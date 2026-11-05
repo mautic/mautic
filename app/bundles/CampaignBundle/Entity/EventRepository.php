@@ -71,12 +71,14 @@ class EventRepository extends CommonRepository
         $parentQb = $this->getEntityManager()->createQueryBuilder();
         $parentQb->select('parent_log_event.id')
             ->from(LeadEventLog::class, 'parent_log_event')
+            ->innerJoin('parent_log_event.event', 'parent_event')
             ->where(
                 $parentQb->expr()->eq('parent_log_event.event', 'e.parent'),
                 $parentQb->expr()->eq('parent_log_event.lead', 'l.lead'),
                 $parentQb->expr()->eq('parent_log_event.rotation', 'l.rotation'),
                 $parentQb->expr()->eq('parent_log_event.isScheduled', 0),
                 $parentQb->expr()->orX(
+                    $parentQb->expr()->eq('parent_event.eventType', ':actionType'),
                     $parentQb->expr()->andX(
                         $parentQb->expr()->orX(
                             $parentQb->expr()->isNull('e.decisionPath'),
@@ -120,7 +122,8 @@ class EventRepository extends CommonRepository
             ->setParameter('type', $type)
             ->setParameter('contactId', (int) $contactId)
             ->setParameter('positivePath', Event::PATH_ACTION)
-            ->setParameter('negativePath', Event::PATH_INACTION);
+            ->setParameter('negativePath', Event::PATH_INACTION)
+            ->setParameter('actionType', Event::TYPE_ACTION);
 
         return $q->getQuery()->getResult();
     }

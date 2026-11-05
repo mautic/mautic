@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\DashboardBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\DashboardBundle\Entity\Widget;
@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,9 +23,19 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
-    public function testUploadedDashboardIsPreviewed(): void
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function dataUploadedDashboardIsPreviewed(): iterable
     {
-        $dashboardName       = 'Automation test dashboard preview';
+        yield 'plain file name' => ['Automation test dashboard preview'];
+        yield 'file name with an earlier .json occurrence' => ['Automation.json test dashboard preview'];
+    }
+
+    #[DataProvider('dataUploadedDashboardIsPreviewed')]
+    public function testUploadedDashboardIsPreviewed(string $dashboardNamePrefix): void
+    {
+        $dashboardName       = $dashboardNamePrefix.' '.bin2hex(random_bytes(6));
         $dashboardFileName   = $dashboardName.'.json';
         $temporaryDirectory  = sys_get_temp_dir().'/mautic-dashboard-'.bin2hex(random_bytes(6));
         $this->assertTrue(mkdir($temporaryDirectory));
@@ -48,18 +59,9 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertSelectorExists('.list-group-item.active');
             $this->assertSelectorTextContains('.list-group-item.active', $dashboardName);
         } finally {
-            $parameters             = self::getContainer()->get(CoreParametersHelper::class);
-            $dashboardDirectory     = (string) $parameters->get('dashboard_import_user_dir');
-            $uploadedDashboards     = [$dashboardDirectory.'/'.$dashboardFileName];
-            $userUploadedDashboards = glob($dashboardDirectory.'/*/'.$dashboardFileName);
-            if (false !== $userUploadedDashboards) {
-                $uploadedDashboards = array_merge($uploadedDashboards, $userUploadedDashboards);
-            }
-
-            foreach ($uploadedDashboards as $uploadedDashboard) {
-                if (file_exists($uploadedDashboard)) {
-                    unlink($uploadedDashboard);
-                }
+            $uploadedDashboard = self::getContainer()->get(PathsHelper::class)->getSystemPath('dashboard.user').'/'.$dashboardFileName;
+            if (file_exists($uploadedDashboard)) {
+                unlink($uploadedDashboard);
             }
             if (file_exists($filePath)) {
                 unlink($filePath);

@@ -478,7 +478,7 @@ final class DashboardController extends AbstractFormController
         foreach ($dashboardFiles as $type => $dirDashboardFiles) {
             $tempDashboard = [];
             foreach ($dirDashboardFiles as $dashId => $dashboard) {
-                $dashboard = str_replace('.json', '', $dashboard);
+                $dashboard = pathinfo($dashboard, PATHINFO_FILENAME);
                 $config    = json_decode(
                     file_get_contents($directories[$type].'/'.$dirDashboardFiles[$dashId]),
                     true

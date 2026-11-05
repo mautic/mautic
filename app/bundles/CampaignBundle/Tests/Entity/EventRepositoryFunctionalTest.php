@@ -104,6 +104,35 @@ final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($noDecision->getId(), array_values($pendingEvents)[0]->getId());
     }
 
+    public function testGetContactPendingEventsDoesNotBlockChildOfActionWithInactivePath(): void
+    {
+        $repository = self::getContainer()->get(EventRepository::class);
+        $this->assertInstanceOf(EventRepository::class, $repository);
+
+        $campaign = $this->createCampaign();
+        $action   = $this->createEvent($campaign);
+
+        $child = $this->createEvent($campaign);
+        $child->setParent($action);
+
+        $lead = $this->createLead();
+        $this->createCampaignMember($lead, $campaign);
+
+        $log = new LeadEventLog();
+        $log->setEvent($action);
+        $log->setCampaign($campaign);
+        $log->setLead($lead);
+        $log->setRotation(1);
+        $log->setDateTriggered(new \DateTime());
+        $log->setNonActionPathTaken(true);
+        $this->em->persist($log);
+        $this->em->flush();
+
+        $pendingEvents = $repository->getContactPendingEvents($lead->getId(), $child->getType());
+        $this->assertCount(1, $pendingEvents);
+        $this->assertSame($child->getId(), array_values($pendingEvents)[0]->getId());
+    }
+
     public function testSetEventsAsDeletedWithRedirectUpdatesChains(): void
     {
         /** @var EventRepository $repository */

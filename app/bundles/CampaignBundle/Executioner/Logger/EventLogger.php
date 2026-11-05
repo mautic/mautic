@@ -80,7 +80,9 @@ class EventLogger
         }
         $log->setLead($contact);
 
-        if ($isInactiveEvent) {
+        if (Event::TYPE_CONDITION === $event->getEventType()) {
+            $log->setNonActionPathTaken(null);
+        } elseif ($isInactiveEvent) {
             $log->setNonActionPathTaken(true);
         }
 
