@@ -7,12 +7,9 @@ namespace Mautic\EmailBundle\Tests\Mailer\Transport;
 use Mautic\EmailBundle\Mailer\Transport\TransportFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
-use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Transport as SymfonyTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
-use Symfony\Component\Mailer\Transport\FailoverTransport;
 use Symfony\Component\Mailer\Transport\NullTransport;
-use Symfony\Component\Mailer\Transport\RoundRobinTransport;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
@@ -114,40 +111,6 @@ final class TransportFactoryTest extends TestCase
 
         $this->assertSame('SG.test', $factory->capturedDsn->getUser());
         $this->assertNull($factory->capturedDsn->getPassword());
-    }
-
-    public function testPasswordOnlyApiDsnWorksInsideFailoverTransport(): void
-    {
-        $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
-        $transport = new TransportFactory(new SymfonyTransportFactory([$factory, new CapturingTransportFactory('smtp')]));
-
-        $result = $transport->fromString('failover(future+api://:SG.test@default smtp://relay.test)');
-
-        $this->assertInstanceOf(FailoverTransport::class, $result);
-        $this->assertSame('SG.test', $factory->capturedDsn->getUser());
-        $this->assertNull($factory->capturedDsn->getPassword());
-    }
-
-    public function testPasswordOnlyApiDsnWorksInsideRoundRobinTransport(): void
-    {
-        $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
-        $transport = new TransportFactory(new SymfonyTransportFactory([$factory, new CapturingTransportFactory('smtp')]));
-
-        $result = $transport->fromString('roundrobin(future+api://:SG.test@default smtp://relay.test)?retry_period=90');
-
-        $this->assertInstanceOf(RoundRobinTransport::class, $result);
-        $this->assertSame('SG.test', $factory->capturedDsn->getUser());
-        $this->assertNull($factory->capturedDsn->getPassword());
-    }
-
-    public function testCompoundDsnRejectsTrailingContent(): void
-    {
-        $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
-        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('garbage at the end');
-        $transport->fromString('failover(future+api://:SG.test@default)?unexpected=true');
     }
 }
 
