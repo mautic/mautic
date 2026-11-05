@@ -97,13 +97,13 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testSearchCommandWhereClauseWithStandardCommand(): void
     {
-        $filter = $this->createFilter('ispublished:1');
+        $filter = $this->createFilter('is:published');
         $q      = $this->focusRepository->createQueryBuilder('f');
 
         [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
 
-        $this->assertNotNull($expr);
-        $this->assertIsArray($parameters);
+        $this->assertStringContainsString('isPublished', (string) $expr);
+        $this->assertSame([true], array_values($parameters));
     }
 
     public function testGetSearchCommands(): void
