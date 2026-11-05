@@ -26,9 +26,11 @@ final class ListQuickFiltersTemplateTest extends TestCase
         $output = $this->render([
             'myplugin.quick_filters.empty'  => ['conflictGroup' => true],
             'myplugin.quick_filters.status' => ['conflictGroup' => true, 'filters' => [$this->filter('ispublished')]],
+            'myplugin.quick_filters.owner'  => ['conflictGroup' => true, 'filters' => [$this->filter('ismine')]],
         ]);
 
         $this->assertStringContainsString('<div class="dropdown-header mt-0">myplugin.quick_filters.status</div>', $output);
+        $this->assertStringContainsString('<div class="dropdown-header">myplugin.quick_filters.owner</div>', $output);
         $this->assertStringNotContainsString('myplugin.quick_filters.empty', $output);
         $this->assertStringContainsString('data-filter="ispublished"', $output);
     }
