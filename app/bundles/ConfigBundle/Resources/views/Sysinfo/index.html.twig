@@ -43,16 +43,16 @@
     </div>
 
     <!-- container -->
-    <div class="col-md-9 height-auto bdr-l">
+    <div class="col-md-9 height-auto border-start">
 
         <!-- Tab panes -->
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane fade in active bdr-w-0" id="phpinfo">
+            <div role="tabpanel" class="tab-pane fade in active border-0" id="phpinfo">
                 <div class="pt-md pr-md pl-md pb-md">
                     {{ phpInfo|raw }}
                 </div>
             </div>
-            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="recommendations">
+            <div role="tabpanel" class="tab-pane fade border-0" id="recommendations">
                 <div class="pt-md pr-md pl-md pb-md">
                     {% if recommendations is empty and requirements is empty %}
                         <div class="alert alert-info">
@@ -71,7 +71,7 @@
                     {% endfor %}
                 </div>
             </div>
-            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="folders">
+            <div role="tabpanel" class="tab-pane fade border-0" id="folders">
                 <div class="pt-md pr-md pl-md pb-md">
                     <h2 class="pb-md">{{ 'mautic.sysinfo.folders.title'|trans }}</h2>
                     <table class="table table-hover">
@@ -96,7 +96,7 @@
                     </table>
                 </div>
             </div>
-            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="log">
+            <div role="tabpanel" class="tab-pane fade border-0" id="log">
                 <div class="pt-md pr-md pl-md pb-md">
                     <h2 class="pb-md">{{ 'mautic.sysinfo.log.title'|trans }}</h2>
                     {% if log is defined and log is not empty %}
@@ -108,7 +108,7 @@
                     {% endif %}
                 </div>
             </div>
-            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="dbinfo">
+            <div role="tabpanel" class="tab-pane fade border-0" id="dbinfo">
                 <div class="pt-md pr-md pl-md pb-md">
                     <h2 class="pb-md">{{ 'mautic.sysinfo.dbinfo.title'|trans }}</h2>
                     <table class="table table-bordered">

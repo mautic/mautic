@@ -2,12 +2,6 @@
 // Utilities
 // --------------------------------------------------
 
-// vertical alignment
-// ---------------------------------------------
-.va-t { vertical-align: top !important; }
-.va-m { vertical-align: middle !important; }
-.va-b { vertical-align: bottom !important; }
-
 // float and text alignment
 // ---------------------------------------------
 .pull-right-xs { float:right; }
@@ -45,26 +39,11 @@
 
 // Border
 // ---------------------------------------------
-.bdr-a { border: 1px solid var(--border-subtle) !important; }
-.bdr-l { border-left: 1px solid var(--border-subtle) !important; }
-.bdr-r { border-right: 1px solid var(--border-subtle) !important; }
-.bdr-t { border-top: 1px solid var(--border-subtle) !important; }
-.bdr-b { border-bottom: 1px solid var(--border-subtle) !important; }
 .bdr-c-info { border-color: var(--support-info) !important; }
 .bdr-c-success { border-color: var(--support-success) !important; }
 .bdr-c-warning { border-color: var(--support-warning) !important; }
 .bdr-c-error { border-color: var(--support-error) !important; }
 .bdr-c-t { border-color: transparent !important; }
-.bdr-w-0 { border-width: 0 !important; }
-.bdr-l-wdh-0 { border-left-width: 0 !important; }
-.bdr-r-wdh-0 { border-right-width: 0 !important; }
-.bdr-t-wdh-0 { border-top-width: 0 !important; }
-.bdr-b-wdh-0 { border-bottom-width: 0 !important; }
-.bdr-rds-0 { border-radius: 0 !important; }
-.bdr-rds { border-radius: $border-radius-base !important; }
-.bdr-rds-lg { border-radius: $border-radius-large !important; }
-.bdr-rds-sm { border-radius: $border-radius-small !important; }
-.bdr-rds-circle { border-radius: 50% !important; }
 
 // breakpoint screen-xs and up
 @media (max-width: $screen-xs-max) {
@@ -485,12 +464,6 @@
   }
 }
 
-// Overflow
-// ---------------------------------------------
-.ovf-h {
-  overflow: hidden;
-}
-
 .break-word {
   -ms-word-break: break-all;
   word-break: break-all;
@@ -545,7 +518,6 @@
 .as-stretch { align-self: stretch; }
 .fg-1 { flex-grow: 1; }
 .fg-0 { flex-grow: 0; }
-.fs-1 { flex-shrink: 1; }
 .fs-0 { flex-shrink: 0; }
 .fb-auto { flex-basis: auto; }
 .fb-0 { flex-basis: 0; }

@@ -468,7 +468,7 @@ final class ButtonHelper
         } elseif (!isset($button['attr']['class'])) {
             // Conditional check for LOCATION_TOOLBAR_BULK_ACTIONS
             if (self::LOCATION_TOOLBAR_BULK_ACTIONS === $this->location) {
-                $addTo['attr']['class'] = 'btn btn-primary bdr-rds-0';
+                $addTo['attr']['class'] = 'btn btn-primary rounded-0';
                 $addTo['attr']['size']  = 'lg';
             } else {
                 $addTo['attr']['class'] = 'btn btn-tertiary';

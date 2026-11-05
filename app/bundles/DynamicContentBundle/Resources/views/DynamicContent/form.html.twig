@@ -47,7 +47,7 @@
 
                 <!-- start: tab-content -->
                 <div class="tab-content pa-md">
-                    <div class="tab-pane fade in active bdr-w-0" id="details">
+                    <div class="tab-pane fade in active border-0" id="details">
                         <div class="row">
                             <div class="col-md-6">
                                 {{ form_row(form.name) }}
@@ -59,13 +59,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade bdr-w-0" id="filters">
+                    <div class="tab-pane fade border-0" id="filters">
                         {% if hasFilterErrors and '' is not same as form_errors(form.filters) %}
                             <div class="has-error alert alert-danger" role="alert" style="padding:5px 10px 0 10px;">
                                 {{ form_errors(form.filters) }}
                             </div>
                         {% endif %}
-                        <div class="dwc-filter bdr-w-0" id="{{ form.vars.id }}">
+                        <div class="dwc-filter border-0" id="{{ form.vars.id }}">
                             <div class="row">
                                 <div class="col-xs-7">
                                     <label>{{ 'Filters'|trans }}</label>
@@ -119,7 +119,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3 height-auto bdr-l">
+    <div class="col-md-3 height-auto border-start">
         <div class="pr-lg pl-lg pt-md pb-md">
             {{ form_row(form.type) }}
             {{ form_row(form.category) }}

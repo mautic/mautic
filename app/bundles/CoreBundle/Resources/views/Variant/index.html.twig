@@ -14,7 +14,7 @@
 {%- if variants.properties is defined and variants.properties is not empty -%}
   {% if variants.parent.variantStartDate is not empty %}
     <div class="box-layout mb-lg">
-        <div class="col-xs-10 va-m">
+        <div class="col-xs-10 align-middle">
             <h4>
                     {{ 'mautic.core.variant_start_date'|trans({
                         '%time%': dateToTime(variants.parent.variantStartDate),
@@ -24,7 +24,7 @@
             </h4>
         </div>
         <!-- button -->
-        <div class="col-xs-2 va-m text-right">
+        <div class="col-xs-2 align-middle text-right">
             {% include '@MauticCore/Helper/button.html.twig' with {
                 buttons: [
                     {
