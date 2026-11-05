@@ -17,6 +17,8 @@ use Mautic\SmsBundle\SmsEvents;
  */
 class WebhookRepository extends CommonRepository
 {
+    private const EVENT_COMMAND = 'mautic.webhook.searchcommand.event';
+
     /**
      * @param QueryBuilder|DbalQueryBuilder $q
      * @param object                        $filter
@@ -36,7 +38,7 @@ class WebhookRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        if ($this->matchesCommand($filter->command, 'mautic.webhook.searchcommand.event')) {
+        if ($this->matchesCommand($filter->command, self::EVENT_COMMAND)) {
             return $this->buildEventSearchCommandExpression($q, $filter);
         }
 
@@ -62,7 +64,7 @@ class WebhookRepository extends CommonRepository
     public function getSearchCommands(): array
     {
         return array_merge(
-            ['mautic.core.searchcommand.name', 'mautic.webhook.searchcommand.event'],
+            ['mautic.core.searchcommand.name', self::EVENT_COMMAND],
             $this->getStandardSearchCommands()
         );
     }
@@ -84,9 +86,9 @@ class WebhookRepository extends CommonRepository
      */
     private function buildEventSearchCommandExpression($q, object $filter): array
     {
-        $eventTypes = $this->resolveEventTypes($filter->string ?? '');
+        $eventTypes = $this->resolveEventTypes($filter->string);
         if ([] === $eventTypes) {
-            return [false, []];
+            return $filter->not ? [false, []] : [$q->expr()->eq(1, 0), []];
         }
 
         $parameterName = $this->generateRandomParameterName();
@@ -118,8 +120,7 @@ class WebhookRepository extends CommonRepository
             ->where($aliasName.'.webhook_id = '.$this->getTableAlias().'.id')
             ->andWhere($aliasName.'.event_type IN (:'.$parameterName.')');
 
-        $subQuerySql = $subQuery->getSQL();
-        $expression = "EXISTS ({$subQuerySql})";
+        $expression = "EXISTS ({$subQuery->getSQL()})";
         if ($filter->not) {
             $expression = "NOT ({$expression})";
         }

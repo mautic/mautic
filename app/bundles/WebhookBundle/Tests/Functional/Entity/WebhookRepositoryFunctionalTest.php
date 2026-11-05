@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\WebhookBundle\Tests\Entity;
+namespace Mautic\WebhookBundle\Tests\Functional\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\EmailEvents;
@@ -15,7 +15,7 @@ use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
 use PHPUnit\Framework\Assert;
 
-final class WebhookRepositoryTest extends MauticMysqlTestCase
+final class WebhookRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private WebhookRepository $repository;
 
@@ -25,9 +25,6 @@ final class WebhookRepositoryTest extends MauticMysqlTestCase
         $repository = $this->em->getRepository(Webhook::class);
         \assert($repository instanceof WebhookRepository);
         $this->repository = $repository;
-
-        $translator = static::getContainer()->get('translator');
-        $this->repository->setTranslator($translator);
 
         $this->truncateTables('webhook_events', 'webhooks');
     }
@@ -120,7 +117,7 @@ final class WebhookRepositoryTest extends MauticMysqlTestCase
         $webhook->setName($name);
         $webhook->setWebhookUrl('https://example.com/'.rawurlencode(strtolower(str_replace(' ', '-', $name))));
         $webhook->setSecret(hash('crc32b', $name));
-        $webhook->isPublished(true);
+        $webhook->setIsPublished(true);
         $webhook->setCreatedBy(1);
 
         foreach ($eventTypes as $eventType) {
