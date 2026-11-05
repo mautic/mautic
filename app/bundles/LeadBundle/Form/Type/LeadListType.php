@@ -24,8 +24,11 @@ final class LeadListType extends AbstractType
     {
         $resolver->setDefaults([
             'choices' => function (Options $options): array {
-                $lists = (empty($options['global_only'])) ? $this->segmentModel->getUserLists() : $this->segmentModel->getGlobalLists();
-                $lists = (empty($options['preference_center_only'])) ? $lists : $this->segmentModel->getPreferenceCenterLists();
+                if ($options['preference_center_only']) {
+                    $lists = $this->segmentModel->getPreferenceCenterLists($options['preferred_locale']);
+                } else {
+                    $lists = $options['global_only'] ? $this->segmentModel->getGlobalLists() : $this->segmentModel->getUserLists();
+                }
 
                 $choices = [];
                 foreach ($lists as $l) {
@@ -40,6 +43,7 @@ final class LeadListType extends AbstractType
             },
             'global_only'            => false,
             'preference_center_only' => false,
+            'preferred_locale'       => null,
             'required'               => false,
         ]);
     }

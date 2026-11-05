@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadListTranslationRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
@@ -35,6 +36,7 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Form\Type\ListType;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
+use Mautic\LeadBundle\Helper\SegmentPublicNameResolver;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
@@ -42,6 +44,7 @@ use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
+use Mautic\LeadBundle\Services\SegmentPublicNameTranslationManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -52,6 +55,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<LeadList>
@@ -59,6 +63,23 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ListModel extends FormModel implements GlobalSearchInterface
 {
     use OperatorListTrait;
+
+    private SegmentPublicNameTranslationManager $publicNameTranslationManager;
+
+    private LeadListTranslationRepository $publicNameTranslationRepository;
+
+    private SegmentPublicNameResolver $publicNameResolver;
+
+    #[Required]
+    public function autowireListModel(
+        SegmentPublicNameTranslationManager $publicNameTranslationManager,
+        LeadListTranslationRepository $publicNameTranslationRepository,
+        SegmentPublicNameResolver $publicNameResolver,
+    ): void {
+        $this->publicNameTranslationManager    = $publicNameTranslationManager;
+        $this->publicNameTranslationRepository = $publicNameTranslationRepository;
+        $this->publicNameResolver              = $publicNameResolver;
+    }
 
     /**
      * @var mixed[]
@@ -159,6 +180,22 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * Save a Segment and its public name translations in the same Doctrine flush.
+     *
+     * @param list<array{locale: string, publicName: string}> $translations
+     */
+    public function saveEntityWithTranslations(LeadList $entity, array $translations, bool $unlock = true): void
+    {
+        $this->em->getConnection()->transactional(function () use ($entity, $translations, $unlock): void {
+            if ($entity->getIsPreferenceCenter()) {
+                $this->publicNameTranslationManager->sync($entity, $translations);
+            }
+
+            $this->saveEntity($entity, $unlock);
+        });
+    }
+
+    /**
      * @param array<int> $ids
      *
      * @return array<object>
@@ -228,6 +265,14 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
         if (!empty($action)) {
             $options['action'] = $action;
+        }
+
+        if (!isset($options['translation_rows']) && null !== $entity->getId()) {
+            $translations = $this->publicNameTranslationRepository->findForSegmentIds([$entity->getId()])[$entity->getId()] ?? [];
+            $options['translation_rows'] = [];
+            foreach ($translations as $locale => $publicName) {
+                $options['translation_rows'][] = ['locale' => $locale, 'publicName' => $publicName];
+            }
         }
 
         return $formFactory->create(ListType::class, $entity, $options);
@@ -369,9 +414,25 @@ class ListModel extends FormModel implements GlobalSearchInterface
      *      alias: string
      *   }>
      */
-    public function getPreferenceCenterLists(): array
+    public function getPreferenceCenterLists(?string $preferredLocale = null): array
     {
-        return $this->leadListRepository->getPreferenceCenterList();
+        $lists = $this->leadListRepository->getPreferenceCenterList();
+        if (null === $preferredLocale || '' === trim($preferredLocale) || [] === $lists) {
+            return $lists;
+        }
+
+        $ids = array_map(intval(...), array_column($lists, 'id'));
+        $translationsBySegmentId = $this->publicNameTranslationRepository->findForSegmentIds($ids);
+        foreach ($lists as &$list) {
+            $list['publicName'] = $this->publicNameResolver->resolve(
+                $preferredLocale,
+                $list['publicName'],
+                $list['name'],
+                $translationsBySegmentId[$list['id']] ?? [],
+            );
+        }
+
+        return $lists;
     }
 
     /**

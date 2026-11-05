@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector;
 use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -17,6 +18,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListTranslation;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -61,8 +63,12 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['show_contact_preferred_channels'] = 1;
         }
 
-        if ('testContactPreferencesFormRenderOnUnsubscribePage' === $this->name()) {
+        if (in_array($this->name(), ['testContactPreferencesFormRenderOnUnsubscribePage', 'testContactPreferencesFormUsesLocalizedSegmentNames', 'testContactPreferencesFormFallsBackToLanguageAndDefaultPublicNames', 'testPreferenceCenterLoadsTranslationsInOneBatch'], true)) {
             $this->configParams['show_contact_segments'] = 1;
+        }
+
+        if ('testPreferenceCenterLoadsTranslationsInOneBatch' === $this->name()) {
+            $this->clientOptions = ['debug' => true];
         }
 
         switch ($this->name()) {
@@ -988,6 +994,89 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
                 );
             }
         );
+    }
+
+    public function testContactPreferencesFormUsesLocalizedSegmentNames(): void
+    {
+        $lead = $this->createLead('fr_CH');
+        $stat = $this->getStat(null, $lead);
+        $first = $this->createSegment('First segment', 'A default', 'localized-first');
+        $second = $this->createSegment('Second segment', 'B default', 'localized-second');
+        $unpublished = $this->createSegment('Draft segment', 'C default', 'localized-draft', false);
+        $private = $this->createSegment('Private segment', 'D default', 'localized-private', true, false);
+        $this->em->persist(new LeadListTranslation($first, 'fr', 'Nouvelles'));
+        $this->em->persist(new LeadListTranslation($first, 'fr_CH', 'Actualités'));
+        $this->em->persist(new LeadListTranslation($second, 'fr_CH', 'Actualités'));
+        $this->em->persist(new LeadListTranslation($unpublished, 'fr_CH', 'Draft in French'));
+        $this->em->persist(new LeadListTranslation($private, 'fr_CH', 'Private in French'));
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
+        self::assertResponseIsSuccessful();
+
+        $labels = $crawler->filter('#contact-segments label[for]')->each(fn ($node): string => trim($node->text()));
+        $this->assertSame(['Actualités ('.$first->getId().')', 'Actualités ('.$second->getId().')'], $labels);
+        $values = $crawler->filter('#contact-segments input[type="checkbox"]')->each(fn ($node): string => $node->attr('value'));
+        $this->assertSame([(string) $first->getId(), (string) $second->getId()], $values);
+        $this->assertNotContains((string) $unpublished->getId(), $values);
+        $this->assertNotContains((string) $private->getId(), $values);
+    }
+
+    public function testContactPreferencesFormFallsBackToLanguageAndDefaultPublicNames(): void
+    {
+        $lead = $this->createLead('fr_CH');
+        $stat = $this->getStat(null, $lead);
+        $languageFallback = $this->createSegment('Language fallback', 'A default', 'language-fallback');
+        $defaultFallback = $this->createSegment('Default fallback', 'B default', 'default-fallback');
+        $this->em->persist(new LeadListTranslation($languageFallback, 'fr', 'Nouvelles'));
+        $this->em->persist(new LeadListTranslation($defaultFallback, 'it', 'Notizie'));
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
+        self::assertResponseIsSuccessful();
+
+        $labels = $crawler->filter('#contact-segments label[for]')->each(fn ($node): string => trim($node->text()));
+        $this->assertSame(['Nouvelles ('.$languageFallback->getId().')', 'B default ('.$defaultFallback->getId().')'], $labels);
+        $values = $crawler->filter('#contact-segments input[type="checkbox"]')->each(fn ($node): string => $node->attr('value'));
+        $this->assertSame([(string) $languageFallback->getId(), (string) $defaultFallback->getId()], $values);
+    }
+
+    public function testPreferenceCenterLoadsTranslationsInOneBatch(): void
+    {
+        $lead = $this->createLead('fr_CH');
+        $stat = $this->getStat(null, $lead);
+        $segments = [];
+        foreach (range(1, 5) as $number) {
+            $segment = $this->createSegment('Segment '.$number, 'Default '.$number, 'batch-'.$number);
+            $this->em->persist(new LeadListTranslation($segment, 'fr', 'French '.$number));
+            $this->em->persist(new LeadListTranslation($segment, 'fr_CH', 'Swiss '.$number));
+            $segments[$number] = $segment;
+        }
+        $this->em->flush();
+
+        $this->client->enableProfiler();
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
+        self::assertResponseIsSuccessful();
+
+        $expectedLabels = [];
+        $expectedValues = [];
+        foreach ($segments as $number => $segment) {
+            $expectedLabels[] = 'Swiss '.$number.' ('.$segment->getId().')';
+            $expectedValues[] = (string) $segment->getId();
+        }
+        $labels = $crawler->filter('#contact-segments label[for]')->each(fn ($node): string => trim($node->text()));
+        $values = $crawler->filter('#contact-segments input[type="checkbox"]')->each(fn ($node): string => $node->attr('value'));
+        $this->assertSame($expectedLabels, $labels);
+        $this->assertSame($expectedValues, $values);
+
+        $dbCollector = $this->client->getProfile()->getCollector('db');
+        $this->assertInstanceOf(DoctrineDataCollector::class, $dbCollector);
+        $translationQueries = array_filter(
+            $dbCollector->getQueries()['default'],
+            static fn (array $query): bool => str_starts_with($query['sql'], 'SELECT')
+                && str_contains($query['sql'], MAUTIC_TABLE_PREFIX.LeadListTranslation::TABLE_NAME),
+        );
+        $this->assertCount(1, $translationQueries);
     }
 
     private function createSegment(

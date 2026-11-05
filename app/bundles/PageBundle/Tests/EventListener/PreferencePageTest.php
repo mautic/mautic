@@ -8,11 +8,13 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListTranslation;
 use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -125,6 +127,36 @@ final class PreferencePageTest extends MauticMysqlTestCase
         $this->assertStringContainsString($segment->getName(), $content);
     }
 
+    #[DataProvider('preferredLocaleCases')]
+    public function testPreferenceCenterUsesContactLocaleForSegmentLabels(string $locale, string $expectedName): void
+    {
+        $segment = $this->createSegment();
+        $segment->setPublicName('Mautic News');
+        $this->em->persist(new LeadListTranslation($segment, 'fr', 'Actualités Mautic'));
+        $this->em->persist(new LeadListTranslation($segment, 'fr_CH', 'Nouvelles Mautic'));
+        $this->em->flush();
+
+        $form = $this->createForm($locale);
+        $choices = $form->createView()['lead_lists']->vars['choices'];
+        $this->assertSame($expectedName.' ('.$segment->getId().')', $choices[0]->label);
+        $this->assertSame((string) $segment->getId(), $choices[0]->value);
+
+        $params         = $this->createParams();
+        $params['form'] = $form->createView();
+        $this->assertStringContainsString($expectedName.' ('.$segment->getId().')', $this->dispatchEvent($this->createPage(), $params));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function preferredLocaleCases(): iterable
+    {
+        yield 'exact locale' => ['fr_CH', 'Nouvelles Mautic'];
+        yield 'base language' => ['fr_CA', 'Actualités Mautic'];
+        yield 'missing locale' => ['it', 'Mautic News'];
+        yield 'empty locale' => ['', 'Mautic News'];
+    }
+
     private function createCategory(): Category
     {
         $category = new Category();
@@ -168,7 +200,7 @@ final class PreferencePageTest extends MauticMysqlTestCase
         return $page;
     }
 
-    private function createForm(): FormInterface
+    private function createForm(?string $preferredLocale = null): FormInterface
     {
         return $this->formFactory->create(ContactFrequencyType::class, [
             'lead_channels' => [
@@ -178,6 +210,7 @@ final class PreferencePageTest extends MauticMysqlTestCase
             'channels'               => $this->leadModel->getPreferenceChannels(),
             'public_view'            => true,
             'preference_center_only' => true,
+            'preferred_locale'       => $preferredLocale,
             'allow_extra_fields'     => true,
         ]);
     }

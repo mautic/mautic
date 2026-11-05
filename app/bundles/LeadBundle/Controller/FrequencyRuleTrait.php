@@ -78,6 +78,7 @@ trait FrequencyRuleTrait
                 'channels'                 => $allChannels,
                 'public_view'              => $isPublic,
                 'preference_center_only'   => $isPreferenceCenter,
+                'preferred_locale'         => $isPublic && $isPreferenceCenter ? $lead->getPreferredLocale() : null,
                 'allow_extra_fields'       => true,
             ]
         );
