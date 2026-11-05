@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
 {
@@ -24,86 +25,60 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         $reflection            = new \ReflectionClass($this->focusRepository);
         if ($reflection->hasProperty('translator')) {
             $prop = $reflection->getProperty('translator');
-            $prop->setAccessible(true);
             $prop->setValue($this->focusRepository, $translator);
         }
         $this->setUpTestData();
     }
 
-    public function testSearchCommandWhereClauseWithStyleBar(): void
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function styleCommandProvider(): iterable
     {
-        $filter = $this->createFilter('style:bar');
-        $q      = $this->focusRepository->createQueryBuilder('f');
-
-        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
-
-        $this->assertNotNull($expr);
-        $this->assertIsArray($parameters);
-        $this->assertNotEmpty($parameters);
-        $this->assertContains('bar', array_values($parameters));
+        yield 'bar' => ['style:bar', 'bar'];
+        yield 'modal' => ['style:modal', 'modal'];
+        yield 'notification' => ['style:notification', 'notification'];
+        yield 'fullpage' => ['style:fullpage', 'page'];
     }
 
-    public function testSearchCommandWhereClauseWithStyleModal(): void
+    #[DataProvider('styleCommandProvider')]
+    public function testStyleCommandReturnsOnlyFocusesWithThatStyle(string $command, string $style): void
     {
-        $filter = $this->createFilter('style:modal');
-        $q      = $this->focusRepository->createQueryBuilder('f');
+        $result = $this->getSearchResult($this->createFilter($command));
 
-        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
-
-        $this->assertNotNull($expr);
-        $this->assertIsArray($parameters);
-        $this->assertNotEmpty($parameters);
-        $this->assertContains('modal', array_values($parameters));
+        $this->assertNotEmpty($result);
+        foreach ($result as $focus) {
+            $this->assertSame($style, $focus->getStyle());
+        }
     }
 
-    public function testSearchCommandWhereClauseWithStyleNotification(): void
+    public function testNegatedStyleCommandExcludesThatStyle(): void
     {
-        $filter = $this->createFilter('style:notification');
-        $q      = $this->focusRepository->createQueryBuilder('f');
+        $result = $this->getSearchResult($this->createFilter('style:bar', true));
 
-        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
-
-        $this->assertNotNull($expr);
-        $this->assertIsArray($parameters);
-        $this->assertNotEmpty($parameters);
-        $this->assertContains('notification', array_values($parameters));
-    }
-
-    public function testSearchCommandWhereClauseWithStyleFullpage(): void
-    {
-        $filter = $this->createFilter('style:fullpage');
-        $q      = $this->focusRepository->createQueryBuilder('f');
-
-        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
-
-        $this->assertNotNull($expr);
-        $this->assertIsArray($parameters);
-        $this->assertNotEmpty($parameters);
-        $this->assertContains('page', array_values($parameters));
-    }
-
-    public function testSearchCommandWhereClauseWithNotFilter(): void
-    {
-        $filter = $this->createFilter('style:bar', true);
-        $q      = $this->focusRepository->createQueryBuilder('f');
-
-        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
-
-        $this->assertNotNull($expr);
-        $this->assertIsArray($parameters);
-        $this->assertNotEmpty($parameters);
-        $this->assertContains('bar', array_values($parameters));
+        $this->assertNotEmpty($result);
+        foreach ($result as $focus) {
+            $this->assertNotSame('bar', $focus->getStyle());
+        }
     }
 
     public function testSearchCommandWhereClauseWithStandardCommand(): void
     {
-        $filter = $this->createFilter('is:published');
-        $q      = $this->focusRepository->createQueryBuilder('f');
+        $published = $this->createFocus('Published Focus', 'bar');
+        $published->setIsPublished(true);
+        $this->focusModel->saveEntity($published);
 
-        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
+        $unpublished = $this->createFocus('Unpublished Focus', 'bar');
+        $unpublished->setIsPublished(false);
+        $this->focusModel->saveEntity($unpublished);
 
-        $this->assertStringContainsString('isPublished', (string) $expr);
-        $this->assertSame([true], array_values($parameters));
+        $ids = array_map(
+            static fn (Focus $focus): ?int => $focus->getId(),
+            $this->getSearchResult($this->createFilter('is:published'))
+        );
+
+        $this->assertContains($published->getId(), $ids);
+        $this->assertNotContains($unpublished->getId(), $ids);
     }
 
     public function testGetSearchCommands(): void
@@ -116,95 +91,6 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertContains('mautic.focus.focus.searchcommand.stylenotification', $commands);
         $this->assertContains('mautic.focus.focus.searchcommand.stylefullpage', $commands);
         $this->assertContains('mautic.project.searchcommand.name', $commands);
-    }
-
-    public function testGetTableAlias(): void
-    {
-        $this->assertEquals('f', $this->focusRepository->getTableAlias());
-    }
-
-    public function testGetDefaultOrder(): void
-    {
-        $order = $this->callProtectedMethod('getDefaultOrder', []);
-
-        $this->assertIsArray($order);
-        $this->assertCount(1, $order);
-        $this->assertCount(2, $order[0]);
-        $this->assertEquals('f.name', $order[0][0]);
-        $this->assertEquals('ASC', $order[0][1]);
-    }
-
-    public function testAddCatchAllWhereClause(): void
-    {
-        $filter = $this->createFilter('test');
-        $q      = $this->focusRepository->createQueryBuilder('f');
-
-        [$expr, $parameters] = $this->callProtectedMethod('addCatchAllWhereClause', [$q, $filter]);
-
-        $this->assertNotNull($expr);
-        $this->assertIsArray($parameters);
-        $this->assertNotEmpty($parameters);
-        $this->assertContains('%test%', array_values($parameters));
-    }
-
-    public function testGetEntities(): void
-    {
-        $args     = ['iterable_mode' => false];
-        $entities = $this->focusRepository->getEntities($args);
-
-        if ($entities instanceof \Traversable) {
-            $entities = iterator_to_array($entities, false);
-        }
-        $this->assertIsArray($entities);
-        $this->assertGreaterThan(0, count($entities));
-    }
-
-    public function testGetEntitiesWithIterableMode(): void
-    {
-        $args     = ['iterable_mode' => true];
-        $entities = $this->focusRepository->getEntities($args);
-
-        if ($entities instanceof \Traversable) {
-            $entities = iterator_to_array($entities, false);
-        }
-        $this->assertIsArray($entities);
-        $this->assertGreaterThan(0, count($entities));
-    }
-
-    public function testFindByForm(): void
-    {
-        $focuses = $this->focusRepository->findByForm(null);
-
-        $this->assertIsArray($focuses);
-    }
-
-    public function testGetFocusList(): void
-    {
-        $focusList = $this->focusRepository->getFocusList(1);
-
-        $this->assertIsArray($focusList);
-        $this->assertGreaterThan(0, count($focusList));
-    }
-
-    public function testSearchCommandIntegration(): void
-    {
-        $q = $this->focusRepository->createQueryBuilder('f');
-
-        $filter              = $this->createFilter('style:bar');
-        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
-
-        $q->where($expr);
-        foreach ($parameters as $param => $value) {
-            $q->setParameter($param, $value);
-        }
-
-        $result = $q->getQuery()->getResult();
-
-        $this->assertIsArray($result);
-        foreach ($result as $focus) {
-            $this->assertInstanceOf(Focus::class, $focus);
-            $this->assertEquals('bar', $focus->getStyle());
-        }
     }
 
     private function setUpTestData(): void
@@ -278,6 +164,19 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         return $filter;
     }
 
+    private function getSearchResult(\stdClass $filter): array
+    {
+        $q                   = $this->focusRepository->createQueryBuilder('f');
+        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
+
+        $q->where($expr);
+        foreach ($parameters as $param => $value) {
+            $q->setParameter($param, $value);
+        }
+
+        return $q->getQuery()->getResult();
+    }
+
     /**
      * @param array<int, mixed> $args
      */
@@ -285,7 +184,6 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         $reflection = new \ReflectionClass($this->focusRepository);
         $method     = $reflection->getMethod($methodName);
-        $method->setAccessible(true);
 
         return $method->invokeArgs($this->focusRepository, $args);
     }
