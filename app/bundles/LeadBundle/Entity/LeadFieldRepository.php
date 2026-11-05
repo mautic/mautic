@@ -11,8 +11,8 @@ use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Symfony\Contracts\Service\Attribute\Required;
 use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonRepository<LeadField>
@@ -206,7 +206,7 @@ class LeadFieldRepository extends CommonRepository
     /**
      * Add company left join.
      *
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param OrmQueryBuilder|DbalQueryBuilder $q
      */
     private function addCompanyLeftJoin($q): void
     {
