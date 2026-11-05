@@ -12,7 +12,6 @@
 
 ## Removed code
 
-- `EmailController::indexAction()` no longer dispatches `Mautic\CoreBundle\Event\SearchHelpEvent` for the email list, so listeners can no longer change its search help.
 - Deprecated class `Mautic\MessengerBundle\MessageHandler\TestHandler` removed with no replacement.
 - Deprecated class `Mautic\CoreBundle\Factory\MauticFactory` removed. Use dependency injection instead.
 - Deprecated class `Mautic\CampaignBundle\Service\Campaign` removed with no replacement.
