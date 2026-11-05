@@ -98,14 +98,6 @@ parameters:
                 - app/bundles/EmailBundle/EventListener/PointSubscriber.php
                 - app/bundles/PageBundle/EventListener/PointSubscriber.php
 
-        # type-perfect no_mixed_caller: rule enabled, remaining violations typed incrementally per file
-        -
-            identifier: typePerfect.noMixedMethodCaller
-            paths:
-                - app/bundles/CoreBundle/Form/EventListener/FormExitSubscriber.php
-                - app/bundles/CoreBundle/Tests/Functional/Controller/AjaxControllerTest.php
-                - app/bundles/CoreBundle/Twig/Extension/ButtonExtension.php
-
         -
             path: utils/phpstan/src/Rule/EntityParamConcreteTypeRule.php
             identifier: phpstanApi.method
