@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[UniqueEntity(fields: ['alias'], message: 'mautic.lead.field_group.name.unique', errorPath: 'name')]
+#[UniqueEntity(fields: ['name'], message: 'mautic.lead.field_group.name.unique', errorPath: 'name')]
 class FieldGroup extends FormEntity
 {
     public const TABLE_NAME  = 'lead_field_groups';
