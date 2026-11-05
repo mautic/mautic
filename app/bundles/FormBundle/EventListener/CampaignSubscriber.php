@@ -67,6 +67,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
      */
     public function onFormSubmit(SubmissionEvent $event): void
     {
+        if (null === $event->getLead()) {
+            return;
+        }
+
         $form = $event->getSubmission()->getForm();
         $this->realTimeExecutioner->execute('form.submit', $form, 'form', $form->getId());
     }
