@@ -106,24 +106,13 @@ parameters:
                 - app/bundles/CoreBundle/Form/EventListener/FormExitSubscriber.php
                 - app/bundles/CoreBundle/Tests/Functional/Controller/AjaxControllerTest.php
                 - app/bundles/CoreBundle/Twig/Extension/ButtonExtension.php
-                - app/bundles/LeadBundle/Field/Command/AnalyseCustomFieldCommand.php
-                - app/bundles/LeadBundle/Model/LeadModel.php
                 - app/bundles/PluginBundle/Form/Type/FeatureSettingsType.php
                 - app/bundles/PluginBundle/Form/Type/IntegrationConfigType.php
                 - app/bundles/PluginBundle/Form/Type/KeysType.php
                 - app/bundles/PluginBundle/Helper/IntegrationHelper.php
                 - app/bundles/PluginBundle/Model/IntegrationEntityModel.php
-                - app/bundles/UserBundle/Security/Authenticator/Oauth2Authenticator.php
                 - *.html.php
                 - app/config/
-                - plugins/MauticCrmBundle/Api/SalesforceApi.php
-                - plugins/MauticCrmBundle/Api/SugarcrmApi.php
-                - plugins/MauticCrmBundle/Form/Type/IntegrationCampaignsTaskType.php
-                - plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-                - plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-                - plugins/MauticCrmBundle/Integration/ZohoIntegration.php
-                - plugins/MauticFocusBundle/Controller/FocusController.php
-                - plugins/MauticTagManagerBundle/Form/Type/TagEntityType.php
 
         -
             path: utils/phpstan/src/Rule/EntityParamConcreteTypeRule.php

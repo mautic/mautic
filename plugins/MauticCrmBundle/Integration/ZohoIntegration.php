@@ -439,9 +439,13 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
                 $oparams['page'] = 1;
 
-                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
-                    $progress = new ProgressBar($params['output']);
-                    $progress->start();
+                if (isset($params['output'])) {
+                    /** @var OutputInterface $output */
+                    $output = $params['output'];
+                    if ($output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+                        $progress = new ProgressBar($output);
+                        $progress->start();
+                    }
                 }
 
                 while (true) {
@@ -466,8 +470,12 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     ++$oparams['page'];
                 }
 
-                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
-                    $progress->finish();
+                if (isset($params['output'])) {
+                    /** @var OutputInterface $output */
+                    $output = $params['output'];
+                    if ($output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+                        $progress->finish();
+                    }
                 }
             }
         } catch (Exception $e) {
@@ -510,9 +518,13 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
                 $oparams['page'] = 1;
 
-                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
-                    $progress = new ProgressBar($params['output']);
-                    $progress->start();
+                if (isset($params['output'])) {
+                    /** @var OutputInterface $output */
+                    $output = $params['output'];
+                    if ($output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+                        $progress = new ProgressBar($output);
+                        $progress->start();
+                    }
                 }
 
                 while (true) {
@@ -536,8 +548,12 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     ++$oparams['page'];
                 }
 
-                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
-                    $progress->finish();
+                if (isset($params['output'])) {
+                    /** @var OutputInterface $output */
+                    $output = $params['output'];
+                    if ($output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+                        $progress->finish();
+                    }
                 }
             }
         } catch (Exception $e) {

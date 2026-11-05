@@ -262,8 +262,10 @@ final class SalesforceApi extends CrmApi
         if ([] !== $activity) {
             foreach ($activity as $sfId => $records) {
                 foreach ($records['records'] as $record) {
-                    $body = [
-                        $namespace.'ActivityDate__c' => $record['dateAdded']->format('c'),
+                    /** @var \DateTimeInterface $recordDateAdded */
+                    $recordDateAdded = $record['dateAdded'];
+                    $body            = [
+                        $namespace.'ActivityDate__c' => $recordDateAdded->format('c'),
                         $namespace.'Description__c'  => $record['description'],
                         'Name'                       => substr($record['name'], 0, 80),
                         $namespace.'Mautic_url__c'   => $records['leadUrl'],

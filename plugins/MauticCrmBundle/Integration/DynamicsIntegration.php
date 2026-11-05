@@ -370,9 +370,13 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     $oparams['$filter'] = sprintf('modifiedon ge %sZ', substr($params['start'], 0, -6));
                 }
 
-                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
-                    $progress = new ProgressBar($params['output']);
-                    $progress->start();
+                if (isset($params['output'])) {
+                    /** @var OutputInterface $output */
+                    $output = $params['output'];
+                    if ($output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+                        $progress = new ProgressBar($output);
+                        $progress->start();
+                    }
                 }
 
                 while (true) {
@@ -404,8 +408,12 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     $oparams['$skiptoken'] = urldecode(substr($nextLink, strpos($nextLink, '$skiptoken=') + 11));
                 }
 
-                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
-                    $progress->finish();
+                if (isset($params['output'])) {
+                    /** @var OutputInterface $output */
+                    $output = $params['output'];
+                    if ($output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+                        $progress->finish();
+                    }
                 }
             }
         } catch (Exception $e) {
@@ -442,9 +450,13 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     $oparams['$filter'] = sprintf('modifiedon ge %sZ', substr($params['start'], 0, -6));
                 }
 
-                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
-                    $progress = new ProgressBar($params['output']);
-                    $progress->start();
+                if (isset($params['output'])) {
+                    /** @var OutputInterface $output */
+                    $output = $params['output'];
+                    if ($output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+                        $progress = new ProgressBar($output);
+                        $progress->start();
+                    }
                 }
 
                 while (true) {
@@ -475,8 +487,12 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     $oparams['$skiptoken'] = urldecode(substr($nextLink, strpos($nextLink, '$skiptoken=') + 11));
                 }
 
-                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
-                    $progress->finish();
+                if (isset($params['output'])) {
+                    /** @var OutputInterface $output */
+                    $output = $params['output'];
+                    if ($output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+                        $progress->finish();
+                    }
                 }
             }
         } catch (Exception $e) {

@@ -262,7 +262,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array|int|Company $companies
+     * @param int[]|int|Company $companies
      * @param array|Lead    $lead
      *
      * @throws ORMException

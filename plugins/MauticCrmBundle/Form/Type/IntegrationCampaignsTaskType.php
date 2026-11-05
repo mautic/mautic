@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Form\Type;
 
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
@@ -7,6 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -36,6 +39,7 @@ final class IntegrationCampaignsTaskType extends AbstractType
                 'constraints' => [
                     new Callback(
                         function ($validateMe, ExecutionContextInterface $context): void {
+                            /** @var FormInterface $root */
                             $root = $context->getRoot();
                             $data = $root->getData();
                             if (!empty($data['properties']['config']['push_activities']) && empty($validateMe)) {
@@ -68,6 +72,7 @@ final class IntegrationCampaignsTaskType extends AbstractType
                 'constraints'       => [
                     new Callback(
                         function ($validateMe, ExecutionContextInterface $context): void {
+                            /** @var FormInterface $root */
                             $root = $context->getRoot();
                             $data = $root->getData();
                             if (!empty($data['properties']['config']['push_activities']) && empty($validateMe)) {

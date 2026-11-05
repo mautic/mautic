@@ -19,9 +19,9 @@ final readonly class IdentifyCompanyHelper
     }
 
     /**
-     * @param mixed $lead
+     * @return array{0: mixed[]|null, 1: bool, 2: Company|null}
      */
-    public function identifyLeadsCompany(array $data, $lead): array
+    public function identifyLeadsCompany(array $data, mixed $lead): array
     {
         $addContactToCompany = true;
 

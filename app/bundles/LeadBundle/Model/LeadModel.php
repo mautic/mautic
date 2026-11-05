@@ -431,6 +431,7 @@ class LeadModel extends FormModel
 
         if (!empty($company)) {
             // Save after the lead in for new leads created through the API and maybe other places
+            /** @var Company $companyEntity */
             $this->companyModel->addLeadToCompany($companyEntity, $entity);
             $this->setPrimaryCompany($companyEntity->getId(), $entity->getId());
         } elseif (array_key_exists('company', $updatedFields) && empty($updatedFields['company'])) {
@@ -1332,6 +1333,7 @@ class LeadModel extends FormModel
         }
 
         if (!empty($fields['stage']) && !empty($data[$fields['stage']])) {
+            /** @var array<string, Stage> $stages */
             static $stages = [];
             $stageName     = $data[$fields['stage']];
             if (!array_key_exists($stageName, $stages)) {
