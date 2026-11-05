@@ -114,6 +114,28 @@ final class LanguageHelperTest extends TestCase
         @unlink($langFile);
     }
 
+    public function testUnexpectedStatusCodeIsLogged(): void
+    {
+        $this->coreParametersHelper->method('get')->willReturnCallback(
+            fn (string $name): string => 'translations_list_url' === $name ? 'https://languages.test' : ''
+        );
+
+        $body = json_encode(['languages' => [['name' => 'Spanish', 'locale' => 'es']]]);
+        $this->client->method('get')->willReturn(new Response(203, [], $body));
+
+        $logger = $this->createMock(Logger::class);
+        $logger->expects($this->once())
+            ->method('error')
+            ->with('An unexpected 203 code was returned while attempting to fetch the language.  The message received was: '.$body);
+
+        $helper = new LanguageHelper($this->pathsHelper, $logger, $this->coreParametersHelper, $this->client, $this->createStub(TranslatorInterface::class));
+
+        $this->assertSame(
+            ['error' => true, 'message' => 'mautic.core.language.helper.error.fetching.languages'],
+            $helper->fetchLanguages(true, true)
+        );
+    }
+
     public function testLanguageIsFetched(): void
     {
         $languages = ['languages' => ['es' => []]];
