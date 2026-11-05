@@ -22,7 +22,7 @@ final class ProjectRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repository = $this->configureRepository(Project::class);
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(
@@ -42,10 +42,10 @@ final class ProjectRepositoryTest extends TestCase
     {
         $commands = $this->repository->getSearchCommands();
 
-        self::assertContains('mautic.project.searchcommand.hasemails', $commands);
-        self::assertContains('mautic.project.searchcommand.hascampaigns', $commands);
-        self::assertContains('mautic.project.searchcommand.haspages', $commands);
-        self::assertContains('mautic.project.searchcommand.hasassets', $commands);
+        $this->assertContains('mautic.project.searchcommand.hasemails', $commands);
+        $this->assertContains('mautic.project.searchcommand.hascampaigns', $commands);
+        $this->assertContains('mautic.project.searchcommand.haspages', $commands);
+        $this->assertContains('mautic.project.searchcommand.hasassets', $commands);
     }
 
     /**
@@ -69,12 +69,11 @@ final class ProjectRepositoryTest extends TestCase
         $filter       = (object) ['command' => $command, 'string' => '', 'not' => false, 'strict' => false];
 
         $method = new \ReflectionMethod(ProjectRepository::class, 'addSearchCommandWhereClause');
-        $method->setAccessible(true);
 
         [$expr, $params] = $method->invoke($this->repository, $queryBuilder, $filter);
 
-        self::assertSame($expectedExpression, (string) $expr);
-        self::assertSame([], $params);
+        $this->assertSame($expectedExpression, (string) $expr);
+        $this->assertSame([], $params);
     }
 
     /**
@@ -105,12 +104,11 @@ final class ProjectRepositoryTest extends TestCase
         $filter       = (object) ['command' => 'has:emails', 'string' => '', 'not' => true, 'strict' => false];
 
         $method = new \ReflectionMethod(ProjectRepository::class, 'addSearchCommandWhereClause');
-        $method->setAccessible(true);
 
         [$expr, $params] = $method->invoke($this->repository, $queryBuilder, $filter);
 
-        self::assertSame('p.id NOT IN (9)', (string) $expr);
-        self::assertSame([], $params);
+        $this->assertSame('p.id NOT IN (9)', (string) $expr);
+        $this->assertSame([], $params);
     }
 
     public function testAssociationFilterFallsBackWhenNoAssociationsExist(): void
@@ -130,11 +128,10 @@ final class ProjectRepositoryTest extends TestCase
         $filter       = (object) ['command' => 'has:assets', 'string' => '', 'not' => false, 'strict' => false];
 
         $method = new \ReflectionMethod(ProjectRepository::class, 'addSearchCommandWhereClause');
-        $method->setAccessible(true);
 
         [$expr, $params] = $method->invoke($this->repository, $queryBuilder, $filter);
 
-        self::assertSame('p.id IN (0)', (string) $expr);
-        self::assertSame([], $params);
+        $this->assertSame('p.id IN (0)', (string) $expr);
+        $this->assertSame([], $params);
     }
 }

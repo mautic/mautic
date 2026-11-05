@@ -54,7 +54,7 @@ final class ProjectRepository extends CommonRepository
             ->executeQuery()
             ->fetchFirstColumn();
 
-        $ids = array_map('intval', $ids ?: []);
+        $ids = array_map(static fn (int $id): string => (string) $id, array_map(intval(...), $ids ?: []));
 
         if ([] === $ids) {
             $ids = [0];
