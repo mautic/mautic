@@ -11,6 +11,12 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 class FocusRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
+    private const STYLE_COMMANDS = [
+        'mautic.focus.focus.searchcommand.stylebar'          => 'bar',
+        'mautic.focus.focus.searchcommand.stylemodal'        => 'modal',
+        'mautic.focus.focus.searchcommand.stylenotification' => 'notification',
+        'mautic.focus.focus.searchcommand.stylefullpage'     => 'page',
+    ];
 
     /**
      * @return array
@@ -65,16 +71,10 @@ class FocusRepository extends CommonRepository
         $parameters      = [];
         $forceParameters = [];
 
-        $styleMapping = [
-            'mautic.focus.focus.searchcommand.stylebar'          => 'bar',
-            'mautic.focus.focus.searchcommand.stylemodal'        => 'modal',
-            'mautic.focus.focus.searchcommand.stylenotification' => 'notification',
-            'mautic.focus.focus.searchcommand.stylefullpage'     => 'page',
-        ];
-
-        if (isset($styleMapping[$command]) || $this->isTranslatedCommand($command, array_keys($styleMapping))) {
+        $styleValue = $this->getStyleValueFromCommand($command);
+        if (null !== $styleValue) {
             $expr            = $q->expr()->eq('f.style', ":$unique");
-            $forceParameters = [$unique => $styleMapping[$command] ?? $this->getStyleValueFromCommand($command, $styleMapping)];
+            $forceParameters = [$unique => $styleValue];
         } elseif ($this->isTranslatedCommand($command, ['mautic.project.searchcommand.name'])) {
             return $this->handleProjectFilter(
                 $this->_em->getConnection()->createQueryBuilder(),
@@ -101,34 +101,31 @@ class FocusRepository extends CommonRepository
     }
 
     /**
-     * Check if a command matches any of the given translation keys (including fallback to en_US)
+     * Check if a command matches any of the given translation keys (including fallback to en_US).
      *
      * @param array<string> $translationKeys
      */
     private function isTranslatedCommand(string $command, array $translationKeys): bool
     {
         foreach ($translationKeys as $key) {
-            if ($command === $this->translator->trans($key) ||
-                $command === $this->translator->trans($key, [], null, 'en_US')) {
+            if ($command === $this->translator->trans($key)
+                || $command === $this->translator->trans($key, [], null, 'en_US')) {
                 return true;
             }
         }
+
         return false;
     }
 
-    /**
-     * Get the style value from a translated command
-     *
-     * @param array<string, string> $styleMapping
-     */
-    private function getStyleValueFromCommand(string $command, array $styleMapping): ?string
+    private function getStyleValueFromCommand(string $command): ?string
     {
-        foreach ($styleMapping as $key => $value) {
-            if ($command === $this->translator->trans($key) ||
-                $command === $this->translator->trans($key, [], null, 'en_US')) {
+        foreach (self::STYLE_COMMANDS as $key => $value) {
+            if ($command === $this->translator->trans($key)
+                || $command === $this->translator->trans($key, [], null, 'en_US')) {
                 return $value;
             }
         }
+
         return null;
     }
 
@@ -137,13 +134,11 @@ class FocusRepository extends CommonRepository
      */
     public function getSearchCommands(): array
     {
-        return array_merge([
-            'mautic.project.searchcommand.name',
-            'mautic.focus.focus.searchcommand.stylebar',
-            'mautic.focus.focus.searchcommand.stylemodal',
-            'mautic.focus.focus.searchcommand.stylenotification',
-            'mautic.focus.focus.searchcommand.stylefullpage',
-        ], $this->getStandardSearchCommands());
+        return array_merge(
+            ['mautic.project.searchcommand.name'],
+            array_keys(self::STYLE_COMMANDS),
+            $this->getStandardSearchCommands()
+        );
     }
 
     /**

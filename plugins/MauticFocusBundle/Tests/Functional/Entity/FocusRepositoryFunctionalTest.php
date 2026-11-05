@@ -10,7 +10,7 @@ use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
+final class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private FocusModel $focusModel;
     private FocusRepository $focusRepository;
@@ -21,12 +21,6 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $this->focusModel      = static::$kernel->getContainer()->get('mautic.focus.model.focus');
         $this->focusRepository = $this->focusModel->getRepository();
-        $translator            = static::$kernel->getContainer()->get('translator');
-        $reflection            = new \ReflectionClass($this->focusRepository);
-        if ($reflection->hasProperty('translator')) {
-            $prop = $reflection->getProperty('translator');
-            $prop->setValue($this->focusRepository, $translator);
-        }
         $this->setUpTestData();
     }
 
@@ -35,34 +29,27 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
      */
     public static function styleCommandProvider(): iterable
     {
-        yield 'bar' => ['style:bar', 'bar'];
-        yield 'modal' => ['style:modal', 'modal'];
-        yield 'notification' => ['style:notification', 'notification'];
-        yield 'fullpage' => ['style:fullpage', 'page'];
+        yield 'bar' => ['style:bar', 'Bar Focus'];
+        yield 'modal' => ['style:modal', 'Modal Focus'];
+        yield 'notification' => ['style:notification', 'Notification Focus'];
+        yield 'fullpage' => ['style:fullpage', 'Fullpage Focus'];
     }
 
     #[DataProvider('styleCommandProvider')]
-    public function testStyleCommandReturnsOnlyFocusesWithThatStyle(string $command, string $style): void
+    public function testStyleCommandReturnsOnlyFocusesWithThatStyle(string $searchString, string $expectedName): void
     {
-        $result = $this->getSearchResult($this->createFilter($command));
-
-        $this->assertNotEmpty($result);
-        foreach ($result as $focus) {
-            $this->assertSame($style, $focus->getStyle());
-        }
+        $this->assertSame([$expectedName], $this->getFocusNames($searchString));
     }
 
     public function testNegatedStyleCommandExcludesThatStyle(): void
     {
-        $result = $this->getSearchResult($this->createFilter('style:bar', true));
-
-        $this->assertNotEmpty($result);
-        foreach ($result as $focus) {
-            $this->assertNotSame('bar', $focus->getStyle());
-        }
+        $this->assertSame(
+            ['Fullpage Focus', 'Modal Focus', 'Notification Focus'],
+            $this->getFocusNames('!style:bar')
+        );
     }
 
-    public function testSearchCommandWhereClauseWithStandardCommand(): void
+    public function testIsPublishedCommandReturnsOnlyPublishedFocuses(): void
     {
         $published = $this->createFocus('Published Focus', 'bar');
         $published->setIsPublished(true);
@@ -74,23 +61,11 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $ids = array_map(
             static fn (Focus $focus): ?int => $focus->getId(),
-            $this->getSearchResult($this->createFilter('is:published'))
+            $this->getSearchResult('is:published')
         );
 
         $this->assertContains($published->getId(), $ids);
         $this->assertNotContains($unpublished->getId(), $ids);
-    }
-
-    public function testGetSearchCommands(): void
-    {
-        $commands = $this->focusRepository->getSearchCommands();
-
-        $this->assertIsArray($commands);
-        $this->assertContains('mautic.focus.focus.searchcommand.stylebar', $commands);
-        $this->assertContains('mautic.focus.focus.searchcommand.stylemodal', $commands);
-        $this->assertContains('mautic.focus.focus.searchcommand.stylenotification', $commands);
-        $this->assertContains('mautic.focus.focus.searchcommand.stylefullpage', $commands);
-        $this->assertContains('mautic.project.searchcommand.name', $commands);
     }
 
     private function setUpTestData(): void
@@ -153,38 +128,28 @@ class FocusRepositoryFunctionalTest extends MauticMysqlTestCase
         return $focus;
     }
 
-    private function createFilter(string $command, bool $not = false): \stdClass
+    /**
+     * @return Focus[]
+     */
+    private function getSearchResult(string $searchString): array
     {
-        $filter          = new \stdClass();
-        $filter->command = $command;
-        $filter->string  = 'test';
-        $filter->not     = $not;
-        $filter->strict  = false;
-
-        return $filter;
-    }
-
-    private function getSearchResult(\stdClass $filter): array
-    {
-        $q                   = $this->focusRepository->createQueryBuilder('f');
-        [$expr, $parameters] = $this->callProtectedMethod('addSearchCommandWhereClause', [$q, $filter]);
-
-        $q->where($expr);
-        foreach ($parameters as $param => $value) {
-            $q->setParameter($param, $value);
-        }
-
-        return $q->getQuery()->getResult();
+        return $this->focusRepository->getEntities([
+            'filter'           => ['string' => $searchString, 'force' => []],
+            'ignore_paginator' => true,
+        ]);
     }
 
     /**
-     * @param array<int, mixed> $args
+     * @return string[]
      */
-    private function callProtectedMethod(string $methodName, array $args): mixed
+    private function getFocusNames(string $searchString): array
     {
-        $reflection = new \ReflectionClass($this->focusRepository);
-        $method     = $reflection->getMethod($methodName);
+        $names = array_map(
+            static fn (Focus $focus): string => $focus->getName(),
+            $this->getSearchResult($searchString)
+        );
+        sort($names);
 
-        return $method->invokeArgs($this->focusRepository, $args);
+        return $names;
     }
 }
