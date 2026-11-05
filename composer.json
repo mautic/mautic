@@ -45,7 +45,6 @@
     "rector/type-perfect": "^2.1.4",
     "rector/rector": "dev-main",
     "symfony/browser-kit": "~7.4.0",
-    "symfony/dom-crawler": "~7.4.0",
     "symfony/maker-bundle": "^1.64",
     "symfony/phpunit-bridge": "~7.4.0",
     "symfony/var-dumper": "~7.4.0",

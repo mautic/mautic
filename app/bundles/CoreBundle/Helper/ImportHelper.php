@@ -6,8 +6,38 @@ namespace Mautic\CoreBundle\Helper;
 
 class ImportHelper
 {
+    private const BLOCKED_ASSET_EXTENSIONS = [
+        'asp',
+        'aspx',
+        'bash',
+        'cgi',
+        'dll',
+        'exe',
+        'htt',
+        'htw',
+        'inc',
+        'jsp',
+        'phar',
+        'phps',
+        'pht',
+        'phtml',
+        'pl',
+        'py',
+        'pyc',
+        'pyo',
+        'rb',
+        'sh',
+        'shtml',
+    ];
+
+    private const BLOCKED_ASSET_FILENAMES = ['web.config'];
+
+    // Builder image types (see FileUploader), allowed even if missing from allowed_extensions.
+    private const EXPORTED_IMAGE_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'webp', 'svg'];
+
     public function __construct(
         private readonly PathsHelper $pathsHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -22,6 +52,12 @@ class ImportHelper
         $tempDir      = $this->pathsHelper->getTemporaryPath();
         $zip          = new \ZipArchive();
         $jsonFilePath = null;
+
+        /** @var string[] $allowedAssetExtensions */
+        $allowedAssetExtensions = array_merge(
+            array_map(strtolower(...), (array) $this->coreParametersHelper->get('allowed_extensions', [])),
+            self::EXPORTED_IMAGE_EXTENSIONS,
+        );
 
         // Zip Bomb protection constants
         $maxFiles     = 1000;  // Maximum number of files
@@ -74,6 +110,10 @@ class ImportHelper
             if (str_contains($normalizedFilename, '..') || str_starts_with($normalizedFilename, '/')) {
                 $zip->close();
                 throw new \RuntimeException('Unsafe file path detected in ZIP: '.$filename);
+            }
+
+            if (str_starts_with($normalizedFilename, 'assets/') && !str_ends_with($filename, '/')) {
+                $this->assertSafeAsset($normalizedFilename, $allowedAssetExtensions, $zip);
             }
 
             // Check compression ratio for potential zip bomb
@@ -210,6 +250,30 @@ class ImportHelper
         }
 
         return $jsonData;
+    }
+
+    /**
+     * @param string[] $allowedExtensions
+     */
+    private function assertSafeAsset(string $filename, array $allowedExtensions, \ZipArchive $zip): void
+    {
+        $basename            = strtolower(basename($filename));
+        $extension           = strtolower(pathinfo($basename, PATHINFO_EXTENSION));
+        $extensions          = array_slice(explode('.', $basename), 1);
+        $hasBlockedExtension = [] !== array_filter(
+            $extensions,
+            static fn (string $candidate): bool => in_array($candidate, self::BLOCKED_ASSET_EXTENSIONS, true)
+                || 1 === preg_match('/^(?:php|pcgi|pchi)\d*$/', $candidate),
+        );
+
+        if (str_starts_with($basename, '.')
+            || in_array($basename, self::BLOCKED_ASSET_FILENAMES, true)
+            || $hasBlockedExtension
+            || !in_array($extension, $allowedExtensions, true)
+        ) {
+            $zip->close();
+            throw new \RuntimeException('Unsafe asset file detected in ZIP: '.$filename);
+        }
     }
 
     private function normalizePath(string $path): string
