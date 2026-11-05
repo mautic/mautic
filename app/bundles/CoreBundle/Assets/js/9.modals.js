@@ -28,6 +28,9 @@ Mautic.hideModal = function (element) {
 };
 
 Mautic.configureModal = function (element, options) {
+    if (!element) {
+        return null;
+    }
     const modal = bootstrap.Modal.getOrCreateInstance(element, options);
     modal._config.keyboard = options.keyboard;
     modal._config.backdrop = options.backdrop;
