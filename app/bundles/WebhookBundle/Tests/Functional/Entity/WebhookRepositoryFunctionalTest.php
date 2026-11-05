@@ -17,6 +17,8 @@ use PHPUnit\Framework\Assert;
 
 final class WebhookRepositoryFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     private WebhookRepository $repository;
 
     protected function setUp(): void
