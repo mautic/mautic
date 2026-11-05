@@ -73,6 +73,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 #[EntityEvent]
 #[ScheduleDateRange]
 #[ValidEmailLinks]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'email_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'email_projects_xref'),
+)])]
 class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface, OptimisticLockInterface
 {
     /** @use VariantEntityTrait<Email> */
@@ -416,7 +422,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
 
-        self::addProjectsField($builder, 'email_projects_xref', 'email_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

@@ -14,7 +14,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -54,6 +53,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueUserAlias(field: 'alias', message: 'mautic.lead.list.alias.unique')]
 #[SegmentUsedInCampaigns]
 #[SegmentInUse]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'leadlist_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'lead_list_projects_xref'),
+)])]
 class LeadList extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -150,14 +155,6 @@ class LeadList extends FormEntity implements UuidInterface
     {
         $this->leads = new ArrayCollection();
         $this->initializeProjects();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
-
     }
 
     /**

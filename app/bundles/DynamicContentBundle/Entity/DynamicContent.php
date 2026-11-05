@@ -64,6 +64,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'dynamic_content_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'dynamic_content_projects_xref'),
+)])]
 class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
     /** @use TranslationEntityTrait<DynamicContent> */
@@ -190,7 +196,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         self::addVariantMetadata($builder, self::class);
         self::addFiltersMetadata($builder);
 
-        self::addProjectsField($builder, 'dynamic_content_projects_xref', 'dynamic_content_id');
     }
 
     /**

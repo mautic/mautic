@@ -15,7 +15,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -47,6 +46,12 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'form_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'form_projects_xref'),
+)])]
 class Form extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -219,11 +224,9 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * This var is used to cache the result once gained from the loop.
-     *
-     * @var bool
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read'])]
-    private $usesProgressiveProfiling;
+    private ?bool $usesProgressiveProfiling = null;
 
     public function __clone()
     {
@@ -238,13 +241,6 @@ class Form extends FormEntity implements UuidInterface
         $this->actions     = new ArrayCollection();
         $this->submissions = new ArrayCollection();
         $this->initializeProjects();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::addProjectsField($builder, 'form_projects_xref', 'form_id');
     }
 
     public static function determineValidationGroups(\Symfony\Component\Form\Form $form): array
@@ -764,10 +760,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * Check if some Progressive Profiling setting is turned on on any of the form fields.
-     *
-     * @return bool
      */
-    public function usesProgressiveProfiling()
+    public function usesProgressiveProfiling(): bool
     {
         if (null !== $this->usesProgressiveProfiling) {
             return $this->usesProgressiveProfiling;
