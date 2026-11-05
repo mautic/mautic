@@ -11,11 +11,13 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Exception\ContactNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,7 +41,12 @@ class ContactRequestHelper
         private readonly ContactMerger $contactMerger,
         private readonly StatRepository $statRepository,
         private readonly BotRatioHelper $botRatioHelper,
+        private readonly ?DeviceTrackingServiceInterface $deviceTrackingService = null,
+        private readonly ?LeadRepository $leadRepository = null,
     ) {
+        if (null === $deviceTrackingService || null === $leadRepository) {
+            trigger_deprecation('mautic/mautic', '7.2.2', 'Not passing $deviceTrackingService and $leadRepository to %s() is deprecated and they will be required in 8.0. Without them the tracked visitor is not merged into the identified contact.', __METHOD__);
+        }
     }
 
     public function getContactFromQuery(array $queryFields = []): ?Lead
@@ -126,11 +133,8 @@ class ContactRequestHelper
                 true
             );
 
-            if ($this->trackedContact && $this->trackedContact->getId() && $foundContact->getId()) {
-                try {
-                    $foundContact = $this->contactMerger->merge($this->trackedContact, $foundContact);
-                } catch (SameContactException) {
-                }
+            if ($foundContact->getId()) {
+                $foundContact = $this->mergeWithTrackedContact($foundContact);
             }
 
             if (null === $this->trackedContact || $foundContact->getId() !== $this->trackedContact->getId()) {
@@ -147,11 +151,9 @@ class ContactRequestHelper
     /**
      * Identify a contact through a clickthrough URL.
      *
-     * @return Lead
-     *
      * @throws ContactNotFoundException
      */
-    private function getContactFromClickthrough(array $clickthrough)
+    private function getContactFromClickthrough(array $clickthrough): Lead
     {
         $event = new ContactIdentificationEvent($clickthrough);
         $this->eventDispatcher->dispatch($event, LeadEvents::ON_CLICKTHROUGH_IDENTIFICATION);
@@ -200,13 +202,32 @@ class ContactRequestHelper
     }
 
     /**
-     * @return Lead
+     * Merge the anonymous visitor tracked by the device cookie into the identified contact.
+     * The tracked contact is not set yet when the request is being identified, so it is looked up by device.
+     * Only the device is trusted: the legacy mtc_id fallback is not proof that the request owns the contact.
      */
-    private function mergeWithTrackedContact(Lead $foundContact)
+    private function mergeWithTrackedContact(Lead $foundContact): Lead
     {
-        if ($this->trackedContact && $this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
+        if (null === $this->deviceTrackingService || null === $this->leadRepository) {
+            return $foundContact;
+        }
+
+        $trackedDevice  = $this->deviceTrackingService->getTrackedDevice();
+        $trackedContact = $this->trackedContact ?? $trackedDevice?->getLead();
+
+        if ($trackedContact && $trackedContact->getId() && !$trackedContact->hasFields()) {
+            // isAnonymous() reads social profiles from the custom field values
+            $trackedContact->setFields($this->leadRepository->getFieldValues($trackedContact->getId()));
+        }
+
+        if ($trackedContact && $trackedContact->getId() && $trackedContact->isAnonymous()) {
             try {
-                return $this->contactMerger->merge($this->trackedContact, $foundContact);
+                $foundContact = $this->contactMerger->merge($foundContact, $trackedContact);
+
+                // The tracked device still references the merged visitor, which has been deleted
+                if ($trackedDevice && $trackedDevice->getLead() === $trackedContact) {
+                    $trackedDevice->setLead($foundContact);
+                }
             } catch (SameContactException) {
             }
         }

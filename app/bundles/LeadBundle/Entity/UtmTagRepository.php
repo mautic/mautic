@@ -38,4 +38,18 @@ class UtmTagRepository extends CommonRepository
 
         return $this->getTimelineResults($qb, $options, 'ut.utm_campaign', 'ut.date_added', ['query'], ['date_added'], null, 'ut.id');
     }
+
+    /**
+     * Updates lead ID (e.g. after a lead merge).
+     */
+    public function updateLead(int $fromLeadId, int $toLeadId): void
+    {
+        $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'lead_utmtags')
+            ->set('lead_id', ':toLeadId')
+            ->where('lead_id = :fromLeadId')
+            ->setParameter('toLeadId', $toLeadId)
+            ->setParameter('fromLeadId', $fromLeadId)
+            ->executeStatement();
+    }
 }
