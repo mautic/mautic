@@ -111,8 +111,6 @@ class WebhookRepository extends CommonRepository
             return [$expression, []];
         }
 
-        \assert($q instanceof DbalQueryBuilder);
-
         $eventTable = $this->_em->getClassMetadata(Event::class)->getTableName();
         $subQuery   = $this->_em->getConnection()->createQueryBuilder()
             ->select('1')

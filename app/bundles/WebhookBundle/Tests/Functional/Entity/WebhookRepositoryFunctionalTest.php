@@ -13,7 +13,6 @@ use Mautic\SmsBundle\SmsEvents;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
-use PHPUnit\Framework\Assert;
 
 final class WebhookRepositoryFunctionalTest extends MauticMysqlTestCase
 {
@@ -25,7 +24,7 @@ final class WebhookRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
         $repository = $this->em->getRepository(Webhook::class);
-        \assert($repository instanceof WebhookRepository);
+        $this->assertInstanceOf(WebhookRepository::class, $repository);
         $this->repository = $repository;
 
         $this->truncateTables('webhook_events', 'webhooks');
@@ -35,23 +34,20 @@ final class WebhookRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         $this->createDefaultWebhooks();
 
-        Assert::assertSame(['Company Webhook'], $this->getSearchResultNames('event:company'));
-        Assert::assertSame(['Contact Webhook'], $this->getSearchResultNames('event:lead'));
-        Assert::assertSame(['Contact Webhook'], $this->getSearchResultNames('event:contact'));
-        Assert::assertSame(['Email Webhook', 'Hybrid Webhook'], $this->getSearchResultNames('event:email'));
-        Assert::assertSame(['Form Webhook'], $this->getSearchResultNames('event:form'));
-        Assert::assertSame(['Hybrid Webhook', 'Page Webhook'], $this->getSearchResultNames('event:page'));
-        Assert::assertSame(['Text Message Webhook'], $this->getSearchResultNames('event:text-message'));
+        $this->assertSame(['Company Webhook'], $this->getSearchResultNames('event:company'));
+        $this->assertSame(['Contact Webhook'], $this->getSearchResultNames('event:lead'));
+        $this->assertSame(['Contact Webhook'], $this->getSearchResultNames('event:contact'));
+        $this->assertSame(['Email Webhook', 'Hybrid Webhook'], $this->getSearchResultNames('event:email'));
+        $this->assertSame(['Form Webhook'], $this->getSearchResultNames('event:form'));
+        $this->assertSame(['Hybrid Webhook', 'Page Webhook'], $this->getSearchResultNames('event:page'));
+        $this->assertSame(['Text Message Webhook'], $this->getSearchResultNames('event:text-message'));
     }
 
     public function testItSupportsMultipleAliasesInSingleQuery(): void
     {
         $this->createDefaultWebhooks();
 
-        Assert::assertSame(
-            ['Contact Webhook', 'Form Webhook'],
-            $this->getSearchResultNames('event:lead,form')
-        );
+        $this->assertSame(['Contact Webhook', 'Form Webhook'], $this->getSearchResultNames('event:lead,form'));
     }
 
     public function testItSupportsMultipleEventTypesWithSpacesAsAndOperation(): void
@@ -59,26 +55,17 @@ final class WebhookRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->createDefaultWebhooks();
 
         // This should return empty because no webhook has BOTH email AND form events
-        Assert::assertSame(
-            [],
-            $this->getSearchResultNames('event:email event:form')
-        );
+        $this->assertSame([], $this->getSearchResultNames('event:email event:form'));
 
         // But this should work because Hybrid Webhook has both email AND page events
-        Assert::assertSame(
-            ['Hybrid Webhook'],
-            $this->getSearchResultNames('event:email event:page')
-        );
+        $this->assertSame(['Hybrid Webhook'], $this->getSearchResultNames('event:email event:page'));
     }
 
     public function testItExcludesMatchingEventsWhenNegated(): void
     {
         $this->createDefaultWebhooks();
 
-        Assert::assertSame(
-            ['Company Webhook', 'Contact Webhook', 'Form Webhook', 'Page Webhook', 'Text Message Webhook'],
-            $this->getSearchResultNames('!event:email')
-        );
+        $this->assertSame(['Company Webhook', 'Contact Webhook', 'Form Webhook', 'Page Webhook', 'Text Message Webhook'], $this->getSearchResultNames('!event:email'));
     }
 
     private function createDefaultWebhooks(): void
