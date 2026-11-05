@@ -106,11 +106,7 @@ parameters:
                 - app/bundles/CoreBundle/Form/EventListener/FormExitSubscriber.php
                 - app/bundles/CoreBundle/Tests/Functional/Controller/AjaxControllerTest.php
                 - app/bundles/CoreBundle/Twig/Extension/ButtonExtension.php
-                - app/bundles/PluginBundle/Form/Type/FeatureSettingsType.php
-                - app/bundles/PluginBundle/Form/Type/IntegrationConfigType.php
-                - app/bundles/PluginBundle/Form/Type/KeysType.php
                 - app/bundles/PluginBundle/Helper/IntegrationHelper.php
-                - app/bundles/PluginBundle/Model/IntegrationEntityModel.php
                 - *.html.php
                 - app/config/
 

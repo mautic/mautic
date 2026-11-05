@@ -5795,11 +5795,6 @@ parameters:
 			count: 1
 			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
 
-		-
-			message: '#^Method Mautic\\PluginBundle\\Model\\IntegrationEntityModel\:\:getRecordList\(\) has parameter \$integrationObject with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
 
 		-
 			message: '#^Method Mautic\\PluginBundle\\Model\\IntegrationEntityModel\:\:getSyncedRecords\(\) has parameter \$integrationName with no type specified\.$#'

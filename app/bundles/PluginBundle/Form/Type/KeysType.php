@@ -2,6 +2,7 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -17,6 +18,7 @@ final class KeysType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var AbstractIntegration $object */
         $object       = $options['integration_object'];
         $secretKeys   = $object->getSecretKeys();
         $requiredKeys = $object->getRequiredKeyFields();

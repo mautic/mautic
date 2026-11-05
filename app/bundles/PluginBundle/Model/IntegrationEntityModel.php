@@ -47,22 +47,6 @@ final class IntegrationEntityModel extends FormModel
         );
     }
 
-    /**
-     * @return array<mixed, array<'id', mixed>>
-     */
-    public function getRecordList($integrationObject): array
-    {
-        $recordList = [];
-
-        foreach ($integrationObject->getRecords() as $record) {
-            $recordList[$record['Id']] = [
-                'id' => $record['Id'],
-            ];
-        }
-
-        return $recordList;
-    }
-
     public function formatListOfContacts(array|string $recordList): ?string
     {
         if (empty($recordList)) {

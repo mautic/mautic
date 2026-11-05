@@ -2,6 +2,7 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,7 +16,9 @@ final class IntegrationConfigType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (null != $options['integration']) {
-            $options['integration']->appendToForm($builder, $options['data'], 'integration');
+            /** @var AbstractIntegration $integration */
+            $integration = $options['integration'];
+            $integration->appendToForm($builder, $options['data'], 'integration');
         }
 
         if (!empty($options['campaigns'])) {

@@ -1995,8 +1995,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Allows appending extra data to the config.
      *
-     * @param FormBuilder|Form $builder
-     * @param string           $formArea Section of form being built keys|features|integration
+     * @param FormBuilderInterface<mixed>|FormBuilder|Form $builder
+     * @param string                                       $formArea Section of form being built keys|features|integration
      *                                   keys can be used to store login/request related settings; keys are encrypted
      *                                   features can be used for configuring share buttons, etc
      *                                   integration is called when adding an integration to events like point triggers,

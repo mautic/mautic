@@ -1,7 +1,6 @@
 # *Model methods whose single param is genuinely loose, so left untyped:
 # CompanyModel/LeadModel::organizeFieldsByGroup (a Paginator or null is passed)
 # PageModel::generateSlug (a VariantEntityInterface is passed)
-# IntegrationEntityModel::getRecordList (extra arg + iterates ->getRecords())
 # ImportModel::isEmptyCsvRow (defensive mixed row from CSV parsing)
 parameters:
     ignoreErrors:
@@ -10,7 +9,6 @@ parameters:
             paths:
                 - app/bundles/LeadBundle/Model/CompanyModel.php
                 - app/bundles/LeadBundle/Model/ImportModel.php
-                - app/bundles/PluginBundle/Model/IntegrationEntityModel.php
 
         # generic base contracts handle any entity, so "object $entity" is correct and cannot name a concrete class
         -
