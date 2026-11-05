@@ -447,13 +447,14 @@ class LeadListRepository extends CommonRepository
             case $this->translator->trans('mautic.lead.list.searchcommand.dynamic'):
             case $this->translator->trans('mautic.lead.list.searchcommand.dynamic', [], null, 'en_US'):
                 [$staticExpr, $forceParameters] = $this->getStaticSegmentExpression($q);
-                $expr                           = $q->expr()->not($staticExpr);
-                $returnParameter                = false;
+                $expr                           = ($filter->not) ? $staticExpr : $q->expr()->not($staticExpr);
                 break;
             case $this->translator->trans('mautic.lead.list.searchcommand.static'):
             case $this->translator->trans('mautic.lead.list.searchcommand.static', [], null, 'en_US'):
                 [$expr, $forceParameters] = $this->getStaticSegmentExpression($q);
-                $returnParameter          = false;
+                if ($filter->not) {
+                    $expr = $q->expr()->not($expr);
+                }
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
@@ -512,7 +513,7 @@ class LeadListRepository extends CommonRepository
             $expr,
             [
                 $emptyParameter => serialize([]),
-                $nullParameter  => 'N;',
+                $nullParameter  => serialize(null),
             ],
         ];
     }
