@@ -51,8 +51,8 @@ class EmailRepository extends CommonRepository
     /**
      * * Get an array of do not email.
      *
-     * @param array      $leadIds
-     * @param int[]|null $reasons
+     * @param array $leadIds
+     * @param int[] $reasons
      *
      * @throws Exception
      */
