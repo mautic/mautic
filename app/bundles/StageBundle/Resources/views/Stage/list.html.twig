@@ -90,6 +90,14 @@
                         'text'       : 'mautic.core.category',
                         'class'      : 'visible-md visible-lg col-stage-category',
                     }) -}}
+                    {% if permissions['lead:leads:viewother'] %}
+                    {{- include('@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar' : 'stage',
+                        'text'       : 'mautic.lead.list.thead.leadcount',
+                        'class'      : 'visible-md visible-lg col-stage-leadcount',
+                    }) -}}
+                    {% endif %}
                     {{- include('@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'stage',
@@ -103,9 +111,20 @@
             {% for item in items %}
                 <tr>
                     <td>
-                    {% set customButtons = [] %}
+                    {% set stageContactsUrl = path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.stage_id'|trans ~ ':' ~ item.id}) %}
+                    {% set customButtons = (permissions['lead:leads:viewown'] or permissions['lead:leads:viewother']) ? [
+                        {
+                            'attr' : {
+                                'data-toggle' : 'ajax',
+                                'href'        : stageContactsUrl,
+                            },
+                            'btnText'   : 'mautic.lead.list.view_contacts'|trans,
+                            'iconClass' : 'ri-team-line',
+                            'priority'  : 100,
+                        }
+                    ] : [] %}
                     {% if permissions['stage:stages:edit'] and permissions['stage:stages:delete'] %}
-                        {% set customButtons = [
+                        {% set customButtons = customButtons|merge([
                             {
                                 'attr' : {
                                     'data-toggle' : 'ajaxmodal',
@@ -117,7 +136,7 @@
                                 'iconClass' : 'ri-flag-line',
                                 'priority'  : 100,
                             }
-                        ] %}
+                        ]) %}
                     {% endif %}
                     {{- include('@MauticCore/Helper/list_actions.html.twig',
                             {
@@ -155,6 +174,23 @@
                     <td class="visible-md visible-lg">
                         {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
+                    {% if permissions['lead:leads:viewother'] %}
+                    <td class="visible-md visible-lg">
+                        {% set stageContactCount = contactCounts[item.id]|default(0) %}
+                        {% include '@MauticCore/Helper/_tag.html.twig' with {
+                            tags: [{
+                                label: 'mautic.lead.list.viewleads_count'|trans({'%count%': stageContactCount}),
+                                color: 'gray',
+                                size: 'sm',
+                                attributes: {
+                                    id: 'stage-contacts-count-' ~ item.id,
+                                    href: stageContactsUrl,
+                                    'data-toggle': 'ajax'
+                                }|filter((v, k) => 0 != (stageContactCount) or (k != 'href' and k != 'data-toggle'))
+                            }]
+                        } %}
+                    </td>
+                    {% endif %}
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
                 </tr>
             {% endfor %}
@@ -164,7 +200,7 @@
     <div class="panel-footer">
         {{- include('@MauticCore/Helper/pagination.html.twig',
             {
-                'totalItems' : items|length,
+                'totalItems' : totalItems,
                 'page'       : page,
                 'limit'      : limit,
                 'menuLinkId' : 'mautic_stage_index',
