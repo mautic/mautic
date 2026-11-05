@@ -58,9 +58,10 @@ final class EventEntityReferencesTest extends TestCase
     public function testTagNames(): void
     {
         $this->assertSame(
-            ['one', 'two'],
-            $this->references->getTagNames('lead.changetags', ['add_tags' => ['one', '7'], 'remove_tags' => ['two', 'one']])
+            ['one', '2026', 'two'],
+            $this->references->getTagNames('lead.changetags', ['add_tags' => ['one', '2026'], 'remove_tags' => ['two', 'one']])
         );
+        $this->assertSame(['2026'], $this->references->getTagNames('lead.tags', ['tags' => [2026, '']]));
         $this->assertSame([], $this->references->getTagNames('lead.tags', ['tags' => null]));
     }
 
@@ -214,10 +215,19 @@ final class EventEntityReferencesTest extends TestCase
         $this->assertSame(['useremail' => ['email' => 301], 'user_id' => [], 'to_owner' => true], $event['properties']);
     }
 
-    public function testRemapEventKeepsTagNamesAndRemovesTagIds(): void
+    public function testRemapEventKeepsNumericTagNames(): void
     {
-        $event = $this->references->remapEvent(['type' => 'lead.changetags', 'properties' => ['add_tags' => ['one', '7'], 'remove_tags' => []]], []);
-        $this->assertSame(['add_tags' => ['one'], 'remove_tags' => []], $event['properties']);
+        // Tag IDs are only remapped in segment filters, campaign events refer to tags by name
+        $idMaps = [EventEntityReferences::TAG_ID => [2026 => 9]];
+
+        $event = $this->references->remapEvent(
+            ['type' => 'lead.changetags', 'properties' => ['add_tags' => ['one', '2026'], 'remove_tags' => ['7'], 'properties' => ['add_tags' => ['2026']]]],
+            $idMaps
+        );
+        $this->assertSame(['add_tags' => ['one', '2026'], 'remove_tags' => ['7'], 'properties' => ['add_tags' => ['2026']]], $event['properties']);
+
+        $event = $this->references->remapEvent(['type' => 'lead.tags', 'properties' => ['tags' => ['2026']]], $idMaps);
+        $this->assertSame(['tags' => ['2026']], $event['properties']);
     }
 
     public function testRemapEventRenamesChangedFieldAliases(): void
@@ -267,7 +277,11 @@ final class EventEntityReferencesTest extends TestCase
         $this->assertSame([Asset::ENTITY_NAME => [4]], $this->references->getFormActionExportedIds('asset.download', ['asset' => 4, 'category' => 6]));
         $this->assertSame([], $this->references->getFormActionExportedIds('form.repost', ['post_url' => 'https://example.com']));
         $this->assertSame([EventEntityReferences::CATEGORY => [6]], $this->references->getFormActionLinkedIds('asset.download', ['asset' => 4, 'category' => 6]));
-        $this->assertSame(['one'], $this->references->getFormActionTagNames('lead.changetags', ['add_tags' => ['one', '7'], 'remove_tags' => []]));
+        $this->assertSame(['one', '2026'], $this->references->getFormActionTagNames('lead.changetags', ['add_tags' => ['one', '2026'], 'remove_tags' => []]));
+        $this->assertSame(
+            ['add_tags' => ['one', '2026'], 'remove_tags' => []],
+            $this->references->remapFormActionProperties('lead.changetags', ['add_tags' => ['one', '2026'], 'remove_tags' => []], [EventEntityReferences::TAG_ID => [2026 => 9]])
+        );
 
         $idMaps = [Email::ENTITY_NAME => [3 => 303], LeadList::ENTITY_NAME => [1 => 101], Group::ENTITY_NAME => [2 => 202], Asset::ENTITY_NAME => [4 => 404]];
 

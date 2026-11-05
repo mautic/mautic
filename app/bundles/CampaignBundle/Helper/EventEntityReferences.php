@@ -254,6 +254,9 @@ final class EventEntityReferences
     public function remapFormActionProperties(string $actionType, array $properties, array $idMaps): array
     {
         foreach (self::FORM_ACTION_REFERENCES[$actionType] ?? [] as $path => $kind) {
+            if (self::TAG === $kind) {
+                continue;
+            }
             $properties = $this->remapValue($properties, $path, $idMaps[$kind] ?? []);
         }
 
@@ -386,7 +389,10 @@ final class EventEntityReferences
             }
 
             foreach ((array) $this->getValue($properties, $path) as $name) {
-                if (is_string($name) && '' !== $name && !is_numeric($name)) {
+                if (is_int($name)) {
+                    $name = (string) $name;
+                }
+                if (is_string($name) && '' !== $name) {
                     $names[] = $name;
                 }
             }
@@ -512,6 +518,10 @@ final class EventEntityReferences
     private function remapProperties(array $properties, string $eventType, array $idMaps, array $fieldAliases): array
     {
         foreach (self::REFERENCES[$eventType] ?? [] as $path => $kind) {
+            // Tags are referred to by name, even when the name is a number
+            if (self::TAG === $kind) {
+                continue;
+            }
             $properties = $this->remapValue($properties, $path, $idMaps[$kind] ?? []);
         }
 
@@ -538,7 +548,7 @@ final class EventEntityReferences
     }
 
     /**
-     * Replaces the IDs in the value by the new ones and removes the IDs without a new one. Other values, like tag names, stay.
+     * Replaces the IDs in the value by the new ones and removes the IDs without a new one. Values that are not IDs stay.
      *
      * @param array<string, mixed>   $properties
      * @param array<int|string, int> $idMap

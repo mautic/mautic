@@ -181,7 +181,7 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
 
         $this->addFormAction($form, 'email.send.lead', ['email' => $email->getId()]);
         $this->addFormAction($form, 'lead.changelist', ['addToLists' => [$segment->getId()], 'removeFromLists' => []]);
-        $this->addFormAction($form, 'lead.changetags', ['add_tags' => ['form-action-tag'], 'remove_tags' => []]);
+        $this->addFormAction($form, 'lead.changetags', ['add_tags' => ['form-action-tag', '2027'], 'remove_tags' => []]);
         $this->addFormAction($form, 'lead.pointschange', ['operator' => 'plus', 'points' => 3, 'group' => $group->getId()]);
         $this->addFormAction($form, 'email.send.user', ['useremail' => ['email' => $email->getId()], 'user_id' => [1]]);
 
@@ -200,8 +200,9 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
 
         $this->assertSame($newIds[Email::ENTITY_NAME][$email->getId()], $actions['email.send.lead']['email']);
         $this->assertSame([$newIds[LeadList::ENTITY_NAME][$segment->getId()]], $actions['lead.changelist']['addToLists']);
-        $this->assertSame(['form-action-tag'], $actions['lead.changetags']['add_tags']);
+        $this->assertSame(['form-action-tag', '2027'], $actions['lead.changetags']['add_tags']);
         $this->assertInstanceOf(Tag::class, $this->em->getRepository(Tag::class)->findOneBy(['tag' => 'form-action-tag']));
+        $this->assertInstanceOf(Tag::class, $this->em->getRepository(Tag::class)->findOneBy(['tag' => '2027']));
         $this->assertSame($newIds[Group::ENTITY_NAME][$group->getId()], $actions['lead.pointschange']['group']);
         $this->assertSame(['email' => $newIds[Email::ENTITY_NAME][$email->getId()]], $actions['email.send.user']['useremail']);
         $this->assertSame([], $actions['email.send.user']['user_id']);
@@ -316,7 +317,7 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         self::getContainer()->get(FieldModel::class)->saveEntity($field);
 
         $campaign = $this->createCampaign([
-            'lead.changetags'  => ['action', ['add_tags' => ['brand-new-tag'], 'remove_tags' => []]],
+            'lead.changetags'  => ['action', ['add_tags' => ['brand-new-tag', '2026'], 'remove_tags' => []]],
             'lead.updatelead'  => ['action', ['imported_custom' => 'value', 'firstname' => '']],
             'lead.field_value' => ['condition', ['field' => 'imported_custom', 'operator' => '=', 'value' => 'value']],
         ]);
@@ -328,7 +329,9 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $events = $this->getImportedEvents($newIds[Campaign::ENTITY_NAME][$campaign->getId()]);
 
         $this->assertInstanceOf(Tag::class, $this->em->getRepository(Tag::class)->findOneBy(['tag' => 'brand-new-tag']));
-        $this->assertReference(['brand-new-tag'], $events['lead.changetags'], 'add_tags');
+        // A tag named like a number is still a name, not an ID
+        $this->assertInstanceOf(Tag::class, $this->em->getRepository(Tag::class)->findOneBy(['tag' => '2026']));
+        $this->assertReference(['brand-new-tag', '2026'], $events['lead.changetags'], 'add_tags');
 
         // The imported field gets another alias next to the existing one with the same alias
         $importedAlias = $this->em->find(LeadField::class, $newIds[LeadField::ENTITY_NAME][(int) $field->getId()])->getAlias();
