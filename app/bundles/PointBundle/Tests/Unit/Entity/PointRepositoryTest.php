@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PointRepositoryTest extends TestCase
+final class PointRepositoryTest extends TestCase
 {
     public function testTypeGainCommandBuildsPositiveDeltaExpression(): void
     {
@@ -98,11 +98,10 @@ class PointRepositoryTest extends TestCase
     }
 }
 
-class TestPointRepository extends PointRepository
+final class TestPointRepository extends PointRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        // Avoid invoking the parent constructor to keep the repository lightweight for unit tests.
     }
 
     public function exposeAddSearchCommandWhereClause($q, $filter): array
@@ -116,7 +115,7 @@ class TestPointRepository extends PointRepository
     }
 }
 
-class DummyQueryBuilder
+final class DummyQueryBuilder
 {
     private DummyQueryExpr $expr;
 
@@ -131,7 +130,7 @@ class DummyQueryBuilder
     }
 }
 
-class DummyQueryExpr
+final class DummyQueryExpr
 {
     public function gt(string $field, string $value): array
     {
