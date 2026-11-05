@@ -41,7 +41,7 @@ reviews:
         the database and unit tests for isolated logic. Flag tests that only
         assert mocks were called without checking an outcome, and tests that
         depend on execution order or wall-clock time.
-    - path: "tests/acceptance/**"
+    - path: "tests/{acceptance,_support}/**"
       instructions: |
         Codeception E2E tests must not use fixed delays: `$I->wait()`, PHP
         `sleep()`/`usleep()`, or `executeJS()`/`executeAsyncJS()` used only to
