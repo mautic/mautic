@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -18,7 +17,6 @@ final readonly class FinalizeUpdateStep implements StepInterface
         private PathsHelper $pathsHelper,
         private RequestStack $requestStack,
         private AppVersion $appVersion,
-        private Filesystem $filesystem,
     ) {
     }
 
@@ -36,12 +34,6 @@ final readonly class FinalizeUpdateStep implements StepInterface
     {
         $progressBar->setMessage($this->translator->trans('mautic.core.command.update.step.wrapping_up'));
         $progressBar->advance();
-
-        $mediaPath = $this->pathsHelper->getSystemPath('media', true);
-        $this->filesystem->remove([
-            $mediaPath.'/js/libraries.js',
-            $mediaPath.'/js/app.js',
-        ]);
 
         // Clear the cached update data and the download package now that we've updated
         @unlink($this->pathsHelper->getRootPath().'/upgrade.php');

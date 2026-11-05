@@ -87,7 +87,7 @@ Mautic.chartAxisBorder = {display: false, dash: [3, 3]};
 Mautic.chartGradientFill = (datasets) => {
   datasets.forEach((dataset) => {
     const color = String(dataset.borderColor);
-    if (!color.startsWith('rgba(')) {
+    if (!color.startsWith('rgba(') || !color.includes(',')) {
       return;
     }
     dataset.pointBackgroundColor = color;

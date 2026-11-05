@@ -30,11 +30,14 @@ test('gradient uses the dataset colour with fading opacity', () => {
     assert.equal(dataset.backgroundColor({chart: {}}), undefined);
 });
 
-test('non-rgba colours keep their existing fill', () => {
-    const dataset = {borderColor: '#123456', backgroundColor: '#abcdef'};
-    Mautic.chartGradientFill([dataset]);
-    assert.equal(dataset.backgroundColor, '#abcdef');
-});
+for (const color of ['#123456', 'rgba(10 20 30 / 0.8)']) {
+    test(`unsupported gradient colour ${color} keeps existing styling`, () => {
+        const dataset = {borderColor: color, backgroundColor: '#abcdef', pointBackgroundColor: '#fedcba'};
+        Mautic.chartGradientFill([dataset]);
+        assert.equal(dataset.backgroundColor, '#abcdef');
+        assert.equal(dataset.pointBackgroundColor, '#fedcba');
+    });
+}
 
 for (const [min, max, midpoint] of [
     [-10, 0, -5],
