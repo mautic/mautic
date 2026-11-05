@@ -8,7 +8,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 abstract class AbstractParentWithConstructor
 {
-    public function __construct(protected EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        protected EntityManagerInterface $entityManager,
+    ) {
     }
 }

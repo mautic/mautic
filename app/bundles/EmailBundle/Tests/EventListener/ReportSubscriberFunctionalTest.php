@@ -14,6 +14,7 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Tests\Functional\AbstractReportSubscriberTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -289,6 +290,203 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
         ], $result['data']);
     }
 
+    public function testEmailStatsReportWithUnsubscribedToOpenRatio(): void
+    {
+        $email    = $this->createEmail('Email');
+        $contacts = [
+            $this->createContact('test1@example.com'),
+            $this->createContact('test2@example.com'),
+        ];
+        $this->em->flush();
+
+        $stats = $this->emulateEmailSend($email, $contacts);
+        $this->emulateEmailRead($stats[0]);
+        $this->emulateEmailRead($stats[1]);
+        $this->createDnc('email', $contacts[0], DoNotContact::UNSUBSCRIBED, $email->getId());
+        $this->em->flush();
+
+        $report = $this->createReport(
+            source: 'email.stats',
+            columns: ['l.email', 'unsubscribed', 'unsubscribed_to_open_ratio'],
+            order: [['column' => 'l.email', 'direction' => 'ASC']]
+        );
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $this->assertResponseIsSuccessful();
+        $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
+
+        $this->assertSame([
+            // no., email, unsubscribed, unsubscribed_to_open_ratio
+            ['1', 'test1@example.com', 'Yes', '50.0%'],
+            ['2', 'test2@example.com', 'No', '50.0%'],
+        ], array_slice($this->domTableToArray($crawlerReportTable), 1, 2));
+    }
+
+    public function testEmailReportClickThroughIgnoresOtherChannels(): void
+    {
+        $email    = $this->createEmail('Email 1');
+        $contacts = [
+            $this->createContact('test1@example.com'),
+            $this->createContact('test2@example.com'),
+        ];
+        $this->em->flush();
+
+        $emailTrackable = $this->createTrackable('https://example.com/1', $email->getId());
+        // SMS trackable with the same channel ID as the email.
+        $smsTrackable = $this->createTrackable('https://example.com/2', $email->getId(), 0, 0, 'sms');
+        $this->em->flush();
+
+        $this->emulateEmailSend($email, $contacts);
+
+        $this->emulateLinkClick($email, $emailTrackable, $contacts[0]);
+        $this->emulateLinkClick($email, $smsTrackable, $contacts[1], 1, 'sms');
+        $this->em->flush();
+
+        $report = new Report();
+        $report->setName('Email click through without other channels');
+        $report->setSource('emails');
+        $report->setColumns(['e.id', 'click_through_count', 'click_through_rate']);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
+        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertSame([
+            [
+                'e_id'                => (string) $email->getId(),
+                'click_through_count' => '1',
+                'click_through_rate'  => '50.0%',
+            ],
+        ], $result['data']);
+    }
+
+    /**
+     * @return iterable<string, array{string[]}>
+     */
+    public static function dncColumnsGroupByProvider(): iterable
+    {
+        yield 'default grouping' => [[]];
+        yield 'grouped by email ID' => [['e.id']];
+    }
+
+    /**
+     * @param string[] $groupBy
+     */
+    #[DataProvider('dncColumnsGroupByProvider')]
+    public function testEmailReportWithDncColumns(array $groupBy): void
+    {
+        $emails = [
+            $this->createEmail('Email 1'),
+            $this->createEmail('Email 2'),
+        ];
+        $contacts = [
+            $this->createContact('test1@example.com'),
+            $this->createContact('test2@example.com'),
+            $this->createContact('test3@example.com'),
+        ];
+        $this->em->flush();
+
+        $this->emulateEmailSend($emails[0], $contacts);
+        $this->emulateEmailSend($emails[1], $contacts);
+
+        $this->createDnc('email', $contacts[0], DoNotContact::UNSUBSCRIBED, $emails[0]->getId());
+        $this->createDnc('email', $contacts[1], DoNotContact::BOUNCED, $emails[0]->getId());
+        $this->createDnc('email', $contacts[2], DoNotContact::BOUNCED, $emails[1]->getId());
+        // Entries of other channels with the same channel ID must not be counted.
+        $this->createDnc('sms', $contacts[2], DoNotContact::UNSUBSCRIBED, $emails[0]->getId());
+        $this->createDnc('sms', $contacts[0], DoNotContact::BOUNCED, $emails[1]->getId());
+        $this->em->flush();
+
+        $report = new Report();
+        $report->setName('Email with DNC columns');
+        $report->setSource('emails');
+        $report->setColumns(['e.id', 'e.name', 'unsubscribed', 'unsubscribed_ratio', 'bounced', 'bounced_ratio']);
+        $report->setGroupBy($groupBy);
+        $report->setGraphs([
+            'mautic.email.graph.pie.read.ingored.unsubscribed.bounced',
+            'mautic.email.graph.pie.sent.read.clicked.unsubscribed',
+        ]);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
+        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertSame([
+            [
+                'e_id'               => (string) $emails[0]->getId(),
+                'e_name'             => 'Email 1',
+                'unsubscribed'       => '1',
+                'unsubscribed_ratio' => '33.3%',
+                'bounced'            => '1',
+                'bounced_ratio'      => '33.3%',
+            ],
+            [
+                'e_id'               => (string) $emails[1]->getId(),
+                'e_name'             => 'Email 2',
+                'unsubscribed'       => '0',
+                'unsubscribed_ratio' => '0.0%',
+                'bounced'            => '1',
+                'bounced_ratio'      => '33.3%',
+            ],
+        ], $result['data']);
+    }
+
+    public function testEmailReportFilteredByDncColumnWithGraphs(): void
+    {
+        $emails = [
+            $this->createEmail('Email 1'),
+            $this->createEmail('Email 2'),
+        ];
+        $contacts = [
+            $this->createContact('test1@example.com'),
+            $this->createContact('test2@example.com'),
+        ];
+        $this->em->flush();
+
+        $this->emulateEmailSend($emails[0], $contacts);
+        $this->emulateEmailSend($emails[1], $contacts);
+
+        $this->createDnc('email', $contacts[0], DoNotContact::UNSUBSCRIBED, $emails[0]->getId());
+        $this->em->flush();
+
+        $report = new Report();
+        $report->setName('Email filtered by DNC column');
+        $report->setSource('emails');
+        $report->setColumns(['e.id', 'e.name', 'unsubscribed']);
+        $report->setFilters([
+            [
+                'column'    => 'unsubscribed',
+                'glue'      => 'and',
+                'dynamic'   => null,
+                'condition' => 'gt',
+                'value'     => '0',
+            ],
+        ]);
+        $report->setGraphs([
+            'mautic.email.graph.pie.read.ingored.unsubscribed.bounced',
+            'mautic.email.graph.pie.sent.read.clicked.unsubscribed',
+            'mautic.email.table.most.emails.clicks',
+        ]);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
+        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertSame([
+            [
+                'e_id'         => (string) $emails[0]->getId(),
+                'e_name'       => 'Email 1',
+                'unsubscribed' => '1',
+            ],
+        ], $result['data']);
+    }
+
     private function createContact(string $email): Lead
     {
         $contact = new Lead();
@@ -313,7 +511,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
         return $email;
     }
 
-    private function createTrackable(string $url, int $channelId, int $hits = 0, int $uniqueHits = 0): Trackable
+    private function createTrackable(string $url, int $channelId, int $hits = 0, int $uniqueHits = 0, string $channel = 'email'): Trackable
     {
         $redirect = new Redirect();
         $redirect->setRedirectId(uniqid());
@@ -324,7 +522,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
 
         $trackable = new Trackable();
         $trackable->setChannelId($channelId);
-        $trackable->setChannel('email');
+        $trackable->setChannel($channel);
         $trackable->setHits($hits);
         $trackable->setUniqueHits($uniqueHits);
         $trackable->setRedirect($redirect);
@@ -373,7 +571,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
         $this->em->persist($email);
     }
 
-    private function emulateLinkClick(Email $email, Trackable $trackable, Lead $lead, int $count = 1): void
+    private function emulateLinkClick(Email $email, Trackable $trackable, Lead $lead, int $count = 1, string $source = 'email'): void
     {
         $trackable->setHits($trackable->getHits() + $count);
         $trackable->setUniqueHits($trackable->getUniqueHits() + 1);
@@ -395,7 +593,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
             $pageHit->setCode(200);
             $pageHit->setUrl($redirect->getUrl());
             $pageHit->setTrackingId($redirect->getRedirectId());
-            $pageHit->setSource('email');
+            $pageHit->setSource($source);
             $pageHit->setSourceId($email->getId());
             $this->em->persist($pageHit);
         }

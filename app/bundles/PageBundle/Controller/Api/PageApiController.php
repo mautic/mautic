@@ -23,15 +23,27 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Page>
  */
-class PageApiController extends CommonApiController
+final class PageApiController extends CommonApiController
 {
     /**
      * @var PageModel|null
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, PageModel $pageModel)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        PageModel $pageModel,
+    ) {
         $this->model            = $pageModel;
         $this->entityClass      = Page::class;
         $this->entityNameOne    = 'page';

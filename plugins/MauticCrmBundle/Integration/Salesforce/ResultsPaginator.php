@@ -5,7 +5,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Psr\Log\LoggerInterface;
 
-class ResultsPaginator
+final class ResultsPaginator
 {
     /**
      * @var array

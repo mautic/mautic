@@ -124,9 +124,9 @@
         <div>
             <!-- asset detail collapseable toggler -->
             <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse"
-                       data-target="#asset-details"><span class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
+                <span data-bs-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse"
+                       data-bs-target="#asset-details"><span class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
                 </span>
             </div>
             <!--/ asset detail collapseable toggler -->
@@ -138,14 +138,14 @@
                     <div class="col-md-4">
                         <div class="panel">
                             <div class="panel-body box-layout">
-                                <div class="va-m">
+                                <div class="align-middle">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="fa-row-statuses"></span>
                                         {{ 'mautic.lead.import.row.statuses'|trans }}
                                     </h5>
                                 </div>
                             </div>
-                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                            <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {
                                       'chartData': item.getRowStatusesPieChart(translatorGetHelper()),
                                       'chartType': 'pie',
@@ -157,14 +157,14 @@
                     <div class="col-md-8">
                         <div class="panel">
                             <div class="panel-body box-layout">
-                                <div class="va-m">
+                                <div class="align-middle">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="fa-row-statuses"></span>
                                         {{ 'mautic.lead.import.processed.rows.minute'|trans }}
                                     </h5>
                                 </div>
                             </div>
-                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                            <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {
                                       'chartData': importedRowsChart,
                                       'chartType': 'line',

@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
         'mautic:campaigns:messages',
     ]
 )]
-class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
+final class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

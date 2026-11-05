@@ -9,8 +9,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class NoteControllerTest extends MauticMysqlTestCase
@@ -238,7 +240,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->em->persist($role);
         $this->em->flush();
 
-        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        $roleModel = self::getContainer()->get(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
 
@@ -249,7 +251,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $user->setEmail('note.controller.'.uniqid().'@example.com');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $this->em->persist($user);
@@ -290,7 +292,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->em->persist($role);
         $this->em->flush();
 
-        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        $roleModel = self::getContainer()->get(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
 
@@ -301,7 +303,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $user->setEmail('note.user.'.uniqid().'@example.com');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $this->em->persist($user);

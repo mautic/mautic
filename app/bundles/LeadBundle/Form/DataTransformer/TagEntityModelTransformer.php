@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\DataTransformer;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -10,14 +10,14 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 /**
  * @implements DataTransformerInterface<array<mixed>|int|null, array<mixed>|object|null>
  */
-class TagEntityModelTransformer implements DataTransformerInterface
+final class TagEntityModelTransformer implements DataTransformerInterface
 {
     /**
      * @param string $repository
      * @param bool   $isArray
      */
     public function __construct(
-        private readonly EntityManager $em,
+        private readonly EntityManagerInterface $em,
         private $repository = '',
         private $isArray = false,
     ) {

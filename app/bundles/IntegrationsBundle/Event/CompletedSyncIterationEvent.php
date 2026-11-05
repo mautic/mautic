@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderResultsDAO;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CompletedSyncIterationEvent extends Event
+final class CompletedSyncIterationEvent extends Event
 {
     public function __construct(
         private readonly OrderResultsDAO $orderResultsDAO,

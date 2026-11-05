@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Doctrine\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\DateTimeImmutableType;
 
-class UTCDateTimeImmutableType extends DateTimeImmutableType
+final class UTCDateTimeImmutableType extends DateTimeImmutableType
 {
     /**
      * Persist the date in UTC.

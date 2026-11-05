@@ -9,10 +9,10 @@ use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class DncReasonExtension extends AbstractExtension
+final class DncReasonExtension extends AbstractExtension
 {
     public function __construct(
-        protected DncReasonHelper $helper,
+        private readonly DncReasonHelper $helper,
     ) {
     }
 

@@ -50,7 +50,7 @@ final class EntityExportCommand extends ModeratedCommand
 
         $entityIds = array_filter(array_map(intval(...), explode(',', (string) $idOption)));
 
-        if (empty($entityName) || empty($entityIds)) {
+        if (empty($entityName) || [] === $entityIds) {
             $output->writeln('<error>You must specify the entity and at least one valid entity ID.</error>');
 
             return self::FAILURE;
@@ -62,12 +62,12 @@ final class EntityExportCommand extends ModeratedCommand
             $event = $this->dispatchEntityExportEvent($entityName, $entityId);
             $data  = $event->getEntities();
 
-            if (!empty($data)) {
+            if ([] !== $data) {
                 $allData[] = $data;
             }
         }
 
-        if (empty($allData)) {
+        if ([] === $allData) {
             $output->writeln('<error>No data found for export.</error>');
 
             return self::FAILURE;

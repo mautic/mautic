@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: AnonymizeIpCommand::COMMAND_NAME,
     description: 'Delete all stored ip addresses.'
 )]
-class AnonymizeIpCommand extends Command
+final class AnonymizeIpCommand extends Command
 {
     /**
      * @var string

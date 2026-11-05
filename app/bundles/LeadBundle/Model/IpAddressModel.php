@@ -4,7 +4,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -15,7 +15,7 @@ class IpAddressModel
     private const DELETE_SIZE = 10000;
 
     public function __construct(
-        protected EntityManager $entityManager,
+        protected EntityManagerInterface $entityManager,
         protected LoggerInterface $logger,
         private readonly IpAddressRepository $ipAddressRepository,
     ) {

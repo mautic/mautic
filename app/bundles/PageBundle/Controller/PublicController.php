@@ -231,7 +231,7 @@ final class PublicController extends AbstractFormController
                     );
                     \assert($translatedEntity instanceof Page);
 
-                    if ($translationParent && $translatedEntity !== $entity) {
+                    if ($translatedEntity !== $entity) {
                         if (!$request->get('ntrd', 0)) {
                             $url = $model->generateUrl($translatedEntity, false);
                             $model->hitPage($entity, $request, 302, $lead, $query);
@@ -403,6 +403,7 @@ final class PublicController extends AbstractFormController
         TrackingHelper $trackingHelper,
         ContactTracker $contactTracker,
         PageModel $model,
+        IpLookupHelper $ipLookupHelper,
     ): JsonResponse {
         $notSuccessResponse = new JsonResponse(
             [
@@ -418,6 +419,18 @@ final class PublicController extends AbstractFormController
         } catch (InvalidDecodedStringException) {
             // do not track invalid ct
             return $notSuccessResponse;
+        }
+
+        // A visitor Mautic doesn't track isn't looked up, and gets nothing back that would let the script recognise them again
+        if (!$ipLookupHelper->isRequestTrackable()) {
+            return new JsonResponse(
+                [
+                    'id'        => null,
+                    'sid'       => null,
+                    'device_id' => null,
+                    'events'    => [],
+                ]
+            );
         }
 
         $lead          = $contactTracker->getContact();
@@ -499,7 +512,7 @@ final class PublicController extends AbstractFormController
                     // Invalid ct value so we must unset it
                     // and process the request without it
 
-                    $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
+                    $logger->warning(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
 
                     $request->request->remove('ct');
                     $request->query->remove('ct');
@@ -563,10 +576,17 @@ final class PublicController extends AbstractFormController
     /**
      * Get the ID of the currently tracked Contact.
      */
-    public function getContactIdAction(DeviceTrackingServiceInterface $trackedDeviceService, ContactTracker $contactTracker): JsonResponse
+    public function getContactIdAction(DeviceTrackingServiceInterface $trackedDeviceService, ContactTracker $contactTracker, IpLookupHelper $ipLookupHelper): JsonResponse
     {
         $data = [];
-        if ($this->security->isAnonymous()) {
+        if ($this->security->isAnonymous() && !$ipLookupHelper->isRequestTrackable()) {
+            // A visitor Mautic doesn't track isn't looked up, and gets nothing back that would let the script recognise them again
+            $data = [
+                'id'        => null,
+                'sid'       => null,
+                'device_id' => null,
+            ];
+        } elseif ($this->security->isAnonymous()) {
             $lead          = $contactTracker->getContact();
             $trackedDevice = $trackedDeviceService->getTrackedDevice();
             $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());

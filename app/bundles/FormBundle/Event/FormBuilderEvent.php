@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormBuilderEvent extends Event
+final class FormBuilderEvent extends Event
 {
     use ComponentValidationTrait;
 
@@ -172,7 +172,7 @@ class FormBuilderEvent extends Event
      */
     public function addValidatorsToBuilder(FormInterface $form): void
     {
-        if (!empty($this->validators)) {
+        if ([] !== $this->validators) {
             $validationData = $form->getData()['validation'] ?? [];
             foreach ($this->validators as $validator) {
                 if (isset($validator['formType']) && isset($validator['fieldType']) && $validator['fieldType'] == $form->getData()['type']) {

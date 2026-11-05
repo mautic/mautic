@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CampaignBundle\Form\Type\CampaignListType;
@@ -13,10 +15,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventLeadCampaignsType extends AbstractType
+final class CampaignEventLeadCampaignsType extends AbstractType
 {
     public function __construct(
-        protected ListModel $listModel,
+        private readonly ListModel $listModel,
     ) {
     }
 
@@ -25,7 +27,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
         $builder->add('campaigns',
             CampaignListType::class, [
                 'label'      => 'mautic.lead.lead.events.campaigns.membership',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -54,7 +56,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
                     ],
                 ]),
                 'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'data-show-on' => '{"campaignevent_properties_dataAddedLimit_1":"checked"}',
@@ -67,7 +69,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.lead.lead.events.campaigns.date',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'data-toggle'  => 'datetime',

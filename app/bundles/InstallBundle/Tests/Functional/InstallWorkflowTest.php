@@ -11,7 +11,10 @@ use Mautic\LeadBundle\Entity\LeadField;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This test must run in a separate process because it sets the global constant
@@ -27,11 +30,16 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
 
     private string $defaultMemoryLimit;
 
+    private string $logDir;
+
     protected function setUp(): void
     {
         parent::setUp();
-        $this->localConfigPath    = static::getContainer()->get('kernel')->getLocalConfigFile();
+        /** @var \AppKernel $kernel */
+        $kernel                   = self::getContainer()->get(KernelInterface::class);
+        $this->localConfigPath    = $kernel->getLocalConfigFile();
         $this->defaultMemoryLimit = ini_get('memory_limit');
+        $this->logDir             = self::getContainer()->getParameter('kernel.logs_dir');
 
         if (file_exists($this->localConfigPath)) {
             // Move local.php so we can get to the installer.
@@ -48,6 +56,16 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
         if (file_exists($this->localConfigPath.'.bak')) {
             // Restore the local config file in it's original state.
             rename($this->localConfigPath.'.bak', $this->localConfigPath);
+        }
+
+        $stashedLogDir = $this->logDir.'.stashed';
+        if (is_dir($stashedLogDir)) {
+            // Put back the real log directory, contents and tracked .gitkeep included.
+            (new Filesystem())->remove($this->logDir);
+            rename($stashedLogDir, $this->logDir);
+        } elseif (!is_dir($this->logDir)) {
+            // A test removed it and could not put it back; the suite still logs through it.
+            mkdir($this->logDir, 0777, true);
         }
 
         ini_set('memory_limit', $this->defaultMemoryLimit);
@@ -108,7 +126,7 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
     public function testInstallRequirementsAndRecommendations(): void
     {
         $limit                 = FileHelper::convertPHPSizeToBytes(CheckStep::RECOMMENDED_MEMORY_LIMIT);
-        $expectedMemoryMessage = static::getContainer()->get('translator')->trans('mautic.install.memory.limit', ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT]);
+        $expectedMemoryMessage = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.install.memory.limit', ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT]);
 
         // set the memory limit lower than the recommended value.
         ini_set('memory_limit', (string) ($limit - 1));
@@ -125,5 +143,23 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
 
         $details = $crawler->filter('#minorDetails ul')->html();
         $this->assertStringNotContainsString($expectedMemoryMessage, $details);
+    }
+
+    public function testInstallerCreatesTheLogDirectoryWhenItIsMissing(): void
+    {
+        // Move it aside rather than deleting it: var/logs/.gitkeep is tracked.
+        rename($this->logDir, $this->logDir.'.stashed');
+        $this->assertDirectoryDoesNotExist($this->logDir);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/installer');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertDirectoryExists($this->logDir, 'The installer should create the log directory rather than refuse to run.');
+
+        $unwritableMessage = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.install.directory.unwritable', ['%path%' => $this->logDir]);
+        $this->assertStringNotContainsString($unwritableMessage, $crawler->filter('body')->html());
+
+        // The check step renders its "next" button only when there are no major problems.
+        $this->assertCount(1, $crawler->selectButton('install_check_step[buttons][next]'));
     }
 }

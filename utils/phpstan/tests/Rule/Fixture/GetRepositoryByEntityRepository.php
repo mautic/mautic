@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Tests\Rule\Fixture;
 
 // the repository is fetched by an entity constant - must be reported
-class GetRepositoryByEntityRepository
+final class GetRepositoryByEntityRepository
 {
     /**
      * @var object

@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-class Serializer
+final class Serializer
 {
     /**
      * Unserializing a string can be a security vulnerability as it can contain classes that can execute a PHP code.

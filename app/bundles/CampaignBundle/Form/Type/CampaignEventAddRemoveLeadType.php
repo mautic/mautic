@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CampaignBundle\Form\Validator\Constraints\InfiniteLoop;
@@ -10,13 +12,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventAddRemoveLeadType extends AbstractType
+final class CampaignEventAddRemoveLeadType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('addTo', CampaignListType::class, [
             'label'      => 'mautic.campaign.form.addtocampaigns',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class' => 'form-control',
             ],
@@ -28,7 +30,7 @@ class CampaignEventAddRemoveLeadType extends AbstractType
 
         $builder->add('removeFrom', CampaignListType::class, [
             'label'      => 'mautic.campaign.form.removefromcampaigns',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class' => 'form-control',
             ],

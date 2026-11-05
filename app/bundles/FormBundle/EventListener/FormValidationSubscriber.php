@@ -102,7 +102,7 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
 
         if (!empty($field->getValidation()['blockfreeemail'])) {
             $blockedProviders = $this->coreParametersHelper->get('blocked_free_email_providers') ?? [];
-            $domain           = strtolower((string) substr(strrchr($value, '@'), 1));
+            $domain           = strtolower(substr(strrchr($value, '@'), 1));
             if ($domain && in_array($domain, $blockedProviders, true)) {
                 $validationMsg = $field->getValidation()['blockfreeemail_validationmsg'] ?? $this->translator->trans('mautic.form.submission.email.freeproviders.invalid', [], 'validators');
                 $event->failedValidation($validationMsg);

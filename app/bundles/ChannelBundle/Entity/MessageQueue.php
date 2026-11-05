@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -88,7 +90,7 @@ class MessageQueue
      */
     private $dateSent;
 
-    private $options = [];
+    private array $options = [];
 
     /**
      * Used by listeners to note if the message had been processed in bulk.
@@ -104,10 +106,7 @@ class MessageQueue
      */
     private $failed = false;
 
-    /**
-     * @var bool
-     */
-    private $metadataUpdated = false;
+    private bool $metadataUpdated = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -200,10 +199,7 @@ class MessageQueue
         $this->attempts = $attempts;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -464,10 +460,7 @@ class MessageQueue
         $this->options['metadata'] = $metadata;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasMetadataUpdated()
+    public function wasMetadataUpdated(): bool
     {
         return $this->metadataUpdated;
     }

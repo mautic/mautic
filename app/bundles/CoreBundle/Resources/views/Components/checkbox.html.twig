@@ -1,0 +1,69 @@
+{% set items = items|default([]) %}
+{% set name = name|default('') %}
+{% set legend = legend|default(null) %}
+{% set helpText = helpText|default(null) %}
+{% set wrapperClass = wrapperClass|default('') %}
+{% set inline = inline|default(false) %}
+{% set reverse = reverse|default(false) %}
+{% set required = required|default(false) %}
+{% set base_id = (name ?: 'checkbox')|replace({'[': '-', ']': '', ' ': '-', '.': '-'}) %}
+{% set help_id = helpText ? base_id ~ '-help' : null %}
+
+<fieldset class="{{ [wrapperClass, 'border-0', 'p-0', 'm-0']|filter(value => value is not empty)|join(' ')|escape('html_attr') }}" style="min-width: 0; border: 0; padding: 0; margin: 0;">
+    {% if legend %}
+        <legend class="form-label mb-2">{{ legend|trans }}</legend>
+    {% endif %}
+
+    {% for item in items %}
+        {% set item_label = item.label|default('') %}
+        {% set item_value = item.value is defined ? item.value : loop.index0 %}
+        {% set item_id = item.id|default(base_id ~ '-' ~ loop.index0 ~ '-' ~ item_value|replace({' ': '-', '.': '-', '_': '-', '[': '-', ']': ''})|lower) %}
+        {% set item_name = item.name|default(name) %}
+        {% set item_attributes = item.attributes|default({}) %}
+        {% set classes = ['form-check'] %}
+
+        {% if inline %}
+            {% set classes = classes|merge(['form-check-inline']) %}
+        {% endif %}
+
+        {% if reverse %}
+            {% set classes = classes|merge(['form-check-reverse']) %}
+        {% endif %}
+
+        <div class="{{ classes|join(' ')|escape('html_attr') }}">
+            {% set input_classes = ['form-check-input'] %}
+            {% if item.className|default('') %}
+                {% set input_classes = input_classes|merge([item.className]) %}
+            {% endif %}
+            {% if item_attributes.class is defined and item_attributes.class is not empty %}
+                {% set input_classes = input_classes|merge([item_attributes.class]) %}
+            {% endif %}
+            <input
+                class="{{ input_classes|join(' ')|escape('html_attr') }}"
+                type="checkbox"
+                {% if item_name %}name="{{ item_name|escape('html_attr') }}"{% endif %}
+                id="{{ item_id|escape('html_attr') }}"
+                value="{{ item_value|escape('html_attr') }}"
+                {% if help_id %}aria-describedby="{{ help_id|escape('html_attr') }}"{% endif %}
+                {% if item.checked|default(false) %}checked{% endif %}
+                {% if item.disabled|default(false) %}disabled{% endif %}
+                {% if required %}required{% endif %}
+                {% for attr_key, attr_value in item_attributes %}
+                    {% if attr_key != 'class' and attr_value is not same as(false) and attr_value is not null %}
+                        {{ attr_key|escape('html_attr') }}{% if attr_value is not same as(true) %}="{{ attr_value|escape('html_attr') }}"{% endif %}
+                    {% endif %}
+                {% endfor %}
+            >
+            {% if item_label is not same as('') %}
+            <label class="form-check-label" for="{{ item_id|escape('html_attr') }}"{% for label_key, label_value in item.labelAttributes|default({}) %} {{ label_key|escape('html_attr') }}="{{ label_value|escape('html_attr') }}"{% endfor %}>
+                {% set item_text = item_label|trans(item.label_translation_parameters|default({}), item.translation_domain is defined ? item.translation_domain : null) %}
+                {% if item.label_html|default(false) %}{{ item_text|purify }}{% else %}{{ item_text|escape('html') }}{% endif %}
+            </label>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    {% if helpText %}
+        <div id="{{ help_id|escape('html_attr') }}" class="form-text">{{ helpText|trans }}</div>
+    {% endif %}
+</fieldset>

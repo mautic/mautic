@@ -26,4 +26,9 @@
             {{ dateToDate(packageDetail.time) }}
         </td>
     </tr>
+    {% for label, value in {
+        'marketplace.package.favorites': packageDetail.packageBase.favers,
+        'marketplace.package.dependents': packageDetail.dependents,
+        'marketplace.package.suggesters': packageDetail.suggesters
+    } %}<tr><th>{{ label|trans }}</th><td>{{ value }}</td></tr>{% endfor %}
 </table>

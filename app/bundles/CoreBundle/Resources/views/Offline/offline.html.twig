@@ -17,7 +17,7 @@
         <div class="{{ (error.isPrevious is defined and error.isPrevious is not empty) or (inline is defined and inline is not empty) ? 'col-sm-12' : 'col-sm-offset-2 col-sm-8' }}">
             <div class="pa-sm" style=" word-wrap: break-word;{% if (error.isPrevious is not defined or error.isPrevious is empty) and (inline is not defined or inline is empty) %} margin-top:100px;{% endif %}">
             {% if inline is defined and inline is not empty %}
-                <h3><i class="ri-alert-line ri-fw text-danger pull-left"></i>{{ error.message | raw }}</h3>
+                <h3><i class="ri-alert-line ri-fw text-danger float-start"></i>{{ error.message | raw }}</h3>
                 <h6 class="text-secondary">{{ error.file |raw ~ ':'~ error.line | raw }}</h6>
             {% else %}
                 <div class="text-center">
@@ -25,7 +25,7 @@
                 </div>
                 <div class="alert alert-danger">
                     <div>{{ error.message | raw }}</div>
-                    <div class="text-secondary small text-right mt-10">
+                    <div class="text-secondary small text-end mt-10">
                         {{ error.file | raw ~ ':'~ error.line | raw }}
                     </div>
                 </div>

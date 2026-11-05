@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -11,10 +13,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class AddToCompanyActionType extends AbstractType
+final class AddToCompanyActionType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router,
+        private readonly RouterInterface $router,
     ) {
     }
 

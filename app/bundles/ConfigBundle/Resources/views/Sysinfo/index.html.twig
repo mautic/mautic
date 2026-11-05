@@ -12,28 +12,28 @@
         <div class="pr-lg pl-lg pt-md pb-md">
             <!-- Nav tabs -->
             <ul class="list-group list-group-tabs" role="tablist">
-                <li role="presentation" class="list-group-item in active">
-                    <a href="#phpinfo" aria-controls="phpinfo" role="tab" data-toggle="tab" class="list-group-item-heading">
+                <li role="presentation" class="list-group-item show active">
+                    <a href="#phpinfo" aria-controls="phpinfo" role="tab" data-bs-toggle="tab" class="nav-link active list-group-item-heading" aria-selected="true">
                         {{ 'mautic.sysinfo.tab.phpinfo'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
-                    <a href="#recommendations" aria-controls="phpinfo" role="tab" data-toggle="tab" class="list-group-item-heading">
+                    <a href="#recommendations" aria-controls="recommendations" role="tab" data-bs-toggle="tab" class="nav-link list-group-item-heading">
                         {{ 'mautic.sysinfo.tab.recommendations'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
-                    <a href="#folders" aria-controls="folders" role="tab" data-toggle="tab" class="list-group-item-heading">
+                    <a href="#folders" aria-controls="folders" role="tab" data-bs-toggle="tab" class="nav-link list-group-item-heading">
                         {{ 'mautic.sysinfo.tab.folders'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
-                    <a href="#log" aria-controls="log" role="tab" data-toggle="tab" class="list-group-item-heading">
+                    <a href="#log" aria-controls="log" role="tab" data-bs-toggle="tab" class="nav-link list-group-item-heading">
                         {{ 'mautic.sysinfo.tab.log'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
-                    <a href="#dbinfo" aria-controls="dbinfo" role="tab" data-toggle="tab" class="list-group-item-heading">
+                    <a href="#dbinfo" aria-controls="dbinfo" role="tab" data-bs-toggle="tab" class="nav-link list-group-item-heading">
                         {{ 'mautic.sysinfo.tab.dbinfo'|trans }}
                     </a>
                 </li>
@@ -47,7 +47,7 @@
 
         <!-- Tab panes -->
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane fade in active bdr-w-0" id="phpinfo">
+            <div role="tabpanel" class="tab-pane fade show active bdr-w-0" id="phpinfo">
                 <div class="pt-md pr-md pl-md pb-md">
                     {{ phpInfo|raw }}
                 </div>

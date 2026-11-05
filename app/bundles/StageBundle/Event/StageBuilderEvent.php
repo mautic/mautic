@@ -6,7 +6,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class StageBuilderEvent extends Event
+final class StageBuilderEvent extends Event
 {
     private array $actions = [];
 

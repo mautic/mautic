@@ -565,10 +565,8 @@ final class SmsController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.sms.page', 1);
         $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $page]);
@@ -673,7 +671,7 @@ final class SmsController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->smsModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -718,15 +716,13 @@ final class SmsController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1,
-    ) {
+    ): Response {
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,

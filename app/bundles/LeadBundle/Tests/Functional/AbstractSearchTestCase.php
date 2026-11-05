@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +22,7 @@ abstract class AbstractSearchTestCase extends MauticMysqlTestCase
     protected function createContact(array $data): void
     {
         /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = static::getContainer()->get(LeadModel::class);
 
         $contact = (new Lead())
             ->setFirstname($data['firstname'])
@@ -48,7 +49,7 @@ abstract class AbstractSearchTestCase extends MauticMysqlTestCase
         $field->setIsIndex(true);
         $field->setType('text');
 
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = static::getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 
@@ -58,7 +59,7 @@ abstract class AbstractSearchTestCase extends MauticMysqlTestCase
     protected function createCompany(array $data): void
     {
         /** @var CompanyModel $companyModel */
-        $companyModel = static::getContainer()->get('mautic.lead.model.company');
+        $companyModel = static::getContainer()->get(CompanyModel::class);
 
         $company = (new Company())
             ->setName($data['name'] ?? null)

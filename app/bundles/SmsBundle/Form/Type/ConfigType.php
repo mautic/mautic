@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -12,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public const SMS_DISABLE_TRACKABLE_URLS = 'sms_disable_trackable_urls';
 
@@ -36,7 +38,7 @@ class ConfigType extends AbstractType
 
         $builder->add('sms_transport', ChoiceType::class, [
             'label'      => 'mautic.sms.config.select_default_transport',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.sms.config.select_default_transport',

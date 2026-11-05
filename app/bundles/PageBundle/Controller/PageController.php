@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Controller;
 
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
@@ -19,8 +20,8 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageEditSubmitEvent;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Mautic\PageBundle\Helper\PageConfig;
+use Mautic\PageBundle\Helper\PageSearchScopeProvider;
 use Mautic\PageBundle\Model\PageModel;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -29,6 +30,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class PageController extends FormController
 {
+    use CategoryListFiltersTrait;
     use FormErrorMessagesTrait;
 
     private const PERMISSION_PAGES_VIEW_OWN        = 'page:pages:viewown';
@@ -42,12 +44,13 @@ final class PageController extends FormController
     private PageModel $pageModel;
 
     #[Required]
-    public function autowirePageController(PageModel $pageModel): void
-    {
+    public function autowirePageController(
+        PageModel $pageModel,
+    ): void {
         $this->pageModel = $pageModel;
     }
 
-    public function indexAction(Request $request, PageConfig $pageConfig, PageHelperFactoryInterface $pageHelperFactory, PageModel $model, int $page = 1): Response
+    public function indexAction(Request $request, PageConfig $pageConfig, PageHelperFactoryInterface $pageHelperFactory, PageModel $model, PageSearchScopeProvider $pageSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissionBase = 'page:pages';
@@ -115,6 +118,13 @@ final class PageController extends FormController
         if (!str_contains($search, "{$langSearchCommand}:")) {
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
+        $categoryFilters = $this->applyCategoryListFilter(
+            $request,
+            'mautic.page.list_filters',
+            'page',
+            'c.id',
+            $filter
+        );
 
         $orderBy    = $request->getSession()->get('mautic.page.orderby', 'p.dateModified');
         $orderByDir = $request->getSession()->get('mautic.page.orderbydir', $this->getDefaultOrderDirection());
@@ -151,9 +161,11 @@ final class PageController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue' => $search,
-                'items'       => $pages,
-                'categories'  => $model->getLookupResults('category', '', 0),
+                'searchValue'  => $search,
+                'searchScopes' => $pageSearchScopeProvider->getScopes(),
+                'filters'      => $categoryFilters['filters'],
+                'items'        => $pages,
+                'categories'   => $categoryFilters['categories'],
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
@@ -486,8 +498,6 @@ final class PageController extends FormController
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @return JsonResponse|Response
      */
     public function editAction(
         Request $request,
@@ -496,7 +506,7 @@ final class PageController extends FormController
         ThemeHelper $themeHelper,
         int $objectId,
         bool $ignorePost = false,
-    ) {
+    ): Response {
         $entity     = $model->getEntity($objectId);
         $session    = $request->getSession();
         $page       = $request->getSession()->get('mautic.page.page', 1);
@@ -720,10 +730,8 @@ final class PageController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, PageModel $model, $objectId)
+    public function deleteAction(Request $request, PageModel $model, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.page.page', 1);
         $returnUrl = $this->generateUrl('mautic_page_index', ['page' => $page]);
@@ -822,7 +830,7 @@ final class PageController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->pageModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -924,10 +932,8 @@ final class PageController extends FormController
 
     /**
      * Make the variant the main.
-     *
-     * @return Response
      */
-    public function winnerAction(Request $request, PageModel $model, $objectId)
+    public function winnerAction(Request $request, PageModel $model, $objectId): Response
     {
         // todo - add confirmation to button click
         $page      = $request->getSession()->get('mautic.page.page', 1);

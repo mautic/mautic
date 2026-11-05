@@ -13,7 +13,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -31,7 +30,7 @@ final class ProfileController extends FormController
     /**
      * Generate's account profile.
      */
-    public function indexAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher,
+    public function indexAction(Request $request, LanguageHelper $languageHelper,
         TokenStorageInterface $tokenStorage, SAMLHelper $samlHelper): Response|RedirectResponse
     {
         // get current user
@@ -72,7 +71,7 @@ final class ProfileController extends FormController
                             TextType::class,
                             [
                                 'label'      => 'mautic.core.firstname',
-                                'label_attr' => ['class' => 'control-label'],
+                                'label_attr' => ['class' => 'form-label'],
                                 'attr'       => ['class' => 'form-control'],
                                 'mapped'     => false,
                                 'disabled'   => true,
@@ -87,7 +86,7 @@ final class ProfileController extends FormController
                             TextType::class,
                             [
                                 'label'      => 'mautic.core.lastname',
-                                'label_attr' => ['class' => 'control-label'],
+                                'label_attr' => ['class' => 'form-label'],
                                 'attr'       => ['class' => 'form-control'],
                                 'mapped'     => false,
                                 'disabled'   => true,
@@ -105,7 +104,7 @@ final class ProfileController extends FormController
                             TextType::class,
                             [
                                 'label'      => 'mautic.core.username',
-                                'label_attr' => ['class' => 'control-label'],
+                                'label_attr' => ['class' => 'form-label'],
                                 'attr'       => ['class' => 'form-control'],
                                 'mapped'     => false,
                                 'disabled'   => true,
@@ -122,7 +121,7 @@ final class ProfileController extends FormController
                             TextType::class,
                             [
                                 'label'      => 'mautic.core.position',
-                                'label_attr' => ['class' => 'control-label'],
+                                'label_attr' => ['class' => 'form-label'],
                                 'attr'       => ['class' => 'form-control'],
                                 'mapped'     => false,
                                 'disabled'   => true,
@@ -139,7 +138,7 @@ final class ProfileController extends FormController
                             TextType::class,
                             [
                                 'label'      => 'mautic.core.type.email',
-                                'label_attr' => ['class' => 'control-label'],
+                                'label_attr' => ['class' => 'form-label'],
                                 'attr'       => ['class' => 'form-control'],
                                 'mapped'     => false,
                                 'disabled'   => true,
@@ -160,7 +159,7 @@ final class ProfileController extends FormController
             // check to see if the password needs to be rehashed
             $formUser              = $request->request->all()['user'] ?? [];
             $submittedPassword     = $formUser['plainPassword']['password'] ?? null;
-            $overrides['password'] = $this->userModel->checkNewPassword($me, $hasher, $submittedPassword);
+            $overrides['password'] = $this->userModel->checkNewPassword($me, $submittedPassword);
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     foreach ($overrides as $k => $v) {

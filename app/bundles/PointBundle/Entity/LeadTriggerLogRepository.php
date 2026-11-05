@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<LeadTriggerLog>
  */
-class LeadTriggerLogRepository extends CommonRepository
+final class LeadTriggerLogRepository extends CommonRepository
 {
     /**
      * Updates lead ID (e.g. after a lead merge).
@@ -33,7 +33,7 @@ class LeadTriggerLogRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
 
-        if (!empty($events)) {
+        if ([] !== $events) {
             $q->andWhere(
                 $q->expr()->notIn('event_id', ':events')
             )

@@ -7,14 +7,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
+final class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
     public const PRIORITY = 100;
 
     /**
      * @var HttpKernelInterface
      */
-    protected $app;
+    private $app;
 
     public function __construct(HttpKernelInterface $app)
     {

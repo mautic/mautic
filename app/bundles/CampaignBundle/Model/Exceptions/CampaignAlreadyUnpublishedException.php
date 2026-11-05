@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Model\Exceptions;
 
-class CampaignAlreadyUnpublishedException extends \Exception
+final class CampaignAlreadyUnpublishedException extends \Exception
 {
 }

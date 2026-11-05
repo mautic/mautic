@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -23,7 +25,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 <info>php %command.full_name%</info>
 TXT
 )]
-class UnusedIpDeleteCommand extends ModeratedCommand
+final class UnusedIpDeleteCommand extends ModeratedCommand
 {
     private const DEFAULT_LIMIT = 10000;
 

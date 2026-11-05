@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Report;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
-class FieldDAO
+final class FieldDAO
 {
     public const FIELD_CHANGED   = 'changed';
 

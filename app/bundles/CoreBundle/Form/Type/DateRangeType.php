@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * @extends AbstractType<mixed>
  */
-class DateRangeType extends AbstractType
+final class DateRangeType extends AbstractType
 {
     public function __construct(
         private readonly RequestStack $requestStack,
@@ -46,7 +46,7 @@ class DateRangeType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.date.from',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
                 'data'       => $dateFrom->format($humanFormat),
@@ -64,7 +64,7 @@ class DateRangeType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.date.to',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
                 'data'       => $dateTo->format($humanFormat),

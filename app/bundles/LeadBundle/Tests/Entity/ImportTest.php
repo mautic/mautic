@@ -90,7 +90,7 @@ final class ImportTest extends StandardImportTestHelper
         $import->increaseIgnoredCount();
         $import->increaseIgnoredCount();
 
-        $expectedCount = (int) (2 + $expectedCount);
+        $expectedCount = 2 + $expectedCount;
         $this->assertSame($expectedCount, $import->getProcessedRows()); // @phpstan-ignore argument.unresolvableType (I don't see anything wrong)
     }
 

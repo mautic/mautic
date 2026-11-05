@@ -12,14 +12,14 @@
 {% set alertId = (dismissible ? 'dismissible-' : '') ~ 'alert-' ~ cleanedPathString ~ '-' ~ sanitizedTitle %}
 
 <div id="{{ alertId }}" class="alert alert-{{ alert_type }}">
-    <div class="d-flex fd-column fd-row-md jc-space-between fg-1">
-        <div class="d-flex ai-center fw-wrap mr-xs">
+    <div class="d-flex flex-column flex-lg-row justify-content-between flex-grow-1">
+        <div class="d-flex align-items-center flex-wrap mr-xs">
             <strong class="mr-xs">{{ title | trans }}</strong>
             {{ content | trans }}
         </div>
 
         {% if action_label is defined and action_link is defined %}
-            <a class="fs-0{% if dismissible %} mr-lg{% endif %}" href="{{ action_link }}">{{ action_label | trans }}</a>
+            <a class="flex-shrink-0{% if dismissible %} mr-lg{% endif %}" href="{{ action_link }}">{{ action_label | trans }}</a>
         {% endif %}
 
         {% if dismissible %}

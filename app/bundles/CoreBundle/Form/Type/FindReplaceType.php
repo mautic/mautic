@@ -26,7 +26,7 @@ final class FindReplaceType extends AbstractType
                 'required'    => true,
                 'choices'     => $options['field_choices'],
                 'placeholder' => 'mautic.core.form.chooseone',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
             ]
         );
@@ -37,7 +37,7 @@ final class FindReplaceType extends AbstractType
             [
                 'label'      => 'mautic.core.find_replace.find',
                 'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -48,7 +48,7 @@ final class FindReplaceType extends AbstractType
             [
                 'label'      => 'mautic.core.find_replace.replace',
                 'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -70,7 +70,7 @@ final class FindReplaceType extends AbstractType
                 'save_text'      => 'mautic.core.find_replace.replace_all',
                 'cancel_onclick' => 'javascript:void(0);',
                 'cancel_attr'    => [
-                    'data-dismiss' => 'modal',
+                    'data-bs-dismiss' => 'modal',
                 ],
             ]
         );

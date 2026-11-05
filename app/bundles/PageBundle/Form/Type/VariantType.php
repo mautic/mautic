@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class VariantType extends AbstractType
+final class VariantType extends AbstractType
 {
     public function __construct(
         private readonly PageModel $pageModel,
@@ -27,7 +27,7 @@ class VariantType extends AbstractType
             'weight',
             IntegerType::class, [
                 'label'      => 'mautic.core.ab_test.form.traffic_weight',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.ab_test.form.traffic_weight.help',
@@ -50,7 +50,7 @@ class VariantType extends AbstractType
                 'winnerCriteria',
                 ChoiceType::class, [
                     'label'      => 'mautic.core.ab_test.form.winner',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'    => 'form-control',
                         'onchange' => 'Mautic.getAbTestWinnerForm(\'page\', \'page\', this);',

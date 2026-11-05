@@ -388,7 +388,11 @@ blockquote {
   border-width: 0px;
 }
 
-.help-block {
+.help-block,
+.form-text {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
   font-size: 12px;
   color: var(--text-helper);
 }
@@ -399,8 +403,11 @@ code {
 }
 
 pre {
-  min-height: 40px;
   overflow: auto;
+}
+
+.code-snippet--multi pre.code-snippet__code {
+  min-height: 40px;
 }
 
 .code-snippet--multi pre.code-snippet__code:before {

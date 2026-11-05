@@ -17,11 +17,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class NotificationSendTypeTest extends TypeTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setup();
-    }
-
     /**
      * @return array<mixed>
      */

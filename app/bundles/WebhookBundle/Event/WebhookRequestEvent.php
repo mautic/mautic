@@ -7,7 +7,7 @@ namespace Mautic\WebhookBundle\Event;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class WebhookRequestEvent extends Event
+final class WebhookRequestEvent extends Event
 {
     public function __construct(
         private readonly Lead $contact,

@@ -12,11 +12,11 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Twilio\Exceptions\ConfigurationException;
 
-class TwilioCallback implements CallbackInterface
+final readonly class TwilioCallback implements CallbackInterface
 {
     public function __construct(
-        private readonly ContactHelper $contactHelper,
-        private readonly Configuration $configuration,
+        private ContactHelper $contactHelper,
+        private Configuration $configuration,
     ) {
     }
 

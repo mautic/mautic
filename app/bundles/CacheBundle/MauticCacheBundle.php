@@ -6,6 +6,6 @@ namespace Mautic\CacheBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class MauticCacheBundle extends Bundle
+final class MauticCacheBundle extends Bundle
 {
 }

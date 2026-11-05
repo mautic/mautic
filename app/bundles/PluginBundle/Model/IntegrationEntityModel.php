@@ -16,8 +16,9 @@ class IntegrationEntityModel extends FormModel
     private IntegrationEntityRepository $integrationEntityRepository;
 
     #[Required]
-    public function autowireIntegrationEntityModel(IntegrationEntityRepository $integrationEntityRepository): void
-    {
+    public function autowireIntegrationEntityModel(
+        IntegrationEntityRepository $integrationEntityRepository,
+    ): void {
         $this->integrationEntityRepository = $integrationEntityRepository;
     }
 

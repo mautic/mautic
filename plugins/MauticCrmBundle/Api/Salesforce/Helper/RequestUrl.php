@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper;
 
-class RequestUrl
+final class RequestUrl
 {
     /**
      * Correctly generate the URL based on given URL parts.

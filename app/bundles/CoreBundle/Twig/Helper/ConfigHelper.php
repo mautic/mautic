@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

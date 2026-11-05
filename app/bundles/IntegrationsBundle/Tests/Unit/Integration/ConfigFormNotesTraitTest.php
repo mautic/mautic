@@ -43,15 +43,12 @@ final class ConfigFormNotesTraitTest extends TestCase
             }
         };
 
-        $this->assertInstanceOf(Note::class, $configFormNotes->getAuthorizationNote());
         $this->assertSame(Note::TYPE_WARNING, $configFormNotes->getAuthorizationNote()->getType());
         $this->assertSame('Authorisation', $configFormNotes->getAuthorizationNote()->getNote());
 
-        $this->assertInstanceOf(Note::class, $configFormNotes->getFeaturesNote());
         $this->assertSame(Note::TYPE_INFO, $configFormNotes->getFeaturesNote()->getType());
         $this->assertSame('Features', $configFormNotes->getFeaturesNote()->getNote());
 
-        $this->assertInstanceOf(Note::class, $configFormNotes->getFieldMappingNote());
         $this->assertSame(Note::TYPE_WARNING, $configFormNotes->getFieldMappingNote()->getType());
         $this->assertSame('Field Mapping', $configFormNotes->getFieldMappingNote()->getNote());
     }

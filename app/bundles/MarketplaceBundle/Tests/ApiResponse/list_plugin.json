@@ -1,0 +1,29 @@
+{
+    "results": [
+        {
+            "name": "example/newsletter-plugin-one",
+            "display_name": "Newsletter Plugin One",
+            "type": "mautic-plugin",
+            "description": "A newsletter plugin package.",
+            "url": "https://marketplace.mautic.org/packages/example/newsletter-plugin-one",
+            "repository": "https://github.com/example/newsletter-plugin",
+            "downloads": 123,
+            "favers": 4,
+            "average_rating": 4.5,
+            "total_reviews": 2
+        },
+        {
+            "name": "example/newsletter-plugin-two",
+            "display_name": "Newsletter Plugin Two",
+            "type": "mautic-plugin",
+            "description": "A newsletter plugin package.",
+            "url": "https://marketplace.mautic.org/packages/example/newsletter-plugin-two",
+            "repository": "https://github.com/example/newsletter-plugin",
+            "downloads": 123,
+            "favers": 4,
+            "average_rating": 4.5,
+            "total_reviews": 2
+        }
+    ],
+    "total": 2
+}

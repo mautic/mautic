@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -10,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class FacebookType extends AbstractType
+final class FacebookType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -25,7 +27,7 @@ class FacebookType extends AbstractType
             'label'             => 'mautic.integration.Facebook.share.layout',
             'required'          => false,
             'placeholder'       => false,
-            'label_attr'        => ['class' => 'control-label'],
+            'label_attr'        => ['class' => 'form-label'],
             'attr'              => ['class' => 'form-control'],
         ]);
 
@@ -38,7 +40,7 @@ class FacebookType extends AbstractType
             'label'             => 'mautic.integration.Facebook.share.action',
             'required'          => false,
             'placeholder'       => false,
-            'label_attr'        => ['class' => 'control-label'],
+            'label_attr'        => ['class' => 'form-label'],
             'attr'              => ['class' => 'form-control'],
         ]);
 

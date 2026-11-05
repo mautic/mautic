@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class MauticUserBundle extends Bundle
+final class MauticUserBundle extends Bundle
 {
     public function build(ContainerBuilder $container): void
     {

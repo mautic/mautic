@@ -22,7 +22,7 @@ final class DoctrineEventsSubscriber
      * @param string $tablePrefix
      */
     public function __construct(
-        #[Autowire('%mautic.db_table_prefix%')]
+        #[Autowire(param: 'mautic.db_table_prefix')]
         private $tablePrefix,
     ) {
     }

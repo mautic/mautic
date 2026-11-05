@@ -22,7 +22,7 @@ final class FieldModelDeleteTest extends MauticMysqlTestCase
     public function testBatchDeleteFields(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         $leadField = new LeadField();
         $leadField->setName('Test Lead Field')
@@ -58,7 +58,7 @@ final class FieldModelDeleteTest extends MauticMysqlTestCase
 
     private function columnExists(string $table, string $column): bool
     {
-        $prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         return (bool) $this->connection->createQueryBuilder()
             ->select('1')

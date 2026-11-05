@@ -8,7 +8,7 @@ Mautic.notificationOnLoad = function (container, response) {
 };
 
 Mautic.selectNotificationType = function(notificationType) {
-    if (notificationType == 'list') {
+    if (notificationType === 'list') {
         mQuery('#leadList').removeClass('hide');
         mQuery('#publishStatus').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newListNotification);
@@ -31,10 +31,10 @@ Mautic.standardNotificationUrl = function(options) {
         return;
     }
 
-    var url = options.windowUrl;
+    const url = options.windowUrl;
     if (url) {
-        var editEmailKey = '/notifications/edit/notificationId';
-        var previewEmailKey = '/notifications/preview/notificationId';
+        const editEmailKey = '/notifications/edit/notificationId';
+        const previewEmailKey = '/notifications/preview/notificationId';
         if (url.indexOf(editEmailKey) > -1 ||
             url.indexOf(previewEmailKey) > -1) {
             options.windowUrl = url.replace('notificationId', mQuery('#campaignevent_properties_notification').val());
@@ -45,38 +45,41 @@ Mautic.standardNotificationUrl = function(options) {
 };
 
 Mautic.disabledNotificationAction = function(opener) {
-    if (typeof opener == 'undefined') {
+    if (typeof opener === 'undefined') {
         opener = window;
     }
 
-    var notification = opener.mQuery('#campaignevent_properties_notification').val();
+    const notification = opener.mQuery('#campaignevent_properties_notification').val();
 
-    var disabled = notification === '' || notification === null;
+    const disabled = notification === '' || notification === null;
 
     opener.mQuery('#campaignevent_properties_editNotificationButton').prop('disabled', disabled);
 };
 
 Mautic.activatePreviewPanelUpdate = function () {
-    var notificationPreview = mQuery('#notification-preview');
-    var notificationForm    = mQuery('form[name="notification"]');
+    const notificationPreview = mQuery('#notification-preview');
+    const notificationForm    = mQuery('form[name="notification"]');
 
     if (notificationPreview.length && notificationForm.length) {
-        var inputs = notificationForm.find('input,textarea');
+        const previewFields = {
+            'notification[heading]': notificationPreview.find('[data-notification-preview="heading"]'),
+            'notification[message]': notificationPreview.find('[data-notification-preview="message"]'),
+            'notification[button]': notificationPreview.find('[data-notification-preview="button"]')
+        };
 
-        inputs.on('blur', function () {
-            var $this = mQuery(this);
-            var name  = $this.attr('name');
+        notificationForm.find('input,textarea').on('input', function () {
+            const $this = mQuery(this);
+            const name  = $this.attr('name');
+            const previewField = previewFields[name];
 
-            if (name === 'notification[heading]') {
-                notificationPreview.find('h4').text($this.val());
-            }
+            if (previewField && previewField.length) {
+                const value = $this.val().trim();
+                const fallback = previewField.attr('data-notification-preview-default') || '';
 
-            if (name === 'notification[message]') {
-                notificationPreview.find('p').text($this.val());
-            }
-
-            if (name === 'notification[url]') {
-                notificationPreview.find('span').not('.ri-notification-3-fill').text($this.val());
+                previewField.text(value || fallback);
+                if (name === 'notification[button]') {
+                    previewField.toggleClass('hide', !value);
+                }
             }
         });
     }

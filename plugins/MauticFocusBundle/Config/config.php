@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'name'        => 'Mautic Focus',
     'description' => 'Drive visitor\'s focus on your website with Mautic Focus',
@@ -38,19 +40,6 @@ return [
                 'path'       => '/focus/{id}/js',
                 'controller' => 'MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController::generateJsAction',
                 'method'     => 'POST',
-            ],
-        ],
-    ],
-
-    'services' => [
-        'other' => [
-            'mautic.focus.helper.token' => [
-                'class'     => MauticPlugin\MauticFocusBundle\Helper\TokenHelper::class,
-                'arguments' => [
-                    'mautic.focus.model.focus',
-                    'router',
-                    'mautic.security',
-                ],
             ],
         ],
     ],

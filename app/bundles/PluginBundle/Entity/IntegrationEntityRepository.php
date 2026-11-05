@@ -71,12 +71,12 @@ class IntegrationEntityRepository extends CommonRepository
             }
         }
 
-        if ($startDate and !$push) {
+        if ($startDate && !$push) {
             $q->andWhere('i.last_sync_date >= :startDate')
                 ->setParameter('startDate', $startDate);
         }
 
-        if ($endDate and !$push) {
+        if ($endDate && !$push) {
             $q->andWhere('i.last_sync_date <= :endDate')
                 ->setParameter('endDate', $endDate);
         }
@@ -272,7 +272,7 @@ class IntegrationEntityRepository extends CommonRepository
 
         // Group by email to prevent duplicates from affecting this
 
-        if (false === $limit and $integrationEntity) {
+        if (false === $limit && $integrationEntity) {
             $q->groupBy('i.integration_entity')->having('total');
         }
         if ($limit) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -14,7 +16,7 @@ use Symfony\Component\Validator\Constraints\Url;
 /**
  * @extends AbstractType<mixed>
  */
-class SubmitActionRepostType extends AbstractType
+final class SubmitActionRepostType extends AbstractType
 {
     use FormFieldTrait;
 
@@ -25,7 +27,7 @@ class SubmitActionRepostType extends AbstractType
             UrlType::class,
             [
                 'label'      => 'mautic.form.action.repost.post_url',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'preaddon' => 'ri-earth-line',
@@ -46,7 +48,7 @@ class SubmitActionRepostType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.action.repost.authorization_header',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.form.action.repost.authorization_header.tooltip',
@@ -61,7 +63,7 @@ class SubmitActionRepostType extends AbstractType
             EmailType::class,
             [
                 'label'      => 'mautic.form.action.repost.failure_email',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.form.action.repost.failure_email.tooltip',
@@ -82,7 +84,7 @@ class SubmitActionRepostType extends AbstractType
                 TextType::class,
                 [
                     'label'      => $label." ({$alias})",
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class' => 'form-control',
                     ],

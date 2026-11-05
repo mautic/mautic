@@ -39,7 +39,7 @@
                         {% endif %}
                         <a href="{{url}}"{{ parseMenuAttributes(linkAttributes) }}>
                             {% if (extras.iconClass is defined and extras.iconClass is not empty) %}
-                            <span style="margin-top: 4px;" class="icon pull-left fa {{ extras.iconClass }}"></span>
+                            <span style="margin-top: 4px;" class="icon float-start fa {{ extras.iconClass }}"></span>
                             {% endif %}
 
                             {% set labelAttributes = child.getLabelAttributes() %}

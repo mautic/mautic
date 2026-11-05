@@ -23,6 +23,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\Email as EmailMime;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -52,7 +53,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('sendToDncStatus', $content);
         $this->assertSame($sendToDnc, $content['sendToDncStatus']);
         $this->assertSame(
-            static::getContainer()->get('translator')->trans($expectedTranslationKey),
+            self::getContainer()->get(TranslatorInterface::class)->trans($expectedTranslationKey),
             $content['sendToDncText']
         );
     }
@@ -79,7 +80,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     public function testSendTestEmailAction(): void
     {
         /** @var CoreParametersHelper $parameters */
-        $parameters = self::getContainer()->get('mautic.helper.core_parameters');
+        $parameters = self::getContainer()->get(CoreParametersHelper::class);
 
         $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendTestEmail');
         self::assertResponseIsSuccessful();
@@ -91,7 +92,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(EmailMime::class, $email);
 
         /** @var UserHelper $userHelper */
-        $userHelper = static::getContainer()->get(UserHelper::class);
+        $userHelper = self::getContainer()->get(UserHelper::class);
         $user       = $userHelper->getUser();
 
         $this->assertSame('Mautic test email', $email->getSubject());
@@ -271,7 +272,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $email->setSubject('Email Subject');
         $email->setEmailType('template');
         $this->em->persist($email);
-        $this->em->flush($email);
+        $this->em->flush();
 
         $payload = [
             'action'     => 'email:getLookupChoiceList',
@@ -328,7 +329,6 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(Email::class, $email);
         $this->assertFalse($email->isPublished(), 'The email should not be published.');
         $this->assertInstanceOf(EmailEvent::class, $dispatchedEvent, 'The event should have been dispatched.');
-        $this->assertInstanceOf(Email::class, $email);
         $this->assertSame($email->getId(), $dispatchedEvent->getEmail()->getId(), 'The email entity should match the one in the request.');
     }
 

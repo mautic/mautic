@@ -19,7 +19,7 @@ abstract class AbstractEventAccessor
         'channelIdField',
     ];
 
-    private array $extraProperties = [];
+    private array $extraProperties;
 
     public function __construct(
         protected array $config,

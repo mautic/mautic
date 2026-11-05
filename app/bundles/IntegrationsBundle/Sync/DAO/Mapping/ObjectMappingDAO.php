@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
-class ObjectMappingDAO
+final class ObjectMappingDAO
 {
     public const SYNC_TO_MAUTIC       = 'mautic';
 

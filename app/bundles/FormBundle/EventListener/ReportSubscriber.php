@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -34,6 +35,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         private CoreParametersHelper $coreParametersHelper,
         private TranslatorInterface $translator,
         private DncReportService $dncReportService,
+        private FormRepository $formRepository,
     ) {
     }
 
@@ -128,12 +130,11 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         }
 
         if ($event->checkContext(self::CONTEXT_FORM_RESULT)) {
-            $formRepository = $this->formModel->getRepository();
             // select only the table for an existing report, if the setting is disabled
             if (false === $this->coreParametersHelper->get('form_results_data_sources')) {
                 $reportSource = empty($event->getContext()) ? ($event->getReportSource() ?? '') : $event->getContext();
 
-                $id   = $formRepository->getFormTableIdViaResults($reportSource);
+                $id   = $this->formRepository->getFormTableIdViaResults($reportSource);
                 $args = [
                     'filter' => [
                         'force' => [
@@ -147,7 +148,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                 ];
             }
 
-            $forms = $formRepository->getEntities($args ?? []);
+            $forms = $this->formRepository->getEntities($args ?? []);
             foreach ($forms as $form) {
                 $formEntity         = $form[0];
 
@@ -165,7 +166,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     'columns'      => $formResultsColumns,
                 ];
 
-                $resultsTableName   = $formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
+                $resultsTableName   = $this->formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
                 $event->addTable(self::CONTEXT_FORM_RESULT.'.'.$resultsTableName, $data, self::CONTEXT_FORM_RESULT);
             }
         }

@@ -82,6 +82,78 @@ export default class BuilderService {
     MjmlService.__gjsBuilderListStylesPatched = true;
   }
 
+  patchMjmlCommentViews(editor) {
+    const dc = editor?.DomComponents;
+    if (!dc || dc.__mauticMjmlCommentViewPatched) {
+      return;
+    }
+
+    const commentType = dc.getType('comment');
+    const BaseCommentModel = commentType?.model;
+    const BaseCommentView = commentType?.view;
+
+    if (!BaseCommentModel || !BaseCommentView) {
+      return;
+    }
+
+    dc.addType('comment', {
+      model: BaseCommentModel,
+      view: BaseCommentView.extend({
+        _createElement() {
+          const parent = typeof this.model?.parent === 'function' ? this.model.parent() : null;
+          const parentTagName = `${parent?.get?.('tagName') || ''}`.toLowerCase();
+
+          if (parentTagName !== 'mj-body') {
+            return document.createComment(this.model.content || '');
+          }
+
+          const marker = document.createElement('div');
+          marker.setAttribute('aria-hidden', 'true');
+          marker.setAttribute('data-gjs-comment-marker', 'true');
+          marker.style.cssText =
+            'display:block;width:100%;height:1px;min-height:1px;margin:0;padding:0;border:0;opacity:0;overflow:hidden;pointer-events:none;';
+
+          return marker;
+        },
+      }),
+    });
+
+    dc.__mauticMjmlCommentViewPatched = true;
+  }
+
+  patchMjmlStyleSerialization(editor) {
+    const dc = editor?.DomComponents;
+    if (!dc || dc.__mauticMjmlStyleSerializationPatched) {
+      return;
+    }
+
+    const textNodeType = dc.getType('textnode');
+    const BaseTextNodeModel = textNodeType?.model;
+
+    if (!BaseTextNodeModel) {
+      return;
+    }
+
+    dc.addType('textnode', {
+      model: BaseTextNodeModel.extend({
+        toHTML() {
+          const parent = typeof this.parent === 'function' ? this.parent() : null;
+          const parentTagName = `${parent?.get?.('tagName') || ''}`.toLowerCase();
+
+          // CSS is raw text in MJML. Escaping child selectors here turns `>` into
+          // `&gt;`, which makes the saved stylesheet invalid when it is reopened.
+          if (parentTagName === 'mj-style') {
+            return this.content;
+          }
+
+          return BaseTextNodeModel.prototype.toHTML.call(this);
+        },
+      }),
+    });
+
+    dc.__mauticMjmlStyleSerializationPatched = true;
+  }
+
   /**
    * Initialize GrapesJsBuilder
    *
@@ -1278,6 +1350,8 @@ export default class BuilderService {
       },
     });
 
+    this.patchMjmlCommentViews(this.editor);
+    this.patchMjmlStyleSerialization(this.editor);
     this.unsetComponentVoidTypes(this.editor);
     this.editor.setComponents(components);
 

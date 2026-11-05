@@ -8,7 +8,7 @@ use Doctrine\DBAL\Types\Type;
 use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 
-class ExampleClassWithPrivateProperty
+final class ExampleClassWithPrivateProperty
 {
     /**
      * @phpstan-ignore-next-line
@@ -16,15 +16,15 @@ class ExampleClassWithPrivateProperty
     private string $test = 'value';
 }
 
-class ExampleClassWithProtectedProperty
+final class ExampleClassWithProtectedProperty
 {
     /**
      * @phpstan-ignore-next-line
      */
-    protected $test = 'value';
+    private string $test = 'value';
 }
 
-class ExampleClassWithPublicProperty
+final class ExampleClassWithPublicProperty
 {
     /**
      * @phpstan-ignore-next-line

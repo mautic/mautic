@@ -11,6 +11,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 final class ProjectAddEntityTest extends MauticMysqlTestCase
 {
@@ -175,7 +176,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $user->setLastName('User');
         $user->setUsername('testuser');
         $user->setEmail('test@example.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $user->setPassword($hasher->hash('password'));
         $user->setRole($role);
         $this->em->persist($user);

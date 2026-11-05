@@ -2,38 +2,20 @@
 
 namespace Mautic\ConfigBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ConfigBundle\Model\SysinfoModel;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\FormBundle\Helper\FormFieldHelper;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class SysinfoController extends FormController
 {
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        private readonly SysinfoModel $sysinfoModel,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private SysinfoModel $sysinfoModel;
+
+    #[Required]
+    public function autowireSysinfoController(
+        SysinfoModel $sysinfoModel,
+    ): void {
+        $this->sysinfoModel = $sysinfoModel;
     }
 
     public function indexAction(): Response

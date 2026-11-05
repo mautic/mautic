@@ -315,7 +315,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
             if (!$options['ignoreDNC']) {
                 $categories = $this->leadModel->getUnsubscribedLeadCategoriesIds($contact);
-                if ($emailCategory && !empty($categories) && in_array($emailCategory, $categories)) {
+                if ($emailCategory && [] !== $categories && in_array($emailCategory, $categories)) {
                     // Pass with a note to the UI because no use retrying
                     $event->passWithError(
                         $pending->get($logId),

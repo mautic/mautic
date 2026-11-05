@@ -74,6 +74,28 @@ final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($date->format('P'), $helper->getLocalTimezoneOffset());
     }
 
+    public function testLocalTimezoneUsesCurrentPhpTimezone(): void
+    {
+        $originalTimezone = date_default_timezone_get();
+        $reflection       = new \ReflectionClass(DateTimeHelper::class);
+        $property         = $reflection->getProperty('defaultLocalTimezone');
+        $originalLocalTimezone = $property->getValue();
+
+        try {
+            date_default_timezone_set('America/Sao_Paulo');
+            $helper = new DateTimeHelper(new \DateTimeImmutable('2026-10-05 00:07:30', new \DateTimeZone('UTC')));
+
+            date_default_timezone_set('Europe/Lisbon');
+            DateTimeHelper::setLocalTimezone('Europe/Lisbon');
+            $helper->setDateTime($helper->getDateTime(), DateTimeHelper::FORMAT_DB, 'local');
+
+            $this->assertSame('2026-10-05 01:07:30', $helper->getLocalDateTime()->format(DateTimeHelper::FORMAT_DB));
+        } finally {
+            $property->setValue(null, $originalLocalTimezone);
+            date_default_timezone_set($originalTimezone);
+        }
+    }
+
     public function testGetDiff(): void
     {
         // Initialize DateTimeHelper with a specific date and timezone
@@ -250,7 +272,6 @@ final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
     {
         $result = DateTimeHelper::setTimeIfMissing($input, $defaultTime, $timezone);
 
-        $this->assertInstanceOf(\DateTimeImmutable::class, $result);
         $this->assertSame($expectedOutput, $result->format('Y-m-d H:i:s'));
         $this->assertSame($expectedTimezone, $result->getTimezone()->getName());
     }
@@ -322,5 +343,35 @@ final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         yield 'with America/New_York timezone' => [
             '2025-01-31', '00:00:00', 'America/New_York', '2025-01-31 00:00:00', 'America/New_York',
         ];
+    }
+
+    public function testSetDateTimeDoesNotMutateCallerDateTime(): void
+    {
+        $originalTimezone = date_default_timezone_get();
+        date_default_timezone_set('Europe/Berlin');
+
+        try {
+            $input = new \DateTime('2026-12-15 19:00:00', new \DateTimeZone('Europe/Berlin'));
+            $helper = new DateTimeHelper();
+            // System "local" timezone for DateTimeHelper comes from default_timezone (often UTC).
+            $helper->setDateTime($input, DateTimeHelper::FORMAT_DB, 'local');
+            $helper->toLocalString();
+
+            $this->assertSame('Europe/Berlin', $input->getTimezone()->getName());
+            $this->assertSame('2026-12-15 19:00:00', $input->format('Y-m-d H:i:s'));
+        } finally {
+            date_default_timezone_set($originalTimezone);
+        }
+    }
+
+    public function testToLocalStringDoesNotMutateInternalDateTimeTimezone(): void
+    {
+        $helper = new DateTimeHelper('2026-12-15 19:00:00', DateTimeHelper::FORMAT_DB, 'Europe/Berlin');
+        $before = $helper->getDateTime()->getTimezone()->getName();
+        $helper->toLocalString();
+        $after = $helper->getDateTime()->getTimezone()->getName();
+
+        $this->assertSame($before, $after);
+        $this->assertSame('Europe/Berlin', $after);
     }
 }

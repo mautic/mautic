@@ -241,7 +241,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $contacts = $dncEvent->getContacts(); // The contacts param is reset here too, no?
 
         // Check if any contacts remain. If not, return early.
-        if (empty($contacts)) {
+        if ([] === $contacts) {
             return $results;
         }
 
@@ -536,12 +536,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     }
 
     /**
-     * @param string $filter
-     * @param int    $limit
-     * @param int    $start
-     * @param array  $options
+     * @param string|array<int, string> $filter
+     * @param array<string, mixed>      $options
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
         switch ($type) {

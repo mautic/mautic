@@ -3,6 +3,18 @@
 	<!-- CSS-STYLE -->
 	<mj-style inline="inline"> p, li {margin:0 !important; padding:0; line-height:140%;}
 	</mj-style>
+	<mj-attributes>
+	  <mj-all font-family="Ubuntu, Helvetica, Arial, sans-serif"></mj-all>
+	  <mj-text mj-class="t-body"></mj-text>
+	  <mj-button border-radius="3px" padding="10px 25px"></mj-button>
+	  <mj-section></mj-section>
+
+	  <mj-class name="t-body" font-size="16px"></mj-class>
+	  <mj-class name="t-btn" inner-padding="16px 32px"></mj-class>
+	  <mj-class name="t-btn-primary" background-color="#{{ getBrandPrimaryColor() }}" color="#{{ getTextOnBrandColor() }}" font-size="16px"></mj-class>
+	  <mj-class name="t-section"></mj-class>
+	  <mj-class name="t-surface-1" background-color="#ffffff"></mj-class>
+	</mj-attributes>
   </mj-head>
   <!-- BODY -->
   <mj-body background-color="#f4f4f4">
@@ -33,7 +45,7 @@
 	</mj-section>
 	<mj-section background-color="#ffffff">
 	  <mj-column width="530px">
-		<mj-text font-size="16px" align="center">
+		<mj-text mj-class="t-body" align="center">
 		  <p>Design a standout email by strategically placing content blocks in key areas. Test different layouts to maximize reader engagement and conversion.
 		  </p>
 		</mj-text>
@@ -43,7 +55,7 @@
 		  <p>For e-commerce businesses
 		  </p>
 		</mj-text>
-		<mj-text font-size="16px" align="center">
+		<mj-text mj-class="t-body" align="center">
 		  <p>Engage customers at every stage: welcome new buyers, reconnect with inactive shoppers, or reward loyal patrons with exclusive offers.
 		  </p>
 		</mj-text>
@@ -53,13 +65,13 @@
 		  <p>For service-based businesses
 		  </p>
 		</mj-text>
-		<mj-text font-size="16px" align="center">
+		<mj-text mj-class="t-body" align="center">
 		  <p>Nurture your email list: greet new subscribers warmly, express gratitude to event attendees, and reach out to dormant contacts with a friendly reminder.
 		  </p>
 		</mj-text>
 		<mj-spacer>
 		</mj-spacer>
-		<mj-button href="https://" background-color="#{{ getBrandPrimaryColor() }}" color="#{{ getTextOnBrandColor() }}" inner-padding="16px 32px" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px" font-size="16px">
+		<mj-button href="#" mj-class="t-btn t-btn-primary" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px">
 		  <p>Call to action here
 		  </p>
 		</mj-button>
@@ -73,7 +85,7 @@
 		  <p>Highlight recent events
 		  </p>
 		</mj-text>
-		<mj-text font-size="16px" align="center">
+		<mj-text mj-class="t-body" align="center">
 		  <p>Inform your readers about your latest activities and important updates they may have overlooked.
 		  </p>
 		</mj-text>
@@ -89,7 +101,7 @@
 		</mj-image>
 		<mj-spacer>
 		</mj-spacer>
-		<mj-text font-family="Ubuntu, Helvetica, Arial, sans-serif" line-height="1.5" align="center" padding-top="0px" padding-bottom="0px" font-size="12px" color="#{{ getTextOnBrandColor() }}">
+		<mj-text line-height="1.5" align="center" padding-top="0px" padding-bottom="0px" font-size="12px" color="#{{ getTextOnBrandColor() }}">
 		  <p>{brand=name}
 			<br/>11111 Beautiful City, 1212 Nice Street
 			<br/>Brazil

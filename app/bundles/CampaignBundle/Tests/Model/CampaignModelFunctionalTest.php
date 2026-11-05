@@ -30,7 +30,7 @@ final class CampaignModelFunctionalTest extends MauticMysqlTestCase
     public function testGetEmailsCountryStats(): void
     {
         /** @var CampaignModel $model */
-        $model = $this->getContainer()->get('mautic.campaign.model.campaign');
+        $model = $this->getContainer()->get(CampaignModel::class);
 
         $dateFrom     = new \DateTimeImmutable('2023-07-21');
         $dateTo       = new \DateTimeImmutable('2023-07-24');
@@ -194,7 +194,7 @@ final class CampaignModelFunctionalTest extends MauticMysqlTestCase
     public function testGetContextEntity(): void
     {
         /** @var CampaignModel $model */
-        $model = $this->getContainer()->get('mautic.campaign.model.campaign');
+        $model = $this->getContainer()->get(CampaignModel::class);
 
         $campaign = new Campaign();
         $campaign->setName('Test email');

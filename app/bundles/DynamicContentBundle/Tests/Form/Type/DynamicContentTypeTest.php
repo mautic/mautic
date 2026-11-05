@@ -40,10 +40,6 @@ final class DynamicContentTypeTest extends TestCase
 
         $leadRepositoryMock = $this->createMock(LeadRepository::class);
 
-        $leadModelMock->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($leadRepositoryMock);
-
         $leadRepositoryMock->expects($this->once())
             ->method('getCustomFieldList')
             ->with('lead')
@@ -61,6 +57,7 @@ final class DynamicContentTypeTest extends TestCase
             $leadModelMock,
             new TypeList(),
             $relativeDateMock,
+            $leadRepositoryMock,
         );
 
         $formBuilderInterfaceMock = $this->createMock(FormBuilderInterface::class);
@@ -69,7 +66,7 @@ final class DynamicContentTypeTest extends TestCase
         $tagChoices = [];
 
         foreach ($tags as $tag) {
-            $tagChoices[$tag['value']] = $tag['label'];
+            $tagChoices[$tag['label']] = $tag['value'];
         }
         $matcher = $this->exactly(2);
 
@@ -80,7 +77,7 @@ final class DynamicContentTypeTest extends TestCase
                     $this->assertSame(DynamicContentListType::class, $parameters[1]);
                     $this->assertSame([
                         'label'       => 'mautic.core.form.translation_parent',
-                        'label_attr'  => ['class' => 'control-label'],
+                        'label_attr'  => ['class' => 'form-label'],
                         'attr'        => [
                             'class'   => 'form-control',
                             'tooltip' => 'mautic.core.form.translation_parent.help',

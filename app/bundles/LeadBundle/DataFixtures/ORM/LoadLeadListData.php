@@ -8,7 +8,7 @@ use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 
-class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly ListModel $segmentModel,

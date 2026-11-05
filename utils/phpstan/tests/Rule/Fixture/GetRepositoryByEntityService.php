@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Tests\Rule\Fixture;
 
 // not a repository - must be skipped
-class GetRepositoryByEntityService
+final class GetRepositoryByEntityService
 {
     /**
      * @var object

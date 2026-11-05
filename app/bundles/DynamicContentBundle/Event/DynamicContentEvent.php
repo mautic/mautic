@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DynamicContentBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 
-class DynamicContentEvent extends CommonEvent
+final class DynamicContentEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

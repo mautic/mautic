@@ -53,12 +53,13 @@ class SendEmailToContact
     public function flush($resetMailer = true): static
     {
         // Flushes the batch in case of using API mailers
-        if ($this->emailEntityId && !$flushResult = $this->mailer->flushQueue()) {
-            $sendFailures = $this->mailer->getErrors();
-
-            // Check to see if failed recipients were stored by the transport
-            if (!empty($sendFailures['failures'])) {
-                $this->processSendFailures($sendFailures);
+        if ($this->emailEntityId) {
+            $this->mailer->flushQueue();
+            if ($sendFailures = $this->mailer->getErrors()) {
+                // Check to see if failed recipients were stored by the transport
+                if (!empty($sendFailures['failures'])) {
+                    $this->processSendFailures($sendFailures);
+                }
             }
         }
 

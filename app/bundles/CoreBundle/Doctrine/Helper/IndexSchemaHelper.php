@@ -85,7 +85,7 @@ class IndexSchemaHelper
     {
         $textColumns = $this->getTextColumns($columns);
 
-        if (empty($textColumns)) {
+        if ([] === $textColumns) {
             return $this;
         }
 

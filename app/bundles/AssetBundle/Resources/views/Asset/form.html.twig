@@ -19,10 +19,10 @@
         <div class="pa-md">
 	        <div class="row">
 		        <div class="col-lg-6">
-					<div class="col-md-7 pl-0">
+					<div class="col-md-7 ps-0">
 						{{ form_row(form.storageLocation) }}
 					</div>
-			        <div class="text-left mt-lg mb-lg{% if startOnLocal %}  hide {% endif %}" id="remote-button">
+			        <div class="text-start mt-lg mb-lg{% if startOnLocal %}  hide {% endif %}" id="remote-button">
 						{% if integrations %}
 							{% include '@MauticCore/Helper/button.html.twig' with {
 								buttons: [
@@ -50,7 +50,7 @@
 								{{ form_label(form.tempName) }}
 								{{ form_widget(form.tempName) }}
 								{{ form_errors(form.tempName) }}
-						        <div class="help-block mdropzone-error"></div>
+						        <div class="form-text mdropzone-error"></div>
 						        <div class="mdropzone text-center" id="dropzone">
 						        	<div class="dz-message">
 						        		{% trans %}mautic.asset.drop.file.here{% endtrans %}</h4>
@@ -70,7 +70,7 @@
 					</div>
 		    	</div>
 		    	<div class="col-lg-6">
-		    		<div class="tile jc-center">
+					<div class="tile justify-content-center">
 				    	<div class="form-group col-xs-12 ">
 				    		{{- include('@MauticAsset/Modules/preview.html.twig', {
 								'variant': 'interactive',

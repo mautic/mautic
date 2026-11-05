@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\ReportBundle\Entity\Report;
 
-class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
+final class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
     public static function getGroups(): array
     {

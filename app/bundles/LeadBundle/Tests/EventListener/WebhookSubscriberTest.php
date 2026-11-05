@@ -43,7 +43,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 LeadEvents::LEAD_POST_SAVE.'_new'
             );
 
-        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class), $this->createStub(LeadRepository::class));
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -64,7 +64,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 LeadEvents::LEAD_POST_SAVE.'_update'
             );
 
-        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class), $this->createStub(LeadRepository::class));
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -83,7 +83,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->mockModel->expects($this->exactly(0))
             ->method('queueWebhooksByType');
 
-        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class), $this->createStub(LeadRepository::class));
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -100,7 +100,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockModel->expects($this->exactly(0))
             ->method('queueWebhooksByType');
 
-        $webhookSubscriber = new WebhookSubscriber($mockModel, $leadModel);
+        $webhookSubscriber = new WebhookSubscriber($mockModel, $leadModel, $this->createStub(LeadRepository::class));
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -140,7 +140,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class), $this->createStub(LeadRepository::class));
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -169,7 +169,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class), $this->createStub(LeadRepository::class));
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -185,7 +185,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->mockModel->expects($this->exactly(2))
             ->method('queueWebhooksByType');
 
-        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class), $this->createStub(LeadRepository::class));
 
         $dispatcher->addSubscriber($webhookSubscriber);
 
@@ -220,10 +220,6 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getEntity')
             ->with($contact['id'])
             ->willReturn($contactEntity);
-        $leadModel->expects($this->once())
-            ->method('getRepository')
-            ->with()
-            ->willReturn($leadRepository);
 
         $webhookModel->expects($this->once())
             ->method('queueWebhooksByType')
@@ -236,7 +232,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $example = new WebhookSubscriber($webhookModel, $leadModel);
+        $example = new WebhookSubscriber($webhookModel, $leadModel, $leadRepository);
 
         $example->onSegmentChange($changeEvent);
     }
@@ -260,8 +256,6 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $leadModel->expects($this->never())
             ->method('getEntity');
-        $leadModel->method('getRepository')
-            ->willReturn($leadRepository);
 
         $webhookModel->expects($this->once())
             ->method('queueWebhooksByType')
@@ -274,7 +268,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $example = new WebhookSubscriber($webhookModel, $leadModel);
+        $example = new WebhookSubscriber($webhookModel, $leadModel, $leadRepository);
 
         $example->onSegmentBatchChange($changeEvent);
     }
@@ -298,8 +292,6 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $leadRepository->expects($this->once())
             ->method('detachEntity')
             ->with($contactEntity);
-        $leadModel->method('getRepository')
-            ->willReturn($leadRepository);
 
         $leadModel->expects($this->once())
             ->method('getEntity')
@@ -317,7 +309,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $example = new WebhookSubscriber($webhookModel, $leadModel);
+        $example = new WebhookSubscriber($webhookModel, $leadModel, $leadRepository);
 
         $example->onSegmentBatchChange($changeEvent);
     }

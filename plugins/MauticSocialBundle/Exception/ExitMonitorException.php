@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Exception;
 
-class ExitMonitorException extends \Exception
+final class ExitMonitorException extends \Exception
 {
     public function __construct($message = 'Exit monitor requested', $code = 0, ?\Exception $previous = null)
     {

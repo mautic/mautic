@@ -21,7 +21,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->model = self::getContainer()->get('mautic.stage.model.stage');
+        $this->model = self::getContainer()->get(StageModel::class);
     }
 
     public function testUpdateLead(): void

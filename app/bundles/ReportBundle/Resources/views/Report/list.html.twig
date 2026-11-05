@@ -11,6 +11,8 @@
   <div id="page-list-wrapper" class="panel panel-default">
     {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
       'searchValue': searchValue,
+      'searchScopes': searchScopes|default([]),
+      'searchScopeHint': searchScopeHint|default(null),
       'action': currentRoute,
       'page_actions': {
           'templateButtons': {
@@ -44,6 +46,12 @@
               'label': 'mautic.core.searchcommand.ismine.label',
               'tooltip': 'mautic.core.searchcommand.ismine.description',
               'icon': 'ri-user-line'
+          },
+          {
+              'search': 'mautic.report.report.searchcommand.isscheduled',
+              'label': 'mautic.report.report.searchcommand.isscheduled.label',
+              'tooltip': 'mautic.report.report.searchcommand.isscheduled.description',
+              'icon': 'ri-calendar-schedule-line'
           }
       ]
   }) }}

@@ -25,19 +25,19 @@
                         </div>
                         <div class="row">
                             {% set sampleContent %}
-                                <div class="d-flex fd-row-md fd-column fw-wrap fw-nowrap-md gap-md">
+                                <div class="d-flex flex-lg-row flex-column flex-wrap flex-lg-nowrap gap-md">
                                     {{ form_row(form.batchlimit) }}
                                     {{ form_row(form.delimiter) }}
                                     {{ form_row(form.enclosure) }}
                                     {{ form_row(form.escape) }}
                                 </div>
                                 <div class="tile mt-lg">
-                                    <div class="row-no-gutters gap-sm fw-nowrap-md">
+                                    <div class="row-no-gutters gap-sm flex-lg-nowrap">
                                         <div class="col-md-8 gap-xs">
                                             <h5 class="fw-b"> {{'mautic.lead.import.start.instructions.sample'|trans }}</h5>
                                             <span> {{ 'mautic.lead.import.start.instructions.sample.description'|trans }}</span>
                                         </div>
-                                        <div class="col-md-4 ai-end jc-center">
+                                        <div class="col-md-4 align-items-end justify-content-center">
                                             {% include '@MauticCore/Helper/button.html.twig' with {
                                                 'buttons': [
                                                     {

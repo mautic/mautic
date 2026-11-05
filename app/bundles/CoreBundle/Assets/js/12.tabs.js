@@ -323,6 +323,9 @@ Mautic.deleteTab = function(deleteBtn) {
      * Remember the last active tab for each tab list on the page.
      */
     Mautic.rememberActiveTabs = function() {
+        if (/\/new$/.test(globalThis.location.pathname)) {
+            return;
+        }
         mQuery('.nav-tabs').each(function(index) {
             // Using index would have nasty effects when tabs, with different tab count, are loaded asynchronously somewhere on the page.
             const $navTabs = mQuery(this);
@@ -358,11 +361,11 @@ Mautic.deleteTab = function(deleteBtn) {
                 }
             } else {
                 // Or store the default, so the script will not end up with NULL value.
-                const href = $navTabs.find('.active a[data-toggle="tab"]').attr('href');
+                const href = $navTabs.find('.active a[data-toggle="tab"], .active a[data-bs-toggle="tab"]').attr('href');
                 tabStorage.setItem(storageKeys[index], href);
             }
 
-            $navTabs.find('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+            $navTabs.find('a[data-toggle="tab"], a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
                 tabStorage.setItem(storageKeys[index], mQuery(e.target).attr('href'));
             });
         });

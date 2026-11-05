@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Command\ContactScheduledExportCommand;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\ContactExportSchedulerRepository;
-use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,7 +23,6 @@ final class ContactScheduledExportCommandTest extends TestCase
 {
     public function testForSignalCaughtException(): void
     {
-        $contactExportScheduledModel = $this->createMock(ContactExportSchedulerModel::class);
         $eventDispatcher             = $this->createMock(EventDispatcherInterface::class);
 
         $translator           = $this->createStub(TranslatorInterface::class);
@@ -45,14 +43,11 @@ final class ContactScheduledExportCommandTest extends TestCase
         $contactExportSchedulerRepository->method('findBy')
             ->willReturn([new ContactExportScheduler()]);
 
-        $contactExportScheduledModel->method('getRepository')
-            ->willReturn($contactExportSchedulerRepository);
-
         $eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->willThrowException(new SignalCaughtException(1));
 
-        $command = new class($contactExportScheduledModel, $eventDispatcher, $formatterHelper, $processSignalService) extends ContactScheduledExportCommand {
+        $command = new class($eventDispatcher, $formatterHelper, $processSignalService, $contactExportSchedulerRepository) extends ContactScheduledExportCommand {
             public function getExecute(InputInterface $input, OutputInterface $output): int
             {
                 return $this->execute($input, $output);

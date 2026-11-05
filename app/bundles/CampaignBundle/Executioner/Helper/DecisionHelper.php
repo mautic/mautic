@@ -9,10 +9,10 @@ use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\LeadBundle\Entity\Lead;
 
-class DecisionHelper
+final readonly class DecisionHelper
 {
     public function __construct(
-        private readonly LeadRepository $leadRepository,
+        private LeadRepository $leadRepository,
     ) {
     }
 

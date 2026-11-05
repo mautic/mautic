@@ -4,9 +4,7 @@
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'mautic.core.close' | trans }}">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'mautic.core.close' | trans }}"></button>
         <p class="modal-title" id="searchCommandsModalLabel">
           {{ "mautic.core.help.searchcommands.title" | trans }}
         </p>
@@ -19,15 +17,15 @@
           <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
             <!-- General operators -->
             <li class="panel">
-              <a role="button" id="headingSearchOperators" class="accordion-heading collapsed" data-toggle="collapse"
-                data-parent="#accordion" href="#collapseSearchOperators" aria-expanded="false"
+              <button type="button" id="headingSearchOperators" class="accordion-heading collapsed" data-bs-toggle="collapse"
+                data-bs-target="#collapseSearchOperators" aria-expanded="false"
                 aria-controls="collapseSearchOperators">
                 <i class="ri-arrow-down-s-line accordion-arrow"></i>
                 <span class="accordion-title">{{ 'mautic.core.searchcommands.operators'|trans }}</span>
-              </a>
+              </button>
 
               <div id="collapseSearchOperators" class="collapse accordion-wrapper" role="tabpanel"
-                aria-labelledby="headingSearchOperators">
+                data-bs-parent="#accordion" aria-labelledby="headingSearchOperators">
                 <div class="accordion-content">
                   <p><code>+term</code>: {{ 'mautic.core.searchcommands.operators.exact_term'|trans|raw }}</p>
                   <p><code>!term</code>: {{ 'mautic.core.searchcommands.operators.exclude_terms'|trans|raw }}</p>
@@ -70,13 +68,13 @@
           {% for section, commands in searchCommands %}
               {% set sectionId = section|replace({'.': '_'})|lower %}
               <li class="panel">
-                  <a role="button" id="heading{{ sectionId|capitalize }}" class="accordion-heading collapsed" data-toggle="collapse"
-                    data-parent="#specificCommandsAccordion" href="#collapse{{ sectionId|capitalize }}" aria-expanded="false" aria-controls="collapse{{ sectionId|capitalize }}">
+                  <button type="button" id="heading{{ sectionId|capitalize }}" class="accordion-heading collapsed" data-bs-toggle="collapse"
+                    data-bs-target="#collapse{{ sectionId|capitalize }}" aria-expanded="false" aria-controls="collapse{{ sectionId|capitalize }}">
                       <i class="ri-arrow-down-s-line accordion-arrow"></i>
                       <span class="accordion-title">{{ section|trans }}</span>
-                  </a>
+                  </button>
 
-                  <div id="collapse{{ sectionId|capitalize }}" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="heading{{ sectionId|capitalize }}">
+                  <div id="collapse{{ sectionId|capitalize }}" class="collapse accordion-wrapper" role="tabpanel" data-bs-parent="#specificCommandsAccordion" aria-labelledby="heading{{ sectionId|capitalize }}">
                       <div class="accordion-content">
                           {% for groupName, groupCommands in commandGroups %}
                               {% if groupName != 'filters' %}

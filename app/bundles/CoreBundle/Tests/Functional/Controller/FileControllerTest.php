@@ -22,7 +22,7 @@ final class FileControllerTest extends MauticMysqlTestCase
         $this->arrayHasKey('url');
         $this->assertNotEmpty($responseData['url']);
         $uploadedFileName = basename($responseData['url']);
-        $uploadedImage    = static::getContainer()->getParameter('mautic.application_dir').'/media/images/'.$uploadedFileName;
+        $uploadedImage    = self::getContainer()->getParameter('mautic.application_dir').'/media/images/'.$uploadedFileName;
         $this->assertFileExists($uploadedImage);
     }
 

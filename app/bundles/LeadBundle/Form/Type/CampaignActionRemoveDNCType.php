@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -9,7 +11,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignActionRemoveDNCType extends AbstractType
+final class CampaignActionRemoveDNCType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

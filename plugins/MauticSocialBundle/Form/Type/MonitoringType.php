@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class MonitoringType extends AbstractType
+final class MonitoringType extends AbstractType
 {
     public function __construct(
         private readonly MonitoringModel $monitoringModel,
@@ -34,13 +34,13 @@ class MonitoringType extends AbstractType
 
         $builder->add('title', TextType::class, [
             'label'      => 'mautic.core.name',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
 
         $builder->add('description', TextareaType::class, [
             'label'      => 'mautic.core.description',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => ['class' => 'form-control editor'],
             'required'   => false,
         ]);
@@ -50,7 +50,7 @@ class MonitoringType extends AbstractType
         $builder->add('publishDown', PublishDownDateType::class);
         $builder->add('networkType', ChoiceType::class, [
             'label'      => 'mautic.social.monitoring.type.list',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.getNetworkFormAction(this)',
@@ -79,7 +79,7 @@ class MonitoringType extends AbstractType
             LeadListType::class,
             [
                 'label'      => 'mautic.lead.lead.events.addtolists',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],

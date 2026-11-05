@@ -11,8 +11,10 @@ use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ProjectControllerTest extends MauticMysqlTestCase
@@ -108,6 +110,40 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString($project->getName(), (string) $clientResponseContent, 'The return must contain project');
     }
 
+    public function testViewActionOpensTheOnlyEditableEntityTypeDirectly(): void
+    {
+        $project = $this->projectRepository->findOneBy([]);
+
+        $this->createAndLoginUser([
+            'project:project' => ['view'],
+            'asset:assets'    => ['viewown', 'editown'],
+        ]);
+
+        $this->client->request('GET', '/s/projects/view/'.$project->getId());
+        $content = (string) $this->client->getResponse()->getContent();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('/s/projects/addEntity/', $content);
+        $this->assertStringContainsString('entityType=asset', $content);
+    }
+
+    public function testViewActionOpensEntityTypeSelectorWhenSeveralEntityTypesAreEditable(): void
+    {
+        $project = $this->projectRepository->findOneBy([]);
+
+        $this->createAndLoginUser([
+            'project:project' => ['view'],
+            'asset:assets'    => ['viewown', 'editown'],
+            'email:emails'    => ['viewown', 'editown'],
+        ]);
+
+        $this->client->request('GET', '/s/projects/view/'.$project->getId());
+        $content = (string) $this->client->getResponse()->getContent();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('/s/projects/selectEntityType/', $content);
+    }
+
     public function testViewActionNotFound(): void
     {
         $this->client->followRedirects(false);
@@ -184,10 +220,16 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(403, (string) $this->client->getResponse()->getStatusCode());
     }
 
-    private function createAndLoginUser(): User
+    /**
+     * @param array<string, array<int, string>> $permissions
+     */
+    private function createAndLoginUser(array $permissions = []): User
     {
         // Create non-admin role
         $role = $this->createRole();
+        /** @var RoleModel $roleModel */
+        $roleModel = self::getContainer()->get(RoleModel::class);
+        $roleModel->setRolePermissions($role, $permissions);
         // Create non-admin user
         $user = $this->createUser($role);
 
@@ -219,7 +261,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername(self::USERNAME);
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('mautic'));
         $user->setRole($role);

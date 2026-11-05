@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class LeadChangeCompanyEvent extends Event
+final class LeadChangeCompanyEvent extends Event
 {
     private ?Lead $lead = null;
 

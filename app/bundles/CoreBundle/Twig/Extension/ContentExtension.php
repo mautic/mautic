@@ -8,10 +8,10 @@ use Mautic\CoreBundle\Twig\Helper\ContentHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ContentExtension extends AbstractExtension
+final class ContentExtension extends AbstractExtension
 {
     public function __construct(
-        protected ContentHelper $contentHelper,
+        private readonly ContentHelper $contentHelper,
     ) {
     }
 

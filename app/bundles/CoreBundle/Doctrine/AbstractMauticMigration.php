@@ -8,7 +8,6 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractMauticMigration extends AbstractMigration
@@ -64,10 +63,14 @@ abstract class AbstractMauticMigration extends AbstractMigration
         // Not supported
     }
 
-    public function setContainer(?ContainerInterface $container = null): void
+    public function setContainer(ContainerInterface $container): void
     {
         $this->container = $container;
-        $this->prefix    = (string) $container->get(CoreParametersHelper::class)->get('db_table_prefix', '');
+    }
+
+    public function setPrefix(string $prefix): void
+    {
+        $this->prefix = $prefix;
     }
 
     /**

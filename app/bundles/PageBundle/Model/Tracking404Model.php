@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

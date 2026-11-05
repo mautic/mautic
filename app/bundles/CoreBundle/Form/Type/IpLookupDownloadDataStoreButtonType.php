@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class IpLookupDownloadDataStoreButtonType extends AbstractType
+final class IpLookupDownloadDataStoreButtonType extends AbstractType
 {
     public function __construct(
         private readonly DateHelper $dateHelper,

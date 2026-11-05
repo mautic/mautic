@@ -12,10 +12,10 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Ramsey\Uuid\Uuid;
 
 #[AsDoctrineListener(Events::prePersist)]
-class UUIDListener
+final readonly class UUIDListener
 {
     public function __construct(
-        private readonly EntityManagerInterface $em,
+        private EntityManagerInterface $em,
     ) {
     }
 

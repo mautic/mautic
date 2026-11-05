@@ -472,12 +472,15 @@ final class PublicControllerTest extends TestCase
             $security
         );
 
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
+
         $response = $publicController->trackingAction(
             $request,
             $deviceTrackingService,
             $trackingHelper,
             $contactTracker,
-            $this->pageModel
+            $this->pageModel,
+            $this->ipLookupHelper
         );
 
         $json = json_decode($response->getContent(), true);
@@ -522,7 +525,8 @@ final class PublicControllerTest extends TestCase
             $this->createStub(DeviceTrackingServiceInterface::class),
             $this->createStub(TrackingHelper::class),
             $this->createStub(ContactTracker::class),
-            $this->pageModel
+            $this->pageModel,
+            $this->ipLookupHelper
         );
         $this->assertEquals(
             ['success' => 0],

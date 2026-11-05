@@ -73,7 +73,7 @@
           <thead>
           <tr>
               <th class="timeline-icon">
-                  <a class="btn btn-sm btn-nospin btn-ghost" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
+                  <a class="btn btn-sm btn-nospin btn-ghost" data-activate-details="all" data-bs-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
                       <span class="ri-fw ri-corner-right-down-line"></span>
                   </a>
               </th>
@@ -123,7 +123,7 @@
 
               <tr class="timeline-row {{ cycle(['', 'timeline-row-highlighted'], loop.index) }} {% if event.feature is defined %}timeline-featured{% endif %}">
                   <td class="timeline-icon">
-                      <a data-activate-details="{{ loop.index }}" class="btn btn-sm btn-nospin btn-ghost {% if details is empty %}disabled{% endif %}" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_details'|trans }}" data-target="timeline-details-{{ loop.index }}">
+                      <a data-activate-details="{{ loop.index }}" class="btn btn-sm btn-nospin btn-ghost {% if details is empty %}disabled{% endif %}" data-bs-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_details'|trans }}" data-bs-target="timeline-details-{{ loop.index }}">
                           <span class="fa ri-fw {{ icon }}"></span>
                       </a>
                   </td>

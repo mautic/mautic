@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token;
 use kamermans\OAuth2\Token\TokenInterface;
 use kamermans\OAuth2\Token\TokenSerializer;
 
-class IntegrationToken implements TokenInterface
+final class IntegrationToken implements TokenInterface
 {
     // Pull in serialize() and unserialize() methods
     use TokenSerializer;

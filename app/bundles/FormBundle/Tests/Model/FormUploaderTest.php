@@ -205,15 +205,15 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $this->expectException(FileUploadException::class);
         $this->expectExceptionMessage('file2');
 
-        $formUploader->uploadFiles($filesToUpload, $submission);
+        // file2 fails, so the successful upload is rolled back and the
+        // submission keeps the results it already had.
+        $expected = ['key' => 'value'];
 
-        $expected = [
-            'key'   => 'value',
-            'file1' => 'upload1.jpg',
-            'file2' => 'upload2.txt',
-        ];
-
-        $this->assertSame($expected, $submission->getResults());
+        try {
+            $formUploader->uploadFiles($filesToUpload, $submission);
+        } finally {
+            $this->assertSame($expected, $submission->getResults());
+        }
     }
 
     #[TestDox('Uploader do nothing if no files for upload provided')]

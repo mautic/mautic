@@ -12,9 +12,11 @@ use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Command\ContactScheduledExportCommand;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -107,7 +109,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         $this->assertInstanceOf(AuditLog::class, $sendEmailAuditLog);
 
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
         $zipFileName          = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()->format('Y_m_d_H_i_s').'.zip';
         $this->filePaths[]    = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
         $downloadLink         = $this->router->generate(
@@ -142,7 +144,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
             $contacts[] = $contact;
         }
 
-        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $leadModel->saveEntities($contacts);
     }
 
@@ -185,7 +187,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         $user->setLastName('Last');
         $user->setUsername($username);
         $user->setEmail($email);
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);

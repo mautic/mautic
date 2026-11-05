@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Webhook>
  */
-class WebhookType extends AbstractType
+final class WebhookType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -36,7 +36,7 @@ class WebhookType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => true,
             ]
@@ -59,7 +59,7 @@ class WebhookType extends AbstractType
             UrlType::class,
             [
                 'label'      => 'mautic.webhook.form.webhook_url',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => true,
             ]
@@ -70,7 +70,7 @@ class WebhookType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.webhook.form.secret',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.webhook.secret.tooltip',
@@ -95,7 +95,7 @@ class WebhookType extends AbstractType
                 'multiple'   => true,
                 'expanded'   => true,
                 'label'      => 'mautic.webhook.form.webhook.events',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => ''],
             ]
         );

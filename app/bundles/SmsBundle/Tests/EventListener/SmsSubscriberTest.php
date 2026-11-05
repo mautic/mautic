@@ -21,11 +21,6 @@ final class SmsSubscriberTest extends TestCase
 
     private string $messageUrl = 'http://mautic.com';
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testOnTokenReplacementWithTrackableUrls(): void
     {
         $mockAuditLogModel = $this->createStub(AuditLogModel::class);

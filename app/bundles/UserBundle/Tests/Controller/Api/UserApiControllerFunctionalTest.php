@@ -12,6 +12,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -180,7 +181,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
         $user->setRole($role);
@@ -240,7 +241,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertSame($userData['email'], $user->getEmail());
 
             // Verify the password was hashed correctly by checking if we can verify it
-            $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+            $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
             $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
             $this->assertTrue(
                 $hasher->verify($user->getPassword(), $userData['plainPassword']),

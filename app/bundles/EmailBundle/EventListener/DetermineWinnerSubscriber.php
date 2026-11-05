@@ -2,19 +2,19 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Entity\Stat;
-use Mautic\PageBundle\Entity\Hit;
+use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\PageBundle\Entity\HitRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EntityManagerInterface $em,
+        private StatRepository $statRepository,
+        private HitRepository $hitRepository,
         private TranslatorInterface $translator,
     ) {
     }
@@ -36,15 +36,13 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
         $parent     = $parameters['parent'];
         $children   = $parameters['children'];
 
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $repo */
-        $repo = $this->em->getRepository(Stat::class);
         /** @var Email $parent */
         $ids       = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
 
         if (null != $startDate && !empty($ids)) {
             // get their bounce rates
-            $counts = $repo->getOpenedRates($ids, $startDate, $parent->getVariantEndDate());
+            $counts = $this->statRepository->getOpenedRates($ids, $startDate, $parent->getVariantEndDate());
 
             if ($counts) {
                 $rates      = $support      = $data      = [];
@@ -128,18 +126,14 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
         $parent     = $parameters['parent'];
         $children   = $parameters['children'];
 
-        /** @var \Mautic\PageBundle\Entity\HitRepository $pageRepo */
-        $pageRepo = $this->em->getRepository(Hit::class);
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $emailRepo */
-        $emailRepo = $this->em->getRepository(Stat::class);
         /** @var Email $parent */
         $ids = $parent->getRelatedEntityIds();
 
         $startDate = $parent->getVariantStartDate();
         if (null != $startDate && !empty($ids)) {
             // get their bounce rates
-            $clickthroughCounts = $pageRepo->getEmailClickthroughHitCount($ids, $startDate, 200, $parent->getVariantEndDate());
-            $sentCounts         = $emailRepo->getSentCounts($ids, $startDate, $parent->getVariantEndDate());
+            $clickthroughCounts = $this->hitRepository->getEmailClickthroughHitCount($ids, $startDate, 200, $parent->getVariantEndDate());
+            $sentCounts         = $this->statRepository->getSentCounts($ids, $startDate, $parent->getVariantEndDate());
 
             if ($clickthroughCounts) {
                 $rates      = $support      = $data      = [];

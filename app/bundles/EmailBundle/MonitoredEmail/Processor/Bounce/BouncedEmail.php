@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 
-class BouncedEmail
+final class BouncedEmail
 {
     /**
      * @var string|null

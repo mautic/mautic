@@ -817,7 +817,7 @@ class FieldModel extends FormModel
      */
     public function setFieldProperties(LeadField $entity, array $properties)
     {
-        if (!empty($properties) && is_array($properties)) {
+        if ([] !== $properties && is_array($properties)) {
             $properties = InputHelper::clean($properties);
         } else {
             $properties = [];

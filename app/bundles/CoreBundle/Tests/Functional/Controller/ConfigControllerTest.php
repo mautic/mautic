@@ -29,7 +29,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
     #[DataProvider('dataListOfRemoteDomainsVisibility')]
     public function testListOfRemoteDomainsVisibility(bool $enabled): void
     {
-        $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->client->request(Request::METHOD_GET, '/s/config/edit/coreconfig');
         self::assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();

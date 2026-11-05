@@ -6,10 +6,11 @@ namespace Utils\PHPStan\Tests\Rule\Fixture;
 
 use Symfony\Contracts\Service\Attribute\Required;
 
-class SetterAutowireController
+final class SetterAutowireController
 {
     #[Required]
-    public function setSomeModel(SomeModel $someModel): void
-    {
+    public function setSomeModel(
+        SomeModel $someModel,
+    ): void {
     }
 }

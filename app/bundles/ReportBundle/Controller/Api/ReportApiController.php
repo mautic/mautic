@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Report>
  */
-class ReportApiController extends CommonApiController
+final class ReportApiController extends CommonApiController
 {
     /**
      * @var ReportModel|null
@@ -44,7 +44,7 @@ class ReportApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        protected UserHelper $userHelper,
+        private readonly UserHelper $userHelper,
         ReportModel $reportModel,
     ) {
         $this->model            = $reportModel;

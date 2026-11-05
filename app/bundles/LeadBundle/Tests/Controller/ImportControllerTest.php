@@ -27,7 +27,9 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportControllerTest extends MauticMysqlTestCase
 {
@@ -323,16 +325,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $crawler     = $this->client->submit($uploadForm);
         $mappingForm = $crawler->selectButton('Import')->form();
         $mappingForm['lead_field_import[skip_if_exists]']->setValue('1');
-
-        // fetch company name mapping value
-        $primaryCompanyOptions = $crawler->filter("#lead_field_import_company > optgroup[label='Primary company']")->filter('option');
-        $optionValues          = $primaryCompanyOptions->each(function ($node) {
-            if ('Company Name' === $node->text()) {
-                return $node->attr('value');
-            }
-        });
-        $companyFieldMapping = array_filter($optionValues);
-        $mappingForm['lead_field_import[company]']->setValue(end($companyFieldMapping));
+        $this->selectCompanyMapping($crawler, $mappingForm);
         $crawler = $this->client->submit($mappingForm);
 
         $this->assertStringContainsString('Import process was successfully created. You will be notified when finished.', $crawler->html(), $crawler->html());
@@ -445,8 +438,8 @@ final class ImportControllerTest extends MauticMysqlTestCase
     private function addCancellationNotification(?Import $import = null): void
     {
         /** @var NotificationModel $notificationModel */
-        $notificationModel = static::getContainer()->get('mautic.core.model.notification');
-        $translator        = static::getContainer()->get('translator');
+        $notificationModel = self::getContainer()->get(NotificationModel::class);
+        $translator        = self::getContainer()->get(TranslatorInterface::class);
 
         $fileName = basename('/tmp/test.csv');
         $message  = $import && $import->getId()
@@ -540,7 +533,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $user->setLastName($lastName);
         $user->setUsername($username);
         $user->setEmail($email);
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
@@ -565,7 +558,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $field->setProperties(['no' => 'No', 'yes' => 'Yes']);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 
@@ -605,12 +598,15 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
     private function selectCompanyMapping(Crawler $crawler, Form $mappingForm): void
     {
-        $options = $crawler->filter("#lead_field_import_company > optgroup[label='Primary company']")->filter('option');
+        $options = $crawler->filter("#lead_field_import_company > optgroup[label=\"Contact's primary company\"] option");
         $values  = array_filter($options->each(function ($node) {
             if ('Company Name' === $node->text()) {
                 return $node->attr('value');
             }
         }));
+
+        $this->assertNotEmpty($values, 'Company Name mapping option must be available in the import form.');
+
         $mappingForm['lead_field_import[company]']->setValue(end($values));
     }
 }

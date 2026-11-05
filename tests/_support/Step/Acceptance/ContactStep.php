@@ -41,6 +41,7 @@ final class ContactStep extends \AcceptanceTester
     {
         $I           = $this;
         $xpath       = "//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]";
+        $I->waitForElementVisible($xpath, self::TIMEOUT);
         $contactName = $I->grabTextFrom($xpath);
         $I->see($contactName, $xpath);
 
@@ -66,7 +67,7 @@ final class ContactStep extends \AcceptanceTester
     public function selectContactFromList($place): void
     {
         $I     = $this;
-        $xpath = "//*[@id='leadTable']/tbody/tr[{$place}]/td[1]/div/span/input";
+        $xpath = "//*[@id='leadTable']/tbody/tr[{$place}]/td[1]//input[contains(concat(' ', normalize-space(@class), ' '), ' list-checkbox ')]";
         $I->waitForElementClickable($xpath, self::TIMEOUT);
         $I->checkOption($xpath);
         $I->seeCheckboxIsChecked($xpath);
@@ -78,7 +79,7 @@ final class ContactStep extends \AcceptanceTester
     public function selectContactByNameFromList(string $contactName): void
     {
         $I     = $this;
-        $xpath = "//*[@id='leadTable']/tbody/tr[td[2]/a/div[1][normalize-space()=\"{$contactName}\"]]/td[1]/div/span/input";
+        $xpath = "//*[@id='leadTable']/tbody/tr[td[2]/a/div[1][normalize-space()=\"{$contactName}\"]]/td[1]//input[contains(concat(' ', normalize-space(@class), ' '), ' list-checkbox ')]";
         $I->waitForElementClickable($xpath, self::TIMEOUT);
         $I->checkOption($xpath);
         $I->seeCheckboxIsChecked($xpath);
@@ -90,7 +91,7 @@ final class ContactStep extends \AcceptanceTester
     public function selectContactByLeadIdFromList(int $leadId): void
     {
         $I     = $this;
-        $xpath = "//*[@id='leadTable']/tbody/tr[td[2]/a[contains(@href, '/contacts/view/{$leadId}')]]/td[1]/div/span/input";
+        $xpath = "//*[@id='leadTable']/tbody/tr[td[2]/a[contains(@href, '/contacts/view/{$leadId}')]]/td[1]//input[contains(concat(' ', normalize-space(@class), ' '), ' list-checkbox ')]";
         $I->waitForElementClickable($xpath, self::TIMEOUT);
         $I->checkOption($xpath);
         $I->seeCheckboxIsChecked($xpath);
@@ -130,7 +131,9 @@ final class ContactStep extends \AcceptanceTester
     public function selectOptionFromDropDownContactsPage(int|string $option): void
     {
         $I = $this;
-        $I->click("//*[@id='page-list-actions']");
+        $pageListActions = "//*[@id='page-list-actions']";
+        $I->waitForElementVisible($pageListActions, self::TIMEOUT);
+        $I->click($pageListActions);
 
         if (is_string($option) && !ctype_digit($option)) {
             $I->click("//button[@id='page-list-actions']/following-sibling::ul/li/a[contains(normalize-space(), \"{$option}\")]");

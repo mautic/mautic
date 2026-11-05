@@ -125,7 +125,7 @@ class Field implements UuidInterface
     private $properties = [];
 
     /**
-     * @var array
+     * @var array|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $validation = [];
@@ -501,7 +501,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @param array $validation
+     * @param array|null $validation
      */
     public function setValidation($validation): static
     {
@@ -512,7 +512,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function getValidation()
     {

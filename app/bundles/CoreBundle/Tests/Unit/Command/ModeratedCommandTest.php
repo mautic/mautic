@@ -167,6 +167,62 @@ final class ModeratedCommandTest extends TestCase
         rmdir($runDir);
     }
 
+    public function testPidLockThrowsWhenTheLockFileCannotBeOpened(): void
+    {
+        if (!$this->fakeModeratedCommand->isPidSupported()) {
+            $this->markTestSkipped('getmypid and/or posix_getpgid are not available');
+        }
+
+        // Directories of this test's own, so the cleanup below only removes what it created.
+        $baseDir  = sys_get_temp_dir().'/mautic_moderated_command_'.uniqid();
+        $cacheDir = $baseDir.'/tmp';
+        $runDir   = $baseDir.'/run';
+        mkdir($cacheDir, 0755, true);
+
+        // Make the run directory non-writable so opening the lock file inside it fails. This
+        // mirrors a run directory owned by another user, e.g. one created by a console command
+        // executed as root while the scheduled commands run as the web server user.
+        mkdir($runDir);
+        chmod($runDir, 0500);
+        clearstatcache(true, $runDir);
+
+        if (is_writable($runDir)) {
+            rmdir($runDir);
+            rmdir($cacheDir);
+            rmdir($baseDir);
+            $this->markTestSkipped('The run directory could not be made non-writable; the test is running as a privileged user or on a filesystem without POSIX permissions.');
+        }
+
+        $this->pathsHelper->expects($this->once())
+            ->method('getSystemPath')
+            ->with('cache')
+            ->willReturn($cacheDir);
+
+        $this->input->method('getOption')
+            ->willReturnCallback(
+                fn (string $name): string|false|null => match ($name) {
+                    'lock_mode'      => ModeratedCommand::MODE_PID,
+                    'bypass-locking' => false,
+                    default          => null,
+                }
+            );
+
+        // Without the guard, fopen() returns false and flock() raises a TypeError on PHP 8.
+        // Returning false instead of throwing would report this permanent failure as ordinary
+        // lock contention, which every caller of checkRunStatus() maps to a successful exit.
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/could not be opened/');
+
+        try {
+            $this->fakeModeratedCommand->run($this->input, $this->output);
+        } finally {
+            chmod($runDir, 0700);
+            rmdir($runDir);
+            rmdir($cacheDir);
+            rmdir($baseDir);
+        }
+    }
+
     public function testFileLock(): void
     {
         $cacheDir = __DIR__.'/resource/cache/tmp';

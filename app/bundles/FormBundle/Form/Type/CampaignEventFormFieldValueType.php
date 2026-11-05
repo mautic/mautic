@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventFormFieldValueType extends AbstractType
+final class CampaignEventFormFieldValueType extends AbstractType
 {
     public function __construct(
         private readonly FormModel $model,
@@ -28,7 +28,7 @@ class CampaignEventFormFieldValueType extends AbstractType
             FormListType::class,
             [
                 'label'       => 'mautic.form.campaign.event.forms',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'multiple'    => false,
                 'placeholder' => 'mautic.core.select',
                 'attr'        => [
@@ -134,7 +134,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                     TextType::class,
                     [
                         'label'      => 'mautic.form.field.form.value',
-                        'label_attr' => ['class' => 'control-label'],
+                        'label_attr' => ['class' => 'form-label'],
                         'attr'       => [
                             'class' => 'form-control',
                         ],
@@ -153,7 +153,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                     [
                         'choices'    => array_flip($options[$data['field']]),
                         'label'      => 'mautic.form.field.form.value',
-                        'label_attr' => ['class' => 'control-label'],
+                        'label_attr' => ['class' => 'form-label'],
                         'attr'       => [
                             'class' => 'form-control not-chosen',
                         ],

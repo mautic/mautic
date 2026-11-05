@@ -15,16 +15,6 @@ final class NotificationControllerTest extends MauticMysqlTestCase
     use NotificationTrait;
 
     /**
-     * @var string
-     */
-    private const REST_API_ID = 'restApiID';
-
-    /**
-     * @var string
-     */
-    private const API_ID = 'apiID';
-
-    /**
      * Smoke test to ensure the '/s/notifications' route loads.
      */
     public function testIndexRouteSuccessfullyLoads(): void
@@ -40,10 +30,14 @@ final class NotificationControllerTest extends MauticMysqlTestCase
      */
     public function testNewRouteSuccessfullyLoads(): void
     {
-        $this->client->request(Request::METHOD_GET, '/s/notifications/new');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/notifications/new');
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertCount(1, $crawler->filter('#notification-preview'));
+        $this->assertCount(1, $crawler->filter('[data-notification-preview="heading"]'));
+        $this->assertCount(1, $crawler->filter('[data-notification-preview="message"]'));
+        $this->assertCount(1, $crawler->filter('[data-notification-preview="button"].hide'));
     }
 
     public function testNewWebNotificationValidSubmit(): void

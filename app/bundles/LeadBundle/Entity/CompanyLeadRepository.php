@@ -170,7 +170,7 @@ class CompanyLeadRepository extends CommonRepository
 
         $result = $q->executeQuery()->fetchAllAssociative();
 
-        return !empty($result) ? $result[0] : [];
+        return $result[0] ?? [];
     }
 
     /**

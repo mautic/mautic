@@ -55,7 +55,7 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
         return [];
     }
 
-    public function getCatalogue($locale = null): MessageCatalogueInterface
+    public function getCatalogue(?string $locale = null): MessageCatalogueInterface
     {
         return $this->translator->getCatalogue($locale);
     }

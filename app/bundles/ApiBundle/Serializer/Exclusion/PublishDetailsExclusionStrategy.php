@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Serializer\Exclusion;
 
 /**
  * Only include FormEntity properties for the top level entity and not the associated entities.
  */
-class PublishDetailsExclusionStrategy extends FieldExclusionStrategy
+final class PublishDetailsExclusionStrategy extends FieldExclusionStrategy
 {
     public function __construct()
     {

@@ -10,7 +10,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 /**
  * @implements DataTransformerInterface<array<mixed>|int|string, array<mixed>|int|string>
  */
-class IdToEntityModelTransformer implements DataTransformerInterface
+final class IdToEntityModelTransformer implements DataTransformerInterface
 {
     /**
      * @param class-string $repository

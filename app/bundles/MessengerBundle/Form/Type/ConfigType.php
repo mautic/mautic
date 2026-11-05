@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
@@ -59,7 +59,7 @@ class ConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.messenger.config.retry_strategy.max_retries',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class' => 'form-control',
@@ -73,7 +73,7 @@ class ConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.messenger.config.retry_strategy.delay',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class' => 'form-control',
@@ -88,7 +88,7 @@ class ConfigType extends AbstractType
             [
                 'scale'      => 2,
                 'label'      => 'mautic.messenger.config.retry_strategy.multiplier',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class' => 'form-control',
@@ -105,7 +105,7 @@ class ConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.messenger.config.retry_strategy.max_delay',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class' => 'form-control',

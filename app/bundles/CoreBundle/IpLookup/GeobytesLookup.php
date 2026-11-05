@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class GeobytesLookup extends AbstractRemoteDataLookup
+final class GeobytesLookup extends AbstractRemoteDataLookup
 {
     public string $forwarderfor        = '';
 

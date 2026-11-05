@@ -55,7 +55,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        protected EmailModel $emailModel,
+        private readonly EmailModel $emailModel,
         private readonly RouterInterface $router,
     ) {
     }

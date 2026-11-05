@@ -7,6 +7,7 @@ namespace Mautic\IntegrationsBundle\Helper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
 use Mautic\PluginBundle\Entity\Integration;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class BuilderIntegrationsHelper
 {
@@ -15,9 +16,17 @@ class BuilderIntegrationsHelper
      */
     private array $builders = [];
 
+    /**
+     * @param iterable<BuilderInterface> $integrations
+     */
     public function __construct(
         private readonly IntegrationsHelper $integrationsHelper,
+        #[AutowireIterator('mautic.builder_integration')]
+        iterable $integrations = [],
     ) {
+        foreach ($integrations as $integration) {
+            $this->addIntegration($integration);
+        }
     }
 
     /**
@@ -49,7 +58,7 @@ class BuilderIntegrationsHelper
         return $names;
     }
 
-    public function addIntegration(BuilderInterface $integration): void
+    private function addIntegration(BuilderInterface $integration): void
     {
         $this->builders[$integration->getName()] = $integration;
     }

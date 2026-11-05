@@ -33,7 +33,7 @@ final class CompanyLeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var CompanyModel $companyModel */
-        $companyModel    = self::getContainer()->get('mautic.lead.model.company');
+        $companyModel    = self::getContainer()->get(CompanyModel::class);
         $repoCompanyLead = $companyModel->getCompanyLeadRepository();
 
         $this->assertCount(0, $repoCompanyLead->getPrimaryCompaniesByLeadIds([]), 'No IDs');

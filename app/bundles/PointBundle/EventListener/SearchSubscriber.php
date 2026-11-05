@@ -46,7 +46,7 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             '@MauticPoint/SubscribedEvents/Search/global_point.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.point.actions.header.index', $results);
         }
     }
@@ -60,7 +60,7 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             '@MauticPoint/SubscribedEvents/Search/global_group.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.point.group.header.index', $results);
         }
     }
@@ -74,7 +74,7 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             '@MauticPoint/SubscribedEvents/Search/global_trigger.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.point.trigger.header.index', $results);
         }
     }

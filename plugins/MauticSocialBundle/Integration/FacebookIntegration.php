@@ -3,8 +3,9 @@
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use MauticPlugin\MauticSocialBundle\Form\Type\FacebookType;
+use Psr\Http\Message\ResponseInterface;
 
-class FacebookIntegration extends SocialIntegration
+final class FacebookIntegration extends SocialIntegration
 {
     public function getName(): string
     {
@@ -72,16 +73,14 @@ class FacebookIntegration extends SocialIntegration
 
     /**
      * Get public data.
-     *
-     * @return array
      */
-    public function getUserData($identifier, &$socialCache)
+    public function getUserData($identifier, &$socialCache): ?ResponseInterface
     {
         $this->persistNewLead = false;
         $accessToken          = $this->getContactAccessToken($socialCache);
 
         if (!isset($accessToken['access_token'])) {
-            return;
+            return null;
         }
 
         $url    = $this->getApiUrl('v2.8/me');
@@ -121,7 +120,7 @@ class FacebookIntegration extends SocialIntegration
         return null;
     }
 
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         return [
             'about'       => ['type' => 'string'],

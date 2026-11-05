@@ -45,12 +45,12 @@ final class CampaignRotationTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var ContactTracker $contactTracker */
-        $contactTracker               = static::getContainer()->get('mautic.tracker.contact');
-        $this->campaignLeadRepository = static::getContainer()->get('mautic.campaign.repository.lead');
-        $this->leadEventLogRepository = static::getContainer()->get('mautic.campaign.repository.lead_event_log');
+        $contactTracker               = self::getContainer()->get(ContactTracker::class);
+        $this->campaignLeadRepository = self::getContainer()->get(LeadRepository::class);
+        $this->leadEventLogRepository = self::getContainer()->get(LeadEventLogRepository::class);
 
         /** @var RequestStack $requestStack */
-        $requestStack = static::getContainer()->get('request_stack');
+        $requestStack = self::getContainer()->get(RequestStack::class);
         $request      = new Request();
 
         $request->setSession($sessionMock = $this->createMock(Session::class));

@@ -6,7 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
-class Version20190410143658 extends AbstractMauticMigration
+final class Version20190410143658 extends AbstractMauticMigration
 {
     /**
      * @throws \Doctrine\DBAL\Schema\SchemaException

@@ -8,7 +8,7 @@ namespace Mautic\IntegrationsBundle\DTO;
  * This class represents tokens which provide links to objects which have been
  * synced from integrations into Mautic.
  */
-class IntegrationObjectToken
+final class IntegrationObjectToken
 {
     /**
      * @var string

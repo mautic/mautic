@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
@@ -17,7 +19,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailSendType extends AbstractType
+final class EmailSendType extends AbstractType
 {
     public function __construct(
         private readonly RouterInterface $router,
@@ -31,7 +33,7 @@ class EmailSendType extends AbstractType
             EmailListType::class,
             [
                 'label'      => 'mautic.email.send.selectemails',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'                => 'form-control',
                     'tooltip'              => 'mautic.email.choose.emails_descr',
@@ -58,7 +60,7 @@ class EmailSendType extends AbstractType
                         'mautic.core.form.yes' => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
                     ],
                     'label'      => 'mautic.email.send.emailtype',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control email-type',
                         'tooltip' => 'mautic.email.send.emailtype.tooltip',

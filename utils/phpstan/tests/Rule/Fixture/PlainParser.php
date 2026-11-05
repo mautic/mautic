@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Tests\Rule\Fixture;
 
-class PlainParser
+final class PlainParser
 {
     public function parse(): void
     {

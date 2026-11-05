@@ -200,6 +200,10 @@ trait CustomFieldRepositoryTrait
         $q->where($this->getTableAlias().'.id = '.(int) $id);
         $values = $q->executeQuery()->fetchAssociative();
 
+        if (!$values) {
+            return []; // As the entity does not exist, return an empty array
+        }
+
         return $this->formatFieldValues($values, $byGroup, $object);
     }
 
@@ -303,12 +307,7 @@ trait CustomFieldRepositoryTrait
         unset($r['owner_id']);
     }
 
-    /**
-     * @param array  $values
-     * @param bool   $byGroup
-     * @param string $object
-     */
-    protected function formatFieldValues($values, $byGroup = true, $object = 'lead'): array
+    protected function formatFieldValues(array $values, bool $byGroup = true, string $object = 'lead'): array
     {
         [$fields, $fixedFields] = $this->getCustomFieldList($object);
 
@@ -319,45 +318,42 @@ trait CustomFieldRepositoryTrait
 
         $fieldValues = [];
 
-        // loop over results to put fields in something that can be assigned to the entities
-        foreach ($values as $k => $r) {
-            if (isset($fields[$k])) {
-                $r = CustomFieldHelper::fixValueType($fields[$k]['type'], $r);
-
-                if (null !== $r) {
-                    switch ($fields[$k]['type']) {
-                        case 'number':
-                            $r = (float) $r;
-                            break;
-                        case 'boolean':
-                            $r = (int) $r;
-                            break;
-                    }
-                }
-
-                $alias = $fields[$k]['alias'];
-
-                if ($byGroup) {
-                    $group                                = $fields[$k]['group'];
-                    $fieldValues[$group][$alias]          = $fields[$k];
-                    $fieldValues[$group][$alias]['value'] = $r;
-                } else {
-                    $fieldValues[$alias]          = $fields[$k];
-                    $fieldValues[$alias]['value'] = $r;
-                }
-
-                unset($fields[$k]);
+        if ($byGroup) {
+            // Ensure each group key is present.
+            foreach ($this->getFieldGroups() as $g) {
+                $fieldValues[$g] = [];
             }
         }
 
-        if ($byGroup) {
-            // make sure each group key is present
-            $groups = $this->getFieldGroups();
-            foreach ($groups as $g) {
-                if (!isset($fieldValues[$g])) {
-                    $fieldValues[$g] = [];
-                }
+        // Loop over the results, transforming field values into values that can be assigned to the entities.
+        foreach ($values as $k => $r) {
+            if (!isset($fields[$k])) {
+                continue;
             }
+
+            ['type' => $type, 'alias' => $alias, 'group' => $group] = $fields[$k];
+
+            $r = CustomFieldHelper::fixValueType($type, $r);
+
+            if (null !== $r && 'boolean' === $type) {
+                /**
+                 * The fixValueType method used above sets boolean fields to
+                 * actual boolean. The previous iteration of this code cast
+                 * boolean fields to int for assignment to an entity, so we
+                 * retain that functionality here.
+                 */
+                $r = (int) $r;
+            }
+
+            if ($byGroup) {
+                $fieldValues[$group][$alias]          = $fields[$k];
+                $fieldValues[$group][$alias]['value'] = $r;
+            } else {
+                $fieldValues[$alias]          = $fields[$k];
+                $fieldValues[$alias]['value'] = $r;
+            }
+
+            unset($fields[$k]);
         }
 
         return $fieldValues;

@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
-class BarChart extends AbstractChart implements ChartInterface
+final class BarChart extends AbstractChart implements ChartInterface
 {
     /**
      * Defines the basic chart values, generates the time axe labels from it.

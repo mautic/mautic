@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Exception;
 
-class ChoicesNotFoundException extends \Exception
+final class ChoicesNotFoundException extends \Exception
 {
 }

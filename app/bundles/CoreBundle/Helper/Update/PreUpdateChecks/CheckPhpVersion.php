@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper\Update\PreUpdateChecks;
 
-class CheckPhpVersion extends AbstractPreUpdateCheck
+final class CheckPhpVersion extends AbstractPreUpdateCheck
 {
     public function runCheck(): PreUpdateCheckResult
     {

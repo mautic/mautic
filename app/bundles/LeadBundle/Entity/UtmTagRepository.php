@@ -23,7 +23,7 @@ class UtmTagRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_utmtags', 'ut');
 
         if ($lead instanceof Lead) {
-            $qb->where('ut.lead_id = '.(int) $lead->getId());
+            $qb->where('ut.lead_id = '.$lead->getId());
         }
 
         if (isset($options['search']) && $options['search']) {

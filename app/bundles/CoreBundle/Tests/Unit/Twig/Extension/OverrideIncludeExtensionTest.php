@@ -10,6 +10,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
+use Twig\Markup;
 
 final class OverrideIncludeExtensionTest extends TestCase
 {
@@ -31,6 +32,7 @@ final class OverrideIncludeExtensionTest extends TestCase
         // Twig 3.28 returns the rendered output as a Twig\Markup instance instead of a string.
         $result = $this->extension->includeWithEvent($this->environment, [], 'included.html.twig');
 
+        $this->assertInstanceOf(Markup::class, $result);
         $this->assertSame('included content', (string) $result);
     }
 
@@ -38,6 +40,7 @@ final class OverrideIncludeExtensionTest extends TestCase
     {
         $result = $this->extension->includeWithEvent($this->environment, [], ['first.html.twig', 'included.html.twig']);
 
+        $this->assertInstanceOf(Markup::class, $result);
         $this->assertSame('first content', (string) $result);
     }
 }

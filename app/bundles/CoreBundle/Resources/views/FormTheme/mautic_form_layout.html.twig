@@ -49,12 +49,12 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% block button_group_widget %}
 {# apply attributes to radios #}
 {% set attr = form.vars.attr %}
-<div class="btn-group list-group nav-justified btn-block d-flex fw-nowrap-sm {{ buttonBlockClass }}" data-toggle="buttons" style="{{ (attr.readonly is defined and attr.readonly is not empty) or (attr.disabled is defined and attr.disabled is not empty) ? 'pointer-events: none;' : '' }}">
+<div class="btn-group list-group nav-justified d-flex flex-wrap flex-md-nowrap w-100 {{ buttonBlockClass }}" style="{{ (attr.readonly is defined and attr.readonly is not empty) or (attr.disabled is defined and attr.disabled is not empty) ? 'pointer-events: none;' : '' }}">
     {% for child in form %}
-        {% set class = (child.vars.checked is not empty ? ' active' : '') ~ (child.vars.disabled is not empty or (attribute(attr, 'readonly') is defined and attr.readonly is not empty) ? ' disabled' : '') %}
-        <label class="btn {{ class }} btn-block mt-0 list-group-item">
-            {{ form_widget(child, {'attr': attr}) }}
-            <span class="list-group-item-heading btn-block text-left">{{ child.vars.label|trans }}</span>
+        {% set childAttr = attr|merge({'class': (attr.class|default('') ~ ' btn-check')|trim}) %}
+        {{ form_widget(child, {'attr': childAttr}) }}
+        <label for="{{ child.vars.id }}" class="btn w-100 mt-0 list-group-item">
+            <span class="list-group-item-heading d-block text-start">{{ child.vars.label|trans }}</span>
         </label>
     {% endfor %}
 </div>
@@ -85,12 +85,10 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% set feedbackClass = hasErrors is not empty ? ' has-error' : '' %}
 <div class="row">
     <div class="form-group col-xs-12{{ feedbackClass }}">
-        <div class="checkbox">
-            <label>
-                {{ form_widget(form) }}
-                {{ form.vars.label|trans }}
-            </label>
-        </div>
+        {% include '@MauticCore/Components/checkbox.html.twig' with {
+            required: form.vars.required,
+            items: [{ id: form.vars.id, name: form.vars.full_name, value: form.vars.value, checked: form.vars.checked, disabled: form.vars.disabled, label: form.vars.label is null ? form.vars.name|humanize : form.vars.label, label_html: form.vars.label_html, translation_domain: form.vars.translation_domain, label_translation_parameters: form.vars.label_translation_parameters, attributes: form.vars.attr }]
+        } only %}
         {{ form_errors(form) }}
     </div>
 </div>
@@ -131,14 +129,12 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
         {{ form_label(form, label) }}
         <div class="choice-wrapper">
             {% if expanded and multiple %}
+            {% set checkboxItems = [] %}
             {% for child in form.children %}
-                <div class="checkbox">
-                    <label>
-                        {{ form_widget(child, {'attr': attr}) }}
-                        {{ child.vars.label|trans }}
-                    </label>
-                </div>
+                {% do child.setRendered() %}
+                {% set checkboxItems = checkboxItems|merge([{ id: child.vars.id, name: child.vars.full_name, value: child.vars.value, checked: child.vars.checked, disabled: child.vars.disabled, label: child.vars.label, label_html: child.vars.label_html, translation_domain: child.vars.translation_domain, label_translation_parameters: child.vars.label_translation_parameters, attributes: attr|merge(child.vars.attr) }]) %}
             {% endfor %}
+            {% include '@MauticCore/Components/checkbox.html.twig' with { items: checkboxItems } only %}
             {% else %}
             {{ form_widget(form) }}
             {% endif %}
@@ -202,15 +198,16 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_errors.html.php #}
 {% block form_errors %}
 {% if errors|length > 0 %}
-    <div class="help-block">
+    {% set itemClass = attr.itemClass|default('alert alert-danger') %}
+    <div class="{{ attr.blockClass|default('form-text') }}">
     {% if errors|length > 1 %}
         <ul>
             {% for error in errors %}
-                <li class="alert alert-danger">{{ error.getMessage()|escape }}</li>
+                <li class="{{ itemClass }}">{{ error.getMessage()|escape }}</li>
             {% endfor %}
         </ul>
     {% else %}
-        <div class="alert alert-danger">{{ (errors|first).getMessage()|escape }}</div>
+        <div class="{{ itemClass }}">{{ (errors|first).getMessage()|escape }}</div>
     {% endif %}
     </div>
 {% endif %}
@@ -231,7 +228,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% set tooltip = form.vars.attr.tooltip is defined and form.vars.attr.tooltip is not empty ? form.vars.attr.tooltip|trans : false %}
 <label {% for k, v in label_attr %}
     {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
-{% endfor %}{{ tooltip ? 'data-toggle="tooltip" data-container="body" data-placement="top" title="%s"'|format(tooltip)|raw : ''}}>
+{% endfor %}{{ tooltip ? 'data-bs-toggle="tooltip" data-bs-container="body" data-bs-placement="top" title="%s"'|format(tooltip)|raw : ''}}>
 {{ label_html ? label|trans({}, translation_domain)|purify : label|trans({}, translation_domain)|escape }}{{ tooltip ? ' <i class="ri-question-line"></i>' : '' }}</label>
 {% endif %}
 {% endblock form_label %}
@@ -384,10 +381,10 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     {% endif %}
     <div>
         <div class="row">
-            <div class="col-xs-6 mr-0 pr-0 bdr-r-wdh-0">
+            <div class="col-xs-6 me-0 pe-0 bdr-r-wdh-0">
             {{ form_widget(form.label, {'attr': {'class': 'form-control sortable-label', 'placeholder': form.label.vars.label}}) }}
             </div>
-            <div class="col-xs-6 ml-0 pl-0">
+            <div class="col-xs-6 ms-0 ps-0">
             {{ form_widget(form.value, {'attr': {'class': 'form-control sortable-value', 'placeholder': form.value.vars.label}}) }}
             </div>
         </div>
@@ -421,7 +418,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% endfor %}
 
 {% if errorMessages|length > 0 %}
-    <div class="help-block">
+    <div class="form-text">
         {% if errorMessages|length > 1 %}
             <ul>
                 {% for errorMessage in errorMessages %}
@@ -632,7 +629,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 
 {% block form_help -%}
     {%- if help is not empty or form.vars.attr.help_icon is defined -%}
-        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-block')|trim}) -%}
+        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' form-text')|trim}) -%}
         <p id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
             {%- if form.vars.attr.help_icon is defined and form.vars.attr.help_icon is not empty -%}
                 <i class="{{ form.vars.attr.help_icon }} ri-lg mr-xs"></i>
@@ -657,3 +654,19 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
         </div>
     </div>
 {%- endblock alert_widget %}
+
+{% block datespan_widget %}
+    {% set errorAttr = { attr: { blockClass: 'm-0', itemClass: 'alert alert-danger m-0' } } %}
+    <div class="row-no-gutters">
+        <div class="col-xs-12 col-lg-8">
+            {{ form_widget(form.interval) }}
+            {{ form_errors(form.interval, errorAttr) }}
+        </div>
+        <div class="col-xs-12 col-lg-4">
+            <div class="choice-wrapper">
+                {{ form_widget(form.unit) }}
+                {{ form_errors(form.unit, errorAttr) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

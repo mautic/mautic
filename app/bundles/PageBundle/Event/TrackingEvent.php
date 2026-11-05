@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class TrackingEvent extends Event
+final class TrackingEvent extends Event
 {
     private readonly ParameterBag $response;
 

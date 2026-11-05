@@ -18,8 +18,9 @@ final class AjaxController extends CommonAjaxController
     private PluginModel $pluginModel;
 
     #[Required]
-    public function autowirePluginAjaxController(PluginModel $pluginModel): void
-    {
+    public function autowirePluginAjaxController(
+        PluginModel $pluginModel,
+    ): void {
         $this->pluginModel = $pluginModel;
     }
 
@@ -37,13 +38,17 @@ final class AjaxController extends CommonAjaxController
      */
     public function getIntegrationFieldsAction(Request $request, IntegrationHelper $helper): JsonResponse
     {
-        $integration = $request->query->get('integration');
-        $settings    = $request->query->all()['settings'] ?? [];
-        $page        = $request->query->get('page');
+        $querySettings   = $request->query->all()['settings'] ?? [];
+        $requestSettings = $request->request->all()['settings'] ?? [];
+        $querySettings   = is_array($querySettings) ? $querySettings : [];
+        $requestSettings = is_array($requestSettings) ? $requestSettings : [];
+        $integration     = $request->request->get('integration') ?? $request->query->get('integration');
+        $settings        = array_replace_recursive($querySettings, $requestSettings);
+        $page            = $request->request->get('page') ?? $request->query->get('page');
 
         $dataArray = ['success' => 0];
 
-        if (!empty($integration) && !empty($settings)) {
+        if (!empty($integration) && [] !== $settings) {
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
             $integrationObject = $helper->getIntegrationObject($integration);
 

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
+use Mautic\ConfigBundle\Form\DataTransformer\DsnTransformer;
 use Mautic\ConfigBundle\Form\DataTransformer\DsnTransformerFactory;
 use Mautic\ConfigBundle\Form\Type\DsnType;
+use Mautic\ConfigBundle\Form\Type\EscapeTransformer;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType;
@@ -35,9 +37,9 @@ final class ConfigTypeTest extends TypeTestCase
     {
         // Some local environments do not have ext-imap loaded, but Mailbox uses these
         // constants in method signatures and class loading fails without them.
-        defined('SORTARRIVAL') or define('SORTARRIVAL', 0);
-        defined('SE_UID') or define('SE_UID', 1);
-        defined('FT_PEEK') or define('FT_PEEK', 2);
+        defined('SORTARRIVAL') || define('SORTARRIVAL', 0);
+        defined('SE_UID') || define('SE_UID', 1);
+        defined('FT_PEEK') || define('FT_PEEK', 2);
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
@@ -51,10 +53,21 @@ final class ConfigTypeTest extends TypeTestCase
         $permsMock = $this->createMock(CorePermissions::class);
         $permsMock->method('isGranted')->willReturn(false);
 
+        $dsnTransformerFactoryMock = $this->createMock(DsnTransformerFactory::class);
+        $dsnTransformerFactoryMock->method('create')->willReturnCallback(
+            fn (string $configKey, bool $allowEmpty): DsnTransformer => new DsnTransformer(
+                $this->createStub(CoreParametersHelper::class),
+                new EscapeTransformer([]),
+                '',
+                false
+            )
+        );
+
         $dsnType              = new DsnType(
-            $this->createStub(DsnTransformerFactory::class),
+            $dsnTransformerFactoryMock,
             $this->createStub(CoreParametersHelper::class),
         );
+
         $configType                     = new ConfigType($translator);
         $preferenceCenterList           = new PreferenceCenterListType($pageModelMock, $permsMock);
         $configMonitoredEmail           = new ConfigMonitoredEmailType(new EventDispatcher());

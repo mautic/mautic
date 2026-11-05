@@ -9,7 +9,7 @@ use LightSaml\Credential\X509Credential;
 use LightSaml\Store\Credential\CredentialStoreInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class EntityDescriptorProviderFactory
+final class EntityDescriptorProviderFactory
 {
     public static function build(
         string $ownEntityId,

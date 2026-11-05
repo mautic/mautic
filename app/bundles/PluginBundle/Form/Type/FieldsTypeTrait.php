@@ -141,7 +141,7 @@ trait FieldsTypeTrait
                             'mapped'       => false,
                         ]
                     );
-                    if (isset($options['enable_data_priority']) and $options['enable_data_priority']) {
+                    if (isset($options['enable_data_priority']) && $options['enable_data_priority']) {
                         $updateName = 'update_mautic';
 
                         if ($fieldObject) {
@@ -171,7 +171,7 @@ trait FieldsTypeTrait
                                 'data'              => $data,
                                 'placeholder'       => false,
                                 'attr'              => [
-                                    'data-toggle'   => 'tooltip',
+                                    'data-bs-toggle'   => 'tooltip',
                                     'title'         => 'mautic.plugin.direction.data.update',
                                     'disabled'      => $disabled,
                                     'forceDirection'=> $forceDirection,
@@ -193,7 +193,7 @@ trait FieldsTypeTrait
                             'choices'    => $mauticFields,
                             'label'      => false,
                             'data'       => $matched && isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
-                            'label_attr' => ['class' => 'control-label'],
+                            'label_attr' => ['class' => 'form-label'],
                             'attr'       => [
                                 'class'            => 'field-selector',
                                 'data-placeholder' => ' ',

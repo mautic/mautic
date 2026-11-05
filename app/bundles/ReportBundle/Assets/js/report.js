@@ -164,7 +164,7 @@ Mautic.addReportRow = function (elId) {
     }
 
     Mautic.activateChosenSelect(mQuery('#' + elId + '_' + index + '_column'));
-    mQuery("#" + elId + " *[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
+    mQuery("#" + elId + " *[data-toggle='tooltip'], #" + elId + " *[data-bs-toggle='tooltip']").tooltip({html: true, container: 'body'});
 
 };
 
@@ -333,7 +333,7 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
 };
 
 Mautic.removeReportRow = function (container) {
-    mQuery("#" + container + " *[data-toggle='tooltip']").tooltip('destroy');
+    mQuery("#" + container + " *[data-toggle='tooltip'], #" + container + " *[data-bs-toggle='tooltip']").tooltip('destroy');
     mQuery('#' + container).remove();
 };
 
@@ -478,5 +478,5 @@ Mautic.cloneReportRow = function (containerId) {
     }
 
     // Reinitialize tooltips
-    newContainer.find("*[data-toggle='tooltip']").tooltip({ html: true, container: 'body' });
+    newContainer.find("*[data-toggle='tooltip'], *[data-bs-toggle='tooltip']").tooltip({ html: true, container: 'body' });
 };

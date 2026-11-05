@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class NotificationConfigType extends AbstractType
+final class NotificationConfigType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -38,7 +38,7 @@ class NotificationConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.notification.form.config.notification_email_addresses',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control notification_email_addresses',
                     'tooltip'      => 'mautic.notification.form.config.notification_email_addresses.tooltip',
@@ -69,7 +69,7 @@ class NotificationConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.notification.form.config.notification_email_addresses',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control notification_email_addresses',
                     'tooltip'      => 'mautic.notification.form.config.notification_email_addresses.tooltip',

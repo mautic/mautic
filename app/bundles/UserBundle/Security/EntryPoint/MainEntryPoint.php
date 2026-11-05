@@ -6,20 +6,19 @@ namespace Mautic\UserBundle\Security\EntryPoint;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
-class MainEntryPoint implements AuthenticationEntryPointInterface
+final readonly class MainEntryPoint implements AuthenticationEntryPointInterface
 {
     public function __construct(
-        private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly bool $samlEnabled,
+        private UrlGeneratorInterface $urlGenerator,
+        private bool $samlEnabled,
     ) {
     }
 
-    public function start(Request $request, ?AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): RedirectResponse
     {
         // as per https://docs.mautic.org/en/5.x/authentication/authentication.html#logging-in
         // log in always as SAML for all requests.

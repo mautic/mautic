@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
@@ -9,7 +11,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 
-class BcInterfaceTokenTransport implements TransportInterface
+final class BcInterfaceTokenTransport implements TransportInterface
 {
     /**
      * @var array<string, mixed>

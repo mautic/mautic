@@ -15,13 +15,13 @@ use Symfony\Component\Form\FormInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class PointActionUrlHitType extends AbstractType
+final class PointActionUrlHitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('page_url', TextType::class, [
             'label'      => 'mautic.page.point.action.form.page.url',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'       => 'form-control',
                 'tooltip'     => 'mautic.page.point.action.form.page.url.descr',
@@ -31,7 +31,7 @@ class PointActionUrlHitType extends AbstractType
 
         $builder->add('page_hits', IntegerType::class, [
             'label'      => 'mautic.page.hits',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'required'   => false,
             'attr'       => [
                 'class'   => 'form-control',
@@ -50,7 +50,7 @@ class PointActionUrlHitType extends AbstractType
                 $builder->create('accumulative_time', TextType::class, [
                     'label'      => 'mautic.page.point.action.form.accumulative.time',
                     'required'   => false,
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.page.point.action.form.accumulative.time.descr',
@@ -71,7 +71,7 @@ class PointActionUrlHitType extends AbstractType
                 $builder->create('returns_within', TextType::class, [
                     'label'      => 'mautic.page.point.action.form.returns.within',
                     'required'   => false,
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.page.point.action.form.returns.within.descr',
@@ -92,7 +92,7 @@ class PointActionUrlHitType extends AbstractType
                 $builder->create('returns_after', TextType::class, [
                     'label'      => 'mautic.page.point.action.form.returns.after',
                     'required'   => false,
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.page.point.action.form.returns.after.descr',

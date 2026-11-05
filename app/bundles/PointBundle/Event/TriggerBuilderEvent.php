@@ -6,7 +6,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TriggerBuilderEvent extends Event
+final class TriggerBuilderEvent extends Event
 {
     private array $events = [];
 

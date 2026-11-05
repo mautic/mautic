@@ -9,9 +9,9 @@
     {% set errors = item.fail_reason %}
 {% endif %}
 
-{% set parentDetails = false %}
-{% if (event.extra.parentDetails is defined) %}
-    {% set parentDetails = event.extra.parentDetails %}
+{% set eventDetails = false %}
+{% if (event.extra.eventDetails is defined) %}
+    {% set eventDetails = event.extra.eventDetails %}
 {% endif %}
 
 {% set cancelled = item.isScheduled is empty and item.dateTriggered is empty %}
@@ -39,17 +39,17 @@
                     <button type="button" id="timeline-campaign-event-save-{{ item.event_id }}"
                             class="btn btn-ghost btn-nospin" onmousedown="return false;"
                             onclick="Mautic.saveScheduledCampaignEvent({{ item.event_id }}, {{ lead.getId() }})"
-                            data-toggle="tooltip" title="{{ 'mautic.campaign.event.save'|trans }}" style="display:none">
+                            data-bs-toggle="tooltip" title="{{ 'mautic.campaign.event.save'|trans }}" style="display:none">
                         <i class="ri-save-line text-interactive"></i>
                     </button>
                     <button type="button" class="btn btn-ghost btn-nospin btn-reschedule"
                             onclick="Mautic.updateScheduledCampaignEvent({{ item.event_id }}, {{ lead.getId() }})"
-                            data-toggle="tooltip" title="{{ 'mautic.campaign.event.reschedule'|trans }}">
+                            data-bs-toggle="tooltip" title="{{ 'mautic.campaign.event.reschedule'|trans }}">
                         <i class="ri-time-line text-interactive"></i>
                     </button>
                     <button type="button"
                             class="btn btn-ghost btn-nospin"{{ cancelled ? ' disabled' : '' }} onclick="Mautic.cancelScheduledCampaignEvent({{ item.event_id }}, {{ lead.getId() }})"
-                            data-toggle="tooltip" title="{{ 'mautic.campaign.event.cancel'|trans }}">
+                            data-bs-toggle="tooltip" title="{{ 'mautic.campaign.event.cancel'|trans }}">
                         <i class="ri-close-line text-danger"></i>
                     </button>
                 </span>
@@ -78,13 +78,24 @@
             <p class="mt-0 mb-10">{{ 'mautic.campaign.campaign.description'|trans({'%description%' : item.event_description})|purify }}</p>
         {% endif %}
     {% endif %}
-    {% if parentDetails != false %}
+    {% if eventDetails != false %}
         <h6 class="mt-lg mb-sm">
-            {{ 'mautic.campaign.parent.details'|trans({'%path%': parentDetails.path, '%type%': parentDetails.type, '%name%': parentDetails.name})|purify }}
+            {% set props = eventDetails.properties|default({}) %}
+            {% if props.field is defined and props.operator is defined and props.comparisonValue is defined and props.value is defined %}
+                {% set comparisonValue = props.comparisonValue is iterable ? props.comparisonValue|join(',') : props.comparisonValue %}
+                {% set value = props.value is iterable ? props.value|join(',') : props.value %}
+                {{ 'mautic.campaign.event.condition.details'|trans({
+                    '%path%': eventDetails.path|default(''),
+                    '%field%': props.field ?? '',
+                    '%operator%': props.operator ?? '',
+                    '%comparisonValue%': comparisonValue ?? '',
+                    '%value%': value ?? '',
+                })|purify }}  
+            {% endif %}
         </h6>
         <dl class="dl-horizontal">
-            {% for key, value in parentDetails.properties %}
-                <dt>{{ key|capitalize }}:</dt>
+            {% for key, value in eventDetails.properties %}
+                <dt>{{ key|humanize }}:</dt>
                 <dd>{{ value|json_encode()|trim('"') }}</dd>
             {% endfor %}
         </dl>

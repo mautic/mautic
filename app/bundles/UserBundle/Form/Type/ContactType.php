@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ContactType extends AbstractType
+final class ContactType extends AbstractType
 {
     /**
      * @param FormBuilderInterface<array<mixed>|null> $builder
@@ -28,7 +28,7 @@ class ContactType extends AbstractType
                 TextType::class,
                 [
                     'label'       => 'mautic.email.subject',
-                    'label_attr'  => ['class' => 'control-label'],
+                    'label_attr'  => ['class' => 'form-label'],
                     'attr'        => ['class' => 'form-control'],
                     'constraints' => [
                         new NotBlank(message: 'Subject should not be blank.'),
@@ -41,7 +41,7 @@ class ContactType extends AbstractType
                 TextareaType::class,
                 [
                     'label'      => 'mautic.user.user.contact.message',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class' => 'form-control',
                         'rows'  => 10,

@@ -5,14 +5,14 @@ namespace Mautic\CoreBundle\Helper;
 use MatthiasMullie\Minify;
 use Symfony\Component\Finder\Finder;
 
-class AssetGenerationHelper
+final readonly class AssetGenerationHelper
 {
     // Temporary array of libraries to load from node_modules before we switch
     // to Symfony Encore. This is the first step to load libraries from NPM.
     private const NODE_MODULES = [
         'mousetrap/mousetrap.js', // Needed for keyboard shortcuts
         'jquery/dist/jquery.js', // Needed for everything. It's the underlying framework.
-        '../vendor/twbs/bootstrap-sass/assets/javascripts/bootstrap.js', // Needed for the UI components like modal boxes.
+        '../vendor/twbs/bootstrap/dist/js/bootstrap.bundle.js', // Needed for the UI components like modal boxes.
         'jquery-form/src/jquery.form.js', // Needed for ajax forms with file attachments.
         'moment/min/moment.min.js', // Needed for date/time formatting.
         'jquery.caret/dist/jquery.caret.js', // Needed for the text editor Twitter-like mentions (tokens).
@@ -24,7 +24,7 @@ class AssetGenerationHelper
         '@claviska/jquery-minicolors/jquery.minicolors.js', // Needed for the color picker.
         'dropzone/dist/dropzone.js', // Needed for the file upload in the asset detail page.
         'multiselect/js/jquery.multi-select.js', // Needed for the multiselect UI component.
-        'chart.js/dist/Chart.js', // Needed for the charts.
+        'chart.js/dist/chart.umd.js', // Needed for the charts.
         'chosen-js/chosen.jquery.js',
         'at.js/dist/js/jquery.atwho.js',
         'jvectormap-next/jquery-jvectormap.js',
@@ -63,11 +63,11 @@ class AssetGenerationHelper
         'jquery-ui-touch-punch/jquery.ui.touch-punch.js', // Needed for touch devices, and needs to be added after the jquery-ui components
     ];
 
-    private readonly string $version;
+    private string $version;
 
     public function __construct(
-        private readonly BundleHelper $bundleHelper,
-        private readonly PathsHelper $pathsHelper,
+        private BundleHelper $bundleHelper,
+        private PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
         AppVersion $appVersion,
     ) {
@@ -243,7 +243,7 @@ class AssetGenerationHelper
      *
      * @return array<string, false|int>
      */
-    protected function findAssets(string $dir, string $ext, string $env, array &$assets): array
+    private function findAssets(string $dir, string $ext, string $env, array &$assets): array
     {
         $rootPath    = str_replace('\\', '/', $this->pathsHelper->getSystemPath('assets_root').'/');
         $directories = new Finder();
@@ -327,7 +327,7 @@ class AssetGenerationHelper
     /**
      * Find asset overrides in the template.
      */
-    protected function findOverrides($env, array &$assets): array
+    private function findOverrides($env, array &$assets): array
     {
         $rootPath      = $this->pathsHelper->getSystemPath('assets_root');
         $currentTheme  = $this->pathsHelper->getSystemPath('current_theme');

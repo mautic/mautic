@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Report;
 
-class RelationDAO
+final class RelationDAO
 {
     private ?int $relObjectInternalId = null;
 

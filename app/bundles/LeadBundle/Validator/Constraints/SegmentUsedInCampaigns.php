@@ -6,10 +6,11 @@ namespace Mautic\LeadBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class SegmentUsedInCampaigns extends Constraint
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
+final class SegmentUsedInCampaigns extends Constraint
 {
-    public function getTargets(): string|array
+    public function getTargets(): string
     {
-        return static::CLASS_CONSTRAINT;
+        return self::CLASS_CONSTRAINT;
     }
 }

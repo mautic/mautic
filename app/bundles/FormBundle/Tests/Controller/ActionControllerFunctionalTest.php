@@ -43,6 +43,7 @@ final class ActionControllerFunctionalTest extends MauticMysqlTestCase
         $form->setValues([
             'formaction[properties][subject]' => 'Test Japanese',
             'formaction[properties][message]' => '<p style="font-family: メイリオ">Test</p>',
+            'formaction[properties][to]'      => 'test@example.com',
         ]);
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();

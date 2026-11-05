@@ -13,6 +13,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
 final class SamlTest extends MauticMysqlTestCase
 {
@@ -20,7 +21,7 @@ final class SamlTest extends MauticMysqlTestCase
 
     public function testDiscoveryTemplateIsOverridden(): void
     {
-        $twig    = static::getContainer()->get('twig');
+        $twig    = self::getContainer()->get(Environment::class);
         $content = $twig->render('@LightSamlSp/discovery.html.twig', ['parties' => []]);
 
         $this->assertStringContainsString('SAML not configured or configured incorrectly.', (string) $content);
@@ -49,7 +50,7 @@ final class SamlTest extends MauticMysqlTestCase
         $metadataUrl = 'http://'.$host.':'.$port.'/simplesaml/saml2/idp/metadata.php';
         $this->assertTrue(copy($metadataUrl, $temporaryFile), 'Error copying '.$metadataUrl.' to '.$temporaryFile);
 
-        $configUrl        = '/s/config/edit?tab=userconfig';
+        $configUrl        = '/s/config/edit/userconfig';
         $crawler          = $this->client->request(Request::METHOD_GET, $configUrl);
         $configSaveButton = $crawler->selectButton('config[buttons][apply]');
         $configForm       = $configSaveButton->form();
@@ -74,11 +75,9 @@ final class SamlTest extends MauticMysqlTestCase
 
         // Fill in email in the fields Email, First Name and Last name (we are testing, so no problem that the actual values are not correct)
         $configForm->setValues([
-            'config[leadconfig][contact_columns]'               => ['name', 'email', 'id'],
-            'config[companyconfig][company_columns]'            => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
-            'config[userconfig][saml_idp_email_attribute]'      => $attributeName,
-            'config[userconfig][saml_idp_firstname_attribute]'  => $attributeName,
-            'config[userconfig][saml_idp_lastname_attribute]'   => $attributeName,
+            'config[userconfig][saml_idp_email_attribute]'     => $attributeName,
+            'config[userconfig][saml_idp_firstname_attribute]' => $attributeName,
+            'config[userconfig][saml_idp_lastname_attribute]'  => $attributeName,
         ]);
         $this->client->submit($configForm);
         $clientResponse = $this->client->getResponse();

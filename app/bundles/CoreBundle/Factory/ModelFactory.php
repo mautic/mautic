@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Factory;
 
 use Mautic\CoreBundle\Model\MauticModelInterface;
-use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * @template M of object
@@ -11,7 +11,7 @@ use Psr\Container\ContainerInterface;
 class ModelFactory
 {
     public function __construct(
-        private readonly ContainerInterface $container,
+        private readonly ServiceLocator $container,
     ) {
     }
 

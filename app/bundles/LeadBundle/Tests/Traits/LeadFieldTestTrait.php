@@ -24,7 +24,7 @@ trait LeadFieldTestTrait
             $field->setProperties($fieldDetails['properties']);
         }
 
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         \assert($fieldModel instanceof FieldModel);
         $fieldModel->saveEntity($field);
     }

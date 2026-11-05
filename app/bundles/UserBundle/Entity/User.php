@@ -261,12 +261,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
         $metadata->addPropertyConstraint('plainPassword', new Assert\Length(min: 6, minMessage: 'mautic.user.user.password.minlength', groups: ['CheckPassword']));
 
-        $metadata->addPropertyConstraint('plainPassword', new NotWeak(
-            [
-                'message'    => 'mautic.user.user.password.weak',
-                'groups'     => ['CheckPassword'],
-            ]
-        ));
+        $metadata->addPropertyConstraint('plainPassword', new NotWeak(message: 'mautic.user.user.password.weak', groups: ['CheckPassword']));
 
         $metadata->setGroupSequence(['User', 'SecondPass', 'CheckPassword']);
     }

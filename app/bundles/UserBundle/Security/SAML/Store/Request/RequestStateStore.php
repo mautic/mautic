@@ -8,7 +8,7 @@ use LightSaml\State\Request\RequestState;
 use LightSaml\Store\Request\AbstractRequestStateArrayStore;
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
 
-class RequestStateStore extends AbstractRequestStateArrayStore
+final class RequestStateStore extends AbstractRequestStateArrayStore
 {
     private readonly string $prefix;
 

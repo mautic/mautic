@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -9,13 +11,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class CampaignEventPageHitType extends AbstractType
+final class CampaignEventPageHitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('pages', PageListType::class, [
             'label'      => 'mautic.page.campaign.event.form.pages',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.page.campaign.event.form.pages.descr',
@@ -24,7 +26,7 @@ class CampaignEventPageHitType extends AbstractType
 
         $builder->add('url', TextType::class, [
             'label'      => 'mautic.page.campaign.event.form.url',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'required'   => false,
             'attr'       => [
                 'class'   => 'form-control',
@@ -34,7 +36,7 @@ class CampaignEventPageHitType extends AbstractType
 
         $builder->add('referer', TextType::class, [
             'label'      => 'mautic.page.campaign.event.form.referer',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'required'   => false,
             'attr'       => [
                 'class'   => 'form-control',

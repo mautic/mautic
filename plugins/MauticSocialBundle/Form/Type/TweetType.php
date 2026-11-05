@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
@@ -23,10 +23,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<Tweet>
  */
-class TweetType extends AbstractType
+final class TweetType extends AbstractType
 {
     public function __construct(
-        protected EntityManager $em,
+        private readonly EntityManagerInterface $em,
     ) {
     }
 
@@ -38,7 +38,7 @@ class TweetType extends AbstractType
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.name',
                 'required'   => true,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'tooltip' => 'mautic.social.monitoring.twitter.tweet.name.tooltip',
                     'class'   => 'form-control',
@@ -57,7 +57,7 @@ class TweetType extends AbstractType
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.description',
                 'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'tooltip' => 'mautic.social.monitoring.twitter.tweet.description.tooltip',
                     'class'   => 'form-control',
@@ -71,7 +71,7 @@ class TweetType extends AbstractType
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.text',
                 'required'   => true,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'tooltip' => 'mautic.social.monitoring.twitter.tweet.text.tooltip',
                     'class'   => 'form-control tweet-message',
@@ -92,7 +92,7 @@ class TweetType extends AbstractType
                 [
                     'label'       => 'mautic.social.monitoring.twitter.assets',
                     'placeholder' => 'mautic.social.monitoring.list.choose',
-                    'label_attr'  => ['class' => 'control-label'],
+                    'label_attr'  => ['class' => 'form-label'],
                     'multiple'    => false,
                     'attr'        => [
                         'class'   => 'form-control tweet-insert-asset',
@@ -110,7 +110,7 @@ class TweetType extends AbstractType
                 [
                     'label'       => 'mautic.social.monitoring.twitter.pages',
                     'placeholder' => 'mautic.social.monitoring.list.choose',
-                    'label_attr'  => ['class' => 'control-label'],
+                    'label_attr'  => ['class' => 'form-label'],
                     'multiple'    => false,
                     'attr'        => [
                         'class'   => 'form-control tweet-insert-page',

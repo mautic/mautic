@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -10,13 +12,13 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class StageActionChangeType extends AbstractType
+final class StageActionChangeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('stage', StageActionListType::class, [
             'label'      => 'mautic.stage.selectstage',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.stage.choose.stage_descr',

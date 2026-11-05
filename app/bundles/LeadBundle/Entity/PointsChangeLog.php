@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -198,7 +200,7 @@ class PointsChangeLog
         return $this->lead;
     }
 
-    public function setIpAddress(IpAddress $ipAddress): static
+    public function setIpAddress(?IpAddress $ipAddress): static
     {
         $this->ipAddress = $ipAddress;
 

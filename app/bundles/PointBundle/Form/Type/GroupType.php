@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<GroupType>
  */
-class GroupType extends AbstractType
+final class GroupType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -27,7 +27,7 @@ class GroupType extends AbstractType
 
         $builder->add('name', TextType::class, [
             'label'      => 'mautic.core.name',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
 
@@ -36,7 +36,7 @@ class GroupType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control editor'],
                 'required'   => false,
             ]

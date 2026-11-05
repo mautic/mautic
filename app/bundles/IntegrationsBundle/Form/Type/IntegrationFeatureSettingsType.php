@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class IntegrationFeatureSettingsType extends AbstractType
+final class IntegrationFeatureSettingsType extends AbstractType
 {
     /**
      * @throws IntegrationNotFoundException

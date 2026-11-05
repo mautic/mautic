@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Event;
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class FormLoadEvent extends Event
+final class FormLoadEvent extends Event
 {
     public function __construct(
         private readonly Integration $integrationConfiguration,

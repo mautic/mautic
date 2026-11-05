@@ -1,22 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CommandListEvent extends Event
+final class CommandListEvent extends Event
 {
-    /**
-     * @var array
-     */
-    protected $commands = [];
+    private array $commands = [];
 
     /**
      * Returns the list of currently stored commands.
-     *
-     * @return mixed
      */
-    public function getCommands()
+    public function getCommands(): array
     {
         return $this->commands;
     }

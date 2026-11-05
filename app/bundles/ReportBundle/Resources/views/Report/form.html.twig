@@ -23,22 +23,22 @@
                   <!-- tabs controls -->
                   <ul class="nav nav-tabs nav-tabs-contained">
                       <li class="active">
-                          <a href="#details-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a>
+                          <a href="#details-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">{{ 'mautic.core.details'|trans }}</a>
                       </li>
                       <li class="">
-                          <a href="#data-container" role="tab" data-toggle="tab">{{ 'mautic.report.tab.data'|trans }}</a>
+                          <a href="#data-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.report.tab.data'|trans }}</a>
                       </li>
                       <li class="{% if not showGraphTab %}hide{% endif %}" id="graphs-tab">
-                          <a href="#graphs-container" role="tab" data-toggle="tab">{{ 'mautic.report.tab.graphs'|trans }}</a>
+                          <a href="#graphs-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.report.tab.graphs'|trans }}</a>
                       </li>
                       <li>
-                          <a href="#schedule-container" role="tab" class="{% if formContainsErrors(form.toAddress) %}text-danger{% endif %}" data-toggle="tab">{{ 'mautic.report.tab.schedule'|trans }}</a>
+                          <a href="#schedule-container" role="tab" class="nav-link {% if formContainsErrors(form.toAddress) %}text-danger{% endif %}" data-bs-toggle="tab">{{ 'mautic.report.tab.schedule'|trans }}</a>
                       </li>
                   </ul>
                   <!--/ tabs controls -->
 
                   <div class="tab-content pa-md">
-                      <div class="tab-pane fade in active bdr-w-0" id="details-container">
+                      <div class="tab-pane fade show active bdr-w-0" id="details-container">
                           <div class="row">
                               <div class="col-md-6">
                                   <div class="pa-md">

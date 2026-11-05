@@ -63,7 +63,7 @@ class RealTimeExecutioner
         $this->logger->debug('CAMPAIGN: Campaign triggered for event type '.$type.'('.$channel.' / '.$channelId.')');
 
         // Kept for BC support although not sure we need this
-        defined('MAUTIC_CAMPAIGN_NOT_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_NOT_SYSTEM_TRIGGERED', 1);
+        defined('MAUTIC_CAMPAIGN_NOT_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_NOT_SYSTEM_TRIGGERED', 1);
 
         try {
             $this->fetchCurrentContact();

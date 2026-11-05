@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\StatsEvent;
@@ -29,7 +29,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
 
     public function __construct(
         protected CorePermissions $security,
-        protected EntityManager $entityManager,
+        protected EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -52,6 +52,10 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
 
             $permissions  = $this->permissions[$table] ?? [];
             $allowedJoins = [];
+
+            if ([] === $permissions && !$this->security->isAdmin()) {
+                throw new AccessDeniedException(sprintf('You do not have permission to load data from the %s table', $table));
+            }
 
             foreach ($permissions as $tableAlias => $permBase) {
                 // It's an admin, don't check any further

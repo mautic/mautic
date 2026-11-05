@@ -6,11 +6,13 @@ namespace Mautic\ReportBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ReportApiControllerTest extends MauticMysqlTestCase
@@ -139,7 +141,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         // Set new permissions
         $role->setIsAdmin(false);
         /** @var RoleModel $roleModel */
-        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        $roleModel = self::getContainer()->get(RoleModel::class);
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
@@ -178,10 +180,10 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         return $role;
     }
 
-    private function createReportData(int $createBy = 0): Report
+    private function createReportData(int $createBy = 0, string $name = 'Contact report'): Report
     {
         $report = new Report();
-        $report->setName('Contact report');
+        $report->setName($name);
         $report->setDescription('<b>This is allowed HTML</b>');
         $report->setSource('leads');
         $coulmns = [
@@ -196,8 +198,13 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
             $report->setCreatedByUser($createBy);
         }
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         return $report;
+    }
+
+    private function getUserPlainPassword(): string
+    {
+        return 'Maut1cR0cks!';
     }
 }

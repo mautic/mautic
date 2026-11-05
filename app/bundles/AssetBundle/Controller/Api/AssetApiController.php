@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Asset>
  */
-class AssetApiController extends CommonApiController
+final class AssetApiController extends CommonApiController
 {
     /**
      * @var AssetModel|null

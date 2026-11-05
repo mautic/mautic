@@ -8,12 +8,12 @@
                 <p>{{ 'mautic.config.tab.pagetracking.info'|trans|purify }}</p>
                 <ul class="nav nav-tabs nav-tabs-contained">
                     <li class="active">
-                        <a href="#tracking-snippet-consent" role="tab" data-toggle="tab">
+                        <a href="#tracking-snippet-consent" role="tab" data-bs-toggle="tab" class="active nav-link">
                             {{ 'mautic.page.config.tracking.script.consent.tab'|trans }}
                         </a>
                     </li>
                     <li>
-                        <a href="#tracking-snippet-full" role="tab" data-toggle="tab">
+                        <a href="#tracking-snippet-full" role="tab" data-bs-toggle="tab" class="nav-link">
                             {{ 'mautic.page.config.tracking.script.full.tab'|trans }}
                         </a>
                     </li>
@@ -90,7 +90,7 @@
             <div class="row">
                 <hr>
                 {% for name, f in form.children %}
-                    {% if name in ['anonymize_ip', 'track_contact_by_ip', 'do_not_track_404_anonymous', 'append_segment_id_tracking_url'] %}
+                    {% if name in ['anonymize_ip', 'track_contact_by_ip', 'do_not_track_404_anonymous', 'append_segment_id_tracking_url', 'aggregate_analytics'] %}
                         <div class="col-xs-12">
                             {{ form_row(f) }}
                             {% if name == 'anonymize_ip' %}
@@ -111,7 +111,7 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-12">
-                    {{ form_row(form.facebook_pixel_id) }}
+                    {{ formRowIfExists(form, 'facebook_pixel_id') }}
                 </div>
                 <hr>
                 {% for name, f in form.children %}
@@ -133,7 +133,7 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-12">
-                    {{ form_row(form.google_analytics_id) }}
+                    {{ formRowIfExists(form, 'google_analytics_id') }}
                 </div>
                 <hr>
                 {% for name, f in form.children %}

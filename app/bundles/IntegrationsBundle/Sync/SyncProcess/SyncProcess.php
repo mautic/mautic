@@ -28,7 +28,7 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProc
 use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class SyncProcess
+final class SyncProcess
 {
     private ?int $syncIteration = null;
 
@@ -53,7 +53,7 @@ class SyncProcess
      */
     public function execute(): void
     {
-        defined('MAUTIC_INTEGRATION_ACTIVE_SYNC') or define('MAUTIC_INTEGRATION_ACTIVE_SYNC', 1);
+        defined('MAUTIC_INTEGRATION_ACTIVE_SYNC') || define('MAUTIC_INTEGRATION_ACTIVE_SYNC', 1);
 
         // Setup/prepare for the sync
         $this->syncDateHelper->setSyncDateTimes($this->inputOptionsDAO->getStartDateTime(), $this->inputOptionsDAO->getEndDateTime());
@@ -218,7 +218,7 @@ class SyncProcess
         // Relation objects we need to synchronize
         $objectsToSynchronize = $this->relationsHelper->getObjectsToSynchronize();
 
-        if (!empty($objectsToSynchronize)) {
+        if ([] !== $objectsToSynchronize) {
             $this->synchronizeMissingObjects($objectsToSynchronize, $syncReport);
         }
     }

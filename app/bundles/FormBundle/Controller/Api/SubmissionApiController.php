@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Submission>
  */
-class SubmissionApiController extends CommonApiController
+final class SubmissionApiController extends CommonApiController
 {
     public function __construct(
         CorePermissions $security,

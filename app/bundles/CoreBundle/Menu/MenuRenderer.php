@@ -7,13 +7,13 @@ use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\Renderer\RendererInterface;
 use Twig\Environment;
 
-class MenuRenderer implements RendererInterface
+final readonly class MenuRenderer implements RendererInterface
 {
-    private readonly array $defaultOptions;
+    private array $defaultOptions;
 
     public function __construct(
-        private readonly MatcherInterface $matcher,
-        private readonly Environment $twig,
+        private MatcherInterface $matcher,
+        private Environment $twig,
         array $defaultOptions = [],
     ) {
         $this->defaultOptions = array_merge(

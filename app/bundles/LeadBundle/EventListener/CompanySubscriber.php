@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -17,7 +17,7 @@ final readonly class CompanySubscriber implements EventSubscriberInterface
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel,
-        private EntityManager $entityManager,
+        private EntityManagerInterface $entityManager,
         private CoreParametersHelper $coreParametersHelper,
         private CompanyLeadRepository $companyLeadRepository,
         private CompanyModel $companyModel,

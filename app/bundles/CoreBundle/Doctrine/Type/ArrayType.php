@@ -10,7 +10,7 @@ use Doctrine\DBAL\Types\ConversionException;
  *
  * @since 2.0
  */
-class ArrayType extends \Doctrine\DBAL\Types\ArrayType
+final class ArrayType extends \Doctrine\DBAL\Types\ArrayType
 {
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {

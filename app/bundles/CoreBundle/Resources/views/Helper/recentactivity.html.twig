@@ -1,4 +1,4 @@
-<div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
+<div class="panel shd-none rounded-0 bdr-w-0 mb-0">
     <div class="panel-heading">
         <div class="panel-title">{% trans %}mautic.core.recent.activity{% endtrans %}</div>
     </div>
@@ -7,7 +7,7 @@
         <ul class="media-list media-list-feed">
             {% for log in logs %}
             <li class="media">
-                <div class="media-object pull-left">
+                <div class="media-object float-start">
                 {% if log.action == 'create' %}
                     <span class="figure featured bg-success"><span class="ri-check-line"></span></span>
                 {% else %}

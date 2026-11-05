@@ -16,8 +16,9 @@ class EmailDraftModel extends AbstractCommonModel
     private EmailDraftRepository $emailDraftRepository;
 
     #[Required]
-    public function autowireEmailDraftModel(EmailDraftRepository $emailDraftRepository): void
-    {
+    public function autowireEmailDraftModel(
+        EmailDraftRepository $emailDraftRepository,
+    ): void {
         $this->emailDraftRepository = $emailDraftRepository;
     }
 

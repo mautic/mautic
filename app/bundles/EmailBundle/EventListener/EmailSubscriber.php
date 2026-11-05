@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
@@ -36,6 +37,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private EntityManagerInterface $entityManager,
         private EmailDraftModel $emailDraftModel,
+        private EmailRepository $emailRepository,
     ) {
     }
 
@@ -58,7 +60,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     {
         $email = $event->getEmail();
         if ($email->isVariant()) {
-            $this->emailModel->getRepository()->cloneFromParentToVariant($email);
+            $this->emailRepository->cloneFromParentToVariant($email);
         }
     }
 

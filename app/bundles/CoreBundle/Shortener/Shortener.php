@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Shortener;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class Shortener
 {
@@ -15,12 +16,20 @@ class Shortener
      */
     private array $services = [];
 
+    /**
+     * @param iterable<ShortenerServiceInterface> $shortenerServices
+     */
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,
+        #[AutowireIterator('mautic.shortener.service')]
+        iterable $shortenerServices = [],
     ) {
+        foreach ($shortenerServices as $shortenerService) {
+            $this->addService($shortenerService);
+        }
     }
 
-    public function addService(ShortenerServiceInterface $shortener): void
+    private function addService(ShortenerServiceInterface $shortener): void
     {
         $this->services[$shortener::class] = $shortener;
     }

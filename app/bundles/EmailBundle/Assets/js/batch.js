@@ -17,7 +17,7 @@ Mautic.emailBatchSubmit = function() {
 
 function setCategory(id, newCategory) {
     const tr = document.querySelector("#row_email_" + id);
-    const div = tr.querySelector("div.d-flex.ai-center.gap-xs");
+    const div = tr.querySelector("div.d-flex.align-items-center.gap-xs");
     const span = div.querySelector("span");
 
     div.textContent = newCategory.name;

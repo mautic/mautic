@@ -220,9 +220,4 @@ final class ReportDevicesSubscriberFunctionalTest extends MauticMysqlTestCase
 
         return $report;
     }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
 }

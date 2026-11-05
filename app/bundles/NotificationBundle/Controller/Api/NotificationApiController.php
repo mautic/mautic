@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\NotificationBundle\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -24,7 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Notification>
  */
-class NotificationApiController extends CommonApiController
+final class NotificationApiController extends CommonApiController
 {
     public function __construct(
         CorePermissions $security,
@@ -33,7 +35,7 @@ class NotificationApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        protected ContactTracker $contactTracker,
+        private readonly ContactTracker $contactTracker,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,

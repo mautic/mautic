@@ -8,6 +8,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use Mautic\EmailBundle\Entity\Email;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
+use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -24,6 +25,7 @@ final readonly class InjectCustomContentSubscriber implements EventSubscriberInt
         private Environment $twig,
         private RequestStack $requestStack,
         private RouterInterface $router,
+        private GrapesJsBuilderRepository $grapesJsBuilderRepository,
     ) {
     }
 
@@ -55,12 +57,12 @@ final readonly class InjectCustomContentSubscriber implements EventSubscriberInt
             if ($this->requestStack->getCurrentRequest()->request->has('grapesjsbuilder')) {
                 $data = $this->requestStack->getCurrentRequest()->request->all('grapesjsbuilder');
 
-                if (is_array($data) && isset($data['customMjml'])) {
+                if (isset($data['customMjml'])) {
                     $passParams['customMjml'] = $data['customMjml'];
                 }
             }
 
-            $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $parameters['email']]);
+            $grapesJsBuilder = $this->grapesJsBuilderRepository->findOneBy(['email' => $parameters['email']]);
             if ('POST' !== $this->requestStack->getCurrentRequest()->getMethod()) {
                 if (!$grapesJsBuilder instanceof GrapesJsBuilder && $parameters['email']->getIsClone()) {
                     $grapesJsBuilder = $this->grapesJsBuilderModel->getGrapesJsFromEmailId(
