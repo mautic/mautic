@@ -121,11 +121,18 @@
                                     {% endif %}
                                 </td>
                                 <td class="visible-md visible-lg">
-                                    <a size="sm" class="label label-gray" href="{{-  path('mautic_contact_index', {
-                                        'search' : "#{'mautic.tagmanager.lead.searchcommand.list'|trans}:\"#{item.getTag()}\"",
-                                    }) -}}" data-toggle="ajax" {{- 0 == tagsCount[item.getId()] ? 'disabled=disabled' : '' -}}>
-                                    {{- 'mautic.lead.list.viewleads_count'|trans({'%count%': tagsCount[item.getId()]}) -}}
-                                    </a>
+                                    {% include '@MauticCore/Helper/_tag.html.twig' with {
+                                        tags: [{
+                                            label: 'mautic.lead.list.viewleads_count'|trans({'%count%': tagsCount[item.getId()]}),
+                                            color: 'gray',
+                                            size: 'sm',
+                                            attributes: {
+                                                id: 'tag-contacts-count-' ~ item.getId(),
+                                                href: path('mautic_contact_index', {'search': 'mautic.tagmanager.lead.searchcommand.list'|trans ~ ':"' ~ item.getTag() ~ '"'}),
+                                                'data-toggle': 'ajax'
+                                            }|filter((v, k) => 0 != (tagsCount[item.getId()]) or (k != 'href' and k != 'data-toggle'))
+                                        }]
+                                    } %}
                                 </td>
                                 <td class="visible-md visible-lg">{{ item.getId() }}</td>
                             </tr>
