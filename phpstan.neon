@@ -447,11 +447,11 @@ services:
         tags:
             - phpstan.collector
     -
-<<<<<<< HEAD
         class: Utils\PHPStan\Rule\NativeTypeForArrayOrIterableDocblockRule
-=======
+        tags:
+            - phpstan.rules.rule
+    -
         class: Utils\PHPStan\Rule\NativeTypeForArrayOrIterablePropertyRule
->>>>>>> 3d738a6eaa ([phpstan] Require native array/iterable type for array/iterable property docblocks)
         tags:
             - phpstan.rules.rule
     -
