@@ -5,11 +5,16 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\ConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ConfigSubscriber implements EventSubscriberInterface
 {
+    public function __construct(CoreParametersHelper $coreParametersHelper)
+    {
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
