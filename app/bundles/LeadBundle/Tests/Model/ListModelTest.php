@@ -365,7 +365,7 @@ final class ListModelTest extends TestCase
         $doNotContactRepository
             ->expects($this->once())
             ->method('getCount')
-            ->with(null, null, null, $segmentId)
+            ->with('email', null, null, $segmentId)
             ->willReturn($dnc);
 
         $reflection = new \ReflectionClass($this->model);

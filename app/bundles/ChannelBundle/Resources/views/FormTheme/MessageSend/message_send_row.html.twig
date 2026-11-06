@@ -1,6 +1,6 @@
 {% block message_send_row %}
 <div class="row">
-    <div class="col-xs-12 pr-0">
+    <div class="col-xs-12 pe-0">
         {{ form_row(form.marketingMessage) }}
         {% if form.newMarketingMessageButton is defined or form.editMessageButton is defined %}
         <div class="mb-lg d-flex">
@@ -17,8 +17,8 @@
 
 <div class="row">
     <div class="col-md-12 hide" id="marketing_message_send_to_dnc_status">
-        <span class="control-label d-block" data-toggle="tooltip" data-container="body" data-placement="top"
-            data-original-title="{{ 'mautic.email.send.dnc.tooltip.info'|trans }}">
+        <span class="control-label d-block" data-bs-toggle="tooltip" data-bs-container="body" data-bs-placement="top"
+            data-bs-title="{{ 'mautic.email.send.dnc.tooltip.info'|trans }}">
             {{ 'mautic.email.send.dnc.label'|trans }}
             <i class="ri-question-line"></i>
         </span>
