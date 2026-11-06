@@ -38,7 +38,16 @@ final class LeadListRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentTypeSearchCommands(): void
     {
-        $dynamicSegment = $this->createSegment('DynamicSearch');
+        $dynamicSegment = $this->createSegment('DynamicSearch', [
+            [
+                'glue'     => 'and',
+                'type'     => 'lookup',
+                'field'    => 'email',
+                'operator' => '=',
+                'filter'   => 'dynamic@example.test',
+                'display'  => '',
+            ],
+        ]);
         $staticSegment  = $this->createSegment('StaticSearch');
 
         /** @var LeadListRepository $leadListRepository */
