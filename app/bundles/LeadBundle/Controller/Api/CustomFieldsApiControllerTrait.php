@@ -33,7 +33,7 @@ trait CustomFieldsApiControllerTrait
     /**
      * @var mixed[]
      */
-    private $fieldCache = [];
+    private array $fieldCache = [];
 
     /**
      * Remove IpAddress and lastActive as it'll be handled outside the form.

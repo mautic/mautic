@@ -2826,12 +2826,6 @@ parameters:
 			path: app/bundles/FormBundle/Entity/Form.php
 
 		-
-			message: '#^Method Mautic\\FormBundle\\Entity\\Submission\:\:setResults\(\) has parameter \$results with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Entity/Submission.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Entity\\Submission\:\:setTrackingId\(\) has parameter \$trackingId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7915,12 +7909,6 @@ parameters:
 			path: plugins/MauticFullContactBundle/Services/FullContact_Base.php
 
 		-
-			message: '#^Property MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Base\:\:\$_supportedMethods has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Base.php
-
-		-
 			message: '#^Property MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Base\:\:\$_version has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -7976,12 +7964,6 @@ parameters:
 
 		-
 			message: '#^Property MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Icon\:\:\$_resourceUri has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Icon.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Icon\:\:\$_supportedMethods has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Icon.php

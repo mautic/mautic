@@ -25,10 +25,8 @@ final class TrackableModel extends AbstractCommonModel
 
     /**
      * Array of URLs and/or tokens that should not be converted to trackables.
-     *
-     * @var array
      */
-    private $doNotTrack = [];
+    private array $doNotTrack = [];
 
     /**
      * Tokens with values that could be used as URLs.
@@ -465,14 +463,7 @@ final class TrackableModel extends AbstractCommonModel
      */
     private function isInDoNotTrack($url): bool
     {
-        // Ensure it's not in the do not track list
-        foreach ($this->doNotTrack as $notTrackable) {
-            if (preg_match('~'.$notTrackable.'~', $url)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->doNotTrack, fn($notTrackable): int|false => preg_match('~'.$notTrackable.'~', $url));
     }
 
     /**

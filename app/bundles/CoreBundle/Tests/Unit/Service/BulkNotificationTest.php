@@ -68,7 +68,7 @@ final class BulkNotificationTest extends TestCase
             /**
              * @var mixed[]
              */
-            public $notifications = [];
+            public array $notifications = [];
 
             /**
              * @noinspection PhpMissingParentConstructorInspection

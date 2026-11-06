@@ -11,7 +11,7 @@ class MauticMessage extends Email
     /**
      * @var array<string, array<string, mixed[]>>
      */
-    protected $metadata = [];
+    protected array $metadata = [];
 
     protected ?string $leadIdHash = null;
 

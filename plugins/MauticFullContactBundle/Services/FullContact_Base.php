@@ -34,7 +34,7 @@ abstract class FullContact_Base
 
     protected $_webhookJson      = false;
 
-    protected $_supportedMethods = [];
+    protected array $_supportedMethods = [];
 
     public ?stdClass $response_obj = null;
 

@@ -27,7 +27,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
      *
      * @var array<string, array<string, string>>
      */
-    protected $types = [
+    protected array $types = [
         'created.leads.in.time' => [
             'formAlias' => DashboardLeadsInTimeWidgetType::class,
         ],
@@ -47,10 +47,8 @@ final class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Define permissions to see those widgets.
-     *
-     * @var array
      */
-    protected $permissions = [
+    protected array $permissions = [
         'lead:leads:viewown',
         'lead:leads:viewother',
     ];

@@ -15,10 +15,7 @@ trait CustomFieldRepositoryTrait
 {
     protected $useDistinctCount = false;
 
-    /**
-     * @var array
-     */
-    protected $customFieldList = [];
+    protected array $customFieldList = [];
 
     /**
      * @var string
