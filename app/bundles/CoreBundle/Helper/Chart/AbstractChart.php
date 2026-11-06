@@ -10,17 +10,13 @@ abstract class AbstractChart
 
     /**
      * Datasets of the chart.
-     *
-     * @var array
      */
-    protected $datasets = [];
+    protected array $datasets = [];
 
     /**
      * Labels of the time axe.
-     *
-     * @var array
      */
-    protected $labels = [];
+    protected array $labels = [];
 
     /**
      * Date from.
@@ -66,10 +62,8 @@ abstract class AbstractChart
 
     /**
      * Default Mautic colors.
-     *
-     * @var array
      */
-    public $colors = ['#4E5D9D', '#00B49C', '#FD9572', '#FDB933', '#757575', '#9C4E5C', '#694535', '#596935'];
+    public array $colors = ['#4E5D9D', '#00B49C', '#FD9572', '#FDB933', '#757575', '#9C4E5C', '#694535', '#596935'];
 
     /**
      * Get chart time unit.

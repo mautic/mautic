@@ -11,12 +11,12 @@ final class SeriesPieChart extends AbstractChart implements ChartInterface
     /**
      * @var int[][]
      */
-    protected $datasets = [];
+    protected array $datasets = [];
 
     /**
      * @var string[]
      */
-    protected $labels = [];
+    protected array $labels = [];
 
     /**
      * @return array{labels: mixed[], datasets: mixed[]}

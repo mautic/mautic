@@ -92,10 +92,7 @@ final class MailHelper
      */
     private $returnPath;
 
-    /**
-     * @var array
-     */
-    private $errors = [];
+    private array $errors = [];
 
     /**
      * @var array|Lead
@@ -128,15 +125,9 @@ final class MailHelper
      */
     private bool $queueEnabled = false;
 
-    /**
-     * @var array
-     */
-    private $queuedRecipients = [];
+    private array $queuedRecipients = [];
 
-    /**
-     * @var array
-     */
-    public $metadata = [];
+    public array $metadata = [];
 
     /**
      * @var string
@@ -160,10 +151,7 @@ final class MailHelper
 
     private array $assetStats = [];
 
-    /**
-     * @var array
-     */
-    private $headers = [];
+    private array $headers = [];
 
     private array $body = self::DEFAULT_BODY;
 

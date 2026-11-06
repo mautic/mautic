@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class MenuEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $menuItems = ['children' => []];
+    private array $menuItems = ['children' => []];
 
     public function __construct(
         private readonly MenuHelper $helper,

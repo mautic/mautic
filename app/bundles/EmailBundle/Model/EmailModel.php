@@ -109,10 +109,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     protected $updatingTranslationChildren = false;
 
-    /**
-     * @var array
-     */
-    protected $emailSettings = [];
+    protected array $emailSettings = [];
 
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,

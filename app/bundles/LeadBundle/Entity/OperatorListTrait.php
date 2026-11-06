@@ -9,7 +9,7 @@ trait OperatorListTrait
     /**
      * @var array<string, array<string, array<int, string>>>
      */
-    protected $typeOperators = [
+    protected array $typeOperators = [
         'text' => [
             'include' => [
                 OperatorOptions::EQUAL_TO,

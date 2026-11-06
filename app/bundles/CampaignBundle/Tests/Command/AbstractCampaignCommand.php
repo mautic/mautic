@@ -23,10 +23,7 @@ abstract class AbstractCampaignCommand extends MauticMysqlTestCase
 
     public const int CONDITION_SECONDS  = 6;
 
-    /**
-     * @var array
-     */
-    protected $defaultClientServer = [];
+    protected array $defaultClientServer = [];
 
     /**
      * @var Connection

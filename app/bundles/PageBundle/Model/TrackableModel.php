@@ -25,10 +25,8 @@ final class TrackableModel extends AbstractCommonModel
 
     /**
      * Array of URLs and/or tokens that should not be converted to trackables.
-     *
-     * @var array
      */
-    private $doNotTrack = [];
+    private array $doNotTrack = [];
 
     /**
      * Tokens with values that could be used as URLs.

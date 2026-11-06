@@ -26,7 +26,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
      *
      * @var array<string, array<string, string>>
      */
-    protected $types = [
+    protected array $types = [
         'emails.in.time' => [
             'formAlias' => DashboardEmailsInTimeWidgetType::class,
         ],
@@ -46,10 +46,8 @@ final class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Define permissions to see those widgets.
-     *
-     * @var array
      */
-    protected $permissions = [
+    protected array $permissions = [
         'email:emails:viewown',
         'email:emails:viewother',
     ];

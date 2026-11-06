@@ -9,10 +9,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 abstract class AbstractPermissions
 {
-    /**
-     * @var array
-     */
-    protected $permissions = [];
+    protected array $permissions = [];
 
     /**
      * @param mixed[] $params
