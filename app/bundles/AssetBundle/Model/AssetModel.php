@@ -33,6 +33,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
+use Mautic\PageBundle\Helper\AggregateAnalyticsHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -52,6 +53,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      * @var int
      */
     protected $maxAssetSize;
+
+    private readonly AggregateAnalyticsHelper $aggregateAnalyticsHelper;
 
     public function __construct(
         protected LeadModel $leadModel,
@@ -74,8 +77,11 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         private readonly AssetRepository $assetRepository,
         private readonly DownloadRepository $downloadRepository,
         private readonly CategoryRepository $categoryRepository,
+        // Optional, so existing constructor calls keep working. The container always passes it.
+        ?AggregateAnalyticsHelper $aggregateAnalyticsHelper = null, // @phpstan-ignore mautic.noNullableServiceInConstructor
     ) {
-        $this->maxAssetSize           = $coreParametersHelper->get('max_size');
+        $this->maxAssetSize             = $coreParametersHelper->get('max_size');
+        $this->aggregateAnalyticsHelper = $aggregateAnalyticsHelper ?? new AggregateAnalyticsHelper($coreParametersHelper);
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
@@ -123,8 +129,15 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $download->setUtmSource($request->get('utm_source'));
         $download->setUtmTerm($request->get('utm_term'));
 
-        // Check if request is trackable (includes IP, bot, privacy signal, and prefetch checks)
-        if (!$this->ipLookupHelper->isRequestTrackable()) {
+        // The asset tracks downloads and the request is trackable (includes IP, bot, privacy signal, and prefetch checks).
+        // The asset goes first, since the trackability check looks up and stores the visitor's IP address.
+        if (!$asset->getTrackDownloads() || !$this->ipLookupHelper->isRequestTrackable()) {
+            // Still counted, but with nothing that links it to the visitor. Without an identifier it can't count as unique.
+            // Bots, excluded IP addresses and prefetches aren't counted, privacy signals are.
+            if (empty($systemEntry) && $this->ipLookupHelper->isRequestCountable()) {
+                $this->upDownloadCount($asset, 1, false);
+            }
+
             return;
         }
 
@@ -245,7 +258,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         // Skip persisting download record when there is no tracking context
         // (e.g. programmatic/API requests without a browser session).
         if (null === $trackingId && empty($systemEntry)) {
-            $this->getRepository()->upDownloadCount($asset->getId(), 1, true);
+            $this->upDownloadCount($asset, 1, true);
 
             return;
         }
@@ -253,7 +266,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         if (empty($systemEntry)) {
             $download->setAsset($asset);
 
-            $this->assetRepository->upDownloadCount($asset->getId(), 1, $isUnique);
+            $this->upDownloadCount($asset, 1, $isUnique);
         }
 
         // check for existing IP
@@ -284,13 +297,17 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * Increase the download count.
+     * Increase the download count. Download counts are aggregate analytics, so they follow that setting.
      *
      * @param int        $increaseBy
      * @param bool|false $unique
      */
     public function upDownloadCount($asset, $increaseBy = 1, $unique = false): void
     {
+        if (!$this->aggregateAnalyticsHelper->isEnabled()) {
+            return;
+        }
+
         $id = ($asset instanceof Asset) ? $asset->getId() : (int) $asset;
 
         $this->assetRepository->upDownloadCount($id, $increaseBy, $unique);
@@ -336,6 +353,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     {
         if (null === $id) {
             $entity = new Asset();
+            // A new asset starts from the global setting, and keeps its own value after that
+            $entity->setTrackDownloads((bool) $this->coreParametersHelper->get('track_asset_downloads', true));
         } else {
             $entity = parent::getEntity($id);
         }
