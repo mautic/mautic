@@ -114,13 +114,13 @@
                             }
                         }
                     });
-                    if (nbItems) {
-                        // Re-append new back to the top
-                        if (hasNew) {
-                            hasNew.prependTo(select);
-                        }
-                        select.trigger("chosen:updated");
+                    // Re-append new back to the top
+                    if (hasNew) {
+                        hasNew.prependTo(select);
+                    }
+                    select.trigger("chosen:updated");
 
+                    if (nbItems) {
                         setTimeout( function() {
                             // Hack to force chosen to hide already selected values from the list
                             var e = $.Event("keyup.chosen");
@@ -128,8 +128,9 @@
                             field.trigger(e);
                         }, 5);
                     } else {
+                        field.val(searchValue);
                         select.data().chosen.no_results_clear();
-                        select.data().chosen.no_results(field.val());
+                        select.data().chosen.no_results(searchValue);
                     }
                     if (settings.success != null) {
                         settings.success(data);
