@@ -15,7 +15,7 @@ final class KeepAliveControllerTest extends MauticMysqlTestCase
 
         $session   = $this->client->getRequest()->getSession();
         $sessionId = $session->getId();
-        $lastUsed  = $session->getMetadataBag()->getLastUsed();
+        $lastUsed  = time();
         $token     = $session->get('_security_mautic');
         self::assertNotNull($token);
 
@@ -28,11 +28,12 @@ final class KeepAliveControllerTest extends MauticMysqlTestCase
 
         $session = $this->client->getRequest()->getSession();
         self::assertSame($sessionId, $session->getId());
-        self::assertGreaterThan($lastUsed, $session->getMetadataBag()->getLastUsed());
         self::assertSame($token, $session->get('_security_mautic'));
 
         $this->client->request('GET', '/s/dashboard');
         self::assertResponseIsSuccessful();
+        // getLastUsed() reports the timestamp persisted by the previous request.
+        self::assertGreaterThan($lastUsed, $this->client->getRequest()->getSession()->getMetadataBag()->getLastUsed());
         self::assertSelectorNotExists('input#username');
     }
 }
