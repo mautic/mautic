@@ -4,7 +4,7 @@
         {% if headerTitle is defined and headerTitle is not empty %}
             {{ headerTitle|replace({'<': ' <'})|striptags|purify }} |
         {% endif %}
-        {{ pageTitle|default('Mautic') }}
+        {{ pageTitle|default('mautic.core.product_name'|trans) }}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="icon" type="image/x-icon" href="{{ getOverridableUrl('images/favicon.ico') }}" />
