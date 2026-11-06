@@ -217,6 +217,32 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(true, $contact->isNewlyCreated());
     }
 
+    public function testVisitorMarkedAsUntrackedIsNeitherLookedUpNorSaved(): void
+    {
+        $contactTracker = $this->getContactTracker();
+
+        $this->ipLookupHelperMock->method('isVisitorUntracked')
+            ->willReturn(true);
+
+        $this->deviceTrackerMock->expects($this->never())
+            ->method('getTrackedDevice');
+        $this->contactTrackingServiceMock->expects($this->never())
+            ->method('getTrackedLead');
+        $this->ipLookupHelperMock->expects($this->never())
+            ->method('getIpAddress');
+        $this->leadRepositoryMock->expects($this->never())
+            ->method('getLeadsByIp');
+        $this->leadRepositoryMock->expects($this->never())
+            ->method('saveEntity');
+        $this->deviceTrackerMock->expects($this->never())
+            ->method('createDeviceFromUserAgent');
+        $this->leadFieldModelMock->method('getFieldListWithProperties')->willReturn([]);
+
+        $contact = $contactTracker->getContact();
+        $this->assertInstanceOf(Lead::class, $contact);
+        $this->assertTrue($contact->isNewlyCreated());
+    }
+
     public function testEventIsDispatchedWithChangeOfContact(): void
     {
         $contactTracker = $this->getContactTracker();
