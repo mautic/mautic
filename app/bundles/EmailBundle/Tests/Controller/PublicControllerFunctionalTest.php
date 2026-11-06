@@ -253,6 +253,19 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $tokenInput, $this->client->getResponse()->getContent());
     }
 
+    public function testUnsubscribeWithCustomPreferenceCenterHasNoSharedStylesOrIcon(): void
+    {
+        $this->logoutUser();
+        $lead              = $this->createLead();
+        $preferencesCenter = $this->createCustomPreferencesPage('{segmentlist}{saveprefsbutton}');
+        $stat              = $this->getStat(null, $lead, $preferencesCenter);
+        $this->em->flush();
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('Bootstrap v3.3.7', (string) $this->client->getResponse()->getContent());
+        $this->assertCount(0, $crawler->filter('svg[width="64"][height="64"]'));
+    }
+
     private function getPreferencesCenterLandingPage(): Page
     {
         $page = new Page();
@@ -606,11 +619,12 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    public function testUnsubscribeNotFoundEmailStat(): void
+    public function testUnsubscribeNotFoundEmailStatRendersGenericMessage(): void
     {
-        $this->client->request(Request::METHOD_GET, '/email/unsubscribe/non-existant-hash/test@mautic.org/'.$this->getSecretHash('test@mautic.org'));
-        $this->assertStringContainsString('Record not found.', strip_tags((string) $this->client->getResponse()->getContent()));
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/non-existant-hash/test@mautic.org/'.$this->getSecretHash('test@mautic.org'));
         self::assertResponseIsSuccessful();
+        $this->assertCount(0, $crawler->filter('svg'));
+        $this->assertStringContainsString('Record not found.', strip_tags((string) $this->client->getResponse()->getContent()));
     }
 
     public function testUnsubscribeWithEmailStat(): void
@@ -839,12 +853,13 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $email      = $stat->getEmailAddress();
         $this->em->flush();
 
-        $this->client->request(
+        $crawler = $this->client->request(
             Request::METHOD_GET,
             '/email/resubscribe/'.$stat->getTrackingHash().'/'.$email.'/invalid-hash'
         );
 
         $this->assertStringContainsString('Record not found.', strip_tags((string) $this->client->getResponse()->getContent()));
+        $this->assertCount(0, $crawler->filter('svg'));
     }
 
     public function testResubscribeWithoutStatButValidHashWorks(): void
