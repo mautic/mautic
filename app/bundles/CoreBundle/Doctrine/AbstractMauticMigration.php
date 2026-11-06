@@ -81,6 +81,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
      */
     protected function findPropertyName($table, $type, $suffix)
     {
+        /** @var \Doctrine\DBAL\Schema\AbstractSchemaManager|null */
         static $schemaManager;
         static $tables = [];
 
@@ -101,7 +102,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
         switch ($type) {
             case 'fk':
                 if (!array_key_exists('fk', $tables[$table])) {
-                    $keys = $schemaManager->listTableForeignKeys($table);
+                    $keys = $schemaManager->introspectTableForeignKeyConstraintsByUnquotedName($table);
                     /** @var ForeignKeyConstraint $k */
                     foreach ($keys as $k) {
                         $name                       = strtolower(AssetName::ofOptional($k));
@@ -121,7 +122,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
                         'uniq' => [],
                     ];
 
-                    $indexes = $schemaManager->listTableIndexes($table);
+                    $indexes = $schemaManager->introspectTableIndexesByUnquotedName($table);
 
                     /** @var Index $i */
                     foreach ($indexes as $i) {
