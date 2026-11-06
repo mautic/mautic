@@ -10,6 +10,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\ChannelBundle\Entity\Message;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -73,7 +74,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return iterable<string, array{string, mixed, string}>
+     * @return iterable<string, array{string, IdentifierInterface, string}>
      */
     private function dataForGlobalSearch(): iterable
     {
