@@ -158,6 +158,13 @@ final readonly class NativeTypeForArrayOrIterableDocblockRule implements Rule
                 continue;
             }
 
+            // a concrete trait method is copied into the using class, so it binds nothing on its own;
+            // an abstract trait method still constrains the signature, and a parent-trait method stays
+            // bound through the parent class ancestor
+            if ($ancestor->isTrait() && !$this->isAbstractMethod($ancestorMethod)) {
+                continue;
+            }
+
             return true;
         }
 
