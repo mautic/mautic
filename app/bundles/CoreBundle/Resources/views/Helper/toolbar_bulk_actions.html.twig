@@ -43,14 +43,14 @@
                     icon_only: true,
                     spin: false,
                     attributes: {
-                        'class': 'dropdown-toggle bdr-rds-0 pa-0',
-                        'data-toggle': 'dropdown',
+                        'class': 'dropdown-toggle rounded-0 p-0',
+                        'data-bs-toggle': 'dropdown',
                         'type': 'button',
                     }
                 }
             ]
         } %}
-        <ul class="pull-{{ pull }} page-list-actions dropdown-menu dropdown-menu-right" role="menu">
+        <ul class="pull-{{ pull }} page-list-actions dropdown-menu dropdown-menu-end" role="menu">
             {{ dropdownButtons|raw }}
         </ul>
     </div>

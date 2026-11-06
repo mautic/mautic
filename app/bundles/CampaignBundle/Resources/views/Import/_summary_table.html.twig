@@ -63,7 +63,7 @@
                                 {% elseif entity == 'form_action' %}
                                     {{ 'mautic.campaign.campaign.import.follow_form'|trans }}
                                  {% elseif entityKey ends with '_update' %}
-                                    <select name="importAction[{{ entity }}][{{ ids[i] }}]" class="form-control input-sm">
+                                    <select name="importAction[{{ entity }}][{{ ids[i] }}]" class="form-control form-control-sm">
                                         <option value="update" selected>{{ 'mautic.campaign.campaign.import.update_entity'|trans }}</option>
                                         <option value="create">{{ 'mautic.campaign.campaign.import.create_entity'|trans }}</option>
                                     </select>
