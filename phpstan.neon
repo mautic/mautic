@@ -105,7 +105,6 @@ parameters:
                 - app/bundles/CoreBundle/Form/EventListener/FormExitSubscriber.php
                 - app/bundles/CoreBundle/Tests/Functional/Controller/AjaxControllerTest.php
                 - app/bundles/CoreBundle/Twig/Extension/ButtonExtension.php
-                - app/bundles/PluginBundle/Helper/IntegrationHelper.php
                 - *.html.php
                 - app/config/
 
