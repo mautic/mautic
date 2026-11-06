@@ -442,9 +442,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         // A contact who turned tracking off still gets the image, but the open isn't recorded on them. This goes first,
-        // since the trackability check stores the visitor's IP address.
-        $contact = $stat->getLead();
-        if (null !== $contact && !$this->contactTrackingPreferenceHelper->allowsActivityTracking($contact)) {
+        // since the trackability check stores the visitor's IP address. Checked again here for a hit queued before the
+        // contact turned tracking off.
+        if (!$this->contactAllowsOpenTracking($stat)) {
             return;
         }
 
@@ -670,6 +670,24 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function getEmailStatus(string $idHash): ?Stat
     {
         return $this->getStatRepository()->getEmailStatus($idHash);
+    }
+
+    /**
+     * Whether an open of this email may be recorded, checked before the hit is queued so nothing about a contact who
+     * turned tracking off (IP address, user agent, cookies) ends up in the queue. An unknown hash is left to hitEmail().
+     */
+    public function allowsOpenTracking(string $idHash): bool
+    {
+        $stat = $this->getEmailStatus($idHash);
+
+        return null === $stat || $this->contactAllowsOpenTracking($stat);
+    }
+
+    private function contactAllowsOpenTracking(Stat $stat): bool
+    {
+        $contact = $stat->getLead();
+
+        return null === $contact || $this->contactTrackingPreferenceHelper->allowsActivityTracking($contact);
     }
 
     /**
