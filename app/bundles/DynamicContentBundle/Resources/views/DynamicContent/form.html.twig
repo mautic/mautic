@@ -134,6 +134,7 @@
             {% endif %}
             <div id="slotNameDiv" class="{% if form.vars.value.isCampaignBased %}hide{% endif %}">
                 {{ form_row(form.slotName) }}
+                {{ form_row(form.displayOrder) }}
             </div>
             <hr/>
             {% include '@MauticCore/FormTheme/Fields/_utm_tags_fields.html.twig' %}

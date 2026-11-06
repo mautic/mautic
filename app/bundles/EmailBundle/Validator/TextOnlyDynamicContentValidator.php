@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Validator;
 
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
+use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -32,8 +33,7 @@ final class TextOnlyDynamicContentValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, TextOnlyDynamicContent::class);
         }
 
-        // Pattern to match DWC tokens in the format {dwc=slotname}
-        preg_match_all('/{dwc=([^}]*)}/', $value, $matches);
+        preg_match_all(DynamicContentHelper::DYNAMIC_WEB_CONTENT_REGEX, $value, $matches);
 
         foreach ($matches[1] as $slotName) {
             // Retrieve DWC item by slot name
