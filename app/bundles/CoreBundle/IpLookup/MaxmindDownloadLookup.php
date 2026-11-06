@@ -72,7 +72,7 @@ final class MaxmindDownloadLookup extends AbstractLocalDataLookup
             $this->latitude  = $record->location->latitude;
             $this->longitude = $record->location->longitude;
             $this->timezone  = $record->location->timeZone;
-            $this->zipcode   = $record->location->postalCode;
+            $this->zipcode   = $record->postal->code;
         } catch (\Exception) {
         }
     }
