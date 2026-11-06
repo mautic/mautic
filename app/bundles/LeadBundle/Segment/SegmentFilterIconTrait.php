@@ -77,6 +77,7 @@ trait SegmentFilterIconTrait
             'companyindustry'            => 'ri-briefcase-4-line',
             'companynumber_of_employees' => 'ri-team-line',
             'companyphone'               => 'ri-phone-line',
+            'company_tags'               => 'ri-hashtag',
             'companystate'               => 'ri-map-pin-2-line',
             'companywebsite'             => 'ri-global-line',
             'companyzipcode'             => 'ri-mail-send-line',

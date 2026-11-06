@@ -9,6 +9,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -46,9 +48,11 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     use CustomFieldEntityTrait;
     use ProjectTrait;
 
-    public const FIELD_ALIAS = 'company';
+    public const FIELD_ALIAS          = 'company';
 
-    public const TABLE_NAME  = 'companies';
+    public const TABLE_NAME           = 'companies';
+
+    public const TAGS_XREF_TABLE_NAME = 'companies_tags_xref';
 
     /**
      * @var int
@@ -143,11 +147,18 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     #[Groups(['company:read', 'company:write'])]
     private $description;
 
+    /**
+     * @var Collection<string, Tag>
+     */
+    #[Groups(['company:read', 'company:write'])]
+    private Collection $tags;
+
     #[Groups(['company:read', 'company:write'])]
     private ?\DateTimeInterface $deleted = null;
 
     public function __construct()
     {
+        $this->tags = new ArrayCollection();
         $this->initializeProjects();
     }
 
@@ -220,6 +231,18 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             FieldModel::$coreCompanyFields
         );
 
+        $builder->createManyToMany('tags', Tag::class)
+            ->setJoinTable(self::TAGS_XREF_TABLE_NAME)
+            ->addInverseJoinColumn('tag_id', 'id', false)
+            ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
+            ->setOrderBy(['tag' => 'ASC'])
+            ->setIndexBy('tag')
+            ->fetchLazy()
+            ->cascadeMerge()
+            ->cascadePersist()
+            ->cascadeDetach()
+            ->build();
+
         self::addProjectsField($builder, 'company_projects_xref', 'company_id');
     }
 
@@ -253,6 +276,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
                     'id',
                     'fields',
                     'score',
+                    'tags',
                 ]
             )
             ->build();
@@ -283,25 +307,56 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         $prefix = 'company';
 
         if (str_starts_with($prop, $prefix)) {
-            $getter  = 'get'.ucfirst(substr($prop, strlen($prefix)));
-            $current = $this->{$getter}();
-            if ($current !== $val) {
-                $this->addChange($prop, [$current, $val]);
-            }
+            $this->trackCompanyFieldChange($prop, $val, $prefix);
         } elseif ('owner' === $prop) {
-            $current = $this->owner;
-            if ($current && !$val) {
-                $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
-            } elseif (!$current && $val) {
-                $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
-            } elseif ($current && $current->getId() != $val->getId()) {
-                $this->changes['owner'] = [
-                    $current->getName().'('.$current->getId().')',
-                    $val->getName().'('.$val->getId().')',
-                ];
-            }
+            $this->trackOwnerChange($val);
+        } elseif ('tags' == $prop) {
+            $this->trackTagChange($val);
         } else {
             parent::isChanged($prop, $val);
+        }
+    }
+
+    private function trackCompanyFieldChange(string $prop, mixed $val, string $prefix): void
+    {
+        $getter  = 'get'.ucfirst(substr($prop, strlen($prefix)));
+        $current = $this->$getter();
+
+        if ($current !== $val) {
+            $this->addChange($prop, [$current, $val]);
+        }
+    }
+
+    private function trackOwnerChange(mixed $val): void
+    {
+        $current = $this->getOwner();
+
+        if ($current && !$val) {
+            $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
+
+            return;
+        }
+
+        if (!$current && $val) {
+            $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
+
+            return;
+        }
+
+        if ($current && $current->getId() != $val->getId()) {
+            $this->changes['owner'] = [
+                $current->getName().'('.$current->getId().')',
+                $val->getName().'('.$val->getId().')',
+            ];
+        }
+    }
+
+    private function trackTagChange(mixed $val): void
+    {
+        if ($val instanceof Tag) {
+            $this->changes['tags']['added'][] = $val->getTag();
+        } else {
+            $this->changes['tags']['removed'][] = $val;
         }
     }
 
@@ -598,6 +653,38 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     {
         $this->isChanged('companydescription', $description);
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function addTag(Tag $tag): self
+    {
+        $this->isChanged('tags', $tag);
+        $this->tags[$tag->getTag()] = $tag;
+
+        return $this;
+    }
+
+    public function removeTag(Tag $tag): void
+    {
+        $this->isChanged('tags', $tag->getTag());
+        $this->tags->removeElement($tag);
+    }
+
+    /**
+     * @return Collection<string, Tag>
+     */
+    public function getTags(): Collection
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param Collection<string, Tag>|array<string, Tag> $tags
+     */
+    public function setTags(mixed $tags): self
+    {
+        $this->tags = $tags instanceof Collection ? $tags : new ArrayCollection((array) $tags);
 
         return $this;
     }
