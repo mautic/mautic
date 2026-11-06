@@ -9,6 +9,8 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use JMS\Serializer\SerializerInterface;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -29,8 +31,6 @@ use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
-use Mautic\WebhookBundle\Event\WebhookPostSaveEvent;
-use Mautic\WebhookBundle\Event\WebhookPreSaveEvent;
 use Mautic\WebhookBundle\Event\WebhookQueueEvent;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\Model\WebhookModel;
@@ -214,8 +214,8 @@ final class WebhookControllerTest extends TestCase
             ->method('hasListeners')
             ->willReturnMap([
                 [WebhookQueueEvent::class, false],
-                [WebhookPreSaveEvent::class, false],
-                [WebhookPostSaveEvent::class, false],
+                [EntityPreSave::class, false],
+                [EntityPostSave::class, false],
             ])
             ->willReturn(false);
 

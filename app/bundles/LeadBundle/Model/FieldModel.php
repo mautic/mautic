@@ -793,6 +793,36 @@ class FieldModel extends FormModel
     }
 
     /**
+     * @param LeadField $entity
+     *
+     * @throws MethodNotAllowedHttpException
+     */
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    {
+        if (!$entity instanceof LeadField) {
+            throw new MethodNotAllowedHttpException(['LeadField']);
+        }
+
+        $event = match ($action) {
+            'pre_save'    => new FieldPreSaveEvent($entity, $isNew),
+            'post_save'   => new FieldPostSaveEvent($entity, $isNew),
+            'pre_delete'  => new FieldPreDeleteEvent($entity, $isNew),
+            'post_delete' => new FieldPostDeleteEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (null === $event) {
+            return null;
+        }
+
+        try {
+            return $this->fieldSaveDispatcher->dispatchEvent($event);
+        } catch (NoListenerException) {
+            return null;
+        }
+    }
+
+    /**
      * @param LeadField|array<string, mixed> $entity
      *
      * @throws MethodNotAllowedHttpException
@@ -848,36 +878,6 @@ class FieldModel extends FormModel
         }
 
         return $result[1];
-    }
-
-    /**
-     * @param LeadField $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof LeadField) {
-            throw new MethodNotAllowedHttpException(['LeadField']);
-        }
-
-        $event = match ($action) {
-            'pre_save'    => new FieldPreSaveEvent($entity, $isNew),
-            'post_save'   => new FieldPostSaveEvent($entity, $isNew),
-            'pre_delete'  => new FieldPreDeleteEvent($entity, $isNew),
-            'post_delete' => new FieldPostDeleteEvent($entity, $isNew),
-            default       => null,
-        };
-
-        if (null === $event) {
-            return null;
-        }
-
-        try {
-            return $this->fieldSaveDispatcher->dispatchEvent($event);
-        } catch (NoListenerException) {
-            return null;
-        }
     }
 
     /**
