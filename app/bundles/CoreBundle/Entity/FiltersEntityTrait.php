@@ -20,11 +20,9 @@ trait FiltersEntityTrait
     }
 
     /**
-     * @param array $filters
-     *
      * @return $this
      */
-    public function setFilters($filters)
+    public function setFilters(array $filters)
     {
         $this->isChanged('filters', $filters);
         $this->filters = $filters;

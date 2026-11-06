@@ -10,8 +10,10 @@ use PhpParser\Node\Identifier;
 use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ExtendedMethodReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
+use PHPStan\TrinaryLogic;
 use PHPStan\Type\FileTypeMapper;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
@@ -132,17 +134,48 @@ final readonly class NativeTypeForArrayOrIterableDocblockRule implements Rule
             return false;
         }
 
+        $isConstructor = '__construct' === strtolower($methodName);
+
         foreach ($classReflection->getAncestors() as $ancestor) {
             if ($ancestor->getName() === $classReflection->getName()) {
                 continue;
             }
 
-            if ($ancestor->hasMethod($methodName)) {
-                return true;
+            if (!$ancestor->hasNativeMethod($methodName)) {
+                continue;
             }
+
+            $ancestorMethod = $ancestor->getNativeMethod($methodName);
+
+            // a private ancestor method imposes no signature contract on the child
+            if ($ancestorMethod->isPrivate()) {
+                continue;
+            }
+
+            // PHP exempts "__construct" from signature compatibility (LSP) only against a concrete
+            // parent constructor; an interface or abstract constructor is a binding contract
+            if ($isConstructor && !$this->isAbstractMethod($ancestorMethod)) {
+                continue;
+            }
+
+            // a concrete trait method is copied into the using class, so it binds nothing on its own;
+            // an abstract trait method still constrains the signature, and a parent-trait method stays
+            // bound through the parent class ancestor
+            if ($ancestor->isTrait() && !$this->isAbstractMethod($ancestorMethod)) {
+                continue;
+            }
+
+            return true;
         }
 
         return false;
+    }
+
+    private function isAbstractMethod(ExtendedMethodReflection $method): bool
+    {
+        $isAbstract = $method->isAbstract();
+
+        return $isAbstract instanceof TrinaryLogic ? $isAbstract->yes() : $isAbstract;
     }
 
     private function isMissingOrMixed(?Node $type): bool
