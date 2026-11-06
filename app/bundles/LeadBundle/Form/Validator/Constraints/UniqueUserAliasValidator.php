@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 final class UniqueUserAliasValidator extends ConstraintValidator
 {
@@ -19,6 +20,10 @@ final class UniqueUserAliasValidator extends ConstraintValidator
 
     public function validate(mixed $list, Constraint $constraint): void
     {
+        if (!$constraint instanceof UniqueUserAlias) {
+            throw new UnexpectedTypeException($constraint, UniqueUserAlias::class);
+        }
+
         $field = $constraint->field;
 
         if (empty($field)) {

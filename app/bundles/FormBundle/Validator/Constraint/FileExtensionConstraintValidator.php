@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\Validator\Constraint;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 final class FileExtensionConstraintValidator extends ConstraintValidator
 {
@@ -21,6 +22,10 @@ final class FileExtensionConstraintValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint): void
     {
+        if (!$constraint instanceof FileExtensionConstraint) {
+            throw new UnexpectedTypeException($constraint, FileExtensionConstraint::class);
+        }
+
         if (!is_array($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ forbidden }}', '')

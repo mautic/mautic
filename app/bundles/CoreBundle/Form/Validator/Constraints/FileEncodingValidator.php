@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Form\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Throws an exception if the field alias is equal some segment filter keyword.
@@ -16,6 +17,10 @@ final class FileEncodingValidator extends ConstraintValidator
      */
     public function validate(mixed $field, Constraint $constraint): void
     {
+        if (!$constraint instanceof FileEncoding) {
+            throw new UnexpectedTypeException($constraint, FileEncoding::class);
+        }
+
         /*
             If the file uploaded exceeds the max size, it will not be considered,
             and the file path will be an empty string "". If that is the case

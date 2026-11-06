@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -46,6 +47,10 @@ final class FieldAliasKeywordValidator extends ConstraintValidator
      */
     public function validate($field, Constraint $constraint): void
     {
+        if (!$constraint instanceof FieldAliasKeyword) {
+            throw new UnexpectedTypeException($constraint, FieldAliasKeyword::class);
+        }
+
         $oldValue = $this->em->getUnitOfWork()->getOriginalEntityData($field);
         $this->aliasHelper->makeAliasUnique($field);
 

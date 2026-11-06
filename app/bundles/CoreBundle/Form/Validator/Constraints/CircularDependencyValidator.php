@@ -7,6 +7,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Throws an exception if the field alias is equal some segment filter keyword.
@@ -25,6 +26,10 @@ final class CircularDependencyValidator extends ConstraintValidator
      */
     public function validate($filters, Constraint $constraint): void
     {
+        if (!$constraint instanceof CircularDependency) {
+            throw new UnexpectedTypeException($constraint, CircularDependency::class);
+        }
+
         $dependentSegmentIds = $this->flatten(array_map(fn ($id): array => $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters()), $this->reduceToSegmentIds($filters)));
 
         try {
