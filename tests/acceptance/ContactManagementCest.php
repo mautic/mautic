@@ -18,10 +18,17 @@ final class ContactManagementCest
     public function sortingPreservesExistingQueryParameters(AcceptanceTester $I): void
     {
         foreach (['sort+query@example.com', 'sort&query@example.com'] as $email) {
-            $I->haveInDatabase('test_leads', ['email' => $email, 'firstname' => 'Sort', 'lastname' => 'Query', 'is_published' => 1, 'points' => 0]);
+            $I->haveInDatabase('test_leads', [
+                'email'           => $email,
+                'firstname'       => 'Sort',
+                'lastname'        => 'Query',
+                'is_published'    => 1,
+                'points'          => 0,
+                'date_identified' => '2026-01-01 00:00:00',
+            ]);
         }
 
-        foreach (['?search=', '?search=sort%2Bquery%40example.com', '?search=sort%26query%40example.com&category=3'] as $query) {
+        foreach (['', '?search=', '?search=sort%2Bquery%40example.com', '?search=sort%26query%40example.com&category=3'] as $query) {
             $I->amOnPage(ContactPage::$URL.$query);
             $I->waitForJS('return typeof Mautic !== "undefined" && typeof Mautic.reorderTableData === "function";', AcceptanceTester::TIMEOUT);
 
