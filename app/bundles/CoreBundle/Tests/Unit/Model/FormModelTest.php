@@ -114,11 +114,20 @@ final class FormModelTest extends TestCase
         $userHelperMock           = $this->createStub(UserHelper::class);
         $loggerMock               = $this->createStub(LoggerInterface::class);
         $coreParametersHelperMock = $this->createStub(CoreParametersHelper::class);
+        $formRepository           = $this->createStub(FormRepository::class);
+
+        $formRepository
+            ->method('saveEntity')
+            ->willReturnCallback(function (Lead $lead): void {
+                if (!$lead->getId()) {
+                    $lead->setId(1);
+                }
+            });
 
         $this
             ->entityManagerMock
             ->method('getRepository')
-            ->willReturn($this->createStub(FormRepository::class));
+            ->willReturn($formRepository);
 
         $formModel = new FormModel(
             $this->entityManagerMock,
