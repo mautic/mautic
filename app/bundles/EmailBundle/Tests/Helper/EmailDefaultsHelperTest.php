@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Model\PageModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -18,15 +19,19 @@ final class EmailDefaultsHelperTest extends TestCase
 
     private MockObject&EntityManagerInterface $entityManager;
 
+    private MockObject&PageModel $pageModel;
+
     private EmailDefaultsHelper $helper;
 
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->entityManager        = $this->createMock(EntityManagerInterface::class);
+        $this->pageModel            = $this->createMock(PageModel::class);
         $this->helper               = new EmailDefaultsHelper(
             $this->coreParametersHelper,
             $this->entityManager,
+            $this->pageModel,
         );
     }
 
@@ -62,6 +67,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
         $this->entityManager->expects($this->never())->method('find');
         $this->coreParametersHelper->expects($this->never())->method('get');
+        $this->pageModel->expects($this->once())->method('getTranslatedEntity')->willReturn([null, $existingPage]);
 
         $this->assertSame($existingPage, $this->helper->resolvePreferenceCenter($email));
     }
@@ -147,6 +153,8 @@ final class EmailDefaultsHelperTest extends TestCase
             ->with(Page::class, 42)
             ->willReturn($page);
 
+        $this->pageModel->expects($this->once())->method('getTranslatedEntity')->with($page)->willReturn([null, $page]);
+
         $email = new Email();
 
         $this->assertSame($page, $this->helper->resolvePreferenceCenter($email));
@@ -160,6 +168,8 @@ final class EmailDefaultsHelperTest extends TestCase
         $this->entityManager->expects($this->once())->method('find')
             ->with(Page::class, 999)
             ->willReturn(null);
+
+        $this->pageModel->expects($this->never())->method('getTranslatedEntity');
 
         $email = new Email();
 
@@ -176,6 +186,8 @@ final class EmailDefaultsHelperTest extends TestCase
             ->with(Page::class, 42)
             ->willReturn($page);
 
+        $this->pageModel->expects($this->never())->method('getTranslatedEntity');
+
         $email = new Email();
 
         $this->assertNotInstanceOf(Page::class, $this->helper->resolvePreferenceCenter($email));
@@ -190,6 +202,8 @@ final class EmailDefaultsHelperTest extends TestCase
         $this->entityManager->expects($this->once())->method('find')
             ->with(Page::class, 42)
             ->willReturn($page);
+
+        $this->pageModel->expects($this->never())->method('getTranslatedEntity');
 
         $email = new Email();
 
