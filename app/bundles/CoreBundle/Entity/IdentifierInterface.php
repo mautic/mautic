@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Entity;
 interface IdentifierInterface
 {
     /**
-     * @return int|null
+     * @return int|string|null
      */
     public function getId();
 }
