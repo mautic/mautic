@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Mailer\Transport;
 
+use Mautic\CoreBundle\Helper\Dsn\Dsn as MauticDsn;
+use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport as SymfonyTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -34,7 +36,7 @@ class TransportFactory
     public function fromString(string $dsn): TransportInterface
     {
         try {
-            return $this->transportFactory->fromString($dsn);
+            return $this->fromStringWithoutUnsupportedSchemeFallback($dsn);
         } catch (UnsupportedSchemeException) {
             return new InvalidTransport();
         }
@@ -43,5 +45,32 @@ class TransportFactory
     public function fromDsnObject(Dsn $dsn): TransportInterface
     {
         return $this->transportFactory->fromDsnObject($dsn);
+    }
+
+    public function fromStringForValidation(string $dsn): TransportInterface
+    {
+        return $this->fromStringWithoutUnsupportedSchemeFallback($dsn);
+    }
+
+    private function fromStringWithoutUnsupportedSchemeFallback(string $dsn): TransportInterface
+    {
+        try {
+            return $this->transportFactory->fromString($dsn);
+        } catch (IncompleteDsnException $exception) {
+            $parsed = MauticDsn::fromString($dsn);
+
+            if (null !== $parsed->getUser()
+                || null === $parsed->getPassword()
+                || preg_match('/(?:^|\+)smtps?$/', $parsed->getScheme())
+            ) {
+                throw $exception;
+            }
+
+            try {
+                return $this->transportFactory->fromString((string) $parsed->setUser($parsed->getPassword())->setPassword(null));
+            } catch (IncompleteDsnException) {
+                throw $exception;
+            }
+        }
     }
 }
