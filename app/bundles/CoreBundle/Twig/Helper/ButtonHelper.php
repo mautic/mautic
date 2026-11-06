@@ -82,7 +82,7 @@ final class ButtonHelper
     /**
      * @var array<array<string,mixed>>
      */
-    private $buttons = [];
+    private array $buttons = [];
 
     private int $buttonCount = 0;
 

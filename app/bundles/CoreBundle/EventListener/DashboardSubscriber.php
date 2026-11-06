@@ -28,7 +28,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
      *
      * @var array<string, array<string, string>>
      */
-    protected $types = [
+    protected array $types = [
         self::TYPE_RECENT_ACTIVITY => [],
     ];
 

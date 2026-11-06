@@ -69,10 +69,7 @@ class Submission
     #[ORM\JoinColumn(name: 'page_id', onDelete: 'SET NULL')]
     private ?Page $page = null;
 
-    /**
-     * @var array
-     */
-    private $results = [];
+    private array $results = [];
 
     /**
      * Prepares the metadata for API usage.

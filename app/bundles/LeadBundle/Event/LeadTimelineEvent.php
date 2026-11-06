@@ -53,10 +53,7 @@ final class LeadTimelineEvent extends Event
 
     private bool $fetchTypesOnly = false;
 
-    /**
-     * @var array
-     */
-    private $serializerGroups = [
+    private array $serializerGroups = [
         'ipAddressList',
     ];
 

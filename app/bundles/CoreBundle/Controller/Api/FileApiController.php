@@ -29,10 +29,8 @@ final class FileApiController extends CommonApiController
 {
     /**
      * Holds array of allowed file extensions.
-     *
-     * @var array
      */
-    private $allowedExtensions = [];
+    private array $allowedExtensions = [];
 
     public function __construct(
         CorePermissions $security,

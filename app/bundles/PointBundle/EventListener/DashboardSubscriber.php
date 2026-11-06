@@ -20,16 +20,14 @@ final class DashboardSubscriber extends MainDashboardSubscriber
      *
      * @var array<string, array<string, string>>
      */
-    protected $types = [
+    protected array $types = [
         'points.in.time' => [],
     ];
 
     /**
      * Define permissions to see those widgets.
-     *
-     * @var array
      */
-    protected $permissions = [
+    protected array $permissions = [
         'point:points:viewown',
         'point:points:viewother',
     ];

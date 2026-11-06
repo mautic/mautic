@@ -107,10 +107,7 @@ class LeadModel extends FormModel
 
     public const string CHANNEL_FEATURE = 'contact_preference';
 
-    /**
-     * @var array
-     */
-    protected $leadFields = [];
+    protected array $leadFields = [];
 
     protected $leadTrackingId;
 
@@ -119,10 +116,7 @@ class LeadModel extends FormModel
      */
     protected $leadTrackingCookieGenerated = false;
 
-    /**
-     * @var array
-     */
-    protected $availableLeadFields = [];
+    protected array $availableLeadFields = [];
 
     private bool $repoSetup = false;
 

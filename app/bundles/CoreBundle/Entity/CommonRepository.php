@@ -54,10 +54,8 @@ abstract class CommonRepository extends ServiceEntityRepository
 
     /**
      * Stores the parsed columns and their negate status for addAdvancedSearchWhereClause().
-     *
-     * @var array
      */
-    protected $advancedFilterCommands = [];
+    protected array $advancedFilterCommands = [];
 
     /**
      * @var User|null

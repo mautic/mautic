@@ -12,7 +12,7 @@ namespace MauticPlugin\MauticFullContactBundle\Services;
  */
 final class FullContact_Icon extends FullContact_Base
 {
-    protected $_supportedMethods = ['available'];
+    protected array $_supportedMethods = ['available'];
 
     protected $_resourceUri      = '/icon/';
 

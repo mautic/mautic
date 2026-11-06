@@ -22,7 +22,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
      *
      * @var array<string, array<string, string>>
      */
-    protected $types = [
+    protected array $types = [
         'page.hits.in.time' => [
             'formAlias' => DashboardHitsInTimeWidgetType::class,
         ],
@@ -35,10 +35,8 @@ final class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Define permissions to see those widgets.
-     *
-     * @var array
      */
-    protected $permissions = [
+    protected array $permissions = [
         'page:pages:viewown',
         'page:pages:viewother',
     ];

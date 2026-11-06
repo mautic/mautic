@@ -21,17 +21,13 @@ class DashboardSubscriber implements EventSubscriberInterface
 
     /**
      * Define the widget(s).
-     *
-     * @var array
      */
-    protected $types = [];
+    protected array $types = [];
 
     /**
      * Define permissions to see those widgets.
-     *
-     * @var array
      */
-    protected $permissions = [];
+    protected array $permissions = [];
 
     public static function getSubscribedEvents(): array
     {
