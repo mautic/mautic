@@ -5,17 +5,11 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\ConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ConfigSubscriber implements EventSubscriberInterface
 {
-    public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-    ) {
-    }
-
     public static function getSubscribedEvents(): array
     {
         return [
@@ -39,13 +33,12 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
     {
         $data = $event->getConfig('emailconfig');
 
-        // Get the original data so that passwords aren't lost
-        $monitoredEmail = $this->coreParametersHelper->get('monitored_email');
+        // Get the original form data so that passwords aren't lost
+        $monitoredEmail = $event->getOriginalNormData()['emailconfig']['parameters']['monitored_email'] ?? [];
         if (isset($data['monitored_email'])) {
             foreach ($data['monitored_email'] as $key => $monitor) {
                 if (empty($monitor['password']) && !empty($monitoredEmail[$key]['password'])) {
-                    // The resolved value is written to local.php and must escape literal percent signs.
-                    $data['monitored_email'][$key]['password'] = str_replace('%', '%%', (string) $monitoredEmail[$key]['password']);
+                    $data['monitored_email'][$key]['password'] = $monitoredEmail[$key]['password'];
                 }
 
                 if ('general' != $key) {
