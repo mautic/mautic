@@ -35,7 +35,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $this->configRoute = static::getContainer()->get(RouterInterface::class)->generate('mautic_plugin_config', ['name' => 'FullContact']);
+        $this->configRoute = self::getContainer()->get(RouterInterface::class)->generate('mautic_plugin_config', ['name' => 'FullContact']);
     }
 
     public function testConfigFormRendersKeysFieldsAndCopyableWebhookUrl(): void
@@ -75,9 +75,9 @@ final class ConfigControllerTest extends MauticMysqlTestCase
         $this->assertNotSame(self::API_KEY, $integration->getApiKeys()['apikey'] ?? null);
 
         /** @var IntegrationsHelper $integrationsHelper */
-        $integrationsHelper = static::getContainer()->get(IntegrationsHelper::class);
+        $integrationsHelper = self::getContainer()->get(IntegrationsHelper::class);
         /** @var ConfigSupport $configSupport */
-        $configSupport = static::getContainer()->get(ConfigSupport::class);
+        $configSupport = self::getContainer()->get(ConfigSupport::class);
         $decrypted     = $integrationsHelper->getIntegrationConfiguration($configSupport);
         $this->assertSame(self::API_KEY, $decrypted->getApiKeys()['apikey']);
 
