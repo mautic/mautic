@@ -50,7 +50,8 @@ final class ConfigControllerTest extends MauticMysqlTestCase
         $readonlyUrl = $crawler->filter('input[readonly]')->reduce(
             fn ($node): bool => str_contains((string) $node->attr('value'), '/fullcontact/callback')
         );
-        $this->assertGreaterThan(0, $readonlyUrl->count(), 'The copyable FullContact webhook URL input is missing from the config form.');
+        $this->assertCount(1, $readonlyUrl, 'The copyable FullContact webhook URL input is missing from the config form.');
+        $this->assertMatchesRegularExpression('#^https?://[^/]+/fullcontact/callback$#', (string) $readonlyUrl->attr('value'));
     }
 
     public function testSavedApiKeyIsPublishedEncryptedAtRestAndRedisplayed(): void
