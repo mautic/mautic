@@ -770,6 +770,6 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     private function getQuickFiltersCrawler(): Crawler
     {
-        return new Crawler($this->client->getCrawler()->filter('[data-quick-filter]')->attr('data-content'));
+        return new Crawler($this->client->getCrawler()->filter('[data-quick-filter]')->attr('data-bs-content'));
     }
 }
