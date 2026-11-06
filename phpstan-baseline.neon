@@ -2826,12 +2826,6 @@ parameters:
 			path: app/bundles/FormBundle/Entity/Form.php
 
 		-
-			message: '#^Method Mautic\\FormBundle\\Entity\\Submission\:\:setResults\(\) has parameter \$results with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Entity/Submission.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Entity\\Submission\:\:setTrackingId\(\) has parameter \$trackingId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1

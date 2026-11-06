@@ -171,7 +171,7 @@ final class ButtonHelper
 
         $content              = '';
         $dropdownHtmlAppended = false;
-        if (!empty($this->buttons)) {
+        if ($this->buttons !== []) {
             $buttonCount = 0;
 
             foreach ($this->buttons as $button) {
