@@ -115,7 +115,7 @@ mQuery( document ).ready(function() {
         var authenticatedUrl = mauticBaseUrl + 's/';
         var authenticatedPath = new URL(authenticatedUrl, window.location.href).pathname;
         if (window.location.pathname.startsWith(authenticatedPath) && window.location.pathname !== authenticatedPath + 'login') {
-            mQuery.get(authenticatedUrl + 'keep-alive')
+            mQuery.get(window.location.origin + authenticatedPath + 'keep-alive')
                 .fail(function(errorThrown) {
                     console.error('Error with keep-alive:', errorThrown);
                 });

@@ -6,8 +6,8 @@ const {test} = require('node:test');
 
 const source = fs.readFileSync(path.join(__dirname, '../../../Assets/js/1.core.js'), 'utf8');
 
-function keepAliveRequests(baseUrl, pathname) {
-    const pageUrl = new URL(pathname, new URL(baseUrl, 'http://localhost/'));
+function keepAliveRequests(baseUrl, pathname, pageOrigin = new URL(baseUrl, 'http://localhost/').origin) {
+    const pageUrl = new URL(pathname, pageOrigin);
     const ready = [];
     const timers = [];
     const requests = [];
@@ -41,11 +41,23 @@ function keepAliveRequests(baseUrl, pathname) {
 for (const baseUrl of ['/', '/marketing/', '/marketing/index.php/', 'https://example.com/', 'https://example.com/marketing/', 'https://example.com/marketing/index.php/']) {
     const basePath = new URL(baseUrl, 'http://localhost/').pathname;
     test(`keep-alive uses the installation URL ${baseUrl}`, () => {
-        assert.deepEqual(keepAliveRequests(baseUrl, `${basePath}s/dashboard`), [`${baseUrl}s/keep-alive`]);
+        const pageOrigin = new URL(baseUrl, 'http://localhost/').origin;
+        assert.deepEqual(keepAliveRequests(baseUrl, `${basePath}s/dashboard`), [`${pageOrigin}${basePath}s/keep-alive`]);
     });
 
     test(`login and public pages do not refresh sessions under ${baseUrl}`, () => {
         assert.deepEqual(keepAliveRequests(baseUrl, `${basePath}s/login`), []);
         assert.deepEqual(keepAliveRequests(baseUrl, `${basePath}unsubscribe/123`), []);
     });
+}
+
+for (const baseUrl of ['https://example.com/', 'https://example.com/marketing/', 'https://example.com/marketing/index.php/']) {
+    const basePath = new URL(baseUrl).pathname;
+    for (const pageOrigin of ['http://localhost', 'http://example.com', 'https://example.com:8443']) {
+        test(`keep-alive stays on ${pageOrigin} with base URL ${baseUrl}`, () => {
+            assert.deepEqual(keepAliveRequests(baseUrl, `${basePath}s/dashboard`, pageOrigin), [`${pageOrigin}${basePath}s/keep-alive`]);
+            assert.deepEqual(keepAliveRequests(baseUrl, `${basePath}s/login`, pageOrigin), []);
+            assert.deepEqual(keepAliveRequests(baseUrl, `${basePath}unsubscribe/123`, pageOrigin), []);
+        });
+    }
 }
