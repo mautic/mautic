@@ -1653,12 +1653,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param mixed      $data        Profile data from integration
      * @param bool|true  $persist     Set to false to not persist lead to the database in this method
-     * @param array|null $socialCache
      * @param mixed|null $identifiers
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null)
+    public function getMauticLead($data, $persist = true, ?array $socialCache = null, $identifiers = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
