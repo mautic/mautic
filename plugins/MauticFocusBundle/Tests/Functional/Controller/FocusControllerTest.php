@@ -51,6 +51,6 @@ final class FocusControllerTest extends MauticMysqlTestCase
 
     private function getQuickFiltersCrawler(): Crawler
     {
-        return new Crawler($this->client->getCrawler()->filter('[data-quick-filter]')->attr('data-content'));
+        return new Crawler($this->client->getCrawler()->filter('[data-quick-filter]')->attr('data-bs-content'));
     }
 }
