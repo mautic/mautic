@@ -15,6 +15,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Validator\Constraints\Upload;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\FileHelper;
@@ -59,7 +60,7 @@ use Symfony\Component\Validator\Constraints\Sequentially;
     inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
     joinTable: new ORM\JoinTable(name: 'asset_projects_xref'),
 )])]
-class Asset extends FormEntity implements UuidInterface
+class Asset extends FormEntity implements UuidInterface, IdentifierInterface
 {
     use UuidTrait;
 

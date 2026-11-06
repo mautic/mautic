@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Form\EventListener;
 
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormEvent;
@@ -22,7 +25,9 @@ final readonly class FormExitSubscriber implements EventSubscriberInterface
 
     public function preSetData(FormEvent $event): void
     {
-        $id = !empty($this->options['data']) ? $this->options['data']->getId() : 0;
+        /** @var IdentifierInterface|null $data */
+        $data = $this->options['data'] ?? null;
+        $id   = !empty($data) ? $data->getId() : 0;
         if ($id && empty($this->options['ignore_formexit'])) {
             // add a hidden field that is used exclusively to warn a user to use save/cancel to exit a form
             $form = $event->getForm();
