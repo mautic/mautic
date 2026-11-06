@@ -12,8 +12,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final readonly class ConfigSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
+        CoreParametersHelper $coreParametersHelper,
     ) {
+        // Keep the legacy constructor signature for third-party plugins.
+        unset($coreParametersHelper);
     }
 
     public static function getSubscribedEvents(): array
