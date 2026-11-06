@@ -397,6 +397,7 @@ final class ContactManagementCest
         $I->fillField(ContactPage::$addToTheFollowingSegmentInput, 'Segment Test 3');
         $I->pressKey(ContactPage::$addToTheFollowingSegmentInput, WebDriverKeys::ENTER);
         $I->click(ContactPage::$changeSegmentModalSaveButton);
+        $I->waitForElementNotVisible('#MauticSharedModal', AcceptanceTester::TIMEOUT);
 
         // Clear all selection
         $I->click(ContactPage::$clearAllContactsSelection);
@@ -439,6 +440,7 @@ final class ContactManagementCest
         $I->fillField(ContactPage::$removeFromTheFollowingSegmentInput, 'Segment Test 3');
         $I->pressKey(ContactPage::$removeFromTheFollowingSegmentInput, WebDriverKeys::ENTER);
         $I->click(ContactPage::$changeSegmentModalSaveButton);
+        $I->waitForElementNotVisible('#MauticSharedModal', AcceptanceTester::TIMEOUT);
 
         // Clear all selection
         $I->click(ContactPage::$clearAllContactsSelection);
@@ -506,6 +508,7 @@ final class ContactManagementCest
 
         // Wait for the import page to load
         $I->waitForText('Import Contacts', AcceptanceTester::TIMEOUT, 'h1.page-header-title');
+        $I->waitForElementVisible(ContactPage::$importForm, AcceptanceTester::TIMEOUT);
         $I->waitForElementVisible(ContactPage::$uploadButton, AcceptanceTester::TIMEOUT);
 
         // Click 'Choose file' and select a file
@@ -524,7 +527,7 @@ final class ContactManagementCest
         $I->click(ContactPage::$importInBrowser);
 
         // Wait for import completion message
-        $I->waitForText('Successful import', AcceptanceTester::TIMEOUT, 'h2');
+        $I->waitForText('Successful import', AcceptanceTester::TIMEOUT, '#leadImportProgressComplete h2');
 
         // Extract the number of contacts created from the progress message
         $expectedContactsAdded = (int) $I->grabTextFrom('#leadImportProgressComplete > div > div:nth-child(2) > div > div.panel-body > div:nth-child(2) > div > span');

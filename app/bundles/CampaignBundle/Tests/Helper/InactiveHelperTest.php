@@ -88,7 +88,7 @@ final class InactiveHelperTest extends TestCase
         $log = $this->createMock(LeadEventLog::class);
         $log->expects($this->exactly(3))
             ->method('getNonActionPathTaken')
-            ->willReturnOnConsecutiveCalls(1, 0, 1);
+            ->willReturnOnConsecutiveCalls(true, false, true);
 
         /** @var Campaign&MockObject $campaign */
         $campaign = $this->createMock(Campaign::class);
