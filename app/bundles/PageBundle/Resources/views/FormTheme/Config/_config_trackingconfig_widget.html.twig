@@ -1,9 +1,10 @@
 {% block _config_trackingconfig_widget %}
+{% set sharedConsentSelected = form.focus_uses_mautic_tracking_consent.vars.data == 1 %}
 <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.pagetracking'|trans }}</h4>
 <div class="text-muted small pb-md">{{ 'mautic.core.config.header.pagetracking.description'|trans }}</div>
 <div class="row">
     <div class="panel panel-default mb-md">
-        <div class="panel-body">
+        <div class="panel-body" data-focus-consent-snippets>
             <div class="form-group">
                 <p>{{ 'mautic.config.tab.pagetracking.info'|trans|purify }}</p>
                 <ul class="nav nav-tabs nav-tabs-contained">
@@ -29,7 +30,7 @@
                         {% include '@MauticCore/Components/code-snippet.html.twig' with {
                             variant: 'multi',
                             ariaLabel: 'mautic.page.config.tracking.script.essential.label'|trans,
-                            innerText: '&lt;script&gt;
+                            innerText: '<script>
     (function(w,d,t,u,a,m){
         if (d.getElementById(\'mautic-essential-script\')) return;
         a=d.createElement(t),m=d.getElementsByTagName(t)[0];
@@ -40,19 +41,29 @@
             }
         };m.parentNode.insertBefore(a,m)
     })(window,document,\'script\',\'' ~ url('mautic_essential_js') ~ '\');
-&lt;/script&gt;',
+</script>',
                         } %}
                         <h5 class="fw-sb mt-lg mb-xs">{{ 'mautic.page.config.tracking.script.tracking.label'|trans }}</h5>
                         <p class="text-muted small">{{ 'mautic.page.config.tracking.script.tracking.description'|trans }}</p>
-                        {% include '@MauticCore/Components/code-snippet.html.twig' with {
-                            variant: 'multi',
-                            ariaLabel: 'mautic.page.config.tracking.script.tracking.label'|trans,
-                            innerText: '&lt;script&gt;
+                        {% for sharedConsent in [false, true] %}
+                            <div data-focus-consent-snippet="{{ sharedConsent ? 'shared' : 'independent' }}" class="{{ sharedConsent == sharedConsentSelected ? '' : 'hide' }}">
+                                {% include '@MauticCore/Components/code-snippet.html.twig' with {
+                                    variant: 'multi',
+                                    ariaLabel: 'mautic.page.config.tracking.script.tracking.label'|trans,
+                                    innerText: '<script>
     (function(w,d,t,u,n,a,m){
         function enableTracking(){
             if (!w.MauticJS || w.MauticJS.runtimeReady !== true) return;
             d.removeEventListener(\'mauticEssentialReady\',enableTracking);
-            if (w.MauticJS.trackingEnabled === true || d.getElementById(\'mautic-tracking-script\')) return;
+' ~ (sharedConsent ? '
+            // Use Mautic consent for Focus tracking
+            w.MauticFocusUseMauticTrackingConsent=true;
+            if (w.MauticJS.trackingEnabled === true) {
+                w.MauticJS.dispatchEvent(\'mautic:tracking-enabled\');
+                return;
+            }
+
+' : '') ~ '            if (w.MauticJS.trackingEnabled === true || d.getElementById(\'mautic-tracking-script\')) return;
             w[\'MauticTrackingObject\']=n;
             w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)};
             w[n](\'send\',\'pageview\');
@@ -65,16 +76,25 @@
             d.addEventListener(\'mauticEssentialReady\',enableTracking)
         }
     })(window,document,\'script\',\'' ~ url('mautic_tracking_js') ~ '\',\'mt\');
-&lt;/script&gt;',
-                        } %}
+</script>',
+                                } %}
+                            </div>
+                        {% endfor %}
                     </div>
                     <div class="tab-pane bdr-w-0" id="tracking-snippet-full">
                         <p class="text-muted small">{{ 'mautic.page.config.tracking.script.full.description'|trans }}</p>
-                        {% include '@MauticCore/Components/code-snippet.html.twig' with {
-                            variant: 'multi',
-                            ariaLabel: 'mautic.page.config.tracking.script.full.tab'|trans,
-                            innerText: '&lt;script&gt;
-    (function(w,d,t,e,r,n,a,m,s){w[\'MauticTrackingObject\']=n;
+                        {% for sharedConsent in [false, true] %}
+                            <div data-focus-consent-snippet="{{ sharedConsent ? 'shared' : 'independent' }}" class="{{ sharedConsent == sharedConsentSelected ? '' : 'hide' }}">
+                                {% include '@MauticCore/Components/code-snippet.html.twig' with {
+                                    variant: 'multi',
+                                    ariaLabel: 'mautic.page.config.tracking.script.full.tab'|trans,
+                                    innerText: '<script>
+    (function(w,d,t,e,r,n,a,m,s){
+' ~ (sharedConsent ? '
+        // Use Mautic consent for Focus tracking
+        w.MauticFocusUseMauticTrackingConsent=true;
+
+' : '') ~ '        w[\'MauticTrackingObject\']=n;
         w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
         m=d.getElementsByTagName(t)[0];a.async=1;a.src=e;
         a.onload=function(){s=d.createElement(t);s.async=1;s.src=r;
@@ -82,9 +102,15 @@
         };m.parentNode.insertBefore(a,m)
     })(window,document,\'script\',\'' ~ url('mautic_essential_js') ~ '\',\'' ~ url('mautic_tracking_js') ~ '\',\'mt\');
     mt(\'send\', \'pageview\');
-&lt;/script&gt;',
-                        } %}
+</script>',
+                                } %}
+                            </div>
+                        {% endfor %}
                     </div>
+                </div>
+                <div class="pa-md">
+                    <h5 class="fw-sb mb-xs">{{ 'mautic.page.config.tracking.script.modifiers.label'|trans }}</h5>
+                    {{ form_row(form.focus_uses_mautic_tracking_consent) }}
                 </div>
             </div>
             <div class="row">
