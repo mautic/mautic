@@ -15,6 +15,46 @@ final class ContactManagementCest
         $I->login('admin', 'Maut1cR0cks!');
     }
 
+    public function sortingPreservesExistingQueryParameters(AcceptanceTester $I): void
+    {
+        foreach (['', '?search=alice%2Bbob', '?search=A%26B&category=3'] as $query) {
+            $I->amOnPage(ContactPage::$URL.$query);
+            $I->waitForJS('return typeof Mautic !== "undefined" && typeof Mautic.reorderTableData === "function";', AcceptanceTester::TIMEOUT);
+
+            $I->executeJS(<<<'JS'
+window.tableSortRequest = null;
+mQuery(document).on('ajaxComplete.tableSortQuery', function (event, xhr, settings) {
+    var url = new URL(settings.url, window.location.href);
+    if (url.searchParams.get('orderby') !== 'l.lastname') {
+        return;
+    }
+    window.tableSortRequest = {
+        search: url.searchParams.get('search'),
+        category: url.searchParams.get('category'),
+        tmpl: url.searchParams.get('tmpl'),
+        name: url.searchParams.get('name'),
+        orderby: url.searchParams.get('orderby'),
+        method: settings.type,
+        status: xhr.status
+    };
+    mQuery(document).off('ajaxComplete.tableSortQuery');
+});
+Mautic.reorderTableData('lead', 'l.lastname', 'list', '.page-list', window.location.pathname + window.location.search);
+JS);
+            $I->waitForJS('return window.tableSortRequest !== null;', AcceptanceTester::TIMEOUT);
+            $request = $I->executeJS('return window.tableSortRequest;');
+
+            parse_str(ltrim($query, '?'), $expected);
+            $I->assertSame($expected['search'] ?? null, $request['search']);
+            $I->assertSame($expected['category'] ?? null, $request['category']);
+            $I->assertSame('list', $request['tmpl']);
+            $I->assertSame('lead', $request['name']);
+            $I->assertSame('l.lastname', $request['orderby']);
+            $I->assertSame('POST', $request['method']);
+            $I->assertSame(200, $request['status']);
+        }
+    }
+
     public function createContactFromQuickAdd(
         AcceptanceTester $I,
         ContactStep $contact,
