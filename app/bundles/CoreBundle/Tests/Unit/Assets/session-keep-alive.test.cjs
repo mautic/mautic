@@ -7,6 +7,7 @@ const {test} = require('node:test');
 const source = fs.readFileSync(path.join(__dirname, '../../../Assets/js/1.core.js'), 'utf8');
 
 function keepAliveRequests(baseUrl, pathname) {
+    const pageUrl = new URL(pathname, new URL(baseUrl, 'http://localhost/'));
     const ready = [];
     const timers = [];
     const requests = [];
@@ -17,10 +18,14 @@ function keepAliveRequests(baseUrl, pathname) {
     };
     const query = () => chain;
     query.ajaxSetup = () => {};
-    query.get = (url) => { requests.push(url); return {fail() {}}; };
+    query.get = (url) => {
+        assert.equal(new URL(url, pageUrl).origin, pageUrl.origin);
+        requests.push(url);
+        return {fail() {}};
+    };
     const context = vm.createContext({
         jQuery: {noConflict: () => query}, document: {},
-        window: {location: {pathname, href: `http://localhost${pathname}`}}, URL,
+        window: {location: {pathname, href: pageUrl.href, origin: pageUrl.origin}}, URL,
         localStorage: {getItem: () => null},
         mauticBaseUrl: baseUrl, mauticSessionLifetime: 1200,
         setInterval: (callback, delay) => timers.push({callback, delay}), console
