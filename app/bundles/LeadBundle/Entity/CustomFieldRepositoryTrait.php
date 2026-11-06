@@ -27,9 +27,8 @@ trait CustomFieldRepositoryTrait
 
     /**
      * @param string $object
-     * @param array  $args
      */
-    public function getEntitiesWithCustomFields($object, $args, $resultsCallback = null)
+    public function getEntitiesWithCustomFields($object, array $args, $resultsCallback = null)
     {
         $skipOrdering           = $args['skipOrdering'] ?? false;
         [$fields, $fixedFields] = $this->getCustomFieldList($object);
@@ -295,10 +294,9 @@ trait CustomFieldRepositoryTrait
     }
 
     /**
-     * @param array  $values
      * @param string $object
      */
-    protected function formatFieldValues($values, bool $byGroup = true, $object = 'lead'): array
+    protected function formatFieldValues(array $values, bool $byGroup = true, $object = 'lead'): array
     {
         [$fields, $fixedFields] = $this->getCustomFieldList($object);
 
