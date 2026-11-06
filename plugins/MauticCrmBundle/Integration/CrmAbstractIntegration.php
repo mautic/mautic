@@ -325,13 +325,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @param mixed       $data        Profile data from integration
      * @param bool|true   $persist     Set to false to not persist lead to the database in this method
-     * @param array|null  $socialCache
      * @param mixed|null  $identifiers
      * @param string|null $object
      *
      * @return Lead|null
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $object = null)
+    public function getMauticLead($data, $persist = true, ?array $socialCache = null, $identifiers = null, $object = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels

@@ -150,7 +150,7 @@ class EmailRepository extends CommonRepository
     /**
      * @param int            $emailId
      * @param int[]|null     $variantIds
-     * @param int[]|null     $listIds
+     * @param int|int[]|null $listIds
      * @param int|null       $limit
      * @param int|null       $minContactId
      * @param int|null       $maxContactId
@@ -158,7 +158,7 @@ class EmailRepository extends CommonRepository
      */
     public function getEmailPendingQuery(
         $emailId,
-        $variantIds = null,
+        ?array $variantIds = null,
         $listIds = null,
         bool $countOnly = false,
         $limit = null,
@@ -323,14 +323,14 @@ class EmailRepository extends CommonRepository
     /**
      * @param int        $emailId
      * @param int[]|null $variantIds
-     * @param int[]|null $listIds
+     * @param int|int[]|null $listIds
      * @param int|null   $limit
      * @param int|null   $minContactId
      * @param int|null   $maxContactId
      */
     public function getEmailPendingLeads(
         $emailId,
-        $variantIds = null,
+        ?array $variantIds = null,
         $listIds = null,
         bool $countOnly = false,
         $limit = null,
