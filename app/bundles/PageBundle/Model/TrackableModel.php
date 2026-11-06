@@ -310,8 +310,8 @@ class TrackableModel extends AbstractCommonModel
         $firstPassReplace = $this->contentReplacements['first_pass'];
 
         foreach ($this->literalDoNotTrackUrls as $url) {
-            $expandedUrl                    = trim(str_ireplace($firstPassSearch, $firstPassReplace, $url));
-            $this->doNotTrack[$expandedUrl] = '^'.preg_quote($expandedUrl, '~').'$';
+            $expandedUrl       = trim(str_ireplace($firstPassSearch, $firstPassReplace, $url));
+            $this->doNotTrack[] = '^'.preg_quote($expandedUrl, '~').'$';
         }
 
         $content          = str_ireplace($firstPassSearch, $firstPassReplace, $content);
@@ -785,7 +785,7 @@ class TrackableModel extends AbstractCommonModel
     {
         $normalizedUrl                             = trim($url);
         $this->literalDoNotTrackUrls[$normalizedUrl] = $normalizedUrl;
-        $this->doNotTrack[$normalizedUrl]            = '^'.preg_quote($normalizedUrl, '~').'$';
+        $this->doNotTrack[]                          = '^'.preg_quote($normalizedUrl, '~').'$';
     }
 
     /**

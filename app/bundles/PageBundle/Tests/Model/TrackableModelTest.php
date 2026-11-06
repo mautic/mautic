@@ -555,6 +555,27 @@ final class TrackableModelTest extends TestCase
         yield 'surrounding whitespace' => ['https://example.com/', ' https://example.com/contact/ '];
     }
 
+    public function testNumericLiteralDoNotTrackUrlDoesNotOverwriteEventExclusion(): void
+    {
+        $eventExcludedUrl = 'https://example.com/private/';
+        $model            = $this->getModel(['^'.preg_quote($eventExcludedUrl, '~').'$']);
+        $excludedContent  = sprintf('<a href="%s">Private</a>', $eventExcludedUrl);
+
+        [$processedContent, $trackables] = $model->parseContentForTrackables(
+            [
+                '<a href="https://example.com/">Homepage</a><a href="0" data-mautic-disable-tracking="true">Disabled</a>',
+                $excludedContent,
+            ],
+            [],
+            'email',
+            1
+        );
+
+        $this->assertCount(1, $trackables);
+        $this->assertSame('https://example.com/', reset($trackables)->getRedirect()->getUrl());
+        $this->assertSame($excludedContent, $processedContent[1]);
+    }
+
     public function testTokenizedDoNotTrackUrlIsNotRewrittenAfterTokenExpansion(): void
     {
         $model = $this->getModel();
