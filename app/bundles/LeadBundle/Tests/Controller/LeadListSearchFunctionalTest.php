@@ -76,7 +76,7 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->assertQueries([
             "SELECT list.id FROM {$this->prefix}lead_lists list WHERE list.alias = '{$listOne->getAlias()}'",
             "SELECT COUNT(l.id) as count FROM {$this->prefix}leads l{$hint} WHERE (EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listOne->getId()})))) AND (l.date_identified IS NOT NULL)",
-            "SELECT l.* FROM {$this->$prefix}leads l{$hint} WHERE (EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listOne->getId()})))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+            "SELECT l.* FROM {$this->prefix}leads l{$hint} WHERE (EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listOne->getId()})))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
 
         $this->assertSearchResult('!segment%3A'.$listOne->getAlias(), [$leadFour, $leadFive, $leadSix], [$leadOne, $leadTwo, $leadThree]);
