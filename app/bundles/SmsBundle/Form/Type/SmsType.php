@@ -138,8 +138,28 @@ final class SmsType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $builder->add('publishUp', PublishUpDateType::class);
-        $builder->add('publishDown', PublishDownDateType::class);
+        $scheduleFields = static function (FormEvent $event) use ($options): void {
+            $form      = $event->getForm();
+            $eventData = $event->getData();
+            $sms       = $eventData instanceof Sms ? $eventData : $form->getData();
+
+            if (!$sms instanceof Sms) {
+                return;
+            }
+
+            // Segment SMS schedules are managed through the dedicated schedule form.
+            // Check both the persisted and submitted type so crafted requests cannot
+            // use the main editor to change the schedule in either direction.
+            $submittedType = is_array($eventData) ? ($eventData['smsType'] ?? null) : null;
+            $isSegmentSms   = $options['disable_segment_schedule_fields']
+                && ('list' === $sms->getSmsType() || 'list' === $submittedType);
+
+            $form->add('publishUp', PublishUpDateType::class, ['disabled' => $isSegmentSms]);
+            $form->add('publishDown', PublishDownDateType::class, ['disabled' => $isSegmentSms]);
+        };
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, $scheduleFields);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, $scheduleFields);
 
         // add category
         $builder->add(
@@ -239,10 +259,12 @@ final class SmsType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => Sms::class,
+                'data_class'                      => Sms::class,
+                'disable_segment_schedule_fields' => false,
             ]
         );
 
         $resolver->setDefined(['update_select']);
+        $resolver->setAllowedTypes('disable_segment_schedule_fields', 'bool');
     }
 }
