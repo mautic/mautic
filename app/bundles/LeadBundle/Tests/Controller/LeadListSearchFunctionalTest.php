@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -30,6 +31,15 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
     }
 
+    private function getIndexHint(): string
+    {
+        if (!DatabasePlatform::allowsIndexHint($this->em->getConnection()->getDatabasePlatform())) {
+            return '';
+        }
+
+        return " USE INDEX FOR JOIN ({$this->prefix}lead_date_added)";
+    }
+
     /**
      * @noinspection SqlResolve
      */
@@ -44,8 +54,8 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $leadSix   = $this->createLead('six');
 
         // add some leads in lists
-        $listOne  = $this->createLeadList('first-list', $leadOne, $leadTwo, $leadThree);
-        $listTwo  = $this->createLeadList('second-list', $leadOne, $leadFour, $leadFive, $leadSix);
+        $listOne  = $this->createLeadList('first-list', [$leadTwo], $leadOne, $leadTwo, $leadThree);
+        $listTwo  = $this->createLeadList('second-list', [], $leadOne, $leadFour, $leadFive, $leadSix);
 
         $this->em->flush();
         $this->em->clear();
@@ -65,57 +75,58 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->assertSearchResult('segment%3A'.$listOne->getAlias(), [$leadOne, $leadTwo, $leadThree], [$leadFour, $leadFive, $leadSix]);
         $this->assertQueries([
             "SELECT list.id FROM {$this->prefix}lead_lists list WHERE list.alias = '{$listOne->getAlias()}'",
-            "SELECT COUNT(l.id) as count FROM {$this->prefix}leads l{$hint} WHERE (EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL)",
-            "SELECT l.* FROM {$this->prefix}leads l{$hint} WHERE (EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$this->prefix}leads l{$hint} WHERE (EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listOne->getId()})))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$this->$prefix}leads l{$hint} WHERE (EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listOne->getId()})))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
+
         $this->assertSearchResult('!segment%3A'.$listOne->getAlias(), [$leadFour, $leadFive, $leadSix], [$leadOne, $leadTwo, $leadThree]);
         $this->assertQueries([
             "SELECT list.id FROM {$this->prefix}lead_lists list WHERE list.alias = '{$listOne->getAlias()}'",
-            "SELECT COUNT(l.id) as count FROM {$this->prefix}leads l{$hint} WHERE (NOT EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL)",
-            "SELECT l.* FROM {$this->prefix}leads l{$hint} WHERE (NOT EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$this->prefix}leads l{$hint} WHERE (NOT EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listOne->getId()})))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$this->prefix}leads l{$hint} WHERE (NOT EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listOne->getId()})))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
 
         // second-list segment search
         $this->assertSearchResult('segment%3A'.$listTwo->getAlias(), [$leadOne, $leadFour, $leadFive, $leadSix], [$leadTwo, $leadThree]);
         $this->assertQueries([
             "SELECT list.id FROM {$this->prefix}lead_lists list WHERE list.alias = '{$listTwo->getAlias()}'",
-            "SELECT COUNT(l.id) as count FROM {$this->prefix}leads l{$hint} WHERE (EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL)",
-            "SELECT l.* FROM {$this->prefix}leads l{$hint} WHERE (EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$this->prefix}leads l{$hint} WHERE (EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listTwo->getId()})))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$this->prefix}leads l{$hint} WHERE (EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listTwo->getId()})))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
         $this->assertSearchResult('!segment%3A'.$listTwo->getAlias(), [$leadTwo, $leadThree], [$leadOne, $leadFour, $leadFive, $leadSix]);
         $this->assertQueries([
             "SELECT list.id FROM {$this->prefix}lead_lists list WHERE list.alias = '{$listTwo->getAlias()}'",
-            "SELECT COUNT(l.id) as count FROM {$this->prefix}leads l{$hint} WHERE (NOT EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL)",
-            "SELECT l.* FROM {$this->prefix}leads l{$hint} WHERE (NOT EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$this->prefix}leads l{$hint} WHERE (NOT EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listTwo->getId()})))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$this->prefix}leads l{$hint} WHERE (NOT EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listTwo->getId()})))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
     }
 
-    private function getIndexHint(): string
+    public function testSegmentSourceSearch(): void
     {
-        if (!DatabasePlatform::allowsIndexHint($this->em->getConnection()->getDatabasePlatform())) {
-            return '';
-        }
+        $leadOne   = $this->createLead('one');
+        $leadTwo   = $this->createLead('two');
+        $leadThree = $this->createLead('three');
 
-        return " USE INDEX FOR JOIN ({$this->prefix}lead_date_added)";
-    }
+        $list = $this->createLeadList('first-list', [$leadTwo], $leadOne, $leadTwo, $leadThree);
 
-    /**
-     * @param Lead[] $expectedLeads
-     * @param Lead[] $notExpectedLeads
-     */
-    private function assertSearchResult(string $search, array $expectedLeads, array $notExpectedLeads): void
-    {
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search='.$search);
-        self::assertResponseIsSuccessful();
-        $responseText = $crawler->text();
+        $this->em->flush();
+        $this->em->clear();
 
-        foreach ($expectedLeads as $expectedLead) {
-            $this->assertStringContainsString($expectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should be in the result.', $expectedLead->getEmail()));
-        }
+        $leadRepository = $this->em->getRepository(Lead::class);
+        $this->assertInstanceOf(LeadRepository::class, $leadRepository);
+        $this->assertContains('mautic.lead.lead.searchcommand.source', $leadRepository->getSearchCommands());
+        $this->client->enableProfiler();
 
-        foreach ($notExpectedLeads as $notExpectedLead) {
-            $this->assertStringNotContainsString($notExpectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should not be in the result.', $notExpectedLead->getEmail()));
-        }
+        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20segment_source%3Amanually_added', [$leadTwo], [$leadOne, $leadThree]);
+        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20segment_source%3Afilter_added', [$leadOne, $leadThree], [$leadTwo]);
+        $this->assertSearchResult('segment_source%3Amanually_added%20segment%3A'.$list->getAlias(), [$leadTwo], [$leadOne, $leadThree]);
+        $this->assertSearchResult('segment_source%3Afilter_added%20segment%3A'.$list->getAlias(), [$leadOne, $leadThree], [$leadTwo]);
+        $this->assertSearchUsesSingleSegmentMembershipLookup();
+        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20!segment_source%3Amanually_added', [$leadOne, $leadThree], [$leadTwo]);
+        $this->assertSearchResult('!segment_source%3Amanually_added%20segment%3A'.$list->getAlias(), [$leadOne, $leadThree], [$leadTwo]);
+        $this->assertSearchResult('segment_source%3Amanually_added', [], [$leadOne, $leadTwo, $leadThree]);
+        $this->assertSearchResult('!segment%3A'.$list->getAlias().'%20segment_source%3Amanually_added', [], [$leadOne, $leadTwo, $leadThree]);
+        $this->assertSearchResult('segment_source%3Amanually_added%20!segment%3A'.$list->getAlias(), [], [$leadOne, $leadTwo, $leadThree]);
     }
 
     /**
@@ -140,6 +151,40 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @param Lead[] $expectedLeads
+     * @param Lead[] $notExpectedLeads
+     */
+    private function assertSearchResult(string $search, array $expectedLeads, array $notExpectedLeads): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search='.$search);
+        self::assertResponseIsSuccessful();
+        $responseText = $crawler->text();
+
+        foreach ($expectedLeads as $expectedLead) {
+            $this->assertStringContainsString($expectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should be in the result.', $expectedLead->getEmail()));
+        }
+
+        foreach ($notExpectedLeads as $notExpectedLead) {
+            $this->assertStringNotContainsString($notExpectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should not be in the result.', $notExpectedLead->getEmail()));
+        }
+    }
+
+    private function assertSearchUsesSingleSegmentMembershipLookup(): void
+    {
+        /** @var DoctrineDataCollector $dbCollector */
+        $dbCollector = $this->client->getProfile()->getCollector('db');
+        $queries     = array_filter(
+            $dbCollector->getQueries()['default'],
+            fn (array $query): bool => str_contains($query['sql'], 'FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads')
+        );
+
+        $this->assertNotEmpty($queries);
+        foreach ($queries as $query) {
+            $this->assertSame(1, substr_count($query['sql'], 'FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads'), $query['sql']);
+        }
+    }
+
+    /**
      * @throws ORMException
      */
     private function createLead(string $lastName): Lead
@@ -153,9 +198,11 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @param Lead[] $manuallyAddedLeads
+     *
      * @throws ORMException
      */
-    private function createLeadList(string $name, Lead ...$leads): LeadList
+    private function createLeadList(string $name, array $manuallyAddedLeads, Lead ...$leads): LeadList
     {
         $leadList = new LeadList();
         $leadList->setName($name);
@@ -164,18 +211,19 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($leadList);
 
         foreach ($leads as $lead) {
-            $this->addLeadToList($lead, $leadList);
+            $this->addLeadToList($lead, $leadList, in_array($lead, $manuallyAddedLeads, true));
         }
 
         return $leadList;
     }
 
-    private function addLeadToList(Lead $leadOne, LeadList $sourceList): void
+    private function addLeadToList(Lead $lead, LeadList $sourceList, bool $manuallyAdded): void
     {
         $listLead = new ListLead();
-        $listLead->setLead($leadOne);
+        $listLead->setLead($lead);
         $listLead->setList($sourceList);
         $listLead->setDateAdded(new \DateTime());
+        $listLead->setManuallyAdded($manuallyAdded);
         $this->em->persist($listLead);
     }
 }
