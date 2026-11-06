@@ -9,8 +9,10 @@ use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[Group('non-parallel')]
 final class OwnerSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     use UserEntityTrait;

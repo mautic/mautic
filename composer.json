@@ -26,6 +26,7 @@
     "mautic/core-lib": "^7.0"
   },
   "require-dev": {
+    "brianium/paratest": "^7.8",
     "codeception/codeception": "^5.3.5",
     "codeception/module-asserts": "^3.3",
     "codeception/module-db": "^3.2",
