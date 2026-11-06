@@ -42,6 +42,7 @@
         <div id="page-list-wrapper" class="panel panel-default">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
+                'searchPlaceholder': 'mautic.marketplace.search.placeholder',
                 'action'      : listRoute,
                 'filtersLabel': 'marketplace.package.type',
                 'filters': {

@@ -96,7 +96,6 @@
   color: $text-muted;//color - hint
 }
 .twitter-typeahead .tt-input {
-  z-index: 2;
   //disabled status
   //overwrite inline styles of .tt-query
   &[disabled],
