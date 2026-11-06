@@ -94,6 +94,7 @@ final class CampaignType extends AbstractType
         }
 
         $attr['readonly'] = $readonly;
+        $attr['data-enable-schedule-when-inactive'] = 'true';
 
         $builder->add('isPublished', YesNoButtonGroupType::class, [
             'data' => $data,
