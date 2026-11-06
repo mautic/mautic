@@ -552,6 +552,7 @@ final class TrackableModelTest extends TestCase
         yield 'same host casing' => ['https://example.com/', 'https://example.com/contact/'];
         yield 'different host casing' => ['https://example.com/', 'https://EXAMPLE.com/contact/'];
         yield 'regex metacharacters' => ['https://example.com/', 'https://example.com/contact/?ref=1'];
+        yield 'surrounding whitespace' => ['https://example.com/', ' https://example.com/contact/ '];
     }
 
     public function testTokenizedDoNotTrackUrlIsNotRewrittenAfterTokenExpansion(): void

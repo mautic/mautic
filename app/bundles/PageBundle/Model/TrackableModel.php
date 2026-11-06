@@ -310,7 +310,7 @@ class TrackableModel extends AbstractCommonModel
         $firstPassReplace = $this->contentReplacements['first_pass'];
 
         foreach ($this->literalDoNotTrackUrls as $url) {
-            $expandedUrl                    = str_ireplace($firstPassSearch, $firstPassReplace, $url);
+            $expandedUrl                    = trim(str_ireplace($firstPassSearch, $firstPassReplace, $url));
             $this->doNotTrack[$expandedUrl] = '^'.preg_quote($expandedUrl, '~').'$';
         }
 
@@ -332,7 +332,7 @@ class TrackableModel extends AbstractCommonModel
                     function (array $m) use ($replace): string {
                         // Decode HTML entities so raw href suffixes (&amp;) match normalized URLs
                         // in the do-not-track list (which are stored with plain &).
-                        $fullHref = html_entity_decode($m[3].$m[4], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $fullHref = trim(html_entity_decode($m[3].$m[4], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
                         if ($this->isInDoNotTrack($fullHref)) {
                             return $m[0];
                         }
@@ -783,8 +783,9 @@ class TrackableModel extends AbstractCommonModel
 
     private function addDoNotTrackUrl(string $url): void
     {
-        $this->literalDoNotTrackUrls[$url] = $url;
-        $this->doNotTrack[$url]            = '^'.preg_quote($url, '~').'$';
+        $normalizedUrl                             = trim($url);
+        $this->literalDoNotTrackUrls[$normalizedUrl] = $normalizedUrl;
+        $this->doNotTrack[$normalizedUrl]            = '^'.preg_quote($normalizedUrl, '~').'$';
     }
 
     /**
