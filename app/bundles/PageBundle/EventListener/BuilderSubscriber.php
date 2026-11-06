@@ -43,6 +43,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
     public const preferredchannel         = '{preferredchannel}';
 
+    public const trackingPreference       = '{trackingpreference}';
+
     public const saveprefsRegex           = '{saveprefsbutton}';
 
     public const successmessage           = '{successmessage}';
@@ -174,6 +176,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
                         self::categoryListRegex => $thisPagePrefix.$this->translator->trans('mautic.page.form.categorylist'),
                         self::preferredchannel  => $thisPagePrefix.$this->translator->trans('mautic.page.form.preferredchannel'),
                         self::channelfrequency  => $thisPagePrefix.$this->translator->trans('mautic.page.form.channelfrequency'),
+                        self::trackingPreference => $thisPagePrefix.$this->translator->trans('mautic.page.form.trackingpreference'),
                         self::saveprefsRegex    => $thisPagePrefix.$this->translator->trans('mautic.page.form.saveprefs'),
                         self::successmessage    => $thisPagePrefix.$this->translator->trans('mautic.page.form.successmessage'),
                         self::identifierToken   => $thisPagePrefix.$this->translator->trans('mautic.page.form.leadidentifier'),
@@ -253,6 +256,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             self::categoryListRegex,
             self::preferredchannel,
             self::channelfrequency,
+            self::trackingPreference,
             self::saveprefsRegex,
             self::successmessage,
         ], [
@@ -260,6 +264,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             str_contains($content, self::categoryListRegex) ? $this->renderCategoryList($params) : '',
             str_contains($content, self::preferredchannel) ? $this->renderPreferredChannel($params) : '',
             str_contains($content, self::channelfrequency) ? $this->renderChannelFrequency($params) : '',
+            str_contains($content, self::trackingPreference) ? $this->renderTrackingPreference($params) : '',
             str_contains($content, self::saveprefsRegex) ? $this->renderSavePrefs($params) : '',
             str_contains($content, self::successmessage) ? $this->renderSuccessMessage($params) : '',
         ], $content);
@@ -333,6 +338,19 @@ final class BuilderSubscriber implements EventSubscriberInterface
             '@MauticCore/Slots/channelfrequency.html.twig',
             $params,
             '<div class="pref-channelfrequency"%s>{templateContent}</div>',
+            self::firstSlotAttribute
+        );
+    }
+
+    /**
+     * @param array<string,mixed> $params
+     */
+    private function renderTrackingPreference(array $params): string
+    {
+        return $this->renderTemplate(
+            '@MauticCore/Slots/trackingpreference.html.twig',
+            $params,
+            '<div class="pref-trackingpreference"%s>{templateContent}</div>',
             self::firstSlotAttribute
         );
     }

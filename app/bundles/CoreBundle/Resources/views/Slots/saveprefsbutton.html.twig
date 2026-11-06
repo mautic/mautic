@@ -5,6 +5,10 @@
     {% do form.lead_channels.subscribed_channels.setRendered() %}
     {% do form.buttons.save.setRendered() %}
     {% do form.buttons.cancel.setRendered() %}
+    {# The tracking choice only shows where the page has its token, and isn't submitted otherwise #}
+    {% if form.allow_activity_tracking is defined %}
+        {% do form.allow_activity_tracking.setRendered() %}
+    {% endif %}
     {# add form tag #}
     <script src="{{ getAssetUrl('app/bundles/PageBundle/Assets/js/prefcenter.js') }}"></script>
 

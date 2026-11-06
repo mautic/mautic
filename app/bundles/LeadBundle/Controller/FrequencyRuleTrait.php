@@ -7,7 +7,9 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\TrackingPreference;
 use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
+use Mautic\LeadBundle\Helper\ContactTrackingPreferenceHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
@@ -28,6 +30,8 @@ trait FrequencyRuleTrait
     private \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel;
 
     private RequestStack $requestStack;
+
+    private ContactTrackingPreferenceHelper $contactTrackingPreferenceHelper;
 
     /**
      * @param array $viewParameters
@@ -150,6 +154,10 @@ trait FrequencyRuleTrait
         $data['lead_channels']['subscribed_channels'] = $leadChannels;
         $this->isPublicView                           = $isPublic;
 
+        if ($isPublic) {
+            $data['allow_activity_tracking'] = (int) $this->contactTrackingPreferenceHelper->allowsActivityTracking($lead);
+        }
+
         return $data;
     }
 
@@ -182,14 +190,24 @@ trait FrequencyRuleTrait
             }
         }
         $leadModel->setFrequencyRules($lead, $formData, $this->leadLists);
+
+        // A page that doesn't show the choice doesn't submit it, so the contact's choice stays as it is
+        if ($this->isPublicView && isset($formData['allow_activity_tracking'])) {
+            $allowed = (bool) $formData['allow_activity_tracking'];
+            if ($allowed !== $this->contactTrackingPreferenceHelper->allowsActivityTracking($lead)) {
+                $this->contactTrackingPreferenceHelper->setActivityTracking($lead, $allowed, TrackingPreference::SOURCE_PREFERENCE_CENTRE);
+            }
+        }
     }
 
     #[Required]
     public function autowireFrequencyRuleTrait(
         \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel,
         RequestStack $requestStack,
+        ContactTrackingPreferenceHelper $contactTrackingPreferenceHelper,
     ): void {
         $this->doNotContactModel = $doNotContactModel;
         $this->requestStack = $requestStack;
+        $this->contactTrackingPreferenceHelper = $contactTrackingPreferenceHelper;
     }
 }
