@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\EventListener;
 
 use Mautic\ReportBundle\Event\ReportScheduleSendEvent;

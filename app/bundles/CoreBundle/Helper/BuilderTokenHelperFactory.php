@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -28,7 +30,7 @@ class BuilderTokenHelperFactory
         ?string $langVar = null,
     ): BuilderTokenHelper {
         $builderTokenHelper = new BuilderTokenHelper($this->security, $this->modelFactory, $this->connection, $this->userHelper, $this->translator);
-        $builderTokenHelper->configure($modelName, $viewPermissionBase, $bundleName, $langVar);
+        $builderTokenHelper->configure($modelName, $viewPermissionBase);
 
         return $builderTokenHelper;
     }

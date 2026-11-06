@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Monitoring>
  */
-class MonitoringRepository extends CommonRepository
+final class MonitoringRepository extends CommonRepository
 {
     /**
      * @return Paginator

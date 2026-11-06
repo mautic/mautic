@@ -83,7 +83,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
     public function onEmailBuild(EmailBuilderEvent $event): void
     {
-        if ($event->tokensRequested([static::pageTokenRegex])) {
+        if ($event->tokensRequested([self::pageTokenRegex])) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
             $tokenFilter = $event->getTokenFilter();
             $tokens      = $tokenHelper->getFormattedTokens(
@@ -133,7 +133,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
         }
 
-        if ($event->tokensRequested([static::pageTokenRegex, static::dwcTokenRegex])) {
+        if ($event->tokensRequested([self::pageTokenRegex, self::dwcTokenRegex])) {
             $tokenFilter = $event->getTokenFilter();
             $labelFilter = 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '';
             $tokens      = $tokenHelper->getFormattedTokens(
@@ -150,7 +150,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $dwcTokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('dynamicContent', 'dynamiccontent:dynamiccontents');
             $expr           = $this->connection->createExpressionBuilder()->and('e.is_campaign_based <> 1 and e.slot_name is not null');
             $dwcTokens      = $dwcTokenHelper->getFormattedTokens(
-                static::dwcTokenRegex,
+                self::dwcTokenRegex,
                 TokenFormatOptions::simplePrefix('mautic.page.token.dwc'),
                 $labelFilter,
                 'name',
@@ -165,18 +165,18 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $event->addTokens(
                 $event->filterTokens(
                     [
-                        static::langBarRegex      => $thisPagePrefix.$this->translator->trans('mautic.page.token.lang'),
-                        static::shareButtonsRegex => $thisPagePrefix.$this->translator->trans('mautic.page.token.share'),
-                        static::titleRegex        => $thisPagePrefix.$this->translator->trans('mautic.core.title'),
-                        static::brandName         => $thisPagePrefix.$this->translator->trans('mautic.core.token.brand_name'),
-                        static::descriptionRegex  => $thisPagePrefix.$this->translator->trans('mautic.page.form.metadescription'),
-                        static::segmentListRegex  => $thisPagePrefix.$this->translator->trans('mautic.page.form.segmentlist'),
-                        static::categoryListRegex => $thisPagePrefix.$this->translator->trans('mautic.page.form.categorylist'),
-                        static::preferredchannel  => $thisPagePrefix.$this->translator->trans('mautic.page.form.preferredchannel'),
-                        static::channelfrequency  => $thisPagePrefix.$this->translator->trans('mautic.page.form.channelfrequency'),
-                        static::saveprefsRegex    => $thisPagePrefix.$this->translator->trans('mautic.page.form.saveprefs'),
-                        static::successmessage    => $thisPagePrefix.$this->translator->trans('mautic.page.form.successmessage'),
-                        static::identifierToken   => $thisPagePrefix.$this->translator->trans('mautic.page.form.leadidentifier'),
+                        self::langBarRegex      => $thisPagePrefix.$this->translator->trans('mautic.page.token.lang'),
+                        self::shareButtonsRegex => $thisPagePrefix.$this->translator->trans('mautic.page.token.share'),
+                        self::titleRegex        => $thisPagePrefix.$this->translator->trans('mautic.core.title'),
+                        self::brandName         => $thisPagePrefix.$this->translator->trans('mautic.core.token.brand_name'),
+                        self::descriptionRegex  => $thisPagePrefix.$this->translator->trans('mautic.page.form.metadescription'),
+                        self::segmentListRegex  => $thisPagePrefix.$this->translator->trans('mautic.page.form.segmentlist'),
+                        self::categoryListRegex => $thisPagePrefix.$this->translator->trans('mautic.page.form.categorylist'),
+                        self::preferredchannel  => $thisPagePrefix.$this->translator->trans('mautic.page.form.preferredchannel'),
+                        self::channelfrequency  => $thisPagePrefix.$this->translator->trans('mautic.page.form.channelfrequency'),
+                        self::saveprefsRegex    => $thisPagePrefix.$this->translator->trans('mautic.page.form.saveprefs'),
+                        self::successmessage    => $thisPagePrefix.$this->translator->trans('mautic.page.form.successmessage'),
+                        self::identifierToken   => $thisPagePrefix.$this->translator->trans('mautic.page.form.leadidentifier'),
                     ]
                 )
             );
@@ -217,17 +217,17 @@ final class BuilderSubscriber implements EventSubscriberInterface
     private function replaceCommonTokens(string $content, Page $page): string
     {
         return str_ireplace([
-            static::langBarRegex,
-            static::shareButtonsRegex,
-            static::titleRegex,
-            static::brandName,
-            static::descriptionRegex,
+            self::langBarRegex,
+            self::shareButtonsRegex,
+            self::titleRegex,
+            self::brandName,
+            self::descriptionRegex,
         ], [
-            str_contains($content, static::langBarRegex) ? $this->renderLanguageBar($page) : '',
-            str_contains($content, static::shareButtonsRegex) ? $this->renderSocialShareButtons() : '',
-            str_contains($content, static::titleRegex) ? $page->getTitle() : '',
-            str_contains($content, static::brandName) ? $this->coreParametersHelper->get('brand_name') : '',
-            str_contains($content, static::descriptionRegex) ? $page->getMetaDescription() : '',
+            str_contains($content, self::langBarRegex) ? $this->renderLanguageBar($page) : '',
+            str_contains($content, self::shareButtonsRegex) ? $this->renderSocialShareButtons() : '',
+            str_contains($content, self::titleRegex) ? $page->getTitle() : '',
+            str_contains($content, self::brandName) ? $this->coreParametersHelper->get('brand_name') : '',
+            str_contains($content, self::descriptionRegex) ? $page->getMetaDescription() : '',
         ], $content);
     }
 
@@ -249,19 +249,19 @@ final class BuilderSubscriber implements EventSubscriberInterface
     private function replacePreferenceCenterTokens(string $content, array $params): string
     {
         return str_ireplace([
-            static::segmentListRegex,
-            static::categoryListRegex,
-            static::preferredchannel,
-            static::channelfrequency,
-            static::saveprefsRegex,
-            static::successmessage,
+            self::segmentListRegex,
+            self::categoryListRegex,
+            self::preferredchannel,
+            self::channelfrequency,
+            self::saveprefsRegex,
+            self::successmessage,
         ], [
-            str_contains($content, static::segmentListRegex) ? $this->renderSegmentList($params) : '',
-            str_contains($content, static::categoryListRegex) ? $this->renderCategoryList($params) : '',
-            str_contains($content, static::preferredchannel) ? $this->renderPreferredChannel($params) : '',
-            str_contains($content, static::channelfrequency) ? $this->renderChannelFrequency($params) : '',
-            str_contains($content, static::saveprefsRegex) ? $this->renderSavePrefs($params) : '',
-            str_contains($content, static::successmessage) ? $this->renderSuccessMessage($params) : '',
+            str_contains($content, self::segmentListRegex) ? $this->renderSegmentList($params) : '',
+            str_contains($content, self::categoryListRegex) ? $this->renderCategoryList($params) : '',
+            str_contains($content, self::preferredchannel) ? $this->renderPreferredChannel($params) : '',
+            str_contains($content, self::channelfrequency) ? $this->renderChannelFrequency($params) : '',
+            str_contains($content, self::saveprefsRegex) ? $this->renderSavePrefs($params) : '',
+            str_contains($content, self::successmessage) ? $this->renderSuccessMessage($params) : '',
         ], $content);
     }
 
@@ -304,7 +304,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             '@MauticCore/Slots/segmentlist.html.twig',
             $params,
             '<div class="pref-segmentlist"%s>{templateContent}</div>',
-            static::firstSlotAttribute
+            self::firstSlotAttribute
         );
     }
 
@@ -314,7 +314,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             '@MauticCore/Slots/categorylist.html.twig',
             $params,
             '<div class="pref-categorylist"%s>{templateContent}</div>',
-            static::firstSlotAttribute
+            self::firstSlotAttribute
         );
     }
 
@@ -333,7 +333,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             '@MauticCore/Slots/channelfrequency.html.twig',
             $params,
             '<div class="pref-channelfrequency"%s>{templateContent}</div>',
-            static::firstSlotAttribute
+            self::firstSlotAttribute
         );
     }
 
@@ -343,8 +343,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
             '@MauticCore/Slots/saveprefsbutton.html.twig',
             $params,
             '<div class="%s"%s>{templateContent}</div>',
-            static::saveButtonContainerClass,
-            static::firstSlotAttribute
+            self::saveButtonContainerClass,
+            self::firstSlotAttribute
         );
     }
 
@@ -472,7 +472,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $content = implode('', array_map([$node->ownerDocument, 'saveHTML'], iterator_to_array($node->childNodes)));
 
         // Check if the save button exists in the content. If not, try again with the parentNode.
-        if (!str_contains($content, static::saveButtonContainerClass)) {
+        if (!str_contains($content, self::saveButtonContainerClass)) {
             if (null === $node->parentNode) {
                 throw new \RuntimeException("Can't get parent node of #document. Did you forget to insert a save button in your preference center form?");
             }

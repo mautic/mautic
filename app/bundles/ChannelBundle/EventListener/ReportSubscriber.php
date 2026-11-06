@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\EventListener;
 
 use Mautic\LeadBundle\Model\CompanyReportData;

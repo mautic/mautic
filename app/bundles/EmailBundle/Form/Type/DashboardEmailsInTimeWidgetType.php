@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CampaignBundle\Form\Type\CampaignListType;
@@ -28,7 +30,7 @@ final class DashboardEmailsInTimeWidgetType extends AbstractType
                     'mautic.email.flag.sent.and.opened'            => 'sent_and_opened',
                     'mautic.email.flag.sent.and.opened.and.failed' => 'sent_and_opened_and_failed',
                 ],
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'empty_data' => '',
                 'required'   => false,
@@ -40,7 +42,7 @@ final class DashboardEmailsInTimeWidgetType extends AbstractType
             CompanyListType::class,
             [
                 'label'       => 'mautic.email.companyId.filter',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'placeholder' => '',
                 'required'    => false,
@@ -54,7 +56,7 @@ final class DashboardEmailsInTimeWidgetType extends AbstractType
             CampaignListType::class,
             [
                 'label'       => 'mautic.email.campaignId.filter',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'empty_data'  => '',
                 'placeholder' => '',
@@ -68,7 +70,7 @@ final class DashboardEmailsInTimeWidgetType extends AbstractType
             LeadListType::class,
             [
                 'label'       => 'mautic.email.segmentId.filter',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'placeholder' => '',
                 'required'    => false,

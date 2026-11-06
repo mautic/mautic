@@ -8,7 +8,7 @@ use Mautic\EmailBundle\Helper\EmailValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-class MultipleEmailsValidValidator extends ConstraintValidator
+final class MultipleEmailsValidValidator extends ConstraintValidator
 {
     public function __construct(
         private readonly EmailValidator $emailValidator,

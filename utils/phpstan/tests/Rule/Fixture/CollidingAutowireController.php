@@ -9,7 +9,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class CollidingAutowireController
 {
     #[Required]
-    public function autowire(SomeModel $someModel): void
-    {
+    public function autowire(
+        SomeModel $someModel,
+    ): void {
     }
 }

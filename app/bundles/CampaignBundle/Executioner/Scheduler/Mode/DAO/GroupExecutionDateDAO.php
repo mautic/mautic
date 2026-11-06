@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Executioner\Scheduler\Mode\DAO;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 
-class GroupExecutionDateDAO
+final readonly class GroupExecutionDateDAO
 {
-    private readonly ArrayCollection $contacts;
+    private ArrayCollection $contacts;
 
     public function __construct(
-        private readonly \DateTimeInterface $executionDate,
+        private \DateTimeInterface $executionDate,
     ) {
         $this->contacts      = new ArrayCollection();
     }

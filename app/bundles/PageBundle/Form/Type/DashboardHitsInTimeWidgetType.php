@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -20,7 +22,7 @@ final class DashboardHitsInTimeWidgetType extends AbstractType
                 'mautic.page.show.unique.visits'           => 'unique',
                 'mautic.page.show.unique.and.total.visits' => 'total_and_unique',
             ],
-            'label_attr'        => ['class' => 'control-label'],
+            'label_attr'        => ['class' => 'form-label'],
             'attr'              => ['class' => 'form-control'],
             'empty_data'        => '',
             'required'          => false,

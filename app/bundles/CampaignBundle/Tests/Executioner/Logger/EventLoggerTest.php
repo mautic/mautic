@@ -55,8 +55,9 @@ final class EventLoggerTest extends TestCase
             $logCollection->add($log);
         }
 
-        $this->leadEventLogRepository->expects($this->exactly(3))
-            ->method('saveEntities');
+        // upsert is called once per log (60 times total)
+        $this->leadEventLogRepository->expects($this->exactly(60))
+            ->method('upsert');
 
         $logger = $this->getLogger();
         foreach ($logCollection as $log) {
@@ -103,6 +104,31 @@ final class EventLoggerTest extends TestCase
         // rotation for campaign 2 and contact 1
         $log = $this->getLogger()->buildLogEntry($event, $contact, false);
         $this->assertEquals(1, $log->getRotation());
+    }
+
+    public function testBuildLogEntryLeavesInactiveConditionPathUnset(): void
+    {
+        $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress());
+        $this->leadRepository->method('getContactRotations')->willReturn([]);
+
+        /** @var MockObject&Campaign $campaign */
+        $campaign = $this->createMock(Campaign::class);
+        $campaign->method('getId')->willReturn(1);
+
+        $condition = new Event();
+        $condition->setCampaign($campaign);
+        $condition->setEventType(Event::TYPE_CONDITION);
+
+        $action = new Event();
+        $action->setCampaign($campaign);
+        $action->setEventType(Event::TYPE_ACTION);
+
+        /** @var MockObject&Lead $contact */
+        $contact = $this->createMock(Lead::class);
+        $contact->method('getId')->willReturn(1);
+
+        $this->assertNull($this->getLogger()->buildLogEntry($condition, $contact, true)->getNonActionPathTaken());
+        $this->assertTrue($this->getLogger()->buildLogEntry($action, $contact, true)->getNonActionPathTaken());
     }
 
     private function getLogger(): EventLogger

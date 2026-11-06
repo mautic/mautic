@@ -7,6 +7,7 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -17,7 +18,7 @@ final readonly class BroadcastSubscriber implements EventSubscriberInterface
         private EmailModel $model,
         private EntityManagerInterface $em,
         private TranslatorInterface $translator,
-        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
+        private EmailRepository $emailRepository,
     ) {
     }
 
@@ -34,8 +35,14 @@ final readonly class BroadcastSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $allowNullForPublishedUp = false;
+        if ($event->isAbTestWinner() && $event->getId() > 0) {
+            // PublishedUp can be null for a winner variant
+            $allowNullForPublishedUp = true;
+        }
+
         // Get list of published broadcasts or broadcast if there is only a single ID
-        $emails = $this->emailRepository->getPublishedBroadcastsIterable($event->getId());
+        $emails = $this->emailRepository->getPublishedBroadcastsIterable($event->getId(), $allowNullForPublishedUp);
 
         foreach ($emails as $email) {
             // Reset per-email variables from event defaults
@@ -96,7 +103,7 @@ final readonly class BroadcastSubscriber implements EventSubscriberInterface
                 if ($isNotParallelSending && !$totalPendingCount && !$sentCount) {
                     $emailEntity->setIsPublished(false);
                     $this->model->saveEntity($emailEntity);
-                    $event->getOutput()->writeln('Email "'.$emailEntity->getName().'" has been unpublished as there are no more pending contacts to send to.');
+                    $event->getOutput()?->writeln('Email "'.$emailEntity->getName().'" has been unpublished as there are no more pending contacts to send to.');
                 }
             }
 

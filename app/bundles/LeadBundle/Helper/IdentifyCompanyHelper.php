@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class IdentifyCompanyHelper
+final class IdentifyCompanyHelper
 {
     /**
      * @param mixed $lead
@@ -27,14 +27,14 @@ class IdentifyCompanyHelper
             return [null, false, null];
         }
 
-        if (!empty($companies)) {
+        if ([] !== $companies) {
             $companyEntity = end($companies);
             $companyData   = $companyEntity->getProfileFields();
 
             if ($lead) {
                 $companyLeadRepo = $companyModel->getCompanyLeadRepository();
                 $companyLead     = $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
-                if (!empty($companyLead)) {
+                if ([] !== $companyLead) {
                     $addContactToCompany = false;
                 }
             }
@@ -66,7 +66,7 @@ class IdentifyCompanyHelper
         }
 
         $companyData     = $parameters;
-        if (!empty($companyEntities)) {
+        if ([] !== $companyEntities) {
             $key               = array_key_last($companyEntities);
             $companyData['id'] = $companyEntities[$key]->getId();
         }
@@ -109,30 +109,5 @@ class IdentifyCompanyHelper
         }
 
         return $parameters;
-    }
-
-    /**
-     * Checks if email address' domain has a DNS MX record. Returns the domain if found.
-     *
-     * @param string $email
-     */
-    protected static function domainExists($email): false|string
-    {
-        if (!strstr($email, '@')) { // not a valid email adress
-            return false;
-        }
-
-        [$user, $domain]     = explode('@', $email);
-        $arr                 = dns_get_record($domain, DNS_MX);
-
-        if (empty($arr)) {
-            return false;
-        }
-
-        if ($arr[0]['host'] === $domain) {
-            return $domain;
-        }
-
-        return false;
     }
 }

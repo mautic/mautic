@@ -4,10 +4,10 @@ namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class TrailingSlashHelper
+final readonly class TrailingSlashHelper
 {
     public function __construct(
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

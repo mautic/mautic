@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Stat;
 
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
 
-class StatHelper
+final class StatHelper
 {
     /**
      * Just store email ID and lead ID to avoid doctrine RAM issues with entities.

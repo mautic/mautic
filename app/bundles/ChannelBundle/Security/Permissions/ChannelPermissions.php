@@ -5,7 +5,7 @@ namespace Mautic\ChannelBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class ChannelPermissions extends AbstractPermissions
+final class ChannelPermissions extends AbstractPermissions
 {
     /**
      * @param mixed[] $params

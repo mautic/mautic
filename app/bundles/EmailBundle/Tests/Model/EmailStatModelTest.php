@@ -72,7 +72,7 @@ final class EmailStatModelTest extends TestCase
     }
 }
 
-class StatTest extends Stat
+final class StatTest extends Stat
 {
     private ?string $id = null;
 

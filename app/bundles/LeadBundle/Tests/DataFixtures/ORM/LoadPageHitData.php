@@ -7,8 +7,10 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\PageBundle\Entity\Hit;
 
-class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
 {
+    use ManagedLeadTrait;
+
     public function load(ObjectManager $manager): void
     {
         $hits = [
@@ -85,7 +87,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         }
     }
 
-    protected function createHit(array $hitConfig, ObjectManager $manager): void
+    private function createHit(array $hitConfig, ObjectManager $manager): void
     {
         $hit = new Hit();
 
@@ -93,7 +95,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         $hit->setUrl($hitConfig['url']);
         $hit->setReferer($hitConfig['referer']);
         $hit->setUrlTitle($hitConfig['urlTitle']);
-        $hit->setLead($hitConfig['contact']);
+        $hit->setLead($this->getManagedLead($hitConfig['contact'], $manager));
         $hit->setDateHit($hitConfig['dateHit']);
         $hit->setCode($hitConfig['code']);
         $hit->setTrackingId($hitConfig['trackingId']);

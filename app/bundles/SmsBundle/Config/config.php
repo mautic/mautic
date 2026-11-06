@@ -1,40 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 return [
-    'services' => [
-        'helpers' => [
-            'mautic.helper.sms' => [
-                'class'     => Mautic\SmsBundle\Helper\SmsHelper::class,
-                'arguments' => [
-                    'mautic.lead.repository.lead',
-                    'mautic.lead.model.lead',
-                    'mautic.helper.phone_number',
-                    'mautic.sms.model.sms',
-                    'mautic.helper.integration',
-                    'mautic.lead.model.dnc',
-                    'mautic.helper.core_parameters',
-                ],
-                'alias' => 'sms_helper',
-            ],
-        ],
-        'other' => [
-            'mautic.sms.twilio.transport' => [
-                'class'        => Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class,
-                'arguments'    => [
-                    'mautic.sms.twilio.configuration',
-                    'monolog.logger.mautic',
-                ],
-                'tag'          => 'mautic.sms_transport',
-                'tagArguments' => [
-                    'integrationAlias' => 'Twilio',
-                ],
-                'serviceAliases' => [
-                    'sms_api',
-                    'mautic.sms.api',
-                ],
-            ],
-        ],
-    ],
     'routes' => [
         'main' => [
             'mautic_sms_index' => [

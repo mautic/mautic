@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class DynamicContentApiController extends CommonController
+final class DynamicContentApiController extends CommonController
 {
     private PageModel $pageModel;
 
@@ -32,7 +32,7 @@ class DynamicContentApiController extends CommonController
         $method = strtolower($request->getMethod());
         if (method_exists($this, $method.'Action')) {
             return $this->forwardWithPost(
-                static::class.'::'.$method.'Action',
+                self::class.'::'.$method.'Action',
                 $request->request->all(),
                 [
                     'objectAlias' => $objectAlias,
@@ -48,7 +48,7 @@ class DynamicContentApiController extends CommonController
         DynamicContentHelper $helper,
         DeviceTrackingServiceInterface $deviceTrackingService,
         ContactRequestHelper $contactRequestHelper,
-        $objectAlias,
+        string $objectAlias,
     ): Response {
         $lead          = $contactRequestHelper->getContactFromQuery($this->pageModel->getHitQuery($request));
         $content       = $helper->getDynamicContentForLead($objectAlias, $lead);

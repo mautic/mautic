@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class CampaignPermissions extends AbstractPermissions
+final class CampaignPermissions extends AbstractPermissions
 {
     /**
      * @param mixed[] $params

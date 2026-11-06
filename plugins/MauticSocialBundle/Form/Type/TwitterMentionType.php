@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -12,7 +14,7 @@ final class TwitterMentionType extends TwitterAbstractType
     {
         $builder->add('handle', TextType::class, [
             'label'      => 'mautic.social.monitoring.twitter.handle',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'    => 'form-control',
                 'tooltip'  => 'mautic.social.monitoring.twitter.handle.tooltip',
@@ -28,7 +30,7 @@ final class TwitterMentionType extends TwitterAbstractType
             'label'             => 'mautic.social.monitoring.twitter.namematching',
             'required'          => false,
             'placeholder'       => false,
-            'label_attr'        => ['class' => 'control-label'],
+            'label_attr'        => ['class' => 'form-label'],
             'attr'              => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.social.monitoring.twitter.namematching.tooltip',

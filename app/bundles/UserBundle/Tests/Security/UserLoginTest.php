@@ -18,6 +18,9 @@ final class UserLoginTest extends MauticMysqlTestCase
         if (strpos($this->name(), 'WithSaml') > 0) {
             $this->configParams['saml_idp_metadata'] = 'any_string';
         }
+        // Explicitly disable OIDC for this test - config/local.php might have it enabled
+        $this->configParams['open_id_is_enabled'] = 0;
+        $this->configParams['open_id_is_required'] = 0;
         parent::setUp();
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -51,15 +53,6 @@ return [
     'categories' => [
         'asset' => [
             'class' => Mautic\AssetBundle\Entity\Asset::class,
-        ],
-    ],
-
-    'services' => [
-        'others' => [
-            // Override the DropzoneController
-            'oneup_uploader.controller.dropzone.class' => [
-                'class'     => Mautic\AssetBundle\Controller\UploadController::class,
-            ],
         ],
     ],
 

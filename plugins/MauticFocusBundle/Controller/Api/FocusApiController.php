@@ -21,7 +21,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Focus>
  */
-class FocusApiController extends CommonApiController
+final class FocusApiController extends CommonApiController
 {
     /**
      * @var FocusModel|null

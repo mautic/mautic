@@ -29,7 +29,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 <info>php %command.full_name%</info>
 TXT
 )]
-class GenerateProductionAssetsCommand extends Command
+final class GenerateProductionAssetsCommand extends Command
 {
     public function __construct(
         private readonly AssetGenerationHelper $assetGenerationHelper,
@@ -78,6 +78,11 @@ class GenerateProductionAssetsCommand extends Command
         $this->installElFinderAssets($relativeMediaPath);
 
         // Combine and minify bundle assets
+        $librariesCssFile = $mediaDir.'/css/libraries.css';
+        if ($this->filesystem->exists($librariesCssFile)) {
+            $this->filesystem->remove($librariesCssFile);
+        }
+
         $this->assetGenerationHelper->getAssets(true);
         $this->ensureStylesheetCompatibilityFiles($mediaDir, $vendorDir);
 

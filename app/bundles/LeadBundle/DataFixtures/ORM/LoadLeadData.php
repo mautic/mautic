@@ -4,15 +4,17 @@ namespace Mautic\LeadBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CsvHelper;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
-class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly LeadRepository $leadRepository,
@@ -48,12 +50,17 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
             $this->setReference('lead-'.$count, $lead);
 
             // Assign to companies in a predictable way
-            $lastCharacter = (int) substr($count, -1, 1);
+            $lastCharacter = (int) substr((string) $count, -1, 1);
             if ($lastCharacter <= 3) {
                 if ($this->hasReference('company-'.$lastCharacter)) {
                     $companyLead = new CompanyLead();
+                    $company     = $this->getReference('company-'.$lastCharacter);
+                    \assert($company instanceof Company);
+                    \assert($manager instanceof EntityManagerInterface);
+                    $managedCompany = $manager->getReference(Company::class, $company->getId());
+                    \assert($managedCompany instanceof Company);
                     $companyLead->setLead($lead);
-                    $companyLead->setCompany($this->getReference('company-'.$lastCharacter));
+                    $companyLead->setCompany($managedCompany);
                     $companyLead->setDateAdded($today);
                     $companyLead->setPrimary(true);
                     $this->companyLeadRepository->saveEntity($companyLead);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,7 +28,10 @@ final class StatsSubscriber extends CommonStatsSubscriber
             ]
         );
 
-        $this->repositories[] = $redirectRepository;
-        $this->repositories[] = $trackableRepository;
+        $this->repositories[]                                   = $redirectRepository;
+        $this->permissions[$redirectRepository->getTableName()] = ['admin'];
+
+        $this->repositories[]                                    = $trackableRepository;
+        $this->permissions[$trackableRepository->getTableName()] = ['admin'];
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'menu' => [
         'admin' => [
@@ -125,56 +127,17 @@ return [
                 'path'       => '/saml/login_retry',
                 'controller' => 'Mautic\UserBundle\Controller\SecurityController::samlLoginRetryAction',
             ],
-        ],
-    ],
-
-    'services' => [
-        'other' => [
-            // Authentication
-            'mautic.user.manager' => [
-                'class'     => Doctrine\ORM\EntityManager::class,
-                'arguments' => Mautic\UserBundle\Entity\User::class,
-                'factory'   => ['@doctrine', 'getManagerForClass'],
+            'mautic_oidc_login' => [
+                'path'       => '/s/open_id/login',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::oidcLoginAction',
             ],
-            'mautic.permission.manager' => [
-                'class'     => Doctrine\ORM\EntityManager::class,
-                'arguments' => Mautic\UserBundle\Entity\Permission::class,
-                'factory'   => ['@doctrine', 'getManagerForClass'],
+            'mautic_oidc_check' => [
+                'path'       => '/s/open_id/login_check',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::oidcCheckAction',
             ],
-            'mautic.security.logout_handler' => [
-                'class'        => Mautic\UserBundle\EventListener\LogoutListener::class,
-                'tagArguments' => [
-                    'event'      => Symfony\Component\Security\Http\Event\LogoutEvent::class,
-                ],
-                'tag'          => 'kernel.event_listener',
-                'arguments'    => [
-                    'mautic.user.model.user',
-                    'event_dispatcher',
-                    'mautic.helper.user',
-                ],
-            ],
-
-            'mautic.security.saml.entity_descriptor_provider' => [
-                'class'     => LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class,
-                'factory'   => [Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory::class, 'build'],
-                'arguments' => [
-                    '%lightsaml.own.entity_id%',
-                    'router',
-                    '%lightsaml.route.login_check%',
-                    'lightsaml.own.credential_store',
-                ],
-            ],
-
-            'mautic.security.saml.username_mapper' => [
-                'class'     => Mautic\UserBundle\Security\SAML\User\UserMapper::class,
-                'arguments' => [
-                    [
-                        'email'     => '%mautic.saml_idp_email_attribute%',
-                        'username'  => '%mautic.saml_idp_username_attribute%',
-                        'firstname' => '%mautic.saml_idp_firstname_attribute%',
-                        'lastname'  => '%mautic.saml_idp_lastname_attribute%',
-                    ],
-                ],
+            'mautic_oidc_required' => [
+                'path'       => '/s/open_id/required',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::oidcRequiredAction',
             ],
         ],
     ],
@@ -189,5 +152,15 @@ return [
         'saml_idp_firstname_attribute' => '',
         'saml_idp_lastname_attribute'  => '',
         'saml_idp_default_role'        => '',
+
+        // OIDC Parameters
+        'open_id_is_enabled'                   => 0,
+        'open_id_is_required'                  => 0,
+        'open_id_is_user_registration_allowed' => 0,
+        'open_id_registered_user_role'         => 2,
+        'open_id_client_id'                    => '',
+        'open_id_client_secret'                => '',
+        'open_id_client_url'                   => '',
+        'open_id_mapping_field'                => 'sub',
     ],
 ];

@@ -47,7 +47,7 @@ abstract class AbstractCacheProvider implements CacheProviderInterface
         return $this->getCacheAdapter()->getItems($keys);
     }
 
-    public function hasItem($key): bool
+    public function hasItem(string $key): bool
     {
         return $this->getCacheAdapter()->hasItem($key);
     }
@@ -57,7 +57,7 @@ abstract class AbstractCacheProvider implements CacheProviderInterface
         return $this->getCacheAdapter()->clear();
     }
 
-    public function deleteItem($key): bool
+    public function deleteItem(string $key): bool
     {
         return $this->getCacheAdapter()->deleteItem($key);
     }

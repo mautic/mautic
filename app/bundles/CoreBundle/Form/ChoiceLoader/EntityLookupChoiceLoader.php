@@ -46,7 +46,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         $this->options = $options;
     }
 
-    public function loadChoiceList($value = null): ChoiceListInterface
+    public function loadChoiceList(?callable $value = null): ChoiceListInterface
     {
         return new ArrayChoiceList($this->getChoices(null, true));
     }
@@ -56,7 +56,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      *
      * Convert to other data types to strings - we're already working with IDs so just return $values
      */
-    public function loadChoicesForValues(array $values, $value = null): array
+    public function loadChoicesForValues(array $values, ?callable $value = null): array
     {
         return $values;
     }
@@ -64,7 +64,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * Convert to other data types to strings - we're already working with IDs so just return $choices.
      */
-    public function loadValuesForChoices(array $choices, $value = null): array
+    public function loadValuesForChoices(array $choices, ?callable $value = null): array
     {
         return $choices;
     }
@@ -105,7 +105,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
                 $this->formatChoices($choices);
             }
 
-            if ($includeNew && !empty($data)) {
+            if ($includeNew && [] !== $data) {
                 // Fetch some extra choices
                 $extraChoices = $this->fetchChoices($modelName);
 
@@ -202,7 +202,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
         // Default to 100 records if no data is populated
         if (!isset($args['limit'])) {
-            $args['limit'] = empty($data) ? 100 : count($data);
+            $args['limit'] = [] === $data ? 100 : count($data);
         } elseif (0 !== $args['limit']) {
             $args['limit'] = max($args['limit'], count($data));
         }

@@ -1,8 +1,7 @@
 <?php
 
-use Mautic\FormBundle\Form\Type\FieldType;
-use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
-use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
+declare(strict_types=1);
+
 use Mautic\FormBundle\Helper\BlockedFreeEmailProvidersHelper;
 
 return [
@@ -140,42 +139,6 @@ return [
         ],
     ],
 
-    'services' => [
-        'forms' => [
-            'mautic.form.type.field' => [
-                'class'       => FieldType::class,
-                'arguments'   => [
-                    'translator',
-                    'mautic.form.collector.object',
-                    'mautic.form.collector.field',
-                    'mautic.form.collector.already.mapped.field',
-                ],
-                'methodCalls' => [
-                    'setFieldModel' => ['mautic.form.model.field'],
-                    'setFormModel'  => ['mautic.form.model.form'],
-                ],
-            ],
-            'mautic.form.type.form_submitaction_sendemail' => [
-                'class'       => SubmitActionEmailType::class,
-                'arguments'   => [
-                    'translator',
-                    'mautic.helper.core_parameters',
-                ],
-                'methodCalls' => [
-                    'setFieldModel' => ['mautic.form.model.field'],
-                    'setFormModel'  => ['mautic.form.model.form'],
-                ],
-            ],
-            'mautic.form.type.form_submitaction_repost' => [
-                'class'       => SubmitActionRepostType::class,
-                'methodCalls' => [
-                    'setFieldModel' => ['mautic.form.model.field'],
-                    'setFormModel'  => ['mautic.form.model.form'],
-                ],
-            ],
-        ],
-    ],
-
     'parameters' => [
         'form_upload_dir'              => '%mautic.application_dir%/media/files/form',
         'blacklisted_extensions'       => ['php', 'sh'],
@@ -183,5 +146,6 @@ return [
         'blocked_free_email_providers' => BlockedFreeEmailProvidersHelper::load(),
         'form_results_data_sources'    => false,
         'successful_submit_action'     => 'top',
+        'form_field_autofill'          => false,
     ],
 ];

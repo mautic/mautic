@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Mautic\LeadBundle\Field\FieldList;
@@ -28,7 +30,7 @@ final class ConfigType extends AbstractType
                 'choices'           => array_flip($leadFields),
                 'label'             => 'mautic.social.config.twitter.field.label',
                 'required'          => false,
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => ['class' => 'form-control'],
             ]
         );

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -28,10 +30,16 @@ final class DynamicListType extends AbstractType
 
                 // Reorder list in case keys were dynamically removed.
                 if (is_array($data)) {
+                    $data = array_filter(
+                        $data,
+                        static fn (mixed $key): bool => is_int($key) || (is_string($key) && ctype_digit($key)),
+                        ARRAY_FILTER_USE_KEY
+                    );
                     $data = array_values($data);
                     $event->setData($data);
                 }
-            }
+            },
+            512
         );
     }
 
@@ -73,7 +81,7 @@ final class DynamicListType extends AbstractType
                 'allow_delete'    => true,
                 'prototype'       => true,
                 'constraints'     => fn (Options $options): array => ($options['option_required']) ? [
-                    new Count(minMessage: 'mautic.form.lists.count', min: 1),
+                    new Count(min: 1, minMessage: 'mautic.form.lists.count'),
                 ] : [],
                 'error_bubbling'  => false,
             ]

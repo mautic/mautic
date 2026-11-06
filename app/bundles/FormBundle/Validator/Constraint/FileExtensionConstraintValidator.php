@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-class FileExtensionConstraintValidator extends ConstraintValidator
+final class FileExtensionConstraintValidator extends ConstraintValidator
 {
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,

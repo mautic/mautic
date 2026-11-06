@@ -21,7 +21,7 @@ The <info>%command.name%</info> command checks for updates for the Mautic applic
 <info>php %command.full_name%</info>
 TXT
 )]
-class FindUpdatesCommand extends Command
+final class FindUpdatesCommand extends Command
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

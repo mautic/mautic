@@ -10,13 +10,17 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\ListTypeaheadEvent;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -42,29 +46,37 @@ final class AjaxController extends CommonAjaxController
     use AjaxLookupControllerTrait;
     use SegmentFilterIconTrait;
 
-    private \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository;
+    private LeadFieldRepository $leadFieldRepository;
 
-    private \Mautic\EmailBundle\Entity\EmailRepository $emailRepository;
+    private EmailRepository $emailRepository;
 
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
+    private LeadRepository $leadRepository;
 
     private LeadModel $leadModel;
 
     private DoNotContactRepository $doNotContactRepository;
 
+    private FormFieldHelper $formFieldHelper;
+
+    private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
+
     #[Required]
     public function autowireLeadAjaxController(
-        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
-        \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
-        \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
+        LeadRepository $leadRepository,
+        EmailRepository $emailRepository,
+        LeadFieldRepository $leadFieldRepository,
         LeadModel $leadModel,
         DoNotContactRepository $doNotContactRepository,
+        FormFieldHelper $formFieldHelper,
+        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ): void {
-        $this->leadModel = $leadModel;
-        $this->doNotContactRepository = $doNotContactRepository;
-        $this->leadRepository = $leadRepository;
-        $this->emailRepository = $emailRepository;
-        $this->leadFieldRepository = $leadFieldRepository;
+        $this->leadModel                  = $leadModel;
+        $this->doNotContactRepository     = $doNotContactRepository;
+        $this->leadRepository             = $leadRepository;
+        $this->emailRepository            = $emailRepository;
+        $this->leadFieldRepository        = $leadFieldRepository;
+        $this->formFieldHelper            = $formFieldHelper;
+        $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
     }
 
     public function userListAction(Request $request): JsonResponse
@@ -99,14 +111,28 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($results);
     }
 
-    public function getLeadIdsByFieldValueAction(Request $request, LeadModel $leadModel): JsonResponse
+    public function companyListAction(Request $request, CompanyModel $model): JsonResponse
+    {
+        $filter = ['companyname', InputHelper::clean($request->query->get('filter'))];
+
+        $results = $model->getLookupResults('companyfield', $filter);
+        $results = array_map(fn (array $entry): array => ['value'=> $entry['label'], 'id' => $entry['value']], $results);
+
+        $results['success'] = 1;
+
+        return $this->sendJsonResponse($results);
+    }
+
+    public function getLeadIdsByFieldValueAction(Request $request): JsonResponse
     {
         $field     = InputHelper::clean($request->query->get('field'));
         $value     = InputHelper::clean($request->query->all()['value'] ?? '');
         $ignore    = (int) $request->query->get('ignore');
         $dataArray = ['items' => []];
 
-        if ($field && $value) {
+        $allowedFields = array_keys($this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['object' => 'lead']));
+
+        if ($field && $value && in_array($field, $allowedFields, true)) {
             $leads                      = $this->leadRepository->getLeadsByFieldValue($field, $value, $ignore);
             $dataArray['existsMessage'] = $this->translator->trans('mautic.lead.exists.by.field').': ';
 
@@ -161,13 +187,17 @@ final class AjaxController extends CommonAjaxController
         $form = $formFactory->createNamed('RENAME', FilterPropertiesType::class);
 
         if ($fieldAlias && $operator) {
-            $formAdjustmentsProvider->adjustForm(
-                $form,
-                $fieldAlias,
-                $fieldObject,
-                $operator,
-                $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias]
-            );
+            $fieldConfig = $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias] ?? null;
+
+            if (null !== $fieldConfig) {
+                $formAdjustmentsProvider->adjustForm(
+                    $form,
+                    $fieldAlias,
+                    $fieldObject,
+                    $operator,
+                    $fieldConfig
+                );
+            }
         }
 
         $formHtml = $this->renderView(
@@ -580,7 +610,7 @@ final class AjaxController extends CommonAjaxController
                 }
             }
 
-            if (!empty($newTags)) {
+            if ([] !== $newTags) {
                 $leadModel->getTagRepository()->saveEntities($newTags);
             }
 
@@ -623,7 +653,7 @@ final class AjaxController extends CommonAjaxController
                 }
             }
 
-            if (!empty($newUtmTags)) {
+            if ([] !== $newUtmTags) {
                 $leadModel->getUtmTagRepository()->saveEntities($newUtmTags);
             }
 
@@ -703,9 +733,7 @@ final class AjaxController extends CommonAjaxController
                     case 'date':
                     case 'datetime':
                         if ('date' == $operator) {
-                            $fieldHelper = new FormFieldHelper();
-                            $fieldHelper->setTranslator($this->translator);
-                            $options = $fieldHelper->getDateChoices();
+                            $options = $this->formFieldHelper->getDateChoices();
                             $options = array_merge(
                                 [
                                     'custom' => $this->translator->trans('mautic.campaign.event.timed.choice.custom'),

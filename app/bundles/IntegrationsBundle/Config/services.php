@@ -88,4 +88,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.integrations.helper.config_integrations', Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper::class);
     $services->alias('mautic.integrations.helper.builder_integrations', Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper::class);
     $services->alias('mautic.integrations.sync.notification.handler_container', Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer::class);
+    $services->alias('mautic.integrations.subscriber.controller', Mautic\IntegrationsBundle\EventListener\ControllerSubscriber::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\IntegrationsBundle\EventListener\ControllerSubscriber::class.'" service instead.');
+    $services->alias('mautic.integrations.sync.service', Mautic\IntegrationsBundle\Sync\SyncService\SyncService::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\IntegrationsBundle\Sync\SyncService\SyncService::class.'" service instead.');
 };

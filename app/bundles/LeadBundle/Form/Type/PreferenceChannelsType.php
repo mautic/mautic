@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\LeadModel;
@@ -27,7 +29,7 @@ final class PreferenceChannelsType extends AbstractType
                 'choices'     => fn (Options $options): array => $model->getPreferenceChannels(),
                 'placeholder' => '',
                 'attr'        => ['class' => 'form-control'],
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'multiple'    => false,
                 'expanded'    => false,
                 'required'    => false,

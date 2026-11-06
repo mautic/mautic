@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\ListModel;
@@ -28,7 +30,7 @@ final class DashboardSegmentsBuildTime extends AbstractType
                     'mautic.widget.segments.build.time.shortest' => 'ASC',
                     'mautic.widget.segments.build.time.longest'  => 'DESC',
                 ],
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'empty_data' => '',
                 'required'   => false,
@@ -45,7 +47,7 @@ final class DashboardSegmentsBuildTime extends AbstractType
             'label'             => 'mautic.lead.list.filter',
             'multiple'          => true,
             'choices'           => $segments,
-            'label_attr'        => ['class' => 'control-label'],
+            'label_attr'        => ['class' => 'form-label'],
             'attr'              => ['class' => 'form-control'],
             'required'          => false,
         ]

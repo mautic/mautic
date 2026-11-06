@@ -19,13 +19,12 @@ class GroupContactScore extends CommonEntity
 
     private Group $group;
 
-    private int $score;
+    private int $score = 0;
 
     public function __construct()
     {
         $this->contact = new Lead();
         $this->group   = new Group();
-        $this->score   = 0;
     }
 
     /**

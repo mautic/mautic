@@ -7,7 +7,7 @@ namespace Mautic\MessengerBundle\Transport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
-class NullTransport implements TransportInterface
+final class NullTransport implements TransportInterface
 {
     public function get(): iterable
     {

@@ -9,10 +9,9 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
-class UserCreator implements UserCreatorInterface
+final class UserCreator implements UserCreatorInterface
 {
     private readonly int $defaultRole;
 
@@ -27,7 +26,6 @@ class UserCreator implements UserCreatorInterface
         private readonly EntityManagerInterface $entityManager,
         private readonly UserMapper $userMapper,
         private readonly UserModel $userModel,
-        private readonly UserPasswordHasherInterface $hasher,
         $defaultRole,
     ) {
         $this->defaultRole   = (int) $defaultRole;
@@ -43,7 +41,7 @@ class UserCreator implements UserCreatorInterface
         $defaultRole = $this->entityManager->getReference(Role::class, $this->defaultRole);
 
         $user = $this->userMapper->getUser($response);
-        $user->setPassword($this->userModel->checkNewPassword($user, $this->hasher, EncryptionHelper::generateKey()));
+        $user->setPassword($this->userModel->checkNewPassword($user, EncryptionHelper::generateKey()));
         $user->setRole($defaultRole);
 
         $this->validateUser($user);

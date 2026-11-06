@@ -294,6 +294,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(TrackableRepository::class), // $trackableRepository
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->companyRepository, // $companyRepository
         );
 
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepository);
@@ -325,76 +326,44 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         // Setup an email variant email
         $variantDate = new \DateTime();
-        $this->emailEntity
-            ->method('getId')
-            ->willReturn(1);
-        $this->emailEntity->method('getTemplate')
-            ->willReturn('');
-        $this->emailEntity->method('getSentCount')
-            ->willReturn(0);
-        $this->emailEntity->method('getVariantSentCount')
-            ->willReturn(0);
-        $this->emailEntity->method('getVariantStartDate')
-            ->willReturn($variantDate);
-        $this->emailEntity->method('getTranslations')
-            ->willReturn([]);
-        $this->emailEntity->method('isPublished')
-            ->willReturn(true);
-        $this->emailEntity->method('isVariant')
-            ->willReturn(true);
+        $parentEmail = new class() extends Email {
+            public function getId(): int
+            {
+                return 1;
+            }
+        };
+
+        $variantA = new class() extends Email {
+            public function getId(): int
+            {
+                return 2;
+            }
+        };
+        $variantA->setVariantParent($parentEmail);
+        $variantA->setVariantStartDate($variantDate);
+        $variantA->setVariantSettings(['weight' => '25']);
+
+        $variantB = new class() extends Email {
+            public function getId(): int
+            {
+                return 3;
+            }
+        };
+        $variantB->setVariantParent($parentEmail);
+        $variantB->setVariantStartDate($variantDate);
+        $variantB->setVariantSettings(['weight' => '25']);
+
+        $parentEmail->addVariantChild($variantA);
+        $parentEmail->addVariantChild($variantB);
+        $parentEmail->setVariantStartDate($variantDate);
 
         $this->mailHelper->method('createEmailStat')
-            ->willReturnCallback(function (): Stat {
+            ->willReturnCallback(function () use ($parentEmail): Stat {
                 $stat = new Stat();
-                $stat->setEmail($this->emailEntity);
+                $stat->setEmail($parentEmail);
 
                 return $stat;
             });
-
-        $variantA = $this->createMock(Email::class);
-        $variantA
-            ->method('getId')
-            ->willReturn(2);
-        $variantA->method('getTemplate')
-            ->willReturn('');
-        $variantA->method('getSentCount')
-            ->willReturn(0);
-        $variantA->method('getVariantSentCount')
-            ->willReturn(0);
-        $variantA->method('getVariantStartDate')
-            ->willReturn($variantDate);
-        $variantA->method('getTranslations')
-            ->willReturn([]);
-        $variantA->method('isPublished')
-            ->willReturn(true);
-        $variantA->method('isVariant')
-            ->willReturn(true);
-        $variantA->method('getVariantSettings')
-            ->willReturn(['weight' => '25']);
-
-        $variantB = $this->createMock(Email::class);
-        $variantB
-            ->method('getId')
-            ->willReturn(3);
-        $variantB->method('getTemplate')
-            ->willReturn('');
-        $variantB->method('getSentCount')
-            ->willReturn(0);
-        $variantB->method('getVariantSentCount')
-            ->willReturn(0);
-        $variantB->method('getVariantStartDate')
-            ->willReturn($variantDate);
-        $variantB->method('getTranslations')
-            ->willReturn([]);
-        $variantB->method('isPublished')
-            ->willReturn(true);
-        $variantB->method('isVariant')
-            ->willReturn(true);
-        $variantB->method('getVariantSettings')
-            ->willReturn(['weight' => '25']);
-
-        $this->emailEntity->method('getVariantChildren')
-            ->willReturn(new ArrayCollection([$variantA, $variantB]));
 
         $this->emailRepository->method('getDoNotEmailList')
             ->willReturn([]);
@@ -420,9 +389,16 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             --$count;
         }
 
-        $this->emailModel->sendEmail($this->emailEntity, $contacts);
+        $this->emailModel->sendEmail($parentEmail, $contacts);
 
-        $emailSettings = $this->emailModel->getEmailSettings($this->emailEntity);
+        $this->assertSame(6, $parentEmail->getVariantSentCount());
+        $this->assertSame(3, $variantA->getVariantSentCount());
+        $this->assertSame(3, $variantB->getVariantSentCount());
+        $this->assertSame(6, $parentEmail->getSentCount());
+        $this->assertSame(3, $variantA->getSentCount());
+        $this->assertSame(3, $variantB->getSentCount());
+
+        $emailSettings = $this->emailModel->getEmailSettings($parentEmail);
 
         // Sent counts should be as follows
         // ID 1 => 6 50%
@@ -466,69 +442,44 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         // Setup an email variant email
         $variantDate = new \DateTime();
-        $this->emailEntity
-            ->method('getId')
-            ->willReturn(1);
-        $this->emailEntity->method('getTemplate')->willReturn('');
-        $this->emailEntity->method('getSentCount')->willReturn(0);
-        $this->emailEntity->method('getVariantSentCount')->willReturn(0);
-        $this->emailEntity->method('getVariantStartDate')->willReturn($variantDate);
-        $this->emailEntity->method('getTranslations')->willReturn([]);
-        $this->emailEntity->method('isPublished')->willReturn(true);
-        $this->emailEntity->method('isVariant')->willReturn(true);
+        $parentEmail = new class() extends Email {
+            public function getId(): int
+            {
+                return 1;
+            }
+        };
+
+        $variantA = new class() extends Email {
+            public function getId(): int
+            {
+                return 2;
+            }
+        };
+        $variantA->setVariantParent($parentEmail);
+        $variantA->setVariantStartDate($variantDate);
+        $variantA->setVariantSettings(['weight' => '25']);
+
+        $variantB = new class() extends Email {
+            public function getId(): int
+            {
+                return 3;
+            }
+        };
+        $variantB->setVariantParent($parentEmail);
+        $variantB->setVariantStartDate($variantDate);
+        $variantB->setVariantSettings(['weight' => '25']);
+
+        $parentEmail->addVariantChild($variantA);
+        $parentEmail->addVariantChild($variantB);
+        $parentEmail->setVariantStartDate($variantDate);
 
         $this->mailHelper->method('createEmailStat')
-            ->willReturnCallback(function (): Stat {
+            ->willReturnCallback(function () use ($parentEmail): Stat {
                 $stat = new Stat();
-                $stat->setEmail($this->emailEntity);
+                $stat->setEmail($parentEmail);
 
                 return $stat;
             });
-
-        $variantA = $this->createMock(Email::class);
-        $variantA
-            ->method('getId')
-            ->willReturn(2);
-        $variantA->method('getTemplate')
-            ->willReturn('');
-        $variantA->method('getSentCount')
-            ->willReturn(0);
-        $variantA->method('getVariantSentCount')
-            ->willReturn(0);
-        $variantA->method('getVariantStartDate')
-            ->willReturn($variantDate);
-        $variantA->method('getTranslations')
-            ->willReturn([]);
-        $variantA->method('isPublished')
-            ->willReturn(true);
-        $variantA->method('isVariant')
-            ->willReturn(true);
-        $variantA->method('getVariantSettings')
-            ->willReturn(['weight' => '25']);
-
-        $variantB = $this->createMock(Email::class);
-        $variantB
-            ->method('getId')
-            ->willReturn(3);
-        $variantB->method('getTemplate')
-            ->willReturn('');
-        $variantB->method('getSentCount')
-            ->willReturn(0);
-        $variantB->method('getVariantSentCount')
-            ->willReturn(0);
-        $variantB->method('getVariantStartDate')
-            ->willReturn($variantDate);
-        $variantB->method('getTranslations')
-            ->willReturn([]);
-        $variantB->method('isPublished')
-            ->willReturn(true);
-        $variantB->method('isVariant')
-            ->willReturn(true);
-        $variantB->method('getVariantSettings')
-            ->willReturn(['weight' => '25']);
-
-        $this->emailEntity->method('getVariantChildren')
-            ->willReturn(new ArrayCollection([$variantA, $variantB]));
 
         $this->emailRepository->method('getDoNotEmailList')
             ->willReturn([]);
@@ -553,10 +504,10 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             ];
             --$count;
 
-            $results[] = $this->emailModel->sendEmail($this->emailEntity, [$contact]);
+            $results[] = $this->emailModel->sendEmail($parentEmail, [$contact]);
         }
 
-        $emailSettings = $this->emailModel->getEmailSettings($this->emailEntity);
+        $emailSettings = $this->emailModel->getEmailSettings($parentEmail);
 
         // Sent counts should be as follows
         // ID 1 => 6 50%
@@ -587,13 +538,17 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn([1 => 'someone@domain.com']);
 
         // If it makes it to the point of calling getContactCompanies then DNC failed
-        $this->companyModel->expects($this->exactly(0))
-            ->method('getRepository');
+        $this->companyRepository->expects($this->exactly(0))
+            ->method('getCompaniesForContacts');
 
-        $this->emailEntity->method('getId')
-            ->willReturn(1);
+        $email = new class() extends Email {
+            public function getId(): int
+            {
+                return 1;
+            }
+        };
 
-        $this->assertCount(0, $this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']]));
+        $this->assertCount(0, $this->emailModel->sendEmail($email, [1 => ['id' => 1, 'email' => 'someone@domain.com']]));
     }
 
     #[DataProvider('dataStatRecordExistance')]
@@ -638,6 +593,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(TrackableRepository::class), // $trackableRepository
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->companyRepository, // $companyRepository
         );
 
         $contacts = [
@@ -727,9 +683,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelper = $this->createStub(CoreParametersHelper::class);
 
         $messageModel = new MessageQueueModel(
-            $this->leadModel,
-            $this->companyModel,
-            $coreParametersHelper,
             $this->entityManager,
             $this->createStub(CorePermissions::class),
             $this->eventDispatcher,
@@ -737,8 +690,14 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->userHelper,
             $this->createStub(LoggerInterface::class),
-            $this->createStub(MessageQueueRepository::class), // $messageQueueRepository
-            $this->frequencyRepository // $frequencyRuleRepository
+            $coreParametersHelper,
+        );
+        $messageModel->autowireMessageQueueModel(
+            $this->leadModel,
+            $this->companyModel,
+            $this->createStub(MessageQueueRepository::class),
+            $this->frequencyRepository,
+            $this->createStub(LeadRepository::class)
         );
 
         $emailModel = new EmailModel(
@@ -779,13 +738,18 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(TrackableRepository::class), // $trackableRepository
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->companyRepository, // $companyRepository
         );
 
-        $this->emailEntity->method('getId')
-            ->willReturn(1);
+        $email = new class() extends Email {
+            public function getId(): int
+            {
+                return 1;
+            }
+        };
 
         $result = $emailModel->sendEmail(
-            $this->emailEntity,
+            $email,
             [
                 1 => [
                     'id'        => 1,

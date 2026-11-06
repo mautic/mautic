@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: DeleteWebhookLogsCommand::COMMAND_NAME,
     description: 'Retains a rolling number of log records.'
 )]
-class DeleteWebhookLogsCommand extends Command
+final class DeleteWebhookLogsCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:webhooks:delete_logs';
 

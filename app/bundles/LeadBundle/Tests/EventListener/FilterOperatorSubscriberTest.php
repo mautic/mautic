@@ -21,25 +21,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriberTest extends TestCase
 {
-    /**
-     * @var MockObject&LeadFieldRepository
-     */
-    private MockObject $leadFieldRepository;
+    private LeadFieldRepository&MockObject $leadFieldRepository;
 
-    /**
-     * @var MockObject&TypeOperatorProviderInterface
-     */
-    private MockObject $typeOperatorProvider;
+    private TypeOperatorProviderInterface&MockObject $typeOperatorProvider;
 
-    /**
-     * @var MockObject&FieldChoicesProviderInterface
-     */
-    private MockObject $fieldChoicesProvider;
+    private FieldChoicesProviderInterface&MockObject $fieldChoicesProvider;
 
-    /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
+    private TranslatorInterface&MockObject $translator;
 
     private FilterOperatorSubscriber $subscriber;
 
@@ -319,6 +307,20 @@ final class FilterOperatorSubscriberTest extends TestCase
                         'iconClass' => 'ri-shapes-line',
                     ],
                 ],
+                'company_all' => [
+                    'test_text' => [
+                        'label'      => 'Test Text',
+                        'properties' => [
+                            'type' => 'text',
+                        ],
+                        'object'    => 'company_all',
+                        'operators' => [
+                            'equals'    => '=',
+                            'not equal' => '!=',
+                        ],
+                        'iconClass' => 'ri-shapes-line',
+                    ],
+                ],
             ],
             $event->getChoices()
         );
@@ -491,18 +493,18 @@ final class FilterOperatorSubscriberTest extends TestCase
                 'properties' => [
                     'type' => 'number',
                 ],
+                'object'    => 'lead',
                 'operators' => [
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object'    => 'lead',
                 'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']
         );
     }
 
-    public function testOnlyCustomFieldsAreLoadedForNonSegmentRoutes(): void
+    public function testFieldsAreLoadedForNonSegmentRoutes(): void
     {
         $request = new Request();
         $request->attributes->set('_route', 'mautic_dynamicContent_action');
@@ -616,6 +618,20 @@ final class FilterOperatorSubscriberTest extends TestCase
                             'type' => 'text',
                         ],
                         'object'    => 'company',
+                        'operators' => [
+                            'equals'    => '=',
+                            'not equal' => '!=',
+                        ],
+                        'iconClass' => 'ri-shapes-line',
+                    ],
+                ],
+                'company_all' => [
+                    'test_text' => [
+                        'label'      => 'Test Text',
+                        'properties' => [
+                            'type' => 'text',
+                        ],
+                        'object'    => 'company_all',
                         'operators' => [
                             'equals'    => '=',
                             'not equal' => '!=',
@@ -795,11 +811,11 @@ final class FilterOperatorSubscriberTest extends TestCase
                 'properties' => [
                     'type' => 'number',
                 ],
+                'object'    => 'lead',
                 'operators' => [
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object'    => 'lead',
                 'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']

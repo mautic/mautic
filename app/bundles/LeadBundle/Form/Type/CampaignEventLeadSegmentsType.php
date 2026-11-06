@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -18,7 +20,7 @@ final class CampaignEventLeadSegmentsType extends AbstractType
             [
                 'global_only' => true,
                 'label'       => 'mautic.lead.lead.lists',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'multiple'    => true,
                 'required'    => false,
             ]

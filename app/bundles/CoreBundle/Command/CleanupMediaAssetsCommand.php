@@ -22,7 +22,7 @@ use Symfony\Component\Finder\Finder;
 <info>php %command.full_name%</info>
 TXT
 )]
-class CleanupMediaAssetsCommand extends Command
+final class CleanupMediaAssetsCommand extends Command
 {
     public function __construct(
         private readonly PathsHelper $pathsHelper,

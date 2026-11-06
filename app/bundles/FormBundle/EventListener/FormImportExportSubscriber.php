@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -19,7 +20,6 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class FormImportExportSubscriber implements EventSubscriberInterface
 {
@@ -32,7 +32,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
         private EventDispatcherInterface $dispatcher,
-        private DenormalizerInterface $serializer,
+        private ImportEntityDenormalizer $serializer,
     ) {
     }
 
@@ -87,7 +87,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             $this->mergeExportData($data, $subEvent);
 
             $event->addDependencyEntity(Form::ENTITY_NAME, [
-                Form::ENTITY_NAME       => (int) $formId,
+                Form::ENTITY_NAME       => $formId,
                 Field::ENTITY_NAME      => (int) $field->getId(),
             ]);
         }
@@ -99,7 +99,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             $this->mergeExportData($data, $subEvent);
 
             $event->addDependencyEntity(Form::ENTITY_NAME, [
-                Form::ENTITY_NAME       => (int) $formId,
+                Form::ENTITY_NAME       => $formId,
                 Action::ENTITY_NAME     => (int) $action->getId(),
             ]);
         }

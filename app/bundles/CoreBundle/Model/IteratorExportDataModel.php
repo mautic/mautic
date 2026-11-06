@@ -6,18 +6,18 @@ use Mautic\CoreBundle\Helper\DataExporterHelper;
 
 class IteratorExportDataModel implements \Iterator
 {
-    private int $position;
+    private int $position = 0;
 
     private $callback;
 
-    private int $total;
+    private int $total = 0;
 
     /**
      * @var ?mixed[]
      */
-    private ?array $data;
+    private ?array $data = [];
 
-    private int $totalResult;
+    private int $totalResult = 0;
 
     /**
      * @param AbstractCommonModel<T> $model
@@ -32,10 +32,6 @@ class IteratorExportDataModel implements \Iterator
         private readonly bool $skipOrdering = false,
     ) {
         $this->callback     = $callback;
-        $this->position     = 0;
-        $this->total        = 0;
-        $this->totalResult  = 0;
-        $this->data         = [];
     }
 
     /**

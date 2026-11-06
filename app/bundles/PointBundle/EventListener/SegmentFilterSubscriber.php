@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\EventListener;
 
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;

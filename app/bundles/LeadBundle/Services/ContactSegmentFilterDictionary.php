@@ -31,7 +31,7 @@ class ContactSegmentFilterDictionary
      */
     public function getFilters(): array
     {
-        if (empty($this->filters)) {
+        if ([] === $this->filters) {
             $this->setDefaultFilters();
             $this->fetchFiltersFromSubscribers();
         }

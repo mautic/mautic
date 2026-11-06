@@ -55,7 +55,7 @@ final readonly class PreUpdateChecksStep implements StepInterface
             }
         }
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $errorString = '';
 
             foreach ($errors as $error) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -104,7 +106,7 @@ final class PropertiesType extends AbstractType
                     'mautic.focus.form.when.leave'         => 'leave',
                 ],
                 'label'       => 'mautic.focus.form.when',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'expanded'    => false,
                 'multiple'    => false,
@@ -118,7 +120,7 @@ final class PropertiesType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.focus.form.timeout',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'          => 'form-control',
                     'postaddon_text' => 'sec',
@@ -140,7 +142,7 @@ final class PropertiesType extends AbstractType
                     'mautic.focus.form.frequency.daily'     => 'daily',
                 ],
                 'label'       => 'mautic.focus.form.frequency',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control', 'tooltip' => 'mautic.focus.form.frequency.help'],
                 'expanded'    => false,
                 'multiple'    => false,

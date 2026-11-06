@@ -6,24 +6,23 @@ namespace Mautic\Middleware\Tests;
 
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\Middleware\HSTSMiddleware;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\ExpectationFailedException as PHPUnitException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class HSTSMiddlewareTest extends AbstractMauticTestCase
+final class HSTSMiddlewareTest extends AbstractMauticTestCase
 {
     public const HSTS_KEY = 'strict-transport-security';
 
-    protected \ReflectionProperty $addHSTS;
+    private \ReflectionProperty $addHSTS;
 
-    protected \ReflectionProperty $includeDubDomains;
+    private \ReflectionProperty $includeDubDomains;
 
-    protected \ReflectionProperty $preload;
+    private \ReflectionProperty $preload;
 
-    protected HSTSMiddleware $middleware;
+    private HSTSMiddleware $middleware;
 
-    protected \ReflectionClass $middlewareReflection;
+    private \ReflectionClass $middlewareReflection;
 
     /**
      * @throws \ReflectionException
@@ -45,7 +44,7 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
     {
         $response = $this->getMiddlewareResponse();
 
-        Assert::assertNotEmpty($response->headers);
+        $this->assertNotEmpty($response->headers);
     }
 
     public function testHSTSEnabled(): void
@@ -53,10 +52,7 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
         $this->setHSTS(true);
         $response = $this->getMiddlewareResponse();
 
-        Assert::assertTrue(
-            $response->headers->has(self::HSTS_KEY),
-            'Strict-Transport-Security is enabled but is missing from the response headers'
-        );
+        $this->assertTrue($response->headers->has(self::HSTS_KEY), 'Strict-Transport-Security is enabled but is missing from the response headers');
     }
 
     public function testHSTSDisabled(): void
@@ -64,10 +60,7 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
         $this->setHSTS(false);
         $response = $this->getMiddlewareResponse();
 
-        Assert::assertFalse(
-            $response->headers->has(self::HSTS_KEY),
-            'Strict-Transport-Security is disabled but is present in response headers'
-        );
+        $this->assertFalse($response->headers->has(self::HSTS_KEY), 'Strict-Transport-Security is disabled but is present in response headers');
     }
 
     public function testIncludeSubdomainsEnabled(): void
@@ -77,11 +70,7 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
         $this->setIncludeDubDomainsValue(true);
         $response = $this->getMiddlewareResponse();
 
-        Assert::assertStringContainsString(
-            $needle,
-            $response->headers->get(self::HSTS_KEY),
-            'Option include Subdomains is enabled but is missing from the HSTS value'
-        );
+        $this->assertStringContainsString($needle, (string) $response->headers->get(self::HSTS_KEY), 'Option include Subdomains is enabled but is missing from the HSTS value');
     }
 
     public function testIncludeSubdomainsDisabled(): void
@@ -92,11 +81,7 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
 
         $response = $this->getMiddlewareResponse();
 
-        Assert::assertStringNotContainsStringIgnoringCase(
-            $needle,
-            $this->getHSTSValue($response),
-            'Option include Subdomains is disabled but is present in HSTS value'
-        );
+        $this->assertStringNotContainsStringIgnoringCase($needle, $this->getHSTSValue($response), 'Option include Subdomains is disabled but is present in HSTS value');
     }
 
     public function testPreloadEnabled(): void
@@ -107,11 +92,7 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
 
         $response = $this->getMiddlewareResponse();
 
-        Assert::assertStringContainsString(
-            $needle,
-            $response->headers->get(self::HSTS_KEY),
-            'Option preload is enabled but is missing from the HSTS value'
-        );
+        $this->assertStringContainsString($needle, (string) $response->headers->get(self::HSTS_KEY), 'Option preload is enabled but is missing from the HSTS value');
     }
 
     public function testPreloadDisabled(): void
@@ -122,11 +103,7 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
 
         $response = $this->getMiddlewareResponse();
 
-        Assert::assertStringNotContainsStringIgnoringCase(
-            $needle,
-            $this->getHSTSValue($response),
-            'Option preload is disabled but is present in HSTS value'
-        );
+        $this->assertStringNotContainsStringIgnoringCase($needle, $this->getHSTSValue($response), 'Option preload is disabled but is present in HSTS value');
     }
 
     /**
@@ -141,11 +118,7 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
 
         $response = $this->getMiddlewareResponse();
 
-        Assert::assertMatchesRegularExpression(
-            '/max-age='.$expireTimeValue.'(; includeSubDomains)?/',
-            $this->getHSTSValue($response),
-            'Expire time does not match the configuration'
-        );
+        $this->assertMatchesRegularExpression('/max-age='.$expireTimeValue.'(; includeSubDomains)?/', $this->getHSTSValue($response), 'Expire time does not match the configuration');
     }
 
     private function setHSTS(bool $value): void

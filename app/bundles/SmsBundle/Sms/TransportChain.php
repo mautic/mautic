@@ -14,7 +14,7 @@ class TransportChain
     /**
      * @var array<string, array{alias: string, integrationAlias: string, service: TransportInterface, published?: bool}>
      */
-    private array $transports;
+    private array $transports = [];
 
     /**
      * @param string $primaryTransport
@@ -23,7 +23,6 @@ class TransportChain
         private $primaryTransport,
         private readonly IntegrationHelper $integrationHelper,
     ) {
-        $this->transports        = [];
     }
 
     /**

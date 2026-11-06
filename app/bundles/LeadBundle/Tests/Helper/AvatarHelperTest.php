@@ -39,7 +39,9 @@ final class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 
         $assetsHelperMock->setPathsHelper($pathsHelperMock);
         $defaultAvatarHelperMock       = new DefaultAvatarHelper($assetsHelperMock);
-        $gravatarHelperMock            = new GravatarHelper($defaultAvatarHelperMock, $this->createStub(CoreParametersHelper::class), $this->createStub(RequestStack::class));
+        $coreParametersHelperMock      = $this->createStub(CoreParametersHelper::class);
+        $coreParametersHelperMock->method('get')->willReturnCallback(static fn (string $name, mixed $default = null): mixed => 'gravatar_enabled' === $name ? true : $default);
+        $gravatarHelperMock            = new GravatarHelper($defaultAvatarHelperMock, $coreParametersHelperMock, $this->createStub(RequestStack::class));
         $this->leadMock                = $this->createMock(Lead::class);
         $this->avatarHelper            = new AvatarHelper($assetsHelperMock, $pathsHelperMock, $gravatarHelperMock, $defaultAvatarHelperMock);
     }

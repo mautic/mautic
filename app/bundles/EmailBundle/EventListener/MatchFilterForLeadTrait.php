@@ -26,20 +26,6 @@ trait MatchFilterForLeadTrait
             $isCompanyField = (str_starts_with((string) $data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
 
-            if ('leadlist' === $data['type'] && isset($this->segmentRepository) && $this->segmentRepository instanceof LeadListRepository) {
-                return $this->isContactSegmentRelationshipValid($this->segmentRepository, (int) $lead['id'], $data['operator'], $data['filter']);
-            }
-
-            if ($isCompanyField) {
-                if (empty($primaryCompany)) {
-                    continue;
-                }
-            } else {
-                if (!array_key_exists($data['field'] ?? '', $lead)) {
-                    continue;
-                }
-            }
-
             /*
              * Split the filters into groups based on the glue.
              * The first filter and any filters whose glue is
@@ -65,6 +51,21 @@ trait MatchFilterForLeadTrait
              */
             if (null === $groups[$groupNum]) {
                 $groups[$groupNum] = false;
+            }
+
+            if ('leadlist' === $data['type'] && property_exists($this, 'segmentRepository') && $this->segmentRepository instanceof LeadListRepository) {
+                $groups[$groupNum] = $this->isContactSegmentRelationshipValid($this->segmentRepository, (int) $lead['id'], $data['operator'], $data['filter']);
+                continue;
+            }
+
+            if ($isCompanyField) {
+                if (empty($primaryCompany)) {
+                    continue;
+                }
+            } else {
+                if (!array_key_exists($data['field'] ?? '', $lead)) {
+                    continue;
+                }
             }
 
             $leadVal   = ($isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']]);

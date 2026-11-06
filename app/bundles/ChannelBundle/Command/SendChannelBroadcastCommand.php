@@ -28,7 +28,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 <info>php %command.full_name% --channel=email --id=3</info>
 TXT
 )]
-class SendChannelBroadcastCommand extends ModeratedCommand
+final class SendChannelBroadcastCommand extends ModeratedCommand
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

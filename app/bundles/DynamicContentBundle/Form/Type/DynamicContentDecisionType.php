@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DynamicContentBundle\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -15,7 +17,7 @@ final class DynamicContentDecisionType extends DynamicContentSendType
             TextType::class,
             [
                 'label'      => 'mautic.dynamicContent.send.slot_name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip',
@@ -34,7 +36,7 @@ final class DynamicContentDecisionType extends DynamicContentSendType
             DynamicContentListType::class,
             [
                 'label'      => 'mautic.dynamicContent.send.selectDynamicContents.default',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.dynamicContent.choose.dynamicContents',

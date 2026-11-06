@@ -259,7 +259,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                     $violations = $validator->validate(
                         $dwc->getFilters(),
                         [
-                            new Count(minMessage: 'mautic.dynamicContent.filter.options.empty', min: 1),
+                            new Count(min: 1, minMessage: 'mautic.dynamicContent.filter.options.empty'),
                         ]
                     );
                     foreach ($violations as $violation) {

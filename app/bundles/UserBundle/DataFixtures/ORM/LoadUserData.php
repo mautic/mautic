@@ -9,7 +9,7 @@ use Doctrine\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
+final class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
     public static function getGroups(): array
     {

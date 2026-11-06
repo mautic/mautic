@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterType;
 
-class TwitterIntegration extends SocialIntegration
+final class TwitterIntegration extends SocialIntegration
 {
     public const NAME = 'Twitter';
 
@@ -213,7 +213,7 @@ class TwitterIntegration extends SocialIntegration
         }
     }
 
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         return [
             'profileHandle' => ['type' => 'string'],

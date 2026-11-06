@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class DateTimeExtension extends AbstractExtension
+final class DateTimeExtension extends AbstractExtension
 {
     public function __construct(
         private readonly DateTimeHelper $helper,

@@ -21,11 +21,9 @@ final readonly class CacheClearSubscriber implements CacheClearerInterface
     }
 
     /**
-     * @param string $cacheDir
-     *
      * @throws \Exception
      */
-    public function clear($cacheDir): void
+    public function clear(string $cacheDir): void
     {
         try {
             $reflect = new \ReflectionClass($this->cacheProvider->getCacheAdapter());

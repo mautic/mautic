@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -20,8 +21,11 @@ use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\MappedObjectCollector;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Helper\FormSearchScopeProvider;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -33,6 +37,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
+    use CategoryListFiltersTrait;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -50,13 +56,13 @@ class FormController extends CommonFormController
         private readonly FormModel $formModel,
         private readonly AuditLogModel $auditLogModel,
         private readonly SubmissionModel $submissionModel,
-        private readonly \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository,
-        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly FormRepository $formRepository,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, FormSearchScopeProvider $formSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -92,6 +98,13 @@ class FormController extends CommonFormController
         if (!$permissions['form:forms:viewother']) {
             $filter['force'][] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
+        $categoryFilters = $this->applyCategoryListFilter(
+            $request,
+            'mautic.form.list_filters',
+            'form',
+            'c.id',
+            $filter
+        );
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
         $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
@@ -131,8 +144,10 @@ class FormController extends CommonFormController
         return $this->delegateView(
             [
                 'viewParameters'  => [
-                    'searchValue' => $search,
-                    'items'       => $forms,
+                    'searchValue'  => $search,
+                    'searchScopes' => $formSearchScopeProvider->getScopes(),
+                    'filters'      => $categoryFilters['filters'],
+                    'items'        => $forms,
                     'totalItems'  => $count,
                     'page'        => $page,
                     'limit'       => $limit,
@@ -313,7 +328,7 @@ class FormController extends CommonFormController
                     $fields = array_diff_key($modifiedFields, array_flip($deletedFields));
 
                     // make sure that at least one field is selected
-                    if (empty($fields)) {
+                    if ([] === $fields) {
                         // set the error
                         $form->addError(
                             new FormError(
@@ -478,10 +493,8 @@ class FormController extends CommonFormController
      * @param int|Form $objectId
      * @param bool     $ignorePost
      * @param bool     $forceTypeSelection
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false): Response
     {
         $formData         = $request->request->all()['mauticform'] ?? [];
         $sessionId        = $formData['sessionId'] ?? null;
@@ -569,7 +582,7 @@ class FormController extends CommonFormController
 
                 if ($valid = $this->isFormValid($form)) {
                     // make sure that at least one field is selected
-                    if (empty($fields)) {
+                    if ([] === $fields) {
                         // set the error
                         $form->addError(
                             new FormError(
@@ -958,10 +971,8 @@ class FormController extends CommonFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);
@@ -1069,7 +1080,7 @@ class FormController extends CommonFormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->formModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

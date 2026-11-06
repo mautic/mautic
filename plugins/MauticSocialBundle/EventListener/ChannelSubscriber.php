@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;

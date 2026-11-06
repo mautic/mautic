@@ -9,7 +9,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 trait SomeAutowireTrait
 {
     #[Required]
-    public function setSomeModelOnTrait(SomeModel $someModel): void
-    {
+    public function setSomeModelOnTrait(
+        SomeModel $someModel,
+    ): void {
     }
 }

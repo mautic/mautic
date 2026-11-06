@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 
-class PhoneNumberHelper
+final class PhoneNumberHelper
 {
     /**
      * @param int $format

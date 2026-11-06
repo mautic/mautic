@@ -8,7 +8,7 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class RedisTagAwareAdapter extends TagAwareAdapter
+final class RedisTagAwareAdapter extends TagAwareAdapter
 {
     use RedisAdapterTrait;
 

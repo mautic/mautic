@@ -6,7 +6,7 @@ use LightSaml\Model\Metadata\EntityDescriptor;
 use LightSaml\Store\EntityDescriptor\EntityDescriptorStoreInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class EntityDescriptorStore implements EntityDescriptorStoreInterface
+final class EntityDescriptorStore implements EntityDescriptorStoreInterface
 {
     private ?EntityDescriptor $entityDescriptor = null;
 

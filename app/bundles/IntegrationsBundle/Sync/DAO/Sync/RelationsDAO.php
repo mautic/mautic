@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 
-class RelationsDAO implements \Iterator, \Countable
+final class RelationsDAO implements \Iterator, \Countable
 {
     /**
      * @var RelationDAO[]

@@ -25,7 +25,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testPointsAreAdded(): void
     {
         /** @var LeadModel $model */
-        $model = static::getContainer()->get(LeadModel::class);
+        $model = self::getContainer()->get(LeadModel::class);
 
         $this->lead->adjustPoints(100);
 
@@ -40,7 +40,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testPointsAreSubtracted(): void
     {
         /** @var LeadModel $model */
-        $model = static::getContainer()->get(LeadModel::class);
+        $model = self::getContainer()->get(LeadModel::class);
 
         $this->lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
 
@@ -55,7 +55,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testPointsAreMultiplied(): void
     {
         /** @var LeadModel $model */
-        $model = static::getContainer()->get(LeadModel::class);
+        $model = self::getContainer()->get(LeadModel::class);
 
         $this->lead->adjustPoints(2, Lead::POINTS_MULTIPLY);
 
@@ -70,7 +70,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testPointsAreDivided(): void
     {
         /** @var LeadModel $model */
-        $model = static::getContainer()->get(LeadModel::class);
+        $model = self::getContainer()->get(LeadModel::class);
 
         $this->lead->adjustPoints(2, Lead::POINTS_DIVIDE);
 
@@ -85,7 +85,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testMixedOperatorPointsAreCalculated(): void
     {
         /** @var LeadModel $model */
-        $model = static::getContainer()->get(LeadModel::class);
+        $model = self::getContainer()->get(LeadModel::class);
 
         $this->lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
         $this->lead->adjustPoints(120, Lead::POINTS_ADD);
@@ -103,7 +103,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testMixedModelAndRepositorySavesDoNotDoublePoints(): void
     {
         /** @var LeadModel $model */
-        $model = static::getContainer()->get(LeadModel::class);
+        $model = self::getContainer()->get(LeadModel::class);
         $this->lead->adjustPoints(120, Lead::POINTS_ADD);
         $model->saveEntity($this->lead);
         // Changes should be stored with points
@@ -181,6 +181,30 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertCount($expectedCount, $contentArray['items']);
     }
 
+    #[DataProvider('dataForRejectedLeadFields')]
+    public function testAjaxGetLeadsByFieldValueRejectsInvalidField(string $field): void
+    {
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', [
+            'action' => 'lead:getLeadIdsByFieldValue',
+            'field'  => $field,
+            'value'  => 'a',
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $contentArray = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertSame([], $contentArray['items']);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function dataForRejectedLeadFields(): iterable
+    {
+        yield 'SQL injection payload' => ['email OR 1=1-- -'];
+        yield 'non-unique field' => ['firstname'];
+    }
+
     /**
      * @return iterable<string, array<int, int|string|bool|string[]>>
      */
@@ -239,6 +263,14 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $lead = $this->createLead();
 
         $this->assertTrue($repo->exists((string) $lead->getId()));
+    }
+
+    public function testGetFieldValuesReturnEmptyArrayIfLeadDoesNotExist(): void
+    {
+        $leadRepository = $this->em->getRepository(Lead::class);
+        $this->assertInstanceOf(LeadRepository::class, $leadRepository);
+
+        $this->assertSame([], $leadRepository->getFieldValues(999));
     }
 
     private function createLead(string $email = ''): Lead

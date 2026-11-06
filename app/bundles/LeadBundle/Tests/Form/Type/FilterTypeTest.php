@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Form\Type;
 use Mautic\LeadBundle\Form\Type\FilterType;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Form;
@@ -37,7 +38,8 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
         $this->listModel               = $this->createMock(ListModel::class);
         $this->form                    = new FilterType(
             $this->formAdjustmentsProvider,
-            $this->listModel
+            $this->listModel,
+            $this->createStub(TypeOperatorProviderInterface::class),
         );
     }
 
@@ -184,7 +186,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                              * @param FormInterface<FormInterface<mixed>>|string $child
                              * @param mixed[]                                    $options
                              */
-                            public function add($child, ?string $type = null, array $options = []): static
+                            public function add(FormInterface|string $child, ?string $type = null, array $options = []): static
                             {
                                 ++$this->addMethodCallCounter;
 

@@ -4,7 +4,7 @@ namespace Mautic\CampaignBundle\Helper;
 
 use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
 
-class CampaignEventHelper
+final class CampaignEventHelper
 {
     /**
      * Determine if this campaign applies.

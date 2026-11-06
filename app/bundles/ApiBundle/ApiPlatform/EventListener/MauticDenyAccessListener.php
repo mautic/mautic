@@ -7,7 +7,10 @@ namespace Mautic\ApiBundle\ApiPlatform\EventListener;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Util\RequestAttributesExtractor;
+use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -17,6 +20,7 @@ final readonly class MauticDenyAccessListener
     public function __construct(
         private CorePermissions $security,
         private ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -36,69 +40,99 @@ final readonly class MauticDenyAccessListener
 
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
         $operation        = $resourceMetadata->getOperation($attributes['operation_name']);
-        $isGranted        = $operation->getSecurity() ?? null;
+        $securityExpression = $operation->getSecurity() ?? null;
 
-        if (null === $isGranted) {
+        if (null === $securityExpression || !is_string($securityExpression)) {
             return;
         }
 
-        // Extract object path to getCreatedBy - () parenthesis at the end
-        preg_match('#\((.*?)\)#', $isGranted, $match);
-        $objectProperty = null;
-        if (count($match) > 1) {
-            $objectProperty = $match[1];
-        }
-        if ($startParenthesis = strpos($isGranted, '(')) {
-            $isGranted = substr($isGranted, 0, $startParenthesis);
+        $permission = $this->extractPermission($securityExpression);
+        if (null === $permission) {
+            return;
         }
 
-        // Extract id from object - [] parenthesis in the text
-        preg_match('#\[(.*?)\]#', $isGranted, $match);
-        $objectIdProperty = null;
-        if (count($match) > 1) {
-            $objectIdProperty = $match[1];
-        }
-        if (str_contains($isGranted, '[') && str_contains($isGranted, ']')) {
-            $startParenthesis = strpos($isGranted, '[');
-            $stopParenthesis  = strpos($isGranted, ']');
-            if ($request->getContent()
-                && ($contentArray = json_decode($request->getContent(), true))
-                && is_array($contentArray)
-                && array_key_exists($objectIdProperty, $contentArray)
-            ) {
-                $url      = $contentArray[$objectIdProperty];
-                $objectId = substr($url, strrpos($url, '/') + 1);
-            } else {
-                $requestObject = $request->attributes->get('data');
-                $property      = 'get'.$objectIdProperty;
-                $objectId      = $requestObject->{$property}()->getId();
-            }
-            $isGranted = substr($isGranted, 0, $startParenthesis).$objectId.substr($isGranted, $stopParenthesis + 1);
-        }
-
-        // Get the object to check the security
         $requestObject = $request->attributes->get('data');
-        if (null !== $objectProperty) {
-            $objectPropertyList = explode('.', $objectProperty);
-            foreach ($objectPropertyList as $property) {
-                $requestObject = $requestObject->{$property}();
-            }
-        }
+        $permissionContextEvent = new ApiPlatformPermissionContextEvent(
+            $securityExpression,
+            $permission,
+            $requestObject,
+            $request,
+            $attributes,
+        );
+        $this->dispatcher->dispatch($permissionContextEvent, ApiEvents::API_PLATFORM_PERMISSION_CONTEXT);
 
-        // Extract isGranted and action
-        $isGranted     = str_replace('"', '', $isGranted);
-        $isGranted     = str_replace("'", '', $isGranted);
-        $isGrantedList = explode(':', $isGranted);
-        $action        = array_pop($isGrantedList);
+        $permission    = $permissionContextEvent->getPermission();
+        $requestObject = $permissionContextEvent->getRequestObject();
 
-        if (in_array($action, ['view', 'edit', 'delete'])) {
-            if (!$this->security->hasEntityAccess($isGranted.'own', $isGranted.'other', $requestObject->getCreatedBy())) {
+        if ($this->shouldCheckEntityOwnership($permission)) {
+            [$ownPermission, $otherPermission] = $this->resolveOwnershipPermissions($permission);
+
+            if (!$this->security->hasEntityAccess($ownPermission, $otherPermission, $this->resolveOwner($requestObject))) {
                 throw new AccessDeniedException();
             }
-        } else {
-            if (!$this->security->isGranted($isGranted)) {
-                throw new AccessDeniedException();
-            }
+
+            return;
         }
+
+        if (!$this->security->isGranted($permission)) {
+            throw new AccessDeniedException();
+        }
+    }
+
+    private function shouldCheckEntityOwnership(string $permission): bool
+    {
+        if (preg_match('/:(?:view|edit|delete)(?:own|other)$/', $permission)) {
+            return true;
+        }
+
+        return (bool) preg_match('/:(?:view|edit|delete)$/', $permission);
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function resolveOwnershipPermissions(string $permission): array
+    {
+        if (preg_match('/(?:own|other)$/', $permission)) {
+            $basePermission = preg_replace('/(?:own|other)$/', '', $permission) ?? $permission;
+
+            return [$basePermission.'own', $basePermission.'other'];
+        }
+
+        return [$permission.'own', $permission.'other'];
+    }
+
+    private function extractPermission(string $securityExpression): ?string
+    {
+        if (preg_match("/is_granted\\('([^']+)'/", $securityExpression, $matches)) {
+            return $matches[1];
+        }
+
+        if (preg_match('/^["\']([^"\']+)["\']$/', trim($securityExpression), $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    private function resolveOwner(mixed $requestObject): mixed
+    {
+        if (!is_object($requestObject)) {
+            return 0;
+        }
+
+        if (method_exists($requestObject, 'getPermissionUser')) {
+            return $requestObject->getPermissionUser() ?? 0;
+        }
+
+        if (method_exists($requestObject, 'getCreatedBy')) {
+            return $requestObject->getCreatedBy() ?? 0;
+        }
+
+        if (method_exists($requestObject, 'getOwner')) {
+            return $requestObject->getOwner() ?? 0;
+        }
+
+        return 0;
     }
 }

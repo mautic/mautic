@@ -3,15 +3,10 @@
 namespace Mautic\StageBundle\Model;
 
 use Doctrine\DBAL\ParameterType;
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\StageBundle\Entity\LeadStageLogRepository;
@@ -21,34 +16,36 @@ use Mautic\StageBundle\Event\StageBuilderEvent;
 use Mautic\StageBundle\Event\StageEvent;
 use Mautic\StageBundle\Form\Type\StageType;
 use Mautic\StageBundle\StageEvents;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonFormModel<Stage>
  */
 class StageModel extends CommonFormModel implements GlobalSearchInterface
 {
-    public function __construct(
-        protected LeadModel $leadModel,
-        UserHelper $userHelper,
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-        private readonly StageRepository $stageRepository,
-        private readonly StagesChangeLogRepository $stagesChangeLogRepository,
-        private readonly LeadStageLogRepository $leadStageLogRepository,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    protected LeadModel $leadModel;
+
+    private StageRepository $stageRepository;
+
+    private StagesChangeLogRepository $stagesChangeLogRepository;
+
+    private LeadStageLogRepository $leadStageLogRepository;
+
+    #[Required]
+    public function autowireStageModel(
+        LeadModel $leadModel,
+        StageRepository $stageRepository,
+        StagesChangeLogRepository $stagesChangeLogRepository,
+        LeadStageLogRepository $leadStageLogRepository,
+    ): void {
+        $this->leadModel                 = $leadModel;
+        $this->stageRepository           = $stageRepository;
+        $this->stagesChangeLogRepository = $stagesChangeLogRepository;
+        $this->leadStageLogRepository    = $leadStageLogRepository;
     }
 
     public function getRepository(): StageRepository
@@ -209,5 +206,33 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
             $this->userHelper->getUser() : false;
 
         return $this->stageRepository->getStages($user);
+    }
+
+    /**
+     * Fetch stage entities together with per-stage contact counts.
+     *
+     * Returns a tuple: Stage objects for the current page, a map of
+     * stage ID to contact count, and the total item count across all pages.
+     *
+     * @param array<string, mixed> $args
+     *
+     * @return array{0: array<int, Stage>, 1: array<int, int>, 2: int}
+     */
+    public function getEntitiesWithContactCounts(array $args = []): array
+    {
+        $args['withContactCount'] = true;
+        $paginator                = $this->getEntities($args);
+
+        $entities      = [];
+        $contactCounts = [];
+
+        foreach ($paginator as $row) {
+            /** @var Stage $stage */
+            $stage                          = $row[0];
+            $entities[]                     = $stage;
+            $contactCounts[$stage->getId()] = (int) $row['contactCount'];
+        }
+
+        return [$entities, $contactCounts, count($paginator)];
     }
 }

@@ -23,7 +23,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<LeadNote>
  */
-class NoteApiController extends CommonApiController
+final class NoteApiController extends CommonApiController
 {
     use LeadAccessTrait;
 

@@ -2,40 +2,31 @@
 
 namespace Mautic\PageBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Shortener\Shortener;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
 use Mautic\PageBundle\PageEvents;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Redirect>
  */
 class RedirectModel extends FormModel
 {
-    public function __construct(
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-        private readonly Shortener $shortener,
-        private readonly RedirectRepository $redirectRepository,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    private Shortener $shortener;
+
+    private RedirectRepository $redirectRepository;
+
+    #[Required]
+    public function autowireRedirectModel(
+        Shortener $shortener,
+        RedirectRepository $redirectRepository,
+    ): void {
+        $this->shortener          = $shortener;
+        $this->redirectRepository = $redirectRepository;
     }
 
     public function getRepository(): RedirectRepository

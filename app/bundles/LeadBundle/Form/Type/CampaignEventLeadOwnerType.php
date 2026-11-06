@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\UserBundle\Form\Type\UserListType;
@@ -18,7 +20,7 @@ final class CampaignEventLeadOwnerType extends AbstractType
             UserListType::class,
             [
                 'label'      => 'mautic.lead.lead.field.owner',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],

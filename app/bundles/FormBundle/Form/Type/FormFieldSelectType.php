@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -26,7 +28,7 @@ final class FormFieldSelectType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.emptyvalue',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]

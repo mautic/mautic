@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper\Tree;
 
-class IntNode implements NodeInterface
+final class IntNode implements NodeInterface
 {
     /**
      * @var NodeInterface[]

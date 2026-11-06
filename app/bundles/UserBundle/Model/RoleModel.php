@@ -21,7 +21,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Role>
  */
-class RoleModel extends FormModel implements GlobalSearchInterface
+final class RoleModel extends FormModel implements GlobalSearchInterface
 {
     private UserRepository $userRepository;
 
@@ -81,7 +81,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
         }
 
         // set permissions if applicable and if the user is not an admin
-        $permissions = (!$entity->isAdmin() && !empty($rawPermissions)) ?
+        $permissions = (!$entity->isAdmin() && [] !== $rawPermissions) ?
             $this->security->generatePermissions($rawPermissions) :
             [];
 

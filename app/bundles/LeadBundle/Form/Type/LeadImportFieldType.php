@@ -40,7 +40,7 @@ final class LeadImportFieldType extends AbstractType
                     'choices'    => $choices,
                     'label'      => $label,
                     'required'   => false,
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => ['class' => 'form-control'],
                     'data'       => $this->getDefaultValue($field, $options['import_fields']),
                 ]
@@ -55,7 +55,7 @@ final class LeadImportFieldType extends AbstractType
                 UserListType::class,
                 [
                     'label'      => 'mautic.lead.lead.field.owner',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class' => 'form-control',
                     ],
@@ -73,7 +73,7 @@ final class LeadImportFieldType extends AbstractType
                     LeadListType::class,
                     [
                         'label'      => 'mautic.lead.lead.field.list',
-                        'label_attr' => ['class' => 'control-label'],
+                        'label_attr' => ['class' => 'form-label'],
                         'attr'       => [
                             'class' => 'form-control',
                         ],
@@ -89,7 +89,7 @@ final class LeadImportFieldType extends AbstractType
                 [
                     'label'      => 'mautic.lead.tags',
                     'required'   => false,
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'                => 'form-control',
                         'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
@@ -107,10 +107,26 @@ final class LeadImportFieldType extends AbstractType
                 YesNoButtonGroupType::class,
                 [
                     'label'      => 'mautic.lead.import.skip_if_exists',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => ['class' => 'form-control'],
                     'required'   => false,
                     'data'       => false,
+                ]
+            );
+
+            $createNewLabel = 'lead' === $options['object']
+                ? 'mautic.lead.import.create_new'
+                : 'mautic.company.import.create_new';
+
+            $builder->add(
+                'create_new',
+                YesNoButtonGroupType::class,
+                [
+                    'label'      => $createNewLabel,
+                    'label_attr' => ['class' => 'form-label'],
+                    'attr'       => ['class' => 'form-control'],
+                    'required'   => false,
+                    'data'       => true,
                 ]
             );
         }

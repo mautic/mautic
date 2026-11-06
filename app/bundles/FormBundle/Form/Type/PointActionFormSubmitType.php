@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -14,7 +16,7 @@ final class PointActionFormSubmitType extends AbstractType
     {
         $builder->add('forms', FormListType::class, [
             'label'      => 'mautic.form.point.action.forms',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'required'   => false,
             'attr'       => [
                 'class'   => 'form-control',

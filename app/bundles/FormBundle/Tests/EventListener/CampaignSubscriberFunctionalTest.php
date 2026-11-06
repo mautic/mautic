@@ -116,7 +116,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         );
 
         /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = static::getContainer()->get(EventDispatcherInterface::class);
+        $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
 
         $dispatcher->dispatch($event, FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
 
@@ -155,7 +155,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
     protected function beforeTearDown(): void
     {
-        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_test_form")) {
             $this->connection->executeStatement("DROP TABLE {$tablePrefix}form_results_1_test_form");

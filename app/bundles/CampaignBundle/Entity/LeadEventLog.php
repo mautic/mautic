@@ -64,7 +64,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     private $systemTriggered = false;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private $metadata = [];
 
@@ -105,6 +105,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     private ?\DateTime $dateQueued = null;
 
+    private bool $isExecuted = false;
+
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -114,7 +116,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
             ->addIndex(['is_scheduled', 'lead_id'], 'campaign_event_upcoming_search')
             ->addIndex(['campaign_id', 'is_scheduled', 'trigger_date'], 'campaign_event_schedule_counts')
             ->addIndex(['date_triggered'], 'campaign_date_triggered')
-            ->addIndex(['lead_id', 'campaign_id', 'rotation'], 'campaign_leads')
+            ->addIndex(['campaign_id', 'lead_id', 'rotation'], 'campaign_leads')
             ->addIndex(['channel', 'channel_id', 'lead_id'], 'campaign_log_channel')
             ->addIndex(['campaign_id', 'event_id', 'date_triggered'], 'campaign_actions')
             ->addIndex(['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], 'campaign_stats')
@@ -388,18 +390,12 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getNonActionPathTaken()
+    public function getNonActionPathTaken(): ?bool
     {
         return $this->nonActionPathTaken;
     }
 
-    /**
-     * @param bool $nonActionPathTaken
-     */
-    public function setNonActionPathTaken($nonActionPathTaken): static
+    public function setNonActionPathTaken(?bool $nonActionPathTaken): static
     {
         $this->nonActionPathTaken = $nonActionPathTaken;
 
@@ -539,5 +535,15 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         $this->dateQueued = $dateQueued;
 
         return $this;
+    }
+
+    public function isExecuted(): bool
+    {
+        return $this->isExecuted;
+    }
+
+    public function setIsExecuted(bool $isExecuted): void
+    {
+        $this->isExecuted = $isExecuted;
     }
 }

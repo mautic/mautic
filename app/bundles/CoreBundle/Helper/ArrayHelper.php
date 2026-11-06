@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 /**
  * Helper functions for simpler operations with arrays.
  */
-class ArrayHelper
+final class ArrayHelper
 {
     /**
      * If the $key exists in the $origin array then it will return its value.

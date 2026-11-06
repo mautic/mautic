@@ -32,8 +32,7 @@ final class BuildJsSubscriberTest extends TestCase
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturn('Please wait');
 
-        $requestStack = new RequestStack();
-        $requestStack->push(Request::create('https://mautic.example'));
+        $requestStack = new RequestStack([Request::create('https://mautic.example')]);
 
         $router = $this->createStub(RouterInterface::class);
         $router->method('generate')->willReturn('https://mautic.example/dwc/slotNamePlaceholder');

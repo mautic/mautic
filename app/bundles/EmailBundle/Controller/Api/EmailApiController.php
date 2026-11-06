@@ -30,7 +30,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Email>
  */
-class EmailApiController extends CommonApiController
+final class EmailApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
@@ -140,11 +140,9 @@ class EmailApiController extends CommonApiController
      * @param int $id     Email ID
      * @param int $leadId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function sendLeadAction(Request $request, $id, $leadId)
+    public function sendLeadAction(Request $request, $id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -252,6 +250,11 @@ class EmailApiController extends CommonApiController
         if (Request::METHOD_PUT === $method && !array_key_exists('sendToDnc', $parameters)) {
             // use default value, in case of PUT method it does not use default value if entity is already exist and tried to call setter method with null value.
             $parameters['sendToDnc'] = false;
+        }
+
+        if (Request::METHOD_PATCH === $method && !array_key_exists('dynamicContent', $parameters)) {
+            // EmailType replaces a missing dynamicContent with the default one, so a partial update must send the current one.
+            $parameters['dynamicContent'] = $entity->getDynamicContent();
         }
 
         return parent::processForm($request, $entity, $parameters, $method);

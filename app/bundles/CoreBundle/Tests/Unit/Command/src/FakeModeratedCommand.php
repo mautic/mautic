@@ -12,7 +12,7 @@ use Symfony\Component\Lock\LockInterface;
 #[AsCommand(
     name: 'mautic:fake:command'
 )]
-class FakeModeratedCommand extends ModeratedCommand
+final class FakeModeratedCommand extends ModeratedCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

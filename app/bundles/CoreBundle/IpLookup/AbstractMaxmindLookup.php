@@ -91,7 +91,7 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
 
     protected function shouldPerformLookup(): bool
     {
-        if (!isset($this->ip)) {
+        if (null === $this->ip) {
             return false;
         }
 

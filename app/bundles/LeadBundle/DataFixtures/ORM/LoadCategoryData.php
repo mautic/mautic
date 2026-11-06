@@ -9,7 +9,7 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CoreBundle\Helper\CsvHelper;
 
-class LoadCategoryData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadCategoryData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly CategoryRepository $categoryRepository,

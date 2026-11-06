@@ -40,7 +40,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         /** @var CategoryModel $model */
-        $model      = static::getContainer()->get(CategoryModel::class);
+        $model      = self::getContainer()->get(CategoryModel::class);
 
         foreach ($categoriesData as $categoryData) {
             $category = new Category();
@@ -50,7 +50,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             $model->saveEntity($category);
         }
 
-        $this->translator = static::getContainer()->get(TranslatorInterface::class);
+        $this->translator = self::getContainer()->get(TranslatorInterface::class);
     }
 
     /**
@@ -138,9 +138,9 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
     public function testEditLockCategory(): void
     {
         /** @var CategoryModel $categoryModel */
-        $categoryModel      = static::getContainer()->get(CategoryModel::class);
+        $categoryModel      = self::getContainer()->get(CategoryModel::class);
         /** @var UserModel $userModel */
-        $userModel      = static::getContainer()->get(UserModel::class);
+        $userModel      = self::getContainer()->get(UserModel::class);
         $user           = $userModel->getEntity(2);
 
         $category = new Category();
@@ -296,7 +296,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $category->setBundle($bundle);
         $category->setAlias($alias);
         /** @var CategoryModel $categoryModel */
-        $categoryModel      = static::getContainer()->get(CategoryModel::class);
+        $categoryModel      = self::getContainer()->get(CategoryModel::class);
         $categoryModel->saveEntity($category);
 
         return $category;

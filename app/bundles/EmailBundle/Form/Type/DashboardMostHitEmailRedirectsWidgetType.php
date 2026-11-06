@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CampaignBundle\Form\Type\CampaignListType;
@@ -20,7 +22,7 @@ final class DashboardMostHitEmailRedirectsWidgetType extends AbstractType
             CompanyListType::class,
             [
                 'label'       => 'mautic.email.companyId.filter',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'empty_data'  => '',
                 'required'    => false,
@@ -34,7 +36,7 @@ final class DashboardMostHitEmailRedirectsWidgetType extends AbstractType
             CampaignListType::class,
             [
                 'label'       => 'mautic.email.campaignId.filter',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'empty_data'  => '',
                 'placeholder' => '',
@@ -48,7 +50,7 @@ final class DashboardMostHitEmailRedirectsWidgetType extends AbstractType
             LeadListType::class,
             [
                 'label'      => 'mautic.email.segmentId.filter',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'empty_data' => '',
                 'required'   => false,

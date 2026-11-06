@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -34,7 +35,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         private CoreParametersHelper $coreParametersHelper,
         private TranslatorInterface $translator,
         private DncReportService $dncReportService,
-        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
+        private FormRepository $formRepository,
     ) {
     }
 

@@ -15,7 +15,7 @@ final class CleanupCommandTest extends MauticMysqlTestCase
     public function testOrphanFieldChangeRecordDeleted(): void
     {
         $lead                    = $this->createLead();
-        $fieldChangeExistLead    = $this->createFieldChange((int) $lead->getId());
+        $fieldChangeExistLead    = $this->createFieldChange($lead->getId());
         $fieldChangeNonExistLead = $this->createFieldChange(9999);
         $response                = $this->testSymfonyCommand(CleanupCommand::NAME);
         $this->assertSame(Command::SUCCESS, $response->getStatusCode());

@@ -2,12 +2,20 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Mautic\AssetBundle\Helper\AssetSearchScopeProvider;
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\AssetBundle\Service\ArchiveBuilder;
+use Mautic\AssetBundle\Service\BatchDownloadRequestValidator;
+use Mautic\AssetBundle\Service\BatchDownloadResponder;
+use Mautic\AssetBundle\Service\BatchFileCollector;
+use Mautic\AssetBundle\Service\Exception\BatchDownloadException;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,16 +25,17 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class AssetController extends FormController
 {
+    use CategoryListFiltersTrait;
+
     private AuditLogModel $auditLogModel;
 
     #[Required]
-    public function autowireAssetController(
-        AuditLogModel $auditLogModel,
-    ): void {
+    public function autowireAssetController(AuditLogModel $auditLogModel): void
+    {
         $this->auditLogModel = $auditLogModel;
     }
 
-    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
+    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, AssetSearchScopeProvider $assetSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -64,9 +73,20 @@ final class AssetController extends FormController
         $filter = ['string' => $search, 'force' => []];
 
         if (!$permissions['asset:assets:viewother']) {
-            $filter['force'][] =
-                ['column' => 'a.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+            $filter['force'][] = [
+                'column' => 'a.createdBy',
+                'expr'   => 'eq',
+                'value'  => $this->user->getId(),
+            ];
         }
+
+        $categoryFilters = $this->applyCategoryListFilter(
+            $request,
+            'mautic.asset.list_filters',
+            'asset',
+            'c.id',
+            $filter
+        );
 
         $orderBy    = $request->getSession()->get('mautic.asset.orderby', 'a.dateModified');
         $orderByDir = $request->getSession()->get('mautic.asset.orderbydir', $this->getDefaultOrderDirection());
@@ -108,14 +128,13 @@ final class AssetController extends FormController
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
-        // retrieve a list of categories
-        $categories = $assetModel->getLookupResults('category', '', 0);
-
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue' => $search,
-                'items'       => $assets,
-                'categories'  => $categories,
+                'searchValue'  => $search,
+                'searchScopes' => $assetSearchScopeProvider->getScopes(),
+                'filters'      => $categoryFilters['filters'],
+                'items'        => $assets,
+                'categories'   => $categoryFilters['categories'],
                 'limit'       => $limit,
                 'permissions' => $permissions,
                 'model'       => $assetModel,
@@ -399,10 +418,8 @@ final class AssetController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId, $ignorePost = false)
+    public function editAction(Request $request, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId, $ignorePost = false): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -592,10 +609,8 @@ final class AssetController extends FormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, AssetModel $model, $objectId)
+    public function deleteAction(Request $request, AssetModel $model, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.asset.page', 1);
         $returnUrl = $this->generateUrl('mautic_asset_index', ['page' => $page]);
@@ -651,6 +666,52 @@ final class AssetController extends FormController
         );
     }
 
+    public function batchDownloadAction(
+        Request $request,
+        BatchDownloadRequestValidator $batchDownloadRequestValidator,
+        BatchFileCollector $batchFileCollector,
+        ArchiveBuilder $archiveBuilder,
+        BatchDownloadResponder $batchDownloadResponder,
+    ): Response {
+        if (!$request->isMethod(Request::METHOD_POST)) {
+            return new Response('', Response::HTTP_METHOD_NOT_ALLOWED, ['Allow' => Request::METHOD_POST]);
+        }
+
+        if (!$batchDownloadRequestValidator->validatePermissions()) {
+            $this->throwAccessDenied();
+        }
+
+        if (!$batchDownloadRequestValidator->hasValidCsrfToken($request)) {
+            $this->throwAccessDenied();
+        }
+
+        try {
+            $ids                = $batchDownloadRequestValidator->validateAndExtractIds($request);
+            $downloadableAssets = $batchFileCollector->collectDownloadableAssets($ids);
+            $zipPath            = $archiveBuilder->buildArchive($downloadableAssets);
+
+            return $batchDownloadResponder->createResponse($zipPath);
+        } catch (BatchDownloadException $e) {
+            return $this->createBatchDownloadErrorResponse($e->getMessage());
+        }
+    }
+
+    /**
+     * @param array<string, string|int> $messageVars
+     */
+    private function createBatchDownloadErrorResponse(string $messageKey, array $messageVars = []): JsonResponse
+    {
+        $this->addFlashMessage($messageKey, $messageVars, FlashBag::LEVEL_ERROR);
+
+        return new JsonResponse(
+            [
+                'message' => $this->translator->trans($messageKey, $messageVars, 'flashes'),
+                'flashes' => $this->getFlashContent(),
+            ],
+            Response::HTTP_BAD_REQUEST
+        );
+    }
+
     /**
      * Deletes a group of entities.
      */
@@ -697,7 +758,7 @@ final class AssetController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $model->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -719,8 +780,6 @@ final class AssetController extends FormController
 
     /**
      * Renders the container for the remote file browser.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function remoteAction(Request $request, IntegrationHelper $integrationHelper): Response
     {

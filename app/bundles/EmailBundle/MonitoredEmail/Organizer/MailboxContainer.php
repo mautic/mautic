@@ -1,28 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\MonitoredEmail\Organizer;
 
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 
-class MailboxContainer
+final class MailboxContainer
 {
-    /**
-     * @var array
-     */
-    protected $criteria = [];
+    private array $criteria = [];
 
-    /**
-     * @var bool
-     */
-    protected $markAsSeen = true;
-
-    /**
-     * @var array
-     */
-    protected $messages = [];
+    private bool $markAsSeen = true;
 
     public function __construct(
-        protected ConfigAccessor $config,
+        private readonly ConfigAccessor $config,
     ) {
     }
 
@@ -43,10 +34,7 @@ class MailboxContainer
         $this->markAsSeen = false;
     }
 
-    /**
-     * @return bool
-     */
-    public function shouldMarkAsSeen()
+    public function shouldMarkAsSeen(): bool
     {
         return $this->markAsSeen;
     }
@@ -59,10 +47,7 @@ class MailboxContainer
         return $this->config->getPath();
     }
 
-    /**
-     * @return array
-     */
-    public function getCriteria()
+    public function getCriteria(): array
     {
         return $this->criteria;
     }

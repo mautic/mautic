@@ -74,7 +74,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
         ]);
 
         /** @var FocusModel $focusModel */
-        $focusModel = static::getContainer()->get(FocusModel::class);
+        $focusModel = self::getContainer()->get(FocusModel::class);
         $focusModel->saveEntity($focus);
 
         $this->em->clear();

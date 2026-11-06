@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -30,7 +32,7 @@ final class SmsSendType extends AbstractType
             SmsListType::class,
             [
                 'label'      => 'mautic.sms.send.selectsmss',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.sms.choose.smss',

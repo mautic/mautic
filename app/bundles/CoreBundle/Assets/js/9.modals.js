@@ -188,7 +188,7 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
  * @param target
  */
 Mautic.resetModal = function (target) {
-    if (mQuery(target).hasClass('in')) {
+    if (mQuery(target).hasClass('show')) {
         return;
     }
 
@@ -323,18 +323,18 @@ Mautic.showConfirmation = function (el, customMessage) {
             }
         })
         .html(confirmText);
-    if (cancelText) {
-        var cancelButton = mQuery('<button type="button" />')
-            .addClass("btn btn-primary")
-            .click(function () {
-                if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
-                    window["Mautic"][cancelCallback].apply('window', [el]);
-                } else {
-                    Mautic.dismissConfirmation();
-                }
-            })
-            .html(cancelText);
-    }
+	    if (cancelText) {
+	        var cancelButton = mQuery('<button type="button" />')
+	            .addClass("btn btn-primary")
+	            .click(function () {
+	                if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
+	                    window["Mautic"][cancelCallback].apply('window', [el]);
+	                } else {
+	                    Mautic.dismissConfirmation();
+	                }
+	            })
+	            .text(cancelText);
+	    }
 
     if (typeof cancelButton != 'undefined') {
         confirmFooterDiv.append(cancelButton);
@@ -408,7 +408,7 @@ Mautic.loadAjaxModalBySelectValue = function (el, value, route, header) {
  * @param target
  */
 Mautic.showModal = function(target) {
-    if (mQuery('.modal.in').length) {
+    if (mQuery('.modal.show').length) {
         // another modal is activated so let's stack
 
         // is this modal within another modal?
@@ -422,13 +422,13 @@ Mautic.showModal = function(target) {
             mQuery(target).appendTo('body');
         }
 
-        var activeModal = mQuery('.modal.in .modal-dialog:not(:has(.aside))').parents('.modal').last(),
+        var activeModal = mQuery('.modal.show .modal-dialog:not(:has(.aside))').parents('.modal').last(),
             targetModal  = mQuery(target);
 
         if (activeModal.length && activeModal.attr('id') !== targetModal.attr('id')) {
             targetModal.attr('data-previous-modal', '#'+activeModal.attr('id'));
             activeModal.find('.modal-dialog').addClass('aside');
-            var stackedDialogCount = mQuery('.modal.in .modal-dialog.aside').length;
+            var stackedDialogCount = mQuery('.modal.show .modal-dialog.aside').length;
             if (stackedDialogCount <= 5) {
                 activeModal.find('.modal-dialog').addClass('aside-' + stackedDialogCount);
             }
@@ -452,5 +452,4 @@ Mautic.showModal = function(target) {
 
     mQuery(target).modal('show');
 };
-
 

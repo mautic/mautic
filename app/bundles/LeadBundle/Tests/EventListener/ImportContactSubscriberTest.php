@@ -256,7 +256,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
-                public function import(array $fields, array $data, $owner = null, $list = null, $tags = null, bool $persist = true, ?LeadEventLog $eventLog = null, $importId = null, bool $skipIfExists = false): bool
+                public function import(array $fields, array $data, $owner = null, $list = null, $tags = null, bool $persist = true, ?LeadEventLog $eventLog = null, $importId = null, bool $skipIfExists = false, bool $createNew = true): bool
                 {
                     return true;
                 }

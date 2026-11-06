@@ -9,7 +9,8 @@
 .alert-dismissable, // The misspelled .alert-dismissable was deprecated in 3.2.0.
 .alert-dismissible {
   // Adjust close link position
-  .close {
+  .close,
+  .btn-close {
     top: -1px;
   }
 }
@@ -64,7 +65,8 @@
         left: 10px;
         font-size: 18px;
       }
-      .close {
+      .close,
+      .btn-close {
         position: absolute;
         top: 10px;
         right: 5px;
@@ -72,7 +74,8 @@
     }
   }
 
-  .close {
+  .close,
+  .btn-close {
     font-size: 13px;
     position: absolute;
     right: 12px;
@@ -207,7 +210,8 @@
   }
 }
 
-.alert-growl .close {
+.alert-growl .close,
+.alert-growl .btn-close {
   font-size: ($font-size-base);
   color: var(--text-inverse);
   margin-left: 10px;

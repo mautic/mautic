@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Update;
 use Mautic\CoreBundle\Update\Step\StepInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-class StepProvider
+final class StepProvider
 {
     /**
      * @var StepInterface[]

@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Loader\EnvVars;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class SessionEnvVars implements EnvVarsInterface
+final class SessionEnvVars implements EnvVarsInterface
 {
     public static function load(ParameterBag $config, ParameterBag $defaultConfig, ParameterBag $envVars): void
     {

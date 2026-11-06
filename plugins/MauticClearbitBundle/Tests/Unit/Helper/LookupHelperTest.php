@@ -7,7 +7,10 @@ namespace MauticPlugin\MauticClearbitBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\Integration;
@@ -31,6 +34,10 @@ final class LookupHelperTest extends TestCase
 
     private MockObject&CompanyModel $companyModel;
 
+    private MockObject&LeadRepository $leadRepository;
+
+    private MockObject&CompanyRepository $companyRepository;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -40,6 +47,8 @@ final class LookupHelperTest extends TestCase
         $this->logger             = $this->createStub(LoggerInterface::class);
         $this->leadModel          = $this->createMock(LeadModel::class);
         $this->companyModel       = $this->createMock(CompanyModel::class);
+        $this->leadRepository     = $this->createMock(LeadRepository::class);
+        $this->companyRepository  = $this->createMock(CompanyRepository::class);
     }
 
     public function testConstructorLeavesIntegrationNullWhenNotFound(): void
@@ -91,7 +100,7 @@ final class LookupHelperTest extends TestCase
         $lead->method('getEmail')->willReturn(null);
 
         $this->leadModel->expects($this->never())->method('saveEntity');
-        $this->leadModel->expects($this->never())->method('getRepository');
+        $this->leadRepository->expects($this->never())->method('saveEntity');
 
         $this->makeHelper()->lookupContact($lead);
     }
@@ -105,7 +114,7 @@ final class LookupHelperTest extends TestCase
         $lead->method('getEmail')->willReturn('john@example.com');
 
         $this->leadModel->expects($this->never())->method('saveEntity');
-        $this->leadModel->expects($this->never())->method('getRepository');
+        $this->leadRepository->expects($this->never())->method('saveEntity');
 
         $this->makeHelper()->lookupContact($lead, false, true);
     }
@@ -115,11 +124,11 @@ final class LookupHelperTest extends TestCase
         $this->integrationsHelper->method('getIntegration')->with('Clearbit')
             ->willReturn($this->makeIntegration(true, ['apikey' => 'abc123']));
 
-        $company = $this->createMock(\Mautic\LeadBundle\Entity\Company::class);
+        $company = $this->createMock(Company::class);
         $company->method('getFieldValue')->with('companywebsite')->willReturn(null);
 
         $this->companyModel->expects($this->never())->method('saveEntity');
-        $this->companyModel->expects($this->never())->method('getRepository');
+        $this->companyRepository->expects($this->never())->method('saveEntity');
 
         $this->makeHelper()->lookupCompany($company);
     }
@@ -178,6 +187,8 @@ final class LookupHelperTest extends TestCase
             $this->logger,
             $this->leadModel,
             $this->companyModel,
+            $this->leadRepository,
+            $this->companyRepository,
         );
     }
 

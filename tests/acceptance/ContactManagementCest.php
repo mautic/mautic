@@ -17,7 +17,6 @@ final class ContactManagementCest
 
     public function createContactFromQuickAdd(
         AcceptanceTester $I,
-        ContactStep $contact,
     ): void {
         $email = sprintf('quickadd%s@example.com', time());
 
@@ -398,6 +397,7 @@ final class ContactManagementCest
         $I->fillField(ContactPage::$addToTheFollowingSegmentInput, 'Segment Test 3');
         $I->pressKey(ContactPage::$addToTheFollowingSegmentInput, WebDriverKeys::ENTER);
         $I->click(ContactPage::$changeSegmentModalSaveButton);
+        $I->waitForElementNotVisible('#MauticSharedModal', AcceptanceTester::TIMEOUT);
 
         // Clear all selection
         $I->click(ContactPage::$clearAllContactsSelection);
@@ -440,6 +440,7 @@ final class ContactManagementCest
         $I->fillField(ContactPage::$removeFromTheFollowingSegmentInput, 'Segment Test 3');
         $I->pressKey(ContactPage::$removeFromTheFollowingSegmentInput, WebDriverKeys::ENTER);
         $I->click(ContactPage::$changeSegmentModalSaveButton);
+        $I->waitForElementNotVisible('#MauticSharedModal', AcceptanceTester::TIMEOUT);
 
         // Clear all selection
         $I->click(ContactPage::$clearAllContactsSelection);
@@ -507,7 +508,8 @@ final class ContactManagementCest
 
         // Wait for the import page to load
         $I->waitForText('Import Contacts', AcceptanceTester::TIMEOUT, 'h1.page-header-title');
-        $I->seeElement(ContactPage::$importModal);
+        $I->waitForElementVisible(ContactPage::$importForm, AcceptanceTester::TIMEOUT);
+        $I->waitForElementVisible(ContactPage::$uploadButton, AcceptanceTester::TIMEOUT);
 
         // Click 'Choose file' and select a file
         $I->attachFile(ContactPage::$chooseFileButton, '10contacts.csv');
@@ -515,19 +517,17 @@ final class ContactManagementCest
         // Click the upload button
         $I->click(ContactPage::$uploadButton);
 
-        // Wait for the new form to open
-        $I->waitForElement(ContactPage::$importForm, AcceptanceTester::TIMEOUT);
+        // Wait for the mapping form to open and field widgets to initialize
+        $I->waitForElementVisible(ContactPage::$firstName, AcceptanceTester::TIMEOUT);
 
         // Fill in the form
-        $I->seeElement(ContactPage::$importFormFields);
         $contact->fillImportFormFields();
 
         // Click 'import in browser'
         $I->click(ContactPage::$importInBrowser);
 
         // Wait for import completion message
-        $I->waitForElement(ContactPage::$importProgressComplete, AcceptanceTester::TIMEOUT);
-        $I->see('Successful import', 'h2');
+        $I->waitForText('Successful import', AcceptanceTester::TIMEOUT, '#leadImportProgressComplete h2');
 
         // Extract the number of contacts created from the progress message
         $expectedContactsAdded = (int) $I->grabTextFrom('#leadImportProgressComplete > div > div:nth-child(2) > div > div.panel-body > div:nth-child(2) > div > span');

@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Release;
 
-class ThisRelease
+final class ThisRelease
 {
     public static function getMetadata(): Metadata
     {

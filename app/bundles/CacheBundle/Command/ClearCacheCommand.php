@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'mautic:cache:clear',
     description: "Clears Mautic's cache"
 )]
-class ClearCacheCommand extends Command
+final class ClearCacheCommand extends Command
 {
     public function __construct(
         private readonly CacheProviderInterface $cacheProvider,

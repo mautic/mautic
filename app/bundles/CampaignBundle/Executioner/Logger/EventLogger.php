@@ -55,7 +55,7 @@ class EventLogger
 
     public function persistLog(LeadEventLog $log): void
     {
-        $this->leadEventLogRepository->saveEntity($log);
+        $this->leadEventLogRepository->upsert($log);
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
             $this->summaryModel->updateSummary([$log]);
         }
@@ -80,7 +80,9 @@ class EventLogger
         }
         $log->setLead($contact);
 
-        if ($isInactiveEvent) {
+        if (Event::TYPE_CONDITION === $event->getEventType()) {
+            $log->setNonActionPathTaken(null);
+        } elseif ($isInactiveEvent) {
             $log->setNonActionPathTaken(true);
         }
 
@@ -120,7 +122,10 @@ class EventLogger
             return $this;
         }
 
-        $this->leadEventLogRepository->saveEntities($collection->getValues());
+        foreach ($collection as $log) {
+            $this->leadEventLogRepository->upsert($log);
+        }
+
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
             $this->summaryModel->updateSummary($collection->getValues());
         }
@@ -180,6 +185,14 @@ class EventLogger
             $log->setDateTriggered(new \DateTime());
             ChannelExtractor::setChannel($log, $event, $config);
 
+            if (!$isInactiveEntry) {
+                if (Event::TYPE_CONDITION === $event->getEventType()) {
+                    $log->setNonActionPathTaken(null);
+                } else {
+                    $log->setNonActionPathTaken(false);
+                }
+            }
+
             if ($isDecision) {
                 // Do not pre-persist decision logs as they must be evaluated first
                 $this->logs->add($log);
@@ -203,7 +216,9 @@ class EventLogger
             return;
         }
 
-        $this->leadEventLogRepository->saveEntities($this->persistQueue->getValues());
+        foreach ($this->persistQueue as $log) {
+            $this->leadEventLogRepository->upsert($log);
+        }
 
         // Push them into the logs ArrayCollection to be used later.
         foreach ($this->persistQueue as $log) {

@@ -154,7 +154,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
                 if (!$isNew) {
                     // get a list of leads that has already had this event applied
                     $leadIds = $this->triggerEventRepository->getLeadsForEvent($event->getId());
-                    if (!empty($leadIds)) {
+                    if ([] !== $leadIds) {
                         $args['filter']['force'][] = [
                             'column' => 'l.id',
                             'expr'   => 'notIn',
@@ -180,7 +180,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
                 }
             }
 
-            if (!empty($persist)) {
+            if ([] !== $persist) {
                 $this->triggerEventRepository->saveEntities($persist);
             }
         }
@@ -275,7 +275,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getEvents(): array
     {
-        if (empty($this->cachedEvents)) {
+        if ([] === $this->cachedEvents) {
             $event = new TriggerBuilderEvent($this->translator);
             $this->dispatcher->dispatch($event, PointEvents::TRIGGER_ON_BUILD);
             $this->cachedEvents = $event->getEvents();
@@ -393,7 +393,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         $groupEvents  = $this->triggerEventRepository->getPublishedByGroupScore($lead->getGroupScores());
         $events       = array_merge($events, $groupEvents);
 
-        if (!empty($events)) {
+        if ([] !== $events) {
             // get a list of actions that has already been applied to this lead
             $appliedEvents = $this->triggerEventRepository->getLeadTriggeredEvents($lead->getId());
             $ipAddress     = $this->ipLookupHelper->getIpAddress();
@@ -415,7 +415,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
                 }
             }
 
-            if (!empty($persist)) {
+            if ([] !== $persist) {
                 $this->triggerEventRepository->saveEntities($persist);
                 $this->triggerEventRepository->detachEntities($persist);
             }

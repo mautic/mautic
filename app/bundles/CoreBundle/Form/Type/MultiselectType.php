@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\LeadBundle\Validator\Constraints\Length;
@@ -15,7 +17,7 @@ final class MultiselectType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'label_attr'        => ['class' => 'control-label'],
+            'label_attr'        => ['class' => 'form-label'],
             'attr'              => ['class' => 'form-control'],
             'multiple'          => true,
             'choices_as_values' => true,

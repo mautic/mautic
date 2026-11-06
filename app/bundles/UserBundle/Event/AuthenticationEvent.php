@@ -26,6 +26,8 @@ class AuthenticationEvent extends Event
      */
     protected $isAuthenticated = false;
 
+    private bool $isSupportUser = false;
+
     /**
      * @var bool
      */
@@ -166,6 +168,22 @@ class AuthenticationEvent extends Event
     public function isAuthenticated()
     {
         return $this->isAuthenticated;
+    }
+
+    /**
+     * Check if the user is a support user.
+     */
+    public function isSupportUser(): bool
+    {
+        return $this->isSupportUser;
+    }
+
+    /**
+     * Set if this user is a support user.
+     */
+    public function setIsSupportUser(bool $isSupportUser): void
+    {
+        $this->isSupportUser = $isSupportUser;
     }
 
     /**

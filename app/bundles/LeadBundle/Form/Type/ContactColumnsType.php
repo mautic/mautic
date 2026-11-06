@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Services\ContactColumnsDictionary;
@@ -23,7 +25,7 @@ final class ContactColumnsType extends AbstractType
             [
                 'choices'    => array_flip($this->columnsDictionary->getFields()),
                 'label'      => false,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'multiple'   => true,
                 'expanded'   => false,

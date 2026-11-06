@@ -180,7 +180,7 @@ final class ProjectEntityLoaderService
      */
     private function getEntityTypes(): array
     {
-        if (!empty($this->entityTypesCache)) {
+        if ([] !== $this->entityTypesCache) {
             return $this->entityTypesCache;
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -33,7 +35,7 @@ final class CampaignActionAddDNCType extends AbstractType
             [
                 'label'      => 'mautic.lead.batch.dnc_reason',
                 'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );

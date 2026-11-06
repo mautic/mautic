@@ -10,7 +10,7 @@ use Symfony\Component\Mime\Address;
 
 final class AddressDTO
 {
-    private ?string $name = null;
+    private ?string $name;
 
     public function __construct(
         private readonly string $email,

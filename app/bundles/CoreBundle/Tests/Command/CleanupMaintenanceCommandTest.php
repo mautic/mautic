@@ -23,7 +23,7 @@ final class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--days-old' => 180, '--no-interaction' => true]);
 
         $this->assertNull(
-            static::getContainer()->get(LeadModel::class)->getEntity($contactId),
+            self::getContainer()->get(LeadModel::class)->getEntity($contactId),
             'Purge an unidentified lead that is considered inactive'
         );
 
@@ -42,7 +42,7 @@ final class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--days-old' => 180, '--no-interaction' => true]);
 
         $this->assertNotNull(
-            static::getContainer()->get(LeadModel::class)->getEntity($contactId),
+            self::getContainer()->get(LeadModel::class)->getEntity($contactId),
             'Keep an unidentified lead that is still considered active'
         );
     }

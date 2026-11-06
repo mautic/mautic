@@ -9,7 +9,7 @@ use Doctrine\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\Role;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class RoleData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
+final class RoleData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

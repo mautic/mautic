@@ -28,7 +28,7 @@ You can optionally specify to bypass the verification check with the --force opt
 <info>php %command.full_name% --force</info>
 TXT
 )]
-class InstallDataCommand extends Command
+final class InstallDataCommand extends Command
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

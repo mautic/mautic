@@ -19,7 +19,7 @@ use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 
-class SlowTest implements Extension
+final class SlowTest implements Extension
 {
     private bool $prepared          = false;
 

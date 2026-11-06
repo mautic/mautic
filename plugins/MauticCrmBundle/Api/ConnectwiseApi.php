@@ -52,7 +52,7 @@ class ConnectwiseApi extends CrmApi
                 }
             }
         }
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             throw new ApiErrorException(implode(' ', $errors), $code);
         }
 

@@ -93,7 +93,6 @@ final class PluginAuthenticatorTest extends TestCase
         );
 
         $authenticateResult = $authenticateResult->authenticate($request);
-        $this->assertInstanceOf(SelfValidatingPassport::class, $authenticateResult);
         $this->assertCount(2, $authenticateResult->getBadges());
 
         $userBadge = $authenticateResult->getBadge(UserBadge::class);

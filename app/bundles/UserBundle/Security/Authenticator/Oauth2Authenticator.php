@@ -52,7 +52,10 @@ class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenticator\
                 }
             }
 
-            $roles = (null !== $user) ? $user->getRoles() : [];
+            // For user-bound tokens, use the user's roles.
+            // For client-only tokens (client_credentials), use a placeholder role to mark the badge
+            // as resolved. The actual roles will be set by ApiUserSubscriber from the client's Role.
+            $roles = (null !== $user) ? $user->getRoles() : ['ROLE_API'];
             $scope = $accessToken->getScope();
 
             if (!empty($scope)) {
@@ -68,6 +71,8 @@ class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenticator\
             // Parent uses $client->getUserIdentifier() here, which breaks
             // user-bound bearer tokens on /api/v2 because the client identifier
             // is not a Mautic username.
+            // Note: No userLoader is provided here - ApiUserSubscriber will set one
+            // for client-only tokens to create a pseudo-user with proper permissions.
             return new SelfValidatingPassport(
                 new UserBadge($user?->getUserIdentifier() ?? $client->getUserIdentifier()),
                 [$accessTokenBadge]

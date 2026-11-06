@@ -26,7 +26,7 @@ final class PasswordResetConfirmType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.user.auth.form.loginusername',
-                'label_attr' => ['class' => 'sr-only'],
+                'label_attr' => ['class' => 'visually-hidden'],
                 'attr'       => [
                     'class'       => 'form-control',
                     'preaddon'    => 'ri-user-6-fill',
@@ -46,7 +46,7 @@ final class PasswordResetConfirmType extends AbstractType
                 'first_name'    => 'password',
                 'first_options' => [
                     'label'      => 'mautic.core.password',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'        => 'form-control',
                         'placeholder'  => 'mautic.user.user.passwordreset.password.placeholder',
@@ -59,15 +59,13 @@ final class PasswordResetConfirmType extends AbstractType
                     'constraints'    => [
                         new Assert\NotBlank(message: 'mautic.user.user.passwordreset.notblank'),
                         new Assert\Length(min: 6, minMessage: 'mautic.user.user.password.minlength'),
-                        new NotWeak([
-                            'message' => 'mautic.user.user.password.weak',
-                        ]),
+                        new NotWeak(message: 'mautic.user.user.password.weak'),
                     ],
                 ],
                 'second_name'    => 'confirm',
                 'second_options' => [
                     'label'      => 'mautic.user.user.form.passwordconfirm',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'        => 'form-control',
                         'placeholder'  => 'mautic.user.user.passwordreset.confirm.placeholder',

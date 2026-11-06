@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -25,7 +27,7 @@ final class ButtonGroupType extends AbstractType
             'multiple'           => false,
             'placeholder'        => false,
             'required'           => false,
-            'label_attr'         => ['class' => 'control-label'],
+            'label_attr'         => ['class' => 'form-label'],
             'button_group_class' => 'btn-block',
         ]);
     }

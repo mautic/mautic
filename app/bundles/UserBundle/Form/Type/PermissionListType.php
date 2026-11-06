@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -19,7 +21,7 @@ final class PermissionListType extends AbstractType
         $resolver->setDefaults([
             'multiple'          => true,
             'expanded'          => true,
-            'label_attr'        => ['class' => 'control-label'],
+            'label_attr'        => ['class' => 'form-label'],
             'attr'              => fn (Options $options): array => [
                 'data-permission' => $options['bundle'].':'.$options['level'],
                 'onchange'        => 'Mautic.onPermissionChange(this, \''.$options['bundle'].'\')',

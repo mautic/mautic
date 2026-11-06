@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Value;
 
-class ReferenceValueDAO implements \Stringable
+final class ReferenceValueDAO implements \Stringable
 {
     private ?int $value = null;
 

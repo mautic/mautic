@@ -33,4 +33,14 @@ interface TypeOperatorProviderInterface
      * @return mixed[]
      */
     public function getAllTypeOperators(): array;
+
+    /**
+     * Set the context for which the operators are being generated.
+     */
+    public function setContext(string $context): void;
+
+    /**
+     * Get the context for which the operators are being generated.
+     */
+    public function getContext(): string;
 }

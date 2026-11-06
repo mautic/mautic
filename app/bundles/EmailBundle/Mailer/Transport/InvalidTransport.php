@@ -10,7 +10,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\RawMessage;
 
-class InvalidTransport implements TransportInterface
+final class InvalidTransport implements TransportInterface
 {
     public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {

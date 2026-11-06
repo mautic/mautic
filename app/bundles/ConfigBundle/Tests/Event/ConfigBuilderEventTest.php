@@ -6,16 +6,15 @@ namespace Mautic\ConfigBundle\Tests\Event;
 
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\CoreBundle\Tests\CommonMocks;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 
 final class ConfigBuilderEventTest extends CommonMocks
 {
     public function testAddForm(): void
     {
-        $event  = $this->initEvent();
-        $form   = ['formAlias' => 'testform'];
-        $result = $event->addForm($form);
-
-        $this->assertInstanceOf(ConfigBuilderEvent::class, $result);
+        $event = $this->initEvent();
+        $form  = ['formAlias' => 'testform'];
+        $event->addForm($form);
 
         $forms = $event->getForms();
 
@@ -34,6 +33,31 @@ final class ConfigBuilderEventTest extends CommonMocks
 
         $this->assertSame([], $forms);
         $this->assertTrue($result);
+    }
+
+    #[RunInSeparateProcess]
+    public function testGetParametersFromConfigHandlesIncompleteBundleMetadata(): void
+    {
+        $bundleHelper = $this->getBundleHelperMock();
+        $bundleHelper->expects($this->once())
+            ->method('getMauticBundles')
+            ->with(true)
+            ->willReturn([
+                'BundleWithoutConfig' => [],
+                'BundleWithoutParameters' => ['config' => []],
+                'BundleWithParameters' => [
+                    'config' => [
+                        'parameters' => ['example' => 'value'],
+                    ],
+                ],
+            ]);
+
+        $event = new ConfigBuilderEvent($bundleHelper);
+
+        $this->assertSame([], $event->getParametersFromConfig('MissingBundle'));
+        $this->assertSame([], $event->getParametersFromConfig('BundleWithoutConfig'));
+        $this->assertSame([], $event->getParametersFromConfig('BundleWithoutParameters'));
+        $this->assertSame(['example' => 'value'], $event->getParametersFromConfig('BundleWithParameters'));
     }
 
     protected function initEvent(): ConfigBuilderEvent

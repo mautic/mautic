@@ -345,7 +345,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $field->setProperties($properties);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get(FieldModel::class);
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 
@@ -401,7 +401,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->getContainer()->get(UserTokenSetter::class)->setUser($import->getCreatedBy());
         /** @var ImportModel $importModel */
-        $importModel = static::getContainer()->get(ImportModel::class);
+        $importModel = self::getContainer()->get(ImportModel::class);
         $importModel->saveEntity($import);
 
         return $import;
@@ -457,7 +457,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $tag->setTag($tagName);
 
         /** @var TagModel $tagModel */
-        $tagModel = static::getContainer()->get(TagModel::class);
+        $tagModel = self::getContainer()->get(TagModel::class);
         $tagModel->saveEntity($tag);
 
         return $tag;

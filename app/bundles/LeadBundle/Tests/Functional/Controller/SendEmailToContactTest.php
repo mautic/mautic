@@ -214,7 +214,6 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->assertCount(1, $messages, 'Expected exactly one email message to be sent');
         $rawMessage = $messages[0];
         $this->assertInstanceOf(Message::class, $rawMessage);
-        $this->assertInstanceOf(Message::class, $rawMessage);
 
         // For signed messages, use toString() instead of getBody()
         $email   = $rawMessage->toString();

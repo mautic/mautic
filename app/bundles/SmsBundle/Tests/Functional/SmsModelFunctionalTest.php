@@ -170,7 +170,6 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(Lead::class, $contact1);
 
         $stat1 = $statRepo->getLeadStats($contact1->getId());
-        $this->assertInstanceOf(Sms::class, $sms);
         $this->assertSame((string) $sms->getId(), $stat1[0]['sms_id'], 'English contact should map to base SMS.');
 
         $stat2 = $statRepo->getLeadStats($contact2->getId());
@@ -179,9 +178,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
 
         // 8. Validate SMS stats for translation and parent
         $this->em->clear();
-        $this->assertInstanceOf(Sms::class, $sms);
         $sms      = $this->em->find(Sms::class, $sms->getId());
-        $this->assertInstanceOf(Sms::class, $smsFr);
         $smsFr    = $this->em->find(Sms::class, $smsFr->getId());
         $this->assertInstanceOf(Sms::class, $sms);
 

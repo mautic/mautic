@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -60,6 +62,17 @@ final class ConfigTrackingPageType extends AbstractType
                 'data'  => isset($options['data']['append_segment_id_tracking_url']) && (bool) $options['data']['append_segment_id_tracking_url'],
                 'attr'  => [
                     'tooltip' => 'mautic.page.config.form.append_segment_id_tracking_url.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'aggregate_analytics',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.page.config.form.aggregate_analytics',
+                'attr'  => [
+                    'tooltip' => 'mautic.page.config.form.aggregate_analytics.tooltip',
                 ],
             ]
         );

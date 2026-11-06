@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Sync\SyncJudge\Modes;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 
-class FuzzyEvidence implements JudgementModeInterface
+final class FuzzyEvidence implements JudgementModeInterface
 {
     /**
      * @throws ConflictUnresolvedException

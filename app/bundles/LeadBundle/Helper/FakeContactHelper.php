@@ -19,14 +19,20 @@ class FakeContactHelper
     public function prepareFakeContactWithPrimaryCompany(): array
     {
         $contact = $this->prepareFakeEntity('lead');
-
-        $company = $this->prepareFakeEntity('company');
-
-        $company['is_primary'] = 1;
-
-        $contact['companies'][] = $company;
+        $contact['companies'][] = $this->prepareFakeCompany();
 
         return $contact;
+    }
+
+    /**
+     * @return array<int|string, int|string|array<int|string, mixed>|null>
+     */
+    public function prepareFakeCompany(): array
+    {
+        $company = $this->prepareFakeEntity('company');
+        $company['is_primary'] = 1;
+
+        return $company;
     }
 
     /**
@@ -40,7 +46,7 @@ class FakeContactHelper
         ]);
 
         array_walk($fields, function (&$field): void {
-            $field = "[{$field}]";
+            $field = "[$field]";
         });
 
         $fields['id'] = 0;

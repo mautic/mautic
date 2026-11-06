@@ -30,10 +30,8 @@ final class LeadImportType extends AbstractType
                 'constraints' => [
                     new File(mimeTypes: ['text/*', 'application/octet-stream', 'application/csv'], mimeTypesMessage: 'mautic.core.invalid_file_type'),
                     new EncodingValidation(
-                        [
-                            'encodingFormat'        => ['UTF-8'],
-                            'encodingFormatMessage' => 'mautic.core.invalid_file_encoding',
-                        ]
+                        encodingFormatMessage: 'mautic.core.invalid_file_encoding',
+                        encodingFormat: ['UTF-8'],
                     ),
                     new NotBlank(
                         message: 'mautic.import.file.required'
@@ -55,7 +53,7 @@ final class LeadImportType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.lead.import.delimiter',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.import.delimiter.help',
@@ -71,7 +69,7 @@ final class LeadImportType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.lead.import.enclosure',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.import.enclosure.help',
@@ -87,7 +85,7 @@ final class LeadImportType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.lead.import.escape',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.import.escape.help',
@@ -103,7 +101,7 @@ final class LeadImportType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.lead.import.batchlimit',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.import.batchlimit_tooltip',

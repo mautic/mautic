@@ -11,11 +11,13 @@ final class PackageBase
          * Original name in format "vendor/name".
          */
         public string $name,
-        public string $url,
-        public string $repository,
-        public string $description,
+        public ?string $url,
+        public ?string $repository,
+        public ?string $description,
         public int $downloads,
         public int $favers,
+        public float $averageRating,
+        public int $reviewCount,
         /**
          * E.g. mautic-plugin.
          */
@@ -28,11 +30,13 @@ final class PackageBase
     {
         return new self(
             $array['name'],
-            $array['url'],
-            $array['repository'],
-            $array['description'],
+            $array['url'] ?? '',
+            $array['repository'] ?? null,
+            $array['description'] ?? null,
             (int) $array['downloads'],
             (int) $array['favers'],
+            (float) ($array['average_rating'] ?? 0),
+            (int) ($array['total_review'] ?? $array['total_reviews'] ?? $array['reviewCount'] ?? 0),
             $array['type'] ?? null,
             $array['display_name'] ?? null
         );

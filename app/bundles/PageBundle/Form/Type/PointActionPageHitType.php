@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -14,7 +16,7 @@ final class PointActionPageHitType extends AbstractType
     {
         $builder->add('pages', PageListType::class, [
             'label'      => 'mautic.page.point.action.form.pages',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.page.point.action.form.pages.descr',

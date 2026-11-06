@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Unit\EventSubscriber;
 
 use Mautic\CoreBundle\Event\CustomAssetsEvent;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Install\InstallService;
 use MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\AssetsSubscriber;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -16,22 +18,25 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class AssetsSubscriberTest extends TestCase
 {
-    private const ASSET_SUBDIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
+    private const ASSET_SUBDIR = 'GrapesJsBuilderBundle/Assets/library/js/dist';
 
     private MockObject&CustomAssetsEvent $assetsEvent;
 
     private string $projectDir;
 
+    private string $pluginsDir;
+
     protected function setUp(): void
     {
         $this->assetsEvent = $this->createMock(CustomAssetsEvent::class);
         $this->projectDir  = sys_get_temp_dir().'/gjs_assets_test_'.uniqid();
-        mkdir($this->projectDir.'/'.self::ASSET_SUBDIR, 0777, true);
+        $this->pluginsDir  = $this->projectDir.'/plugins';
+        mkdir($this->projectDir);
     }
 
     protected function tearDown(): void
     {
-        $assetDir = $this->projectDir.'/'.self::ASSET_SUBDIR;
+        $assetDir = $this->pluginsDir.'/'.self::ASSET_SUBDIR;
 
         foreach (glob($assetDir.'/*') ?: [] as $file) {
             unlink($file);
@@ -128,8 +133,11 @@ final class AssetsSubscriberTest extends TestCase
         $this->makeSubscriberPublished()->injectAssets($this->assetsEvent);
     }
 
-    public function testInjectAssetsAddsScriptAndStylesheetWhenBothAssetsResolved(): void
+    #[DataProvider('providePluginsPaths')]
+    public function testInjectAssetsAddsScriptAndStylesheetWhenBothAssetsResolved(string $pluginsPath): void
     {
+        $this->pluginsDir = $this->projectDir.'/'.$pluginsPath;
+
         $jsFile  = 'builder.abc123.js';
         $cssFile = 'builder.abc123.css';
 
@@ -137,10 +145,20 @@ final class AssetsSubscriberTest extends TestCase
         $this->touchAsset($jsFile);
         $this->touchAsset($cssFile);
 
-        $this->assetsEvent->expects($this->once())->method('addScript')->with(self::ASSET_SUBDIR.'/'.$jsFile);
-        $this->assetsEvent->expects($this->once())->method('addStylesheet')->with(self::ASSET_SUBDIR.'/'.$cssFile);
+        $this->assetsEvent->expects($this->once())->method('addScript')->with('plugins/'.self::ASSET_SUBDIR.'/'.$jsFile);
+        $this->assetsEvent->expects($this->once())->method('addStylesheet')->with('plugins/'.self::ASSET_SUBDIR.'/'.$cssFile);
 
         $this->makeSubscriberPublished()->injectAssets($this->assetsEvent);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function providePluginsPaths(): iterable
+    {
+        yield 'root webroot' => ['plugins'];
+        yield 'docroot webroot' => ['docroot/plugins'];
+        yield 'public webroot' => ['public/plugins'];
     }
 
     public function testInjectAssetsAddsOnlyScriptWhenCssNotInManifest(): void
@@ -191,11 +209,14 @@ final class AssetsSubscriberTest extends TestCase
         $requestStack = $this->createStub(RequestStack::class);
         $requestStack->method('getCurrentRequest')->willReturn($request);
 
+        $pathsHelper = $this->createStub(PathsHelper::class);
+        $pathsHelper->method('getPluginsPath')->willReturn($this->pluginsDir);
+
         return new AssetsSubscriber(
             $config ?? $this->createStub(Config::class),
             $installer,
             $requestStack,
-            $this->projectDir,
+            $pathsHelper,
             $this->createStub(LoggerInterface::class),
         );
     }
@@ -206,11 +227,12 @@ final class AssetsSubscriberTest extends TestCase
     private function writeManifest(array|string $content): void
     {
         $data = is_array($content) ? json_encode($content) : $content;
-        file_put_contents($this->projectDir.'/'.self::ASSET_SUBDIR.'/manifest.json', $data);
+        mkdir($this->pluginsDir.'/'.self::ASSET_SUBDIR, 0777, true);
+        file_put_contents($this->pluginsDir.'/'.self::ASSET_SUBDIR.'/manifest.json', $data);
     }
 
     private function touchAsset(string $fileName): void
     {
-        touch($this->projectDir.'/'.self::ASSET_SUBDIR.'/'.$fileName);
+        touch($this->pluginsDir.'/'.self::ASSET_SUBDIR.'/'.$fileName);
     }
 }

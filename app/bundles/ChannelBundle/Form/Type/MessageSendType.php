@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -26,7 +28,8 @@ final class MessageSendType extends AbstractType
             MessageListType::class,
             [
                 'label'       => 'mautic.channel.send.selectmessages',
-                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [],
+                'label_attr'  => ['class' => 'form-label'],
                 'multiple'    => false,
                 'required'    => true,
                 'constraints' => [

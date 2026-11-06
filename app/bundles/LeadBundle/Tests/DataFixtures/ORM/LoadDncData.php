@@ -9,15 +9,17 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\DoNotContact;
 
-class LoadDncData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadDncData extends AbstractFixture implements OrderedFixtureInterface
 {
+    use ManagedLeadTrait;
+
     public function load(ObjectManager $manager): void
     {
         $dnc = new DoNotContact();
         $dnc->setChannel('sms');
         $dnc->setReason(DoNotContact::MANUAL);
         $dnc->setDateAdded(new \DateTime());
-        $dnc->setLead($this->getReference('lead-1'));
+        $dnc->setLead($this->getManagedLead($this->getReference('lead-1'), $manager));
 
         $manager->persist($dnc);
         $manager->flush();

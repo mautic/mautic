@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\UserBundle\Model\UserModel;
@@ -27,7 +29,7 @@ final class ChangeOwnerType extends AbstractType
                 'multiple'          => false,
                 'choices'           => $this->userModel->getOwnerListChoices(),
                 'required'          => true,
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => ['class' => 'form-control'],
             ]
         );

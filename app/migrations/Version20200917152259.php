@@ -11,10 +11,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20200917152259 extends AbstractMauticMigration
 {
-    /**
-     * @var string
-     */
-    private $table = 'lead_fields';
+    private string $table = 'lead_fields';
 
     /**
      * @throws SkipMigration

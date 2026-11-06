@@ -27,6 +27,8 @@
     <div id="page-list-wrapper" class="panel panel-default">
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
+            'searchScopes': searchScopes|default([]),
+            'searchScopeHint': searchScopeHint|default(null),
             'action': currentRoute,
             'page_actions': {
                 'templateButtons': {
@@ -42,6 +44,20 @@
                     'delete': permissions['lead:fields:full'],
                 },
             },
+            'quickFilters': [
+                {
+                    'search': 'mautic.lead.field.searchcommand.isindexed',
+                    'label': 'mautic.lead.field.searchcommand.isindexed.label',
+                    'tooltip': 'mautic.lead.field.searchcommand.isindexed.description',
+                    'icon': 'ri-search-eye-line'
+                },
+                {
+                    'search': 'mautic.lead.field.searchcommand.isunique',
+                    'label': 'mautic.lead.field.searchcommand.isunique.label',
+                    'tooltip': 'mautic.lead.field.searchcommand.isunique.description',
+                    'icon': 'ri-fingerprint-line'
+                }
+            ],
         }) }}
         <div class="page-list">
   {% endif %}
@@ -139,25 +155,25 @@
                       <td class="visible-md visible-lg">{{ item.id }}</td>
                       <td class="visible-sm visible-md visible-lg">
                           {% if item.isRequired %}
-                              <i class="ri-asterisk" data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.required'|trans }}"></i>
+                              <i class="ri-asterisk" data-bs-toggle="tooltip" data-bs-placement="left" title="{{ 'mautic.lead.field.tooltip.required'|trans }}"></i>
                           {% endif %}
                           {% if item.isVisible %}
-                              <i class="ri-eye-line-slash" data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.invisible'|trans }}"></i>
+                              <i class="ri-eye-line-slash" data-bs-toggle="tooltip" data-bs-placement="left" title="{{ 'mautic.lead.field.tooltip.invisible'|trans }}"></i>
                           {% endif %}
                           {% if item.isFixed %}
-                              <i class="ri-lock-fill" data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.fixed'|trans }}"></i>
+                              <i class="ri-lock-fill" data-bs-toggle="tooltip" data-bs-placement="left" title="{{ 'mautic.lead.field.tooltip.fixed'|trans }}"></i>
                           {% endif %}
                           {% if item.isListable %}
-                              <i class="ri-list-check " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.listable'|trans }}"></i>
+                              <i class="ri-list-check " data-bs-toggle="tooltip" data-bs-placement="left" title="{{ 'mautic.lead.field.tooltip.listable'|trans }}"></i>
                           {% endif %}
                           {% if item.isPubliclyUpdatable %}
-                              <i class="ri-earth-line text-danger " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.public'|trans }}"></i>
+                              <i class="ri-earth-line text-danger " data-bs-toggle="tooltip" data-bs-placement="left" title="{{ 'mautic.lead.field.tooltip.public'|trans }}"></i>
                           {% endif %}
                           {% if item.isUniqueIdentifer %}
-                              <i class="ri-key-2-line " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isuniqueidentifer'|trans }}"></i>
+                              <i class="ri-key-2-line " data-bs-toggle="tooltip" data-bs-placement="left" title="{{ 'mautic.lead.field.tooltip.isuniqueidentifer'|trans }}"></i>
                           {% endif %}
                           {% if item.isIsIndex %}
-                              <i class="ri-menu-search-line " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isindex'|trans }}"></i>
+                              <i class="ri-menu-search-line " data-bs-toggle="tooltip" data-bs-placement="left" title="{{ 'mautic.lead.field.tooltip.isindex'|trans }}"></i>
                           {% endif %}
                       </td>
                   </tr>

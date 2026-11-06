@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 
-class ClickthroughHelper
+final class ClickthroughHelper
 {
     /**
      * Encode an array to append to a URL.

@@ -6,6 +6,6 @@ namespace Mautic\EmailBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-class EmailDraftRepository extends CommonRepository
+final class EmailDraftRepository extends CommonRepository
 {
 }

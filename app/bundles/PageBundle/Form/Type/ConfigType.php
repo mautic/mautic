@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -31,7 +33,7 @@ final class ConfigType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.page.config.form.google.analytics',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'data'       => htmlspecialchars_decode((string) $options['data']['google_analytics']),
                 'attr'       => [
                     'class'   => 'form-control',

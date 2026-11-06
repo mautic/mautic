@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Helper;
 /**
  * Provides functions to get the PHP version number.
  */
-class PhpVersionHelper
+final class PhpVersionHelper
 {
     /**
      * For example, if the PHP version is 7.2.34-9+0\~20210112.53+debian10\~1.gbpfdd1e6,
