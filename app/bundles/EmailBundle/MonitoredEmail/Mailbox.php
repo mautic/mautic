@@ -257,7 +257,7 @@ class Mailbox
      *
      * @return mixed
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function isGmail()
     {
@@ -343,7 +343,7 @@ class Mailbox
      * @param int $options
      * @param int $retriesNum
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function setConnectionArgs($options = 0, $retriesNum = 0, ?array $params = null): void
     {
@@ -436,7 +436,7 @@ class Mailbox
      *
      * @return \stdClass
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function checkMailbox(): \stdClass|bool
     {
@@ -446,7 +446,7 @@ class Mailbox
     /**
      * Creates a new mailbox specified by mailbox.
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function createMailbox(): bool
     {
@@ -461,7 +461,7 @@ class Mailbox
      *
      * @return \stdClass if the box doesn't exist
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function statusMailbox(): \stdClass|bool
     {
@@ -490,7 +490,7 @@ class Mailbox
     }
 
     /**
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function fetchUnread($folder = null): array
     {
@@ -544,19 +544,18 @@ class Mailbox
             $searchQuery->ids(ImapIdSet::fromSequenceString($matches[1]));
         } elseif (self::CRITERIA_UNSEEN === $criteria) {
             $searchQuery->flag('SEEN', false);
+        } elseif (self::CRITERIA_SEEN === $criteria) {
+            $searchQuery->flag('SEEN');
         } elseif (self::CRITERIA_ALL !== $criteria) {
-            $searchQuery->flag('SEEN', false);
+            throw new MailboxException("Unsupported search criteria: {$criteria}");
         }
 
         try {
-            $results = $this->getClient()->search(
-                $this->imapFolder,
-                $searchQuery,
-            );
-
-            return $results->match->toArray();
-        } catch (\Exception) {
-            return [];
+            return $this->getClient()->search($this->imapFolder, $searchQuery)->match->toArray();
+        } catch (MailboxException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            throw new MailboxException($e->getMessage(), (int) $e->getCode(), $e);
         }
     }
 
@@ -565,7 +564,7 @@ class Mailbox
      *
      * @param string $filename
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function saveMail($mailId, $filename = 'email.eml'): bool
     {
@@ -575,7 +574,7 @@ class Mailbox
     /**
      * Marks mails listed in mailId for deletion.
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function deleteMail($mailId): bool
     {
@@ -585,7 +584,7 @@ class Mailbox
     /**
      * Move mail to another box.
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function moveMail($mailId, $mailBox): bool
     {
@@ -595,7 +594,7 @@ class Mailbox
     /**
      * Deletes all the mails marked for deletion by imap_delete(), imap_mail_move(), or imap_setflag_full().
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function expungeDeletedMails(): bool
     {
@@ -605,7 +604,7 @@ class Mailbox
     /**
      * Add the flag \Seen to a mail.
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function markMailAsRead($mailId): bool
     {
@@ -615,7 +614,7 @@ class Mailbox
     /**
      * Remove the flag \Seen from a mail.
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function markMailAsUnread($mailId): bool
     {
@@ -625,7 +624,7 @@ class Mailbox
     /**
      * Add the flag \Flagged to a mail.
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function markMailAsImportant($mailId): bool
     {
@@ -635,7 +634,7 @@ class Mailbox
     /**
      * Add the flag \Seen to a mails.
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function markMailsAsRead(array $mailIds): bool
     {
@@ -645,7 +644,7 @@ class Mailbox
     /**
      * Remove the flag \Seen from some mails.
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function markMailsAsUnread(array $mailIds): bool
     {
@@ -655,7 +654,7 @@ class Mailbox
     /**
      * Add the flag \Flagged to some mails.
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function markMailsAsImportant(array $mailIds): bool
     {
@@ -665,7 +664,7 @@ class Mailbox
     /**
      * Causes a store to add the specified flag to the flags set for the mails in the specified sequence.
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      *
      * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
      */
@@ -679,7 +678,7 @@ class Mailbox
      *
      * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function clearFlag(array $mailsIds, $flag): bool
     {
@@ -709,7 +708,7 @@ class Mailbox
      *
      * @return array
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function getMailsInfo(array $mailsIds): array|false
     {
@@ -744,7 +743,7 @@ class Mailbox
      *  Deleted - number of deleted messages
      *  Size - mailbox size
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function getMailboxInfo(): \stdClass
     {
@@ -768,7 +767,7 @@ class Mailbox
      *
      * @return array Mails ids
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function sortMails($criteria = SORTARRIVAL, $reverse = true): array|bool
     {
@@ -778,7 +777,7 @@ class Mailbox
     /**
      * Get mails count in mail box.
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function countMails(): int|bool
     {
@@ -790,7 +789,7 @@ class Mailbox
      *
      * @return array - FALSE in the case of call failure
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     protected function getQuota(): array|bool
     {
@@ -802,7 +801,7 @@ class Mailbox
      *
      * @return int - FALSE in the case of call failure
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function getQuotaLimit()
     {
@@ -819,7 +818,7 @@ class Mailbox
      *
      * @return int - FALSE in the case of call failure
      *
-     * @depreacated
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
      */
     public function getQuotaUsage()
     {
@@ -866,7 +865,7 @@ class Mailbox
         $mail->date = date('Y-m-d H:i:s', $dateHeader ? strtotime(preg_replace('/\(.*?\)/', '', $dateHeader->value())) : time());
 
         $subjectHeader = $headers->subject();
-        $mail->subject = $subjectHeader ? $this->decodeMimeStr($subjectHeader->value()) : null;
+        $mail->subject = $subjectHeader ? Rfc2047::decode($subjectHeader->value()) : null;
 
         if ($from = $headers->from()) {
             $addresses = $this->parseAddressList($from->value());
@@ -960,8 +959,9 @@ class Mailbox
     private function mapEncryption(string $encryption): SecureMode
     {
         return match (strtolower(ltrim($encryption, '/'))) {
-            'tls', 'starttls' => SecureMode::Tls,
-            default    => SecureMode::Ssl,
+            '' => SecureMode::None,
+            'tls', 'starttls', 'tls/novalidate-cert' => SecureMode::Tls,
+            default => SecureMode::Ssl,
         };
     }
 
@@ -1080,7 +1080,7 @@ class Mailbox
             if (!empty($addr->mailbox) && !empty($addr->host)) {
                 $addresses[] = [
                     'email'    => $addr->mailbox.'@'.$addr->host,
-                    'personal' => !empty($addr->personal) ? $this->decodeMimeStr($addr->personal) : null,
+                    'personal' => !empty($addr->personal) ? Rfc2047::decode($addr->personal) : null,
                 ];
             }
         }
@@ -1088,9 +1088,24 @@ class Mailbox
         return $addresses;
     }
 
-    private function decodeMimeStr(string $string): string
+    /**
+     * @param string $charset
+     *
+     * @deprecated since 7.x, to be removed in 8.0. No replacement; IMAP access now uses horde/imap_client.
+     */
+    protected function decodeMimeStr($string, $charset = 'utf-8'): string
     {
-        return Rfc2047::decode($string);
+        $newString = '';
+        $elements  = imap_mime_header_decode($string);
+        $counter = count($elements);
+        for ($i = 0; $i < $counter; ++$i) {
+            if ('default' == $elements[$i]->charset) {
+                $elements[$i]->charset = 'iso-8859-1';
+            }
+            $newString .= $this->convertStringEncoding($elements[$i]->text, $elements[$i]->charset, $charset);
+        }
+
+        return $newString;
     }
 
     /**
@@ -1125,6 +1140,7 @@ class Mailbox
             imap_alerts();
 
             @imap_close($this->imapStream, CL_EXPUNGE);
+            $this->imapStream = null;
         }
     }
 
