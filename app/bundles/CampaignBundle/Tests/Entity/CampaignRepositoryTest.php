@@ -93,6 +93,32 @@ final class CampaignRepositoryTest extends TestCase
         $this->assertSame([], $params);
     }
 
+    public function testAddSearchCommandWhereClauseHandlesNegatedSegmentSourceFilter(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'source:segment', 'string' => '', 'not' => true, 'strict' => false];
+
+        $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
+
+        $this->assertSame('NOT EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref cl WHERE cl.campaign_id = c.id)', (string) $expr);
+        $this->assertSame([], $params);
+    }
+
+    public function testAddSearchCommandWhereClauseHandlesNegatedFormSourceFilter(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'source:form', 'string' => '', 'not' => true, 'strict' => false];
+
+        $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
+
+        $this->assertSame('NOT EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_form_xref cf WHERE cf.campaign_id = c.id)', (string) $expr);
+        $this->assertSame([], $params);
+    }
+
     public function testGetSearchCommandsContainsCampaignFilters(): void
     {
         $commands = $this->repository->getSearchCommands();
