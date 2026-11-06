@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EventListener\ConfigSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -43,7 +44,7 @@ final class ConfigSubscriberTest extends TestCase
             ],
         ]);
 
-        (new ConfigSubscriber())->onConfigBeforeSave($event);
+        (new ConfigSubscriber($this->createStub(CoreParametersHelper::class)))->onConfigBeforeSave($event);
 
         $monitoredEmail = $event->getConfig('emailconfig')['monitored_email'];
 
