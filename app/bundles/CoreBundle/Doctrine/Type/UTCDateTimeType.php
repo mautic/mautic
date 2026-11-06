@@ -12,7 +12,7 @@ final class UTCDateTimeType extends DateTimeType
     private static ?\DateTimeZone $utc = null;
 
     /**
-     * @param \DateTime $value
+     * @param \DateTime|\DateTimeImmutable|null $value
      *
      * @return string|null
      */
@@ -33,7 +33,7 @@ final class UTCDateTimeType extends DateTimeType
             $value = clone $value;
         }
 
-        $value->setTimezone(self::$utc);
+        $value = $value->setTimezone(self::$utc);
 
         return parent::convertToDatabaseValue($value, $platform);
     }
