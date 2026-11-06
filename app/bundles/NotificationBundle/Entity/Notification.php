@@ -14,7 +14,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
@@ -204,13 +203,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::addTranslationMetadata($builder, self::class);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

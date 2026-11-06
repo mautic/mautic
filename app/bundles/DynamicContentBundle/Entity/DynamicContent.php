@@ -192,7 +192,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
 
     }

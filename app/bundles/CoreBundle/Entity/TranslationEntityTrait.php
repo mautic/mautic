@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
@@ -24,34 +24,21 @@ trait TranslationEntityTrait
      * @var Collection<int, TEntity>
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'translationParent', indexBy: 'id')]
+    #[ORM\OrderBy(['isPublished' => 'DESC'])]
     private $translationChildren;
 
     /**
      * @var TEntity|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'translationChildren')]
+    #[ORM\JoinColumn(name: 'translation_parent_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
     private $translationParent;
 
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'lang', type: 'string', length: 191)]
     private string $language = 'en';
-
-    protected static function addTranslationMetadata(ClassMetadataBuilder $builder, string $entityClass, string $languageColumnName = 'lang'): void
-    {
-        $builder->createOneToMany('translationChildren', $entityClass)
-            ->setIndexBy('id')
-            ->setOrderBy(['isPublished' => 'DESC'])
-            ->mappedBy('translationParent')
-            ->build();
-
-        $builder->createManyToOne('translationParent', $entityClass)
-            ->inversedBy('translationChildren')
-            ->addJoinColumn('translation_parent_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->createField('language', 'string')
-            ->columnName($languageColumnName)
-            ->build();
-    }
 
     /**
      * @param TEntity $child
