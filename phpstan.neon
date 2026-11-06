@@ -102,7 +102,6 @@ parameters:
         -
             identifier: typePerfect.noMixedMethodCaller
             paths:
-                - app/bundles/CoreBundle/Twig/Extension/ButtonExtension.php
                 - *.html.php
                 - app/config/
 
