@@ -39,6 +39,7 @@ Mautic.reorderTableData = function (name, orderby, tmpl, target, baseUrl) {
 
         // Reset to first page by modifying the path
         baseUrl = baseUrl.replace(/\/\d+$/, '/1');
+        baseUrl += window.location.search;
     }
 
     // Start building the query parameters
@@ -56,7 +57,8 @@ Mautic.reorderTableData = function (name, orderby, tmpl, target, baseUrl) {
         params.push('orderby=' + encodeURIComponent(orderby));
     }
 
-    var route = baseUrl + (params.length ? '?' + params.join('&') : '');
+    var queryGlue = baseUrl.indexOf('?') === -1 ? '?' : '&';
+    var route = baseUrl + (params.length ? queryGlue + params.join('&') : '');
 
     Mautic.loadContent(route, '', 'POST', target);
 };

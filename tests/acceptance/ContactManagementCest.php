@@ -15,6 +15,58 @@ final class ContactManagementCest
         $I->login('admin', 'Maut1cR0cks!');
     }
 
+    public function sortingPreservesExistingQueryParameters(AcceptanceTester $I): void
+    {
+        foreach (['sort+query@example.com', 'sort&query@example.com'] as $email) {
+            $I->haveInDatabase('test_leads', [
+                'email'           => $email,
+                'firstname'       => 'Sort',
+                'lastname'        => 'Query',
+                'is_published'    => 1,
+                'points'          => 0,
+                'date_identified' => '2026-01-01 00:00:00',
+            ]);
+        }
+
+        foreach (['', '?search=', '?search=sort%2Bquery%40example.com', '?search=sort%26query%40example.com&category=3'] as $query) {
+            $I->amOnPage(ContactPage::$URL.$query);
+            $I->waitForJS('return typeof Mautic !== "undefined" && typeof Mautic.reorderTableData === "function";', AcceptanceTester::TIMEOUT);
+
+            $I->executeJS(<<<'JS'
+window.tableSortRequest = null;
+mQuery(document).on('ajaxComplete.tableSortQuery', function (event, xhr, settings) {
+    var url = new URL(settings.url, window.location.href);
+    if (url.searchParams.get('orderby') !== 'l.lastname, l.firstname, l.company, l.email') {
+        return;
+    }
+    window.tableSortRequest = {
+        search: url.searchParams.get('search'),
+        category: url.searchParams.get('category'),
+        tmpl: url.searchParams.get('tmpl'),
+        name: url.searchParams.get('name'),
+        orderby: url.searchParams.get('orderby'),
+        method: settings.type,
+        status: xhr.status
+    };
+    mQuery(document).off('ajaxComplete.tableSortQuery');
+});
+JS);
+            $I->waitForElementClickable('#leadTable .col-lead-name a.table-sort', AcceptanceTester::TIMEOUT);
+            $I->click('#leadTable .col-lead-name a.table-sort');
+            $I->waitForJS('return window.tableSortRequest !== null;', AcceptanceTester::TIMEOUT);
+            $request = $I->executeJS('return window.tableSortRequest;');
+
+            parse_str(ltrim($query, '?'), $expected);
+            $I->assertSame($expected['search'] ?? null, $request['search']);
+            $I->assertSame($expected['category'] ?? null, $request['category']);
+            $I->assertSame('list', $request['tmpl']);
+            $I->assertSame('lead', $request['name']);
+            $I->assertSame('l.lastname, l.firstname, l.company, l.email', $request['orderby']);
+            $I->assertSame('POST', $request['method']);
+            $I->assertSame(200, $request['status']);
+        }
+    }
+
     public function createContactFromQuickAdd(
         AcceptanceTester $I,
         ContactStep $contact,
