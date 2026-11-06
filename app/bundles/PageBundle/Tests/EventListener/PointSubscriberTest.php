@@ -71,9 +71,18 @@ final class PointSubscriberTest extends TestCase
         $pointActionHelper = $this->createStub(PointActionHelper::class);
 
         $pageHitEvent->expects($this->once())->method('getPage')->willReturn($page);
-        $pageHitEvent->expects($this->once())->method('getHit')->willReturn($hit);
-        $pageHitEvent->expects($this->once())->method('getLead')->willReturn($lead);
-        $pointModel->expects($this->once())->method('triggerAction')->with('page.hit', $hit, null, $lead);
+        $pageHitEvent->expects($this->exactly(2))->method('getHit')->willReturn($hit);
+        $pageHitEvent->expects($this->exactly(2))->method('getLead')->willReturn($lead);
+        $pointModel->expects($this->exactly(2))->method('triggerAction')
+            ->willReturnCallback(function (string $type, $h, $_, ?Lead $l) use ($hit, $lead): void {
+                if ('page.hit' === $type) {
+                    $this->assertSame($hit, $h);
+                    $this->assertSame($lead, $l);
+                } elseif ('url.hit' === $type) {
+                    $this->assertSame($hit, $h);
+                    $this->assertSame($lead, $l);
+                }
+            });
 
         $pointSubscriber = new PointSubscriber($pointModel, $pointActionHelper);
         $pointSubscriber->onPageHit($pageHitEvent);
