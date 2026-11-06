@@ -259,6 +259,7 @@ return [
         'tmp_path'                        => '%kernel.project_dir%/var/tmp',
         'theme'                           => 'blank',
         'theme_import_allowed_extensions' => ['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'],
+        'theme_custom_tab_enabled'        => false,
         'brand_name'                      => 'Your Brand (configurable)',
         'primary_brand_color'             => '000000',
         'rounded_corners'                 => '0',

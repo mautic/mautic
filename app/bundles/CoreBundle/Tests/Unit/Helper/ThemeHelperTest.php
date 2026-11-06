@@ -62,6 +62,8 @@ final class ThemeHelperTest extends TestCase
 
     private ThemeHelper $themeHelper;
 
+    private ?string $temporaryThemesDir = null;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -87,6 +89,40 @@ final class ThemeHelperTest extends TestCase
             new Finder(),
             $this->builderIntegrationsHelper
         );
+    }
+
+    protected function tearDown(): void
+    {
+        if (null !== $this->temporaryThemesDir) {
+            (new Filesystem())->remove($this->temporaryThemesDir);
+            $this->temporaryThemesDir = null;
+        }
+
+        parent::tearDown();
+    }
+
+    /**
+     * Creates a writable themes directory with a minimal config.json in every theme.
+     *
+     * @param string[] $themeNames
+     */
+    private function createThemesDirectory(array $themeNames): string
+    {
+        $this->temporaryThemesDir = sys_get_temp_dir().'/mautic_theme_helper_test_'.bin2hex(random_bytes(6));
+        mkdir($this->temporaryThemesDir);
+
+        foreach ($themeNames as $themeName) {
+            mkdir($this->temporaryThemesDir.'/'.$themeName);
+            file_put_contents($this->temporaryThemesDir.'/'.$themeName.'/config.json', json_encode(['name' => ucfirst($themeName)], JSON_THROW_ON_ERROR));
+        }
+
+        return $this->temporaryThemesDir;
+    }
+
+    private function mockThemesPath(string $themesDir): void
+    {
+        $this->pathsHelper->method('getSystemPath')->willReturn($themesDir);
+        $this->pathsHelper->method('getThemesPath')->willReturn($themesDir);
     }
 
     public function testExceptionThrownWithMissingConfig(): void
@@ -662,7 +698,8 @@ final class ThemeHelperTest extends TestCase
             ->willReturn(__DIR__.'/resource/themes');
 
         $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->exactly(5))
+        // 4 config.json checks, 1 check for the custom themes file after the removal and 1 check in exists().
+        $filesystem->expects($this->exactly(6))
             ->method('exists')->willReturn(true);
 
         $filesystem->method('readFile')->willReturn('{"name": "Test Theme"}');
@@ -689,6 +726,113 @@ final class ThemeHelperTest extends TestCase
 
         $this->expectException(FileNotFoundException::class);
         $this->themeHelper->delete('theme-legacy-email-foo');
+    }
+
+    public function testToggleCustomMarksAndUnmarksTheme(): void
+    {
+        $themesDir = $this->createThemesDirectory(['one', 'two']);
+        $this->mockThemesPath($themesDir);
+
+        $themes = $this->themeHelper->getInstalledThemes('all', true);
+        $this->assertFalse($themes['one']['custom']);
+        $this->assertFalse($themes['two']['custom']);
+
+        // Set as custom theme.
+        $this->assertTrue($this->themeHelper->toggleCustom('one'));
+        $this->assertSame('one', file_get_contents($themesDir.'/'.ThemeHelper::CUSTOM_THEMES_TXT));
+
+        $themes = $this->themeHelper->getInstalledThemes('all', true);
+        $this->assertTrue($themes['one']['custom']);
+        $this->assertFalse($themes['two']['custom']);
+
+        // A second theme is added to the list.
+        $this->assertTrue($this->themeHelper->toggleCustom('two'));
+        $this->assertSame('one|two', file_get_contents($themesDir.'/'.ThemeHelper::CUSTOM_THEMES_TXT));
+
+        // Remove the custom mark again.
+        $this->assertFalse($this->themeHelper->toggleCustom('one'));
+        $this->assertSame('two', file_get_contents($themesDir.'/'.ThemeHelper::CUSTOM_THEMES_TXT));
+
+        $themes = $this->themeHelper->getInstalledThemes('all', true);
+        $this->assertFalse($themes['one']['custom']);
+        $this->assertTrue($themes['two']['custom']);
+
+        // The file is removed when no custom theme is left.
+        $this->assertFalse($this->themeHelper->toggleCustom('two'));
+        $this->assertFileDoesNotExist($themesDir.'/'.ThemeHelper::CUSTOM_THEMES_TXT);
+    }
+
+    public function testToggleCustomKeepsTheCaseOfTheThemeName(): void
+    {
+        $themesDir = $this->createThemesDirectory(['one', 'ThemeCreative']);
+        $this->mockThemesPath($themesDir);
+
+        $this->assertTrue($this->themeHelper->toggleCustom('ThemeCreative'));
+        $this->assertSame('ThemeCreative', file_get_contents($themesDir.'/'.ThemeHelper::CUSTOM_THEMES_TXT));
+
+        $themes = $this->themeHelper->getInstalledThemes('all', true);
+        $this->assertTrue($themes['ThemeCreative']['custom']);
+        $this->assertFalse($themes['one']['custom']);
+
+        $this->assertFalse($this->themeHelper->toggleCustom('ThemeCreative'));
+        $this->assertFileDoesNotExist($themesDir.'/'.ThemeHelper::CUSTOM_THEMES_TXT);
+
+        // The name must be exactly the name of the installed theme.
+        $this->expectException(FileNotFoundException::class);
+        $this->themeHelper->toggleCustom('themecreative');
+    }
+
+    public function testCustomThemesAreReadFromTheFile(): void
+    {
+        $themesDir = $this->createThemesDirectory(['one', 'two', 'three']);
+        file_put_contents($themesDir.'/'.ThemeHelper::CUSTOM_THEMES_TXT, '|one| three |');
+        $this->mockThemesPath($themesDir);
+
+        $themes = $this->themeHelper->getInstalledThemes('all', true);
+        $this->assertTrue($themes['one']['custom']);
+        $this->assertFalse($themes['two']['custom']);
+        $this->assertTrue($themes['three']['custom']);
+    }
+
+    public function testToggleCustomWorksForDefaultThemes(): void
+    {
+        $themesDir = $this->createThemesDirectory(['blank']);
+        $this->mockThemesPath($themesDir);
+
+        $this->assertContains('blank', $this->themeHelper->getDefaultThemes());
+        $this->assertTrue($this->themeHelper->toggleCustom('blank'));
+        $this->assertTrue($this->themeHelper->getInstalledThemes('all', true)['blank']['custom']);
+    }
+
+    public function testToggleCustomThrowsExceptionIfThemeDoesNotExist(): void
+    {
+        $themesDir = $this->createThemesDirectory(['one']);
+        $this->mockThemesPath($themesDir);
+
+        $this->expectException(FileNotFoundException::class);
+        try {
+            $this->themeHelper->toggleCustom('unknown');
+        } finally {
+            $this->assertFileDoesNotExist($themesDir.'/'.ThemeHelper::CUSTOM_THEMES_TXT);
+        }
+    }
+
+    public function testDeletingThemeRemovesItFromCustomThemes(): void
+    {
+        $themesDir = $this->createThemesDirectory(['one', 'two']);
+        $this->mockThemesPath($themesDir);
+
+        $this->themeHelper->toggleCustom('one');
+        $this->themeHelper->toggleCustom('two');
+        $this->assertSame('one|two', file_get_contents($themesDir.'/'.ThemeHelper::CUSTOM_THEMES_TXT));
+
+        $this->themeHelper->delete('one');
+        $this->assertDirectoryDoesNotExist($themesDir.'/one');
+        $this->assertSame('two', file_get_contents($themesDir.'/'.ThemeHelper::CUSTOM_THEMES_TXT));
+
+        $this->themeHelper->delete('two');
+        $this->assertDirectoryDoesNotExist($themesDir.'/two');
+        $this->assertFileDoesNotExist($themesDir.'/'.ThemeHelper::CUSTOM_THEMES_TXT);
     }
 
     public function testRenderThemeTemplateResolvesRuntimeBackedFiltersInsideSandbox(): void
