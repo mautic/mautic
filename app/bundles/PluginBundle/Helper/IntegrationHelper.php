@@ -29,7 +29,7 @@ final class IntegrationHelper
     private array $integrations = [];
 
     /**
-     * @var mixed[]
+     * @var array<string, array{isPlugin: bool, integration: string, settings: Integration, namespace: string}>
      */
     private array $available = [];
 
@@ -536,32 +536,27 @@ final class IntegrationHelper
     /**
      * Loops through field values available and finds the field the integration needs to obtain the user.
      *
-     * @return bool
+     * @return array<string, mixed>
      */
-    public function getUserIdentifierField($integrationObject, $fields)
+    public function getUserIdentifierField(AbstractIntegration $integrationObject, $fields): array
     {
         $identifierField = $integrationObject->getIdentifierFields();
-        $identifier      = (is_array($identifierField)) ? [] : false;
+        $identifier      = [];
         $matchFound      = false;
 
         $findMatch = function ($f, array $fields) use (&$identifierField, &$identifier, &$matchFound): void {
-            if (is_array($identifier)) {
-                // there are multiple fields the integration can identify by
-                foreach ($identifierField as $idf) {
-                    $value = (is_array($fields[$f]) && isset($fields[$f]['value'])) ? $fields[$f]['value'] : $fields[$f];
+            // there are multiple fields the integration can identify by
+            foreach ($identifierField as $idf) {
+                $value = (is_array($fields[$f]) && isset($fields[$f]['value'])) ? $fields[$f]['value'] : $fields[$f];
 
-                    if (!in_array($value, $identifier) && str_contains($f, $idf)) {
-                        $identifier[$f] = $value;
-                        if (count($identifier) === count($identifierField)) {
-                            // found enough matches so break
-                            $matchFound = true;
-                            break;
-                        }
+                if (!in_array($value, $identifier) && str_contains($f, $idf)) {
+                    $identifier[$f] = $value;
+                    if (count($identifier) === count($identifierField)) {
+                        // found enough matches so break
+                        $matchFound = true;
+                        break;
                     }
                 }
-            } elseif ($identifierField === $f || str_contains($f, $identifierField)) {
-                $matchFound = true;
-                $identifier = (is_array($fields[$f])) ? $fields[$f]['value'] : $fields[$f];
             }
         };
 
