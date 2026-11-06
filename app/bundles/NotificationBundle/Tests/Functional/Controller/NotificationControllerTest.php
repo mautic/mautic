@@ -25,6 +25,26 @@ final class NotificationControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
 
+    public function testIndexRouteCanFilterByLanguage(): void
+    {
+        $germanNotification = $this->createNotification($this->em);
+        $germanNotification->setName('German notification');
+        $germanNotification->setLanguage('de_DE');
+
+        $englishNotification = $this->createNotification($this->em);
+        $englishNotification->setName('English notification');
+        $englishNotification->setLanguage('en_US');
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/notifications?search=lang%3Ade');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('German notification', $crawler->text());
+        $this->assertStringNotContainsString('English notification', $crawler->text());
+    }
+
     /**
      * Smoke test to ensure the '/s/notifications/new' route loads.
      */
