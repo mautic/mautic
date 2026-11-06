@@ -5465,11 +5465,6 @@ parameters:
 			count: 1
 			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
 
-		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\IntegrationHelper\:\:getUserIdentifierField\(\) has parameter \$integrationObject with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
 
 		-
 			message: '#^Method Mautic\\PluginBundle\\Helper\\oAuthHelper\:\:encode\(\) has parameter \$string with no type specified\.$#'
