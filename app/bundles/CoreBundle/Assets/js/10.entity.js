@@ -39,6 +39,7 @@ Mautic.reorderTableData = function (name, orderby, tmpl, target, baseUrl) {
 
         // Reset to first page by modifying the path
         baseUrl = baseUrl.replace(/\/\d+$/, '/1');
+        baseUrl += window.location.search;
     }
 
     // Start building the query parameters

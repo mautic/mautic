@@ -17,7 +17,11 @@ final class ContactManagementCest
 
     public function sortingPreservesExistingQueryParameters(AcceptanceTester $I): void
     {
-        foreach (['', '?search=alice%2Bbob', '?search=A%26B&category=3'] as $query) {
+        foreach (['sort+query@example.com', 'sort&query@example.com'] as $email) {
+            $I->haveInDatabase('test_leads', ['email' => $email, 'firstname' => 'Sort', 'lastname' => 'Query', 'is_published' => 1, 'points' => 0]);
+        }
+
+        foreach (['?search=', '?search=sort%2Bquery%40example.com', '?search=sort%26query%40example.com&category=3'] as $query) {
             $I->amOnPage(ContactPage::$URL.$query);
             $I->waitForJS('return typeof Mautic !== "undefined" && typeof Mautic.reorderTableData === "function";', AcceptanceTester::TIMEOUT);
 
@@ -25,7 +29,7 @@ final class ContactManagementCest
 window.tableSortRequest = null;
 mQuery(document).on('ajaxComplete.tableSortQuery', function (event, xhr, settings) {
     var url = new URL(settings.url, window.location.href);
-    if (url.searchParams.get('orderby') !== 'l.lastname') {
+    if (url.searchParams.get('orderby') !== 'l.lastname, l.firstname, l.company, l.email') {
         return;
     }
     window.tableSortRequest = {
@@ -39,8 +43,9 @@ mQuery(document).on('ajaxComplete.tableSortQuery', function (event, xhr, setting
     };
     mQuery(document).off('ajaxComplete.tableSortQuery');
 });
-Mautic.reorderTableData('lead', 'l.lastname', 'list', '.page-list', window.location.pathname + window.location.search);
 JS);
+            $I->waitForElementClickable('#leadTable .col-lead-name a.table-sort', AcceptanceTester::TIMEOUT);
+            $I->click('#leadTable .col-lead-name a.table-sort');
             $I->waitForJS('return window.tableSortRequest !== null;', AcceptanceTester::TIMEOUT);
             $request = $I->executeJS('return window.tableSortRequest;');
 
@@ -49,7 +54,7 @@ JS);
             $I->assertSame($expected['category'] ?? null, $request['category']);
             $I->assertSame('list', $request['tmpl']);
             $I->assertSame('lead', $request['name']);
-            $I->assertSame('l.lastname', $request['orderby']);
+            $I->assertSame('l.lastname, l.firstname, l.company, l.email', $request['orderby']);
             $I->assertSame('POST', $request['method']);
             $I->assertSame(200, $request['status']);
         }
