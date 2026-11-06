@@ -231,12 +231,13 @@ final class TriggerCampaignCommand extends ModeratedCommand
                 $statusCode = ExitCode::SUCCESS;
                 $campaign = $this->campaignRepository->getEntity($id);
                 if ($campaign instanceof Campaign) {
-                    $this->triggerCampaign($campaign);
+                    if ($this->checkCampaignEmailLocks($input, $output, $campaign)) {
+                        $this->triggerCampaign($campaign);
+                    }
                 } else {
                     $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
                     $statusCode = ExitCode::FAILURE;
                 }
-                $this->completeRun();
 
                 return (int) $statusCode;
             }
@@ -264,20 +265,63 @@ final class TriggerCampaignCommand extends ModeratedCommand
             $campaigns = $this->campaignRepository->getEntities($filter);
 
             foreach ($campaigns as $campaign) {
-                $this->triggerCampaign($campaign);
+                if ($this->checkCampaignEmailLocks($input, $output, $campaign)) {
+                    $this->triggerCampaign($campaign);
+                }
                 if ($this->limiter->hasCampaignLimit()) {
                     $this->limiter->resetCampaignLimitRemaining();
                 }
             }
 
-            $this->completeRun();
-
             return ExitCode::SUCCESS;
         } catch (SignalCaughtException) {
             $exitCode = ExitCode::TERMINATED;
+        } finally {
+            $this->completeRun();
         }
 
         return $exitCode;
+    }
+
+    private function checkCampaignEmailLocks(InputInterface $input, OutputInterface $output, Campaign $campaign): bool
+    {
+        if (!$campaign->isPublished()) {
+            return true;
+        }
+
+        $emailIds = [];
+        foreach ($campaign->getEvents() as $event) {
+            if ('email.send' !== $event->getType()) {
+                continue;
+            }
+
+            $properties = $event->getProperties();
+            if ('marketing' !== ($properties['email_type'] ?? null)) {
+                continue;
+            }
+
+            $emailId = (int) ($properties['email'] ?? 0);
+            if ($emailId > 0) {
+                $emailIds[] = $emailId;
+            }
+        }
+
+        // Mautic's duplicate-send rule is based on contact + marketing email,
+        // not on the segment. Lock the email for the whole trigger run so
+        // overlapping or different segments cannot race before email_stats is
+        // written. Different emails remain independently runnable.
+        $moderationKeys = [];
+        foreach (array_unique($emailIds) as $emailId) {
+            $moderationKeys[] = sprintf('campaign-email-%d', $emailId);
+        }
+
+        sort($moderationKeys);
+
+        return $this->checkAdditionalRunStatus(
+            $input,
+            $output,
+            $moderationKeys
+        );
     }
 
     /**
