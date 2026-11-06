@@ -144,7 +144,8 @@
       "symfony/flex": true,
       "mautic/core-composer-scaffold": true,
       "mautic/core-project-message": true,
-      "php-http/discovery": true
+      "php-http/discovery": true,
+      "horde/horde-installer-plugin": false
     }
   },
   "autoload": {
