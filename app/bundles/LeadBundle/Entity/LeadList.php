@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -59,7 +60,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
     joinTable: new ORM\JoinTable(name: 'lead_list_projects_xref'),
 )])]
-class LeadList extends FormEntity implements UuidInterface
+class LeadList extends FormEntity implements UuidInterface, IdentifierInterface
 {
     use UuidTrait;
 

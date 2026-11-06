@@ -17,6 +17,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FiltersEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -69,7 +70,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
     joinTable: new ORM\JoinTable(name: 'dynamic_content_projects_xref'),
 )])]
-class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
+class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface, IdentifierInterface
 {
     /** @use TranslationEntityTrait<DynamicContent> */
     use TranslationEntityTrait;
