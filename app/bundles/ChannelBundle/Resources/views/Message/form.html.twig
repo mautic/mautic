@@ -49,6 +49,15 @@
             {% endif %}
         </div>
     {% endif %}
+
+    <script type="text/javascript">
+        mQuery(document).ready(function() {
+            const emailId = mQuery("#message_channels_email_channelId").val();
+            if (!emailId) return;
+
+            Mautic.setMarketingMessageEmailChannelSendToDncStatus(emailId);
+        });
+    </script>
 {% endblock %}
 {# active, id, name, content #}
 {% set tabs, active = [], true %}

@@ -26,4 +26,13 @@
     </div>
 </div>
 
+<script type="text/javascript">
+    mQuery(document).ready(function() {
+        const messageId = mQuery("#campaignevent_properties_marketingMessage").val();
+        if (!messageId) return;
+
+        Mautic.setMarketingMessageSendToDncStatus(messageId);
+    });
+</script>
+
 {% endblock %}

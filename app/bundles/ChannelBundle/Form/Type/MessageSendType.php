@@ -28,7 +28,9 @@ final class MessageSendType extends AbstractType
             MessageListType::class,
             [
                 'label'       => 'mautic.channel.send.selectmessages',
-                'attr'        => [],
+                'attr'        => [
+                    'onchange' => 'Mautic.setMarketingMessageSendToDncStatus(mQuery(this).val());',
+                ],
                 'label_attr'  => ['class' => 'form-label'],
                 'multiple'    => false,
                 'required'    => true,
