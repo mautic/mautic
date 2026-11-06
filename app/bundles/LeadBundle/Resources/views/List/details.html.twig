@@ -60,7 +60,7 @@
                 color: 'high-contrast',
                 attributes: {
                     title: ('mautic.lead.tag.' ~ segmentType ~ '_segment.tooltip')|trans,
-                    'data-toggle': 'tooltip',
+                    'data-bs-toggle': 'tooltip',
                     'tooltip-placement': 'top'
                 }
             }
@@ -112,10 +112,6 @@
                         <table class="table table-hover mb-0">
                             <tbody>
                             {{ include('@MauticCore/Helper/details.html.twig', {'entity': list}) }}
-                            <tr>
-                                <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.leads'|trans }}</span></td>
-                                <td>{{ segmentCount }}</td>
-                            </tr>
                             {% if list.lastBuiltTime %}
                             <tr>
                                 <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.list.last_built_time'|trans }}</span></td>
@@ -133,8 +129,8 @@
         <!--/ segment detail collapseable toggler -->
         <div>
             <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#segment-details">
+                <span data-bs-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#segment-details">
                         <span class="caret"></span> {{ 'mautic.core.details'|trans }}
                     </a>
                 </span>
@@ -146,21 +142,9 @@
                 <div class="row">
                     <div class="col-sm-12">
                         {% if securityIsGranted('lead:leads:viewown') %}
-                            {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
-                                {
-                                    'title': 'mautic.lead.segments.total.contacts'|trans,
-                                    'value': segmentCount,
-                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias}),
-                                    'icon': 'ri-group-line'
-                                },
-                                {
-                                    'title': 'mautic.lead.segments.active.contacts'|trans,
-                                    'value': activeSegmentCount,
-                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias ~ ' !' ~ ('mautic.lead.lead.searchcommand.dnc'|trans) ~ ':' ~ ('mautic.lead.lead.searchcommand.dnc.any'|trans)}),
-                                    'icon': 'ri-user-follow-line',
-                                    tooltip: 'mautic.lead.segments.active.contacts.tooltip'|trans
-                                }
-                            ]}) }}
+                            <div id="segment-stats" data-target-url="{{ path('mautic_segment_action', {'objectAction': 'segmentStats', 'objectId': list.id}) }}">
+                                <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
+                            </div>
                         {% endif %}
                         <div class="panel">
                             <div class="panel-body box-layout">
@@ -173,11 +157,11 @@
                                 <div class="col-md-9 align-middle">
                                     {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
                                           'dateRangeForm': dateRangeForm,
-                                          'class': 'pull-right',
+                                          'class': 'float-end',
                                     }) }}
                                 </div>
                             </div>
-                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                            <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {
                                       'chartData': stats,
                                       'chartType': 'line',
@@ -210,15 +194,15 @@
             <!--/ search bar -->
             <ul class="nav nav-tabs nav-tabs-contained">
                 <li class="active">
-                    <a href="#contacts-container" role="tab" data-toggle="tab">{{ 'mautic.lead.leads'|trans }}</a>
+                    <a href="#contacts-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">{{ 'mautic.lead.leads'|trans }}</a>
                 </li>
                 {% if hasSegmentMembershipFilter %}
                   <li>
-                      <a id="segment-dependencies" href="#segment-dependencies-container" role="tab" data-toggle="tab">{{ 'mautic.lead.segment.dependencies'|trans }}</a>
+                      <a id="segment-dependencies" href="#segment-dependencies-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.lead.segment.dependencies'|trans }}</a>
                   </li>
                 {% endif %}
                 <li>
-                    <a id="campaign-share-tab" href="#campaign-container" role="tab" data-toggle="tab">{{ 'mautic.lead.campaign.share'|trans }}</a>
+                    <a id="campaign-share-tab" href="#campaign-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.lead.campaign.share'|trans }}</a>
                 </li>
             </ul>
             <!--/ tabs controls -->

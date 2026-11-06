@@ -11,7 +11,7 @@
             'status': item.getPublishUp() is not null ? 'sending' : 'available',
             'simplified': 'true'
         }) -}}
-        <span class="pull-right" data-toggle="tooltip" title="{{ 'mautic.email.readcount'|trans }}" data-placement="left">
+        <span class="float-end" data-bs-toggle="tooltip" title="{{ 'mautic.email.readcount'|trans }}" data-bs-placement="left">
             <i class="ri-mail-open-line"></i>
             {{ item.readCount }}
         </span>
