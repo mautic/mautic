@@ -22,9 +22,9 @@ final class FieldControllerTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields');
 
         $this->assertResponseIsSuccessful();
-        $filterButton = $crawler->filter('button[data-toggle="popover"]');
+        $filterButton = $crawler->filter('button[data-bs-toggle="popover"]');
         $this->assertCount(1, $filterButton);
-        $filterContent = $filterButton->attr('data-content');
+        $filterContent = $filterButton->attr('data-bs-content');
         $this->assertNotNull($filterContent);
         $filters = new Crawler($filterContent);
         $this->assertCount(1, $filters->filter('[data-filter="is:indexed"]'));
