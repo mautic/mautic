@@ -102,8 +102,6 @@ parameters:
         -
             identifier: typePerfect.noMixedMethodCaller
             paths:
-                - app/bundles/CoreBundle/Form/EventListener/FormExitSubscriber.php
-                - app/bundles/CoreBundle/Tests/Functional/Controller/AjaxControllerTest.php
                 - app/bundles/CoreBundle/Twig/Extension/ButtonExtension.php
                 - *.html.php
                 - app/config/
