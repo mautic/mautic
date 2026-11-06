@@ -79,6 +79,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelper->method('get')
             ->willReturnMap([
                 ['form_field_autofill', false, true],
+                ['form_track_submitters', null, true],
             ]);
 
         $this->formModel = new FormModel(

@@ -25,6 +25,14 @@ final class KioskModeSubmissionFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    protected function setUp(): void
+    {
+        // Regular forms track the submitter, whatever the installer set
+        $this->configParams['form_track_submitters'] = true;
+
+        parent::setUp();
+    }
+
     /**
      * @return iterable<string, array{bool, bool}>
      */

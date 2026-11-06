@@ -330,6 +330,27 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('0', $this->getConfigPageForm('leadconfig')['config[leadconfig][contact_export_notify_admins]']->getValue());
     }
 
+    public function testFormTrackSubmittersConfigCanBeEnabledAndDisabled(): void
+    {
+        // New installs start with No and upgrades with Yes, so set Yes first instead of relying on either
+        $this->submitConfigPage('formconfig', [
+            'config[formconfig][form_track_submitters]' => '1',
+        ]);
+        $this->assertTrue((bool) $this->getConfigParameters()['form_track_submitters']);
+        $this->assertSame('1', $this->getConfigPageForm('formconfig')['config[formconfig][form_track_submitters]']->getValue());
+        $this->assertStringContainsString('Track submitters on form submission', (string) $this->client->getResponse()->getContent());
+
+        $this->submitConfigPage('formconfig', [
+            'config[formconfig][form_track_submitters]' => '0',
+        ]);
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('form_track_submitters', $configParameters);
+        $this->assertFalse((bool) $configParameters['form_track_submitters']);
+
+        $this->assertSame('0', $this->getConfigPageForm('formconfig')['config[formconfig][form_track_submitters]']->getValue());
+    }
+
     public function testAggregateAnalyticsDefaultsToEnabledAndCanBeDisabled(): void
     {
         $this->assertSame('1', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][aggregate_analytics]']->getValue());

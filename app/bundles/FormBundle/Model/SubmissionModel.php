@@ -135,10 +135,13 @@ final class SubmissionModel extends CommonFormModel
             }
         }
 
-        // Kiosk mode does not track the submitter, so their IP address is not stored either
-        $trackSubmitter = !$form->isInKioskMode();
+        // An untracked submitter's IP address is not stored either
+        $trackSubmitter = $this->shouldTrackSubmitter($form);
         if ($trackSubmitter) {
             $submission->setIpAddress($this->ipLookupHelper->getIpAddress());
+        } else {
+            // Keeps the IP out of the contact, company, point trigger and campaign logs this submission writes
+            $this->ipLookupHelper->markVisitorAsUntracked();
         }
 
         if (!empty($post['return'])) {
@@ -151,6 +154,12 @@ final class SubmissionModel extends CommonFormModel
 
         // clean the referer by removing mauticError and mauticMessage
         $referer = InputHelper::url($referer, null, null, null, ['mauticError', 'mauticMessage']);
+
+        // An untracked submitter's referer keeps only the page address and the UTM tags, as the rest of the query string can carry identifiers
+        if (!$trackSubmitter) {
+            $referer = $this->stripIdentifiersFromReferer($referer);
+        }
+
         $submission->setReferer($referer);
 
         // Create an event to be dispatched through the processes
@@ -305,13 +314,12 @@ final class SubmissionModel extends CommonFormModel
             ->setResults($results)
             ->setContactFieldMatches($leadFieldMatches);
 
-        $lead = $form->isInKioskMode()
-            ? null
-            : $this->contactTracker->getContact();
+        // Looking up the tracked contact would identify an untracked submitter, so it is skipped for them
+        $lead = $trackSubmitter ? $this->contactTracker->getContact() : null;
 
-        // Remove validation errors if the field is not visible
-        if ($lead && $form->usesProgressiveProfiling()) {
-            $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
+        // Remove validation errors if the field is not visible, the same way the form was rendered, also for an untracked submitter
+        if ($form->usesProgressiveProfiling()) {
+            $leadSubmissions = $lead ? $this->formModel->getLeadSubmissions($form, $lead->getId()) : null;
 
             $displayManager = new DisplayManager($form, $this->formModel->getCustomComponents()['viewOnlyFields']);
             foreach ($fields as $field) {
@@ -409,6 +417,17 @@ final class SubmissionModel extends CommonFormModel
         // made it to the end so return the submission event to give the calling method access to tokens, results, etc
         // otherwise return false that no errors were encountered (to keep BC really)
         return ($returnEvent) ? ['submission' => $submissionEvent] : false;
+    }
+
+    /**
+     * Kiosk mode never tracks the submitter, and no form does when tracking submitters is turned off.
+     * Other forms track only trackable requests (no DNT/GPC, bot or prefetch).
+     */
+    private function shouldTrackSubmitter(Form $form): bool
+    {
+        return !$form->isInKioskMode()
+            && $this->coreParametersHelper->get('form_track_submitters')
+            && $this->ipLookupHelper->isRequestTrackable();
     }
 
     /**
@@ -937,13 +956,13 @@ final class SubmissionModel extends CommonFormModel
     protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields, ?Company $companyEntity = null): Lead
     {
         // set the mapped data
-        $inKioskMode   = $form->isInKioskMode();
-        $leadId        = null;
-        $lead          = new Lead();
-        $currentFields = $leadFieldMatches;
-        $companyFields = $this->leadFieldModel->getFieldListWithProperties('company');
+        $trackSubmitter = $this->shouldTrackSubmitter($form);
+        $leadId         = null;
+        $lead           = new Lead();
+        $currentFields  = $leadFieldMatches;
+        $companyFields  = $this->leadFieldModel->getFieldListWithProperties('company');
 
-        if (!$inKioskMode) {
+        if ($trackSubmitter) {
             // Default to currently tracked lead
             if ($currentLead = $this->contactTracker->getContact()) {
                 $lead          = $currentLead;
@@ -953,10 +972,10 @@ final class SubmissionModel extends CommonFormModel
 
             $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #'.$leadId);
         } else {
-            // Default to a new lead in kiosk mode
+            // Default to a new lead in kiosk mode or when the request is not trackable
             $lead->setNewlyCreated(true);
 
-            $this->logger->debug('FORM: In kiosk mode so assuming a new contact');
+            $this->logger->debug('FORM: In kiosk mode or not trackable so assuming a new contact');
         }
 
         $uniqueLeadFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
@@ -1044,14 +1063,14 @@ final class SubmissionModel extends CommonFormModel
             $uniqueFieldsFound         = $getData($foundLeadFields, true);
             [$hasConflict, $conflicts] = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
-            if ($inKioskMode || $hasConflict || !$lead->getId()) {
-                // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
+            if (!$trackSubmitter || $hasConflict || !$lead->getId()) {
+                // Use the found lead without merging because there is some sort of conflict with unique identifiers or the submitter is not tracked and thus should not merge
                 $lead = $foundLead;
 
                 if ($hasConflict) {
                     $this->logger->debug('FORM: Conflicts found in '.implode(', ', $conflicts).' so not merging');
                 } else {
-                    $this->logger->debug('FORM: In kiosk mode so not merging');
+                    $this->logger->debug('FORM: In kiosk mode or not trackable so not merging');
                 }
             } else {
                 $this->logger->debug('FORM: Merging contacts '.$lead->getId().' and '.$foundLead->getId());
@@ -1070,7 +1089,7 @@ final class SubmissionModel extends CommonFormModel
             $uniqueFieldsCurrent = $getData($currentFields, true);
         }
 
-        if (!$inKioskMode) {
+        if ($trackSubmitter) {
             // Check for conflicts with the submitted data and the currently tracked lead
             [$hasConflict, $conflicts] = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
 
@@ -1092,7 +1111,7 @@ final class SubmissionModel extends CommonFormModel
                 );
             }
 
-            // The lookup itself saves new IP addresses, so kiosk mode never reaches it
+            // The lookup itself saves new IP addresses, so an untracked submitter never reaches it
             $ipAddress = $this->ipLookupHelper->getIpAddress();
 
             // no lead was found by a mapped email field so create a new one
@@ -1159,7 +1178,7 @@ final class SubmissionModel extends CommonFormModel
         ));
         $this->leadModel->saveEntity($lead, false);
 
-        if (!$inKioskMode) {
+        if ($trackSubmitter) {
             // Set the current lead which will generate tracking cookies
             $this->contactTracker->setTrackedContact($lead);
         } else {
@@ -1242,5 +1261,19 @@ final class SubmissionModel extends CommonFormModel
         }
 
         return implode(', ', $value);
+    }
+
+    /**
+     * Keeps the page address and the UTM tags, which carry campaign attribution, and drops the other query parameters and the fragment.
+     */
+    private function stripIdentifiersFromReferer(string $referer): string
+    {
+        [$referer] = explode('#', $referer, 2);
+        [$address, $query] = array_pad(explode('?', $referer, 2), 2, '');
+
+        parse_str($query, $parameters);
+        $utmTags = array_filter($parameters, static fn ($name): bool => str_starts_with((string) $name, 'utm_'), ARRAY_FILTER_USE_KEY);
+
+        return [] === $utmTags ? $address : $address.'?'.http_build_query($utmTags);
     }
 }

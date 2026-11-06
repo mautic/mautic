@@ -15,6 +15,14 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    protected function setUp(): void
+    {
+        // These submissions are from tracked visitors, whatever the installer set
+        $this->configParams['form_track_submitters'] = true;
+
+        parent::setUp();
+    }
+
     public function testSaveSubmissionChangeCompanyField(): void
     {
         [$formId, $formAlias] = $this->createFormWithCompanies();
