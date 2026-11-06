@@ -731,15 +731,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return \Generator<int, array<int, array<string, mixed>>>
      */
-    public function findEmailFieldsWithMissingDonotSubmitValidation(): array
+    public function findEmailFieldsWithMissingDonotSubmitValidation(): \Generator
     {
         $connection = $this->em->getConnection();
         $tableName  = MAUTIC_TABLE_PREFIX.Field::TABLE_NAME;
-
-        $fieldsToUpdate = [];
-        $lastId         = 0;
+        $lastId     = 0;
 
         do {
             $batch = $connection->executeQuery(
@@ -768,10 +766,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
                 array_column($batch, 'id')
             );
 
-            $fieldsToUpdate = array_merge($fieldsToUpdate, $batch);
+            yield $batch;
         } while (self::DONOTSUBMIT_BATCH_SIZE === count($batch));
-
-        return $fieldsToUpdate;
     }
 
     /**

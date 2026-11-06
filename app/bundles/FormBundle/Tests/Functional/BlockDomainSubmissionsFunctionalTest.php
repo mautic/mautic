@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,6 +25,44 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
     {
         $this->configParams['do_not_submit_emails'] = [];
         parent::setUp();
+    }
+
+    public function testEmailFieldRepairYieldsBoundedBatches(): void
+    {
+        $form = new Form();
+        $form->setName('Batch repair');
+        $form->setAlias('batch_repair');
+        $form->setFormType('standalone');
+        $this->em->persist($form);
+
+        for ($index = 0; $index < 501; ++$index) {
+            $field = new Field();
+            $field->setForm($form);
+            $field->setType('email');
+            $field->setLabel('Email '.$index);
+            $field->setAlias('email_'.$index);
+            $field->setValidation(['blockfreeemail' => true]);
+            $this->em->persist($field);
+        }
+        $this->em->flush();
+
+        $model   = self::getContainer()->get(FormModel::class);
+        $batches = $model->findEmailFieldsWithMissingDonotSubmitValidation();
+        $this->assertCount(500, $batches->current());
+        $this->assertSame(1, (int) $this->connection->fetchOne(
+            'SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.Field::TABLE_NAME.' WHERE form_id = ? AND JSON_CONTAINS_PATH(validation, ?, ?) = 0',
+            [$form->getId(), 'one', '$.donotsubmit']
+        ));
+
+        $batches->next();
+        $this->assertCount(1, $batches->current());
+        $batches->next();
+        $this->assertFalse($batches->valid());
+        $this->assertSame([], iterator_to_array($model->findEmailFieldsWithMissingDonotSubmitValidation()));
+        $this->assertSame(501, (int) $this->connection->fetchOne(
+            'SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.Field::TABLE_NAME.' WHERE form_id = ? AND JSON_EXTRACT(validation, ?) = true AND JSON_EXTRACT(validation, ?) = true',
+            [$form->getId(), '$.donotsubmit', '$.blockfreeemail']
+        ));
     }
 
     public function testMarkSpamBlocksDomainForFutureSubmissions(): void
