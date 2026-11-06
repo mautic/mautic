@@ -6,7 +6,7 @@
 
 {% if parameters.isUserRegistrationAllowed %}
     <div>
-        <a href="#" data-toggle="modal" data-target="#noAccountModal">
+        <a href="#" data-bs-toggle="modal" data-bs-target="#noAccountModal">
             {{ 'mautic.open_id.login.register.question'|trans|raw }}
         </a>
     </div>
@@ -17,7 +17,7 @@
                     {{ 'mautic.open_id.login.register.answer'|trans({'%provider%': 'OpenID Connect'})|raw }}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ 'mautic.open_id.modal.close'|trans }}</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'mautic.open_id.modal.close'|trans }}</button>
                 </div>
             </div>
         </div>
@@ -25,7 +25,7 @@
 {% endif %}
 
 <div>
-    <a href="#" data-toggle="modal" data-target="#linkAccountModal">
+    <a href="#" data-bs-toggle="modal" data-bs-target="#linkAccountModal">
         {{ 'mautic.open_id.login.link.question'|trans|raw }}
     </a>
 </div>
@@ -37,7 +37,7 @@
                 <p>{{ 'mautic.open_id.login.linked.answer'|trans({'%provider%': 'OpenID Connect'})|raw }}</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ 'mautic.open_id.modal.close'|trans }}</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'mautic.open_id.modal.close'|trans }}</button>
             </div>
         </div>
     </div>
