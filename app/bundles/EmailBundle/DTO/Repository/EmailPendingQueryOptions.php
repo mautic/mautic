@@ -26,6 +26,8 @@ final class EmailPendingQueryOptions
     private ?\DateTimeInterface $sendStopDate = null;
     private bool $segmentMembershipViaJoin = false;
 
+    private bool $sentToDnc = false;
+
     public function __construct(private readonly int $emailId)
     {
     }
@@ -60,10 +62,14 @@ final class EmailPendingQueryOptions
     }
 
     /**
-     * @param ?int[] $listIds
+     * @param int[]|int|null $listIds
      */
-    public function setListIds(?array $listIds): self
+    public function setListIds($listIds): self
     {
+        if (null !== $listIds) {
+            $listIds = (array) $listIds;
+        }
+
         return $this->copy('listIds', $listIds);
     }
 
@@ -165,6 +171,16 @@ final class EmailPendingQueryOptions
     public function setSegmentMembershipViaJoin(bool $segmentMembershipViaJoin): self
     {
         return $this->copy('segmentMembershipViaJoin', $segmentMembershipViaJoin);
+    }
+
+    public function isSentToDnc(): bool
+    {
+        return $this->sentToDnc;
+    }
+
+    public function setSentToDnc(bool $sentToDnc): EmailPendingQueryOptions
+    {
+        return $this->copy('sentToDnc', $sentToDnc);
     }
 
     private function copy(string $property, mixed $value): self
