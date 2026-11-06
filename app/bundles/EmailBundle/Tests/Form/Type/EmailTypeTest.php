@@ -62,23 +62,25 @@ final class EmailTypeTest extends \PHPUnit\Framework\TestCase
     public function testBuildForm(): void
     {
         $options = ['data' => new Email()];
-        $names   = [];
+        $names             = [];
+        $customHtmlOptions = null;
         $this->expectThemeHelper();
 
         $this->formBuilder->method('add')
-            ->with(
-                $this->callback(
-                    function (string|FormBuilderInterface $name) use (&$names): true {
-                        $names[] = $name;
+            ->willReturnCallback(function (string|FormBuilderInterface $name, mixed $type = null, mixed $fieldOptions = null) use (&$names, &$customHtmlOptions): FormBuilderInterface {
+                $names[] = $name;
+                if ('customHtml' === $name) {
+                    $customHtmlOptions = $fieldOptions;
+                }
 
-                        return true;
-                    }
-                )
-            );
+                return $this->formBuilder;
+            });
 
         $this->form->buildForm($this->formBuilder, $options);
 
         $this->assertContains('buttons', $names);
+        $this->assertIsArray($customHtmlOptions);
+        $this->assertTrue($customHtmlOptions['error_bubbling']);
     }
 
     private function expectThemeHelper(): void
