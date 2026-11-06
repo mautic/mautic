@@ -217,12 +217,14 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $member = $this->createSegment('Member');
         $email  = $this->createEmail();
         $tag    = $this->save(new Tag('segment-filter-tag'));
+        $zeroTag = $this->save(new Tag('0'));
 
         $segment = $this->createSegment('Filtered');
         $segment->setFilters([
             $this->segmentFilter('leadlist', [$member->getId()]),
             $this->segmentFilter('lead_email_received', [$email->getId()]),
             $this->segmentFilter('tags', [$tag->getId()]),
+            $this->segmentFilter('tags', [$zeroTag->getId()]),
         ]);
         $this->save($segment);
 
@@ -247,14 +249,16 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         ]);
         $export = $this->exportCampaign($campaign);
 
-        // On the target, the tag does not exist
-        $this->connection->executeStatement('DELETE FROM '.MAUTIC_TABLE_PREFIX.'lead_tags WHERE id = ?', [$tag->getId()]);
+        // On the target, the tags do not exist
+        $this->connection->executeStatement('DELETE FROM '.MAUTIC_TABLE_PREFIX.'lead_tags WHERE id IN (?, ?)', [$tag->getId(), $zeroTag->getId()]);
 
         $newIds = $this->importAsAnotherInstance($export);
 
         $imported = $this->em->find(LeadList::class, $newIds[LeadList::ENTITY_NAME][$segment->getId()]);
         $newTag   = $this->em->getRepository(Tag::class)->findOneBy(['tag' => 'segment-filter-tag']);
         $this->assertInstanceOf(Tag::class, $newTag);
+        $newZeroTag = $this->em->getRepository(Tag::class)->findOneBy(['tag' => '0']);
+        $this->assertInstanceOf(Tag::class, $newZeroTag);
         $this->assertInstanceOf(LeadList::class, $imported);
 
         $values = array_map(static fn (array $filter): mixed => $filter['properties']['filter'], $imported->getFilters());
@@ -262,6 +266,7 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
             [$newIds[LeadList::ENTITY_NAME][$member->getId()]],
             [$newIds[Email::ENTITY_NAME][$email->getId()]],
             [$newTag->getId()],
+            [$newZeroTag->getId()],
         ], $values);
         $this->assertTrue($imported->getIsPublished());
 

@@ -184,8 +184,11 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         foreach ($this->eventEntityReferences->getSegmentFilterTagIds($filters) as $id) {
             $tag = $this->entityManager->find(Tag::class, $id);
 
-            if ($tag instanceof Tag && $tag->getTag()) {
-                $names[$id] = $tag->getTag();
+            $name = $tag instanceof Tag ? $tag->getTag() : null;
+
+            // A tag can be named "0"
+            if (is_string($name) && '' !== $name) {
+                $names[$id] = $name;
             }
         }
 
