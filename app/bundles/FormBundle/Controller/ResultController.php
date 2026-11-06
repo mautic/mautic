@@ -401,7 +401,7 @@ final class ResultController extends CommonFormController
 
     public function markSpamAction(Request $request, Configurator $configurator, CacheHelper $cacheHelper, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
-        if (!$this->security->isAdmin()) {
+        if (!$this->security->isAdmin() || !$request->isXmlHttpRequest()) {
             $this->throwAccessDenied();
         }
 
@@ -455,7 +455,7 @@ final class ResultController extends CommonFormController
 
     public function batchMarkSpamAction(Request $request, Configurator $configurator, CacheHelper $cacheHelper, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
-        if (!$this->security->isAdmin()) {
+        if (!$this->security->isAdmin() || !$request->isXmlHttpRequest()) {
             $this->throwAccessDenied();
         }
 

@@ -793,7 +793,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             }
 
             $form->setCachedHtml('');
-            $this->saveEntity($form);
+            $this->saveEntity($form, false);
         }
     }
 

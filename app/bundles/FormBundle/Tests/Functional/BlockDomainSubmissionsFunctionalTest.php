@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Functional;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -79,6 +80,32 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
 
         /** @var Submission $submission */
         $submission = $submissions[0];
+        $batchIds   = urlencode(json_encode([$submission->getId()], JSON_THROW_ON_ERROR));
+
+        foreach ([
+            "/s/forms/results/{$formId}/markSpam/{$submission->getId()}",
+            "/s/forms/results/{$formId}/batchMarkSpam?ids={$batchIds}",
+        ] as $url) {
+            $this->client->request(Request::METHOD_POST, $url);
+            $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        }
+
+        $editor = $this->createUserWithPermission([
+            'email'      => 'form-editor@mautic-test.com',
+            'user-name'  => 'form-editor',
+            'first-name' => 'Form',
+            'last-name'  => 'Editor',
+            'role'       => [
+                'name'        => 'form-editor-role',
+                'permissions' => ['form:forms' => 1023],
+            ],
+        ]);
+        $this->em->flush();
+        $lockedForm = $this->em->getRepository(Form::class)->find($formId);
+        $checkedOut = new \DateTime('now');
+        $lockedForm->setCheckedOut($checkedOut);
+        $lockedForm->setCheckedOutBy($editor);
+        $this->em->flush();
 
         $this->client->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
         $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}?tmpl=list");
@@ -111,7 +138,6 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
             ['{"blockfreeemail":true}', $formId, 'email']
         );
 
-        $batchIds = urlencode(json_encode([$submission->getId()], JSON_THROW_ON_ERROR));
         $this->client->request(
             Request::METHOD_POST,
             "/s/forms/results/{$formId}/batchMarkSpam?ids={$batchIds}"
@@ -124,17 +150,13 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
         ), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue((bool) $repairedValidation['donotsubmit']);
 
-        $editor = $this->createUserWithPermission([
-            'email'      => 'form-editor@mautic-test.com',
-            'user-name'  => 'form-editor',
-            'first-name' => 'Form',
-            'last-name'  => 'Editor',
-            'role'       => [
-                'name'        => 'form-editor-role',
-                'permissions' => ['form:forms' => 1023],
-            ],
-        ]);
-        $this->em->flush();
+        $lock = $this->connection->fetchAssociative(
+            'SELECT checked_out, checked_out_by FROM '.MAUTIC_TABLE_PREFIX.Form::TABLE_NAME.' WHERE id = ?',
+            [$formId]
+        );
+        $this->assertSame($checkedOut->format('Y-m-d H:i:s'), $lock['checked_out']);
+        $this->assertSame($editor->getId(), (int) $lock['checked_out_by']);
+
         $this->loginOtherUser($editor);
         $this->client->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
         $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}?tmpl=list");
