@@ -31,6 +31,8 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             OperatorOptions::LESS_THAN,
             OperatorOptions::GREATER_THAN_OR_EQUAL,
             OperatorOptions::LESS_THAN_OR_EQUAL,
+            OperatorOptions::BETWEEN,
+            OperatorOptions::NOT_BETWEEN,
         ],
         'number' => [
             OperatorOptions::EQUAL_TO,
