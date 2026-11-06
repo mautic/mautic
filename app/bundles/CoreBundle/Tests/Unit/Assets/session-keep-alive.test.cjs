@@ -20,7 +20,8 @@ function keepAliveRequests(baseUrl, pathname) {
     query.get = (url) => { requests.push(url); return {fail() {}}; };
     const context = vm.createContext({
         jQuery: {noConflict: () => query}, document: {},
-        window: {location: {pathname}}, localStorage: {getItem: () => null},
+        window: {location: {pathname, href: `http://localhost${pathname}`}}, URL,
+        localStorage: {getItem: () => null},
         mauticBaseUrl: baseUrl, mauticSessionLifetime: 1200,
         setInterval: (callback, delay) => timers.push({callback, delay}), console
     });
@@ -32,13 +33,14 @@ function keepAliveRequests(baseUrl, pathname) {
     return requests;
 }
 
-for (const baseUrl of ['/', '/marketing/', '/marketing/index.php/']) {
+for (const baseUrl of ['/', '/marketing/', '/marketing/index.php/', 'https://example.com/', 'https://example.com/marketing/', 'https://example.com/marketing/index.php/']) {
+    const basePath = new URL(baseUrl, 'http://localhost/').pathname;
     test(`keep-alive uses the installation URL ${baseUrl}`, () => {
-        assert.deepEqual(keepAliveRequests(baseUrl, `${baseUrl}s/dashboard`), [`${baseUrl}s/keep-alive`]);
+        assert.deepEqual(keepAliveRequests(baseUrl, `${basePath}s/dashboard`), [`${baseUrl}s/keep-alive`]);
     });
 
     test(`login and public pages do not refresh sessions under ${baseUrl}`, () => {
-        assert.deepEqual(keepAliveRequests(baseUrl, `${baseUrl}s/login`), []);
-        assert.deepEqual(keepAliveRequests(baseUrl, `${baseUrl}unsubscribe/123`), []);
+        assert.deepEqual(keepAliveRequests(baseUrl, `${basePath}s/login`), []);
+        assert.deepEqual(keepAliveRequests(baseUrl, `${basePath}unsubscribe/123`), []);
     });
 }
