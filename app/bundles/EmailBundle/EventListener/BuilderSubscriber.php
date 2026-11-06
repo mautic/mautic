@@ -231,10 +231,10 @@ final class BuilderSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $disableTrackableUrls = $this->coreParametersHelper->get('disable_trackable_urls');
+        $email                = $event->getEmail();
+        $disableTrackableUrls = $this->areTrackableUrlsDisabled($email);
         $shortenEnabled       = $this->coreParametersHelper->get('shortener_email_enable', false);
 
-        $email          = $event->getEmail();
         $emailId        = $email instanceof Email ? $email->getId() : null;
         $utmTags        = $email instanceof Email ? $email->getUtmTags() : [];
 
@@ -266,6 +266,15 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
             $event->addToken($token, $url);
         }
+    }
+
+    private function areTrackableUrlsDisabled(?Email $email): bool
+    {
+        if ($this->coreParametersHelper->get('disable_trackable_urls')) {
+            return true;
+        }
+
+        return $email instanceof Email && !$email->isTrackingEnabled();
     }
 
     /**
