@@ -9,7 +9,7 @@
 
 Mautic.testFullContactApi = function (btn) {
     mQuery(btn).prop('disabled', true);
-    var apikey = mQuery('#integration_details_apiKeys_apikey').val();
+    var apikey = mQuery('#integration_config_apiKeys_apikey').val();
     var d = new Date();
     var month = d.getMonth() + 1;
     var period = d.getFullYear() + '-' + ((month < 10) ? '0' + month : month);
@@ -56,9 +56,9 @@ Mautic.testFullContactApi = function (btn) {
             result += ' - Name/Location/Stats: ' + free.usage + ' matches used from ' + free.planLevel + ' (' + free.remaining + ' remaining)' + EOL;
         }
 
-        mQuery('#integration_details_apiKeys_stats').val(result);
+        mQuery('#integration_config_apiKeys_stats').val(result);
     }).fail(function(error) {
-        mQuery('#integration_details_apiKeys_stats').val((error.responseJSON && error.responseJSON.message)?error.responseJSON.message:'Error: ' + JSON.stringify(error));
+        mQuery('#integration_config_apiKeys_stats').val((error.responseJSON && error.responseJSON.message)?error.responseJSON.message:'Error: ' + JSON.stringify(error));
     });
     mQuery(btn).prop('disabled', false);
 };
