@@ -179,7 +179,7 @@ class Submission
         return $this->results;
     }
 
-    public function setResults($results): static
+    public function setResults(array $results): static
     {
         $this->results = $results;
 

@@ -1411,7 +1411,7 @@ class LeadModel extends FormModel
             $this->modifyTags($lead, $tags, null, false);
         }
 
-        if (empty($this->leadFields)) {
+        if ($this->leadFields === []) {
             $this->leadFields = $this->leadFieldModel->getEntities(
                 [
                     'filter' => [
