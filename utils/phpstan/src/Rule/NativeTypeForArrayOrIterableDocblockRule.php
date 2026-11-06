@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Rule;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr\ArrowFunction;
 use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Function_;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Rules\Rule;
@@ -19,8 +22,9 @@ use PHPStan\Type\TypeCombinator;
 /**
  * A "@param"/"@return" docblock typed as an array (e.g. "Foo[]", "array") or "iterable" must be
  * backed by a native "array"/"iterable" type declaration. A missing or "mixed" native type is reported.
+ * Applies to methods, plain functions and closures.
  *
- * @implements Rule<ClassMethod>
+ * @implements Rule<FunctionLike>
  *
  * @see \Utils\PHPStan\Tests\Rule\NativeTypeForArrayOrIterableDocblockRuleTest
  */
@@ -33,11 +37,11 @@ final readonly class NativeTypeForArrayOrIterableDocblockRule implements Rule
 
     public function getNodeType(): string
     {
-        return ClassMethod::class;
+        return FunctionLike::class;
     }
 
     /**
-     * @param ClassMethod $node
+     * @param FunctionLike $node
      *
      * @return list<\PHPStan\Rules\IdentifierRuleError>
      */
@@ -50,9 +54,14 @@ final readonly class NativeTypeForArrayOrIterableDocblockRule implements Rule
 
         $classReflection = $scope->getClassReflection();
 
+        // a bare name ("handle") is needed to look up parents; the display name ("handle()",
+        // "{closure}") is only used in the reported message
+        $methodName = $node instanceof ClassMethod || $node instanceof Function_ ? $node->name->toString() : null;
+        $displayName = $this->resolveDisplayName($node, $methodName);
+
         // an overridden method cannot freely change its native param/return types without breaking
         // the parent/interface signature, so adding a type is left to the method that declares it
-        if ($this->overridesParentMethod($classReflection, $node->name->toString())) {
+        if ($node instanceof ClassMethod && null !== $methodName && $this->overridesParentMethod($classReflection, $methodName)) {
             return [];
         }
 
@@ -60,14 +69,14 @@ final readonly class NativeTypeForArrayOrIterableDocblockRule implements Rule
             $scope->getFile(),
             $classReflection?->getName(),
             $scope->isInTrait() ? $scope->getTraitReflection()->getName() : null,
-            $node->name->toString(),
+            $this->resolveDocBlockFunctionName($node),
             $docComment->getText()
         );
 
         $ruleErrors = [];
 
         $paramTags = $resolvedPhpDoc->getParamTags();
-        foreach ($node->params as $param) {
+        foreach ($node->getParams() as $param) {
             if (!$param->var instanceof Variable || !is_string($param->var->name)) {
                 continue;
             }
@@ -96,9 +105,9 @@ final readonly class NativeTypeForArrayOrIterableDocblockRule implements Rule
             }
 
             $ruleErrors[] = RuleErrorBuilder::message(sprintf(
-                'Param "$%s" of "%s()" has a "%s" docblock, so it must declare the native "%s" type.',
+                'Param "$%s" of "%s" has a "%s" docblock, so it must declare the native "%s" type.',
                 $param->var->name,
-                $node->name->toString(),
+                $displayName,
                 $requiredType,
                 $requiredType
             ))
@@ -112,8 +121,8 @@ final readonly class NativeTypeForArrayOrIterableDocblockRule implements Rule
             $requiredType = $this->resolveRequiredNativeType($returnTag->getType());
             if (null !== $requiredType) {
                 $ruleErrors[] = RuleErrorBuilder::message(sprintf(
-                    'Method "%s()" has a "%s" return docblock, so it must declare the native "%s" return type.',
-                    $node->name->toString(),
+                    'Method "%s" has a "%s" return docblock, so it must declare the native "%s" return type.',
+                    $displayName,
                     $requiredType,
                     $requiredType
                 ))
@@ -124,6 +133,36 @@ final readonly class NativeTypeForArrayOrIterableDocblockRule implements Rule
         }
 
         return $ruleErrors;
+    }
+
+    // the docblock resolver keys a method by its bare name (the class provides the scope) but a plain
+    // function by its fully-qualified name; a closure has neither
+    private function resolveDocBlockFunctionName(FunctionLike $functionLike): ?string
+    {
+        if ($functionLike instanceof ClassMethod) {
+            return $functionLike->name->toString();
+        }
+
+        if ($functionLike instanceof Function_) {
+            return null !== $functionLike->namespacedName
+                ? $functionLike->namespacedName->toString()
+                : $functionLike->name->toString();
+        }
+
+        return null;
+    }
+
+    private function resolveDisplayName(FunctionLike $functionLike, ?string $methodName): string
+    {
+        if (null !== $methodName) {
+            return $methodName.'()';
+        }
+
+        if ($functionLike instanceof ArrowFunction) {
+            return 'fn()';
+        }
+
+        return '{closure}';
     }
 
     private function overridesParentMethod(?ClassReflection $classReflection, string $methodName): bool

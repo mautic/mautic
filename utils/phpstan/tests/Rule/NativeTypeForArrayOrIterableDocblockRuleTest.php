@@ -59,6 +59,20 @@ final class NativeTypeForArrayOrIterableDocblockRuleTest extends RuleTestCase
         ]);
     }
 
+    public function testFunctions(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/NativeTypeForArrayOrIterableDocblock/some_functions.php'], [
+            [
+                'Param "$items" of "missingArrayParamFunction()" has a "array" docblock, so it must declare the native "array" type.',
+                10,
+            ],
+            [
+                'Method "missingIterableReturnFunction()" has a "iterable" return docblock, so it must declare the native "iterable" return type.',
+                17,
+            ],
+        ]);
+    }
+
     public function testSkipOverriddenMethod(): void
     {
         $this->analyse([__DIR__.'/Fixture/NativeTypeForArrayOrIterableDocblock/SkipOverride.php'], []);
