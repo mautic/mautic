@@ -31,26 +31,86 @@
                 'delete': (permissions['webhook:webhooks:deleteown'] or permissions['webhook:webhooks:deleteother'])
             }
         },
-        'quickFilters': [
-            {
-                'search': 'mautic.core.searchcommand.ispublished',
-                'label': 'mautic.core.form.active',
-                'tooltip': 'mautic.core.searchcommand.ispublished.description',
-                'icon': 'ri-check-line'
+        'quickFilters': {
+            'mautic.core.quick_filters.status': {
+                'conflictGroup': true,
+                'filters': [
+                    {
+                        'search': 'mautic.core.searchcommand.ispublished',
+                        'label': 'mautic.core.form.active',
+                        'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                        'icon': 'ri-check-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.isunpublished',
+                        'label': 'mautic.core.form.inactive',
+                        'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                        'icon': 'ri-close-line'
+                    }
+                ]
             },
-            {
-                'search': 'mautic.core.searchcommand.isunpublished',
-                'label': 'mautic.core.form.inactive',
-                'tooltip': 'mautic.core.searchcommand.isunpublished.description',
-                'icon': 'ri-close-line'
+            'mautic.webhook.quick_filters.events': {
+                'filters': [
+                    {
+                        'search': 'mautic.webhook.searchcommand.event.company',
+                        'label': 'mautic.webhook.searchcommand.event.company.label',
+                        'tooltip': 'mautic.webhook.searchcommand.event.company.description',
+                        'icon': 'ri-building-line'
+                    },
+                    {
+                        'search': 'mautic.webhook.searchcommand.event.lead',
+                        'label': 'mautic.webhook.searchcommand.event.lead.label',
+                        'tooltip': 'mautic.webhook.searchcommand.event.lead.description',
+                        'icon': 'ri-user-3-line'
+                    },
+                    {
+                        'search': 'mautic.webhook.searchcommand.event.email',
+                        'label': 'mautic.webhook.searchcommand.event.email.label',
+                        'tooltip': 'mautic.webhook.searchcommand.event.email.description',
+                        'icon': 'ri-mail-line'
+                    },
+                    {
+                        'search': 'mautic.webhook.searchcommand.event.form',
+                        'label': 'mautic.webhook.searchcommand.event.form.label',
+                        'tooltip': 'mautic.webhook.searchcommand.event.form.description',
+                        'icon': 'ri-survey-line'
+                    },
+                    {
+                        'search': 'mautic.webhook.searchcommand.event.page',
+                        'label': 'mautic.webhook.searchcommand.event.page.label',
+                        'tooltip': 'mautic.webhook.searchcommand.event.page.description',
+                        'icon': 'ri-pages-line'
+                    },
+                    {
+                        'search': 'mautic.webhook.searchcommand.event.text_message',
+                        'label': 'mautic.webhook.searchcommand.event.text_message.label',
+                        'tooltip': 'mautic.webhook.searchcommand.event.text_message.description',
+                        'icon': 'ri-message-3-line'
+                    }
+                ]
             },
-            {
-                'search': 'mautic.core.searchcommand.ismine',
-                'label': 'mautic.core.searchcommand.ismine.label',
-                'tooltip': 'mautic.core.searchcommand.ismine.description',
-                'icon': 'ri-user-line'
+            'mautic.core.quick_filters.ownership': {
+                'conflictGroup': true,
+                'filters': [
+                    {
+                        'search': 'mautic.core.searchcommand.ismine',
+                        'label': 'mautic.core.searchcommand.ismine.label',
+                        'tooltip': 'mautic.core.searchcommand.ismine.description',
+                        'icon': 'ri-user-line'
+                    }
+                ]
+            },
+            'mautic.core.quick_filters.others': {
+                'filters': [
+                    {
+                        'search': 'mautic.core.searchcommand.isuncategorized',
+                        'label': 'mautic.core.form.uncategorized',
+                        'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                        'icon': 'ri-folder-unknow-line'
+                    }
+                ]
             }
-        ]
+        }
     }) }}
     <div class="page-list">
         {{ block('listResults') }}
