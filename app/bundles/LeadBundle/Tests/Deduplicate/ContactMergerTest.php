@@ -57,6 +57,9 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $this->leadRepository->method('getFieldValues')->willReturn([]);
         $this->translator->method('trans')->willReturnArgument(0);
+        $this->mergeRecordRepo->method('wrapInTransaction')->willReturnCallback(
+            static fn (callable $callback): mixed => $callback()
+        );
     }
 
     public function testMergeTimestamps(): void

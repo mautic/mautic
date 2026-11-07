@@ -59,6 +59,13 @@ class ContactMerger
             throw new SameContactException();
         }
 
+        return $this->repo->wrapInTransaction(
+            fn (): Lead => $this->performMerge($winner, $loser)
+        );
+    }
+
+    private function performMerge(Lead $winner, Lead $loser): Lead
+    {
         $this->logger->debug('CONTACT: ID# '.$loser->getId().' will be merged into ID# '.$winner->getId());
 
         // Dispatch pre merge event
