@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\ProjectBundle\Tests\Entity;
 
-use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectRepository;
@@ -22,7 +24,7 @@ final class ProjectRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repository = $this->configureRepository(Project::class);
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): DbalQueryBuilder => new DbalQueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(
@@ -48,22 +50,10 @@ final class ProjectRepositoryTest extends TestCase
         $this->assertContains('mautic.project.searchcommand.hasassets', $commands);
     }
 
-    /**
-     * @param array<int> $associatedProjectIds
-     */
     #[\PHPUnit\Framework\Attributes\DataProvider('associationFilterProvider')]
-    public function testAddSearchCommandWhereClauseHandlesAssociationFilters(string $command, string $expectedTable, array $associatedProjectIds, string $expectedExpression): void
+    public function testAddSearchCommandWhereClauseHandlesAssociationFilters(string $command, string $expectedTable): void
     {
-        $this->result->method('fetchFirstColumn')->willReturn($associatedProjectIds);
-
-        $this->connection->expects($this->once())
-            ->method('executeQuery')
-            ->with(
-                $this->callback(fn (string $sql): bool => str_contains($sql, $expectedTable)),
-                $this->anything(),
-                $this->anything()
-            )
-            ->willReturn($this->result);
+        $this->connection->expects($this->never())->method('executeQuery');
 
         $queryBuilder = $this->connection->createQueryBuilder();
         $filter       = (object) ['command' => $command, 'string' => '', 'not' => false, 'strict' => false];
@@ -72,33 +62,26 @@ final class ProjectRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repository, $queryBuilder, $filter);
 
-        $this->assertSame($expectedExpression, (string) $expr);
+        $expression = (string) $expr;
+        $this->assertStringContainsString('p.id IN (SELECT projectxref.project_id FROM ', $expression);
+        $this->assertStringContainsString($expectedTable.' projectxref', $expression);
         $this->assertSame([], $params);
     }
 
     /**
-     * @return iterable<array{0: string, 1: string, 2: array<int>, 3: string}>
+     * @return iterable<array{0: string, 1: string}>
      */
     public static function associationFilterProvider(): iterable
     {
-        yield ['has:emails', 'email_projects_xref', [1, 2], 'p.id IN (1, 2)'];
-        yield ['has:campaigns', 'campaign_projects_xref', [5], 'p.id IN (5)'];
-        yield ['has:pages', 'page_projects_xref', [8, 13, 21], 'p.id IN (8, 13, 21)'];
-        yield ['has:assets', 'asset_projects_xref', [42], 'p.id IN (42)'];
+        yield ['has:emails', 'email_projects_xref'];
+        yield ['has:campaigns', 'campaign_projects_xref'];
+        yield ['has:pages', 'page_projects_xref'];
+        yield ['has:assets', 'asset_projects_xref'];
     }
 
     public function testAssociationFilterSupportsNegation(): void
     {
-        $this->result->method('fetchFirstColumn')->willReturn([9]);
-
-        $this->connection->expects($this->once())
-            ->method('executeQuery')
-            ->with(
-                $this->callback(fn (string $sql): bool => str_contains($sql, 'email_projects_xref')),
-                $this->anything(),
-                $this->anything()
-            )
-            ->willReturn($this->result);
+        $this->connection->expects($this->never())->method('executeQuery');
 
         $queryBuilder = $this->connection->createQueryBuilder();
         $filter       = (object) ['command' => 'has:emails', 'string' => '', 'not' => true, 'strict' => false];
@@ -107,31 +90,29 @@ final class ProjectRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repository, $queryBuilder, $filter);
 
-        $this->assertSame('p.id NOT IN (9)', (string) $expr);
+        $this->assertStringContainsString('p.id NOT IN (SELECT projectxref.project_id FROM ', (string) $expr);
+        $this->assertStringContainsString('email_projects_xref projectxref', (string) $expr);
         $this->assertSame([], $params);
     }
 
-    public function testAssociationFilterFallsBackWhenNoAssociationsExist(): void
+    public function testOrmAssociationFilterUsesCorrelatedSubquery(): void
     {
-        $this->result->method('fetchFirstColumn')->willReturn([]);
+        $this->entityManager->method('getExpressionBuilder')->willReturn(new Expr());
+        $subQuery = new OrmQueryBuilder($this->entityManager);
+        $this->entityManager->expects($this->once())->method('createQueryBuilder')->willReturn($subQuery);
 
-        $this->connection->expects($this->once())
-            ->method('executeQuery')
-            ->with(
-                $this->callback(fn (string $sql): bool => str_contains($sql, 'asset_projects_xref')),
-                $this->anything(),
-                $this->anything()
-            )
-            ->willReturn($this->result);
-
-        $queryBuilder = $this->connection->createQueryBuilder();
-        $filter       = (object) ['command' => 'has:assets', 'string' => '', 'not' => false, 'strict' => false];
+        $queryBuilder = new OrmQueryBuilder($this->entityManager);
+        $filter       = (object) ['command' => 'has:emails', 'string' => '', 'not' => true, 'strict' => false];
 
         $method = new \ReflectionMethod(ProjectRepository::class, 'addSearchCommandWhereClause');
 
         [$expr, $params] = $method->invoke($this->repository, $queryBuilder, $filter);
+        $subQueryDql     = $subQuery->getDQL();
 
-        $this->assertSame('p.id IN (0)', (string) $expr);
+        $this->assertStringContainsString('NOT(EXISTS', (string) $expr);
+        $this->assertStringContainsString('FROM Mautic\\EmailBundle\\Entity\\Email associated', $subQueryDql);
+        $this->assertStringContainsString('INNER JOIN associated.projects associatedProject', $subQueryDql);
+        $this->assertStringContainsString('associatedProject.id = p.id', $subQueryDql);
         $this->assertSame([], $params);
     }
 }

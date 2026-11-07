@@ -6,18 +6,22 @@ namespace Mautic\ProjectBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder;
+use Mautic\AssetBundle\Entity\Asset;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\PageBundle\Entity\Page;
 
 final class ProjectRepository extends CommonRepository
 {
     /**
-     * @var array<string, string>
+     * @var array<string, array{xrefTable: string, entityClass: class-string}>
      */
-    private const ASSOCIATION_XREF_TABLES = [
-        'mautic.project.searchcommand.hasemails'    => 'email_projects_xref',
-        'mautic.project.searchcommand.hascampaigns' => 'campaign_projects_xref',
-        'mautic.project.searchcommand.haspages'     => 'page_projects_xref',
-        'mautic.project.searchcommand.hasassets'    => 'asset_projects_xref',
+    private const ASSOCIATION_FILTERS = [
+        'mautic.project.searchcommand.hasemails'    => ['entityClass' => Email::class, 'xrefTable' => 'email_projects_xref'],
+        'mautic.project.searchcommand.hascampaigns' => ['entityClass' => Campaign::class, 'xrefTable' => 'campaign_projects_xref'],
+        'mautic.project.searchcommand.haspages'      => ['entityClass' => Page::class, 'xrefTable' => 'page_projects_xref'],
+        'mautic.project.searchcommand.hasassets'     => ['entityClass' => Asset::class, 'xrefTable' => 'asset_projects_xref'],
     ];
 
     /**
@@ -30,12 +34,17 @@ final class ProjectRepository extends CommonRepository
             return [$expr, $parameters];
         }
 
-        foreach (self::ASSOCIATION_XREF_TABLES as $translationKey => $xrefTable) {
+        foreach (self::ASSOCIATION_FILTERS as $translationKey => $association) {
             $command   = $this->translator->trans($translationKey);
             $commandEn = $this->translator->trans($translationKey, [], null, 'en_US');
 
             if ($filter->command === $command || $filter->command === $commandEn) {
-                return $this->buildAssociationExpression($xrefTable, (bool) $filter->not);
+                return $this->buildAssociationExpression(
+                    $q,
+                    $association['xrefTable'],
+                    $association['entityClass'],
+                    (bool) $filter->not
+                );
             }
         }
 
@@ -45,25 +54,32 @@ final class ProjectRepository extends CommonRepository
     /**
      * @return array{0: string, 1: array<string, mixed>}
      */
-    private function buildAssociationExpression(string $xrefTable, bool $negation): array
+    private function buildAssociationExpression(QueryBuilder|DbalQueryBuilder $q, string $xrefTable, string $entityClass, bool $negation): array
     {
-        $queryBuilder = $this->_em->getConnection()->createQueryBuilder();
-        $ids          = $queryBuilder
-            ->select('DISTINCT project_id')
-            ->from(MAUTIC_TABLE_PREFIX.$xrefTable, 'projectxref')
-            ->executeQuery()
-            ->fetchFirstColumn();
+        $field = sprintf('%s.id', $this->getTableAlias());
 
-        $ids = array_map(static fn (int $id): string => (string) $id, array_map(intval(...), $ids ?: []));
+        if ($q instanceof QueryBuilder) {
+            $subQuery = $this->_em->createQueryBuilder()
+                ->select('associated.id')
+                ->from($entityClass, 'associated')
+                ->innerJoin('associated.projects', 'associatedProject')
+                ->where('associatedProject.id = '.$field);
 
-        if ([] === $ids) {
-            $ids = [0];
+            $expr = $q->expr()->exists($subQuery->getDQL());
+            if ($negation) {
+                $expr = $q->expr()->not($expr);
+            }
+
+            return [(string) $expr, []];
         }
 
-        $field = sprintf('%s.id', $this->getTableAlias());
-        $expr  = $negation
-            ? $queryBuilder->expr()->notIn($field, $ids)
-            : $queryBuilder->expr()->in($field, $ids);
+        $subQuery = $this->_em->getConnection()->createQueryBuilder()
+            ->select('projectxref.project_id')
+            ->from(MAUTIC_TABLE_PREFIX.$xrefTable, 'projectxref');
+
+        $expr = $negation
+            ? $q->expr()->notIn($field, $subQuery->getSQL())
+            : $q->expr()->in($field, $subQuery->getSQL());
 
         return [$expr, []];
     }
@@ -73,7 +89,7 @@ final class ProjectRepository extends CommonRepository
      */
     public function getSearchCommands(): array
     {
-        return array_merge(array_keys(self::ASSOCIATION_XREF_TABLES), parent::getSearchCommands());
+        return array_merge(array_keys(self::ASSOCIATION_FILTERS), parent::getSearchCommands());
     }
 
     /**
