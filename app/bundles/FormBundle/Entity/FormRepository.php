@@ -118,22 +118,40 @@ class FormRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired', [], null, 'en_US'):
-                $expr = $q->expr()->and(
-                    $q->expr()->eq('f.isPublished', ":{$unique}"),
-                    $q->expr()->isNotNull('f.publishDown'),
-                    $q->expr()->neq('f.publishDown', $q->expr()->literal('')),
-                    $q->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()')
-                );
+                if ($q instanceof \Doctrine\ORM\QueryBuilder) {
+                    $expr = new \Doctrine\ORM\Query\Expr\Andx([
+                        $q->expr()->eq('f.isPublished', ":{$unique}"),
+                        $q->expr()->isNotNull('f.publishDown'),
+                        $q->expr()->neq('f.publishDown', $q->expr()->literal('')),
+                        $q->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()'),
+                    ]);
+                } else {
+                    $expr = $q->expr()->and(
+                        $q->expr()->eq('f.isPublished', ":{$unique}"),
+                        $q->expr()->isNotNull('f.publishDown'),
+                        $q->expr()->neq('f.publishDown', $q->expr()->literal('')),
+                        $q->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()')
+                    );
+                }
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.ispending'):
             case $this->translator->trans('mautic.form.form.searchcommand.ispending', [], null, 'en_US'):
-                $expr = $q->expr()->and(
-                    $q->expr()->eq('f.isPublished', ":{$unique}"),
-                    $q->expr()->isNotNull('f.publishUp'),
-                    $q->expr()->neq('f.publishUp', $q->expr()->literal('')),
-                    $q->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()')
-                );
+                if ($q instanceof \Doctrine\ORM\QueryBuilder) {
+                    $expr = new \Doctrine\ORM\Query\Expr\Andx([
+                        $q->expr()->eq('f.isPublished', ":{$unique}"),
+                        $q->expr()->isNotNull('f.publishUp'),
+                        $q->expr()->neq('f.publishUp', $q->expr()->literal('')),
+                        $q->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()'),
+                    ]);
+                } else {
+                    $expr = $q->expr()->and(
+                        $q->expr()->eq('f.isPublished', ":{$unique}"),
+                        $q->expr()->isNotNull('f.publishUp'),
+                        $q->expr()->neq('f.publishUp', $q->expr()->literal('')),
+                        $q->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()')
+                    );
+                }
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.hasresults'):
@@ -147,6 +165,17 @@ class FormRepository extends CommonRepository
                     )
                     ->where(
                         $q->expr()->eq('s.form', 'f')
+                    )
+                    ->getDql();
+                $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 0);
+                break;
+            case $this->translator->trans('mautic.form.form.searchcommand.hasactions'):
+            case $this->translator->trans('mautic.form.form.searchcommand.hasactions', [], null, 'en_US'):
+                $sq       = $this->getEntityManager()->createQueryBuilder();
+                $subquery = $sq->select('count(a.id)')
+                    ->from(Action::class, 'a')
+                    ->where(
+                        $q->expr()->eq('a.form', 'f')
                     )
                     ->getDql();
                 $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 0);
@@ -264,6 +293,7 @@ class FormRepository extends CommonRepository
             'mautic.form.form.searchcommand.isexpired',
             'mautic.form.form.searchcommand.ispending',
             'mautic.form.form.searchcommand.hasresults',
+            'mautic.form.form.searchcommand.hasactions',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.name',
             'mautic.project.searchcommand.name',
