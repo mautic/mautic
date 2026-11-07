@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactMerger
 {
-    private ?TranslatorInterface $translator = null;
+    private TranslatorInterface $translator;
 
     /**
      * @var Lead
@@ -207,10 +207,14 @@ class ContactMerger
         $loserStage = $loser->getStage();
 
         if (null === $winner->getStage() && null !== $loserStage) {
+            $mergeAction = isset($this->translator)
+                ? $this->translator->trans('mautic.lead.event.merge')
+                : 'Contact merged';
+
             $this->leadModel->addToStage(
                 $winner,
                 $loserStage,
-                $this->translator?->trans('mautic.lead.event.merge') ?? 'Contact merged'
+                $mergeAction
             );
         }
 
