@@ -38,7 +38,8 @@ final class LeadListRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentTypeSearchCommands(): void
     {
-        $dynamicSegment = $this->createSegment('DynamicSearch', [
+        $dynamicSegment = $this->buildSegment('DynamicSearch');
+        $dynamicSegment->setFilters([
             [
                 'glue'     => 'and',
                 'type'     => 'lookup',
@@ -48,6 +49,8 @@ final class LeadListRepositoryFunctionalTest extends MauticMysqlTestCase
                 'display'  => '',
             ],
         ]);
+        $this->em->persist($dynamicSegment);
+        $this->em->flush();
         $staticSegment  = $this->createSegment('StaticSearch');
 
         /** @var LeadListRepository $leadListRepository */
@@ -106,19 +109,21 @@ final class LeadListRepositoryFunctionalTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    private function createSegment(string $suffix = 'A', ?array $filters = null): LeadList
+    private function createSegment(string $suffix = 'A'): LeadList
+    {
+        $segment = $this->buildSegment($suffix);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        return $segment;
+    }
+
+    private function buildSegment(string $suffix): LeadList
     {
         $segment = new LeadList();
         $segment->setName("Segment {$suffix}");
         $segment->setPublicName("Segment {$suffix}");
         $segment->setAlias("segment-{$suffix}");
-
-        if (null !== $filters) {
-            $segment->setFilters($filters);
-        }
-
-        $this->em->persist($segment);
-        $this->em->flush();
 
         return $segment;
     }
