@@ -29,6 +29,37 @@ final class BuildJsSubscriberTest extends TestCase
         $this->assertStringNotContainsString('MauticJS.checkForTrackingPixel = function', $js);
     }
 
+    public function testPageTrackingPostsUseKeepaliveFetchWithoutPreflightHeader(): void
+    {
+        $event = new BuildJsEvent('', true, [BuildJsScope::RUNTIME]);
+
+        (new BuildJsSubscriber())->onBuildJs($event);
+
+        $js         = $event->getJs();
+        $fetchStart = strpos($js, 'window.fetch(url');
+        $xhrStart   = strpos($js, 'var xhr = MauticJS.createCORSRequest', $fetchStart);
+
+        $this->assertIsInt($fetchStart);
+        $this->assertIsInt($xhrStart);
+
+        $fetchBlock = substr($js, $fetchStart, $xhrStart - $fetchStart);
+        $xhrBlock   = substr($js, $xhrStart);
+
+        $this->assertStringContainsString("method === 'POST'", $js);
+        $this->assertStringContainsString('url === MauticJS.pageTrackingCORSUrl', $js);
+        $this->assertStringContainsString("typeof window.fetch === 'function'", $js);
+        $this->assertStringContainsString('query.length <= 60 * 1024', $js);
+        $this->assertStringContainsString('keepalive: true', $fetchBlock);
+        $this->assertStringContainsString("credentials: MauticJS.requestWithCredentials ? 'include' : 'same-origin'", $fetchBlock);
+        $this->assertStringContainsString("headers: { 'Content-Type': 'application/x-www-form-urlencoded' }", $fetchBlock);
+        $this->assertStringContainsString('MauticJS.parseTextToJSON(responseText)', $fetchBlock);
+        $this->assertStringContainsString('callbackSuccess(response, responseDetails)', $fetchBlock);
+        $this->assertStringContainsString('callbackError(response, responseDetails)', $fetchBlock);
+        $this->assertStringContainsString('callbackError({}, { status: 0 })', $fetchBlock);
+        $this->assertStringNotContainsString('X-Requested-With', $fetchBlock);
+        $this->assertStringContainsString("xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')", $xhrBlock);
+    }
+
     public function testTrackingRestoresIdentityAndCredentialedRequests(): void
     {
         $event = new BuildJsEvent('', true, [BuildJsScope::TRACKING]);
