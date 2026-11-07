@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Doctrine\Common\DataFixtures\Event\PreExecuteEvent;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\FormBundle\Entity\Action;
@@ -78,10 +79,10 @@ final class LoadFormData extends AbstractFixture implements OrderedFixtureInterf
 
             // because form table data will be deleted we must have same autoincrement as before the insertion
             // to have the form_results table to match the form id in table name e.g. form_results_69_kaleidosco
+            $connection    = $event->getEntityManager()->getConnection();
             $formTableName = $this->formRepository->getTableName();
-            $event->getEntityManager()->getConnection()->executeStatement(
-                'ALTER TABLE '.$formTableName.' AUTO_INCREMENT='.$firstId
-            );
+
+            DatabasePlatform::resetAutoIncrement($connection, $formTableName, $firstId);
         });
     }
 

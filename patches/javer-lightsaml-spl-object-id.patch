@@ -1,0 +1,13 @@
+diff --git a/vendor/javer/lightsaml/src/LightSaml/Context/Profile/Helper/LogHelper.php b/vendor/javer/lightsaml/src/LightSaml/Context/Profile/Helper/LogHelper.php
+index 487a01e52d..57eb088def 100644
+--- a/vendor/javer/lightsaml/src/LightSaml/Context/Profile/Helper/LogHelper.php
++++ b/vendor/javer/lightsaml/src/LightSaml/Context/Profile/Helper/LogHelper.php
+@@ -55,7 +55,7 @@ abstract class LogHelper
+         if ($action) {
+             $result['action'] = get_class($action);
+         }
+-        $result['top_context_id'] = spl_object_hash($topContext);
++        $result['top_context_id'] = spl_object_id($topContext);
+
+         if ($logWholeContext) {
+             $result['top_context'] = $topContext;

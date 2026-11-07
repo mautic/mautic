@@ -22,9 +22,18 @@ class PointsChangeLogRepository extends CommonRepository
      */
     public function getLeadTimelineEvents($leadId = null, array $options = [])
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $connection = $this->getEntityManager()->getConnection();
+
+        $query = $connection->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
-            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id, lp.lead_id, pl.name as groupName')
+            ->select('lp.event_name as '.$connection->quoteIdentifier('eventName'),
+                'lp.action_name as '.$connection->quoteIdentifier('actionName'),
+                'lp.date_added as '.$connection->quoteIdentifier('dateAdded'),
+                'lp.type',
+                'lp.delta',
+                'lp.id',
+                'lp.lead_id',
+                'pl.name as '.$connection->quoteIdentifier('groupName'))
             ->leftJoin('lp', MAUTIC_TABLE_PREFIX.Group::TABLE_NAME, 'pl', 'lp.group_id = pl.id');
 
         if ($leadId) {

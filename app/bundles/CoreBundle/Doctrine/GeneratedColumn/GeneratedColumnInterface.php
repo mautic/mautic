@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Doctrine\GeneratedColumn;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+
 interface GeneratedColumnInterface
 {
     public function getTableName(): string;
@@ -21,13 +23,13 @@ interface GeneratedColumnInterface
 
     public function getTimeUnit(): ?string;
 
-    public function getAlterTableSql(): string;
+    public function getAlterTableSql(?AbstractPlatform $platform = null): string;
 
-    public function getAddColumnSql(): string;
+    public function getAddColumnSql(?AbstractPlatform $platform = null): string;
 
     public function getAddIndexSql(): string;
 
-    public function getColumnDefinition(): string;
+    public function getColumnDefinition(?AbstractPlatform $platform = null): string;
 
     public function getIndexColumns(): array;
 

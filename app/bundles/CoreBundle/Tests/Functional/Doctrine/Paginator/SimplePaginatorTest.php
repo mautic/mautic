@@ -61,10 +61,26 @@ final class SimplePaginatorTest extends MauticMysqlTestCase
         ], iterator_to_array($paginator), 'Only 2 last records should be returned.');
 
         $prefix  = self::getContainer()->getParameter('mautic.db_table_prefix');
-        $queries = $this->debugDataHolder->getData()['default'];
+        $queries = $this->getQueries();
 
         $this->assertCount(5, $queries, 'There should be exactly 5 queries executed.');
         $this->assertMatchesRegularExpression("/^SELECT count\((.{2}_)\.id\) AS sclr_0 FROM {$prefix}ip_addresses \\1$/", $queries[3]['sql'], 'Simple paginator should not use either a DISTINCT keyword or sub-queries.');
         $this->assertMatchesRegularExpression("/^SELECT (.{2}_)\.id AS id_0, \\1\.ip_address AS ip_address_1, \\1\.ip_details AS ip_details_2 FROM {$prefix}ip_addresses \\1 ORDER BY \\1\.id ASC LIMIT 5 OFFSET 1$/", $queries[4]['sql'], 'Ordering and limit/offset have to be reflected.');
+    }
+
+    /**
+     * Return real queries (with excluded NEXTVAL() calls on PostgreSQL).
+     *
+     * @return array<int, mixed>
+     */
+    private function getQueries(): array
+    {
+        // Exclude PostgreSQL sequence queries (NEXTVAL)
+        return array_values(
+            array_filter(
+                $this->debugDataHolder->getData()['default'] ?? [],
+                fn (array $item): bool => !str_starts_with($item['sql'], 'SELECT NEXTVAL')
+            )
+        );
     }
 }

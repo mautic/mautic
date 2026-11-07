@@ -10,27 +10,40 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20220722074516 extends AbstractMauticMigration
 {
+    protected const TABLE_NAME = 'notifications';
+    protected const INDEX_NAME = 'deduplicate_date_added';
+
     public function preUp(Schema $schema): void
     {
-        if ($schema->getTable($this->getTableName())->hasColumn('deduplicate')) {
-            throw new SkipMigration("The deduplicate column has already been added to the {$this->getTableName()} table.");
+        $table = $this->getPrefixedTableName(self::TABLE_NAME);
+
+        if ($schema->getTable($table)->hasColumn('deduplicate')) {
+            throw new SkipMigration("The deduplicate column has already been added to the {$table} table.");
         }
     }
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->getTableName()} ADD deduplicate VARCHAR(32) DEFAULT NULL");
-        $this->addSql("CREATE INDEX deduplicate_date_added ON {$this->getTableName()} (deduplicate, date_added)");
+        $table = $this->getPrefixedTableName(self::TABLE_NAME);
+
+        $this->addSql("ALTER TABLE {$table} ADD deduplicate VARCHAR(32) DEFAULT NULL");
+
+        $this->createIndex(
+            $table,
+            $this->getPrefixedIndexName(self::INDEX_NAME),
+            ['deduplicate', 'date_added']
+        );
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql("DROP INDEX deduplicate_date_added ON {$this->getTableName()}");
-        $this->addSql("ALTER TABLE {$this->getTableName()} DROP deduplicate");
-    }
+        $table = $this->getPrefixedTableName(self::TABLE_NAME);
 
-    private function getTableName(): string
-    {
-        return $this->prefix.'notifications';
+        $this->dropIndex(
+            $table,
+            $this->getPrefixedIndexName(self::INDEX_NAME),
+        );
+
+        $this->addSql("ALTER TABLE {$table} DROP deduplicate");
     }
 }

@@ -186,7 +186,7 @@ final class JumpToActionTest extends MauticMysqlTestCase
     {
         $eventLogRepository = $this->em->getRepository(LeadEventLog::class);
 
-        return $eventLogRepository->findBy(['lead' => $contact->getId()]);
+        return $eventLogRepository->findBy(['lead' => $contact->getId()], ['id' => 'ASC']); // Force stable order
     }
 
     /**

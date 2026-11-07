@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -100,8 +101,9 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getEvents(?Lead $contact = null, $bundle = null, $object = null, $actions = null, array $options = [])
     {
-        $alias = $this->getTableAlias();
-        $qb    = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $alias      = $this->getTableAlias();
+        $connection = $this->getEntityManager()->getConnection();
+        $qb         = $connection->createQueryBuilder()
             ->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', $alias);
 
@@ -133,7 +135,14 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         if (!empty($options['search'])) {
-            $qb->andWhere($qb->expr()->like('LOWER('.$alias.'.properties)', $qb->expr()->literal('%'.strtolower($options['search']).'%')));
+            $qb->andWhere(
+                DatabasePlatform::getCaseInsensitiveLike(
+                    $connection->getDatabasePlatform(),
+                    $alias.'.properties',
+                    $qb->expr()->literal('%'.mb_strtolower($options['search']).'%'),
+                    DatabasePlatform::FLAG_ENSURE_CAST | DatabasePlatform::FLAG_LOWER_COLUMN
+                )
+            );
         }
 
         return $this->getTimelineResults($qb, $options, $alias.'.action', $alias.'.date_added', [], ['date_added'], null, $alias.'.id');

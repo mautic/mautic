@@ -653,8 +653,10 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->em->flush();
         $property = ['points' => 1];
         $event1   = $this->createEvent('Event', $campaign, 'lead.changepoints', 'action', $property);
+        $event1->setOrder(1); // Fix for non-deterministic ordering
         $property = ['removeFrom' => ['this']];
         $event2   = $this->createEvent('Event', $campaign, 'campaign.addremovelead', 'action', $property);
+        $event2->setOrder(2); // Fix for non-deterministic ordering
         $this->em->flush();
         $this->em->clear();
 

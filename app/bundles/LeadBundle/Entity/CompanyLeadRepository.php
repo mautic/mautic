@@ -39,7 +39,7 @@ class CompanyLeadRepository extends CommonRepository
                 // Only one company should be set as primary so reset all in order to let the entity update the one
                 $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->update(MAUTIC_TABLE_PREFIX.'companies_leads')
-                    ->set('is_primary', 0);
+                    ->set('is_primary', 'FALSE');
 
                 $qb->where(
                     $qb->expr()->in('lead_id', ':leadIds')
@@ -58,8 +58,8 @@ class CompanyLeadRepository extends CommonRepository
         $q->select('cl.company_id, cl.date_added as date_associated, cl.is_primary, comp.*')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'comp.id = cl.company_id')
-        ->where('cl.lead_id = :leadId')
-        ->setParameter('leadId', $leadId);
+            ->where('cl.lead_id = :leadId')
+            ->setParameter('leadId', $leadId);
 
         if ($companyId) {
             $q->andWhere(
@@ -69,7 +69,7 @@ class CompanyLeadRepository extends CommonRepository
 
         if ($onlyPrimary) {
             $q->andWhere(
-                $q->expr()->eq('cl.is_primary', true)
+                $q->expr()->eq('cl.is_primary', 'TRUE')
             );
         }
 
@@ -94,7 +94,7 @@ class CompanyLeadRepository extends CommonRepository
         $q->select('comp.*')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
             ->join('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
-            ->andWhere('cl.is_primary = 1')
+            ->andWhere('cl.is_primary = TRUE')
             ->andWhere('cl.lead_id IN (:ids)')
             ->setParameter('ids', $ids, ArrayParameterType::INTEGER);
 
@@ -226,7 +226,7 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter('companyId', $company->getId())
             ->andWhere($q->expr()->neq('l.company', ':company'))
             ->setParameter('company', $company->getName())
-            ->andWhere('cl.is_primary = 1')
+            ->andWhere('cl.is_primary = TRUE')
             ->setMaxResults(self::BATCH_SIZE);
         while ($leadIds = $q->executeQuery()->fetchFirstColumn()) {
             $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -243,15 +243,30 @@ class CompanyLeadRepository extends CommonRepository
 
     public function deleteCompanyLeads(int $companyId): void
     {
-        $tableName  = MAUTIC_TABLE_PREFIX.'companies_leads';
-        $statement  = $this->getEntityManager()
-            ->getConnection()
-            ->prepare("DELETE FROM {$tableName} WHERE company_id = :companyId LIMIT ".self::BATCH_SIZE);
-        $statement->bindValue('companyId', $companyId, ParameterType::INTEGER);
+        $conn = $this->getEntityManager()->getConnection();
+        $q    = $conn->createQueryBuilder();
+        $q->select('company_id', 'lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads')
+            ->where($q->expr()->eq('company_id', ':companyId'))
+            ->setParameter('companyId', $companyId, ParameterType::INTEGER)
+            ->setMaxResults(self::BATCH_SIZE);
 
-        do {
-            $affected = $statement->executeStatement();
-        } while ($affected);
+        while ($pairs = $q->executeQuery()->fetchAllAssociative()) {
+            $deleteQb = $conn->createQueryBuilder();
+
+            $deleteQb
+                ->delete(MAUTIC_TABLE_PREFIX.'companies_leads')
+                ->where(
+                    $deleteQb->expr()->in(
+                        '(company_id, lead_id)',
+                        array_map(
+                            static fn (array $pair): string => '('.(int) $pair['company_id'].', '.(int) $pair['lead_id'].')',
+                            $pairs
+                        )
+                    )
+                )
+                ->executeStatement();
+        }
     }
 
     public function removeContactPrimaryCompany(int $leadId): void
@@ -261,17 +276,37 @@ class CompanyLeadRepository extends CommonRepository
         $qb->where(
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', 1)
+            $qb->expr()->eq('is_primary', 'TRUE')
         )->executeStatement();
     }
 
     public function removeAllSecondaryCompanies(): void
     {
         $conn = $this->getEntityManager()->getConnection();
-        do {
-            $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads WHERE is_primary = 0 LIMIT '.self::DELETE_BATCH_SIZE;
-            $row = $conn->executeStatement($sql);
-        } while ($row);
+
+        $q = $conn->createQueryBuilder();
+        $q->select('company_id', 'lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads')
+            ->where($q->expr()->eq('is_primary', ':isPrimary'))
+            ->setParameter('isPrimary', false, ParameterType::BOOLEAN)
+            ->setMaxResults(self::DELETE_BATCH_SIZE);
+
+        while ($pairs = $q->executeQuery()->fetchAllAssociative()) {
+            $deleteQb = $conn->createQueryBuilder();
+
+            $deleteQb
+                ->delete(MAUTIC_TABLE_PREFIX.'companies_leads')
+                ->where(
+                    $deleteQb->expr()->in(
+                        '(company_id, lead_id)',
+                        array_map(
+                            static fn (array $pair): string => '('.(int) $pair['company_id'].', '.(int) $pair['lead_id'].')',
+                            $pairs
+                        )
+                    )
+                )
+                ->executeStatement();
+        }
     }
 
     public function removeContactSecondaryCompanies(int $leadId): void
@@ -281,7 +316,7 @@ class CompanyLeadRepository extends CommonRepository
         $qb->where(
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', 0)
+            $qb->expr()->eq('is_primary', 'FALSE')
         )->executeStatement();
     }
 }

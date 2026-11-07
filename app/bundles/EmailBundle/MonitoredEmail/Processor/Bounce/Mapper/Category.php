@@ -16,7 +16,6 @@ final class Category
         private $type,
         private $isPermanent,
     ) {
-        return $this;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
+use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
@@ -14,7 +15,13 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
     public function __construct(
         private RandomParameterName $parameterNameGenerator,
         private readonly EventDispatcherInterface $dispatcher,
+        private readonly Connection $connection,
     ) {
+    }
+
+    public function getConnection(): Connection
+    {
+        return $this->connection;
     }
 
     public static function getServiceId(): string

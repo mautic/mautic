@@ -6,6 +6,7 @@ namespace Mautic\IntegrationsBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Types\Types;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -22,7 +23,7 @@ class ObjectMappingRepository extends CommonRepository
     /**
      * @return array<string,mixed>|null
      */
-    public function getInternalObjectWithLock(string $integration, string $integrationObjectName, string $integrationObjectId, string $internalObjectName, string $lock = 'LOCK IN SHARE MODE'): ?array
+    public function getInternalObjectWithLock(string $integration, string $integrationObjectName, string $integrationObjectId, string $internalObjectName, bool $lock = true): ?array
     {
         return $this->doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName, $lock);
     }
@@ -102,21 +103,29 @@ class ObjectMappingRepository extends CommonRepository
      */
     public function insert(string $integration, string $integrationObjectName, string $integrationObjectId, string $internalObjectName, int $internalObjectId, ?\DateTimeInterface $createdAt = null): int
     {
-        $createdAt = $createdAt ?: new \DateTimeImmutable();
-        $qb        = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection = $this->getEntityManager()->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+        $table      = MAUTIC_TABLE_PREFIX.'sync_object_mapping';
 
-        $qb->insert(MAUTIC_TABLE_PREFIX.'sync_object_mapping')
-            ->values([
-                'integration'             => ':integration',
-                'integration_object_name' => ':integrationObjectName',
-                'integration_object_id'   => ':integrationObjectId',
-                'internal_object_name'    => ':internalObjectName',
-                'internal_object_id'      => ':internalObjectId',
-                'date_created'            => ':date',
-                'last_sync_date'          => ':date',
-                'is_deleted'              => ':isDeleted',
-                'internal_storage'        => ':internalStorage',
-            ])
+        $createdAt = $createdAt ?: new \DateTimeImmutable();
+        $qb        = $connection->createQueryBuilder();
+
+        $idValues = DatabasePlatform::getInsertIdValues($platform, $table);
+
+        $values = $idValues + [
+            'integration'             => ':integration',
+            'integration_object_name' => ':integrationObjectName',
+            'integration_object_id'   => ':integrationObjectId',
+            'internal_object_name'    => ':internalObjectName',
+            'internal_object_id'      => ':internalObjectId',
+            'date_created'            => ':date',
+            'last_sync_date'          => ':date',
+            'is_deleted'              => ':isDeleted',
+            'internal_storage'        => ':internalStorage',
+        ];
+
+        $qb->insert($table)
+            ->values($values)
             ->setParameter('integration', $integration)
             ->setParameter('integrationObjectName', $integrationObjectName)
             ->setParameter('integrationObjectId', $integrationObjectId)
@@ -196,7 +205,7 @@ class ObjectMappingRepository extends CommonRepository
      *
      * @return mixed[]|null
      */
-    private function doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName, ?string $lock = null): ?array
+    private function doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName, bool $lock = false): ?array
     {
         $connection = $this->getEntityManager()->getConnection();
         $qb         = $connection->createQueryBuilder();
@@ -215,8 +224,13 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('integrationObjectId', $integrationObjectId)
             ->setParameter('internalObjectName', $internalObjectName);
 
-        $lock   = $lock ? ' '.$lock : '';
-        $result = $connection->executeQuery($qb->getSQL().$lock, $qb->getParameters(), $qb->getParameterTypes())->fetchAssociative();
+        if ($lock) {
+            $lockClause = ' '.DatabasePlatform::getShareLockClause($connection->getDatabasePlatform());
+        } else {
+            $lockClause = '';
+        }
+
+        $result = $connection->executeQuery($qb->getSQL().$lockClause, $qb->getParameters(), $qb->getParameterTypes())->fetchAssociative();
 
         return $result ?: null;
     }

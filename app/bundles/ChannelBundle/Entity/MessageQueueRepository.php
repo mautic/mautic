@@ -105,11 +105,25 @@ class MessageQueueRepository extends CommonRepository
      */
     public function getLeadTimelineEvents($leadId = null, array $options = [])
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $connection       = $this->getEntityManager()->getConnection();
+        $databasePlatform = $connection->getDatabasePlatform();
+
+        $query = $connection->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')
-            ->select('mq.id, mq.lead_id, mq.channel as channelName, mq.channel_id as channelId,
-            mq.priority as priority, mq.attempts, mq.success, mq.status, mq.date_published as dateAdded,
-            mq.scheduled_date as scheduledDate, mq.last_attempt as lastAttempt, mq.date_sent as dateSent');
+            ->select(
+                'mq.id',
+                'mq.lead_id',
+                'mq.channel as '.$databasePlatform->quoteIdentifier('channelName'),
+                'mq.channel_id as '.$databasePlatform->quoteIdentifier('channelId'),
+                'mq.priority as '.$databasePlatform->quoteIdentifier('priority'),
+                'mq.attempts',
+                'mq.success',
+                'mq.status',
+                'mq.date_published as '.$databasePlatform->quoteIdentifier('dateAdded'),
+                'mq.scheduled_date as '.$databasePlatform->quoteIdentifier('scheduledDate'),
+                'mq.last_attempt as '.$databasePlatform->quoteIdentifier('lastAttempt'),
+                'mq.date_sent as '.$databasePlatform->quoteIdentifier('dateSent')
+            );
 
         if ($leadId) {
             $query->where('mq.lead_id = :leadId')

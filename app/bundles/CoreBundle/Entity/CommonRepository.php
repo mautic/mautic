@@ -18,6 +18,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Helper\CsvHelper;
@@ -358,6 +359,17 @@ class CommonRepository extends ServiceEntityRepository
         if (isset($args['qb'])) {
             $q = $args['qb'];
         } else {
+            /*
+             * Index By Behavior:
+             * When indexBy is used, Doctrine changes its hydration behavior.
+             * Instead of returning a standard list of objects, it attempts to map the database results into keys.
+             *
+             * PostgreSQL Driver Differences:
+             * The PostgreSQL PDO driver returns row identifiers and integer columns differently than MySQL.
+             * When Doctrine processes an indexBy query with HYDRATE_OBJECT on PostgreSQL,
+             * a known driver quirk causes the hydration to fail to map into entity instances,
+             * silently falling back to returning an array of data arrays indexed by the ID string.
+             */
             $q = $this->_em
                 ->createQueryBuilder()
                 ->select($alias)
@@ -871,13 +883,19 @@ class CommonRepository extends ServiceEntityRepository
      *
      * Warning: This method use DBAL, not ORM. It will save only the entity you send it.
      * It will NOT save the entity's associations. Entity manager won't know that the entity was flushed.
+     *
+     * @throw DBALRuntimeException
      */
     public function upsert(object $entity): void
     {
         $connection = $this->getEntityManager()->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+
         $metadata   = $this->getClassMetadata();
-        $identifier = $metadata->getSingleIdentifierFieldName();
-        $makeUpdate = fn (string $column): string => "{$column} = VALUES({$column})";
+
+        // Platform-specific "Update" expression
+        $makeUpdate = fn (string $column): string => DatabasePlatform::getUpsertUpdateExpression($platform, $column);
+
         $columns    = [];
         $values     = [];
         $types      = [];
@@ -890,30 +908,26 @@ class CommonRepository extends ServiceEntityRepository
             $fieldNames = array_diff($fieldNames, [$entity->getVersionField()]);
         }
 
+        // 1. Process Fields
         foreach ($fieldNames as $fieldName) {
-            $value = $metadata->getFieldValue($entity, $fieldName);
-            if ($metadata->isIdentifier($fieldName)) {
-                if ($value) {
-                    $hasId = true;
-                } elseif ($fieldName === $identifier) {
-                    // https://bugs.php.net/bug.php?id=76896
-                    // mysql_last_insert_id might return 0 if our insert updates a row
-                    // Call LAST_INSERT_ID() for the column to ensure the correct value
-                    $column   = $metadata->getColumnName($fieldName);
-                    $update[] = "{$column} = LAST_INSERT_ID({$column})";
-                    continue;
-                } else {
-                    continue;
-                }
+            if (DatabasePlatform::processIdentifierForUpsert(
+                $connection,
+                $entity,
+                $metadata,
+                $this->getTableName(),
+                $fieldName,
+                $makeUpdate,
+                $columns,
+                $values,
+                $types,
+                $set,
+                $update,
+            )) {
+                $hasId = true;
             }
-            $column    = $metadata->getColumnName($fieldName);
-            $columns[] = $column;
-            $values[]  = $value;
-            $types[]   = $metadata->getTypeOfField($fieldName);
-            $set[]     = '?';
-            $update[]  = $makeUpdate($column);
         }
 
+        // 2. Process Associations
         foreach ($metadata->getAssociationNames() as $fieldName) {
             $assocEntity = $metadata->getFieldValue($entity, $fieldName);
             if (!$metadata->isAssociationWithSingleJoinColumn($fieldName) || !is_object($assocEntity)) {
@@ -929,25 +943,25 @@ class CommonRepository extends ServiceEntityRepository
             $update[]  = $makeUpdate($column);
         }
 
-        $numberOfRowsAffected = $connection->executeStatement(
-            'INSERT INTO '.$this->getTableName().' ('.implode(', ', $columns).')'.
-            ' VALUES ('.implode(', ', $set).')'.
-            ' ON DUPLICATE KEY UPDATE '.implode(', ', $update),
+        // 3. Execution & Result Detection
+        [$wasInserted, $wasUpdated] = DatabasePlatform::getUpsertStatement(
+            $connection,
+            $entity,
+            $metadata,
+            $this->getTableName(),
+            $columns,
             $values,
-            $types
+            $types,
+            $set,
+            $update,
+            $hasId
         );
 
+        // 4. Update Interface
         if ($entity instanceof UpsertInterface) {
-            $entity->setHasBeenInserted(UpsertInterface::ROWS_AFFECTED_ON_INSERT === $numberOfRowsAffected);
-            $entity->setHasBeenUpdated(UpsertInterface::ROWS_AFFECTED_ON_UPDATE === $numberOfRowsAffected);
+            $entity->setHasBeenInserted($wasInserted);
+            $entity->setHasBeenUpdated($wasUpdated);
         }
-        if ($hasId) {
-            return;
-        }
-
-        $id = (int) $connection->lastInsertId();
-
-        $metadata->setFieldValue($entity, $identifier, $id);
     }
 
     /**
@@ -1144,45 +1158,57 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param object       $filter
+     * @param QueryBuilder|DbalQueryBuilder $q
+     * @param object                        $filter
      */
     protected function addStandardCatchAllWhereClause(&$q, $filter, array $columns): array
     {
         $unique = $this->generateRandomParameterName(); // ensure that the string has a unique parameter identifier
         $string = $filter->string;
 
-        if (!$filter->strict) {
-            if (!str_contains($string, '%')) {
-                $string = "%{$string}%";
+        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+        $isOrm    = $q instanceof QueryBuilder;
+
+        if ($isOrm) {
+            // ORM path - PostgreSQL uses LOWER(column) LIKE, MySQL uses column LIKE
+            $expr = $q->expr()->orX();
+            foreach ($columns as $col) {
+                $expr->add(
+                    DatabasePlatform::getCaseInsensitiveLike(
+                        $platform,
+                        $col,
+                        ":{$unique}",
+                        DatabasePlatform::FLAG_FORCE_LOWER_COLUMN
+                    )
+                );
             }
-        }
 
-        $ormQb = true;
-
-        if ($q instanceof QueryBuilder) {
-            $xFunc    = 'orX';
-            $exprFunc = 'like';
+            $string = DatabasePlatform::normalizeSearchValue($platform, $string);
         } else {
-            $ormQb = false;
-            if ($filter->not) {
-                $xFunc    = 'andX';
-                $exprFunc = 'notLike';
-            } else {
-                $xFunc    = 'orX';
-                $exprFunc = 'like';
-            }
-        }
+            // DBAL path: use native ILIKE on PostgreSQL, LIKE on MySQL
+            $xFunc = $filter->not ? 'andX' : 'orX';
 
-        $expr = $q->expr()->{$xFunc}();
-        foreach ($columns as $col) {
-            $expr->add(
-                $q->expr()->{$exprFunc}($col, ":{$unique}")
-            );
+            $expr = $q->expr()->$xFunc();
+            foreach ($columns as $col) {
+                $expr->add( /** @phpstan-ignore-line add is deprecated */
+                    DatabasePlatform::getCaseInsensitiveLike(
+                        $platform,
+                        $col,
+                        ":{$unique}",
+                        $filter->not ? DatabasePlatform::FLAG_NEGATIVE : 0
+                    )
+                );
+            }
         }
 
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
+        }
+
+        if (!$filter->strict) {
+            if (!str_contains($string, '%')) {
+                $string = "%{$string}%";
+            }
         }
 
         return [
@@ -1421,6 +1447,7 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param QueryBuilder|DbalQueryBuilder $q
+     * @param array<string, mixed>          $args
      */
     protected function buildSelectClause($q, array $args)
     {

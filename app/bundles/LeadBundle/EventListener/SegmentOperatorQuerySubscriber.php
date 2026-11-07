@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\Query\Expr;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -73,7 +74,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             'notLike',
             'notBetween', // Used only for date with week combination (NOT EQUAL [this week, next week, last week])
             'notIn',
-            OperatorOptions::EXCLUDING_ALL, // For non-multiselect fields (e.g. select/country), treat as notIn
+            OperatorOptions::EXCLUDING_ALL // For non-multiselect fields (e.g. select/country), treat as notIn
         )) {
             return;
         }
@@ -98,11 +99,16 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         // Treat EXCLUDING_ALL with a single value as notIn
         $operator = $event->operatorIsOneOf(OperatorOptions::EXCLUDING_ALL) ? 'notIn' : $event->getFilter()->getOperator();
 
+        $platform   = $event->getQueryBuilder()->getConnection()->getDatabasePlatform(); /** @phpstan-ignore-line getConnection is deprecated */
+        $fieldExpr  = 'notLike' == $operator ?
+            DatabasePlatform::applyTypeIfStrict($platform, $leadsTableAlias.'.'.$event->getFilter()->getField(), 'text') :
+            $leadsTableAlias.'.'.$event->getFilter()->getField();
+
         $event->addExpression(
             $event->getQueryBuilder()->expr()->or(
                 $event->getQueryBuilder()->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
                 $event->getQueryBuilder()->expr()->{$operator}(
-                    $leadsTableAlias.'.'.$event->getFilter()->getField(),
+                    $fieldExpr,
                     $event->getParameterHolder()
                 )
             )
@@ -146,8 +152,15 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             $filterGlue = 'or';
         }
 
+        $connection = $event->getQueryBuilder()->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
+        $fieldExpr  = DatabasePlatform::applyTypeIfStrict(
+            $connection->getDatabasePlatform(),
+            $leadsTableAlias.'.'.$event->getFilter()->getField(),
+            'text'
+        );
+
         foreach ($event->getParameterHolder() as $parameter) {
-            $expressions[] = $queryBuilder->expr()->{$operator}($leadsTableAlias.'.'.$event->getFilter()->getField(), $parameter);
+            $expressions[] = $queryBuilder->expr()->$operator($fieldExpr, $parameter);
         }
 
         if ($applyIsNull) {
@@ -210,9 +223,21 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
         $operator = $event->operatorIsOneOf(OperatorOptions::INCLUDING_ALL) ? 'in' : $event->getFilter()->getOperator();
 
+        $qb         = $event->getQueryBuilder();
+        $connection = $qb->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
+        if (in_array($operator, ['like', 'startsWith', 'endsWith', 'regexp', 'notRegexp'])) {
+            $fieldExpr  = DatabasePlatform::applyTypeIfStrict(
+                $connection->getDatabasePlatform(),
+                $leadsTableAlias.'.'.$event->getFilter()->getField(),
+                'text'
+            );
+        } else {
+            $fieldExpr  = $leadsTableAlias.'.'.$event->getFilter()->getField();
+        }
+
         $event->addExpression(
             $event->getQueryBuilder()->expr()->{$operator}(
-                $leadsTableAlias.'.'.$event->getFilter()->getField(),
+                $fieldExpr,
                 $event->getParameterHolder()
             )
         );

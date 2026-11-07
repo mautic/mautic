@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -52,34 +53,34 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         'unsubscribed' => [
             'alias'   => 'unsubscribed',
             'label'   => 'mautic.email.report.unsubscribed',
-            'type'    => 'string',
-            'formula' => 'IFNULL('.self::DNC_COUNT_PREFIX.'.unsubscribed, 0)',
+            'type'    => 'int',
+            'formula' => 'COALESCE('.self::DNC_COUNT_PREFIX.'.unsubscribed, 0)',
         ],
         'unsubscribed_ratio' => [
             'alias'   => 'unsubscribed_ratio',
             'label'   => 'mautic.email.report.unsubscribed_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.unsubscribed/'.self::EMAILS_PREFIX.'.sent_count)*100, 1), \'0.0\')',
+            'formula' => 'COALESCE(ROUND(('.self::DNC_COUNT_PREFIX.'.unsubscribed * 100.0) / NULLIF('.self::EMAILS_PREFIX.'.sent_count, 0), 1), \'0.0\')',
             'suffix'  => '%',
         ],
         'unsubscribed_to_open_ratio' => [
             'alias'   => 'unsubscribed_to_open_ratio',
             'label'   => 'mautic.email.report.unsubscribed_to_open_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.unsubscribed/'.self::EMAILS_PREFIX.'.read_count)*100, 1), \'0.0\')',
+            'formula' => 'COALESCE(ROUND(('.self::DNC_COUNT_PREFIX.'.unsubscribed * 100.0) / NULLIF('.self::EMAILS_PREFIX.'.read_count, 0), 1), \'0.0\')',
             'suffix'  => '%',
         ],
         'bounced' => [
             'alias'   => 'bounced',
             'label'   => 'mautic.email.report.bounced',
-            'type'    => 'string',
-            'formula' => 'IFNULL('.self::DNC_COUNT_PREFIX.'.bounced, 0)',
+            'type'    => 'int',
+            'formula' => 'COALESCE('.self::DNC_COUNT_PREFIX.'.bounced, 0)',
         ],
         'bounced_ratio' => [
             'alias'   => 'bounced_ratio',
             'label'   => 'mautic.email.report.bounced_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.bounced/'.self::EMAILS_PREFIX.'.sent_count)*100, 1), \'0.0\')',
+            'formula' => 'COALESCE(ROUND(('.self::DNC_COUNT_PREFIX.'.bounced * 100.0) / NULLIF('.self::EMAILS_PREFIX.'.sent_count, 0), 1), \'0.0\')',
             'suffix'  => '%',
         ],
     ];
@@ -140,27 +141,27 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         'hits' => [
             'alias'   => 'hits',
             'label'   => 'mautic.email.report.hits_count',
-            'type'    => 'string',
-            'formula' => 'IFNULL('.self::CLICK_PREFIX.'.hits, 0)',
+            'type'    => 'int',
+            'formula' => 'COALESCE('.self::CLICK_PREFIX.'.hits, 0)',
         ],
         'unique_hits' => [
             'alias'   => 'unique_hits',
             'label'   => 'mautic.email.report.unique_hits_count',
-            'type'    => 'string',
-            'formula' => 'IFNULL('.self::CLICK_PREFIX.'.unique_hits, 0)',
+            'type'    => 'int',
+            'formula' => 'COALESCE('.self::CLICK_PREFIX.'.unique_hits, 0)',
         ],
         'hits_ratio' => [
             'alias'   => 'hits_ratio',
             'label'   => 'mautic.email.report.hits_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL(ROUND('.self::CLICK_PREFIX.'.hits/('.self::EMAILS_PREFIX.'.sent_count)*100, 1), \'0.0\')',
+            'formula' => 'COALESCE(ROUND('.self::CLICK_PREFIX.'.hits * 100.0 / NULLIF('.self::EMAILS_PREFIX.'.sent_count, 0), 1), \'0.0\')',
             'suffix'  => '%',
         ],
         'unique_ratio' => [
             'alias'   => 'unique_ratio',
             'label'   => 'mautic.email.report.unique_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL(ROUND('.self::CLICK_PREFIX.'.unique_hits/('.self::EMAILS_PREFIX.'.sent_count)*100, 1), \'0.0\')',
+            'formula' => 'COALESCE(ROUND('.self::CLICK_PREFIX.'.unique_hits * 100.0 / NULLIF('.self::EMAILS_PREFIX.'.sent_count, 0), 1), \'0.0\')',
             'suffix'  => '%',
         ],
     ];
@@ -213,7 +214,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                 'alias'   => 'read_ratio',
                 'label'   => 'mautic.email.report.read_ratio',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND(('.$prefix.'read_count/'.$prefix.'sent_count)*100, 1), \'0.0\')',
+                'formula' => 'COALESCE(ROUND(('.$prefix.'read_count * 100.0) / NULLIF('.$prefix.'sent_count, 0), 1), \'0.0\')',
                 'suffix'  => '%',
             ],
             $prefix.'sent_count' => [
@@ -240,21 +241,21 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             'click_through_count' => [
                 'alias'   => 'click_through_count',
                 'label'   => 'mautic.email.report.click_through_count',
-                'type'    => 'string',
-                'formula' => 'IFNULL('.self::CLICK_THROUGH_PREFIX.'.click_through_count, 0)',
+                'type'    => 'int',
+                'formula' => 'COALESCE('.self::CLICK_THROUGH_PREFIX.'.click_through_count, 0)',
             ],
             'click_through_rate' => [
                 'alias'   => 'click_through_rate',
                 'label'   => 'mautic.email.report.click_through_rate',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND('.self::CLICK_THROUGH_PREFIX.'.click_through_count/'.$prefix.'sent_count * 100, 1), \'0.0\')',
+                'formula' => 'COALESCE(ROUND('.self::CLICK_THROUGH_PREFIX.'.click_through_count * 100.0 / NULLIF('.$prefix.'sent_count, 0), 1), \'0.0\')',
                 'suffix'  => '%',
             ],
             'click_to_open_rate' => [
                 'alias'   => 'click_to_open_rate',
                 'label'   => 'mautic.email.report.click_to_open_rate',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND('.self::CLICK_THROUGH_PREFIX.'.click_through_count/'.$prefix.'read_count * 100, 1), \'0.0\')',
+                'formula' => 'COALESCE(ROUND('.self::CLICK_THROUGH_PREFIX.'.click_through_count * 100.0 / NULLIF('.$prefix.'read_count, 0), 1), \'0.0\')',
                 'suffix'  => '%',
             ],
         ];
@@ -283,7 +284,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             // Ratios are not applicable for individual stats
             unset($columns['read_ratio'], $columns['unsubscribed_ratio'], $columns['bounced_ratio'], $columns['hits_ratio'], $columns['unique_ratio']);
 
-            // Click through value are not applicable for individual stats
+            // Click through values are not applicable for individual stats
             unset($columns['click_through_count'], $columns['click_through_rate'], $columns['click_to_open_rate']);
 
             // Email counts are not applicable for individual stats
@@ -291,25 +292,28 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
             // Prevent null DNC records from filtering the results
             $columns['unsubscribed']['type']    = 'bool';
-            $columns['unsubscribed']['formula'] = 'IF(dnc.id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0)';
+            $columns['unsubscribed']['formula'] = 'CASE WHEN '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE 0 END';
 
             $columns['bounced']['type']    = 'bool';
-            $columns['bounced']['formula'] = 'IF(dnc.id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.', 1, 0)';
+            $columns['bounced']['formula'] = 'CASE WHEN '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE 0 END';
 
             // clicked column for individual stats
             $columns['is_hit'] = [
                 'alias'   => 'is_hit',
                 'label'   => 'mautic.email.report.is_hit',
                 'type'    => 'bool',
-                'formula' => 'IF('.self::CLICK_PREFIX.'.hits is NULL, 0, 1)',
+                'formula' => 'CASE WHEN '.self::CLICK_PREFIX.'.hits IS NOT NULL THEN 1 ELSE 0 END',
             ];
 
-            // time between sent and read
+            // Platform-specific read delay
+            $platform        = $this->db->getDatabasePlatform();
+            $timeDiffFormula = DatabasePlatform::getReadDelayFormula($platform);
+
             $columns['read_delay'] = [
                 'alias'   => 'read_delay',
                 'label'   => 'mautic.email.report.read.delay',
                 'type'    => 'string',
-                'formula' => 'IF(es.date_read IS NOT NULL, TIMEDIFF(es.date_read, es.date_sent), \'-\')',
+                'formula' => $timeDiffFormula,
             ];
 
             $columns = array_merge(
@@ -639,10 +643,11 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     }
                     break;
                 case 'mautic.email.graph.pie.read.ingored.unsubscribed.bounced':
-                    $queryBuilder->select('SUM(DISTINCT e.sent_count) as sent_count,
-                        SUM(DISTINCT e.read_count) as read_count,
-                        count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed,
-                        count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
+                    $queryBuilder->select(
+                        'SUM(DISTINCT e.sent_count) as sent_count,
+                         SUM(DISTINCT e.read_count) as read_count,
+                         COUNT(DISTINCT CASE WHEN dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN dnc.lead_id END) as unsubscribed,
+                         COUNT(DISTINCT CASE WHEN dnc.reason = '.DoNotContact::BOUNCED.' THEN dnc.lead_id END) as bounced'
                     );
                     $this->addDNCTableForEmails($queryBuilder);
                     $queryBuilder->resetQueryPart('groupBy');
@@ -754,7 +759,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $this->joinEmailsTableIfMissing($queryBuilder, $event);
                     $this->addDNCTableForEmailStats($queryBuilder);
                     $queryBuilder->select(
-                        'e.id, e.subject as title, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
+                        'e.id, e.subject as title, count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
                     )
                         ->having(
                             'count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) > 0'
@@ -774,7 +779,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
                 case 'mautic.email.table.most.emails.read.percent':
                     $this->joinEmailsTableIfMissing($queryBuilder, $event);
-                    $queryBuilder->select('e.id, e.subject as title, round(e.read_count / e.sent_count * 100) as ratio')
+                    $queryBuilder->select('e.id, e.subject as title, ROUND(e.read_count * 100.0 / NULLIF(e.sent_count, 0), 0) as ratio')
                         ->groupBy('e.id, e.subject')
                         ->orderBy('ratio', 'DESC');
                     $limit                  = 10;
@@ -790,9 +795,18 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
                 case 'mautic.email.table.most.emails.clicks':
                     $this->addTrackableTablesForEmailStats($queryBuilder);
-                    $queryBuilder->select('e.id, e.subject as `title`, tr.hits as `clicks`, tr.unique_hits as `unique clicks`, pr.url as `URL`')
+
+                    // 1. Use quoteSingleIdentifier for aliases to handle MySQL backticks vs PostgreSQL double quotes
+                    $titleAlias   = $this->db->quoteIdentifier('title');
+                    $clicksAlias  = $this->db->quoteIdentifier('clicks');
+                    $uClicksAlias = $this->db->quoteIdentifier('unique clicks');
+                    $urlAlias     = $this->db->quoteIdentifier('URL');
+
+                    $queryBuilder->select("e.id, e.subject as $titleAlias, tr.hits as $clicksAlias, tr.unique_hits as $uClicksAlias, pr.url as $urlAlias")
                         ->andWhere('pr.url IS NOT NULL')
-                        ->groupBy('e.id, tr.redirect_id, tr.hits')
+                        // 2. PostgreSQL requires ALL non-aggregated columns in the GROUP BY.
+                        // MySQL/MariaDB accept this strict syntax as well.
+                        ->groupBy('e.id, e.subject, tr.hits, tr.unique_hits, pr.url, tr.redirect_id')
                         ->orderBy('tr.hits', 'DESC')
                         ->setMaxResults(10);
 
@@ -875,8 +889,8 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         $qbdnc = $this->db->createQueryBuilder();
         $qbdnc->select(
             'e2.id AS channel_id',
-            'SUM(IF(dnc2.reason = '.DoNotContact::UNSUBSCRIBED.', 1, 0)) AS unsubscribed',
-            'SUM(IF(dnc2.reason = '.DoNotContact::BOUNCED.', 1, 0)) AS bounced'
+            'SUM(CASE WHEN dnc2.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE 0 END) AS unsubscribed',
+            'SUM(CASE WHEN dnc2.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE 0 END) AS bounced'
         )
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc2')
             ->innerJoin('dnc2', MAUTIC_TABLE_PREFIX.'emails', 'e2', 'e2.id = dnc2.channel_id')
