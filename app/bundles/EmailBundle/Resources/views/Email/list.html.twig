@@ -11,7 +11,6 @@
         <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
-                'searchHelp': searchHelp|default('mautic.email.help.searchcommands'),
                 'action': currentRoute,
                 'filters': filters,
                 'page_actions': {
@@ -39,44 +38,75 @@
                         },
                     ]
                 },
-                'quickFilters': [
-                    {
-                        'search': 'mautic.core.searchcommand.ispublished',
-                        'label': 'mautic.core.form.available',
-                        'tooltip': 'mautic.core.searchcommand.ispublished.description',
-                        'icon': 'ri-check-line'
+                'quickFilters': {
+                    'mautic.core.quick_filters.status': {
+                        'conflictGroup': true,
+                        'filters': [
+                            {
+                                'search': 'mautic.core.searchcommand.ispublished',
+                                'label': 'mautic.core.form.available',
+                                'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                                'icon': 'ri-check-line'
+                            },
+                            {
+                                'search': 'mautic.core.searchcommand.isunpublished',
+                                'label': 'mautic.core.form.unavailable',
+                                'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                                'icon': 'ri-close-line'
+                            },
+                            {
+                                'search': 'mautic.email.email.searchcommand.isexpired',
+                                'label': 'mautic.core.form.sending_expired',
+                                'tooltip': 'mautic.email.email.searchcommand.isexpired.description',
+                                'icon': 'ri-time-line'
+                            },
+                            {
+                                'search': 'mautic.email.email.searchcommand.ispending',
+                                'label': 'mautic.core.form.scheduled_to_send',
+                                'tooltip': 'mautic.email.email.searchcommand.ispending.description',
+                                'icon': 'ri-timer-line'
+                            }
+                        ]
                     },
-                    {
-                        'search': 'mautic.core.searchcommand.isunpublished',
-                        'label': 'mautic.core.form.unavailable',
-                        'tooltip': 'mautic.core.searchcommand.isunpublished.description',
-                        'icon': 'ri-close-line'
+                    'mautic.email.quick_filters.type': {
+                        'conflictGroup': true,
+                        'filters': [
+                        {
+                            'search': 'mautic.email.searchcommand.segment',
+                            'label': 'mautic.email.type.list',
+                            'tooltip': 'mautic.email.searchcommand.segment.description',
+                            'icon': 'ri-pie-chart-line'
+                        },
+                        {
+                            'search': 'mautic.email.searchcommand.triggered',
+                            'label': 'mautic.email.type.template',
+                            'tooltip': 'mautic.email.searchcommand.triggered.description',
+                            'icon': 'ri-flashlight-line'
+                        }
+                        ]
                     },
-                    {
-                        'search': 'mautic.core.searchcommand.isuncategorized',
-                        'label': 'mautic.core.form.uncategorized',
-                        'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
-                        'icon': 'ri-folder-unknow-line'
+                    'mautic.core.quick_filters.ownership': {
+                        'conflictGroup': true,
+                        'filters': [
+                            {
+                                'search': 'mautic.core.searchcommand.ismine',
+                                'label': 'mautic.core.searchcommand.ismine.label',
+                                'tooltip': 'mautic.core.searchcommand.ismine.description',
+                                'icon': 'ri-user-line'
+                            }
+                        ]
                     },
-                    {
-                        'search': 'mautic.core.searchcommand.ismine',
-                        'label': 'mautic.core.searchcommand.ismine.label',
-                        'tooltip': 'mautic.core.searchcommand.ismine.description',
-                        'icon': 'ri-user-line'
+                    'mautic.core.quick_filters.others': {
+                        'filters': [
+                            {
+                                'search': 'mautic.core.searchcommand.isuncategorized',
+                                'label': 'mautic.core.form.uncategorized',
+                                'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                                'icon': 'ri-folder-unknow-line'
+                            }
+                        ]
                     },
-                    {
-                        'search': 'mautic.email.email.searchcommand.isexpired',
-                        'label': 'mautic.core.form.sending_expired',
-                        'tooltip': 'mautic.email.email.searchcommand.isexpired.description',
-                        'icon': 'ri-time-line'
-                    },
-                    {
-                        'search': 'mautic.email.email.searchcommand.ispending',
-                        'label': 'mautic.core.form.scheduled_to_send',
-                        'tooltip': 'mautic.email.email.searchcommand.ispending.description',
-                        'icon': 'ri-timer-line'
-                    }
-                ],
+                },
                 'searchScopes': searchScopes|default([]),
             }) -}}
 

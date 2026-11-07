@@ -36,26 +36,53 @@
               'delete': permissions['lead:lists:deleteother'],
           },
         },
-        'quickFilters': [
-            {
-                'search': 'mautic.core.searchcommand.ismine',
-                'label': 'mautic.core.searchcommand.ismine.label',
-                'tooltip': 'mautic.core.searchcommand.ismine.description',
-                'icon': 'ri-user-line'
+        'quickFilters': {
+            'mautic.core.quick_filters.status': {
+                'conflictGroup': true,
+                'filters': [
+                    {
+                        'search': 'mautic.core.searchcommand.ispublished',
+                        'label': 'mautic.core.form.active',
+                        'tooltip': 'mautic.core.search.quickfilter.is_published',
+                        'icon': 'ri-check-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.isunpublished',
+                        'label': 'mautic.core.form.inactive',
+                        'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
+                        'icon': 'ri-close-line'
+                    }
+                ]
             },
-            {
-                'search': 'mautic.core.searchcommand.ispublished',
-                'label': 'mautic.core.form.active',
-                'tooltip': 'mautic.core.search.quickfilter.is_published',
-                'icon': 'ri-check-line'
+            'mautic.core.quick_filters.ownership': {
+                'conflictGroup': true,
+                'filters': [
+                    {
+                        'search': 'mautic.core.searchcommand.ismine',
+                        'label': 'mautic.core.searchcommand.ismine.label',
+                        'tooltip': 'mautic.core.searchcommand.ismine.description',
+                        'icon': 'ri-user-line'
+                    }
+                ]
             },
-            {
-                'search': 'mautic.core.searchcommand.isunpublished',
-                'label': 'mautic.core.form.inactive',
-                'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
-                'icon': 'ri-close-line'
+            'mautic.lead.list.quick_filters.type': {
+                'conflictGroup': true,
+                'filters': [
+                    {
+                        'search': 'mautic.lead.list.searchcommand.dynamic',
+                        'label': 'mautic.lead.tag.dynamic_segment',
+                        'tooltip': 'mautic.lead.tag.dynamic_segment.tooltip',
+                        'icon': 'ri-filter-3-line'
+                    },
+                    {
+                        'search': 'mautic.lead.list.searchcommand.static',
+                        'label': 'mautic.lead.tag.static_segment',
+                        'tooltip': 'mautic.lead.tag.static_segment.tooltip',
+                        'icon': 'ri-user-add-line'
+                    }
+                ]
             }
-        ],
+        },
         'searchScopes': searchScopes|default([]),
         'searchScopeHint': searchScopeHint|default(''),
     }) -}}

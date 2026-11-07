@@ -36,6 +36,45 @@ final class LeadListRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($result);
     }
 
+    public function testSegmentTypeSearchCommands(): void
+    {
+        $dynamicSegment = $this->buildSegment('DynamicSearch');
+        $dynamicSegment->setFilters([
+            [
+                'glue'     => 'and',
+                'type'     => 'lookup',
+                'field'    => 'email',
+                'operator' => '=',
+                'filter'   => 'dynamic@example.test',
+                'display'  => '',
+            ],
+        ]);
+        $this->em->persist($dynamicSegment);
+        $this->em->flush();
+        $staticSegment  = $this->createSegment('StaticSearch');
+
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+
+        $commands = $leadListRepository->getSearchCommands();
+        $this->assertContains('mautic.lead.list.searchcommand.dynamic', $commands);
+        $this->assertContains('mautic.lead.list.searchcommand.static', $commands);
+
+        $dynamicResults = $leadListRepository->getEntities([
+            'filter'           => ['string' => sprintf('ids:%d is:dynamic', $dynamicSegment->getId())],
+            'ignore_paginator' => true,
+        ]);
+        $dynamicIds = array_map(intval(...), array_keys($dynamicResults));
+        $this->assertSame([$dynamicSegment->getId()], $dynamicIds);
+
+        $staticResults = $leadListRepository->getEntities([
+            'filter'           => ['string' => sprintf('ids:%d is:static', $staticSegment->getId())],
+            'ignore_paginator' => true,
+        ]);
+        $staticIds = array_map(intval(...), array_keys($staticResults));
+        $this->assertSame([$staticSegment->getId()], $staticIds);
+    }
+
     public function testGetSegmentStatisticsAggregatesActiveLeadSources(): void
     {
         $segment = $this->createSegment();
@@ -72,13 +111,19 @@ final class LeadListRepositoryFunctionalTest extends MauticMysqlTestCase
 
     private function createSegment(string $suffix = 'A'): LeadList
     {
+        $segment = $this->buildSegment($suffix);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        return $segment;
+    }
+
+    private function buildSegment(string $suffix): LeadList
+    {
         $segment = new LeadList();
         $segment->setName("Segment {$suffix}");
         $segment->setPublicName("Segment {$suffix}");
         $segment->setAlias("segment-{$suffix}");
-
-        $this->em->persist($segment);
-        $this->em->flush();
 
         return $segment;
     }
