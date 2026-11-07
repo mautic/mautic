@@ -521,7 +521,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Protected methods `Mautic\CoreBundle\Model\FormModel::dispatchEventFromBatch()` and `Mautic\LeadBundle\Model\LeadModel::dispatchEventFromBatch()` removed; `dispatchEvent()` now covers both the single and batch save paths. The only behavioral difference was `LeadEvent::setAlreadyProcessedInBatch()`, whose value is read nowhere, so during batch saves `LeadEvent::isAlreadyProcessedInBatch()` now returns `false` instead of `true`.
 - Deprecated method `Mautic\CoreBundle\Entity\CommonRepository::getPublishedByDateExpression()` removed. Use `getPublishedByDateOrmExpression()` for a `Doctrine\ORM\QueryBuilder` or `getPublishedByDateDbalExpression()` for a `Doctrine\DBAL\Query\QueryBuilder`; both take the same arguments.
 - Deprecated property `leadField` removed from `Mautic\FormBundle\Entity\Field` together with `getLeadField()` and `setLeadField()`. Use `mappedObject` and `mappedField` (`getMappedObject()`/`getMappedField()`) instead. The `lead_field` column is dropped from the `form_fields` table by a migration, which first copies any value not yet present in `mapped_field` (and the matching `mapped_object`). API impact: form fields in `/api/forms` responses no longer include `leadField`, and a `leadField` sent in a request is ignored - send `mappedObject` (`contact` or `company`) and `mappedField` instead. Custom form field templates must read `field.mappedField` instead of `field.leadField`.
-- Per-entity lifecycle event classes removed in favor of four generic events in `Mautic\CoreBundle\Event`: `EntityPreSave`, `EntityPostSave`, `EntityPreDelete`, `EntityPostDelete` (all extending `AbstractEntityEvent`). The default `Mautic\CoreBundle\Model\FormModel::dispatchEvent()` dispatches these, so an entity whose model relies on that default no longer needs its own event class or `dispatchEvent()` override. Models that still override `dispatchEvent()` with their own event class (for example `Mautic\FormBundle\Model\FormModel`, `Mautic\PageBundle\Model\PageModel`, `Mautic\LeadBundle\Model\LeadModel`, `Mautic\LeadBundle\Model\CompanyModel`, `Mautic\AssetBundle\Model\AssetModel`, `Mautic\CampaignBundle\Model\CampaignModel` and other bundle models whose subscribers were not migrated) keep dispatching only their own legacy event, so the generic events do not fire for those entities. Subscribe to the generic event and check the entity instance inside the listener:
+- Per-entity lifecycle event classes removed in favor of four generic events in `Mautic\CoreBundle\Event`: `EntityPreSave`, `EntityPostSave`, `EntityPreDelete`, `EntityPostDelete` (all extending `AbstractEntityEvent`). The default `Mautic\CoreBundle\Model\FormModel::dispatchEvent()` dispatches these, so an entity whose model relies on that default no longer needs its own event class or `dispatchEvent()` override. Models that still override `dispatchEvent()` with their own event class (for example `Mautic\FormBundle\Model\FormModel`, `Mautic\PageBundle\Model\PageModel`, `Mautic\LeadBundle\Model\LeadModel`, `Mautic\LeadBundle\Model\CompanyModel` and other bundle models whose subscribers were not migrated) keep dispatching only their own legacy event, so the generic events do not fire for those entities. Subscribe to the generic event and check the entity instance inside the listener:
 
     ```php
     use Mautic\CoreBundle\Event\EntityPostSave;
@@ -573,6 +573,31 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\WebhookBundle\Event\WebhookPostSaveEvent` | `EntityPostSave` (check `instanceof Webhook`) |
     | `Mautic\WebhookBundle\Event\WebhookPreDeleteEvent` | `EntityPreDelete` (check `instanceof Webhook`) |
     | `Mautic\WebhookBundle\Event\WebhookPostDeleteEvent` | `EntityPostDelete` (check `instanceof Webhook`) |
+    | `Mautic\AssetBundle\Event\AssetPreSaveEvent` | `EntityPreSave` (check `instanceof Asset`) |
+    | `Mautic\AssetBundle\Event\AssetPostSaveEvent` | `EntityPostSave` (check `instanceof Asset`) |
+    | `Mautic\AssetBundle\Event\AssetPreDeleteEvent` | `EntityPreDelete` (check `instanceof Asset`) |
+    | `Mautic\AssetBundle\Event\AssetPostDeleteEvent` | `EntityPostDelete` (check `instanceof Asset`) |
+    | `Mautic\AssetBundle\Event\AssetEvent` | generic entity events above |
+    | `Mautic\SmsBundle\Event\SmsPreSaveEvent` | `EntityPreSave` (check `instanceof Sms`) |
+    | `Mautic\SmsBundle\Event\SmsPostSaveEvent` | `EntityPostSave` (check `instanceof Sms`) |
+    | `Mautic\SmsBundle\Event\SmsPreDeleteEvent` | `EntityPreDelete` (check `instanceof Sms`) |
+    | `Mautic\SmsBundle\Event\SmsPostDeleteEvent` | `EntityPostDelete` (check `instanceof Sms`) |
+    | `Mautic\SmsBundle\Event\SmsEvent` | generic entity events above |
+    | `Mautic\LeadBundle\Event\ImportPreSaveEvent` | `EntityPreSave` (check `instanceof Import`) |
+    | `Mautic\LeadBundle\Event\ImportPostSaveEvent` | `EntityPostSave` (check `instanceof Import`) |
+    | `Mautic\LeadBundle\Event\ImportPreDeleteEvent` | `EntityPreDelete` (check `instanceof Import`) |
+    | `Mautic\LeadBundle\Event\ImportPostDeleteEvent` | `EntityPostDelete` (check `instanceof Import`) |
+    | `Mautic\LeadBundle\Event\NotePreSaveEvent` | `EntityPreSave` (check `instanceof LeadNote`) |
+    | `Mautic\LeadBundle\Event\NotePostSaveEvent` | `EntityPostSave` (check `instanceof LeadNote`) |
+    | `Mautic\LeadBundle\Event\NotePreDeleteEvent` | `EntityPreDelete` (check `instanceof LeadNote`) |
+    | `Mautic\LeadBundle\Event\NotePostDeleteEvent` | `EntityPostDelete` (check `instanceof LeadNote`) |
+    | `Mautic\LeadBundle\Event\LeadNoteEvent` | generic entity events above |
+    | `Mautic\CampaignBundle\Event\CampaignPreSaveEvent` | `EntityPreSave` (check `instanceof Campaign`) |
+    | `Mautic\CampaignBundle\Event\CampaignPostSaveEvent` | `EntityPostSave` (check `instanceof Campaign`) |
+    | `Mautic\CampaignBundle\Event\CampaignPreDeleteEvent` | `EntityPreDelete` (check `instanceof Campaign`) |
+    | `Mautic\CampaignBundle\Event\CampaignPostDeleteEvent` | `EntityPostDelete` (check `instanceof Campaign`) |
+
+    `Mautic\LeadBundle\Event\ImportEvent` and `Mautic\CampaignBundle\Event\CampaignEvent` are kept (still used by `ImportBatchProcessedEvent` and `CampaignImportExportSubscriber` respectively); only their four lifecycle subclasses are removed. `ImportModel::dispatchEvent()` keeps a slim override for its non-lifecycle `batch_processed` action and delegates the four lifecycle actions to the parent.
 
     Constants `NOTIFICATION_PRE_SAVE`, `NOTIFICATION_POST_SAVE`, `NOTIFICATION_PRE_DELETE` and `NOTIFICATION_POST_DELETE` were removed from `Mautic\NotificationBundle\NotificationEvents`; subscribe to the generic event classes instead.
 
