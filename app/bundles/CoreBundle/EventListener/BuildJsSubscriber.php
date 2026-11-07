@@ -115,7 +115,8 @@ MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callback
     if (method === 'POST'
         && url === MauticJS.pageTrackingCORSUrl
         && typeof window.fetch === 'function'
-        && new Blob([query]).size <= 60 * 1024
+        && typeof window.Blob === 'function'
+        && new window.Blob([query]).size <= 60 * 1024
     ) {
         if (!MauticJS.CORSRequestsAllowed) {
             callbackError({}, { status: 0 });
