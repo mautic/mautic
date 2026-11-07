@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
-use Mautic\FormBundle\Event as Events;
-use Mautic\FormBundle\FormEvents;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\FormBundle\Entity\Form;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
@@ -23,11 +23,14 @@ final readonly class FormSubscriber
      * Add a delete entry to the audit log.
      */
     #[AsEventListener(
-        event: FormEvents::FORM_POST_DELETE,
+        event: EntityPostDelete::class,
     )]
-    public function onFormDelete(Events\FormEvent $event): void
+    public function onFormDelete(EntityPostDelete $event): void
     {
-        $form   = $event->getForm();
+        $form = $event->getEntity();
+        if (!$form instanceof Form) {
+            return;
+        }
         $formId = $form->deletedId;
         $foci   = $this->focusRepository->findByForm($formId);
 

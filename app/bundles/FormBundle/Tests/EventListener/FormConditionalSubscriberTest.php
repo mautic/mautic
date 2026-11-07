@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\EventListener\FormConditionalSubscriber;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
@@ -65,7 +65,7 @@ final class FormConditionalSubscriberTest extends TestCase
         $this->formModel->expects($this->never())
             ->method('deleteFields');
 
-        $this->subscriber->onFormPostSave(new FormEvent($form, true));
+        $this->subscriber->onFormPostSave(new EntityPostSave($form, true));
     }
 
     /**
@@ -91,6 +91,6 @@ final class FormConditionalSubscriberTest extends TestCase
             ->method('deleteFields')
             ->with($form, [$childId]);
 
-        $this->subscriber->onFormPostSave(new FormEvent($form, true));
+        $this->subscriber->onFormPostSave(new EntityPostSave($form, true));
     }
 }

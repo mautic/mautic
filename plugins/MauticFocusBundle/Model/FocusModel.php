@@ -26,9 +26,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
-use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\Event\FocusTokenReplacementEvent;
-use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -36,7 +34,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
 use Twig\Runtime\EscaperRuntime;
 
@@ -304,47 +301,6 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
         $this->statRepository->saveEntity($stat);
 
         return $stat;
-    }
-
-    /**
-     * @param Focus $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Focus) {
-            throw new MethodNotAllowedHttpException(['Focus']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = FocusEvents::PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = FocusEvents::POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = FocusEvents::PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = FocusEvents::POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new FocusEvent($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
     }
 
     public function getStats(Focus $focus, ?string $unit, \DateTime $dateFrom, \DateTime $dateTo, ?string $dateFormat = null, bool $canViewOthers = true): array

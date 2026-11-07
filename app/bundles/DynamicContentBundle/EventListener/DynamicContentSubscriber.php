@@ -8,11 +8,11 @@ use DOMNode;
 use DOMXPath;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
-use Mautic\DynamicContentBundle\Event as Events;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
@@ -52,16 +52,20 @@ final readonly class DynamicContentSubscriber
      * Add an entry to the audit log.
      */
     #[AsEventListener(
-        event: DynamicContentEvents::POST_SAVE,
+        event: EntityPostSave::class,
     )]
-    public function onPostSave(Events\DynamicContentEvent $event): void
+    public function onPostSave(EntityPostSave $event): void
     {
-        $entity = $event->getDynamicContent();
+        $dwc = $event->getEntity();
+        if (!$dwc instanceof DynamicContent) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'   => 'dynamicContent',
                 'object'   => 'dynamicContent',
-                'objectId' => $entity->getId(),
+                'objectId' => $dwc->getId(),
                 'action'   => ($event->isNew()) ? 'create' : 'update',
                 'details'  => $details,
             ];
@@ -73,17 +77,21 @@ final readonly class DynamicContentSubscriber
      * Add a delete entry to the audit log.
      */
     #[AsEventListener(
-        event: DynamicContentEvents::POST_DELETE,
+        event: EntityPostDelete::class,
     )]
-    public function onDelete(Events\DynamicContentEvent $event): void
+    public function onDelete(EntityPostDelete $event): void
     {
-        $entity = $event->getDynamicContent();
-        $log    = [
+        $dwc = $event->getEntity();
+        if (!$dwc instanceof DynamicContent) {
+            return;
+        }
+
+        $log = [
             'bundle'   => 'dynamicContent',
             'object'   => 'dynamicContent',
-            'objectId' => $entity->deletedId,
+            'objectId' => $dwc->deletedId,
             'action'   => 'delete',
-            'details'  => ['name' => $entity->getName()],
+            'details'  => ['name' => $dwc->getName()],
         ];
         $this->auditLogModel->writeToLog($log);
     }

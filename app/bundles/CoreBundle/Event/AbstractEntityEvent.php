@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Event;
 
-abstract class AbstractEntityEvent extends CommonEvent
+abstract class AbstractEntityEvent extends CommonEvent implements DependencyErrorEventInterface
 {
+    use DependencyErrorEventTrait;
+
     public function __construct(object &$entity, bool $isNew = false)
     {
         $this->entity = &$entity;

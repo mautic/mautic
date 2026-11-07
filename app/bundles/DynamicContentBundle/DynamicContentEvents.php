@@ -10,38 +10,6 @@ namespace Mautic\DynamicContentBundle;
 final class DynamicContentEvents
 {
     /**
-     * The mautic.dwc_pre_save event is thrown right before a asset is persisted.
-     *
-     * The event listener receives a
-     * Mautic\DynamicContentBundle\Event\DynamicContentEvent instance.
-     */
-    public const string PRE_SAVE = 'mautic.dwc_pre_save';
-
-    /**
-     * The mautic.dwc_post_save event is thrown right after a asset is persisted.
-     *
-     * The event listener receives a
-     * Mautic\DynamicContentBundle\Event\DynamicContentEvent instance.
-     */
-    public const string POST_SAVE = 'mautic.dwc_post_save';
-
-    /**
-     * The mautic.dwc_pre_delete event is thrown prior to when a asset is deleted.
-     *
-     * The event listener receives a
-     * Mautic\DynamicContentBundle\Event\DynamicContentEvent instance.
-     */
-    public const string PRE_DELETE = 'mautic.dwc_pre_delete';
-
-    /**
-     * The mautic.dwc_post_delete event is thrown after a asset is deleted.
-     *
-     * The event listener receives a
-     * Mautic\DynamicContentBundle\Event\DynamicContentEvent instance.
-     */
-    public const string POST_DELETE = 'mautic.dwc_post_delete';
-
-    /**
      * The mautic.asset.on_campaign_trigger_decision event is fired when the campaign decision triggers.
      *
      * The event listener receives a

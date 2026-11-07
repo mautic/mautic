@@ -2,6 +2,8 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -12,7 +14,6 @@ use Mautic\PageBundle\Event\PageEditSubmitEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Model\PageDraftModel;
 use Mautic\PageBundle\Model\PageModel;
-use Mautic\PageBundle\PageEvents;
 use ReflectionObject;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -33,11 +34,14 @@ final readonly class PageSubscriber
      * Add an entry to the audit log.
      */
     #[AsEventListener(
-        event: PageEvents::PAGE_POST_SAVE,
+        event: EntityPostSave::class,
     )]
-    public function onPagePostSave(PageEvent $event): void
+    public function onPagePostSave(EntityPostSave $event): void
     {
-        $page = $event->getPage();
+        $page = $event->getEntity();
+        if (!$page instanceof Page) {
+            return;
+        }
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'page',
@@ -58,11 +62,14 @@ final readonly class PageSubscriber
      * Add a delete entry to the audit log.
      */
     #[AsEventListener(
-        event: PageEvents::PAGE_POST_DELETE,
+        event: EntityPostDelete::class,
     )]
-    public function onPageDelete(PageEvent $event): void
+    public function onPageDelete(EntityPostDelete $event): void
     {
-        $page = $event->getPage();
+        $page = $event->getEntity();
+        if (!$page instanceof Page) {
+            return;
+        }
         $log  = [
             'bundle'    => 'page',
             'object'    => 'page',

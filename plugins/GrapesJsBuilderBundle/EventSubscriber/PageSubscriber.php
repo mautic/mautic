@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
-use Mautic\PageBundle\Event\PageEvent;
-use Mautic\PageBundle\PageEvents;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\PageBundle\Entity\Page;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -19,14 +19,19 @@ final readonly class PageSubscriber
     }
 
     #[AsEventListener(
-        event: PageEvents::PAGE_POST_SAVE,
+        event: EntityPostSave::class,
     )]
-    public function onPagePostSave(PageEvent $event): void
+    public function onPagePostSave(EntityPostSave $event): void
     {
+        $page = $event->getEntity();
+        if (!$page instanceof Page) {
+            return;
+        }
+
         if (!$this->config->isPublished()) {
             return;
         }
 
-        $this->grapesJsBuilderModel->addOrEditPageEntity($event->getPage());
+        $this->grapesJsBuilderModel->addOrEditPageEntity($page);
     }
 }

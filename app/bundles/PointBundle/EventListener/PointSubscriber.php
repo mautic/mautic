@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\PointBundle\Event as Events;
-use Mautic\PointBundle\PointEvents;
+use Mautic\PointBundle\Entity\Point;
+use Mautic\PointBundle\Entity\Trigger;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class PointSubscriber
@@ -21,12 +23,14 @@ final readonly class PointSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[AsEventListener(
-        event: PointEvents::POINT_POST_SAVE,
-    )]
-    public function onPointPostSave(Events\PointEvent $event): void
+    #[AsEventListener]
+    public function onPointPostSave(EntityPostSave $event): void
     {
-        $point = $event->getPoint();
+        $point = $event->getEntity();
+        if (!$point instanceof Point) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'point',
@@ -43,13 +47,15 @@ final readonly class PointSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: PointEvents::POINT_POST_DELETE,
-    )]
-    public function onPointDelete(Events\PointEvent $event): void
+    #[AsEventListener]
+    public function onPointDelete(EntityPostDelete $event): void
     {
-        $point = $event->getPoint();
-        $log   = [
+        $point = $event->getEntity();
+        if (!$point instanceof Point) {
+            return;
+        }
+
+        $log = [
             'bundle'    => 'point',
             'object'    => 'point',
             'objectId'  => $point->deletedId,
@@ -63,12 +69,14 @@ final readonly class PointSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[AsEventListener(
-        event: PointEvents::TRIGGER_POST_SAVE,
-    )]
-    public function onTriggerPostSave(Events\TriggerEvent $event): void
+    #[AsEventListener]
+    public function onTriggerPostSave(EntityPostSave $event): void
     {
-        $trigger = $event->getTrigger();
+        $trigger = $event->getEntity();
+        if (!$trigger instanceof Trigger) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'point',
@@ -85,13 +93,15 @@ final readonly class PointSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: PointEvents::TRIGGER_POST_DELETE,
-    )]
-    public function onTriggerDelete(Events\TriggerEvent $event): void
+    #[AsEventListener]
+    public function onTriggerDelete(EntityPostDelete $event): void
     {
-        $trigger = $event->getTrigger();
-        $log     = [
+        $trigger = $event->getEntity();
+        if (!$trigger instanceof Trigger) {
+            return;
+        }
+
+        $log = [
             'bundle'    => 'point',
             'object'    => 'trigger',
             'objectId'  => $trigger->deletedId,

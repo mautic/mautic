@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Scheduler\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\ReportBundle\Entity\Report;
-use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 use PHPUnit\Framework\TestCase;
@@ -15,7 +15,7 @@ final class ReportSchedulerSubscriberTest extends TestCase
     public function testOnReportSave(): void
     {
         $report = new Report();
-        $event  = new ReportEvent($report);
+        $event  = new EntityPostSave($report);
 
         $schedulerPlanner = $this->createMock(SchedulerPlanner::class);
 
