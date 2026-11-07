@@ -1037,7 +1037,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @return mixed[]
      */
-    protected function addAdvancedSearchWhereClause($qb, $filters): array
+    protected function addAdvancedSearchWhereClause($qb, $filters, bool $containsOr = false): array
     {
         $parseFilters = [];
         if (isset($filters->root[0])) {
@@ -1056,11 +1056,23 @@ class CommonRepository extends ServiceEntityRepository
             $type = 'and';
         }
 
+        // SearchStringHelper stores the operator on the filter following it.
+        // Inspect all filters as well so sparse or nested parser output cannot
+        // accidentally turn an OR group into an AND group.
+        foreach ($parseFilters as $filter) {
+            if ('or' === ($filter->type ?? null)) {
+                $type = 'or';
+                break;
+            }
+        }
+
+        $containsOr = $containsOr || 'or' === $type;
+
         $parameters  = [];
         $expressions = $qb->expr()->{"{$type}X"}();
 
         if ($parseFilters) {
-            $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters);
+            $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters, $containsOr);
         }
 
         return [$expressions, $parameters];
@@ -1570,19 +1582,23 @@ class CommonRepository extends ServiceEntityRepository
             }
 
             if ([] !== $advancedFilterStrings) {
+                $parsedFilters = [];
                 foreach ($advancedFilterStrings as $parseString) {
                     $parsed = $filterHelper->parseString($parseString);
+                    $parsedFilters[] = $parsed;
 
                     $advancedFilters->root = array_merge($advancedFilters->root, $parsed->root);
                     $filterHelper->mergeCommands($advancedFilters, $parsed->commands);
                 }
                 $this->advancedFilterCommands = $advancedFilters->commands;
 
-                [$expr, $parameters] = $this->addAdvancedSearchWhereClause($q, $advancedFilters);
-                $this->appendExpression($queryExpression, $expr);
+                foreach ($parsedFilters as $parsed) {
+                    [$expr, $parameters] = $this->addAdvancedSearchWhereClause($q, $parsed);
+                    $this->appendExpression($queryExpression, $expr);
 
-                if (is_array($parameters)) {
-                    $queryParameters = array_merge($queryParameters, $parameters);
+                    if (is_array($parameters)) {
+                        $queryParameters = array_merge($queryParameters, $parameters);
+                    }
                 }
             }
         }
@@ -1780,9 +1796,13 @@ class CommonRepository extends ServiceEntityRepository
      * @param \StdClass                     $parseFilters
      * @param QueryBuilder|DbalQueryBuilder $qb
      */
-    protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters)
+    protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters, bool $containsOr = false)
     {
         foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
+            if ($containsOr) {
+                $f->containsOr = true;
+            }
+
             [$expr, $params] = $this->getSearchFilterExpression($qb, $f);
 
             if ([] !== $params) {
@@ -1805,7 +1825,7 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         if (isset($filter->children)) {
-            return $this->addAdvancedSearchWhereClause($qb, $filter);
+            return $this->addAdvancedSearchWhereClause($qb, $filter, (bool) ($filter->containsOr ?? false));
         }
 
         if (!empty($filter->command)) {
