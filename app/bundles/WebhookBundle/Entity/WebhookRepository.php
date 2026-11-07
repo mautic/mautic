@@ -139,7 +139,7 @@ class WebhookRepository extends CommonRepository
      */
     private function resolveEventTypes(string $value): array
     {
-        $aliases  = array_filter(array_map(fn (string $part): string => $this->normalizeEventAlias($part), preg_split('/\s*,\s*/', $value) ?: []));
+        $aliases  = array_filter(array_map($this->normalizeEventAlias(...), preg_split('/\s*,\s*/', $value) ?: []));
         $aliasMap = $this->getEventAliasMap();
 
         $eventTypes = [];
