@@ -220,7 +220,7 @@ final class PageRepository extends CommonRepository implements ResettableVariant
     /**
      * Resets variant_start_date and variant_hits.
      */
-    public function resetVariants($relatedIds, $date): void
+    public function resetVariants($relatedIds, string $date): void
     {
         if (!is_array($relatedIds)) {
             $relatedIds = [(int) $relatedIds];

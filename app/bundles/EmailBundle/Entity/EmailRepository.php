@@ -681,9 +681,8 @@ class EmailRepository extends CommonRepository implements ResettableVariantsInte
      * Resets variant_start_date, variant_read_count, variant_sent_count.
      *
      * @param string[]|string|int $relatedIds
-     * @param string              $date
      */
-    public function resetVariants($relatedIds, $date): void
+    public function resetVariants($relatedIds, string $date): void
     {
         if (!is_array($relatedIds)) {
             $relatedIds = [(string) $relatedIds];
