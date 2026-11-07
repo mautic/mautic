@@ -17,6 +17,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactMerger
 {
@@ -37,6 +38,7 @@ class ContactMerger
         protected LoggerInterface $logger,
         protected CompanyLeadRepository $companyLeadRepository,
         private readonly LeadRepository $leadRepository,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -194,8 +196,14 @@ class ContactMerger
      */
     public function mergeStages(Lead $winner, Lead $loser): static
     {
-        if (null === $winner->getStage() && null !== $loser->getStage()) {
-            $winner->setStage($loser->getStage());
+        $loserStage = $loser->getStage();
+
+        if (null === $winner->getStage() && null !== $loserStage) {
+            $this->leadModel->addToStage(
+                $winner,
+                $loserStage,
+                $this->translator->trans('mautic.lead.event.merge')
+            );
         }
 
         return $this;

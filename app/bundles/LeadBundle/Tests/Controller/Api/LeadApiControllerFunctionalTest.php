@@ -20,6 +20,9 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
+use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -152,6 +155,56 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 $this->assertEquals('Prčice', $responseArray['contact']['fields']['all']['city'], $clientResponse->getContent());
             }
         );
+    }
+
+    public function testUnrelatedPatchDoesNotCreateStageChangeAfterMerge(): void
+    {
+        $stage = new Stage();
+        $stage->setName('Inherited stage');
+
+        $winner = new Lead();
+        $winner->setEmail('stage-merge-winner@example.com');
+
+        $loser = new Lead();
+        $loser->setEmail('stage-merge-loser@example.com');
+
+        /** @var LeadModel $leadModel */
+        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel->addToStage($loser, $stage, 'Test setup');
+
+        $this->em->persist($stage);
+        $this->em->persist($winner);
+        $this->em->persist($loser);
+        $this->em->flush();
+
+        $winnerId = (int) $winner->getId();
+        $stageId  = (int) $stage->getId();
+
+        /** @var ContactMerger $contactMerger */
+        $contactMerger = self::getContainer()->get(ContactMerger::class);
+        $contactMerger->merge($winner, $loser);
+
+        /** @var StagesChangeLogRepository $stagesChangeLogRepository */
+        $stagesChangeLogRepository = self::getContainer()->get(StagesChangeLogRepository::class);
+        $countStageChanges         = fn (): int => (int) $this->em->getConnection()->fetchOne(
+            'SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log WHERE lead_id = ?',
+            [$winnerId]
+        );
+
+        $this->assertSame($stageId, $stagesChangeLogRepository->getCurrentLeadStage($winnerId));
+        $this->assertSame(1, $countStageChanges());
+
+        $this->client->request(
+            Request::METHOD_PATCH,
+            "/api/contacts/{$winnerId}/edit",
+            ['firstname' => 'Updated firstname']
+        );
+
+        $this->assertResponseIsSuccessful();
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertSame('Updated firstname', $response['contact']['fields']['all']['firstname']);
+        $this->assertSame($stageId, $stagesChangeLogRepository->getCurrentLeadStage($winnerId));
+        $this->assertSame(1, $countStageChanges());
     }
 
     private function doTestSingleEndpointCanHandleMergedContacts(string $method, string $email, int $expectedStatusCode, callable $assertResponse): void
