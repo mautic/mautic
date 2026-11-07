@@ -73,7 +73,10 @@ class FocusRepository extends CommonRepository
 
         $styleValue = $this->getStyleValueFromCommand($command);
         if (null !== $styleValue) {
-            $expr            = $q->expr()->eq('f.style', ":$unique");
+            $expr = $q->expr()->eq('f.style', ":$unique");
+            if ($filter->not) {
+                $expr = $q->expr()->not($expr);
+            }
             $forceParameters = [$unique => $styleValue];
         } elseif ($this->isTranslatedCommand($command, ['mautic.project.searchcommand.name'])) {
             return $this->handleProjectFilter(
@@ -84,10 +87,6 @@ class FocusRepository extends CommonRepository
                 $filter->string,
                 $filter->not
             );
-        }
-
-        if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
         }
 
         if ([] !== $forceParameters) {
