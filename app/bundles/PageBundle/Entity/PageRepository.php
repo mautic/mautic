@@ -5,13 +5,14 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Entity\ResettableVariantsInterface;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Page>
  */
-final class PageRepository extends CommonRepository
+final class PageRepository extends CommonRepository implements ResettableVariantsInterface
 {
     use ProjectRepositoryTrait;
 

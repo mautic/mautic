@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\CommonEntity;
+use Mautic\CoreBundle\Entity\ResettableVariantsInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
@@ -74,7 +75,7 @@ trait VariantModelTrait
     {
         $repo = $this->getRepository();
 
-        if (method_exists($repo, 'resetVariants')) {
+        if ($repo instanceof ResettableVariantsInterface) {
             if (null == $relatedIds) {
                 $relatedIds = $entity->getRelatedEntityIds();
             }
