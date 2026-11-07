@@ -17,10 +17,13 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactMerger
 {
+    private ?TranslatorInterface $translator = null;
+
     /**
      * @var Lead
      */
@@ -38,8 +41,13 @@ class ContactMerger
         protected LoggerInterface $logger,
         protected CompanyLeadRepository $companyLeadRepository,
         private readonly LeadRepository $leadRepository,
-        private readonly TranslatorInterface $translator,
     ) {
+    }
+
+    #[Required]
+    public function setTranslator(TranslatorInterface $translator): void
+    {
+        $this->translator = $translator;
     }
 
     /**
@@ -202,7 +210,7 @@ class ContactMerger
             $this->leadModel->addToStage(
                 $winner,
                 $loserStage,
-                $this->translator->trans('mautic.lead.event.merge')
+                $this->translator?->trans('mautic.lead.event.merge') ?? 'Contact merged'
             );
         }
 

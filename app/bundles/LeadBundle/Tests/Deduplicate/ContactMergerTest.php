@@ -594,6 +594,28 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->getMerger()->mergeStages($winner, $loser);
     }
 
+    public function testMergeStagesSupportsLegacyConstructorWithoutTranslator(): void
+    {
+        $stage  = new Stage();
+        $winner = new Lead();
+        $loser  = (new Lead())->setStage($stage);
+
+        $this->leadModel->expects($this->once())
+            ->method('addToStage')
+            ->with($winner, $stage, 'Contact merged');
+
+        $merger = new ContactMerger(
+            $this->leadModel,
+            $this->mergeRecordRepo,
+            $this->createStub(EventDispatcher::class),
+            $this->logger,
+            $this->companyLeadRepo,
+            $this->leadRepository
+        );
+
+        $merger->mergeStages($winner, $loser);
+    }
+
     public function testMergeStagesKeepsWinnerStageWhenLoserHasNone(): void
     {
         $winnerStage = new Stage();
@@ -910,14 +932,17 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     private function getMerger(): ContactMerger
     {
-        return new ContactMerger(
+        $merger = new ContactMerger(
             $this->leadModel,
             $this->mergeRecordRepo,
             $this->createStub(EventDispatcher::class),
             $this->logger,
             $this->companyLeadRepo,
-            $this->leadRepository,
-            $this->translator
+            $this->leadRepository
         );
+
+        $merger->setTranslator($this->translator);
+
+        return $merger;
     }
 }
