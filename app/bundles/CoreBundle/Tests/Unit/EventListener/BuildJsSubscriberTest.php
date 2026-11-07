@@ -48,7 +48,7 @@ final class BuildJsSubscriberTest extends TestCase
         $this->assertStringContainsString("method === 'POST'", $js);
         $this->assertStringContainsString('url === MauticJS.pageTrackingCORSUrl', $js);
         $this->assertStringContainsString("typeof window.fetch === 'function'", $js);
-        $this->assertStringContainsString('query.length <= 60 * 1024', $js);
+        $this->assertStringContainsString('new Blob([query]).size <= 60 * 1024', $js);
         $this->assertStringContainsString('keepalive: true', $fetchBlock);
         $this->assertStringContainsString("credentials: MauticJS.requestWithCredentials ? 'include' : 'same-origin'", $fetchBlock);
         $this->assertStringContainsString("headers: { 'Content-Type': 'application/x-www-form-urlencoded' }", $fetchBlock);
