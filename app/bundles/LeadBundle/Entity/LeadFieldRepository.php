@@ -4,9 +4,13 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -140,8 +144,8 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param object                                                       $filter
+     * @param OrmQueryBuilder|DbalQueryBuilder $q
+     * @param object                           $filter
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -199,7 +203,9 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * Add company left join.
+     *
+     * @param OrmQueryBuilder|DbalQueryBuilder $q
      */
     private function addCompanyLeftJoin($q): void
     {
@@ -210,8 +216,8 @@ class LeadFieldRepository extends CommonRepository
     /**
      * Return property by field alias and join tables.
      *
-     * @param string                                                       $field
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param string                           $field
+     * @param OrmQueryBuilder|DbalQueryBuilder $q
      */
     public function getPropertyByField($field, $q): string
     {
@@ -486,6 +492,8 @@ class LeadFieldRepository extends CommonRepository
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.ismine',
+            'mautic.lead.field.searchcommand.issystemdefault',
+            'mautic.lead.field.searchcommand.isusercreated',
             'mautic.lead.field.searchcommand.isindexed',
             'mautic.lead.field.searchcommand.isunique',
             'mautic.lead.field.searchcommand.type',
@@ -510,8 +518,8 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param \StdClass                                                    $filter
+     * @param OrmQueryBuilder|DbalQueryBuilder $q
+     * @param \StdClass                        $filter
      *
      * @return mixed[]
      */
@@ -526,6 +534,7 @@ class LeadFieldRepository extends CommonRepository
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
         $prefix          = $this->getTableAlias();
+        $forceParameters = [];
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.field.searchcommand.isindexed'):
@@ -552,10 +561,23 @@ class LeadFieldRepository extends CommonRepository
                 $expr            = $q->expr()->like($prefix.'.group', ":{$unique}");
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.lead.field.searchcommand.issystemdefault'):
+            case $this->translator->trans('mautic.lead.field.searchcommand.issystemdefault', [], null, 'en_US'):
+                [$expr, $forceParameters] = $this->getSystemAliasExpression($q, $prefix.'.alias');
+                $parameters               = [];
+                break;
+            case $this->translator->trans('mautic.lead.field.searchcommand.isusercreated'):
+            case $this->translator->trans('mautic.lead.field.searchcommand.isusercreated', [], null, 'en_US'):
+                [$expr, $forceParameters] = $this->getSystemAliasExpression($q, $prefix.'.alias');
+                $parameters               = [];
+                if ($expr) {
+                    $expr = $this->negateExpression($q, $expr);
+                }
+                break;
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $this->negateExpression($q, $expr);
         }
 
         if (!empty($forceParameters)) {
@@ -566,5 +588,50 @@ class LeadFieldRepository extends CommonRepository
         }
 
         return [$expr, $parameters];
+    }
+
+    /**
+     * @param OrmQueryBuilder|DbalQueryBuilder $q
+     *
+     * @return array{0:mixed,1:array<string,mixed>}
+     */
+    private function getSystemAliasExpression($q, string $column): array
+    {
+        $aliases = $this->getSystemDefaultAliases();
+
+        if (!$aliases) {
+            return [false, []];
+        }
+
+        $parameter = $this->generateRandomParameterName();
+        $expr      = $q->expr()->in($column, ":$parameter");
+
+        $q->setParameter($parameter, $aliases, ArrayParameterType::STRING);
+
+        return [$expr, []];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getSystemDefaultAliases(): array
+    {
+        return array_values(array_unique(array_merge(
+            array_keys(FieldModel::$coreFields),
+            array_keys(FieldModel::$coreCompanyFields)
+        )));
+    }
+
+    /**
+     * @param OrmQueryBuilder|DbalQueryBuilder $q
+     * @param mixed                            $expr
+     */
+    private function negateExpression($q, $expr): object|string
+    {
+        if ($q instanceof OrmQueryBuilder) {
+            return $q->expr()->not($expr);
+        }
+
+        return sprintf('NOT(%s)', (string) $expr);
     }
 }
