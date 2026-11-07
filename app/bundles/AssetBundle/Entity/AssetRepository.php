@@ -92,6 +92,12 @@ class AssetRepository extends CommonRepository
         $command         = $field         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
+        $negationMatchesNullMime = false;
+        $mimeCommandMap  = [
+            'mautic.asset.asset.searchcommand.isimage' => 'image/%',
+            'mautic.asset.asset.searchcommand.isvideo' => 'video/%',
+            'mautic.asset.asset.searchcommand.isaudio' => 'audio/%',
+        ];
         switch ($command) {
             case $this->translator->trans('mautic.asset.asset.searchcommand.isexpired'):
             case $this->translator->trans('mautic.asset.asset.searchcommand.isexpired', [], null, 'en_US'):
@@ -119,6 +125,51 @@ class AssetRepository extends CommonRepository
                 $expr            = '('.$q->expr()->eq('a.language', ":{$unique}").' OR '.$q->expr()->like('a.language', ":{$langUnique}").')';
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isimage'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isimage', [], null, 'en_US'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isvideo'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isvideo', [], null, 'en_US'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isaudio'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isaudio', [], null, 'en_US'):
+                foreach ($mimeCommandMap as $key => $pattern) {
+                    if (in_array($command, [
+                        $this->translator->trans($key),
+                        $this->translator->trans($key, [], null, 'en_US'),
+                    ], true)) {
+                        $expr                    = $q->expr()->like('a.mime', ":$unique");
+                        $forceParameters         = [$unique => $pattern];
+                        $negationMatchesNullMime = true;
+                        break;
+                    }
+                }
+                break;
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isdocument'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isdocument', [], null, 'en_US'):
+                $documentMimeTypes = [
+                    'application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/vnd.ms-excel',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'application/vnd.ms-powerpoint',
+                    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                    'application/vnd.oasis.opendocument.text',
+                    'application/vnd.oasis.opendocument.spreadsheet',
+                    'application/vnd.oasis.opendocument.presentation',
+                    'application/rtf',
+                    'text/plain',
+                    'text/csv',
+                ];
+                $documentExpressions = [];
+                $forceParameters     = [];
+                foreach ($documentMimeTypes as $mime) {
+                    $documentUnique                   = $this->generateRandomParameterName();
+                    $documentExpressions[]            = $q->expr()->eq('a.mime', ":$documentUnique");
+                    $forceParameters[$documentUnique] = $mime;
+                }
+                $expr                    = '('.implode(' OR ', $documentExpressions).')';
+                $negationMatchesNullMime = true;
+                break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
                 return $this->handleProjectFilter(
@@ -133,6 +184,9 @@ class AssetRepository extends CommonRepository
 
         if ($expr && $filter->not) {
             $expr = $q->expr()->not($expr);
+            if ($negationMatchesNullMime) {
+                $expr = '('.$expr.' OR '.$q->expr()->isNull('a.mime').')';
+            }
         }
 
         if (!empty($forceParameters)) {
@@ -161,6 +215,10 @@ class AssetRepository extends CommonRepository
             'mautic.asset.asset.searchcommand.ispending',
             'mautic.core.searchcommand.category',
             'mautic.asset.asset.searchcommand.lang',
+            'mautic.asset.asset.searchcommand.isimage',
+            'mautic.asset.asset.searchcommand.isvideo',
+            'mautic.asset.asset.searchcommand.isdocument',
+            'mautic.asset.asset.searchcommand.isaudio',
             'mautic.project.searchcommand.name',
         ];
 

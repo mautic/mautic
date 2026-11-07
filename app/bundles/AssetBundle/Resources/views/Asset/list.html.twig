@@ -43,44 +43,87 @@
                         },
                     ] : [],
                 },
-                'quickFilters': [
-                    {
-                        'search': 'mautic.core.searchcommand.isuncategorized',
-                        'label': 'mautic.core.form.uncategorized',
-                        'tooltip': 'mautic.core.search.quickfilter.is_uncategorized',
-                        'icon': 'ri-folder-unknow-line'
+                'quickFilters': {
+                    'mautic.core.quick_filters.status': {
+                        'conflictGroup': true,
+                        'filters': [
+                            {
+                                'search': 'mautic.core.searchcommand.ispublished',
+                                'label': 'mautic.core.form.available',
+                                'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                                'icon': 'ri-check-line'
+                            },
+                            {
+                                'search': 'mautic.core.searchcommand.isunpublished',
+                                'label': 'mautic.core.form.unavailable',
+                                'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                                'icon': 'ri-close-line'
+                            },
+                            {
+                                'search': 'mautic.asset.asset.searchcommand.isexpired',
+                                'label': 'mautic.core.form.no_longer_available',
+                                'tooltip': 'mautic.asset.asset.searchcommand.isexpired.description',
+                                'icon': 'ri-time-line'
+                            },
+                            {
+                                'search': 'mautic.asset.asset.searchcommand.ispending',
+                                'label': 'mautic.core.form.not_yet_available',
+                                'tooltip': 'mautic.asset.asset.searchcommand.ispending.description',
+                                'icon': 'ri-timer-line'
+                            }
+                        ]
                     },
-                    {
-                        'search': 'mautic.core.searchcommand.ispublished',
-                        'label': 'mautic.core.form.available',
-                        'tooltip': 'mautic.core.search.quickfilter.is_published',
-                        'icon': 'ri-check-line'
+                    'mautic.core.quick_filters.ownership': {
+                        'conflictGroup': true,
+                        'filters': [
+                            {
+                                'search': 'mautic.core.searchcommand.ismine',
+                                'label': 'mautic.core.searchcommand.ismine.label',
+                                'tooltip': 'mautic.core.searchcommand.ismine.description',
+                                'icon': 'ri-user-line'
+                            }
+                        ]
                     },
-                    {
-                        'search': 'mautic.core.searchcommand.isunpublished',
-                        'label': 'mautic.core.form.unavailable',
-                        'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
-                        'icon': 'ri-close-line'
+                    'mautic.asset.quick_filters.type': {
+                        'conflictGroup': true,
+                        'filters': [
+                            {
+                                'search': 'mautic.asset.asset.searchcommand.isimage',
+                                'label': 'mautic.asset.type.image',
+                                'tooltip': 'mautic.asset.asset.searchcommand.isimage.description',
+                                'icon': 'ri-image-line'
+                            },
+                            {
+                                'search': 'mautic.asset.asset.searchcommand.isvideo',
+                                'label': 'mautic.asset.type.video',
+                                'tooltip': 'mautic.asset.asset.searchcommand.isvideo.description',
+                                'icon': 'ri-vidicon-line'
+                            },
+                            {
+                                'search': 'mautic.asset.asset.searchcommand.isdocument',
+                                'label': 'mautic.asset.type.document',
+                                'tooltip': 'mautic.asset.asset.searchcommand.isdocument.description',
+                                'icon': 'ri-file-text-line'
+                            },
+                            {
+                                'search': 'mautic.asset.asset.searchcommand.isaudio',
+                                'label': 'mautic.asset.type.audio',
+                                'tooltip': 'mautic.asset.asset.searchcommand.isaudio.description',
+                                'icon': 'ri-music-2-line'
+                            }
+                        ]
                     },
-                    {
-                        'search': 'mautic.core.searchcommand.ismine',
-                        'label': 'mautic.core.searchcommand.ismine.label',
-                        'tooltip': 'mautic.core.searchcommand.ismine.description',
-                        'icon': 'ri-user-line'
-                    },
-                    {
-                        'search': 'mautic.asset.asset.searchcommand.isexpired',
-                        'label': 'mautic.core.form.no_longer_available',
-                        'tooltip': 'mautic.asset.asset.searchcommand.isexpired.description',
-                        'icon': 'ri-time-line'
-                    },
-                    {
-                        'search': 'mautic.asset.asset.searchcommand.ispending',
-                        'label': 'mautic.core.form.not_yet_available',
-                        'tooltip': 'mautic.asset.asset.searchcommand.ispending.description',
-                        'icon': 'ri-timer-line'
+                    'mautic.core.quick_filters.others': {
+                        'filters': [
+                            {
+                                'search': 'mautic.core.searchcommand.isuncategorized',
+                                'label': 'mautic.core.form.uncategorized',
+                                'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                                'icon': 'ri-folder-unknow-line'
+                            }
+                        ]
                     }
-                ],
+                },
                 'searchScopes': searchScopes|default([]),
                 'searchScopeHint': searchScopeHint|default(''),
             }) -}}
