@@ -63,24 +63,40 @@ PHP
     #[RunInSeparateProcess]
     public function testUnreadablePluginDirectoryDoesNotPreventBundleRegistration(): void
     {
-        $kernel = new class($this->applicationDir) extends \AppKernel {
-            public function __construct(private readonly string $testApplicationDir)
-            {
-                parent::__construct('prod', false);
+        $warnings = [];
+        set_error_handler(static function (int $severity, string $message) use (&$warnings): bool {
+            if (E_USER_WARNING === $severity) {
+                $warnings[] = $message;
             }
 
-            public function getApplicationDir(): string
-            {
-                return $this->testApplicationDir;
-            }
-        };
+            return true;
+        });
 
-        $bundles = iterator_to_array($kernel->registerBundles());
+        try {
+            $kernel = new class($this->applicationDir) extends \AppKernel {
+                public function __construct(private readonly string $testApplicationDir)
+                {
+                    parent::__construct('prod', false);
+                }
 
-        $this->assertContains(
-            'MauticPlugin\\ReadablePluginBundle\\ReadablePluginBundle',
-            array_map(get_class(...), $bundles)
-        );
+                public function getApplicationDir(): string
+                {
+                    return $this->testApplicationDir;
+                }
+            };
+
+            $bundles = iterator_to_array($kernel->registerBundles());
+
+            $this->assertContains(
+                'MauticPlugin\\ReadablePluginBundle\\ReadablePluginBundle',
+                array_map(get_class(...), $bundles)
+            );
+
+            $this->assertNotEmpty($warnings);
+            $this->assertStringContainsString('.unreadable', implode("\n", $warnings));
+        } finally {
+            restore_error_handler();
+        }
     }
 
     #[PreserveGlobalState(false)]
@@ -94,6 +110,15 @@ PHP
             chmod($pluginRoot, 0700);
             $this->markTestSkipped('The test process can read mode-000 plugin roots.');
         }
+
+        $warnings = [];
+        set_error_handler(static function (int $severity, string $message) use (&$warnings): bool {
+            if (E_USER_WARNING === $severity) {
+                $warnings[] = $message;
+            }
+
+            return true;
+        });
 
         try {
             $kernel = new class($this->applicationDir) extends \AppKernel {
@@ -109,7 +134,10 @@ PHP
             };
 
             $this->assertIsArray(iterator_to_array($kernel->registerBundles()));
+            $this->assertNotEmpty($warnings);
+            $this->assertStringContainsString('/plugins', implode("\n", $warnings));
         } finally {
+            restore_error_handler();
             chmod($pluginRoot, 0700);
         }
     }
