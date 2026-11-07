@@ -177,7 +177,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($loser);
         $this->em->flush();
 
-        $winnerId = (int) $winner->getId();
+        $winnerId = $winner->getId();
         $stageId  = (int) $stage->getId();
 
         /** @var ContactMerger $contactMerger */
