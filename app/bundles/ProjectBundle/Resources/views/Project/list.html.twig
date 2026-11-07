@@ -27,15 +27,48 @@
                 'delete': permissions['project:project:delete'],
             },
         },
-        'quickFilters': [
-            {
-                'search': 'mautic.core.searchcommand.ismine',
-                'label': 'mautic.core.searchcommand.ismine.label',
-                'tooltip': 'mautic.core.searchcommand.ismine.description',
-                'icon': 'ri-user-line'
+        'quickFilters': {
+            'mautic.core.quick_filters.ownership': {
+                'conflictGroup': true,
+                'filters': [
+                    {
+                        'search': 'mautic.core.searchcommand.ismine',
+                        'label': 'mautic.core.searchcommand.ismine.label',
+                        'tooltip': 'mautic.core.searchcommand.ismine.description',
+                        'icon': 'ri-user-line'
+                    }
+                ]
+            },
+            'mautic.project.quick_filters.associations': {
+                'filters': [
+                    {
+                        'search': 'mautic.project.searchcommand.hasemails',
+                        'label': 'mautic.project.quickfilter.hasemails',
+                        'tooltip': 'mautic.project.quickfilter.hasemails.tooltip',
+                        'icon': 'ri-mail-line'
+                    },
+                    {
+                        'search': 'mautic.project.searchcommand.hascampaigns',
+                        'label': 'mautic.project.quickfilter.hascampaigns',
+                        'tooltip': 'mautic.project.quickfilter.hascampaigns.tooltip',
+                        'icon': 'ri-rocket-line'
+                    },
+                    {
+                        'search': 'mautic.project.searchcommand.haspages',
+                        'label': 'mautic.project.quickfilter.haspages',
+                        'tooltip': 'mautic.project.quickfilter.haspages.tooltip',
+                        'icon': 'ri-pages-line'
+                    },
+                    {
+                        'search': 'mautic.project.searchcommand.hasassets',
+                        'label': 'mautic.project.quickfilter.hasassets',
+                        'tooltip': 'mautic.project.quickfilter.hasassets.tooltip',
+                        'icon': 'ri-file-3-line'
+                    }
+                ]
             }
-        ]
-    }) }}
+        }
+            }) }}
     <div class="page-list">
 {% endif %}
 
