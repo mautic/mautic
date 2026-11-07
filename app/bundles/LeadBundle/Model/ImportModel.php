@@ -24,10 +24,6 @@ use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportBatchProcessedEvent;
-use Mautic\LeadBundle\Event\ImportPostDeleteEvent;
-use Mautic\LeadBundle\Event\ImportPostSaveEvent;
-use Mautic\LeadBundle\Event\ImportPreDeleteEvent;
-use Mautic\LeadBundle\Event\ImportPreSaveEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
@@ -589,20 +585,17 @@ class ImportModel extends FormModel
      */
     protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
+        if ('batch_processed' !== $action) {
+            return parent::dispatchEvent($action, $entity, $isNew, $event);
+        }
+
         if (!$entity instanceof Import) {
             throw new MethodNotAllowedHttpException(['Import']);
         }
 
-        $event = match ($action) {
-            'pre_save'        => new ImportPreSaveEvent($entity, $isNew),
-            'post_save'       => new ImportPostSaveEvent($entity, $isNew),
-            'pre_delete'      => new ImportPreDeleteEvent($entity, $isNew),
-            'post_delete'     => new ImportPostDeleteEvent($entity, $isNew),
-            'batch_processed' => new ImportBatchProcessedEvent($entity, $isNew),
-            default           => null,
-        };
+        $event = new ImportBatchProcessedEvent($entity, $isNew);
 
-        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+        if (!$this->dispatcher->hasListeners($event::class)) {
             return null;
         }
 
