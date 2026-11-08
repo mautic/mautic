@@ -320,11 +320,9 @@ trait LeadDetailsTrait
     /**
      * Get an array to create company's engagements graph.
      *
-     * @param array $contacts
-     *
      * @return array{engagements: list<float|int>, points: list<float|int>}
      */
-    protected function getCompanyEngagementData($contacts): array
+    protected function getCompanyEngagementData(array $contacts): array
     {
         $engagements = [0, 0, 0, 0, 0, 0];
         $points      = [0, 0, 0, 0, 0, 0];

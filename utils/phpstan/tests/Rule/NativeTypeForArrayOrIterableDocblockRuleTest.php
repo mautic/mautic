@@ -63,4 +63,43 @@ final class NativeTypeForArrayOrIterableDocblockRuleTest extends RuleTestCase
     {
         $this->analyse([__DIR__.'/Fixture/NativeTypeForArrayOrIterableDocblock/SkipOverride.php'], []);
     }
+
+    public function testNarrowedOverride(): void
+    {
+        // a concrete parent constructor is LSP-exempt and a private parent method imposes no contract,
+        // so both narrowing child methods are still reported
+        $this->analyse([__DIR__.'/Fixture/NativeTypeForArrayOrIterableDocblock/NarrowedOverride.php'], [
+            [
+                'Param "$items" of "__construct()" has a "array" docblock, so it must declare the native "array" type.',
+                14,
+            ],
+            [
+                'Param "$items" of "onlyPrivate()" has a "array" docblock, so it must declare the native "array" type.',
+                21,
+            ],
+        ]);
+    }
+
+    public function testSkipConstructorBoundByAbstractParent(): void
+    {
+        // an abstract/interface constructor is a binding signature contract, so the override is skipped
+        $this->analyse([__DIR__.'/Fixture/NativeTypeForArrayOrIterableDocblock/BoundConstructorOverride.php'], []);
+    }
+
+    public function testSkipNonPrivateParentTraitMethodOverride(): void
+    {
+        // a parent-trait method stays bound through the parent class, so the override is skipped
+        $this->analyse([__DIR__.'/Fixture/NativeTypeForArrayOrIterableDocblock/ChildOverridingTraitMethod.php'], []);
+    }
+
+    public function testReportOwnConcreteTraitMethodReplacement(): void
+    {
+        // a concrete own-trait method is not a binding contract, so the replacing class method is reported
+        $this->analyse([__DIR__.'/Fixture/NativeTypeForArrayOrIterableDocblock/ClassReplacingOwnTraitMethod.php'], [
+            [
+                'Param "$items" of "handleOwn()" has a "array" docblock, so it must declare the native "array" type.',
+                14,
+            ],
+        ]);
+    }
 }
