@@ -8,8 +8,9 @@ use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\ResetInterface;
 
-class IpLookupHelper
+class IpLookupHelper implements ResetInterface
 {
     /**
      * @var array
@@ -62,9 +63,9 @@ class IpLookupHelper
      *
      * @return string
      */
-    public function getIpAddressFromRequest()
+    public function getIpAddressFromRequest(?Request $request = null)
     {
-        $request = $this->getRequest();
+        $request ??= $this->getRequest();
 
         if (null !== $request) {
             $ipHolders = [
@@ -100,16 +101,16 @@ class IpLookupHelper
     /**
      * Get an IpAddress entity for current session or for passed in IP address.
      *
-     * @param string $ip
+     * @param string|null $ip
      *
      * @return IpAddress
      */
-    public function getIpAddress($ip = null)
+    public function getIpAddress($ip = null, ?Request $request = null, bool $checkDeviceDetector = true)
     {
         $isIpAnonymizationEnabled = (bool) $this->coreParametersHelper->get('anonymize_ip');
 
         if (null === $ip) {
-            $ip = $this->getIpAddressFromRequest();
+            $ip = $this->getIpAddressFromRequest($request);
         }
 
         if (empty($ip) || !$this->ipIsValid($ip)) {
@@ -123,7 +124,9 @@ class IpLookupHelper
             $ip = '*.*.*.*';
         }
 
-        if (!isset(self::$ipAddresses[$ip])) {
+        $cacheKey = $ip.'|'.(int) $checkDeviceDetector;
+
+        if (!isset(self::$ipAddresses[$cacheKey])) {
             $ipAddress = $this->ipAddressRepository->findOneByIpAddress($ip);
             $saveIp    = (null === $ipAddress);
 
@@ -149,7 +152,9 @@ class IpLookupHelper
 
             $ipAddress->setDoNotTrackList($doNotTrack);
 
-            if ($ipAddress->isTrackable() && $request = $this->getRequest()) {
+            $request ??= $this->getRequest();
+
+            if ($ipAddress->isTrackable() && $request) {
                 $userAgent = $request->headers->get('User-Agent', '');
                 foreach ($this->doNotTrackBots as $bot) {
                     if (str_contains($userAgent, $bot)) {
@@ -159,12 +164,14 @@ class IpLookupHelper
                     }
                 }
 
-                // second check for bots  https://github.com/matomo-org/device-detector
-                $deviceDetector = $this->deviceDetectorFactory->create($userAgent);
-                $deviceDetector->parse();
-                if ($deviceDetector->isBot()) {
-                    $doNotTrack[] = $ip;
-                    $ipAddress->setDoNotTrackList($doNotTrack);
+                if ($checkDeviceDetector) {
+                    // second check for bots  https://github.com/matomo-org/device-detector
+                    $deviceDetector = $this->deviceDetectorFactory->create($userAgent);
+                    $deviceDetector->parse();
+                    if ($deviceDetector->isBot()) {
+                        $doNotTrack[] = $ip;
+                        $ipAddress->setDoNotTrackList($doNotTrack);
+                    }
                 }
             }
 
@@ -187,10 +194,10 @@ class IpLookupHelper
                 $this->ipAddressRepository->saveEntity($ipAddress);
             }
 
-            self::$ipAddresses[$ip] = $ipAddress;
+            self::$ipAddresses[$cacheKey] = $ipAddress;
         }
 
-        return self::$ipAddresses[$ip];
+        return self::$ipAddresses[$cacheKey];
     }
 
     /**
@@ -273,12 +280,12 @@ class IpLookupHelper
      * - DNT: 1 (Do Not Track - user preference)
      * - Known bots (existing IP/User-Agent filtering)
      */
-    public function isRequestTrackable(): bool
+    public function isRequestTrackable(?Request $request = null, bool $checkDeviceDetector = true): bool
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request ??= $this->getRequest();
 
         if (null === $request) {
-            return $this->getIpAddress()->isTrackable();
+            return $this->getIpAddress(null, null, $checkDeviceDetector)->isTrackable();
         }
 
         // Skip HEAD requests - often used by bots/monitoring tools
@@ -305,7 +312,7 @@ class IpLookupHelper
         }
 
         // Use existing IP/User-Agent based bot filtering
-        return $this->getIpAddress()->isTrackable();
+        return $this->getIpAddress(null, $request, $checkDeviceDetector)->isTrackable();
     }
 
     private function getRequest(): ?Request

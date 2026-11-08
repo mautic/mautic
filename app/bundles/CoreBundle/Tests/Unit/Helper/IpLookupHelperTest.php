@@ -85,6 +85,46 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('73.77.245.53', $ip->getIpAddress());
     }
 
+    #[TestDox('Check that a supplied request is used without a current request stack entry')]
+    public function testClientIpIsReturnedFromSuppliedRequest(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.54']);
+        $ip      = $this->getIpHelper()->getIpAddress(null, $request);
+
+        $this->assertEquals('73.77.245.54', $ip->getIpAddress());
+    }
+
+    #[TestDox('Check that email tracking can skip generic device-detector bot classification')]
+    public function testEmailTrackingCanSkipDeviceDetectorBotClassification(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.55']);
+        $request->headers->set('User-Agent', 'Mozilla/5.0 (via ggpht.com GoogleImageProxy)');
+
+        $this->deviceDetector->expects($this->never())->method('parse');
+
+        $this->assertTrue($this->getIpHelper()->isRequestTrackable($request, false));
+    }
+
+    #[TestDox('Check that the user-agent-dependent IP cache is reset between worker messages')]
+    public function testResetClearsUserAgentDependentIpCache(): void
+    {
+        $this->deviceDetector
+            ->method('isBot')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $helper = $this->getIpHelper();
+        $botRequest = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.56']);
+        $botRequest->headers->set('User-Agent', 'KnownBot/1.0');
+        $normalRequest = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.56']);
+        $normalRequest->headers->set('User-Agent', 'Mozilla/5.0');
+
+        $this->assertFalse($helper->getIpAddress(null, $botRequest)->isTrackable());
+
+        $helper->reset();
+
+        $this->assertTrue($helper->getIpAddress(null, $normalRequest)->isTrackable());
+    }
+
     #[TestDox('Check that a local IP is returned for internal IPs')]
     public function testLocalIpIsReturnedForInternalNetworkIp(): void
     {

@@ -816,7 +816,13 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $stat->setLead($contact);
 
         $this->ipLookupHelper->expects($this->once())
+            ->method('isRequestTrackable')
+            ->with($request, false)
+            ->willReturn(true);
+
+        $this->ipLookupHelper->expects($this->once())
             ->method('getIpAddress')
+            ->with(null, $request, false)
             ->willReturn($ipAddress);
 
         $this->deviceTrackerMock->expects($this->once())
