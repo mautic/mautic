@@ -153,9 +153,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 
         $helper = $this->getIpHelper(
             mockRepository: $repository,
-            deviceDetectorFactoryCallback: function (string $userAgent) use ($botDetector, $normalDetector): DeviceDetector {
-                return str_contains($userAgent, 'KnownBot') ? $botDetector : $normalDetector;
-            }
+            deviceDetectorFactoryCallback: fn (string $userAgent): DeviceDetector => str_contains($userAgent, 'KnownBot') ? $botDetector : $normalDetector,
         );
         $botRequest = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.57']);
         $botRequest->headers->set('User-Agent', 'KnownBot/1.0');

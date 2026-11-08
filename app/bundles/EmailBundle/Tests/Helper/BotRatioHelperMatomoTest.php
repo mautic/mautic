@@ -68,6 +68,14 @@ final class BotRatioHelperMatomoTest extends TestCase
         $this->assertTrue($result, 'Expected bot to be detected via ratio-based logic when Matomo returns false');
     }
 
+    public function testGgphtDomainAloneDoesNotMatchMailProviderProxy(): void
+    {
+        $deviceDetectorFactoryMock = $this->createMock(DeviceDetectorFactoryInterface::class);
+        $botRatioHelper            = new BotRatioHelper($deviceDetectorFactoryMock);
+
+        $this->assertFalse($botRatioHelper->isMailProviderProxy('Googlebot/2.1 (ggpht.com)'));
+    }
+
     #[DataProvider('mailProviderProxyUserAgentsProvider')]
     public function testMailProviderProxiesAreNotClassifiedAsBots(string $userAgent): void
     {
