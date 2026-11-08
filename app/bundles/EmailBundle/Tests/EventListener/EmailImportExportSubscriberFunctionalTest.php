@@ -214,4 +214,48 @@ final class EmailImportExportSubscriberFunctionalTest extends MauticMysqlTestCas
             $imported->getPublishUp()->format('Y-m-d H:i')
         );
     }
+
+    /**
+     * A published email with an MJML theme and no compiled customHtml cannot be
+     * saved (see EmailModel::validateMjmlThemeHasCustomHtml). The import must
+     * reject just that email through the event's ERRORS channel instead of
+     * letting the exception escape the campaign import as a server error.
+     */
+    public function testImportRejectsUnsavedMjmlEmailAndImportsTheRest(): void
+    {
+        $validPayload = [
+            'uuid'         => 'aaaaaaaa-bbbb-4ccc-8ddd-000000000001',
+            'name'         => 'Valid Imported Email',
+            'subject'      => 'Valid Subject',
+            'template'     => 'blank',
+            'custom_html'  => '<html><body><p>Compiled body</p></body></html>',
+            'email_type'   => 'template',
+            'is_published' => true,
+        ];
+        $mjmlPayload = [
+            'uuid'         => 'aaaaaaaa-bbbb-4ccc-8ddd-000000000002',
+            'name'         => 'Uncompiled MJML Email',
+            'subject'      => 'MJML Subject',
+            'template'     => 'blank',
+            'custom_html'  => '',
+            'email_type'   => 'template',
+            'is_published' => true,
+        ];
+
+        $event = new EntityImportEvent(Email::ENTITY_NAME, [$validPayload, $mjmlPayload], 1);
+        $this->dispatcher->dispatch($event);
+
+        $status = $event->getStatus();
+
+        // The valid email imports; the uncompiled MJML email is rejected without
+        // aborting the rest of the payload.
+        $this->assertSame(1, $status[EntityImportEvent::NEW][Email::ENTITY_NAME]['count']);
+        $this->assertSame(['Uncompiled MJML Email'], $status[EntityImportEvent::ERRORS][Email::ENTITY_NAME]['names']);
+
+        $this->em->clear();
+
+        $imported = $this->em->getRepository(Email::class)->findOneBy(['uuid' => $validPayload['uuid']]);
+        $this->assertInstanceOf(Email::class, $imported);
+        $this->assertNull($this->em->getRepository(Email::class)->findOneBy(['uuid' => $mjmlPayload['uuid']]));
+    }
 }

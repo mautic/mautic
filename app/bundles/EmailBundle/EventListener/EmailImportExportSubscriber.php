@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
+use Mautic\EmailBundle\Exception\MjmlThemeEmptyCustomHtmlException;
 use Mautic\EmailBundle\Helper\EmailMediaImageHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Entity\Form;
@@ -143,6 +144,8 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
         ];
 
+        $rejectedEmails = [];
+
         foreach ($event->getEntityData() as $element) {
             $email = $this->emailRepository->findOneBy(['uuid' => $element['uuid']]);
             $isNew = !$email;
@@ -184,7 +187,21 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
                 $email->setCustomHtml($element['custom_html']);
             }
 
-            $this->emailModel->saveEntity($email);
+            try {
+                $this->emailModel->saveEntity($email);
+            } catch (MjmlThemeEmptyCustomHtmlException $exception) {
+                // A published email with an MJML theme and no compiled customHtml
+                // cannot be saved. Reject only this email through the event's
+                // ERRORS channel and keep importing the rest: letting the
+                // exception escape aborts the whole import (a server error for
+                // the campaign import API). The entity is detached because the
+                // denormalized payload was already applied to the managed
+                // instance and must not leak into a later flush.
+                $this->entityManager->detach($email);
+                $rejectedEmails[] = $email->getName() ?? '';
+
+                continue;
+            }
 
             $event->addEntityIdMap((int) $element['id'], $email->getId());
 
@@ -200,6 +217,13 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             if ($info['count'] > 0) {
                 $event->setStatus($status, [Email::ENTITY_NAME => $info]);
             }
+        }
+
+        if ([] !== $rejectedEmails) {
+            $errors          = $event->getStatus()[EntityImportEvent::ERRORS][Email::ENTITY_NAME] ?? ['names' => [], 'ids' => [], 'count' => 0];
+            $errors['names'] = array_merge($errors['names'], $rejectedEmails);
+            $errors['count'] += count($rejectedEmails);
+            $event->setStatus(EntityImportEvent::ERRORS, [Email::ENTITY_NAME => $errors]);
         }
     }
 
