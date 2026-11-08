@@ -224,6 +224,7 @@ final class EmailImportExportSubscriberFunctionalTest extends MauticMysqlTestCas
     public function testImportRejectsUnsavedMjmlEmailAndImportsTheRest(): void
     {
         $validPayload = [
+            'id'           => 101,
             'uuid'         => 'aaaaaaaa-bbbb-4ccc-8ddd-000000000001',
             'name'         => 'Valid Imported Email',
             'subject'      => 'Valid Subject',
@@ -233,6 +234,7 @@ final class EmailImportExportSubscriberFunctionalTest extends MauticMysqlTestCas
             'is_published' => true,
         ];
         $mjmlPayload = [
+            'id'           => 102,
             'uuid'         => 'aaaaaaaa-bbbb-4ccc-8ddd-000000000002',
             'name'         => 'Uncompiled MJML Email',
             'subject'      => 'MJML Subject',
