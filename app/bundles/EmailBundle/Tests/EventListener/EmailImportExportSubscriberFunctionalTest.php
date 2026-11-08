@@ -258,6 +258,6 @@ final class EmailImportExportSubscriberFunctionalTest extends MauticMysqlTestCas
 
         $imported = $this->em->getRepository(Email::class)->findOneBy(['uuid' => $validPayload['uuid']]);
         $this->assertInstanceOf(Email::class, $imported);
-        $this->assertNull($this->em->getRepository(Email::class)->findOneBy(['uuid' => $mjmlPayload['uuid']]));
+        $this->assertNotInstanceOf(Email::class, $this->em->getRepository(Email::class)->findOneBy(['uuid' => $mjmlPayload['uuid']]));
     }
 }

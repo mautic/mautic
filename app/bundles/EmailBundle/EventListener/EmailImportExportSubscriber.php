@@ -189,7 +189,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
 
             try {
                 $this->emailModel->saveEntity($email);
-            } catch (MjmlThemeEmptyCustomHtmlException $exception) {
+            } catch (MjmlThemeEmptyCustomHtmlException) {
                 // A published email with an MJML theme and no compiled customHtml
                 // cannot be saved. Reject only this email through the event's
                 // ERRORS channel and keep importing the rest: letting the
