@@ -319,9 +319,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return;
         }
 
-        // Match <mjml> and attribute-bearing opening tags (<mjml lang="en">)
-        // alike: uploaded themes may render attributes on the root element.
-        if (preg_match('/<mjml[\s>]/', $renderedHtml)) {
+        if (MailHelper::hasMjmlRootTag($renderedHtml)) {
             throw new MjmlThemeEmptyCustomHtmlException(sprintf('The "%s" theme uses MJML which must be compiled into customHtml before saving. Please open the email in the builder to compile the template.', $template));
         }
     }
