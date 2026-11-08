@@ -809,11 +809,16 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
     {
         $contact       = new Lead();
         $stat          = new Stat();
-        $request       = new Request();
+        $request       = new Request([], [], [], [], [], ['HTTP_USER_AGENT' => 'Mozilla/5.0 (via ggpht.com GoogleImageProxy)']);
         $contactDevice = new LeadDevice();
         $ipAddress     = new IpAddress();
 
         $stat->setLead($contact);
+
+        $this->botRatioHelperMock->expects($this->once())
+            ->method('isMailProviderProxy')
+            ->with('Mozilla/5.0 (via ggpht.com GoogleImageProxy)')
+            ->willReturn(true);
 
         $this->ipLookupHelper->expects($this->once())
             ->method('isRequestTrackableForRequest')
@@ -867,7 +872,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
     {
         $contact       = new Lead();
         $stat          = new Stat();
-        $request       = new Request();
+        $request       = new Request([], [], [], [], [], ['HTTP_USER_AGENT' => 'Mozilla/5.0']);
         $contactDevice = new LeadDevice();
         $ipAddress     = new IpAddress();
 
@@ -877,9 +882,14 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $stat->setLead($contact);
 
+        $this->botRatioHelperMock->expects($this->once())
+            ->method('isMailProviderProxy')
+            ->with('Mozilla/5.0')
+            ->willReturn(false);
+
         $this->ipLookupHelper->expects($this->once())
             ->method('isRequestTrackableForRequest')
-            ->with($request, false)
+            ->with($request, true)
             ->willReturn(true);
 
         $this->ipLookupHelper->expects($this->once())
