@@ -274,8 +274,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         ?CoreParametersHelper $mockCoreParametersHelper = null,
         ?IpAddressRepository $mockRepository = null,
         ?callable $deviceDetectorFactoryCallback = null,
-    ): IpLookupHelper
-    {
+    ): IpLookupHelper {
         $requestStack = new RequestStack();
 
         if ($request) {

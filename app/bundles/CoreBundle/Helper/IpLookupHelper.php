@@ -72,7 +72,35 @@ class IpLookupHelper implements ResetInterface
     {
         $request = $this->getRequest();
 
-        return null !== $request ? $this->getIpAddressFromRequestObject($request) : '127.0.0.1';
+        if (null !== $request) {
+            $ipHolders = [
+                'HTTP_CLIENT_IP',
+                'HTTP_X_FORWARDED_FOR',
+                'HTTP_X_FORWARDED',
+                'HTTP_X_CLUSTER_CLIENT_IP',
+                'HTTP_FORWARDED_FOR',
+                'HTTP_FORWARDED',
+                'REMOTE_ADDR',
+            ];
+
+            foreach ($ipHolders as $key) {
+                if ($request->server->get($key)) {
+                    $ip = trim($request->server->get($key));
+
+                    if (str_contains($ip, ',')) {
+                        $ip = $this->getClientIpFromProxyList($ip);
+                    }
+
+                    // Validate IP
+                    if (null !== $ip && $this->ipIsValid($ip)) {
+                        return $ip;
+                    }
+                }
+            }
+        }
+
+        // if everything else fails
+        return '127.0.0.1';
     }
 
     /**
