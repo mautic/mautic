@@ -1262,6 +1262,9 @@ class MailHelper
 
         $template   = $email->getTemplate();
         $customHtml = $email->getCustomHtml();
+        // Set when the MJML fallback is skipped below; the HTML part must stay
+        // truly empty so send() omits it for plain-text-only emails.
+        $skipHtmlFallback = false;
         // Process emails created by Mautic v1
         if (empty($customHtml) && $template) {
             $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
@@ -1275,18 +1278,24 @@ class MailHelper
             // Bundled themes since Mautic 5 are MJML. GrapesJS compiles them into
             // customHtml client-side; sending the raw theme template as text/html
             // delivers uncompiled <mjml> markup to recipients.
-            if (str_contains($renderedHtml, '<mjml>')) {
+            // Match <mjml> and attribute-bearing opening tags (<mjml lang="en">)
+            // alike: uploaded themes may render attributes on the root element.
+            if (preg_match('/<mjml[\s>]/', $renderedHtml)) {
                 $this->logger->warning(sprintf(
                     'Email%s uses MJML theme "%s" with empty customHtml; skipping theme HTML fallback to avoid sending uncompiled MJML.',
                     null !== $email->getId() ? ' ID '.$email->getId() : '',
                     $template
                 ));
-                $customHtml = '';
+                $customHtml       = '';
+                $skipHtmlFallback = true;
 
                 // When the theme fallback is skipped and there is no plain text
-                // either, the message has no usable body. Hard-fail setEmail() so
-                // the send is aborted rather than delivering an empty email.
+                // either, the message has no usable body. Hard-fail setEmail()
+                // and mark the mailer fatal (the flag send() and flushQueue()
+                // check before handing the message to the transport) so the send
+                // is aborted rather than delivering an empty email.
                 if (empty($plainText)) {
+                    $this->fatal    = true;
                     $this->errors[] = sprintf(
                         'Email%s uses MJML theme "%s" with empty customHtml and no plain text; the email has no usable body and cannot be sent.',
                         null !== $email->getId() ? ' ID '.$email->getId() : '',
@@ -1298,7 +1307,10 @@ class MailHelper
             }
         }
 
-        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
+        // A skipped fallback must not grow an image-only HTML part: appending the
+        // tracking pixel to the empty body would leave a single <img> that
+        // HTML-preferring clients render instead of the plain text.
+        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel || $skipHtmlFallback);
 
         // Reset attachments
         $this->assets = $this->attachedAssets = [];
@@ -2126,7 +2138,9 @@ class MailHelper
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PRE_SEND);
 
         $this->skip               = $event->isSkip();
-        $this->fatal              = $event->isFatal();
+        // Keep a fatal state set before the dispatch (e.g. setEmail() marking an
+        // unusable message) — listeners can only escalate it, never clear it.
+        $this->fatal              = $this->fatal || $event->isFatal();
         $errors                   = $event->getErrors();
         if ([] !== $errors) {
             $currentErrors = [];

@@ -1493,6 +1493,133 @@ MJML;
         $this->assertStringNotContainsString('<mjml>', $mailer->getBody());
     }
 
+    public function testSetEmailSkipsMjmlThemeFallbackForOpeningTagWithAttributes(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['minify_email_html', null, false],
+            ['mailer_append_tracking_pixel', null, false],
+        ]);
+
+        // Uploaded themes may render attributes on the root MJML element; the
+        // exact-string '<mjml>' check misses those and would send uncompiled MJML.
+        $mjml = <<<'MJML'
+<mjml lang="en">
+    <mj-body>
+        <mj-section>
+            <mj-column>
+                <mj-text>Hello World!</mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>
+MJML;
+
+        $this->themeHelper->method('checkForTwigTemplate')
+            ->willReturn('@themes/blank/html/email.html.twig');
+        $this->themeHelper->method('renderThemeTemplate')
+            ->willReturn($mjml);
+
+        $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
+
+        $email = new Email();
+        $email->setSubject('MJML attribute tag test');
+        $email->setTemplate('blank');
+        $email->setCustomHtml('');
+        $email->setPlainText('Plain text body.');
+
+        $this->assertTrue($mailer->setEmail($email));
+        $this->assertSame('', $mailer->getBody());
+        $this->assertStringNotContainsString('<mjml', $mailer->getBody());
+    }
+
+    public function testSetEmailDoesNotBuildImageOnlyHtmlPartWhenMjmlThemeFallbackSkipped(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['minify_email_html', null, false],
+            // Tracking pixels enabled: appending one to the skipped empty body
+            // would leave an image-only HTML part that HTML-preferring clients
+            // render instead of the plain text.
+            ['mailer_append_tracking_pixel', null, true],
+        ]);
+
+        $mjml = <<<'MJML'
+<mjml>
+    <mj-body>
+        <mj-section>
+            <mj-column>
+                <mj-text>Hello World!</mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>
+MJML;
+
+        $this->themeHelper->method('checkForTwigTemplate')
+            ->willReturn('@themes/blank/html/email.html.twig');
+        $this->themeHelper->method('renderThemeTemplate')
+            ->willReturn($mjml);
+
+        $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
+
+        $email = new Email();
+        $email->setSubject('MJML tracking pixel test');
+        $email->setTemplate('blank');
+        $email->setCustomHtml('');
+        $email->setPlainText('Plain text body.');
+
+        $this->assertTrue($mailer->setEmail($email));
+        // The HTML part must stay truly empty — send() omits it entirely for
+        // plain-text-only emails, but only while it is empty.
+        $this->assertSame('', $mailer->getBody());
+    }
+
+    public function testSendNeverReachesTransportWhenMjmlThemeSkippedWithNoPlainText(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(6))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['minify_email_html', null, false],
+            ['mailer_append_tracking_pixel', null, false],
+        ]);
+
+        $mjml = <<<'MJML'
+<mjml>
+    <mj-body>
+        <mj-section>
+            <mj-column>
+                <mj-text>Hello World!</mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>
+MJML;
+
+        $this->themeHelper->method('checkForTwigTemplate')
+            ->willReturn('@themes/blank/html/email.html.twig');
+        $this->themeHelper->method('renderThemeTemplate')
+            ->willReturn($mjml);
+
+        $transport = new SmtpTransport();
+
+        $mailer = $this->createMailHelperWithTransport($transport);
+
+        $email = new Email();
+        $email->setSubject('MJML fatal test');
+        $email->setTemplate('blank');
+        $email->setCustomHtml('');
+        // No plain text — the email has no usable body after the MJML skip.
+
+        $this->assertFalse($mailer->setEmail($email));
+
+        // queue() must abort without handing the empty message to the transport.
+        $this->assertFalse($mailer->queue(true));
+        $this->assertFalse(isset($transport->sentMessage), 'The empty message must never reach the transport.');
+    }
+
     public function testSetEmailFailsWhenMjmlThemeSkippedAndNoPlainText(): void
     {
         $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
