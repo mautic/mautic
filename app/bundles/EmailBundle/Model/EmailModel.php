@@ -441,11 +441,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         // Email opens can be processed by a Messenger worker without a current RequestStack entry.
         // Use the request carried by the message and leave email-specific bot detection to BotRatioHelper.
-        if (!$this->ipLookupHelper->isRequestTrackable($request, false)) {
+        if (!$this->ipLookupHelper->isRequestTrackableForRequest($request, false)) {
             return;
         }
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress(null, $request, false);
+        $ipAddress = $this->ipLookupHelper->getIpAddressForRequest($request);
 
         $readDateTime = new DateTimeHelper($hitDateTime);
         $userAgent    = $request->server->get('HTTP_USER_AGENT');

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use DeviceDetector\DeviceDetector;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -89,7 +90,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     public function testClientIpIsReturnedFromSuppliedRequest(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.54']);
-        $ip      = $this->getIpHelper()->getIpAddress(null, $request);
+        $ip      = $this->getIpHelper()->getIpAddressForRequest($request);
 
         $this->assertEquals('73.77.245.54', $ip->getIpAddress());
     }
@@ -102,7 +103,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->deviceDetector->expects($this->never())->method('parse');
 
-        $this->assertTrue($this->getIpHelper()->isRequestTrackable($request, false));
+        $this->assertTrue($this->getIpHelper()->isRequestTrackableForRequest($request, false));
     }
 
     #[TestDox('Check that the user-agent-dependent IP cache is reset between worker messages')]
@@ -118,11 +119,40 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $normalRequest = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.56']);
         $normalRequest->headers->set('User-Agent', 'Mozilla/5.0');
 
-        $this->assertFalse($helper->getIpAddress(null, $botRequest)->isTrackable());
+        $this->assertFalse($helper->isRequestTrackableForRequest($botRequest));
 
         $helper->reset();
 
-        $this->assertTrue($helper->getIpAddress(null, $normalRequest)->isTrackable());
+        $this->assertTrue($helper->isRequestTrackableForRequest($normalRequest));
+    }
+
+    #[TestDox('Keep User-Agent classification separate from the persisted IP entity in either lookup order')]
+    public function testRequestTrackabilityIsIndependentOfLookupOrder(): void
+    {
+        $persistedIp = new IpAddress('73.77.245.57');
+        $repository  = $this->createMock(IpAddressRepository::class);
+        $repository
+            ->method('__call')
+            ->with('findOneByIpAddress')
+            ->willReturn($persistedIp);
+
+        $this->deviceDetector
+            ->method('isBot')
+            ->willReturnOnConsecutiveCalls(true, false, false, true);
+
+        $helper = $this->getIpHelper(null, null, $repository);
+        $botRequest = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.57']);
+        $botRequest->headers->set('User-Agent', 'KnownBot/1.0');
+        $normalRequest = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.57']);
+        $normalRequest->headers->set('User-Agent', 'Mozilla/5.0');
+
+        $this->assertFalse($helper->isRequestTrackableForRequest($botRequest));
+        $this->assertTrue($helper->isRequestTrackableForRequest($normalRequest));
+
+        $helper->reset();
+
+        $this->assertTrue($helper->isRequestTrackableForRequest($normalRequest));
+        $this->assertFalse($helper->isRequestTrackableForRequest($botRequest));
     }
 
     #[TestDox('Check that a local IP is returned for internal IPs')]
@@ -223,7 +253,11 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    private function getIpHelper(?Request $request = null, ?CoreParametersHelper $mockCoreParametersHelper = null): IpLookupHelper
+    private function getIpHelper(
+        ?Request $request = null,
+        ?CoreParametersHelper $mockCoreParametersHelper = null,
+        ?IpAddressRepository $mockRepository = null,
+    ): IpLookupHelper
     {
         $requestStack = new RequestStack();
 
@@ -231,11 +265,13 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
             $requestStack->push($request);
         }
 
-        $mockRepository = $this->createMock(IpAddressRepository::class);
-        $mockRepository
-            ->method('__call')
-            ->with('findOneByIpAddress')
-            ->willReturn(null);
+        if (null === $mockRepository) {
+            $mockRepository = $this->createMock(IpAddressRepository::class);
+            $mockRepository
+                ->method('__call')
+                ->with('findOneByIpAddress')
+                ->willReturn(null);
+        }
 
         if (null === $mockCoreParametersHelper) {
             $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
