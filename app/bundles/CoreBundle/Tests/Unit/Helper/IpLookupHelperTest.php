@@ -113,17 +113,15 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
             ->method('isBot')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $helper = $this->getIpHelper();
-        $botRequest = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.56']);
-        $botRequest->headers->set('User-Agent', 'KnownBot/1.0');
-        $normalRequest = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.56']);
-        $normalRequest->headers->set('User-Agent', 'Mozilla/5.0');
+        $helper  = $this->getIpHelper();
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.56']);
+        $request->headers->set('User-Agent', 'Mozilla/5.0');
 
-        $this->assertFalse($helper->isRequestTrackableForRequest($botRequest));
+        $this->assertFalse($helper->isRequestTrackableForRequest($request));
 
         $helper->reset();
 
-        $this->assertTrue($helper->isRequestTrackableForRequest($normalRequest));
+        $this->assertTrue($helper->isRequestTrackableForRequest($request));
     }
 
     #[TestDox('Keep User-Agent classification separate from the persisted IP entity in either lookup order')]
@@ -136,11 +134,17 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
             ->with('findOneByIpAddress')
             ->willReturn($persistedIp);
 
-        $this->deviceDetector
-            ->method('isBot')
-            ->willReturnOnConsecutiveCalls(true, false, false, true);
+        $botDetector    = $this->createMock(DeviceDetector::class);
+        $normalDetector = $this->createMock(DeviceDetector::class);
+        $botDetector->method('isBot')->willReturn(true);
+        $normalDetector->method('isBot')->willReturn(false);
 
-        $helper = $this->getIpHelper(null, null, $repository);
+        $helper = $this->getIpHelper(
+            mockRepository: $repository,
+            deviceDetectorFactoryCallback: function (string $userAgent) use ($botDetector, $normalDetector): DeviceDetector {
+                return str_contains($userAgent, 'KnownBot') ? $botDetector : $normalDetector;
+            }
+        );
         $botRequest = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.57']);
         $botRequest->headers->set('User-Agent', 'KnownBot/1.0');
         $normalRequest = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.57']);
@@ -257,6 +261,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         ?Request $request = null,
         ?CoreParametersHelper $mockCoreParametersHelper = null,
         ?IpAddressRepository $mockRepository = null,
+        ?callable $deviceDetectorFactoryCallback = null,
     ): IpLookupHelper
     {
         $requestStack = new RequestStack();
@@ -283,7 +288,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->deviceDetectorFactory
             ->method('create')
             ->willReturnCallback(
-                fn (): \PHPUnit\Framework\MockObject\MockObject => $this->deviceDetector
+                $deviceDetectorFactoryCallback ?? fn (): \PHPUnit\Framework\MockObject\MockObject => $this->deviceDetector
             );
 
         $helper = new IpLookupHelper($requestStack, $mockRepository, $mockCoreParametersHelper, $this->deviceDetectorFactory);

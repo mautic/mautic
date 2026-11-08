@@ -72,35 +72,7 @@ class IpLookupHelper implements ResetInterface
     {
         $request = $this->getRequest();
 
-        if (null !== $request) {
-            $ipHolders = [
-                'HTTP_CLIENT_IP',
-                'HTTP_X_FORWARDED_FOR',
-                'HTTP_X_FORWARDED',
-                'HTTP_X_CLUSTER_CLIENT_IP',
-                'HTTP_FORWARDED_FOR',
-                'HTTP_FORWARDED',
-                'REMOTE_ADDR',
-            ];
-
-            foreach ($ipHolders as $key) {
-                if ($request->server->get($key)) {
-                    $ip = trim($request->server->get($key));
-
-                    if (str_contains($ip, ',')) {
-                        $ip = $this->getClientIpFromProxyList($ip);
-                    }
-
-                    // Validate IP
-                    if (null !== $ip && $this->ipIsValid($ip)) {
-                        return $ip;
-                    }
-                }
-            }
-        }
-
-        // if everything else fails
-        return '127.0.0.1';
+        return null !== $request ? $this->getIpAddressFromRequestObject($request) : '127.0.0.1';
     }
 
     /**
@@ -417,30 +389,6 @@ class IpLookupHelper implements ResetInterface
             return $this->getIpAddress()->isTrackable();
         }
 
-        // Skip HEAD requests - often used by bots/monitoring tools
-        if ($request->isMethod('HEAD')) {
-            return false;
-        }
-
-        // Skip prefetch requests (browser prefetching links)
-        $purpose = $request->headers->get('Purpose') ?? $request->headers->get('Sec-Purpose');
-        if ($purpose && in_array(strtolower($purpose), ['prefetch', 'prerender'], true)) {
-            return false;
-        }
-
-        // Respect privacy signals - Global Privacy Control (legally required in California/CCPA)
-        $secGpc = trim((string) ($request->headers->get('Sec-GPC') ?? $request->server->get('HTTP_SEC_GPC')));
-        if ('1' === $secGpc) {
-            return false;
-        }
-
-        // Respect Do Not Track header
-        $dnt = trim((string) ($request->headers->get('DNT') ?? $request->server->get('HTTP_DNT')));
-        if ('1' === $dnt) {
-            return false;
-        }
-
-        // Use existing IP/User-Agent based bot filtering
         return $this->isRequestTrackableForRequest($request);
     }
 
