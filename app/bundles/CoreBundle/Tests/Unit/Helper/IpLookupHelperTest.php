@@ -106,6 +106,18 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->getIpHelper()->isRequestTrackableForRequest($request, false));
     }
 
+    #[TestDox('Check that email tracking still rejects ordinary device-detector bots')]
+    public function testEmailTrackingCanUseDeviceDetectorBotClassification(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.55']);
+        $request->headers->set('User-Agent', 'KnownBot/1.0');
+
+        $this->deviceDetector->expects($this->once())->method('parse');
+        $this->deviceDetector->method('isBot')->willReturn(true);
+
+        $this->assertFalse($this->getIpHelper()->isRequestTrackableForRequest($request));
+    }
+
     #[TestDox('Check that the user-agent-dependent IP cache is reset between worker messages')]
     public function testResetClearsUserAgentDependentIpCache(): void
     {

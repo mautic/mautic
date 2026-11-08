@@ -522,7 +522,7 @@ class Stat
     }
 
     /**
-     * @param string $details
+     * @param array{datetime: string, useragent: string, inBrowser: bool} $details
      */
     public function addOpenDetails($details): void
     {

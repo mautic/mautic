@@ -95,7 +95,7 @@ class BotRatioHelper
         return $this->isBotByMatomoDetector($userAgent);
     }
 
-    private function isMailProviderProxy(string $userAgent): bool
+    public function isMailProviderProxy(string $userAgent): bool
     {
         $userAgent = strtolower($userAgent);
 
