@@ -4,9 +4,6 @@ namespace Mautic\ApiBundle\Model;
 
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
-use Mautic\ApiBundle\Event\ClientEvent;
-use Mautic\ApiBundle\Event\ClientPostDeleteEvent;
-use Mautic\ApiBundle\Event\ClientPostSaveEvent;
 use Mautic\ApiBundle\Form\Type\ClientType;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
@@ -14,7 +11,6 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -97,41 +93,6 @@ final class ClientModel extends FormModel implements GlobalSearchInterface
         }
 
         return parent::getEntity($id);
-    }
-
-    /**
-     * @param Client $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Client) {
-            throw new MethodNotAllowedHttpException(['Client']);
-        }
-
-        $name = match ($action) {
-            'post_save'   => ClientPostSaveEvent::class,
-            'post_delete' => ClientPostDeleteEvent::class,
-            default       => null,
-        };
-
-        if (null === $name) {
-            return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof ClientEvent) {
-                $event = 'post_save' === $action
-                    ? new ClientPostSaveEvent($entity, $isNew)
-                    : new ClientPostDeleteEvent($entity, $isNew);
-            }
-            $this->dispatcher->dispatch($event);
-
-            return $event;
-        }
-
-        return null;
     }
 
     public function getUserClients(User $user): array
