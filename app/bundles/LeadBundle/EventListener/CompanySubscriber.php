@@ -3,14 +3,15 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Event as Events;
-use Mautic\LeadBundle\Event\CompanyPostDeleteEvent;
-use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
-use Mautic\LeadBundle\Event\CompanyPreSaveEvent;
 use Mautic\LeadBundle\Event\CompanySoftDeleteEvent;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -30,12 +31,14 @@ final readonly class CompanySubscriber
     /**
      * Add a company entry to the audit log.
      */
-    #[AsEventListener(
-        event: CompanyPostSaveEvent::class,
-    )]
-    public function onCompanyPostSave(Events\CompanyEvent $event): void
+    #[AsEventListener]
+    public function onCompanyPostSave(EntityPostSave $event): void
     {
-        $company = $event->getCompany();
+        $company = $event->getEntity();
+        if (!$company instanceof Company) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'lead',
@@ -53,13 +56,15 @@ final readonly class CompanySubscriber
     /**
      * Add a company delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: CompanyPostDeleteEvent::class,
-    )]
-    public function onCompanyDelete(Events\CompanyEvent $event): void
+    #[AsEventListener]
+    public function onCompanyDelete(EntityPostDelete $event): void
     {
-        $company = $event->getCompany();
-        $log     = [
+        $company = $event->getEntity();
+        if (!$company instanceof Company) {
+            return;
+        }
+
+        $log = [
             'bundle'    => 'lead',
             'object'    => 'company',
             'objectId'  => $company->deletedId,
@@ -96,18 +101,21 @@ final readonly class CompanySubscriber
         $this->companyModel->permanentDeleteCompany($event->getCompany());
     }
 
-    #[AsEventListener(
-        event: CompanyPreSaveEvent::class,
-    )]
-    public function onCompanyPreSave(Events\CompanyEvent $event): void
+    #[AsEventListener]
+    public function onCompanyPreSave(EntityPreSave $event): void
     {
+        $company = $event->getEntity();
+        if (!$company instanceof Company) {
+            return;
+        }
+
         if ($this->coreParametersHelper->get('update_company_mapping_data_in_background', false)) {
             return;
         }
-        if ($event->getCompany()->isNew() || empty($event->getCompany()->getChanges()['fields']['companyname'])) {
+        if ($company->isNew() || empty($company->getChanges()['fields']['companyname'])) {
             return;
         }
-        $this->companyLeadRepository->updateLeadsPrimaryCompanyName($event->getCompany());
+        $this->companyLeadRepository->updateLeadsPrimaryCompanyName($company);
     }
 
     private function clearCompanyInLeadsCompanyFields(?string $companyName): void

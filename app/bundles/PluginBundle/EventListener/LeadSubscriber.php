@@ -6,8 +6,6 @@ use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Event\EntityPreDelete;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Event\CompanyEvent;
-use Mautic\LeadBundle\Event\CompanyPreDeleteEvent;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
@@ -36,13 +34,14 @@ final readonly class LeadSubscriber
         return false;
     }
 
-    #[AsEventListener(
-        event: CompanyPreDeleteEvent::class,
-    )]
-    public function onCompanyDelete(CompanyEvent $event): bool
+    #[AsEventListener]
+    public function onCompanyDelete(EntityPreDelete $event): bool
     {
-        /** @var Company $company */
-        $company = $event->getCompany();
+        $company = $event->getEntity();
+        if (!$company instanceof Company) {
+            return false;
+        }
+
         $this->integrationEntityRepository->findLeadsToDelete('company%', $company->getId());
 
         return false;
