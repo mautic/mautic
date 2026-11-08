@@ -1620,6 +1620,51 @@ MJML;
         $this->assertFalse(isset($transport->sentMessage), 'The empty message must never reach the transport.');
     }
 
+    public function testValidRecipientAfterInvalidAddressIsStillSent(): void
+    {
+        $this->stubCoreParameters([
+            'mailer_convert_embed_images'  => false,
+            'mailer_append_tracking_pixel' => false,
+            'mailer_from_email'            => 'nobody@nowhere.com',
+            'mailer_reply_to_email'        => null,
+            'mailer_from_name'             => 'No Body',
+            'mailer_address_length_limit'  => 320,
+            'mailer_return_path'           => false,
+            'brand_name'                   => null,
+        ]);
+
+        $transport = new SmtpTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+        $mailer->setIdHash('abc123');
+
+        $email = new Email();
+        $email->setSubject('Stale fatal regression');
+        $email->setCustomHtml('<p>Body</p>');
+        $this->assertTrue($mailer->setEmail($email), 'A usable email must compose successfully.');
+
+        // An invalid address makes addTo() log an error, which sets the mailer
+        // fatal. EmailModel::sendEmailToUser() then continues its loop without
+        // queue()/clearErrors(), so the state would leak into the next
+        // recipient's send unless dispatchPreSendEvent() resets it.
+        $this->assertFalse($mailer->addTo('not-an-email'), 'The invalid address must be rejected by addTo().');
+
+        $this->assertTrue($mailer->addTo('valid@example.com'));
+
+        // queue() may legitimately return false here because the invalid-
+        // address error is still in the error list when send() runs (upstream
+        // semantics: any error recorded for the batch fails the queue call).
+        // The regression this test pins is whether the message reaches the
+        // transport for the valid recipient — dispatchPreSendEvent() must not
+        // preserve the earlier fatal state, or the valid recipient is
+        // silently dropped.
+        $mailer->queue(true);
+
+        $this->assertTrue(isset($transport->sentMessage), 'A valid recipient must reach the transport even when an earlier addTo() recorded an error.');
+        $to = $transport->sentMessage->getTo();
+        $this->assertCount(1, $to, 'The transport must send to exactly one recipient.');
+        $this->assertSame('valid@example.com', $to[0]->getAddress(), 'The transport must send to the valid recipient only.');
+    }
+
     public function testSetEmailFailsWhenMjmlThemeSkippedAndNoPlainText(): void
     {
         $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([

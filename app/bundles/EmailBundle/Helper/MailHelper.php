@@ -222,6 +222,15 @@ class MailHelper
      */
     protected $fatal = false;
 
+    /**
+     * Set when setEmail() finds no usable message body (an MJML theme fallback
+     * was skipped and there is no plain text). Tracked separately from $fatal
+     * so a generic fatal recorded for one recipient (e.g. an invalid address in
+     * addTo()) cannot stick to later recipients' sends, while an unusable body
+     * still blocks every send/flush until reset() or clearErrors().
+     */
+    protected bool $unusableBody = false;
+
     protected bool $skip = false;
 
     /**
@@ -333,7 +342,7 @@ class MailHelper
         }
 
         $this->dispatchPreSendEvent();
-        if (empty($this->fatal)) {
+        if (empty($this->fatal) && !$this->unusableBody) {
             if (!$isQueueFlush) {
                 // Search/replace tokens if this is not a queue flush
 
@@ -544,7 +553,7 @@ class MailHelper
     public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
     {
         // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
-        $flushed = empty($this->fatal);
+        $flushed = empty($this->fatal) && !$this->unusableBody;
         if ($this->tokenizationEnabled && count($this->metadata) && $flushed) {
             $errors             = $this->errors;
             $errors['failures'] = [];
@@ -624,6 +633,7 @@ class MailHelper
         $this->contentHash      = null;
         $this->internalSend     = false;
         $this->fatal            = false;
+        $this->unusableBody     = false;
         $this->idHashState      = true;
 
         if ($cleanSlate) {
@@ -1227,6 +1237,17 @@ class MailHelper
     }
 
     /**
+     * Detect an MJML root opening tag, including attribute-bearing forms like
+     * <mjml lang="en">. Shared by MailHelper::setEmail() (send-time fallback
+     * check) and EmailModel::validateMjmlThemeHasCustomHtml() (save-time
+     * validation) so the two gates can never diverge on what counts as MJML.
+     */
+    public static function hasMjmlRootTag(string $html): bool
+    {
+        return (bool) preg_match('/<mjml[\\s>]/', $html);
+    }
+
+    /**
      * @param bool  $allowBcc            Honor BCC if set in email
      * @param array $assetAttachments    Assets to send
      * @param bool  $ignoreTrackingPixel Do not append tracking pixel HTML
@@ -1278,9 +1299,7 @@ class MailHelper
             // Bundled themes since Mautic 5 are MJML. GrapesJS compiles them into
             // customHtml client-side; sending the raw theme template as text/html
             // delivers uncompiled <mjml> markup to recipients.
-            // Match <mjml> and attribute-bearing opening tags (<mjml lang="en">)
-            // alike: uploaded themes may render attributes on the root element.
-            if (preg_match('/<mjml[\s>]/', $renderedHtml)) {
+            if (self::hasMjmlRootTag($renderedHtml)) {
                 $this->logger->warning(sprintf(
                     'Email%s uses MJML theme "%s" with empty customHtml; skipping theme HTML fallback to avoid sending uncompiled MJML.',
                     null !== $email->getId() ? ' ID '.$email->getId() : '',
@@ -1291,11 +1310,11 @@ class MailHelper
 
                 // When the theme fallback is skipped and there is no plain text
                 // either, the message has no usable body. Hard-fail setEmail()
-                // and mark the mailer fatal (the flag send() and flushQueue()
-                // check before handing the message to the transport) so the send
-                // is aborted rather than delivering an empty email.
+                // and track the unusable body (send() and flushQueue() check it
+                // before handing the message to the transport) so the send is
+                // aborted rather than delivering an empty email.
                 if (empty($plainText)) {
-                    $this->fatal    = true;
+                    $this->unusableBody = true;
                     $this->errors[] = sprintf(
                         'Email%s uses MJML theme "%s" with empty customHtml and no plain text; the email has no usable body and cannot be sent.',
                         null !== $email->getId() ? ' ID '.$email->getId() : '',
@@ -1598,8 +1617,9 @@ class MailHelper
      */
     public function clearErrors(): void
     {
-        $this->errors = [];
-        $this->fatal  = false;
+        $this->errors       = [];
+        $this->fatal        = false;
+        $this->unusableBody = false;
     }
 
     /**
@@ -2137,10 +2157,13 @@ class MailHelper
         $event = new EmailSendEvent($this);
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PRE_SEND);
 
-        $this->skip               = $event->isSkip();
-        // Keep a fatal state set before the dispatch (e.g. setEmail() marking an
-        // unusable message) — listeners can only escalate it, never clear it.
-        $this->fatal              = $this->fatal || $event->isFatal();
+        $this->skip = $event->isSkip();
+        // The pre-dispatch fatal (e.g. from addTo() rejecting an invalid
+        // address) must NOT carry into this send: the overwrite is what lets a
+        // later valid recipient go out after an earlier invalid one. Message-
+        // level "cannot be sent" state lives in $unusableBody, checked in
+        // send()/flushQueue() independently of this event.
+        $this->fatal = $event->isFatal();
         $errors                   = $event->getErrors();
         if ([] !== $errors) {
             $currentErrors = [];
