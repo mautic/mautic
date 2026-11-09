@@ -15,7 +15,6 @@ use Mautic\EmailBundle\Form\Type\ConfigMonitoredMailboxesType;
 use Mautic\EmailBundle\Form\Type\ConfigType;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Mailer\Transport\TransportFactory;
-use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Validator\DsnValidator;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator;
 use Mautic\LeadBundle\Validator\CustomFieldValidator;
@@ -35,12 +34,6 @@ final class ConfigTypeTest extends TypeTestCase
 {
     protected function getExtensions(): array
     {
-        // Some local environments do not have ext-imap loaded, but Mailbox uses these
-        // constants in method signatures and class loading fails without them.
-        defined('SORTARRIVAL') || define('SORTARRIVAL', 0);
-        defined('SE_UID') || define('SE_UID', 1);
-        defined('FT_PEEK') || define('FT_PEEK', 2);
-
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
 
@@ -71,7 +64,7 @@ final class ConfigTypeTest extends TypeTestCase
         $configType                     = new ConfigType($translator);
         $preferenceCenterList           = new PreferenceCenterListType($pageModelMock, $permsMock);
         $configMonitoredEmail           = new ConfigMonitoredEmailType(new EventDispatcher());
-        $configMonitoredMailboxes       = new ConfigMonitoredMailboxesType($this->createStub(Mailbox::class));
+        $configMonitoredMailboxes       = new ConfigMonitoredMailboxesType();
         $dsnValidator                   = new DsnValidator($this->createStub(TransportFactory::class));
         $emailOrEmailTokenListValidator = new EmailOrEmailTokenListValidator($this->createStub(EmailValidator::class), $this->createStub(CustomFieldValidator::class));
         $validator                      = Validation::createValidatorBuilder()
@@ -136,5 +129,30 @@ final class ConfigTypeTest extends TypeTestCase
         $this->assertSame('email', $data['email_default_utm_medium']);
         $this->assertSame('spring-promo', $data['email_default_utm_campaign']);
         $this->assertSame('header-link', $data['email_default_utm_content']);
+    }
+
+    public function testBuildingMonitoredMailboxFormKeepsTheExistingFolderWithoutConnectingToImap(): void
+    {
+        $form = $this->factory->create(
+            ConfigMonitoredMailboxesType::class,
+            [
+                'host'     => 'imap.example.invalid',
+                'port'     => '993',
+                'user'     => 'monitor@example.invalid',
+                'password' => 'invalid-password',
+                'folder'   => 'Custom',
+            ],
+            [
+                'mailbox'          => 'EmailBundle_bounces',
+                'default_folder'   => 'INBOX',
+                'general_settings' => [],
+            ]
+        );
+
+        $this->assertTrue($form->has('folder'));
+        $this->assertSame(
+            ['INBOX' => 'INBOX', 'Trash' => 'Trash', 'Custom' => 'Custom'],
+            $form->get('folder')->getConfig()->getOption('choices')
+        );
     }
 }
