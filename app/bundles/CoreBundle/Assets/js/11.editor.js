@@ -238,7 +238,7 @@ Mautic.getFeedItems = function (queryText) {
         setTimeout( () => {
             const itemsToDisplay = Mautic.builderTokensForCkEditor
                 .filter( isItemMatching )
-                .slice( 0, 5 );
+                .slice( 0, 20 );
             resolve( itemsToDisplay );
         }, 100 );
     } );
@@ -266,7 +266,7 @@ Mautic.getTokensForPlugIn = function(method) {
                 mQuery.extend(Mautic.builderTokens, Mautic.dynamicContentTokens);
                 Mautic.builderTokensForCkEditor = mQuery.map(Mautic.builderTokens, function(value, i) {
                     return {'id':i, 'name':value};
-                });
+                }).sort((a, b) => a.name.localeCompare(b.name));
             }
         },
         error: function (request, textStatus, errorThrown) {
@@ -436,7 +436,8 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
                     {
                         marker: '{',
                         feed: Mautic.getFeedItems,
-                        itemRenderer: Mautic.customItemRenderer
+                        itemRenderer: Mautic.customItemRenderer,
+                        minimumCharacters: 0
                     }
                 ]
             }
