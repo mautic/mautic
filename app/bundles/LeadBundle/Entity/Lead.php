@@ -181,6 +181,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $eventLog;
 
     /**
+     * @var DoNotContact[]
+     */
+    private array $newDoNotContacts = [];
+
+    /**
      * @var \DateTimeInterface
      */
     #[Groups(['contact:read'])]
@@ -1115,6 +1120,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             'comments' => $doNotContact->getComments(),
         ];
 
+        $this->newDoNotContacts[] = $doNotContact;
+
         $this->doNotContact[$doNotContact->getChannel()] = $doNotContact;
 
         return $this;
@@ -1129,6 +1136,21 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         ];
 
         $this->doNotContact->removeElement($doNotContact);
+    }
+
+    /**
+     * DoNotContact entries added since the last reset. They only get an ID once the contact is saved.
+     *
+     * @return DoNotContact[]
+     */
+    public function getNewDoNotContacts(): array
+    {
+        return $this->newDoNotContacts;
+    }
+
+    public function resetNewDoNotContacts(): void
+    {
+        $this->newDoNotContacts = [];
     }
 
     /**
