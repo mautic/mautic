@@ -24,16 +24,17 @@ use Symfony\Component\Routing\RouterInterface;
 final class LookupHelperTest extends TestCase
 {
     /**
-     * Without a settings row, or while unpublished, FullContact is not configured:
-     * lookups do nothing instead of failing.
+     * Without a settings row, or while unpublished, FullContact is not configured: lookups do nothing
+     * instead of failing. An automatic lookup also does nothing while auto update is off.
      */
-    #[DataProvider('notConfiguredProvider')]
-    public function testLookupsDoNothingWhenNotConfigured(bool $hasSettingsRow): void
+    #[DataProvider('noLookupProvider')]
+    public function testLookupsDoNothing(bool $hasSettingsRow, bool $isPublished, bool $checkAuto): void
     {
         $integrationsHelper = $this->createStub(IntegrationsHelper::class);
         if ($hasSettingsRow) {
             $settings = new Integration();
-            $settings->setIsPublished(false);
+            $settings->setIsPublished($isPublished);
+            $settings->setApiKeys(['apikey' => 'test-key', 'auto_update' => false]);
             $integration = new FullContactIntegration();
             $integration->setIntegrationConfiguration($settings);
             $integrationsHelper->method('getIntegration')->willReturn($integration);
@@ -61,19 +62,20 @@ final class LookupHelperTest extends TestCase
 
         $lead = new Lead();
         $lead->setEmail('john@example.com');
-        $helper->lookupContact($lead);
+        $helper->lookupContact($lead, false, $checkAuto);
 
         $company = new Company();
         $company->addUpdatedField('companywebsite', 'https://example.com');
-        $helper->lookupCompany($company);
+        $helper->lookupCompany($company, false, $checkAuto);
     }
 
     /**
-     * @return iterable<string, array{bool}>
+     * @return iterable<string, array{bool, bool, bool}>
      */
-    public static function notConfiguredProvider(): iterable
+    public static function noLookupProvider(): iterable
     {
-        yield 'no settings row' => [false];
-        yield 'unpublished' => [true];
+        yield 'no settings row' => [false, false, false];
+        yield 'unpublished' => [true, false, false];
+        yield 'automatic lookup with auto update off' => [true, true, true];
     }
 }
