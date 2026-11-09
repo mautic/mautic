@@ -42,7 +42,7 @@ final class PreferenceBuilder
     /**
      * @param string $channel
      */
-    private function addChannelRule($channel, array $rule, LeadEventLog $log, int $priority): void
+    private function addChannelRule(int|string $channel, array $rule, LeadEventLog $log, int $priority): void
     {
         $channelPreferences = $this->getChannelPreferenceObject($channel, $priority);
 
@@ -69,7 +69,7 @@ final class PreferenceBuilder
      *
      * @return ChannelPreferences
      */
-    private function getChannelPreferenceObject($channel, int $priority)
+    private function getChannelPreferenceObject(int|string $channel, int $priority)
     {
         if (!isset($this->channels[$channel])) {
             $this->channels[$channel] = new ChannelPreferences($this->event);
