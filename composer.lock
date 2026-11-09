@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c1cc20196efbbb8d2124a505be232159",
+    "content-hash": "1f923f3758bb802a89c777713ea21362",
     "packages": [
         {
             "name": "api-platform/core",
@@ -5954,7 +5954,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "11bbfbc71ad89f8320435b335fc0a9b0ef4c89c5"
+                "reference": "02565e9e24b9010ed330a6dc74dbaa53daa2c087"
             },
             "require": {
                 "api-platform/core": "^4.3.0",
@@ -15918,11 +15918,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.3.4",
+            "version": "2.3.5",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/f20ce6f3c82556cfcfc086b152445a12d1d64fff",
-                "reference": "f20ce6f3c82556cfcfc086b152445a12d1d64fff",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/645a1bd6bead15fc1b8474137467961d0fa30a79",
+                "reference": "645a1bd6bead15fc1b8474137467961d0fa30a79",
                 "shasum": ""
             },
             "require": {
@@ -15978,7 +15978,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-28T22:38:53+00:00"
+            "time": "2026-11-03T12:14:22+00:00",
+            "published-time": "2026-11-03T12:14:36+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -16792,21 +16793,21 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.8.3",
+            "version": "2.8.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "12ddb68d34acb91bcf3d00302bf1c7c1b5840bd6"
+                "reference": "55acbd956d7e3907f7d21aab54edd68a310609e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/12ddb68d34acb91bcf3d00302bf1c7c1b5840bd6",
-                "reference": "12ddb68d34acb91bcf3d00302bf1c7c1b5840bd6",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/55acbd956d7e3907f7d21aab54edd68a310609e6",
+                "reference": "55acbd956d7e3907f7d21aab54edd68a310609e6",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.4|^8.0",
-                "phpstan/phpstan": "^2.3.4"
+                "phpstan/phpstan": "^2.3.5"
             },
             "conflict": {
                 "rector/rector-doctrine": "*",
@@ -16837,7 +16838,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.8.3"
+                "source": "https://github.com/rectorphp/rector/tree/2.8.4"
             },
             "funding": [
                 {
@@ -16845,7 +16846,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-29T05:51:41+00:00"
+            "time": "2026-11-03T18:48:08+00:00",
+            "published-time": "2026-11-03T18:48:15+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -18212,16 +18214,16 @@
         },
         {
             "name": "symplify/easy-coding-standard",
-            "version": "13.3.12",
+            "version": "13.3.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ecsphp/ecs.git",
-                "reference": "712df94dba55ddda2a8f360a65c13fa3160f24b2"
+                "reference": "4a975bfa3cee8b4ddb3b1fae9934e8ffde155271"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ecsphp/ecs/zipball/712df94dba55ddda2a8f360a65c13fa3160f24b2",
-                "reference": "712df94dba55ddda2a8f360a65c13fa3160f24b2",
+                "url": "https://api.github.com/repos/ecsphp/ecs/zipball/4a975bfa3cee8b4ddb3b1fae9934e8ffde155271",
+                "reference": "4a975bfa3cee8b4ddb3b1fae9934e8ffde155271",
                 "shasum": ""
             },
             "require": {
@@ -18254,9 +18256,10 @@
             ],
             "support": {
                 "issues": "https://github.com/ecsphp/ecs/issues",
-                "source": "https://github.com/ecsphp/ecs/tree/13.3.12"
+                "source": "https://github.com/ecsphp/ecs/tree/13.3.15"
             },
-            "time": "2026-10-29T14:53:28+00:00"
+            "time": "2026-11-07T20:02:40+00:00",
+            "published-time": "2026-11-07T20:03:48+00:00"
         },
         {
             "name": "symplify/phpstan-rules",
@@ -18604,5 +18607,5 @@
     "platform-overrides": {
         "php": "8.4.1"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.11.0"
 }
