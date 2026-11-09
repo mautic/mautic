@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Tests\Translation;
 
 use Mautic\CoreBundle\DependencyInjection\Compiler\TranslationLoaderPass;
 use Mautic\CoreBundle\Translation\MauticResourceTranslator;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\Container;
@@ -33,7 +32,7 @@ final class MauticResourceTranslatorTest extends TestCase
         $container->register('translator.default', Translator::class)
             ->setArgument(4, $options)
             ->setArgument(5, $enabledLocales);
-        (new TranslationLoaderPass())->process($container);
+        new TranslationLoaderPass()->process($container);
         $warmupLocales = $container->getDefinition('translator.mautic_resource')->getArgument(1);
 
         $loader = new class() implements LoaderInterface {
@@ -55,10 +54,10 @@ final class MauticResourceTranslatorTest extends TestCase
             $translator = $createTranslator();
             $translator->warmUp($cacheDir);
 
-            Assert::assertSame('Deutsch', $translator->trans('warmup.probe', [], null, 'de'));
-            Assert::assertSame('Deutsch', $createTranslator()->trans('warmup.probe', [], null, 'de'));
+            $this->assertSame('Deutsch', $translator->trans('warmup.probe', [], null, 'de'));
+            $this->assertSame('Deutsch', $createTranslator()->trans('warmup.probe', [], null, 'de'));
         } finally {
-            (new Filesystem())->remove($cacheDir);
+            new Filesystem()->remove($cacheDir);
         }
     }
 
