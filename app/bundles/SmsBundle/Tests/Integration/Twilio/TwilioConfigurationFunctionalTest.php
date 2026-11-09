@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Facade\EncryptionService;
 use Mautic\Migrations\Version20261109130000;
@@ -95,9 +96,11 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($settings);
         $this->em->flush();
 
-        $migration = new Version20261109130000($this->connection, new NullLogger());
-        $migration->setPrefix(MAUTIC_TABLE_PREFIX);
-        $migration->up($this->connection->createSchemaManager()->introspectSchema());
+        $schema    = $this->connection->createSchemaManager()->introspectSchema();
+        $migration = $this->createMigration();
+        // flat legacy keys present: the migration must run
+        $migration->preUp($schema);
+        $migration->up($schema);
 
         $this->em->clear();
         $settings = self::getContainer()->get(IntegrationRepository::class)->find($settings->getId());
@@ -109,5 +112,17 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
             ],
             $settings->getFeatureSettings()
         );
+
+        // nothing left to move: the migration is skipped
+        $this->expectException(SkipMigration::class);
+        $this->createMigration()->preUp($schema);
+    }
+
+    private function createMigration(): Version20261109130000
+    {
+        $migration = new Version20261109130000($this->connection, new NullLogger());
+        $migration->setPrefix(MAUTIC_TABLE_PREFIX);
+
+        return $migration;
     }
 }
