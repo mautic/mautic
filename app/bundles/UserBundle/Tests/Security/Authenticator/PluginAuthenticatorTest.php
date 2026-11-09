@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Security\Authenticator;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PluginBundle\Integration\AbstractSsoServiceIntegration;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\AuthenticationEvent;
 use Mautic\UserBundle\Event\PreAuthenticationEvent;
@@ -45,12 +44,11 @@ final class PluginAuthenticatorTest extends TestCase
 
         $userProvider = $this->createStub(UserProviderInterface::class);
 
-        $integrationService = $this->createStub(AbstractSsoServiceIntegration::class);
         $integrationHelper  = $this->createMock(IntegrationHelper::class);
         $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
             ->with($integration, ['sso_service'], false, null, true)
-            ->willReturn([$integrationService]);
+            ->willReturn([]);
 
         $authEvent = new PreAuthenticationEvent(
             null,
@@ -59,7 +57,7 @@ final class PluginAuthenticatorTest extends TestCase
             $request,
             false, // because there is no request attributes
             $integration,
-            [$integrationService]
+            []
         );
 
         // If there will be an issue with this, then please replace with proper class name.
@@ -119,12 +117,11 @@ final class PluginAuthenticatorTest extends TestCase
 
         $userProvider = $this->createStub(UserProviderInterface::class);
 
-        $integrationService = $this->createStub(AbstractSsoServiceIntegration::class);
         $integrationHelper  = $this->createMock(IntegrationHelper::class);
         $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
             ->with($integration, ['sso_service'], false, null, true)
-            ->willReturn([$integrationService]);
+            ->willReturn([]);
 
         $authEvent = new PreAuthenticationEvent(
             null,
@@ -133,7 +130,7 @@ final class PluginAuthenticatorTest extends TestCase
             $request,
             false, // because there is no request attributes
             $integration,
-            [$integrationService]
+            []
         );
 
         // If there will be an issue with this, then please replace with proper class name.

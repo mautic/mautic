@@ -5701,18 +5701,6 @@ parameters:
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractSsoServiceIntegration\:\:extractAuthKeys\(\) has parameter \$data with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractSsoServiceIntegration.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractSsoServiceIntegration\:\:extractAuthKeys\(\) has parameter \$tokenOverride with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractSsoServiceIntegration.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Model\\IntegrationEntityModel\:\:getMauticContactsById\(\) has parameter \$integrationName with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
