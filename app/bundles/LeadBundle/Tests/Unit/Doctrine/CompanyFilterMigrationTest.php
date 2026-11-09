@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Unit\Doctrine;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\Migrations\Version20261109120000;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -53,7 +54,7 @@ final class CompanyFilterMigrationTest extends TestCase
                 'operator' => '=',
                 'filter'   => 'Germany',
             ]], 12],
-            [$parameters['filters'] ? unserialize($parameters['filters']) : null, $parameters['id']]
+            [$parameters['filters'] ? Serializer::decode($parameters['filters']) : null, $parameters['id']]
         );
     }
 
