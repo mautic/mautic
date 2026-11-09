@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Security\Authenticator;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\FormAuthenticationEvent;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
@@ -304,7 +305,7 @@ final class SsoAuthenticatorTest extends TestCase
             ->method('set')
             ->with(SecurityRequestAttributes::LAST_USERNAME, $username);
 
-        $integrations = [];
+        $integrations = [$this->createStub(UnifiedIntegrationInterface::class)];
         $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
             ->with($integration, ['sso_form'], false, null, true)
@@ -366,7 +367,7 @@ final class SsoAuthenticatorTest extends TestCase
             ->method('set')
             ->with(SecurityRequestAttributes::LAST_USERNAME, $username);
 
-        $integrations = [];
+        $integrations = [$this->createStub(UnifiedIntegrationInterface::class)];
         $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
             ->with($integration, ['sso_form'], false, null, true)
@@ -430,7 +431,7 @@ final class SsoAuthenticatorTest extends TestCase
             ->method('set')
             ->with(SecurityRequestAttributes::LAST_USERNAME, $username);
 
-        $integrations = [];
+        $integrations = [$this->createStub(UnifiedIntegrationInterface::class)];
         $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
             ->with($integration, ['sso_form'], false, null, true)
@@ -519,7 +520,7 @@ final class SsoAuthenticatorTest extends TestCase
             ->method('set')
             ->with(SecurityRequestAttributes::LAST_USERNAME, $username);
 
-        $integrations = [];
+        $integrations = [$this->createStub(UnifiedIntegrationInterface::class)];
         $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
             ->with($integration, ['sso_form'], false, null, true)
