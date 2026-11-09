@@ -50,7 +50,10 @@ class DoNotContact implements MauticModelInterface
                 }
 
                 // The log must be created before the DNC is removed because the ID is gone once it is deleted.
-                $contact->addEventLog(LeadEventLog::forDoNotContact($contact, LeadEventLog::ACTION_SUBSCRIBED, $dnc));
+                // An entry without an ID was never saved, so the contact never was unsubscribed and there is nothing to log.
+                if (null !== $dnc->getId()) {
+                    $contact->addEventLog(LeadEventLog::forDoNotContact($contact, LeadEventLog::ACTION_SUBSCRIBED, $dnc));
+                }
                 $contact->removeDoNotContactEntry($dnc);
 
                 if ($persist) {

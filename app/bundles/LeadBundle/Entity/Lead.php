@@ -1135,6 +1135,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             'comments'   => $doNotContact->getComments(),
         ];
 
+        // An entry that is added and removed before the contact is saved never reaches the database.
+        $this->newDoNotContacts = array_values(array_filter(
+            $this->newDoNotContacts,
+            static fn (DoNotContact $newDoNotContact): bool => $newDoNotContact !== $doNotContact
+        ));
+
         $this->doNotContact->removeElement($doNotContact);
     }
 

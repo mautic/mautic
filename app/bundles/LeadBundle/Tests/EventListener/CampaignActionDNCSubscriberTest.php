@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
-use PHPUnit\Framework\Assert;
 
 final class CampaignActionDNCSubscriberTest extends MauticMysqlTestCase
 {
@@ -32,23 +31,23 @@ final class CampaignActionDNCSubscriberTest extends MauticMysqlTestCase
             ['--campaign-id' => $campaign->getId()]
         );
 
-        Assert::assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
+        $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         // The DNC record was added by the campaign but also removed right after. So there should be none.
-        Assert::assertNull($this->em->getRepository(DoNotContact::class)->findOneBy(['lead' => $contact]));
+        $this->assertNotInstanceOf(DoNotContact::class, $this->em->getRepository(DoNotContact::class)->findOneBy(['lead' => $contact]));
 
         $logs = $this->em->getRepository(LeadEventLog::class)->findBy(['object' => 'dnc'], ['id' => 'ASC']);
-        Assert::assertCount(2, $logs);
+        $this->assertCount(2, $logs);
 
-        Assert::assertSame('unsubscribed', $logs[0]->getAction());
-        Assert::assertSame('email', $logs[0]->getProperties()['channel']);
-        Assert::assertSame(DoNotContact::MANUAL, $logs[0]->getProperties()['reason']);
-        Assert::assertSame('Test reason', $logs[0]->getProperties()['comments']);
+        $this->assertSame('unsubscribed', $logs[0]->getAction());
+        $this->assertSame('email', $logs[0]->getProperties()['channel']);
+        $this->assertSame(DoNotContact::MANUAL, $logs[0]->getProperties()['reason']);
+        $this->assertSame('Test reason', $logs[0]->getProperties()['comments']);
 
-        Assert::assertSame('subscribed', $logs[1]->getAction());
-        Assert::assertSame('email', $logs[1]->getProperties()['channel']);
-        Assert::assertSame(DoNotContact::MANUAL, $logs[1]->getProperties()['reason'], 'The reason of the removed DNC is stored.');
-        Assert::assertSame('', $logs[1]->getProperties()['comments']);
+        $this->assertSame('subscribed', $logs[1]->getAction());
+        $this->assertSame('email', $logs[1]->getProperties()['channel']);
+        $this->assertSame(DoNotContact::MANUAL, $logs[1]->getProperties()['reason'], 'The reason of the removed DNC is stored.');
+        $this->assertSame('', $logs[1]->getProperties()['comments']);
     }
 
     private function addContactToCampaign(Lead $contact, Campaign $campaign): void

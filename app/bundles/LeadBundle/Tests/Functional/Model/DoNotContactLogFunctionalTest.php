@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use PHPUnit\Framework\Assert;
 
 final class DoNotContactLogFunctionalTest extends MauticMysqlTestCase
 {
@@ -21,32 +20,26 @@ final class DoNotContactLogFunctionalTest extends MauticMysqlTestCase
         $this->getDncModel()->addDncForContact($contact->getId(), 'email', DoNotContact::UNSUBSCRIBED, 'Clicked the link');
 
         $logs = $this->getLogs();
-        Assert::assertCount(1, $logs);
-        Assert::assertSame('unsubscribed', $logs[0]->getAction());
-        Assert::assertSame('lead', $logs[0]->getBundle());
-        Assert::assertSame($contact->getId(), $logs[0]->getLead()->getId());
+        $this->assertCount(1, $logs);
+        $this->assertSame('unsubscribed', $logs[0]->getAction());
+        $this->assertSame('lead', $logs[0]->getBundle());
+        $this->assertSame($contact->getId(), $logs[0]->getLead()->getId());
 
         $dnc = $this->em->getRepository(DoNotContact::class)->findOneBy(['lead' => $contact]);
-        Assert::assertSame($dnc->getId(), $logs[0]->getObjectId());
-        Assert::assertSame(
-            ['channel' => 'email', 'channel_id' => null, 'reason' => DoNotContact::UNSUBSCRIBED, 'comments' => 'Clicked the link'],
-            $logs[0]->getProperties()
-        );
+        $this->assertInstanceOf(DoNotContact::class, $dnc);
+        $this->assertSame($dnc->getId(), $logs[0]->getObjectId());
+        $this->assertEquals(['channel' => 'email', 'channel_id' => null, 'reason' => DoNotContact::UNSUBSCRIBED, 'comments' => 'Clicked the link'], $logs[0]->getProperties());
 
         $dncId = $dnc->getId();
         $this->em->clear();
 
-        Assert::assertTrue($this->getDncModel()->removeDncForContact($contact->getId(), 'email'));
+        $this->assertTrue($this->getDncModel()->removeDncForContact($contact->getId(), 'email'));
 
         $logs = $this->getLogs();
-        Assert::assertCount(2, $logs);
-        Assert::assertSame('subscribed', $logs[1]->getAction());
-        Assert::assertSame($dncId, $logs[1]->getObjectId());
-        Assert::assertSame(
-            ['channel' => 'email', 'channel_id' => null, 'reason' => DoNotContact::UNSUBSCRIBED, 'comments' => ''],
-            $logs[1]->getProperties(),
-            'The removed record\'s reason is stored.'
-        );
+        $this->assertCount(2, $logs);
+        $this->assertSame('subscribed', $logs[1]->getAction());
+        $this->assertSame($dncId, $logs[1]->getObjectId());
+        $this->assertEquals(['channel' => 'email', 'channel_id' => null, 'reason' => DoNotContact::UNSUBSCRIBED, 'comments' => ''], $logs[1]->getProperties(), 'The removed record\'s reason is stored.');
     }
 
     public function testSavingTheContactAgainDoesNotLogTheSameDncTwice(): void
@@ -56,19 +49,32 @@ final class DoNotContactLogFunctionalTest extends MauticMysqlTestCase
         $this->getDncModel()->addDncForContact($contact->getId(), 'email', DoNotContact::MANUAL, 'user');
 
         $contact = $this->em->getRepository(Lead::class)->find($contact->getId());
+        $this->assertInstanceOf(Lead::class, $contact);
         $contact->setFirstname('Changed');
         $this->getLeadModel()->saveEntity($contact);
         $this->getLeadModel()->saveEntity($contact);
 
-        Assert::assertCount(1, $this->getLogs());
+        $this->assertCount(1, $this->getLogs());
     }
 
     public function testRemovingAbsentDncIsNotLogged(): void
     {
         $contact = $this->createContact();
 
-        Assert::assertFalse($this->getDncModel()->removeDncForContact($contact->getId(), 'email'));
-        Assert::assertCount(0, $this->getLogs());
+        $this->assertFalse($this->getDncModel()->removeDncForContact($contact->getId(), 'email'));
+        $this->assertCount(0, $this->getLogs());
+    }
+
+    public function testDncAddedAndRemovedBeforeSavingIsNotLogged(): void
+    {
+        $contact = $this->createContact();
+
+        $this->getDncModel()->addDncForContact($contact->getId(), 'email', DoNotContact::MANUAL, 'user', false);
+        $this->getDncModel()->removeDncForContact($contact->getId(), 'email', false);
+        $this->getLeadModel()->saveEntity($this->getLeadModel()->getEntity($contact->getId()));
+
+        $this->assertCount(0, $this->getLogs());
+        $this->assertNotInstanceOf(DoNotContact::class, $this->em->getRepository(DoNotContact::class)->findOneBy(['lead' => $contact->getId()]));
     }
 
     private function createContact(): Lead
@@ -93,11 +99,11 @@ final class DoNotContactLogFunctionalTest extends MauticMysqlTestCase
 
     private function getDncModel(): DoNotContactModel
     {
-        return static::getContainer()->get(DoNotContactModel::class);
+        return self::getContainer()->get(DoNotContactModel::class);
     }
 
     private function getLeadModel(): LeadModel
     {
-        return static::getContainer()->get(LeadModel::class);
+        return self::getContainer()->get(LeadModel::class);
     }
 }
