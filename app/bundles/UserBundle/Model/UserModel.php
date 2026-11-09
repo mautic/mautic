@@ -157,19 +157,14 @@ final class UserModel extends FormModel implements GlobalSearchInterface
         return $entity;
     }
 
-    /**
-     * @return User|null
-     */
-    public function getSystemAdministrator(): ?object
+    public function getSystemAdministrator(): ?User
     {
         $adminRole = $this->roleRepository->findOneBy(['isAdmin' => true]);
 
-        return $this->userRepository->findOneBy(
-            [
-                'role'        => $adminRole,
-                'isPublished' => true,
-            ]
-        );
+        return $this->userRepository->findOneBy([
+            'role'        => $adminRole,
+            'isPublished' => true,
+        ]);
     }
 
     /**
