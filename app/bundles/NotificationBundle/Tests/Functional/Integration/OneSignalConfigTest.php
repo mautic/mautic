@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\NotificationBundle\Tests\Functional\Integration;
 
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Facade\EncryptionService;
 use Mautic\Migrations\Version20261109120000;
@@ -107,9 +108,11 @@ final class OneSignalConfigTest extends MauticMysqlTestCase
             'platforms'      => ['ios', 'android'],
         ]);
 
-        $migration = new Version20261109120000($this->connection, new NullLogger());
-        $migration->setPrefix(MAUTIC_TABLE_PREFIX);
-        $migration->up($this->connection->createSchemaManager()->introspectSchema());
+        $schema    = $this->connection->createSchemaManager()->introspectSchema();
+        $migration = $this->createMigration();
+        // flat legacy keys present: the migration must run
+        $migration->preUp($schema);
+        $migration->up($schema);
 
         $this->em->clear();
         $settings = self::getContainer()->get(IntegrationRepository::class)->find($settings->getId());
@@ -118,6 +121,18 @@ final class OneSignalConfigTest extends MauticMysqlTestCase
             ['integration' => ['subdomain_name' => 'acme', 'platforms' => ['ios', 'android']]],
             $settings->getFeatureSettings()
         );
+
+        // nothing left to move: the migration is skipped
+        $this->expectException(SkipMigration::class);
+        $this->createMigration()->preUp($schema);
+    }
+
+    private function createMigration(): Version20261109120000
+    {
+        $migration = new Version20261109120000($this->connection, new NullLogger());
+        $migration->setPrefix(MAUTIC_TABLE_PREFIX);
+
+        return $migration;
     }
 
     /**
