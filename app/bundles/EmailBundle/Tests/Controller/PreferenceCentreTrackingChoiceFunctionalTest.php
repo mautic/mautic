@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\TrackingPreference;
 use Mautic\LeadBundle\Helper\ContactTrackingPreferenceHelper;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * A contact can turn tracking of their activity off and on again from the preference centre.
@@ -36,7 +37,7 @@ final class PreferenceCentreTrackingChoiceFunctionalTest extends MauticMysqlTest
 
         $crawler = $this->client->request(Request::METHOD_GET, $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
-        $this->assertSame('Allow my activity to be recorded and associated with my profile', trim($crawler->filter('fieldset.activity-tracking legend')->text()), 'the question labels its choices');
+        $this->assertSame(self::getContainer()->get(TranslatorInterface::class)->trans('mautic.lead.preference.allow_activity_tracking'), trim($crawler->filter('fieldset.activity-tracking legend')->text()), 'the question labels its choices');
 
         $form = $crawler->filter('form')->form();
         $this->assertSame('1', $form[self::FIELD]->getValue(), 'tracking starts as allowed');
