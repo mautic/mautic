@@ -36,7 +36,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('window.MauticFocusItems', $content);
         $this->assertStringContainsString('loadTracking', $content);
         $this->assertMatchesRegularExpression('/trackingEnabled:(?:true|!0)/', $content);
-        $this->assertMatchesRegularExpression("/Focus\\.cookies\\.setItem\\(['\"]mautic_focus_{$focus->getId()}['\"]\\s*,\\s*-1\\s*,/", $content);
+        $this->assertMatchesRegularExpression("/Focus\\.setFocusCookie\\(['\"]mautic_focus_{$focus->getId()}['\"]\\s*,\\s*-1\\s*,/", $content);
         $this->assertStringNotContainsString('MauticJS', $content);
         $this->assertStringNotContainsString('mtc_id', $content);
         $this->assertStringNotContainsString('mautic_device_id', $content);

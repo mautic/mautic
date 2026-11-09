@@ -73,7 +73,7 @@ final class FocusTrackingCest
         $I->assertSame([], $this->trackingStorageAccess($state['storageAccess']));
         $this->assertIdentityValues($I, $state['identity']);
         $this->assertIdentityValuesAbsentFromRequests($I, $state['requests']);
-        $I->assertMatchesRegularExpression('/(?:^|; )mautic_focus_'.self::DISPLAY_FOCUS_ID.'=\d+(?:;|$)/', $state['identity']['cookies']);
+        $I->assertStringNotContainsString('mautic_focus_'.self::DISPLAY_FOCUS_ID, $state['identity']['cookies'], 'no frequency cookie before tracking is enabled');
 
         $formMarkerCount = $I->executeJS(sprintf(<<<'JS'
 var focus = window.MauticFocusItems[%d];
@@ -94,16 +94,13 @@ JS, self::DISPLAY_FOCUS_ID));
         $I->waitForJS('return document.querySelectorAll("iframe").length === 0', 10);
         $I->executeJS('window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].convertVisitor();');
         $modalState = $this->focusState($I, self::DISPLAY_FOCUS_ID);
-        $I->assertStringContainsString('mautic_focus_'.self::DISPLAY_FOCUS_ID.'=-1', $modalState['identity']['cookies']);
-        $I->assertStringContainsString('mautic_focus_'.self::DISPLAY_FOCUS_ID.'_closed=1', $modalState['identity']['cookies']);
-        $this->assertAllowedFocusCookieWrites($I, $modalState['cookieWrites'], [
-            'mautic_focus_'.self::DISPLAY_FOCUS_ID,
-            'mautic_focus_'.self::DISPLAY_FOCUS_ID.'_closed',
-        ]);
+        $I->assertStringNotContainsString('mautic_focus_'.self::DISPLAY_FOCUS_ID, $modalState['identity']['cookies'], 'no conversion or dismissal cookie before tracking is enabled');
+        $I->assertSame([], $modalState['cookieWrites']);
 
+        // Nothing was stored, so the next page shows the item again
         $this->openFixture($I, [$displayPath]);
-        $I->waitForJS('return window.focusFixture.finished && window.MauticFocusItems && window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].initialized', 10);
-        $I->assertSame(0, $I->executeJS('return document.querySelectorAll("iframe").length;'));
+        $this->waitForFocus($I, self::DISPLAY_FOCUS_ID, true);
+        $I->assertSame(1, $I->executeJS('return document.querySelectorAll("iframe").length;'));
 
         $barPath = $this->focusPath(self::BAR_FOCUS_ID, 'display');
         $this->openFixture($I, [$barPath]);
@@ -113,7 +110,6 @@ JS, self::DISPLAY_FOCUS_ID));
         $collapsedState = $this->focusState($I, self::BAR_FOCUS_ID);
         $I->assertStringContainsString('mf-bar-collapser-'.self::BAR_FOCUS_ID.'=90', $collapsedState['identity']['cookies']);
         $this->assertAllowedFocusCookieWrites($I, $collapsedState['cookieWrites'], [
-            'mautic_focus_'.self::BAR_FOCUS_ID,
             'mf-bar-collapser-'.self::BAR_FOCUS_ID,
         ]);
 
@@ -124,6 +120,42 @@ JS, self::DISPLAY_FOCUS_ID));
         $this->assertIdentityValues($I, $finalState['identity']);
         $I->seeNumRecords(0, 'test_focus_stats', ['focus_id' => self::DISPLAY_FOCUS_ID]);
         $I->seeNumRecords(0, 'test_focus_stats', ['focus_id' => self::BAR_FOCUS_ID]);
+    }
+
+    public function focusCookiesAreWrittenOnceTrackingIsEnabled(\AcceptanceTester $I): void
+    {
+        $this->openFixture($I, [$this->focusPath(self::DISPLAY_FOCUS_ID, 'display')], ['reset' => '1']);
+        $this->waitForFocus($I, self::DISPLAY_FOCUS_ID, true);
+        $I->executeJS('window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].iframeDoc.querySelector(".mf-modal-close a").click();');
+        $I->waitForJS('return document.querySelectorAll("iframe").length === 0', 10);
+        $I->assertSame([], $this->focusState($I, self::DISPLAY_FOCUS_ID)['cookieWrites']);
+
+        $I->executeJS('window.MauticFocus.enableTracking('.self::DISPLAY_FOCUS_ID.');');
+        $I->waitForJS('return window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].trackingEnabled === true', 10);
+        $this->waitForNetworkQuiet($I);
+
+        // What happened before consent is stored once tracking is enabled
+        $state = $this->focusState($I, self::DISPLAY_FOCUS_ID);
+        $I->assertSame([], $state['errors']);
+        $I->assertMatchesRegularExpression('/(?:^|; )mautic_focus_'.self::DISPLAY_FOCUS_ID.'=\d+(?:;|$)/', $state['identity']['cookies']);
+        $I->assertStringContainsString('mautic_focus_'.self::DISPLAY_FOCUS_ID.'_closed=1', $state['identity']['cookies']);
+
+        // Frequency capping works again: the item is shown once
+        $this->openFixture($I, [$this->focusPath(self::DISPLAY_FOCUS_ID, 'display')]);
+        $I->waitForJS('return window.focusFixture.finished && window.MauticFocusItems && window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].initialized', 10);
+        $I->assertSame(0, $I->executeJS('return document.querySelectorAll("iframe").length;'));
+
+        $barPath = $this->focusPath(self::BAR_FOCUS_ID, 'display');
+        $this->openFixture($I, [$barPath], ['reset' => '1']);
+        $this->waitForFocus($I, self::BAR_FOCUS_ID, true);
+        $I->executeJS('window.MauticFocus.enableTracking('.self::BAR_FOCUS_ID.');');
+        $I->waitForJS('return window.MauticFocusItems['.self::BAR_FOCUS_ID.'].trackingEnabled === true', 10);
+        $I->executeJS('document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.'").click();');
+        $I->waitForJS('return document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.' svg").getAttribute("data-transform-direction") === "90"', 10);
+
+        $barState = $this->focusState($I, self::BAR_FOCUS_ID);
+        $I->assertStringContainsString('mf-bar-collapser-'.self::BAR_FOCUS_ID.'=90', $barState['identity']['cookies']);
+        $I->assertMatchesRegularExpression('/(?:^|; )mautic_focus_'.self::BAR_FOCUS_ID.'=\d+(?:;|$)/', $barState['identity']['cookies']);
     }
 
     public function displayThenTrackingCountsMountedItemOnce(\AcceptanceTester $I): void

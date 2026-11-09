@@ -155,6 +155,8 @@
             waitingForTracking: false,
             trackingScript: null,
             pendingTrackingActivation: null,
+            // Frequency and dismissal values kept on the page until tracking is enabled
+            deferredCookies: {},
             trackingHooks: {
                 onEngage: function () {},
                 onConvert: function () {}
@@ -206,6 +208,7 @@
                 Focus.trackingLoading = false;
                 Focus.trackingRequested = false;
                 Focus.trackingEnabled = true;
+                Focus.writeDeferredCookies();
 
                 return true;
             },
@@ -545,11 +548,11 @@
             engageVisitor: function () {
                 var now = Math.floor(Date.now() / 1000);
 
-                if (Focus.cookies.hasItem('mautic_focus_{{ focus.id }}')) {
+                if (Focus.hasFocusCookie('mautic_focus_{{ focus.id }}')) {
                     if (Focus.debug)
                         console.log('Cookie exists thus checking frequency');
 
-                    var lastEngaged = parseInt(Focus.cookies.getItem('mautic_focus_{{ focus.id }}')),
+                    var lastEngaged = parseInt(Focus.getFocusCookie('mautic_focus_{{ focus.id }}')),
                         frequency = '{{ props.frequency }}',
                         engage;
 
@@ -714,8 +717,10 @@
                 if (Focus.debug)
                     console.log('mautic_focus_{{ focus.id }} cookie set for ' + now);
 
-                Focus.cookies.removeItem('mautic_focus_{{ focus.id }}');
-                Focus.cookies.setItem('mautic_focus_{{ focus.id }}', now, Infinity, '/');
+                if (Focus.trackingEnabled) {
+                    Focus.cookies.removeItem('mautic_focus_{{ focus.id }}');
+                }
+                Focus.setFocusCookie('mautic_focus_{{ focus.id }}', now, Infinity, '/');
                 if (Focus.trackingEnabled) {
                     Focus.trackingHooks.onEngage();
                 }
@@ -874,7 +879,7 @@
                     if (Focus.debug)
                         console.log('Visitor converted');
 
-                    Focus.cookies.setItem('mautic_focus_{{ focus.id }}', -1, Infinity, '/');
+                    Focus.setFocusCookie('mautic_focus_{{ focus.id }}', -1, Infinity, '/');
                 } else if (Focus.debug) {
                     console.log('Visitor converted but ignoreConverted not enabled');
                 }
@@ -898,8 +903,8 @@
             },
 
             getCloseCount() {
-                if (Focus.cookies.hasItem('mautic_focus_{{ focus.id }}_closed')) {
-                    return parseInt(Focus.cookies.getItem('mautic_focus_{{ focus.id }}_closed'))
+                if (Focus.hasFocusCookie('mautic_focus_{{ focus.id }}_closed')) {
+                    return parseInt(Focus.getFocusCookie('mautic_focus_{{ focus.id }}_closed'))
                 } else {
                     return 0;
                 }
@@ -907,7 +912,41 @@
 
             incrementCloseCount() {
                 var closeCount = Focus.getCloseCount();
-                Focus.cookies.setItem('mautic_focus_{{ focus.id }}_closed', ++closeCount);
+                Focus.setFocusCookie('mautic_focus_{{ focus.id }}_closed', ++closeCount);
+            },
+
+            // The frequency and dismissal cookies are only written once tracking is enabled
+            setFocusCookie: function (name, value, expires, path) {
+                if (!Focus.trackingEnabled) {
+                    Focus.deferredCookies[name] = {value, expires, path};
+
+                    return;
+                }
+
+                Focus.cookies.setItem(name, value, expires, path);
+            },
+
+            hasDeferredCookie: function (name) {
+                return Object.prototype.hasOwnProperty.call(Focus.deferredCookies, name);
+            },
+
+            hasFocusCookie: function (name) {
+                return Focus.hasDeferredCookie(name) || Focus.cookies.hasItem(name);
+            },
+
+            getFocusCookie: function (name) {
+                if (Focus.hasDeferredCookie(name)) {
+                    return String(Focus.deferredCookies[name].value);
+                }
+
+                return Focus.cookies.getItem(name);
+            },
+
+            writeDeferredCookies: function () {
+                Object.entries(Focus.deferredCookies).forEach(([name, cookie]) => {
+                    Focus.cookies.setItem(name, cookie.value, cookie.expires, cookie.path);
+                });
+                Focus.deferredCookies = {};
             },
 
             // Cookie handling
