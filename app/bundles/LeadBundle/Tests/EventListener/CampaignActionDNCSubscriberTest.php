@@ -69,8 +69,8 @@ final class CampaignActionDNCSubscriberTest extends MauticMysqlTestCase
         $this->em->persist($campaign);
         $this->em->flush();
 
-        $addDncAction    = $this->createEvent($campaign, 'lead.adddnc');
-        $removeDncAction = $this->createEvent($campaign, 'lead.removednc');
+        $addDncAction    = $this->createEvent($campaign, 'lead.adddnc', 1);
+        $removeDncAction = $this->createEvent($campaign, 'lead.removednc', 2);
 
         $this->em->flush();
 
@@ -125,12 +125,13 @@ final class CampaignActionDNCSubscriberTest extends MauticMysqlTestCase
         return $campaign;
     }
 
-    private function createEvent(Campaign $campaign, string $action): Event
+    private function createEvent(Campaign $campaign, string $action, int $order): Event
     {
         $event = new Event();
         $event->setCampaign($campaign);
         $event->setName('Remove DNC');
         $event->setType($action);
+        $event->setOrder($order);
         $event->setEventType(Event::TYPE_ACTION);
         $event->setTriggerMode(Event::TRIGGER_MODE_IMMEDIATE);
         $event->setProperties(
