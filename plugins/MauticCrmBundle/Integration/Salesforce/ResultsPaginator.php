@@ -9,26 +9,17 @@ final class ResultsPaginator
 {
     private ?array $results = null;
 
-    /**
-     * @var int
-     */
-    private $totalRecords = 0;
+    private int $totalRecords = 0;
 
     private int $recordCount = 0;
 
     private int $retryCount = 0;
 
-    /**
-     * @var string|null
-     */
-    private $nextRecordsUrl;
+    private ?string $nextRecordsUrl = null;
 
-    /**
-     * @param string $salesforceBaseUrl
-     */
     public function __construct(
         private readonly LoggerInterface $logger,
-        private $salesforceBaseUrl,
+        private string $salesforceBaseUrl,
     ) {
     }
 
@@ -91,6 +82,6 @@ final class ResultsPaginator
 
     public function getTotal(): int
     {
-        return (int) $this->totalRecords;
+        return $this->totalRecords;
     }
 }
