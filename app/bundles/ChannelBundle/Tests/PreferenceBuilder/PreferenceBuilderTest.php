@@ -100,6 +100,47 @@ final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $pushLogs);
     }
 
+    public function testRulesForChannelsNotInMessageAreIgnored(): void
+    {
+        $lead = $this->createMock(Lead::class);
+        $lead->expects($this->once())
+            ->method('getChannelRules')
+            ->willReturn(
+                [
+                    // Channel (core or custom) that is not part of the marketing message
+                    'whatsapp' => [
+                        'dnc' => DoNotContact::MANUAL,
+                    ],
+                    'notification' => [
+                        'dnc' => DoNotContact::IS_CONTACTABLE,
+                    ],
+                ]
+            );
+
+        $log = $this->createMock(LeadEventLog::class);
+        $log->method('getLead')
+            ->willReturn($lead);
+        $log->method('getId')
+            ->willReturn(1);
+        $log->expects($this->never())
+            ->method('appendToMetadata');
+
+        $logs    = new ArrayCollection([$log]);
+        $builder = new PreferenceBuilder($logs, new Event(), ['email' => []], new NullLogger());
+
+        $preferences = $builder->getChannelPreferences();
+
+        // Only the message's own channels are built
+        $this->assertCount(1, $preferences);
+        $this->assertArrayHasKey('email', $preferences);
+
+        // The only message channel must be priority 1, otherwise it is never processed
+        // because the campaign subscriber only iterates count(message channels) priorities
+        $emailLogs = $preferences['email']->getLogsByPriority(1);
+        $this->assertCount(1, $emailLogs);
+        $this->assertEquals(1, $emailLogs->first()->getId());
+    }
+
     public function testLogIsRemovedFromAllChannels(): void
     {
         $lead = $this->createMock(Lead::class);
