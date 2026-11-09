@@ -14,17 +14,14 @@ abstract class CommonStatsSubscriber
     /**
      * @var mixed[]
      */
-    protected $repositories = [];
+    protected array $repositories = [];
 
     /**
      * @var array<string, mixed>
      */
     protected array $selects = [];
 
-    /**
-     * @var array
-     */
-    protected $permissions = [];
+    protected array $permissions = [];
 
     public function __construct(
         protected CorePermissions $security,

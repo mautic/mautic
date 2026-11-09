@@ -82,7 +82,7 @@ final class ButtonHelper
     /**
      * @var array<array<string,mixed>>
      */
-    private $buttons = [];
+    private array $buttons = [];
 
     private int $buttonCount = 0;
 
@@ -171,7 +171,7 @@ final class ButtonHelper
 
         $content              = '';
         $dropdownHtmlAppended = false;
-        if (!empty($this->buttons)) {
+        if ($this->buttons !== []) {
             $buttonCount = 0;
 
             foreach ($this->buttons as $button) {

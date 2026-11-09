@@ -22,7 +22,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
      *
      * @var array<string, array<string, string>>
      */
-    protected $types = [
+    protected array $types = [
         'submissions.in.time'      => [],
         'top.submission.referrers' => [],
         'top.submitters'           => [],
@@ -31,10 +31,8 @@ final class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Define permissions to see those widgets.
-     *
-     * @var array
      */
-    protected $permissions = [
+    protected array $permissions = [
         'form:forms:viewown',
         'form:forms:viewother',
     ];

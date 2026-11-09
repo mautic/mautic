@@ -78,10 +78,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Used to determine social identity.
-     *
-     * @var array
      */
-    private $availableSocialFields = [];
+    private array $availableSocialFields = [];
 
     /**
      * @var int|string
@@ -311,10 +309,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Used to determine order of preferred channels.
-     *
-     * @var array
      */
-    private $channelRules = [];
+    private ?array $channelRules = null;
 
     public function __construct()
     {

@@ -22,10 +22,8 @@ class ChartQuery extends AbstractChart
     /**
      * Match date/time unit to a SQL datetime format
      * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}.
-     *
-     * @var array
      */
-    protected $sqlFormats = [
+    protected array $sqlFormats = [
         's' => 'Y-m-d H:i:s',
         'i' => 'Y-m-d H:i:00',
         'H' => 'Y-m-d H:00:00',
@@ -41,10 +39,8 @@ class ChartQuery extends AbstractChart
      * Match date/time unit to a MySql datetime format
      * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * {@link dev.mysql.com/doc/refman/5.5/en/date-and-time-functions.html#function_date-format}.
-     *
-     * @var array
      */
-    protected $mysqlTimeUnits = [
+    protected array $mysqlTimeUnits = [
         's' => '%Y-%m-%d %H:%i:%s',
         'i' => '%Y-%m-%d %H:%i',
         'H' => '%Y-%m-%d %H:00',

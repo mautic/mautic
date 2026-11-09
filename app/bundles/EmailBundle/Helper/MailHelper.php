@@ -92,10 +92,7 @@ final class MailHelper
      */
     private $returnPath;
 
-    /**
-     * @var array
-     */
-    private $errors = [];
+    private array $errors = [];
 
     /**
      * @var array|Lead
@@ -128,15 +125,9 @@ final class MailHelper
      */
     private bool $queueEnabled = false;
 
-    /**
-     * @var array
-     */
-    private $queuedRecipients = [];
+    private array $queuedRecipients = [];
 
-    /**
-     * @var array
-     */
-    public $metadata = [];
+    public array $metadata = [];
 
     /**
      * @var string
@@ -160,10 +151,7 @@ final class MailHelper
 
     private array $assetStats = [];
 
-    /**
-     * @var array
-     */
-    private $headers = [];
+    private array $headers = [];
 
     private array $body = self::DEFAULT_BODY;
 
@@ -251,7 +239,7 @@ final class MailHelper
      */
     public function send(bool $dispatchSendEvent = false, bool $isQueueFlush = false)
     {
-        if ($this->tokenizationEnabled && !empty($this->queuedRecipients) && !$isQueueFlush) {
+        if ($this->tokenizationEnabled && $this->queuedRecipients !== [] && !$isQueueFlush) {
             // This transport uses tokenization and queue()/flushQueue() was not used therefore use them in order
             // properly populate metadata for this transport
 
@@ -381,7 +369,7 @@ final class MailHelper
             }
         }
 
-        $error = empty($this->errors);
+        $error = $this->errors === [];
 
         if (!$isQueueFlush) {
             $this->createAssetDownloadEntries();
@@ -535,7 +523,7 @@ final class MailHelper
                     unset($this->errors['failures']);
                 }
 
-                if (!empty($this->errors)) {
+                if ($this->errors !== []) {
                     $errors = array_merge($errors, $this->errors);
                 }
 
@@ -1217,7 +1205,7 @@ final class MailHelper
             }
         }
 
-        return empty($this->errors);
+        return $this->errors === [];
     }
 
     public function setCustomHeaders(array $headers, bool $merge = true): void
@@ -1311,7 +1299,7 @@ final class MailHelper
             return "<{$url}>";
         }
 
-        if (!empty($this->queuedRecipients) || !empty($this->lead)) {
+        if ($this->queuedRecipients !== [] || !empty($this->lead)) {
             return '<{unsubscribe_url}>';
         }
 

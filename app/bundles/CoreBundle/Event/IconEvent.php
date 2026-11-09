@@ -8,10 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class IconEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $icons = [];
+    private array $icons = [];
 
     /**
      * @param string $icon

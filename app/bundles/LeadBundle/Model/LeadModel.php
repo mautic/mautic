@@ -107,10 +107,7 @@ class LeadModel extends FormModel
 
     public const string CHANNEL_FEATURE = 'contact_preference';
 
-    /**
-     * @var array
-     */
-    protected $leadFields = [];
+    protected iterable $leadFields = [];
 
     protected $leadTrackingId;
 
@@ -119,10 +116,7 @@ class LeadModel extends FormModel
      */
     protected $leadTrackingCookieGenerated = false;
 
-    /**
-     * @var array
-     */
-    protected $availableLeadFields = [];
+    protected array $availableLeadFields = [];
 
     private bool $repoSetup = false;
 
@@ -1417,7 +1411,7 @@ class LeadModel extends FormModel
             $this->modifyTags($lead, $tags, null, false);
         }
 
-        if (empty($this->leadFields)) {
+        if ($this->leadFields === []) {
             $this->leadFields = $this->leadFieldModel->getEntities(
                 [
                     'filter' => [
