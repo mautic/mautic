@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Security\OIDC;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
 use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
 use Mautic\UserBundle\Security\OIDC\User\UserFactoryInterface;
 use Mautic\UserBundle\Security\Provider\UserProvider as MauticUserProvider;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -21,6 +23,8 @@ final readonly class UserProvider implements CredentialsUserProviderInterface
         private UserFactoryInterface $userFactory,
         private MauticUserProvider $userProvider,
         private TokenStorageInterface $tokenStorage,
+        private EntityManagerInterface $entityManager,
+        private UserPasswordHasherInterface $passwordHasher,
     ) {
     }
 
@@ -54,8 +58,21 @@ final readonly class UserProvider implements CredentialsUserProviderInterface
             return $this->userProvider->loadUserByIdentifier($linkedUser->getUsername());
         }
 
-        $newUser = $this->userProvider->saveUser($this->userFactory->create($credentials));
-        $linkedUser = $this->linker->linkToUser($credentials->getId(), $newUser);
+        $createdUser = $this->userFactory->create($credentials);
+
+        // Bypass saveUser/findUser to prevent account takeover via username/email collision
+        // saveUser's findUser() matches "username OR email", which an attacker can exploit
+        // Instead, persist the user directly without the findUser logic
+
+        // Generate a random password for OIDC-created users
+        $createdUser->setPassword(
+            $this->passwordHasher->hashPassword($createdUser, bin2hex(random_bytes(32)))
+        );
+
+        $this->entityManager->persist($createdUser);
+        $this->entityManager->flush();
+
+        $linkedUser = $this->linker->linkToUser($credentials->getId(), $createdUser);
 
         return $this->userProvider->loadUserByIdentifier($linkedUser->getUsername());
     }
