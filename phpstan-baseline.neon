@@ -5506,12 +5506,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/Lead.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\Lead\:\:getPrimaryIdentifier\(\) should return string but returns true\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/LeadBundle/Entity/Lead.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\Lead\:\:setActualPoints\(\) has parameter \$points with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
