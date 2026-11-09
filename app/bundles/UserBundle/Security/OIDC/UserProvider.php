@@ -6,10 +6,13 @@ namespace Mautic\UserBundle\Security\OIDC;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
 use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
 use Mautic\UserBundle\Security\OIDC\User\UserFactoryInterface;
 use Mautic\UserBundle\Security\Provider\UserProvider as MauticUserProvider;
+use Mautic\UserBundle\UserEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
@@ -25,6 +28,7 @@ final readonly class UserProvider implements CredentialsUserProviderInterface
         private TokenStorageInterface $tokenStorage,
         private EntityManagerInterface $entityManager,
         private UserPasswordHasherInterface $passwordHasher,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -69,8 +73,19 @@ final readonly class UserProvider implements CredentialsUserProviderInterface
             $this->passwordHasher->hashPassword($createdUser, bin2hex(random_bytes(32)))
         );
 
+        // Dispatch USER_PRE_SAVE event (for audit log, etc.)
+        $event = new UserEvent($createdUser, true);
+        if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_SAVE)) {
+            $event = $this->dispatcher->dispatch($event, UserEvents::USER_PRE_SAVE);
+        }
+
         $this->entityManager->persist($createdUser);
         $this->entityManager->flush();
+
+        // Dispatch USER_POST_SAVE event
+        if ($this->dispatcher->hasListeners(UserEvents::USER_POST_SAVE)) {
+            $this->dispatcher->dispatch($event, UserEvents::USER_POST_SAVE);
+        }
 
         $linkedUser = $this->linker->linkToUser($credentials->getId(), $createdUser);
 

@@ -103,11 +103,20 @@ final class OidcRegistrationSecurityTest extends MauticMysqlTestCase
         $this->client->setMaxRedirects(10);
         $this->client->disableReboot();
 
-        // Attempt OIDC login/registration
+        // Attempt OIDC login/registration - should fail
         $this->client->request('GET', self::LOGIN_PATH, [
             'code'  => 'test_code',
             'state' => 'test_state',
         ]);
+
+        // Registration should have failed - verify no OIDC link was created for attacker
+        $oidcRepo = $this->em->getRepository(\Mautic\UserBundle\Entity\OidcSubjectId::class);
+        $attackerOidcLink = $oidcRepo->findOneBy(['subjectID' => 'attacker_sub_123']);
+        $this->assertNull($attackerOidcLink, 'Attacker OIDC link should not exist - registration should have been rejected');
+
+        // Verify no user was created with attacker's email
+        $attackerUser = $userRepo->findOneBy(['email' => 'attacker@evil.com']);
+        $this->assertNull($attackerUser, 'No user should have been created with attacker email');
 
         // Verify the victim user was NOT modified
         $this->em->clear();
@@ -117,22 +126,8 @@ final class OidcRegistrationSecurityTest extends MauticMysqlTestCase
         $this->assertEquals('victim', $victimUserAfter->getUsername());
 
         // Verify the victim is NOT linked to the attacker's OIDC sub
-        $oidcRepo = $this->em->getRepository(\Mautic\UserBundle\Entity\OidcSubjectId::class);
         $victimOidcLink = $oidcRepo->findOneBy(['user' => $victimUserId]);
-        // If a link exists, it should NOT be the attacker's sub
-        if ($victimOidcLink) {
-            $this->assertNotEquals('attacker_sub_123', $victimOidcLink->getSubjectId());
-        }
-
-        // Either the request failed (preferred) or a new separate user was created
-        // We verify that in both cases, the victim was not compromised
-        $attackerOidcLink = $oidcRepo->findOneBy(['subjectID' => 'attacker_sub_123']);
-        if ($attackerOidcLink) {
-            // If a new user was created, verify it's NOT the victim
-            $newUser = $attackerOidcLink->getUser();
-            $this->assertNotEquals($victimUserId, $newUser->getId());
-            $this->assertNotEquals('victim@example.com', $newUser->getEmail());
-        }
+        $this->assertNull($victimOidcLink, 'Victim should not have any OIDC link');
     }
 
     /**
@@ -194,11 +189,20 @@ final class OidcRegistrationSecurityTest extends MauticMysqlTestCase
         $this->client->setMaxRedirects(10);
         $this->client->disableReboot();
 
-        // Attempt OIDC login/registration
+        // Attempt OIDC login/registration - should fail
         $this->client->request('GET', self::LOGIN_PATH, [
             'code'  => 'test_code',
             'state' => 'test_state',
         ]);
+
+        // Registration should have failed - verify no OIDC link was created for attacker
+        $oidcRepo = $this->em->getRepository(\Mautic\UserBundle\Entity\OidcSubjectId::class);
+        $attackerOidcLink = $oidcRepo->findOneBy(['subjectID' => 'attacker_sub_456']);
+        $this->assertNull($attackerOidcLink, 'Attacker OIDC link should not exist - registration should have been rejected');
+
+        // Verify no user was created with attacker's invalid email (which matches victim username)
+        $attackerUser = $userRepo->findOneBy(['email' => 'victim']);
+        $this->assertNull($attackerUser, 'No user should have been created with the collision-causing email');
 
         // Verify the victim user was NOT modified
         $this->em->clear();
@@ -208,21 +212,8 @@ final class OidcRegistrationSecurityTest extends MauticMysqlTestCase
         $this->assertEquals('victim', $victimUserAfter->getUsername());
 
         // Verify the victim is NOT linked to the attacker's OIDC sub
-        $oidcRepo = $this->em->getRepository(\Mautic\UserBundle\Entity\OidcSubjectId::class);
         $victimOidcLink = $oidcRepo->findOneBy(['user' => $victimUserId]);
-        // If a link exists, it should NOT be the attacker's sub
-        if ($victimOidcLink) {
-            $this->assertNotEquals('attacker_sub_456', $victimOidcLink->getSubjectId());
-        }
-
-        // Either the request failed (preferred) or a new separate user was created
-        $attackerOidcLink = $oidcRepo->findOneBy(['subjectID' => 'attacker_sub_456']);
-        if ($attackerOidcLink) {
-            // If a new user was created, verify it's NOT the victim
-            $newUser = $attackerOidcLink->getUser();
-            $this->assertNotEquals($victimUserId, $newUser->getId());
-            $this->assertNotEquals('victim', $newUser->getUsername());
-        }
+        $this->assertNull($victimOidcLink, 'Victim should not have any OIDC link');
     }
 
     private function logOut(): void

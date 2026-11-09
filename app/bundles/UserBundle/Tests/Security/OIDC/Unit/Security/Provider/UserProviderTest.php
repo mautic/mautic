@@ -12,6 +12,7 @@ use Mautic\UserBundle\Security\OIDC\User\UserFactoryInterface;
 use Mautic\UserBundle\Security\OIDC\UserProvider;
 use Mautic\UserBundle\Security\Provider\UserProvider as MauticUserProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -39,7 +40,8 @@ final class UserProviderTest extends TestCase
 
         $entityManager = $this->createStub(EntityManagerInterface::class);
         $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
+        $dispatcher = $this->createStub(EventDispatcherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher, $dispatcher);
         $loadedUser   = $userProvider->loadUserByIdentifier('subjectId');
         $this->assertSame($user, $loadedUser);
     }
@@ -58,7 +60,8 @@ final class UserProviderTest extends TestCase
 
         $entityManager = $this->createStub(EntityManagerInterface::class);
         $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
+        $dispatcher = $this->createStub(EventDispatcherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher, $dispatcher);
         $userProvider->loadUserByIdentifier('subjectId');
     }
 
@@ -78,7 +81,8 @@ final class UserProviderTest extends TestCase
 
         $entityManager = $this->createStub(EntityManagerInterface::class);
         $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
+        $dispatcher = $this->createStub(EventDispatcherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher, $dispatcher);
         $loadedUser   = $userProvider->refreshUser($user);
 
         $this->assertSame($user, $loadedUser);
@@ -100,7 +104,8 @@ final class UserProviderTest extends TestCase
 
         $entityManager = $this->createStub(EntityManagerInterface::class);
         $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
+        $dispatcher = $this->createStub(EventDispatcherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher, $dispatcher);
         $loadedUser   = $userProvider->supportsClass(User::class);
 
         $this->assertTrue($loadedUser);
@@ -122,7 +127,8 @@ final class UserProviderTest extends TestCase
 
         $entityManager = $this->createStub(EntityManagerInterface::class);
         $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
+        $dispatcher = $this->createStub(EventDispatcherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher, $dispatcher);
         $loadedUser   = $userProvider->supportsClass(User::class);
 
         $this->assertFalse($loadedUser);
@@ -149,7 +155,8 @@ final class UserProviderTest extends TestCase
 
         $entityManager = $this->createStub(EntityManagerInterface::class);
         $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
+        $dispatcher = $this->createStub(EventDispatcherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher, $dispatcher);
         $loadedUser   = $userProvider->loadUserByCredentials($credentials);
 
         $this->assertSame($user, $loadedUser);
@@ -185,7 +192,8 @@ final class UserProviderTest extends TestCase
 
         $entityManager = $this->createStub(EntityManagerInterface::class);
         $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
+        $dispatcher = $this->createStub(EventDispatcherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher, $dispatcher);
         $loadedUser   = $userProvider->loadUserByCredentials($credentials);
 
         $this->assertSame($user, $loadedUser);
@@ -238,7 +246,8 @@ final class UserProviderTest extends TestCase
             ->with('test')
             ->willReturn($user);
 
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
+        $dispatcher = $this->createStub(EventDispatcherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher, $dispatcher);
         $loadedUser   = $userProvider->loadUserByCredentials($credentials);
 
         $this->assertSame($user, $loadedUser);
