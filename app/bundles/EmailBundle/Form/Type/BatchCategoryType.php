@@ -28,7 +28,7 @@ final class BatchCategoryType extends AbstractType
                 'class'         => Category::class,
                 'choice_label'  => 'title',
                 'required'      => true,
-                'label_attr'    => ['class' => 'control-label'],
+                'label_attr'    => ['class' => 'form-label'],
                 'attr'          => ['class' => 'form-control'],
                 'query_builder' => function (CategoryRepository $cr): QueryBuilder {
                     $qb =$cr->createQueryBuilder('c');
@@ -50,7 +50,7 @@ final class BatchCategoryType extends AbstractType
                 'save_text'      => 'mautic.core.form.save',
                 'cancel_onclick' => 'javascript:void(0);',
                 'cancel_attr'    => [
-                    'data-dismiss' => 'modal',
+                    'data-bs-dismiss' => 'modal',
                 ],
             ]
         );

@@ -66,6 +66,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.campaign.scheduler', Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::class);
     $services->alias('mautic.campaign.executioner.action', Mautic\CampaignBundle\Executioner\Event\ActionExecutioner::class);
     $services->alias('mautic.campaign.executioner.realtime', Mautic\CampaignBundle\Executioner\RealTimeExecutioner::class);
+    $services->alias('mautic.campaign.event_collector', Mautic\CampaignBundle\EventCollector\EventCollector::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\CampaignBundle\EventCollector\EventCollector::class.'" service instead.');
+    $services->alias('mautic.campaign.fixture.campaign', Mautic\CampaignBundle\DataFixtures\ORM\CampaignData::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\CampaignBundle\DataFixtures\ORM\CampaignData::class.'" service instead.');
     $services->set(Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class)->tag('kernel.reset', ['method' => 'reset']);
 
     if ('test' === ($_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? 'prod')) {

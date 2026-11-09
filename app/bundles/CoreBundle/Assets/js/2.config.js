@@ -12,10 +12,10 @@ Mautic.downloadIpLookupDataStore = function() {
 
         if (response.message) {
             mQuery('#iplookup_fetch_button_container').parent().removeClass('has-error').addClass('has-success');
-            mQuery('#iplookup_fetch_button_container').next('.help-block').html(response.message);
+            mQuery('#iplookup_fetch_button_container').next('.form-text').html(response.message);
         } else if (response.error) {
             mQuery('#iplookup_fetch_button_container').parent().removeClass('has-success').addClass('has-error');
-            mQuery('#iplookup_fetch_button_container').next('.help-block').html(response.error);
+            mQuery('#iplookup_fetch_button_container').next('.form-text').html(response.error);
         }
     }, false, false, 'POST');
 };
@@ -36,6 +36,9 @@ Mautic.getIpLookupFormConfig = function() {
 };
 
 Mautic.configOnLoad = function(container) {
+    // Expand the collapsed sections that contain validation errors so they are visible
+    mQuery(container + ' .accordion-wrapper').has('.has-error').collapse('show');
+
     document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
         const attributeName = radio.dataset.attributeToggle;
         const modifiedName = attributeName.replace('-', '_');
@@ -61,5 +64,11 @@ Mautic.configOnLoad = function(container) {
             }
         });
     });
+
+    Mautic.initConfigUnsavedChangesGuard(container);
+};
+
+Mautic.configOnUnload = function() {
+    Mautic.removeConfigUnsavedChangesGuard();
 };
 

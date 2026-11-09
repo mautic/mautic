@@ -95,6 +95,9 @@ if (!isset($args['repackage'])) {
         'deleted_files.txt'              => true,
         'critical_migrations.txt'        => true,
         'upgrade.php'                    => true,
+        // Generated during packaging and required before the first request after an update.
+        'assets/build/'                   => true,
+        'var/sass/'                       => true,
         // Temp fix for GrapesJs builder
         'plugins/GrapesJsBuilderBundle/' => true,
     ];

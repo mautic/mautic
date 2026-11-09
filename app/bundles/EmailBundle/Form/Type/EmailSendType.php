@@ -33,7 +33,7 @@ final class EmailSendType extends AbstractType
             EmailListType::class,
             [
                 'label'      => 'mautic.email.send.selectemails',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'                => 'form-control',
                     'tooltip'              => 'mautic.email.choose.emails_descr',
@@ -60,7 +60,7 @@ final class EmailSendType extends AbstractType
                         'mautic.core.form.yes' => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
                     ],
                     'label'      => 'mautic.email.send.emailtype',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control email-type',
                         'tooltip' => 'mautic.email.send.emailtype.tooltip',

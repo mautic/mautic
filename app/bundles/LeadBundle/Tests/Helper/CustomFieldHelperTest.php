@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\TestCase;
 
 final class CustomFieldHelperTest extends TestCase
@@ -221,6 +222,16 @@ final class CustomFieldHelperTest extends TestCase
             // Date strings without a time component are parsed using PHP's default timezone (UTC here),
             // so the date remains unchanged.
             $this->assertEquals('2025-01-24', $result, 'Date was not converted from Etc/GMT-2 to UTC correctly');
+
+            $field  = ['type' => 'date'];
+            $value  = '2025-01-24';
+            $result = CustomFieldHelper::fieldValueTransformer($field, $value, OperatorOptions::IN_NEXT);
+            $this->assertEquals('2025-01-24 23:59:59', $result, '"In the next operator should always set the time part to 23:59:59"');
+
+            $field  = ['type' => 'date'];
+            $value  = '2025-01-24';
+            $result = CustomFieldHelper::fieldValueTransformer($field, $value, OperatorOptions::IN_LAST);
+            $this->assertEquals('2025-01-24 00:00:00', $result, '"In the last operator should always set the time part to 00:00:00"');
         } finally {
             $property->setValue(null, $originalDefaultLocalTimezone);
             date_default_timezone_set($originalTimezone);

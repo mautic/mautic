@@ -54,13 +54,12 @@ final class ConfigTypeTest extends MauticMysqlTestCase
      */
     private function submitMultiplier(string $value): string
     {
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/messengerconfig');
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('config[buttons][save]')->form();
         $form->setValues([
-            'config[coreconfig][site_url]' => 'https://mautic-community.local', // required
-            self::MULTIPLIER_FIELD         => $value,
+            self::MULTIPLIER_FIELD => $value,
         ]);
 
         $this->client->submit($form);

@@ -723,8 +723,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 );
             }
 
+            $isAlreadyCounted = false;
+
             if (null != $listLead) {
-                if ($manuallyAdded && $listLead->wasManuallyRemoved()) {
+                if ($manuallyAdded && ($listLead->wasManuallyRemoved() || !$listLead->wasManuallyAdded())) {
+                    $isAlreadyCounted = !$listLead->wasManuallyRemoved();
                     $listLead->setManuallyRemoved(false);
                     $listLead->setManuallyAdded($manuallyAdded);
 
@@ -745,6 +748,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
                 $persistLists[]   = $listLead;
                 $dispatchEvents[] = $listId;
+            }
+
+            if ($isAlreadyCounted) {
+                continue;
             }
 
             if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
@@ -1460,10 +1467,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
         return $leadCounts;
     }
 
-    public function getActiveSegmentContactCount(int $segmentId): int
+    public function getActiveSegmentContactCount(int $segmentId, ?int $totalCount = null): int
     {
-        $total = $this->getRepository()->getLeadCount($segmentId);
-        $dnc   = $this->doNotContactRepository->getCount(null, null, null, $segmentId);
+        $total = $totalCount ?? $this->getRepository()->getLeadCount($segmentId);
+        $dnc   = $this->doNotContactRepository->getCount('email', null, null, $segmentId);
 
         return max(0, $total - $dnc);
     }

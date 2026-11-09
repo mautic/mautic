@@ -22,7 +22,7 @@ final class ValidateEmailType extends AbstractType
             EmailType::class,
             [
                 'label'       => 'mautic.email.address.to.validate',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => [
                     'class'         => 'form-control',
                     'autocomplete'  => 'email',

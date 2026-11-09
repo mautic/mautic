@@ -24,11 +24,15 @@ return function (ContainerConfigurator $configurator): void {
         ->autoconfigure()
         ->public();
 
-    $excludes = [
-    ];
+    $excludes = [];
 
     $services->load('Mautic\\UserBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+    // Security folder is excluded by DEFAULT_EXCLUDES, load OIDC separately
+    // Exclude Client classes to prevent HTTP requests during container compilation
+    $services->load('Mautic\\UserBundle\\Security\\OIDC\\', '../Security/OIDC/')
+        ->exclude('../Security/OIDC/{DTO,Client}');
 
     $services->load('Mautic\\UserBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
@@ -128,6 +132,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.security.saml.id_store', Mautic\UserBundle\Security\SAML\Store\IdStore::class);
 
     $services->set(Mautic\UserBundle\Security\UserTokenSetter::class);
+    $services->alias('mautic.security.logout_handler', Mautic\UserBundle\EventListener\LogoutListener::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\UserBundle\EventListener\LogoutListener::class.'" service instead.');
+    $services->alias('mautic.security.user_token_setter', Mautic\UserBundle\Security\UserTokenSetter::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\UserBundle\Security\UserTokenSetter::class.'" service instead.');
 
     $services->set('mautic.user.model.user_token_service', Mautic\UserBundle\Model\UserToken\UserTokenService::class);
 

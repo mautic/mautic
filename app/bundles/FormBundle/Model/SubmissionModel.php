@@ -135,8 +135,11 @@ final class SubmissionModel extends CommonFormModel
             }
         }
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-        $submission->setIpAddress($ipAddress);
+        // Kiosk mode does not track the submitter, so their IP address is not stored either
+        $trackSubmitter = !$form->isInKioskMode();
+        if ($trackSubmitter) {
+            $submission->setIpAddress($this->ipLookupHelper->getIpAddress());
+        }
 
         if (!empty($post['return'])) {
             $referer = $post['return'];
@@ -147,7 +150,7 @@ final class SubmissionModel extends CommonFormModel
         }
 
         // clean the referer by removing mauticError and mauticMessage
-        $referer = InputHelper::url($referer, null, null, ['mauticError', 'mauticMessage']);
+        $referer = InputHelper::url($referer, null, null, null, ['mauticError', 'mauticMessage']);
         $submission->setReferer($referer);
 
         // Create an event to be dispatched through the processes
@@ -302,7 +305,9 @@ final class SubmissionModel extends CommonFormModel
             ->setResults($results)
             ->setContactFieldMatches($leadFieldMatches);
 
-        $lead = $this->contactTracker->getContact();
+        $lead = $form->isInKioskMode()
+            ? null
+            : $this->contactTracker->getContact();
 
         // Remove validation errors if the field is not visible
         if ($lead && $form->usesProgressiveProfiling()) {
@@ -328,7 +333,9 @@ final class SubmissionModel extends CommonFormModel
             $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields, $company);
         }
 
-        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+        $lead = $this->getManagedLeadForSubmission($lead);
+
+        $trackedDevice = $trackSubmitter ? $this->deviceTrackingService->getTrackedDevice() : null;
         $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
         // set tracking ID for stats purposes to determine unique hits
@@ -381,7 +388,7 @@ final class SubmissionModel extends CommonFormModel
         $campaigns = $this->campaignModel->getCampaignsByForm($form);
         /** @var Campaign $campaign */
         foreach ($campaigns ?? [] as $campaign) {
-            if ($campaign->isPublished()) {
+            if ($lead instanceof Lead && $campaign->isPublished()) {
                 $this->membershipManager->addContact($lead, $campaign);
             }
         }
@@ -402,6 +409,30 @@ final class SubmissionModel extends CommonFormModel
         // made it to the end so return the submission event to give the calling method access to tokens, results, etc
         // otherwise return false that no errors were encountered (to keep BC really)
         return ($returnEvent) ? ['submission' => $submissionEvent] : false;
+    }
+
+    /**
+     * Ensure a lead assigned to a submission is managed by Doctrine.
+     */
+    private function getManagedLeadForSubmission(?Lead $lead): ?Lead
+    {
+        if (null === $lead) {
+            return null;
+        }
+
+        if ($this->em->contains($lead)) {
+            return $lead;
+        }
+
+        if (!$lead->getId()) {
+            $this->em->persist($lead);
+
+            return $lead;
+        }
+
+        $managedLead = $this->em->find(Lead::class, $lead->getId());
+
+        return $managedLead instanceof Lead ? $managedLead : null;
     }
 
     /**
@@ -1060,20 +1091,15 @@ final class SubmissionModel extends CommonFormModel
                     .' between current tracked contact and submitted data so assuming a new contact'
                 );
             }
-        }
 
-        // check for existing IP address
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
+            // The lookup itself saves new IP addresses, so kiosk mode never reaches it
+            $ipAddress = $this->ipLookupHelper->getIpAddress();
 
-        // no lead was found by a mapped email field so create a new one
-        if ($lead->isNewlyCreated()) {
-            if (!$inKioskMode) {
+            // no lead was found by a mapped email field so create a new one
+            if ($lead->isNewlyCreated()) {
                 $lead->addIpAddress($ipAddress);
                 $this->logger->debug('FORM: Associating '.$ipAddress->getIpAddress().' to contact');
-            }
-        } elseif (!$inKioskMode) {
-            $leadIpAddresses = $lead->getIpAddresses();
-            if (!$leadIpAddresses->contains($ipAddress)) {
+            } elseif (!$lead->getIpAddresses()->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
 
                 $this->logger->debug('FORM: Associating '.$ipAddress->getIpAddress().' to contact');

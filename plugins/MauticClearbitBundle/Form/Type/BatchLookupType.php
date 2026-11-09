@@ -25,7 +25,7 @@ final class BatchLookupType extends AbstractType
                 'save_text'      => 'mautic.core.form.submit',
                 'cancel_onclick' => 'javascript:void(0);',
                 'cancel_attr'    => [
-                    'data-dismiss' => 'modal',
+                    'data-bs-dismiss' => 'modal',
                 ],
             ]
         );
@@ -35,7 +35,7 @@ final class BatchLookupType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.plugin.clearbit.notify',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],

@@ -30,7 +30,7 @@ final class CampaignEventSendWebhookType extends AbstractType
             UrlType::class,
             [
                 'label'       => 'mautic.webhook.event.sendwebhook.url',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'required'    => true,
                 'constraints' => [
@@ -53,7 +53,7 @@ final class CampaignEventSendWebhookType extends AbstractType
                     'DELETE' => 'delete',
                 ],
                 'multiple'   => false,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'label'      => 'mautic.webhook.event.sendwebhook.method',
                 'attr'       => [
                     'class' => 'form-control',
@@ -90,7 +90,7 @@ final class CampaignEventSendWebhookType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.webhook.event.sendwebhook.timeout',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'          => 'form-control',
                     'postaddon_text' => $this->translator->trans('mautic.core.time.seconds'),

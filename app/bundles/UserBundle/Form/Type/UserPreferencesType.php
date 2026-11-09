@@ -21,7 +21,7 @@ final class UserPreferencesType extends AbstractType
             HiddenType::class,
             [
                 'label'      => 'mautic.user.preferences.theme',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -35,7 +35,7 @@ final class UserPreferencesType extends AbstractType
             HiddenType::class,
             [
                 'label'      => 'mautic.user.preferences.reduce_transparency',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
             ]
         );
@@ -46,7 +46,7 @@ final class UserPreferencesType extends AbstractType
             HiddenType::class,
             [
                 'label'      => 'mautic.user.preferences.reduce_motion',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
             ]
         );
@@ -57,7 +57,7 @@ final class UserPreferencesType extends AbstractType
             HiddenType::class,
             [
                 'label'      => 'mautic.user.preferences.contrast_borders',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
             ]
         );
@@ -68,7 +68,7 @@ final class UserPreferencesType extends AbstractType
             HiddenType::class,
             [
                 'label'      => 'mautic.user.preferences.enable_underlines',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
             ]
         );
