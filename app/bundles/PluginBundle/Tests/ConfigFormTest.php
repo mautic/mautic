@@ -14,6 +14,7 @@ use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\PluginBundle\PluginEvents;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -44,6 +45,10 @@ final class ConfigFormTest extends KernelTestCase
         $plugins = $this->getIntegrationObject()->getIntegrationObjects();
 
         foreach ($plugins as $plugin) {
+            if (!$plugin instanceof AbstractIntegration) {
+                continue;
+            }
+
             $featureSettings = $plugin->getFormSettings();
 
             $this->assertArrayHasKey('requires_callback', $featureSettings);
@@ -74,7 +79,6 @@ final class ConfigFormTest extends KernelTestCase
 
         $expected                = [];
         $expected['Connectwise'] = $this->getOauthData('', ['clientId' => $connectWiseHeader['appcookie']]);
-        $expected['OneSignal']   = $this->getOauthData('');
         $expected['Twilio']      = $this->getOauthData('');
         $expected['Vtiger']      = $this->getOauthData('sessionName');
         $expected['Dynamics']    = $this->getOauthData('access_token');
@@ -84,6 +88,10 @@ final class ConfigFormTest extends KernelTestCase
         $expected['Hubspot']     = $this->getOauthData('hapikey');
 
         foreach ($plugins as $index => $integration) {
+            if (!$integration instanceof AbstractIntegration) {
+                continue;
+            }
+
             $this->assertSame($expected[$index], $integration->prepareRequest($url, $parameters, $method, ['appcookie' => 'ololo'], $authType));
         }
     }

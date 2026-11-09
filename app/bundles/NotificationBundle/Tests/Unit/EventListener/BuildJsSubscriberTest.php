@@ -8,9 +8,8 @@ use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
 use Mautic\NotificationBundle\EventListener\BuildJsSubscriber;
 use Mautic\NotificationBundle\Helper\NotificationHelper;
-use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper;
+use Mautic\NotificationBundle\Integration\OneSignalIntegration;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -18,8 +17,8 @@ final class BuildJsSubscriberTest extends TestCase
 {
     public function testEssentialBuildSkipsOneSignalLookup(): void
     {
-        $integrationHelper = $this->createMock(IntegrationHelper::class);
-        $integrationHelper->expects($this->never())->method('getIntegrationObject');
+        $integrationHelper = $this->createMock(OneSignalIntegrationHelper::class);
+        $integrationHelper->expects($this->never())->method('getPublishedIntegration');
         $subscriber = new BuildJsSubscriber(
             $this->createStub(NotificationHelper::class),
             $integrationHelper,
@@ -34,13 +33,8 @@ final class BuildJsSubscriberTest extends TestCase
 
     public function testTrackingBuildContainsGuardedOneSignalContribution(): void
     {
-        $settings = new Integration();
-        $settings->setIsPublished(true);
-        $integration = $this->createStub(AbstractIntegration::class);
-        $integration->method('getIntegrationSettings')->willReturn($settings);
-
-        $integrationHelper = $this->createStub(IntegrationHelper::class);
-        $integrationHelper->method('getIntegrationObject')->willReturn($integration);
+        $integrationHelper = $this->createStub(OneSignalIntegrationHelper::class);
+        $integrationHelper->method('getPublishedIntegration')->willReturn(new OneSignalIntegration());
 
         $notificationHelper = $this->createStub(NotificationHelper::class);
         $notificationHelper->method('getHeaderScript')->willReturn("MauticJS.insertScript('https://cdn.onesignal.com/OneSignalSDK.js');");

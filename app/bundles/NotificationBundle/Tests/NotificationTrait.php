@@ -7,9 +7,11 @@ namespace Mautic\NotificationBundle\Tests;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\IntegrationsBundle\Facade\EncryptionService;
 use Mautic\NotificationBundle\Entity\Notification;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\NotificationBundle\Integration\OneSignalIntegration;
+use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 trait NotificationTrait
@@ -55,15 +57,13 @@ trait NotificationTrait
 
     private function setupIntegration(ContainerInterface $container, EntityManagerInterface $em, string $apiId, string $restApiId): void
     {
-        /** @var AbstractIntegration $integration */
-        $integration = $container->get(IntegrationHelper::class)
-            ->getIntegrationObject('OneSignal');
-        $integrationSettings = $integration->getIntegrationSettings();
+        $integrationSettings = $container->get(IntegrationRepository::class)->findOneBy(['name' => OneSignalIntegration::NAME])
+            ?? new Integration()->setName(OneSignalIntegration::NAME);
         $integrationSettings->setIsPublished(true);
-        $integration->encryptAndSetApiKeys([
+        $integrationSettings->setApiKeys($container->get(EncryptionService::class)->encrypt([
             'app_id'       => $apiId,
             'rest_api_key' => $restApiId,
-        ], $integrationSettings);
+        ]));
         $em->persist($integrationSettings);
     }
 }

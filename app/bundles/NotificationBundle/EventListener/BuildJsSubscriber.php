@@ -7,7 +7,7 @@ namespace Mautic\NotificationBundle\EventListener;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
 use Mautic\NotificationBundle\Helper\NotificationHelper;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -16,7 +16,7 @@ final readonly class BuildJsSubscriber
 {
     public function __construct(
         private NotificationHelper $notificationHelper,
-        private IntegrationHelper $integrationHelper,
+        private OneSignalIntegrationHelper $oneSignalIntegrationHelper,
         private RouterInterface $router,
     ) {
     }
@@ -31,9 +31,7 @@ final readonly class BuildJsSubscriber
             return;
         }
 
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
-
-        if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
+        if (!$this->oneSignalIntegrationHelper->getPublishedIntegration()) {
             return;
         }
 

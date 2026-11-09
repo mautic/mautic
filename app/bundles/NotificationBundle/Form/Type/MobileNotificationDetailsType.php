@@ -4,7 +4,7 @@ namespace Mautic\NotificationBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -18,14 +18,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 final class MobileNotificationDetailsType extends AbstractType
 {
     public function __construct(
-        private readonly IntegrationHelper $integrationHelper,
+        private readonly OneSignalIntegrationHelper $oneSignalIntegrationHelper,
     ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
-        $settings    = $integration->getIntegrationSettings()->getFeatureSettings();
+        $settings = $this->oneSignalIntegrationHelper->getIntegration()?->getIntegrationFeatureSettings() ?? [];
 
         $builder->add(
             'additional_data',
