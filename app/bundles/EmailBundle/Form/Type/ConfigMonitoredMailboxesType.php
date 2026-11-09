@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -19,6 +20,12 @@ use Symfony\Component\Validator\Constraints\Email;
  */
 final class ConfigMonitoredMailboxesType extends AbstractType
 {
+    public function __construct(Mailbox $imapHelper)
+    {
+        // Keep the historical constructor signature for third-party integrations.
+        unset($imapHelper);
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $monitoredShowOn = ('general' == $options['mailbox']) ? '{}'
