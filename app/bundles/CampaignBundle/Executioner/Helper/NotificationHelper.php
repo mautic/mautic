@@ -119,7 +119,7 @@ final readonly class NotificationHelper
     /**
      * @return User|null
      */
-    private function getUser(Lead $contact, Event $event)
+    private function getUser(Lead $contact, Event $event): ?object
     {
         // Default is to notify the contact owner
         if ($owner = $contact->getOwner()) {
