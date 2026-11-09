@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\Security\Provider;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
 use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
@@ -11,6 +12,7 @@ use Mautic\UserBundle\Security\OIDC\User\UserFactoryInterface;
 use Mautic\UserBundle\Security\OIDC\UserProvider;
 use Mautic\UserBundle\Security\Provider\UserProvider as MauticUserProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
@@ -35,7 +37,9 @@ final class UserProviderTest extends TestCase
             ->method('loadUserByIdentifier')
             ->willReturn($user);
 
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
         $loadedUser   = $userProvider->loadUserByIdentifier('subjectId');
         $this->assertSame($user, $loadedUser);
     }
@@ -52,7 +56,9 @@ final class UserProviderTest extends TestCase
 
         $this->expectException(UserNotFoundException::class);
 
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
         $userProvider->loadUserByIdentifier('subjectId');
     }
 
@@ -70,7 +76,9 @@ final class UserProviderTest extends TestCase
             ->method('refreshUser')
             ->willReturn($user);
 
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
         $loadedUser   = $userProvider->refreshUser($user);
 
         $this->assertSame($user, $loadedUser);
@@ -90,7 +98,9 @@ final class UserProviderTest extends TestCase
             ->method('supportsClass')
             ->willReturn(true);
 
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
         $loadedUser   = $userProvider->supportsClass(User::class);
 
         $this->assertTrue($loadedUser);
@@ -110,7 +120,9 @@ final class UserProviderTest extends TestCase
             ->method('supportsClass')
             ->willReturn(false);
 
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
         $loadedUser   = $userProvider->supportsClass(User::class);
 
         $this->assertFalse($loadedUser);
@@ -135,7 +147,9 @@ final class UserProviderTest extends TestCase
             ->method('loadUserByIdentifier')
             ->willReturn($user);
 
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
         $loadedUser   = $userProvider->loadUserByCredentials($credentials);
 
         $this->assertSame($user, $loadedUser);
@@ -169,7 +183,9 @@ final class UserProviderTest extends TestCase
             ->method('loadUserByIdentifier')
             ->willReturn($user);
 
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
         $loadedUser   = $userProvider->loadUserByCredentials($credentials);
 
         $this->assertSame($user, $loadedUser);
@@ -181,10 +197,13 @@ final class UserProviderTest extends TestCase
         $security            = $this->createMock(TokenStorageInterface::class);
         $linkerInterface     = $this->createMock(LinkerInterface::class);
         $userFactory         = $this->createMock(UserFactoryInterface::class);
+        $entityManager       = $this->createMock(EntityManagerInterface::class);
+        $passwordHasher      = $this->createMock(UserPasswordHasherInterface::class);
         $user                = new User();
         $credentials         = new UserCredentials('subjectId', 'email@mautic.com');
 
         $user->setUsername('test');
+        $user->setEmail('email@mautic.com');
 
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUser')->willReturn(null);
@@ -196,9 +215,19 @@ final class UserProviderTest extends TestCase
 
         $userFactory->method('create')->willReturn($user);
 
-        $mauticUserProvider->expects($this->once())
-            ->method('saveUser')
-            ->willReturn($user);
+        // Expect password to be hashed and set
+        $passwordHasher->expects($this->once())
+            ->method('hashPassword')
+            ->with($user, $this->anything())
+            ->willReturn('hashed_password');
+
+        // Expect user to be persisted and flushed
+        $entityManager->expects($this->once())
+            ->method('persist')
+            ->with($user);
+
+        $entityManager->expects($this->once())
+            ->method('flush');
 
         $linkerInterface->expects($this->once())
             ->method('linkToUser')
@@ -209,7 +238,7 @@ final class UserProviderTest extends TestCase
             ->with('test')
             ->willReturn($user);
 
-        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
+        $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security, $entityManager, $passwordHasher);
         $loadedUser   = $userProvider->loadUserByCredentials($credentials);
 
         $this->assertSame($user, $loadedUser);
