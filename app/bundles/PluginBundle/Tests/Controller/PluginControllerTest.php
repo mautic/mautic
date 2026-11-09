@@ -11,11 +11,13 @@ final class PluginControllerTest extends MauticMysqlTestCase
 {
     public function testConfigurePluginSuccessValidation(): void
     {
+        // the plugin list creates the integration settings rows the config page loads
+        $this->client->request(Request::METHOD_GET, '/s/plugins');
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/plugins/config/Twilio');
         $form       = $crawler->filter('form')->form();
 
         $form->setValues([
-            'integration_details' => [
+            'integration_config' => [
                 'isPublished' => 0,
                 'apiKeys'     => [
                     'username' => 'valid_username',
@@ -30,11 +32,12 @@ final class PluginControllerTest extends MauticMysqlTestCase
 
     public function testConfigurePluginValidationError(): void
     {
+        $this->client->request(Request::METHOD_GET, '/s/plugins');
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/plugins/config/Twilio');
         $form       = $crawler->filter('form')->form();
 
         $form->setValues([
-            'integration_details' => [
+            'integration_config' => [
                 'isPublished' => 1,
                 'apiKeys'     => [
                     'username' => '',
@@ -44,7 +47,7 @@ final class PluginControllerTest extends MauticMysqlTestCase
         ]);
 
         $crawler     = $this->client->submit($form);
-        $this->assertStringContainsString('A value is required.', $crawler->filter('#integration_details_apiKeys div')->html());
+        $this->assertStringContainsString('A value is required.', $crawler->filter('#integration_config_apiKeys')->ancestors()->first()->html());
     }
 
     public function testReturnPluginVersion(): void

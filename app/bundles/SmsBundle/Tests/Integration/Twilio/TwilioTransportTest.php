@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
 use Mautic\SmsBundle\Integration\Twilio\TwilioTransport;
+use Mautic\SmsBundle\Integration\TwilioIntegration;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -26,7 +28,10 @@ final class TwilioTransportTest extends TestCase
     protected function setUp(): void
     {
         $this->logger      = $this->createMock(Logger::class);
-        $configuration     = new Configuration($this->createStub(IntegrationHelper::class));
+        // Twilio has no settings row, so it is not configured
+        $integrationsHelper = $this->createStub(IntegrationsHelper::class);
+        $integrationsHelper->method('getIntegrationConfiguration')->willThrowException(new IntegrationNotFoundException());
+        $configuration = new Configuration(new TwilioIntegration(), $integrationsHelper);
 
         $this->twilioTransport = new TwilioTransport($configuration, $this->logger);
     }

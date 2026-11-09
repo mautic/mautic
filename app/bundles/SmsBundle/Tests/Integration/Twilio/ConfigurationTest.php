@@ -4,126 +4,97 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\MockObject\MockObject;
+use Mautic\SmsBundle\Integration\TwilioIntegration;
 use PHPUnit\Framework\TestCase;
 use Twilio\Exceptions\ConfigurationException;
 
-#[AllowMockObjectsWithoutExpectations]
 final class ConfigurationTest extends TestCase
 {
-    private MockObject&IntegrationHelper $integrationHelper;
-
-    private MockObject&AbstractIntegration $integrationObject;
-
-    protected function setUp(): void
-    {
-        $this->integrationHelper = $this->createMock(IntegrationHelper::class);
-
-        $integrationSettings = new Integration();
-        $integrationSettings->setIsPublished(true);
-        $integrationSettings->setFeatureSettings(['messaging_service_sid' => '123']);
-        /** @phpstan-ignore classConstant.deprecatedClass */
-        $this->integrationObject = $this->createMock(AbstractIntegration::class);
-        $this->integrationObject->method('getIntegrationSettings')
-            ->willReturn($integrationSettings);
-
-        $this->integrationHelper->expects($this->once())->method('getIntegrationObject')
-            ->with('Twilio')
-            ->willReturn($this->integrationObject);
-    }
-
     public function testGetMessagingServiceSid(): void
     {
-        $this->integrationObject->method('getDecryptedApiKeys')
-            ->willReturn(
-                [
-                    'username' => 'username',
-                    'password' => 'password',
-                ]
-            );
-        $this->assertEquals('123', $this->getConfiguration()->getMessagingServiceSid());
+        $this->assertSame('123', $this->getConfiguration($this->createSettings())->getMessagingServiceSid());
     }
 
     public function testGetAccountSid(): void
     {
-        $this->integrationObject->method('getDecryptedApiKeys')
-            ->willReturn(
-                [
-                    'username' => 'username',
-                    'password' => 'password',
-                ]
-            );
-        $this->assertEquals('username', $this->getConfiguration()->getAccountSid());
+        $this->assertSame('username', $this->getConfiguration($this->createSettings())->getAccountSid());
     }
 
     public function testGetAuthToken(): void
     {
-        $this->integrationObject->method('getDecryptedApiKeys')
-            ->willReturn(
-                [
-                    'username' => 'username',
-                    'password' => 'password',
-                ]
-            );
-        $this->assertEquals('password', $this->getConfiguration()->getAuthToken());
+        $this->assertSame('password', $this->getConfiguration($this->createSettings())->getAuthToken());
     }
 
     public function testConfigurationExceptionThrownIfNotPublished(): void
     {
         $this->expectException(ConfigurationException::class);
 
-        $integrationSettings = new Integration();
-        $integrationSettings->setIsPublished(false);
-        $integrationSettings->setFeatureSettings(['messaging_service_sid' => '123']);
+        $this->getConfiguration($this->createSettings(isPublished: false))->getMessagingServiceSid();
+    }
 
-        $this->integrationObject->method('getIntegrationSettings')
-            ->willReturn($integrationSettings);
+    public function testConfigurationExceptionThrownWithoutSettingsRow(): void
+    {
+        $this->expectException(ConfigurationException::class);
 
-        $this->getConfiguration()->getMessagingServiceSid();
+        $integrationsHelper = $this->createStub(IntegrationsHelper::class);
+        $integrationsHelper->method('getIntegrationConfiguration')->willThrowException(new IntegrationNotFoundException());
+
+        new Configuration(new TwilioIntegration(), $integrationsHelper)->getMessagingServiceSid();
     }
 
     public function testConfigurationExceptionThrownWithoutMessagingServiceSId(): void
     {
         $this->expectException(ConfigurationException::class);
 
-        $this->integrationObject->getIntegrationSettings()->setFeatureSettings(['messaging_service_sid' => '']);
-
-        $this->getConfiguration()->getMessagingServiceSid();
+        $this->getConfiguration($this->createSettings(messagingServiceSid: ''))->getMessagingServiceSid();
     }
 
     public function testConfigurationExceptionThrownWithoutUsername(): void
     {
         $this->expectException(ConfigurationException::class);
-        $this->integrationObject->method('getDecryptedApiKeys')
-            ->willReturn(
-                [
-                    'username' => '',
-                    'password' => 'password',
-                ]
-            );
-        $this->getConfiguration()->getMessagingServiceSid();
+
+        $this->getConfiguration($this->createSettings(username: ''))->getMessagingServiceSid();
     }
 
     public function testConfigurationExceptionThrownWithoutPassword(): void
     {
         $this->expectException(ConfigurationException::class);
-        $this->integrationObject->method('getDecryptedApiKeys')
-            ->willReturn(
-                [
-                    'username' => 'username',
-                    'password' => '',
-                ]
-            );
-        $this->getConfiguration()->getMessagingServiceSid();
+
+        $this->getConfiguration($this->createSettings(password: ''))->getMessagingServiceSid();
     }
 
-    private function getConfiguration(): Configuration
+    private function createSettings(
+        bool $isPublished = true,
+        string $messagingServiceSid = '123',
+        string $username = 'username',
+        string $password = 'password',
+    ): Integration {
+        $settings = new Integration();
+        $settings->setIsPublished($isPublished);
+        $settings->setFeatureSettings(['integration' => ['messaging_service_sid' => $messagingServiceSid]]);
+        $settings->setApiKeys(['username' => $username, 'password' => $password]);
+
+        return $settings;
+    }
+
+    private function getConfiguration(Integration $settings): Configuration
     {
-        return new Configuration($this->integrationHelper);
+        $integration = new TwilioIntegration();
+
+        // IntegrationsHelper hydrates the integration and returns its settings with decrypted keys
+        $integrationsHelper = $this->createStub(IntegrationsHelper::class);
+        $integrationsHelper->method('getIntegrationConfiguration')->willReturnCallback(
+            function (TwilioIntegration $twilio) use ($settings): Integration {
+                $twilio->setIntegrationConfiguration($settings);
+
+                return $settings;
+            }
+        );
+
+        return new Configuration($integration, $integrationsHelper);
     }
 }

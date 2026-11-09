@@ -7,6 +7,7 @@ namespace Mautic\SmsBundle\Tests;
 use Mautic\SmsBundle\Integration\TwilioIntegration;
 use Mautic\SmsBundle\Sms\TransportChain;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,18 +20,23 @@ trait SmsTestHelperTrait
 
         $integration = $this->getContainer()->get(TwilioIntegration::class);
 
-        $crawler  = $this->client->request(Request::METHOD_GET, 's/plugins/config/'.$integration->getName());
+        // Like any admin page, the plugin list creates the integration settings rows the config page loads.
+        $this->client->request(Request::METHOD_GET, '/s/plugins');
+
+        $crawler  = $this->client->request(Request::METHOD_GET, '/s/plugins/config/'.$integration->getName());
         $response = $this->client->getResponse();
 
         Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
 
-        $saveButton = $crawler->selectButton('integration_details[buttons][save]');
+        $saveButton = $crawler->selectButton('integration_config[buttons][save]');
         $form       = $saveButton->form();
 
-        $form['integration_details[apiKeys][username]']->setValue('test_username');
-        $form['integration_details[apiKeys][password]']->setValue('test_password');
-        $form['integration_details[isPublished]']->setValue('1');
-        $form['integration_details[featureSettings][messaging_service_sid]']->setValue($messagingServiceSid);
+        $form['integration_config[apiKeys][username]']->setValue('test_username');
+        $form['integration_config[apiKeys][password]']->setValue('test_password');
+        $isPublished = $form['integration_config[isPublished]'];
+        Assert::assertInstanceOf(ChoiceFormField::class, $isPublished);
+        $isPublished->select('1');
+        $form['integration_config[featureSettings][integration][messaging_service_sid]']->setValue($messagingServiceSid);
 
         $this->client->submit($form);
 
