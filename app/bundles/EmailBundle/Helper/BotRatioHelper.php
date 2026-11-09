@@ -18,6 +18,7 @@ class BotRatioHelper
      */
     private const MAIL_PROVIDER_PROXY_MARKERS = [
         'googleimageproxy',
+        'gmailimageproxy',
         'via ggpht.com',
         'yahoo! mail proxy',
     ];
