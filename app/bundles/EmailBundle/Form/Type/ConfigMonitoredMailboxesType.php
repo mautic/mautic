@@ -4,7 +4,6 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -20,11 +19,6 @@ use Symfony\Component\Validator\Constraints\Email;
  */
 final class ConfigMonitoredMailboxesType extends AbstractType
 {
-    public function __construct(
-        private readonly Mailbox $imapHelper,
-    ) {
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $monitoredShowOn = ('general' == $options['mailbox']) ? '{}'
@@ -156,26 +150,16 @@ final class ConfigMonitoredMailboxesType extends AbstractType
                 ]
             );
 
-            $settings = (empty($options['data']['override_settings'])) ? $options['general_settings'] : $options['data'];
-
-            $this->imapHelper->setMailboxSettings($settings);
-
-            // Check for IMAP connection and get a folder list
+            // Keep form rendering independent from the monitored mailbox. The explicit test-connection
+            // action loads the live folder list, while an unavailable server must not block configuration.
             $choices = [
                 'INBOX' => 'INBOX',
                 'Trash' => 'Trash',
             ];
 
-            if ($this->imapHelper->isConfigured()) {
-                try {
-                    $folders = $this->imapHelper->getListingFolders();
-                    $choices = array_combine($folders, $folders);
-                } catch (\Exception) {
-                    // If the connection failed - add back the selected folder just in case it's a temporary connection issue
-                    if (!empty($options['data']['folder'])) {
-                        $choices[$options['data']['folder']] = $options['data']['folder'];
-                    }
-                }
+            // Preserve a previously selected custom folder until the connection is tested again.
+            if (!empty($options['data']['folder'])) {
+                $choices[$options['data']['folder']] = $options['data']['folder'];
             }
 
             $builder->add(
