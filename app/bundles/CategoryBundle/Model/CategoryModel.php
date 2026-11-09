@@ -129,7 +129,7 @@ final class CategoryModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);
