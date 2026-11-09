@@ -14,6 +14,7 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -59,6 +60,7 @@ use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
+use Mautic\LeadBundle\Event\ContactLastActiveUpdatedEvent;
 use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
@@ -369,6 +371,7 @@ class LeadModel extends FormModel
                 break;
             case 'post_save':
                 $name = LeadEvents::LEAD_POST_SAVE;
+                $this->dispatchLastActiveUpdatedEvent($entity, $event);
                 break;
             case 'pre_delete':
                 $name = LeadEvents::LEAD_PRE_DELETE;
@@ -391,6 +394,30 @@ class LeadModel extends FormModel
         }
 
         return null;
+    }
+
+    private function dispatchLastActiveUpdatedEvent(Lead $lead, ?Event $event): void
+    {
+        if (!$this->dispatcher->hasListeners(ContactLastActiveUpdatedEvent::class)) {
+            return;
+        }
+
+        // A pre_save listener may already have read and reset the entity changes, the event keeps them.
+        $changes = $event instanceof CommonEvent ? $event->getChanges() : $lead->getChanges();
+        if (!isset($changes['dateLastActive'])) {
+            return;
+        }
+
+        [$previousLastActive, $lastActive] = $changes['dateLastActive'];
+        if (!$lastActive instanceof \DateTimeInterface || $previousLastActive == $lastActive) {
+            return;
+        }
+
+        $this->dispatcher->dispatch(new ContactLastActiveUpdatedEvent(
+            (int) $lead->getId(),
+            $lastActive,
+            $previousLastActive instanceof \DateTimeInterface ? $previousLastActive : null
+        ));
     }
 
     protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event

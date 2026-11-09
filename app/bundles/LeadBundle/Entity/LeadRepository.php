@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\LeadBundle\Controller\ListController;
+use Mautic\LeadBundle\Event\ContactLastActiveUpdatedEvent;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -111,6 +112,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $this->triggerModel = $triggerModel;
     }
 
+    #[Required]
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
@@ -1172,7 +1174,27 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $dt     = new DateTimeHelper($lastActiveDate ?? '');
         $fields = ['last_active' => $dt->toUtcString()];
 
+        $dispatchEvent      = $this->dispatcher?->hasListeners(ContactLastActiveUpdatedEvent::class) ?? false;
+        $previousLastActive = $dispatchEvent ? $this->getLastActive((int) $leadId) : null;
+
         $this->getEntityManager()->getConnection()->update(MAUTIC_TABLE_PREFIX.'leads', $fields, ['id' => $leadId]);
+
+        if ($dispatchEvent) {
+            $this->dispatcher->dispatch(new ContactLastActiveUpdatedEvent((int) $leadId, $dt->getUtcDateTime(), $previousLastActive));
+        }
+    }
+
+    private function getLastActive(int $leadId): ?\DateTimeImmutable
+    {
+        $lastActive = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('l.last_active')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where('l.id = :id')
+            ->setParameter('id', $leadId)
+            ->executeQuery()
+            ->fetchOne();
+
+        return $lastActive ? new \DateTimeImmutable($lastActive, new \DateTimeZone('UTC')) : null;
     }
 
     /**
