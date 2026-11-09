@@ -12,7 +12,7 @@ final class TrackingConfigTest extends MauticMysqlTestCase
 {
     public function testTrackingScriptOptionsAreRendered(): void
     {
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit?tab=trackingconfig');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/trackingconfig');
 
         self::assertResponseIsSuccessful();
 

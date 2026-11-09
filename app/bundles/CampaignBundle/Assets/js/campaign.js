@@ -477,6 +477,8 @@ Mautic.handleCampaignEventAjaxClick = function (event) {
  * @param response
  */
 Mautic.campaignEventOnLoad = function (container, response) {
+    Mautic.messageSendOnLoad(container);
+
     if (mQuery('#campaignevent_triggerHour').length) {
         Mautic.campaignEventUpdateIntervalHours();
         mQuery('#campaignevent_triggerHour').on('change', Mautic.campaignEventUpdateIntervalHours);
@@ -571,7 +573,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
             });
 
         //initialize tooltips
-        mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
+        mQuery(eventId).find("*[data-bs-toggle='tooltip'], *[data-toggle='tooltip']").tooltip({html: true});
 
         // Connect into last anchor clicked
         Mautic.campaignBuilderInstance.connect({
@@ -761,7 +763,7 @@ Mautic.campaignSourceOnLoad = function (container, response) {
             });
 
         //initialize tooltipslist-campaign-event
-        mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
+        mQuery(eventId).find("*[data-bs-toggle='tooltip'], *[data-toggle='tooltip']").tooltip({html: true});
         if (autoConnect) {
             // Connect into last anchor clicked
             if (Mautic.campaignBuilderAnchorClicked.search('left') !== -1) {
@@ -1249,7 +1251,7 @@ Mautic.initCampaignCanvasPan = function () {
                 return;
             }
 
-            if (mQuery('.modal.in').length > 0) {
+            if (mQuery('.modal.show').length > 0) {
                 return;
             }
 

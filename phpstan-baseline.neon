@@ -1516,24 +1516,6 @@ parameters:
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
-			message: '#^Method Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/bundles/CoreBundle/Entity/CommonRepository.php
-
-		-
-			message: '#^Method Doctrine\\ORM\\Query\\Expr\:\:andX\(\) invoked with 2 parameters, 0\-1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/bundles/CoreBundle/Entity/CommonRepository.php
-
-		-
-			message: '#^Method Doctrine\\ORM\\Query\\Expr\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/bundles/CoreBundle/Entity/CommonRepository.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Entity\\CommonRepository\:\:appendExpression\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -12008,12 +11990,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Person.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticOutlookBundle\\Integration\\OutlookIntegration\:\:getFormNotes\(\) has parameter \$section with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticOutlookBundle/Integration/OutlookIntegration.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Command\\MauticSocialMonitoringCommand\:\:getMonitors\(\) has parameter \$id with no type specified\.$#'

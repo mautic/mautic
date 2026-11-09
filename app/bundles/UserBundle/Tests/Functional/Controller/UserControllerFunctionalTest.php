@@ -30,6 +30,56 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    #[DataProvider('unmatchedActivityProvider')]
+    public function testEditPageWithUnmatchedActivity(string $object, string $action): void
+    {
+        // Non-empty profile values prevent unrelated users matching empty audit details.
+        foreach ($this->em->getRepository(User::class)->findAll() as $user) {
+            $user->setFirstName('Existing');
+            $user->setLastName('User');
+            $user->setPosition('Existing position');
+            $user->setSignature('Existing signature');
+        }
+        $role = new Role();
+        $role->setName('Activity test role');
+        $role->setDescription('Activity test role description');
+        $this->em->persist($role);
+
+        $actor = $this->userSetter($role);
+        $actor->setPosition('Activity test position');
+        $actor->setSignature('Activity test signature');
+        $this->em->persist($actor);
+        $this->em->flush();
+
+        $log = $this->auditLogSetter($actor->getId(), 'Historical actor', 'user', $object, 999999, $action, [
+            'email'    => ['', 'deleted@example.com'],
+            // Older records may lack a usable username as well as a current target.
+            'username' => ['', ''],
+            'name'     => ['', 'Deleted role'],
+        ]);
+        $this->em->persist($log);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/s/users/edit/'.$actor->getId());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $crawler->filter('form[name="user"]'));
+        $activity = $crawler->filter('.media-list-feed li.media');
+        $this->assertCount(1, $activity);
+        $this->assertCount(1, $activity->filter('a'));
+        $this->assertSame('Historical actor', $activity->filter('a')->text());
+        $this->assertSame('/s/users/edit/'.$actor->getId(), $activity->filter('a')->attr('href'));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function unmatchedActivityProvider(): iterable
+    {
+        yield 'user created' => ['user', 'create'];
+        yield 'user updated' => ['user', 'update'];
+    }
+
     public function testRedirectNonExistingUser(): void
     {
         $crawler = $this->client->request('GET', '/s/users/edit/00000');
@@ -66,6 +116,36 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('The email entered is invalid.', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testIndexUsesLocalAvatars(): void
+    {
+        $crawler = $this->client->request('GET', '/s/users');
+
+        $this->assertResponseIsSuccessful();
+        $images = $crawler->filter('#userTable tbody img');
+        $this->assertGreaterThan(0, $images->count());
+
+        foreach ($images as $image) {
+            $this->assertInstanceOf(\DOMElement::class, $image);
+            $this->assertLocalAvatarUrl($image->getAttribute('src'));
+            $this->assertSame('', $image->getAttribute('alt'));
+        }
+    }
+
+    public function testAccountPageUsesLocalAvatar(): void
+    {
+        $crawler = $this->client->request('GET', '/s/account');
+
+        $this->assertResponseIsSuccessful();
+        $image = $crawler->filter('img.media-object');
+        $this->assertGreaterThan(0, $image->count());
+        $this->assertLocalAvatarUrl((string) $image->attr('src'));
+    }
+
+    private function assertLocalAvatarUrl(string $avatarUrl): void
+    {
+        $this->assertStringStartsWith('data:image/svg+xml;', $avatarUrl);
     }
 
     public function testIndexIncludesInviteForm(): void

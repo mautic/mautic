@@ -6,7 +6,7 @@ return [
     'name'        => 'Zapier Integration',
     'description' => 'Zapier lets you connect Mautic with 1100+ other apps
 ---
-Learn more about Zapier integration in the <a href="https://mautic.org/docs/en/plugins/zapier.html">docs</a>. Make sure Mautic API and Basic Auth is enabled in the <a href="config/edit" target="_blank">configuration</a>.
+Learn more about Zapier integration in the <a href="https://mautic.org/docs/en/plugins/zapier.html">docs</a>. Make sure Mautic API and Basic Auth is enabled in the <a href="config/edit/apiconfig" target="_blank">configuration</a>.
 <br>
 <br>
 Use these predefined Zap templates as a starting point:

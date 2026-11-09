@@ -81,7 +81,7 @@ final class ThemeController extends FormController
                             );
                         }
                     }
-                } else {
+                } elseif ($form->isSubmitted()) {
                     $form->addError(new FormError($form->getErrors(true)));
                 }
             }

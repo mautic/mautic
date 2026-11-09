@@ -272,7 +272,7 @@ final class ButtonHelper
                 "{$this->wrapClosingTag}\n";
         } else {
             // Default `data-toggle` for buttons
-            if (!isset($button['attr']['data-toggle'])) {
+            if (!isset($button['attr']['data-toggle']) && !isset($button['attr']['data-bs-toggle'])) {
                 $button['attr']['data-toggle'] = 'ajax';
             }
 
@@ -426,16 +426,17 @@ final class ButtonHelper
     {
         $tooltip = '';
         if (isset($button['tooltip'])) {
-            $tooltip .= ' data-toggle="tooltip"';
+            $tooltip .= ' data-bs-toggle="tooltip"';
             if (is_array($button['tooltip'])) {
                 foreach ($button['tooltip'] as $k => $v) {
                     if ('title' == $k) {
                         $v = $this->translator->trans($v);
                     }
-                    $tooltip .= " {$k}=".'"'.$v.'"';
+                    $attribute = 'placement' == $k ? 'data-bs-placement' : $k;
+                    $tooltip .= " {$attribute}=".'"'.$v.'"';
                 }
             } else {
-                $tooltip .= ' title="'.$this->translator->trans($button['tooltip']).'" data-placement="left"';
+                $tooltip .= ' title="'.$this->translator->trans($button['tooltip']).'" data-bs-placement="left"';
             }
         }
 
@@ -477,7 +478,7 @@ final class ButtonHelper
         } elseif (!isset($button['attr']['class'])) {
             // Conditional check for LOCATION_TOOLBAR_BULK_ACTIONS
             if (self::LOCATION_TOOLBAR_BULK_ACTIONS === $this->location) {
-                $addTo['attr']['class'] = 'btn btn-primary bdr-rds-0';
+                $addTo['attr']['class'] = 'btn btn-primary rounded-0';
                 $addTo['attr']['size']  = 'lg';
             } else {
                 $addTo['attr']['class'] = 'btn btn-tertiary';

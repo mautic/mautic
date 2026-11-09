@@ -35,7 +35,7 @@ final class NotificationType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.notification.form.internal.name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -45,7 +45,7 @@ final class NotificationType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.notification.form.internal.description',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]
@@ -56,7 +56,7 @@ final class NotificationType extends AbstractType
             EmailUtmTagsType::class,
             [
                 'label'      => 'mautic.email.utm_tags',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.utm_tags.tooltip',
@@ -70,7 +70,7 @@ final class NotificationType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.notification.form.heading',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => true,
             ]
@@ -81,7 +81,7 @@ final class NotificationType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.notification.form.message',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                     'rows'  => 6,
@@ -95,7 +95,7 @@ final class NotificationType extends AbstractType
             UrlType::class,
             [
                 'label'      => 'mautic.notification.form.url',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.notification.form.url.tooltip',
@@ -109,7 +109,7 @@ final class NotificationType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.notification.form.button',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.notification.form.button.tooltip',
@@ -136,7 +136,7 @@ final class NotificationType extends AbstractType
             LocaleType::class,
             [
                 'label'      => 'mautic.core.language',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],

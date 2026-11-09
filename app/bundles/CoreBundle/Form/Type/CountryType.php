@@ -19,7 +19,7 @@ final class CountryType extends AbstractType
         $resolver->setDefaults([
             'choices_as_values' => true,
             'choices'           => FormFieldHelper::getCountryChoices(),
-            'label_attr'        => ['class' => 'control-label'],
+            'label_attr'        => ['class' => 'form-label'],
             'attr'              => ['class' => 'form-control'],
             'multiple'          => false,
             'expanded'          => false,

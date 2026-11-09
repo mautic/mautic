@@ -398,7 +398,7 @@ Mautic.batchActionPrecheck = function(container) {
         container = '';
     }
 
-    return mQuery(container + ' input[class=list-checkbox]:checked').length;
+    return mQuery(container + ' input.list-checkbox:checked').length;
 };
 
 /**
@@ -409,7 +409,7 @@ Mautic.batchActionPrecheck = function(container) {
  * @returns {*}
  */
 Mautic.getCheckedListIds = function(el, stringify) {
-    var checkboxes = 'input[class=list-checkbox]:checked';
+    var checkboxes = 'input.list-checkbox:checked';
 
     // Check for a target
     if (typeof el != 'undefined' && el) {
