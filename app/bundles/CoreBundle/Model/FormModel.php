@@ -153,7 +153,7 @@ class FormModel extends AbstractCommonModel
             $this->setTimestamps($entity, $isNew, $unlock);
 
             // Pre save single dispatcher
-            $preEvent                = $this->dispatchEventFromBatch('pre_save', $entity, $isNew);
+            $preEvent                = $this->dispatchEvent('pre_save', $entity, $isNew);
             $entitiesPreSaveParams[] = ['entity' => $entity, 'isNew' => $isNew, 'event' => $preEvent];
         }
 
@@ -176,7 +176,7 @@ class FormModel extends AbstractCommonModel
         $entitiesPostSaveParams = [];
         foreach ($entitiesPreSaveParams as &$entityParams) {
             // Post save single dispatcher after flush
-            $postEvent                = $this->dispatchEventFromBatch('post_save', $entityParams['entity'], $entityParams['isNew'], $entityParams['event']);
+            $postEvent                = $this->dispatchEvent('post_save', $entityParams['entity'], $entityParams['isNew'], $entityParams['event']);
             $entitiesPostSaveParams[] = ['entity' => $entityParams['entity'], 'isNew' => $entityParams['isNew'], 'event' => $postEvent];
         }
 
@@ -391,14 +391,6 @@ class FormModel extends AbstractCommonModel
         // ...
 
         return $event;
-    }
-
-    /**
-     * Dispatches events for child classes.
-     */
-    protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        return $this->dispatchEvent($action, $entity, $isNew, $event);
     }
 
     /**
