@@ -24,11 +24,11 @@ class AcceptanceTester extends Codeception\Actor
 
     public const TIMEOUT = 30;
 
-    public function login(string $name = 'admin', string $password = 'Maut1cR0cks!'): void
+    public function login(string $name = 'admin', string $password = 'Maut1cR0cks!', bool $reuseSessionSnapshot = true): void
     {
         $I = $this;
         // if snapshot exists - skipping login
-        if ($I->loadSessionSnapshot('login')) {
+        if ($reuseSessionSnapshot && $I->loadSessionSnapshot('login')) {
             $I->amOnPage('/s/dashboard');
             $I->waitForJS('return typeof window.LoginUserId !== "undefined";', self::TIMEOUT);
             if ($I->executeJS('return window.LoginUserId > 0;')) {
@@ -36,6 +36,21 @@ class AcceptanceTester extends Codeception\Actor
             }
         }
         // logging in
+        if (!$reuseSessionSnapshot) {
+            $I->amOnPage('/s/logout');
+            $I->executeInSelenium(static function (Facebook\WebDriver\Remote\RemoteWebDriver $webDriver): void {
+                foreach ($webDriver->manage()->getCookies() as $cookie) {
+                    if (in_array(trim($cookie['name']), [
+                        Codeception\Coverage\Subscriber\LocalServer::COVERAGE_COOKIE,
+                        Codeception\Coverage\Subscriber\LocalServer::COVERAGE_COOKIE_ERROR,
+                    ], true)) {
+                        continue;
+                    }
+
+                    $webDriver->manage()->deleteCookieNamed($cookie['name']);
+                }
+            });
+        }
         $I->amOnPage('/s/login');
         $I->fillField('#username', $name);
         $I->fillField('#password', $password);
