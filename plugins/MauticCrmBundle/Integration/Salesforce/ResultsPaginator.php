@@ -19,7 +19,7 @@ final class ResultsPaginator
 
     public function __construct(
         private readonly LoggerInterface $logger,
-        private string $salesforceBaseUrl,
+        private readonly string $salesforceBaseUrl,
     ) {
     }
 
@@ -42,11 +42,9 @@ final class ResultsPaginator
     }
 
     /**
-     * @return string
-     *
      * @throws ApiErrorException
      */
-    public function getNextResultsUrl()
+    public function getNextResultsUrl(): ?string
     {
         if (isset($this->results['nextRecordsUrl'])) {
             $this->retryCount     = 0;
