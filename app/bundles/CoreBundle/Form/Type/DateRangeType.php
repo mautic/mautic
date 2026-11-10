@@ -33,6 +33,8 @@ final class DateRangeType extends AbstractType
         $humanFormat = 'M j, Y';
         $dateFrom    = $options['data']['date_from'] ?? null;
         $dateTo      = $options['data']['date_to'] ?? null;
+        $dateFrom    = $this->normalizeIsoDate($dateFrom, $humanFormat);
+        $dateTo      = $this->normalizeIsoDate($dateTo, $humanFormat);
 
         if ($options['set_default_values']) {
             $sessionDateFrom = $session->get('mautic.daterange.form.from');
@@ -115,11 +117,41 @@ final class DateRangeType extends AbstractType
         }
     }
 
+    /**
+     * The shared date picker expects the human format, but callers (e.g. reports) may supply ISO dates.
+     */
+    private function normalizeIsoDate(mixed $value, string $humanFormat): mixed
+    {
+        if (!is_string($value) || !preg_match('/^\d{4}-\d{2}-\d{2}/', $value)) {
+            return $value;
+        }
+
+        try {
+            return (new \DateTime($value))->format($humanFormat);
+        } catch (\Exception) {
+            return $value;
+        }
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'show_apply_button'  => true,
             'set_default_values' => true,
+            'constraints'        => [
+                new Callback(static function (mixed $data, ExecutionContextInterface $context): void {
+                    if (!is_array($data)) {
+                        return;
+                    }
+
+                    $from = is_string($data['date_from'] ?? null) ? \DateTime::createFromFormat('!M j, Y', $data['date_from']) : false;
+                    $to   = is_string($data['date_to'] ?? null) ? \DateTime::createFromFormat('!M j, Y', $data['date_to']) : false;
+
+                    if ($from && $to && $from > $to) {
+                        $context->buildViolation('mautic.core.daterange.invalid.range')->addViolation();
+                    }
+                }),
+            ],
         ]);
     }
 

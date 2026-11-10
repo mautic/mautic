@@ -59,6 +59,7 @@ class DateAbsoluteInterval implements FilterDecoratorInterface
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): array
     {
         $bounds = [];
+        $dates  = [];
         foreach (['date_from' => ' 00:00:00', 'date_to' => ' 23:59:59'] as $key => $time) {
             $value = $this->originalValue[$key] ?? null;
             $date   = is_string($value) ? \DateTime::createFromFormat('M j, Y', $value) : false;
@@ -68,7 +69,12 @@ class DateAbsoluteInterval implements FilterDecoratorInterface
                 throw new \InvalidArgumentException(sprintf('Invalid "%s" value for the date range filter.', $key));
             }
 
+            $dates[]  = $date;
             $bounds[] = $date->format('Y-m-d').$time;
+        }
+
+        if ($dates[0] > $dates[1]) {
+            throw new \InvalidArgumentException('The "date_from" value must not be later than "date_to" for the date range filter.');
         }
 
         return $bounds;
