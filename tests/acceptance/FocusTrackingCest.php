@@ -85,13 +85,13 @@ JS, self::DISPLAY_FOCUS_ID));
 
         $displayUrl = $this->getMauticUrl($I).$displayPath;
         $I->executeJS('window.originalFocusItem = window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.']; window.focusFixture.loadScript('.json_encode($displayUrl, JSON_THROW_ON_ERROR).').then(function () { window.secondDisplayLoaded = true; });');
-        $I->waitForJS('return window.secondDisplayLoaded === true', 10);
+        $I->waitForJS('return window.secondDisplayLoaded === true', \AcceptanceTester::TIMEOUT);
         $idempotentState = $I->executeJS('return {sameItem: window.originalFocusItem === window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'], iframeCount: document.querySelectorAll("iframe").length};');
         $I->assertTrue($idempotentState['sameItem']);
         $I->assertSame(1, $idempotentState['iframeCount']);
 
         $I->executeJS('window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].iframeDoc.querySelector(".mf-modal-close a").click();');
-        $I->waitForJS('return document.querySelectorAll("iframe").length === 0', 10);
+        $I->waitForJS('return document.querySelectorAll("iframe").length === 0', \AcceptanceTester::TIMEOUT);
         $I->executeJS('window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].convertVisitor();');
         $modalState = $this->focusState($I, self::DISPLAY_FOCUS_ID);
         $I->assertStringNotContainsString('mautic_focus_'.self::DISPLAY_FOCUS_ID, $modalState['identity']['cookies'], 'no conversion or dismissal cookie before tracking is enabled');
@@ -106,7 +106,7 @@ JS, self::DISPLAY_FOCUS_ID));
         $this->openFixture($I, [$barPath]);
         $this->waitForFocus($I, self::BAR_FOCUS_ID, true);
         $I->executeJS('document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.'").click();');
-        $I->waitForJS('return document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.' svg").getAttribute("data-transform-direction") === "90"', 10);
+        $I->waitForJS('return document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.' svg").getAttribute("data-transform-direction") === "90"', \AcceptanceTester::TIMEOUT);
         $collapsedState = $this->focusState($I, self::BAR_FOCUS_ID);
         $I->assertStringContainsString('mf-bar-collapser-'.self::BAR_FOCUS_ID.'=90', $collapsedState['identity']['cookies']);
         $this->assertAllowedFocusCookieWrites($I, $collapsedState['cookieWrites'], [
@@ -115,7 +115,7 @@ JS, self::DISPLAY_FOCUS_ID));
 
         $this->openFixture($I, [$barPath]);
         $this->waitForFocus($I, self::BAR_FOCUS_ID, true);
-        $I->waitForJS('return document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.'").classList.contains("mf-bar-collapsed") && document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.' svg").getAttribute("data-transform-direction") === "90"', 10);
+        $I->waitForJS('return document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.'").classList.contains("mf-bar-collapsed") && document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.' svg").getAttribute("data-transform-direction") === "90"', \AcceptanceTester::TIMEOUT);
         $finalState = $this->focusState($I, self::BAR_FOCUS_ID);
         $this->assertIdentityValues($I, $finalState['identity']);
         $I->seeNumRecords(0, 'test_focus_stats', ['focus_id' => self::DISPLAY_FOCUS_ID]);
@@ -127,11 +127,11 @@ JS, self::DISPLAY_FOCUS_ID));
         $this->openFixture($I, [$this->focusPath(self::DISPLAY_FOCUS_ID, 'display')], ['reset' => '1']);
         $this->waitForFocus($I, self::DISPLAY_FOCUS_ID, true);
         $I->executeJS('window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].iframeDoc.querySelector(".mf-modal-close a").click();');
-        $I->waitForJS('return document.querySelectorAll("iframe").length === 0', 10);
+        $I->waitForJS('return document.querySelectorAll("iframe").length === 0', \AcceptanceTester::TIMEOUT);
         $I->assertSame([], $this->focusState($I, self::DISPLAY_FOCUS_ID)['cookieWrites']);
 
         $I->executeJS('window.MauticFocus.enableTracking('.self::DISPLAY_FOCUS_ID.');');
-        $I->waitForJS('return window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].trackingEnabled === true', 10);
+        $I->waitForJS('return window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].trackingEnabled === true', \AcceptanceTester::TIMEOUT);
         $this->waitForNetworkQuiet($I);
 
         // What happened before consent is stored once tracking is enabled
@@ -142,16 +142,16 @@ JS, self::DISPLAY_FOCUS_ID));
 
         // Frequency capping works again: the item is shown once
         $this->openFixture($I, [$this->focusPath(self::DISPLAY_FOCUS_ID, 'display')]);
-        $I->waitForJS('return window.focusFixture.finished && window.MauticFocusItems && window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].initialized', 10);
+        $I->waitForJS('return window.focusFixture.finished && window.MauticFocusItems && window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].initialized', \AcceptanceTester::TIMEOUT);
         $I->assertSame(0, $I->executeJS('return document.querySelectorAll("iframe").length;'));
 
         $barPath = $this->focusPath(self::BAR_FOCUS_ID, 'display');
         $this->openFixture($I, [$barPath], ['reset' => '1']);
         $this->waitForFocus($I, self::BAR_FOCUS_ID, true);
         $I->executeJS('window.MauticFocus.enableTracking('.self::BAR_FOCUS_ID.');');
-        $I->waitForJS('return window.MauticFocusItems['.self::BAR_FOCUS_ID.'].trackingEnabled === true', 10);
+        $I->waitForJS('return window.MauticFocusItems['.self::BAR_FOCUS_ID.'].trackingEnabled === true', \AcceptanceTester::TIMEOUT);
         $I->executeJS('document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.'").click();');
-        $I->waitForJS('return document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.' svg").getAttribute("data-transform-direction") === "90"', 10);
+        $I->waitForJS('return document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.' svg").getAttribute("data-transform-direction") === "90"', \AcceptanceTester::TIMEOUT);
 
         $barState = $this->focusState($I, self::BAR_FOCUS_ID);
         $I->assertStringContainsString('mf-bar-collapser-'.self::BAR_FOCUS_ID.'=90', $barState['identity']['cookies']);
@@ -164,7 +164,7 @@ JS, self::DISPLAY_FOCUS_ID));
         $trackingPath = $this->focusPath(self::EXPLICIT_FOCUS_ID, 'tracking');
         $viewPath = $this->focusPath(self::EXPLICIT_FOCUS_ID, 'view');
         $this->openFixture($I, [$displayPath], ['reset' => '1']);
-        $I->waitForJS('return window.focusFixture.finished && window.MauticFocusItems && window.MauticFocusItems['.self::EXPLICIT_FOCUS_ID.'].runtimeReady', 10);
+        $I->waitForJS('return window.focusFixture.finished && window.MauticFocusItems && window.MauticFocusItems['.self::EXPLICIT_FOCUS_ID.'].runtimeReady', \AcceptanceTester::TIMEOUT);
         $I->executeJS('window.MauticFocusItems['.self::EXPLICIT_FOCUS_ID.'].engageVisitor();');
         $this->waitForFocus($I, self::EXPLICIT_FOCUS_ID, true);
         $I->executeJS('window.MauticFocusItems['.self::EXPLICIT_FOCUS_ID.'].iframeDoc.body.insertAdjacentHTML("beforeend", "<div class=\"mauticform_wrapper\"><form data-mautic-form=\"test\"></form></div>");');
@@ -176,7 +176,7 @@ JS, self::DISPLAY_FOCUS_ID));
         $I->seeNumRecords(0, 'test_focus_stats', ['focus_id' => self::EXPLICIT_FOCUS_ID]);
 
         $I->executeJS('window.MauticFocusItems['.self::EXPLICIT_FOCUS_ID.'].loadTracking(); window.MauticFocusItems['.self::EXPLICIT_FOCUS_ID.'].loadTracking();');
-        $I->waitForJS('return window.MauticFocusItems['.self::EXPLICIT_FOCUS_ID.'].trackingEnabled === true', 10);
+        $I->waitForJS('return window.MauticFocusItems['.self::EXPLICIT_FOCUS_ID.'].trackingEnabled === true', \AcceptanceTester::TIMEOUT);
         $this->waitForNetworkQuiet($I);
 
         $postActivationState = $this->focusState($I, self::EXPLICIT_FOCUS_ID);
@@ -198,13 +198,13 @@ JS, self::DISPLAY_FOCUS_ID));
         $removedTrackingPath = $this->focusPath(self::REMOVED_FOCUS_ID, 'tracking');
         $removedViewPath = $this->focusPath(self::REMOVED_FOCUS_ID, 'view');
         $this->openFixture($I, [$removedDisplayPath], ['reset' => '1']);
-        $I->waitForJS('return window.focusFixture.finished && window.MauticFocusItems && window.MauticFocusItems['.self::REMOVED_FOCUS_ID.'].runtimeReady', 10);
+        $I->waitForJS('return window.focusFixture.finished && window.MauticFocusItems && window.MauticFocusItems['.self::REMOVED_FOCUS_ID.'].runtimeReady', \AcceptanceTester::TIMEOUT);
         $I->executeJS('window.MauticFocusItems['.self::REMOVED_FOCUS_ID.'].engageVisitor();');
         $this->waitForFocus($I, self::REMOVED_FOCUS_ID, true);
         $I->executeJS('window.MauticFocusItems['.self::REMOVED_FOCUS_ID.'].iframeDoc.querySelector(".mf-modal-close a").click();');
-        $I->waitForJS('return document.querySelectorAll("iframe").length === 0', 10);
+        $I->waitForJS('return document.querySelectorAll("iframe").length === 0', \AcceptanceTester::TIMEOUT);
         $I->executeJS('window.MauticFocusItems['.self::REMOVED_FOCUS_ID.'].loadTracking();');
-        $I->waitForJS('return window.MauticFocusItems['.self::REMOVED_FOCUS_ID.'].trackingEnabled === true', 10);
+        $I->waitForJS('return window.MauticFocusItems['.self::REMOVED_FOCUS_ID.'].trackingEnabled === true', \AcceptanceTester::TIMEOUT);
         $this->waitForNetworkQuiet($I);
 
         $removedState = $this->focusState($I, self::REMOVED_FOCUS_ID);
@@ -220,8 +220,8 @@ JS, self::DISPLAY_FOCUS_ID));
         $trackingPath = $this->focusPath(self::QUEUED_FOCUS_ID, 'tracking');
         $viewPath = $this->focusPath(self::QUEUED_FOCUS_ID, 'view');
         $this->openFixture($I, [$displayPath], ['reset' => '1', 'queued' => (string) self::QUEUED_FOCUS_ID]);
-        $I->waitForJS('return Boolean(window.MauticFocusItems && window.MauticFocusItems['.self::QUEUED_FOCUS_ID.'].trackingEnabled && window.MauticFocusItems['.self::QUEUED_FOCUS_ID.'].iframeDoc)', 10);
-        $I->waitForJS('return window.focusFixture.countRequests('.json_encode($viewPath, JSON_THROW_ON_ERROR).', "image") === 1', 10);
+        $I->waitForJS('return Boolean(window.MauticFocusItems && window.MauticFocusItems['.self::QUEUED_FOCUS_ID.'].trackingEnabled && window.MauticFocusItems['.self::QUEUED_FOCUS_ID.'].iframeDoc)', \AcceptanceTester::TIMEOUT);
+        $I->waitForJS('return window.focusFixture.countRequests('.json_encode($viewPath, JSON_THROW_ON_ERROR).', "image") === 1', \AcceptanceTester::TIMEOUT);
         $this->waitForNetworkQuiet($I);
 
         $state = $this->focusState($I, self::QUEUED_FOCUS_ID);
@@ -243,7 +243,7 @@ JS, self::DISPLAY_FOCUS_ID));
         $scripts = [$displayPath, '/mautic-essential.js', '/mautic-tracking.js'];
 
         $this->openFixture($I, $scripts, ['reset' => '1']);
-        $I->waitForJS('return window.focusFixture.finished && window.MauticJS && window.MauticJS.trackingEnabled === true', 10);
+        $I->waitForJS('return window.focusFixture.finished && window.MauticJS && window.MauticJS.trackingEnabled === true', \AcceptanceTester::TIMEOUT);
         $this->waitForNetworkQuiet($I);
         $independentState = $this->focusState($I, self::EXPLICIT_FOCUS_ID);
         $I->assertTrue($I->executeJS('return window.MauticJS.trackingEnabled === true;'));
@@ -252,7 +252,7 @@ JS, self::DISPLAY_FOCUS_ID));
         $I->assertSame([], $independentState['errors']);
 
         $this->openFixture($I, $scripts, ['reset' => '1', 'shared' => '1']);
-        $I->waitForJS('return window.focusFixture.finished && window.MauticJS && window.MauticJS.trackingEnabled === true && window.MauticFocusItems['.self::EXPLICIT_FOCUS_ID.'].trackingEnabled === true', 10);
+        $I->waitForJS('return window.focusFixture.finished && window.MauticJS && window.MauticJS.trackingEnabled === true && window.MauticFocusItems['.self::EXPLICIT_FOCUS_ID.'].trackingEnabled === true', \AcceptanceTester::TIMEOUT);
         $this->waitForNetworkQuiet($I);
         $sharedState = $this->focusState($I, self::EXPLICIT_FOCUS_ID);
         $I->assertTrue($I->executeJS('return window.MauticJS.trackingEnabled === true;'));
@@ -267,7 +267,7 @@ JS, self::DISPLAY_FOCUS_ID));
         $viewPath = $this->focusPath(self::LEGACY_FOCUS_ID, 'view');
         $this->openFixture($I, [$legacyPath], ['reset' => '1']);
         $this->waitForFocus($I, self::LEGACY_FOCUS_ID, true);
-        $I->waitForJS('return Array.from(window.MauticFocusItems['.self::LEGACY_FOCUS_ID.'].iframeDoc.images).filter(function (image) { return new URL(image.src).pathname === '.json_encode($viewPath, JSON_THROW_ON_ERROR).' && image.complete; }).length === 1', 10);
+        $I->waitForJS('return Array.from(window.MauticFocusItems['.self::LEGACY_FOCUS_ID.'].iframeDoc.images).filter(function (image) { return new URL(image.src).pathname === '.json_encode($viewPath, JSON_THROW_ON_ERROR).' && image.complete; }).length === 1', \AcceptanceTester::TIMEOUT);
 
         $state = $this->focusState($I, self::LEGACY_FOCUS_ID);
         $I->assertSame([], $state['errors']);
@@ -363,7 +363,7 @@ JS, self::DISPLAY_FOCUS_ID));
         }
 
         $I->amOnPage('/tests/_data/focus-tracking.html?'.implode('&', $query));
-        $I->waitForJS('return window.focusFixture && window.focusFixture.finished === true', 10);
+        $I->waitForJS('return window.focusFixture && window.focusFixture.finished === true', \AcceptanceTester::TIMEOUT);
     }
 
     private function waitForFocus(\AcceptanceTester $I, int $focusId, bool $withIframe): void
@@ -372,12 +372,12 @@ JS, self::DISPLAY_FOCUS_ID));
         if ($withIframe) {
             $condition .= ' && typeof window.MauticFocusItems['.$focusId.'].iframeDoc !== "undefined"';
         }
-        $I->waitForJS($condition.' ? true : false', 10);
+        $I->waitForJS($condition.' ? true : false', \AcceptanceTester::TIMEOUT);
     }
 
     private function waitForNetworkQuiet(\AcceptanceTester $I): void
     {
-        $I->waitForJS('return window.focusFixture.pendingRequests === 0 && Date.now() - window.focusFixture.lastNetworkActivity >= window.focusFixture.networkQuietPeriod', 10);
+        $I->waitForJS('return window.focusFixture.pendingRequests === 0 && Date.now() - window.focusFixture.lastNetworkActivity >= window.focusFixture.networkQuietPeriod', \AcceptanceTester::TIMEOUT);
     }
 
     /**
