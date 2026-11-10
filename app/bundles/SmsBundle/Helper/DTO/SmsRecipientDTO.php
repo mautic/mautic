@@ -30,7 +30,7 @@ final class SmsRecipientDTO implements \JsonSerializable
         return $this->lead;
     }
 
-    public function setResult(mixed $result): void
+    public function setResult(bool|string $result): void
     {
         // Some legacy transports return provider error strings. Only a literal true
         // represents acceptance, and raw provider responses must not remain on the DTO.
