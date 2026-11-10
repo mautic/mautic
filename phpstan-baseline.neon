@@ -5506,12 +5506,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/Lead.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\Lead\:\:getPrimaryIdentifier\(\) should return string but returns true\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/LeadBundle/Entity/Lead.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\Lead\:\:setActualPoints\(\) has parameter \$points with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -11991,12 +11985,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Person.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticOutlookBundle\\Integration\\OutlookIntegration\:\:getFormNotes\(\) has parameter \$section with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticOutlookBundle/Integration/OutlookIntegration.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Command\\MauticSocialMonitoringCommand\:\:getMonitors\(\) has parameter \$id with no type specified\.$#'
