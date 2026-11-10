@@ -7,8 +7,8 @@ namespace Mautic\LeadBundle\Deduplicate\Exception;
 final class ValueNotMergeableException extends \Exception
 {
     public function __construct(
-        private mixed $newerValue,
-        private mixed $olderValue,
+        private readonly mixed $newerValue,
+        private readonly mixed $olderValue,
     ) {
         parent::__construct();
     }

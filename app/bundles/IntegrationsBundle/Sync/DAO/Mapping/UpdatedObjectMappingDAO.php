@@ -15,7 +15,7 @@ final class UpdatedObjectMappingDAO
     public function __construct(
         private readonly string $integration,
         private readonly string $integrationObjectName,
-        private mixed $integrationObjectId,
+        private readonly mixed $integrationObjectId,
         \DateTimeInterface $objectModifiedDate,
     ) {
         $this->objectModifiedDate    = $objectModifiedDate instanceof \DateTimeImmutable ? new \DateTime(

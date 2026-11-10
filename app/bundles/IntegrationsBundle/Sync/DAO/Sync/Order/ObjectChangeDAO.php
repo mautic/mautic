@@ -35,7 +35,7 @@ final class ObjectChangeDAO
         private readonly string $object,
         private mixed $objectId,
         private readonly string $mappedObject,
-        private mixed $mappedId,
+        private readonly mixed $mappedId,
         private ?\DateTimeInterface $changeDateTime = null,
     ) {
     }
