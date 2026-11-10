@@ -22,6 +22,9 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    /**
+     * @param TransactionIsolationLevel::* $isolation
+     */
     #[DataProvider('isolationLevels')]
     public function testCreationLockIsHeldUntilOutermostCommit(int $isolation): void
     {
@@ -110,7 +113,7 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return iterable<string, array{int}>
+     * @return iterable<string, array{TransactionIsolationLevel::*}>
      */
     public static function isolationLevels(): iterable
     {
