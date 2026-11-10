@@ -146,6 +146,20 @@ final class PushContactTest extends MauticMysqlTestCase
         $this->assertSame('https://us7.api.mailchimp.com/3.0/lists/list-1/merge-fields', $this->requests[1]['url']);
     }
 
+    public function testIntegrationConfigReloadOfAnUnknownIntegrationReturnsNothing(): void
+    {
+        $this->client->request('GET', '/s/ajax', [
+            'action'      => 'plugin:getIntegrationConfig',
+            'integration' => 'Unknown',
+            'settings'    => ['name' => 'campaignevent[properties][integration]'],
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $this->assertSame(0, $response['success']);
+        $this->assertArrayNotHasKey('html', $response);
+    }
+
     private function mockResponses(MockResponse ...$responses): void
     {
         $httpClient = self::getContainer()->get(MockHttpClient::class);

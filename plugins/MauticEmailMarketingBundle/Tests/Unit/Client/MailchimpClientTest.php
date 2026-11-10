@@ -101,6 +101,7 @@ final class MailchimpClientTest extends TestCase
     {
         yield 'not configured' => [[], new MockResponse('{}'), 'Mailchimp is not configured.'];
         yield 'key without data center' => [['password' => 'key'], new MockResponse('{}'), 'Invalid key'];
+        yield 'error status' => [['password' => 'key-us7'], new MockResponse('{"status":"error","error":"Invalid list"}'), 'Invalid list'];
         yield 'error list' => [['password' => 'key-us7'], new MockResponse('{"errors":[{"message":"Bad"},{"message":"request"}]}'), 'Bad request'];
         yield 'problem details' => [['password' => 'key-us7'], new MockResponse('{"title":"API Key Invalid","status":401,"detail":"Your API key may be invalid."}', ['http_code' => 401]), 'Your API key may be invalid.'];
         yield 'transport error' => [['password' => 'key-us7'], new MockResponse('', ['error' => 'Connection refused']), 'Connection refused'];

@@ -53,6 +53,26 @@ final class ConstantContactClientTest extends TestCase
         $client->subscribe(self::KEYS, '1', 'john@example.com', [], 'ACTION_BY_OWNER');
     }
 
+    public function testHttpErrorWithoutMessagesIsReported(): void
+    {
+        $client = new ConstantContactClient(new MockHttpClient(new MockResponse('{}', ['http_code' => 500])));
+
+        $this->expectException(ApiException::class);
+        $this->expectExceptionMessage('Constant Contact returned HTTP 500.');
+
+        $client->getLists(self::KEYS);
+    }
+
+    public function testTransportErrorIsReported(): void
+    {
+        $client = new ConstantContactClient(new MockHttpClient(new MockResponse('', ['error' => 'Connection refused'])));
+
+        $this->expectException(ApiException::class);
+        $this->expectExceptionMessage('Connection refused');
+
+        $client->getLists(self::KEYS);
+    }
+
     public function testRequiresTheApiKeyAndToken(): void
     {
         $client = new ConstantContactClient(new MockHttpClient());

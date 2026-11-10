@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Exception\PushContactException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\PushContactInterface;
@@ -84,6 +85,27 @@ final class CampaignSubscriberTest extends TestCase
         $integration->expects($this->never())->method('pushContact');
 
         $subscriber = $this->createSubscriber($integration);
+        $subscriber->onCampaignTriggerAction($pendingEvent);
+
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+    }
+
+    public function testActionPassesWhenTheIntegrationHasNoSettings(): void
+    {
+        $pendingEvent = $this->createPendingEvent(['integration' => 'Foo']);
+
+        $listed = $this->createStub(PushContactInterface::class);
+        $listed->method('getName')->willReturn('Foo');
+
+        $integrationHelper = $this->createStub(IntegrationHelper::class);
+        $integrationHelper->method('getIntegrationObjects')->willReturn(['Foo' => $listed]);
+
+        $integrationsHelper = $this->createMock(IntegrationsHelper::class);
+        $integrationsHelper->expects($this->once())->method('getIntegration')->willThrowException(new IntegrationNotFoundException());
+
+        $subscriber = new CampaignSubscriber();
+        $subscriber->autowirePushToIntegrationTrait($integrationHelper);
+        $subscriber->autowirePushContactIntegrations($integrationsHelper);
         $subscriber->onCampaignTriggerAction($pendingEvent);
 
         $this->assertCount(1, $pendingEvent->getSuccessful());
