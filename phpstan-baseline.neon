@@ -3754,12 +3754,6 @@ parameters:
 			path: app/bundles/EmailBundle/Model/EmailModel.php
 
 		-
-			message: '#^Parameter \#1 \$details of method Mautic\\EmailBundle\\Entity\\Stat\:\:addOpenDetails\(\) expects string, array\<string, mixed\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
 			message: '#^Parameter \#1 \$label of method Mautic\\CoreBundle\\Helper\\Chart\\BarChart\:\:setDataset\(\) expects string, null given\.$#'
 			identifier: argument.type
 			count: 1

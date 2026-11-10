@@ -221,5 +221,6 @@ return [
         'bot_helper_blocked_ip_addresses'                                   => [],
         'smime_signing_enabled'                                             => false,
         'smime_certificates_path'                                           => '%kernel.project_dir%/var/smime_certificates',
+        'email_stats_compaction_threshold_days'                             => 0,
     ],
 ];
