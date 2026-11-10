@@ -14,18 +14,18 @@
             <div class="progress-bar progress-bar-danger" style="width:{{ event['noPercent'] }}%; left: {{ event['yesPercent'] }}%"></div>
             <div class="box-layout">
                 <div class="visible-sm visible-md visible-lg col-stats">
-                    <span class="mt-xs label label-{{ typeClass }}" data-toggle="tooltip" title="{{ percentLabel|trans }}">
+                    <span class="mt-xs label label-{{ typeClass }}" data-bs-toggle="tooltip" title="{{ percentLabel|trans }}">
                       {{ event[percentProp] }}%
                     </span>
                     {% if event.eventType is defined and 'action' != event.eventType %}
-                        <span class="label label-danger" data-toggle="tooltip" title="{{ 'mautic.report.campaign.no.percent'|trans }}">
+                        <span class="label label-danger" data-bs-toggle="tooltip" title="{{ 'mautic.report.campaign.no.percent'|trans }}">
                           {{ event.noPercent }}%
                         </span>
                     {% endif %}
-                <span class="mt-xs label label-warning" data-toggle="tooltip" title="{{ 'mautic.report.campaign.completed.actions'|trans }}">
+                <span class="mt-xs label label-warning" data-bs-toggle="tooltip" title="{{ 'mautic.report.campaign.completed.actions'|trans }}">
                     {{ event.logCountProcessed }}
                 </span>
-                <span size="sm" class="mt-xs label label-gray"  data-toggle="tooltip" title="{{ 'mautic.report.campaign.pending.actions'|trans }}">
+                <span size="sm" class="mt-xs label label-gray"  data-bs-toggle="tooltip" title="{{ 'mautic.report.campaign.pending.actions'|trans }}">
                     {{ event.logCountForPending }}
                 </span>
                 </div>
@@ -41,7 +41,7 @@
                     </h5>
                     <h6 class="text-white dark-sm">{{ event.description }}</h6>
                 </div>
-                <div class="col-md-3 align-middle text-right">
+                <div class="col-md-3 align-middle text-end">
                     <em class="text-white dark-sm">{{ ('mautic.campaign.'~event.type)|trans }}</em>
                 </div>
             </div>

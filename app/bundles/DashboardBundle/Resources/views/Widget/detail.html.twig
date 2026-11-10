@@ -1,12 +1,12 @@
 <div class="tile" style="height: {{ widget.height|default('310') - 10 }}px;">
-    <div class="card-header d-flex jc-space-between ai-center">
+    <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="fw-sb">{{ widget.name|purify }}</h4>
         {% if widget.id %}
             <div class="dropdown">
-                <a class="btn btn-ghost btn--icon-only btn-xs dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
+                <a class="btn btn-ghost btn--icon-only btn-xs dropdown-toggle" data-bs-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
                     <i class="ri-more-2-fill"></i>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-right">
+                <ul class="dropdown-menu dropdown-menu-end">
                     <li class="small fw-sb text-secondary ma-md ellipsis">
                         {% if widget.isCached %}
                             <i class="ri-history-line mr-xs"></i>
@@ -42,7 +42,7 @@
         {% endif %}
     </div>
     <hr class="bdr-b">
-    <div class="card-body d-flex fd-column fg-1">
+    <div class="card-body d-flex flex-column flex-grow-1">
         {% if widget.errorMessage %}
             <div class="alert alert-danger" role="alert">
                 {{ widget.errorMessage|trans }}
@@ -53,7 +53,7 @@
             <!-- end: {{ widget.template }} -->
         {% endif %}
     </div>
-    <div class="widget-overlay d-flex ai-center jc-center">
+    <div class="widget-overlay d-flex align-items-center justify-content-center">
         <i class="ri-drag-drop-fill ri-4x text-interactive"></i>
     </div>
 </div>
