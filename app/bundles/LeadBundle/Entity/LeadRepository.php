@@ -1179,7 +1179,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $this->getEntityManager()->getConnection()->update(MAUTIC_TABLE_PREFIX.'leads', $fields, ['id' => $leadId]);
 
-        if ($dispatchEvent) {
+        if ($dispatchEvent && $previousLastActive?->format('Y-m-d H:i:s') !== $fields['last_active']) {
             $this->dispatcher->dispatch(new ContactLastActiveUpdatedEvent((int) $leadId, $dt->getUtcDateTime(), $previousLastActive));
         }
     }
