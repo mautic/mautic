@@ -49,8 +49,10 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
 
             $this->connection->commit();
 
-            // Once the first user is committed, the same candidate is rejected before insertion.
-            $this->assertIdentityRejected($otherRepository, $second);
+            // The failed ORM transaction closes its manager. Check the committed identity
+            // through the primary manager, which is still open.
+            $this->assertFalse($otherEm->isOpen());
+            $this->assertIdentityRejected($repository, $this->newUser($role, 'second-user', 'shared@example.com'));
             $this->assertSame(1, $repository->count(['username' => 'shared@example.com']));
             $this->assertSame(0, $repository->count(['email' => 'shared@example.com']));
         } finally {

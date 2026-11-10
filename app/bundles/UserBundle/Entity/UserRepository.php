@@ -26,13 +26,12 @@ class UserRepository extends CommonRepository
             throw new \InvalidArgumentException('Only new users can be created.');
         }
 
-        $connection = $this->getEntityManager()->getConnection();
-
         try {
-            $connection->transactional(function () use ($user): void {
+            $this->getEntityManager()->wrapInTransaction(function () use ($user): void {
                 // Lock matching users and the index gaps for identifiers that do not exist yet.
                 // Keep these locks until commit so a competing registration cannot insert a conflict.
                 $duplicate = $this->createQueryBuilder('u')
+                    ->select('1')
                     ->where('u.username IN (:identifiers) OR u.email IN (:identifiers)')
                     ->setParameter('identifiers', [$user->getUsername(), $user->getEmail()])
                     ->setMaxResults(1)
@@ -44,7 +43,7 @@ class UserRepository extends CommonRepository
                     throw new OidcException('mautic.open_id.registration.exception.identity_taken');
                 }
 
-                $this->saveEntity($user);
+                $this->getEntityManager()->persist($user);
             });
         } catch (RetryableException|UniqueConstraintViolationException $exception) {
             throw new OidcException('mautic.open_id.registration.exception.identity_taken', 0, $exception);
