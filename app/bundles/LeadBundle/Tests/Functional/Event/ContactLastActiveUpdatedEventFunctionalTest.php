@@ -45,6 +45,16 @@ final class ContactLastActiveUpdatedEventFunctionalTest extends MauticMysqlTestC
         $this->assertSame('2026-01-01 10:00:00', $this->events[0]->getPreviousLastActive()?->format('Y-m-d H:i:s'));
     }
 
+    public function testRepositoryUpdateWithUnchangedDateDispatchesNoEvent(): void
+    {
+        $lastActive = new \DateTime('2026-01-01 10:00:00', new \DateTimeZone('UTC'));
+        $contact    = $this->createContact($lastActive);
+
+        self::getContainer()->get(LeadRepository::class)->updateLastActive($contact->getId(), $lastActive);
+
+        $this->assertCount(0, $this->events);
+    }
+
     public function testSavingContactWithChangedLastActiveDispatchesEvent(): void
     {
         $contact = $this->createContact(null);
@@ -56,7 +66,7 @@ final class ContactLastActiveUpdatedEventFunctionalTest extends MauticMysqlTestC
         $this->assertCount(1, $this->events);
         $this->assertSame($contact->getId(), $this->events[0]->getContactId());
         $this->assertSame($lastActive, $this->events[0]->getLastActive());
-        $this->assertNull($this->events[0]->getPreviousLastActive());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $this->events[0]->getPreviousLastActive());
     }
 
     public function testSavingContactWithoutLastActiveChangeDispatchesNoEvent(): void

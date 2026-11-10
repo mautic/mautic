@@ -414,7 +414,7 @@ class LeadModel extends FormModel
         }
 
         $this->dispatcher->dispatch(new ContactLastActiveUpdatedEvent(
-            (int) $lead->getId(),
+            $lead->getId(),
             $lastActive,
             $previousLastActive instanceof \DateTimeInterface ? $previousLastActive : null
         ));
