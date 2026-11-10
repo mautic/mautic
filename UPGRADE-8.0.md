@@ -198,7 +198,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
   | `EMAIL_PRE_SEND` | `EmailPreSendEvent` |
   | `EMAIL_ON_DISPLAY` | `EmailDisplayEvent` |
   | `EMAIL_ON_BUILD` | `EmailOnBuildEvent` |
-  | `EMAIL_ON_TOGGLE_PUBLISH` | `Mautic\CoreBundle\Event\EntityTogglePublishEvent` (see below) |
+  | `EMAIL_ON_TOGGLE_PUBLISH` | `Mautic\CoreBundle\Event\EntityTogglePublishEvent` (dispatched for every entity, see above) |
   | `EMAIL_PRE_SAVE` | `EmailPreSaveEvent` |
   | `EMAIL_POST_SAVE` | `EmailPostSaveEvent` |
   | `EMAIL_PRE_DELETE` | `EmailPreDeleteEvent` |
