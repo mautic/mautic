@@ -10,6 +10,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -168,6 +170,9 @@ final class ConfigMonitoredMailboxesType extends AbstractType
             if (!empty($options['data']['folder'])) {
                 $choices[$options['data']['folder']] = $options['data']['folder'];
             }
+            if (!empty($options['default_folder'])) {
+                $choices[$options['default_folder']] = $options['default_folder'];
+            }
 
             $builder->add(
                 'folder',
@@ -182,6 +187,21 @@ final class ConfigMonitoredMailboxesType extends AbstractType
                     'required' => false,
                 ]
             );
+
+            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($choices): void {
+                $submitted = $event->getData();
+                $folder    = is_array($submitted) ? ($submitted['folder'] ?? null) : null;
+
+                if (!is_string($folder) || '' === trim($folder) || str_contains($folder, "\0") || array_key_exists($folder, $choices)) {
+                    return;
+                }
+
+                $form       = $event->getForm();
+                $folderForm = $form->get('folder');
+                $folderOpts = $folderForm->getConfig()->getOptions();
+                $folderOpts['choices'][$folder] = $folder;
+                $form->add('folder', ChoiceType::class, $folderOpts);
+            });
         }
 
         $builder->add(
