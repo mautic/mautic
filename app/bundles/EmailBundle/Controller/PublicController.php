@@ -600,8 +600,13 @@ final class PublicController extends CommonFormController
             }
         }
 
-        $content = $this->generateContent($emailEntity, $assetsHelper, $draftEnabled, $objectType);
         $company = $previewHelper->getCompanyEntity($companyId);
+        if ([] !== $company && !$this->canViewCompany($company)) {
+            // disallow displaying company information
+            $company = [];
+        }
+
+        $content = $this->generateContent($emailEntity, $assetsHelper, $draftEnabled, $objectType);
         $content = $previewHelper->generatePreviewContent($emailEntity, $contact, $company, $content);
 
         if ($this->security->isAnonymous()) {
@@ -661,6 +666,12 @@ final class PublicController extends CommonFormController
         }
 
         $company = $previewHelper->getCompanyEntity($companyId);
+        if ([] !== $company && !$this->canViewCompany($company)) {
+            // disallow displaying company information
+            $companyId = 0;
+            $company   = [];
+            $this->addFlash(FlashBag::LEVEL_ERROR, $this->translator->trans('mautic.email.preview.company.access.denied', [], 'flashes'));
+        }
 
         $previewPageUrl = $this->generateUrl('mautic_email_preview', [
             'objectId'   => $objectId,
@@ -713,6 +724,21 @@ final class PublicController extends CommonFormController
             ],
             'contentTemplate' => '@MauticEmail/Email/preview.html.twig',
         ]);
+    }
+
+    /**
+     * @param array<mixed> $company
+     */
+    private function canViewCompany(array $company): bool
+    {
+        if ($this->security->isAdmin()) {
+            return true;
+        }
+
+        $ownerId = $company[0]['owner_id'] ?? $company[0]['created_by'] ?? 0;
+
+        return !$this->security->isAnonymous()
+            && $this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', (int) $ownerId);
     }
 
     /**
