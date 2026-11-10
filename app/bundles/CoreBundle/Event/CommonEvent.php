@@ -38,6 +38,15 @@ abstract class CommonEvent extends Event
     }
 
     /**
+     * Carries state collected by the pre-* event over to the post-* event.
+     */
+    public function inheritStateFrom(self $previousEvent): void
+    {
+        $this->changes = $previousEvent->changes;
+        $this->failed  = $previousEvent->failed;
+    }
+
+    /**
      * Gets changes to original entity.
      *
      * @return mixed

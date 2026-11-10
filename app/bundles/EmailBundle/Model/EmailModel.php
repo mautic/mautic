@@ -14,6 +14,7 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
+use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -390,7 +391,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         if ($this->dispatcher->hasListeners($eventClass)) {
             if (!$event instanceof $eventClass) {
-                $event = new $eventClass($entity, $isNew);
+                $previousEvent = $event;
+                $event         = new $eventClass($entity, $isNew);
+
+                if ($previousEvent instanceof CommonEvent) {
+                    $event->inheritStateFrom($previousEvent);
+                }
             }
 
             $this->dispatcher->dispatch($event);
