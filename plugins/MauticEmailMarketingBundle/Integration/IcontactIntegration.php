@@ -13,6 +13,7 @@ use MauticPlugin\MauticEmailMarketingBundle\Client\IcontactClient;
 use MauticPlugin\MauticEmailMarketingBundle\Exception\ApiException;
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
 use MauticPlugin\MauticEmailMarketingBundle\Helper\ContactFieldMapper;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class IcontactIntegration extends BasicIntegration implements BasicInterface, PushContactInterface
 {
@@ -42,6 +43,7 @@ class IcontactIntegration extends BasicIntegration implements BasicInterface, Pu
     public function __construct(
         private readonly IcontactClient $client,
         private readonly ContactFieldMapper $contactFieldMapper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -69,12 +71,12 @@ class IcontactIntegration extends BasicIntegration implements BasicInterface, Pu
     {
         $listSettings = $config['list_settings'] ?? null;
         if (!is_array($listSettings) || empty($listSettings['list'])) {
-            throw new PushContactException('No iContact list is selected.');
+            throw new PushContactException($this->translator->trans('mautic.emailmarketing.push.no_list', ['%integration%' => $this->getDisplayName()]));
         }
 
         $data = $this->contactFieldMapper->map($contact, ContactFieldMapper::normalize((array) ($listSettings['leadFields'] ?? [])), self::NAME);
         if (empty($data['email'])) {
-            throw new PushContactException('The contact has no value for the field mapped to the iContact email.');
+            throw new PushContactException($this->translator->trans('mautic.emailmarketing.push.no_email', ['%integration%' => $this->getDisplayName()]));
         }
 
         // Custom fields are sent by their iContact ID

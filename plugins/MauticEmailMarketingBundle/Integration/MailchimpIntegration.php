@@ -13,6 +13,7 @@ use MauticPlugin\MauticEmailMarketingBundle\Client\MailchimpClient;
 use MauticPlugin\MauticEmailMarketingBundle\Exception\ApiException;
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType;
 use MauticPlugin\MauticEmailMarketingBundle\Helper\ContactFieldMapper;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MailchimpIntegration extends BasicIntegration implements BasicInterface, PushContactInterface
 {
@@ -21,6 +22,7 @@ class MailchimpIntegration extends BasicIntegration implements BasicInterface, P
     public function __construct(
         private readonly MailchimpClient $client,
         private readonly ContactFieldMapper $contactFieldMapper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -48,12 +50,12 @@ class MailchimpIntegration extends BasicIntegration implements BasicInterface, P
     {
         $listSettings = $config['list_settings'] ?? null;
         if (!is_array($listSettings) || empty($listSettings['list'])) {
-            throw new PushContactException('No Mailchimp list is selected.');
+            throw new PushContactException($this->translator->trans('mautic.emailmarketing.push.no_list', ['%integration%' => $this->getDisplayName()]));
         }
 
         $data = $this->contactFieldMapper->map($contact, ContactFieldMapper::normalize((array) ($listSettings['leadFields'] ?? [])), self::NAME);
         if (empty($data['EMAIL'])) {
-            throw new PushContactException('The contact has no value for the field mapped to the Mailchimp email.');
+            throw new PushContactException($this->translator->trans('mautic.emailmarketing.push.no_email', ['%integration%' => $this->getDisplayName()]));
         }
 
         $email = $data['EMAIL'];

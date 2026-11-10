@@ -61,6 +61,25 @@ final class MailchimpClientTest extends TestCase
         );
     }
 
+    public function testSubscribingAContactAlreadyOnTheListSucceeds(): void
+    {
+        $client = new MailchimpClient(new MockHttpClient(new MockResponse('{"title":"Member Exists","status":400,"detail":"john@example.com is already a list member."}', ['http_code' => 400])));
+
+        $client->subscribe(['password' => 'key-us7'], 'a1', 'john@example.com', [], true, true);
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testSubscribeReportsOtherErrors(): void
+    {
+        $client = new MailchimpClient(new MockHttpClient(new MockResponse('{"title":"Invalid Resource","status":400,"detail":"Please provide a valid email address."}', ['http_code' => 400])));
+
+        $this->expectException(ApiException::class);
+        $this->expectExceptionMessage('Please provide a valid email address.');
+
+        $client->subscribe(['password' => 'key-us7'], 'a1', 'john@example', [], true, true);
+    }
+
     /**
      * @param array<string, mixed> $keys
      */

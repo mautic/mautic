@@ -19,6 +19,7 @@ use MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegrati
 use MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration;
 use MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PushContactTest extends TestCase
 {
@@ -31,7 +32,7 @@ final class PushContactTest extends TestCase
             ->method('subscribe')
             ->with(self::KEYS, 'a1', 'john@example.com', ['FNAME' => 'John'], false, true);
 
-        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com', 'FNAME' => 'John'])));
+        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com', 'FNAME' => 'John']), $this->translator()));
 
         $this->assertSame(MailchimpType::class, $integration->getPushContactConfigFormName());
         $integration->pushContact(new Lead(), ['list_settings' => ['list' => 'a1', 'doubleOptin' => '0', 'sendWelcome' => '1', 'leadFields' => ['EMAIL' => 'email', 'FNAME' => 'firstname']]]);
@@ -42,7 +43,7 @@ final class PushContactTest extends TestCase
         $client = $this->createStub(MailchimpClient::class);
         $client->method('subscribe')->willThrowException(new ApiException('Member Exists'));
 
-        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com'])));
+        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com']), $this->translator()));
 
         $this->expectException(PushContactException::class);
         $this->expectExceptionMessage('Member Exists');
@@ -55,10 +56,10 @@ final class PushContactTest extends TestCase
         $client = $this->createMock(MailchimpClient::class);
         $client->expects($this->never())->method('subscribe');
 
-        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com'])));
+        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com']), $this->translator()));
 
         $this->expectException(PushContactException::class);
-        $this->expectExceptionMessage('No Mailchimp list is selected.');
+        $this->expectExceptionMessage('mautic.emailmarketing.push.no_list MailChimp');
 
         $integration->pushContact(new Lead(), ['list_settings' => ['list' => '']]);
     }
@@ -68,10 +69,10 @@ final class PushContactTest extends TestCase
         $client = $this->createMock(MailchimpClient::class);
         $client->expects($this->never())->method('subscribe');
 
-        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['FNAME' => 'John'])));
+        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['FNAME' => 'John']), $this->translator()));
 
         $this->expectException(PushContactException::class);
-        $this->expectExceptionMessage('The contact has no value for the field mapped to the Mailchimp email.');
+        $this->expectExceptionMessage('mautic.emailmarketing.push.no_email MailChimp');
 
         $integration->pushContact(new Lead(), ['list_settings' => ['list' => 'a1']]);
     }
@@ -92,7 +93,7 @@ final class PushContactTest extends TestCase
             'first_name'    => 'John',
             'address_city'  => 'address_x',
             'customfield_1' => 'customfield_y',
-        ])));
+        ]), $this->translator()));
 
         $this->assertSame(ConstantContactType::class, $integration->getPushContactConfigFormName());
         $integration->pushContact(new Lead(), ['list_settings' => ['list' => '5', 'sendWelcome' => '0']]);
@@ -109,10 +110,18 @@ final class PushContactTest extends TestCase
             'email'     => 'john@example.com',
             'cf_color'  => 'blue',
             'firstName' => 'John',
-        ])));
+        ]), $this->translator()));
 
         $this->assertSame(IcontactType::class, $integration->getPushContactConfigFormName());
         $integration->pushContact(new Lead(), ['list_settings' => ['list' => '7']]);
+    }
+
+    private function translator(): TranslatorInterface
+    {
+        $translator = $this->createStub(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(static fn (string $id, array $parameters = []): string => trim($id.' '.implode(' ', $parameters)));
+
+        return $translator;
     }
 
     /**

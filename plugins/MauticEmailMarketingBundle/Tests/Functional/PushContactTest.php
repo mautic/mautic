@@ -95,7 +95,7 @@ final class PushContactTest extends MauticMysqlTestCase
 
     public function testPushActionFailsWhenMailchimpRejectsTheContact(): void
     {
-        $this->mockResponses(new MockResponse('{"title":"Member Exists","status":400,"detail":"john@example.com is already a list member."}', ['http_code' => 400]));
+        $this->mockResponses(new MockResponse('{"title":"Invalid Resource","status":400,"detail":"john@example.com looks fake or invalid."}', ['http_code' => 400]));
 
         $contact = new Lead();
         $contact->setEmail('john@example.com');

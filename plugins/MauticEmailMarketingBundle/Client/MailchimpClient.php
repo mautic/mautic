@@ -84,19 +84,21 @@ class MailchimpClient
         }
         $parameters['email_address'] = $email;
 
-        $this->request($keys, 'POST', 'lists/'.$listId.'/members', json: $parameters);
+        // A contact already on the list stays as it is, as with the former integration
+        $this->request($keys, 'POST', 'lists/'.$listId.'/members', json: $parameters, acceptedErrors: ['Member Exists']);
     }
 
     /**
      * @param array<string, mixed>      $keys
      * @param array<string, int|string> $query
      * @param array<string, mixed>|null $json
+     * @param string[]                  $acceptedErrors titles of error responses that do not fail the request
      *
      * @return array<string, mixed>
      *
      * @throws ApiException
      */
-    private function request(array $keys, string $method, string $endpoint, array $query = [], ?array $json = null): array
+    private function request(array $keys, string $method, string $endpoint, array $query = [], ?array $json = null, array $acceptedErrors = []): array
     {
         if (!empty($keys['password'])) {
             // An API key carries its data center after the dash
@@ -139,7 +141,7 @@ class MailchimpClient
         }
 
         // Errors come back as problem details
-        if ($response->getStatusCode() >= 400) {
+        if ($response->getStatusCode() >= 400 && !in_array($data['title'] ?? null, $acceptedErrors, true)) {
             throw new ApiException((string) ($data['detail'] ?? $data['title'] ?? 'Mailchimp returned HTTP '.$response->getStatusCode().'.'));
         }
 
