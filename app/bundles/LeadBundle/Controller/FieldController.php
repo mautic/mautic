@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
@@ -181,7 +182,7 @@ final class FieldController extends AbstractFormController
                         try {
                             // form is valid so process the data
                             $this->fieldModel->saveEntity($field);
-                        } catch (\Doctrine\DBAL\Exception $ee) {
+                        } catch (Exception $ee) {
                             $flashMessage = $ee->getMessage();
                         } catch (AbortColumnCreateException) {
                             $flashMessage = $this->translator->trans('mautic.lead.field.pushed_to_background');

@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -900,7 +901,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
         return array_unique($dependents);
     }
 
-    private function getConnection(): \Doctrine\DBAL\Connection
+    private function getConnection(): Connection
     {
         $connection = $this->em->getConnection();
         if ($connection instanceof PrimaryReadReplicaConnection) {

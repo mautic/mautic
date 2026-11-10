@@ -1568,7 +1568,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         /** @var SubmissionModel $submissionModel */
         $submissionModel = self::getContainer()->get(SubmissionModel::class);
         $submission      = $submissionModel->getEntity($submissionId);
-        $this->assertInstanceOf(\Mautic\FormBundle\Entity\Submission::class, $submission);
+        $this->assertInstanceOf(Submission::class, $submission);
         $submissionModel->deleteEntity($submission);
 
         $this->assertSame(0, (int) $this->connection->fetchOne($countSql, [$formId]));

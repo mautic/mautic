@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -46,7 +47,7 @@ final class MauticDenyAccessListenerTest extends TestCase
 
         $dispatcher = new EventDispatcher();
         AttributeEventListenerRegistrar::register($dispatcher, new class() {
-            #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+            #[AsEventListener(
                 event: ApiPlatformPermissionContextEvent::class,
                 priority: 0
             )]

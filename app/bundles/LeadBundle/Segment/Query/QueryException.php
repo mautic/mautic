@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
+use Doctrine\DBAL\Exception;
+
 /**
  * DBAL 4 turned Doctrine\DBAL\Exception from a base class into an interface, so this
  * extends \Exception and implements it instead - keeping existing
@@ -9,7 +11,7 @@ namespace Mautic\LeadBundle\Segment\Query;
  *
  * @since 2.1.4
  */
-final class QueryException extends \Exception implements \Doctrine\DBAL\Exception
+final class QueryException extends \Exception implements Exception
 {
     public static function unknownAlias($alias, $registeredAliases): self
     {

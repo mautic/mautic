@@ -161,7 +161,7 @@ class Asset extends FormEntity implements UuidInterface
     private int $revision = 1;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
-    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 

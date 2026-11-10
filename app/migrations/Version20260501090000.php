@@ -6,6 +6,7 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Helper\Serializer;
 
 final class Version20260501090000 extends AbstractMauticMigration
 {
@@ -59,7 +60,7 @@ final class Version20260501090000 extends AbstractMauticMigration
             return [];
         }
 
-        $decoded = @\Mautic\CoreBundle\Helper\Serializer::decode($permissions);
+        $decoded = @Serializer::decode($permissions);
 
         return is_array($decoded) ? $decoded : [];
     }

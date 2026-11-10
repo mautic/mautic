@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field;
 
+use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -138,7 +139,7 @@ final class CustomFieldColumnTest extends TestCase
         $this->columnSchemaHelper->expects($this->once())
             ->method('addColumn');
 
-        $dbalException = new class('message', 1118) extends \Exception implements \Doctrine\DBAL\Driver\Exception {
+        $dbalException = new class('message', 1118) extends \Exception implements Exception {
             public function getSQLState(): string
             {
                 return 'some SQL state';

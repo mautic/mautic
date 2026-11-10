@@ -128,7 +128,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     private $sentCount = 0;
 
     #[Groups(['sms:read', 'sms:write'])]
-    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 

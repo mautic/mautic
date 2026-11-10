@@ -116,7 +116,7 @@ class Trigger extends FormEntity implements UuidInterface
     private $triggerExistingLeads = false;
 
     #[Groups(['trigger:read', 'trigger:write'])]
-    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 
