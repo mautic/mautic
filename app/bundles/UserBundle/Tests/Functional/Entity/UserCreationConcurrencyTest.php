@@ -8,7 +8,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\RetryableException;
 use Doctrine\DBAL\TransactionIsolationLevel;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\PostPersistEventArgs;
+use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -69,7 +69,7 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
         }
     }
 
-    public function testCollisionInsertedDuringFlushRollsBackRegistration(): void
+    public function testCollisionInsertedBeforeFlushRollsBackRegistration(): void
     {
         $otherConnection = DriverManager::getConnection($this->connection->getParams());
         $otherEm = new EntityManager($otherConnection, $this->em->getConfiguration(), $this->em->getEventManager());
@@ -87,10 +87,10 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
             {
             }
 
-            public function postPersist(PostPersistEventArgs $event): void
+            public function prePersist(PrePersistEventArgs $event): void
             {
                 if ($event->getObject() === $this->first) {
-                    // Reproduce a competing writer that already passed its availability checks.
+                    // Commit a competing writer after availability checks but before the first INSERT.
                     $this->repository->saveEntity($this->second);
                 }
             }
@@ -99,13 +99,14 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
         try {
             $this->connection->setTransactionIsolation(TransactionIsolationLevel::READ_COMMITTED);
             $otherConnection->setTransactionIsolation(TransactionIsolationLevel::READ_COMMITTED);
-            $this->em->getEventManager()->addEventListener([Events::postPersist], $listener);
-            $this->assertIdentityRejected($repository, $first);
+            $this->em->getEventManager()->addEventListener([Events::prePersist], $listener);
+            $exception = $this->assertIdentityRejected($repository, $first);
+            $this->assertNotInstanceOf(\Throwable::class, $exception->getPrevious(), 'The conflict must be detected by the identity check, not a failed competing INSERT.');
             $this->assertFalse($this->em->contains($first));
             $this->assertSame(0, $repository->count(['username' => 'shared@example.com']));
             $this->assertSame(1, $repository->count(['email' => 'shared@example.com']));
         } finally {
-            $this->em->getEventManager()->removeEventListener([Events::postPersist], $listener);
+            $this->em->getEventManager()->removeEventListener([Events::prePersist], $listener);
             $this->connection->setTransactionIsolation($originalIsolation);
             $otherEm->close();
             $otherConnection->close();
@@ -165,7 +166,7 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
         yield 'duplicate email' => ['second-user', 'first@example.com'];
     }
 
-    private function assertIdentityRejected(UserRepository $repository, User $user): void
+    private function assertIdentityRejected(UserRepository $repository, User $user): OidcException
     {
         try {
             $repository->saveNewUser($user);
@@ -175,6 +176,8 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
             if ($user->getId()) {
                 $this->assertNotInstanceOf(User::class, $this->em->getRepository(User::class)->find($user->getId()));
             }
+
+            return $exception;
         }
     }
 
