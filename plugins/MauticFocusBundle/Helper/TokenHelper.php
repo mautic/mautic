@@ -11,8 +11,9 @@ class TokenHelper
 {
     public const REGEX = '/{focus=(.*?)}/i';
 
-    // Matches the whole token, including the optional |display or |tracking mode
-    private const TOKEN_REGEX = '/{focus=[^}]*}/i';
+    // Matches the whole token, including the optional |display or |tracking mode.
+    // It stops at a line break or another brace, so an unclosed token can't swallow the content after it.
+    private const TOKEN_REGEX = '/{focus=[^{}\r\n]*}/i';
 
     public const MODE_DISPLAY = 'display';
 

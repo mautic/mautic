@@ -184,6 +184,19 @@ final class TokenHelperTest extends TestCase
         );
     }
 
+    public function testUnclosedTokenDoesNotSwallowTheContentAfterIt(): void
+    {
+        $this->model->expects($this->once())
+            ->method('getEntity')
+            ->with(1)
+            ->willReturn(null);
+
+        $this->assertSame(
+            ['{focus=1}' => ''],
+            $this->helper->findFocusTokens("Intro {focus=oops\n<p>Page content</p>\n{focus=1}"),
+        );
+    }
+
     public function testPublicRegexStillCapturesTheTokenValue(): void
     {
         // Plugins that use the constant read the ID from the first capture group
