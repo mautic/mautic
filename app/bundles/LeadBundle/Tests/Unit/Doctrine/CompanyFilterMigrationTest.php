@@ -103,4 +103,20 @@ final class CompanyFilterMigrationTest extends TestCase
         $this->assertSame(ContactSegmentFilterCrate::LEGACY_COMPANY_FILTER_SCOPE_VALUE, $migrated[1][ContactSegmentFilterCrate::LEGACY_COMPANY_FILTER_SCOPE]);
         $this->assertSame($filters[2], $migrated[2]);
     }
+
+    public function testMalformedFiltersAreSkippedWithoutAbortingTheMigration(): void
+    {
+        $result = $this->createStub(Result::class);
+        $result->method('fetchAllAssociative')->willReturn([
+            ['id' => 15, 'filters' => 'not-serialized'],
+        ]);
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('executeQuery')->willReturn($result);
+
+        $migration = new Version20261109120000($connection, new NullLogger());
+        $migration->setPrefix('test_');
+        $migration->up(new Schema());
+
+        $this->assertSame([], $migration->getSql());
+    }
 }

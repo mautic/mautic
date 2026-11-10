@@ -41,7 +41,13 @@ final class Version20261109120000 extends PreUpAssertionMigration
 
             foreach ($rows as $row) {
                 $lastId = (int) $row['id'];
-                $filters = Serializer::decode($row['filters']);
+                try {
+                    $filters = Serializer::decode($row['filters']);
+                } catch (\ErrorException|\InvalidArgumentException) {
+                    $this->write(sprintf('<comment>Skipping segment %d: filters cannot be decoded</comment>', $lastId));
+
+                    continue;
+                }
 
                 if (!is_array($filters)) {
                     continue;
