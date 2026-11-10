@@ -402,7 +402,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
         $path = tempnam(sys_get_temp_dir(), 'share_banner_');
         rename($path, $path .= '.png');
         // 1x1 transparent PNG so the File constraint's mime sniffing sees a real image.
-        file_put_contents($path, (string) base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', true));
+        file_put_contents($path, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', true));
 
         return $path;
     }
