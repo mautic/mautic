@@ -6,6 +6,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Tests\Unit\Client;
 
 use MauticPlugin\MauticEmailMarketingBundle\Client\IcontactClient;
 use MauticPlugin\MauticEmailMarketingBundle\Exception\ApiException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -71,6 +72,30 @@ final class IcontactClientTest extends TestCase
         $this->expectExceptionMessage('Invalid AppId');
 
         $client->getLists(self::KEYS + ['accountId' => '1', 'clientFolderId' => '2']);
+    }
+
+    #[DataProvider('failureProvider')]
+    public function testFailures(MockResponse $first, ?MockResponse $second, string $message): void
+    {
+        $client = new IcontactClient(new MockHttpClient(array_filter([$first, $second])));
+
+        $this->expectException(ApiException::class);
+        $this->expectExceptionMessage($message);
+
+        $client->getLists(self::KEYS);
+    }
+
+    /**
+     * @return iterable<string, array{MockResponse, ?MockResponse, string}>
+     */
+    public static function failureProvider(): iterable
+    {
+        yield 'no account' => [new MockResponse('{"accounts":[]}'), null, 'No iContact account found for these credentials.'];
+        yield 'no client folder' => [new MockResponse('{"accounts":[{"accountId":"1"}]}'), new MockResponse('{"clientfolders":[]}'), 'No iContact client folder found for these credentials.'];
+        yield 'error object' => [new MockResponse('{"errors":{"message":"Timeout"}}'), null, 'Timeout'];
+        yield 'structured error' => [new MockResponse('{"errors":[{"code":"E1","message":"Bad folder"}]}'), null, '{"code":"E1","message":"Bad folder"}'];
+        yield 'HTTP error without details' => [new MockResponse('{}', ['http_code' => 503]), null, 'iContact returned HTTP 503.'];
+        yield 'transport error' => [new MockResponse('', ['error' => 'Connection refused']), null, 'Connection refused'];
     }
 
     public function testRequiresAllCredentials(): void

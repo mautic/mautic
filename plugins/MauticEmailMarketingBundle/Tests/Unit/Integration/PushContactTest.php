@@ -18,6 +18,7 @@ use MauticPlugin\MauticEmailMarketingBundle\Helper\ContactFieldMapper;
 use MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration;
 use MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration;
 use MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -114,6 +115,44 @@ final class PushContactTest extends TestCase
 
         $this->assertSame(IcontactType::class, $integration->getPushContactConfigFormName());
         $integration->pushContact(new Lead(), ['list_settings' => ['list' => '7']]);
+    }
+
+    /**
+     * @param class-string<MailchimpIntegration|ConstantContactIntegration|IcontactIntegration> $integrationClass
+     * @param class-string<MailchimpClient|ConstantContactClient|IcontactClient>                $clientClass
+     * @param array<string, string>                                                          $data
+     * @param array<string, mixed>                                                           $config
+     */
+    #[DataProvider('failureProvider')]
+    public function testFailures(string $integrationClass, string $clientClass, array $data, array $config, string $message): void
+    {
+        $client = $this->createStub($clientClass);
+        $client->method('subscribe')->willThrowException(new ApiException('Rejected'));
+
+        $integration = $this->configure(new $integrationClass($client, $this->mapper($data), $this->translator()));
+
+        $this->expectException(PushContactException::class);
+        $this->expectExceptionMessage($message);
+
+        $integration->pushContact(new Lead(), $config);
+    }
+
+    /**
+     * @return iterable<string, array{class-string, class-string, array<string, string>, array<string, mixed>, string}>
+     */
+    public static function failureProvider(): iterable
+    {
+        $integrations = [
+            'Mailchimp'        => [MailchimpIntegration::class, MailchimpClient::class, 'EMAIL', 'MailChimp'],
+            'Constant Contact' => [ConstantContactIntegration::class, ConstantContactClient::class, 'email', 'Constant Contact'],
+            'iContact'         => [IcontactIntegration::class, IcontactClient::class, 'email', 'iContact'],
+        ];
+
+        foreach ($integrations as $label => [$integrationClass, $clientClass, $emailField, $displayName]) {
+            yield $label.': no list settings' => [$integrationClass, $clientClass, [$emailField => 'john@example.com'], [], 'mautic.emailmarketing.push.no_list '.$displayName];
+            yield $label.': no email' => [$integrationClass, $clientClass, [], ['list_settings' => ['list' => '1']], 'mautic.emailmarketing.push.no_email '.$displayName];
+            yield $label.': rejected' => [$integrationClass, $clientClass, [$emailField => 'john@example.com'], ['list_settings' => ['list' => '1']], 'Rejected'];
+        }
     }
 
     private function translator(): TranslatorInterface
