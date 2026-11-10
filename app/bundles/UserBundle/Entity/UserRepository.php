@@ -4,6 +4,7 @@ namespace Mautic\UserBundle\Entity;
 
 use Doctrine\DBAL\Exception\RetryableException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -16,7 +17,7 @@ use Mautic\UserBundle\Exception\OidcException;
 class UserRepository extends CommonRepository
 {
     /**
-     * Insert and verify the shared username/email namespace before committing.
+     * Check both login identifiers before creating a new user.
      */
     public function saveNewUser(User $user): void
     {
@@ -24,35 +25,38 @@ class UserRepository extends CommonRepository
             throw new \InvalidArgumentException('Only new users can be created.');
         }
 
-        $em = $this->getEntityManager();
-        $connection = $em->getConnection();
-        $userTable = $connection->quoteIdentifier($this->getClassMetadata()->getTableName());
-
         try {
-            $connection->transactional(function () use ($connection, $userTable, $user): void {
-                $this->saveEntity($user);
+            $this->getEntityManager()->getConnection()->transactional(function () use ($user): void {
+                // Use the first existing user as a common lock for all registrations until commit.
+                // Otherwise, two registrations could both find no duplicate and insert conflicting
+                // usernames/emails. This row is only a locking point; its fields are not changed.
+                $firstUser = $this->createQueryBuilder('u')
+                    ->orderBy('u.id')
+                    ->setMaxResults(1)
+                    ->getQuery()
+                    ->setLockMode(LockMode::PESSIMISTIC_WRITE)
+                    ->getOneOrNullResult();
 
-                // Insert first: its row lock makes concurrent cross-column checks wait.
-                // A locking read also sees users committed after an older transaction snapshot.
-                $existingId = $connection->fetchOne(
-                    "SELECT id FROM $userTable WHERE id <> :id AND (username IN (:username, :email) OR email IN (:username, :email)) LIMIT 1 FOR UPDATE",
-                    ['id' => $user->getId(), 'username' => $user->getUsername(), 'email' => $user->getEmail()]
-                );
+                if (null === $firstUser) {
+                    throw new \LogicException('User registration requires an existing installation user.');
+                }
 
-                if (false !== $existingId) {
+                $duplicate = $this->createQueryBuilder('u')
+                    ->where('u.username IN (:identifiers) OR u.email IN (:identifiers)')
+                    ->setParameter('identifiers', [$user->getUsername(), $user->getEmail()])
+                    ->setMaxResults(1)
+                    ->getQuery()
+                    ->setLockMode(LockMode::PESSIMISTIC_READ)
+                    ->getOneOrNullResult();
+
+                if (null !== $duplicate) {
                     throw new OidcException('mautic.open_id.registration.exception.identity_taken');
                 }
+
+                $this->saveEntity($user);
             });
-        } catch (\Throwable $exception) {
-            // The insert was rolled back; do not retain a managed, nonexistent user.
-            $em->detach($user);
-
-            // Competing inserts may deadlock or violate a single-column unique constraint.
-            if ($exception instanceof RetryableException || $exception instanceof UniqueConstraintViolationException) {
-                throw new OidcException('mautic.open_id.registration.exception.identity_taken', 0, $exception);
-            }
-
-            throw $exception;
+        } catch (RetryableException|UniqueConstraintViolationException $exception) {
+            throw new OidcException('mautic.open_id.registration.exception.identity_taken', 0, $exception);
         }
     }
 
