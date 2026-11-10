@@ -9,8 +9,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @extends AbstractType<mixed>
@@ -54,12 +56,21 @@ final class DateRangeType extends AbstractType
         $constraints = [
             new NotBlank(),
             new Regex(
-                [
-                    'pattern' => self::DATE_REGEX,
-                    'match'   => true,
-                    'message' => 'mautic.core.daterange.invalid.date.format',
-                ]
+                pattern: self::DATE_REGEX,
+                message: 'mautic.core.daterange.invalid.date.format',
             ),
+            new Callback(static function (mixed $value, ExecutionContextInterface $context): void {
+                if (!is_string($value) || !preg_match(self::DATE_REGEX, $value)) {
+                    return; // Handled by the Regex constraint.
+                }
+
+                $date   = \DateTime::createFromFormat('M j, Y', $value);
+                $errors = \DateTime::getLastErrors();
+
+                if (false === $date || (is_array($errors) && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
+                    $context->buildViolation('mautic.core.daterange.invalid.date.format')->addViolation();
+                }
+            }),
         ];
 
         $builder->add(

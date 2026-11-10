@@ -934,9 +934,6 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         yield [OperatorOptions::IN_NEXT, 2];
     }
 
-    /**
-     * @param array<int, array<string, mixed>> $filters
-     */
     public function testBetweenDatesFilterWithInvalidFields(): void
     {
         $filters = [[
@@ -985,16 +982,16 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $segmentId = json_decode($clientResponse->getContent(), true)['list']['id'];
 
         $contactA = new Lead();
-        $contactA->setLastActive(new \DateTime('2024-01-02 23:59:59')); // 1 second before the date_from - won't get to the segment
+        $contactA->setLastActive(new \DateTime('2024-01-02 23:59:59', new \DateTimeZone('UTC'))); // 1 second before the date_from - won't get to the segment
 
         $contactB = new Lead();
-        $contactB->setLastActive(new \DateTime('2024-01-03 00:00:00')); // 1 second after the date_from - will get to the segment
+        $contactB->setLastActive(new \DateTime('2024-01-03 00:00:00', new \DateTimeZone('UTC'))); // 1 second after the date_from - will get to the segment
 
         $contactC = new Lead();
-        $contactC->setLastActive(new \DateTime('2024-02-03 23:59:59')); // 1 second before the date_to - will get to the segment
+        $contactC->setLastActive(new \DateTime('2024-02-03 23:59:59', new \DateTimeZone('UTC'))); // 1 second before the date_to - will get to the segment
 
         $contactD = new Lead();
-        $contactD->setLastActive(new \DateTime('2024-02-04 00:00:00')); // 1 second after the date_to - won't get to the segment
+        $contactD->setLastActive(new \DateTime('2024-02-04 00:00:00', new \DateTimeZone('UTC'))); // 1 second after the date_to - won't get to the segment
 
         $this->em->persist($contactA);
         $this->em->persist($contactB);
@@ -1040,16 +1037,16 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $segmentId = json_decode($clientResponse->getContent(), true)['list']['id'];
 
         $contactA = new Lead();
-        $contactA->setLastActive(new \DateTime('2024-01-02 23:59:59')); // 1 second before the date_from - will get to the segment
+        $contactA->setLastActive(new \DateTime('2024-01-02 23:59:59', new \DateTimeZone('UTC'))); // 1 second before the date_from - will get to the segment
 
         $contactB = new Lead();
-        $contactB->setLastActive(new \DateTime('2024-01-03 00:00:00')); // 1 second after the date_from - won't get to the segment
+        $contactB->setLastActive(new \DateTime('2024-01-03 00:00:00', new \DateTimeZone('UTC'))); // 1 second after the date_from - won't get to the segment
 
         $contactC = new Lead();
-        $contactC->setLastActive(new \DateTime('2024-02-03 23:59:59')); // 1 second before the date_to - won't get to the segment
+        $contactC->setLastActive(new \DateTime('2024-02-03 23:59:59', new \DateTimeZone('UTC'))); // 1 second before the date_to - won't get to the segment
 
         $contactD = new Lead();
-        $contactD->setLastActive(new \DateTime('2024-02-04 00:00:00')); // 1 second after the date_to - will get to the segment
+        $contactD->setLastActive(new \DateTime('2024-02-04 00:00:00', new \DateTimeZone('UTC'))); // 1 second after the date_to - will get to the segment
 
         $this->em->persist($contactA);
         $this->em->persist($contactB);
@@ -1072,6 +1069,9 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectedMembers, $actualMembers);
     }
 
+    /**
+     * @param array<int, array<string, mixed>> $filters
+     */
     private function saveSegment(string $name, string $alias, array $filters = [], ?LeadList $segment = null): LeadList
     {
         $segment ??= new LeadList();

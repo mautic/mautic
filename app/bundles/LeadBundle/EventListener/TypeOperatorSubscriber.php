@@ -328,13 +328,14 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $form = $event->getForm();
+        $form       = $event->getForm();
+        $filterData = $form->getData()['filter'] ?? [];
         $form->add(
             'filter',
             DateRangeType::class,
             [
                 'label'              => false,
-                'data'               => $form->getData()['filter'] ?? [],
+                'data'               => is_array($filterData) ? $filterData : [],
                 'show_apply_button'  => false,
                 'set_default_values' => false,
             ]

@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Entity\StageRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -526,23 +527,23 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onSegmentFilterFormHandleDefault($event);
     }
 
-    /**
-     * @dataProvider operatorProvider
-     */
+    #[DataProvider('operatorProvider')]
     public function testOnSegmentFilterFormHandleDate(string $operator): void
     {
         $alias    = 'email_clicked_link_date';
         $object   = 'behaviors';
+        $filter   = [
+            'date_from' => 'May 7, 2024',
+            'date_to'   => 'May 9, 2024',
+        ];
         $details  = [
             'properties'  => [
-                'type'   => 'datetime',
-                'filter' => [
-                    'date_from' => 'May 7, 2024',
-                    'date_to'   => 'May 9, 2024',
-                ],
+                'type' => 'datetime',
             ],
         ];
         $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->method('getData')->willReturn(['filter' => $filter]);
 
         $this->form->expects($this->once())
             ->method('add')
@@ -551,19 +552,21 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 DateRangeType::class,
                 [
                     'label'              => false,
-                    'data'               => $event->getForm()->getData()['filter'] ?? [],
+                    'data'               => $filter,
                     'show_apply_button'  => false,
                     'set_default_values' => false,
                 ]
             );
 
         $this->subscriber->onSegmentFilterFormHandleDate($event);
+
+        $this->assertTrue($event->isPropagationStopped());
     }
 
     /**
      * @return array<string, array<int, string>>
      */
-    public function operatorProvider(): array
+    public static function operatorProvider(): array
     {
         return [
             'between'     => [OperatorOptions::BETWEEN],
