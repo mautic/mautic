@@ -211,6 +211,70 @@ final class MatchFilterForLeadTraitTest extends TestCase
         $this->assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
+    /**
+     * @see https://github.com/acquia/mc-cs/pull/3135
+     */
+    #[DataProvider('numberNullAndZeroProvider')]
+    public function testMatchFilterForLeadTraitNumberTreatsNullAndZeroLikeSegments(
+        ?string $value,
+        string $operator,
+        ?string $filterValue,
+        bool $expect,
+    ): void {
+        $filters = [
+            [
+                'glue'     => 'and',
+                'field'    => 'distance',
+                'object'   => 'lead',
+                'type'     => 'number',
+                'filter'   => $filterValue,
+                'display'  => null,
+                'operator' => $operator,
+            ],
+        ];
+
+        $lead = [
+            'id'       => 1,
+            'distance' => $value,
+        ];
+
+        $this->assertSame($expect, $this->matchFilterForLeadTrait->match($filters, $lead));
+    }
+
+    /**
+     * @return iterable<string, array{0: ?string, 1: string, 2: ?string, 3: bool}>
+     */
+    public static function numberNullAndZeroProvider(): iterable
+    {
+        // NULL must never satisfy a comparison operator, the way SQL behaves for segments.
+        yield 'null gte 0'     => [null, OperatorOptions::GREATER_THAN_OR_EQUAL, '0', false];
+        yield 'null lte 10'    => [null, OperatorOptions::LESS_THAN_OR_EQUAL, '10', false];
+        yield 'null gt 0'      => [null, OperatorOptions::GREATER_THAN, '0', false];
+        yield 'null lt 10'     => [null, OperatorOptions::LESS_THAN, '10', false];
+
+        // Zero is a real value and must still be compared numerically.
+        yield 'zero gte 0'     => ['0', OperatorOptions::GREATER_THAN_OR_EQUAL, '0', true];
+        yield 'zero lte 10'    => ['0', OperatorOptions::LESS_THAN_OR_EQUAL, '10', true];
+        yield 'zero gt 0'      => ['0', OperatorOptions::GREATER_THAN, '0', false];
+        yield 'five gte 0'     => ['5', OperatorOptions::GREATER_THAN_OR_EQUAL, '0', true];
+        yield 'five lte 10'    => ['5', OperatorOptions::LESS_THAN_OR_EQUAL, '10', true];
+
+        // NULL is not equal to 0, and the segment neq handler ORs in IS NULL.
+        yield 'null eq 0'      => [null, OperatorOptions::EQUAL_TO, '0', false];
+        yield 'null neq 0'     => [null, OperatorOptions::NOT_EQUAL_TO, '0', true];
+        yield 'zero eq 0'      => ['0', OperatorOptions::EQUAL_TO, '0', true];
+        yield 'zero neq 0'     => ['0', OperatorOptions::NOT_EQUAL_TO, '0', false];
+        yield 'zero neq 5'     => ['0', OperatorOptions::NOT_EQUAL_TO, '5', true];
+
+        // Zero is not "empty" for a numeric field.
+        yield 'zero notEmpty'  => ['0', '!empty', null, true];
+        yield 'zero empty'     => ['0', 'empty', null, false];
+        yield 'null notEmpty'  => [null, '!empty', null, false];
+        yield 'null empty'     => [null, 'empty', null, true];
+        yield 'blank empty'    => ['', 'empty', null, true];
+        yield 'blank notEmpty' => ['', '!empty', null, false];
+    }
+
     #[DataProvider('dateMatchTestProvider')]
     public function testMatchFilterForLeadTraitForDate(?string $value, string $operator, bool $expect): void
     {
