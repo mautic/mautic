@@ -15,7 +15,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FiltersEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
@@ -23,6 +22,7 @@ use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\CoreBundle\Entity\VariantEntityMappingTrait;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Validator\Constraints\NoNesting;
@@ -76,6 +76,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     use TranslationEntityTrait;
     /** @use VariantEntityTrait<DynamicContent> */
     use VariantEntityTrait;
+    /** @use VariantEntityMappingTrait<DynamicContent> */
+    use VariantEntityMappingTrait;
     use FiltersEntityTrait;
     use UuidTrait;
     use ProjectTrait;
@@ -186,14 +188,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::addVariantMetadata($builder, self::class);
-
     }
 
     /**

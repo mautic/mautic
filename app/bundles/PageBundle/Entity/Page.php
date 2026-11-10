@@ -14,7 +14,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
@@ -23,6 +22,7 @@ use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\CoreBundle\Entity\VariantEntityMappingTrait;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
@@ -70,6 +70,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     /** @use VariantEntityTrait<Page> */
     use VariantEntityTrait;
+    /** @use VariantEntityMappingTrait<Page> */
+    use VariantEntityMappingTrait;
 
     use UuidTrait;
 
@@ -253,13 +255,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $this->translationChildren = new ArrayCollection();
         $this->variantChildren     = new ArrayCollection();
         $this->initializeProjects();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::addVariantMetadata($builder, self::class);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

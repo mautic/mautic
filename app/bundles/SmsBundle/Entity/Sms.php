@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
+use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
@@ -74,6 +75,26 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     use VariantEntityTrait;
 
     public const string TABLE_NAME = 'sms_messages';
+
+    /**
+     * Variant properties are not mapped for SMS, they are here only to satisfy VariantEntityTrait.
+     *
+     * @var Collection<int, Sms>
+     */
+    #[Groups(['email:read', 'email:write', 'download:read'])]
+    private $variantChildren;
+
+    #[Groups(['email:read', 'email:write', 'download:read'])]
+    private ?Sms $variantParent = null;
+
+    /**
+     * @var array<mixed>
+     */
+    #[Groups(['email:read', 'email:write', 'download:read'])]
+    private array $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_AB_WEIGHT, 'enableAbTest' => false];
+
+    #[Groups(['email:read', 'email:write', 'download:read'])]
+    private ?\DateTimeInterface $variantStartDate = null;
 
     /**
      * @var int

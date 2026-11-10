@@ -16,7 +16,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -27,6 +26,7 @@ use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\CoreBundle\Entity\VariantEntityMappingTrait;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Validator\EntityEvent;
@@ -83,6 +83,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 {
     /** @use VariantEntityTrait<Email> */
     use VariantEntityTrait;
+    /** @use VariantEntityMappingTrait<Email> */
+    use VariantEntityMappingTrait;
 
     /** @use TranslationEntityTrait<Email> */
     use TranslationEntityTrait;
@@ -413,14 +415,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::addVariantMetadata($builder, self::class);
-
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

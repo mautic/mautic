@@ -4,27 +4,15 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
+ * Variant behaviour; the using class provides the variant properties, see VariantEntityMappingTrait.
+ *
  * @template TEntity of VariantEntityInterface
  */
 trait VariantEntityTrait
 {
-    /**
-     * @var Collection<int, TEntity>
-     */
-    #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $variantChildren;
-
-    /**
-     * @var TEntity|null
-     */
-    #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $variantParent;
-
     /**
      * @var array<string>
      */
@@ -34,40 +22,6 @@ trait VariantEntityTrait
      * @var array<string>
      */
     private array $parentSettingsKeys = ['totalWeight', 'enableAbTest', 'winnerCriteria', 'sendWinnerDelay'];
-
-    /**
-     * @var array<mixed>|null
-     */
-    #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_AB_WEIGHT, 'enableAbTest' => false];
-
-    #[Groups(['email:read', 'email:write', 'download:read'])]
-    private ?\DateTimeInterface $variantStartDate = null;
-
-    protected static function addVariantMetadata(ClassMetadataBuilder $builder, string $entityClass): void
-    {
-        $builder->createManyToOne('variantParent', $entityClass)
-            ->inversedBy('variantChildren')
-            ->addJoinColumn('variant_parent_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->createOneToMany('variantChildren', $entityClass)
-            ->setIndexBy('id')
-            ->setOrderBy(['isPublished' => 'DESC'])
-            ->mappedBy('variantParent')
-            ->cascadePersist()
-            ->build();
-
-        $builder->createField('variantSettings', 'array')
-            ->columnName('variant_settings')
-            ->nullable()
-            ->build();
-
-        $builder->createField('variantStartDate', 'datetime')
-            ->columnName('variant_start_date')
-            ->nullable()
-            ->build();
-    }
 
     /**
      * Add variant.
@@ -149,7 +103,7 @@ trait VariantEntityTrait
      */
     public function getVariantSettings(): array
     {
-        return $this->variantSettings ?? [];
+        return $this->variantSettings ?: [];
     }
 
     public function getVariantStartDate(): ?\DateTimeInterface
