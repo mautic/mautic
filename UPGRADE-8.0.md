@@ -23,6 +23,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
 - `Mautic\SmsBundle\Entity\Sms` no longer implements `Mautic\CoreBundle\Entity\VariantEntityInterface` nor uses `VariantEntityTrait`. SMS never stored variants (the `sms_messages` table has no variant columns), so the following methods were removed from `Sms` with no replacement: `Sms::addVariantChild()`, `Sms::removeVariantChild()`, `Sms::getVariantChildren()`, `Sms::setVariantParent()`, `Sms::getVariantParent()`, `Sms::removeVariantParent()`, `Sms::setVariantSettings()`, `Sms::getVariantSettings()`, `Sms::getVariantStartDate()`, `Sms::setVariantStartDate()`, `Sms::isVariant()`, `Sms::isParent()`, `Sms::hasVariants()`, `Sms::clearVariants()`, `Sms::getVariants()`, `Sms::getRelatedEntityIds()`, `Sms::clearVariantSettings()`, `Sms::isEnableAbTest()`, `Sms::getVariantsPendingCount()`, `Sms::getVariantEndDate()`.
 - `Mautic\CoreBundle\Entity\VariantEntityTrait` now maps `variantParent`, `variantChildren`, `variantSettings` and `variantStartDate` with Doctrine attributes. Entities mapped with `#[ORM\Entity]` that use the trait must stop calling `addVariantMetadata()` from `loadMetadata()`, otherwise the variant fields are mapped twice. Entities mapped only via `loadMetadata()` keep calling `addVariantMetadata()`.
+- Event class `Mautic\EmailBundle\Event\EmailOnTogglePublishEvent` and constant `Mautic\PageBundle\PageEvents::PAGE_ON_TOGGLE_PUBLISH` (`mautic.page_on_toggle_publish`) removed. `Mautic\CoreBundle\Model\FormModel::togglePublishStatus()` now dispatches the generic `Mautic\CoreBundle\Event\EntityTogglePublishEvent` for every entity, so the toggle is no longer limited to emails and pages. Subscribe to `EntityTogglePublishEvent::class` and check the type of `$event->getEntity()` instead.
 - Unused service aliases `mautic.integration.gmail.config` and `mautic.integration.tagmanager.config` were removed. Inject the corresponding bundle’s `Integration\Support\ConfigSupport` class instead; the services and integrations remain available.
 - The ClearbitBundle was removed as the service was sunset.
 - The unused contact companies modal was removed: `Mautic\LeadBundle\Controller\LeadController::companyAction()` (`/s/contacts/company/{objectId}`), the `@MauticLead/Lead/company.html.twig` template, the `Mautic.toggleCompanyLead` JS function and the `lead:toggleCompanyLead` AJAX action (`Mautic\LeadBundle\Controller\AjaxController::toggleCompanyLeadAction()`). Nothing linked to the modal since the contact page button was removed, and the action failed with a 500 error. Add or remove a contact's companies through the contact edit form or the API (`/api/companies/{companyId}/contact/{contactId}/add` and `/remove`) instead.
@@ -197,7 +198,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
   | `EMAIL_PRE_SEND` | `EmailPreSendEvent` |
   | `EMAIL_ON_DISPLAY` | `EmailDisplayEvent` |
   | `EMAIL_ON_BUILD` | `EmailOnBuildEvent` |
-  | `EMAIL_ON_TOGGLE_PUBLISH` | `EmailOnTogglePublishEvent` |
+  | `EMAIL_ON_TOGGLE_PUBLISH` | `Mautic\CoreBundle\Event\EntityTogglePublishEvent` (see below) |
   | `EMAIL_PRE_SAVE` | `EmailPreSaveEvent` |
   | `EMAIL_POST_SAVE` | `EmailPostSaveEvent` |
   | `EMAIL_PRE_DELETE` | `EmailPreDeleteEvent` |
@@ -650,7 +651,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
      }
     ```
 
-    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY)` becomes `$dispatcher->dispatch($event)`. The `Mautic\PageBundle\PageEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class stay as string constants: the `PageEvent` group (`PAGE_ON_BUILD`, `PAGE_PRE_SAVE`, `PAGE_POST_SAVE`, `PAGE_PRE_DELETE`, `PAGE_POST_DELETE`, `PAGE_ON_TOGGLE_PUBLISH`) and the `DetermineWinnerEvent` pair (`ON_DETERMINE_BOUNCE_RATE_WINNER`, `ON_DETERMINE_DWELL_TIME_WINNER`) are unchanged, as are the campaign constants (`ON_CAMPAIGN_TRIGGER_DECISION`, `ON_CAMPAIGN_BATCH_ACTION`) whose events are shared across bundles.
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY)` becomes `$dispatcher->dispatch($event)`. The `Mautic\PageBundle\PageEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class stay as string constants: the `PageEvent` group (`PAGE_ON_BUILD`, `PAGE_PRE_SAVE`, `PAGE_POST_SAVE`, `PAGE_PRE_DELETE`, `PAGE_POST_DELETE`) and the `DetermineWinnerEvent` pair (`ON_DETERMINE_BOUNCE_RATE_WINNER`, `ON_DETERMINE_DWELL_TIME_WINNER`) are unchanged, as are the campaign constants (`ON_CAMPAIGN_TRIGGER_DECISION`, `ON_CAMPAIGN_BATCH_ACTION`) whose events are shared across bundles.
 
     Full mapping of the converted constants to their event class (all in the `Mautic\PageBundle\Event` namespace):
 
