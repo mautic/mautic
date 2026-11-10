@@ -45,14 +45,15 @@ final readonly class BroadcastExecutioner
 
             try {
                 while ($remainingLimit > 0) {
-                    $batchSize  = min($event->getBatch(), $remainingLimit);
-                    $batchResult = $this->sendNextBatch($sms, $batchSize, $partition);
+                    $batchSize   = min($event->getBatch(), $remainingLimit);
+                    $batch       = $this->processNextBatch($sms, $batchSize, $partition, false);
+                    $batchResult = $batch['result'];
                     $result->merge($batchResult);
 
                     $processedCount  = $batchResult->getProcessedCount();
                     $remainingLimit -= $processedCount;
 
-                    if ($batchResult->getExecutionFailureCount() > 0 || 0 === $processedCount || 0 === $batchResult->getRemainingCount()) {
+                    if ($batchResult->getExecutionFailureCount() > 0 || !$batch['hasMore']) {
                         break;
                     }
                 }
@@ -71,22 +72,32 @@ final readonly class BroadcastExecutioner
 
     public function sendNextBatch(Sms $sms, int $batchSize, ?ContactLimiter $partition = null): BroadcastResult
     {
+        return $this->processNextBatch($sms, $batchSize, $partition, true)['result'];
+    }
+
+    /**
+     * @return array{result: BroadcastResult, hasMore: bool}
+     */
+    private function processNextBatch(Sms $sms, int $batchSize, ?ContactLimiter $partition, bool $countRemaining): array
+    {
         $result = new BroadcastResult();
         if ($batchSize <= 0 || null === $sms->getId()) {
-            return $result;
+            return ['result' => $result, 'hasMore' => false];
         }
 
         $this->entityManager->refresh($sms);
         if ('list' !== $sms->getSmsType() || !$sms->isPublished()) {
-            return $result;
+            return ['result' => $result, 'hasMore' => false];
         }
 
         $partition ??= new ContactLimiter($batchSize);
         $contacts = $this->broadcastQuery->getPendingContacts($sms, $partition, $batchSize);
         if ([] === $contacts) {
-            $result->setRemainingCount($this->broadcastQuery->getPendingCount($sms, $partition));
+            if ($countRemaining) {
+                $result->setRemainingCount($this->broadcastQuery->getPendingCount($sms, $partition));
+            }
 
-            return $result;
+            return ['result' => $result, 'hasMore' => false];
         }
 
         $contactIds = [];
@@ -145,20 +156,25 @@ final readonly class BroadcastExecutioner
                 // replacing or double-reporting it with secondary bookkeeping failures.
             }
 
-            return $result;
+            return ['result' => $result, 'hasMore' => false];
         }
 
         $nextContactId = $contactIds[array_key_last($contactIds)] + 1;
         if (null !== $partition->getMaxContactId() && $nextContactId > $partition->getMaxContactId()) {
             $result->setRemainingCount(0);
 
-            return $result;
+            return ['result' => $result, 'hasMore' => false];
         }
 
+        $hasMore = true;
         try {
             $partition->setBatchMinContactId($nextContactId);
-            $result->setRemainingCount($this->broadcastQuery->getPendingCount($sms, $partition));
+            if ($countRemaining) {
+                $result->setRemainingCount($this->broadcastQuery->getPendingCount($sms, $partition));
+                $hasMore = $result->getRemainingCount() > 0;
+            }
         } catch (\Throwable $exception) {
+            $hasMore = false;
             // Submission has already completed. Preserve those known outcomes while
             // reporting that cursor/count bookkeeping could not be completed.
             if (!$executionFailureReported) {
@@ -167,7 +183,7 @@ final readonly class BroadcastExecutioner
             }
         }
 
-        return $result;
+        return ['result' => $result, 'hasMore' => $hasMore];
     }
 
     private function reportExecutionFailure(Sms $sms, \Throwable $exception): void

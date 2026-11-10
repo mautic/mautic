@@ -253,7 +253,7 @@ final class BroadcastExecutionerTest extends MauticMysqlTestCase
         ));
     }
 
-    public function testExecuteRetainsSentBatchOutcomeWhenRemainingCountFails(): void
+    public function testExecuteRetainsSentBatchOutcomeWhenNextFetchFails(): void
     {
         [$sms]         = $this->createBroadcast(2, 'post-send-failure');
         $broadcastQuery = self::getContainer()->get(BroadcastQuery::class);
