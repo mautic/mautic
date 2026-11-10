@@ -184,4 +184,19 @@ final class ConfigTypeTest extends TypeTestCase
         $this->assertTrue($form->isSynchronized());
         $this->assertSame('Archive', $form->getData()['folder']);
     }
+
+    public function testConfiguredDefaultFolderIsAvailableWithoutConnectingToImap(): void
+    {
+        $form = $this->factory->create(
+            ConfigMonitoredMailboxesType::class,
+            [],
+            [
+                'mailbox'          => 'EmailBundle_bounces',
+                'default_folder'   => 'Archive',
+                'general_settings' => [],
+            ]
+        );
+
+        $this->assertArrayHasKey('Archive', $form->get('folder')->getConfig()->getOption('choices'));
+    }
 }
