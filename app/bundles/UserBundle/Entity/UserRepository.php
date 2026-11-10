@@ -18,6 +18,7 @@ class UserRepository extends CommonRepository
 {
     /**
      * Check both login identifiers before creating a new user.
+     * Requires InnoDB REPEATABLE READ or SERIALIZABLE isolation for gap locking.
      */
     public function saveNewUser(User $user): void
     {
@@ -25,28 +26,18 @@ class UserRepository extends CommonRepository
             throw new \InvalidArgumentException('Only new users can be created.');
         }
 
+        $connection = $this->getEntityManager()->getConnection();
+
         try {
-            $this->getEntityManager()->getConnection()->transactional(function () use ($user): void {
-                // Use the first existing user as a common lock for all registrations until commit.
-                // Otherwise, two registrations could both find no duplicate and insert conflicting
-                // usernames/emails. This row is only a locking point; its fields are not changed.
-                $firstUser = $this->createQueryBuilder('u')
-                    ->orderBy('u.id')
-                    ->setMaxResults(1)
-                    ->getQuery()
-                    ->setLockMode(LockMode::PESSIMISTIC_WRITE)
-                    ->getOneOrNullResult();
-
-                if (null === $firstUser) {
-                    throw new \LogicException('User registration requires an existing installation user.');
-                }
-
+            $connection->transactional(function () use ($user): void {
+                // Lock matching users and the index gaps for identifiers that do not exist yet.
+                // Keep these locks until commit so a competing registration cannot insert a conflict.
                 $duplicate = $this->createQueryBuilder('u')
                     ->where('u.username IN (:identifiers) OR u.email IN (:identifiers)')
                     ->setParameter('identifiers', [$user->getUsername(), $user->getEmail()])
                     ->setMaxResults(1)
                     ->getQuery()
-                    ->setLockMode(LockMode::PESSIMISTIC_READ)
+                    ->setLockMode(LockMode::PESSIMISTIC_WRITE)
                     ->getOneOrNullResult();
 
                 if (null !== $duplicate) {
