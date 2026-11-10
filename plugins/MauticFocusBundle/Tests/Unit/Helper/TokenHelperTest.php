@@ -184,6 +184,13 @@ final class TokenHelperTest extends TestCase
         );
     }
 
+    public function testPublicRegexStillCapturesTheTokenValue(): void
+    {
+        // Plugins that use the constant read the ID from the first capture group
+        $this->assertSame(1, preg_match(TokenHelper::REGEX, 'Before {focus=5} after', $matches));
+        $this->assertSame('5', $matches[1]);
+    }
+
     public function testFormatTokenRejectsLegacyMode(): void
     {
         $this->expectException(\InvalidArgumentException::class);
