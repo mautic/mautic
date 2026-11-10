@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\DynamicContentBundle\Tests\Unit\EventListener;
 
-use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -20,6 +19,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
+use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
