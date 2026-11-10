@@ -39,8 +39,9 @@ final readonly class UserFactory implements UserFactoryInterface
             throw new OidcException('mautic.open_id.registration.exception.email_required');
         }
 
-        if ($this->userRepository->findOneBy(['email' => $credentials->getEmail()])) {
-            $this->logger->debug('Could not register user through Open ID Connect. Email is already taken.');
+        if ($this->userRepository->findOneBy(['email' => $credentials->getEmail()])
+            || $this->userRepository->findOneBy(['username' => $credentials->getEmail()])) {
+            $this->logger->debug('Could not register user through Open ID Connect. Identity is already taken.');
             throw new OidcException('mautic.open_id.registration.exception.identity_taken');
         }
 
@@ -59,17 +60,10 @@ final readonly class UserFactory implements UserFactoryInterface
     private function getUniqueUsername(UserCredentials $credentials): string
     {
         $username = $credentials->getPreferredUsername();
-        // Check both username and email columns to prevent account takeover
         if (!$username
             || $this->userRepository->findOneBy(['username' => $username])
             || $this->userRepository->findOneBy(['email' => $username])) {
             $username = $credentials->getEmail();
-        }
-
-        // Also verify the fallback username doesn't collide
-        if ($this->userRepository->findOneBy(['username' => $username])) {
-            $this->logger->error('Could not register user through Open ID Connect. Username conflicts with existing user.', ['username' => $username]);
-            throw new OidcException('mautic.open_id.registration.exception.identity_taken');
         }
 
         return $username;

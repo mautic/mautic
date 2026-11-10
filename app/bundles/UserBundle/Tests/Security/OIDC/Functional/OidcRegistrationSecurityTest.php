@@ -4,226 +4,173 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\OIDC\Functional;
 
+use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Entity\OidcSubjectId;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Entity\UserRepository;
+use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\Security\OIDC\Settings;
+use Mautic\UserBundle\Security\Provider\UserProvider;
 use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use Mautic\UserBundle\Tests\Security\OIDC\Double\Service\Client;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Mautic\UserBundle\UserEvents;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-/**
- * This test verifies that OIDC self-registration cannot be exploited for account takeover.
- *
- * Specifically, it tests that an attacker cannot:
- * 1. Set their preferred_username to match an existing user's email
- * 2. Set their email to match an existing user's username
- *
- * Both scenarios should result in either a separate new user being created or registration failure,
- * never linking the attacker's OIDC identity to the existing user.
- */
 final class OidcRegistrationSecurityTest extends MauticMysqlTestCase
 {
-    private const LOGIN_PATH = '/s/open_id/login';
+    private int $victimId;
+    private int $roleId;
 
     protected function setUp(): void
     {
-        // Reset the test double client state before parent setUp
-        Client::reset();
-
         parent::setUp();
-        // Clear automatic login from parent - OIDC tests need explicit control over auth state
-        $this->logOut();
+        Client::reset();
+        $this->client->getContainer()->get(TokenStorageInterface::class)->setToken(null);
+        $this->client->getCookieJar()->clear();
+        $this->client->disableReboot();
+        $this->client->followRedirects(false);
 
         $role = new Role();
-        $role->setName('User');
+        $role->setName('OIDC registrants');
         $role->setIsAdmin(false);
         $this->em->persist($role);
+
+        $victim = new User();
+        $victim->setUsername('victim-login@example.com');
+        $victim->setEmail('victim@example.com');
+        $victim->setPassword('unchanged-victim-password');
+        $victim->setFirstName('Victim');
+        $victim->setLastName('User');
+        $victim->setRole($role);
+        $this->em->persist($victim);
         $this->em->flush();
 
-        // Create a victim user that the attacker will try to take over
-        $victimUser = new User();
-        $victimUser->setUsername('victim');
-        $victimUser->setPassword('victim_password');
-        $victimUser->setFirstName('Victim');
-        $victimUser->setLastName('User');
-        $victimUser->setEmail('victim@example.com');
-        $victimUser->setRole($role);
-        $this->em->persist($victimUser);
+        $this->victimId = $victim->getId();
+        $this->roleId   = $role->getId();
 
-        $this->em->flush();
+        $this->client->getContainer()->set(Settings::class, (new ParametersBuilder())
+            ->withIsRequired(false)
+            ->withIsUserRegistrationAllowed(true)
+            ->withRegisteredUserRoleId($this->roleId)
+            ->build());
+    }
+
+    protected function beforeTearDown(): void
+    {
+        Client::reset();
+        parent::beforeTearDown();
+    }
+
+    #[DataProvider('availableIdentities')]
+    public function testRegistrationCreatesAndAuthenticatesSeparateUser(?string $preferredUsername, string $expectedUsername): void
+    {
+        $userCount = $this->em->getRepository(User::class)->count([]);
+        $this->client->getContainer()->get(EventDispatcherInterface::class)->addListener(UserEvents::USER_PRE_SAVE, static function (UserEvent $event): void {
+            $event->getUser()->setTimezone('Europe/Prague');
+        });
+
+        $this->register('new@example.com', $preferredUsername);
+
+        self::assertResponseRedirects('https://localhost/s/dashboard');
+        $authenticatedUser = $this->client->getContainer()->get(TokenStorageInterface::class)->getToken()?->getUser();
+        $this->assertInstanceOf(User::class, $authenticatedUser);
+
+        $this->em->clear();
+        $user = $this->em->getRepository(User::class)->findOneBy(['email' => 'new@example.com']);
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertNotSame($this->victimId, $user->getId());
+        $this->assertSame($user->getId(), $authenticatedUser->getId());
+        $this->assertSame($expectedUsername, $user->getUsername());
+        $this->assertSame('New', $user->getFirstName());
+        $this->assertSame('Registrant', $user->getLastName());
+        $this->assertSame($this->roleId, $user->getRole()->getId());
+        $this->assertFalse($user->getRole()->isAdmin());
+        $this->assertSame('Europe/Prague', $user->getTimezone());
+        $this->assertNotEmpty($user->getPassword());
+        $this->assertSame($userCount + 1, $this->em->getRepository(User::class)->count([]));
+
+        $link = $this->em->getRepository(OidcSubjectId::class)->findOneBy(['subjectID' => 'new-subject']);
+        $this->assertInstanceOf(OidcSubjectId::class, $link);
+        $this->assertSame($user->getId(), $link->getUser()->getId());
+        $this->assertInstanceOf(AuditLog::class, $this->em->getRepository(AuditLog::class)->findOneBy([
+            'bundle' => 'user', 'object' => 'user', 'objectId' => $user->getId(), 'action' => 'create',
+        ]));
+        $this->assertVictimUnchanged();
     }
 
     /**
-     * Test that an attacker cannot take over an account by setting preferred_username
-     * to match the victim's email address.
-     *
-     * Attack scenario:
-     * 1. Attacker controls their IdP account (e.g., Keycloak with self-registration)
-     * 2. Attacker sets preferred_username = "victim@example.com" (the victim's Mautic email)
-     * 3. Attacker keeps their own unused email
-     * 4. Attacker attempts to log in through OIDC
-     *
-     * Expected: Registration should fail or create a separate new user, never link to victim.
+     * @return iterable<string, array{?string, string}>
      */
-    public function testPreferredUsernameMatchingExistingEmailDoesNotTakeoverAccount(): void
+    public static function availableIdentities(): iterable
     {
-        $userRepo = $this->em->getRepository(User::class);
-        $this->assertInstanceOf(UserRepository::class, $userRepo);
+        yield 'unique preferred username' => ['new-user', 'new-user'];
+        yield 'no preferred username' => [null, 'new@example.com'];
+        yield 'preferred username matches existing email' => ['victim@example.com', 'new@example.com'];
+        yield 'preferred username matches existing username' => ['victim-login@example.com', 'new@example.com'];
+        yield 'case-insensitive email collision' => ['VICTIM@example.com', 'new@example.com'];
+    }
 
-        // Verify victim user exists
-        $victimUser = $userRepo->findOneBy(['email' => 'victim@example.com']);
-        $this->assertInstanceOf(User::class, $victimUser);
-        $victimUserId = $victimUser->getId();
+    #[DataProvider('conflictingIdentities')]
+    public function testRegistrationRejectsConflictingEmail(string $email, ?string $preferredUsername): void
+    {
+        $userCount = $this->em->getRepository(User::class)->count([]);
+        $this->register($email, $preferredUsername);
 
-        // Configure the test double with attacker data
-        // The attacker sets preferred_username to the victim's email
-        Client::$userInfoResponse = [
-            'sub'                => 'attacker_sub_123',
-            'email'              => 'attacker@evil.com',  // Attacker's own email
-            'preferred_username' => 'victim@example.com',  // Victim's email!
-            'given_name'         => 'Attacker',
-            'family_name'        => 'Evil',
-        ];
-        Client::$verifiedClaimsResponse = Client::$userInfoResponse;
-        Client::$mappingFieldResponse = 'sub';
-        Client::$authenticateResponse = new RedirectResponse('https://oidc-provider.example.com');
+        self::assertResponseRedirects('https://localhost/s/login');
+        $this->assertNull($this->client->getContainer()->get(TokenStorageInterface::class)->getToken());
+        $crawler = $this->client->followRedirect();
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString('Failed to register. This identity is already associated with an account.', $crawler->text());
 
-        // Enable OIDC with user registration allowed
-        $role = $this->em->getRepository(Role::class)->findOneBy(['name' => 'User']);
-        $parameters = (new ParametersBuilder())
-            ->withIsUserRegistrationAllowed(true)
-            ->withRegisteredUserRoleId($role->getId())
-            ->build();
-        $this->client->getContainer()->set(Settings::class, $parameters);
-
-        $this->client->followRedirects();
-        $this->client->setMaxRedirects(10);
-        $this->client->disableReboot();
-
-        // Attempt OIDC login/registration - should fail
-        $this->client->request('GET', self::LOGIN_PATH, [
-            'code'  => 'test_code',
-            'state' => 'test_state',
-        ]);
-
-        // Registration should have failed - verify no OIDC link was created for attacker
-        $oidcRepo = $this->em->getRepository(\Mautic\UserBundle\Entity\OidcSubjectId::class);
-        $attackerOidcLink = $oidcRepo->findOneBy(['subjectID' => 'attacker_sub_123']);
-        $this->assertNull($attackerOidcLink, 'Attacker OIDC link should not exist - registration should have been rejected');
-
-        // Verify no user was created with attacker's email
-        $attackerUser = $userRepo->findOneBy(['email' => 'attacker@evil.com']);
-        $this->assertNull($attackerUser, 'No user should have been created with attacker email');
-
-        // Verify the victim user was NOT modified
         $this->em->clear();
-        $victimUserAfter = $userRepo->find($victimUserId);
-        $this->assertInstanceOf(User::class, $victimUserAfter);
-        $this->assertEquals('victim@example.com', $victimUserAfter->getEmail());
-        $this->assertEquals('victim', $victimUserAfter->getUsername());
-
-        // Verify the victim is NOT linked to the attacker's OIDC sub
-        $victimOidcLink = $oidcRepo->findOneBy(['user' => $victimUserId]);
-        $this->assertNull($victimOidcLink, 'Victim should not have any OIDC link');
+        $this->assertSame($userCount, $this->em->getRepository(User::class)->count([]));
+        $this->assertNotInstanceOf(OidcSubjectId::class, $this->em->getRepository(OidcSubjectId::class)->findOneBy(['subjectID' => 'new-subject']));
+        $this->assertVictimUnchanged();
     }
 
     /**
-     * Test variant 2: The attacker's email matches the victim's username,
-     * and preferred_username is already taken.
-     *
-     * Attack scenario:
-     * 1. Attacker sets email = "victim" (matches victim's username)
-     * 2. Attacker sets preferred_username to something already taken
-     * 3. UserFactory falls back to using email as username
-     * 4. findUser() could match the victim by username
-     *
-     * Expected: Registration should fail or create separate user, never link to victim.
+     * @return iterable<string, array{string, ?string}>
      */
-    public function testEmailMatchingExistingUsernameDoesNotTakeoverAccount(): void
+    public static function conflictingIdentities(): iterable
     {
-        $userRepo = $this->em->getRepository(User::class);
-        $this->assertInstanceOf(UserRepository::class, $userRepo);
-
-        // Create another user to occupy a preferred_username
-        $otherRole = $this->em->getRepository(Role::class)->findOneBy(['name' => 'User']);
-        $otherUser = new User();
-        $otherUser->setUsername('taken_username');
-        $otherUser->setPassword('password');
-        $otherUser->setFirstName('Other');
-        $otherUser->setLastName('User');
-        $otherUser->setEmail('other@example.com');
-        $otherUser->setRole($otherRole);
-        $this->em->persist($otherUser);
-        $this->em->flush();
-
-        // Verify victim user exists
-        $victimUser = $userRepo->findOneBy(['username' => 'victim']);
-        $this->assertInstanceOf(User::class, $victimUser);
-        $victimUserId = $victimUser->getId();
-
-        // Configure the test double with attacker data
-        // The attacker sets email to match victim's username
-        Client::$userInfoResponse = [
-            'sub'                => 'attacker_sub_456',
-            'email'              => 'victim',  // Matches victim's username!
-            'preferred_username' => 'taken_username',  // Already taken, will fallback to email
-            'given_name'         => 'Attacker',
-            'family_name'        => 'Evil2',
-        ];
-        Client::$verifiedClaimsResponse = Client::$userInfoResponse;
-        Client::$mappingFieldResponse = 'sub';
-        Client::$authenticateResponse = new RedirectResponse('https://oidc-provider.example.com');
-
-        // Enable OIDC with user registration allowed
-        $role = $this->em->getRepository(Role::class)->findOneBy(['name' => 'User']);
-        $parameters = (new ParametersBuilder())
-            ->withIsUserRegistrationAllowed(true)
-            ->withRegisteredUserRoleId($role->getId())
-            ->build();
-        $this->client->getContainer()->set(Settings::class, $parameters);
-
-        $this->client->followRedirects();
-        $this->client->setMaxRedirects(10);
-        $this->client->disableReboot();
-
-        // Attempt OIDC login/registration - should fail
-        $this->client->request('GET', self::LOGIN_PATH, [
-            'code'  => 'test_code',
-            'state' => 'test_state',
-        ]);
-
-        // Registration should have failed - verify no OIDC link was created for attacker
-        $oidcRepo = $this->em->getRepository(\Mautic\UserBundle\Entity\OidcSubjectId::class);
-        $attackerOidcLink = $oidcRepo->findOneBy(['subjectID' => 'attacker_sub_456']);
-        $this->assertNull($attackerOidcLink, 'Attacker OIDC link should not exist - registration should have been rejected');
-
-        // Verify no user was created with attacker's invalid email (which matches victim username)
-        $attackerUser = $userRepo->findOneBy(['email' => 'victim']);
-        $this->assertNull($attackerUser, 'No user should have been created with the collision-causing email');
-
-        // Verify the victim user was NOT modified
-        $this->em->clear();
-        $victimUserAfter = $userRepo->find($victimUserId);
-        $this->assertInstanceOf(User::class, $victimUserAfter);
-        $this->assertEquals('victim@example.com', $victimUserAfter->getEmail());
-        $this->assertEquals('victim', $victimUserAfter->getUsername());
-
-        // Verify the victim is NOT linked to the attacker's OIDC sub
-        $victimOidcLink = $oidcRepo->findOneBy(['user' => $victimUserId]);
-        $this->assertNull($victimOidcLink, 'Victim should not have any OIDC link');
+        yield 'email matches existing email' => ['victim@example.com', 'new-user'];
+        yield 'email matches existing username with unique preferred username' => ['victim-login@example.com', 'new-user'];
+        yield 'email matches existing username with taken preferred username' => ['victim-login@example.com', 'victim@example.com'];
+        yield 'email matches existing username without preferred username' => ['victim-login@example.com', null];
+        yield 'case-insensitive username collision' => ['VICTIM-LOGIN@example.com', 'new-user'];
     }
 
-    private function logOut(): void
+    private function register(string $email, ?string $preferredUsername): void
     {
-        $container = $this->client->getContainer();
+        Client::$userInfoResponse = [
+            'sub'                => 'new-subject',
+            'email'              => $email,
+            'preferred_username' => $preferredUsername,
+            'given_name'         => 'New',
+            'family_name'        => 'Registrant',
+        ];
+        Client::$verifiedClaimsResponse = Client::$userInfoResponse;
+        $this->client->request('GET', '/s/open_id/login', ['code' => 'test-code', 'state' => 'test-state']);
+    }
 
-        // Clear token storage
-        $container->get(TokenStorageInterface::class)->setToken(null);
+    private function assertVictimUnchanged(): void
+    {
+        $victim = $this->em->getRepository(User::class)->find($this->victimId);
+        $this->assertInstanceOf(User::class, $victim);
+        $this->assertSame('victim-login@example.com', $victim->getUsername());
+        $this->assertSame('victim@example.com', $victim->getEmail());
+        $this->assertSame('unchanged-victim-password', $victim->getPassword());
+        $this->assertSame('Victim', $victim->getFirstName());
+        $this->assertSame('User', $victim->getLastName());
+        $this->assertSame($this->roleId, $victim->getRole()->getId());
+        $this->assertNotInstanceOf(OidcSubjectId::class, $this->em->getRepository(OidcSubjectId::class)->findOneBy(['user' => $this->victimId]));
 
-        // Clear cookies to ensure fresh session
-        $this->client->getCookieJar()->clear();
+        // The original identity must remain unambiguous for password sign-in.
+        $provider = $this->client->getContainer()->get(UserProvider::class);
+        $this->assertSame($this->victimId, $provider->loadUserByIdentifier('victim-login@example.com')->getId());
+        $this->assertSame($this->victimId, $provider->loadUserByIdentifier('victim@example.com')->getId());
     }
 }
