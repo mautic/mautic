@@ -105,7 +105,7 @@ class Form extends FormEntity implements UuidInterface
     private $alias;
 
     #[Groups(['form:read', 'form:write', 'campaign:read', 'email:read'])]
-    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 

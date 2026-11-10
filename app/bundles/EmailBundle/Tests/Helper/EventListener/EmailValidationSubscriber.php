@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Helper\EventListener;
 
 use Mautic\EmailBundle\Event\EmailValidationEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class EmailValidationSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailValidationEvent::class,
     )]
     public function onEmailValidation(EmailValidationEvent $event): void

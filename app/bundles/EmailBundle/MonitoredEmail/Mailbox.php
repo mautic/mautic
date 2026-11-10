@@ -144,7 +144,7 @@ final class Mailbox
 
     private $imapFullPath;
 
-    private ?\IMAP\Connection $imapStream = null;
+    private ?Connection $imapStream = null;
 
     private $imapFolder     = 'INBOX';
 
@@ -346,7 +346,7 @@ final class Mailbox
     /**
      * Get IMAP mailbox connection stream.
      */
-    public function getImapStream(): ?\IMAP\Connection
+    public function getImapStream(): ?Connection
     {
         if (!$this->isConnected()) {
             $this->imapStream = $this->initImapStream();

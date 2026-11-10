@@ -63,7 +63,7 @@ class VideoHit
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     private ?Lead $lead = null;
 
-    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\ManyToOne(targetEntity: IpAddress::class, cascade: ['persist', 'detach'])]
     #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private ?IpAddress $ipAddress = null;
 

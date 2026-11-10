@@ -8,6 +8,7 @@ use Mautic\AssetBundle\Tests\RemoteFileServerTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -157,7 +158,7 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
         $this->assertSame(
             0,
             (int) $this->em->getConnection()->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'assets'),

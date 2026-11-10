@@ -39,7 +39,7 @@ class Submission
     #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
     private $form;
 
-    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\ManyToOne(targetEntity: IpAddress::class, cascade: ['persist', 'detach'])]
     #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private ?IpAddress $ipAddress = null;
 

@@ -259,7 +259,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $revision = 1;
 
     #[Groups(['email:read', 'email:write'])]
-    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 

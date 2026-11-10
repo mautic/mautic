@@ -7,13 +7,14 @@ namespace Utils\PHPStan\Rule;
 use FOS\OAuthServerBundle\Controller\AuthorizeController;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Model\FormModel;
-use PhpParser\Node;
-use PhpParser\Node\Name;
-use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
+use PHPStan\Reflection\ClassReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPUnit\Framework\TestCase;
+use PhpParser\Node;
+use PhpParser\Node\Name;
+use PhpParser\Node\Stmt\ClassMethod;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Extension\AbstractExtension;
@@ -195,7 +196,7 @@ final readonly class NoServiceInMethodParameterRule implements Rule
     private function isInheritedParentClassMethod(ClassMethod $classMethod, Scope $scope): bool
     {
         $classReflection = $scope->getClassReflection();
-        if (!$classReflection instanceof \PHPStan\Reflection\ClassReflection) {
+        if (!$classReflection instanceof ClassReflection) {
             return false;
         }
 
@@ -211,7 +212,7 @@ final readonly class NoServiceInMethodParameterRule implements Rule
         }
 
         $classReflection = $scope->getClassReflection();
-        if (!$classReflection instanceof \PHPStan\Reflection\ClassReflection) {
+        if (!$classReflection instanceof ClassReflection) {
             return false;
         }
 
@@ -221,7 +222,7 @@ final readonly class NoServiceInMethodParameterRule implements Rule
     private function isInSkippedClassType(Scope $scope): bool
     {
         $classReflection = $scope->getClassReflection();
-        if (!$classReflection instanceof \PHPStan\Reflection\ClassReflection) {
+        if (!$classReflection instanceof ClassReflection) {
             return false;
         }
 
@@ -231,7 +232,7 @@ final readonly class NoServiceInMethodParameterRule implements Rule
     private function isInTestCase(Scope $scope): bool
     {
         $classReflection = $scope->getClassReflection();
-        if (!$classReflection instanceof \PHPStan\Reflection\ClassReflection) {
+        if (!$classReflection instanceof ClassReflection) {
             return false;
         }
 

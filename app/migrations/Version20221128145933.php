@@ -7,6 +7,7 @@ namespace Mautic\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Form\Type\ConfigType;
 
@@ -28,7 +29,7 @@ final class Version20221128145933 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $confFile = \Mautic\CoreBundle\Loader\ParameterLoader::getLocalConfigFile(__DIR__.'/../');
+        $confFile = ParameterLoader::getLocalConfigFile(__DIR__.'/../');
 
         if (!file_exists($confFile)) {
             return;
