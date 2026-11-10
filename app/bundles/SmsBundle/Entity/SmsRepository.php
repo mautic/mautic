@@ -43,6 +43,9 @@ class SmsRepository extends CommonRepository
         return $this->getPublishedBroadcastsQuery($id)->toIterable();
     }
 
+    /**
+     * Builds the query for published segment broadcasts, optionally restricted by ID.
+     */
     private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());

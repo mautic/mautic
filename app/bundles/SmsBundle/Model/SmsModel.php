@@ -53,6 +53,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 {
     use TranslationModelTrait;
 
+    private const STAT_PERSIST_BATCH_SIZE = 20;
+
     public function __construct(
         protected TrackableModel $pageTrackableModel,
         protected LeadModel $leadModel,
@@ -269,15 +271,18 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $this->dispatcher->dispatch($filterEvent, SmsEvents::FILTER_CONTACTS_ON_SEND);
 
         $missingNumberStats      = [];
+        $missingNumberResults    = [];
         $missingNumberContactIds = array_flip($filterEvent->getRemovedContacts(FilterEvent::REMOVAL_REASON_MISSING_NUMBER));
         foreach ($filterEvent->getRemovedContacts() as $contactId) {
             $status = 'mautic.sms.campaign.failed.missing_number';
-            $results[$contactId] = [
+            $result = [
                 'sent'   => false,
                 'status' => $status,
             ];
 
             if (!isset($missingNumberContactIds[$contactId])) {
+                $results[$contactId] = $result;
+
                 continue;
             }
 
@@ -290,9 +295,14 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                 $this->getContactListId($listIds, $contactId),
             );
             $this->markStatFailed($stat, $status);
-            $missingNumberStats[$contactId] = $stat;
+            $missingNumberStats[$contactId]   = $stat;
+            $missingNumberResults[$contactId] = $result;
         }
-        $this->persistStats($missingNumberStats, $results);
+        try {
+            $this->persistStats($missingNumberStats, $missingNumberResults, $results);
+        } catch (\Throwable $exception) {
+            throw new PartialBatchException($results, $exception);
+        }
 
         $sendContacts = $filterEvent->getContacts();
 
@@ -389,8 +399,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                 'name'    => $recipientCollection->getSms()->getName(),
             ];
 
-            $collectionStats = [];
-            $sentCount       = 0;
+            $collectionResults = [];
+            $collectionStats   = [];
+            $sentCount         = 0;
             foreach ($recipientCollection as $recipient) {
                 $contactId = $recipient->getKey();
                 $defaultSendResult['content'] = $recipient->getFinalMessage();
@@ -405,13 +416,17 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                     ++$sentCount;
                 }
 
-                $results[$contactId]         = $defaultSendResult;
-                $collectionStats[$contactId] = $stats[$contactId];
+                $collectionResults[$contactId] = $defaultSendResult;
+                $collectionStats[$contactId]   = $stats[$contactId];
             }
 
             // Commit each translated collection before attempting the next one. A later
             // transport exception must not make already submitted contacts eligible again.
-            $this->persistStats($collectionStats, $results);
+            try {
+                $this->persistStats($collectionStats, $collectionResults, $results);
+            } catch (\Throwable $exception) {
+                throw new PartialBatchException($results, $exception);
+            }
             foreach (array_keys($collectionStats) as $contactId) {
                 unset($stats[$contactId]);
             }
@@ -428,11 +443,17 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         return $results;
     }
 
+    /**
+     * Resolves either a legacy shared list ID or a contact-specific list ID.
+     */
     private function getContactListId(mixed $listIds, int $contactId): mixed
     {
         return is_array($listIds) ? ($listIds[$contactId] ?? null) : $listIds;
     }
 
+    /**
+     * Marks a stat as failed without retaining provider-supplied response details.
+     */
     private function markStatFailed(Stat $stat, string $status): void
     {
         $stat->setIsFailed(true);
@@ -440,23 +461,28 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     }
 
     /**
+     * Persists bounded stat batches and exposes only outcomes whose transaction committed.
+     *
      * @param array<int, Stat>                 $stats
-     * @param array<int, array<string, mixed>> $results
+     * @param array<int, array<string, mixed>> $pendingResults
+     * @param array<int, array<string, mixed>> $completedResults
      */
-    private function persistStats(array $stats, array &$results): void
+    private function persistStats(array $stats, array $pendingResults, array &$completedResults): void
     {
-        if ([] === $stats) {
-            return;
-        }
+        foreach (array_chunk($stats, self::STAT_PERSIST_BATCH_SIZE, true) as $statBatch) {
+            $this->em->getConnection()->transactional(function () use ($statBatch): void {
+                $this->statRepository->saveEntities($statBatch);
+            });
 
-        $this->statRepository->saveEntities($stats);
+            foreach ($statBatch as $contactId => $stat) {
+                $result = $pendingResults[$contactId];
+                if (!$stat->isFailed()) {
+                    $result['statId'] = $stat->getId();
+                }
 
-        foreach ($stats as $stat) {
-            if (!$stat->isFailed()) {
-                $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
+                $completedResults[$contactId] = $result;
+                $this->smsRepository->detachEntity($stat);
             }
-
-            $this->smsRepository->detachEntity($stat);
         }
     }
 

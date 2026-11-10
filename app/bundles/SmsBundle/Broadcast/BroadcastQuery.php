@@ -23,6 +23,11 @@ final class BroadcastQuery
     ) {
     }
 
+    /**
+     * Returns one ordered, deduplicated batch of contacts eligible for the broadcast.
+     *
+     * @return array<int, array{id: int|string, listId: int|string}>
+     */
     public function getPendingContacts(Sms $sms, ContactLimiter $contactLimiter, ?int $batchLimit = null): array
     {
         if (null !== $batchLimit && $batchLimit <= 0) {
@@ -57,6 +62,9 @@ final class BroadcastQuery
         );
     }
 
+    /**
+     * Counts eligible contacts within the optional contact partition.
+     */
     public function getPendingCount(Sms $sms, ?ContactLimiter $contactLimiter = null): int
     {
         $query = $this->getBasicQuery($sms);

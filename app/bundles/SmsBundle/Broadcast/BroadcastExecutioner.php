@@ -26,6 +26,9 @@ final readonly class BroadcastExecutioner
     ) {
     }
 
+    /**
+     * Processes each published broadcast within the event's batch and contact limits.
+     */
     public function execute(ChannelBroadcastEvent $event): void
     {
         // Get list of published broadcasts or broadcast if there is only a single ID

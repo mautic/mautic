@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Model;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -21,6 +22,7 @@ use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\SmsRepository;
 use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\Event\FilterEvent;
+use Mautic\SmsBundle\Exception\PartialBatchException;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
 use Mautic\SmsBundle\Form\Type\SmsType;
 use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
@@ -61,7 +63,11 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         $pageTrackableModel         = $this->createStub(TrackableModel::class);
         $this->leadModel            = $this->createStub(LeadModel::class);
         $this->transport            = $this->createMock(TransportChain::class);
+        $connection                 = $this->createStub(Connection::class);
+        $connection->method('transactional')
+            ->willReturnCallback(static fn (\Closure $callback): mixed => $callback());
         $entityManger               = $this->createStub(EntityManagerInterface::class);
+        $entityManger->method('getConnection')->willReturn($connection);
         $this->security             = $this->createMock(CorePermissions::class);
         $dispatcher                 = $this->createMock(EventDispatcherInterface::class);
         $urlGenerator               = $this->createStub(UrlGeneratorInterface::class);
@@ -359,6 +365,73 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($results[13]['sent']);
         $this->assertSame('mautic.sms.timeline.status.failed', $results[13]['status']);
         $this->assertStringNotContainsString($providerError, json_encode($results, JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * Confirms that a partial flush reports prior and committed-chunk outcomes only.
+     */
+    public function testPersistenceFailureReportsOnlyDurableOutcomes(): void
+    {
+        $sms = new Sms();
+        ReflectionHelper::setValue($sms, 'id', 1);
+        $sms->setMessage('test');
+
+        $contacts = [];
+        for ($contactId = 1; $contactId <= 22; ++$contactId) {
+            $contact = new Lead();
+            $contact->setId($contactId);
+            $contact->setMobile(1 === $contactId ? '   ' : "+4179000{$contactId}");
+            $contacts[] = $contact;
+        }
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('mautic.sms.campaign.failed.missing_number')
+            ->willReturn('Missing phone number for contact.');
+        $this->transport->expects($this->once())
+            ->method('sendBatchSms')
+            ->willReturnCallback(static function (RecipientCollection $recipients): RecipientCollection {
+                foreach ($recipients as $recipient) {
+                    $recipient->setResult(true);
+                }
+
+                return $recipients;
+            });
+        $this->smsRepository->expects($this->never())->method('upCount');
+
+        $saveCall = 0;
+        $this->statRepository->expects($this->exactly(3))
+            ->method('saveEntities')
+            ->willReturnCallback(function (array $stats) use (&$saveCall): void {
+                ++$saveCall;
+                if (3 === $saveCall) {
+                    throw new \RuntimeException('Stat persistence failed.');
+                }
+
+                foreach ($stats as $contactId => $stat) {
+                    ReflectionHelper::setValue($stat, 'id', (string) $contactId);
+                }
+            });
+
+        try {
+            $this->smsModel->sendSms($sms, $contacts);
+            $this->fail('A persistence failure must abort the remaining batch.');
+        } catch (PartialBatchException $exception) {
+            $results = $exception->getResults();
+            $this->assertCount(21, $results);
+            $this->assertSame(
+                ['sent' => false, 'status' => 'mautic.sms.campaign.failed.missing_number'],
+                $results[1],
+            );
+            foreach (range(2, 21) as $contactId) {
+                $this->assertSame(
+                    ['sent' => true, 'status' => 'mautic.sms.timeline.status.delivered'],
+                    $results[$contactId],
+                );
+            }
+            $this->assertArrayNotHasKey(22, $results);
+            $this->assertSame(\RuntimeException::class, $exception->getOriginalExceptionClass());
+        }
     }
 
     private function sendMessage(bool $isMMS = false): void

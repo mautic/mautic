@@ -27,6 +27,11 @@ final class BroadcastResult
      */
     private array $failedContacts = [];
 
+    /**
+     * Aggregates submitted, scheduled, and failed outcomes for one processed batch.
+     *
+     * @param array<int, array<string, mixed>> $results
+     */
     public function process(array $results, ?int $processedCount = null): void
     {
         $processedCount ??= count($results);

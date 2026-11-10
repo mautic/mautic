@@ -52,6 +52,9 @@ final class FilterEvent extends Event
         return $this->removed;
     }
 
+    /**
+     * Removes a contact and records an optional machine-readable reason.
+     */
     public function removeContact(int $id, ?string $reason = null): void
     {
         $this->removed[] = $id;
