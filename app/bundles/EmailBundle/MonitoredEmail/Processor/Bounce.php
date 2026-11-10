@@ -95,21 +95,13 @@ class Bounce implements ProcessorInterface
 
     protected function updateStat(Stat $stat, BouncedEmail $bouncedEmail): void
     {
-        $dtHelper    = new DateTimeHelper();
-        $openDetails = $stat->getOpenDetails();
-
-        if (!isset($openDetails['bounces'])) {
-            $openDetails['bounces'] = [];
-        }
-
-        $openDetails['bounces'][] = [
+        $dtHelper = new DateTimeHelper();
+        $stat->addBounceDetails([
             'datetime' => $dtHelper->toUtcString(),
             'reason'   => $bouncedEmail->getRuleCategory(),
             'code'     => $bouncedEmail->getRuleNumber(),
             'type'     => $bouncedEmail->getType(),
-        ];
-
-        $stat->setOpenDetails($openDetails);
+        ]);
 
         $retryCount = $stat->getRetryCount();
         ++$retryCount;

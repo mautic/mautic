@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -16,6 +17,11 @@ class Stat
      * @var int Limit number of stored 'openDetails'
      */
     public const MAX_OPEN_DETAILS = 1000;
+
+    /**
+     * @var int Number of newest bounce details kept, separate from opens so bounces are never crowded out
+     */
+    public const MAX_BOUNCE_DETAILS = 10;
 
     public const TABLE_NAME = 'email_stats';
 
@@ -86,9 +92,9 @@ class Stat
     private $sourceId;
 
     /**
-     * @var array
+     * @var array|null
      */
-    private $tokens = [];
+    private $tokens;
 
     /**
      * @var Copy|null
@@ -113,13 +119,29 @@ class Stat
     private $replies;
 
     /**
+     * @var ArrayCollection|StatData[]
+     */
+    private $dataCollection;
+
+    /**
+     * @var ArrayCollection|StatOpenDetail[]
+     */
+    private $dataOpenDetails;
+
+    /**
      * @var array<string,mixed[]>
      */
     private array $changes = [];
 
     public function __construct()
     {
-        $this->replies = new ArrayCollection();
+        $this->replies         = new ArrayCollection();
+        $this->dataCollection  = new ArrayCollection();
+        $this->dataOpenDetails = new ArrayCollection();
+
+        $data = new StatData();
+        $data->setStat($this);
+        $this->dataCollection->add($data);
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -217,6 +239,22 @@ class Stat
             ->fetchExtraLazy()
             ->cascadeAll()
             ->build();
+
+        // Mapped as OneToMany rather than OneToOne so it can lazy-load: an inverse-side to-one
+        // can never be lazy, which would force it onto every Stat hydration in Mautic. The
+        // shared-primary-key column on StatData still enforces at most one row per stat.
+        $builder->createOneToMany('dataCollection', StatData::class)
+            ->mappedBy('stat')
+            ->cascadeAll()
+            ->build();
+
+        $builder->createOneToMany('dataOpenDetails', StatOpenDetail::class)
+            ->orphanRemoval()
+            ->mappedBy('stat')
+            ->setOrderBy(['id' => 'ASC'])
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
     }
 
     /**
@@ -270,6 +308,12 @@ class Stat
         $dateSent = $this->toDateTime($dateSent);
         $this->addChange('dateSent', $this->dateSent, $dateSent);
         $this->dateSent = $dateSent;
+        $this->getData()->setDateSent($dateSent);
+        // Denormalised onto each child row so MaintenanceSubscriber can compact
+        // email_stats_open_details by date_sent without joining email_stats.
+        foreach ($this->dataOpenDetails as $detail) {
+            $detail->setDateSent($dateSent);
+        }
     }
 
     /**
@@ -490,19 +534,6 @@ class Stat
     }
 
     /**
-     * @return array|null
-     */
-    public function getTokens()
-    {
-        return $this->tokens;
-    }
-
-    public function setTokens(array $tokens): void
-    {
-        $this->tokens = $tokens;
-    }
-
-    /**
      * @return int
      */
     public function getOpenCount()
@@ -519,18 +550,6 @@ class Stat
         $this->openCount = $openCount;
 
         return $this;
-    }
-
-    /**
-     * @param string $details
-     */
-    public function addOpenDetails($details): void
-    {
-        if (self::MAX_OPEN_DETAILS > $this->openCount) {
-            $this->openDetails[] = $details;
-        }
-
-        ++$this->openCount;
     }
 
     /**
@@ -555,21 +574,6 @@ class Stat
         $lastOpened = $this->toDateTime($lastOpened);
         $this->addChange('lastOpened', $this->lastOpened, $lastOpened);
         $this->lastOpened = $lastOpened;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getOpenDetails()
-    {
-        return $this->openDetails;
-    }
-
-    public function setOpenDetails(array $openDetails): static
-    {
-        $this->openDetails = $openDetails;
 
         return $this;
     }
@@ -601,6 +605,140 @@ class Stat
     {
         $this->addChange('replyAdded', false, true);
         $this->replies[] = $reply;
+    }
+
+    /**
+     * @return Collection<int,StatOpenDetail>
+     */
+    public function getDataOpenDetails(): Collection
+    {
+        return $this->dataOpenDetails;
+    }
+
+    public function getData(): StatData
+    {
+        if ($this->dataCollection->isEmpty()) {
+            $data = new StatData();
+            $data->setStat($this);
+            $data->setDateSent($this->dateSent);
+            $this->dataCollection->add($data);
+        }
+
+        return $this->dataCollection->first();
+    }
+
+    public function getTokens(): array
+    {
+        // Tokens may be held in the legacy column, the data row, or both.
+        $tokens     = is_array($this->tokens) ? $this->tokens : [];
+        $dataTokens = $this->dataCollection->isEmpty() ? null : $this->dataCollection->first()->getTokens();
+
+        return array_merge($tokens, is_array($dataTokens) ? $dataTokens : []);
+    }
+
+    public function setTokens(array $tokens): void
+    {
+        // Tokens are stored only in the data row.
+        $this->tokens = null;
+        $this->getData()->setTokens($tokens);
+    }
+
+    public function addOpenDetails(mixed $details, bool $increaseOpenCount = true): void
+    {
+        // Each stored detail is an array, so other values are wrapped.
+        $details     = is_array($details) ? $details : ['data' => $details];
+        $storedCount = $increaseOpenCount ? $this->getOpenCount() : $this->dataOpenDetails->count();
+        if (self::MAX_OPEN_DETAILS > $storedCount) {
+            $entity = new StatOpenDetail();
+            $entity->setStat($this);
+            $entity->setDateSent($this->dateSent ?? new \DateTime());
+            $entity->setOpenDetail($details);
+            $this->dataOpenDetails->add($entity);
+        }
+
+        if ($increaseOpenCount) {
+            ++$this->openCount;
+        }
+    }
+
+    /**
+     * @param array<string,mixed> $details
+     */
+    public function addBounceDetails(array $details): void
+    {
+        $this->dropOldestBounces(self::MAX_BOUNCE_DETAILS - 1);
+
+        $entity = new StatOpenDetail();
+        $entity->setStat($this);
+        $entity->setDateSent($this->dateSent ?? new \DateTime());
+        $entity->setOpenDetail([StatOpenDetail::BOUNCES_KEY => [$details]]);
+        $this->dataOpenDetails->add($entity);
+    }
+
+    private function dropOldestBounces(int $keep): void
+    {
+        $legacyBounces = is_array($this->openDetails) ? ($this->openDetails[StatOpenDetail::BOUNCES_KEY] ?? []) : [];
+        $bounceRows    = $this->dataOpenDetails
+            ->filter(fn (StatOpenDetail $detail): bool => isset($detail->getOpenDetail()[StatOpenDetail::BOUNCES_KEY]))
+            ->getValues();
+
+        $excess = count($legacyBounces) + count($bounceRows) - $keep;
+        if ($excess <= 0) {
+            return;
+        }
+
+        // Legacy column entries predate every row, so they are the oldest.
+        $dropLegacy = min($excess, count($legacyBounces));
+        if ($dropLegacy > 0) {
+            $remaining = array_slice($legacyBounces, $dropLegacy);
+            if ($remaining) {
+                $this->openDetails[StatOpenDetail::BOUNCES_KEY] = $remaining;
+            } else {
+                unset($this->openDetails[StatOpenDetail::BOUNCES_KEY]);
+            }
+            $excess -= $dropLegacy;
+        }
+
+        foreach (array_slice($bounceRows, 0, $excess) as $row) {
+            $this->dataOpenDetails->removeElement($row);
+        }
+    }
+
+    public function getOpenDetails(): array
+    {
+        // Details may be held in the legacy column, child rows, or both.
+        $openDetails = is_array($this->openDetails) ? $this->openDetails : [];
+        foreach ($this->dataOpenDetails as $entity) {
+            $openDetails = StatOpenDetail::mergeOpenDetail($openDetails, $entity->getOpenDetail());
+        }
+
+        return $openDetails;
+    }
+
+    /**
+     * @deprecated since Mautic 7.3, to be removed in 8.0. Use addOpenDetails() or addBounceDetails() instead.
+     *
+     * @param array<int|string,mixed> $openDetails
+     */
+    public function setOpenDetails(array $openDetails): static
+    {
+        trigger_deprecation('mautic/mautic', '7.3', 'Stat::setOpenDetails() is deprecated, use addOpenDetails() or addBounceDetails() instead.');
+
+        $this->openDetails = [];
+        $this->dataOpenDetails->clear();
+
+        foreach ($openDetails as $key => $detail) {
+            if (StatOpenDetail::BOUNCES_KEY !== $key) {
+                $this->addOpenDetails($detail, false);
+                continue;
+            }
+
+            foreach ($detail as $bounce) {
+                $this->addBounceDetails($bounce);
+            }
+        }
+
+        return $this;
     }
 
     /**

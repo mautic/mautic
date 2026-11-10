@@ -20,6 +20,7 @@ trait TimelineTrait
      * @param mixed|null   $resultsParserCallback Callback to custom parse results
      * @param string|null  $secondaryOrdering     Name of column for secondary sort
      * @param string|null  $leadIdColumn          Lead ID column for the leadIds filter, defaults to lead_id of the timestamp column's table
+     * @param mixed|null   $postCallback          Callback to process results after fetching
      *
      * @return array<mixed>
      */
@@ -33,6 +34,7 @@ trait TimelineTrait
         $resultsParserCallback = null,
         ?string $secondaryOrdering = null,
         ?string $leadIdColumn = null,
+        $postCallback = null,
     ) {
         if (!empty($options['leadIds'])) {
             $leadIdColumn ??= str_contains($timestampColumn, '.') ? strstr($timestampColumn, '.', true).'.lead_id' : 'lead_id';
@@ -111,6 +113,10 @@ trait TimelineTrait
                     $resultsParserCallback($result);
                 }
             }
+        }
+
+        if (is_callable($postCallback)) {
+            $results = $postCallback($results);
         }
 
         if (!empty($options['paginated'])) {

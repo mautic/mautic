@@ -34,7 +34,7 @@ final class EmailStatModelTest extends TestCase
                     $this->assertInstanceOf(StatTest::class, $entities[0]);
 
                     // Emulate database adding the entity some autoincrement ID.
-                    $entities[0]->setId('123');
+                    $entities[0]->setId(123);
                 }
             );
 
@@ -76,9 +76,9 @@ final class StatTest extends Stat
 {
     private ?string $id = null;
 
-    public function setId(string $id): void
+    public function setId(int $id): void
     {
-        $this->id = $id;
+        $this->id = (string) $id;
     }
 
     public function getId(): ?string
