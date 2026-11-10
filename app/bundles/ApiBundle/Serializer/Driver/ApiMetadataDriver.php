@@ -200,10 +200,8 @@ final class ApiMetadataDriver implements DriverInterface
 
     /**
      * Add a group the property belongs to.
-     *
-     * @param mixed $property
      */
-    public function addGroup($group, $property = null): static
+    public function addGroup($group, mixed $property = null): static
     {
         if (true === $property) {
             foreach ($this->properties as $prop => $metadata) {

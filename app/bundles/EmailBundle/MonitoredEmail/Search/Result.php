@@ -68,10 +68,7 @@ final class Result
         return $this->email;
     }
 
-    /**
-     * @param mixed $email
-     */
-    public function setEmail($email): static
+    public function setEmail(mixed $email): static
     {
         $this->email = $email;
 

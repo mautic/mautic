@@ -31,9 +31,8 @@ trait ProjectTrait
 
     /**
      * @param string $prop
-     * @param mixed  $val
      */
-    protected function isChanged($prop, $val): void
+    protected function isChanged($prop, mixed $val): void
     {
         if ('projects' === $prop) {
             if ($val instanceof Project) {

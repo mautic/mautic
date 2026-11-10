@@ -65,11 +65,9 @@ final class ObjectMappingDAO
     }
 
     /**
-     * @param mixed $integrationObjectId
-     *
      * @return mixed|null
      */
-    public function getMappedInternalObjectId($integrationObjectId)
+    public function getMappedInternalObjectId(mixed $integrationObjectId)
     {
         if (array_key_exists($integrationObjectId, $this->integrationIdMapping)) {
             return $this->integrationIdMapping[$integrationObjectId];

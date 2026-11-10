@@ -13,13 +13,10 @@ final class DecisionEvent extends CampaignExecutionEvent
 
     private bool $applicable = false;
 
-    /**
-     * @param mixed $passthrough
-     */
     public function __construct(
         private readonly AbstractEventAccessor $eventConfig,
         private readonly LeadEventLog $eventLog,
-        private $passthrough = null,
+        private mixed $passthrough = null,
     ) {
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(

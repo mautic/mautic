@@ -694,10 +694,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     }
 
     /**
-     * @param mixed|null                $data
      * @param array<string, string|int> $headers
      */
-    protected function view($data = null, ?int $statusCode = null, array $headers = []): View
+    protected function view(mixed $data = null, ?int $statusCode = null, array $headers = []): View
     {
         if ($data instanceof Paginator) {
             // Get iterator out of Paginator class so that the entities are properly serialized by the serializer

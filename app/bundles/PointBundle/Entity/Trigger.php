@@ -177,9 +177,8 @@ class Trigger extends FormEntity implements UuidInterface
 
     /**
      * @param string $prop
-     * @param mixed  $val
      */
-    protected function isChanged($prop, $val): void
+    protected function isChanged($prop, mixed $val): void
     {
         if ('events' == $prop) {
             // changes are already computed so just add them

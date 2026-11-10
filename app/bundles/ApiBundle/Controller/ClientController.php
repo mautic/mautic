@@ -183,10 +183,7 @@ final class ClientController extends AbstractStandardFormController
         );
     }
 
-    /**
-     * @param mixed $objectId
-     */
-    public function newAction(Request $request, $objectId = 0): Response
+    public function newAction(Request $request, mixed $objectId = 0): Response
     {
         if (!$this->security->isGranted('api:clients:create')) {
             $this->throwAccessDenied();

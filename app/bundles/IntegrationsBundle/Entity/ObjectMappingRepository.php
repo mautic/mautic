@@ -53,11 +53,9 @@ final class ObjectMappingRepository extends CommonRepository
     /**
      * @param string $integration
      * @param string $oldObjectName
-     * @param mixed  $oldObjectId
      * @param string $newObjectName
-     * @param mixed  $newObjectId
      */
-    public function updateIntegrationObject($integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId): int
+    public function updateIntegrationObject($integration, $oldObjectName, mixed $oldObjectId, $newObjectName, mixed $newObjectId): int
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

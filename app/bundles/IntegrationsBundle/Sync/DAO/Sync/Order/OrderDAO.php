@@ -144,12 +144,10 @@ final class OrderDAO
     /**
      * Update an existing mapping in the case of conversions (i.e. Lead converted to Contact).
      *
-     * @param mixed  $oldObjectId
      * @param string $oldObjectName
      * @param string $newObjectName
-     * @param mixed  $newObjectId
      */
-    public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null): void
+    public function remapObject($oldObjectName, mixed $oldObjectId, $newObjectName, mixed $newObjectId = null): void
     {
         $newObjectId ??= $oldObjectId;
 

@@ -325,12 +325,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @param mixed       $data        Profile data from integration
      * @param bool|true   $persist     Set to false to not persist lead to the database in this method
-     * @param mixed|null  $identifiers
      * @param string|null $object
      *
      * @return Lead|null
      */
-    public function getMauticLead($data, $persist = true, ?array $socialCache = null, $identifiers = null, $object = null)
+    public function getMauticLead(mixed $data, $persist = true, ?array $socialCache = null, mixed $identifiers = null, $object = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -609,12 +608,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param mixed  $value
      * @param string $fieldType
      *
      * @return mixed
      */
-    protected function limitString($value, $fieldType = '')
+    protected function limitString(mixed $value, $fieldType = '')
     {
         // We must not convert boolean values to string, otherwise "false" will be converted to an empty string.
         // "False" has to be converted to 0 instead.

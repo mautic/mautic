@@ -12,10 +12,7 @@ final class OAuthCallbackValidator extends ConstraintValidator
 {
     public const string PATTERN = '~^[0-9a-z].*://(.*?)(:[0-9]+)?(/?|/\S+)$~ixu';
 
-    /**
-     * @param mixed $value
-     */
-    public function validate($value, Constraint $constraint): void
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof OAuthCallback) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\OAuthCallback');

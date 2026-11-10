@@ -48,10 +48,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed               $log
          * @param string|array<mixed> $context
          */
-        public static function logDebugEntry($log, $context = 'null', bool $backtrace = false): void
+        public static function logDebugEntry(mixed $log, $context = 'null', bool $backtrace = false): void
         {
             if ($debugLogger = self::$handler->getDebugLogger()) {
                 if (!is_array($context)) {
@@ -355,10 +354,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $this;
         }
 
-        /**
-         * @param mixed $mainLogger
-         */
-        public function setMainLogger($mainLogger): static
+        public function setMainLogger(mixed $mainLogger): static
         {
             $this->mainLogger = $mainLogger;
 

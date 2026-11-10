@@ -28,10 +28,7 @@ final readonly class VariableExpresserHelper implements VariableExpresserHelperI
         return $this->valueNormalizer->normalizeForMautic($encodedValueDAO->getType(), $value);
     }
 
-    /**
-     * @param mixed $var
-     */
-    public function encodeVariable($var): EncodedValueDAO
+    public function encodeVariable(mixed $var): EncodedValueDAO
     {
         if (null === $var) {
             return new EncodedValueDAO(EncodedValueDAO::STRING_TYPE, '');

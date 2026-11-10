@@ -202,10 +202,7 @@ final class ButtonHelper
         return $this->location;
     }
 
-    /**
-     * @param mixed $location
-     */
-    public function setLocation($location): self
+    public function setLocation(mixed $location): self
     {
         $this->location = $location;
 

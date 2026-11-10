@@ -49,10 +49,8 @@ final class EncryptionHelper
 
     /**
      * Encrypt string.
-     *
-     * @param mixed $data
      */
-    public function encrypt($data): string
+    public function encrypt(mixed $data): string
     {
         $encryptionCipher = reset($this->availableCiphers);
         $initVector       = $encryptionCipher->getRandomInitVector();

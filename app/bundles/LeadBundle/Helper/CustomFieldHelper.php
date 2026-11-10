@@ -21,11 +21,10 @@ final class CustomFieldHelper
      * Fixes value type for specific field types.
      *
      * @param string $type
-     * @param mixed  $value
      *
      * @return mixed
      */
-    public static function fixValueType($type, $value)
+    public static function fixValueType($type, mixed $value)
     {
         if (null === $value) {
             // do not transform null values
@@ -46,7 +45,7 @@ final class CustomFieldHelper
      *
      * @return mixed|string|null
      */
-    public static function fieldValueTransfomer(array $field, $value, ?DateTimeHelper $dateTimeHelper = null)
+    public static function fieldValueTransfomer(array $field, mixed $value, ?DateTimeHelper $dateTimeHelper = null)
     {
         if (null === $value) {
             // do not transform null values

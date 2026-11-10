@@ -1236,9 +1236,8 @@ abstract class CommonRepository extends ServiceEntityRepository
      * gathered in a list and the composite is built once, by createCompositeExpression().
      *
      * @param array<int, mixed> $parts
-     * @param mixed             $expr
      */
-    protected function appendExpression(array &$parts, $expr): void
+    protected function appendExpression(array &$parts, mixed $expr): void
     {
         if ($expr instanceof CompositeExpression || $expr instanceof Composite) {
             if ($expr->count()) {

@@ -235,9 +235,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     /**
      * @param string $prop
-     * @param mixed  $val
      */
-    protected function isChanged($prop, $val): void
+    protected function isChanged($prop, mixed $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();

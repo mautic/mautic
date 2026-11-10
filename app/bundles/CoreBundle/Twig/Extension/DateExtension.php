@@ -17,11 +17,10 @@ final readonly class DateExtension
     /**
      * Returns date/time like Today, 10:00 AM.
      *
-     * @param mixed $datetime
      * @param bool  $forceDateForNonText If true, return as full date/time rather than "29 days ago"
      */
     #[AsTwigFunction(name: 'dateToText', isSafe: ['all'])]
-    public function toText($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s', bool $forceDateForNonText = false): string
+    public function toText(mixed $datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s', bool $forceDateForNonText = false): string
     {
         return $this->dateHelper->toText($datetime, $timezone, $fromFormat, $forceDateForNonText);
     }

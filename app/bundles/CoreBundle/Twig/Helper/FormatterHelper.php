@@ -19,13 +19,12 @@ final readonly class FormatterHelper
     /**
      * Format a string.
      *
-     * @param mixed  $val
      * @param string $type
      * @param int    $round
      *
      * @return string
      */
-    public function _($val, $type = 'html', bool $textOnly = false, $round = 1)
+    public function _(mixed $val, $type = 'html', bool $textOnly = false, $round = 1)
     {
         if (empty($val) && 'bool' !== $type && 'float' !== $type) {
             return $val;
@@ -98,12 +97,11 @@ final readonly class FormatterHelper
      * Internally, the method uses conversion to json
      * instead of simple implode to cover multidimensional arrays.
      *
-     * @param mixed  $array
      * @param string $delimiter
      *
      * @return string
      */
-    public function arrayToString($array, $delimiter = ', ')
+    public function arrayToString(mixed $array, $delimiter = ', ')
     {
         if (is_array($array)) {
             $replacements = [
@@ -140,12 +138,11 @@ final readonly class FormatterHelper
     /**
      * Takes a simple csv list like 1,2,3,4 and returns as an array.
      *
-     * @param mixed       $csv
      * @param string|null $type
      *
      * @return array<string, string>|array<int, string>
      */
-    public function simpleCsvToArray($csv, $type = null): array
+    public function simpleCsvToArray(mixed $csv, $type = null): array
     {
         if (!$csv) {
             return [];
@@ -163,10 +160,8 @@ final readonly class FormatterHelper
 
     /**
      * Takes a string and returns a normalized representation of it.
-     *
-     * @param mixed $string
      */
-    public function normalizeStringValue($string): string
+    public function normalizeStringValue(mixed $string): string
     {
         $stringIsDate = \DateTime::createFromFormat('Y-m-d H:i:s', $string, new \DateTimeZone('UTC'));
 

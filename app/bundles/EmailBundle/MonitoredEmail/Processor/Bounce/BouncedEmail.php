@@ -95,10 +95,7 @@ final class BouncedEmail
         return $this->bounceType;
     }
 
-    /**
-     * @param mixed $bounceType
-     */
-    public function setType($bounceType): static
+    public function setType(mixed $bounceType): static
     {
         $this->bounceType = $bounceType;
 
