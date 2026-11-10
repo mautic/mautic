@@ -10,6 +10,10 @@ class ContactSegmentFilterCrate
 
     public const COMPANY_ALL_OBJECT = 'company_all';
 
+    public const LEGACY_COMPANY_FILTER_SCOPE = 'legacy_company_filter_scope';
+
+    public const LEGACY_COMPANY_FILTER_SCOPE_VALUE = 'associated_company';
+
     public const BEHAVIORS_OBJECT = 'behaviors';
 
     /**

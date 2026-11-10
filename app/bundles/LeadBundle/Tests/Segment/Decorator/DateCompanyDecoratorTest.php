@@ -36,6 +36,18 @@ final class DateCompanyDecoratorTest extends TestCase
         $this->assertSame(PrimaryCompanyRelationValueFilterQueryBuilder::getServiceId(), $dateCompanyDecorator->getQueryType($crate));
     }
 
+    public function testGetQueryTypeReturnsComplexServiceForMigratedCompanyObject(): void
+    {
+        $dateCompanyDecorator = $this->createDateCompanyDecorator();
+
+        $crate = new ContactSegmentFilterCrate([
+            'object' => ContactSegmentFilterCrate::COMPANY_OBJECT,
+            ContactSegmentFilterCrate::LEGACY_COMPANY_FILTER_SCOPE => ContactSegmentFilterCrate::LEGACY_COMPANY_FILTER_SCOPE_VALUE,
+        ]);
+
+        $this->assertSame(ComplexRelationValueFilterQueryBuilder::getServiceId(), $dateCompanyDecorator->getQueryType($crate));
+    }
+
     public function testGetQueryTypeReturnsComplexServiceForLeadObject(): void
     {
         $dateCompanyDecorator = $this->createDateCompanyDecorator();
