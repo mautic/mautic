@@ -1187,7 +1187,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->executeStatement();
 
         // Keep an already loaded entity in sync without recording a change, so a later save compares against the stored value.
-        $lead = $this->getEntityManager()->getUnitOfWork()->tryGetById($leadId, Lead::class);
+        $unitOfWork = $this->getEntityManager()->getUnitOfWork();
+        $lead       = $unitOfWork->tryGetById($leadId, Lead::class);
         if ($lead instanceof Lead) {
             $stored  = new \DateTime($lastActive, new \DateTimeZone('UTC'));
             $changes = $lead->getChanges();
@@ -1197,6 +1198,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $changes['dateLastActive'][0] = $stored;
             } else {
                 $lead->setLastActive($stored);
+                // Doctrine must not see this as a change, otherwise a later flush could overwrite a newer value.
+                $unitOfWork->setOriginalEntityProperty(spl_object_id($lead), 'lastActive', $stored);
             }
 
             $lead->setChanges($changes);
