@@ -20,6 +20,7 @@ use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignAlreadyUnpublishedException;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignVersionMismatchedException;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
+use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -186,7 +187,12 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
 
         if ($this->dispatcher->hasListeners($eventClass)) {
             if (!$event instanceof $eventClass) {
-                $event = new $eventClass($entity, $isNew);
+                $previousEvent = $event;
+                $event         = new $eventClass($entity, $isNew);
+
+                if ($previousEvent instanceof CommonEvent) {
+                    $event->inheritStateFrom($previousEvent);
+                }
             }
 
             $this->dispatcher->dispatch($event);
