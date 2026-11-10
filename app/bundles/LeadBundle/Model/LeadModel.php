@@ -408,15 +408,22 @@ class LeadModel extends FormModel
             return;
         }
 
-        [$previousLastActive, $lastActive] = $changes['dateLastActive'];
-        if (!$lastActive instanceof \DateTimeInterface || $previousLastActive == $lastActive) {
+        [$previous, $current] = $changes['dateLastActive'];
+        if (empty($current)) {
+            return;
+        }
+
+        $lastActive         = new DateTimeHelper($current);
+        $previousLastActive = empty($previous) ? null : new DateTimeHelper($previous);
+
+        if ($previousLastActive?->toUtcString() === $lastActive->toUtcString()) {
             return;
         }
 
         $this->dispatcher->dispatch(new ContactLastActiveUpdatedEvent(
             $lead->getId(),
-            $lastActive,
-            $previousLastActive instanceof \DateTimeInterface ? $previousLastActive : null
+            $lastActive->getUtcDateTime(),
+            $previousLastActive?->getUtcDateTime()
         ));
     }
 

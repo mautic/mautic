@@ -55,6 +55,41 @@ final class ContactLastActiveUpdatedEventFunctionalTest extends MauticMysqlTestC
         $this->assertCount(0, $this->events);
     }
 
+    public function testRepositoryUpdateForDeletedContactDispatchesNoEvent(): void
+    {
+        $contact   = $this->createContact(null);
+        $contactId = $contact->getId();
+        $this->em->remove($contact);
+        $this->em->flush();
+
+        self::getContainer()->get(LeadRepository::class)->updateLastActive($contactId, new \DateTime('2026-02-01 12:00:00', new \DateTimeZone('UTC')));
+
+        $this->assertCount(0, $this->events);
+    }
+
+    public function testRepositoryUpdateFollowedBySaveDispatchesOneEvent(): void
+    {
+        $contact = $this->createContact(new \DateTime('2026-01-01 10:00:00', new \DateTimeZone('UTC')));
+
+        self::getContainer()->get(LeadRepository::class)->updateLastActive($contact->getId());
+        $contact->setFirstname('Changed');
+        self::getContainer()->get(LeadModel::class)->saveEntity($contact);
+
+        $this->assertCount(1, $this->events);
+    }
+
+    public function testSavingLoadedContactAfterRepositoryUpdateDispatchesOneEvent(): void
+    {
+        $contact    = $this->createContact(new \DateTime('2026-01-01 10:00:00', new \DateTimeZone('UTC')));
+        $lastActive = new \DateTime('2026-02-01 12:00:00', new \DateTimeZone('UTC'));
+
+        self::getContainer()->get(LeadRepository::class)->updateLastActive($contact->getId(), $lastActive);
+        $contact->setLastActive(clone $lastActive);
+        self::getContainer()->get(LeadModel::class)->saveEntity($contact);
+
+        $this->assertCount(1, $this->events);
+    }
+
     public function testSavingContactWithChangedLastActiveDispatchesEvent(): void
     {
         $contact = $this->createContact(null);
@@ -65,8 +100,20 @@ final class ContactLastActiveUpdatedEventFunctionalTest extends MauticMysqlTestC
 
         $this->assertCount(1, $this->events);
         $this->assertSame($contact->getId(), $this->events[0]->getContactId());
-        $this->assertSame($lastActive, $this->events[0]->getLastActive());
+        $this->assertSame('2026-03-01 08:00:00', $this->events[0]->getLastActive()->format('Y-m-d H:i:s'));
         $this->assertNotInstanceOf(\DateTimeInterface::class, $this->events[0]->getPreviousLastActive());
+    }
+
+    public function testSavingContactWithStringLastActiveDispatchesEvent(): void
+    {
+        $contact = $this->createContact(new \DateTime('2026-01-01 10:00:00', new \DateTimeZone('UTC')));
+
+        $contact->setLastActive('2026-03-01 08:00:00');
+        self::getContainer()->get(LeadModel::class)->saveEntity($contact);
+
+        $this->assertCount(1, $this->events);
+        $this->assertSame('2026-03-01 08:00:00', $this->events[0]->getLastActive()->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-01-01 10:00:00', $this->events[0]->getPreviousLastActive()?->format('Y-m-d H:i:s'));
     }
 
     public function testSavingContactWithoutLastActiveChangeDispatchesNoEvent(): void

@@ -1171,15 +1171,30 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             return;
         }
 
-        $dt     = new DateTimeHelper($lastActiveDate ?? '');
-        $fields = ['last_active' => $dt->toUtcString()];
+        $dt         = new DateTimeHelper($lastActiveDate ?? '');
+        $lastActive = $dt->toUtcString();
 
         $dispatchEvent      = $this->dispatcher?->hasListeners(ContactLastActiveUpdatedEvent::class) ?? false;
         $previousLastActive = $dispatchEvent ? $this->getLastActive((int) $leadId) : null;
 
-        $this->getEntityManager()->getConnection()->update(MAUTIC_TABLE_PREFIX.'leads', $fields, ['id' => $leadId]);
+        $affectedRows = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'leads')
+            ->set('last_active', ':lastActive')
+            ->where('id = :id')
+            ->andWhere('last_active IS NULL OR last_active <> :lastActive')
+            ->setParameter('lastActive', $lastActive)
+            ->setParameter('id', $leadId)
+            ->executeStatement();
 
-        if ($dispatchEvent && $previousLastActive?->format('Y-m-d H:i:s') !== $fields['last_active']) {
+        // Keep an already loaded entity in sync without recording a change, so a later save compares against the stored value.
+        $lead = $this->getEntityManager()->getUnitOfWork()->tryGetById($leadId, Lead::class);
+        if ($lead instanceof Lead) {
+            $changes = $lead->getChanges();
+            $lead->setLastActive(new \DateTime($lastActive, new \DateTimeZone('UTC')));
+            $lead->setChanges($changes);
+        }
+
+        if ($dispatchEvent && $affectedRows > 0) {
             $this->dispatcher->dispatch(new ContactLastActiveUpdatedEvent((int) $leadId, $dt->getUtcDateTime(), $previousLastActive));
         }
     }
