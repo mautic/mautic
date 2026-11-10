@@ -1189,8 +1189,16 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         // Keep an already loaded entity in sync without recording a change, so a later save compares against the stored value.
         $lead = $this->getEntityManager()->getUnitOfWork()->tryGetById($leadId, Lead::class);
         if ($lead instanceof Lead) {
+            $stored  = new \DateTime($lastActive, new \DateTimeZone('UTC'));
             $changes = $lead->getChanges();
-            $lead->setLastActive(new \DateTime($lastActive, new \DateTimeZone('UTC')));
+
+            if (isset($changes['dateLastActive'])) {
+                // A pending change keeps its new value, but is compared against the stored one.
+                $changes['dateLastActive'][0] = $stored;
+            } else {
+                $lead->setLastActive($stored);
+            }
+
             $lead->setChanges($changes);
         }
 
