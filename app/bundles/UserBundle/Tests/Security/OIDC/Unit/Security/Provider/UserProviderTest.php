@@ -197,7 +197,7 @@ final class UserProviderTest extends TestCase
         $userFactory->method('create')->willReturn($user);
 
         $mauticUserProvider->expects($this->once())
-            ->method('saveUser')
+            ->method('createUser')
             ->willReturn($user);
 
         $linkerInterface->expects($this->once())
