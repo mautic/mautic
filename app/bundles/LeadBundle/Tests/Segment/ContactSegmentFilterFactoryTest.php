@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
@@ -103,5 +104,47 @@ final class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
         $contactSegmentFilters = $contactSegmentFilterFactory->getSegmentFilters($leadList);
 
         $this->assertCount(6, $contactSegmentFilters);
+    }
+
+    public function testLegacyAndNewCompanyFiltersAreNotGroupedTogether(): void
+    {
+        $tableSchemaColumnsCache = $this->createStub(TableSchemaColumnsCache::class);
+        $container               = $this->createMock(Container::class);
+        $decoratorFactory        = $this->createMock(DecoratorFactory::class);
+        $filterDecorator         = $this->createMock(FilterDecoratorInterface::class);
+        $filterQueryBuilder      = $this->createStub(FilterQueryBuilderInterface::class);
+
+        $decoratorFactory->expects($this->exactly(2))
+            ->method('getDecoratorForFilter')
+            ->willReturn($filterDecorator);
+        $filterDecorator->expects($this->exactly(2))
+            ->method('getQueryType')
+            ->willReturn('MyQueryTypeId');
+        $container->expects($this->exactly(2))
+            ->method('get')
+            ->with('MyQueryTypeId')
+            ->willReturn($filterQueryBuilder);
+
+        $factory = new ContactSegmentFilterFactory($tableSchemaColumnsCache, $container, $decoratorFactory, $this->createStub(EventDispatcherInterface::class));
+        $leadList = new LeadList();
+        $leadList->setFilters([
+            [
+                'glue'     => 'or',
+                'object'   => 'company',
+                'field'    => 'companycountry',
+                'operator' => '=',
+                'filter'   => 'Germany',
+            ],
+            [
+                'glue'     => 'or',
+                'object'   => 'company',
+                'field'    => 'companycountry',
+                'operator' => '=',
+                'filter'   => 'France',
+                ContactSegmentFilterCrate::LEGACY_COMPANY_FILTER_SCOPE => ContactSegmentFilterCrate::LEGACY_COMPANY_FILTER_SCOPE_VALUE,
+            ],
+        ]);
+
+        $this->assertCount(2, $factory->getSegmentFilters($leadList));
     }
 }

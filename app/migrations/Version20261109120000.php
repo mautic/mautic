@@ -44,7 +44,11 @@ final class Version20261109120000 extends PreUpAssertionMigration
                 try {
                     $filters = Serializer::decode($row['filters']);
                 } catch (\ErrorException|\InvalidArgumentException) {
-                    $this->write(sprintf('<comment>Skipping segment %d: filters cannot be decoded</comment>', $lastId));
+                    $message = $this->container->get('translator')->trans(
+                        'mautic.lead.migration.legacy_company_filter_decode_failed',
+                        ['%id%' => $lastId]
+                    );
+                    $this->write(sprintf('<comment>%s</comment>', $message));
 
                     continue;
                 }

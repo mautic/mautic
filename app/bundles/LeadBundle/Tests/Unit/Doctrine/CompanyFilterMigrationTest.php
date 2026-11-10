@@ -12,6 +12,8 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\Migrations\Version20261109120000;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CompanyFilterMigrationTest extends TestCase
 {
@@ -93,7 +95,6 @@ final class CompanyFilterMigrationTest extends TestCase
         ]);
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('executeQuery')->willReturn($result);
-
         $migration = new Version20261109120000($connection, new NullLogger());
         $migration->setPrefix('test_');
         $migration->up(new Schema());
@@ -112,8 +113,13 @@ final class CompanyFilterMigrationTest extends TestCase
         ]);
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('executeQuery')->willReturn($result);
+        $translator = $this->createStub(TranslatorInterface::class);
+        $translator->method('trans')->willReturn('Skipping segment 15: filters cannot be decoded');
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('get')->willReturn($translator);
 
         $migration = new Version20261109120000($connection, new NullLogger());
+        $migration->setContainer($container);
         $migration->setPrefix('test_');
         $migration->up(new Schema());
 
