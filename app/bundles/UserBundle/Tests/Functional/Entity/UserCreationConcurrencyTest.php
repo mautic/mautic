@@ -8,6 +8,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\LockWaitTimeoutException;
 use Doctrine\DBAL\TransactionIsolationLevel;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -24,7 +25,9 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
     {
         $otherConnection = DriverManager::getConnection($this->connection->getParams());
         $otherEm = new EntityManager($otherConnection, $this->em->getConfiguration(), $this->em->getEventManager());
-        $otherRepository = new UserRepository($otherEm, $otherEm->getClassMetadata(User::class));
+        $otherRegistry = $this->createStub(ManagerRegistry::class);
+        $otherRegistry->method('getManagerForClass')->willReturn($otherEm);
+        $otherRepository = new UserRepository($otherRegistry);
         $repository = $this->em->getRepository(User::class);
         $role = $this->em->getRepository(Role::class)->findOneBy([]);
         $this->assertInstanceOf(Role::class, $role);
@@ -74,7 +77,9 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
     {
         $otherConnection = DriverManager::getConnection($this->connection->getParams());
         $otherEm = new EntityManager($otherConnection, $this->em->getConfiguration(), $this->em->getEventManager());
-        $otherRepository = new UserRepository($otherEm, $otherEm->getClassMetadata(User::class));
+        $otherRegistry = $this->createStub(ManagerRegistry::class);
+        $otherRegistry->method('getManagerForClass')->willReturn($otherEm);
+        $otherRepository = new UserRepository($otherRegistry);
         $repository = $this->em->getRepository(User::class);
         $role = $this->em->getRepository(Role::class)->findOneBy([]);
         $this->assertInstanceOf(Role::class, $role);
