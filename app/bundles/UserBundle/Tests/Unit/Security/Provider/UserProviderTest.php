@@ -24,7 +24,7 @@ final class UserProviderTest extends TestCase
         $repository = $this->createMock(UserRepository::class);
         $repository->expects($this->never())->method('createQueryBuilder');
         $persistedUser = null;
-        $repository->method('saveEntity')->willReturnCallback(static function (User $user) use (&$persistedUser): void {
+        $repository->method('saveNewUser')->willReturnCallback(static function (User $user) use (&$persistedUser): void {
             $persistedUser = clone $user;
         });
         $hasher = $this->createStub(UserPasswordHasherInterface::class);
@@ -55,7 +55,7 @@ final class UserProviderTest extends TestCase
     public function testCreateUserStillValidatesRequiredFields(): void
     {
         $repository = $this->createMock(UserRepository::class);
-        $repository->expects($this->never())->method('saveEntity');
+        $repository->expects($this->never())->method('saveNewUser');
         $provider = new UserProvider($repository, $this->createStub(PermissionRepository::class), new EventDispatcher(), $this->createStub(UserPasswordHasherInterface::class), $this->createStub(TranslatorInterface::class));
 
         $this->expectException(AuthenticationException::class);
@@ -66,7 +66,7 @@ final class UserProviderTest extends TestCase
     public function testCreateUserRejectsPersistedAccount(): void
     {
         $repository = $this->createMock(UserRepository::class);
-        $repository->expects($this->never())->method('saveEntity');
+        $repository->expects($this->never())->method('saveNewUser');
         $provider = new UserProvider($repository, $this->createStub(PermissionRepository::class), new EventDispatcher(), $this->createStub(UserPasswordHasherInterface::class), $this->createStub(TranslatorInterface::class));
         $user = $this->newUser();
         (new \ReflectionProperty(User::class, 'id'))->setValue($user, 42);

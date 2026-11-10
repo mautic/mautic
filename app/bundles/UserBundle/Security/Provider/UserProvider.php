@@ -110,10 +110,10 @@ class UserProvider implements UserProviderInterface
             throw new \InvalidArgumentException('Only new users can be created.');
         }
 
-        return $this->persistUser($user, true);
+        return $this->persistUser($user, true, true);
     }
 
-    private function persistUser(User $user, bool $isNew): User
+    private function persistUser(User $user, bool $isNew, bool $createOnly = false): User
     {
         if (!$user->getRole()) {
             throw new AuthenticationException('mautic.integration.sso.error.no_role');
@@ -147,7 +147,11 @@ class UserProvider implements UserProviderInterface
 
         $event = $this->dispatcher->dispatch(new UserEvent($user, $isNew), UserEvents::USER_PRE_SAVE);
 
-        $this->userRepository->saveEntity($user);
+        if ($createOnly) {
+            $this->userRepository->saveNewUser($user);
+        } else {
+            $this->userRepository->saveEntity($user);
+        }
 
         $this->dispatcher->dispatch($event, UserEvents::USER_POST_SAVE);
 

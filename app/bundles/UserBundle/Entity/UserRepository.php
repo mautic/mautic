@@ -6,12 +6,44 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\UserBundle\Exception\OidcException;
 
 /**
  * @extends CommonRepository<User>
  */
 class UserRepository extends CommonRepository
 {
+    /**
+     * Recheck the shared identity namespace and insert under a transaction-scoped lock.
+     */
+    public function saveNewUser(User $user): void
+    {
+        if ($user->getId()) {
+            throw new \InvalidArgumentException('Only new users can be created.');
+        }
+
+        $connection = $this->getEntityManager()->getConnection();
+        $lockTable = $connection->quoteIdentifier($this->getEntityManager()->getClassMetadata(UserCreationLock::class)->getTableName());
+        $userTable = $connection->quoteIdentifier($this->getClassMetadata()->getTableName());
+
+        $connection->transactional(function () use ($connection, $lockTable, $userTable, $user): void {
+            // The no-op update takes an exclusive row lock, retained until the outermost commit.
+            $connection->executeStatement("INSERT INTO $lockTable (id) VALUES (1) ON DUPLICATE KEY UPDATE id = id");
+
+            // A locking read sees the latest committed users even in an older REPEATABLE READ snapshot.
+            $existingId = $connection->fetchOne(
+                "SELECT id FROM $userTable WHERE username IN (:username, :email) OR email IN (:username, :email) LIMIT 1 FOR UPDATE",
+                ['username' => $user->getUsername(), 'email' => $user->getEmail()]
+            );
+
+            if (false !== $existingId) {
+                throw new OidcException('mautic.open_id.registration.exception.identity_taken');
+            }
+
+            $this->saveEntity($user);
+        });
+    }
+
     /**
      * Find user by username or email.
      */
