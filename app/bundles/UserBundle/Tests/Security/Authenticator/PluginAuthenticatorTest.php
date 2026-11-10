@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Security\Authenticator;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PluginBundle\Integration\AbstractSsoServiceIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\AuthenticationEvent;
 use Mautic\UserBundle\Event\PreAuthenticationEvent;
@@ -45,7 +45,7 @@ final class PluginAuthenticatorTest extends TestCase
 
         $userProvider = $this->createStub(UserProviderInterface::class);
 
-        $integrationService = $this->createStub(AbstractSsoServiceIntegration::class);
+        $integrationService = $this->createStub(UnifiedIntegrationInterface::class);
         $integrationHelper  = $this->createMock(IntegrationHelper::class);
         $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
@@ -119,7 +119,7 @@ final class PluginAuthenticatorTest extends TestCase
 
         $userProvider = $this->createStub(UserProviderInterface::class);
 
-        $integrationService = $this->createStub(AbstractSsoServiceIntegration::class);
+        $integrationService = $this->createStub(UnifiedIntegrationInterface::class);
         $integrationHelper  = $this->createMock(IntegrationHelper::class);
         $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
