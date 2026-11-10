@@ -1,14 +1,53 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
+use Mautic\IntegrationsBundle\Exception\PushContactException;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
+use Mautic\IntegrationsBundle\Integration\Interfaces\PushContactInterface;
+use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\MauticEmailMarketingBundle\Client\ConstantContactClient;
+use MauticPlugin\MauticEmailMarketingBundle\Exception\ApiException;
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType;
+use MauticPlugin\MauticEmailMarketingBundle\Helper\ContactFieldMapper;
 
-final class ConstantContactIntegration extends EmailAbstractIntegration
+class ConstantContactIntegration extends BasicIntegration implements BasicInterface, PushContactInterface
 {
+    public const string NAME = 'ConstantContact';
+
+    public const array FIELDS = [
+        'email',
+        'prefix_name',
+        'first_name',
+        'last_name',
+        'company_name',
+        'job_title',
+        'address_line1',
+        'address_line2',
+        'address_city',
+        'address_state',
+        'address_country_code',
+        'address_postal_code',
+        'cell_phone',
+        'fax',
+        'work_phone',
+        'home_phone',
+    ];
+
+    public const int CUSTOM_FIELD_COUNT = 15;
+
+    public function __construct(
+        private readonly ConstantContactClient $client,
+        private readonly ContactFieldMapper $contactFieldMapper,
+    ) {
+    }
+
     public function getName(): string
     {
-        return 'ConstantContact';
+        return self::NAME;
     }
 
     public function getDisplayName(): string
@@ -16,151 +55,66 @@ final class ConstantContactIntegration extends EmailAbstractIntegration
         return 'Constant Contact';
     }
 
-    public function getAuthenticationType(): string
+    public function getIcon(): string
     {
-        return 'oauth2';
+        return 'plugins/MauticEmailMarketingBundle/Assets/img/constantcontact.png';
     }
 
-    /**
-     * Get the URL required to obtain an oauth2 access token.
-     */
-    public function getAccessTokenUrl(): string
+    public function getPushContactConfigFormName(): string
     {
-        return 'https://oauth2.constantcontact.com/oauth2/oauth/token';
+        return ConstantContactType::class;
     }
 
-    /**
-     * Get the authentication/login URL for oauth2 access.
-     */
-    public function getAuthenticationUrl(): string
+    public function pushContact(Lead $contact, array $config): void
     {
-        return 'https://oauth2.constantcontact.com/oauth2/oauth/siteowner/authorize';
-    }
-
-    /**
-     * Retrieves and stores tokens returned from oAuthLogin.
-     */
-    public function authCallback(array $settings = [], array $parameters = []): string|false
-    {
-        // Constanct Contact doesn't like POST
-        $settings['method'] = 'GET';
-
-        return parent::authCallback($settings, $parameters);
-    }
-
-    /**
-     * @return mixed[]
-     */
-    public function getAvailableLeadFields(array $settings = []): array
-    {
-        if (!$this->isAuthorized()) {
-            return [];
+        $listSettings = $config['list_settings'] ?? null;
+        if (!is_array($listSettings) || empty($listSettings['list'])) {
+            throw new PushContactException('No Constant Contact list is selected.');
         }
 
-        $fields = [
-            'email',
-            'prefix_name',
-            'first_name',
-            'last_name',
-            'company_name',
-            'job_title',
-            'address_line1',
-            'address_line2',
-            'address_city',
-            'address_state',
-            'address_country_code',
-            'address_postal_code',
-            'cell_phone',
-            'fax',
-            'work_phone',
-            'home_phone',
-        ];
-
-        $leadFields = [];
-        foreach ($fields as $f) {
-            $leadFields[$f] = [
-                'label'    => $this->translator->trans('mautic.constantcontact.field.'.$f),
-                'type'     => 'string',
-                'required' => 'email' === $f,
-            ];
+        $data = $this->contactFieldMapper->map($contact, ContactFieldMapper::normalize((array) ($listSettings['leadFields'] ?? [])), self::NAME);
+        if (empty($data['email'])) {
+            throw new PushContactException('The contact has no value for the field mapped to the Constant Contact email.');
         }
 
-        $c = 1;
-        while ($c <= 15) {
-            $leadFields['customfield_'.$c] = [
-                'label'    => $this->translator->trans('mautic.constantcontact.customfield.'.$f),
-                'type'     => 'string',
-                'required' => false,
-            ];
-            ++$c;
+        $email = $data['email'];
+        unset($data['email']);
+
+        // Kept as the former integration had it: the prefixes are checked on the values, not on the field names
+        $addresses    = [];
+        $customFields = [];
+        foreach ($data as $k => $v) {
+            if (str_starts_with($v, 'address_')) {
+                $addresses[str_replace('address_', '', $k)] = $v;
+                unset($data[$k]);
+            } elseif (str_starts_with($v, 'customfield_')) {
+                $customFields[] = [
+                    'name'  => str_replace('customfield_', 'CustomField', $k),
+                    'value' => $v,
+                ];
+                unset($data[$k]);
+            }
         }
 
-        return $leadFields;
-    }
-
-    public function pushLead($lead, $config = []): bool
-    {
-        $config = $this->mergeConfigToFeatureSettings($config);
-
-        $mappedData = $this->populateLeadData($lead, $config);
-
-        if ($mappedData === []) {
-            return false;
+        if ([] !== $addresses) {
+            $addresses['address_type'] = 'PERSONAL';
+            $data['addresses']         = $addresses;
         }
-        if (empty($mappedData['email'])) {
-            return false;
-        }
-        if (!isset($config['list_settings'])) {
-            return false;
+
+        if ([] !== $customFields) {
+            $data['custom_fields'] = $customFields;
         }
 
         try {
-            if ($this->isAuthorized()) {
-                $email = $mappedData['email'];
-                unset($mappedData['email']);
-
-                $addresses    = [];
-                $customfields = [];
-                foreach ($mappedData as $k => $v) {
-                    if (str_starts_with($v, 'address_')) {
-                        $addresses[str_replace('address_', '', $k)] = $v;
-                        unset($mappedData[$k]);
-                    } elseif (str_starts_with($v, 'customfield_')) {
-                        $key            = str_replace('customfield_', 'CustomField', $k);
-                        $customfields[] = [
-                            'name'  => $key,
-                            'value' => $v,
-                        ];
-                        unset($mappedData[$k]);
-                    }
-                }
-
-                if ([] !== $addresses) {
-                    $addresses['address_type'] = 'PERSONAL';
-                    $mappedData['addresses']   = $addresses;
-                }
-
-                if ([] !== $customfields) {
-                    $mappedData['custom_fields'] = $customfields;
-                }
-
-                $options              = [];
-                $options['action_by'] = (!empty($config['list_settings']['sendWelcome'])) ? 'ACTION_BY_VISITOR' : 'ACTION_BY_OWNER';
-                $listId               = $config['list_settings']['list'];
-
-                $this->getApiHelper()->subscribeLead($email, $listId, $mappedData, $options);
-
-                return true;
-            }
-        } catch (\Exception $e) {
-            $this->logIntegrationError($e);
+            $this->client->subscribe(
+                $this->getIntegrationConfiguration()->getApiKeys(),
+                (string) $listSettings['list'],
+                $email,
+                $data,
+                empty($listSettings['sendWelcome']) ? 'ACTION_BY_OWNER' : 'ACTION_BY_VISITOR'
+            );
+        } catch (ApiException $e) {
+            throw new PushContactException($e->getMessage(), 0, $e);
         }
-
-        return false;
-    }
-
-    public function getFormType(): string
-    {
-        return ConstantContactType::class;
     }
 }

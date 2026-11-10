@@ -16,7 +16,6 @@ return function (ContainerConfigurator $configurator): void {
         ->public();
 
     $excludes = [
-        'Api',
     ];
 
     $services->load('MauticPlugin\\MauticEmailMarketingBundle\\', '../')
