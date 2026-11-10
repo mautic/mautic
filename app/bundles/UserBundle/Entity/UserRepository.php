@@ -2,6 +2,8 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\DBAL\Exception\RetryableException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -14,7 +16,7 @@ use Mautic\UserBundle\Exception\OidcException;
 class UserRepository extends CommonRepository
 {
     /**
-     * Recheck the shared identity namespace and insert under a transaction-scoped lock.
+     * Insert and verify the shared username/email namespace before committing.
      */
     public function saveNewUser(User $user): void
     {
@@ -22,26 +24,36 @@ class UserRepository extends CommonRepository
             throw new \InvalidArgumentException('Only new users can be created.');
         }
 
-        $connection = $this->getEntityManager()->getConnection();
-        $lockTable = $connection->quoteIdentifier($this->getEntityManager()->getClassMetadata(UserCreationLock::class)->getTableName());
+        $em = $this->getEntityManager();
+        $connection = $em->getConnection();
         $userTable = $connection->quoteIdentifier($this->getClassMetadata()->getTableName());
 
-        $connection->transactional(function () use ($connection, $lockTable, $userTable, $user): void {
-            // The no-op update takes an exclusive row lock, retained until the outermost commit.
-            $connection->executeStatement("INSERT INTO $lockTable (id) VALUES (1) ON DUPLICATE KEY UPDATE id = id");
+        try {
+            $connection->transactional(function () use ($connection, $userTable, $user): void {
+                $this->saveEntity($user);
 
-            // A locking read sees the latest committed users even in an older REPEATABLE READ snapshot.
-            $existingId = $connection->fetchOne(
-                "SELECT id FROM $userTable WHERE username IN (:username, :email) OR email IN (:username, :email) LIMIT 1 FOR UPDATE",
-                ['username' => $user->getUsername(), 'email' => $user->getEmail()]
-            );
+                // Insert first: its row lock makes concurrent cross-column checks wait.
+                // A locking read also sees users committed after an older transaction snapshot.
+                $existingId = $connection->fetchOne(
+                    "SELECT id FROM $userTable WHERE id <> :id AND (username IN (:username, :email) OR email IN (:username, :email)) LIMIT 1 FOR UPDATE",
+                    ['id' => $user->getId(), 'username' => $user->getUsername(), 'email' => $user->getEmail()]
+                );
 
-            if (false !== $existingId) {
-                throw new OidcException('mautic.open_id.registration.exception.identity_taken');
+                if (false !== $existingId) {
+                    throw new OidcException('mautic.open_id.registration.exception.identity_taken');
+                }
+            });
+        } catch (\Throwable $exception) {
+            // The insert was rolled back; do not retain a managed, nonexistent user.
+            $em->detach($user);
+
+            // Competing inserts may deadlock or violate a single-column unique constraint.
+            if ($exception instanceof RetryableException || $exception instanceof UniqueConstraintViolationException) {
+                throw new OidcException('mautic.open_id.registration.exception.identity_taken', 0, $exception);
             }
 
-            $this->saveEntity($user);
-        });
+            throw $exception;
+        }
     }
 
     /**
