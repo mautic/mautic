@@ -1219,7 +1219,7 @@ final class DatabasePlatform
         $platform = $connection->getDatabasePlatform();
 
         if (self::isPostgreSQL($platform)) {
-            $connection->executeStatement(sprintf("SET %s lock_timeout = '%ds'", $seconds));
+            $connection->executeStatement(sprintf("SET lock_timeout = '%ds'", $seconds));
 
             return;
         }
