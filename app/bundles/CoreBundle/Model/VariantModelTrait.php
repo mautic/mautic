@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
@@ -12,9 +13,9 @@ trait VariantModelTrait
     /**
      * Prepare a variant for saving.
      *
-     * @param array $resetVariantCounterMethods ['setVariantHits', 'setVariantSends', ...]
+     * @param string[] $resetVariantCounterMethods ['setVariantHits', 'setVariantSends', ...]
      */
-    protected function preVariantSaveEntity(VariantEntityInterface $entity, array $resetVariantCounterMethods = [], ?\DateTime $variantStartDate = null): bool
+    protected function preVariantSaveEntity(VariantEntityInterface&CommonEntity $entity, array $resetVariantCounterMethods = [], ?\DateTime $variantStartDate = null): bool
     {
         $isVariant = $entity->isVariant();
 
