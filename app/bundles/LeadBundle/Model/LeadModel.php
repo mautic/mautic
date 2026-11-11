@@ -328,8 +328,9 @@ class LeadModel extends FormModel
     public function getEntities(array $args = [])
     {
         $entities   = parent::getEntities($args);
-        $contactIds = $this->getContactIdsFromArgs($args);
-        $counter = count($contactIds);
+        // Callers that page through an id list must pass resolveMergedContacts => false, as each page would re-add the merged contacts.
+        $contactIds = ($args['resolveMergedContacts'] ?? true) ? $this->getContactIdsFromArgs($args) : [];
+        $counter    = count($contactIds);
         for ($i = 0; $i < $counter; ++$i) {
             $contactId = (int) $contactIds[$i];
             if (empty($entities[$contactId])) {

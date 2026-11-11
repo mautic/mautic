@@ -142,7 +142,7 @@ final class ContactExportSchedulerModel extends AbstractCommonModel
         $resultsCallback = fn (array $contact) => $contact;
         $iterator        = new IteratorExportDataModel(
             $this->leadModel,
-            ['fieldValuesOnly' => true, 'withStage' => true] + $data,
+            ['fieldValuesOnly' => true, 'withStage' => true, 'resolveMergedContacts' => false] + $data,
             $resultsCallback,
             true
         );

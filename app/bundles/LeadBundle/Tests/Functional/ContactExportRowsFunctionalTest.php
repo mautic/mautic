@@ -71,37 +71,35 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    public function testMergedContactIsReturnedAsFieldValueRow(): void
+    public function testContactEntitiesResolveMergedAwayIdsUnlessOptedOut(): void
     {
-        $contact = $this->createContact('Ada', null, $this->createStage('Lead', true));
-        $oldId   = $contact->getId() + 1000;
+        $survivor = $this->createContact('Ada', null, null);
+        $oldId    = $this->createMergeRecord($survivor);
+        $args     = ['filter' => ['string' => '', 'force' => [['column' => 'l.id', 'expr' => 'in', 'value' => [$oldId]]]]];
 
-        $mergeRecord = new MergeRecord();
-        $mergeRecord->setContact($contact);
-        $mergeRecord->setMergedId($oldId);
-        $mergeRecord->setName('Old Ada');
-        $mergeRecord->setDateAdded(new \DateTime());
-        $this->em->persist($mergeRecord);
-        $this->em->flush();
-        $this->em->clear();
+        $entities = $this->getLeadModel()->getEntities($args);
+        $this->assertSame([$survivor->getId()], array_keys($entities));
+        $this->assertSame($oldId, $entities[$survivor->getId()]->getPreviousId());
 
-        $args = [
-            'filter'          => ['string' => '', 'force' => [['column' => 'l.id', 'expr' => 'in', 'value' => [$oldId]]]],
-            'fieldValuesOnly' => true,
-            'withStage'       => true,
-        ];
+        $this->assertSame([], $this->getLeadModel()->getEntities(['resolveMergedContacts' => false] + $args));
+    }
 
-        $rows = $this->getLeadModel()->getEntities($args);
-        $this->assertSame([$contact->getId()], array_keys($rows));
-        $this->assertSame($contact->getId(), $rows[$contact->getId()]['id']);
-        $this->assertSame('Ada', $rows[$contact->getId()]['firstname']);
-        $this->assertSame('Lead', $rows[$contact->getId()]['stage']);
+    public function testScheduledExportSkipsMergedAwayContactIds(): void
+    {
+        $ids      = $this->createContacts(250);
+        $survivor = $this->createContact('Survivor', null, null);
+        $oldId    = $this->createMergeRecord($survivor);
 
-        $wrapped = $this->getLeadModel()->getEntities(['withTotalCount' => true] + $args);
-        array_walk_recursive($wrapped, fn ($value) => $this->assertNotInstanceOf(Lead::class, $value));
-        foreach ($wrapped['results'] as $row) {
-            $this->assertIsArray($row);
+        // Fail rather than hang if the export never reaches an empty page.
+        set_time_limit(60);
+        try {
+            $rows = $this->readScheduledExport(['limit' => 200, 'fileType' => 'csv'] + $this->argsFor([...$ids, $oldId]));
+        } finally {
+            set_time_limit(0);
         }
+
+        array_shift($rows);
+        $this->assertSame($ids, array_map(fn (array $row): int => (int) $row[0], $rows));
     }
 
     public function testScheduledExportWritesEveryContactOnceAcrossBatches(): void
@@ -192,6 +190,21 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         return array_map(fn (Lead $contact): int => $contact->getId(), $contacts);
+    }
+
+    private function createMergeRecord(Lead $contact): int
+    {
+        $oldId       = $contact->getId() + 100000;
+        $mergeRecord = new MergeRecord();
+        $mergeRecord->setContact($this->em->getReference(Lead::class, $contact->getId()));
+        $mergeRecord->setMergedId($oldId);
+        $mergeRecord->setName('Old '.$contact->getFirstname());
+        $mergeRecord->setDateAdded(new \DateTime());
+        $this->em->persist($mergeRecord);
+        $this->em->flush();
+        $this->em->clear();
+
+        return $oldId;
     }
 
     private function createContact(string $firstname, ?string $colour, ?Stage $stage): Lead

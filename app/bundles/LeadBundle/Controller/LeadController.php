@@ -2290,7 +2290,7 @@ final class LeadController extends FormController
 
         $iterator = new IteratorExportDataModel(
             $this->leadModel,
-            ['fieldValuesOnly' => true, 'withStage' => true] + $args,
+            ['fieldValuesOnly' => true, 'withStage' => true, 'resolveMergedContacts' => false] + $args,
             fn (array $contact): array => $contact
         );
         $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
