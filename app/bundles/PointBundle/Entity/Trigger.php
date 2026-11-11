@@ -343,10 +343,7 @@ class Trigger extends FormEntity implements UuidInterface
         return $this->triggerExistingLeads;
     }
 
-    /**
-     * @param mixed $triggerExistingLeads
-     */
-    public function setTriggerExistingLeads($triggerExistingLeads): void
+    public function setTriggerExistingLeads(?bool $triggerExistingLeads): void
     {
         $this->triggerExistingLeads = $triggerExistingLeads;
     }

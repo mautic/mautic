@@ -704,10 +704,7 @@ class Field implements UuidInterface
         return $this->saveResult;
     }
 
-    /**
-     * @param mixed $saveResult
-     */
-    public function setSaveResult($saveResult): void
+    public function setSaveResult(?bool $saveResult): void
     {
         $this->saveResult = $saveResult;
     }
@@ -720,10 +717,7 @@ class Field implements UuidInterface
         return $this->isAutoFill;
     }
 
-    /**
-     * @param mixed $isAutoFill
-     */
-    public function setIsAutoFill($isAutoFill): void
+    public function setIsAutoFill(?bool $isAutoFill): void
     {
         $this->isAutoFill = $isAutoFill;
     }

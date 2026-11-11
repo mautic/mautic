@@ -103,10 +103,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->isPublished;
     }
 
-    /**
-     * @param mixed $isPublished
-     */
-    public function setIsPublished($isPublished): static
+    public function setIsPublished(?bool $isPublished): static
     {
         $this->isChanged('isPublished', $isPublished);
 
