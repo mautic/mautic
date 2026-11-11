@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Event;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Dispatched after any entity's publish status is toggled, before it is saved.
+ * Dispatched by FormModel::togglePublishStatus() after the publish status is toggled, before it is saved. Regular saves do not dispatch it.
  */
 final class EntityTogglePublishEvent extends Event
 {
