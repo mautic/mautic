@@ -19,6 +19,8 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
@@ -32,6 +34,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
@@ -597,7 +600,7 @@ final class PublicController extends CommonFormController
     /**
      * @throws \Exception
      */
-    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, string $integration): void
+    private function doTracking(Request $request, IntegrationsHelper $integrationsHelper, IntegrationHelper $integrationHelper, MailHelper $mailer, string $integration): void
     {
         // if additional data were sent with the tracking pixel
         $query_string = $request->server->get('QUERY_STRING');
@@ -621,14 +624,13 @@ final class PublicController extends CommonFormController
         }
 
         // get secret from plugin settings
-        $myIntegration = $integrationHelper->getIntegrationObject($integration);
+        $keys = $this->getIntegrationApiKeys($integrationsHelper, $integrationHelper, $integration);
 
-        if (!$myIntegration) {
+        if (null === $keys) {
             $this->mauticLogger->log('error', $integration.': integration not found');
 
             return;
         }
-        $keys = $myIntegration->getDecryptedApiKeys();
 
         // generate signature
         $salt = $keys['secret'];
@@ -692,14 +694,34 @@ final class PublicController extends CommonFormController
         }
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function getIntegrationApiKeys(IntegrationsHelper $integrationsHelper, IntegrationHelper $integrationHelper, string $integration): ?array
+    {
+        // Integrations migrated to the IntegrationsBundle get their keys decrypted by the IntegrationsHelper
+        try {
+            return $integrationsHelper->getIntegration($integration)->getIntegrationConfiguration()->getApiKeys();
+        } catch (IntegrationNotFoundException) {
+        }
+
+        $myIntegration = $integrationHelper->getIntegrationObject($integration);
+
+        if (!$myIntegration instanceof AbstractIntegration) {
+            return null;
+        }
+
+        return $myIntegration->getDecryptedApiKeys();
+    }
+
     #[Route(
         path: '/plugin/{integration}/tracking.gif',
         name: 'mautic_plugin_tracker',
         requirements: ['integration' => Requirement::CATCH_ALL],
     )]
-    public function pluginTrackingGifAction(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, string $integration): Response
+    public function pluginTrackingGifAction(Request $request, IntegrationsHelper $integrationsHelper, IntegrationHelper $integrationHelper, MailHelper $mailer, string $integration): Response
     {
-        $this->doTracking($request, $integrationHelper, $mailer, $integration);
+        $this->doTracking($request, $integrationsHelper, $integrationHelper, $mailer, $integration);
 
         return TrackingPixelHelper::getResponse($request); // send gif
     }
