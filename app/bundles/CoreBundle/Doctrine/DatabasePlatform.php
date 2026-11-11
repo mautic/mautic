@@ -1214,7 +1214,7 @@ final class DatabasePlatform
      * calls this helper, so session-level SET is required or the second session
      * waits forever on pg_advisory_xact_lock.
      */
-    public static function setLockWaitTimeout(Connection $connection, int $seconds = 1): void
+    public static function setLockWaitTimeout(Connection $connection, int $seconds): void
     {
         $platform = $connection->getDatabasePlatform();
 
