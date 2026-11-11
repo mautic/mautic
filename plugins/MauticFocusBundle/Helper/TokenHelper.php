@@ -18,7 +18,7 @@ final readonly class TokenHelper
     ) {
     }
 
-    public function findFocusTokens($content): array
+    public function findFocusTokens(string $content): array
     {
         preg_match_all(self::REGEX, $content, $matches);
 

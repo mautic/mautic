@@ -60,7 +60,7 @@ class Focus extends FormEntity implements UuidInterface
     use ProjectTrait;
 
     /**
-     * @var int
+     * @var int|null
      */
     #[Groups(['focus:read'])]
     #[ORM\Id]
@@ -107,7 +107,7 @@ class Focus extends FormEntity implements UuidInterface
     #[Groups(['focus:read', 'focus:write'])]
     #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var string
@@ -260,7 +260,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->editor;
     }
 
-    public function setEditor($editor): static
+    public function setEditor(?string $editor): static
     {
         $this->isChanged('editor', $editor);
 
@@ -277,7 +277,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->html;
     }
 
-    public function setHtml($html): static
+    public function setHtml(?string $html): static
     {
         $this->isChanged('html', $html);
 
@@ -294,7 +294,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->htmlMode;
     }
 
-    public function setHtmlMode($htmlMode): static
+    public function setHtmlMode(?string $htmlMode): static
     {
         $this->isChanged('htmlMode', $htmlMode);
 
@@ -323,18 +323,12 @@ class Focus extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
-    public function setCategory($category): static
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
 

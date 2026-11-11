@@ -13,11 +13,11 @@ final class FocusRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    public function findByForm($formId): array
+    public function findByForm(int $formId): array
     {
         return $this->findBy(
             [
-                'form' => (int) $formId,
+                'form' => $formId,
             ]
         );
     }
@@ -83,7 +83,7 @@ final class FocusRepository extends CommonRepository
         return 'f';
     }
 
-    public function getFocusList($currentId): array
+    public function getFocusList(): array
     {
         $q = $this->createQueryBuilder('f');
         $q->select('partial f.{id, name, description}')->orderBy('f.name');

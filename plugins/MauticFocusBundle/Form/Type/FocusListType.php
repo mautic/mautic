@@ -27,7 +27,7 @@ final class FocusListType extends AbstractType
                 'choices' => function (Options $options): array {
                     $choices = [];
 
-                    $list = $this->focusRepository->getFocusList($options['data']);
+                    $list = $this->focusRepository->getFocusList();
                     foreach ($list as $row) {
                         $choices[$row['name']] = $row['id'];
                     }

@@ -15,7 +15,7 @@ final class StatRepository extends CommonRepository
     /**
      * Fetch the base stat data from the database.
      */
-    public function getStats(int $id, $type, $fromDate = null): array
+    public function getStats(int $id, string $type, ?\DateTimeInterface $fromDate = null): array
     {
         $q = $this->createQueryBuilder('s');
 
