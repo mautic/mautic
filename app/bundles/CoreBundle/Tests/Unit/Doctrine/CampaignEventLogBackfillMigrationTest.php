@@ -37,4 +37,25 @@ final class CampaignEventLogBackfillMigrationTest extends TestCase
         $this->assertFalse($migration->isTransactional());
         $migration->up(new Schema());
     }
+
+    public function testBackfillDoesNotWriteDuringDryRun(): void
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->method('createSchemaManager')->willReturn($this->createStub(AbstractSchemaManager::class));
+        $connection->method('getDatabasePlatform')->willReturn(new MySQLPlatform());
+        $connection->expects($this->never())->method('fetchFirstColumn');
+        $connection->expects($this->never())->method('executeStatement');
+
+        $migration = new Version20260715144000($connection, new NullLogger());
+        $migration->setPrefix('test_');
+
+        $argv            = $_SERVER['argv'];
+        $_SERVER['argv'] = ['bin/console', 'doctrine:migrations:migrate', '--dry-run'];
+
+        try {
+            $migration->up(new Schema());
+        } finally {
+            $_SERVER['argv'] = $argv;
+        }
+    }
 }
