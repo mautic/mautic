@@ -67,7 +67,7 @@ final class MessageQueueModel extends FormModel
         $campaignEventId = null,
         $attempts = 3,
         $priority = MessageQueue::PRIORITY_NORMAL,
-        ?array $messageQueue = null,
+        mixed $messageQueue = null,
         string $statTableName = 'email_stats',
         string $statContactColumn = 'lead_id',
         string $statSentColumn = 'date_sent',

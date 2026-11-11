@@ -18,6 +18,9 @@ class CompanyLead
     #[ORM\JoinColumn(name: 'company_id', nullable: false, onDelete: 'CASCADE')]
     private \Mautic\LeadBundle\Entity\Company $company;
 
+    /**
+     * @var Lead
+     */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
