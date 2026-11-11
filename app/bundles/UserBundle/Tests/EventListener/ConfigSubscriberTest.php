@@ -37,6 +37,20 @@ final class ConfigSubscriberTest extends TestCase
         $this->subscriber = new ConfigSubscriber($clientFactory, $translator, $logger, $subjectIdRepository);
     }
 
+    private function expectPreservedFields(): void
+    {
+        $matcher = $this->exactly(2);
+        $this->configEvent->expects($matcher)
+            ->method('unsetIfEmpty')
+            ->willReturnCallback(function (array|string $fields) use ($matcher): void {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(ConfigSubscriber::PRESERVED_OIDC_FIELDS, $fields);
+                } else {
+                    $this->assertSame('saml_idp_own_password', $fields);
+                }
+            });
+    }
+
     /**
      * Setup config mock to disable OIDC validation and return the provided userconfig data.
      *
@@ -44,9 +58,7 @@ final class ConfigSubscriberTest extends TestCase
      */
     private function setupConfigMockWithOidcDisabled(array $userConfigData): void
     {
-        $this->configEvent->expects($this->once())
-            ->method('unsetIfEmpty')
-            ->with('saml_idp_own_password');
+        $this->expectPreservedFields();
 
         $this->configEvent->expects($this->exactly(2))
             ->method('getConfig')
@@ -61,9 +73,7 @@ final class ConfigSubscriberTest extends TestCase
 
     public function testOwnPasswordIsNotWipedOutOnConfigSaveIfEmpty(): void
     {
-        $this->configEvent->expects($this->once())
-            ->method('unsetIfEmpty')
-            ->with('saml_idp_own_password');
+        $this->expectPreservedFields();
 
         $this->configEvent->expects($this->exactly(2))
             ->method('getConfig')
@@ -80,9 +90,7 @@ final class ConfigSubscriberTest extends TestCase
 
     public function testMetadataFileIsDetectedAsXml(): void
     {
-        $this->configEvent->expects($this->once())
-            ->method('unsetIfEmpty')
-            ->with('saml_idp_own_password');
+        $this->expectPreservedFields();
 
         $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())

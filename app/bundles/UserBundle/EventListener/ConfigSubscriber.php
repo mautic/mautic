@@ -18,6 +18,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigSubscriber implements EventSubscriberInterface
 {
+    public const PRESERVED_OIDC_FIELDS = [
+        'open_id_registered_user_role',
+        'open_id_client_url',
+        'open_id_client_id',
+        'open_id_mapping_field',
+    ];
+
     /**
      * @var string[]
      */
@@ -61,6 +68,11 @@ final class ConfigSubscriber implements EventSubscriberInterface
     public function onConfigSave(ConfigEvent $event): void
     {
         $this->validateOidcConnection($event);
+
+        // Browsers do not submit these fields while OIDC is disabled. Keep the stored values,
+        // otherwise re-enabling the same provider looks like a provider change and unlinks all users.
+        $event->unsetIfEmpty(self::PRESERVED_OIDC_FIELDS);
+
         $this->processSamlConfig($event);
     }
 
