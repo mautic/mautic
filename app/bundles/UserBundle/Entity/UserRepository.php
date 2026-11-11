@@ -25,6 +25,10 @@ class UserRepository extends CommonRepository
      * PostgreSQL: transaction-scoped advisory locks on normalized identifiers
      * (DatabasePlatform::acquireIdentityLocks) provide the same serialization —
      * SELECT … FOR UPDATE alone does not lock missing keys on PostgreSQL.
+     *
+     * Uses a connection-level transaction instead of EntityManager::wrapInTransaction()
+     * so that a business-rule rejection (OidcException) does NOT close the EntityManager.
+     * wrapInTransaction() calls $em->close() on any Throwable, which poisons later tests.
      */
     public function saveNewUser(User $user): void
     {
@@ -32,55 +36,71 @@ class UserRepository extends CommonRepository
             throw new \InvalidArgumentException('Only new users can be created.');
         }
 
+        $em         = $this->getEntityManager();
+        $connection = $em->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+
+        $identifiers = [
+            DatabasePlatform::normalizeSearchValue($platform, (string) $user->getUsername()),
+            DatabasePlatform::normalizeSearchValue($platform, (string) $user->getEmail()),
+        ];
+
+        $connection->beginTransaction();
         try {
-            $this->getEntityManager()->wrapInTransaction(function () use ($user): void {
-                $connection = $this->getEntityManager()->getConnection();
-                $platform   = $connection->getDatabasePlatform();
+            // PostgreSQL: block concurrent registrants on the same identity keys.
+            // MySQL: no-op; gap locks from the FOR UPDATE query below are sufficient.
+            DatabasePlatform::acquireIdentityLocks($connection, $identifiers);
 
-                $identifiers = [
-                    DatabasePlatform::normalizeSearchValue($platform, (string) $user->getUsername()),
-                    DatabasePlatform::normalizeSearchValue($platform, (string) $user->getEmail()),
-                ];
+            $usernameMatch = DatabasePlatform::getCaseInsensitiveComparison(
+                $platform,
+                'u.username',
+                ':identifiers',
+                'IN'
+            );
+            $emailMatch = DatabasePlatform::getCaseInsensitiveComparison(
+                $platform,
+                'u.email',
+                ':identifiers',
+                'IN'
+            );
 
-                // PostgreSQL: block concurrent registrants on the same identity keys.
-                // MySQL: no-op; gap locks from the FOR UPDATE query below are sufficient.
-                DatabasePlatform::acquireIdentityLocks($connection, $identifiers);
+            // Lock matching users (and MySQL index gaps) until commit so a competing
+            // registration cannot insert a conflict.
+            $duplicate = $this->createQueryBuilder('u')
+                ->select('1')
+                ->where("{$usernameMatch} OR {$emailMatch}")
+                ->setParameter('identifiers', $identifiers)
+                ->setMaxResults(1)
+                ->getQuery()
+                ->setLockMode(LockMode::PESSIMISTIC_WRITE)
+                ->getOneOrNullResult();
 
-                $usernameMatch = DatabasePlatform::getCaseInsensitiveComparison(
-                    $platform,
-                    'u.username',
-                    ':identifiers',
-                    'IN'
-                );
-                $emailMatch = DatabasePlatform::getCaseInsensitiveComparison(
-                    $platform,
-                    'u.email',
-                    ':identifiers',
-                    'IN'
-                );
+            if (null !== $duplicate) {
+                $connection->rollBack();
+                throw new OidcException('mautic.open_id.registration.exception.identity_taken');
+            }
 
-                // Lock matching users (and MySQL index gaps) until commit so a competing
-                // registration cannot insert a conflict.
-                $duplicate = $this->createQueryBuilder('u')
-                    ->select('1')
-                    ->where("{$usernameMatch} OR {$emailMatch}")
-                    ->setParameter('identifiers', $identifiers)
-                    ->setMaxResults(1)
-                    ->getQuery()
-                    ->setLockMode(LockMode::PESSIMISTIC_WRITE)
-                    ->getOneOrNullResult();
-
-                if (null !== $duplicate) {
-                    throw new OidcException('mautic.open_id.registration.exception.identity_taken');
-                }
-
-                $this->getEntityManager()->persist($user);
-            });
+            $em->persist($user);
+            $em->flush();
+            $connection->commit();
+        } catch (OidcException $exception) {
+            if ($connection->isTransactionActive()) {
+                $connection->rollBack();
+            }
+            throw $exception;
         } catch (RetryableException|UniqueConstraintViolationException|DriverException $exception) {
             // RetryableException / LockWaitTimeoutException: lock wait (MySQL gap / PG advisory).
             // DriverException: PostgreSQL lock_timeout (SQLSTATE 55P03) if not converted by DBAL.
             // UniqueConstraintViolationException: concurrent insert won the race.
+            if ($connection->isTransactionActive()) {
+                $connection->rollBack();
+            }
             throw new OidcException('mautic.open_id.registration.exception.identity_taken', 0, $exception);
+        } catch (\Throwable $exception) {
+            if ($connection->isTransactionActive()) {
+                $connection->rollBack();
+            }
+            throw $exception;
         }
     }
 

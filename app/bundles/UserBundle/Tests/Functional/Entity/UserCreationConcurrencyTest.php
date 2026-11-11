@@ -92,7 +92,7 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
                 $this->assertSame('mautic.open_id.registration.exception.identity_taken', $exception->getMessage());
                 $this->assertNull($second->getId());
                 $previous = $exception->getPrevious();
-                $this->assertNotNull($previous, 'Expected a lock-timeout previous exception');
+                $this->assertInstanceOf(\Throwable::class, $previous, 'Expected a lock-timeout previous exception');
                 $this->assertTrue(
                     $previous instanceof LockWaitTimeoutException
                     || $previous instanceof DBALException,
