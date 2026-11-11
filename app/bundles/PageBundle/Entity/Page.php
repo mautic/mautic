@@ -726,10 +726,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->customHtml;
     }
 
-    /**
-     * @param mixed $customHtml
-     */
-    public function setCustomHtml($customHtml): void
+    public function setCustomHtml(?string $customHtml): void
     {
         $this->customHtml = $customHtml;
     }

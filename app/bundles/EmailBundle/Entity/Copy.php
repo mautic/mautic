@@ -98,10 +98,7 @@ class Copy
         return $this->subject;
     }
 
-    /**
-     * @param mixed $subject
-     */
-    public function setSubject($subject): static
+    public function setSubject(?string $subject): static
     {
         $this->subject = $subject;
 

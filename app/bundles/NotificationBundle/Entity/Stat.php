@@ -231,10 +231,7 @@ class Stat
         return $this->trackingHash;
     }
 
-    /**
-     * @param mixed $trackingHash
-     */
-    public function setTrackingHash($trackingHash): void
+    public function setTrackingHash(?string $trackingHash): void
     {
         $this->trackingHash = $trackingHash;
     }
@@ -278,10 +275,7 @@ class Stat
         return $this->source;
     }
 
-    /**
-     * @param mixed $source
-     */
-    public function setSource($source): void
+    public function setSource(?string $source): void
     {
         $this->source = $source;
     }
@@ -310,10 +304,7 @@ class Stat
         return $this->tokens;
     }
 
-    /**
-     * @param mixed $tokens
-     */
-    public function setTokens($tokens): void
+    public function setTokens(array $tokens): void
     {
         $this->tokens = $tokens;
     }
@@ -377,10 +368,7 @@ class Stat
         return $this->clickDetails;
     }
 
-    /**
-     * @param mixed $clickDetails
-     */
-    public function setClickDetails($clickDetails): static
+    public function setClickDetails(array $clickDetails): static
     {
         $this->clickDetails = $clickDetails;
 
