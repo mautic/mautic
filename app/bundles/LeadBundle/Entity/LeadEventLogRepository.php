@@ -136,10 +136,11 @@ class LeadEventLogRepository extends CommonRepository
 
         if (!empty($options['search'])) {
             $qb->andWhere(
-                DatabasePlatform::getCaseInsensitiveLike(
+                DatabasePlatform::getCaseInsensitiveComparison(
                     $connection->getDatabasePlatform(),
                     $alias.'.properties',
                     $qb->expr()->literal('%'.mb_strtolower($options['search']).'%'),
+                    'LIKE',
                     DatabasePlatform::FLAG_ENSURE_CAST | DatabasePlatform::FLAG_LOWER_COLUMN
                 )
             );

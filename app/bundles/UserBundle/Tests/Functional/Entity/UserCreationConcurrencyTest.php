@@ -8,6 +8,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\LockWaitTimeoutException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -34,7 +35,7 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
         $second = $this->newUser($otherEm->getReference(Role::class, $role->getId()), 'second-user', 'shared@example.com');
 
         try {
-            $otherConnection->executeStatement('SET SESSION innodb_lock_wait_timeout = 1');
+            DatabasePlatform::setLockWaitTimeout($otherConnection, 1);
             $this->connection->beginTransaction();
             $repository->saveNewUser($first);
 

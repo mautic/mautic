@@ -80,7 +80,7 @@ final class DatabasePlatform
     }
 
     /* ===================================================================
-     * LIKE / ILIKE helpers
+     * Case-insensitive comparison helpers (LIKE / ILIKE / IN / =)
      * =================================================================== */
 
     // Define bitwise flags
@@ -103,10 +103,79 @@ final class DatabasePlatform
     public const FLAG_NEGATIVE           = 32;
 
     /**
-     * Returns case-insensitive LIKE / ILIKE expression.
+     * Returns a case-insensitive comparison expression.
      *
-     * PostgreSQL → ILIKE (faster, no LOWER needed in most cases)
-     * MySQL      → LIKE (with optional LOWER for consistency when search term is lowercased)
+     * Supported operators: LIKE, IN, =
+     *
+     * PostgreSQL:
+     *   LIKE → ILIKE (unless FORCE_LOWER_* forces LOWER()+LIKE)
+     *   IN/= → LOWER(column) IN/ = value   (no ILIKE equivalent)
+     *
+     * MySQL:
+     *   Uses LIKE / IN / = as-is; optional LOWER() via flags.
+     *   Default collations are already case-insensitive.
+     *
+     * @param string $operator One of 'LIKE', 'IN', '='
+     */
+    public static function getCaseInsensitiveComparison(
+        ?AbstractPlatform $platform,
+        string $column,
+        string $valueOrParameter,
+        string $operator = 'LIKE',
+        int $flags = 0,
+    ): string {
+        $operator = strtoupper($operator);
+        if (!\in_array($operator, ['LIKE', 'IN', '='], true)) {
+            throw new \InvalidArgumentException(sprintf('Unsupported operator "%s".', $operator));
+        }
+
+        $ensureCast       = (bool) ($flags & self::FLAG_ENSURE_CAST);
+        $lowerColumn      = (bool) ($flags & self::FLAG_LOWER_COLUMN);
+        $lowerValue       = (bool) ($flags & self::FLAG_LOWER_VALUE);
+        $forceLowerColumn = (bool) ($flags & self::FLAG_FORCE_LOWER_COLUMN);
+        $forceLowerValue  = (bool) ($flags & self::FLAG_FORCE_LOWER_VALUE);
+        $negative         = (bool) ($flags & self::FLAG_NEGATIVE);
+
+        $col = $ensureCast ? self::castIfStrict($platform, $column) : $column;
+        $not = $negative ? ' NOT' : '';
+
+        // IN / = never have an ILIKE equivalent → always use LOWER(column) on PostgreSQL
+        $mustLowerColumn = $forceLowerColumn
+            || $lowerColumn
+            || (self::isPostgreSQL($platform) && ('IN' === $operator || '=' === $operator));
+
+        $mustLowerValue = $forceLowerValue || $lowerValue;
+
+        if (self::isPostgreSQL($platform)) {
+            // Prefer ILIKE for plain LIKE when we are not forced to LOWER()
+            if ('LIKE' === $operator && !$mustLowerColumn && !$mustLowerValue) {
+                return "{$col}{$not} ILIKE {$valueOrParameter}";
+            }
+
+            $c = $mustLowerColumn ? "LOWER({$col})" : $col;
+            $v = $mustLowerValue ? "LOWER({$valueOrParameter})" : $valueOrParameter;
+
+            return match ($operator) {
+                'LIKE'  => "{$c}{$not} LIKE {$v}",
+                'IN'    => "{$c}{$not} IN ({$v})",
+                '='     => "{$c}{$not} = {$v}",
+            };
+        }
+
+        // MySQL / default – collation already CI; LOWER only when flags ask for it
+        $c = $mustLowerColumn ? "LOWER({$col})" : $col;
+        $v = $mustLowerValue ? "LOWER({$valueOrParameter})" : $valueOrParameter;
+
+        return match ($operator) {
+            'LIKE'  => "{$c}{$not} LIKE {$v}",
+            'IN'    => "{$c}{$not} IN ({$v})",
+            '='     => "{$c}{$not} = {$v}",
+        };
+    }
+
+    /**
+     * @deprecated The method is deprecated and will be removed in Mautic 7.3.
+     * Use the `getCaseInsensitiveLike()` method instead.
      */
     public static function getCaseInsensitiveLike(
         ?AbstractPlatform $platform,
@@ -114,33 +183,7 @@ final class DatabasePlatform
         string $valueOrParameter,
         int $flags = 0,
     ): string {
-        // Extract flags into local booleans for readability
-        $ensureCast       = ($flags & self::FLAG_ENSURE_CAST);
-        $lowerColumn      = ($flags & self::FLAG_LOWER_COLUMN);
-        $lowerValue       = ($flags & self::FLAG_LOWER_VALUE);
-        $forceLowerColumn = ($flags & self::FLAG_FORCE_LOWER_COLUMN);
-        $forceLowerValue  = ($flags & self::FLAG_FORCE_LOWER_VALUE);
-        $negative         = ($flags & self::FLAG_NEGATIVE);
-
-        $col = $ensureCast ? self::castIfStrict($platform, $column) : $column;
-        $not = $negative ? ' NOT ' : ' ';
-
-        if (self::isPostgreSQL($platform)) {
-            if ($forceLowerColumn || $forceLowerValue) {
-                $c = $forceLowerColumn ? "LOWER($col)" : $col;
-                $v = $forceLowerValue ? "LOWER($valueOrParameter)" : $valueOrParameter;
-
-                return "{$c}{$not}LIKE {$v}";
-            }
-
-            return "{$col}{$not}ILIKE {$valueOrParameter}";
-        }
-
-        // MySQL / Default
-        $c = ($lowerColumn || $forceLowerColumn) ? "LOWER($col)" : $col;
-        $v = ($lowerValue || $forceLowerValue) ? "LOWER($valueOrParameter)" : $valueOrParameter;
-
-        return "{$c}{$not}LIKE {$v}";
+        return self::getCaseInsensitiveComparison($platform, $column, $valueOrParameter, 'LIKE', $flags);
     }
 
     /* ===================================================================
@@ -1157,6 +1200,26 @@ final class DatabasePlatform
     public static function getShareLockClause(?AbstractPlatform $platform): string
     {
         return self::isPostgreSQL($platform) ? 'FOR SHARE' : 'LOCK IN SHARE MODE';
+    }
+
+    /**
+     * Sets a short lock-wait timeout for the current session/transaction.
+     * Used by concurrency tests that expect a wait to fail quickly.
+     *
+     * MySQL:      SET SESSION innodb_lock_wait_timeout = $seconds
+     * PostgreSQL: SET LOCAL lock_timeout = '${seconds}s'
+     */
+    public static function setLockWaitTimeout(Connection $connection, int $seconds = 1): void
+    {
+        $platform = $connection->getDatabasePlatform();
+
+        if (self::isPostgreSQL($platform)) {
+            $connection->executeStatement(sprintf("SET LOCAL lock_timeout = '%ds'", $seconds));
+
+            return;
+        }
+
+        $connection->executeStatement(sprintf('SET SESSION innodb_lock_wait_timeout = %d', $seconds));
     }
 
     /**

@@ -99,10 +99,11 @@ final class BuilderTokenHelper
         }
 
         if (!empty($filter)) {
-            $filterExpr = DatabasePlatform::getCaseInsensitiveLike(
+            $filterExpr = DatabasePlatform::getCaseInsensitiveComparison(
                 $this->connection->getDatabasePlatform(),
                 $labelColumn,
                 ':label',
+                'LIKE',
                 DatabasePlatform::FLAG_ENSURE_CAST | DatabasePlatform::FLAG_LOWER_COLUMN
             );
 

@@ -27,7 +27,11 @@ trait ProjectRepositoryTrait
         $platform   = $connection->getDatabasePlatform();
 
         $queryBuilder->where(
-            DatabasePlatform::getCaseInsensitiveLike($platform, 'project.name', ':name')
+            DatabasePlatform::getCaseInsensitiveComparison(
+                $platform,
+                'project.name',
+                ':name'
+            )
         );
 
         $queryBuilder->setParameter('name', $projectName);

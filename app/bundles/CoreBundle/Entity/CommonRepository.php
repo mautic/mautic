@@ -1174,10 +1174,11 @@ class CommonRepository extends ServiceEntityRepository
             $expr = $q->expr()->orX();
             foreach ($columns as $col) {
                 $expr->add(
-                    DatabasePlatform::getCaseInsensitiveLike(
+                    DatabasePlatform::getCaseInsensitiveComparison(
                         $platform,
                         $col,
                         ":{$unique}",
+                        'LIKE',
                         DatabasePlatform::FLAG_FORCE_LOWER_COLUMN
                     )
                 );
@@ -1191,10 +1192,11 @@ class CommonRepository extends ServiceEntityRepository
             $expr = $q->expr()->$xFunc();
             foreach ($columns as $col) {
                 $expr->add( /** @phpstan-ignore-line add is deprecated */
-                    DatabasePlatform::getCaseInsensitiveLike(
+                    DatabasePlatform::getCaseInsensitiveComparison(
                         $platform,
                         $col,
                         ":{$unique}",
+                        'LIKE',
                         $filter->not ? DatabasePlatform::FLAG_NEGATIVE : 0
                     )
                 );

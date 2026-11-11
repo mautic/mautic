@@ -462,10 +462,11 @@ class EmailRepository extends CommonRepository
 
                 $q->andWhere(
                     $q->expr()->orX(
-                        DatabasePlatform::getCaseInsensitiveLike(
+                        DatabasePlatform::getCaseInsensitiveComparison(
                             $platform,
                             'e.name',
                             ':'.$param,
+                            'LIKE',
                             DatabasePlatform::FLAG_FORCE_LOWER_COLUMN
                         ),
                         'e.id = :'.$param.'Id',

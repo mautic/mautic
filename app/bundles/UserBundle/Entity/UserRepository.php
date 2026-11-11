@@ -7,6 +7,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Exception\OidcException;
@@ -28,12 +29,32 @@ class UserRepository extends CommonRepository
 
         try {
             $this->getEntityManager()->wrapInTransaction(function () use ($user): void {
+                $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+
+                $identifiers = [
+                    DatabasePlatform::normalizeSearchValue($platform, $user->getUsername()),
+                    DatabasePlatform::normalizeSearchValue($platform, $user->getEmail()),
+                ];
+
+                $usernameMatch = DatabasePlatform::getCaseInsensitiveComparison(
+                    $platform,
+                    'u.username',
+                    ':identifiers',
+                    'IN'
+                );
+                $emailMatch = DatabasePlatform::getCaseInsensitiveComparison(
+                    $platform,
+                    'u.email',
+                    ':identifiers',
+                    'IN'
+                );
+
                 // Lock matching users and the index gaps for identifiers that do not exist yet.
                 // Keep these locks until commit so a competing registration cannot insert a conflict.
                 $duplicate = $this->createQueryBuilder('u')
                     ->select('1')
-                    ->where('u.username IN (:identifiers) OR u.email IN (:identifiers)')
-                    ->setParameter('identifiers', [$user->getUsername(), $user->getEmail()])
+                    ->where("{$usernameMatch} OR {$emailMatch}")
+                    ->setParameter('identifiers', $identifiers)
                     ->setMaxResults(1)
                     ->getQuery()
                     ->setLockMode(LockMode::PESSIMISTIC_WRITE)

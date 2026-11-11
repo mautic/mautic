@@ -28,10 +28,11 @@ final class ProjectRepository extends CommonRepository
     {
         $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
 
-        $where = DatabasePlatform::getCaseInsensitiveLike(
+        $where = DatabasePlatform::getCaseInsensitiveComparison(
             $platform,
             $this->getTableAlias().'.name',
             ':name',
+            'LIKE',
             DatabasePlatform::FLAG_FORCE_LOWER_COLUMN | DatabasePlatform::FLAG_FORCE_LOWER_VALUE
         );
 

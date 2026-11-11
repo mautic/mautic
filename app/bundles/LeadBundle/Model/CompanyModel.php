@@ -600,7 +600,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $expr         = new ExpressionBuilder($this->em->getConnection());
                 $platform     = $this->em->getConnection()->getDatabasePlatform();
                 $composite    = $expr->and(
-                    DatabasePlatform::getCaseInsensitiveLike($platform, "comp.{$column}", ':'.$param)
+                    DatabasePlatform::getCaseInsensitiveComparison(
+                        $platform,
+                        "comp.{$column}",
+                        ':'.$param
+                    )
                 );
 
                 // Validate owner permissions
