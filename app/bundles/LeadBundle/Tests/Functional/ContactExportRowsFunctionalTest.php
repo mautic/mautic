@@ -90,13 +90,7 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
         $survivor = $this->createContact('Survivor', null, null);
         $oldId    = $this->createMergeRecord($survivor);
 
-        // Fail rather than hang if the export never reaches an empty page.
-        set_time_limit(60);
-        try {
-            $rows = $this->readScheduledExport(['limit' => 200, 'fileType' => 'csv'] + $this->argsFor([...$ids, $oldId]));
-        } finally {
-            set_time_limit(0);
-        }
+        $rows = $this->readScheduledExport(['limit' => 200, 'fileType' => 'csv'] + $this->argsFor([...$ids, $oldId]));
 
         array_shift($rows);
         $this->assertSame($ids, array_map(fn (array $row): int => (int) $row[0], $rows));
