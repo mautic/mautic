@@ -304,7 +304,10 @@ class Stat
         return $this->tokens;
     }
 
-    public function setTokens(array $tokens): void
+    /**
+     * @param mixed $tokens
+     */
+    public function setTokens($tokens): void
     {
         $this->tokens = $tokens;
     }
@@ -368,7 +371,10 @@ class Stat
         return $this->clickDetails;
     }
 
-    public function setClickDetails(array $clickDetails): static
+    /**
+     * @param mixed $clickDetails
+     */
+    public function setClickDetails($clickDetails): static
     {
         $this->clickDetails = $clickDetails;
 

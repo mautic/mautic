@@ -118,7 +118,10 @@ class LeadCategory
         return $this->lead;
     }
 
-    public function setLead(Lead $lead): void
+    /**
+     * @param mixed $lead
+     */
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }

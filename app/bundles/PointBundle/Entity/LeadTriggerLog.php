@@ -75,7 +75,10 @@ class LeadTriggerLog
         return $this->lead;
     }
 
-    public function setLead(Lead $lead): void
+    /**
+     * @param mixed $lead
+     */
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -88,7 +91,10 @@ class LeadTriggerLog
         return $this->event;
     }
 
-    public function setEvent(TriggerEvent $event): void
+    /**
+     * @param mixed $event
+     */
+    public function setEvent($event): void
     {
         $this->event = $event;
     }

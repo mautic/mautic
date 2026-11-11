@@ -75,7 +75,10 @@ class Stat
         return $this->focus;
     }
 
-    public function setFocus(Focus $focus): static
+    /**
+     * @param mixed $focus
+     */
+    public function setFocus($focus): static
     {
         $this->focus = $focus;
 

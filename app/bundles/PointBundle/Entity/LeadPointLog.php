@@ -75,7 +75,10 @@ class LeadPointLog
         return $this->lead;
     }
 
-    public function setLead(Lead $lead): void
+    /**
+     * @param mixed $lead
+     */
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -88,7 +91,10 @@ class LeadPointLog
         return $this->point;
     }
 
-    public function setPoint(Point $point): void
+    /**
+     * @param mixed $point
+     */
+    public function setPoint($point): void
     {
         $this->point = $point;
     }
