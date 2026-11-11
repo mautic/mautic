@@ -640,10 +640,7 @@ class Form extends FormEntity implements UuidInterface
         $this->template = $template;
     }
 
-    /**
-     * @return bool
-     */
-    public function getInKioskMode()
+    public function getInKioskMode(): ?bool
     {
         return $this->inKioskMode;
     }
@@ -658,10 +655,7 @@ class Form extends FormEntity implements UuidInterface
         $this->renderStyle = $renderStyle;
     }
 
-    /**
-     * @return bool
-     */
-    public function isInKioskMode()
+    public function isInKioskMode(): ?bool
     {
         return $this->inKioskMode;
     }

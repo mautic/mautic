@@ -541,10 +541,7 @@ class Field implements UuidInterface
         return get_object_vars($this);
     }
 
-    /**
-     * @param bool $showLabel
-     */
-    public function setShowLabel($showLabel): static
+    public function setShowLabel(?bool $showLabel): static
     {
         $this->isChanged('showLabel', $showLabel);
         $this->showLabel = $showLabel;
@@ -552,20 +549,15 @@ class Field implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getShowLabel()
+    public function getShowLabel(): ?bool
     {
         return $this->showLabel;
     }
 
     /**
      * Proxy function to getShowLabel().
-     *
-     * @return bool
      */
-    public function showLabel()
+    public function showLabel(): ?bool
     {
         return $this->showLabel;
     }
@@ -655,10 +647,7 @@ class Field implements UuidInterface
         $this->saveResult = $saveResult;
     }
 
-    /**
-     * @return bool
-     */
-    public function getIsAutoFill()
+    public function getIsAutoFill(): ?bool
     {
         return $this->isAutoFill;
     }
@@ -673,10 +662,7 @@ class Field implements UuidInterface
         return $this->showWhenValueExists;
     }
 
-    /**
-     * @param bool $showWhenValueExists
-     */
-    public function setShowWhenValueExists($showWhenValueExists): void
+    public function setShowWhenValueExists(?bool $showWhenValueExists): void
     {
         $this->showWhenValueExists = $showWhenValueExists;
     }
@@ -802,10 +788,7 @@ class Field implements UuidInterface
         return $this->alwaysDisplay;
     }
 
-    /**
-     * @param bool $alwaysDisplay
-     */
-    public function setAlwaysDisplay($alwaysDisplay): void
+    public function setAlwaysDisplay(?bool $alwaysDisplay): void
     {
         $this->alwaysDisplay = $alwaysDisplay;
     }

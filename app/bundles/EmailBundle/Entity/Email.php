@@ -677,10 +677,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->useOwnerAsMailer;
     }
 
-    /**
-     * @param bool $useOwnerAsMailer
-     */
-    public function setUseOwnerAsMailer($useOwnerAsMailer): static
+    public function setUseOwnerAsMailer(?bool $useOwnerAsMailer): static
     {
         $this->useOwnerAsMailer = $useOwnerAsMailer;
 
@@ -1096,26 +1093,17 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return 0;
     }
 
-    /**
-     * @return bool
-     */
-    public function getPublicPreview()
+    public function getPublicPreview(): ?bool
     {
         return $this->publicPreview;
     }
 
-    /**
-     * @return bool
-     */
-    public function isPublicPreview()
+    public function isPublicPreview(): ?bool
     {
         return $this->publicPreview;
     }
 
-    /**
-     * @param bool $publicPreview
-     */
-    public function setPublicPreview($publicPreview): static
+    public function setPublicPreview(?bool $publicPreview): static
     {
         $this->isChanged('publicPreview', $publicPreview);
         $this->publicPreview = $publicPreview;

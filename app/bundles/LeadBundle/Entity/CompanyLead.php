@@ -73,10 +73,7 @@ class CompanyLead
         $this->company = $company;
     }
 
-    /**
-     * @param bool $primary
-     */
-    public function setPrimary($primary): void
+    public function setPrimary(?bool $primary): void
     {
         $this->primary = $primary;
     }

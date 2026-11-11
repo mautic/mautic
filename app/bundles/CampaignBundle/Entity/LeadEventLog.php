@@ -306,10 +306,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->nonActionPathTaken;
     }
 
-    /**
-     * @param bool $nonActionPathTaken
-     */
-    public function setNonActionPathTaken($nonActionPathTaken): static
+    public function setNonActionPathTaken(?bool $nonActionPathTaken): static
     {
         $this->nonActionPathTaken = $nonActionPathTaken;
 
