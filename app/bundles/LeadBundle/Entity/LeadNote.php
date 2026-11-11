@@ -141,10 +141,7 @@ class LeadNote extends FormEntity
         return $this->dateTime;
     }
 
-    /**
-     * @param mixed $dateTime
-     */
-    public function setDateTime($dateTime): void
+    public function setDateTime(?\DateTimeInterface $dateTime): void
     {
         $this->dateTime = $dateTime;
     }

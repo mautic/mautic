@@ -323,10 +323,7 @@ class LeadDevice
         return $this->dateAdded;
     }
 
-    /**
-     * @param mixed $dateAdded
-     */
-    public function setDateAdded($dateAdded): void
+    public function setDateAdded(?\DateTimeInterface $dateAdded): void
     {
         $this->dateAdded = $dateAdded;
     }

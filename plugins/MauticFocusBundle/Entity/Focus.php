@@ -339,10 +339,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->publishUp;
     }
 
-    /**
-     * @param mixed $publishUp
-     */
-    public function setPublishUp($publishUp): static
+    public function setPublishUp(?\DateTimeInterface $publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
 
@@ -359,10 +356,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->publishDown;
     }
 
-    /**
-     * @param mixed $publishDown
-     */
-    public function setPublishDown($publishDown): static
+    public function setPublishDown(?\DateTimeInterface $publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
 

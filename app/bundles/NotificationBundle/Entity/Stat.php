@@ -151,10 +151,7 @@ class Stat
         return $this->dateClicked;
     }
 
-    /**
-     * @param mixed $dateClicked
-     */
-    public function setDateClicked($dateClicked): void
+    public function setDateClicked(?\DateTimeInterface $dateClicked): void
     {
         $this->dateClicked = $dateClicked;
     }

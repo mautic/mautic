@@ -1106,10 +1106,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->dateIdentified;
     }
 
-    /**
-     * @param mixed $dateIdentified
-     */
-    public function setDateIdentified($dateIdentified): void
+    public function setDateIdentified(?\DateTimeInterface $dateIdentified): void
     {
         $this->isChanged('dateIdentified', $dateIdentified);
         $this->dateIdentified = $dateIdentified;
@@ -1123,10 +1120,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->lastActive;
     }
 
-    /**
-     * @param mixed $lastActive
-     */
-    public function setLastActive($lastActive): void
+    public function setLastActive(?\DateTimeInterface $lastActive): void
     {
         $this->changes['dateLastActive'] = [$this->lastActive, $lastActive];
         $this->lastActive                = $lastActive;
