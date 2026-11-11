@@ -375,7 +375,7 @@ final class CustomFieldColumnTest extends TestCase
         $leadField = new LeadField();
         // Creating the entity from a form will hydrate this with 0/1 instead of a true/false
         // Testing that the getter now appropriately returns a bool for the type hinted getSchemaDefinitionNonStatic
-        $leadField->setIsUniqueIdentifier(1);
+        $leadField->setIsUniqueIdentifier(true);
         $leadField->setAlias('zip');
         $leadField->setType('text');
 
