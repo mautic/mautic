@@ -54,7 +54,7 @@ final readonly class UserProvider implements CredentialsUserProviderInterface
             return $this->userProvider->loadUserByIdentifier($linkedUser->getUsername());
         }
 
-        $newUser = $this->userProvider->saveUser($this->userFactory->create($credentials));
+        $newUser = $this->userProvider->createUser($this->userFactory->create($credentials));
         $linkedUser = $this->linker->linkToUser($credentials->getId(), $newUser);
 
         return $this->userProvider->loadUserByIdentifier($linkedUser->getUsername());
