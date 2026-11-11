@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\OidcSubjectId;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
 
 final class SubjectIdTest extends MauticMysqlTestCase
 {
@@ -105,6 +106,19 @@ final class SubjectIdTest extends MauticMysqlTestCase
         $this->expectException(UniqueConstraintViolationException::class);
         $this->em->persist($subjectId);
         $this->em->flush();
+    }
+
+    public function testSubjectIdIsCaseSensitive(): void
+    {
+        $linker = static::getContainer()->get(LinkerInterface::class);
+        $this->assertNull($linker->findLinkedUser('LINKED_ADMIN', null));
+
+        $this->em->persist(new OidcSubjectId($this->unlinkedUser, 'LINKED_ADMIN'));
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->assertSame('unlinked_admin', $linker->findLinkedUser('LINKED_ADMIN', null)?->getUsername());
+        $this->assertSame('linked_admin', $linker->findLinkedUser('linked_admin', null)?->getUsername());
     }
 
     public function testSubjectIdIsUnique(): void
