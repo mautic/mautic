@@ -78,7 +78,7 @@ class Log
         return $this->statusCode;
     }
 
-    public function setStatusCode(?string $statusCode): static
+    public function setStatusCode(mixed $statusCode): static
     {
         $this->statusCode = $statusCode;
 

@@ -402,7 +402,7 @@ class FormEntity extends CommonEntity
         return $this->modifiedByUser;
     }
 
-    public function setCreatedByUser(?string $createdByUser): static
+    public function setCreatedByUser(mixed $createdByUser): static
     {
         $this->createdByUser = $createdByUser;
 

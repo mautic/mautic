@@ -18,7 +18,7 @@ final class ConfigHelperTest extends TestCase
             {
             }
 
-            public function get($name, $default = null): string
+            public function get($name, mixed $default = null): string
             {
                 Assert::assertEquals('param_a', $name);
 

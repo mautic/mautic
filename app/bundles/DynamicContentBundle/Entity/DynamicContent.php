@@ -263,7 +263,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         self::addProjectsInLoadApiMetadata($metadata, 'dwc');
     }
 
-    protected function isChanged($prop, $val): void
+    protected function isChanged($prop, mixed $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\ListParser\Exception\FormatNotSupportedException;
 
 final class BarListParser implements ListParserInterface
 {
-    public function parse($list): array
+    public function parse(mixed $list): array
     {
         if (!is_string($list)) {
             throw new FormatNotSupportedException();
