@@ -68,12 +68,9 @@ class Field implements UuidInterface
     #[ORM\Column(type: Types::TEXT)]
     private $label;
 
-    /**
-     * @var bool|null
-     */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     #[ORM\Column(name: 'show_label', type: Types::BOOLEAN, nullable: true)]
-    private $showLabel = true;
+    private ?bool $showLabel = true;
 
     /**
      * @var string
@@ -185,19 +182,13 @@ class Field implements UuidInterface
     #[ORM\Column(name: 'container_attr', type: Types::STRING, length: 191, nullable: true)]
     private $containerAttributes;
 
-    /**
-     * @var bool|null
-     */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     #[ORM\Column(name: 'save_result', type: Types::BOOLEAN, nullable: true)]
-    private $saveResult = true;
+    private ?bool $saveResult = true;
 
-    /**
-     * @var bool|null
-     */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     #[ORM\Column(name: 'is_auto_fill', type: Types::BOOLEAN, nullable: true)]
-    private $isAutoFill = false;
+    private ?bool $isAutoFill = false;
 
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     #[ORM\Column(name: 'is_read_only', type: Types::BOOLEAN, options: ['default' => false])]
@@ -211,12 +202,9 @@ class Field implements UuidInterface
 
     private $sessionId;
 
-    /**
-     * @var bool|null
-     */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     #[ORM\Column(name: 'show_when_value_exists', type: Types::BOOLEAN, nullable: true)]
-    private $showWhenValueExists;
+    private ?bool $showWhenValueExists = null;
 
     /**
      * @var int|null
@@ -225,12 +213,9 @@ class Field implements UuidInterface
     #[ORM\Column(name: 'show_after_x_submissions', type: Types::INTEGER, nullable: true)]
     private $showAfterXSubmissions;
 
-    /**
-     * @var bool|null
-     */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     #[ORM\Column(name: 'always_display', type: Types::BOOLEAN, nullable: true)]
-    private $alwaysDisplay;
+    private ?bool $alwaysDisplay = null;
 
     /**
      * @var string|null
@@ -660,10 +645,7 @@ class Field implements UuidInterface
         $this->sessionId = $sessionId;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getSaveResult()
+    public function getSaveResult(): ?bool
     {
         return $this->saveResult;
     }
@@ -686,10 +668,7 @@ class Field implements UuidInterface
         $this->isAutoFill = $isAutoFill;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getShowWhenValueExists()
+    public function getShowWhenValueExists(): ?bool
     {
         return $this->showWhenValueExists;
     }
@@ -818,10 +797,7 @@ class Field implements UuidInterface
             || (array_key_exists('multiple', $this->properties) && 1 === $this->properties['multiple']);
     }
 
-    /**
-     * @return bool|null
-     */
-    public function isAlwaysDisplay()
+    public function isAlwaysDisplay(): ?bool
     {
         return $this->alwaysDisplay;
     }

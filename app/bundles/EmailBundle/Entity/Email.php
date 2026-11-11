@@ -133,12 +133,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private $subject;
 
-    /**
-     * @var bool|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[ORM\Column(name: 'use_owner_as_mailer', type: Types::BOOLEAN, nullable: true)]
-    private $useOwnerAsMailer;
+    private ?bool $useOwnerAsMailer = null;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[ORM\Column(name: 'send_to_dnc', type: Types::BOOLEAN, options: ['default' => 0])]
@@ -229,12 +226,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $publishDown = null;
 
-    /**
-     * @var bool|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[ORM\Column(name: 'public_preview', type: Types::BOOLEAN, nullable: true)]
-    private $publicPreview = false;
+    private ?bool $publicPreview = false;
 
     /**
      * @var int
@@ -678,10 +672,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getUseOwnerAsMailer()
+    public function getUseOwnerAsMailer(): ?bool
     {
         return $this->useOwnerAsMailer;
     }

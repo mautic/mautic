@@ -29,11 +29,8 @@ class CompanyLead
     #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
-    /**
-     * @var bool|null
-     */
     #[ORM\Column(name: 'is_primary', type: 'boolean', nullable: true)]
-    private $primary = false;
+    private ?bool $primary = false;
 
     /**
      * @return \DateTimeInterface
@@ -84,10 +81,7 @@ class CompanyLead
         $this->primary = $primary;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getPrimary()
+    public function getPrimary(): ?bool
     {
         return $this->primary;
     }

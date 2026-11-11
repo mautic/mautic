@@ -81,11 +81,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     #[ORM\Column(type: 'array', nullable: true)]
     private $metadata = [];
 
-    /**
-     * @var bool|null
-     */
     #[ORM\Column(name: 'non_action_path_taken', type: 'boolean', nullable: true)]
-    private $nonActionPathTaken = false;
+    private ?bool $nonActionPathTaken = false;
 
     /**
      * @var string|null
@@ -99,10 +96,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     #[ORM\Column(name: 'channel_id', type: 'integer', nullable: true)]
     private $channelId;
 
-    /**
-     * @var bool|null
-     */
-    private $previousScheduledState;
+    private ?bool $previousScheduledState = null;
 
     /**
      * @var int
@@ -247,10 +241,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     /**
      * If isScheduled was changed, this will have the previous state.
-     *
-     * @return bool|null
      */
-    public function getPreviousScheduledState()
+    public function getPreviousScheduledState(): ?bool
     {
         return $this->previousScheduledState;
     }
@@ -309,10 +301,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getNonActionPathTaken()
+    public function getNonActionPathTaken(): ?bool
     {
         return $this->nonActionPathTaken;
     }

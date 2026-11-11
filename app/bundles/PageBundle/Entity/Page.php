@@ -201,19 +201,13 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 
-    /**
-     * @var bool|null
-     */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     #[ORM\Column(name: 'is_preference_center', type: 'boolean', nullable: true)]
-    private $isPreferenceCenter;
+    private ?bool $isPreferenceCenter = null;
 
-    /**
-     * @var bool|null
-     */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     #[ORM\Column(name: 'no_index', type: 'boolean', nullable: true)]
-    private $noIndex;
+    private ?bool $noIndex = null;
 
     /**
      * Used to identify the page for the builder.
@@ -595,10 +589,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getIsPreferenceCenter()
+    public function getIsPreferenceCenter(): ?bool
     {
         return $this->isPreferenceCenter;
     }
@@ -613,10 +604,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $this->noIndex = $sanitizedValue;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getNoIndex()
+    public function getNoIndex(): ?bool
     {
         return $this->noIndex;
     }
