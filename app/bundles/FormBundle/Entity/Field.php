@@ -239,19 +239,13 @@ class Field implements UuidInterface
     #[ORM\Column(name: 'parent_id', type: 'string', length: 191, nullable: true)]
     private $parent;
 
-    /**
-     * @var string|null
-     */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     #[ORM\Column(name: 'mapped_object', type: Types::STRING, length: 191, nullable: true)]
-    private $mappedObject;
+    private ?string $mappedObject = null;
 
-    /**
-     * @var string|null
-     */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     #[ORM\Column(name: 'mapped_field', type: Types::STRING, length: 191, nullable: true)]
-    private $mappedField;
+    private ?string $mappedField = null;
 
     public ?int $deletedId = null;
 
