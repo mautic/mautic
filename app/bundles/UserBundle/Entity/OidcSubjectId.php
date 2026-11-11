@@ -32,6 +32,7 @@ class OidcSubjectId
             ->length(255)
             ->nullable()
             ->unique()
+            ->option('collation', 'utf8mb4_bin')
             ->build();
     }
 
