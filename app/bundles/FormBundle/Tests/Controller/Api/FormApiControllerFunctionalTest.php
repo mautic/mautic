@@ -436,6 +436,47 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNull(self::getContainer()->get(FormRepository::class)->findOneBy(['name' => $formName]));
     }
 
+    public function testBatchApiRejectsUnavailableCustomFieldWithoutReturningUnsavedChanges(): void
+    {
+        $originalName = 'API form before rejected batch update';
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', [
+            'name'   => $originalName,
+            'fields' => [[
+                'label' => 'Text field',
+                'type'  => 'text',
+            ]],
+        ]);
+
+        $createResponse = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $createResponse->getContent());
+
+        $createData = json_decode($createResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $formId     = (int) $createData['form']['id'];
+        $fieldId    = (int) $createData['form']['fields'][0]['id'];
+
+        $this->client->request(Request::METHOD_PATCH, '/api/forms/batch/edit', [[
+            'id'     => $formId,
+            'name'   => 'Unsaved batch update',
+            'fields' => [[
+                'id'   => $fieldId,
+                'type' => 'plugin.unavailable',
+            ]],
+        ]]);
+
+        $updateResponse = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK, $updateResponse->getContent());
+
+        $updateData = json_decode($updateResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $updateData['statusCodes'][0]);
+        $this->assertSame([], $updateData['forms']);
+
+        $this->em->clear();
+
+        $form = self::getContainer()->get(FormRepository::class)->find($formId);
+        $this->assertInstanceOf(Form::class, $form);
+        $this->assertSame($originalName, $form->getName());
+    }
+
     public function testSingleFormWorkflow(): void
     {
         $payload    = self::TEST_PAYLOAD;

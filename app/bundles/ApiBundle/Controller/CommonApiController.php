@@ -446,6 +446,10 @@ class CommonApiController extends FetchCommonApiController
             $this->detachEntity($entity);
         }
 
+        if (isset($errors[$key])) {
+            unset($entities[$key]);
+        }
+
         $this->inBatchMode = false;
     }
 
