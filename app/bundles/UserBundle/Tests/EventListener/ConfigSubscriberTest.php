@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\EventListener;
 
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\EventListener\ConfigSubscriber;
 use Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigSubscriberTest extends TestCase
@@ -293,5 +297,54 @@ KEY_WRAP;
             ->with('mautic.user.saml.private_key.password_needed', [], 'userconfig', 'saml_idp_own_password');
 
         $this->subscriber->onConfigSave($this->configEvent);
+    }
+
+    /**
+     * @param array<string, mixed> $originalConfig
+     * @param array<string, mixed> $newConfig
+     */
+    #[DataProvider('oidcLinkResetProvider')]
+    public function testOidcLinksAreResetOnlyWhenProviderOrMappingFieldChanges(array $originalConfig, array $newConfig, bool $expectReset): void
+    {
+        $query = $this->createMock(Query::class);
+        $query->expects($expectReset ? $this->once() : $this->never())->method('execute');
+
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $queryBuilder->method('delete')->willReturnSelf();
+        $queryBuilder->method('getQuery')->willReturn($query);
+
+        $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
+        $subjectIdRepository->method('createQueryBuilder')->willReturn($queryBuilder);
+
+        $subscriber = new ConfigSubscriber(
+            $this->createStub(ClientFactoryInterface::class),
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(LoggerInterface::class),
+            $subjectIdRepository,
+        );
+
+        $event = new ConfigEvent(['userconfig' => $newConfig], new ParameterBag());
+        $event->setOriginalNormData(['userconfig' => ['parameters' => $originalConfig]]);
+
+        $subscriber->onConfigPostSave($event);
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, array<string, mixed>, bool}>
+     */
+    public static function oidcLinkResetProvider(): iterable
+    {
+        $current = ['open_id_client_url' => 'https://idp-a.example.com/realms/main', 'open_id_mapping_field' => 'sub'];
+
+        yield 'nothing changed' => [$current, $current, false];
+        yield 'provider URL changed' => [$current, ['open_id_client_url' => 'https://idp-b.example.com/realms/main'] + $current, true];
+        yield 'realm changed' => [$current, ['open_id_client_url' => 'https://idp-a.example.com/realms/other'] + $current, true];
+        yield 'realm case changed' => [$current, ['open_id_client_url' => 'https://idp-a.example.com/realms/Main'] + $current, true];
+        yield 'trailing slash added' => [$current, ['open_id_client_url' => 'https://idp-a.example.com/realms/main/'] + $current, false];
+        yield 'scheme and host case changed' => [$current, ['open_id_client_url' => 'HTTPS://IDP-A.Example.com/realms/main'] + $current, false];
+        yield 'surrounding whitespace added' => [$current, ['open_id_client_url' => ' https://idp-a.example.com/realms/main '] + $current, false];
+        yield 'provider URL configured for the first time' => [['open_id_client_url' => ''] + $current, $current, true];
+        yield 'provider URL cleared' => [$current, ['open_id_client_url' => null, 'open_id_mapping_field' => null], false];
+        yield 'mapping field changed' => [$current, ['open_id_mapping_field' => 'email'] + $current, true];
     }
 }
