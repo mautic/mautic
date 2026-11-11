@@ -7,7 +7,6 @@ namespace Mautic\IntegrationsBundle\Auth\Provider\BasicAuth;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
-use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
