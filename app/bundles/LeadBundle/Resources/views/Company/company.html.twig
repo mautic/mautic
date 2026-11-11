@@ -173,19 +173,19 @@
         {{ customContent('company.engagement.after', _context) }}
         <!-- contacts section -->
         {% set contactsTable %}
-            <div id="contacts-table" data-target-url="{{ path('mautic_company_contacts_list', {'objectId': company.id}) }}">
-                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
-                <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div id="contacts-table" data-target-url="{{ path('mautic_company_contacts_list', {'objectId': company.id}) }}">
+                        <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
             </div>
         {% endset %}
         {% set customTabs %}{{ customContent('company.tabs', _context) }}{% endset %}
         {% if customTabs is empty %}
             <div class="pa-md enage">
-                <div class="row">
-                    <div class="col-sm-12">
-                        {{ contactsTable }}
-                    </div>
-                </div>
+                {{ contactsTable }}
             </div>
         {% else %}
             <div class="pa-md">
