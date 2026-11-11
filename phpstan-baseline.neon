@@ -8040,9 +8040,3 @@ parameters:
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Person.php
 
-		-
-			message: '#^Method MauticPlugin\\MauticOutlookBundle\\Integration\\OutlookIntegration\:\:getFormNotes\(\) has parameter \$section with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticOutlookBundle/Integration/OutlookIntegration.php
-
