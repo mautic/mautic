@@ -161,7 +161,8 @@ final class FormApiController extends CommonApiController
 
         // Add fields from the request
         if (!empty($parameters['fields']) && is_array($parameters['fields'])) {
-            $aliases = $entity->getFieldAliases();
+            $aliases      = $entity->getFieldAliases();
+            $customFields = $this->formModel->getCustomComponents()['fields'];
 
             foreach ($parameters['fields'] as &$fieldParams) {
                 if (empty($fieldParams['id'])) {
@@ -210,7 +211,20 @@ final class FormApiController extends CommonApiController
                 }
                 $requestUsedAliases[] = $fieldEntityArray['alias'];
 
-                $fieldForm = $this->createFieldEntityForm($fieldEntityArray);
+                // Resolve custom field metadata on the server instead of trusting API input.
+                unset($fieldParams['isCustom'], $fieldParams['customParameters']);
+
+                $fieldType        = $fieldParams['type'] ?? $fieldEntityArray['type'] ?? null;
+                $customParameters = is_string($fieldType) ? ($customFields[$fieldType] ?? false) : false;
+
+                if (false !== $customParameters) {
+                    $fieldParams['isCustom']              = true;
+                    $fieldParams['customParameters']      = $customParameters;
+                    $fieldEntityArray['isCustom']         = true;
+                    $fieldEntityArray['customParameters'] = $customParameters;
+                }
+
+                $fieldForm = $this->createFieldEntityForm($fieldEntityArray, $customParameters);
                 $fieldForm->submit($fieldParams, 'PATCH' !== $method);
 
                 if (!$fieldForm->isValid()) {
@@ -314,7 +328,7 @@ final class FormApiController extends CommonApiController
      *
      * @return FormInterface<mixed>
      */
-    protected function createFieldEntityForm($entity): FormInterface
+    protected function createFieldEntityForm(array $entity, array|false $customParameters = false): FormInterface
     {
         return $this->fieldModel->createForm(
             $entity,
@@ -323,6 +337,7 @@ final class FormApiController extends CommonApiController
             [
                 'csrf_protection'    => false,
                 'allow_extra_fields' => true,
+                'customParameters'   => $customParameters,
             ]
         );
     }

@@ -5,17 +5,46 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Event\FormBuilderEvent;
+use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        static::getContainer()->get(EventDispatcherInterface::class)->addListener(
+            FormEvents::FORM_ON_BUILD,
+            static function (FormBuilderEvent $event): void {
+                $event->addFormField('test.custom', [
+                    'label'          => 'Test custom field',
+                    'formType'       => FormType::class,
+                    'template'       => '@MauticForm/Field/text.html.twig',
+                    'builderOptions' => [
+                        'addMappedFieldList' => false,
+                        'addIsRequired'      => false,
+                        'addDefaultValue'    => false,
+                        'addSaveResult'      => false,
+                    ],
+                ]);
+            },
+        );
+    }
 
     private const TEST_PAYLOAD = [
         'name'        => 'API form',
@@ -262,6 +291,49 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
         ];
+    }
+
+    public function testApiResolvesRegisteredCustomFieldMetadata(): void
+    {
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', [
+            'name'   => 'API form with custom field',
+            'fields' => [[
+                'label'            => 'Custom field',
+                'type'             => 'test.custom',
+                'isCustom'         => false,
+                'customParameters' => [
+                    'template' => '@invalid/template.html.twig',
+                ],
+            ]],
+        ]);
+
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $response->getContent());
+
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $formId       = (int) $responseData['form']['id'];
+
+        $this->em->clear();
+
+        $form = static::getContainer()->get(FormRepository::class)->find($formId);
+        $this->assertInstanceOf(Form::class, $form);
+
+        $customField = $form->getFields()->filter(
+            static fn (Field $field): bool => 'test.custom' === $field->getType(),
+        )->first();
+
+        $this->assertInstanceOf(Field::class, $customField);
+        $this->assertTrue($customField->isCustom());
+        $this->assertSame(
+            '@MauticForm/Field/text.html.twig',
+            $customField->getCustomParameters()['template'] ?? null,
+        );
+
+        $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", [
+            'name' => 'Updated API form with custom field',
+        ]);
+
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
     }
 
     public function testSingleFormWorkflow(): void
