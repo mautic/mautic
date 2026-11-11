@@ -36,11 +36,3 @@ class SomeClass extends SomeParent
      */
     protected $inherited;
 }
-
-class SomeParent
-{
-    /**
-     * @var bool|null
-     */
-    protected $inherited;
-}

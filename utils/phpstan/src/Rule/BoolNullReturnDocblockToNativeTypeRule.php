@@ -5,115 +5,65 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Rule;
 
 use PhpParser\Node;
-use PhpParser\Node\Identifier;
-use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
-use PHPStan\Reflection\ClassReflection;
+use PHPStan\Node\CollectedDataNode;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\Type\FileTypeMapper;
-use PHPStan\Type\NeverType;
-use PHPStan\Type\TypeCombinator;
+use Utils\PHPStan\Collector\BoolNullReturnDocblockCollector;
+use Utils\PHPStan\Type\BoolNullFamilyResolver;
 
 /**
- * A "@return bool|null" docblock must be a native "?bool" return type instead.
+ * A "@return bool|null" docblock must be a native "?bool" return type instead. Reported only when the whole
+ * override family can move together (see BoolNullFamilyResolver).
  *
- * @implements Rule<ClassMethod>
+ * @implements Rule<CollectedDataNode>
  *
  * @see \Utils\PHPStan\Tests\Rule\BoolNullReturnDocblockToNativeTypeRuleTest
  */
 final readonly class BoolNullReturnDocblockToNativeTypeRule implements Rule
 {
+    /**
+     * Native return types a child may already declare under a "?bool" parent (covariance).
+     *
+     * @var list<string>
+     */
+    private const array COMPATIBLE_NATIVE_TYPES = ['bool', 'bool|null', 'false', 'false|null', 'true', 'null|true', 'null'];
+
     public function __construct(
-        private FileTypeMapper $fileTypeMapper
+        private ReflectionProvider $reflectionProvider
     ) {
     }
 
     public function getNodeType(): string
     {
-        return ClassMethod::class;
+        return CollectedDataNode::class;
     }
 
     /**
-     * @param ClassMethod $node
+     * @param CollectedDataNode $node
      *
      * @return list<\PHPStan\Rules\IdentifierRuleError>
      */
     public function processNode(Node $node, Scope $scope): array
     {
-        if ($node->returnType instanceof Node && !$this->isMixed($node->returnType)) {
-            return [];
-        }
+        /** @var array<string, list<array{class: string, name: string, file: string, line: int, private: bool, native: string|null, candidate: bool}>> $collected */
+        $collected = $node->get(BoolNullReturnDocblockCollector::class);
 
-        $docComment = $node->getDocComment();
-        if (null === $docComment) {
-            return [];
-        }
+        $familyResolver = new BoolNullFamilyResolver($this->reflectionProvider, false);
 
-        $classReflection = $scope->getClassReflection();
-        if (!$classReflection instanceof ClassReflection) {
-            return [];
-        }
-
-        $methodName = $node->name->toString();
-
-        // changing the native return type of an overridden method would break the parent signature
-        if ($this->overridesAncestorMethod($classReflection, $methodName)) {
-            return [];
-        }
-
-        $returnTag = $this->fileTypeMapper->getResolvedPhpDoc(
-            $scope->getFile(),
-            $classReflection->getName(),
-            $scope->isInTrait() ? $scope->getTraitReflection()->getName() : null,
-            $methodName,
-            $docComment->getText()
-        )->getReturnTag();
-
-        if (null === $returnTag) {
-            return [];
-        }
-
-        $type = $returnTag->getType();
-        $withoutNull = TypeCombinator::removeNull($type);
-        if (!TypeCombinator::containsNull($type) || $withoutNull instanceof NeverType || !$withoutNull->isBoolean()->yes()) {
-            return [];
-        }
-
-        return [
-            RuleErrorBuilder::message(sprintf(
+        $ruleErrors = [];
+        foreach ($familyResolver->resolveReportable($collected, self::COMPATIBLE_NATIVE_TYPES) as $reportable) {
+            $ruleErrors[] = RuleErrorBuilder::message(sprintf(
                 'Method "%s()" has a "bool|null" return docblock, so it must declare the native "?bool" return type instead.',
-                $methodName
+                $reportable['name']
             ))
                 ->identifier('mautic.boolNullReturnDocblockToNativeType')
-                ->line($node->getStartLine())
-                ->build(),
-        ];
-    }
-
-    private function overridesAncestorMethod(ClassReflection $classReflection, string $methodName): bool
-    {
-        foreach ($classReflection->getAncestors() as $ancestor) {
-            if ($ancestor->getName() === $classReflection->getName() || $ancestor->isTrait()) {
-                continue;
-            }
-
-            if (!$ancestor->hasNativeMethod($methodName)) {
-                continue;
-            }
-
-            if ($ancestor->getNativeMethod($methodName)->isPrivate()) {
-                continue;
-            }
-
-            return true;
+                ->file($reportable['file'])
+                ->line($reportable['line'])
+                ->build();
         }
 
-        return false;
-    }
-
-    private function isMixed(Node $type): bool
-    {
-        return $type instanceof Identifier && 'mixed' === strtolower($type->toString());
+        return $ruleErrors;
     }
 }

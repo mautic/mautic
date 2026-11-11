@@ -448,6 +448,14 @@ services:
         tags:
             - phpstan.collector
     -
+        class: Utils\PHPStan\Collector\BoolNullReturnDocblockCollector
+        tags:
+            - phpstan.collector
+    -
+        class: Utils\PHPStan\Collector\BoolNullPropertyDocblockCollector
+        tags:
+            - phpstan.collector
+    -
         class: Utils\PHPStan\Rule\NativeTypeForArrayOrIterableDocblockRule
         tags:
             - phpstan.rules.rule

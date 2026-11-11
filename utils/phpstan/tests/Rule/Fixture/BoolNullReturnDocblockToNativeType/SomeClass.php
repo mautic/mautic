@@ -54,14 +54,3 @@ class SomeClass extends SomeParent
         return null;
     }
 }
-
-class SomeParent
-{
-    /**
-     * @return bool|null
-     */
-    public function overridden()
-    {
-        return null;
-    }
-}
