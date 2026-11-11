@@ -19,9 +19,9 @@ use Mautic\NotificationBundle\Api\OneSignalApi;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\EventListener\CampaignSubscriber;
+use Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\Tests\NotificationTrait;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -409,7 +409,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
     public function testNotificationsSentInBatches(): void
     {
-        $subscriber = new class(self::getContainer()->get(IntegrationHelper::class), self::getContainer()->get(NotificationModel::class), self::getContainer()->get(OneSignalApi::class), self::getContainer()->get(EventDispatcherInterface::class), self::getContainer()->get(DoNotContactModel::class), self::getContainer()->get(TranslatorInterface::class), self::getContainer()->get(NotificationRepository::class)) extends CampaignSubscriber {
+        $subscriber = new class(self::getContainer()->get(OneSignalIntegrationHelper::class), self::getContainer()->get(NotificationModel::class), self::getContainer()->get(OneSignalApi::class), self::getContainer()->get(EventDispatcherInterface::class), self::getContainer()->get(DoNotContactModel::class), self::getContainer()->get(TranslatorInterface::class), self::getContainer()->get(NotificationRepository::class)) extends CampaignSubscriber {
             protected const int MAX_PLAYER_IDS_PER_REQUEST = 2;
         };
         self::getContainer()->set(CampaignSubscriber::class, $subscriber);

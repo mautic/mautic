@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block content %}
-  {% set integrationSettings = integration.integrationSettings.featureSettings %}
+  {% set integrationSettings = integration ? integration.integrationFeatureSettings : {} %}
   {{ form_start(form) }}
   <div class="box-layout">
       <div class="col-md-9 height-auto">

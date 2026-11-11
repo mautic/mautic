@@ -2,15 +2,28 @@
 
 namespace Mautic\NotificationBundle\Api;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Exception\MissingApiKeyException;
 use Mautic\NotificationBundle\Exception\MissingAppIDException;
+use Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper;
+use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Http\Message\ResponseInterface;
 
 final class OneSignalApi extends AbstractNotificationApi
 {
     private string $apiUrlBase = 'https://onesignal.com/api/v1';
+
+    public function __construct(
+        Client $http,
+        TrackableModel $trackableModel,
+        IntegrationHelper $integrationHelper,
+        private readonly OneSignalIntegrationHelper $oneSignalIntegrationHelper,
+    ) {
+        parent::__construct($http, $trackableModel, $integrationHelper);
+    }
 
     /**
      * @throws MissingAppIDException
@@ -18,9 +31,9 @@ final class OneSignalApi extends AbstractNotificationApi
      */
     public function send(string $endpoint, array $data): ResponseInterface
     {
-        $apiKeys    = $this->integrationHelper->getIntegrationObject('OneSignal')->getKeys();
-        $appId      = $apiKeys['app_id'];
-        $restApiKey = $apiKeys['rest_api_key'];
+        $apiKeys    = $this->oneSignalIntegrationHelper->getIntegration()?->getIntegrationConfiguration()->getApiKeys() ?? [];
+        $appId      = $apiKeys['app_id'] ?? null;
+        $restApiKey = $apiKeys['rest_api_key'] ?? null;
 
         if (!$restApiKey) {
             throw new MissingApiKeyException();

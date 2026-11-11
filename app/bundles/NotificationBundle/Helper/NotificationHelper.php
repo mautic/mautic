@@ -3,7 +3,6 @@
 namespace Mautic\NotificationBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -12,7 +11,7 @@ final readonly class NotificationHelper
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
-        private IntegrationHelper $integrationHelper,
+        private OneSignalIntegrationHelper $oneSignalIntegrationHelper,
         private RouterInterface $router,
         private RequestStack $requestStack,
     ) {
@@ -31,21 +30,21 @@ final readonly class NotificationHelper
     public function getScript(): ?string
     {
         if ($this->hasScript()) {
-            $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+            $integration = $this->oneSignalIntegrationHelper->getPublishedIntegration();
 
-            if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
+            if (!$integration) {
                 return null;
             }
 
-            $settings        = $integration->getIntegrationSettings();
-            $keys            = $integration->getDecryptedApiKeys();
+            $settings        = $integration->getIntegrationConfiguration();
+            $keys            = $settings->getApiKeys();
             $supported       = $settings->getSupportedFeatures();
-            $featureSettings = $settings->getFeatureSettings();
+            $featureSettings = $integration->getIntegrationFeatureSettings();
 
             $appId                      = $keys['app_id'];
             $safariWebId                = $keys['safari_web_id'];
             $welcomenotificationEnabled = in_array('welcome_notification_enabled', $supported);
-            $notificationSubdomainName  = $featureSettings['subdomain_name'];
+            $notificationSubdomainName  = $featureSettings['subdomain_name'] ?? null;
             $leadAssociationUrl         = $this->router->generate(
                 'mautic_subscribe_notification',
                 [],
@@ -153,13 +152,13 @@ JS;
             $landingPage = false;
         }
 
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+        $integration = $this->oneSignalIntegrationHelper->getPublishedIntegration();
 
-        if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
+        if (!$integration) {
             return false;
         }
 
-        $supportedFeatures = $integration->getIntegrationSettings()->getSupportedFeatures();
+        $supportedFeatures = $integration->getIntegrationConfiguration()->getSupportedFeatures();
 
         // disable on Landing pages
         if ($landingPage && !in_array('landing_page_enabled', $supportedFeatures)) {

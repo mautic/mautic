@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\NotificationBundle\Tests\Form\Type;
 
 use Mautic\NotificationBundle\Form\Type\MobileNotificationDetailsType;
+use Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper;
+use Mautic\NotificationBundle\Integration\OneSignalIntegration;
 use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -31,14 +31,11 @@ final class MobileNotificationDetailsTypeTest extends TypeTestCase
 
         $this->integrationSettings = new Integration();
 
-        // @phpstan-ignore-next-line
-        $integration = $this->createMock(AbstractIntegration::class);
-        $integration->method('getIntegrationSettings')
-            ->willReturn($this->integrationSettings);
+        $integration = new OneSignalIntegration();
+        $integration->setIntegrationSettings($this->integrationSettings);
 
-        $integrationHelper = $this->createMock(IntegrationHelper::class);
-        $integrationHelper->expects($this->once())->method('getIntegrationObject')
-            ->with('OneSignal')
+        $integrationHelper = $this->createStub(OneSignalIntegrationHelper::class);
+        $integrationHelper->method('getIntegration')
             ->willReturn($integration);
 
         return [
@@ -68,7 +65,7 @@ final class MobileNotificationDetailsTypeTest extends TypeTestCase
     #[DataProvider('platformProvider')]
     public function testPlatformSelected(array $platforms, array $settings): void
     {
-        $this->integrationSettings->setFeatureSettings(['platforms' => $platforms]);
+        $this->integrationSettings->setFeatureSettings(['integration' => ['platforms' => $platforms]]);
 
         $form = $this->factory->create(MobileNotificationDetailsType::class);
 
