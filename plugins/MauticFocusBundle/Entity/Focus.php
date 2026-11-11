@@ -331,10 +331,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
-    public function setCategory($category): static
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
 
