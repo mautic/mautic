@@ -15,7 +15,6 @@ use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
@@ -51,7 +50,6 @@ final class FormApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         private readonly FormModel $formModel,
         private readonly FieldModel $fieldModel,
-        private readonly FormFieldHelper $formFieldHelper,
         private readonly ActionModel $actionModel,
         private readonly FormRepository $formRepository,
     ) {
@@ -146,6 +144,22 @@ final class FormApiController extends CommonApiController
         // Set timestamps
         $this->model->setTimestamps($entity, true, false);
 
+        $customFields = [];
+        if (!empty($parameters['fields']) && is_array($parameters['fields'])) {
+            $customFields = $this->formModel->getCustomComponents()['fields'];
+
+            // Validate explicit field types before a new form is saved to obtain its ID.
+            foreach ($parameters['fields'] as $fieldParams) {
+                if (!empty($fieldParams['id']) || !array_key_exists('type', $fieldParams)) {
+                    continue;
+                }
+
+                if ($error = $this->getUnregisteredFieldTypeError($fieldParams['type'], $customFields)) {
+                    return $error;
+                }
+            }
+        }
+
         if (!$entity->getId()) {
             $isNew = true;
 
@@ -163,9 +177,7 @@ final class FormApiController extends CommonApiController
 
         // Add fields from the request
         if (!empty($parameters['fields']) && is_array($parameters['fields'])) {
-            $aliases       = $entity->getFieldAliases();
-            $builtInFields = $this->formFieldHelper->getTypes();
-            $customFields  = $this->formModel->getCustomComponents()['fields'];
+            $aliases = $entity->getFieldAliases();
 
             foreach ($parameters['fields'] as &$fieldParams) {
                 if (empty($fieldParams['id'])) {
@@ -220,12 +232,8 @@ final class FormApiController extends CommonApiController
                 $fieldType        = $fieldParams['type'] ?? $fieldEntityArray['type'] ?? null;
                 $customParameters = is_string($fieldType) ? ($customFields[$fieldType] ?? false) : false;
 
-                if (false === $customParameters
-                    && (!is_string($fieldType) || ('button' !== $fieldType && !isset($builtInFields[$fieldType])))
-                ) {
-                    $type = is_string($fieldType) ? $fieldType : get_debug_type($fieldType);
-
-                    return $this->badRequest(sprintf('Form field type "%s" is not registered.', $type));
+                if ($error = $this->getUnregisteredFieldTypeError($fieldType, $customFields)) {
+                    return $error;
                 }
 
                 if (false !== $customParameters) {
@@ -356,6 +364,29 @@ final class FormApiController extends CommonApiController
                 'customParameters'   => $customParameters,
             ]
         );
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $customFields
+     *
+     * @return array<string, array<mixed>|int|string|null>|Response|null
+     */
+    private function getUnregisteredFieldTypeError(mixed $fieldType, array $customFields): array|Response|null
+    {
+        if (is_string($fieldType)
+            && (isset($customFields[$fieldType]) || $this->formModel->isFieldTypeRegistered($fieldType))
+        ) {
+            return null;
+        }
+
+        $type = is_string($fieldType) ? $fieldType : get_debug_type($fieldType);
+        $msg  = $this->translator->trans(
+            'mautic.form.field.type.not_registered',
+            ['%type%' => $type],
+            'validators',
+        );
+
+        return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
     }
 
     /**

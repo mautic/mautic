@@ -6,6 +6,7 @@ namespace Mautic\FormBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\Submission;
@@ -378,11 +379,15 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $customField = $form->getFields()->first();
         $this->assertInstanceOf(Field::class, $customField);
 
+        $fieldRepository = static::getContainer()->get(FieldRepository::class);
+        $customField     = $fieldRepository->find($customField->getId());
+        $this->assertInstanceOf(Field::class, $customField);
+
         $customParameters = ['template' => '@UnavailablePlugin/Field/custom.html.twig'];
         $customField->setType('plugin.unavailable');
         $customField->setIsCustom(true);
         $customField->setCustomParameters($customParameters);
-        $this->em->flush();
+        $fieldRepository->saveEntity($customField);
         $this->em->clear();
 
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", [
@@ -404,6 +409,31 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('plugin.unavailable', $customField->getType());
         $this->assertTrue($customField->isCustom());
         $this->assertSame($customParameters, $customField->getCustomParameters());
+    }
+
+    public function testBatchApiRejectsUnavailableCustomFieldWithoutCreatingForm(): void
+    {
+        $formName = 'Batch API form with unavailable custom field';
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/batch/new', [[
+            'name'   => $formName,
+            'fields' => [[
+                'label' => 'Unavailable custom field',
+                'type'  => 'plugin.unavailable',
+            ]],
+        ]]);
+
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $response->getContent());
+
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $responseData['statusCodes'][0]);
+        $this->assertSame(
+            'Form field type "plugin.unavailable" is not registered.',
+            $responseData['errors'][0]['message'],
+        );
+        $this->assertSame([], $responseData['forms']);
+        $this->assertNull(static::getContainer()->get(FormRepository::class)->findOneBy(['name' => $formName]));
     }
 
     public function testSingleFormWorkflow(): void
