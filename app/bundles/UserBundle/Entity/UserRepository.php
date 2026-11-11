@@ -2,6 +2,7 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Exception\RetryableException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\LockMode;
@@ -37,8 +38,8 @@ class UserRepository extends CommonRepository
                 $platform   = $connection->getDatabasePlatform();
 
                 $identifiers = [
-                    DatabasePlatform::normalizeSearchValue($platform, $user->getUsername()),
-                    DatabasePlatform::normalizeSearchValue($platform, $user->getEmail()),
+                    DatabasePlatform::normalizeSearchValue($platform, (string) $user->getUsername()),
+                    DatabasePlatform::normalizeSearchValue($platform, (string) $user->getEmail()),
                 ];
 
                 // PostgreSQL: block concurrent registrants on the same identity keys.
@@ -58,8 +59,8 @@ class UserRepository extends CommonRepository
                     'IN'
                 );
 
-                // Lock matching users and the index gaps for identifiers that do not exist yet.
-                // Keep these locks until commit so a competing registration cannot insert a conflict.
+                // Lock matching users (and MySQL index gaps) until commit so a competing
+                // registration cannot insert a conflict.
                 $duplicate = $this->createQueryBuilder('u')
                     ->select('1')
                     ->where("{$usernameMatch} OR {$emailMatch}")
@@ -75,7 +76,10 @@ class UserRepository extends CommonRepository
 
                 $this->getEntityManager()->persist($user);
             });
-        } catch (RetryableException|UniqueConstraintViolationException $exception) {
+        } catch (RetryableException|UniqueConstraintViolationException|DriverException $exception) {
+            // RetryableException / LockWaitTimeoutException: lock wait (MySQL gap / PG advisory).
+            // DriverException: PostgreSQL lock_timeout (SQLSTATE 55P03) if not converted by DBAL.
+            // UniqueConstraintViolationException: concurrent insert won the race.
             throw new OidcException('mautic.open_id.registration.exception.identity_taken', 0, $exception);
         }
     }

@@ -30,9 +30,7 @@ final class UserFactoryTest extends TestCase
 
         // preferredUsername collides → falls back to email as username
         $userRepo->method('findByIdentifier')
-            ->willReturnCallback(static function (string $identifier): ?User {
-                return 'preferredUsername' === $identifier ? new User() : null;
-            });
+            ->willReturnCallback(static fn (string $identifier): ?User => 'preferredUsername' === $identifier ? new User() : null);
 
         $credentials = new UserCredentials('id', 'email@mautic.local', '', 'familyName', 'preferredUsername');
         $userFactory = new UserFactory($parameters, $userRepo, $roleRepo, $logger);
