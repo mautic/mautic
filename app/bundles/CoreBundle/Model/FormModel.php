@@ -226,7 +226,7 @@ class FormModel extends AbstractCommonModel
 
             // set timestamp changes
             $this->setTimestamps($entity, false, false);
-        } elseif (method_exists($entity, 'setIsEnabled')) {
+        } elseif (method_exists($entity, 'setIsEnabled') && method_exists($entity, 'getIsEnabled')) {
             $entity->setIsEnabled(!$entity->getIsEnabled());
         }
 
