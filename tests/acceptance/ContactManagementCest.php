@@ -274,8 +274,12 @@ final class ContactManagementCest
         $I->amOnPage(ContactPage::$URL);
 
         // Capture the specific contacts to avoid row-order related flakiness.
-        $leadHref1    = $I->grabAttributeFrom("//*[@id='leadTable']/tbody/tr[1]/td[2]/a", 'href');
-        $leadHref2    = $I->grabAttributeFrom("//*[@id='leadTable']/tbody/tr[2]/td[2]/a", 'href');
+        $leadSelector1 = "//*[@id='leadTable']/tbody/tr[1]/td[2]/a[contains(@href, '/contacts/view/')]";
+        $leadSelector2 = "//*[@id='leadTable']/tbody/tr[2]/td[2]/a[contains(@href, '/contacts/view/')]";
+        $I->waitForElementVisible($leadSelector1, AcceptanceTester::TIMEOUT);
+        $I->waitForElementVisible($leadSelector2, AcceptanceTester::TIMEOUT);
+        $leadHref1 = $I->grabAttributeFrom($leadSelector1, 'href');
+        $leadHref2 = $I->grabAttributeFrom($leadSelector2, 'href');
         preg_match('#/contacts/view/(\d+)#', (string) $leadHref1, $leadIdMatch1);
         preg_match('#/contacts/view/(\d+)#', (string) $leadHref2, $leadIdMatch2);
         $leadId1 = (int) ($leadIdMatch1[1] ?? 0);
