@@ -201,13 +201,13 @@ Mautic.initSelectTheme = function(themeField) {
  */
 Mautic.initThemeFavorites = function() {
     mQuery('[data-theme-select]').each(function() {
-        var themeSelect = mQuery(this);
+        const themeSelect = mQuery(this);
 
         themeSelect.find('[data-theme-favorite]').off('click.themeFavorite').on('click.themeFavorite', function(event) {
             event.preventDefault();
 
-            var button = mQuery(this);
-            var favorite = !button.closest('[data-theme-section]').is('[data-theme-section="favorites"]');
+            const button = mQuery(this);
+            const favorite = !button.closest('[data-theme-section]').is('[data-theme-section="favorites"]');
 
             // Queue the requests, so that fast clicks on more than one star do not overwrite each other
             Mautic.ajaxActionRequest(
@@ -237,9 +237,9 @@ Mautic.initThemeFavorites = function() {
  * @param isFavorite
  */
 Mautic.setThemeFavoriteState = function(themeSelect, button, isFavorite) {
-    var icon = button.find('i');
-    var label = isFavorite ? button.attr('data-label-remove') : button.attr('data-label-add');
-    var hasTooltip = !!icon.data('bs.tooltip');
+    const icon = button.find('i');
+    const label = isFavorite ? button.attr('data-label-remove') : button.attr('data-label-add');
+    const hasTooltip = !!icon.data('bs.tooltip');
 
     // Close the tooltip before the theme moves, because it does not follow the button
     if (hasTooltip) {
@@ -276,9 +276,9 @@ Mautic.setThemeFavoriteState = function(themeSelect, button, isFavorite) {
  * @param card
  */
 Mautic.insertThemeCard = function(section, card) {
-    var order = parseInt(card.attr('data-theme-order'), 10);
-    var cards = section.children('[data-theme-order]').not(card);
-    var nextCard = cards.filter(function() {
+    const order = parseInt(card.attr('data-theme-order'), 10);
+    const cards = section.children('[data-theme-order]').not(card);
+    const nextCard = cards.filter(function() {
         return parseInt(mQuery(this).attr('data-theme-order'), 10) > order;
     }).first();
 
