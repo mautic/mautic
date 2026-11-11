@@ -21,7 +21,7 @@ class CompanyLead
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
-    private \Mautic\LeadBundle\Entity\Lead $lead;
+    private ?Lead $lead = null;
 
     /**
      * @var \DateTimeInterface
@@ -51,7 +51,7 @@ class CompanyLead
         $this->dateAdded = $date;
     }
 
-    public function getLead(): Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
