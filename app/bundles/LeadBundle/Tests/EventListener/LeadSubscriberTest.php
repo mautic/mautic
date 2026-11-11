@@ -120,7 +120,7 @@ final class LeadSubscriberTest extends CommonMocks
             ->method('writeToLog');
 
         $subscriber = new LeadSubscriber(
-            $this->createStub(IpLookupHelper::class),
+            $this->createConfiguredStub(IpLookupHelper::class, ['getIpAddressFromRequest' => '127.0.0.1']),
             $this->auditLogModel,
             $this->createStub(LeadChangeEventDispatcher::class),
             $this->dncReasonHelper,
@@ -218,7 +218,7 @@ final class LeadSubscriberTest extends CommonMocks
             });
 
         $subscriber = new LeadSubscriber(
-            $this->createStub(IpLookupHelper::class),
+            $this->createConfiguredStub(IpLookupHelper::class, ['getIpAddressFromRequest' => '127.0.0.1']),
             $this->auditLogModel,
             $this->createStub(LeadChangeEventDispatcher::class),
             $this->dncReasonHelper,
@@ -289,7 +289,7 @@ final class LeadSubscriberTest extends CommonMocks
                             'firstname' => [null, 'John'],
                             'lastname'  => [null, 'Doe'],
                         ],
-                        'ipAddress' => null,
+                        'ipAddress' => '127.0.0.1',
                     ], $parameters[0]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
@@ -308,7 +308,7 @@ final class LeadSubscriberTest extends CommonMocks
                             'firstname' => [null, 'Jane'],
                             'lastname'  => [null, 'Doe'],
                         ],
-                        'ipAddress' => null,
+                        'ipAddress' => '127.0.0.1',
                     ], $parameters[0]);
                 }
                 if (3 === $matcher->numberOfInvocations()) {
@@ -323,13 +323,13 @@ final class LeadSubscriberTest extends CommonMocks
                                 'lastname' => [null, 'Somebody'],
                             ],
                         ],
-                        'ipAddress' => null,
+                        'ipAddress' => '127.0.0.1',
                     ], $parameters[0]);
                 }
             });
 
         $subscriber = new LeadSubscriber(
-            $this->createStub(IpLookupHelper::class),
+            $this->createConfiguredStub(IpLookupHelper::class, ['getIpAddressFromRequest' => '127.0.0.1']),
             $this->auditLogModel,
             $this->createStub(LeadChangeEventDispatcher::class),
             $this->dncReasonHelper,
@@ -394,12 +394,12 @@ final class LeadSubscriberTest extends CommonMocks
                         'manipulated_by'  => 'Event Name (Campaign Name)',
                         'manipulator_key' => 'campaign:trigger-action:1',
                     ],
-                    'ipAddress' => null,
+                    'ipAddress' => '127.0.0.1',
                 ]
             );
 
         $subscriber = new LeadSubscriber(
-            $this->createStub(IpLookupHelper::class),
+            $this->createConfiguredStub(IpLookupHelper::class, ['getIpAddressFromRequest' => '127.0.0.1']),
             $this->auditLogModel,
             $this->createStub(LeadChangeEventDispatcher::class),
             $this->dncReasonHelper,
