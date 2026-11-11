@@ -1271,3 +1271,8 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     -protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     +protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     ```
+
+- Several parameters previously documented only as `@param mixed` now declare an exact native type. Callers that pass a value of another type now hit a `TypeError`:
+    - `Mautic\ChannelBundle\Model\MessageQueueModel::processFrequencyRules()` types `$messageQueue` as `?array`. This also applies to the `resend_message_queue` option passed through `Mautic\EmailBundle\Model\EmailModel::sendEmail()`. Passing `false` for "no queue" now throws; pass `null` instead.
+    - `Mautic\CoreBundle\Controller\FormThemeTrait::setFormTheme()` types `$themes` as `array|string|null`. An object holding template paths (e.g. a custom form field's `formTheme` forwarded by `Mautic\FormBundle\Controller\FieldController`) is no longer cast to an array; pass an array or a string.
+    - `Mautic\CoreBundle\ErrorHandler\ErrorHandler::setDisplayErrors()` types `$displayErrors` as `bool`. Passing `null`, or an integer from a `strict_types` file, now throws; pass an explicit boolean.
