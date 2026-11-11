@@ -420,6 +420,8 @@ rules:
     - Symplify\PHPStanRules\Rules\RequireArrayShapeReturnRule
     - Utils\PHPStan\Rule\GenericTraitUseMustHaveGenericDocblockRule
     - Utils\PHPStan\Rule\BigIntIdParamMustBeIntOrStringRule
+    - Utils\PHPStan\Rule\BoolNullReturnDocblockToNativeTypeRule
+    - Utils\PHPStan\Rule\BoolNullPropertyDocblockToNativeTypeRule
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
     - Utils\PHPStan\Rule\NoServiceInEventConstructorRule
     - Utils\PHPStan\Rule\SingleArgumentDispatchRule
