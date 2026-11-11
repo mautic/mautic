@@ -64,14 +64,6 @@ parameters:
     bootstrapFiles:
         - phpstan-bootstrap.php
     ignoreErrors:
-        # Sms redeclares the VariantEntityTrait properties without ORM attributes to keep them unmapped,
-        # PHP requires the redeclaration to match the trait signature exactly
-        -
-            identifiers:
-                - mautic.nullableObjectPropertyMustHaveNativeType
-                - property.unusedType
-            path: app/bundles/SmsBundle/Entity/Sms.php
-
         # Public integration hooks let third-party plugins populate the social cache by reference.
         # Keep their contract after removing the bundled social integrations.
         -

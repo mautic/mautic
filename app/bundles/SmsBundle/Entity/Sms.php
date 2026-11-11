@@ -20,9 +20,6 @@ use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
-use Mautic\CoreBundle\Entity\VariantEntityInterface;
-use Mautic\CoreBundle\Entity\VariantEntityTrait;
-use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
@@ -65,39 +62,14 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
     joinTable: new ORM\JoinTable(name: 'sms_projects_xref'),
 )])]
-class Sms extends FormEntity implements UuidInterface, TranslationEntityInterface, VariantEntityInterface
+class Sms extends FormEntity implements UuidInterface, TranslationEntityInterface
 {
     use UuidTrait;
     use ProjectTrait;
     /** @use TranslationEntityTrait<Sms> */
     use TranslationEntityTrait;
-    /** @use VariantEntityTrait<Sms> */
-    use VariantEntityTrait;
 
     public const string TABLE_NAME = 'sms_messages';
-
-    /**
-     * Redeclared without ORM attributes, so SMS does not map the variant columns of VariantEntityTrait.
-     *
-     * @var Collection<int, Sms>
-     */
-    #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $variantChildren;
-
-    /**
-     * @var Sms|null
-     */
-    #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $variantParent;
-
-    /**
-     * @var array<mixed>|null
-     */
-    #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_AB_WEIGHT, 'enableAbTest' => false];
-
-    #[Groups(['email:read', 'email:write', 'download:read'])]
-    private ?\DateTimeInterface $variantStartDate = null;
 
     /**
      * @var int
