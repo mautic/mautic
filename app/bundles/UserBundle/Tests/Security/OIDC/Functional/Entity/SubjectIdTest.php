@@ -117,8 +117,12 @@ final class SubjectIdTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->assertSame('unlinked_admin', $linker->findLinkedUser('LINKED_ADMIN', null)?->getUsername());
-        $this->assertSame('linked_admin', $linker->findLinkedUser('linked_admin', null)?->getUsername());
+        $upperCaseUser = $linker->findLinkedUser('LINKED_ADMIN', $this->unlinkedUser);
+        $lowerCaseUser = $linker->findLinkedUser('linked_admin', $this->linkedUser);
+        $this->assertInstanceOf(User::class, $upperCaseUser);
+        $this->assertInstanceOf(User::class, $lowerCaseUser);
+        $this->assertSame('unlinked_admin', $upperCaseUser->getUsername());
+        $this->assertSame('linked_admin', $lowerCaseUser->getUsername());
     }
 
     public function testSubjectIdIsUnique(): void
