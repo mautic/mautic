@@ -258,15 +258,15 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         foreach ($contacts as $contact) {
             $log = $this->createStub(LeadEventLog::class);
             $log->method('getLead')->willReturn($this->contactRepository->getEntity($contact->getId()));
-            $log->method('getEvent')->willReturn([
-                'type'       => 'lead.stages',
-                'properties' => [
-                    'type'   => 'lead.stages',
-                    // The created stage's id, not a hard-coded 1: auto-increment does not
-                    // restart per test now that the cleanup transaction is off.
-                    'stages' => [0 => (string) $stageIds[0]],
-                ],
+            $campaignEvent = new Event();
+            $campaignEvent->setType('lead.stages');
+            $campaignEvent->setProperties([
+                'type'   => 'lead.stages',
+                // The created stage's id, not a hard-coded 1: auto-increment does not
+                // restart per test now that the cleanup transaction is off.
+                'stages' => [0 => (string) $stageIds[0]],
             ]);
+            $log->method('getEvent')->willReturn($campaignEvent);
 
             $event      = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
             $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
@@ -1099,15 +1099,15 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $log = $this->createStub(LeadEventLog::class);
         $log->method('getLead')->willReturn($contact);
-        $log->method('getEvent')->willReturn([
-            'type'       => 'lead.field_value',
-            'eventType'  => 'condition',
-            'properties' => [
-                'field'    => 'test_date',
-                'value'    => $regex,
-                'operator' => $operator,
-            ],
+        $campaignEvent = new Event();
+        $campaignEvent->setType('lead.field_value');
+        $campaignEvent->setEventType('condition');
+        $campaignEvent->setProperties([
+            'field'    => 'test_date',
+            'value'    => $regex,
+            'operator' => $operator,
         ]);
+        $log->method('getEvent')->willReturn($campaignEvent);
 
         $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 

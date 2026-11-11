@@ -542,7 +542,6 @@ final class CampaignSubscriber
     )]
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
-        /** @var Lead|null $lead */
         $lead   = $event->getLead();
         $result = false;
 
