@@ -354,6 +354,58 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], $builtInField->getCustomParameters());
     }
 
+    public function testApiRejectsUnavailableCustomFieldWithoutClearingMetadata(): void
+    {
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', [
+            'name'   => 'API form with unavailable custom field',
+            'fields' => [[
+                'label' => 'Custom field',
+                'type'  => 'text',
+            ]],
+        ]);
+
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $response->getContent());
+
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $formId       = (int) $responseData['form']['id'];
+
+        $this->em->clear();
+
+        $form = static::getContainer()->get(FormRepository::class)->find($formId);
+        $this->assertInstanceOf(Form::class, $form);
+
+        $customField = $form->getFields()->first();
+        $this->assertInstanceOf(Field::class, $customField);
+
+        $customParameters = ['template' => '@UnavailablePlugin/Field/custom.html.twig'];
+        $customField->setType('plugin.unavailable');
+        $customField->setIsCustom(true);
+        $customField->setCustomParameters($customParameters);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", [
+            'fields' => [[
+                'id'    => $customField->getId(),
+                'label' => 'Updated custom field',
+            ]],
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getContent());
+
+        $this->em->clear();
+
+        $form = static::getContainer()->get(FormRepository::class)->find($formId);
+        $this->assertInstanceOf(Form::class, $form);
+
+        $customField = $form->getFields()->first();
+        $this->assertInstanceOf(Field::class, $customField);
+        $this->assertSame('plugin.unavailable', $customField->getType());
+        $this->assertTrue($customField->isCustom());
+        $this->assertSame($customParameters, $customField->getCustomParameters());
+    }
+
     public function testSingleFormWorkflow(): void
     {
         $payload    = self::TEST_PAYLOAD;
