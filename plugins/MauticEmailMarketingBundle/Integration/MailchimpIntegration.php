@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\IntegrationsBundle\Exception\PushContactException;
 use Mautic\IntegrationsBundle\Integration\BasicIntegration;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
@@ -19,10 +20,13 @@ class MailchimpIntegration extends BasicIntegration implements BasicInterface, P
 {
     public const string NAME = 'Mailchimp';
 
+    private const int MERGE_FIELDS_CACHE_TTL = 3600;
+
     public function __construct(
         private readonly MailchimpClient $client,
         private readonly ContactFieldMapper $contactFieldMapper,
         private readonly TranslatorInterface $translator,
+        private readonly CacheProviderInterface $cacheProvider,
     ) {
     }
 
@@ -69,7 +73,7 @@ class MailchimpIntegration extends BasicIntegration implements BasicInterface, P
             $missingFields = array_diff_key($mapping, $data, ['EMAIL' => true]);
             if ([] !== $missingFields) {
                 // Like the former integration, required merge fields without a value are sent as "Unknown"
-                $mergeFields = $this->client->getMergeFields($keys, $listId);
+                $mergeFields = $this->getMergeFields($keys, $listId);
                 foreach (array_keys($missingFields) as $tag) {
                     if (!empty($mergeFields[$tag]['required'])) {
                         $data[$tag] = $this->translator->trans('mautic.integration.form.lead.unknown');
@@ -88,5 +92,30 @@ class MailchimpIntegration extends BasicIntegration implements BasicInterface, P
         } catch (ApiException $e) {
             throw new PushContactException($e->getMessage(), 0, $e);
         }
+    }
+
+    /**
+     * Cached per list, like the former integration, so a campaign does not fetch them for every contact.
+     *
+     * @param array<string, mixed> $keys
+     *
+     * @return array<string, array{label: string, required: bool}>
+     *
+     * @throws ApiException
+     */
+    private function getMergeFields(array $keys, string $listId): array
+    {
+        $item = $this->cacheProvider->getItem('mailchimp.merge_fields.'.$listId);
+        if ($item->isHit()) {
+            /** @var array<string, array{label: string, required: bool}> */
+            return $item->get();
+        }
+
+        $mergeFields = $this->client->getMergeFields($keys, $listId);
+        $item->set($mergeFields);
+        $item->expiresAfter(self::MERGE_FIELDS_CACHE_TTL);
+        $this->cacheProvider->save($item);
+
+        return $mergeFields;
     }
 }

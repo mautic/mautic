@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Tests\Unit\Integration;
 
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\IntegrationsBundle\Exception\PushContactException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
@@ -20,6 +21,7 @@ use MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration;
 use MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PushContactTest extends TestCase
@@ -33,7 +35,7 @@ final class PushContactTest extends TestCase
             ->method('subscribe')
             ->with(self::KEYS, 'a1', 'john@example.com', ['FNAME' => 'John'], false, true);
 
-        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com', 'FNAME' => 'John']), $this->translator()));
+        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com', 'FNAME' => 'John']), $this->translator(), $this->cache()));
 
         $this->assertSame(MailchimpType::class, $integration->getPushContactConfigFormName());
         $integration->pushContact(new Lead(), ['list_settings' => ['list' => 'a1', 'doubleOptin' => '0', 'sendWelcome' => '1', 'leadFields' => ['EMAIL' => 'email', 'FNAME' => 'firstname']]]);
@@ -50,13 +52,16 @@ final class PushContactTest extends TestCase
                 'LNAME' => ['label' => 'Last Name', 'required' => false],
                 'EMAIL' => ['label' => 'Email', 'required' => true],
             ]);
-        $client->expects($this->once())
+        $client->expects($this->exactly(2))
             ->method('subscribe')
             ->with(self::KEYS, 'a1', 'john@example.com', ['FNAME' => 'mautic.integration.form.lead.unknown'], true, true);
 
-        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com']), $this->translator()));
+        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com']), $this->translator(), $this->cache()));
 
-        $integration->pushContact(new Lead(), ['list_settings' => ['list' => 'a1', 'leadFields' => ['EMAIL' => 'email', 'FNAME' => 'firstname', 'LNAME' => 'lastname']]]);
+        // The second push reads the merge fields from the cache
+        $config = ['list_settings' => ['list' => 'a1', 'leadFields' => ['EMAIL' => 'email', 'FNAME' => 'firstname', 'LNAME' => 'lastname']]];
+        $integration->pushContact(new Lead(), $config);
+        $integration->pushContact(new Lead(), $config);
     }
 
     public function testMailchimpReportsApiErrors(): void
@@ -64,7 +69,7 @@ final class PushContactTest extends TestCase
         $client = $this->createStub(MailchimpClient::class);
         $client->method('subscribe')->willThrowException(new ApiException('Member Exists'));
 
-        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com']), $this->translator()));
+        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com']), $this->translator(), $this->cache()));
 
         $this->expectException(PushContactException::class);
         $this->expectExceptionMessage('Member Exists');
@@ -77,7 +82,7 @@ final class PushContactTest extends TestCase
         $client = $this->createMock(MailchimpClient::class);
         $client->expects($this->never())->method('subscribe');
 
-        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com']), $this->translator()));
+        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com']), $this->translator(), $this->cache()));
 
         $this->expectException(PushContactException::class);
         $this->expectExceptionMessage('mautic.emailmarketing.push.no_list MailChimp');
@@ -90,7 +95,7 @@ final class PushContactTest extends TestCase
         $client = $this->createMock(MailchimpClient::class);
         $client->expects($this->never())->method('subscribe');
 
-        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['FNAME' => 'John']), $this->translator()));
+        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['FNAME' => 'John']), $this->translator(), $this->cache()));
 
         $this->expectException(PushContactException::class);
         $this->expectExceptionMessage('mautic.emailmarketing.push.no_email MailChimp');
@@ -138,18 +143,21 @@ final class PushContactTest extends TestCase
     }
 
     /**
-     * @param class-string<MailchimpIntegration|ConstantContactIntegration|IcontactIntegration> $integrationClass
      * @param class-string<MailchimpClient|ConstantContactClient|IcontactClient>                $clientClass
      * @param array<string, string>                                                          $data
      * @param array<string, mixed>                                                           $config
      */
     #[DataProvider('failureProvider')]
-    public function testFailures(string $integrationClass, string $clientClass, array $data, array $config, string $message): void
+    public function testFailures(string $clientClass, array $data, array $config, string $message): void
     {
         $client = $this->createStub($clientClass);
         $client->method('subscribe')->willThrowException(new ApiException('Rejected'));
 
-        $integration = $this->configure(new $integrationClass($client, $this->mapper($data), $this->translator()));
+        $integration = $this->configure(match (true) {
+            $client instanceof MailchimpClient       => new MailchimpIntegration($client, $this->mapper($data), $this->translator(), $this->cache()),
+            $client instanceof ConstantContactClient => new ConstantContactIntegration($client, $this->mapper($data), $this->translator()),
+            $client instanceof IcontactClient        => new IcontactIntegration($client, $this->mapper($data), $this->translator()),
+        });
 
         $this->expectException(PushContactException::class);
         $this->expectExceptionMessage($message);
@@ -158,20 +166,20 @@ final class PushContactTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{class-string, class-string, array<string, string>, array<string, mixed>, string}>
+     * @return iterable<string, array{class-string, array<string, string>, array<string, mixed>, string}>
      */
     public static function failureProvider(): iterable
     {
         $integrations = [
-            'Mailchimp'        => [MailchimpIntegration::class, MailchimpClient::class, 'EMAIL', 'MailChimp'],
-            'Constant Contact' => [ConstantContactIntegration::class, ConstantContactClient::class, 'email', 'Constant Contact'],
-            'iContact'         => [IcontactIntegration::class, IcontactClient::class, 'email', 'iContact'],
+            'Mailchimp'        => [MailchimpClient::class, 'EMAIL', 'MailChimp'],
+            'Constant Contact' => [ConstantContactClient::class, 'email', 'Constant Contact'],
+            'iContact'         => [IcontactClient::class, 'email', 'iContact'],
         ];
 
-        foreach ($integrations as $label => [$integrationClass, $clientClass, $emailField, $displayName]) {
-            yield $label.': no list settings' => [$integrationClass, $clientClass, [$emailField => 'john@example.com'], [], 'mautic.emailmarketing.push.no_list '.$displayName];
-            yield $label.': no email' => [$integrationClass, $clientClass, [], ['list_settings' => ['list' => '1']], 'mautic.emailmarketing.push.no_email '.$displayName];
-            yield $label.': rejected' => [$integrationClass, $clientClass, [$emailField => 'john@example.com'], ['list_settings' => ['list' => '1']], 'Rejected'];
+        foreach ($integrations as $label => [$clientClass, $emailField, $displayName]) {
+            yield $label.': no list settings' => [$clientClass, [$emailField => 'john@example.com'], [], 'mautic.emailmarketing.push.no_list '.$displayName];
+            yield $label.': no email' => [$clientClass, [], ['list_settings' => ['list' => '1']], 'mautic.emailmarketing.push.no_email '.$displayName];
+            yield $label.': rejected' => [$clientClass, [$emailField => 'john@example.com'], ['list_settings' => ['list' => '1']], 'Rejected'];
         }
     }
 
@@ -181,6 +189,16 @@ final class PushContactTest extends TestCase
         $translator->method('trans')->willReturnCallback(static fn (string $id, array $parameters = []): string => trim($id.' '.implode(' ', $parameters)));
 
         return $translator;
+    }
+
+    private function cache(): CacheProviderInterface
+    {
+        $adapter = new ArrayAdapter();
+        $cache   = $this->createStub(CacheProviderInterface::class);
+        $cache->method('getItem')->willReturnCallback($adapter->getItem(...));
+        $cache->method('save')->willReturnCallback($adapter->save(...));
+
+        return $cache;
     }
 
     /**
