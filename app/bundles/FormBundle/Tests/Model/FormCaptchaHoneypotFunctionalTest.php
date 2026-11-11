@@ -73,10 +73,11 @@ final class FormCaptchaHoneypotFunctionalTest extends MauticMysqlTestCase
             'isPublished' => true,
             'fields'      => [
                 [
-                    'label'      => 'Email',
-                    'alias'      => 'email',
-                    'type'       => 'email',
-                    'leadField'  => 'email',
+                    'label'        => 'Email',
+                    'alias'        => 'email',
+                    'type'         => 'email',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
                 ],
                 [
                     'label'      => 'Leave blank',

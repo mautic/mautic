@@ -49,10 +49,11 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                         'multiple' => false,
                     ],
                 ], [
-                    'label'     => 'Email',
-                    'alias'     => 'email',
-                    'type'      => 'email',
-                    'leadField' => 'email',
+                    'label'        => 'Email',
+                    'alias'        => 'email',
+                    'type'         => 'email',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
                 ], [
                     'label' => 'Submit',
                     'alias' => 'submit',

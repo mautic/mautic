@@ -172,11 +172,12 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
             'postAction' => 'return',
             'fields'     => [
                 [
-                    'label'      => 'Email',
-                    'alias'      => 'email',
-                    'type'       => 'email',
-                    'leadField'  => 'email',
-                    'isRequired' => true,
+                    'label'        => 'Email',
+                    'alias'        => 'email',
+                    'type'         => 'email',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
+                    'isRequired'   => true,
                 ], [
                     'label' => 'Submit',
                     'alias' => 'submit',
@@ -195,30 +196,6 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Ceci est requis.', $crawler->html());
 
         $filesystem->remove($languagePath);
-    }
-
-    public function testMappedFieldIsNotMarkedAsRemappedUponSavingTheForm(): void
-    {
-        $form  = $this->createForm('Test', 'test');
-        $field = $this->createFormField([
-            'label'        => 'Email',
-            'type'         => 'email',
-        ])->setForm($form);
-
-        // @phpstan-ignore-next-line (using the deprecated method on purpose)
-        $field->setLeadField('email');
-        $this->em->persist($field);
-        $this->em->flush();
-        $this->em->clear();
-
-        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
-        $this->assertResponseIsSuccessful();
-
-        $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
-        $this->client->submit($formElement);
-        $response = $this->client->getResponse();
-        $this->assertResponseIsSuccessful();
-        $this->assertStringNotContainsString('contact: Email', (string) $response->getContent(), 'Email field should not be marked as mapped.');
     }
 
     public function testMappedFieldIsNotAutoFilledWhenUpdatingField(): void

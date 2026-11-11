@@ -36,10 +36,11 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
             'isPublished' => true,
             'fields'      => [
                 [
-                    'label'     => 'Email',
-                    'type'      => 'email',
-                    'alias'     => 'email',
-                    'leadField' => 'email',
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
                 ],
                 [
                     'label' => 'Submit',

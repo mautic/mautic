@@ -168,10 +168,11 @@ final class ExportControllerTest extends MauticMysqlTestCase
                     'type'      => 'text',
                 ],
                 [
-                    'label'     => 'email',
-                    'alias'     => 'email',
-                    'type'      => 'email',
-                    'leadField' => 'email',
+                    'label'        => 'email',
+                    'alias'        => 'email',
+                    'type'         => 'email',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
                 ],
                 [
                     'label'     => 'description',

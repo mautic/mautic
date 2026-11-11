@@ -186,15 +186,6 @@ class Field implements UuidInterface
     private $containerAttributes;
 
     /**
-     * @var string|null
-     *
-     * @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
-     */
-    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
-    #[ORM\Column(name: 'lead_field', type: Types::STRING, length: 191, nullable: true)]
-    private $leadField;
-
-    /**
      * @var bool|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
@@ -295,7 +286,6 @@ class Field implements UuidInterface
                     'labelAttributes',
                     'inputAttributes',
                     'containerAttributes',
-                    'leadField', // @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
                     'saveResult',
                     'isAutoFill',
                     'isReadOnly',
@@ -677,26 +667,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
-     *
-     * @return string|null
-     */
-    public function getLeadField()
-    {
-        return $this->leadField;
-    }
-
-    /**
-     * @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
-     *
-     * @param mixed $leadField
-     */
-    public function setLeadField($leadField): void
-    {
-        $this->leadField = $leadField;
-    }
-
-    /**
      * @return bool|null
      */
     public function getSaveResult()
@@ -938,7 +908,6 @@ class Field implements UuidInterface
     public function setMappedObject(?string $mappedObject): void
     {
         $this->mappedObject = $mappedObject;
-        $this->resetLeadFieldIfValueIsEmpty($mappedObject);
     }
 
     public function getMappedField(): ?string
@@ -949,22 +918,6 @@ class Field implements UuidInterface
     public function setMappedField(?string $mappedField): void
     {
         $this->mappedField = $mappedField;
-        $this->resetLeadFieldIfValueIsEmpty($mappedField);
-    }
-
-    private function resetLeadFieldIfValueIsEmpty(?string $value): void
-    {
-        if ($value) {
-            return;
-        }
-
-        /**
-         * Ignoring this line because the leadField is deprecated and will be removed in Mautic 4.
-         * Todo: Use mappedObject or mappedField instead.
-         *
-         * @phpstan-ignore-next-line
-         */
-        $this->leadField = null;
     }
 
     public function isAutoFillReadOnly(): bool

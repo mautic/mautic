@@ -128,10 +128,10 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
     private function createFormFields(): array
     {
         return [
-            ['label' => 'Email', 'type' => 'email', 'alias' => 'email', 'leadField' => 'email'],
-            ['label' => 'Owners Email', 'type' => 'text', 'alias' => 'owner_by_email', 'leadField' => 'ownerbyemail'],
-            ['label' => 'Owners id', 'type' => 'text', 'alias' => 'owner_by_id', 'leadField' => 'ownerbyid'],
-            ['label' => 'Stage', 'type' => 'text', 'alias' => 'stage', 'leadField' => 'stagebyname'],
+            ['label' => 'Email', 'type' => 'email', 'alias' => 'email', 'mappedObject' => 'contact', 'mappedField' => 'email'],
+            ['label' => 'Owners Email', 'type' => 'text', 'alias' => 'owner_by_email', 'mappedObject' => 'contact', 'mappedField' => 'ownerbyemail'],
+            ['label' => 'Owners id', 'type' => 'text', 'alias' => 'owner_by_id', 'mappedObject' => 'contact', 'mappedField' => 'ownerbyid'],
+            ['label' => 'Stage', 'type' => 'text', 'alias' => 'stage', 'mappedObject' => 'contact', 'mappedField' => 'stagebyname'],
             ['label' => 'Submit', 'type' => 'button'],
         ];
     }
