@@ -66,7 +66,7 @@ final class ConfigSubscriber implements EventSubscriberInterface
 
     public function onConfigPostSave(ConfigEvent $event): void
     {
-        $this->deleteOidcLinksIfMappingFieldChanged($event);
+        $this->deleteOidcLinksIfProviderChanged($event);
     }
 
     private function validateOidcConnection(ConfigEvent $event): void
@@ -142,23 +142,36 @@ final class ConfigSubscriber implements EventSubscriberInterface
         $event->setConfig($data, 'userconfig');
     }
 
-    private function deleteOidcLinksIfMappingFieldChanged(ConfigEvent $event): void
+    private function deleteOidcLinksIfProviderChanged(ConfigEvent $event): void
     {
-        $originalData = $event->getOriginalNormData();
+        $originalData = $event->getOriginalNormData()['userconfig']['parameters'] ?? [];
         $newData      = $event->getConfig('userconfig');
 
-        $originalMappingField = $originalData['userconfig']['open_id_mapping_field'] ?? null;
-        $newMappingField      = $newData['open_id_mapping_field'] ?? null;
+        $newMappingField = $newData['open_id_mapping_field'] ?? null;
+        $newClientUrl    = $this->normalizeUrl($newData['open_id_client_url'] ?? null);
 
-        // Only delete links if:
-        // 1. The new mapping field is not null/empty (OIDC is actually configured)
-        // 2. The mapping field has changed
-        if (!empty($newMappingField) && $newMappingField !== $originalMappingField) {
+        // Subject IDs are only unique per provider and mapping field, so existing links
+        // must not be reused when either changes. Empty new values mean OIDC is not configured.
+        $mappingFieldChanged = !empty($newMappingField) && $newMappingField !== ($originalData['open_id_mapping_field'] ?? null);
+        $clientUrlChanged    = '' !== $newClientUrl && $newClientUrl !== $this->normalizeUrl($originalData['open_id_client_url'] ?? null);
+
+        if ($mappingFieldChanged || $clientUrlChanged) {
             $this->subjectIdRepository->createQueryBuilder('s')
                 ->delete()
                 ->getQuery()
                 ->execute();
         }
+    }
+
+    /**
+     * Ignores differences that do not change the provider: surrounding whitespace,
+     * trailing slashes and the case of the scheme and host.
+     */
+    private function normalizeUrl(mixed $url): string
+    {
+        $url = rtrim(trim((string) $url), '/');
+
+        return (string) preg_replace_callback('~^[a-z][a-z0-9+.-]*://[^/?#]*~i', static fn (array $matches): string => strtolower($matches[0]), $url);
     }
 
     private function validateXml(string $content): bool
