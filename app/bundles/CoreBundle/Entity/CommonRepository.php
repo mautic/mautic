@@ -600,23 +600,6 @@ abstract class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @deprecated use getPublishedByDateOrmExpression() or getPublishedByDateDbalExpression()
-     */
-    public function getPublishedByDateExpression(
-        QueryBuilder|DbalQueryBuilder $q,
-        ?string $alias = null,
-        bool $setNowParameter = true,
-        bool $setTrueParameter = true,
-        bool $allowNullForPublishedUp = true,
-    ): Andx|CompositeExpression {
-        if ($q instanceof QueryBuilder) {
-            return $this->getPublishedByDateOrmExpression($q, $alias, $setNowParameter, $setTrueParameter, $allowNullForPublishedUp);
-        }
-
-        return $this->getPublishedByDateDbalExpression($q, $alias, $setNowParameter, $setTrueParameter, $allowNullForPublishedUp);
-    }
-
-    /**
      * Get an array of rows from one table using DBAL.
      *
      * @return array{total: mixed, results: list<array<string, mixed>>}

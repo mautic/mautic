@@ -447,6 +447,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Trait `Mautic\IntegrationsBundle\Integration\DefaultConfigFormTrait` removed; each method only returned `null`. Implement `getConfigFormName()` and `getConfigFormContentTemplate()` directly on your integration (return `null` to keep the default).
 - Method `Mautic\CampaignBundle\Entity\CampaignRepository::getCampaignLeads()` removed as dead code. Nothing in Mautic calls it, and its `$limit` parameter was typed `bool`, so any truthy limit (such as `50`) became `setMaxResults(1)`, while `false` or `0` returned every row. `CampaignModel::getCampaignLeads()` is unrelated and unchanged.
 - Protected methods `Mautic\CoreBundle\Model\FormModel::dispatchEventFromBatch()` and `Mautic\LeadBundle\Model\LeadModel::dispatchEventFromBatch()` removed; `dispatchEvent()` now covers both the single and batch save paths. The only behavioral difference was `LeadEvent::setAlreadyProcessedInBatch()`, whose value is read nowhere, so during batch saves `LeadEvent::isAlreadyProcessedInBatch()` now returns `false` instead of `true`.
+- Deprecated method `Mautic\CoreBundle\Entity\CommonRepository::getPublishedByDateExpression()` removed. Use `getPublishedByDateOrmExpression()` for a `Doctrine\ORM\QueryBuilder` or `getPublishedByDateDbalExpression()` for a `Doctrine\DBAL\Query\QueryBuilder`; both take the same arguments.
 
 ## Changed code
 
