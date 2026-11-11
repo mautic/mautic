@@ -110,7 +110,7 @@ final class SubjectIdTest extends MauticMysqlTestCase
 
     public function testSubjectIdIsCaseSensitive(): void
     {
-        $linker = static::getContainer()->get(LinkerInterface::class);
+        $linker = self::getContainer()->get(LinkerInterface::class);
         $this->assertNull($linker->findLinkedUser('LINKED_ADMIN', null));
 
         $this->em->persist(new OidcSubjectId($this->unlinkedUser, 'LINKED_ADMIN'));
