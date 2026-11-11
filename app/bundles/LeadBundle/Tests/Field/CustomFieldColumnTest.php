@@ -389,6 +389,7 @@ final class CustomFieldColumnTest extends TestCase
 
         $this->schemaDefinition->expects($this->once())
             ->method('getSchemaDefinitionNonStatic')
+            ->with('zip', 'text', true, 64)
             ->willReturn(['type' => 'string']);
 
         $this->columnSchemaHelper->expects($this->once())
