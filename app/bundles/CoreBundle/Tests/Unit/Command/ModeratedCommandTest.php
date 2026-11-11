@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Command;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Tests\Unit\Command\src\FakeModeratedCommand;
+use Mautic\CoreBundle\Tests\Unit\Command\Source\FakeModeratedCommand;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
