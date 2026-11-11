@@ -105,10 +105,7 @@ class Stat
         return $this->typeId;
     }
 
-    /**
-     * @param mixed $typeId
-     */
-    public function setTypeId($typeId): static
+    public function setTypeId(?int $typeId): static
     {
         $this->typeId = $typeId;
 

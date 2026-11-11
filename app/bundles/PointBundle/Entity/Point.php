@@ -347,10 +347,7 @@ class Point extends FormEntity implements UuidInterface
         return $this->delta;
     }
 
-    /**
-     * @param mixed $delta
-     */
-    public function setDelta($delta): void
+    public function setDelta(?int $delta): void
     {
         $this->delta = (int) $delta;
     }

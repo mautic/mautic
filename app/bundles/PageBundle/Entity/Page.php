@@ -702,10 +702,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantHits') : $this->variantHits;
     }
 
-    /**
-     * @param mixed $variantHits
-     */
-    public function setVariantHits($variantHits): void
+    public function setVariantHits(?int $variantHits): void
     {
         $this->variantHits = $variantHits;
     }

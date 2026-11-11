@@ -257,10 +257,7 @@ class Download
         return $this->sourceId;
     }
 
-    /**
-     * @param mixed $sourceId
-     */
-    public function setSourceId($sourceId): void
+    public function setSourceId(?int $sourceId): void
     {
         $this->sourceId = (int) $sourceId;
     }

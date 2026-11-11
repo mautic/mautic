@@ -463,10 +463,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->form;
     }
 
-    /**
-     * @param mixed $form
-     */
-    public function setForm($form): static
+    public function setForm(?int $form): static
     {
         if ($form instanceof Form) {
             $form = $form->getId();
