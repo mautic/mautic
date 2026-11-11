@@ -192,7 +192,7 @@ final class MessageModel extends FormModel implements AjaxLookupModelInterface, 
      */
     public function getMarketingMessagesEventLogs($messageId, $dateFrom = null, $dateTo = null)
     {
-        return $this->leadEventLogRepository->getEventLogs(['type' => 'message.send', 'dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'channel' => 'message', 'channelId' => $messageId]);
+        return $this->leadEventLogRepository->getChartQuery(['type' => 'message.send', 'dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'channel' => 'message', 'channelId' => $messageId]);
     }
 
     /**
