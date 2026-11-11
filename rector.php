@@ -25,19 +25,6 @@ return RectorConfig::configure()
     // ->withImportNames(importShortClasses: false)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
-        // to be used next on loadMetadata()
-        \Utils\Rector\LoadMetadataMauticHelperToAttributeRector::class,
-        // \Utils\Rector\LoadMetadataStaticHelperToAttributeRector::class,
-        \Utils\Rector\LoadMetadataColumnToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataAssociationToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataManyToManyToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataTableToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataRepositoryToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataIndexToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataLifecycleToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataClassToDoctrineAttributeRector::class,
-        // \Utils\Rector\AddDoctrineOrmMappingAliasImportRector::class,
-
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
