@@ -7,6 +7,7 @@ namespace Mautic\UserBundle\Tests\Functional\Entity;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\LockWaitTimeoutException;
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
