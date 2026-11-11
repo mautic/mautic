@@ -15,6 +15,8 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
@@ -293,6 +295,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testApiResolvesRegisteredCustomFieldMetadata(): void
     {
         $this->client->request(Request::METHOD_POST, '/api/forms/new', [
@@ -330,10 +334,24 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", [
-            'name' => 'Updated API form with custom field',
+            'name'   => 'Updated API form with built-in field',
+            'fields' => [[
+                'id'   => $customField->getId(),
+                'type' => 'text',
+            ]],
         ]);
 
         $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
+
+        $this->em->clear();
+
+        $form = static::getContainer()->get(FormRepository::class)->find($formId);
+        $this->assertInstanceOf(Form::class, $form);
+
+        $builtInField = $form->getFields()->first();
+        $this->assertInstanceOf(Field::class, $builtInField);
+        $this->assertFalse($builtInField->isCustom());
+        $this->assertSame([], $builtInField->getCustomParameters());
     }
 
     public function testSingleFormWorkflow(): void

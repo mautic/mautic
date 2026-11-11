@@ -222,6 +222,11 @@ final class FormApiController extends CommonApiController
                     $fieldParams['customParameters']      = $customParameters;
                     $fieldEntityArray['isCustom']         = true;
                     $fieldEntityArray['customParameters'] = $customParameters;
+                } else {
+                    $fieldParams['isCustom']              = false;
+                    $fieldParams['customParameters']      = [];
+                    $fieldEntityArray['isCustom']         = false;
+                    $fieldEntityArray['customParameters'] = [];
                 }
 
                 $fieldForm = $this->createFieldEntityForm($fieldEntityArray, $customParameters);
