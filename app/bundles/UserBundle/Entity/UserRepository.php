@@ -19,7 +19,11 @@ class UserRepository extends CommonRepository
 {
     /**
      * Check both login identifiers before creating a new user.
-     * Requires InnoDB REPEATABLE READ or SERIALIZABLE isolation for gap locking.
+     *
+     * MySQL: InnoDB gap locks from SELECT … FOR UPDATE serialize concurrent inserts.
+     * PostgreSQL: transaction-scoped advisory locks on normalized identifiers
+     * (DatabasePlatform::acquireIdentityLocks) provide the same serialization —
+     * SELECT … FOR UPDATE alone does not lock missing keys on PostgreSQL.
      */
     public function saveNewUser(User $user): void
     {
@@ -29,12 +33,17 @@ class UserRepository extends CommonRepository
 
         try {
             $this->getEntityManager()->wrapInTransaction(function () use ($user): void {
-                $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+                $connection = $this->getEntityManager()->getConnection();
+                $platform   = $connection->getDatabasePlatform();
 
                 $identifiers = [
                     DatabasePlatform::normalizeSearchValue($platform, $user->getUsername()),
                     DatabasePlatform::normalizeSearchValue($platform, $user->getEmail()),
                 ];
+
+                // PostgreSQL: block concurrent registrants on the same identity keys.
+                // MySQL: no-op; gap locks from the FOR UPDATE query below are sufficient.
+                DatabasePlatform::acquireIdentityLocks($connection, $identifiers);
 
                 $usernameMatch = DatabasePlatform::getCaseInsensitiveComparison(
                     $platform,
@@ -76,13 +85,18 @@ class UserRepository extends CommonRepository
      */
     public function findByIdentifier(string $identifier): ?User
     {
-        $q = $this->createQueryBuilder('u')
-            ->where('u.username = :identifier OR u.email = :identifier')
-            ->setParameter('identifier', $identifier);
+        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+        $value    = DatabasePlatform::normalizeSearchValue($platform, $identifier);
 
-        $result = $q->getQuery()->getResult();
+        $usernameMatch = DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.username', ':id', '=');
+        $emailMatch    = DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.email', ':id', '=');
 
-        return (!empty($result)) ? $result[0] : null;
+        return $this->createQueryBuilder('u')
+            ->where("{$usernameMatch} OR {$emailMatch}")
+            ->setParameter('id', $value)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     public function setLastLogin($user): void
@@ -104,23 +118,41 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * Checks to ensure that a username and/or email is unique.
+     * Checks to ensure that a username and/or email is unique (case-insensitive).
      *
      * @return array
      */
     public function checkUniqueUsernameEmail(array $params)
     {
-        $q = $this->createQueryBuilder('u');
+        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+        $q        = $this->createQueryBuilder('u');
+        $parts    = [];
 
         if (isset($params['email'])) {
-            $q->where('u.username = :email OR u.email = :email')
-                ->setParameter('email', $params['email']);
+            $email = DatabasePlatform::normalizeSearchValue($platform, (string) $params['email']);
+            $parts[] = '('
+                .DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.username', ':email', '=')
+                .' OR '
+                .DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.email', ':email', '=')
+                .')';
+            $q->setParameter('email', $email);
         }
 
         if (isset($params['username'])) {
-            $q->orWhere('u.username = :username OR u.email = :username')
-                ->setParameter('username', $params['username']);
+            $username = DatabasePlatform::normalizeSearchValue($platform, (string) $params['username']);
+            $parts[] = '('
+                .DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.username', ':username', '=')
+                .' OR '
+                .DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.email', ':username', '=')
+                .')';
+            $q->setParameter('username', $username);
         }
+
+        if ([] === $parts) {
+            return [];
+        }
+
+        $q->where(implode(' OR ', $parts));
 
         return $q->getQuery()->getResult();
     }

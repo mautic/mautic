@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Functional\Entity;
 
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\LockWaitTimeoutException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
@@ -44,8 +45,16 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
                 $otherRepository->saveNewUser($second);
                 $this->fail('The second registration must wait for the first transaction.');
             } catch (OidcException $exception) {
-                $this->assertInstanceOf(LockWaitTimeoutException::class, $exception->getPrevious());
                 $this->assertNull($second->getId());
+                $previous = $exception->getPrevious();
+                $this->assertNotNull($previous, 'Expected a lock-timeout or constraint previous exception');
+                // MySQL typically surfaces LockWaitTimeoutException.
+                // PostgreSQL surfaces a DriverException / RetryableException for lock_timeout.
+                $this->assertTrue(
+                    $previous instanceof LockWaitTimeoutException
+                    || $previous instanceof DBALException,
+                    'Previous exception must be a DBAL lock/driver exception, got: '.$previous::class
+                );
             }
 
             $this->connection->commit();

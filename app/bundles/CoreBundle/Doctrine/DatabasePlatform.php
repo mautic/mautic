@@ -1223,6 +1223,30 @@ final class DatabasePlatform
     }
 
     /**
+     * Acquire transaction-scoped locks for registration identifiers.
+     * MySQL relies on InnoDB gap locks from SELECT … FOR UPDATE (no-op here).
+     * PostgreSQL uses pg_advisory_xact_lock so concurrent saveNewUser() waits.
+     *
+     * @param list<string> $identifiers already passed through normalizeSearchValue()
+     */
+    public static function acquireIdentityLocks(Connection $connection, array $identifiers): void
+    {
+        if (!self::isPostgreSQL($connection->getDatabasePlatform())) {
+            return;
+        }
+
+        $unique = array_values(array_unique($identifiers));
+        sort($unique); // stable order avoids deadlocks between sessions
+
+        foreach ($unique as $identifier) {
+            $connection->executeStatement(
+                'SELECT pg_advisory_xact_lock(hashtext(?))',
+                [$identifier]
+            );
+        }
+    }
+
+    /**
      * Resets the auto-increment / sequence of a table to a specific value.
      *
      * MySQL:      ALTER TABLE ... AUTO_INCREMENT = X
