@@ -31,7 +31,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        static::getContainer()->get(EventDispatcherInterface::class)->addListener(
+        self::getContainer()->get(EventDispatcherInterface::class)->addListener(
             FormEvents::FORM_ON_BUILD,
             static function (FormBuilderEvent $event): void {
                 $event->addFormField('test.custom', [
@@ -320,7 +320,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $form = static::getContainer()->get(FormRepository::class)->find($formId);
+        $form = self::getContainer()->get(FormRepository::class)->find($formId);
         $this->assertInstanceOf(Form::class, $form);
 
         $customField = $form->getFields()->filter(
@@ -346,7 +346,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $form = static::getContainer()->get(FormRepository::class)->find($formId);
+        $form = self::getContainer()->get(FormRepository::class)->find($formId);
         $this->assertInstanceOf(Form::class, $form);
 
         $builtInField = $form->getFields()->first();
@@ -373,13 +373,13 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $form = static::getContainer()->get(FormRepository::class)->find($formId);
+        $form = self::getContainer()->get(FormRepository::class)->find($formId);
         $this->assertInstanceOf(Form::class, $form);
 
         $customField = $form->getFields()->first();
         $this->assertInstanceOf(Field::class, $customField);
 
-        $fieldRepository = static::getContainer()->get(FieldRepository::class);
+        $fieldRepository = self::getContainer()->get(FieldRepository::class);
         $customField     = $fieldRepository->find($customField->getId());
         $this->assertInstanceOf(Field::class, $customField);
 
@@ -401,7 +401,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $form = static::getContainer()->get(FormRepository::class)->find($formId);
+        $form = self::getContainer()->get(FormRepository::class)->find($formId);
         $this->assertInstanceOf(Form::class, $form);
 
         $customField = $form->getFields()->first();
@@ -433,7 +433,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
             $responseData['errors'][0]['message'],
         );
         $this->assertSame([], $responseData['forms']);
-        $this->assertNull(static::getContainer()->get(FormRepository::class)->findOneBy(['name' => $formName]));
+        $this->assertNull(self::getContainer()->get(FormRepository::class)->findOneBy(['name' => $formName]));
     }
 
     public function testSingleFormWorkflow(): void
