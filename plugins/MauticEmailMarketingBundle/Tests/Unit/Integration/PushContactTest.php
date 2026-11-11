@@ -39,6 +39,26 @@ final class PushContactTest extends TestCase
         $integration->pushContact(new Lead(), ['list_settings' => ['list' => 'a1', 'doubleOptin' => '0', 'sendWelcome' => '1', 'leadFields' => ['EMAIL' => 'email', 'FNAME' => 'firstname']]]);
     }
 
+    public function testMailchimpSendsUnknownForEmptyRequiredMergeFields(): void
+    {
+        $client = $this->createMock(MailchimpClient::class);
+        $client->expects($this->once())
+            ->method('getMergeFields')
+            ->with(self::KEYS, 'a1')
+            ->willReturn([
+                'FNAME' => ['label' => 'First Name', 'required' => true],
+                'LNAME' => ['label' => 'Last Name', 'required' => false],
+                'EMAIL' => ['label' => 'Email', 'required' => true],
+            ]);
+        $client->expects($this->once())
+            ->method('subscribe')
+            ->with(self::KEYS, 'a1', 'john@example.com', ['FNAME' => 'mautic.integration.form.lead.unknown'], true, true);
+
+        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com']), $this->translator()));
+
+        $integration->pushContact(new Lead(), ['list_settings' => ['list' => 'a1', 'leadFields' => ['EMAIL' => 'email', 'FNAME' => 'firstname', 'LNAME' => 'lastname']]]);
+    }
+
     public function testMailchimpReportsApiErrors(): void
     {
         $client = $this->createStub(MailchimpClient::class);

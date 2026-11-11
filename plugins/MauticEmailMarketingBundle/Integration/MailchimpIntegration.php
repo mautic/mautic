@@ -53,7 +53,8 @@ class MailchimpIntegration extends BasicIntegration implements BasicInterface, P
             throw new PushContactException($this->translator->trans('mautic.emailmarketing.push.no_list', ['%integration%' => $this->getDisplayName()]));
         }
 
-        $data = $this->contactFieldMapper->map($contact, ContactFieldMapper::normalize((array) ($listSettings['leadFields'] ?? [])), self::NAME);
+        $mapping = ContactFieldMapper::normalize((array) ($listSettings['leadFields'] ?? []));
+        $data    = $this->contactFieldMapper->map($contact, $mapping, self::NAME);
         if (empty($data['EMAIL'])) {
             throw new PushContactException($this->translator->trans('mautic.emailmarketing.push.no_email', ['%integration%' => $this->getDisplayName()]));
         }
@@ -61,10 +62,24 @@ class MailchimpIntegration extends BasicIntegration implements BasicInterface, P
         $email = $data['EMAIL'];
         unset($data['EMAIL']);
 
+        $keys   = $this->getIntegrationConfiguration()->getApiKeys();
+        $listId = (string) $listSettings['list'];
+
         try {
+            $missingFields = array_diff_key($mapping, $data, ['EMAIL' => true]);
+            if ([] !== $missingFields) {
+                // Like the former integration, required merge fields without a value are sent as "Unknown"
+                $mergeFields = $this->client->getMergeFields($keys, $listId);
+                foreach (array_keys($missingFields) as $tag) {
+                    if (!empty($mergeFields[$tag]['required'])) {
+                        $data[$tag] = $this->translator->trans('mautic.integration.form.lead.unknown');
+                    }
+                }
+            }
+
             $this->client->subscribe(
-                $this->getIntegrationConfiguration()->getApiKeys(),
-                (string) $listSettings['list'],
+                $keys,
+                $listId,
                 $email,
                 $data,
                 (bool) ($listSettings['doubleOptin'] ?? true),
