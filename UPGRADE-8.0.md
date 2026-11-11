@@ -1271,3 +1271,12 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     -protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     +protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     ```
+
+- Association setters previously documented as `@param mixed` now declare their target entity as native type. Passing anything else (e.g. an ID or `null`) now throws a `TypeError`; pass the entity, or `EntityManager::getReference()` if you only have an ID:
+    - `Mautic\LeadBundle\Entity\CompanyLead::setLead(Lead $lead)`
+    - `Mautic\LeadBundle\Entity\LeadCategory::setLead(Lead $lead)`
+    - `Mautic\LeadBundle\Entity\ListLead::setLead(Lead $lead)`
+    - `Mautic\PointBundle\Entity\LeadPointLog::setLead(Lead $lead)` and `setPoint(Point $point)`
+    - `Mautic\PointBundle\Entity\LeadTriggerLog::setLead(Lead $lead)` and `setEvent(TriggerEvent $event)`
+    - `MauticPlugin\MauticFocusBundle\Entity\Stat::setFocus(Focus $focus)`
+    - `MauticPlugin\MauticFocusBundle\Entity\Focus::setCategory(?Category $category)`
