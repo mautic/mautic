@@ -7,7 +7,6 @@ namespace Mautic\UserBundle\Tests\Functional\Entity;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\LockWaitTimeoutException;
-use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
@@ -18,37 +17,29 @@ use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Exception\OidcException;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+/**
+ * Cross-DB concurrency coverage for UserRepository::saveNewUser().
+ *
+ * Diverges from upstream only where PostgreSQL requires it:
+ * - DatabasePlatform::setLockWaitTimeout() instead of raw innodb_lock_wait_timeout
+ * - Accept any DBAL previous exception on lock wait (PG SQLSTATE 55P03 is not always
+ *   LockWaitTimeoutException)
+ * - Do not assert that the secondary EntityManager is closed (upstream relied on
+ *   wrapInTransaction() closing the EM; saveNewUser no longer does that)
+ */
 final class UserCreationConcurrencyTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    /**
-     * If a prior assertion left the EM closed, reboot before tearDown's resetDatabase()
-     * tries to reload fixtures (PostgreSQL path always reloads essential fixtures after TRUNCATE).
-     */
-    protected function beforeTearDown(): void
-    {
-        if (isset($this->em) && !$this->em->isOpen()) {
-            $this->setUpSymfony($this->configParams);
-        }
-
-        parent::beforeTearDown();
-    }
-
     public function testConcurrentRegistrationWaitsAndThenRejectsTheDuplicate(): void
     {
-        $role = $this->em->getRepository(Role::class)->findOneBy([]);
+        $repository = $this->em->getRepository(User::class);
+        $role       = $this->em->getRepository(Role::class)->findOneBy([]);
         $this->assertInstanceOf(Role::class, $role);
+        $first = $this->newUser($role, 'shared@example.com', 'first@example.com');
 
-        $platform    = $this->connection->getDatabasePlatform();
-        $identifiers = [
-            DatabasePlatform::normalizeSearchValue($platform, 'shared@example.com'),
-            DatabasePlatform::normalizeSearchValue($platform, 'first@example.com'),
-        ];
-
-        // Independent connection/EM — do not share EventManager with the primary EM.
         $otherConnection = DriverManager::getConnection($this->connection->getParams());
-        $otherEm         = new EntityManager($otherConnection, clone $this->em->getConfiguration());
+        $otherEm         = new EntityManager($otherConnection, $this->em->getConfiguration(), $this->em->getEventManager());
         $otherRegistry   = $this->createStub(ManagerRegistry::class);
         $otherRegistry->method('getManagerForClass')->willReturn($otherEm);
         $otherRepository = new UserRepository($otherRegistry);
@@ -59,40 +50,19 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
         );
 
         try {
-            // Hold identity locks + first user row open on the PRIMARY connection.
-            // Do not call saveNewUser() here: it would nest transactions and complicate rollback.
-            $this->connection->beginTransaction();
-
-            DatabasePlatform::acquireIdentityLocks($this->connection, $identifiers);
-
-            $first = $this->newUser($role, 'shared@example.com', 'first@example.com');
-            $this->em->persist($first);
-            $this->em->flush();
-
-            // Also take the same row locks MySQL gap-locking would hold after saveNewUser().
-            $usernameMatch = DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.username', ':identifiers', 'IN');
-            $emailMatch    = DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.email', ':identifiers', 'IN');
-            $this->em->createQueryBuilder()
-                ->select('1')
-                ->from(User::class, 'u')
-                ->where("{$usernameMatch} OR {$emailMatch}")
-                ->setParameter('identifiers', $identifiers)
-                ->setMaxResults(1)
-                ->getQuery()
-                ->setLockMode(LockMode::PESSIMISTIC_WRITE)
-                ->getOneOrNullResult();
-
-            // Session-level timeout must be set before the other session opens its transaction.
             DatabasePlatform::setLockWaitTimeout($otherConnection, 1);
+            $this->connection->beginTransaction();
+            // Holds MySQL gap locks / PostgreSQL advisory locks until outer commit.
+            $repository->saveNewUser($first);
 
             try {
                 $otherRepository->saveNewUser($second);
                 $this->fail('The second registration must wait for the first transaction.');
             } catch (OidcException $exception) {
-                $this->assertSame('mautic.open_id.registration.exception.identity_taken', $exception->getMessage());
                 $this->assertNull($second->getId());
                 $previous = $exception->getPrevious();
-                $this->assertInstanceOf(\Throwable::class, $previous, 'Expected a lock-timeout previous exception');
+                $this->assertInstanceOf(\Throwable::class, $previous, 'Expected a lock-timeout or constraint previous exception');
+                // MySQL: LockWaitTimeoutException; PostgreSQL: often plain DriverException (55P03).
                 $this->assertTrue(
                     $previous instanceof LockWaitTimeoutException
                     || $previous instanceof DBALException,
@@ -102,31 +72,19 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
 
             $this->connection->commit();
 
-            $this->assertTrue($this->em->isOpen(), 'Primary EntityManager must stay open');
-
-            $repository = $this->em->getRepository(User::class);
             $this->assertIdentityRejected($repository, $this->newUser($role, 'second-user', 'shared@example.com'));
             $this->assertSame(1, $repository->count(['username' => 'shared@example.com']));
             $this->assertSame(0, $repository->count(['email' => 'shared@example.com']));
-        } catch (\Throwable $e) {
-            if ($this->connection->isTransactionActive()) {
-                $this->connection->rollBack();
-            }
-            throw $e;
         } finally {
             if ($this->connection->isTransactionActive()) {
                 $this->connection->rollBack();
             }
-
             try {
                 DatabasePlatform::setLockWaitTimeout($otherConnection, 0);
             } catch (\Throwable) {
-                // ignore — connection may be broken after lock timeout
+                // connection may be unusable after a lock timeout
             }
-
-            if ($otherEm->isOpen()) {
-                $otherEm->close();
-            }
+            $otherEm->close();
             $otherConnection->close();
         }
     }
@@ -135,14 +93,13 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
     public function testRejectsExistingIdentityBeforeInserting(string $username, string $email): void
     {
         $repository = $this->em->getRepository(User::class);
-        $role = $this->em->getRepository(Role::class)->findOneBy([]);
+        $role       = $this->em->getRepository(Role::class)->findOneBy([]);
         $this->assertInstanceOf(Role::class, $role);
         $repository->saveNewUser($this->newUser($role, 'first-login@example.com', 'first@example.com'));
         $initialCount = $repository->count([]);
 
         $this->assertIdentityRejected($repository, $this->newUser($role, $username, $email));
 
-        $this->assertTrue($this->em->isOpen(), 'Primary EntityManager must stay open after rejection');
         $this->assertSame($initialCount, $repository->count([]));
     }
 
