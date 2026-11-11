@@ -142,11 +142,21 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $this->assertReference(null, $events['lead.addtocompany'], 'company');
     }
 
-    public function testImportFindsTheCompanyByNameOrCreatesIt(): void
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function companyNameProvider(): iterable
+    {
+        yield 'a regular name' => ['Imported company'];
+        yield 'a company named "0"' => ['0'];
+    }
+
+    #[DataProvider('companyNameProvider')]
+    public function testImportFindsTheCompanyByNameOrCreatesIt(string $companyName): void
     {
         $companyModel = self::getContainer()->get(CompanyModel::class);
         $company      = new Company();
-        $companyModel->setFieldValues($company, ['companyname' => 'Imported company'], true);
+        $companyModel->setFieldValues($company, ['companyname' => $companyName], true);
         $companyModel->saveEntity($company);
 
         $campaign = $this->createCampaign([
@@ -166,7 +176,7 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $companyId = $events['lead.addtocompany']->getProperties()['company'];
         $this->assertIsInt($companyId);
         $this->assertNotSame($company->getId(), $companyId);
-        $this->assertSame('Imported company', $companyModel->getEntity($companyId)->getName());
+        $this->assertSame($companyName, $companyModel->getEntity($companyId)->getName());
     }
 
     public function testImportedFormActionsReferToTheImportedEntities(): void

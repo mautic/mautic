@@ -225,9 +225,11 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
             foreach ($ids as $id) {
                 // The model loads the company name, which is a company field
                 $company = EventEntityReferences::COMPANY === $kind ? $this->companyModel->getEntity($id) : null;
+                $name    = $company instanceof Company ? $company->getName() : null;
 
-                if ($company instanceof Company && $company->getName()) {
-                    $names[$kind][$id] = $company->getName();
+                // A company can be named "0"
+                if (is_string($name) && '' !== $name) {
+                    $names[$kind][$id] = $name;
                 }
             }
         }
