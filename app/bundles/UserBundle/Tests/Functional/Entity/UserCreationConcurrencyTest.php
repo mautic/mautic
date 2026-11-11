@@ -47,7 +47,7 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
             } catch (OidcException $exception) {
                 $this->assertNull($second->getId());
                 $previous = $exception->getPrevious();
-                $this->assertNotNull($previous, 'Expected a lock-timeout or constraint previous exception');
+                $this->assertInstanceOf(\Throwable::class, $previous, 'Expected a lock-timeout or constraint previous exception');
                 // MySQL typically surfaces LockWaitTimeoutException.
                 // PostgreSQL surfaces a DriverException / RetryableException for lock_timeout.
                 $this->assertTrue(

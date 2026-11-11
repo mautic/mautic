@@ -28,6 +28,12 @@ final class UserFactoryTest extends TestCase
         $roleRepo->method('find')
             ->willReturn($role);
 
+        // preferredUsername collides → falls back to email as username
+        $userRepo->method('findByIdentifier')
+            ->willReturnCallback(static function (string $identifier): ?User {
+                return 'preferredUsername' === $identifier ? new User() : null;
+            });
+
         $credentials = new UserCredentials('id', 'email@mautic.local', '', 'familyName', 'preferredUsername');
         $userFactory = new UserFactory($parameters, $userRepo, $roleRepo, $logger);
         $user        = $userFactory->create($credentials);
@@ -82,9 +88,10 @@ final class UserFactoryTest extends TestCase
         $roleRepo->method('find')
             ->willReturn($role);
 
+        // Production code uses findByIdentifier() (case-insensitive), not findOneBy().
         $userRepo->expects($this->once())
-            ->method('findOneBy')
-            ->with(['email' => 'email@mautic.local'])
+            ->method('findByIdentifier')
+            ->with('email@mautic.local')
             ->willReturn(new User());
 
         $this->expectException(OidcException::class);

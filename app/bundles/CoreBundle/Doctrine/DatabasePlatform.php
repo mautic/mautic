@@ -1203,18 +1203,23 @@ final class DatabasePlatform
     }
 
     /**
-     * Sets a short lock-wait timeout for the current session/transaction.
+     * Sets a short lock-wait timeout for the current session.
      * Used by concurrency tests that expect a wait to fail quickly.
      *
      * MySQL:      SET SESSION innodb_lock_wait_timeout = $seconds
-     * PostgreSQL: SET LOCAL lock_timeout = '${seconds}s'
+     * PostgreSQL: SET lock_timeout = '${seconds}s'  (session-level — NOT SET LOCAL)
+     *
+     * Important: SET LOCAL is a no-op outside an open transaction on PostgreSQL.
+     * saveNewUser() opens its transaction via wrapInTransaction() *after* the test
+     * calls this helper, so session-level SET is required or the second session
+     * waits forever on pg_advisory_xact_lock.
      */
     public static function setLockWaitTimeout(Connection $connection, int $seconds = 1): void
     {
         $platform = $connection->getDatabasePlatform();
 
         if (self::isPostgreSQL($platform)) {
-            $connection->executeStatement(sprintf("SET LOCAL lock_timeout = '%ds'", $seconds));
+            $connection->executeStatement(sprintf("SET %s lock_timeout = '%ds'", $seconds));
 
             return;
         }
