@@ -22,9 +22,9 @@ final class PRedisConnectionHelper
      * Transform the redis url config key into an array if needed
      * If possible also resolve the configured redis hostname to multiple IP addresses.
      *
-     * @param iterable<mixed>|string $configuredUrls a string or an array of redis endpoints to connect to
+     * @param mixed $configuredUrls a string or an array of redis endpoints to connect to
      */
-    public static function getRedisEndpoints(iterable|string $configuredUrls): iterable
+    public static function getRedisEndpoints($configuredUrls): iterable
     {
         if (is_iterable($configuredUrls)) {
             // assume arrays are already in the correct format
