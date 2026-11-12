@@ -810,7 +810,7 @@ final class FormModelTest extends TestCase
     /**
      * @return FormModel&MockObject
      */
-    private function createFormModelPartialMock(): FormModel
+    private function createFormModelPartialMock(): MockObject
     {
         return $this->getMockBuilder(FormModel::class)
             ->setConstructorArgs([
