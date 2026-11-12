@@ -128,10 +128,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->supportedFeatures;
     }
 
-    /**
-     * @param mixed $supportedFeatures
-     */
-    public function setSupportedFeatures($supportedFeatures): static
+    public function setSupportedFeatures(array $supportedFeatures): static
     {
         $this->isChanged('supportedFeatures', $supportedFeatures);
 
@@ -166,10 +163,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->featureSettings;
     }
 
-    /**
-     * @param mixed $featureSettings
-     */
-    public function setFeatureSettings($featureSettings): static
+    public function setFeatureSettings(array $featureSettings): static
     {
         $this->isChanged('featureSettings', $featureSettings);
 
