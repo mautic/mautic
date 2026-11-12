@@ -9,7 +9,7 @@
                     {{ form_errors(form) }}
                     {% block aboveTabsContent %}{% endblock %}
                     {{ customContent('tabs.above', _context) }}
-                    {{- include('@MauticCore/Helper/tabs.html.twig', {'tabs' : formTabs }) -}}
+                    {{- include('@MauticCore/Components/tabs.html.twig', {'tabs': formTabs}) -}}
                     <div class="pe-16 ps-16">
                         {% if block('_content') is defined %}
                             {{ block('_content') }}
