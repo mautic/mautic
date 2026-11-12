@@ -205,10 +205,7 @@ class Stat
         return $this->isClicked;
     }
 
-    /**
-     * @param mixed $isClicked
-     */
-    public function setIsClicked($isClicked): void
+    public function setIsClicked(?bool $isClicked): void
     {
         $this->isClicked = $isClicked;
     }
