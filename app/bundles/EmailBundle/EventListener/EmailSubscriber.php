@@ -3,6 +3,10 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreDelete;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
@@ -12,11 +16,6 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
-use Mautic\EmailBundle\Event\EmailEvent;
-use Mautic\EmailBundle\Event\EmailPostDeleteEvent;
-use Mautic\EmailBundle\Event\EmailPostSaveEvent;
-use Mautic\EmailBundle\Event\EmailPreDeleteEvent;
-use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Model\EmailDraftModel;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -48,12 +47,14 @@ final readonly class EmailSubscriber
     ) {
     }
 
-    #[AsEventListener(
-        event: EmailPreSaveEvent::class,
-    )]
-    public function cloneParentEmailDataForVariant(EmailEvent $event): void
+    #[AsEventListener]
+    public function cloneParentEmailDataForVariant(EntityPreSave $event): void
     {
-        $email = $event->getEmail();
+        $email = $event->getEntity();
+        if (!$email instanceof Email) {
+            return;
+        }
+
         if ($email->isVariant()) {
             $this->emailRepository->cloneFromParentToVariant($email);
         }
@@ -62,12 +63,14 @@ final readonly class EmailSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[AsEventListener(
-        event: EmailPostSaveEvent::class,
-    )]
-    public function onEmailPostSave(EmailEvent $event): void
+    #[AsEventListener]
+    public function onEmailPostSave(EntityPostSave $event): void
     {
-        $email = $event->getEmail();
+        $email = $event->getEntity();
+        if (!$email instanceof Email) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'email',
@@ -112,13 +115,15 @@ final readonly class EmailSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: EmailPostDeleteEvent::class,
-    )]
-    public function onEmailDelete(EmailEvent $event): void
+    #[AsEventListener]
+    public function onEmailDelete(EntityPostDelete $event): void
     {
-        $email = $event->getEmail();
-        $log   = [
+        $email = $event->getEntity();
+        if (!$email instanceof Email) {
+            return;
+        }
+
+        $log = [
             'bundle'    => 'email',
             'object'    => 'email',
             'objectId'  => $email->deletedId,
@@ -233,11 +238,16 @@ final readonly class EmailSubscriber
         $this->entityManager->flush();
     }
 
-    #[AsEventListener(event: EmailPreDeleteEvent::class)]
-    public function deleteEmailDraft(EmailEvent $event): void
+    #[AsEventListener]
+    public function deleteEmailDraft(EntityPreDelete $event): void
     {
+        $email = $event->getEntity();
+        if (!$email instanceof Email) {
+            return;
+        }
+
         try {
-            $this->emailDraftModel->deleteDraft($event->getEmail());
+            $this->emailDraftModel->deleteDraft($email);
         } catch (NotFoundHttpException) {
             // No associated draft found for deletion. We have nothing to do here. Return.
             return;
