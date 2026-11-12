@@ -223,14 +223,14 @@
 
               <hr/>
 
-              {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': leadFormTabs, 'variant': 'vertical', 'part': 'nav'}) }}
+              <div class="tabs-container tabs-container--vertical">{{ include('@MauticCore/Components/tabs.html.twig', {'tabs': leadFormTabs, 'variant': 'vertical', 'part': 'nav'}) }}</div>
           </div>
       </div>
       <!--/ step container -->
 
       <!-- container -->
       <div class="col-md-9 height-auto bdr-l">
-          {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': leadFormTabs, 'variant': 'vertical', 'part': 'content'}) }}
+          <div class="tabs-container tabs-container--vertical">{{ include('@MauticCore/Components/tabs.html.twig', {'tabs': leadFormTabs, 'variant': 'vertical', 'part': 'content'}) }}</div>
       </div>
       <!--/ end: container -->
   </div>
