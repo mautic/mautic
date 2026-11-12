@@ -154,28 +154,10 @@
 
             <!-- lead detail collapseable -->
             <div class="collapse pe-16 ps-16" id="lead-details">
-                <ul class="pt-16 nav nav-tabs nav-tabs-contained" role="tablist">
-                    {% for g in groups %}
-                        {% if fields[g] is not empty %}
-                            <li class="{% if loop.first %}active{% endif %}">
-                                <a href="#{{ g }}" class="nav-link group{% if loop.first %} active{% endif %}" data-bs-toggle="tab">
-                                    {{ ('mautic.lead.field.group.'~g)|trans }}
-                                </a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                        <li>
-                            <a href="#devices" class="nav-link group" data-bs-toggle="tab">{{ 'mautic.lead.devices'|trans }}</a>
-                        </li>
-                    <li>
-                        <a href="#lead-stats" class="nav-link group" data-bs-toggle="tab">{{ 'mautic.lead.stats'|trans }}</a>
-                    </li>
-                </ul>
-
-                <!-- start: tab-content -->
-                <div class="tab-content pa-16">
-                    {% for group in groups %}
-                        <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ group }}">
+                {% set leadDetailTabs = [] %}
+                {% for group in groups %}
+                    {% if fields[group] is not empty %}
+                        {% set groupContent %}
                             <div class="pe-16 ps-16 pb-16">
                                 <div class="panel shd-none mb-0">
                                     <table class="table table-hover mb-0">
@@ -223,19 +205,28 @@
                                     </table>
                                 </div>
                             </div>
-                        </div>
-                    {% endfor %}
-                        <div class="tab-pane fade bdr-w-0" id="devices">
-                            {% if devices %}
-                                {{ include('@MauticLead/Lead/_devices.html.twig', {'devices': devices}) }}
-                            {% else %}
-                                {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.devices'}) }}
-                            {% endif %}
-                        </div>
-                    <div class="tab-pane fade bdr-w-0" id="lead-stats" data-target-url="{{ path('mautic_contact_stats', {'objectId': lead.id}) }}">
-                        <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
-                    </div>
-                </div>
+                        {% endset %}
+                        {% set leadDetailTabs = leadDetailTabs|merge([{
+                            'id': group,
+                            'label': ('mautic.lead.field.group.' ~ group)|trans,
+                            'content': groupContent,
+                            'className': 'bdr-w-0'
+                        }]) %}
+                    {% endif %}
+                {% endfor %}
+                {% set devicesContent %}
+                    {% if devices %}
+                        {{ include('@MauticLead/Lead/_devices.html.twig', {'devices': devices}) }}
+                    {% else %}
+                        {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.devices'}) }}
+                    {% endif %}
+                {% endset %}
+                {% set statsContent %}<div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>{% endset %}
+                {% set leadDetailTabs = leadDetailTabs|merge([
+                    {'id': 'devices', 'label': 'mautic.lead.devices', 'content': devicesContent},
+                    {'id': 'lead-stats', 'label': 'mautic.lead.stats', 'content': statsContent, 'paneAttributes': {'data-target-url': path('mautic_contact_stats', {'objectId': lead.id})}}
+                ]) %}
+                {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': leadDetailTabs, 'variant': 'contained', 'navClass': 'pt-16'}) }}
             </div>
             <!--/ lead detail collapseable -->
         </div>
@@ -336,12 +327,14 @@
             ]) %}
 
             <div class="mt-12">
-                {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': leadTabs, 'variant': 'contained'}) }}
-                {% set customTabs = customContent('tabs', _context)|trim %}
-                {% if customTabs is not empty %}
-                    <div class="tabs-container"><ul class="nav nav-tabs nav-tabs--contained">{{ customTabs|raw }}</ul></div>
-                {% endif %}
-                <div class="tab-content">{{ customContent('tabs.content', _context) }}</div>
+                {% set customTabs %}{{ customContent('tabs', _context) }}{% endset %}
+                {% set customTabsContent %}{{ customContent('tabs.content', _context) }}{% endset %}
+                {{ include('@MauticCore/Components/tabs.html.twig', {
+                    'tabs': leadTabs,
+                    'variant': 'contained',
+                    'navExtra': customTabs,
+                    'contentExtra': customTabsContent
+                }) }}
             </div>
         </div>
 

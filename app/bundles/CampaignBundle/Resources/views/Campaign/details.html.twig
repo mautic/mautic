@@ -215,64 +215,25 @@
 
             {{ customContent('details.stats.graph.below', _context) }}
 
-            <ul class="nav nav-tabs nav-tabs-contained" id="campaign_nav_header_ul">
-                <li class="active" id="preview_li">
-                    <a href="#preview-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">
-                        {{ 'mautic.campaign.preview.header'|trans }}
-                    </a>
-                </li>
-                <li class="" id="decisions_li">
-                    <a href="#decisions-container" role="tab" data-bs-toggle="tab" class="nav-link">
-                        {{ 'mautic.campaign.event.decisions.header'|trans }}
-                    </a>
-                </li>
-                <li class="" id="actions_li">
-                    <a href="#actions-container" role="tab" data-bs-toggle="tab" class="nav-link">
-                        {{ 'mautic.campaign.event.actions.header'|trans }}
-                    </a>
-                </li>
-                <li class="" id="conditions_li">
-                    <a href="#conditions-container" role="tab" data-bs-toggle="tab" class="nav-link">
-                        {{ 'mautic.campaign.event.conditions.header'|trans }}
-                    </a>
-                </li>
-                <li class="">
-                    <a href="#leads-container" role="tab" data-bs-toggle="tab" class="nav-link">
-                        {{ 'mautic.lead.leads'|trans }}
-                    </a>
-                </li>
-                {{ customContent('tabs', _context) }}
-            </ul>
         </div>
 
-        <div class="tab-content pa-16" id="campaign-tab-content"
-             data-event-target-url="{{ path('mautic_campaign_event_stats', {'objectId' : campaign.id, 'dateFromValue' : dateFrom|date('Y-m-d'), 'dateToValue' : dateTo|date('Y-m-d')}) }}">
-            <!-- #events-container -->
-                <div class="active tab-pane fade in bdr-w-0" id="preview-container">
-                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="tab-pane fade in bdr-w-0" id="decisions-container">
-                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="tab-pane fade in bdr-w-0" id="actions-container">
-                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="tab-pane fade in bdr-w-0" id="conditions-container">
-                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
-                    <div class="clearfix"></div>
-                </div>
-            <!--/ #events-container -->
-            <div class="tab-pane fade in bdr-w-0 page-list"
-                 id="leads-container"
-                 data-target-url="{{ path('mautic_campaign_contacts', {'objectId': campaign.id, 'page': app.session.get('mautic.campaign.contact.page', 1)}) }}">
-                <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
-                <div class="clearfix"></div>
-            </div>
-            {{ customContent('tabs.content', _context) }}
-        </div>
+        {% set spinner %}<div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div><div class="clearfix"></div>{% endset %}
+        {% set campaignNavExtra %}{{ customContent('tabs', _context) }}{% endset %}
+        {% set campaignContentExtra %}{{ customContent('tabs.content', _context) }}{% endset %}
+        {{ include('@MauticCore/Components/tabs.html.twig', {
+            'variant': 'contained',
+            'navAttributes': {'id': 'campaign_nav_header_ul'},
+            'contentAttributes': {'id': 'campaign-tab-content', 'data-event-target-url': path('mautic_campaign_event_stats', {'objectId' : campaign.id, 'dateFromValue' : dateFrom|date('Y-m-d'), 'dateToValue' : dateTo|date('Y-m-d')})},
+            'tabs': [
+                {'id': 'preview-container', 'label': 'mautic.campaign.preview.header', 'content': spinner, 'className': 'pa-16', 'itemAttributes': {'id': 'preview_li'}},
+                {'id': 'decisions-container', 'label': 'mautic.campaign.event.decisions.header', 'content': spinner, 'className': 'pa-16', 'itemAttributes': {'id': 'decisions_li'}},
+                {'id': 'actions-container', 'label': 'mautic.campaign.event.actions.header', 'content': spinner, 'className': 'pa-16', 'itemAttributes': {'id': 'actions_li'}},
+                {'id': 'conditions-container', 'label': 'mautic.campaign.event.conditions.header', 'content': spinner, 'className': 'pa-16', 'itemAttributes': {'id': 'conditions_li'}},
+                {'id': 'leads-container', 'label': 'mautic.lead.leads', 'content': spinner, 'className': 'pa-16 page-list', 'paneAttributes': {'data-target-url': path('mautic_campaign_contacts', {'objectId': campaign.id, 'page': app.session.get('mautic.campaign.contact.page', 1)})}}
+            ],
+            'navExtra': campaignNavExtra,
+            'contentExtra': campaignContentExtra
+        }) }}
 
         {{ customContent('left.section.bottom', _context) }}
     </div>
