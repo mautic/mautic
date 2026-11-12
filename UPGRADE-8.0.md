@@ -1901,6 +1901,11 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     -public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     +public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     ```
+- Endpoints /api/contacts/list/owners and /api/users/list/roles will not output unlimited results when request contains a query with negative or "0" `limit` parameter, please omit the query parameter to get whole dataset. Passing non-positive or noninteger values leads to HTTP 400 Bad Request.
+- Endpoint /api/contacts/list/owners will not accept negative or noninteger values for _limit_ and _start_ parameters.
+- Endpoint /api/users/list/roles will not accept negative or noninteger value for _limit_.
+- Method Mautic\LeadBundle\Model\LeadModel::getLookupResults() expects `limit` to be a positive integer to limit result set or null to get whole result set.
+- Method Mautic\UserBundle\Model\UserModel::getLookupResults() expects `limit` to be a positive integer to limit result set or null to get whole result set.
 
 - `Mautic\CoreBundle\Helper\ThemeHelperInterface` methods `setDefaultTheme()`, `createThemeHelper()`, `delete()`, `checkForTwigTemplate()`, `getInstalledThemes()`, `getTheme()` and `zip()` gained native `string` parameter types (and `createThemeHelper()`/`getTheme()` a native `ThemeHelper` return type) promoted from their `@param`/`@return` docblocks. Any class implementing `ThemeHelperInterface` must add the matching native types to its method signatures, otherwise PHP raises an incompatible-signature error.
 
