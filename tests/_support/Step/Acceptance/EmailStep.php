@@ -15,6 +15,7 @@ final class EmailStep extends \AcceptanceTester
         $I->amOnPage(EmailsPage::NEW_URL);
         $I->waitForElementClickable(EmailsPage::SELECT_SEGMENT_EMAIL);
         $I->click(EmailsPage::SELECT_SEGMENT_EMAIL);
+        $I->waitForElementNotVisible(EmailsPage::EMAIL_TYPE_MODAL, self::TIMEOUT);
         $I->fillField(EmailsPage::SUBJECT_FIELD, $name);
         $I->click(''.EmailsPage::CONTACT_SEGMENT_DROPDOWN);
         $I->waitForElementClickable(EmailsPage::CONTACT_SEGMENT_OPTION);
@@ -32,6 +33,7 @@ final class EmailStep extends \AcceptanceTester
         $I->amOnPage(EmailsPage::NEW_URL);
         $I->waitForElementClickable(EmailsPage::SELECT_TRIGGERED_EMAIL);
         $I->click(EmailsPage::SELECT_TRIGGERED_EMAIL);
+        $I->waitForElementNotVisible(EmailsPage::EMAIL_TYPE_MODAL, self::TIMEOUT);
         $I->fillField(EmailsPage::SUBJECT_FIELD, $name);
         $I->click(EmailsPage::SAVE_AND_CLOSE);
         $I->waitForText($name, self::TIMEOUT, 'h1.page-header-title');
