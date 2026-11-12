@@ -147,6 +147,7 @@
             <!--/ lead detail collapseable toggler -->
         </div>
 
+        {{ customContent('company.engagement.before', _context) }}
         <div class="pa-md enage">
             <div class="row">
                 <div class="col-sm-12">
@@ -169,8 +170,9 @@
                 </div>
             </div>
         </div>
+        {{ customContent('company.engagement.after', _context) }}
         <!-- contacts section -->
-        <div class="pa-md enage">
+        {% set contactsTable %}
             <div class="row">
                 <div class="col-sm-12">
                     <div id="contacts-table" data-target-url="{{ path('mautic_company_contacts_list', {'objectId': company.id}) }}">
@@ -179,8 +181,32 @@
                     </div>
                 </div>
             </div>
-        </div>
+        {% endset %}
+        {% set customTabs %}{{ customContent('company.tabs', _context) }}{% endset %}
+        {% if customTabs is empty %}
+            <div class="pa-md enage">
+                {{ contactsTable }}
+            </div>
+        {% else %}
+            <div class="pa-md">
+                <ul class="nav nav-tabs nav-tabs-contained">
+                    <li class="active">
+                        <a href="#company-contacts-container" class="nav-link active" role="tab" data-bs-toggle="tab">
+                            {{ 'mautic.lead.leads'|trans }}
+                        </a>
+                    </li>
+                    {{ customTabs }}
+                </ul>
+                <div class="tab-content pa-md">
+                    <div class="tab-pane fade show active bdr-w-0" id="company-contacts-container">
+                        {{ contactsTable }}
+                    </div>
+                    {{ customContent('company.tabs.content', _context) }}
+                </div>
+            </div>
+        {% endif %}
         <!--/ contacts section -->
+        {{ customContent('company.contacts.after', _context) }}
 
         <!--/ end: tab-content -->
     </div>
@@ -227,6 +253,7 @@
             </div>
         </div>
         <!--/ form HTML -->
+        {{ customContent('company.sidebar.bottom', _context) }}
     </div>
     <!--/ right section -->
 </div>
