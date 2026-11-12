@@ -478,11 +478,16 @@ class LeadListRepository extends CommonRepository
                 break;
             case $this->translator->trans('mautic.lead.list.searchcommand.ispreference'):
             case $this->translator->trans('mautic.lead.list.searchcommand.ispreference', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('l.isPreferenceCenter', ":$unique");
-                if ($filter->not) {
-                    $expr = $q->expr()->not($expr);
+                if ($q instanceof \Doctrine\ORM\QueryBuilder) {
+                    $expr = $q->expr()->eq('l.isPreferenceCenter', ":$unique");
+                    if ($filter->not) {
+                        $expr = $q->expr()->not($expr);
+                    }
+                    $forceParameters = [$unique => true];
+                } else {
+                    $expr            = $q->expr()->eq('l.is_preference_center', ":$unique");
+                    $forceParameters = [$unique => !$filter->not];
                 }
-                $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):

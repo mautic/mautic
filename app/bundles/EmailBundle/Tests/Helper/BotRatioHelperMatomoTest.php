@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 final class BotRatioHelperMatomoTest extends TestCase
 {
     #[DataProvider('knownBotUserAgentsProvider')]
-    public function testMatomoDetectorIdentifiesKnownBots(string $userAgent, string $expectedBotName): void
+    public function testPositiveDetectorResultCountsAsBot(string $userAgent): void
     {
         $deviceDetectorMock = $this->createMock(DeviceDetector::class);
         $deviceDetectorMock->expects($this->once())
@@ -36,9 +36,9 @@ final class BotRatioHelperMatomoTest extends TestCase
         $botRatioHelper = new BotRatioHelper($deviceDetectorFactoryMock);
 
         $emailStatMock    = $this->createMock(Stat::class);
-        $emailSent        = new \DateTime('-1 second');
+        $emailSent        = new \DateTime('2024-01-01 00:00:00');
         $emailStatMock->method('getDateSent')->willReturn($emailSent);
-        $emailHitDateTime = new \DateTime();
+        $emailHitDateTime = new \DateTime('2024-01-01 00:00:01');
         $ipAddress        = new IpAddress('1.2.3.4');
 
         $result = $botRatioHelper->isHitByBot($emailStatMock, $emailHitDateTime, $ipAddress, $userAgent);
@@ -58,10 +58,9 @@ final class BotRatioHelperMatomoTest extends TestCase
 
         $botRatioHelper = new BotRatioHelper($deviceDetectorFactoryMock, 0.6, 2, [], ['1.2.3.*']);
         $emailStatMock  = $this->createMock(Stat::class);
-        $emailSent      = new \DateTime('-1 second');
-        $emailStatMock->method('getDateSent')->willReturn($emailSent);
+        $emailStatMock->method('getDateSent')->willReturn(new \DateTime('2024-01-01 00:00:00'));
 
-        $emailHitDateTime = new \DateTime();
+        $emailHitDateTime = new \DateTime('2024-01-01 00:00:01');
         $ipAddress        = new IpAddress('1.2.3.4');
 
         $result = $botRatioHelper->isHitByBot($emailStatMock, $emailHitDateTime, $ipAddress, $userAgent);
@@ -69,38 +68,32 @@ final class BotRatioHelperMatomoTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{string, string}>
+     * @return iterable<string, array{string}>
      */
     public static function knownBotUserAgentsProvider(): iterable
     {
         yield 'Googlebot' => [
             'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-            'Googlebot',
         ];
 
         yield 'Bingbot' => [
             'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)',
-            'BingBot',
         ];
 
         yield 'AhrefsBot' => [
             'Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)',
-            'aHrefs Bot',
         ];
 
         yield 'Facebookbot' => [
             'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)',
-            'Facebookbot',
         ];
 
         yield 'Twitterbot' => [
             'Twitterbot/1.0',
-            'Twitterbot',
         ];
 
         yield 'LinkedInBot' => [
             'LinkedInBot/1.0 (compatible; Mozilla/5.0; Apache-HttpClient +http://www.linkedin.com)',
-            'LinkedInBot',
         ];
     }
 }
