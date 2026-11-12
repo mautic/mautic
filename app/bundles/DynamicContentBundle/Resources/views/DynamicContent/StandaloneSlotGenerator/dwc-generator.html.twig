@@ -6,130 +6,146 @@
     data-param-slot-name="' ~ entity.slotName ~ '">'|raw }}<div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 align-items-center ms-24 text-primary"><i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-bs-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{{ '</div>'|escape }}</pre>
 {% endset %}
 
-{% set htmlPaneContent %}
-    <div class="tile dwc--generator-wrapper">
-        <div class="d-flex flex-grow-1">
-            <div class="dwc--generator-toolbar pa-5 layer-two d-flex flex-column justify-content-between align-items-start me-16">
-                {% include '@MauticCore/Helper/button.html.twig' with {
-                buttons: [
-                {
-                icon: 'ri-code-s-slash-line ri-lg',
-                label: 'mautic.dynamiccontent.generator.switch_html_tag',
-                icon_only: true,
-                variant: 'ghost',
-                size: 'sm',
-                attributes: {
-                'class': 'm-0',
-                'type': 'button'
-                }
-                },
-                {
-                icon: 'ri-question-line ri-lg',
-                label: 'mautic.dynamiccontent.generator.more_information.html',
-                icon_only: true,
-                variant: 'ghost',
-                size: 'sm',
-                attributes: {
-                'class': 'm-0',
-                'type': 'button',
-                'data-bs-toggle': 'popover',
-                'title': 'mautic.dynamiccontent.generator.html_tag_title'|trans,
-                'data-bs-content': 'mautic.dynamiccontent.generator.html_tag_info'|trans,
-                'data-bs-container': 'body',
-                }
-                }
-                ]
-                } %}
-
-            </div>
-            <div class="dwc--generator-content mt-16 mb-12 d-flex flex-column flex-grow-1">
-                {{ htmlcode }}
-                <div class="dwc--generator-content-help text-helper small">
-                    <i class="ri-information-2-line"></i>
-                    {{ 'mautic.dynamiccontent.generator.preview_content_discard_notice'|trans }}
-                </div>
-            </div>
-        </div>
-    </div>
-{% endset %}
-{% set pluginsPaneContent %}
-    <div class="tile dwc--generator-wrapper">
-        <div class="d-flex flex-grow-1">
-            <div class="dwc--generator-toolbar pa-5 layer-two d-flex flex-column justify-content-between align-items-start me-16">
-                {% include '@MauticCore/Helper/button.html.twig' with {
-                buttons: [
-                {
-                icon: 'ri-brackets-line ri-lg',
-                label: 'mautic.dynamiccontent.generator.switch_code_wrapper',
-                icon_only: true,
-                variant: 'ghost',
-                size: 'sm',
-                attributes: {
-                'class': 'm-0',
-                'type': 'button'
-                }
-                },
-                {
-                icon: 'ri-question-line ri-lg',
-                label: 'mautic.dynamiccontent.generator.more_information.plugins',
-                icon_only: true,
-                variant: 'ghost',
-                size: 'sm',
-                attributes: {
-                'class': 'ma-0',
-                'data-bs-toggle': 'popover',
-                'title': 'mautic.dynamiccontent.generator.when_to_change_brackets'|trans,
-                'data-bs-content': 'mautic.dynamiccontent.generator.joomla_syntax_info'|trans,
-                'data-bs-container': 'body',
-                'type': 'button'
-                }
-                }
-                ]
-                } %}
-
-            </div>
-            <div class="dwc--generator-content mt-16 mb-12 d-flex flex-column flex-grow-1">
-                <pre class="dwc--generator-content-code d-flex flex-column flex-grow-1 gap-16 p-0 fs-16 text-helper">{mautic type="content" slot="{{ entity.slotName }}"} <div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 align-items-center ms-24 text-primary"> <i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-bs-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{/mautic}
-
-                </pre>
-                <div class="dwc--generator-content-help text-helper small">
-                    <i class="ri-information-2-line"></i>
-                    {{ 'mautic.dynamiccontent.generator.preview_content_discard_notice'|trans }}
-                </div>
-            </div>
-        </div>
-    </div>
-{% endset %}
-{% set copyButton %}
-{% include '@MauticCore/Helper/button.html.twig' with {
-buttons: [
-{
-label: 'mautic.dynamiccontent.generator.copy_dynamic_content_slot',
-icon: 'ri-clipboard-line',
-variant: 'secondary',
-size: 'xl',
-wide: 'true',
-attributes: {
-    'class': 'dwc--generator-copy'
-}
-}
-]
-} %}
-{% endset %}
-{% set generatorTabs = [
-    {'id': 'dwc--generator-html', 'label': 'mautic.dynamiccontent.generator.html', 'secondaryLabel': 'mautic.dynamiccontent.generator.html_description', 'renderIcon': 'ri-html5-fill ri-lg', 'content': htmlPaneContent},
-    {'id': 'dwc--generator-plugins', 'label': 'mautic.dynamiccontent.generator.plugins', 'secondaryLabel': 'mautic.dynamiccontent.generator.plugins_description', 'renderIcon': 'ri-apps-2-add-fill ri-lg', 'content': pluginsPaneContent}
-] %}
 <div class="row mt-24">
     <div class="col-xs-12">
         <h2 class="mt-24 mb-16">{{ 'mautic.dynamiccontent.generator.deployment_options'|trans }}</h2>
         <p class="text-muted mb-24">{{ 'mautic.dynamiccontent.generator.deployment_instructions'|trans }}</p>
     </div>
     <div class="col-xs-12 col-md-4">
-        <div class="tabs-container tabs-container--vertical">{{ include('@MauticCore/Components/tabs.html.twig', {'tabs': generatorTabs, 'variant': 'vertical', 'part': 'nav'}) }}</div>
+        <ul class="list-group" role="tablist">
+            <li role="presentation" class="list-group-item active">
+                <a href="#dwc--generator-html" aria-controls="dwc--generator-html" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">
+                    <div class="d-flex justify-content-between mb-12">
+                        <h4 class="list-group-item-heading fw-sb">{{ 'mautic.dynamiccontent.generator.html'|trans }}</h4>
+                        <i class="ri-html5-fill ri-lg"></i>
+                    </div>
+                    <p class="list-group-item-text">{{ 'mautic.dynamiccontent.generator.html_description'|trans }}</p>
+                </a>
+            </li>
+            <li role="presentation" class="list-group-item">
+                <a href="#dwc--generator-plugins" aria-controls="dwc--generator-plugins" role="tab" data-bs-toggle="tab" class="nav-link" aria-selected="false">
+                    <div class="d-flex justify-content-between mb-12">
+                        <h4 class="list-group-item-heading fw-sb">{{ 'mautic.dynamiccontent.generator.plugins'|trans }}</h4>
+                        <i class="ri-apps-2-add-fill ri-lg"></i>
+                    </div>
+                    <p class="list-group-item-text">{{ 'mautic.dynamiccontent.generator.plugins_description'|trans }}</p>
+                </a>
+            </li>
+        </ul>
         {{ include('@MauticDynamicContent/DynamicContent/StandaloneSlotGenerator/dwc-generator--help.html.twig') }}
     </div>
-    <div class="col-xs-12 col-md-8">
-        <div class="tabs-container tabs-container--vertical">{{ include('@MauticCore/Components/tabs.html.twig', {'tabs': generatorTabs, 'variant': 'vertical', 'part': 'content', 'contentExtra': copyButton}) }}</div>
+    <div class="col-xs-12 col-md-8 tab-content">
+
+        <div role="tabpanel" class="tab-pane fade show active" id="dwc--generator-html">
+            <div class="tile dwc--generator-wrapper">
+                <div class="d-flex flex-grow-1">
+                    <div class="dwc--generator-toolbar pa-5 layer-two d-flex flex-column justify-content-between align-items-start me-16">
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                        {
+                        icon: 'ri-code-s-slash-line ri-lg',
+                        label: 'mautic.dynamiccontent.generator.switch_html_tag',
+                        icon_only: true,
+                        variant: 'ghost',
+                        size: 'sm',
+                        attributes: {
+                        'class': 'm-0',
+                        'type': 'button'
+                        }
+                        },
+                        {
+                        icon: 'ri-question-line ri-lg',
+                        label: 'mautic.dynamiccontent.generator.more_information.html',
+                        icon_only: true,
+                        variant: 'ghost',
+                        size: 'sm',
+                        attributes: {
+                        'class': 'm-0',
+                        'type': 'button',
+                        'data-bs-toggle': 'popover',
+                        'title': 'mautic.dynamiccontent.generator.html_tag_title'|trans,
+                        'data-bs-content': 'mautic.dynamiccontent.generator.html_tag_info'|trans,
+                        'data-bs-container': 'body',
+                        }
+                        }
+                        ]
+                        } %}
+
+                    </div>
+                    <div class="dwc--generator-content mt-16 mb-12 d-flex flex-column flex-grow-1">
+                        {{ htmlcode }}
+                        <div class="dwc--generator-content-help text-helper small">
+                            <i class="ri-information-2-line"></i>
+                            {{ 'mautic.dynamiccontent.generator.preview_content_discard_notice'|trans }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane fade" id="dwc--generator-plugins">
+            <div class="tile dwc--generator-wrapper">
+                <div class="d-flex flex-grow-1">
+                    <div class="dwc--generator-toolbar pa-5 layer-two d-flex flex-column justify-content-between align-items-start me-16">
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                        buttons: [
+                        {
+                        icon: 'ri-brackets-line ri-lg',
+                        label: 'mautic.dynamiccontent.generator.switch_code_wrapper',
+                        icon_only: true,
+                        variant: 'ghost',
+                        size: 'sm',
+                        attributes: {
+                        'class': 'm-0',
+                        'type': 'button'
+                        }
+                        },
+                        {
+                        icon: 'ri-question-line ri-lg',
+                        label: 'mautic.dynamiccontent.generator.more_information.plugins',
+                        icon_only: true,
+                        variant: 'ghost',
+                        size: 'sm',
+                        attributes: {
+                        'class': 'ma-0',
+                        'data-bs-toggle': 'popover',
+                        'title': 'mautic.dynamiccontent.generator.when_to_change_brackets'|trans,
+                        'data-bs-content': 'mautic.dynamiccontent.generator.joomla_syntax_info'|trans,
+                        'data-bs-container': 'body',
+                        'type': 'button'
+                        }
+                        }
+                        ]
+                        } %}
+
+                    </div>
+                    <div class="dwc--generator-content mt-16 mb-12 d-flex flex-column flex-grow-1">
+                        <pre class="dwc--generator-content-code d-flex flex-column flex-grow-1 gap-16 p-0 fs-16 text-helper">{mautic type="content" slot="{{ entity.slotName }}"} <div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 align-items-center ms-24 text-primary"> <i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-bs-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{/mautic}
+
+                        </pre>
+                        <div class="dwc--generator-content-help text-helper small">
+                            <i class="ri-information-2-line"></i>
+                            {{ 'mautic.dynamiccontent.generator.preview_content_discard_notice'|trans }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [
+        {
+        label: 'mautic.dynamiccontent.generator.copy_dynamic_content_slot',
+        icon: 'ri-clipboard-line',
+        variant: 'secondary',
+        size: 'xl',
+        wide: 'true',
+        attributes: {
+            'class': 'dwc--generator-copy'
+        }
+        }
+        ]
+        } %}
+
     </div>
 </div>
