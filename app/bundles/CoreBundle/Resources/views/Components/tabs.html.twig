@@ -9,7 +9,7 @@
          id="{{ tabId }}"
          {%- for attrName, attrValue in tab.paneAttributes|default({}) %} {{ attrName }}="{{ attrValue }}"{% endfor %}
          role="tabpanel"
-         aria-labelledby="{{ tabId }}-tab"
+         aria-labelledby="{{ tab.attributes.id|default(tabId ~ '-tab') }}"
          tabindex="0">
         {{ tab.content|raw }}
     </div>
@@ -69,6 +69,7 @@
                         {%- for attrName, attrValue in tab.attributes|default({}) %}{% if attrName != 'id' %} {{ attrName }}="{{ attrValue }}"{% endif %}{% endfor %}
                         role="tab"
                         aria-controls="{{ tabId }}"
+                        {% if variant == 'iconOnly' %}aria-label="{{ tabLabel|trans }}"{% endif %}
                         aria-selected="{{ isActive ? 'true' : 'false' }}"
                         {% if isDisabled %}disabled tabindex="-1"{% endif %}>
                     {% if variant == 'iconOnly' %}
