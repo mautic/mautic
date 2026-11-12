@@ -75,10 +75,7 @@ class Stat
         return $this->focus;
     }
 
-    /**
-     * @param mixed $focus
-     */
-    public function setFocus($focus): static
+    public function setFocus(Focus $focus): static
     {
         $this->focus = $focus;
 
@@ -93,10 +90,7 @@ class Stat
         return $this->type;
     }
 
-    /**
-     * @param mixed $type
-     */
-    public function setType($type): static
+    public function setType(?string $type): static
     {
         $this->type = $type;
 

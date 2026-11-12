@@ -152,10 +152,7 @@ class LeadDevice
         return $this->device;
     }
 
-    /**
-     * @param mixed $device
-     */
-    public function setDevice($device): void
+    public function setDevice(?string $device): void
     {
         $this->device = $device;
     }
@@ -181,10 +178,7 @@ class LeadDevice
         return $this->deviceModel;
     }
 
-    /**
-     * @param mixed $deviceModel
-     */
-    public function setDeviceModel($deviceModel): void
+    public function setDeviceModel(?string $deviceModel): void
     {
         $this->deviceModel = $deviceModel;
     }
