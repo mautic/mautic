@@ -35,7 +35,8 @@ final class PushContactTest extends TestCase
             ->method('subscribe')
             ->with(self::KEYS, 'a1', 'john@example.com', ['FNAME' => 'John'], false, true);
 
-        $integration = $this->configure(new MailchimpIntegration($client, $this->mapper(['EMAIL' => 'john@example.com', 'FNAME' => 'John']), $this->translator(), $this->cache()));
+        $mapper      = $this->mapper(['EMAIL' => 'john@example.com', 'FNAME' => 'John'], ['EMAIL' => 'email', 'FNAME' => 'firstname']);
+        $integration = $this->configure(new MailchimpIntegration($client, $mapper, $this->translator(), $this->cache()));
 
         $this->assertSame(MailchimpType::class, $integration->getPushContactConfigFormName());
         $integration->pushContact(new Lead(), ['list_settings' => ['list' => 'a1', 'doubleOptin' => '0', 'sendWelcome' => '1', 'leadFields' => ['EMAIL' => 'email', 'FNAME' => 'firstname']]]);
@@ -114,15 +115,16 @@ final class PushContactTest extends TestCase
                 'custom_fields' => [['name' => 'CustomField1', 'value' => 'customfield_y']],
             ], 'ACTION_BY_OWNER');
 
+        $mapping     = ['email' => 'email', 'first_name' => 'firstname', 'address_city' => 'city', 'customfield_1' => 'color'];
         $integration = $this->configure(new ConstantContactIntegration($client, $this->mapper([
             'email'         => 'john@example.com',
             'first_name'    => 'John',
             'address_city'  => 'address_x',
             'customfield_1' => 'customfield_y',
-        ]), $this->translator()));
+        ], $mapping), $this->translator()));
 
         $this->assertSame(ConstantContactType::class, $integration->getPushContactConfigFormName());
-        $integration->pushContact(new Lead(), ['list_settings' => ['list' => '5', 'sendWelcome' => '0']]);
+        $integration->pushContact(new Lead(), ['list_settings' => ['list' => '5', 'sendWelcome' => '0', 'leadFields' => $mapping]]);
     }
 
     public function testIcontactSendsCustomFieldsByTheirId(): void
@@ -132,14 +134,15 @@ final class PushContactTest extends TestCase
             ->method('subscribe')
             ->with(self::KEYS, '7', ['email' => 'john@example.com', 'firstName' => 'John', 'color' => 'blue']);
 
+        $mapping     = ['email' => 'email', 'cf_color' => 'color', 'firstName' => 'firstname'];
         $integration = $this->configure(new IcontactIntegration($client, $this->mapper([
             'email'     => 'john@example.com',
             'cf_color'  => 'blue',
             'firstName' => 'John',
-        ]), $this->translator()));
+        ], $mapping), $this->translator()));
 
         $this->assertSame(IcontactType::class, $integration->getPushContactConfigFormName());
-        $integration->pushContact(new Lead(), ['list_settings' => ['list' => '7']]);
+        $integration->pushContact(new Lead(), ['list_settings' => ['list' => '7', 'leadFields' => $mapping]]);
     }
 
     /**
@@ -202,12 +205,23 @@ final class PushContactTest extends TestCase
     }
 
     /**
-     * @param array<string, string> $data
+     * @param array<string, string>      $data
+     * @param array<string, string>|null $mapping the mapping the integration must pass; null accepts any
      */
-    private function mapper(array $data): ContactFieldMapper
+    private function mapper(array $data, ?array $mapping = null): ContactFieldMapper
     {
-        $mapper = $this->createStub(ContactFieldMapper::class);
-        $mapper->method('map')->willReturn($data);
+        if (null === $mapping) {
+            $mapper = $this->createStub(ContactFieldMapper::class);
+            $mapper->method('map')->willReturn($data);
+
+            return $mapper;
+        }
+
+        $mapper = $this->createMock(ContactFieldMapper::class);
+        $mapper->expects($this->once())
+            ->method('map')
+            ->with($this->isInstanceOf(Lead::class), $mapping)
+            ->willReturn($data);
 
         return $mapper;
     }
