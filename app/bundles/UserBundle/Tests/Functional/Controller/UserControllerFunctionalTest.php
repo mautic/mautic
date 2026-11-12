@@ -279,7 +279,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('User');
         $user->setPassword('password');
         $user->setRole($role);
-        $user->setLastLogin('2024-02-22 10:30:00');
+        $user->setLastLogin(new \DateTime('2024-02-22 10:30:00'));
 
         return $user;
     }
