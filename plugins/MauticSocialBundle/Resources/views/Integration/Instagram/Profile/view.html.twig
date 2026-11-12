@@ -4,14 +4,14 @@
             {{ include('@MauticSocial/Integration/Instagram/Profile/profile.html.twig', {
                 'profile': details.profile,
             }) }}
-        
+
     {% endset %}
     {% set tabsinstagramview = tabsinstagramview|merge([{'id': 'InstagramProfile', 'label': 'mautic.lead.lead.social.profile', 'content': tabsinstagramviewContent0, 'className': 'pa-16 pa-24'}]) %}
     {% set tabsinstagramviewContent1 %}
             {{ include('@MauticSocial/Integration/Instagram/Profile/photos.html.twig', {
                 'activity': details.activity.photos|default([]),
             }) }}
-        
+
     {% endset %}
     {% set tabsinstagramview = tabsinstagramview|merge([{'id': 'InstagramPhotos', 'label': 'mautic.lead.lead.social.photos', 'content': tabsinstagramviewContent1, 'className': 'pa-16 pa-24'}]) %}
     {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsinstagramview, 'variant': 'contained'}) }}

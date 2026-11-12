@@ -80,7 +80,7 @@
             {% endfor %}
             </tbody>
         </table>
-    
+
 {% endset %}
 {% set tabsviewsfrequency = tabsviewsfrequency|merge([{'id': 'channels', 'label': 'mautic.lead.contact.channels', 'content': tabsviewsfrequencyContent0, 'className': 'pa-md'}]) %}
 {% set tabsviewsfrequencyContent1 %}
@@ -91,7 +91,7 @@
             </tr>
             </thead>
         </table>
-    
+
 {% endset %}
 {% set tabsviewsfrequency = tabsviewsfrequency|merge([{'id': 'categories', 'label': 'mautic.lead.preferred.categories', 'content': tabsviewsfrequencyContent1, 'className': 'pa-md'}]) %}
 {% set tabsviewsfrequencyContent2 %}
@@ -102,7 +102,7 @@
               </tr>
             </thead>
         </table>
-    
+
 {% endset %}
 {% set tabsviewsfrequency = tabsviewsfrequency|merge([{'id': 'segments', 'label': 'mautic.lead.preferred.segments', 'content': tabsviewsfrequencyContent2, 'className': 'pa-md'}]) %}
 {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsfrequency, 'variant': 'contained'}) }}

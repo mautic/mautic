@@ -177,18 +177,18 @@
                                 'entity'     : sms,
                                 'channel'    : 'sms'
                             }) -}}
-                        
+
             {% endset %}
             {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'clicks-container', 'label': 'mautic.trackable.click_counts', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
             {% set tabsviewsdetailsContent1 %}
                             {{ contacts|raw }}
-                        
+
             {% endset %}
             {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'contacts-container', 'label': 'mautic.lead.leads', 'content': tabsviewsdetailsContent1, 'className': 'pa-16 page-list'}]) %}
             {% if showTranslations %}
             {% set tabsviewsdetailsContent2 %}
                                 {{ translationContent|raw }}
-                            
+
             {% endset %}
             {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'translation-container', 'label': 'mautic.core.translations', 'content': tabsviewsdetailsContent2, 'className': 'pa-16'}]) %}
             {% endif %}

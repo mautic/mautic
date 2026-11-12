@@ -53,7 +53,7 @@
                                                     {{ form_row(form.postActionProperty) }}
                                                 </div>
                                             </div>
-                                        
+
                   {% endset %}
                   {% set tabsviewsindex = tabsviewsindex|merge([{'id': 'details-container', 'label': 'mautic.core.details', 'content': tabsviewsindexContent0, 'className': 'pa-16'}]) %}
                   {% set tabsviewsindexContent1 %}
@@ -116,7 +116,7 @@
                                                   </div>
                                                 {% endif %}
                                             </div>
-                                        
+
                   {% endset %}
                   {% set tabsviewsindex = tabsviewsindex|merge([{'id': 'fields-container', 'label': 'mautic.form.tab.fields', 'content': tabsviewsindexContent1, 'className': 'pa-16', 'itemAttributes': {'id': 'fields-tab'}, 'itemClass': 'text-danger', 'hasError': fieldsTabError}]) %}
                   {% set tabsviewsindexContent2 %}
@@ -160,7 +160,7 @@
                                                   </div>
                                                 {% endif %}
                                             </div>
-                                        
+
                   {% endset %}
                   {% set tabsviewsindex = tabsviewsindex|merge([{'id': 'actions-container', 'label': 'mautic.form.tab.actions', 'content': tabsviewsindexContent2, 'className': 'pa-16', 'itemAttributes': {'id': 'actions-tab'}}]) %}
                   {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsindex, 'variant': 'contained'}) }}

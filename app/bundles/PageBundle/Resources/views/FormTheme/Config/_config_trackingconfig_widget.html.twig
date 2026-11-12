@@ -55,7 +55,7 @@
                     })(window,document,\'script\',\'' ~ url('mautic_tracking_js') ~ '\',\'mt\');
                 &lt;/script&gt;',
                                         } %}
-                                    
+
                 {% endset %}
                 {% set tabsformthemeconfigtrackingconfigwidget = tabsformthemeconfigtrackingconfigwidget|merge([{'id': 'tracking-snippet-consent', 'label': 'mautic.page.config.tracking.script.consent.tab', 'content': tabsformthemeconfigtrackingconfigwidgetContent0, 'className': 'pa-16'}]) %}
                 {% set tabsformthemeconfigtrackingconfigwidgetContent1 %}
@@ -74,7 +74,7 @@
                     mt(\'send\', \'pageview\');
                 &lt;/script&gt;',
                                         } %}
-                                    
+
                 {% endset %}
                 {% set tabsformthemeconfigtrackingconfigwidget = tabsformthemeconfigtrackingconfigwidget|merge([{'id': 'tracking-snippet-full', 'label': 'mautic.page.config.tracking.script.full.tab', 'content': tabsformthemeconfigtrackingconfigwidgetContent1, 'className': 'pa-16'}]) %}
                 {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsformthemeconfigtrackingconfigwidget, 'variant': 'contained'}) }}

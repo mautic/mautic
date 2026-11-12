@@ -63,7 +63,7 @@
                                                 'themes': themes,
                                                 'active': form.template.vars.value,
                                             }, with_context=false) }}
-                                        
+
                   {% endset %}
                   {% set tabsviewsform = tabsviewsform|merge([{'id': 'theme-container', 'label': 'mautic.core.form.theme', 'content': tabsviewsformContent0, 'className': 'pa-16'}]) %}
                   {% set tabsviewsformContent1 %}
@@ -74,7 +74,7 @@
                                                     {{ form_widget(form.customHtml) }}
                                                 </div>
                                             </div>
-                                        
+
                   {% endset %}
                   {% set tabsviewsform = tabsviewsform|merge([{'id': 'advanced-container', 'label': 'mautic.core.advanced', 'content': tabsviewsformContent1, 'className': 'pa-16', 'itemAttributes': {'id': 'advanced-tab'}, 'itemClass': 'hidden'}]) %}
                   {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsform, 'variant': 'contained'}) }}

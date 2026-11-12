@@ -44,7 +44,7 @@
                                                 {{ form_row(form.description) }}
                                             </div>
                                         </div>
-                                    
+
                 {% endset %}
                 {% set tabsviewsform = tabsviewsform|merge([{'id': 'details', 'label': 'mautic.core.details', 'content': tabsviewsformContent0, 'className': 'pa-16', 'hasError': formContainsErrors(form, ['filters'])}]) %}
                 {% set tabsviewsformContent1 %}
@@ -81,7 +81,7 @@
                                             {{ form_errors(form.filters) }}
                                             {{ form_widget(form.filters) }}
                                         </div>
-                                    
+
                 {% endset %}
                 {% set tabsviewsform = tabsviewsform|merge([{'id': 'filters', 'label': 'mautic.core.filters', 'content': tabsviewsformContent1, 'className': 'pa-16', 'itemAttributes': {'data-bs-toggle': 'tooltip', 'title': '', 'data-bs-placement': 'top', 'data-bs-title': 'mautic.lead.lead.segment.add.help'|trans}, 'hasError': formContainsErrors(form.filters)}]) %}
                 {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsform, 'variant': 'contained'}) }}

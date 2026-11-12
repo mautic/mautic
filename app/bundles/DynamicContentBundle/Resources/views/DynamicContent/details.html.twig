@@ -27,9 +27,9 @@
             ? [{ color: 'blue', label: 'mautic.core.icon_tooltip.translation', icon_only: true, icon: 'ri-translate' }]
             : [])
         |merge(entity.isTranslation(true)
-            ? [{ 
-                color: 'warm-gray', 
-                label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), 
+            ? [{
+                color: 'warm-gray',
+                label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}),
                 icon: 'ri-translate',
                 attributes: {
                     'href': path('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': translations.parent.id}),
@@ -179,13 +179,13 @@
               {% set tabsviewsdetailsContent0 %}
                                 {{ include('@MauticPage/Trackable/click_counts.html.twig', {'trackables': trackables, 'entity': entity, 'channel': 'dynamicContent'}) }}
 
-                            
+
               {% endset %}
               {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'clicks-container', 'label': 'mautic.trackable.click_counts', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
               {% if showTranslations %}
               {% set tabsviewsdetailsContent1 %}
                                     {{ translationContent|raw }}
-                                
+
               {% endset %}
               {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'translation-container', 'label': 'mautic.core.translations', 'content': tabsviewsdetailsContent1, 'className': 'pa-16'}]) %}
               {% endif %}
