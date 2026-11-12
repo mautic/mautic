@@ -83,6 +83,7 @@ final class PointType extends AbstractType
                     'min'     => -999999,
                     'max'     => 999999,
                     'digits'  => 5,
+                    'size'    => 'sm',
                 ],
                 'scale' => 0,
             ]
