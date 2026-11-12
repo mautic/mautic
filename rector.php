@@ -38,6 +38,7 @@ return RectorConfig::configure()
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
         '*/Fixture/*',
+        '*/Source/*',
 
         // form event subscribers register on the Form dispatcher via addEventSubscriber(), which needs EventSubscriberInterface;
         // SecurityController listens on kernel.request but a controller cannot expose a public non-action method;
