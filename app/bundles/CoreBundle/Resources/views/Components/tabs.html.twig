@@ -85,7 +85,7 @@
                         </div>
                     {% elseif variant == 'vertical' %}
                         <div class="tabs__nav-item-label-wrapper justify-content-between">
-                            <span class="tabs__nav-item-label">{{ tabLabel|trans(tab.labelParameters|default({})) }}</span>
+                            <span class="tabs__nav-item-label">{{ tabLabel|trans(tab.labelParameters|default({})) }}{{ tab.labelSuffix|default('')|raw }}</span>
                             {{ _self.iconContent(tab, variant, false) }}
                         </div>
                         {{ _self.secondaryLabel(tab) }}
