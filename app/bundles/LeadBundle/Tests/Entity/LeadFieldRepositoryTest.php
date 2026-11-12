@@ -393,47 +393,24 @@ final class LeadFieldRepositoryTest extends TestCase
             array_keys(FieldModel::$coreCompanyFields)
         )));
 
-        $systemQueryBuilder = $this->createMock(QueryBuilder::class);
-        $systemQueryBuilder->method('expr')->willReturn(new ExpressionBuilder($this->connection));
-        $systemQueryBuilder->expects($this->once())
-            ->method('setParameter')
-            ->with(
-                self::callback(static fn (string $name): bool => str_starts_with($name, 'par')),
-                self::callback(static function ($value) use ($expectedAliases): bool {
-                    self::assertIsArray($value);
-                    self::assertEqualsCanonicalizing($expectedAliases, $value);
-
-                    return true;
-                }),
-                ArrayParameterType::STRING
-            );
-
+        $systemQueryBuilder = new QueryBuilder($this->connection);
         [$systemExpr, $systemParameters] = $method->invoke($this->repository, $systemQueryBuilder, $filter);
+        $systemQueryBuilder->where($systemExpr);
 
         $this->assertSame([], $systemParameters);
-        $this->assertStringContainsString('f.alias IN', (string) $systemExpr);
+        $this->assertStringContainsString('f.alias IN', $systemQueryBuilder->getSQL());
+        $this->assertEqualsCanonicalizing($expectedAliases, array_values($systemQueryBuilder->getParameters())[0]);
+        $this->assertSame(ArrayParameterType::STRING, array_values($systemQueryBuilder->getParameterTypes())[0]);
 
         $customFilter          = clone $filter;
         $customFilter->command = 'mautic.lead.field.searchcommand.isusercreated';
-        $customQueryBuilder    = $this->createMock(QueryBuilder::class);
-        $customQueryBuilder->method('expr')->willReturn(new ExpressionBuilder($this->connection));
-        $customQueryBuilder->expects($this->once())
-            ->method('setParameter')
-            ->with(
-                self::callback(static fn (string $name): bool => str_starts_with($name, 'par')),
-                self::callback(static function ($value) use ($expectedAliases): bool {
-                    self::assertIsArray($value);
-                    self::assertEqualsCanonicalizing($expectedAliases, $value);
-
-                    return true;
-                }),
-                ArrayParameterType::STRING
-            );
-
+        $customQueryBuilder    = new QueryBuilder($this->connection);
         [$customExpr, $customParameters] = $method->invoke($this->repository, $customQueryBuilder, $customFilter);
+        $customQueryBuilder->where($customExpr);
 
         $this->assertSame([], $customParameters);
-        $this->assertStringContainsString('NOT', (string) $customExpr);
+        $this->assertStringContainsString('NOT', $customQueryBuilder->getSQL());
+        $this->assertEqualsCanonicalizing($expectedAliases, array_values($customQueryBuilder->getParameters())[0]);
     }
 
     private function createQueryMock(): MockObject

@@ -7,6 +7,7 @@ namespace Page\Acceptance;
 final class EmailsPage
 {
     public const URL                         = '/s/emails';
+    public const NEW_URL                     = '/s/emails/new';
     public const NEW_BUTTON                  = 'a#new';
     public const EDIT_BUTTON                 = 'a#edit';
     public const SCHEDULE_BUTTON             = 'a[aria-label="Schedule"][data-header="Schedule"]';

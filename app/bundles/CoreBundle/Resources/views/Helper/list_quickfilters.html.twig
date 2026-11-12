@@ -1,5 +1,5 @@
 {% if quickFilters is defined and quickFilters is not empty %}
-{% if quickFilters|first.filters is defined %}
+{% if quickFilters|filter(group => group.filters is defined) is not empty %}
     <div class="d-flex flex-column gap-xs">
         {% for groupKey, groupData in quickFilters %}
             {% if groupData.filters is defined and groupData.filters is not empty %}

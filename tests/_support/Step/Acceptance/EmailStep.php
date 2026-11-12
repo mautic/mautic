@@ -12,9 +12,7 @@ final class EmailStep extends \AcceptanceTester
     public function createSegmentEmail(string $name): void
     {
         $I=$this;
-        $I->amOnPage(EmailsPage::URL);
-        $I->waitForElementClickable(EmailsPage::NEW_BUTTON);
-        $I->click(EmailsPage::NEW_BUTTON);
+        $I->amOnPage(EmailsPage::NEW_URL);
         $I->waitForElementClickable(EmailsPage::SELECT_SEGMENT_EMAIL);
         $I->click(EmailsPage::SELECT_SEGMENT_EMAIL);
         $I->fillField(EmailsPage::SUBJECT_FIELD, $name);
@@ -31,9 +29,7 @@ final class EmailStep extends \AcceptanceTester
     public function createTriggeredEmail(string $name): void
     {
         $I=$this;
-        $I->amOnPage(EmailsPage::URL);
-        $I->waitForElementClickable(EmailsPage::NEW_BUTTON);
-        $I->click(EmailsPage::NEW_BUTTON);
+        $I->amOnPage(EmailsPage::NEW_URL);
         $I->waitForElementClickable(EmailsPage::SELECT_TRIGGERED_EMAIL);
         $I->click(EmailsPage::SELECT_TRIGGERED_EMAIL);
         $I->fillField(EmailsPage::SUBJECT_FIELD, $name);
