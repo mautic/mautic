@@ -4,10 +4,10 @@
     const HOLD_FAST_INTERVAL = 40;
     const HOLD_FAST_AFTER = 10;
     const FLASH_DURATION = 400;
-    const ROLL_DISTANCE = 12;
-    const ROLL_SPRING = {stiffness: 400, damping: 30};
-    const ROLL_REPEAT = {duration: 100, easing: 'ease-out'};
-    const springCache = new Map();
+    const ROLL_DISTANCE = 10;
+    const ROLL_IN = {duration: 200, easing: 'cubic-bezier(0.22, 1, 0.36, 1)'};
+    const ROLL_OUT = {duration: 120, easing: 'cubic-bezier(0.4, 0, 1, 1)'};
+    const ROLL_REPEAT = {duration: 90, easing: 'ease-out'};
     const SHAKE = [0, -4, 4, -2, 2, 0];
     const SHAKE_DURATION = 300;
     const state = new WeakMap();
@@ -47,7 +47,10 @@
     }
 
     function fit(input) {
-        input.style.width = `${Math.max(input.value.length, 2)}ch`;
+        const {min, max} = bounds(input);
+        const reserved = Number(input.dataset.digits) || Math.max(String(min).length, String(max).length);
+
+        input.style.width = `${Math.max(reserved, input.value.length, 2)}ch`;
     }
 
     function sync(root) {
@@ -59,42 +62,6 @@
         root.querySelectorAll('[data-quantity-step]').forEach((button) => {
             const blocked = Number(button.dataset.quantityStep) < 0 ? current <= min : current >= max;
             button.setAttribute('aria-disabled', blocked ? 'true' : 'false');
-        });
-    }
-
-    function spring({stiffness, damping}) {
-        const key = `${stiffness}/${damping}`;
-        if (springCache.has(key)) {
-            return springCache.get(key);
-        }
-
-        const omega = Math.sqrt(stiffness);
-        const zeta = damping / (2 * omega);
-        const omegaD = omega * Math.sqrt(1 - zeta * zeta);
-        const progress = (t) => 1 - Math.exp(-zeta * omega * t) * (Math.cos(omegaD * t) + (zeta * omega / omegaD) * Math.sin(omegaD * t));
-        const samples = [];
-        let settled = 0;
-        let t = 0;
-        while (settled < 4 && t < 1.5) {
-            const value = progress(t);
-            samples.push(value);
-            settled = Math.abs(1 - value) < 0.002 ? settled + 1 : 0;
-            t += 1 / 60;
-        }
-
-        const result = {duration: Math.round(t * 1000), samples};
-        springCache.set(key, result);
-
-        return result;
-    }
-
-    function frames(samples, offset, entering) {
-        return samples.map((value) => {
-            const opacity = Math.min(1, Math.max(0, value));
-
-            return entering
-                ? {transform: `translateY(${offset * (1 - value)}px)`, opacity}
-                : {transform: `translateY(${-offset * value}px)`, opacity: 1 - opacity};
         });
     }
 
@@ -121,19 +88,13 @@
         }
 
         const repeating = info(root).repeating;
-        const motion = repeating ? null : spring(ROLL_SPRING);
         const offset = direction * ROLL_DISTANCE;
-        const timing = repeating ? Object.assign({fill: 'both'}, ROLL_REPEAT) : {fill: 'both', duration: motion.duration, easing: 'linear'};
-        const enter = repeating
-            ? [{transform: `translateY(${offset}px)`, opacity: 0}, {transform: 'translateY(0)', opacity: 1}]
-            : frames(motion.samples, offset, true);
-        const exit = repeating
-            ? [{transform: 'translateY(0)', opacity: 1}, {transform: `translateY(${-offset}px)`, opacity: 0}]
-            : frames(motion.samples, offset, false);
+        const enterTiming = Object.assign({fill: 'both'}, repeating ? ROLL_REPEAT : ROLL_IN);
+        const exitTiming = Object.assign({fill: 'both'}, repeating ? ROLL_REPEAT : ROLL_OUT);
 
-        entering.animate(enter, timing);
+        entering.animate([{transform: `translateY(${offset}px)`, opacity: 0}, {transform: 'translateY(0)', opacity: 1}], enterTiming);
         if (previous) {
-            previous.animate(exit, timing).onfinish = () => previous.remove();
+            previous.animate([{transform: 'translateY(0)', opacity: 1}, {transform: `translateY(${-offset}px)`, opacity: 0}], exitTiming).onfinish = () => previous.remove();
         }
     }
 

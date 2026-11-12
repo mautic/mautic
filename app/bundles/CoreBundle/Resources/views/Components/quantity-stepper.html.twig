@@ -16,7 +16,7 @@
             <i class="ri-subtract-line" aria-hidden="true"></i>
         </button>
         <span class="quantity-stepper__field">
-            <input type="number" id="{{ id }}" name="{{ name|default('quantity') }}" class="quantity-stepper__value" value="{{ value }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" inputmode="numeric" autocomplete="off"{{ disabled ? ' disabled' }}{{ required|default(false) ? ' required' }}>
+            <input type="number" id="{{ id }}" name="{{ name|default('quantity') }}" class="quantity-stepper__value" value="{{ value }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" inputmode="numeric" autocomplete="off"{% if digits|default(null) %} data-digits="{{ digits }}"{% endif %}{{ disabled ? ' disabled' }}{{ required|default(false) ? ' required' }}>
             <span class="quantity-stepper__display" aria-hidden="true"><span class="quantity-stepper__digit">{{ value }}</span></span>
         </span>
         <button type="button" class="quantity-stepper__button" data-quantity-step="1" tabindex="-1" aria-label="{{ increaseLabel|default('mautic.core.quantity_stepper.increase')|trans }}"{{ disabled ? ' disabled' }}>

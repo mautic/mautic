@@ -308,6 +308,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     max: attr.max|default(99),
     step: attr.step|default(1),
     size: attr.size|default('md'),
+    digits: attr.digits|default(null),
     disabled: disabled,
     required: required,
     ariaLabel: label ? label : null
