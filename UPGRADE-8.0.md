@@ -491,6 +491,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `MauticPlugin\MauticFocusBundle\Entity\StatRepository::getStats()` takes `string $type` and `?\DateTimeInterface $fromDate`.
     - `MauticPlugin\MauticFocusBundle\Helper\TokenHelper::findFocusTokens()` takes `string $content`.
     - `MauticPlugin\MauticFocusBundle\Model\FocusModel::getStats()` takes `?string $unit` and `?string $dateFormat`, and `MauticPlugin\MauticFocusBundle\Model\FocusModel::isLightColor()` takes `string $hex` and `int $level`.
+- `MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::getFullUrl()` declares native parameter types: it takes `string $fileName` and `string $separator`. Passing `null`, a value PHP cannot coerce to `string`, or any other type from a file with `declare(strict_types=1)` now throws a `TypeError`.
 
 - `Mautic\CategoryBundle\Entity\CategoryRepository::getCategoryList()` now types `$search` as `string|array` (a title prefix, or a list of category ids). Passing `null` or an integer now throws a `TypeError`; pass `''` for no search.
 - Most core event subscribers no longer implement `Symfony\Component\EventDispatcher\EventSubscriberInterface`. Listener methods now carry a `#[AsEventListener]` attribute instead of being declared in `getSubscribedEvents()`, and are registered through service autoconfiguration. Two consequences for plugins:

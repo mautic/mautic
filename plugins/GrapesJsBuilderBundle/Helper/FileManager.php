@@ -71,7 +71,7 @@ final readonly class FileManager
         return $this->getGrapesJsImagesPath(true);
     }
 
-    public function getFullUrl($fileName, $separator = '/'): string
+    public function getFullUrl(string $fileName, string $separator = '/'): string
     {
         // if a static_url (CDN) is configured use that, otherwise use the site url
         $url = $this->coreParametersHelper->get('static_url') ?? $this->coreParametersHelper->get('site_url');
@@ -82,10 +82,7 @@ final readonly class FileManager
             .$fileName;
     }
 
-    /**
-     * @param string $separator
-     */
-    private function getGrapesJsImagesPath(bool $fullPath = false, $separator = '/'): string
+    private function getGrapesJsImagesPath(bool $fullPath = false, string $separator = '/'): string
     {
         return $this->pathsHelper->getSystemPath('images', $fullPath)
             .$separator
