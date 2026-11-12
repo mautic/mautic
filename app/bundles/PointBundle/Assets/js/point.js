@@ -51,6 +51,7 @@ Mautic.pointTriggerEventOnLoad = function (container, response) {
         }
 
         //initialize tooltips
+        window.MauticBootstrapCompatibility?.mirrorLegacyMarkup(mQuery(eventId)[0]);
         mQuery(eventId).find("*[data-bs-toggle='tooltip'], *[data-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true}));
 
         //activate new stuff
