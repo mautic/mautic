@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Exception\InvalidImportAliasException;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -480,9 +481,14 @@ final class CampaignApiController extends CommonApiController
         $importHelper->recursiveRemoveEmailaddress($data);
         $userId = $userHelper->getUser()->getId();
 
-        foreach ($data as $entity) {
-            $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
-            $this->dispatcher->dispatch($event);
+        try {
+            foreach ($data as $entity) {
+                $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
+                $this->dispatcher->dispatch($event);
+            }
+        } catch (InvalidImportAliasException $e) {
+            // Like an archive that can't be read
+            return $this->handleView($this->view(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST));
         }
         $view = $this->view([$this->translator->trans('mautic.campaign.campaign.import.finished', [], 'messages')], Response::HTTP_CREATED);
         $this->setSerializationContext($view);
