@@ -11,13 +11,8 @@ class TokenHelper
 {
     public const REGEX = '/{focus=(.*?)}/i';
 
-    // Matches the whole token, including the optional |display or |tracking mode.
-    // It stops at a line break or another brace, so an unclosed token can't swallow the content after it.
+    // Stops at a line break or another brace, so an unclosed token can't swallow the content after it
     private const TOKEN_REGEX = '/{focus=[^{}\r\n]*}/i';
-
-    public const MODE_DISPLAY = 'display';
-
-    public const MODE_TRACKING = 'tracking';
 
     public function __construct(
         protected FocusModel $model,
@@ -36,14 +31,14 @@ class TokenHelper
         $tokens = [];
 
         foreach (array_unique($matches[0]) as $token) {
-            $parsedToken = $this->parseToken($token);
-            if (null === $parsedToken) {
+            $id = $this->parseToken($token);
+            if (null === $id) {
                 $tokens[$token] = '';
 
                 continue;
             }
 
-            $focus = $this->model->getEntity($parsedToken['id']);
+            $focus = $this->model->getEntity($id);
             if (null !== $focus
                 && (
                     $focus->isPublished()
@@ -56,8 +51,8 @@ class TokenHelper
             ) {
                 $script = '<script src="'.
                     $this->router->generate(
-                        $this->resolveRoute($parsedToken['mode']),
-                        ['id' => $parsedToken['id']],
+                        'mautic_focus_generate',
+                        ['id' => $id],
                         UrlGeneratorInterface::ABSOLUTE_URL
                     ).
                 '" type="text/javascript" charset="utf-8" async="async"></script>';
@@ -71,35 +66,14 @@ class TokenHelper
     }
 
     /**
-     * @return array{id: int, mode: 'display'|'tracking'}|null
+     * The Focus Item ID of a {focus=id} token, or null when the token isn't valid.
      */
-    public function parseToken(string $token): ?array
+    private function parseToken(string $token): ?int
     {
-        if (1 !== preg_match('/^{focus=([1-9]\d*)(?:\s*\|\s*(display|tracking)\s*)?}$/i', $token, $matches)) {
+        if (1 !== preg_match('/^{focus=([1-9]\d*)}$/i', $token, $matches)) {
             return null;
         }
 
-        return [
-            'id'   => (int) $matches[1],
-            'mode' => isset($matches[2]) && self::MODE_DISPLAY === strtolower($matches[2]) ? self::MODE_DISPLAY : self::MODE_TRACKING,
-        ];
-    }
-
-    public function formatToken(int $id, string $mode): string
-    {
-        return match ($mode) {
-            self::MODE_DISPLAY => '{focus='.$id.'|display}',
-            self::MODE_TRACKING => '{focus='.$id.'|tracking}',
-            default            => throw new \InvalidArgumentException('Unknown Focus token mode.'),
-        };
-    }
-
-    private function resolveRoute(string $mode): string
-    {
-        return match ($mode) {
-            self::MODE_DISPLAY => 'mautic_focus_generate_display',
-            self::MODE_TRACKING => 'mautic_focus_generate',
-            default            => throw new \InvalidArgumentException('Unknown Focus token mode.'),
-        };
+        return (int) $matches[1];
     }
 }

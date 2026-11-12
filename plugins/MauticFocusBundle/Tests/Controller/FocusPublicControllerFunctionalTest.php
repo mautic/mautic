@@ -10,6 +10,7 @@ use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
 
 final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
@@ -35,9 +36,14 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString("mf-bar-collapser-{$focus->getId()}", $content);
         $this->assertStringContainsString('window.MauticFocusItems', $content);
         $this->assertStringContainsString('loadTracking', $content);
-        $this->assertMatchesRegularExpression('/trackingEnabled:(?:true|!0)/', $content);
+        // Tracking only starts when Mautic tracking is enabled on the page
+        $this->assertMatchesRegularExpression('/trackingEnabled:(?:false|!1)/', $content);
+        $this->assertStringContainsString('mautic:tracking-enabled', $content);
+        $this->assertStringContainsString('MauticJS.trackingEnabled===', $content);
+        $this->assertStringNotContainsString('MauticFocus.enableTracking', $content);
+        $this->assertStringNotContainsString('MauticFocusTrackingQueue', $content);
+        $this->assertStringNotContainsString('MauticFocusUseMauticTrackingConsent', $content);
         $this->assertMatchesRegularExpression("/Focus\\.cookies\\.setItem\\(['\"]mautic_focus_{$focus->getId()}['\"]\\s*,\\s*-1\\s*,/", $content);
-        $this->assertStringNotContainsString('MauticJS', $content);
         $this->assertStringNotContainsString('mtc_id', $content);
         $this->assertStringNotContainsString('mautic_device_id', $content);
         $this->assertStringNotContainsString('/mtc.js', $content);
@@ -56,7 +62,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $focusModel->saveEntity($focus);
         $id = $focus->getId();
 
-        foreach (["/focus/{$id}.js", "/focus/{$id}/display.js", "/focus/{$id}/tracking.js"] as $url) {
+        foreach (["/focus/{$id}.js", "/focus/{$id}/tracking.js"] as $url) {
             $this->client->request(Request::METHOD_GET, $url);
             $response = $this->client->getResponse();
 
@@ -67,18 +73,18 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         $this->client->request(Request::METHOD_GET, "/focus/{$id}/display.js");
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+
+        $this->client->request(Request::METHOD_GET, "/focus/{$id}.js");
         $displayContent = (string) $this->client->getResponse()->getContent();
         $this->assertStringContainsString("MauticFocus{$id}", $displayContent);
         $this->assertStringContainsString("mautic_focus_{$id}", $displayContent);
         $this->assertStringContainsString("mautic_focus_{$id}_closed", $displayContent);
         $this->assertStringContainsString("mf-bar-collapser-{$id}", $displayContent);
         $this->assertStringContainsString('privacysafe.example', $displayContent);
-        $this->assertStringContainsString('window.MauticFocus', $displayContent);
-        $this->assertStringContainsString('enableTracking', $displayContent);
         $this->assertStringContainsString('window.MauticFocusItems', $displayContent);
         $this->assertStringContainsString('loadTracking', $displayContent);
         $this->assertStringContainsString('queueTrackingActivation', $displayContent);
-        $this->assertStringContainsString('MauticFocusTrackingQueue', $displayContent);
         $this->assertStringContainsString('DOMContentLoaded', $displayContent);
         $this->assertStringContainsString('initialized', $displayContent);
         $this->assertStringContainsString('delete window.MauticFocusItems', $displayContent);
@@ -99,11 +105,6 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('mtc_id', $displayContent);
         $this->assertStringNotContainsString('mautic_device_id', $displayContent);
         $this->assertStringNotContainsString('/mautic-tracking.js', $displayContent);
-
-        $this->client->request(Request::METHOD_GET, "/focus/{$id}.js");
-        $legacyContent = (string) $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('viewpixel.gif', $legacyContent);
-        $this->assertStringNotContainsString('privacysafe.example', $legacyContent);
 
         $this->client->request(Request::METHOD_GET, "/focus/{$id}/tracking.js");
         $trackingContent = (string) $this->client->getResponse()->getContent();
@@ -135,7 +136,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         ]));
         $focusModel->saveEntity($focusOff);
 
-        $this->client->request(Request::METHOD_GET, "/focus/{$focusOff->getId()}/display.js");
+        $this->client->request(Request::METHOD_GET, "/focus/{$focusOff->getId()}.js");
         $offContent = (string) $this->client->getResponse()->getContent();
         $this->assertResponseIsSuccessful();
         // Twig "is not empty" treats integer 0 as not empty; YesNo fields must use truthiness.
@@ -149,7 +150,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         ]));
         $focusModel->saveEntity($focusOn);
 
-        $this->client->request(Request::METHOD_GET, "/focus/{$focusOn->getId()}/display.js");
+        $this->client->request(Request::METHOD_GET, "/focus/{$focusOn->getId()}.js");
         $onContent = (string) $this->client->getResponse()->getContent();
         $this->assertResponseIsSuccessful();
         $this->assertMatchesRegularExpression('/ignoreClosed:(?:true|!0)/', $onContent);
@@ -170,21 +171,17 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $focusModel->saveEntity($focus);
         $id = $focus->getId();
 
-        $this->client->request(Request::METHOD_GET, "/focus/{$id}/display.js");
+        $this->client->request(Request::METHOD_GET, "/focus/{$id}.js");
         $displayContent = (string) $this->client->getResponse()->getContent();
         $this->client->request(Request::METHOD_GET, "/focus/{$id}/tracking.js");
         $trackingContent = (string) $this->client->getResponse()->getContent();
-        $this->client->request(Request::METHOD_GET, "/focus/{$id}.js");
-        $aggregateContent = (string) $this->client->getResponse()->getContent();
 
         $temporaryDirectory = sys_get_temp_dir().'/mautic-focus-'.bin2hex(random_bytes(8));
         $this->assertTrue(mkdir($temporaryDirectory));
-        $displayPath   = $temporaryDirectory.'/display.js';
-        $trackingPath  = $temporaryDirectory.'/tracking.js';
-        $aggregatePath = $temporaryDirectory.'/aggregate.js';
+        $displayPath  = $temporaryDirectory.'/display.js';
+        $trackingPath = $temporaryDirectory.'/tracking.js';
         file_put_contents($displayPath, $displayContent);
         file_put_contents($trackingPath, $trackingContent);
-        file_put_contents($aggregatePath, $aggregateContent);
 
         try {
             $process = new Process([
@@ -192,7 +189,6 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
                 __DIR__.'/../Fixtures/focus-tracking-runtime.js',
                 $displayPath,
                 $trackingPath,
-                $aggregatePath,
                 (string) $id,
             ]);
             $process->mustRun();
@@ -200,7 +196,6 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         } finally {
             unlink($displayPath);
             unlink($trackingPath);
-            unlink($aggregatePath);
             rmdir($temporaryDirectory);
         }
     }
@@ -217,10 +212,8 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
 
         foreach ([
             "/focus/{$focus->getId()}.js",
-            "/focus/{$focus->getId()}/display.js",
             "/focus/{$focus->getId()}/tracking.js",
             '/focus/999999999.js',
-            '/focus/999999999/display.js',
             '/focus/999999999/tracking.js',
         ] as $url) {
             $this->client->request(Request::METHOD_GET, $url);

@@ -97,10 +97,10 @@ MauticJS.enhanceDynamicContent = function(dwcContent) {
         try {
             var focusUrl = new URL(script.getAttribute('src'), mauticBaseUrl.href.replace(/\/$/, '') + '/');
             var focusPath = focusUrl.pathname.substring(focusBasePath.length);
-            var isDisplayEndpoint = focusUrl.pathname.indexOf(focusBasePath) === 0 && /^[1-9]\d*\/display\.js$/.test(focusPath);
-            var isLegacyEndpoint = focusUrl.pathname.indexOf(focusBasePath) === 0 && /^[1-9]\d*\.js$/.test(focusPath);
+            var isFocusScript = focusUrl.pathname.indexOf(focusBasePath) === 0 && /^[1-9]\d*\.js$/.test(focusPath);
 
-            if (focusUrl.origin === mauticBaseUrl.origin && (isDisplayEndpoint || (MauticJS.trackingEnabled && isLegacyEndpoint))) {
+            // The Focus script loads its tracking only once Mautic tracking is enabled
+            if (focusUrl.origin === mauticBaseUrl.origin && isFocusScript) {
                 MauticJS.insertScript(focusUrl.href);
             }
         } catch (error) {

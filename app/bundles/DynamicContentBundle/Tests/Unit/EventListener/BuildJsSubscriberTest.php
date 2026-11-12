@@ -58,7 +58,7 @@ final class BuildJsSubscriberTest extends TestCase
         $this->assertStringContainsString('MauticSDK.onLoad();', $js);
         $this->assertStringContainsString("container.content.querySelectorAll('script[src]')", $js);
         $this->assertStringContainsString('focusUrl.origin === mauticBaseUrl.origin', $js);
-        $this->assertStringContainsString('MauticJS.trackingEnabled && isLegacyEndpoint', $js);
+        $this->assertStringContainsString('focusUrl.origin === mauticBaseUrl.origin && isFocusScript', $js);
         $this->assertStringNotContainsString('MauticJS.setTrackedContact(response)', $js);
         $this->assertSame(2, substr_count($js, 'MauticJS.replaceDynamicContent'));
     }
@@ -91,7 +91,7 @@ final class BuildJsSubscriberTest extends TestCase
         $this->assertSame(1, substr_count($js, 'MauticJS.enhanceDynamicContent(dwcContent);'));
         $this->assertStringContainsString("container.content.querySelectorAll('script[src]')", $js);
         $this->assertStringContainsString('focusUrl.origin === mauticBaseUrl.origin', $js);
-        $this->assertStringContainsString('MauticJS.trackingEnabled && isLegacyEndpoint', $js);
+        $this->assertStringContainsString('focusUrl.origin === mauticBaseUrl.origin && isFocusScript', $js);
         $this->assertLessThan(strpos($js, 'MauticJS.setTrackedContact(response)'), strpos($js, 'MauticJS.replaceDynamicContent = function'));
     }
 }

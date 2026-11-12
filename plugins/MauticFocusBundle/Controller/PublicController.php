@@ -25,12 +25,10 @@ final class PublicController extends CommonController
         $this->focusModel = $focusModel;
     }
 
+    /**
+     * Shows the item without tracking. Tracking loads separately once Mautic tracking is enabled on the page.
+     */
     public function generateAction($id): Response
-    {
-        return $this->buildJavascript($id);
-    }
-
-    public function displayAction($id): Response
     {
         return $this->buildJavascript($id, [FocusJsScope::RUNTIME, FocusJsScope::DISPLAY]);
     }
@@ -64,11 +62,7 @@ final class PublicController extends CommonController
     /**
      * @param FocusJsScope[] $acceptedScopes
      */
-    private function buildJavascript($id, array $acceptedScopes = [
-        FocusJsScope::RUNTIME,
-        FocusJsScope::DISPLAY,
-        FocusJsScope::TRACKING,
-    ]): Response
+    private function buildJavascript($id, array $acceptedScopes): Response
     {
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);

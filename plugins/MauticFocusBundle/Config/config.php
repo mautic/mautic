@@ -24,10 +24,6 @@ return [
                 'path'       => '/focus/{id}.js',
                 'controller' => 'MauticPlugin\MauticFocusBundle\Controller\PublicController::generateAction',
             ],
-            'mautic_focus_generate_display' => [
-                'path'       => '/focus/{id}/display.js',
-                'controller' => 'MauticPlugin\MauticFocusBundle\Controller\PublicController::displayAction',
-            ],
             'mautic_focus_generate_tracking' => [
                 'path'       => '/focus/{id}/tracking.js',
                 'controller' => 'MauticPlugin\MauticFocusBundle\Controller\PublicController::trackingAction',
