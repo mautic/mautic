@@ -431,6 +431,10 @@
       background-color: var(--layer);
       min-inline-size: 235px;
 
+      .nav-item {
+        margin-bottom: 0;
+      }
+
       &::before {
         content: '';
         display: block;
@@ -453,7 +457,7 @@
         background-color: var(--layer);
         border-right: 0;
         border-bottom: 1px solid var(--border-subtle);
-        margin-bottom: 1px;
+        margin-bottom: 0;
         z-index: 1;
 
         &:hover {
