@@ -36,21 +36,6 @@ class AcceptanceTester extends Codeception\Actor
             }
         }
         // logging in
-        if (!$reuseSnapshot) {
-            $I->amOnPage('/s/logout');
-            $I->executeInSelenium(static function (Facebook\WebDriver\Remote\RemoteWebDriver $webDriver): void {
-                foreach ($webDriver->manage()->getCookies() as $cookie) {
-                    if (in_array(trim($cookie['name']), [
-                        Codeception\Coverage\Subscriber\LocalServer::COVERAGE_COOKIE,
-                        Codeception\Coverage\Subscriber\LocalServer::COVERAGE_COOKIE_ERROR,
-                    ], true)) {
-                        continue;
-                    }
-
-                    $webDriver->manage()->deleteCookieNamed($cookie['name']);
-                }
-            });
-        }
         $I->amOnPage('/s/login');
         $I->fillField('#username', $name);
         $I->fillField('#password', $password);

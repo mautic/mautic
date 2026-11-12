@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Page\Acceptance\EmailsPage;
 use Step\Acceptance\EmailStep;
-use Step\Acceptance\SegmentStep;
 
 final class EmailScheduleCest
 {
@@ -96,12 +95,8 @@ final class EmailScheduleCest
         $I->dontSeeElement('#scheduleOptionsNotice');
     }
 
-    public function createSegmentEmailAndVerifyScheduleNoticeTogglesOnEdit(AcceptanceTester $I, SegmentStep $segment, EmailStep $email): void
+    public function createSegmentEmailAndVerifyScheduleNoticeTogglesOnEdit(AcceptanceTester $I, EmailStep $email): void
     {
-        $contactSegmentName = 'Segment '.date('YmdHis');
-
-        $segment->createAContactSegment($contactSegmentName);
-
         $segmentEmailName = 'Segment Email '.date('YmdHis');
 
         $email->createSegmentEmail($segmentEmailName);
@@ -141,12 +136,8 @@ final class EmailScheduleCest
         $I->dontSeeElement('#scheduleOptionsNotice');
     }
 
-    public function createSegmentEmailAndVerifyScheduleButtonOnView(AcceptanceTester $I, SegmentStep $segment, EmailStep $email): void
+    public function createSegmentEmailAndVerifyScheduleButtonOnView(AcceptanceTester $I, EmailStep $email): void
     {
-        $contactSegmentName = 'Segment '.date('YmdHis');
-
-        $segment->createAContactSegment($contactSegmentName);
-
         $segmentEmailName = 'Segment Email '.date('YmdHis');
 
         $email->createSegmentEmail($segmentEmailName);
