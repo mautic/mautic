@@ -198,20 +198,29 @@
   {% endfor %}
   {{ form_start(form) }}
   <div class="box-layout">
-    <div class="col-xs-12 height-auto">
-      <div class="pa-16 d-flex align-items-start gap-16">
-        <img class="rounded img-bordered media-object contact-avatar" style="width: 96px; height: 96px; object-fit: cover;" src="{{ img }}" alt="">
-        <div>
+    <div class="col-md-3 height-auto">
+      <div class="pe-24 ps-24 pt-16 pb-16">
+        <div class="media">
+          <div class="media-body">
+            <img class="rounded img-bordered img-fluid media-object contact-avatar" src="{{ img }}" alt="">
+          </div>
+        </div>
+
+        <div class="row mt-5">
+          <div class="col-sm-12">
             {{ form_label(form.preferred_profile_image) }}
             {{ form_widget(form.preferred_profile_image) }}
-            <div class="{% if false == form.custom_avatar.vars.valid %}has-error{% endif %}"
-                 id="customAvatarContainer"
-                 style="{% if 'custom' != form.preferred_profile_image.vars.data %}display: none;{% endif %}">
-                {{ form_widget(form.custom_avatar) }}
-                {{ form_errors(form.custom_avatar) }}
-            </div>
+          </div>
+          <div class="col-sm-12 {% if false == form.custom_avatar.vars.valid %}has-error{% endif %}"
+               id="customAvatarContainer"
+               style="{% if 'custom' != form.preferred_profile_image.vars.data %}display: none;{% endif %}">
+            {{ form_widget(form.custom_avatar) }}
+            {{ form_errors(form.custom_avatar) }}
+          </div>
         </div>
       </div>
+    </div>
+    <div class="col-md-9 height-auto bdr-l">
       {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': contactTabs, 'variant': 'line'}) }}
     </div>
   </div>
