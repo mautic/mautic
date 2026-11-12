@@ -407,6 +407,17 @@
       flex-direction: row;
       width: 100%;
       min-inline-size: 0;
+
+      > .nav-tabs-wrapper {
+        display: flex;
+        flex: 0 0 auto;
+        overflow: visible;
+        margin-bottom: 0;
+
+        > .scroll-btn {
+          display: none;
+        }
+      }
     }
 
     .nav-tabs {

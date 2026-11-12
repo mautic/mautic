@@ -48,9 +48,13 @@
         {% endif %}
     {% endfor %}
     <div class="box-layout">
-        <div class="col-xs-12 height-auto">
+        <div class="col-md-3 height-auto">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                {{ customContent('company.form.sidebar', _context) }}
+            </div>
+        </div>
+        <div class="col-md-9 height-auto bdr-l">
             {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': companyTabs, 'variant': 'vertical'}) }}
-            {{ customContent('company.form.sidebar', _context) }}
         </div>
     </div>
 {{ form_end(form) }}
