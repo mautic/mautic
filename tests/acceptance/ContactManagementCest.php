@@ -69,11 +69,34 @@ mQuery(document).on('ajaxComplete.tableSortQuery', function (event, xhr, setting
 JS);
             $I->waitForElementClickable('#leadTable .col-lead-name a.table-sort', AcceptanceTester::TIMEOUT);
             if ('clearBeforeSort' === $scenario) {
-                // Click in the same browser task, before the clear-search response arrives.
+                // Hold the search request until both real WebDriver clicks have completed.
                 $I->executeJS(<<<'JS'
-document.querySelector("button[data-livesearch-parent='list-search']").click();
-document.querySelector('#leadTable .col-lead-name a.table-sort').click();
+window.releaseTableSearch = null;
+mQuery.ajaxPrefilter(function (options) {
+    if (window.releaseTableSearch !== null || options.type !== 'GET' || options.url.indexOf('/s/contacts') === -1) {
+        return;
+    }
+    const createXhr = options.xhr;
+    options.xhr = function () {
+        const xhr = createXhr();
+        const send = xhr.send;
+        xhr.send = function (body) {
+            window.releaseTableSearch = function () {
+                send.call(xhr, body);
+            };
+        };
+        return xhr;
+    };
+});
 JS);
+                $clearButton = "button[data-livesearch-parent='list-search']";
+                $I->waitForElementClickable($clearButton, AcceptanceTester::TIMEOUT);
+                $I->click($clearButton);
+                $I->waitForJS('return typeof window.releaseTableSearch === "function";', AcceptanceTester::TIMEOUT);
+                $I->waitForElementClickable('#leadTable .col-lead-name a.table-sort', AcceptanceTester::TIMEOUT);
+                $I->click('#leadTable .col-lead-name a.table-sort');
+                $I->assertNull($I->executeJS('return window.tableSortRequest;'));
+                $I->executeJS('window.releaseTableSearch();');
             } else {
                 $I->click('#leadTable .col-lead-name a.table-sort');
             }
@@ -89,6 +112,42 @@ JS);
             $I->assertSame('POST', $request['method']);
             $I->assertSame(200, $request['status']);
         }
+    }
+
+    public function sortingSurvivesRejectedSearches(AcceptanceTester $I): void
+    {
+        $I->amOnPage(ContactPage::$URL);
+        $I->executeJS(<<<'JS'
+window.queuedSortResult = null;
+const originalLoad = Mautic.loadContent;
+const originalSearch = Mautic.liveSearchXhr;
+const requests = [];
+const first = mQuery.Deferred();
+const replacement = mQuery.Deferred();
+first.listTarget = replacement.listTarget = '.page-list';
+Mautic.loadContent = function (route) {
+    requests.push(route);
+};
+Mautic.liveSearchXhr = first;
+Mautic.reorderTableData('lead', 'l.lastname', 'list', '.page-list');
+first.reject(null, 'searchCompleted');
+Mautic.liveSearchXhr = replacement;
+setTimeout(function () {
+    const whilePending = requests.length;
+    replacement.reject(null, 'error');
+    delete Mautic.liveSearchXhr;
+    setTimeout(function () {
+        Mautic.loadContent = originalLoad;
+        Mautic.liveSearchXhr = originalSearch;
+        window.queuedSortResult = {whilePending, requests};
+    }, 20);
+}, 20);
+JS);
+        $I->waitForJS('return window.queuedSortResult !== null;', AcceptanceTester::TIMEOUT);
+        $result = $I->executeJS('return window.queuedSortResult;');
+        $I->assertSame(0, $result['whilePending']);
+        $I->assertCount(1, $result['requests']);
+        $I->assertStringContainsString('orderby=l.lastname', $result['requests'][0]);
     }
 
     public function createContactFromQuickAdd(

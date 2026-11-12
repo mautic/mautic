@@ -38,8 +38,11 @@ Mautic.reorderTableData = function (name, orderby, tmpl, target, baseUrl) {
         // A pending list search updates the page URL when its response is rendered.
         var searchRequest = Mautic.liveSearchXhr;
         if (searchRequest && searchRequest.listTarget === target && searchRequest.state() === 'pending') {
-            searchRequest.then(function () {
-                Mautic.reorderTableData(name, orderby, tmpl, target);
+            searchRequest.always(function () {
+                // Rejections can be synchronous; let cleanup and a replacement search finish first.
+                setTimeout(function () {
+                    Mautic.reorderTableData(name, orderby, tmpl, target);
+                }, 0);
             });
             return;
         }
