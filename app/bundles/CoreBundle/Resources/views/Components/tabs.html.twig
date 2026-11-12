@@ -114,6 +114,7 @@
                 </button>
             </li>
         {% endfor %}
+        {{- navAppend|default('')|raw -}}
     </ul>
 
     <div class="tab-content{% if variant == 'contained' %} tab-content--contained{% elseif variant == 'vertical' %} tab-content--contained tab-content--vertical{% endif %}">
@@ -123,5 +124,6 @@
             {%- set isActive = loop.index0 == selectedIndex -%}
             {{ _self.tabContent(tab, tabId, isActive, variant, layer) }}
         {% endfor %}
+        {{- contentAppend|default('')|raw -}}
     </div>
 </div>

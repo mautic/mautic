@@ -135,11 +135,11 @@ Mautic.leadOnLoad = function (container, response) {
 
     var leadMap = [];
 
-    mQuery(document).on('shown.bs.tab', 'a#load-lead-map',  () => {
+    mQuery(document).on('shown.bs.tab', '[data-bs-target="#place-container"]', () => {
         leadMap = Mautic.initMap('#place-container', 'markers');
     });
 
-    mQuery('a[data-bs-toggle="tab"]').not('a#load-lead-map').on('shown.bs.tab', function (e) {
+    mQuery('[data-bs-toggle="tab"]').not('[data-bs-target="#place-container"]').on('shown.bs.tab', function (e) {
         if (leadMap.length) {
             leadMap.destroyMap();
             leadMap = undefined;
@@ -218,7 +218,7 @@ Mautic.leadTimelineOnLoad = function (container, response) {
     });
 
     if (response && typeof response.timelineCount !== 'undefined') {
-        mQuery('#TimelineCount').html(response.timelineCount);
+        mQuery('#TimelineCount span').html(response.timelineCount);
     }
 };
 
@@ -1017,7 +1017,7 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
             if (response.success) {
                 if (response.completeProfile) {
                     mQuery('#social-container').html(response.completeProfile);
-                    mQuery('#SocialCount').html(response.socialCount);
+                    mQuery('#SocialCount span').html(response.socialCount);
                 } else {
                     //loop through each network
                     mQuery.each(response.profiles, function (index, value) {
@@ -1053,7 +1053,7 @@ Mautic.clearLeadSocialProfile = function(network, leadId, event) {
                 if (response.completeProfile) {
                     mQuery('#social-container').html(response.completeProfile);
                 }
-                mQuery('#SocialCount').html(response.socialCount);
+                mQuery('#SocialCount span').html(response.socialCount);
             }
 
             Mautic.stopIconSpinPostEvent();
@@ -1068,7 +1068,7 @@ Mautic.clearLeadSocialProfile = function(network, leadId, event) {
 Mautic.refreshLeadAuditLog = function(form) {
     Mautic.postForm(mQuery(form), function (response) {
         response.target = '#auditlog-table';
-        mQuery('#AuditLogCount').html(response.auditLogCount);
+        mQuery('#AuditLogCount span').html(response.auditLogCount);
         Mautic.processPageContent(response);
     });
 };
@@ -1076,7 +1076,7 @@ Mautic.refreshLeadAuditLog = function(form) {
 Mautic.refreshLeadTimeline = function(form) {
     Mautic.postForm(mQuery(form), function (response) {
         response.target = '#timeline-table';
-        mQuery('#TimelineCount').html(response.timelineCount);
+        mQuery('#TimelineCount span').html(response.timelineCount);
         Mautic.processPageContent(response);
     });
 };
@@ -1084,7 +1084,7 @@ Mautic.refreshLeadTimeline = function(form) {
 Mautic.refreshLeadNotes = function(form) {
     Mautic.postForm(mQuery(form), function (response) {
         response.target = '#NoteList';
-        mQuery('#NoteCount').html(response.noteCount);
+        mQuery('#NoteCount span').html(response.noteCount);
         Mautic.processPageContent(response);
     });
 };
@@ -1218,7 +1218,7 @@ Mautic.leadNoteOnLoad = function (container, response) {
     }
 
     if (response.upNoteCount || response.noteCount || response.downNoteCount) {
-        var noteCountWrapper = mQuery('#NoteCount');
+        var noteCountWrapper = mQuery('#NoteCount span');
         var count = parseInt(noteCountWrapper.text().trim());
 
         if (response.upNoteCount) {
