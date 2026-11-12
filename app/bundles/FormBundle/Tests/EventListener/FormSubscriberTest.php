@@ -86,6 +86,39 @@ New line',
         ], 'Form data should be decode before posting to next form');
     }
 
+    public function testRepostWithoutContactOrMappedFields(): void
+    {
+        $postData = [
+            'formId'   => '1',
+            'formName' => 'kiosk_form',
+            'return'   => '',
+        ];
+
+        $request    = new Request();
+        $submission = $this->getFormSubmission()->setLead(null);
+        $action     = $this->getFormRepostAction()->setProperties([
+            'post_url'             => 'http://127.0.0.1:1',
+            'failure_email'        => '',
+            'authorization_header' => '',
+        ]);
+
+        $event = new SubmissionEvent($submission, $postData, $request->server, $request);
+        $event->setResults([])
+            ->setFields([])
+            ->setAction($action);
+
+        $this->subscriber->onFormSubmitActionRepost($event);
+
+        $this->assertSame([
+            'mautic_contact' => [],
+            'mautic_form'    => [
+                'id'   => '1',
+                'name' => 'kiosk_form',
+                'url'  => '',
+            ],
+        ], $event->getPostSubmitPayload());
+    }
+
     public function testOnFormSubmitSendsNothingIfNoEmailsWereSet(): void
     {
         $tokensData = [];
