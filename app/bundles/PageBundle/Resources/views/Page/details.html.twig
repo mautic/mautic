@@ -200,14 +200,14 @@
               {% if showVariants %}
               {% set tabsviewsdetailsContent0 %}
                                 {{ variantContent|raw }}
-                            
+
               {% endset %}
               {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'variants-container', 'label': 'mautic.core.variants', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
               {% endif %}
               {% if showTranslations %}
               {% set tabsviewsdetailsContent1 %}
                                 {{ translationContent|raw }}
-                            
+
               {% endset %}
               {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'translation-container', 'label': 'mautic.core.translations', 'content': tabsviewsdetailsContent1, 'className': 'pa-16' ~ " " ~ (not showVariants ? 'active' : ''), 'itemClass': (not showVariants ? 'active' : '')}]) %}
               {% endif %}
@@ -217,7 +217,7 @@
           {% if showVariants or showTranslations %}
 
           {% endif %}
-          
+
           {% set additionalCards = [{
               heading: 'mautic.page.results.view',
               copy: (not showVariants and not showTranslations) ? 'mautic.page.results.view.description' : null,
@@ -228,7 +228,7 @@
                   'data-menu-link': 'mautic_form_index'
               }
           }] %}
-          
+
           {{ include('@MauticCore/Modules/suggested-actions.html.twig', {
               'entity': activePage,
               'routeBase': 'page',

@@ -279,12 +279,14 @@
             {% set leadTabs = [
                 {
                     'id': 'timeline-container',
+                    'className': 'pa-16',
                     'label': 'mautic.lead.lead.tab.history',
                     'renderTag': {'label': events.total, 'attributes': {'id': 'TimelineCount'}},
                     'content': include('@MauticLead/Timeline/list.html.twig', {'events': events, 'lead': lead})
                 },
                 {
                     'id': 'notes-container',
+                    'className': 'pa-16',
                     'label': 'mautic.lead.lead.tab.notes',
                     'renderTag': {'label': noteCount, 'attributes': {'id': 'NoteCount'}},
                     'content': render(controller('Mautic\\LeadBundle\\Controller\\NoteController::indexAction', {'leadId': lead.id, 'ignoreAjax': 1}))
@@ -293,6 +295,7 @@
             {% if not isAnonymous %}
                 {% set leadTabs = leadTabs|merge([{
                     'id': 'social-container',
+                    'className': 'pa-16',
                     'label': 'mautic.lead.lead.tab.social',
                     'renderTag': {'label': socialProfiles|length, 'attributes': {'id': 'SocialCount'}},
                     'content': include('@MauticLead/Social/index.html.twig', {
@@ -305,6 +308,7 @@
             {% set leadTabs = leadTabs|merge([
                 {
                     'id': 'integration-container',
+                    'className': 'pa-16',
                     'label': 'mautic.lead.lead.tab.integration',
                     'renderTag': {'label': integrations|length, 'attributes': {'id': 'IntegrationCount'}},
                     'content': include('@MauticLead/Integration/index.html.twig', {
@@ -314,6 +318,7 @@
                 },
                 {
                     'id': 'auditlog-container',
+                    'className': 'pa-16',
                     'label': 'mautic.lead.lead.tab.auditlog',
                     'renderTag': {'label': auditlog.total, 'attributes': {'id': 'AuditLogCount'}},
                     'content': include('@MauticLead/Auditlog/_list.html.twig', {
@@ -323,6 +328,7 @@
                 },
                 {
                     'id': 'place-container',
+                    'className': 'pa-16',
                     'label': 'mautic.lead.lead.tab.places',
                     'renderTag': {'label': places|length, 'attributes': {'id': 'PlaceCount'}},
                     'content': include('@MauticLead/Lead/_map.html.twig', {'places': places})
@@ -333,7 +339,7 @@
                 {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': leadTabs, 'variant': 'contained'}) }}
                 {% set customTabs = customContent('tabs', _context)|trim %}
                 {% if customTabs is not empty %}
-                    <ul class="nav nav-tabs nav-tabs--contained">{{ customTabs|raw }}</ul>
+                    <div class="tabs-container"><ul class="nav nav-tabs nav-tabs--contained">{{ customTabs|raw }}</ul></div>
                 {% endif %}
                 <div class="tab-content">{{ customContent('tabs.content', _context) }}</div>
             </div>
@@ -482,24 +488,24 @@
             </div>
 
         <div class="pa-12">
-            
+
             {% set maxVisibleTagsCount = 8 %}
             {% set tagCount = lead.tags|length %}
             {% set isExpandable = tagCount > maxVisibleTagsCount %}
-            
+
             {% set tagHeader %}
                 <div class="d-flex justify-content-between">
                     <span class="fw-b ellipsis mb-16">{{ 'mautic.lead.tags'|trans }}</span>
                     <i class="ri-hashtag" aria-hidden="true"></i>
                 </div>
             {% endset %}
-            
+
             {% if not isExpandable %}
-                
+
                 {% set tagContent %}
                     {{ tagHeader }}
-                    
-                    <div class="d-flex flex-wrap gap-xs mt-5">
+
+                    <div class="d-flex flex-wrap gap-5 mt-5">
                         {% if tagCount > 0 %}
                             {% for tag in lead.tags %}
                                 {{ _self.render_tag(tag, lead.id) }}
@@ -511,27 +517,27 @@
                         {% endif %}
                     </div>
                 {% endset %}
-                
+
                 {% include '@MauticCore/Components/tile.html.twig' with {
                     'type': 'base',
                     'content': tagContent
                 } %}
-            
+
             {% else %}
                 {# Use tile--expandable-interactive for more than 8 tags #}
                 {% set firstEightTags = lead.tags|slice(0, maxVisibleTagsCount) %}
                 {% set remainingTags = lead.tags|slice(maxVisibleTagsCount) %}
-                
+
                 {% set aboveContent %}
                     {{ tagHeader }}
-                    
-                    <div class="d-flex flex-wrap gap-xs">
+
+                    <div class="d-flex flex-wrap gap-5">
                         {% for tag in firstEightTags %}
                             {{ _self.render_tag(tag, lead.id) }}
                         {% endfor %}
                     </div>
                 {% endset %}
-                
+
                 {% set belowContent %}
                     <div class="d-flex flex-wrap gap-xs mt-5">
                         {% for tag in remainingTags %}
@@ -539,13 +545,13 @@
                         {% endfor %}
                     </div>
                 {% endset %}
-                
+
                 {% include '@MauticCore/Components/tile.html.twig' with {
                     'type': 'expandable-interactive',
                     'aboveFoldContent': aboveContent,
                     'belowFoldContent': belowContent
                 } %}
-            
+
             {% endif %}
         </div>
 
@@ -611,7 +617,7 @@
             {% if lists[lead.id] is defined and lists[lead.id]|length > 0 %}
                 {% set segments = lists[lead.id] %}
                 {% set classes = ['gray', 'red', 'magenta', 'purple', 'blue', 'cyan', 'teal', 'green'] %}
-                
+
                 {% if segments|length <= 8 %}
                     {% set content %}
                         <div class="d-flex justify-content-between">
@@ -632,7 +638,7 @@
                             {% endfor %}
                         </div>
                     {% endset %}
-                    
+
                     {% include '@MauticCore/Components/tile.html.twig' with {'type': 'base', 'content': content} %}
                 {% else %}
                     {% set aboveContent %}
@@ -654,7 +660,7 @@
                         {% endfor %}
                         </div>
                     {% endset %}
-                    
+
                     {% set belowContent %}
                         <div class="d-flex flex-wrap gap-xs mt-5">
                         {% for key, list in segments|slice(8) %}
@@ -670,7 +676,7 @@
                         {% endfor %}
                         </div>
                     {% endset %}
-                    
+
                     {% include '@MauticCore/Components/tile.html.twig' with {
                         'type': 'expandable-interactive',
                         'aboveFoldContent': aboveContent,
@@ -686,7 +692,7 @@
                 <p class="text-helper">{{ 'mautic.lead.lead.lists.no_results'|trans }}</p>
                 <div class="clearfix"></div>
                 {% endset %}
-                
+
                 {% include '@MauticCore/Components/tile.html.twig' with {'type': 'base', 'content': content} %}
             {% endif %}
         </div>

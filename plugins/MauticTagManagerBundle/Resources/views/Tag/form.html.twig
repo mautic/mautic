@@ -23,7 +23,7 @@
                                                         {{ form_row(form.description) }}
                                                     </div>
                                                 </div>
-                                            
+
                     {% endset %}
                     {% set tabsviewsform = tabsviewsform|merge([{'id': 'details', 'label': 'mautic.core.details', 'content': tabsviewsformContent0, 'className': 'pa-16'}]) %}
                     {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsform, 'variant': 'contained'}) }}

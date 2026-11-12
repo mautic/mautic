@@ -5,7 +5,7 @@
                 'lead': lead,
                 'profile': details.profile,
             }) }}
-        
+
     {% endset %}
     {% set tabsfoursquareview = tabsfoursquareview|merge([{'id': 'FoursquareProfile', 'label': 'mautic.lead.lead.social.profile', 'content': tabsfoursquareviewContent0, 'className': 'pa-16 pa-24'}]) %}
     {% set tabsfoursquareviewContent1 %}
@@ -13,7 +13,7 @@
                 'lead': lead,
                 'activity': details.activity.tips|default([]),
             }) }}
-        
+
     {% endset %}
     {% set tabsfoursquareview = tabsfoursquareview|merge([{'id': 'FoursquareTips', 'label': 'mautic.lead.lead.social.foursquare.tips', 'content': tabsfoursquareviewContent1, 'className': 'pa-16'}]) %}
     {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsfoursquareview, 'variant': 'contained'}) }}

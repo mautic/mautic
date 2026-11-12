@@ -385,6 +385,13 @@
               <!--/ stats -->
 
               <div class="stats-menu ps-16 mt-24">
+                  <div class="date-range ms-auto">
+                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
+                          'dateRangeForm': dateRangeForm,
+                      }) }}
+                  </div>
+              </div>
+              <div class="ps-16 mb-24">
                   {% set tabsviewsdetails = [] %}
                   {% set tabsviewsdetailsContent0 %}
                                         <div id="emailGraphStats"
@@ -395,23 +402,17 @@
                                             </div>
                                         </div>
 
-                                    
+
                   {% endset %}
                   {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'stats-container', 'label': 'mautic.email.thead.stats', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
                   {% set tabsviewsdetailsContent1 %}
                                         <div class="spinner">
                                             <i class="ri-loader-3-line ri-spin"></i>
                                         </div>
-                                    
+
                   {% endset %}
                   {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'reads-map-container', 'label': 'mautic.email.thead.maps', 'content': tabsviewsdetailsContent1, 'className': 'pa-16', 'attributes': {'data-load': 'map'}, 'paneAttributes': {'data-map-url': path('mautic_email_map_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')})}}]) %}
                   {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}
-
-                  <div class="date-range">
-                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
-                          'dateRangeForm': dateRangeForm,
-                      }) }}
-                  </div>
               </div>
 
               {{ customContent('details.stats.graph.below', _context) }}
@@ -425,18 +426,18 @@
                                     'clickCountsSortable' : true,
                                     'clickCountsSorting'  : clickCountsSorting,
                                 }) -}}
-                            
+
               {% endset %}
               {% set tabsviewsdetails2 = tabsviewsdetails2|merge([{'id': 'clicks-container', 'label': 'mautic.trackable.click_counts', 'content': tabsviewsdetails2Content0, 'className': 'pa-16'}]) %}
               {% set tabsviewsdetails2Content1 %}
                                 {{ contacts | raw }}
-                            
+
               {% endset %}
               {% set tabsviewsdetails2 = tabsviewsdetails2|merge([{'id': 'contacts-container', 'label': 'mautic.email.associated.contacts', 'content': tabsviewsdetails2Content1, 'className': 'pa-16 page-list'}]) %}
               {% if showTranslations %}
               {% set tabsviewsdetails2Content2 %}
                                     {{ translationContent|raw }}
-                                
+
               {% endset %}
               {% set tabsviewsdetails2 = tabsviewsdetails2|merge([{'id': 'translation-container', 'label': 'mautic.core.translations', 'content': tabsviewsdetails2Content2, 'className': 'pa-16'}]) %}
               {% endif %}

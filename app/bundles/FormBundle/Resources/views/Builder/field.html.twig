@@ -72,7 +72,7 @@
                             {{ _self.row_if_exists(form, 'fieldWidth') }}
                             {{ placeholder|raw }}
                         </div>
-                    
+
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'general', 'label': 'mautic.form.field.section.general', 'content': tabsviewsfieldContent0, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'presentation'}, 'hasError': generalTabError}]) %}
         {% if showConditions %}
@@ -98,7 +98,7 @@
                                     {{ form_row(form.conditions.any) }}
                                 </div>
                             </div>
-                        
+
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'conditions', 'label': 'mautic.form.field.form.condition', 'content': tabsviewsfieldContent1, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'presentation'}, 'hasError': conditionsTabError}]) %}
         {% endif %}
@@ -108,7 +108,7 @@
                               {{ _self.row_if_exists(form, 'mappedObject') }}
                               {{ _self.row_if_exists(form, 'mappedField') }}
                           </div>
-                      
+
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'mappedfields', 'label': 'mautic.form.field.section.mappedfield', 'content': tabsviewsfieldContent2, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'presentation'}}]) %}
         {% endif %}
@@ -153,7 +153,7 @@
                                     {% endfor %}
                                 </div>
                               {% endif %}
-                      
+
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'required', 'label': 'mautic.form.field.section.validation', 'content': tabsviewsfieldContent3, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'presentation'}}]) %}
         {% endif %}
@@ -202,7 +202,7 @@
                                 {% endif %}
                               {% endfor %}
                           </div>
-                      
+
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'properties', 'label': 'mautic.form.field.section.properties', 'content': tabsviewsfieldContent4, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'presentation'}, 'hasError': propertiesTabError}]) %}
         {% endif %}
@@ -215,7 +215,7 @@
                               {{ _self.row_if_exists(form, 'containerAttributes') }}
                               {{ customAttributes|raw }}
                           </div>
-                      
+
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'attributes', 'label': 'mautic.form.field.section.attributes', 'content': tabsviewsfieldContent5, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'presentation'}}]) %}
         {% endif %}
@@ -228,7 +228,7 @@
                               {{ _self.row_if_exists(form, 'isReadOnly') }}
                               {{ _self.row_if_exists(form, 'showAfterXSubmissions') }}
                           </div>
-                      
+
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'progressive-profiling', 'label': 'mautic.form.field.section.progressive.profiling', 'content': tabsviewsfieldContent6, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'progressive-profiling'}}]) %}
         {% endif %}

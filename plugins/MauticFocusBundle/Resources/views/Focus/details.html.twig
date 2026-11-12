@@ -220,7 +220,7 @@
                                                     'entity': item,
                                                     'channel': 'focus',
                                             }) }}
-                                        
+
                   {% endset %}
                   {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'clicks-container', 'label': 'mautic.trackable.click_counts', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
                   {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}

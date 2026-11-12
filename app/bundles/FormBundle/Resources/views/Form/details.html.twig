@@ -231,7 +231,7 @@
                                         {% endfor %}
                                     </ul>
                                 {% endfor %}
-                            
+
             {% endset %}
             {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'actions-container', 'label': 'mautic.form.tab.actions', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
             {% endif %}
@@ -255,7 +255,7 @@
                                   {% endfor %}
                                 {% endfor %}
                             </ul>
-                        
+
             {% endset %}
             {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'fields-container', 'label': 'mautic.form.tab.fields', 'content': tabsviewsdetailsContent1, 'className': 'pa-16' ~ " " ~ (not showActions ? 'active in' : ''), 'itemClass': (not showActions ? 'active' : '')}]) %}
             {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}
@@ -325,7 +325,7 @@
                 <div class="row">
                     <div class="form-group col-xs-12">
                         <div class="input-group">
-                            <input type="text" class="form-control" readonly 
+                            <input type="text" class="form-control" readonly
                                    aria-label="{{ 'mautic.page.preview.url'|trans }}"
                                    value="{{ previewUrl|escape }}"
                                    onclick="this.setSelectionRange(0, this.value.length);"

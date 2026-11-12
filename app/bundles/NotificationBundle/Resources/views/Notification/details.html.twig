@@ -121,12 +121,12 @@
                                 'entity': notification,
                                 'channel': 'notification'
                             }) }}
-                        
+
             {% endset %}
             {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'clicks-container', 'label': 'mautic.trackable.click_counts', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
             {% set tabsviewsdetailsContent1 %}
                             {{ contacts|purify }}
-                        
+
             {% endset %}
             {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'contacts-container', 'label': 'mautic.lead.leads', 'content': tabsviewsdetailsContent1, 'className': 'pa-16 page-list'}]) %}
             {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}
