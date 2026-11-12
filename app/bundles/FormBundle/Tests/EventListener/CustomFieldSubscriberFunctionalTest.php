@@ -108,7 +108,6 @@ final class CustomFieldSubscriberFunctionalTest extends MauticMysqlTestCase
                     'label'        => 'Test Select',
                     'alias'        => 'test_select',
                     'type'         => 'select',
-                    'leadField'    => self::CUSTOM_FIELD_ALIAS,
                     'mappedObject' => 'contact',
                     'mappedField'  => self::CUSTOM_FIELD_ALIAS,
                     'properties'   => [

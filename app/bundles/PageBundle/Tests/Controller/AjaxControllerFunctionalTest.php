@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Event\EntityTogglePublishEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
-use Mautic\PageBundle\Event\PageEvent;
-use Mautic\PageBundle\PageEvents;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -31,7 +30,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         self::getContainer()
             ->get(EventDispatcherInterface::class)
-            ->addListener(PageEvents::PAGE_ON_TOGGLE_PUBLISH, function (PageEvent $event) use (&$dispatchedEvent): void {
+            ->addListener(EntityTogglePublishEvent::class, function (EntityTogglePublishEvent $event) use (&$dispatchedEvent): void {
                 $dispatchedEvent = $event;
             });
 
@@ -53,7 +52,8 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $page = $this->getContainer()->get(PageRepository::class)->find($page->getId());
         $this->assertInstanceOf(Page::class, $page);
         $this->assertFalse($page->isPublished(), 'The page should not be published.');
-        $this->assertInstanceOf(PageEvent::class, $dispatchedEvent, 'The event should have been dispatched.');
-        $this->assertSame($page->getId(), $dispatchedEvent->getPage()->getId(), 'The page entity should match the one in the request.');
+        $this->assertInstanceOf(EntityTogglePublishEvent::class, $dispatchedEvent, 'The event should have been dispatched.');
+        $this->assertInstanceOf(Page::class, $dispatchedEvent->getEntity());
+        $this->assertSame($page->getId(), $dispatchedEvent->getEntity()->getId(), 'The page entity should match the one in the request.');
     }
 }
