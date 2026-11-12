@@ -8,36 +8,62 @@ export default function normalizeInlineStyleEntities(mjml) {
   }
 
   const normalizeStyle = (value) => {
-    const matches = [...value.matchAll(/&quot;/gi)];
-    if (matches.length === 0 || matches.length % 2 !== 0) {
+    // Other references can hide CSS syntax. Leave those and comments untouched.
+    if (
+      !/&quot;/i.test(value) ||
+      /&(?!quot;|apos;|#0*(?:34|39);|#x0*(?:22|27);)/i.test(value) ||
+      value.includes('/*')
+    ) {
       return value;
     }
 
-    let quoted = false;
+    const tokens = value.match(/&quot;|&apos;|&#(?:0*(?:34|39)|x0*(?:22|27));|[\s\S]/gi) || [];
+    let quote = null;
+    let converting = false;
     let output = '';
-    let cursor = 0;
 
-    for (const match of matches) {
-      const segment = value.slice(cursor, match.index);
-
-      if (quoted) {
-        output += segment.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-      } else {
-        output += segment;
+    for (let index = 0; index < tokens.length; index += 1) {
+      const token = tokens[index];
+      let character = token;
+      if (token.length > 1) {
+        character = /^&(?:quot|#0*34|#x0*22);$/i.test(token) ? '"' : "'";
       }
 
-      output += "'";
-      quoted = !quoted;
-      cursor = match.index + match[0].length;
+      if (character === '\\') {
+        // Copy escapes verbatim, including escaped quotes and paired backslashes.
+        if (index + 1 >= tokens.length) {
+          return value;
+        }
+        output += token + tokens[index + 1];
+        index += 1;
+      } else if (quote && /[\r\n\f]/.test(character)) {
+        return value;
+      } else if (character === quote) {
+        output += converting ? "'" : token;
+        quote = null;
+        converting = false;
+      } else if (!quote && (character === '"' || character === "'")) {
+        quote = character;
+        converting = character === '"';
+        output += converting ? "'" : token;
+      } else {
+        output += converting && character === "'" ? `\\${token}` : token;
+      }
     }
 
-    return output + value.slice(cursor);
+    return quote ? value : output;
   };
 
-  const normalizeTag = (tag) => tag.replace(
-    /(\sstyle\s*=\s*")([^"]*)(")/gi,
-    (match, prefix, value, suffix) => prefix + normalizeStyle(value) + suffix
-  );
+  const normalizeTag = (tag) =>
+    tag.replace(/(\s[^\s=/>]+\s*=\s*)(["'])([\s\S]*?)\2/g, (match, prefix, quote, value) => {
+      if (!/^\sstyle\s*=\s*$/i.test(prefix)) {
+        return match;
+      }
+
+      const normalized = normalizeStyle(value);
+      // CSS backslashes cannot escape HTML delimiters. MJML also expects double quotes here.
+      return normalized === value ? match : `${prefix}"${normalized.replace(/"/g, '&quot;')}"`;
+    });
 
   let output = '';
   let cursor = 0;
@@ -92,9 +118,7 @@ export default function normalizeInlineStyleEntities(mjml) {
     }
 
     const tag = mjml.slice(start, end + 1);
-    output += /^<[a-z][\w:-]*(?=\s|\/?>)/i.test(tag)
-      ? normalizeTag(tag)
-      : tag;
+    output += /^<[a-z][\w:-]*(?=\s|\/?>)/i.test(tag) ? normalizeTag(tag) : tag;
 
     if (/^<mj-style(?=\s|>)/i.test(tag) && !/\/\s*>$/.test(tag)) {
       rawStyle = true;
