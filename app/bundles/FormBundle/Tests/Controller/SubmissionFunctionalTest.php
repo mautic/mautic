@@ -58,10 +58,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
             'fields'      => [
                 [
-                    'label'     => 'Email',
-                    'type'      => 'email',
-                    'alias'     => 'email',
-                    'leadField' => 'email',
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
                 ],
                 [
                     'label' => 'Submit',
@@ -185,11 +186,12 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'postAction'  => 'return',
             'fields'      => [
                 [
-                    'label'      => 'Email',
-                    'type'       => 'email',
-                    'alias'      => 'email',
-                    'isRequired' => true,
-                    'leadField'  => 'email',
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'isRequired'   => true,
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
                 ],
                 [
                     'label' => 'Submit',
@@ -241,10 +243,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'postAction'  => 'return',
             'fields'      => [
                 [
-                    'label'     => 'Email',
-                    'type'      => 'email',
-                    'alias'     => 'email',
-                    'leadField' => 'email',
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
                 ],
                 [
                     'label' => 'Submit',
@@ -292,10 +295,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'isPublished' => true,
             'fields'      => [
                 [
-                    'label'     => 'Country',
-                    'type'      => 'country',
-                    'alias'     => 'country',
-                    'leadField' => 'country',
+                    'label'        => 'Country',
+                    'type'         => 'country',
+                    'alias'        => 'country',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'country',
                 ],
                 [
                     'label' => 'Submit',
@@ -318,13 +322,14 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $patchPayload = [
             'fields' => [
                 [
-                    'label'      => 'State',
-                    'type'       => 'select',
-                    'alias'      => 'state',
-                    'leadField'  => 'state',
-                    'parent'     => $response['form']['fields'][0]['id'],
-                    'isRequired' => true,
-                    'conditions' => [
+                    'label'        => 'State',
+                    'type'         => 'select',
+                    'alias'        => 'state',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'state',
+                    'parent'       => $response['form']['fields'][0]['id'],
+                    'isRequired'   => true,
+                    'conditions'   => [
                         'expr'   => 'in',
                         'any'    => 0,
                         'values' => ['Australia'],
@@ -394,10 +399,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'isPublished' => true,
             'fields'      => [
                 [
-                    'label'     => 'Country',
-                    'type'      => 'country',
-                    'alias'     => 'country',
-                    'leadField' => 'country',
+                    'label'        => 'Country',
+                    'type'         => 'country',
+                    'alias'        => 'country',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'country',
                 ],
                 [
                     'label' => 'Submit',
@@ -418,13 +424,14 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $patchPayload = [
             'fields' => [
                 [
-                    'label'      => 'State',
-                    'type'       => 'select',
-                    'alias'      => 'state',
-                    'leadField'  => 'state',
-                    'parent'     => $response['form']['fields'][0]['id'],
-                    'isRequired' => true,
-                    'conditions' => [
+                    'label'        => 'State',
+                    'type'         => 'select',
+                    'alias'        => 'state',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'state',
+                    'parent'       => $response['form']['fields'][0]['id'],
+                    'isRequired'   => true,
+                    'conditions'   => [
                         'expr'   => 'in',
                         'any'    => 0,
                         'values' => ['Australia'],
@@ -486,10 +493,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'isPublished' => true,
             'fields'      => [
                 [
-                    'label'     => 'Country',
-                    'type'      => 'country',
-                    'alias'     => 'country',
-                    'leadField' => 'country',
+                    'label'        => 'Country',
+                    'type'         => 'country',
+                    'alias'        => 'country',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'country',
                 ],
                 [
                     'label' => 'Submit',
@@ -510,13 +518,14 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $patchPayload = [
             'fields' => [
                 [
-                    'label'      => 'State',
-                    'type'       => 'select',
-                    'alias'      => 'state',
-                    'leadField'  => 'state',
-                    'parent'     => $response['form']['fields'][0]['id'],
-                    'isRequired' => true,
-                    'conditions' => [
+                    'label'        => 'State',
+                    'type'         => 'select',
+                    'alias'        => 'state',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'state',
+                    'parent'       => $response['form']['fields'][0]['id'],
+                    'isRequired'   => true,
+                    'conditions'   => [
                         'expr'   => 'in',
                         'any'    => 0,
                         'values' => ['Australia'],
@@ -570,7 +579,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'label'                  => 'Email',
                     'type'                   => 'email',
                     'alias'                  => 'email',
-                    'leadField'              => 'email',
+                    'mappedObject'           => 'contact',
+                    'mappedField'            => 'email',
                     'is_auto_fill'           => 1,
                     'show_when_value_exists' => 0,
                 ],
@@ -578,7 +588,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'label'                  => 'Firstname',
                     'type'                   => 'text',
                     'alias'                  => 'firstname',
-                    'leadField'              => 'firstname',
+                    'mappedObject'           => 'contact',
+                    'mappedField'            => 'firstname',
                     'is_auto_fill'           => 1,
                     'show_when_value_exists' => 0,
                 ],
@@ -586,7 +597,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'label'                  => 'Lastname',
                     'type'                   => 'text',
                     'alias'                  => 'lastname',
-                    'leadField'              => 'lastname',
+                    'mappedObject'           => 'contact',
+                    'mappedField'            => 'lastname',
                     'is_auto_fill'           => 1,
                     'show_when_value_exists' => 0,
                 ],
@@ -621,10 +633,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'isPublished' => true,
             'fields'      => [
                 [
-                    'label'     => 'Email',
-                    'type'      => 'email',
-                    'alias'     => 'email',
-                    'leadField' => 'email',
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
                 ],
                 [
                     'label' => 'Submit',
@@ -692,10 +705,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'isPublished' => true,
             'fields'      => [
                 [
-                    'label'     => 'Country',
-                    'type'      => 'country',
-                    'alias'     => 'country',
-                    'leadField' => 'country',
+                    'label'        => 'Country',
+                    'type'         => 'country',
+                    'alias'        => 'country',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'country',
                 ],
                 [
                     'label' => 'Submit',
@@ -866,10 +880,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'isPublished' => true,
             'fields'      => [
                 [
-                    'label'     => 'All',
-                    'type'      => 'text',
-                    'alias'     => 'all',
-                    'leadField' => 'firstname',
+                    'label'        => 'All',
+                    'type'         => 'text',
+                    'alias'        => 'all',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'firstname',
                 ],
                 [
                     'label' => 'Submit',
@@ -947,7 +962,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'label'        => 'Email',
                     'type'         => 'email',
                     'alias'        => 'email',
-                    'leadField'    => 'email',
                     'mappedField'  => 'email',
                     'mappedObject' => 'contact',
                 ],
@@ -955,7 +969,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'label'        => 'Firstname',
                     'type'         => 'text',
                     'alias'        => 'firstname',
-                    'leadField'    => 'firstname',
                     'mappedField'  => 'firstname',
                     'mappedObject' => 'contact',
                 ],
@@ -963,7 +976,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'label'        => 'Lastname',
                     'type'         => 'text',
                     'alias'        => 'lastname',
-                    'leadField'    => 'lastname',
                     'mappedField'  => 'lastname',
                     'mappedObject' => 'contact',
                 ],
@@ -971,7 +983,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'label'        => 'Country',
                     'type'         => 'country',
                     'alias'        => 'country',
-                    'leadField'    => 'country',
                     'mappedField'  => 'country',
                     'mappedObject' => 'contact',
                 ],
@@ -979,7 +990,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'label'        => 'Company name',
                     'type'         => 'text',
                     'alias'        => 'company_name',
-                    'leadField'    => 'company',
                     'mappedField'  => 'company',
                     'mappedObject' => 'contact',
                 ],
@@ -987,7 +997,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'label'        => 'Company country',
                     'type'         => 'text',
                     'alias'        => 'company_country',
-                    'leadField'    => 'companycountry',
                     'mappedField'  => 'companycountry',
                     'mappedObject' => 'company',
                 ],
@@ -995,7 +1004,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'label'        => 'Company city',
                     'type'         => 'text',
                     'alias'        => 'company_city',
-                    'leadField'    => 'companycity',
                     'mappedField'  => 'companycity',
                     'mappedObject' => 'company',
                 ],
@@ -1231,7 +1239,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'label'        => 'What kind of animal are you?',
                     'type'         => 'text',
                     'alias'        => 'animal',
-                    'leadField'    => 'animal',
                     'mappedField'  => 'animal',
                     'mappedObject' => 'contact',
                 ],
@@ -1415,7 +1422,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'label'        => 'Email',
                     'type'         => 'email',
                     'alias'        => 'email',
-                    'leadField'    => 'email',
                     'mappedField'  => 'email',
                     'mappedObject' => 'contact',
                 ],
@@ -1483,10 +1489,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'submissionLimitMessage' => 'Stop here',
             'fields'                 => [
                 [
-                    'label'     => 'Email',
-                    'type'      => 'email',
-                    'alias'     => 'email',
-                    'leadField' => 'email',
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
                 ],
                 [
                     'label' => 'Submit',

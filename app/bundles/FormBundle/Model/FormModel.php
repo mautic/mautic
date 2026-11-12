@@ -333,8 +333,6 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             $entity->setAlias($alias);
         }
 
-        $this->backfillReplacedPropertiesForBc($entity);
-
         // save the form so that the ID is available for the form html
         parent::saveEntity($entity, $unlock);
 
@@ -1080,21 +1078,6 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         return null;
-    }
-
-    private function backfillReplacedPropertiesForBc(Form $entity): void
-    {
-        /** @var Field $field */
-        foreach ($entity->getFields() as $field) {
-            if (!$field->getLeadField() && $field->getMappedField()) {
-                $field->setLeadField($field->getMappedField());
-            } elseif ($field->getLeadField() && !$field->getMappedField()) {
-                $field->setMappedField($field->getLeadField());
-                $field->setMappedObject(
-                    str_starts_with($field->getLeadField(), 'company') && 'company' !== $field->getLeadField() ? 'company' : 'contact'
-                );
-            }
-        }
     }
 
     public function getEntitiesForGlobalSearch(GlobalSearchFilterDTO $filterDTO): ?Paginator
