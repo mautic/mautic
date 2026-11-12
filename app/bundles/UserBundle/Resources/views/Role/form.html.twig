@@ -16,15 +16,8 @@
     {{ form_start(form) }}
     <div class="box-layout">
 	<div class="col-xs-12 height-auto">
-		<!-- tabs controls -->
-		<ul class="nav nav-tabs nav-tabs-contained">
-			<li class="active"><a href="#details-container" role="tab" data-bs-toggle="tab" class="active nav-link">{% trans %}mautic.core.details{% endtrans %}</a></li>
-			<li class="" id="permissions-tab"><a href="#permissions-container" role="tab" data-bs-toggle="tab" class="nav-link">{% trans %}mautic.user.role.permissions{% endtrans %}</a></li>
-		</ul>
-		<!--/ tabs controls -->
-
-		<div class="tab-content pa-16">
-			<div class="tab-pane fade show active bdr-w-0 height-auto" id="details-container">
+		{% set hidePerms = form.isAdmin.vars.data %}
+		{% set detailsContent %}
 				<div class="row">
 					<div class="pa-16">
 						<div class="col-md-6">
@@ -42,10 +35,8 @@
 						</div>
 					</div>
 				</div>
-			</div>
-
-            {% set hidePerms = form.isAdmin.vars.data %}
-			<div class="tab-pane fade bdr-w-0" id="permissions-container">
+		{% endset %}
+		{% set permissionsContent %}
 				<div id="rolePermissions"{% if hidePerms %}class="hide"{% endif %}>
 					<!-- start: box layout -->
 					<div class="box-layout">
@@ -97,8 +88,14 @@
 						<p>{% trans %}mautic.user.role.permission.isadmin.message{% endtrans %}</p>
 					</div>
 				</div>
-			</div>
-		</div>
+		{% endset %}
+		{{ include('@MauticCore/Components/tabs.html.twig', {
+			'variant': 'contained',
+			'tabs': [
+				{'id': 'details-container', 'label': 'mautic.core.details', 'content': detailsContent, 'className': 'pa-16'},
+				{'id': 'permissions-container', 'label': 'mautic.user.role.permissions', 'content': permissionsContent, 'className': 'pa-16', 'itemAttributes': {'id': 'permissions-tab'}}
+			]
+		}) }}
 	</div>
 </div>
     {{ form_end(form) }}
