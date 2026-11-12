@@ -341,7 +341,6 @@ parameters:
                 - app/bundles/FormBundle/Model/FormModel.php
                 - app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
                 - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
-                - app/bundles/NotificationBundle/Model/NotificationModel.php
                 - app/bundles/PageBundle/Model/PageModel.php
                 - app/bundles/PointBundle/Model/PointGroupModel.php
                 - app/bundles/PointBundle/Model/PointModel.php
