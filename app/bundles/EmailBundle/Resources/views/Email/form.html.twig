@@ -56,7 +56,30 @@
             <div class="row">
                 <div class="col-xs-12">
 
-                    {% set themeContent %}
+                    <!-- tabs controls -->
+                    <ul class="nav nav-tabs nav-tabs-contained">
+                        <li class="active">
+                            <a href="#email-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">{{ 'mautic.core.form.theme'|trans }}</a>
+                        </li>
+                        <li>
+                            <a href="#advanced-container" role="tab" data-bs-toggle="tab" class="nav-link">
+                                {% if advancedTabHasErrors %}
+                                <span class="text-danger">
+                                    <i class="ri-alert-line" aria-hidden="true"></i> {{ 'mautic.core.advanced'|trans }}
+                                </span>{% else %}
+                                {{ 'mautic.core.advanced'|trans }}
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li id="dynamic-content-tab" {{ (isCodeMode) ? '' : 'class="hidden"' }}>
+                            <a href="#dynamic-content-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.core.dynamicContent'|trans }}</a>
+                        </li>
+                        {{ customContent('email.tabs', _context) }}
+                    </ul>
+                    <!--/ tabs controls -->
+
+                    <div class="tab-content pa-16">
+                        <div class="tab-pane fade show active bdr-w-0" id="email-container">
                             <div class="row">
                                 <div class="col-md-12">{{ form_row(form.template) }}</div>
                             </div>
@@ -65,8 +88,8 @@
                                 'themes' : themes,
                                 'active' : form.template.vars.value,
                             }) -}}
-                    {% endset %}
-                    {% set advancedContent %}
+                        </div>
+                        <div class="tab-pane fade bdr-w-0" id="advanced-container">
                             <div class="row">
                                 <div class="col-md-6">
                                     {{ form_row(form.fromName) }}
@@ -122,10 +145,15 @@
                                     {{ form_widget(form.plainText) }}
                                 </div>
                             </div>
-                    {% endset %}
-                    {% set dynamicContentAddButton %}
-                        <li role="presentation">
-                            {% include '@MauticCore/Helper/button.html.twig' with {
+                        </div>
+                        <div class="tab-pane fade bdr-w-0" id="dynamic-content-container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-xs-3 dynamicContentFilterContainer">
+                                          <ul class="nav nav-tabs nav-tabs-contained tabs-left" id="dynamicContentTabs">
+                                            <li>
+                                                {% include '@MauticCore/Helper/button.html.twig' with {
                                                     buttons: [
                                                         {
                                                             label: 'mautic.core.form.new',
@@ -133,62 +161,34 @@
                                                             icon: 'ri-add-line',
                                                             attributes: {
                                                                 'id': 'addNewDynamicContent',
+                                                                'role': 'tab',
                                                                 'class': 'me-5',
                                                                 'type': 'button'
                                                             }
                                                         }
                                                     ]
                                                 } %}
- 
-                        </li>
-                    {% endset %}
-                    {% set dynamicContentNavTabs = [] %}
-                    {% set dynamicContentPanes %}
-                        {% for dynamicContent in form.dynamicContent %}
-                            {% set dynamicContentName = dynamicContent.tokenName.vars.value %}
-                            {% set dynamicContentLabel = dynamicContentName is defined ? dynamicContentName : 'mautic.core.dynamicContent'|trans ~ ' ' ~ loop.index %}
-                            {% set dynamicContentNavTabs = dynamicContentNavTabs|merge([{'id': dynamicContent.vars.id, 'label': dynamicContentLabel, 'content': ''}]) %}
-                            {{ form_widget(dynamicContent) }}
-                        {% endfor %}
-                    {% endset %}
-                    {% set dynamicContentContent %}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="row">
-                                        <div class="col-xs-3 dynamicContentFilterContainer">
-                                            {{ include('@MauticCore/Components/tabs.html.twig', {
-                                                'tabs': dynamicContentNavTabs,
-                                                'variant': 'vertical',
-                                                'part': 'nav',
-                                                'navAttributes': {'id': 'dynamicContentTabs'},
-                                                'navPrefix': dynamicContentAddButton
-                                            }) }}
+                                            </li>
+                                            {% for dynamicContent in form.dynamicContent %}
+                                              {% set name = dynamicContent.tokenName.vars.value %}
+                                              {% set linkText = name is defined ? name : 'mautic.core.dynamicContent'|trans ~ ' ' ~ loop.index %}
+                                              <li class="{% if loop.first %}active{% endif %}">
+                                                <a role="tab" data-bs-toggle="tab" href="#{{ dynamicContent.vars.id }}" class="nav-link{% if loop.first %} active{% endif %}" aria-selected="{{ loop.first ? 'true' : 'false' }}">{{ linkText }}</a>
+                                              </li>
+                                            {% endfor %}
+                                            </ul>
                                         </div>
-                                        <div class="col-xs-9">
-                                            {{ include('@MauticCore/Components/tabs.html.twig', {
-                                                'tabs': [],
-                                                'variant': 'vertical',
-                                                'part': 'content',
-                                                'contentAttributes': {'id': 'dynamicContentContainer'},
-                                                'contentExtra': dynamicContentPanes
-                                            }) }}
+                                        <div class="tab-content pa-16 col-xs-9" id="dynamicContentContainer">
+                                          {% for dynamicContent in form.dynamicContent %}
+                                              {{ form_widget(dynamicContent) }}
+                                          {% endfor %}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                    {% endset %}
-                    {% set customTabs %}{{ customContent('email.tabs', _context) }}{% endset %}
-                    {% set customTabsContent %}{{ customContent('email.tabs.content', _context) }}{% endset %}
-                    {{ include('@MauticCore/Components/tabs.html.twig', {
-                        'variant': 'contained',
-                        'tabs': [
-                            {'id': 'email-container', 'label': 'mautic.core.form.theme', 'content': themeContent, 'className': 'pa-16'},
-                            {'id': 'advanced-container', 'label': 'mautic.core.advanced', 'content': advancedContent, 'className': 'pa-16', 'hasError': advancedTabHasErrors},
-                            {'id': 'dynamic-content-container', 'label': 'mautic.core.dynamicContent', 'content': dynamicContentContent, 'className': 'pa-16', 'itemClass': isCodeMode ? '' : 'hidden', 'itemAttributes': {'id': 'dynamic-content-tab'}}
-                        ],
-                        'navExtra': customTabs,
-                        'contentExtra': customTabsContent
-                    }) }}
+                        </div>
+                        {{ customContent('email.tabs.content', _context) }}
+                    </div>
                 </div>
             </div>
         </div>

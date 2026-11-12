@@ -367,24 +367,6 @@ Mautic.initEmailDynamicContent = function() {
     }
 };
 
-Mautic.buildDynamicContentTab = function(targetId, label, extraClass, jQueryVariant) {
-    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
-    var tabId  = targetId.replace('#', '');
-    var item   = mQuery('<li class="nav-item" role="presentation"></li>');
-    var button = mQuery('<button type="button" class="nav-link tabs__nav-item" role="tab" data-bs-toggle="tab" aria-selected="false" tabindex="-1"></button>');
-    var wrapper = mQuery('<div class="tabs__nav-item-label-wrapper"></div>');
-
-    if (extraClass) {
-        button.addClass(extraClass);
-        wrapper.addClass('justify-content-between');
-    }
-
-    button.attr({id: tabId + '-tab', 'data-bs-target': targetId, 'aria-controls': tabId});
-    wrapper.append(mQuery('<span class="tabs__nav-item-label"></span>').text(label));
-
-    return item.append(button.append(wrapper));
-};
-
 Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     // To support the parent.mQuery from the builder
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
@@ -399,7 +381,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     var tabId                   = '#emailform_dynamicContent_' + dynamicContentIndex;
     var tokenName               = 'Dynamic Content ' + (dynamicContentIndex + 1);
     var newForm                 = dynamicContentPrototype.replace(/__name__/g, dynamicContentIndex);
-    var newTab                  = Mautic.buildDynamicContentTab(tabId, tokenName, 'tabs__nav-item--vertical', mQuery);
+    var newTab                  = mQuery('<li><a role="tab" data-bs-toggle="tab" href="' + tabId + '">' + tokenName + '</a></li>');
 
     tabHolder.append(newTab);
     filterHolder.append(newForm);
@@ -415,7 +397,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     }
 
     tabHolder.find('i').first().removeClass('ri-loader-3-line ri-spin').addClass('ri-add-line text-success');
-    newTab.find('button').tab('show');
+    newTab.find('a').tab('show');
 
     firstInput.focus();
 
@@ -449,7 +431,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
         filterIndex++;
         filterContainerId = '#emailform_dynamicContent_' + dynamicContentIndex + '_filters_' + filterIndex ;
     }
-    var newTab            = Mautic.buildDynamicContentTab(filterContainerId, 'Variation ' + (filterIndex + 1), '', mQuery);
+    var newTab            = mQuery('<li><a role="tab" data-bs-toggle="tab" href="' + filterContainerId + '">Variation ' + (filterIndex + 1) + '</a></li>');
     var newForm           = filterPrototype.replace(/__name__/g, filterIndex)
         .replace(/dynamicContent_0_filters/g, 'dynamicContent_' + dynamicContentIndex + '_filters')
         .replace(/dynamicContent]\[0]\[filters/g, 'dynamicContent][' + dynamicContentIndex + '][filters');
@@ -482,7 +464,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
 
     Mautic.initRemoveEvents(removeButton, mQuery);
 
-    newTab.find('button').tab('show');
+    newTab.find('a').tab('show');
 
     return filterContainerId;
 };
@@ -542,9 +524,9 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
 Mautic.updateDynamicContentDropdown = function () {
     var options = [];
 
-    mQuery('#dynamicContentTabs').find('[data-bs-toggle="tab"]').each(function () {
+    mQuery('#dynamicContentTabs').find('a[data-bs-toggle="tab"]').each(function () {
         var prototype       = '<li><a class="fr-command" data-cmd="dynamicContent" data-param1="__tokenName__">__tokenName__</a></li>';
-        var newOption       = prototype.replace(/__tokenName__/g, mQuery(this).text().trim());
+        var newOption       = prototype.replace(/__tokenName__/g, mQuery(this).text());
 
         options.push(newOption);
     });
