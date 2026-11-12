@@ -40,7 +40,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    
+
                 {% endset %}
                 {% set tabsviewsform = tabsviewsform|merge([{'id': 'details-container', 'label': 'mautic.core.details', 'content': tabsviewsformContent0, 'className': 'pa-16 height-auto'}]) %}
                 {% set tabsviewsformContent1 %}
@@ -88,7 +88,7 @@
                                                 </div>
                                             {% endfor %}
                                         </div>
-                                    
+
                 {% endset %}
                 {% set tabsviewsform = tabsviewsform|merge([{'id': 'events-container', 'label': 'mautic.point.trigger.tab.events', 'content': tabsviewsformContent1, 'className': 'pa-16'}]) %}
                 {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsform, 'variant': 'contained'}) }}

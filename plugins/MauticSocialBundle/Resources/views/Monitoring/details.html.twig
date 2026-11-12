@@ -96,7 +96,7 @@
               {% set tabsviewsdetails = [] %}
               {% set tabsviewsdetailsContent0 %}
                                 {{ monitorLeads|raw }}
-                            
+
               {% endset %}
               {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'leads-container', 'label': 'mautic.lead.leads', 'content': tabsviewsdetailsContent0, 'className': 'pa-16 page-list'}]) %}
               {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}

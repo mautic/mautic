@@ -5,7 +5,7 @@
                 'lead': lead,
                 'profile': details.profile,
             }) }}
-        
+
     {% endset %}
     {% set tabstwitterview = tabstwitterview|merge([{'id': 'TwitterProfile', 'label': 'mautic.lead.lead.social.profile', 'content': tabstwitterviewContent0, 'className': 'pa-16 pa-24'}]) %}
     {% set tabstwitterviewContent1 %}
@@ -13,7 +13,7 @@
                 'lead': lead,
                 'activity': details.activity.tweets|default([]),
             }) }}
-        
+
     {% endset %}
     {% set tabstwitterview = tabstwitterview|merge([{'id': 'TwitterTweets', 'label': 'mautic.lead.lead.social.twitter.tweets', 'content': tabstwitterviewContent1, 'className': 'pa-16'}]) %}
     {% set tabstwitterviewContent2 %}
@@ -21,7 +21,7 @@
                 'lead': lead,
                  'activity': details.activity.photos|default([]),
             }) }}
-        
+
     {% endset %}
     {% set tabstwitterview = tabstwitterview|merge([{'id': 'TwitterPhotos', 'label': 'mautic.lead.lead.social.photos', 'content': tabstwitterviewContent2, 'className': 'pa-16 pa-24'}]) %}
     {% set tabstwitterviewContent3 %}
@@ -29,7 +29,7 @@
                 'lead': lead,
                 'activity': details.activity.tags|default([]),
             }) }}
-        
+
     {% endset %}
     {% set tabstwitterview = tabstwitterview|merge([{'id': 'TwitterTags', 'label': 'mautic.lead.lead.social.tags', 'content': tabstwitterviewContent3, 'className': 'pa-16 pa-24'}]) %}
     {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabstwitterview, 'variant': 'contained'}) }}

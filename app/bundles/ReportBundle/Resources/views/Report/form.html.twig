@@ -41,7 +41,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        
+
                   {% endset %}
                   {% set tabsviewsform = tabsviewsform|merge([{'id': 'details-container', 'label': 'mautic.core.details', 'content': tabsviewsformContent0, 'className': 'pa-16'}]) %}
                   {% set tabsviewsformContent1 %}
@@ -86,7 +86,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        
+
                   {% endset %}
                   {% set tabsviewsform = tabsviewsform|merge([{'id': 'data-container', 'label': 'mautic.report.tab.data', 'content': tabsviewsformContent1, 'className': 'pa-16'}]) %}
                   {% set tabsviewsformContent2 %}
@@ -98,7 +98,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        
+
                   {% endset %}
                   {% set tabsviewsform = tabsviewsform|merge([{'id': 'graphs-container', 'label': 'mautic.report.tab.graphs', 'content': tabsviewsformContent2, 'className': 'pa-16' ~ " " ~ (not showGraphTab ? 'hide' : ''), 'itemAttributes': {'id': 'graphs-tab'}, 'itemClass': (not showGraphTab ? 'hide' : '')}]) %}
                   {% set tabsviewsformContent3 %}
@@ -131,9 +131,9 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        
+
                   {% endset %}
-                  {% set tabsviewsform = tabsviewsform|merge([{'id': 'schedule-container', 'label': 'mautic.report.tab.schedule', 'content': tabsviewsformContent3, 'className': 'pa-16'}]) %}
+                  {% set tabsviewsform = tabsviewsform|merge([{'id': 'schedule-container', 'label': 'mautic.report.tab.schedule', 'content': tabsviewsformContent3, 'className': 'pa-16', 'hasError': formContainsErrors(form.toAddress)}]) %}
                   {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsform, 'variant': 'contained'}) }}
 
               </div>
