@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadNoteRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
@@ -139,6 +140,7 @@ final class LeadSubscriberTest extends CommonMocks
             $this->createStub(DoNotContactRepository::class),
             $this->createStub(ModelFactory::class),
             $this->createStub(AuditLogRepository::class),
+            $this->createStub(LeadRepository::class),
         );
 
         $subscriber->onLeadPostSave(new LeadEvent($lead));
@@ -237,6 +239,7 @@ final class LeadSubscriberTest extends CommonMocks
             $this->createStub(DoNotContactRepository::class),
             $this->createStub(ModelFactory::class),
             $this->createStub(AuditLogRepository::class),
+            $this->createStub(LeadRepository::class),
             true
         );
 
@@ -348,6 +351,7 @@ final class LeadSubscriberTest extends CommonMocks
             $this->createStub(DoNotContactRepository::class),
             $this->createStub(ModelFactory::class),
             $this->createStub(AuditLogRepository::class),
+            $this->createStub(LeadRepository::class),
             true
         );
 
@@ -418,6 +422,7 @@ final class LeadSubscriberTest extends CommonMocks
             $this->createStub(DoNotContactRepository::class),
             $this->createStub(ModelFactory::class),
             $this->createStub(AuditLogRepository::class),
+            $this->createStub(LeadRepository::class),
             true
         );
 

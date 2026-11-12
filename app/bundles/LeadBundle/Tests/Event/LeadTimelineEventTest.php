@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Event;
 
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -69,5 +70,44 @@ final class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
 
         $this->assertArrayHasKey('eventId', $events[2]);
         $this->assertEquals('foobar123', $events[2]['eventId']);
+    }
+
+    public function testLeadIdsAreAddedToQueryOptions(): void
+    {
+        $event = new LeadTimelineEvent(null, ['search' => '', 'leadIds' => ['3', 1, 3]]);
+
+        $this->assertSame([3, 1], $event->getLeadIds());
+        $this->assertSame([3, 1], $event->getQueryOptions()['leadIds']);
+    }
+
+    public function testLeadIdsAreIgnoredWithoutFilterOrWithLead(): void
+    {
+        $withoutFilter = new LeadTimelineEvent(null, ['search' => '']);
+        $this->assertArrayNotHasKey('leadIds', $withoutFilter->getQueryOptions());
+
+        $lead = new Lead();
+        $lead->setId(5);
+        $withLead = new LeadTimelineEvent($lead, ['search' => '', 'leadIds' => [1, 2]]);
+        $this->assertSame([], $withLead->getLeadIds());
+        $this->assertArrayNotHasKey('leadIds', $withLead->getQueryOptions());
+        $this->assertSame(5, $withLead->getQueryOptions()['leadId']);
+    }
+
+    public function testEventsOfOtherContactsAreDroppedWithLeadIds(): void
+    {
+        $event = new LeadTimelineEvent(null, ['search' => '', 'includeEvents' => [], 'excludeEvents' => [], 'leadIds' => [1]]);
+
+        foreach ([1, 2, null] as $contactId) {
+            $event->addEvent([
+                'event'      => 'foo',
+                'eventId'    => 'foo'.$contactId,
+                'eventLabel' => 'Foo',
+                'eventType'  => 'foo',
+                'timestamp'  => new \DateTime(),
+                'contactId'  => $contactId,
+            ]);
+        }
+
+        $this->assertSame([1], array_column($event->getEvents(), 'contactId'));
     }
 }

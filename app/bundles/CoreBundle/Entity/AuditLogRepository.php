@@ -230,6 +230,11 @@ class AuditLogRepository extends CommonRepository
             );
         }
 
+        if (!empty($options['leadIds'])) {
+            $sqb->andWhere($sqb->expr()->in('l.object_id', ':leadIds'))
+                ->addGroupBy('l.object_id');
+        }
+
         $qb
             ->select('ip.date_added, ip.ip_address, ip.lead_id, ip.id')
             ->from(sprintf('(%s)', $sqb->getSQL()), 'ip');

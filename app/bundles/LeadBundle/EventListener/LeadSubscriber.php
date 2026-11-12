@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadNoteRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
@@ -66,6 +67,7 @@ final class LeadSubscriber implements EventSubscriberInterface
         private DoNotContactRepository $doNotContactRepository,
         ModelFactory $modelFactory,
         private readonly AuditLogRepository $auditLogRepository,
+        private readonly LeadRepository $leadRepository,
         private $isTest = false,
     ) {
         $this->setModelFactory($modelFactory);
@@ -406,7 +408,7 @@ final class LeadSubscriber implements EventSubscriberInterface
                         'eventPriority' => -1, // Usually an IP is added after another event
                         'timestamp'     => $row['date_added'],
                         'extra'         => [
-                            'ipDetails' => $ipAddresses[$row['ip_address']],
+                            'ipDetails' => $ipAddresses[$row['ip_address']] ?? null,
                         ],
                         'contentTemplate' => '@MauticLead/SubscribedEvents/Timeline/ipadded.html.twig',
                         'contactId'       => $row['lead_id'],
@@ -419,6 +421,12 @@ final class LeadSubscriber implements EventSubscriberInterface
 
     private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
+        if ([] !== $event->getLeadIds()) {
+            $this->addTimelineLeadDateEntries($event, $eventTypeKey, $eventTypeName, 'date_added', 'ri-spy-line', -5);
+
+            return;
+        }
+
         // Do nothing if the lead is not set
         if (!$event->getLead() instanceof Lead) {
             return;
@@ -460,6 +468,12 @@ final class LeadSubscriber implements EventSubscriberInterface
 
     private function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
+        if ([] !== $event->getLeadIds()) {
+            $this->addTimelineLeadDateEntries($event, $eventTypeKey, $eventTypeName, 'date_identified', 'ri-user-6-fill', -4, true);
+
+            return;
+        }
+
         // Do nothing if the lead is not set
         if (!$event->getLead() instanceof Lead) {
             return;
@@ -485,6 +499,38 @@ final class LeadSubscriber implements EventSubscriberInterface
                 }
             }
             // Purposively not including this in engagements graph as it's info only
+        }
+    }
+
+    private function addTimelineLeadDateEntries(
+        Events\LeadTimelineEvent $event,
+        string $eventTypeKey,
+        string $eventTypeName,
+        string $dateColumn,
+        string $icon,
+        int $priority,
+        bool $featured = false,
+    ): void {
+        if ($event->isEngagementCount()) {
+            return;
+        }
+
+        $rows = $this->leadRepository->getTimelineDates($dateColumn, $event->getQueryOptions());
+        $event->addToCounter($eventTypeKey, $rows);
+
+        foreach ($rows['results'] as $row) {
+            $event->addEvent(
+                [
+                    'event'         => $eventTypeKey,
+                    'eventId'       => $eventTypeKey.$row['lead_id'],
+                    'icon'          => $icon,
+                    'eventType'     => $eventTypeName,
+                    'eventPriority' => $priority,
+                    'timestamp'     => $row[$dateColumn],
+                    'featured'      => $featured,
+                    'contactId'     => $row['lead_id'],
+                ]
+            );
         }
     }
 
