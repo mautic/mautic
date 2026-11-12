@@ -80,6 +80,13 @@ final class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([3, 1], $event->getQueryOptions()['leadIds']);
     }
 
+    public function testEmptyLeadIdsMatchNoContact(): void
+    {
+        $event = new LeadTimelineEvent(null, ['search' => '', 'leadIds' => []]);
+
+        $this->assertSame([0], $event->getQueryOptions()['leadIds']);
+    }
+
     public function testLeadIdsAreIgnoredWithoutFilterOrWithLead(): void
     {
         $withoutFilter = new LeadTimelineEvent(null, ['search' => '']);

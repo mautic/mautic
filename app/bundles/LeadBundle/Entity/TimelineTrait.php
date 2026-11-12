@@ -35,7 +35,7 @@ trait TimelineTrait
         ?string $leadIdColumn = null,
     ) {
         if (!empty($options['leadIds'])) {
-            $leadIdColumn ??= strstr($timestampColumn, '.', true).'.lead_id';
+            $leadIdColumn ??= str_contains($timestampColumn, '.') ? strstr($timestampColumn, '.', true).'.lead_id' : 'lead_id';
             $query->andWhere($query->expr()->in($leadIdColumn, ':leadIds'))
                 ->setParameter('leadIds', $options['leadIds'], ArrayParameterType::INTEGER);
         }

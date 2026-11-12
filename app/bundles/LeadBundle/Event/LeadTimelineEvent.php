@@ -98,8 +98,9 @@ final class LeadTimelineEvent extends Event
             $this->dateTo = ($filters['dateTo'] instanceof \DateTime) ? $filters['dateTo'] : new \DateTime($filters['dateTo']);
         }
 
-        if (null === $lead && !empty($filters['leadIds'])) {
-            $this->leadIds = array_values(array_unique(array_map(intval(...), (array) $filters['leadIds'])));
+        if (null === $lead && array_key_exists('leadIds', $filters)) {
+            // An empty list must match no contact instead of all contacts
+            $this->leadIds = array_values(array_unique(array_map(intval(...), (array) $filters['leadIds']))) ?: [0];
         }
     }
 

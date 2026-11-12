@@ -104,6 +104,11 @@ final class LeadModelEngagementsLeadIdsFunctionalTest extends MauticMysqlTestCas
         $auditLog->setDateAdded(new \DateTime());
         $this->em->persist($auditLog);
 
+        $staleAuditLog = clone $auditLog;
+        $staleAuditLog->setIpAddress($ip.'0');
+        $staleAuditLog->setDateAdded(new \DateTime('-1 year'));
+        $this->em->persist($staleAuditLog);
+
         return $contact;
     }
 }

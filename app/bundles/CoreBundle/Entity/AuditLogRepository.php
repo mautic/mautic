@@ -231,7 +231,9 @@ class AuditLogRepository extends CommonRepository
         }
 
         if (!empty($options['leadIds'])) {
-            $sqb->andWhere($sqb->expr()->in('l.object_id', ':leadIds'))
+            // Just a check to ensure reused IDs (happens with innodb) doesn't infect data
+            $sqb->innerJoin('l', MAUTIC_TABLE_PREFIX.'leads', 'ld', 'ld.id = l.object_id AND l.date_added >= ld.date_added')
+                ->andWhere($sqb->expr()->in('l.object_id', ':leadIds'))
                 ->addGroupBy('l.object_id');
         }
 
