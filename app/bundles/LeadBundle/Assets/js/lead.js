@@ -1709,7 +1709,7 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
 Mautic.listOnLoad = function(container, response) {
     Mautic.loadAndProcessPageContent('#segment-stats');
 
-    const segmentDependenciesTab = mQuery('a#segment-dependencies');
+    const segmentDependenciesTab = mQuery('#segment-dependencies');
     let segmentDependenciesLoaded = false;
     let jsPlumbData = null;
 

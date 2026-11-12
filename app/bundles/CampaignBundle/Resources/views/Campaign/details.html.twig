@@ -166,6 +166,7 @@
                                 
                 {% endset %}
                 {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'stats-container', 'label': 'mautic.campaign.stats', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
+                {% if showEmailStats|default(false) %}
                 {% set tabsviewsdetailsContent1 %}
                                     <div class="row">
                                         <div class="col-md-6">
@@ -191,7 +192,6 @@
                                     </div>
                                 
                 {% endset %}
-                {% if showEmailStats|default(false) %}
                 {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'campaign-email-stats', 'label': 'mautic.campaign.email_stats', 'content': tabsviewsdetailsContent1, 'className': 'pa-16', 'attributes': {'data-load': 'campaign-email-stats'}}]) %}
                 {% endif %}
                 {% set tabsviewsdetailsContent2 %}

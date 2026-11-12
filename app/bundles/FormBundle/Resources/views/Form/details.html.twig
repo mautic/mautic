@@ -199,6 +199,7 @@
             {{ customContent('details.stats.graph.below', _context) }}
 
             {% set tabsviewsdetails = [] %}
+            {% if showActions %}
             {% set tabsviewsdetailsContent0 %}
                                 {% for group, groupActions in activeFormActions %}
                                     <h5 class="fw-sb mb-5">{{ group|title }}</h5>
@@ -232,7 +233,6 @@
                                 {% endfor %}
                             
             {% endset %}
-            {% if showActions %}
             {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'actions-container', 'label': 'mautic.form.tab.actions', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
             {% endif %}
             {% set tabsviewsdetailsContent1 %}
