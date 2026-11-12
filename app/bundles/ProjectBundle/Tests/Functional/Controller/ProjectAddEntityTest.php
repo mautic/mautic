@@ -40,7 +40,6 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $this->testEmail->setSubject('Test Email Subject');
         $this->testEmail->setEmailType('template');
         $this->testEmail->setTemplate('blank');
-        $this->testEmail->setCustomHtml('<!DOCTYPE html><html><body>Test</body></html>');
         $emailModel->saveEntity($this->testEmail);
     }
 
