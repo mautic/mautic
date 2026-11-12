@@ -1,29 +1,21 @@
 <div class="panel-toolbar p-0">
-    <ul class="nav nav-tabs nav-tabs-contained">
-        <li class="active">
-            <a href="#FoursquareProfile" role="tab" data-bs-toggle="tab" class="active nav-link">
-                {{ 'mautic.lead.lead.social.profile'|trans }}
-            </a>
-        </li>
-        <li>
-            <a href="#FoursquareTips" role="tab" data-bs-toggle="tab" class="nav-link">
-                {{ 'mautic.lead.lead.social.foursquare.tips'|trans }}
-            </a>
-        </li>
-    </ul>
+    {% set tabsfoursquareview = [] %}
+    {% set tabsfoursquareviewContent0 %}
+            {{ include('@MauticSocial/Integration/Foursquare/Profile/profile.html.twig', {
+                'lead': lead,
+                'profile': details.profile,
+            }) }}
+        
+    {% endset %}
+    {% set tabsfoursquareview = tabsfoursquareview|merge([{'id': 'FoursquareProfile', 'label': 'mautic.lead.lead.social.profile', 'content': tabsfoursquareviewContent0, 'className': 'pa-16 pa-24'}]) %}
+    {% set tabsfoursquareviewContent1 %}
+            {{ include('@MauticSocial/Integration/Foursquare/Profile/tips.html.twig', {
+                'lead': lead,
+                'activity': details.activity.tips|default([]),
+            }) }}
+        
+    {% endset %}
+    {% set tabsfoursquareview = tabsfoursquareview|merge([{'id': 'FoursquareTips', 'label': 'mautic.lead.lead.social.foursquare.tips', 'content': tabsfoursquareviewContent1, 'className': 'pa-16'}]) %}
+    {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsfoursquareview, 'variant': 'contained'}) }}
 </div>
 
-<div class="p-0 panel-body tab-content">
-    <div class="pa-24 tab-pane active" id="FoursquareProfile">
-        {{ include('@MauticSocial/Integration/Foursquare/Profile/profile.html.twig', {
-            'lead': lead,
-            'profile': details.profile,
-        }) }}
-    </div>
-    <div class="tab-pane" id="FoursquareTips">
-        {{ include('@MauticSocial/Integration/Foursquare/Profile/tips.html.twig', {
-            'lead': lead,
-            'activity': details.activity.tips|default([]),
-        }) }}
-    </div>
-</div>

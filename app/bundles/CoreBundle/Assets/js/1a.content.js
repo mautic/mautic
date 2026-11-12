@@ -707,7 +707,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
     const maps= mQuery(container).find('[data-load="map"]');
     if(maps.length) {
         maps.each((index,map) => map.addEventListener('click', () => {
-            const scopeId = event.target.getAttribute('href');
+            const scopeId = map.getAttribute('data-bs-target') || map.getAttribute('href');
             const scope = mQuery(scopeId);
 
             if (scope.length) {

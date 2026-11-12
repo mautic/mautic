@@ -7,6 +7,7 @@
 {% macro tabContent(tab, tabId, isActive, variant, layer) %}
     <div class="tab-pane fade{% if isActive %} show active{% endif %}{% if tab.className is defined and tab.className %} {{ tab.className }}{% endif %}{% if variant in ['contained', 'vertical'] %} layer-{{ layer }}{% endif %}"
          id="{{ tabId }}"
+         {%- for attrName, attrValue in tab.paneAttributes|default({}) %} {{ attrName }}="{{ attrValue }}"{% endfor %}
          role="tabpanel"
          aria-labelledby="{{ tabId }}-tab"
          tabindex="0">
@@ -54,11 +55,14 @@
             {%- set tabId = tab.id|default(_self.generateTabId(tabLabel)) -%}
             {%- set isActive = loop.index0 == selectedIndex -%}
             {%- set isDisabled = tab.disabled is defined and tab.disabled -%}
-            <li class="nav-item{% if isDisabled %} disabled{% endif %}"
+            {%- set hasError = tab.hasError|default(false) -%}
+            {%- if hasError -%}{%- set tab = tab|merge({'renderIcon': 'ri-alert-line'}) -%}{%- endif -%}
+            <li class="nav-item{% if isDisabled %} disabled{% endif %}{% if tab.itemClass is defined and tab.itemClass %} {{ tab.itemClass }}{% endif %}"
                 role="presentation"
+                {%- for attrName, attrValue in tab.itemAttributes|default({}) %} {{ attrName }}="{{ attrValue }}"{% endfor %}
                 {% if variant == 'iconOnly' %}title="{{ tabLabel|trans }}"{% endif %}>
                 <button type="button"
-                        class="nav-link{% if isActive %} active{% endif %}{% if variant == 'iconOnly' %} tabs__nav-item tabs__nav-item--icon-only{% if iconOnlyLarge %} tabs__nav-item--icon-only__20{% endif %}{% elseif variant == 'vertical' %} tabs__nav-item tabs__nav-item--vertical{% if iconOnlyLarge %} tabs__nav-item--icon-only__20{% endif %}{% else %} tabs__nav-item{% endif %}{% if isDisabled %} disabled{% endif %}"
+                        class="nav-link{% if isActive %} active{% endif %}{% if variant == 'iconOnly' %} tabs__nav-item tabs__nav-item--icon-only{% if iconOnlyLarge %} tabs__nav-item--icon-only__20{% endif %}{% elseif variant == 'vertical' %} tabs__nav-item tabs__nav-item--vertical{% if iconOnlyLarge %} tabs__nav-item--icon-only__20{% endif %}{% else %} tabs__nav-item{% endif %}{% if isDisabled %} disabled{% endif %}{% if hasError %} text-danger{% endif %}"
                         id="{{ tabId }}-tab"
                         data-bs-toggle="tab"
                         data-bs-target="#{{ tabId }}"

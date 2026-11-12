@@ -198,84 +198,69 @@
 
             {{ customContent('details.stats.graph.below', _context) }}
 
-            <!-- tabs controls -->
-            <ul class="nav nav-tabs nav-tabs-contained">
-                {% if showActions %}
-                    <li class="active">
-                        <a href="#actions-container" role="tab" data-bs-toggle="tab" class="active nav-link" aria-selected="true">{{ 'mautic.form.tab.actions'|trans }}</a>
-                    </li>
-                {% endif %}
-                <li class="{% if not showActions %}active{% endif %}">
-                    <a href="#fields-container" role="tab" data-bs-toggle="tab" class="{% if not showActions %}active {% endif %}nav-link" aria-selected="{{ not showActions ? 'true' : 'false' }}">{{ 'mautic.form.tab.fields'|trans }}</a>
-                </li>
-            </ul>
-            <!--/ tabs controls -->
-        </div>
-
-        <!-- start: tab-content -->
-        <div class="tab-content pa-16">
+            {% set tabsviewsdetails = [] %}
+            {% set tabsviewsdetailsContent0 %}
+                                {% for group, groupActions in activeFormActions %}
+                                    <h5 class="fw-sb mb-5">{{ group|title }}</h5>
+                                    <ul class="list-group">
+                                        {# @var \Mautic\FormBundle\Entity\Action $action #}
+                                        {% for action in groupActions %}
+                                            <li class="list-group-item">
+                                                <div class="box-layout">
+                                                    {% set icon = null %}
+                                                    {% if 'lead' == group %}
+                                                      {% set icon = 'ri-user-6-fill' %}
+                                                    {% elseif 'asset' == group %}
+                                                      {% set icon = 'ri-download-cloud-2-line' %}
+                                                    {% endif %}
+                                                    {% if icon is not empty %}
+                                                        <div class="col-md-1 align-middle">
+                                                            <h3><span class="fa {{ icon }} text-white dark-xs"></span></h3>
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="col-md-7 align-middle">
+                                                        <h5 class="fw-sb text-interactive mb-5">{{ action.name }}</h5>
+                                                        <h6 class="text-white dark-sm">{{ action.description|purify }}</h6>
+                                                    </div>
+                                                    <div class="col-md-4 align-middle text-end">
+                                                        <em class="text-white dark-sm">{% if availableActions[action.type] is defined %}{{ availableActions[action.type]['label']|trans }}{% else %}{{ action.type }}{% endif %}</em>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endfor %}
+                            
+            {% endset %}
             {% if showActions %}
-                <!-- #actions-container -->
-                <div class="tab-pane active fade in bdr-w-0" id="actions-container">
-                    {% for group, groupActions in activeFormActions %}
-                        <h5 class="fw-sb mb-5">{{ group|title }}</h5>
-                        <ul class="list-group">
-                            {# @var \Mautic\FormBundle\Entity\Action $action #}
-                            {% for action in groupActions %}
-                                <li class="list-group-item">
-                                    <div class="box-layout">
-                                        {% set icon = null %}
-                                        {% if 'lead' == group %}
-                                          {% set icon = 'ri-user-6-fill' %}
-                                        {% elseif 'asset' == group %}
-                                          {% set icon = 'ri-download-cloud-2-line' %}
-                                        {% endif %}
-                                        {% if icon is not empty %}
-                                            <div class="col-md-1 align-middle">
-                                                <h3><span class="fa {{ icon }} text-white dark-xs"></span></h3>
-                                            </div>
-                                        {% endif %}
-                                        <div class="col-md-7 align-middle">
-                                            <h5 class="fw-sb text-interactive mb-5">{{ action.name }}</h5>
-                                            <h6 class="text-white dark-sm">{{ action.description|purify }}</h6>
-                                        </div>
-                                        <div class="col-md-4 align-middle text-end">
-                                            <em class="text-white dark-sm">{% if availableActions[action.type] is defined %}{{ availableActions[action.type]['label']|trans }}{% else %}{{ action.type }}{% endif %}</em>
-                                        </div>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% endfor %}
-                </div>
-                <!--/ #actions-container -->
+            {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'actions-container', 'label': 'mautic.form.tab.actions', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
             {% endif %}
-
-            <!-- #fields-container -->
-            <div class="tab-pane fade {% if not showActions %}active in{% endif %} bdr-w-0" id="fields-container">
-                <h5 class="fw-sb mb-5">{{ 'mautic.form.field'|trans }}</h5>
-                <ul class="list-group mb-5">
-                    {# @var \Mautic\FormBundle\Entity\Field $field #}
-                    {% for field in activeFormFields %}
-                      {% if not field.parent %}
-                      <li class="list-group-item">
-                          {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': field}) }}
-                      </li>
-                      {% endif %}
-                      {# @var \Mautic\FormBundle\Entity\Field $field #}
-                      {% for fieldChild in activeFormFields %}
-                          {% if fieldChild.parent == field.id %}
-                              <li class="list-group-item ms-24">
-                                  {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': fieldChild}) }}
-                              </li>
-                          {% endif %}
-                      {% endfor %}
-                    {% endfor %}
-                </ul>
-            </div>
-            <!--/ #fields-container -->
+            {% set tabsviewsdetailsContent1 %}
+                            <h5 class="fw-sb mb-5">{{ 'mautic.form.field'|trans }}</h5>
+                            <ul class="list-group mb-5">
+                                {# @var \Mautic\FormBundle\Entity\Field $field #}
+                                {% for field in activeFormFields %}
+                                  {% if not field.parent %}
+                                  <li class="list-group-item">
+                                      {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': field}) }}
+                                  </li>
+                                  {% endif %}
+                                  {# @var \Mautic\FormBundle\Entity\Field $field #}
+                                  {% for fieldChild in activeFormFields %}
+                                      {% if fieldChild.parent == field.id %}
+                                          <li class="list-group-item ms-24">
+                                              {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': fieldChild}) }}
+                                          </li>
+                                      {% endif %}
+                                  {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        
+            {% endset %}
+            {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'fields-container', 'label': 'mautic.form.tab.fields', 'content': tabsviewsdetailsContent1, 'className': 'pa-16' ~ " " ~ (not showActions ? 'active in' : ''), 'itemClass': (not showActions ? 'active' : '')}]) %}
+            {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}
         </div>
-        <!--/ end: tab-content -->
+
     </div>
     <!--/ left section -->
 
