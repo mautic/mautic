@@ -1,4 +1,5 @@
 {# nav_tabs.html.twig #}
+{% deprecated 'The "@MauticCore/Helper/nav_tabs.html.twig" template is deprecated since Mautic 7.3 and will be removed in 8.0. Use "@MauticCore/Components/tabs.html.twig" instead.' %}
 {% macro generateTabId(translationKey) -%}
     {%- set parts = translationKey|split('.') -%}
     {%- set lastParts = parts|slice(-2) -%}
