@@ -1,5 +1,5 @@
 {% block _config_privacyconfig_widget %}
-{% set integrationsContent %}{% include '@MauticCore/FormTheme/Config/_config_privacyconfig_integrations.html.twig' %}{% endset %}
+{% set integrationsContent %}{% include '@MauticCore/FormTheme/Config/_config_privacyconfig_integrations.html.twig' with {'form': form} %}{% endset %}
 <div class="mt-48">
     {% include '@MauticCore/Components/tabs.html.twig' with {
         'variant': 'line',
