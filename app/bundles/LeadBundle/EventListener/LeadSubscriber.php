@@ -30,6 +30,7 @@ use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadSubscriber implements EventSubscriberInterface
@@ -42,6 +43,8 @@ final class LeadSubscriber implements EventSubscriberInterface
     private array $preventLoop = [];
 
     private ?int $lastContactId = null;
+
+    private LeadRepository $leadRepository;
 
     /**
      * @param ModelFactory<object> $modelFactory
@@ -67,10 +70,15 @@ final class LeadSubscriber implements EventSubscriberInterface
         private DoNotContactRepository $doNotContactRepository,
         ModelFactory $modelFactory,
         private readonly AuditLogRepository $auditLogRepository,
-        private readonly LeadRepository $leadRepository,
         private $isTest = false,
     ) {
         $this->setModelFactory($modelFactory);
+    }
+
+    #[Required]
+    public function setLeadRepository(LeadRepository $leadRepository): void
+    {
+        $this->leadRepository = $leadRepository;
     }
 
     public static function getSubscribedEvents(): array
