@@ -5,6 +5,9 @@
 {% set step = step|default(1) %}
 {% set value = value is defined and value is not null and value != '' ? value : (min > 1 ? min : 1) %}
 {% set disabled = disabled|default(false) %}
+{% set minLength = (min|abs ~ '')|length + (min < 0 ? 1 : 0) %}
+{% set maxLength = (max|abs ~ '')|length + (max < 0 ? 1 : 0) %}
+{% set reservedDigits = max([digits|default(0), minLength, maxLength, (value ~ '')|length, 2]) %}
 {% set labelText = labelText|default(null) %}
 {% set wrapperClass = wrapperClass|default(null) %}
 <div{% if wrapperClass %} class="{{ wrapperClass }}"{% endif %}>
@@ -15,8 +18,8 @@
         <button type="button" class="quantity-stepper__button" data-quantity-step="-1" tabindex="-1" aria-label="{{ decreaseLabel|default('mautic.core.quantity_stepper.decrease')|trans }}"{{ disabled ? ' disabled' }}>
             <i class="ri-subtract-line" aria-hidden="true"></i>
         </button>
-        <span class="quantity-stepper__field">
-            <input type="number" id="{{ id }}" name="{{ name|default('quantity') }}" class="quantity-stepper__value" value="{{ value }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" inputmode="numeric" autocomplete="off"{% if digits|default(null) %} data-digits="{{ digits }}"{% endif %}{{ disabled ? ' disabled' }}{{ required|default(false) ? ' required' }}>
+        <span class="quantity-stepper__field" style="--quantity-stepper-digits: {{ reservedDigits }}">
+            <input type="number" id="{{ id }}" name="{{ name|default('quantity') }}" class="quantity-stepper__value" value="{{ value }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" inputmode="numeric" autocomplete="off"{{ disabled ? ' disabled' }}{{ required|default(false) ? ' required' }}>
             <span class="quantity-stepper__display" aria-hidden="true"><span class="quantity-stepper__digit">{{ value }}</span></span>
         </span>
         <button type="button" class="quantity-stepper__button" data-quantity-step="1" tabindex="-1" aria-label="{{ increaseLabel|default('mautic.core.quantity_stepper.increase')|trans }}"{{ disabled ? ' disabled' }}>

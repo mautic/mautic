@@ -99,7 +99,7 @@
 }
 
 .quantity-stepper__value {
-    width: 2ch;
+    width: calc(var(--quantity-stepper-digits, 2) * 1ch);
     min-width: calc(var(--quantity-stepper-value) - 8px);
     height: 100%;
     padding: 0 4px;

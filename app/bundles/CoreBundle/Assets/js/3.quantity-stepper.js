@@ -47,10 +47,10 @@
     }
 
     function fit(input) {
-        const {min, max} = bounds(input);
-        const reserved = Number(input.dataset.digits) || Math.max(String(min).length, String(max).length);
+        const field = input.closest('.quantity-stepper__field');
+        const current = Number(field.style.getPropertyValue('--quantity-stepper-digits')) || 2;
 
-        input.style.width = `${Math.max(reserved, input.value.length, 2)}ch`;
+        field.style.setProperty('--quantity-stepper-digits', Math.max(current, input.value.length));
     }
 
     function sync(root) {
