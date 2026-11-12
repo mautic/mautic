@@ -603,11 +603,9 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
 
             parentElement.remove();
             tabLink.remove();
-            // if tabContainer is for variants, show the first one, if it is the DEC vertical list, show the second one
-            if (tabContainer.hasClass('tabs-left') || $this.hasClass('remove-filter')) {
-                tabContainer.find('li').first().next().find('a').each((index, element) => bootstrap.Tab.getOrCreateInstance(element).show());
-            } else {
-                tabContainer.find('li').first().find('a').each((index, element) => bootstrap.Tab.getOrCreateInstance(element).show());
+            var nextTab = tabContainer.find('[data-bs-toggle="tab"]').first();
+            if (nextTab.length) {
+                bootstrap.Tab.getOrCreateInstance(nextTab[0]).show();
             }
 
             Mautic.updateDynamicContentDropdown();
