@@ -1,13 +1,4 @@
-<h4 class="fw-sb mb-5">{{ 'mautic.core.config.header.privacyconfig.third_party'|trans }}</h4>
-<div class="text-muted small pb-16">{{ 'mautic.core.config.header.privacyconfig.third_party.description'|trans }}</div>
-<div class="panel panel-default mb-16">
-    <div class="panel-body">
-        <div class="row">
-            {% for child in form.children %}
-            <div class="col-xs-12">
-                {{ form_row(child) }}
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
+<h4 class="fw-sb mt-16 mb-16">{{ 'mautic.core.config.header.privacyconfig.third_party'|trans }}</h4>
+{% for child in form.children %}
+    {{ form_row(child) }}
+{% endfor %}
