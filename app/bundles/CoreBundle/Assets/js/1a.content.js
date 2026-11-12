@@ -457,10 +457,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
             var activeTab  = mQuery(this).find('a[href=' + hash + ']').first();
 
             if (mQuery(activeTab).length) {
-                mQuery('.nav-tabs li').removeClass('active');
-                mQuery('.tab-pane').removeClass('in active');
-                mQuery(activeTab).parent().addClass('active');
-                mQuery(hash).addClass('in active');
+                bootstrap.Tab.getOrCreateInstance(activeTab[0]).show();
             }
         }
 
@@ -824,6 +821,7 @@ Mautic.onPageUnload = function (container, response) {
     //unload tooltips so they don't double show
     if (typeof container != 'undefined') {
         mQuery(container + " *[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
+        mQuery(container).find("*[data-bs-toggle='tab'], *[data-bs-toggle='pill']").each((index, element) => bootstrap.Tab.getInstance(element)?.dispose());
 
         //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
         if (typeof MauticVars.modalsReset == 'undefined') {

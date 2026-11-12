@@ -255,6 +255,9 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     ? Mautic.getQuickFilterPopoverOptions()
                     : { sanitize: false };
                 $("[data-quick-filter]").popover(quickFilterOptions);
+                $(document).on("mouseenter", "[data-bs-toggle~=popover][data-bs-trigger~=hover]", function () {
+                    $("[data-bs-toggle~=popover][data-bs-trigger~=hover]").not(this).each((index, element) => bootstrap.Popover.getInstance(element)?.hide());
+                });
 
             },
 

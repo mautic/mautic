@@ -368,6 +368,7 @@ Mautic.showConfirmation = function (el, customMessage) {
     mQuery('body').append(confirmContainer);
 
     mQuery('.confirmation-modal').on('hidden.bs.modal', function () {
+        bootstrap.Modal.getInstance(this)?.dispose();
         mQuery(this).remove();
     });
 
