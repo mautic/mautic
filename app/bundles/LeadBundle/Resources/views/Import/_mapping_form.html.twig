@@ -25,6 +25,7 @@
                 <div class="col-xs-4">
                     {% if form.create_new is defined %}{{ form_row(form.create_new) }}{% endif %}
                 </div>
+                {{ customContent('import.defaults', _context, '@MauticLead/Import/_mapping_form.html.twig') }}
             </div>
 
         </div>
