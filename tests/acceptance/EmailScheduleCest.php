@@ -10,7 +10,7 @@ final class EmailScheduleCest
 {
     public function _before(AcceptanceTester $I): void
     {
-        $I->login();
+        $I->login(reuseSnapshot: false);
     }
 
     public function triggeredEmailShowsScheduleOptionsOnCreate(AcceptanceTester $I): void

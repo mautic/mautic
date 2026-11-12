@@ -24,11 +24,11 @@ class AcceptanceTester extends Codeception\Actor
 
     public const TIMEOUT = 30;
 
-    public function login(string $name = 'admin', string $password = 'Maut1cR0cks!'): void
+    public function login(string $name = 'admin', string $password = 'Maut1cR0cks!', bool $reuseSnapshot = true): void
     {
         $I = $this;
         // if snapshot exists - skipping login
-        if ($I->loadSessionSnapshot('login')) {
+        if ($reuseSnapshot && $I->loadSessionSnapshot('login')) {
             $I->amOnPage('/s/dashboard');
             $I->waitForJS('return typeof window.LoginUserId !== "undefined";', self::TIMEOUT);
             if ($I->executeJS('return window.LoginUserId > 0;')) {
