@@ -35,6 +35,14 @@ Mautic.getEntityId = function() {
  */
 Mautic.reorderTableData = function (name, orderby, tmpl, target, baseUrl) {
     if (typeof baseUrl == 'undefined') {
+        // A pending list search updates the page URL when its response is rendered.
+        var searchRequest = Mautic.liveSearchXhr;
+        if (searchRequest && searchRequest.listTarget === target && searchRequest.state() === 'pending') {
+            searchRequest.then(function () {
+                Mautic.reorderTableData(name, orderby, tmpl, target);
+            });
+            return;
+        }
         baseUrl = window.location.pathname;
 
         // Reset to first page by modifying the path
@@ -263,6 +271,7 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     delete Mautic.filterButtonClicked;
                 }
             });
+            Mautic.liveSearchXhr.listTarget = target;
         }
     }
 };

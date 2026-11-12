@@ -17,6 +17,16 @@ final class ContactManagementCest
 
     public function sortingPreservesExistingQueryParameters(AcceptanceTester $I): void
     {
+        try {
+            $this->assertSortRequests($I);
+        } finally {
+            // Discard both the contact filter and sort order before the next scenario logs in.
+            $I->amOnPage('/s/logout');
+        }
+    }
+
+    private function assertSortRequests(AcceptanceTester $I): void
+    {
         foreach (['sort+query@example.com', 'sort&query@example.com'] as $email) {
             $I->haveInDatabase('test_leads', [
                 'email'           => $email,
@@ -28,7 +38,13 @@ final class ContactManagementCest
             ]);
         }
 
-        foreach (['', '?search=', '?search=sort%2Bquery%40example.com', '?search=sort%26query%40example.com&category=3'] as $query) {
+        foreach ([
+            '',
+            '?search=',
+            '?search=sort%2Bquery%40example.com',
+            '?search=sort%26query%40example.com&category=3',
+            'clearBeforeSort' => '?search=sort%2Bquery%40example.com',
+        ] as $scenario => $query) {
             $I->amOnPage(ContactPage::$URL.$query);
             $I->waitForJS('return typeof Mautic !== "undefined" && typeof Mautic.reorderTableData === "function";', AcceptanceTester::TIMEOUT);
 
@@ -52,11 +68,19 @@ mQuery(document).on('ajaxComplete.tableSortQuery', function (event, xhr, setting
 });
 JS);
             $I->waitForElementClickable('#leadTable .col-lead-name a.table-sort', AcceptanceTester::TIMEOUT);
-            $I->click('#leadTable .col-lead-name a.table-sort');
+            if ('clearBeforeSort' === $scenario) {
+                // Click in the same browser task, before the clear-search response arrives.
+                $I->executeJS(<<<'JS'
+document.querySelector("button[data-livesearch-parent='list-search']").click();
+document.querySelector('#leadTable .col-lead-name a.table-sort').click();
+JS);
+            } else {
+                $I->click('#leadTable .col-lead-name a.table-sort');
+            }
             $I->waitForJS('return window.tableSortRequest !== null;', AcceptanceTester::TIMEOUT);
             $request = $I->executeJS('return window.tableSortRequest;');
 
-            parse_str(ltrim($query, '?'), $expected);
+            parse_str('clearBeforeSort' === $scenario ? '' : ltrim($query, '?'), $expected);
             $I->assertSame($expected['search'] ?? null, $request['search']);
             $I->assertSame($expected['category'] ?? null, $request['category']);
             $I->assertSame('list', $request['tmpl']);
