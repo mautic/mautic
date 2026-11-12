@@ -1,30 +1,56 @@
-# HoldToConfirmButton
+# Hold to confirm
 
-Twig and native JavaScript equivalent of Acervo's Spectrum UI hold-to-confirm button. React is not shipped. The motion engine and the MIT BorderBeam CSS generator preserve the original spring parameters, beam palettes and theme geometry.
+Native Twig and JavaScript adaptation of Acervo's Spectrum UI control. Production has no React, Motion, TypeScript build or custom font. The existing Mautic button classes provide typography, danger colors, hover, disabled state and theme tokens. Component SCSS only supplies its shape, sizes, progress and feedback. Native Web Animations samples the source spring parameters for press/release, icon pop and label roll; requestAnimationFrame drives the functional progress ring. The MIT BorderBeam CSS generator retains the beam palettes and geometry separately from the interaction controller.
 
 ```twig
 {% include '@MauticCore/Components/hold-to-confirm.html.twig' with {
-    label: 'mautic.example.delete', confirmedLabel: 'mautic.example.deleted',
-    duration: 1200, resetDelay: 1500, size: 'md', disabled: false
+    variant: 'danger',
+    label: 'mautic.core.hold_to_confirm.label',
+    confirmedLabel: 'mautic.core.hold_to_confirm.confirmed',
+    duration: 1200,
+    resetDelay: 0,
+    size: 'md',
+    disabled: false
 } only %}
 ```
 
-Options: `duration` (1200 ms), `resetDelay` (1500 ms; zero stays confirmed), `label`, `confirmedLabel`, `icon`, `size` (`sm`, `md`, `lg`), `disabled`, `className`, `variant` (`destructive`, `neutral`, `beam`), `colorVariant` (`sunset`, `ocean`, `colorful`, `mono`), `beamSize` (`md`), `theme` (`auto`, `light`, `dark`), `strength` (0.65), `beamClassName`, `active` (true), and `id`. Both labels are translated and escaped. For rich icons use the `icon` block of Twig `embed`; client-side updates accept a DOM node as `icon`.
+## API
+
+- `variant`: `danger` (default), `neutral`, `beam`. The old `destructive` name remains an alias for `danger`.
+- `size`: `sm`, `md`, `lg`, retaining 32/40/48 px heights and 20/24/30 px rings.
+- `duration`: 1200 ms. `resetDelay`: 1500 ms; zero stays confirmed until `reset()`.
+- `label`, `confirmedLabel`: translated and escaped. The default confirmation says **Confirmed**, not **Deleted**: completing a gesture does not prove the server deleted anything.
+- `icon`: a Remix icon class, default `ri-delete-bin-line`; Twig `embed` can override the `icon` block. Runtime `update({icon})` accepts a DOM node or null to restore the default.
+- `disabled`, `className`, `id`; beam-only `beamClassName`, `colorVariant` (`sunset`, `ocean`, `colorful`, `mono`), `theme` (`auto`, `light`, `dark`), `strength` (0.65) and `active` (true). The only beam size is `md`, as in the original.
 
 ```javascript
 const element = document.querySelector('[data-component="hold-to-confirm"]');
-const button = window.MauticUI.HoldToConfirmButton.get(element);
-button.update({ onConfirm: () => performAuthorizedAction() });
+const controller = window.MauticUI.HoldToConfirmButton.get(element);
+controller.update({onConfirm: () => performAuthorizedAction()});
 ```
 
-The bubbling `mautic:hold-to-confirm:confirm` event is the alternative to `onConfirm`; choose one to avoid executing the action twice. The client-side confirmation is only a gesture: enforce authorization and CSRF protection on the action endpoint.
+Alternatively listen to the bubbling `mautic:hold-to-confirm:confirm` event. Use either the callback or the event to execute the action, never both. `update()` changes options and `reset()` restores idle. AJAX-inserted controls initialize once; removal releases listeners, animations, timers and beam styles.
 
-Hold Space, Enter or the pointer for the specified duration. A second input joins without restarting progress; releasing one input does not cancel another. Release, pointer cancellation or blur unwind incomplete holds. Completion consumes outstanding holds and fires once. `resetDelay` resets for a later hold, or call `reset()` explicitly. Reduced motion preserves confirmation timing. Removed nodes cancel animation, callbacks, reset timers, beam observers and styles. AJAX insertions initialize automatically.
+Hold the primary pointer, Space or Enter. Short clicks and right clicks do not confirm. Combined pointer/keyboard input does not restart progress or cancel the other input. Releasing the last input unwinds progress; blur, visibility loss and pointer cancellation cancel an incomplete hold. Completion fires once and consumes the physical holds. Reduced motion freezes beam effects and suppresses decorative movement without shortening the confirmation duration.
 
-The original light/dark treatment follows `.dark`. Beam `theme: auto` follows the OS color-scheme media query, as in the source package. The Manrope font is bundled with its OFL license. The default trash SVG follows Lucide's ISC-licensed geometry.
+## Adoption rules
+
+This branch supplies the adapted component and an [adoption audit](hold-to-confirm-danger-audit.md); it does not change existing delete handlers. Keep a clearly explained confirmation surface, affected item/count and a normal Cancel action. For users unable to sustain a press, retain an accessible confirmation alternative in the consuming flow; do not make this gesture the sole way to manage data.
+
+Integrations must preserve authorization, CSRF, POST semantics, batch selection prechecks, lock/dependency checks, loading/error feedback and focus return. Pass the existing action through its established helper after confirmation; do not turn a destructive endpoint into a GET link. Use `resetDelay: 0` and disable while a request is pending. Only a successful server response may claim deletion. Do not stack a second confirmation dialog after the hold.
 
 ## Verification
 
-Run the component tooling commands documented in `animated-checkbox.md`, or from `Assets/components`: `npm ci`, `npm run build`, `npx playwright install --with-deps chromium`, `npm test` (through DDEV locally). The suite type-checks, renders real Twig, checks Mautic's minifier and exercises Chromium. CI discovers it in `core-components.yml`.
+From the registered main DDEV checkout, run the suite against this worktree's actual source:
 
-Eighteen browser tests cover state, timing, pointer/keyboard cooperation, cancellation, reset, disabled updates, removal, beam activation, reduced motion, sizes, escaping and explicit zero values. Twenty-four stable screenshots of the original React button matched dimensions with zero Pixelmatch differences at threshold 0.05: destructive/neutral, all three sizes, idle/confirmed, light/dark. Beam animations and arbitrary host CSS overrides are not covered by that screenshot claim.
+```sh
+ddev exec --dir /var/www/html/.worktrees/hold-to-confirm/app/bundles/CoreBundle/Assets/components env MAUTIC_VENDOR_AUTOLOAD=/var/www/html/vendor/autoload.php npm test
+```
+
+Test setup in `Assets/components`: `npm ci`, then `npx playwright install --with-deps chromium`. CI uses the same Twig/Chromium tests and a small Composer install for Twig and the production PHP minifier. There is no production component build step.
+
+The entire branch `app.scss` also compiles with Sass 1.93.2 and the base branch's Bootstrap Sass 3.4.1 dependency. This compilation is separate from the live preview, whose host checkout already carries the current Bootstrap compatibility work.
+
+The suite covers input cooperation, cancellation, reset, explicit zero/false, escaped labels, disabled/removal lifecycle, sizes, alias/dynamic variant changes, accessible names, reduced motion, beam activation and execution after PHP minification. A regression test includes Mautic's inherited button-span rules and checks the confirmed check stays centered.
+
+Visual verification uses a temporary in-page preview on the authenticated local Contacts route, with the real Mautic styles and the worktree's Twig-rendered markup/SCSS/JS. It verifies idle, hold, cancel and confirmed feedback without issuing a deletion. This is not an installed integration or an end-to-end deletion test, and no new pixel-identical-to-React claim is made after adapting to Mautic's design tokens.

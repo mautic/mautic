@@ -31,7 +31,7 @@ test('complete fires exactly once while held and resetDelay zero stays confirmed
   await page.waitForTimeout(350);
   await page.mouse.up();
   expect(await page.evaluate(() => [window.confirms, window.callbacks])).toEqual([1, 1]);
-  await expect(page.getByRole('status')).toHaveText('Deleted');
+  await expect(page.getByRole('status')).toHaveText('Confirmed');
   await expect(page.locator('[data-component]')).toHaveAttribute('data-state', 'confirmed');
 });
 
@@ -44,7 +44,7 @@ test('release before completion cancels and unwinds', async ({ page }) => {
   await page.waitForTimeout(450);
   expect(await page.evaluate(() => window.confirms)).toBe(0);
   await expect(page.locator('[data-component]')).toHaveAttribute('data-state', 'idle');
-  expect(Number(await page.locator('.acervo-hold__progress').evaluate((circle) => circle.style.strokeDashoffset))).toBeCloseTo(1, 2);
+  expect(Number(await page.locator('.hold-to-confirm__progress').evaluate((circle) => circle.style.strokeDashoffset))).toBeCloseTo(1, 2);
 });
 
 for (const key of ['Space', 'Enter']) {
@@ -156,10 +156,97 @@ for (const variant of ['neutral', 'beam']) {
     await press(page);
     await expect(page.locator('[data-component]')).toHaveAttribute('data-state', 'confirmed');
     await page.mouse.up();
-    await expect(page.getByRole('button')).toHaveCSS('background-color', 'oklch(0.979 0.021 166.113)');
-    await expect(page.getByRole('button')).toHaveCSS('color', 'oklch(0.596 0.145 163.225)');
+    await expect(page.getByRole('button')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+    await expect(page.getByRole('button')).toHaveCSS('color', 'rgb(36, 161, 72)');
   });
 }
+
+test('right click and a short native click do not confirm', async ({ page }) => {
+  await load(page, 'hold-to-confirm', { duration: 150, resetDelay: 0 });
+  await monitor(page);
+  await page.getByRole('button').click({ button: 'right' });
+  await page.waitForTimeout(200);
+  await page.getByRole('button').click();
+  await page.waitForTimeout(200);
+  expect(await page.evaluate(() => window.confirms)).toBe(0);
+});
+
+test('window blur cancels a keyboard hold', async ({ page }) => {
+  await load(page, 'hold-to-confirm', { duration: 200 });
+  await monitor(page);
+  await page.getByRole('button').focus();
+  await page.keyboard.down('Enter');
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+  await page.waitForTimeout(250);
+  await page.keyboard.up('Enter');
+  expect(await page.evaluate(() => window.confirms)).toBe(0);
+});
+
+test('danger alias, dynamic variant and custom class keep native button styles', async ({ page }) => {
+  await load(page, 'hold-to-confirm', { variant: 'destructive' });
+  await expect(page.locator('[data-component]')).toHaveAttribute('data-variant', 'danger');
+  await expect(page.getByRole('button')).toHaveClass(/btn-danger/);
+  await page.evaluate(() => window.MauticUI.HoldToConfirmButton.get(document.querySelector('[data-component]')).update({ variant: 'neutral', className: 'custom' }));
+  await expect(page.getByRole('button')).toHaveClass(/btn-tertiary/);
+  await expect(page.getByRole('button')).not.toHaveClass(/btn-danger/);
+  await expect(page.getByRole('button')).toHaveClass(/custom/);
+  await page.evaluate(() => window.MauticUI.HoldToConfirmButton.get(document.querySelector('[data-component]')).update({ variant: 'danger' }));
+  await expect(page.getByRole('button')).toHaveClass(/btn-danger/);
+});
+
+test('updated instructions and reset restore the accessible name', async ({ page }) => {
+  await load(page, 'hold-to-confirm', { duration: 100, resetDelay: 0 });
+  await page.evaluate(() => window.MauticUI.HoldToConfirmButton.get(document.querySelector('[data-component]')).update({ label: 'Remove contact', confirmedLabel: 'Confirmed' }));
+  await press(page);
+  await expect(page.getByRole('button')).toHaveAccessibleName('Confirmed');
+  await page.mouse.up();
+  await page.evaluate(() => window.MauticUI.HoldToConfirmButton.get(document.querySelector('[data-component]')).reset());
+  await expect(page.getByRole('button')).toHaveAccessibleName('Remove contact. Press and hold for 0.1 seconds to confirm');
+});
+
+test('reduced motion freezes the beam and removes decorative transforms', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await load(page, 'hold-to-confirm', { variant: 'beam', duration: 200, resetDelay: 0 });
+  await press(page);
+  await page.waitForTimeout(50);
+  await expect(page.getByRole('button')).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 0)');
+  expect(await page.locator('[data-component]').evaluate((element) => getComputedStyle(element, '::after').animationName)).toBe('none');
+  await page.mouse.up();
+});
+
+test('zero duration confirms once without leaving an active hold', async ({ page }) => {
+  await load(page, 'hold-to-confirm', { duration: 0, resetDelay: 0 });
+  await monitor(page);
+  await press(page);
+  await expect(page.locator('[data-component]')).toHaveAttribute('data-state', 'confirmed');
+  await page.mouse.up();
+  expect(await page.evaluate(() => window.confirms)).toBe(1);
+});
+
+test('success check stays centered under inherited Mautic button rules', async ({ page }) => {
+  await load(page, 'hold-to-confirm', { duration: 0, resetDelay: 0 });
+  await press(page);
+  await expect(page.locator('[data-component]')).toHaveAttribute('data-state', 'confirmed');
+  await page.mouse.up();
+  await page.waitForTimeout(700);
+  const offset = await page.locator('.hold-to-confirm__symbol').evaluate((element) => {
+    const symbol = element.getBoundingClientRect();
+    const check = element.querySelector('.hold-to-confirm__check svg').getBoundingClientRect();
+    return [Math.abs(symbol.x + symbol.width / 2 - check.x - check.width / 2), Math.abs(symbol.y + symbol.height / 2 - check.y - check.height / 2)];
+  });
+  expect(offset[0]).toBeLessThan(1);
+  expect(offset[1]).toBeLessThan(1);
+});
+
+test('production PHP minifier keeps confirmation and beam working', async ({ page }) => {
+  await load(page, 'hold-to-confirm', { variant: 'beam', duration: 100, resetDelay: 0 }, '', true);
+  await monitor(page);
+  await press(page);
+  await expect(page.locator('[data-component]')).toHaveAttribute('data-state', 'confirmed');
+  await page.mouse.up();
+  expect(await page.evaluate(() => window.confirms)).toBe(1);
+  await expect(page.locator('[data-beam]')).toHaveCount(1);
+});
 
 test('values zero and false are preserved; custom labels are escaped' , () => {
   const html = render('hold-to-confirm', { duration: 0, resetDelay: 0, disabled: false, active: false, strength: 0, label: '<script>bad</script>' });

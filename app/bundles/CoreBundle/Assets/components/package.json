@@ -3,13 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc --noEmit && node build.mjs",
-    "test": "node check-assets.mjs && playwright test"
+    "test": "playwright test"
   },
   "devDependencies": {
     "@playwright/test": "1.58.2",
-    "esbuild": "0.25.12",
-    "motion": "12.43.0",
-    "typescript": "5.9.3"
+    "sass": "1.93.2"
   }
 }

@@ -1,0 +1,148 @@
+.hold-to-confirm {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-self: flex-start;
+    width: fit-content;
+    height: fit-content;
+    border-radius: 9999px;
+
+    &__button.btn {
+        position: relative;
+        justify-content: center;
+        height: 40px;
+        gap: 8px;
+        margin: 0;
+        padding: 0 16px 0 10px;
+        border-radius: inherit;
+        font-family: inherit;
+        font-weight: 500;
+        touch-action: none;
+        user-select: none;
+
+        &:focus-visible {
+            outline: 2px solid var(--focus);
+            outline-offset: 2px;
+        }
+
+        i {
+            order: initial;
+            min-width: 0;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        span {
+            height: auto;
+            justify-content: center;
+            line-height: normal;
+        }
+
+        span > span {
+            margin: 0;
+        }
+    }
+
+    &[data-size='sm'] &__button {
+        height: 32px;
+        gap: 6px;
+        padding-inline: 8px 12px;
+        font-size: 12px;
+
+        i { font-size: 12px; }
+    }
+
+    &[data-size='lg'] &__button {
+        height: 48px;
+        gap: 10px;
+        padding-inline: 12px 20px;
+        font-size: 16px;
+
+        i { font-size: 17px; }
+    }
+
+    &__symbol {
+        position: relative;
+        display: inline-flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__check {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: scale(0);
+        opacity: 0;
+
+        path {
+            stroke-dasharray: 1;
+            stroke-dashoffset: 1;
+            transition: stroke-dashoffset 100ms;
+        }
+    }
+
+    &__ring {
+        position: absolute;
+        inset: 0;
+        transform: rotate(-90deg);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    &__label {
+        position: relative;
+        display: inline-flex;
+        overflow: hidden;
+        transition: opacity 200ms;
+
+        > span {
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        > [hidden] { display: none; }
+    }
+
+    &[data-state='holding'] &__label { opacity: .6; }
+
+    &[data-state='confirmed'] &__button.btn {
+        border-color: var(--support-success);
+        background: var(--layer);
+        color: var(--support-success);
+    }
+
+    &[data-state='confirmed'] &__check path {
+        stroke-dashoffset: 0;
+        transition: stroke-dashoffset 250ms cubic-bezier(.22, 1, .36, 1) 50ms;
+    }
+
+    &__status {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hold-to-confirm *,
+    .hold-to-confirm::before,
+    .hold-to-confirm::after {
+        transition: none !important;
+        animation: none !important;
+    }
+}
