@@ -5,17 +5,49 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\FieldRepository;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Event\FormBuilderEvent;
+use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        self::getContainer()->get(EventDispatcherInterface::class)->addListener(
+            FormEvents::FORM_ON_BUILD,
+            static function (FormBuilderEvent $event): void {
+                $event->addFormField('test.custom', [
+                    'label'          => 'Test custom field',
+                    'formType'       => FormType::class,
+                    'template'       => '@MauticForm/Field/text.html.twig',
+                    'builderOptions' => [
+                        'addMappedFieldList' => false,
+                        'addIsRequired'      => false,
+                        'addDefaultValue'    => false,
+                        'addSaveResult'      => false,
+                    ],
+                ]);
+            },
+        );
+    }
 
     private const TEST_PAYLOAD = [
         'name'        => 'API form',
@@ -262,6 +294,187 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
         ];
+    }
+
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testApiResolvesRegisteredCustomFieldMetadata(): void
+    {
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', [
+            'name'   => 'API form with custom field',
+            'fields' => [[
+                'label'            => 'Custom field',
+                'type'             => 'test.custom',
+                'isCustom'         => false,
+                'customParameters' => [
+                    'template' => '@invalid/template.html.twig',
+                ],
+            ]],
+        ]);
+
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $response->getContent());
+
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $formId       = (int) $responseData['form']['id'];
+
+        $this->em->clear();
+
+        $form = self::getContainer()->get(FormRepository::class)->find($formId);
+        $this->assertInstanceOf(Form::class, $form);
+
+        $customField = $form->getFields()->filter(
+            static fn (Field $field): bool => 'test.custom' === $field->getType(),
+        )->first();
+
+        $this->assertInstanceOf(Field::class, $customField);
+        $this->assertTrue($customField->isCustom());
+        $this->assertSame(
+            '@MauticForm/Field/text.html.twig',
+            $customField->getCustomParameters()['template'] ?? null,
+        );
+
+        $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", [
+            'name'   => 'Updated API form with built-in field',
+            'fields' => [[
+                'id'   => $customField->getId(),
+                'type' => 'text',
+            ]],
+        ]);
+
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
+
+        $this->em->clear();
+
+        $form = self::getContainer()->get(FormRepository::class)->find($formId);
+        $this->assertInstanceOf(Form::class, $form);
+
+        $builtInField = $form->getFields()->first();
+        $this->assertInstanceOf(Field::class, $builtInField);
+        $this->assertFalse($builtInField->isCustom());
+        $this->assertSame([], $builtInField->getCustomParameters());
+    }
+
+    public function testApiRejectsUnavailableCustomFieldWithoutClearingMetadata(): void
+    {
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', [
+            'name'   => 'API form with unavailable custom field',
+            'fields' => [[
+                'label' => 'Custom field',
+                'type'  => 'text',
+            ]],
+        ]);
+
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $response->getContent());
+
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $formId       = (int) $responseData['form']['id'];
+
+        $this->em->clear();
+
+        $form = self::getContainer()->get(FormRepository::class)->find($formId);
+        $this->assertInstanceOf(Form::class, $form);
+
+        $customField = $form->getFields()->first();
+        $this->assertInstanceOf(Field::class, $customField);
+
+        $fieldRepository = self::getContainer()->get(FieldRepository::class);
+        $customField     = $fieldRepository->find($customField->getId());
+        $this->assertInstanceOf(Field::class, $customField);
+
+        $customParameters = ['template' => '@UnavailablePlugin/Field/custom.html.twig'];
+        $customField->setType('plugin.unavailable');
+        $customField->setIsCustom(true);
+        $customField->setCustomParameters($customParameters);
+        $fieldRepository->saveEntity($customField);
+        $this->em->clear();
+
+        $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", [
+            'fields' => [[
+                'id'    => $customField->getId(),
+                'label' => 'Updated custom field',
+            ]],
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getContent());
+
+        $this->em->clear();
+
+        $form = self::getContainer()->get(FormRepository::class)->find($formId);
+        $this->assertInstanceOf(Form::class, $form);
+
+        $customField = $form->getFields()->first();
+        $this->assertInstanceOf(Field::class, $customField);
+        $this->assertSame('plugin.unavailable', $customField->getType());
+        $this->assertTrue($customField->isCustom());
+        $this->assertSame($customParameters, $customField->getCustomParameters());
+    }
+
+    public function testBatchApiRejectsUnavailableCustomFieldWithoutCreatingForm(): void
+    {
+        $formName = 'Batch API form with unavailable custom field';
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/batch/new', [[
+            'name'   => $formName,
+            'fields' => [[
+                'label' => 'Unavailable custom field',
+                'type'  => 'plugin.unavailable',
+            ]],
+        ]]);
+
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $response->getContent());
+
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $responseData['statusCodes'][0]);
+        $this->assertSame(
+            'Form field type "plugin.unavailable" is not registered.',
+            $responseData['errors'][0]['message'],
+        );
+        $this->assertSame([], $responseData['forms']);
+        $this->assertNull(self::getContainer()->get(FormRepository::class)->findOneBy(['name' => $formName]));
+    }
+
+    public function testBatchApiRejectsUnavailableCustomFieldWithoutReturningUnsavedChanges(): void
+    {
+        $originalName = 'API form before rejected batch update';
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', [
+            'name'   => $originalName,
+            'fields' => [[
+                'label' => 'Text field',
+                'type'  => 'text',
+            ]],
+        ]);
+
+        $createResponse = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $createResponse->getContent());
+
+        $createData = json_decode($createResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $formId     = (int) $createData['form']['id'];
+        $fieldId    = (int) $createData['form']['fields'][0]['id'];
+
+        $this->client->request(Request::METHOD_PATCH, '/api/forms/batch/edit', [[
+            'id'     => $formId,
+            'name'   => 'Unsaved batch update',
+            'fields' => [[
+                'id'   => $fieldId,
+                'type' => 'plugin.unavailable',
+            ]],
+        ]]);
+
+        $updateResponse = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK, $updateResponse->getContent());
+
+        $updateData = json_decode($updateResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $updateData['statusCodes'][0]);
+        $this->assertSame([], $updateData['forms']);
+
+        $this->em->clear();
+
+        $form = self::getContainer()->get(FormRepository::class)->find($formId);
+        $this->assertInstanceOf(Form::class, $form);
+        $this->assertSame($originalName, $form->getName());
     }
 
     public function testSingleFormWorkflow(): void

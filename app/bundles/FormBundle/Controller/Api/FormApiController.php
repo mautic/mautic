@@ -144,6 +144,22 @@ final class FormApiController extends CommonApiController
         // Set timestamps
         $this->model->setTimestamps($entity, true, false);
 
+        $customFields = [];
+        if (!empty($parameters['fields']) && is_array($parameters['fields'])) {
+            $customFields = $this->formModel->getCustomComponents()['fields'];
+
+            // Validate explicit field types before a new form is saved to obtain its ID.
+            foreach ($parameters['fields'] as $fieldParams) {
+                if (!empty($fieldParams['id']) || !array_key_exists('type', $fieldParams)) {
+                    continue;
+                }
+
+                if ($error = $this->getUnregisteredFieldTypeError($fieldParams['type'], $customFields)) {
+                    return $error;
+                }
+            }
+        }
+
         if (!$entity->getId()) {
             $isNew = true;
 
@@ -210,7 +226,29 @@ final class FormApiController extends CommonApiController
                 }
                 $requestUsedAliases[] = $fieldEntityArray['alias'];
 
-                $fieldForm = $this->createFieldEntityForm($fieldEntityArray);
+                // Resolve custom field metadata on the server instead of trusting API input.
+                unset($fieldParams['isCustom'], $fieldParams['customParameters']);
+
+                $fieldType        = $fieldParams['type'] ?? $fieldEntityArray['type'] ?? null;
+                $customParameters = is_string($fieldType) ? ($customFields[$fieldType] ?? false) : false;
+
+                if ($error = $this->getUnregisteredFieldTypeError($fieldType, $customFields)) {
+                    return $error;
+                }
+
+                if (false !== $customParameters) {
+                    $fieldParams['isCustom']              = true;
+                    $fieldParams['customParameters']      = $customParameters;
+                    $fieldEntityArray['isCustom']         = true;
+                    $fieldEntityArray['customParameters'] = $customParameters;
+                } else {
+                    $fieldParams['isCustom']              = false;
+                    $fieldParams['customParameters']      = [];
+                    $fieldEntityArray['isCustom']         = false;
+                    $fieldEntityArray['customParameters'] = [];
+                }
+
+                $fieldForm = $this->createFieldEntityForm($fieldEntityArray, $customParameters);
                 $fieldForm->submit($fieldParams, 'PATCH' !== $method);
 
                 if (!$fieldForm->isValid()) {
@@ -314,7 +352,7 @@ final class FormApiController extends CommonApiController
      *
      * @return FormInterface<mixed>
      */
-    protected function createFieldEntityForm($entity): FormInterface
+    protected function createFieldEntityForm(array $entity, array|false $customParameters = false): FormInterface
     {
         return $this->fieldModel->createForm(
             $entity,
@@ -323,8 +361,32 @@ final class FormApiController extends CommonApiController
             [
                 'csrf_protection'    => false,
                 'allow_extra_fields' => true,
+                'customParameters'   => $customParameters,
             ]
         );
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $customFields
+     *
+     * @return array<string, array<mixed>|int|string|null>|Response|null
+     */
+    private function getUnregisteredFieldTypeError(mixed $fieldType, array $customFields): array|Response|null
+    {
+        if (is_string($fieldType)
+            && (isset($customFields[$fieldType]) || $this->formModel->isFieldTypeRegistered($fieldType))
+        ) {
+            return null;
+        }
+
+        $type = is_string($fieldType) ? $fieldType : get_debug_type($fieldType);
+        $msg  = $this->translator->trans(
+            'mautic.form.field.type.not_registered',
+            ['%type%' => $type],
+            'validators',
+        );
+
+        return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
     }
 
     /**
