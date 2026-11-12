@@ -17,9 +17,11 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 {
@@ -42,6 +44,8 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject&LeadRepository $leadRepository;
 
+    private \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface $translator;
+
     protected function setUp(): void
     {
         $this->leadModel       = $this->createMock(LeadModel::class);
@@ -49,8 +53,13 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->mergeRecordRepo = $this->createMock(MergeRecordRepository::class);
         $this->logger          = $this->createMock(Logger::class);
         $this->companyLeadRepo = $this->createMock(CompanyLeadRepository::class);
+        $this->translator      = $this->createMock(TranslatorInterface::class);
 
         $this->leadRepository->method('getFieldValues')->willReturn([]);
+        $this->translator->method('trans')->willReturnArgument(0);
+        $this->mergeRecordRepo->method('wrapInTransaction')->willReturnCallback(
+            static fn (callable $callback): mixed => $callback()
+        );
     }
 
     public function testMergeTimestamps(): void
@@ -563,6 +572,64 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($loserOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
     }
 
+    public function testMergeStagesKeepsWinnerStageWhenBothHaveOne(): void
+    {
+        $winnerStage = new Stage();
+        $loserStage  = new Stage();
+        $winner      = (new Lead())->setStage($winnerStage);
+        $loser       = (new Lead())->setStage($loserStage);
+
+        $this->getMerger()->mergeStages($winner, $loser);
+
+        $this->assertSame($winnerStage, $winner->getStage());
+    }
+
+    public function testMergeStagesInheritsLoserStageWithChangeLog(): void
+    {
+        $stage  = new Stage();
+        $winner = new Lead();
+        $loser  = (new Lead())->setStage($stage);
+
+        $this->leadModel->expects($this->once())
+            ->method('addToStage')
+            ->with($winner, $stage, 'mautic.lead.event.merge');
+
+        $this->getMerger()->mergeStages($winner, $loser);
+    }
+
+    public function testMergeStagesSupportsLegacyConstructorWithoutTranslator(): void
+    {
+        $stage  = new Stage();
+        $winner = new Lead();
+        $loser  = (new Lead())->setStage($stage);
+
+        $this->leadModel->expects($this->once())
+            ->method('addToStage')
+            ->with($winner, $stage, 'Contact merged');
+
+        $merger = new ContactMerger(
+            $this->leadModel,
+            $this->mergeRecordRepo,
+            $this->createStub(EventDispatcher::class),
+            $this->logger,
+            $this->companyLeadRepo,
+            $this->leadRepository
+        );
+
+        $merger->mergeStages($winner, $loser);
+    }
+
+    public function testMergeStagesKeepsWinnerStageWhenLoserHasNone(): void
+    {
+        $winnerStage = new Stage();
+        $winner      = (new Lead())->setStage($winnerStage);
+        $loser       = new Lead();
+
+        $this->getMerger()->mergeStages($winner, $loser);
+
+        $this->assertSame($winnerStage, $winner->getStage());
+    }
+
     public function testMergePoints(): void
     {
         $winner = new Lead();
@@ -685,6 +752,13 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         // mergeOwners
         $winner->expects($this->never())
             ->method('setOwner');
+
+        // The winner inherits the loser's stage and records the change before it is saved
+        $stage = new Stage();
+        $loser->method('getStage')->willReturn($stage);
+        $this->leadModel->expects($this->once())
+            ->method('addToStage')
+            ->with($winner, $stage, 'mautic.lead.event.merge');
 
         // mergePoints
         $loser->expects($this->once())
@@ -861,7 +935,7 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     private function getMerger(): ContactMerger
     {
-        return new ContactMerger(
+        $merger = new ContactMerger(
             $this->leadModel,
             $this->mergeRecordRepo,
             $this->createStub(EventDispatcher::class),
@@ -869,5 +943,9 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
             $this->companyLeadRepo,
             $this->leadRepository
         );
+
+        $merger->setTranslator($this->translator);
+
+        return $merger;
     }
 }
