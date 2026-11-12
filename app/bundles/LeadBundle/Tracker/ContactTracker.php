@@ -216,7 +216,8 @@ class ContactTracker
         $lead = null;
 
         // Return null for leads that are from a non-trackable request (IP, bot, privacy signal, prefetch checks)
-        if (!$this->ipLookupHelper->isRequestTrackable()) {
+        // or a visitor a form submission doesn't track
+        if (!$this->isVisitorTrackable()) {
             return $lead;
         }
 
@@ -245,12 +246,14 @@ class ContactTracker
      */
     private function getContactByIpAddress()
     {
-        $ip = $this->ipLookupHelper->getIpAddress();
         // if no trackingId cookie set the lead is not tracked yet so create a new one
         // Don't save leads from non-trackable requests (IP, bot, privacy signal, prefetch checks)
-        if (!$this->ipLookupHelper->isRequestTrackable()) {
-            return $this->createNewContact($ip, false);
+        // or visitors a form submission doesn't track, and don't look up their IP either, since the lookup saves new addresses
+        if (!$this->isVisitorTrackable()) {
+            return $this->createNewContact(null, false);
         }
+
+        $ip = $this->ipLookupHelper->getIpAddress();
 
         if ($this->coreParametersHelper->get('track_contact_by_ip')) {
             /** @var Lead[] $leads */
@@ -264,6 +267,11 @@ class ContactTracker
         }
 
         return $this->createNewContact($ip);
+    }
+
+    private function isVisitorTrackable(): bool
+    {
+        return $this->ipLookupHelper->isRequestTrackable() && !$this->ipLookupHelper->isVisitorUntracked();
     }
 
     private function createNewContact(?IpAddress $ip = null, bool $persist = true): Lead
