@@ -37,7 +37,7 @@ trait VariantModelTrait
             }
 
             // Reset the variant
-            if (!empty($changes) && empty($this->inConversion)) {
+            if ($changes !== [] && empty($this->inConversion)) {
                 $entity->setVariantStartDate($variantStartDate);
 
                 // Reset counters
