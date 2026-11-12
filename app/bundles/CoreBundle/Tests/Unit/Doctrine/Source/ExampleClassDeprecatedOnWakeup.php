@@ -6,9 +6,6 @@ namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Source;
 
 final class ExampleClassDeprecatedOnWakeup
 {
-    /**
-     * @phpstan-ignore-next-line
-     */
     public $test = 'value';
 
     public function __wakeup(): void
