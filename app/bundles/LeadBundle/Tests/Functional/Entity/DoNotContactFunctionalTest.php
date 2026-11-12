@@ -47,6 +47,28 @@ final class DoNotContactFunctionalTest extends MauticMysqlTestCase
         $this->assertEmpty($dncRepo->getCount(null, $dnc1->getChannelId(), null, [$segment->getId()], null, true));
     }
 
+    public function testGetCountExcludesContactsManuallyRemovedFromSegment(): void
+    {
+        $segment = $this->createSegment();
+        $active  = $this->createEmailDncLead('active@doe.com');
+        $removed = $this->createEmailDncLead('removed@doe.com');
+
+        $this->addContactsToSegment($segment, [$active]);
+
+        $listLead = new ListLead();
+        $listLead->setLead($removed);
+        $listLead->setList($segment);
+        $listLead->setDateAdded(new \DateTime());
+        $listLead->setManuallyRemoved(true);
+        $this->em->persist($listLead);
+        $this->em->flush();
+
+        /** @var DoNotContactRepository $dncRepo */
+        $dncRepo = $this->em->getRepository(DoNotContact::class);
+
+        $this->assertSame(1, $dncRepo->getCount('email', null, null, $segment->getId()));
+    }
+
     private function createSegment(): LeadList
     {
         $segment = new LeadList();
@@ -57,6 +79,24 @@ final class DoNotContactFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($segment);
 
         return $segment;
+    }
+
+    private function createEmailDncLead(string $email): Lead
+    {
+        $lead = new Lead();
+        $lead->setEmail($email);
+
+        $doNotContact = new DoNotContact();
+        $doNotContact->setLead($lead);
+        $doNotContact->setDateAdded(new \DateTime());
+        $doNotContact->setChannel('email');
+        $doNotContact->setChannelId(1);
+
+        $this->em->persist($lead);
+        $this->em->persist($doNotContact);
+        $this->em->flush();
+
+        return $lead;
     }
 
     private function createLead(string $email, DoNotContact $doNotContact): Lead

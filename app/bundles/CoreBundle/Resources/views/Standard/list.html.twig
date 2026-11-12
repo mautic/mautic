@@ -195,7 +195,7 @@
                                     {% set catName, color = category
                                         ? category.getTitle()
                                         : 'mautic.core.form.uncategorized'|trans, category ? '#' ~ category.getColor() : '' %}
-                                    <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+                                    <div class="d-flex align-items-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
                                 </td>
                             {% endif %}
                         {% endif %}

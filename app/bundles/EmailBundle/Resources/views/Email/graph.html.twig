@@ -20,7 +20,7 @@
 <div class="row">
         <div class="col-sm-12">
             {% if isVariant %}
-            <div class="text-right small" id="variant-chart-switcher">
+            <div class="text-end small" id="variant-chart-switcher">
                 <span>
                     <a data-toggle="ajax" class="btn btn-xs{% if not showAllStats %}{{ ' disabled' }}{% endif %}" href="{{ actionRoute ~ '&stats=variant' }}">
                         {{ 'mautic.email.variant.graph.variant'|trans }}
