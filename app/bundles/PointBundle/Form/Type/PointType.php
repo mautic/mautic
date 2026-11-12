@@ -80,9 +80,7 @@ final class PointType extends AbstractType
                 'block_prefix' => 'quantity_stepper',
                 'attr'         => [
                     'tooltip' => 'mautic.point.action.delta.help',
-                    'min'     => -999999,
-                    'max'     => 999999,
-                    'digits'  => 5,
+                    'digits'  => 7,
                     'size'    => 'sm',
                 ],
                 'scale' => 0,

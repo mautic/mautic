@@ -300,19 +300,23 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% endblock form_widget_compound %}
 
 {% block quantity_stepper_widget %}
-{% include '@MauticCore/Components/quantity-stepper.html.twig' with {
-    id: id,
-    name: full_name,
-    value: value,
-    min: attr.min|default(0),
-    max: attr.max|default(99),
-    step: attr.step|default(1),
-    size: attr.size|default('md'),
-    digits: attr.digits|default(null),
-    disabled: disabled,
-    required: required,
+{% set suffix = attr.postaddon_text|default(null) %}
+{% set size = attr.size|default('md') %}
+{% set digits = attr.digits|default(null) %}
+{% set attr = attr|filter((value, key) => key not in ['size', 'digits', 'postaddon_text'])|merge({class: 'quantity-stepper__value', inputmode: 'numeric', autocomplete: 'off', step: attr.step|default(1)}) %}
+{% set inputAttributes %}{{ block('widget_attributes') }}{% endset %}
+{% if suffix %}<div class="d-flex align-items-center gap-2">{% endif %}
+{% embed '@MauticCore/Components/quantity-stepper.html.twig' with {
+    min: attr.min|default(null),
+    max: attr.max|default(null),
+    disabled: disabled or attr.readonly|default(false),
     ariaLabel: label ? label : null
-} only %}
+} %}
+    {% block quantity_stepper_input %}
+        <input type="number" {{ inputAttributes|raw }} value="{{ value }}">
+    {% endblock %}
+{% endembed %}
+{% if suffix %}<span>{{ suffix }}</span></div>{% endif %}
 {% endblock quantity_stepper_widget %}
 
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_widget_simple.html.php #}

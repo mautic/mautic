@@ -41,6 +41,15 @@ final class QuantityStepperComponentTest extends TestCase
         $this->assertStringContainsString('value="0"', $this->render(['name' => 'qty', 'value' => 0]));
     }
 
+    public function testEmptyUnboundedValuesAreNotReplaced(): void
+    {
+        $output = $this->render(['name' => 'qty', 'value' => '', 'min' => null, 'max' => null]);
+
+        $this->assertStringContainsString('value=""', $output);
+        $this->assertStringNotContainsString(' min="', $output);
+        $this->assertStringNotContainsString(' max="', $output);
+    }
+
     public function testDisabledDisablesAllControls(): void
     {
         $output = $this->render(['name' => 'qty', 'disabled' => true]);

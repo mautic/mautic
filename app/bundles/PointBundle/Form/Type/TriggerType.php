@@ -75,9 +75,7 @@ final class TriggerType extends AbstractType
                 'block_prefix' => 'quantity_stepper',
                 'attr'         => [
                     'tooltip' => 'mautic.point.trigger.form.points_descr',
-                    'min'     => -999999,
-                    'max'     => 999999,
-                    'digits'  => 5,
+                    'digits'  => 7,
                     'size'    => 'sm',
                 ],
                 'required' => false,

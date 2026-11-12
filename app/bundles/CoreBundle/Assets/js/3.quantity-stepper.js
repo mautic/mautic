@@ -131,6 +131,10 @@
 
     function change(root, delta, announceLimit = true) {
         const {input} = parts(root);
+        if (input.disabled || input.readOnly) {
+            return false;
+        }
+
         const current = Number(input.value) || 0;
         const next = clamp(input, current + delta);
 
@@ -190,6 +194,14 @@
         start(root, Number(button.dataset.quantityStep));
     });
 
+    document.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-quantity-step]');
+        const root = button && rootOf(button);
+        if (root && event.detail === 0 && !button.disabled) {
+            change(root, Number(button.dataset.quantityStep) * (Number(parts(root).input.step) || 1));
+        }
+    });
+
     ['pointerup', 'pointercancel', 'pointerleave'].forEach((type) => {
         document.addEventListener(type, (event) => {
             const root = rootOf(event.target);
@@ -216,6 +228,10 @@
         }
 
         const {input} = parts(root);
+        if (input.disabled || input.readOnly) {
+            return;
+        }
+
         const step = Number(input.step) || 1;
         const {min, max} = bounds(input);
         const deltas = {ArrowUp: step, ArrowDown: -step, PageUp: step * 10, PageDown: -step * 10};
@@ -236,6 +252,13 @@
         const root = rootOf(event.target);
         const {input} = root ? parts(root) : {};
         if (!root || event.target !== input) {
+            return;
+        }
+
+        if (input.value === '') {
+            roll(root, 0, '');
+            sync(root);
+
             return;
         }
 

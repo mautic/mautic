@@ -21,8 +21,12 @@ final class PointActionType extends AbstractType
             'points',
             NumberType::class,
             [
-                'label'       => 'mautic.lead.lead.event.points',
-                'attr'        => ['class' => 'form-control'],
+                'label'        => 'mautic.lead.lead.event.points',
+                'block_prefix' => 'quantity_stepper',
+                'attr'         => [
+                    'digits' => 5,
+                    'size'   => 'sm',
+                ],
                 'label_attr'  => ['class' => 'form-label'],
                 'scale'       => 0,
                 'data'        => $options['data']['points'] ?? 0,
