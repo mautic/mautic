@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\AssetBundle\Entity\Asset;
+use Mautic\CampaignBundle\Helper\EventEntityReferences;
+use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
@@ -27,6 +28,13 @@ final class ActionImportExportSubscriber implements EventSubscriberInterface
 {
     use ImportExportTrait;
 
+    /**
+     * The actions being exported, as an action can lead back to itself, like through the unsubscribe form of the email it sends.
+     *
+     * @var array<int, true>
+     */
+    private array $exporting = [];
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ActionRepository $actionRepository,
@@ -36,6 +44,7 @@ final class ActionImportExportSubscriber implements EventSubscriberInterface
         private IpLookupHelper $ipLookupHelper,
         private EventDispatcherInterface $dispatcher,
         private ImportEntityDenormalizer $serializer,
+        private EventEntityReferences $eventEntityReferences,
     ) {
     }
 
@@ -58,9 +67,22 @@ final class ActionImportExportSubscriber implements EventSubscriberInterface
         $actionId = $event->getEntityId();
         $action   = $this->actionModel->getEntity($actionId);
 
-        if (!$action instanceof Action) {
+        if (!$action instanceof Action || isset($this->exporting[$actionId])) {
             return;
         }
+
+        $this->exporting[$actionId] = true;
+
+        try {
+            $this->exportAction($event, $action);
+        } finally {
+            unset($this->exporting[$actionId]);
+        }
+    }
+
+    private function exportAction(EntityExportEvent $event, Action $action): void
+    {
+        $actionId = (int) $action->getId();
 
         $actionData = [
             'id'           => $action->getId(),
@@ -73,28 +95,54 @@ final class ActionImportExportSubscriber implements EventSubscriberInterface
             'form'         => $action->getForm()->getId(),
         ];
 
+        if ($linkedUuids = $this->getLinkedUuids($action)) {
+            $actionData['linked_uuids'] = $linkedUuids;
+        }
+
         $event->addEntity(Action::ENTITY_NAME, $actionData);
         $this->logAction('export', $actionId, $actionData, 'formAction');
 
         $data = [];
 
-        if (
-            isset($actionData['properties']['asset'])
-            && !empty($actionData['properties']['asset'])
-        ) {
-            $assetId  = (int) $actionData['properties']['asset'];
-            $subEvent = new EntityExportEvent(Asset::ENTITY_NAME, $assetId);
-            $this->dispatcher->dispatch($subEvent);
-            $this->mergeExportData($data, $subEvent);
+        // Takes along the emails, segments and other entities the action uses, so the import can point the action to them
+        foreach ($this->eventEntityReferences->getFormActionExportedIds((string) $action->getType(), (array) $action->getProperties()) as $entityName => $entityIds) {
+            foreach ($entityIds as $entityId) {
+                $subEvent = new EntityExportEvent($entityName, $entityId);
+                $this->dispatcher->dispatch($subEvent);
+                $this->mergeExportData($data, $subEvent);
+                $event->addDependencies($subEvent->getDependencies());
 
-            $event->addDependencyEntity(Action::ENTITY_NAME, [
-                Action::ENTITY_NAME => $actionId,
-                Asset::ENTITY_NAME  => $assetId,
-            ]);
+                $event->addDependencyEntity(Action::ENTITY_NAME, [
+                    Action::ENTITY_NAME => $actionId,
+                    $entityName         => $entityId,
+                ]);
+            }
         }
         foreach ($data as $entityName => $entities) {
             $event->addEntities([$entityName => $entities]);
         }
+    }
+
+    /**
+     * The UUIDs of the entities the action refers to that are not exported, like an asset category, so the import can find them.
+     *
+     * @return array<string, array<int, string>>
+     */
+    private function getLinkedUuids(Action $action): array
+    {
+        $uuids = [];
+
+        foreach ($this->eventEntityReferences->getFormActionLinkedIds((string) $action->getType(), (array) $action->getProperties()) as $kind => $ids) {
+            foreach ($ids as $id) {
+                $entity = $this->entityManager->find(EventEntityReferences::LINKED[$kind], $id);
+
+                if ($entity instanceof UuidInterface && $entity->getUuid()) {
+                    $uuids[$kind][$id] = $entity->getUuid();
+                }
+            }
+        }
+
+        return $uuids;
     }
 
     public function onImport(EntityImportEvent $event): void
