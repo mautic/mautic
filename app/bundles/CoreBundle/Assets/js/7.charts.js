@@ -71,6 +71,8 @@ Mautic.renderCharts = function(scope) {
                     Mautic.renderSimpleBarChart(canvas)
                 } else if (canvas.hasClass('horizontal-bar-chart')) {
                     Mautic.renderHorizontalBarChart(canvas)
+                } else if (canvas.hasClass('funnel-chart')) {
+                    Mautic.renderFunnelChart(canvas)
                 } else if (canvas.hasClass('hour-chart')) {
                     Mautic.renderHourChart(canvas)
                 }
@@ -308,6 +310,108 @@ Mautic.renderSimpleBarChart = function(canvas) {
             },
             plugins: {
                 legend: {display: false}
+            }
+        }
+    });
+    Mautic.chartObjects.push(chart);
+};
+
+/**
+ * Render the chart.js funnel chart
+ *
+ * @param mQuery element canvas
+ */
+Mautic.renderFunnelChart = function(canvas) {
+    const data = JSON.parse(canvas.text());
+    const values = data.datasets[0].data;
+    const labels = data.labels;
+    const max = Math.max(...values);
+    const palette = ['#0f62fe', '#0043ce', '#002d9c', '#001d6c', '#001141'];
+    const color = (i) => palette[Math.min(i, palette.length - 1)];
+    const gap = 4;
+    const bounds = (bar) => {
+        const props = bar.getProps(['x', 'y', 'base', 'width'], true);
+        const [top, bottom] = [props.y, props.base].sort((a, b) => a - b);
+        return {left: props.x - props.width / 2, right: props.x + props.width / 2, top, bottom};
+    };
+    const funnel = {
+        id: 'funnel',
+        beforeDatasetsDraw(chart) {
+            const {ctx} = chart;
+            const bars = chart.getDatasetMeta(0).data;
+            ctx.save();
+            bars.forEach((bar, i) => {
+                const current = bounds(bar);
+                const height = current.bottom - current.top;
+                const next = i < bars.length - 1 ? bounds(bars[i + 1]) : {top: current.top + height * 0.325, bottom: current.bottom - height * 0.325};
+                const right = current.right - gap;
+                const middle = (current.left + right) / 2;
+                const path = new Path2D();
+                path.moveTo(current.left, current.top);
+                path.bezierCurveTo(middle, current.top, middle, next.top, right, next.top);
+                path.lineTo(right, next.bottom);
+                path.bezierCurveTo(middle, next.bottom, middle, current.bottom, current.left, current.bottom);
+                path.closePath();
+                ctx.fillStyle = color(i);
+                ctx.fill(path);
+                bar.inRange = (x, y) => ctx.isPointInPath(path, x * chart.currentDevicePixelRatio, y * chart.currentDevicePixelRatio);
+            });
+            ctx.restore();
+        },
+        afterDatasetsDraw(chart) {
+            const {ctx, chartArea} = chart;
+            const family = Chart.defaults.font.family;
+            ctx.save();
+            ctx.textBaseline = 'top';
+            ctx.textAlign = 'left';
+            chart.getDatasetMeta(0).data.forEach((bar, i) => {
+                const {left, right} = bounds(bar);
+                const x = left + (i ? 10 : 0);
+                const width = right - x - gap;
+                ctx.fillStyle = '#161616';
+                ctx.font = `600 16px ${family}`;
+                ctx.fillText(values[i].toLocaleString(), x, chartArea.top);
+                ctx.fillStyle = '#525252';
+                ctx.font = `12px ${family}`;
+                const share = i && values[i - 1] ? ` · ${Math.round(values[i] / values[i - 1] * 100)}%` : '';
+                let name = labels[i];
+                while (name.length > 1 && ctx.measureText(name + share).width > width) {
+                    name = `${name.slice(0, -2).trimEnd()}…`;
+                }
+                const text = name + share;
+                ctx.fillText(text, x, chartArea.top + 22);
+            });
+            ctx.restore();
+        }
+    };
+    const chart = new Chart(canvas, {
+        type: 'bar',
+        plugins: [funnel],
+        data: {
+            labels: labels,
+            datasets: [{
+                label: data.datasets[0].label,
+                data: values.map((value) => [-value / 2, value / 2]),
+                backgroundColor: 'transparent',
+                categoryPercentage: 1,
+                barPercentage: 1
+            }]
+        },
+        options: {
+            layout: {padding: {top: 10}},
+            scales: {
+                x: {display: false},
+                y: {display: false, min: -max * 0.51, max: max * 0.8}
+            },
+            plugins: {
+                legend: {display: false},
+                tooltip: {
+                    displayColors: false,
+                    callbacks: {
+                        title: (items) => labels[items[0].dataIndex],
+                        label: (context) => `${data.datasets[0].label}: ${values[context.dataIndex].toLocaleString()}`
+                    }
+                }
             }
         }
     });

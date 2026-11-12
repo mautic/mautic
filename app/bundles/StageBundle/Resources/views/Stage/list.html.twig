@@ -9,6 +9,22 @@
 
 {% block content %}
 {% if isIndex %}
+{% set funnelStages = permissions['lead:leads:viewother'] ? items|filter(stage => stage.isPublished)|sort((a, b) => a.weight <=> b.weight)|slice(0) : [] %}
+{% if funnelStages|length > 1 %}
+<div class="mb-32">
+    {{ include('@MauticCore/Helper/chart.html.twig', {
+        'chartType': 'funnel',
+        'chartHeight': 220,
+        'chartData': {
+            'labels': funnelStages|map(stage => stage.name),
+            'datasets': [{
+                'label': 'mautic.lead.leads'|trans,
+                'data': funnelStages|map(stage => contactCounts[stage.id]),
+            }],
+        },
+    }) }}
+</div>
+{% endif %}
 <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
     {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
         'searchValue': searchValue,
