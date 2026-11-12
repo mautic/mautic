@@ -177,7 +177,7 @@ final class SourceControllerTest extends MauticMysqlTestCase
 
         $this->assertJsonResponseEquals('success', 1, $json);
         $this->assertArrayHasKey('modifiedSources', $json);
-        $this->assertStringContainsString('data-toggle="ajax-delete"', $json['sourceHtml']);
+        $this->assertStringContainsString('data-toggle="ajax-delete"', (string) $json['sourceHtml']);
         $this->assertSame(
             ['lists' => [$segment->getId() => true]],
             $json['modifiedSources']
