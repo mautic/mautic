@@ -50,9 +50,11 @@ final class QuantityStepperFormTest extends TestCase
             ->addExtension(new ValidatorExtension(Validation::createValidator()))
             ->getFormFactory();
         $form = $factory->createNamed('action', CompanyChangeScoreActionType::class);
-        $html = $this->twig->createTemplate('{{ form_widget(form.score) }}')->render(['form' => $form->createView()]);
+        $html = $this->twig->createTemplate('{{ form_row(form.score) }}')->render(['form' => $form->createView()]);
         $crawler = new Crawler($html);
 
+        $this->assertCount(1, $crawler->filter('label[for="action_score"]'));
+        $this->assertCount(0, $crawler->filter('input[tabindex="-1"], input[type="hidden"]'));
         $this->assertCount(1, $crawler->filter('.quantity-stepper--sm input[type="number"][name="action[score]"]'));
         $this->assertCount(0, $crawler->filter('input[min], input[max]'));
         $form->submit(['score' => '-125']);
