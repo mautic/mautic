@@ -913,10 +913,15 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $dnc->setDateAdded(new \DateTime());
         $this->em->persist($dnc);
         $this->em->flush();
-        $this->client->request('GET', sprintf('/s/segments/view/%d', $segment->getId()));
-        $response = $this->client->getResponse();
+        $crawler = $this->client->request('GET', sprintf('/s/segments/view/%d', $segment->getId()));
         $this->assertResponseIsSuccessful();
-        $html = $response->getContent();
+
+        $statsUrl = $crawler->filter('#segment-stats')->attr('data-target-url');
+        $this->assertSame('/s/segments/segmentStats/'.$segment->getId(), $statsUrl);
+
+        $this->client->request(Request::METHOD_GET, $statsUrl);
+        $this->assertResponseIsSuccessful();
+        $html = $this->client->getResponse()->getContent();
         $this->assertStringContainsString('Total contacts', (string) $html);
         $this->assertStringContainsString('2', (string) $html);
         $this->assertStringContainsString('Active contacts', (string) $html);

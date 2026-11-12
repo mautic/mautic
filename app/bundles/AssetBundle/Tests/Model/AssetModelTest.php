@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
+use Mautic\PageBundle\Helper\AggregateAnalyticsHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -127,6 +128,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             $this->assetRepository,
             $this->createStub(DownloadRepository::class),
             $this->createStub(CategoryRepository::class),
+            new AggregateAnalyticsHelper($this->coreParametersHelper),
         );
     }
 
@@ -329,6 +331,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                 $this->createStub(AssetRepository::class),
                 $this->createStub(DownloadRepository::class),
                 $this->createStub(CategoryRepository::class),
+                new AggregateAnalyticsHelper($this->coreParametersHelper),
             ])
             ->onlyMethods(['getEntity'])
             ->getMock();

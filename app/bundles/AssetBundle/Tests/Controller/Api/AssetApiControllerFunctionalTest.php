@@ -14,6 +14,8 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
 
     private const LOCAL_IMAGE_PLACEHOLDER = '@local-image@';
 
+    private const LOCAL_HTML_PLACEHOLDER = '@local-html@';
+
     protected function setUp(): void
     {
         $this->configParams['allowed_extensions']      = ['txt', 'csv', 'jpg', 'jpeg', 'png', 'pdf'];
@@ -61,13 +63,17 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         yield 'Malformed URL' => ['file:///etc/passwd', 'remotePath: The remote should be a valid URL.'];
         yield 'URL returning 404' => ['https://www.google.com/non-existent-path', 'asset: The mimetype of the remote file could not be resolved. Make sure you entered a valid remote URL.'];
-        yield 'Not allowed html MIME type' => ['https://github.com/mautic/mautic', 'asset: Upload failed as the file mimetype text\/html'];
+        yield 'Not allowed html MIME type' => [self::LOCAL_HTML_PLACEHOLDER, 'asset: Upload failed as the file mimetype text\/html'];
         yield 'Not allowed php MIME type' => ['https://raw.githubusercontent.com/mautic/mautic/7.x/index.php', 'asset: Upload failed as the file mimetype text\/x-php'];
     }
 
     #[DataProvider('dataCreateNewRemoteAssetWithInvalidFile')]
     public function testCreateNewRemoteAssetWithInvalidFile(string $file, string $expectedError): void
     {
+        if (self::LOCAL_HTML_PLACEHOLDER === $file) {
+            $file = $this->serveRemoteFile('page.html');
+        }
+
         $payload = [
             'file'            => $file,
             'storageLocation' => 'remote',
