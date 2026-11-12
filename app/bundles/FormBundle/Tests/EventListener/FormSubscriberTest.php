@@ -95,7 +95,7 @@ New line',
         ];
 
         $request    = new Request();
-        $submission = $this->getFormSubmission()->setLead(null);
+        $submission = $this->getFormSubmission()->setLead();
         $action     = $this->getFormRepostAction()->setProperties([
             'post_url'             => 'http://127.0.0.1:1',
             'failure_email'        => '',
