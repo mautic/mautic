@@ -63,14 +63,10 @@ PHP
     #[RunInSeparateProcess]
     public function testUnreadablePluginDirectoryDoesNotPreventBundleRegistration(): void
     {
-        $warnings = [];
-        set_error_handler(static function (int $severity, string $message) use (&$warnings): bool {
-            if (E_USER_WARNING === $severity) {
-                $warnings[] = $message;
-            }
-
-            return true;
-        });
+        $logFile = tempnam(sys_get_temp_dir(), 'mautic_app_kernel_log_');
+        $this->assertNotFalse($logFile);
+        ini_set('log_errors', '1');
+        ini_set('error_log', $logFile);
 
         try {
             $kernel = new class($this->applicationDir) extends \AppKernel {
@@ -92,10 +88,9 @@ PHP
                 array_map(get_class(...), $bundles)
             );
 
-            $this->assertNotEmpty($warnings);
-            $this->assertStringContainsString('.unreadable', implode("\n", $warnings));
+            $this->assertStringContainsString('.unreadable', (string) file_get_contents($logFile));
         } finally {
-            restore_error_handler();
+            unlink($logFile);
         }
     }
 
@@ -111,14 +106,10 @@ PHP
             $this->markTestSkipped('The test process can read mode-000 plugin roots.');
         }
 
-        $warnings = [];
-        set_error_handler(static function (int $severity, string $message) use (&$warnings): bool {
-            if (E_USER_WARNING === $severity) {
-                $warnings[] = $message;
-            }
-
-            return true;
-        });
+        $logFile = tempnam(sys_get_temp_dir(), 'mautic_app_kernel_log_');
+        $this->assertNotFalse($logFile);
+        ini_set('log_errors', '1');
+        ini_set('error_log', $logFile);
 
         try {
             $kernel = new class($this->applicationDir) extends \AppKernel {
@@ -134,10 +125,9 @@ PHP
             };
 
             $this->assertIsArray(iterator_to_array($kernel->registerBundles()));
-            $this->assertNotEmpty($warnings);
-            $this->assertStringContainsString('/plugins', implode("\n", $warnings));
+            $this->assertStringContainsString('/plugins', (string) file_get_contents($logFile));
         } finally {
-            restore_error_handler();
+            unlink($logFile);
             chmod($pluginRoot, 0700);
         }
     }

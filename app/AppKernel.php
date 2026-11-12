@@ -157,15 +157,13 @@ class AppKernel extends Kernel
 
         // dynamically register Mautic Plugin Bundles
         $searchPath = $this->getApplicationDir().'/plugins';
-        if (is_readable($searchPath)) {
-            foreach (scandir($searchPath) ?: [] as $entry) {
-                if ('.' === $entry || '..' === $entry) {
-                    continue;
-                }
-
-                $pluginPath = $searchPath.'/'.$entry;
-                if (is_dir($pluginPath) && !is_readable($pluginPath)) {
-                    $this->warnAboutUnreadablePluginDirectory($pluginPath);
+        $finder = [];
+        if (!is_readable($searchPath)) {
+            error_log(sprintf('Mautic plugin directory "%s" is not readable; skipping plugin discovery.', $searchPath));
+        } else {
+            foreach (new \DirectoryIterator($searchPath) as $directory) {
+                if ($directory->isDir() && !$directory->isReadable()) {
+                    error_log(sprintf('Mautic plugin directory "%s" is not readable; skipping it.', $directory->getPathname()));
                 }
             }
 
@@ -177,29 +175,28 @@ class AppKernel extends Kernel
                 ->ignoreUnreadableDirs()
                 ->name('*Bundle.php');
 
-            foreach ($finder as $file) {
-                $dirname  = basename($file->getRelativePath());
-                $filename = substr($file->getFilename(), 0, -4);
+        }
 
-                $class = '\\MauticPlugin\\'.$dirname.'\\'.$filename;
-                if (class_exists($class)) {
-                    $plugin = new $class();
+        foreach ($finder as $file) {
+            $dirname  = basename($file->getRelativePath());
+            $filename = substr($file->getFilename(), 0, -4);
 
-                    if ($plugin instanceof Symfony\Component\HttpKernel\Bundle\Bundle) {
-                        if (defined($class.'::MINIMUM_MAUTIC_VERSION')) {
-                            // Check if this version supports the plugin before loading it
-                            if (version_compare($this->getVersion(), constant($class.'::MINIMUM_MAUTIC_VERSION'), 'lt')) {
-                                continue;
-                            }
+            $class = '\\MauticPlugin\\'.$dirname.'\\'.$filename;
+            if (class_exists($class)) {
+                $plugin = new $class();
+
+                if ($plugin instanceof Symfony\Component\HttpKernel\Bundle\Bundle) {
+                    if (defined($class.'::MINIMUM_MAUTIC_VERSION')) {
+                        // Check if this version supports the plugin before loading it
+                        if (version_compare($this->getVersion(), constant($class.'::MINIMUM_MAUTIC_VERSION'), 'lt')) {
+                            continue;
                         }
-                        $bundles[] = $plugin;
                     }
-
-                    unset($plugin);
+                    $bundles[] = $plugin;
                 }
+
+                unset($plugin);
             }
-        } else {
-            $this->warnAboutUnreadablePluginDirectory($searchPath);
         }
 
         if (in_array($this->getEnvironment(), ['dev', 'test'])) {
@@ -218,14 +215,6 @@ class AppKernel extends Kernel
         }
 
         return $bundles;
-    }
-
-    private function warnAboutUnreadablePluginDirectory(string $directory): void
-    {
-        trigger_error(
-            sprintf('Mautic plugin directory "%s" is not readable; dynamic plugin discovery skipped this path.', $directory),
-            E_USER_WARNING
-        );
     }
 
     protected function build(ContainerBuilder $container): void
