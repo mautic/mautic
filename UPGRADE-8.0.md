@@ -1254,7 +1254,38 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter` | `createFormatter()` | `self` (`AbstractFormatter`) |
 
 - `Mautic\CoreBundle\Entity\VariantEntityInterface` and `VariantEntityTrait` now declare `getVariantStartDate(): ?\DateTimeInterface` and `setVariantStartDate(?\DateTimeInterface $variantStartDate): static`. The date getter's return type and setter's parameter type were previously `mixed`. Update implementations and overrides accordingly; pass a mutable `DateTimeInterface` or `null`, not a `DateTimeImmutable` or another value.
-- Setters of boolean entity columns now declare a native `?bool` parameter (previously untyped): `Mautic\FormBundle\Entity\Field::setSaveResult()` and `setIsAutoFill()`, `Mautic\FormBundle\Entity\Form::setInKioskMode()` and `setRenderStyle()`, `Mautic\LeadBundle\Entity\LeadField::setIsUniqueIdentifier()`, `setIsUniqueIdentifer()` and `setIsPubliclyUpdatable()`, `Mautic\NotificationBundle\Entity\Stat::setIsClicked()`, `Mautic\PluginBundle\Entity\Integration::setIsPublished()`, `Mautic\PluginBundle\Entity\Plugin::setIsMissing()` and `Mautic\PointBundle\Entity\Trigger::setTriggerExistingLeads()`. Callers in files with `declare(strict_types=1)` that pass a non-boolean value (e.g. `0`/`1` or `'yes'`) now get a `TypeError`; pass `true`, `false` or `null` instead.
+- Setters of string entity columns now declare a native `?string` parameter (previously untyped or `@param mixed`). Callers in files with `declare(strict_types=1)` that pass a non-string value (e.g. an integer) now get a `TypeError`; pass a string (`null` only where the column is nullable):
+    - `Mautic\AssetBundle\Entity\Download::setSource()`
+    - `Mautic\CoreBundle\Entity\FormEntity::setModifiedByUser()`
+    - `Mautic\CoreBundle\Entity\FormEntity::setCheckedOutByUser()`
+    - `Mautic\EmailBundle\Entity\Copy::setSubject()`
+    - `Mautic\EmailBundle\Entity\Email::setFromAddress()`
+    - `Mautic\EmailBundle\Entity\Email::setFromName()`
+    - `Mautic\EmailBundle\Entity\Email::setReplyToAddress()`
+    - `Mautic\EmailBundle\Entity\Email::setBccAddress()`
+    - `Mautic\EmailBundle\Entity\Email::setEmailType()`
+    - `Mautic\FormBundle\Entity\Field::setLeadField()`
+    - `Mautic\FormBundle\Entity\Form::setTemplate()`
+    - `Mautic\LeadBundle\Entity\LeadDevice::setDevice()`
+    - `Mautic\LeadBundle\Entity\LeadDevice::setDeviceModel()`
+    - `Mautic\LeadBundle\Entity\LeadField::setGroup()`
+    - `Mautic\NotificationBundle\Entity\Stat::setTrackingHash()`
+    - `Mautic\NotificationBundle\Entity\Stat::setSource()`
+    - `Mautic\PageBundle\Entity\Page::setCustomHtml()`
+    - `Mautic\PluginBundle\Entity\Plugin::setDescription()`
+    - `Mautic\PluginBundle\Entity\Plugin::setVersion()`
+    - `Mautic\PluginBundle\Entity\Plugin::setAuthor()`
+    - `Mautic\PointBundle\Entity\Trigger::setColor()`
+    - `Mautic\ReportBundle\Entity\Report::setDescription()`
+    - `MauticPlugin\MauticFocusBundle\Entity\Focus::setDescription()`
+    - `MauticPlugin\MauticFocusBundle\Entity\Focus::setName()`
+    - `MauticPlugin\MauticFocusBundle\Entity\Focus::setType()`
+    - `MauticPlugin\MauticFocusBundle\Entity\Focus::setStyle()`
+    - `MauticPlugin\MauticFocusBundle\Entity\Focus::setWebsite()`
+    - `MauticPlugin\MauticFocusBundle\Entity\Focus::setCache()`
+    - `MauticPlugin\MauticFocusBundle\Entity\Stat::setType()`
+- Setters of JSON/array entity columns now declare a native `array` parameter (previously `@param mixed`). Passing `null` or any other non-array value now throws a `TypeError`; pass an array (`[]` for empty): `Mautic\NotificationBundle\Entity\Stat::setTokens()`, `Mautic\NotificationBundle\Entity\Stat::setClickDetails()`, `Mautic\PluginBundle\Entity\Integration::setSupportedFeatures()` and `Mautic\PluginBundle\Entity\Integration::setFeatureSettings()`.
+- Setters of boolean entity columns now declare a native `?bool` parameter (previously untyped): `Mautic\FormBundle\Entity\Field::setSaveResult()`, `Mautic\FormBundle\Entity\Field::setIsAutoFill()`, `Mautic\FormBundle\Entity\Form::setInKioskMode()`, `Mautic\FormBundle\Entity\Form::setRenderStyle()`, `Mautic\LeadBundle\Entity\LeadField::setIsUniqueIdentifier()`, `Mautic\LeadBundle\Entity\LeadField::setIsUniqueIdentifer()`, `Mautic\LeadBundle\Entity\LeadField::setIsPubliclyUpdatable()`, `Mautic\NotificationBundle\Entity\Stat::setIsClicked()`, `Mautic\PluginBundle\Entity\Integration::setIsPublished()`, `Mautic\PluginBundle\Entity\Plugin::setIsMissing()` and `Mautic\PointBundle\Entity\Trigger::setTriggerExistingLeads()`. Callers in files with `declare(strict_types=1)` that pass a non-boolean value (e.g. `0`/`1` or `'yes'`) now get a `TypeError`; pass `true` or `false` (`null` only where the column is nullable) instead.
 - `Mautic\LeadBundle\Controller\FrequencyRuleTrait` now declares `protected array $leadLists = []` (previously untyped and initialized to `null`) and `protected bool $isPublicView = false`. Any class that redeclares these trait properties must use compatible types and defaults; code must no longer assign `null` to `$leadLists`.
 - `Mautic\CoreBundle\Test\AbstractMauticTestCase::$router` now has the native type `Symfony\Component\Routing\RouterInterface`. Plugin tests that redeclare this protected property must use the same type, and assigned test doubles must implement that interface.
 
@@ -1302,14 +1333,13 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     +protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     ```
 
-- Association setters previously documented as `@param mixed` now declare their target entity as native type. Passing anything else (e.g. an ID or `null`) now throws a `TypeError`; pass the entity, or `EntityManager::getReference()` if you only have an ID:
+- Association setters previously documented as `@param mixed` now declare their target entity as native type. Passing anything else (e.g. an ID, or `null` to a non-nullable parameter) now throws a `TypeError`; pass the entity, or `EntityManager::getReference()` if you only have an ID:
     - `Mautic\LeadBundle\Entity\CompanyLead::setLead(Lead $lead)`
     - `Mautic\LeadBundle\Entity\LeadCategory::setLead(Lead $lead)`
     - `Mautic\LeadBundle\Entity\ListLead::setLead(Lead $lead)`
     - `Mautic\PointBundle\Entity\LeadPointLog::setLead(Lead $lead)` and `setPoint(Point $point)`
     - `Mautic\PointBundle\Entity\LeadTriggerLog::setLead(Lead $lead)` and `setEvent(TriggerEvent $event)`
     - `MauticPlugin\MauticFocusBundle\Entity\Stat::setFocus(Focus $focus)`
-    - `MauticPlugin\MauticFocusBundle\Entity\Focus::setCategory(?Category $category)`
 - Several parameters previously documented only as `@param mixed` now declare an exact native type. Callers that pass an incompatible value now hit a `TypeError`. Scalars may still be coerced, depending on the caller's `strict_types` setting:
     - `Mautic\ChannelBundle\Model\MessageQueueModel::processFrequencyRules()` types `$messageQueue` as `?array`. This also applies to the `resend_message_queue` option passed through `Mautic\EmailBundle\Model\EmailModel::sendEmail()`. Passing `false` for "no queue" now throws; pass `null` instead.
     - `Mautic\CoreBundle\Controller\FormThemeTrait::setFormTheme()` types `$themes` as `array|string|null`. An object holding template paths (e.g. a custom form field's `formTheme` forwarded by `Mautic\FormBundle\Controller\FieldController`) is no longer cast to an array; pass an array or a string.
