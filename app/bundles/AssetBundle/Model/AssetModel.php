@@ -296,7 +296,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * Increase the download count. Download counts are aggregate analytics, so they follow that setting.
+     * Increase the download count.
      *
      * @param int        $increaseBy
      * @param bool|false $unique

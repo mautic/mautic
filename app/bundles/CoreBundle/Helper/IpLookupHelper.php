@@ -303,9 +303,15 @@ class IpLookupHelper
         }
 
         try {
-            $address = $this->getVisitorAddress($request);
+            // Unlike getIpAddressFromRequest(), forwarded headers only count from a trusted proxy, so a visitor
+            // can't send one to get past the exclusion list, and a private address is kept so it can be excluded
+            $address = $request->getClientIp();
         } catch (ConflictingHeadersException) {
             // A trusted proxy sent forwarded headers that disagree, so the visitor can't be told apart
+            return false;
+        }
+
+        if (null === $address) {
             return false;
         }
 
@@ -314,15 +320,6 @@ class IpLookupHelper
         $this->setDoNotTrackList($ipAddress, $address);
 
         return $ipAddress->isTrackable();
-    }
-
-    /**
-     * The address that identifies the visitor. Forwarded headers only count from a trusted proxy, so a visitor
-     * can't send one to get past the exclusion list. A private address isn't replaced with 127.0.0.1 here.
-     */
-    private function getVisitorAddress(Request $request): string
-    {
-        return $request->getClientIp() ?? '127.0.0.1';
     }
 
     private function isPrefetch(Request $request): bool

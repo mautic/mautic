@@ -347,6 +347,11 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->getIpHelper()->isRequestCountable());
     }
 
+    public function testIsRequestCountableIsFalseWithoutAVisitorAddress(): void
+    {
+        $this->assertFalse($this->getIpHelper(new Request())->isRequestCountable());
+    }
+
     #[TestDox('Check that a bot request is not trackable and its IP address is not saved')]
     public function testIsRequestTrackableDoesNotSaveBotIpAddress(): void
     {
