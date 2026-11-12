@@ -24,14 +24,6 @@ final class PageEvents
     public const string PAGE_ON_HIT = 'mautic.page_on_hit';
 
     /**
-     * The mautic.page_on_toggle_publish event is dispatched right before a page is toggle publish.
-     *
-     * The event listener receives a
-     * Mautic\PageBundle\Event\PageEvent instance.
-     */
-    public const string PAGE_ON_TOGGLE_PUBLISH = 'mautic.page_on_toggle_publish';
-
-    /**
      * The mautic.page_pre_save event is thrown right before a page is persisted.
      *
      * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.

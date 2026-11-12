@@ -6,14 +6,13 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Event\EntityTogglePublishEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Event\EmailEvent;
-use Mautic\EmailBundle\Event\EmailOnTogglePublishEvent;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
@@ -310,7 +309,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         self::getContainer()
             ->get(EventDispatcherInterface::class)
-            ->addListener(EmailOnTogglePublishEvent::class, function (EmailEvent $event) use (&$dispatchedEvent): void {
+            ->addListener(EntityTogglePublishEvent::class, function (EntityTogglePublishEvent $event) use (&$dispatchedEvent): void {
                 $dispatchedEvent = $event;
             });
 
@@ -330,8 +329,9 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $email = $this->getContainer()->get(EmailRepository::class)->find($email->getId());
         $this->assertInstanceOf(Email::class, $email);
         $this->assertFalse($email->isPublished(), 'The email should not be published.');
-        $this->assertInstanceOf(EmailEvent::class, $dispatchedEvent, 'The event should have been dispatched.');
-        $this->assertSame($email->getId(), $dispatchedEvent->getEmail()->getId(), 'The email entity should match the one in the request.');
+        $this->assertInstanceOf(EntityTogglePublishEvent::class, $dispatchedEvent, 'The event should have been dispatched.');
+        $this->assertInstanceOf(Email::class, $dispatchedEvent->getEntity());
+        $this->assertSame($email->getId(), $dispatchedEvent->getEntity()->getId(), 'The email entity should match the one in the request.');
     }
 
     private function createContact(string $email): Lead

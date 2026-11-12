@@ -6,6 +6,7 @@ use Doctrine\ORM\UnitOfWork;
 use Mautic\CoreBundle\Doctrine\ReservedWords;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Event\EntityTogglePublishEvent;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -230,7 +231,7 @@ class FormModel extends AbstractCommonModel
             $entity->setIsEnabled(!$entity->getIsEnabled());
         }
 
-        $this->dispatchEvent('on_toggle_publish', $entity);
+        $this->dispatcher->dispatch(new EntityTogglePublishEvent($entity));
 
         // hit up event listeners
         $event = $this->dispatchEvent('pre_save', $entity);

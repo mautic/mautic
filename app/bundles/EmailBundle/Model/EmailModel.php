@@ -42,7 +42,6 @@ use Mautic\EmailBundle\Entity\StatDeviceRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
-use Mautic\EmailBundle\Event\EmailOnTogglePublishEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailPostDeleteEvent;
 use Mautic\EmailBundle\Event\EmailPostSaveEvent;
@@ -381,7 +380,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             'post_save'         => EmailPostSaveEvent::class,
             'pre_delete'        => EmailPreDeleteEvent::class,
             'post_delete'       => EmailPostDeleteEvent::class,
-            'on_toggle_publish' => EmailOnTogglePublishEvent::class,
             default             => null,
         };
 

@@ -276,9 +276,6 @@ final class PageModel extends FormModel implements GlobalSearchInterface
             case 'post_delete':
                 $name = PageEvents::PAGE_POST_DELETE;
                 break;
-            case 'on_toggle_publish':
-                $name = PageEvents::PAGE_ON_TOGGLE_PUBLISH;
-                break;
             default:
                 return null;
         }
