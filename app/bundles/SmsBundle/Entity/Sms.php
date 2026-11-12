@@ -20,8 +20,6 @@ use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
-use Mautic\CoreBundle\Entity\VariantEntityInterface;
-use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
@@ -64,14 +62,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
     joinTable: new ORM\JoinTable(name: 'sms_projects_xref'),
 )])]
-class Sms extends FormEntity implements UuidInterface, TranslationEntityInterface, VariantEntityInterface
+class Sms extends FormEntity implements UuidInterface, TranslationEntityInterface
 {
     use UuidTrait;
     use ProjectTrait;
     /** @use TranslationEntityTrait<Sms> */
     use TranslationEntityTrait;
-    /** @use VariantEntityTrait<Sms> */
-    use VariantEntityTrait;
 
     public const string TABLE_NAME = 'sms_messages';
 

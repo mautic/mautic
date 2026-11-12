@@ -14,7 +14,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
@@ -253,13 +252,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $this->translationChildren = new ArrayCollection();
         $this->variantChildren     = new ArrayCollection();
         $this->initializeProjects();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::addVariantMetadata($builder, self::class);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
