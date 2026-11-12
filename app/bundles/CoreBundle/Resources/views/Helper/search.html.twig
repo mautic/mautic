@@ -17,6 +17,7 @@
     {% set parsedScope = {'command': '', 'value': searchValue} %}
     {% set displaySearchValue = searchValue %}
 {% endif %}
+{% set hasActiveSearch = searchValue|trim is not empty %}
 
 <div class="d-flex fg-1">
     {% if searchScopes is defined and searchScopes is not empty %}
