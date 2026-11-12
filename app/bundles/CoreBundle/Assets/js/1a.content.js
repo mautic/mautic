@@ -2808,7 +2808,7 @@ document.addEventListener('click', (event) => {
 const clearSearchField = (clear, field) => {
     const isLiveSearch = field.dataset.toggle === 'livesearch';
     if (isLiveSearch) {
-        MauticVars.lastSearchStr = field.value.trim();
+        MauticVars.lastSearchStr = '';
     }
 
     field.value = '';
