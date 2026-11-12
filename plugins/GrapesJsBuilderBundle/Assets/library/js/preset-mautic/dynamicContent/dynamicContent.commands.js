@@ -220,7 +220,7 @@ export default class DynamicContentCommands {
     // remove the store item
     dcStoreItem.find('a.remove-item:first').click();
     // remove store navigation item
-    const dynCon = mQuery('.dynamicContentFilterContainer').find(`a[href='${dcStoreId}']`);
+    const dynCon = mQuery('.dynamicContentFilterContainer').find(`[data-bs-target='${dcStoreId}']`);
     if (!dynCon || !dynCon.parent()) {
       this.logger.warning('No DynamicContent store item to delete found', { dcStoreId });
     }

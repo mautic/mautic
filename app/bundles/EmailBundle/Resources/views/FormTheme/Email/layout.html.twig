@@ -91,7 +91,7 @@
 {% endblock %}
 
 {% block dynamic_content_filter_entry_widget %}
-    <div class="tab-pane dynamic-content-filter bdr-w-0" id="{{ form.vars.id }}">
+    <div class="tab-pane dynamic-content-filter bdr-w-0 pa-16" id="{{ form.vars.id }}">
         <div class="row form-group">
             <div class="col-xs-10">
                 {{ form_label(form.content) }}
@@ -158,31 +158,41 @@
 {% endblock %}
 
 {% block dynamic_content_filter_widget %}
+    {% set defaultContent %}
+        <div class="row hidden">
+            <div class="col-xs-10">{{ form_row(form.tokenName) }}</div>
+        </div>
+        {{ form_row(form.content) }}
+    {% endset %}
+    {% set filterTabs = [{'id': 'emailform_dynamicContent_' ~ form.vars.name ~ '_default', 'label': 'Default', 'content': defaultContent, 'className': 'bdr-w-0 pa-16'}] %}
+    {% for filter in form.filters %}
+        {% set filterTabs = filterTabs|merge([{'id': filter.vars.id, 'label': ('mautic.core.dynamicContent.tab'|trans) ~ ' ' ~ loop.index, 'content': ''}]) %}
+    {% endfor %}
+    {% set addFilterButton %}
+        <li role="presentation">
+            <button type="button" class="nav-link addNewDynamicContentFilter" data-index="{{ form.vars.name }}"><i class="ri-add-line text-success"></i>{{ 'mautic.core.form.new'|trans }}</button>
+        </li>
+    {% endset %}
+    {% set filterPanes %}
+        {% for filter in form.filters %}
+            {{ form_widget(filter) }}
+        {% endfor %}
+    {% endset %}
     <div class="tab-pane dynamic-content bdr-w-0 {{ '0' == form.vars.name ? 'active' : 'fade' }}" id="{{ form.vars.id }}">
         <div class="panel">
-            <ul class="nav nav-tabs nav-tabs-contained" id="dynamicContentFilterTabs_{{ form.vars.name }}">
-              <li>
-                <a role="tab" class="addNewDynamicContentFilter" data-index="{{ form.vars.name }}"><i class="ri-add-line text-success"></i>{{ 'mautic.core.form.new'|trans }}</a>
-              </li>
-              <li class="active">
-                <a data-bs-toggle="tab" href="#emailform_dynamicContent_{{ form.vars.name }}_default" role="tab" class="nav-link active" aria-selected="true">Default</a>
-              </li>
-              {% for i, filter in form['filters'] %}
-                <li><a role="tab" data-bs-toggle="tab" href="#{{ filter.vars.id }}" class="nav-link">{{ 'mautic.core.dynamicContent.tab'|trans }} {{ loop.index }}</a></li>
-              {% endfor %}
-            </ul>
-
-            <div class="tab-content pa-16">
-              <div class="tab-pane bdr-w-0 active" id="emailform_dynamicContent_{{ form.vars.name }}_default">
-                <div class="row hidden">
-                  <div class="col-xs-10">{{ form_row(form.tokenName) }}</div>
-                </div>
-                {{ form_row(form.content) }}
-              </div>
-              {% for filter in form.filters %}
-                {{ form_widget(filter) }}
-              {% endfor %}
-            </div>
+            {{ include('@MauticCore/Components/tabs.html.twig', {
+                'tabs': filterTabs,
+                'variant': 'contained',
+                'part': 'nav',
+                'navAttributes': {'id': 'dynamicContentFilterTabs_' ~ form.vars.name},
+                'navPrefix': addFilterButton
+            }) }}
+            {{ include('@MauticCore/Components/tabs.html.twig', {
+                'tabs': [filterTabs|first],
+                'variant': 'contained',
+                'part': 'content',
+                'contentExtra': filterPanes
+            }) }}
         </div>
     </div>
 {% endblock %}
