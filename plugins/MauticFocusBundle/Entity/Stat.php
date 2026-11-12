@@ -90,10 +90,7 @@ class Stat
         return $this->type;
     }
 
-    /**
-     * @param mixed $type
-     */
-    public function setType($type): static
+    public function setType(?string $type): static
     {
         $this->type = $type;
 

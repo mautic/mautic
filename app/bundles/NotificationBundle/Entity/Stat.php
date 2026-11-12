@@ -231,10 +231,7 @@ class Stat
         return $this->trackingHash;
     }
 
-    /**
-     * @param mixed $trackingHash
-     */
-    public function setTrackingHash($trackingHash): void
+    public function setTrackingHash(?string $trackingHash): void
     {
         $this->trackingHash = $trackingHash;
     }
@@ -278,10 +275,7 @@ class Stat
         return $this->source;
     }
 
-    /**
-     * @param mixed $source
-     */
-    public function setSource($source): void
+    public function setSource(?string $source): void
     {
         $this->source = $source;
     }

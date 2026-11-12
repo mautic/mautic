@@ -680,10 +680,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         return $this->group;
     }
 
-    /**
-     * @param mixed $group
-     */
-    public function setGroup($group): void
+    public function setGroup(?string $group): void
     {
         $this->group = $group;
     }

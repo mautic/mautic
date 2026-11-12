@@ -327,10 +327,7 @@ class Trigger extends FormEntity implements UuidInterface
         return $this->color;
     }
 
-    /**
-     * @param mixed $color
-     */
-    public function setColor($color): void
+    public function setColor(?string $color): void
     {
         $this->color = $color;
     }

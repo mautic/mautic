@@ -250,7 +250,7 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
     /**
      * Get whether the color is light or dark.
      */
-    public static function isLightColor($hex, $level = 200): bool
+    public static function isLightColor(string $hex, int $level = 200): bool
     {
         $hex = str_replace('#', '', $hex);
         $r   = hexdec(substr($hex, 0, 2));
@@ -351,7 +351,7 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
         return null;
     }
 
-    public function getStats(Focus $focus, $unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, bool $canViewOthers = true): array
+    public function getStats(Focus $focus, ?string $unit, \DateTime $dateFrom, \DateTime $dateTo, ?string $dateFormat = null, bool $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);
