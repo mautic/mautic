@@ -21,6 +21,8 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
 ### Other removed code
 
+- `Mautic\SmsBundle\Entity\Sms` no longer implements `Mautic\CoreBundle\Entity\VariantEntityInterface` nor uses `VariantEntityTrait`. SMS never stored variants (the `sms_messages` table has no variant columns), so the following methods were removed from `Sms` with no replacement: `Sms::addVariantChild()`, `Sms::removeVariantChild()`, `Sms::getVariantChildren()`, `Sms::setVariantParent()`, `Sms::getVariantParent()`, `Sms::removeVariantParent()`, `Sms::setVariantSettings()`, `Sms::getVariantSettings()`, `Sms::getVariantStartDate()`, `Sms::setVariantStartDate()`, `Sms::isVariant()`, `Sms::isParent()`, `Sms::hasVariants()`, `Sms::clearVariants()`, `Sms::getVariants()`, `Sms::getRelatedEntityIds()`, `Sms::clearVariantSettings()`, `Sms::isEnableAbTest()`, `Sms::getVariantsPendingCount()`, `Sms::getVariantEndDate()`.
+- `Mautic\CoreBundle\Entity\VariantEntityTrait` now maps `variantParent`, `variantChildren`, `variantSettings` and `variantStartDate` with Doctrine attributes. Entities mapped with `#[ORM\Entity]` that use the trait must stop calling `addVariantMetadata()` from `loadMetadata()`, otherwise the variant fields are mapped twice. Entities mapped only via `loadMetadata()` keep calling `addVariantMetadata()`.
 - Unused service aliases `mautic.integration.gmail.config` and `mautic.integration.tagmanager.config` were removed. Inject the corresponding bundle’s `Integration\Support\ConfigSupport` class instead; the services and integrations remain available.
 - The ClearbitBundle was removed as the service was sunset.
 - The unused contact companies modal was removed: `Mautic\LeadBundle\Controller\LeadController::companyAction()` (`/s/contacts/company/{objectId}`), the `@MauticLead/Lead/company.html.twig` template, the `Mautic.toggleCompanyLead` JS function and the `lead:toggleCompanyLead` AJAX action (`Mautic\LeadBundle\Controller\AjaxController::toggleCompanyLeadAction()`). Nothing linked to the modal since the contact page button was removed, and the action failed with a 500 error. Add or remove a contact's companies through the contact edit form or the API (`/api/companies/{companyId}/contact/{contactId}/add` and `/remove`) instead.
@@ -1244,6 +1246,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter` | `createFormatter()` | `self` (`AbstractFormatter`) |
 
 - `Mautic\CoreBundle\Entity\VariantEntityInterface` and `VariantEntityTrait` now declare `getVariantStartDate(): ?\DateTimeInterface` and `setVariantStartDate(?\DateTimeInterface $variantStartDate): static`. The date getter's return type and setter's parameter type were previously `mixed`. Update implementations and overrides accordingly; pass a mutable `DateTimeInterface` or `null`, not a `DateTimeImmutable` or another value.
+- Setters of boolean entity columns now declare a native `?bool` parameter (previously untyped): `Mautic\FormBundle\Entity\Field::setSaveResult()` and `setIsAutoFill()`, `Mautic\FormBundle\Entity\Form::setInKioskMode()` and `setRenderStyle()`, `Mautic\LeadBundle\Entity\LeadField::setIsUniqueIdentifier()`, `setIsUniqueIdentifer()` and `setIsPubliclyUpdatable()`, `Mautic\NotificationBundle\Entity\Stat::setIsClicked()`, `Mautic\PluginBundle\Entity\Integration::setIsPublished()`, `Mautic\PluginBundle\Entity\Plugin::setIsMissing()` and `Mautic\PointBundle\Entity\Trigger::setTriggerExistingLeads()`. Callers in files with `declare(strict_types=1)` that pass a non-boolean value (e.g. `0`/`1` or `'yes'`) now get a `TypeError`; pass `true`, `false` or `null` instead.
 - `Mautic\LeadBundle\Controller\FrequencyRuleTrait` now declares `protected array $leadLists = []` (previously untyped and initialized to `null`) and `protected bool $isPublicView = false`. Any class that redeclares these trait properties must use compatible types and defaults; code must no longer assign `null` to `$leadLists`.
 - `Mautic\CoreBundle\Test\AbstractMauticTestCase::$router` now has the native type `Symfony\Component\Routing\RouterInterface`. Plugin tests that redeclare this protected property must use the same type, and assigned test doubles must implement that interface.
 
@@ -1290,3 +1293,16 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     -protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     +protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     ```
+
+- Association setters previously documented as `@param mixed` now declare their target entity as native type. Passing anything else (e.g. an ID or `null`) now throws a `TypeError`; pass the entity, or `EntityManager::getReference()` if you only have an ID:
+    - `Mautic\LeadBundle\Entity\CompanyLead::setLead(Lead $lead)`
+    - `Mautic\LeadBundle\Entity\LeadCategory::setLead(Lead $lead)`
+    - `Mautic\LeadBundle\Entity\ListLead::setLead(Lead $lead)`
+    - `Mautic\PointBundle\Entity\LeadPointLog::setLead(Lead $lead)` and `setPoint(Point $point)`
+    - `Mautic\PointBundle\Entity\LeadTriggerLog::setLead(Lead $lead)` and `setEvent(TriggerEvent $event)`
+    - `MauticPlugin\MauticFocusBundle\Entity\Stat::setFocus(Focus $focus)`
+    - `MauticPlugin\MauticFocusBundle\Entity\Focus::setCategory(?Category $category)`
+- Several parameters previously documented only as `@param mixed` now declare an exact native type. Callers that pass an incompatible value now hit a `TypeError`. Scalars may still be coerced, depending on the caller's `strict_types` setting:
+    - `Mautic\ChannelBundle\Model\MessageQueueModel::processFrequencyRules()` types `$messageQueue` as `?array`. This also applies to the `resend_message_queue` option passed through `Mautic\EmailBundle\Model\EmailModel::sendEmail()`. Passing `false` for "no queue" now throws; pass `null` instead.
+    - `Mautic\CoreBundle\Controller\FormThemeTrait::setFormTheme()` types `$themes` as `array|string|null`. An object holding template paths (e.g. a custom form field's `formTheme` forwarded by `Mautic\FormBundle\Controller\FieldController`) is no longer cast to an array; pass an array or a string.
+    - `Mautic\CoreBundle\ErrorHandler\ErrorHandler::setDisplayErrors()` types `$displayErrors` as `bool`. Passing `null`, or an integer from a `strict_types` file, now throws; pass an explicit boolean.

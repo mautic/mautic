@@ -103,10 +103,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->isPublished;
     }
 
-    /**
-     * @param mixed $isPublished
-     */
-    public function setIsPublished($isPublished): static
+    public function setIsPublished(?bool $isPublished): static
     {
         $this->isChanged('isPublished', $isPublished);
 
@@ -128,10 +125,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->supportedFeatures;
     }
 
-    /**
-     * @param mixed $supportedFeatures
-     */
-    public function setSupportedFeatures($supportedFeatures): static
+    public function setSupportedFeatures(array $supportedFeatures): static
     {
         $this->isChanged('supportedFeatures', $supportedFeatures);
 
@@ -166,10 +160,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->featureSettings;
     }
 
-    /**
-     * @param mixed $featureSettings
-     */
-    public function setFeatureSettings($featureSettings): static
+    public function setFeatureSettings(array $featureSettings): static
     {
         $this->isChanged('featureSettings', $featureSettings);
 

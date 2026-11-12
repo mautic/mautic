@@ -688,10 +688,8 @@ class Field implements UuidInterface
 
     /**
      * @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
-     *
-     * @param mixed $leadField
      */
-    public function setLeadField($leadField): void
+    public function setLeadField(?string $leadField): void
     {
         $this->leadField = $leadField;
     }
@@ -704,10 +702,7 @@ class Field implements UuidInterface
         return $this->saveResult;
     }
 
-    /**
-     * @param mixed $saveResult
-     */
-    public function setSaveResult($saveResult): void
+    public function setSaveResult(?bool $saveResult): void
     {
         $this->saveResult = $saveResult;
     }
@@ -720,10 +715,7 @@ class Field implements UuidInterface
         return $this->isAutoFill;
     }
 
-    /**
-     * @param mixed $isAutoFill
-     */
-    public function setIsAutoFill($isAutoFill): void
+    public function setIsAutoFill(?bool $isAutoFill): void
     {
         $this->isAutoFill = $isAutoFill;
     }
