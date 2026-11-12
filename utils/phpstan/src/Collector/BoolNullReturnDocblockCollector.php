@@ -46,7 +46,8 @@ final readonly class BoolNullReturnDocblockCollector implements Collector
 
         $candidate = false;
         $docComment = $node->getDocComment();
-        if (null === $native && null !== $docComment) {
+        // constructors and destructors cannot declare a return type
+        if (null === $native && null !== $docComment && !in_array(strtolower($methodName), ['__construct', '__destruct'], true)) {
             $returnTag = $this->fileTypeMapper->getResolvedPhpDoc(
                 $scope->getFile(),
                 $classReflection->getName(),

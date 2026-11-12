@@ -52,7 +52,7 @@ final readonly class BoolNullPropertyDocblockToNativeTypeRule implements Rule
         // a typed property must be redeclared with exactly the same type
         foreach ($familyResolver->resolveReportable($entriesByFile, ['bool|null']) as $reportable) {
             $ruleErrors[] = RuleErrorBuilder::message(sprintf(
-                'Property "$%s" has a "bool|null" docblock, so it must declare the native "?bool" type instead.',
+                'Property "$%s" has a "bool|null" docblock, so it must declare the native "?bool" type instead, with a "= null" default if it has none.',
                 $reportable['name']
             ))
                 ->identifier('mautic.boolNullPropertyDocblockToNativeType')

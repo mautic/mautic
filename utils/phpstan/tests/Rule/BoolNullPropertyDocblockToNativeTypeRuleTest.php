@@ -33,23 +33,31 @@ final class BoolNullPropertyDocblockToNativeTypeRuleTest extends RuleTestCase
     {
         $this->analyse(glob(__DIR__.'/Fixture/BoolNullPropertyDocblockToNativeType/*.php') ?: [], [
             [
-                'Property "$inherited" has a "bool|null" docblock, so it must declare the native "?bool" type instead.',
+                'Property "$first" has a "bool|null" docblock, so it must declare the native "?bool" type instead, with a "= null" default if it has none.',
                 12,
             ],
             [
-                'Property "$isPreferenceCenter" has a "bool|null" docblock, so it must declare the native "?bool" type instead.',
+                'Property "$inherited" has a "bool|null" docblock, so it must declare the native "?bool" type instead, with a "= null" default if it has none.',
                 12,
             ],
             [
-                'Property "$traitFlag" has a "bool|null" docblock, so it must declare the native "?bool" type instead.',
+                'Property "$isPreferenceCenter" has a "bool|null" docblock, so it must declare the native "?bool" type instead, with a "= null" default if it has none.',
                 12,
             ],
             [
-                'Property "$shortNullable" has a "bool|null" docblock, so it must declare the native "?bool" type instead.',
+                'Property "$traitFlag" has a "bool|null" docblock, so it must declare the native "?bool" type instead, with a "= null" default if it has none.',
+                12,
+            ],
+            [
+                'Property "$second" has a "bool|null" docblock, so it must declare the native "?bool" type instead, with a "= null" default if it has none.',
+                12,
+            ],
+            [
+                'Property "$shortNullable" has a "bool|null" docblock, so it must declare the native "?bool" type instead, with a "= null" default if it has none.',
                 17,
             ],
             [
-                'Property "$inherited" has a "bool|null" docblock, so it must declare the native "?bool" type instead.',
+                'Property "$inherited" has a "bool|null" docblock, so it must declare the native "?bool" type instead, with a "= null" default if it has none.',
                 37,
             ],
         ]);

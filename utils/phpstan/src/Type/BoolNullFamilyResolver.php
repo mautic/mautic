@@ -38,18 +38,15 @@ final readonly class BoolNullFamilyResolver
             }
         }
 
-        // file:line => [name, every using-class context is safe]
+        // file:line:name => [name, every using-class context is safe]
         $locations = [];
         foreach ($entriesByFile as $entries) {
             foreach ($entries as $entry) {
-                if (!$entry['candidate']) {
-                    continue;
-                }
-
-                // a trait member is collected once per using class, but lives in the trait file
+                // a trait member is collected once per using class, but lives in the trait file,
+                // so a non-candidate context blocks the shared declaration
                 $file = $entry['file'];
-                $key = $file.':'.$entry['line'];
-                $isSafe = $this->isFamilySafe($entry, $entriesByName[$entry['name']], $compatibleNativeTypes);
+                $key = $file.':'.$entry['line'].':'.$entry['name'];
+                $isSafe = $entry['candidate'] && $this->isFamilySafe($entry, $entriesByName[$entry['name']], $compatibleNativeTypes);
 
                 $locations[$key] = [
                     'file' => $file,
