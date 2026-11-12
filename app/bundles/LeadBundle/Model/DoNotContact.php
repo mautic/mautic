@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 
 class DoNotContact implements MauticModelInterface
 {
@@ -46,6 +47,12 @@ class DoNotContact implements MauticModelInterface
                 // Some integrations (Sugar CRM) can use both reasons (unsubscribed, bounced)
                 if ($reason && $dnc->getReason() != $reason) {
                     continue;
+                }
+
+                // The log must be created before the DNC is removed because the ID is gone once it is deleted.
+                // An entry without an ID was never saved, so the contact never was unsubscribed and there is nothing to log.
+                if (null !== $dnc->getId()) {
+                    $contact->addEventLog(LeadEventLog::forDoNotContact($contact, LeadEventLog::ACTION_SUBSCRIBED, $dnc));
                 }
                 $contact->removeDoNotContactEntry($dnc);
 

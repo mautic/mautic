@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadNoteRepository;
@@ -95,6 +96,8 @@ final class LeadSubscriber implements EventSubscriberInterface
     {
         $lead = $event->getLead();
 
+        $this->logNewDoNotContacts($lead);
+
         if (!$details = $event->getChanges()) {
             return;
         }
@@ -163,6 +166,29 @@ final class LeadSubscriber implements EventSubscriberInterface
         }
 
         $this->leadEventDispatcher->dispatchEvents($event, $details);
+    }
+
+    /**
+     * New DNC entries only have an ID after the contact is saved, which is why this runs on post save.
+     */
+    private function logNewDoNotContacts(Lead $lead): void
+    {
+        $logs = [];
+        foreach ($lead->getNewDoNotContacts() as $dnc) {
+            if (null === $dnc->getId()) {
+                continue;
+            }
+
+            $logs[] = LeadEventLog::forDoNotContact($lead, LeadEventLog::ACTION_UNSUBSCRIBED, $dnc);
+
+            // Once event sourcing is ported, the lead.donotcontact EventSource is persisted here too (see mc-cs#2069, #2480).
+        }
+
+        $lead->resetNewDoNotContacts();
+
+        if ([] !== $logs) {
+            $this->leadEventLogRepository->saveEntities($logs);
+        }
     }
 
     /**
