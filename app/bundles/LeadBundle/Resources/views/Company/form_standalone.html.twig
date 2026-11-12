@@ -27,9 +27,6 @@
     {% for g in groups %}
         {% if fields[g] is not empty %}
             {% set groupContent %}
-                <div class="pa-16 bdr-b">
-                    <h4 class="fw-sb">{{ ('mautic.lead.field.group.'~g)|trans }}</h4>
-                </div>
                 {{ include('@MauticLead/Company/_form_group_fields.html.twig', {
                     'form': form,
                     'group': g,
