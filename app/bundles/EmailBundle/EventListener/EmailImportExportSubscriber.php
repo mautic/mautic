@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
-use Mautic\EmailBundle\Exception\MjmlThemeEmptyCustomHtmlException;
 use Mautic\EmailBundle\Helper\EmailMediaImageHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Entity\Form;
@@ -144,8 +143,6 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
         ];
 
-        $rejectedEmails = [];
-
         foreach ($event->getEntityData() as $element) {
             $email = $this->emailRepository->findOneBy(['uuid' => $element['uuid']]);
             $isNew = !$email;
@@ -177,31 +174,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
                 null,
                 ['object_to_populate' => $email]
             );
-
-            // The serializer's MetadataAwareNameConverter does not map
-            // custom_html → customHtml (the Doctrine column name differs
-            // from the property name), so the imported email's compiled HTML
-            // was silently lost. Set it manually to preserve the body and
-            // satisfy the MJML save validation.
-            if (isset($element['custom_html']) && !$email->getCustomHtml()) {
-                $email->setCustomHtml($element['custom_html']);
-            }
-
-            try {
-                $this->emailModel->saveEntity($email);
-            } catch (MjmlThemeEmptyCustomHtmlException) {
-                // A published email with an MJML theme and no compiled customHtml
-                // cannot be saved. Reject only this email through the event's
-                // ERRORS channel and keep importing the rest: letting the
-                // exception escape aborts the whole import (a server error for
-                // the campaign import API). The entity is detached because the
-                // denormalized payload was already applied to the managed
-                // instance and must not leak into a later flush.
-                $this->entityManager->detach($email);
-                $rejectedEmails[] = $email->getName() ?? '';
-
-                continue;
-            }
+            $this->emailModel->saveEntity($email);
 
             $event->addEntityIdMap((int) $element['id'], $email->getId());
 
@@ -217,13 +190,6 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             if ($info['count'] > 0) {
                 $event->setStatus($status, [Email::ENTITY_NAME => $info]);
             }
-        }
-
-        if ([] !== $rejectedEmails) {
-            $errors          = $event->getStatus()[EntityImportEvent::ERRORS][Email::ENTITY_NAME] ?? ['names' => [], 'ids' => [], 'count' => 0];
-            $errors['names'] = array_merge($errors['names'], $rejectedEmails);
-            $errors['count'] += count($rejectedEmails);
-            $event->setStatus(EntityImportEvent::ERRORS, [Email::ENTITY_NAME => $errors]);
         }
     }
 
