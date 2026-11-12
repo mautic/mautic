@@ -185,11 +185,11 @@
                         
             {% endset %}
             {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'contacts-container', 'label': 'mautic.lead.leads', 'content': tabsviewsdetailsContent1, 'className': 'pa-16 page-list'}]) %}
+            {% if showTranslations %}
             {% set tabsviewsdetailsContent2 %}
                                 {{ translationContent|raw }}
                             
             {% endset %}
-            {% if showTranslations %}
             {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'translation-container', 'label': 'mautic.core.translations', 'content': tabsviewsdetailsContent2, 'className': 'pa-16'}]) %}
             {% endif %}
             {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}

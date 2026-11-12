@@ -433,11 +433,11 @@
                             
               {% endset %}
               {% set tabsviewsdetails2 = tabsviewsdetails2|merge([{'id': 'contacts-container', 'label': 'mautic.email.associated.contacts', 'content': tabsviewsdetails2Content1, 'className': 'pa-16 page-list'}]) %}
+              {% if showTranslations %}
               {% set tabsviewsdetails2Content2 %}
                                     {{ translationContent|raw }}
                                 
               {% endset %}
-              {% if showTranslations %}
               {% set tabsviewsdetails2 = tabsviewsdetails2|merge([{'id': 'translation-container', 'label': 'mautic.core.translations', 'content': tabsviewsdetails2Content2, 'className': 'pa-16'}]) %}
               {% endif %}
               {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails2, 'variant': 'contained'}) }}

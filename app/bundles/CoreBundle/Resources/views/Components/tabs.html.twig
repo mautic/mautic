@@ -63,10 +63,10 @@
                 {% if variant == 'iconOnly' %}title="{{ tabLabel|trans }}"{% endif %}>
                 <button type="button"
                         class="nav-link{% if isActive %} active{% endif %}{% if variant == 'iconOnly' %} tabs__nav-item tabs__nav-item--icon-only{% if iconOnlyLarge %} tabs__nav-item--icon-only__20{% endif %}{% elseif variant == 'vertical' %} tabs__nav-item tabs__nav-item--vertical{% if iconOnlyLarge %} tabs__nav-item--icon-only__20{% endif %}{% else %} tabs__nav-item{% endif %}{% if isDisabled %} disabled{% endif %}{% if hasError %} text-danger{% endif %}"
-                        id="{{ tabId }}-tab"
+                        id="{{ tab.attributes.id|default(tabId ~ '-tab') }}"
                         data-bs-toggle="tab"
                         data-bs-target="#{{ tabId }}"
-                        {%- for attrName, attrValue in tab.attributes|default({}) %} {{ attrName }}="{{ attrValue }}"{% endfor %}
+                        {%- for attrName, attrValue in tab.attributes|default({}) %}{% if attrName != 'id' %} {{ attrName }}="{{ attrValue }}"{% endif %}{% endfor %}
                         role="tab"
                         aria-controls="{{ tabId }}"
                         aria-selected="{{ isActive ? 'true' : 'false' }}"
