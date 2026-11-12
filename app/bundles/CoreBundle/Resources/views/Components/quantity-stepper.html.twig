@@ -11,11 +11,14 @@
     {% if labelText %}
     <label for="{{ id }}" class="form-label type-label-01">{{ labelText|trans }}</label>
     {% endif %}
-    <div class="quantity-stepper quantity-stepper--{{ size }}" data-quantity-stepper>
+    <div class="quantity-stepper quantity-stepper--{{ size }}" role="group" aria-label="{{ (ariaLabel|default('mautic.core.quantity_stepper.label'))|trans }}" data-quantity-stepper data-min-message="{{ 'mautic.core.quantity_stepper.min'|trans }}" data-max-message="{{ 'mautic.core.quantity_stepper.max'|trans }}">
         <button type="button" class="quantity-stepper__button" data-quantity-step="-1" tabindex="-1" aria-label="{{ decreaseLabel|default('mautic.core.quantity_stepper.decrease')|trans }}"{{ disabled ? ' disabled' }}>
             <i class="ri-subtract-line" aria-hidden="true"></i>
         </button>
-        <input type="number" id="{{ id }}" name="{{ name|default('quantity') }}" class="quantity-stepper__value" value="{{ value }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" inputmode="numeric"{{ disabled ? ' disabled' }}{{ required|default(false) ? ' required' }}>
+        <span class="quantity-stepper__field">
+            <input type="number" id="{{ id }}" name="{{ name|default('quantity') }}" class="quantity-stepper__value" value="{{ value }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" inputmode="numeric" autocomplete="off"{{ disabled ? ' disabled' }}{{ required|default(false) ? ' required' }}>
+            <span class="quantity-stepper__display" aria-hidden="true"><span class="quantity-stepper__digit">{{ value }}</span></span>
+        </span>
         <button type="button" class="quantity-stepper__button" data-quantity-step="1" tabindex="-1" aria-label="{{ increaseLabel|default('mautic.core.quantity_stepper.increase')|trans }}"{{ disabled ? ' disabled' }}>
             <i class="ri-add-line" aria-hidden="true"></i>
         </button>

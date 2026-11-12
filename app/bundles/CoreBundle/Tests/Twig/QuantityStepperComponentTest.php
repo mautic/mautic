@@ -32,6 +32,8 @@ final class QuantityStepperComponentTest extends TestCase
         $this->assertStringContainsString('quantity-stepper--md', $output);
         $this->assertStringContainsString('data-quantity-step="-1"', $output);
         $this->assertStringContainsString('data-quantity-step="1"', $output);
+        $this->assertStringContainsString('<span class="quantity-stepper__digit">1</span>', $output);
+        $this->assertStringContainsString('role="group"', $output);
     }
 
     public function testValueZeroIsKept(): void

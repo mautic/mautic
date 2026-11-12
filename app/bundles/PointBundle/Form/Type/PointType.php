@@ -75,11 +75,13 @@ final class PointType extends AbstractType
             'delta',
             NumberType::class,
             [
-                'label'      => 'mautic.point.action.delta',
-                'label_attr' => ['class' => 'form-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
+                'label'        => 'mautic.point.action.delta',
+                'label_attr'   => ['class' => 'form-label'],
+                'block_prefix' => 'quantity_stepper',
+                'attr'         => [
                     'tooltip' => 'mautic.point.action.delta.help',
+                    'min'     => -999999,
+                    'max'     => 999999,
                 ],
                 'scale' => 0,
             ]
