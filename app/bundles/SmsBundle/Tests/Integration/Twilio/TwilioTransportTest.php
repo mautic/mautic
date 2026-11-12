@@ -44,7 +44,7 @@ final class TwilioTransportTest extends TestCase
             ->method('warning')
             ->with('mautic.sms.transport.twilio.not_configured');
 
-        $this->twilioTransport->sendSms($lead, 'some_content');
+        $this->assertSame('mautic.sms.transport.twilio.not_configured', $this->twilioTransport->sendSms($lead, 'some_content'));
     }
 
     public function testCreatePayload(): void
