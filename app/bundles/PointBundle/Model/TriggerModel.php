@@ -396,7 +396,8 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         if ([] !== $events) {
             // get a list of actions that has already been applied to this lead
             $appliedEvents = $this->triggerEventRepository->getLeadTriggeredEvents($lead->getId());
-            $ipAddress     = $this->ipLookupHelper->getIpAddress();
+            // No IP lookup for a form submitter Mautic doesn't track, the lookup alone would save the address
+            $ipAddress     = $this->ipLookupHelper->isVisitorUntracked() ? null : $this->ipLookupHelper->getIpAddress();
             $persist       = [];
 
             foreach ($events as $event) {
