@@ -239,7 +239,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $utmTags        = $email instanceof Email ? $email->getUtmTags() : [];
 
         $clickthrough = $event->generateClickthrough();
-        $trackables   = $this->parseContentForUrls($event, $emailId);
+        $trackables   = $this->parseContentForUrls($event, $emailId, !$disableTrackableUrls);
 
         foreach ($trackables as $token => $trackable) {
             if ($disableTrackableUrls) {
@@ -286,17 +286,20 @@ final class BuilderSubscriber implements EventSubscriberInterface
      *
      * @throws MappingException
      */
-    private function parseContentForUrls(EmailSendEvent $event, $emailId): array
+    private function parseContentForUrls(EmailSendEvent $event, $emailId, bool $persistTrackables): array
     {
         $cacheKey = $event->getContentHash().'-'.$emailId;
 
         // Prevent parsing the exact same content over and over
         if (!isset($this->convertedContent[$cacheKey])) {
+            // Links that aren't tracked leave no trackable or redirect rows behind
             [$content, $trackables] = $this->pageTrackableModel->parseContentForTrackables(
                 [$event->getContent(), $event->getPlainText()],
                 $event->getTokens(),
                 ($emailId) ? 'email' : null,
-                $emailId
+                $emailId,
+                true,
+                $persistTrackables
             );
             $this->convertedContent[$cacheKey] = [$content, $trackables];
 

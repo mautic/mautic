@@ -52,6 +52,11 @@ class TrackableModel extends AbstractCommonModel
      */
     protected $usingClickthrough = true;
 
+    /**
+     * Whether new Trackable and Redirect entities found while parsing content are saved.
+     */
+    private bool $persistTrackables = true;
+
     private ?array $contactFieldUrlTokens = null;
 
     protected RedirectModel $redirectModel;
@@ -187,10 +192,10 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Save new entities
-        if (count($newRedirects)) {
+        if ($this->persistTrackables && count($newRedirects)) {
             $this->trackableRepository->saveEntities($newRedirects);
         }
-        if (count($newTrackables)) {
+        if ($this->persistTrackables && count($newTrackables)) {
             $this->trackableRepository->saveEntities($newTrackables);
         }
 
@@ -233,12 +238,16 @@ class TrackableModel extends AbstractCommonModel
      * @param bool            $usingClickthrough Set to false if not using a clickthrough parameter.
      *                                           This is to ensure that URLs are built correctly with ? or & for
      *                                           URLs tracked that include query parameters
+     * @param bool            $persistTrackables Set to false to build the tokens without saving new Trackable and
+     *                                           Redirect entities, for links that won't be tracked
      *
      * @return array{string|string[],Redirect[]|Trackable[]}
      */
-    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, $usingClickthrough = true): array
+    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, $usingClickthrough = true, bool $persistTrackables = true): array
     {
         $this->usingClickthrough = $usingClickthrough;
+        // When the links won't be tracked, the entities are only needed to build the tokens, so nothing is stored
+        $this->persistTrackables = $persistTrackables;
 
         // Set do not track list for validateUrlIsTrackable()
         $this->doNotTrack = $this->getDoNotTrackList($content);
@@ -252,9 +261,13 @@ class TrackableModel extends AbstractCommonModel
             $content          = [$content];
         }
 
-        $trackableTokens = [];
-        foreach ($content as $key => $text) {
-            $content[$key] = $this->parseContent($text, $channel, $channelId, $trackableTokens);
+        try {
+            $trackableTokens = [];
+            foreach ($content as $key => $text) {
+                $content[$key] = $this->parseContent($text, $channel, $channelId, $trackableTokens);
+            }
+        } finally {
+            $this->persistTrackables = true;
         }
 
         return [

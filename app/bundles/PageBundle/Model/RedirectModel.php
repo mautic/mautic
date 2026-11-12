@@ -190,11 +190,16 @@ class RedirectModel extends FormModel
      */
     public function applyUtmTags(string $url, array $utmTags): string
     {
+        // An empty UTM value would only leave a stray "?" or "&" on the URL
+        $utmTags = array_filter(
+            $this->getUtmTagsForUrl($utmTags),
+            static fn ($value): bool => null !== $value && '' !== $value
+        );
+
         if ([] === $utmTags) {
             return $url;
         }
 
-        $utmTags         = $this->getUtmTagsForUrl($utmTags);
         $appendUtmString = http_build_query($utmTags, '', '&');
 
         return UrlHelper::appendQueryToUrl($url, $appendUtmString);

@@ -254,7 +254,8 @@ final class EmailApiController extends CommonApiController
             }
 
             if (!array_key_exists('trackingEnabled', $parameters)) {
-                $parameters['trackingEnabled'] = true;
+                // A PUT that leaves the option out keeps the email's choice, so an update can't turn tracking back on by accident
+                $parameters['trackingEnabled'] = $entity->getId() ? $entity->isTrackingEnabled() : true;
             }
         }
 

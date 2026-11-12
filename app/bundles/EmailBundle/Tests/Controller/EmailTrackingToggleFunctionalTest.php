@@ -10,6 +10,8 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\Trackable;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -40,8 +42,24 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         yield 'tracking off' => [false];
     }
 
-    #[DataProvider('trackingProvider')]
-    public function testSentEmailFollowsItsTrackingOption(bool $trackingEnabled): void
+    /**
+     * @return iterable<string, array{bool, array<string, string|null>, string|null}>
+     */
+    public static function sentLinkProvider(): iterable
+    {
+        // The email form saves every UTM field, empty ones included
+        $emptyUtmTags = ['utmSource' => '', 'utmMedium' => null, 'utmCampaign' => '', 'utmContent' => ''];
+
+        yield 'tracking on' => [true, $emptyUtmTags, null];
+        yield 'tracking off' => [false, $emptyUtmTags, 'https://example.com/offer'];
+        yield 'tracking off with a UTM tag' => [false, ['utmSource' => 'newsletter'] + $emptyUtmTags, 'https://example.com/offer?utm_source=newsletter'];
+    }
+
+    /**
+     * @param array<string, string|null> $utmTags
+     */
+    #[DataProvider('sentLinkProvider')]
+    public function testSentEmailFollowsItsTrackingOption(bool $trackingEnabled, array $utmTags, ?string $expectedLink): void
     {
         $segment = $this->createSegment('tracking-toggle', []);
         $contact = $this->createLead('', '', 'toggle@example.com');
@@ -53,6 +71,7 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         $email->setLists([$segment]);
         $email->setTemplate('blank');
         $email->setCustomHtml('<!DOCTYPE html><html><body><a href="https://example.com/offer">offer</a></body></html>');
+        $email->setUtmTags($utmTags);
         $email->setTrackingEnabled($trackingEnabled);
         $this->em->persist($email);
         $this->em->flush();
@@ -69,12 +88,20 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         preg_match('/<a href="([^"]*)">offer<\/a>/', $body, $link);
         $this->assertArrayHasKey(1, $link, $body);
 
+        $this->em->clear();
+        $trackables = $this->em->getRepository(Trackable::class)->findBy(['channel' => 'email', 'channelId' => $email->getId()]);
+        $redirects  = $this->em->getRepository(Redirect::class)->findBy(['url' => 'https://example.com/offer']);
+
         if ($trackingEnabled) {
             $this->assertStringContainsString('/r/', $link[1], 'the link goes through a tracked link');
             $this->assertMatchesRegularExpression('#/email/[^"/]+\.gif#', $body, 'the open pixel is added');
+            $this->assertCount(1, $trackables);
+            $this->assertCount(1, $redirects);
         } else {
-            $this->assertSame('https://example.com/offer', $link[1], 'the link goes straight to its page');
+            $this->assertSame($expectedLink, $link[1], 'the link goes straight to its page, without a stray "?"');
             $this->assertDoesNotMatchRegularExpression('#/email/[^"/]+\.gif#', $body, 'no open pixel is added');
+            $this->assertSame([], $trackables, 'no trackable row is created for an untracked link');
+            $this->assertSame([], $redirects, 'no redirect row is created for an untracked link');
         }
     }
 
@@ -169,7 +196,18 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
             'language'   => 'en',
         ]);
         $this->assertResponseIsSuccessful((string) $this->client->getResponse()->getContent());
-        $this->assertTrue(json_decode((string) $this->client->getResponse()->getContent(), true)['email']['trackingEnabled'], 'a PUT without the option goes back to tracking on');
+        $this->assertFalse(json_decode((string) $this->client->getResponse()->getContent(), true)['email']['trackingEnabled'], 'a PUT without the option keeps tracking off');
+
+        $this->client->request(Request::METHOD_PUT, sprintf('/api/emails/%d/edit', $email['id']), [
+            'name'            => 'API tracking',
+            'subject'         => 'API tracking',
+            'emailType'       => 'template',
+            'customHtml'      => '<html><body>Hi</body></html>',
+            'language'        => 'en',
+            'trackingEnabled' => 1,
+        ]);
+        $this->assertResponseIsSuccessful((string) $this->client->getResponse()->getContent());
+        $this->assertTrue(json_decode((string) $this->client->getResponse()->getContent(), true)['email']['trackingEnabled'], 'a PUT with the option turns tracking on');
     }
 
     public function testEmailFormHasTheOptionAndDetailsShowItIsOff(): void
