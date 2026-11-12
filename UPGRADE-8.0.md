@@ -1252,6 +1252,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\CampaignBundle\Entity\LeadEventLog` | `getCampaign()` | `?Mautic\CampaignBundle\Entity\Campaign` |
     | `Mautic\CampaignBundle\Entity\LeadEventLog` | `getIpAddress()` | `?Mautic\CoreBundle\Entity\IpAddress` |
     | `Mautic\CampaignBundle\Entity\Event` | `getCampaign()` | `?Mautic\CampaignBundle\Entity\Campaign` |
+    | `Mautic\LeadBundle\Entity\Lead` | `getManipulator()` | `?Mautic\LeadBundle\DataObject\LeadManipulator` |
     | `Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter` | `createFormatter()` | `self` (`AbstractFormatter`) |
 
 - `Mautic\CoreBundle\Entity\VariantEntityInterface` and `VariantEntityTrait` now declare `getVariantStartDate(): ?\DateTimeInterface` and `setVariantStartDate(?\DateTimeInterface $variantStartDate): static`. The date getter's return type and setter's parameter type were previously `mixed`. Update implementations and overrides accordingly; pass a mutable `DateTimeInterface` or `null`, not a `DateTimeImmutable` or another value.
