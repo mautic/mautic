@@ -4,8 +4,7 @@ const vm = require('node:vm');
 
 const displayScript = fs.readFileSync(process.argv[2], 'utf8');
 const trackingScript = fs.readFileSync(process.argv[3], 'utf8');
-const aggregateScript = fs.readFileSync(process.argv[4], 'utf8');
-const focusId = process.argv[5];
+const focusId = process.argv[4];
 
 function createBrowser(body) {
     const documentListeners = {};
@@ -104,12 +103,11 @@ function item(browser) {
 
 {
     const browser = createBrowser();
-    browser.window.MauticFocusTrackingQueue = {[focusId]: true};
+    browser.window.MauticJS = {trackingEnabled: true};
     execute(displayScript, browser);
 
-    assert.strictEqual(browser.appendedScripts.length, 1, 'queued consent must load tracking once');
-    assert.strictEqual(browser.window.MauticFocusTrackingQueue[focusId], undefined, 'queued consent must be consumed');
-    assert.strictEqual(item(browser).initialized, false, 'queued consent must delay engagement until tracking loads');
+    assert.strictEqual(browser.appendedScripts.length, 1, 'enabled Mautic tracking must load Focus tracking once');
+    assert.strictEqual(item(browser).initialized, false, 'enabled Mautic tracking must delay engagement until tracking loads');
 
     let trackingEnabledAtRegistration = false;
     item(browser).registerFocusEvent = function () {
@@ -117,8 +115,8 @@ function item(browser) {
         item(browser).trackingHooks.onEngage();
     };
     execute(trackingScript, browser);
-    assert.strictEqual(browser.images.length, 0, 'queued consent must not send a view during activation');
-    assert.strictEqual(item(browser).trackingEnabled, true, 'queued tracking must activate before engagement');
+    assert.strictEqual(browser.images.length, 0, 'activation must not send a view');
+    assert.strictEqual(item(browser).trackingEnabled, true, 'tracking must activate before engagement');
     browser.appendedScripts[0].onload();
     assert.strictEqual(item(browser).initialized, true, 'display must initialize after tracking activation');
     assert.strictEqual(trackingEnabledAtRegistration, true, 'initial engagement must register after tracking activation');
@@ -127,11 +125,11 @@ function item(browser) {
 
 {
     const browser = createBrowser();
-    browser.window.MauticFocusTrackingQueue = {[focusId]: true};
+    browser.window.MauticJS = {trackingEnabled: true};
     execute(displayScript, browser);
 
     browser.appendedScripts[0].onerror();
-    assert.strictEqual(item(browser).initialized, true, 'failed queued tracking must not block display');
+    assert.strictEqual(item(browser).initialized, true, 'failed tracking must not block display');
     assert.strictEqual(item(browser).trackingEnabled, false);
 }
 
@@ -140,41 +138,15 @@ function item(browser) {
     execute(displayScript, browser);
     const focus = item(browser);
 
-    assert.strictEqual(typeof browser.window.MauticFocus.enableTracking, 'function', 'display must expose the tracking API');
-    browser.window.MauticFocus.enableTracking(focusId);
-    browser.window.MauticFocus.enableTracking(focusId);
-    assert.strictEqual(browser.appendedScripts.length, 1, 'concurrent activation must share one request');
+    assert.strictEqual(browser.window.MauticFocus, undefined, 'display must not expose its own consent API');
+    assert.strictEqual(browser.appendedScripts.length, 0, 'display must not load tracking before Mautic tracking is enabled');
+    browser.document.dispatchEvent(new browser.window.CustomEvent('mautic:tracking-enabled'));
+    browser.document.dispatchEvent(new browser.window.CustomEvent('mautic:tracking-enabled'));
+    assert.strictEqual(browser.appendedScripts.length, 1, 'Mautic tracking must load Focus tracking once');
 
     browser.appendedScripts[0].onerror();
     focus.loadTracking();
     assert.strictEqual(browser.appendedScripts.length, 2, 'failed activation must be retryable');
-}
-
-{
-    const browser = createBrowser();
-    execute(displayScript, browser);
-
-    browser.document.dispatchEvent(new browser.window.CustomEvent('mautic:tracking-enabled'));
-    assert.strictEqual(browser.appendedScripts.length, 0, 'MTC tracking must not imply Focus consent');
-}
-
-{
-    const browser = createBrowser();
-    browser.window.MauticFocusUseMauticTrackingConsent = true;
-    execute(displayScript, browser);
-
-    browser.document.dispatchEvent(new browser.window.CustomEvent('mautic:tracking-enabled'));
-    browser.document.dispatchEvent(new browser.window.CustomEvent('mautic:tracking-enabled'));
-    assert.strictEqual(browser.appendedScripts.length, 1, 'explicit MTC consent bridge must load tracking once');
-}
-
-{
-    const browser = createBrowser();
-    browser.window.MauticFocusUseMauticTrackingConsent = true;
-    browser.window.MauticJS = {trackingEnabled: true};
-    execute(displayScript, browser);
-
-    assert.strictEqual(browser.appendedScripts.length, 1, 'display loaded after MTC tracking must consume opt-in state');
 }
 
 {
@@ -259,10 +231,9 @@ function item(browser) {
     assert.strictEqual(item(browser), focus, 'duplicate display must preserve the existing item');
     assert.strictEqual(browser.appendedScripts.length, 0, 'duplicate display must not load tracking');
 
-    execute(aggregateScript, browser);
-    assert.strictEqual(item(browser), focus, 'aggregate tracking must preserve the existing display item');
-    assert.strictEqual(browser.appendedScripts.length, 1, 'aggregate tracking must load the tracking add-on');
+    browser.document.dispatchEvent(new browser.window.CustomEvent('mautic:tracking-enabled'));
+    assert.strictEqual(browser.appendedScripts.length, 1, 'Mautic tracking must load tracking for the existing item');
 
     execute(trackingScript, browser);
-    assert.strictEqual(focus.trackingEnabled, true, 'aggregate tracking must upgrade the existing display item');
+    assert.strictEqual(focus.trackingEnabled, true, 'tracking must upgrade the existing item');
 }

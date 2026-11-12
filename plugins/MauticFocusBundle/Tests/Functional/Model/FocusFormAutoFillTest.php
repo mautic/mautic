@@ -116,15 +116,13 @@ final class FocusFormAutoFillTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('value="test-autofill@example.com"', $anonymousForm);
         $this->assertStringNotContainsString('mauticform[focusId]', $anonymousForm);
 
-        $this->client->request(Request::METHOD_GET, "/focus/{$focus->getId()}/display.js");
+        // The script that shows the item never fills the form with the contact's data
+        $this->client->request(Request::METHOD_GET, "/focus/{$focus->getId()}.js");
         $displayContent = (string) $this->client->getResponse()->getContent();
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Visitor', $displayContent);
         $this->assertStringNotContainsString('contactfield', $displayContent);
         $this->assertStringNotContainsString('mauticform\u005BfocusId\u005D', $displayContent);
-
-        $this->client->request(Request::METHOD_GET, "/focus/{$focus->getId()}.js");
-        $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('mauticform\u005BfocusId\u005D', (string) $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString('test-autofill@example.com', $displayContent);
     }
 }

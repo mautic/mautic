@@ -10,7 +10,6 @@ use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PageSubscriber implements EventSubscriberInterface
 {
@@ -20,7 +19,6 @@ final class PageSubscriber implements EventSubscriberInterface
         private readonly FocusModel $model,
         private readonly TokenHelper $tokenHelper,
         private readonly BuilderTokenHelperFactory $builderTokenHelperFactory,
-        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -40,22 +38,11 @@ final class PageSubscriber implements EventSubscriberInterface
         if ($event->tokensRequested($this->regex)) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
             $tokenFilter = $event->getTokenFilter();
-            $focusTokens = $tokenHelper->getFormattedTokens(
+            $tokens      = $tokenHelper->getFormattedTokens(
                 $this->regex,
                 TokenFormatOptions::simplePrefix('mautic.focus.focus_item'),
                 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
             );
-            $tokens = [];
-            foreach ($focusTokens as $token => $label) {
-                $parsedToken = $this->tokenHelper->parseToken($token);
-                if (null === $parsedToken) {
-                    continue;
-                }
-
-                $tokens[$this->tokenHelper->formatToken($parsedToken['id'], TokenHelper::MODE_DISPLAY)] = $label.' '.$this->translator->trans('mautic.focus.token.display');
-                $tokens[$this->tokenHelper->formatToken($parsedToken['id'], TokenHelper::MODE_TRACKING)] = $label.' '.$this->translator->trans('mautic.focus.token.tracking');
-            }
-
             if ([] !== $tokens) {
                 $event->addTokens($tokens);
             }

@@ -115,19 +115,6 @@
   {%- set iframeClass = 'mf-' ~ style ~ '-iframe' -%}
 {%- endif -%}
 (function (window) {
-    window.MauticFocus = window.MauticFocus || {};
-    window.MauticFocus.enableTracking = window.MauticFocus.enableTracking || function (id) {
-        var item = window.MauticFocusItems && window.MauticFocusItems[id];
-
-        if (item) {
-            item.loadTracking();
-            return;
-        }
-
-        window.MauticFocusTrackingQueue = window.MauticFocusTrackingQueue || {};
-        window.MauticFocusTrackingQueue[id] = true;
-    };
-
     window.MauticFocusItems = window.MauticFocusItems || {};
     if (window.MauticFocusItems[{{ focus.id }}]) {
         {% if trackingEnabled %}
@@ -1016,20 +1003,16 @@
     var focusItem = MauticFocus{{ focus.id }}();
     window.MauticFocusItems[{{ focus.id }}] = focusItem;
     {% if not trackingEnabled %}
+    // Focus tracking follows Mautic tracking, so it only loads once Mautic tracking is enabled on the page
     var enableTrackingFromMautic = function () {
-        if (window.MauticFocusUseMauticTrackingConsent === true) {
-            focusItem.loadTracking();
-        }
+        document.removeEventListener('mautic:tracking-enabled', enableTrackingFromMautic);
+        focusItem.loadTracking();
     };
     document.addEventListener('mautic:tracking-enabled', enableTrackingFromMautic);
     if (window.MauticJS && window.MauticJS.trackingEnabled === true) {
         enableTrackingFromMautic();
     }
     {% endif %}
-    if (window.MauticFocusTrackingQueue && window.MauticFocusTrackingQueue[{{ focus.id }}]) {
-        delete window.MauticFocusTrackingQueue[{{ focus.id }}];
-        focusItem.loadTracking();
-    }
     focusItem.initialize();
 })(window);
 {%- endif -%}

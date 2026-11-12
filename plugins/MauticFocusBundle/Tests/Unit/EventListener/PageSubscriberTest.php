@@ -25,7 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PageSubscriberTest extends TestCase
 {
-    public function testPickerProvidesDisplayTokenFirstAndTrackingToken(): void
+    public function testPickerProvidesTheFocusToken(): void
     {
         $model = $this->createStub(FocusModel::class);
         $model->method('getPermissionBase')->willReturn('focus:items');
@@ -49,10 +49,8 @@ final class PageSubscriberTest extends TestCase
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(
             static fn (string $key): string => match ($key) {
-                'mautic.focus.focus_item'    => 'Focus Item',
-                'mautic.focus.token.display'  => '(display only)',
-                'mautic.focus.token.tracking' => '(tracking)',
-                default                        => $key,
+                'mautic.focus.focus_item' => 'Focus Item',
+                default                   => $key,
             },
         );
 
@@ -70,45 +68,41 @@ final class PageSubscriberTest extends TestCase
             $model,
             new TokenHelper($model, $this->createStub(RouterInterface::class), $this->createStub(CorePermissions::class)),
             $factory,
-            $translator,
         );
         $event = new PageBuilderEvent($translator, null, 'tokens');
 
         $subscriber->onPageBuild($event);
 
         $this->assertSame([
-            '{focus=7|display}' => 'Focus Item: Test (display only)',
-            '{focus=7|tracking}' => 'Focus Item: Test (tracking)',
+            '{focus=7}' => 'Focus Item: Test',
         ], $event->getTokens());
     }
 
-    public function testPageDisplayReplacesDisplayTrackingAndUnqualifiedTokens(): void
+    public function testPageDisplayReplacesTokensWithTheFocusScript(): void
     {
         $focusItem = new Focus();
         $focusItem->setIsPublished(true);
 
         $model = $this->createMock(FocusModel::class);
-        $model->expects($this->exactly(3))
+        $model->expects($this->exactly(2))
             ->method('getEntity')
             ->willReturn($focusItem);
 
         $router = $this->createMock(RouterInterface::class);
-        $router->expects($this->exactly(3))
+        $router->expects($this->exactly(2))
             ->method('generate')
             ->willReturnCallback(static fn (string $route, array $parameters): string => match ($route) {
-                'mautic_focus_generate'         => 'https://example.test/focus/'.$parameters['id'].'.js',
-                'mautic_focus_generate_display' => 'https://example.test/focus/'.$parameters['id'].'/display.js',
-                default                         => throw new \UnexpectedValueException($route),
+                'mautic_focus_generate' => 'https://example.test/focus/'.$parameters['id'].'.js',
+                default                 => throw new \UnexpectedValueException($route),
             });
 
         $tokenHelper = new TokenHelper($model, $router, $this->createStub(CorePermissions::class));
-        $content     = '{focus=1|tracking} {focus=2|display} {focus=3} {focus=4|legacy}';
+        $content     = '{focus=1} {focus=2} {focus=3|display}';
 
         $subscriber = new PageSubscriber(
             $model,
             $tokenHelper,
             $this->createStub(BuilderTokenHelperFactory::class),
-            $this->createStub(TranslatorInterface::class),
         );
         $event = new PageDisplayEvent($content, new Page());
 
@@ -116,8 +110,7 @@ final class PageSubscriberTest extends TestCase
 
         $this->assertSame(
             '<script src="https://example.test/focus/1.js" type="text/javascript" charset="utf-8" async="async"></script> '
-            .'<script src="https://example.test/focus/2/display.js" type="text/javascript" charset="utf-8" async="async"></script> '
-            .'<script src="https://example.test/focus/3.js" type="text/javascript" charset="utf-8" async="async"></script> ',
+            .'<script src="https://example.test/focus/2.js" type="text/javascript" charset="utf-8" async="async"></script> ',
             $event->getContent(),
         );
     }

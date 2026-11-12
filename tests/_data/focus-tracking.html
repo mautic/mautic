@@ -133,7 +133,6 @@
             } : null,
             pageOrigin: window.location.origin,
             pendingRequests: window.focusFixture.pendingRequests,
-            queueEntry: Boolean(window.MauticFocusTrackingQueue && window.MauticFocusTrackingQueue[focusId]),
             requests: window.focusFixture.requests.slice(),
             storageAccess: storageAccess
         };
@@ -273,16 +272,6 @@
             window.focusFixture.finished = true;
         });
     };
-
-    if (fixtureParams.get('shared') === '1') {
-        window.MauticFocusUseMauticTrackingConsent = true;
-    }
-
-    var queuedFocusId = fixtureParams.get('queued');
-    if (queuedFocusId) {
-        window.MauticFocusTrackingQueue = {};
-        window.MauticFocusTrackingQueue[queuedFocusId] = true;
-    }
 
     window.focusFixture.cookieWrites = [];
     window.focusFixture.requests = [];

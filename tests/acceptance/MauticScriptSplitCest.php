@@ -304,15 +304,16 @@ var essentialScript = Array.from(document.scripts).filter(function (script) {
 var essentialUrl = new URL(essentialScript.src);
 var mauticBaseUrl = essentialUrl.origin + essentialUrl.pathname.slice(0, -'/mautic-essential.js'.length);
 var content = [
-    '<script src="' + mauticBaseUrl + '/focus/1/display.js"></script>',
+    '<script src="' + mauticBaseUrl + '/focus/1.js"></script>',
     "<script src='" + mauticBaseUrl + "/focus/2.js'></script>",
-    '<script src="focus/4/display.js"></script>',
+    '<script src="focus/4.js"></script>',
     '<script src="' + mauticBaseUrl + '/focus/3/tracking.js"></script>',
-    '<script src="' + mauticBaseUrl + '/focus/0/display.js"></script>',
-    '<script src="' + mauticBaseUrl + '/load?next=/focus/5/display.js"></script>',
-    '<script src="https://tracker.example/focus/6/display.js"></script>',
-    '<script src="https://tracker.example/load?next=/focus/7/display.js"></script>',
-    '<script data-src="' + mauticBaseUrl + '/focus/8/display.js"></script>',
+    '<script src="' + mauticBaseUrl + '/focus/9/display.js"></script>',
+    '<script src="' + mauticBaseUrl + '/focus/0.js"></script>',
+    '<script src="' + mauticBaseUrl + '/load?next=/focus/5.js"></script>',
+    '<script src="https://tracker.example/focus/6.js"></script>',
+    '<script src="https://tracker.example/load?next=/focus/7.js"></script>',
+    '<script data-src="' + mauticBaseUrl + '/focus/8.js"></script>',
     '<script src="http://["></script>',
     '<script src="' + mauticBaseUrl + '/other.js"></script>'
 ].join('');
@@ -333,15 +334,14 @@ return {
 JS);
 
         $mauticBaseUrl = $this->getMauticUrl($I);
-        $I->assertSame([
-            $mauticBaseUrl.'/focus/1/display.js',
-            $mauticBaseUrl.'/focus/4/display.js',
-        ], $loadedScripts['beforeTracking']);
-        $I->assertSame([
-            $mauticBaseUrl.'/focus/1/display.js',
+        // The Focus script is the same before and after tracking, it loads its own tracking later
+        $expectedScripts = [
+            $mauticBaseUrl.'/focus/1.js',
             $mauticBaseUrl.'/focus/2.js',
-            $mauticBaseUrl.'/focus/4/display.js',
-        ], $loadedScripts['afterTracking']);
+            $mauticBaseUrl.'/focus/4.js',
+        ];
+        $I->assertSame($expectedScripts, $loadedScripts['beforeTracking']);
+        $I->assertSame($expectedScripts, $loadedScripts['afterTracking']);
     }
 
     public function essentialThenTrackingRequestsDwcOnce(\AcceptanceTester $I): void

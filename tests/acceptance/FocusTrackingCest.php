@@ -10,9 +10,8 @@ final class FocusTrackingCest
     private const DESTINATION_URL = 'https://privacysafe.example/destination';
     private const DISPLAY_FOCUS_ID = 999991;
     private const EXPLICIT_FOCUS_ID = 999992;
-    private const LEGACY_FOCUS_ID = 999995;
-    private const QUEUED_FOCUS_ID = 999993;
     private const REMOVED_FOCUS_ID = 999996;
+    private const TRACKING_FIRST_FOCUS_ID = 999993;
 
     private ?string $corsConfigBackup = null;
 
@@ -124,17 +123,18 @@ JS, self::DISPLAY_FOCUS_ID));
 
     public function focusCookiesAreWrittenOnceTrackingIsEnabled(\AcceptanceTester $I): void
     {
+        $this->allowCorsFromFixtureOrigin();
         $this->openFixture($I, [$this->focusPath(self::DISPLAY_FOCUS_ID, 'display')], ['reset' => '1']);
         $this->waitForFocus($I, self::DISPLAY_FOCUS_ID, true);
         $I->executeJS('window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].iframeDoc.querySelector(".mf-modal-close a").click();');
         $I->waitForJS('return document.querySelectorAll("iframe").length === 0', \AcceptanceTester::TIMEOUT);
         $I->assertSame([], $this->focusState($I, self::DISPLAY_FOCUS_ID)['cookieWrites']);
 
-        $I->executeJS('window.MauticFocus.enableTracking('.self::DISPLAY_FOCUS_ID.');');
+        $this->enableMauticTracking($I);
         $I->waitForJS('return window.MauticFocusItems['.self::DISPLAY_FOCUS_ID.'].trackingEnabled === true', \AcceptanceTester::TIMEOUT);
         $this->waitForNetworkQuiet($I);
 
-        // What happened before consent is stored once tracking is enabled
+        // What happened before consent is stored once Mautic tracking is enabled
         $state = $this->focusState($I, self::DISPLAY_FOCUS_ID);
         $I->assertSame([], $state['errors']);
         $I->assertMatchesRegularExpression('/(?:^|; )mautic_focus_'.self::DISPLAY_FOCUS_ID.'=\d+(?:;|$)/', $state['identity']['cookies']);
@@ -148,7 +148,7 @@ JS, self::DISPLAY_FOCUS_ID));
         $barPath = $this->focusPath(self::BAR_FOCUS_ID, 'display');
         $this->openFixture($I, [$barPath], ['reset' => '1']);
         $this->waitForFocus($I, self::BAR_FOCUS_ID, true);
-        $I->executeJS('window.MauticFocus.enableTracking('.self::BAR_FOCUS_ID.');');
+        $this->enableMauticTracking($I);
         $I->waitForJS('return window.MauticFocusItems['.self::BAR_FOCUS_ID.'].trackingEnabled === true', \AcceptanceTester::TIMEOUT);
         $I->executeJS('document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.'").click();');
         $I->waitForJS('return document.querySelector(".mf-bar-collapser-'.self::BAR_FOCUS_ID.' svg").getAttribute("data-transform-direction") === "90"', \AcceptanceTester::TIMEOUT);
@@ -214,69 +214,49 @@ JS, self::DISPLAY_FOCUS_ID));
         $I->seeNumRecords(0, 'test_focus_stats', ['focus_id' => self::REMOVED_FOCUS_ID, 'type' => 'view']);
     }
 
-    public function queuedConsentActivatesBeforeInitialEngagement(\AcceptanceTester $I): void
+    public function mauticTrackingEnabledBeforeFocusActivatesBeforeInitialEngagement(\AcceptanceTester $I): void
     {
-        $displayPath = $this->focusPath(self::QUEUED_FOCUS_ID, 'display');
-        $trackingPath = $this->focusPath(self::QUEUED_FOCUS_ID, 'tracking');
-        $viewPath = $this->focusPath(self::QUEUED_FOCUS_ID, 'view');
-        $this->openFixture($I, [$displayPath], ['reset' => '1', 'queued' => (string) self::QUEUED_FOCUS_ID]);
-        $I->waitForJS('return Boolean(window.MauticFocusItems && window.MauticFocusItems['.self::QUEUED_FOCUS_ID.'].trackingEnabled && window.MauticFocusItems['.self::QUEUED_FOCUS_ID.'].iframeDoc)', \AcceptanceTester::TIMEOUT);
+        $this->allowCorsFromFixtureOrigin();
+        $displayPath  = $this->focusPath(self::TRACKING_FIRST_FOCUS_ID, 'display');
+        $trackingPath = $this->focusPath(self::TRACKING_FIRST_FOCUS_ID, 'tracking');
+        $viewPath     = $this->focusPath(self::TRACKING_FIRST_FOCUS_ID, 'view');
+        $this->openFixture($I, ['/mautic-essential.js', '/mautic-tracking.js', $displayPath], ['reset' => '1']);
+        $I->waitForJS('return Boolean(window.MauticFocusItems && window.MauticFocusItems['.self::TRACKING_FIRST_FOCUS_ID.'].trackingEnabled && window.MauticFocusItems['.self::TRACKING_FIRST_FOCUS_ID.'].iframeDoc)', \AcceptanceTester::TIMEOUT);
         $I->waitForJS('return window.focusFixture.countRequests('.json_encode($viewPath, JSON_THROW_ON_ERROR).', "image") === 1', \AcceptanceTester::TIMEOUT);
         $this->waitForNetworkQuiet($I);
 
-        $state = $this->focusState($I, self::QUEUED_FOCUS_ID);
+        $state = $this->focusState($I, self::TRACKING_FIRST_FOCUS_ID);
         $I->assertSame(1, $this->requestCount($state['requests'], $displayPath, 'script'));
         $I->assertSame(1, $this->requestCount($state['requests'], $trackingPath, 'script'));
-        $I->assertFalse($state['queueEntry']);
         $I->assertTrue($state['item']['trackingEnabled']);
         $I->assertSame(1, $state['iframeCount']);
         $I->assertSame(1, $this->requestCount($state['requests'], $viewPath, 'image'));
         $I->assertSame([], $state['errors']);
-        $I->seeNumRecords(1, 'test_focus_stats', ['focus_id' => self::QUEUED_FOCUS_ID, 'type' => 'view']);
+        $I->seeNumRecords(1, 'test_focus_stats', ['focus_id' => self::TRACKING_FIRST_FOCUS_ID, 'type' => 'view']);
     }
 
-    public function mauticTrackingConsentActivatesFocusOnlyWithExplicitOptIn(\AcceptanceTester $I): void
+    public function focusTrackingFollowsMauticTracking(\AcceptanceTester $I): void
     {
         $this->allowCorsFromFixtureOrigin();
-        $displayPath = $this->focusPath(self::EXPLICIT_FOCUS_ID, 'display');
+        $displayPath  = $this->focusPath(self::EXPLICIT_FOCUS_ID, 'display');
         $trackingPath = $this->focusPath(self::EXPLICIT_FOCUS_ID, 'tracking');
-        $scripts = [$displayPath, '/mautic-essential.js', '/mautic-tracking.js'];
 
-        $this->openFixture($I, $scripts, ['reset' => '1']);
-        $I->waitForJS('return window.focusFixture.finished && window.MauticJS && window.MauticJS.trackingEnabled === true', \AcceptanceTester::TIMEOUT);
+        // Only the essential script, so no consent yet
+        $this->openFixture($I, [$displayPath, '/mautic-essential.js'], ['reset' => '1']);
+        $I->waitForJS('return window.focusFixture.finished && window.MauticJS && window.MauticJS.runtimeReady === true', \AcceptanceTester::TIMEOUT);
         $this->waitForNetworkQuiet($I);
-        $independentState = $this->focusState($I, self::EXPLICIT_FOCUS_ID);
-        $I->assertTrue($I->executeJS('return window.MauticJS.trackingEnabled === true;'));
-        $I->assertFalse($independentState['item']['trackingEnabled']);
-        $I->assertSame(0, $this->requestCount($independentState['requests'], $trackingPath));
-        $I->assertSame([], $independentState['errors']);
+        $essentialState = $this->focusState($I, self::EXPLICIT_FOCUS_ID);
+        $I->assertFalse($essentialState['item']['trackingEnabled']);
+        $I->assertSame(0, $this->requestCount($essentialState['requests'], $trackingPath));
+        $I->assertSame([], $essentialState['errors']);
 
-        $this->openFixture($I, $scripts, ['reset' => '1', 'shared' => '1']);
+        $this->openFixture($I, [$displayPath, '/mautic-essential.js', '/mautic-tracking.js'], ['reset' => '1']);
         $I->waitForJS('return window.focusFixture.finished && window.MauticJS && window.MauticJS.trackingEnabled === true && window.MauticFocusItems['.self::EXPLICIT_FOCUS_ID.'].trackingEnabled === true', \AcceptanceTester::TIMEOUT);
         $this->waitForNetworkQuiet($I);
-        $sharedState = $this->focusState($I, self::EXPLICIT_FOCUS_ID);
-        $I->assertTrue($I->executeJS('return window.MauticJS.trackingEnabled === true;'));
-        $I->assertTrue($sharedState['item']['trackingEnabled']);
-        $I->assertSame(1, $this->requestCount($sharedState['requests'], $trackingPath, 'script'));
-        $I->assertSame([], $sharedState['errors']);
-    }
-
-    public function legacyEndpointStillRendersAndTracks(\AcceptanceTester $I): void
-    {
-        $legacyPath = $this->focusPath(self::LEGACY_FOCUS_ID, 'legacy');
-        $viewPath = $this->focusPath(self::LEGACY_FOCUS_ID, 'view');
-        $this->openFixture($I, [$legacyPath], ['reset' => '1']);
-        $this->waitForFocus($I, self::LEGACY_FOCUS_ID, true);
-        $I->waitForJS('return Array.from(window.MauticFocusItems['.self::LEGACY_FOCUS_ID.'].iframeDoc.images).filter(function (image) { return new URL(image.src).pathname === '.json_encode($viewPath, JSON_THROW_ON_ERROR).' && image.complete; }).length === 1', \AcceptanceTester::TIMEOUT);
-
-        $state = $this->focusState($I, self::LEGACY_FOCUS_ID);
-        $I->assertSame([], $state['errors']);
-        $I->assertSame(1, $this->requestCount($state['requests'], $legacyPath, 'script'));
-        $I->assertSame(1, $state['iframeCount']);
-        $I->assertStringContainsString('mautic_focus_'.self::LEGACY_FOCUS_ID.'=', $state['identity']['cookies']);
-        $I->assertNotSame(self::DESTINATION_URL, $this->linkUrl($I, self::LEGACY_FOCUS_ID));
-        $I->assertSame(1, $I->executeJS('return Array.from(window.MauticFocusItems['.self::LEGACY_FOCUS_ID.'].iframeDoc.images).filter(function (image) { return new URL(image.src).pathname === '.json_encode($viewPath, JSON_THROW_ON_ERROR).'; }).length;'));
-        $I->seeNumRecords(1, 'test_focus_stats', ['focus_id' => self::LEGACY_FOCUS_ID, 'type' => 'view']);
+        $trackedState = $this->focusState($I, self::EXPLICIT_FOCUS_ID);
+        $I->assertTrue($trackedState['item']['trackingEnabled']);
+        $I->assertSame(1, $this->requestCount($trackedState['requests'], $trackingPath, 'script'));
+        $I->assertSame([], $trackedState['errors']);
     }
 
     /**
@@ -287,9 +267,8 @@ JS, self::DISPLAY_FOCUS_ID));
         return [
             $this->focusFixture(self::DISPLAY_FOCUS_ID, 'Display and functional state', 'modal', 'immediately', 'once', true),
             $this->focusFixture(self::EXPLICIT_FOCUS_ID, 'Display then tracking', 'modal', 'leave'),
-            $this->focusFixture(self::QUEUED_FOCUS_ID, 'Queued consent', 'modal', 'immediately'),
+            $this->focusFixture(self::TRACKING_FIRST_FOCUS_ID, 'Tracking enabled first', 'modal', 'immediately'),
             $this->focusFixture(self::BAR_FOCUS_ID, 'Bar persistence', 'bar', 'immediately'),
-            $this->focusFixture(self::LEGACY_FOCUS_ID, 'Legacy aggregate', 'modal', 'immediately'),
             $this->focusFixture(self::REMOVED_FOCUS_ID, 'Removed before tracking', 'modal', 'leave'),
         ];
     }
@@ -366,6 +345,20 @@ JS, self::DISPLAY_FOCUS_ID));
         $I->waitForJS('return window.focusFixture && window.focusFixture.finished === true', \AcceptanceTester::TIMEOUT);
     }
 
+    /**
+     * Loads the Mautic tracking script on the open page, the way a consent manager would after the visitor consents.
+     */
+    private function enableMauticTracking(\AcceptanceTester $I): void
+    {
+        $mauticUrl = $this->getMauticUrl($I);
+        $I->executeJS(sprintf(
+            'window.mauticTrackingLoaded = false; window.focusFixture.loadScript(%s).then(function () { return window.focusFixture.loadScript(%s); }).then(function () { window.mauticTrackingLoaded = true; });',
+            json_encode($mauticUrl.'/mautic-essential.js', JSON_THROW_ON_ERROR),
+            json_encode($mauticUrl.'/mautic-tracking.js', JSON_THROW_ON_ERROR),
+        ));
+        $I->waitForJS('return window.mauticTrackingLoaded === true && window.MauticJS && window.MauticJS.trackingEnabled === true', \AcceptanceTester::TIMEOUT);
+    }
+
     private function waitForFocus(\AcceptanceTester $I, int $focusId, bool $withIframe): void
     {
         $condition = 'return window.MauticFocusItems && window.MauticFocusItems['.$focusId.'] && window.MauticFocusItems['.$focusId.'].runtimeReady';
@@ -401,8 +394,7 @@ JS, self::DISPLAY_FOCUS_ID));
     private function focusPath(int $focusId, string $scope): string
     {
         return match ($scope) {
-            'display'  => '/focus/'.$focusId.'/display.js',
-            'legacy'   => '/focus/'.$focusId.'.js',
+            'display'  => '/focus/'.$focusId.'.js',
             'tracking' => '/focus/'.$focusId.'/tracking.js',
             'view'     => '/focus/'.$focusId.'/viewpixel.gif',
             default    => throw new \InvalidArgumentException('Unknown Focus script scope: '.$scope),

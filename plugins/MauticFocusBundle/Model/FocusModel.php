@@ -137,13 +137,14 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * Without the tracking scope, the item shows without tracking and loads it once Mautic tracking is enabled on the page.
+     *
      * @param bool           $isPreview
      * @param FocusJsScope[] $acceptedScopes
      */
     public function generateJavascript(Focus $focus, $isPreview = false, array $acceptedScopes = [
         FocusJsScope::RUNTIME,
         FocusJsScope::DISPLAY,
-        FocusJsScope::TRACKING,
     ]): string
     {
         $runtimeEnabled  = in_array(FocusJsScope::RUNTIME, $acceptedScopes, true);

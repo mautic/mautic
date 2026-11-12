@@ -141,11 +141,3 @@ Mautic.leaveConfigPage = function(route, el) {
     Mautic.removeConfigUnsavedChangesGuard();
     mQuery(el).data('link').click();
 };
-
-Mautic.toggleFocusTrackingConsentSnippets = function(element) {
-    const $container = mQuery(element).closest('[data-focus-consent-snippets]'),
-        sharedConsent = element.checked;
-
-    $container.find('[data-focus-consent-snippet="independent"]').toggleClass('hide', sharedConsent);
-    $container.find('[data-focus-consent-snippet="shared"]').toggleClass('hide', !sharedConsent);
-};
