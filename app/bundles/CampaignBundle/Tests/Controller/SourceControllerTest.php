@@ -7,6 +7,7 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
+use Symfony\Component\DomCrawler\Crawler;
 
 final class SourceControllerTest extends MauticMysqlTestCase
 {
@@ -155,16 +156,17 @@ final class SourceControllerTest extends MauticMysqlTestCase
     {
         $segment = $this->createSegment('Page URL Segment', 'list-one');
 
-        $formData = [
-            'campaign_leadsource' => [
-                'sourceType' => 'lists',
-                'lists'      => [(string) $segment->getId()],
-            ],
-            'submit' => '1',
-        ];
+        $this->client->xmlHttpRequest('GET', self::NEW_LISTS_URL);
+        $responseData = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
+        $form         = $crawler->filterXPath('//form[@name="campaign_leadsource"]')->form();
+        $form->setValues([
+            'campaign_leadsource[sourceType]' => 'lists',
+            'campaign_leadsource[lists]'      => [(string) $segment->getId()],
+        ]);
 
         $this->setCsrfHeader();
-        $this->client->xmlHttpRequest('POST', self::NEW_LISTS_URL, $formData);
+        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
@@ -175,6 +177,7 @@ final class SourceControllerTest extends MauticMysqlTestCase
 
         $this->assertJsonResponseEquals('success', 1, $json);
         $this->assertArrayHasKey('modifiedSources', $json);
+        $this->assertStringContainsString('data-toggle="ajax-delete"', $json['sourceHtml']);
         $this->assertSame(
             ['lists' => [$segment->getId() => true]],
             $json['modifiedSources']
