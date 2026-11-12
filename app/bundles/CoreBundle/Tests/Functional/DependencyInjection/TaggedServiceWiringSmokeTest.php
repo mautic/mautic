@@ -29,10 +29,10 @@ final class TaggedServiceWiringSmokeTest extends AbstractContainerSmokeTestCase
     private const array EXPECTED_COLLECTED_SERVICE_COUNTS = [
         'mautic.email.stats.helper_container'         => 6,
         PreUpdateCheckHelper::class                   => 2,
-        IntegrationsHelper::class                     => 6,
+        IntegrationsHelper::class                     => 9,
         AuthIntegrationsHelper::class                 => 0,
         BuilderIntegrationsHelper::class              => 1,
-        ConfigIntegrationsHelper::class               => 6,
+        ConfigIntegrationsHelper::class               => 9,
         SyncIntegrationsHelper::class                 => 0,
         IntegrationsNotificationHandlerContainer::class => 2,
         SmsCallbackHandlerContainer::class            => 1,

@@ -3,6 +3,7 @@
 namespace Mautic\PluginBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\IntegrationsBundle\Integration\Interfaces\PushContactInterface;
 use Mautic\PluginBundle\Form\Type\CompanyFieldsType;
 use Mautic\PluginBundle\Form\Type\FieldsType;
 use Mautic\PluginBundle\Form\Type\IntegrationCampaignsType;
@@ -10,6 +11,7 @@ use Mautic\PluginBundle\Form\Type\IntegrationConfigType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -123,17 +125,29 @@ final class AjaxController extends CommonAjaxController
     /**
      * Get the HTML for integration properties.
      */
-    public function getIntegrationConfigAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
+    public function getIntegrationConfigAction(Request $request, IntegrationHelper $integrationHelper, FormFactoryInterface $formFactory): JsonResponse
     {
         $integration = $request->query->get('integration');
         $settings    = $request->query->all()['settings'] ?? [];
         $dataArray   = ['success' => 0];
 
         if (!empty($integration) && !empty($settings)) {
-            /** @var AbstractIntegration $object */
             $object = $integrationHelper->getIntegrationObject($integration);
 
-            if ($object) {
+            if (!$object) {
+                return $this->sendJsonResponse($dataArray);
+            }
+
+            if ($object instanceof PushContactInterface) {
+                // Rebuilds the integration's push settings, e.g. after a choice that changes which fields are shown
+                $config = $settings['config'] ?? [];
+                $form   = $formFactory->createNamed(
+                    'integration_config',
+                    $object->getPushContactConfigFormName(),
+                    is_array($config) ? $config : [],
+                    ['csrf_protection' => false]
+                );
+            } else {
                 $data           = $statusData           = [];
                 $objectSettings = $object->getIntegrationSettings();
                 $defaults       = $objectSettings->getFeatureSettings();
@@ -150,28 +164,28 @@ final class AjaxController extends CommonAjaxController
                     'csrf_protection' => false,
                     'campaigns'       => $data,
                 ]);
-
-                $html = $this->render('@MauticCore/Helper/blank_form.html.twig', [
-                    'form'      => $form->createView(),
-                    'function'  => 'widget',
-                    'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
-                    'variables' => [
-                        'integration' => $object,
-                    ],
-                ])->getContent();
-
-                $prefix   = str_replace('[integration]', '[config]', $settings['name']);
-                $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
-                if (str_ends_with($idPrefix, '_')) {
-                    $idPrefix = substr($idPrefix, 0, -1);
-                }
-
-                $html = preg_replace('/integration_config\[(.*?)\]/', $prefix.'[$1]', $html);
-                $html = str_replace('integration_config', $idPrefix, $html);
-
-                $dataArray['success'] = 1;
-                $dataArray['html']    = $html;
             }
+
+            $html = $this->render('@MauticCore/Helper/blank_form.html.twig', [
+                'form'      => $form->createView(),
+                'function'  => 'widget',
+                'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
+                'variables' => [
+                    'integration' => $object,
+                ],
+            ])->getContent();
+
+            $prefix   = str_replace('[integration]', '[config]', $settings['name']);
+            $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
+            if (str_ends_with($idPrefix, '_')) {
+                $idPrefix = substr($idPrefix, 0, -1);
+            }
+
+            $html = preg_replace('/integration_config\[(.*?)\]/', $prefix.'[$1]', $html);
+            $html = str_replace('integration_config', $idPrefix, $html);
+
+            $dataArray['success'] = 1;
+            $dataArray['html']    = $html;
         }
 
         return $this->sendJsonResponse($dataArray);

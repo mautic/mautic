@@ -2,6 +2,10 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Exception\PushContactException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\IntegrationsBundle\Integration\Interfaces\PushContactInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
@@ -25,6 +29,18 @@ trait PushToIntegrationTrait
         $this->integrationHelper = $integrationHelper;
     }
 
+    protected IntegrationsHelper $integrationsHelper;
+
+    /**
+     * Used by methodCalls to event subscribers.
+     */
+    #[Required]
+    public function autowirePushContactIntegrations(
+        IntegrationsHelper $integrationsHelper,
+    ): void {
+        $this->integrationsHelper = $integrationsHelper;
+    }
+
     protected function pushToIntegration(array $config, Lead $lead, array &$errors = []): bool
     {
         return $this->pushIt($config, $lead, $errors);
@@ -45,6 +61,14 @@ trait PushToIntegrationTrait
         $success  = true;
 
         foreach ($services as $service) {
+            if ($service instanceof PushContactInterface) {
+                if (!$this->pushContact($service, $lead, $config['config'] ?? [], $errors)) {
+                    $success = false;
+                }
+
+                continue;
+            }
+
             /** @var AbstractIntegration $service */
             $settings = $service->getIntegrationSettings();
             if (!$settings->isPublished()) {
@@ -72,5 +96,33 @@ trait PushToIntegrationTrait
         }
 
         return $success;
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     * @param string[]             $errors
+     */
+    private function pushContact(PushContactInterface $service, Lead $lead, array $config, array &$errors): bool
+    {
+        try {
+            // Loads the integration's configuration with its API keys decrypted
+            $integration = $this->integrationsHelper->getIntegration($service->getName());
+        } catch (IntegrationNotFoundException) {
+            return true;
+        }
+
+        if (!$integration instanceof PushContactInterface || !$integration->getIntegrationConfiguration()->isPublished()) {
+            return true;
+        }
+
+        try {
+            $integration->pushContact($lead, $config);
+        } catch (PushContactException $e) {
+            $errors[] = $e->getMessage();
+
+            return false;
+        }
+
+        return true;
     }
 }
