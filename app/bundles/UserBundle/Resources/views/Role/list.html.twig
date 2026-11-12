@@ -131,12 +131,18 @@
                     {{ item.getDescription()|purify }}
                 </td>
                 <td class="visible-md visible-lg">
-                    <a size="sm" class="label label-gray" href="{{ path('mautic_user_index',
-                        {'search' : (('mautic.user.user.searchcommand.role'|trans) ~ ':"' ~ item.getName() ~ '"')}) }}" data-toggle="ajax"{{ i.user_count == 0 ? 'disabled=disabled' : '' }}>
-                        {{ 'mautic.user.role.list.viewusers_count'|trans(
-                            {'%count%' : i.user_count}
-                        ) }}
-                    </a>
+                    {% include '@MauticCore/Helper/_tag.html.twig' with {
+                        tags: [{
+                            label: 'mautic.user.role.list.viewusers_count'|trans({'%count%': i.user_count}),
+                            color: 'gray',
+                            size: 'sm',
+                            attributes: {
+                                id: 'role-users-count-' ~ item.getId(),
+                                href: path('mautic_user_index', {'search': ('mautic.user.user.searchcommand.role'|trans) ~ ':"' ~ item.getName() ~ '"'}),
+                                'data-toggle': 'ajax'
+                            }|filter((v, k) => 0 != (i.user_count) or (k != 'href' and k != 'data-toggle'))
+                        }]
+                    } %}
                 </td>
                 <td class="visible-md visible-lg">
                     {{ item.getId() }}

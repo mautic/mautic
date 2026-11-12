@@ -2,9 +2,9 @@
 {% if extraMenu is not empty %}
     <!-- start: sidebar-header -->
     <div class="sidebar-header">
-        <a class="mautic-brand{{ extraMenu is empty ? '' : ' pull-left pl-0 pr-0' }}" href="#">
+        <a class="mautic-brand{{ extraMenu is empty ? '' : ' float-start ps-0 pe-0' }}" href="#">
             <div class="dropdown extra-menu">
-                <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                <a href="#" data-bs-toggle="dropdown" class="dropdown-toggle">
                     <i class="ri-arrow-down-s-line ri-lg"></i>
                 </a>
                 {{ extraMenu }}
