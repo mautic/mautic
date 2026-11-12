@@ -5,19 +5,25 @@
     - fields
 #}
 {{ form_start(form) }}
-    <div class="box-layout">
-        <ul class="nav nav-tabs nav-tabs-contained mt-12">
-            {% for g in groups %}
-                {% if fields[g] is not empty %}
-                    <li class="{% if loop.first %}active{% endif %}">
-                        <a href="#company-{{ g }}" class="nav-link steps{% if loop.first %} active{% endif %}" data-bs-toggle="tab">{{ ('mautic.lead.field.group.'~g)|trans }}</a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </div>
-    <div class="tab-content pa-16">
-        {{ include('@MauticLead/Company/form_fields.html.twig', {'form': form, 'groups': groups, 'fields': fields, 'embedded': true}) }}
-    </div>
-    </div>
+    {% set companyTabs = [] %}
+    {% for g in groups %}
+        {% if fields[g] is not empty %}
+            {% set groupContent %}
+                {{ include('@MauticLead/Company/_form_group_fields.html.twig', {
+                    'form': form,
+                    'group': g,
+                    'groupFields': fields[g],
+                    'halfSize': 6,
+                    'fullSize': 12,
+                    'embedded': true,
+                }) }}
+            {% endset %}
+            {% set companyTabs = companyTabs|merge([{
+                'id': 'company-' ~ g,
+                'label': 'mautic.lead.field.group.' ~ g,
+                'content': groupContent,
+            }]) %}
+        {% endif %}
+    {% endfor %}
+    {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': companyTabs, 'variant': 'contained'}) }}
 {{ form_end(form) }}
