@@ -161,7 +161,7 @@ class AppKernel extends Kernel
         if (!is_readable($searchPath)) {
             error_log(sprintf('Mautic plugin directory "%s" is not readable; skipping plugin discovery.', $searchPath));
         } else {
-            foreach (new \DirectoryIterator($searchPath) as $directory) {
+            foreach (new DirectoryIterator($searchPath) as $directory) {
                 if ($directory->isDir() && !$directory->isReadable()) {
                     error_log(sprintf('Mautic plugin directory "%s" is not readable; skipping it.', $directory->getPathname()));
                 }
@@ -174,7 +174,6 @@ class AppKernel extends Kernel
                 ->in($searchPath)
                 ->ignoreUnreadableDirs()
                 ->name('*Bundle.php');
-
         }
 
         foreach ($finder as $file) {
