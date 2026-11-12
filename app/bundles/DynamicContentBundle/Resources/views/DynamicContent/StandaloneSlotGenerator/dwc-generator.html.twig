@@ -126,10 +126,10 @@ attributes: {
         <p class="text-muted mb-24">{{ 'mautic.dynamiccontent.generator.deployment_instructions'|trans }}</p>
     </div>
     <div class="col-xs-12 col-md-4">
-        {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': generatorTabs, 'variant': 'vertical', 'part': 'nav'}) }}
+        <div class="tabs-container tabs-container--vertical">{{ include('@MauticCore/Components/tabs.html.twig', {'tabs': generatorTabs, 'variant': 'vertical', 'part': 'nav'}) }}</div>
         {{ include('@MauticDynamicContent/DynamicContent/StandaloneSlotGenerator/dwc-generator--help.html.twig') }}
     </div>
     <div class="col-xs-12 col-md-8">
-        {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': generatorTabs, 'variant': 'vertical', 'part': 'content', 'contentExtra': copyButton}) }}
+        <div class="tabs-container tabs-container--vertical">{{ include('@MauticCore/Components/tabs.html.twig', {'tabs': generatorTabs, 'variant': 'vertical', 'part': 'content', 'contentExtra': copyButton}) }}</div>
     </div>
 </div>
