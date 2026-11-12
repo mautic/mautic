@@ -18,7 +18,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<LeadDevice>
  */
-final class DeviceModel extends FormModel
+class DeviceModel extends FormModel
 {
     public static function getName(): string
     {

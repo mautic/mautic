@@ -8,7 +8,7 @@ use Doctrine\DBAL\ParameterType;
 /**
  * @extends CommonRepository<IpAddress>
  */
-final class IpAddressRepository extends CommonRepository
+class IpAddressRepository extends CommonRepository
 {
     /**
      * Count how many unique IP addresses is there.

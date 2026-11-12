@@ -25,7 +25,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonRepository<Lead>
  */
-final class LeadRepository extends CommonRepository implements CustomFieldRepositoryInterface
+class LeadRepository extends CommonRepository implements CustomFieldRepositoryInterface
 {
     use CustomFieldRepositoryTrait {
         prepareDbalFieldsForSave as defaultPrepareDbalFieldsForSave;
