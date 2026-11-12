@@ -16,8 +16,15 @@
     {{ form_start(form) }}
     <div class="box-layout">
 	<div class="col-xs-12 height-auto">
-		{% set hidePerms = form.isAdmin.vars.data %}
-		{% set detailsContent %}
+		<!-- tabs controls -->
+		<ul class="nav nav-tabs nav-tabs-contained">
+			<li class="active"><a href="#details-container" role="tab" data-bs-toggle="tab" class="active nav-link">{% trans %}mautic.core.details{% endtrans %}</a></li>
+			<li class="" id="permissions-tab"><a href="#permissions-container" role="tab" data-bs-toggle="tab" class="nav-link">{% trans %}mautic.user.role.permissions{% endtrans %}</a></li>
+		</ul>
+		<!--/ tabs controls -->
+
+		<div class="tab-content pa-16">
+			<div class="tab-pane fade show active bdr-w-0 height-auto" id="details-container">
 				<div class="row">
 					<div class="pa-16">
 						<div class="col-md-6">
@@ -35,65 +42,63 @@
 						</div>
 					</div>
 				</div>
-		{% endset %}
-		{% set permissionTabs = [] %}
-		{% set currentBundle = null %}
-		{% set currentContent = '' %}
-		{% for child in form.permissions.children %}
-			{% if 'newbundle' == child.vars.value %}
-				{% if currentBundle is not null %}
-					{% set permissionTabs = permissionTabs|merge([{
-						'id': currentBundle ~ 'PermissionTab',
-						'label': permissionsConfig['config'][currentBundle]['label'],
-						'labelSuffix': ' <span class="permission-ratio">(<span class="' ~ currentBundle ~ '_granted">' ~ permissionsConfig['config'][currentBundle]['ratio'][0] ~ '</span> / <span class="' ~ currentBundle ~ '_total">' ~ permissionsConfig['config'][currentBundle]['ratio'][1] ~ '</span>)</span>',
-						'content': '<div class="pt-16 pe-16 ps-16 pb-16">' ~ currentContent ~ '</div>',
-						'className': 'bdr-w-0'
-					}]) %}
-				{% endif %}
-				{% set currentBundle = child.vars.name %}
-				{% set currentContent = '' %}
-				{% do child.setRendered() %}
-			{% else %}
-				{% set currentContent = currentContent ~ form_row(child) %}
-			{% endif %}
-		{% endfor %}
-		{% if currentBundle is not null %}
-			{% set permissionTabs = permissionTabs|merge([{
-				'id': currentBundle ~ 'PermissionTab',
-				'label': permissionsConfig['config'][currentBundle]['label'],
-				'labelSuffix': ' <span class="permission-ratio">(<span class="' ~ currentBundle ~ '_granted">' ~ permissionsConfig['config'][currentBundle]['ratio'][0] ~ '</span> / <span class="' ~ currentBundle ~ '_total">' ~ permissionsConfig['config'][currentBundle]['ratio'][1] ~ '</span>)</span>',
-				'content': '<div class="pt-16 pe-16 ps-16 pb-16">' ~ currentContent ~ '</div>',
-				'className': 'bdr-w-0'
-			}]) %}
-		{% endif %}
-		{% do form.permissions.setRendered() %}
-		{% set permissionsContent %}
-			<div id="rolePermissions"{% if hidePerms %} class="hide"{% endif %}>
-				<div class="box-layout">
-					<div class="col-md-5 height-auto">
-						<div class="pe-24 ps-24 pt-16 pb-16">
-							{{ include('@MauticCore/Components/tabs.html.twig', {'tabs': permissionTabs, 'variant': 'vertical', 'part': 'nav'}) }}
+			</div>
+
+            {% set hidePerms = form.isAdmin.vars.data %}
+			<div class="tab-pane fade bdr-w-0" id="permissions-container">
+				<div id="rolePermissions"{% if hidePerms %}class="hide"{% endif %}>
+					<!-- start: box layout -->
+					<div class="box-layout">
+						<!-- step container -->
+						<div class="col-md-5 height-auto">
+							<div class="pe-24 ps-24 pt-16 pb-16">
+
+								<!-- Nav tabs -->
+								<ul class="list-group list-group-tabs" role="tablist">
+                                    {% for bundle, config in permissionsConfig['config'] %}
+										<li role="presentation" class="list-group-item {{ loop.index0 is same as(0) ? 'show active' : '' }}">
+											<a href="#{{ bundle }}PermissionTab" aria-controls="{{ bundle }}PermissionTab" role="tab" data-bs-toggle="tab" class="{{ loop.index0 is same as(0) ? 'active ' : '' }}nav-link list-group-item-heading steps">
+												<span>{{ config['label'] }}</span>
+												<span class="permission-ratio"> (<span class="{{ bundle }}_granted">{{ config['ratio'][0] }}</span> / <span class="{{ bundle }}_total">{{ config['ratio'][1] }}</span>)</span>
+											</a>
+										</li>
+									{% endfor %}
+								</ul>
+							</div>
+						</div>
+
+						<!-- container -->
+						<div class="col-md-7 height-auto bdr-l">
+							<div class="tab-content">
+								{% set permissions = form.permissions.children %}
+								{% for child in permissions %}
+									{% if 'newbundle' == child.vars.value %}
+										{% if loop.index0 > 0 %}
+											{# // Close tab panel #}
+											</div>{{ "\n" }}</div>{{ "\n" }}
+										{% endif %}
+										<div role="tabpanel" class="tab-pane fade{{ 0 is same as(loop.index0) ? ' show active' : '' }} bdr-w-0" id="{{ child.vars.name }}PermissionTab">{{ "\n" }}
+										<div class="pt-16 pe-16 ps-16 pb-16"> {{ "\n" }}
+										{% do child.setRendered() %}
+									{% else %}
+										{{ form_row(child) }}
+									{% endif %}
+								{% endfor %}
+									{# //close last tab  #}
+									</div>{{ "\n" }}
+								{% do form.permissions.setRendered() %}
+							</div>
 						</div>
 					</div>
-					<div class="col-md-7 height-auto bdr-l">
-						{{ include('@MauticCore/Components/tabs.html.twig', {'tabs': permissionTabs, 'variant': 'vertical', 'part': 'content'}) }}
+				</div>
+				<div id="isAdminMessage"{% if not hidePerms %} class="hide"{% endif %}>
+					<div class="alert alert-warning">
+						<h4>{% trans %}mautic.user.role.permission.isadmin.header{% endtrans %}</h4>
+						<p>{% trans %}mautic.user.role.permission.isadmin.message{% endtrans %}</p>
 					</div>
 				</div>
 			</div>
-			<div id="isAdminMessage"{% if not hidePerms %} class="hide"{% endif %}>
-				<div class="alert alert-warning">
-					<h4>{% trans %}mautic.user.role.permission.isadmin.header{% endtrans %}</h4>
-					<p>{% trans %}mautic.user.role.permission.isadmin.message{% endtrans %}</p>
-				</div>
-			</div>
-		{% endset %}
-		{{ include('@MauticCore/Components/tabs.html.twig', {
-			'variant': 'contained',
-			'tabs': [
-				{'id': 'details-container', 'label': 'mautic.core.details', 'content': detailsContent, 'className': 'pa-16'},
-				{'id': 'permissions-container', 'label': 'mautic.user.role.permissions', 'content': permissionsContent, 'className': 'pa-16', 'itemAttributes': {'id': 'permissions-tab'}}
-			]
-		}) }}
+		</div>
 	</div>
 </div>
     {{ form_end(form) }}

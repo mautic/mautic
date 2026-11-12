@@ -47,12 +47,9 @@
 {% set iconOnlyLarge = iconSize is defined and iconSize == 'lg' %}
 {% set isDismissable = isDismissable|default(false) %}
 
-{% set part = part|default('both') %}
-{% if part == 'both' %}<div class="tabs-container{% if variant == 'vertical' %} tabs-container--vertical{% endif %}">{% endif %}
-{% if part != 'content' %}
-    <ul{% for attrName, attrValue in navAttributes|default({}) %} {{ attrName }}="{{ attrValue }}"{% endfor %} class="nav nav-tabs{% if navClass is defined and navClass %} {{ navClass }}{% endif %}{% if variant == 'line' %} nav-tabs--default{% elseif variant == 'contained' %} nav-tabs--contained{% elseif variant == 'iconOnly' %} nav-tabs--default nav-tabs--icon-only{% elseif variant == 'vertical' %} nav-tabs--vertical nav-tabs--contained{% endif %}"
+<div class="tabs-container{% if variant == 'vertical' %} tabs-container--vertical{% endif %}">
+    <ul class="nav nav-tabs{% if variant == 'line' %} nav-tabs--default{% elseif variant == 'contained' %} nav-tabs--contained{% elseif variant == 'iconOnly' %} nav-tabs--default nav-tabs--icon-only{% elseif variant == 'vertical' %} nav-tabs--vertical nav-tabs--contained{% endif %}"
         role="tablist">
-        {{ navPrefix|default('')|raw }}
         {% for tab in tabs %}
             {%- set tabLabel = tab.label|default(tab.title|default('')) -%}
             {%- set tabId = tab.id|default(_self.generateTabId(tabLabel)) -%}
@@ -63,7 +60,7 @@
             <li class="nav-item{% if isDisabled %} disabled{% endif %}{% if tab.itemClass is defined and tab.itemClass %} {{ tab.itemClass }}{% endif %}"
                 role="presentation"
                 {%- for attrName, attrValue in tab.itemAttributes|default({}) %} {{ attrName }}="{{ attrValue }}"{% endfor %}
-                {% if variant == 'iconOnly' %}title="{{ tabLabel|trans(tab.labelParameters|default({})) }}"{% endif %}>
+                {% if variant == 'iconOnly' %}title="{{ tabLabel|trans }}"{% endif %}>
                 <button type="button"
                         class="nav-link{% if isActive %} active{% endif %}{% if variant == 'iconOnly' %} tabs__nav-item tabs__nav-item--icon-only{% if iconOnlyLarge %} tabs__nav-item--icon-only__20{% endif %}{% elseif variant == 'vertical' %} tabs__nav-item tabs__nav-item--vertical{% if iconOnlyLarge %} tabs__nav-item--icon-only__20{% endif %}{% else %} tabs__nav-item{% endif %}{% if isDisabled %} disabled{% endif %}{% if hasError %} text-danger{% endif %}"
                         id="{{ tab.attributes.id|default(tabId ~ '-tab') }}"
@@ -72,7 +69,7 @@
                         {%- for attrName, attrValue in tab.attributes|default({}) %}{% if attrName != 'id' %} {{ attrName }}="{{ attrValue }}"{% endif %}{% endfor %}
                         role="tab"
                         aria-controls="{{ tabId }}"
-                        {% if variant == 'iconOnly' %}aria-label="{{ tabLabel|trans(tab.labelParameters|default({})) }}"{% endif %}
+                        {% if variant == 'iconOnly' %}aria-label="{{ tabLabel|trans }}"{% endif %}
                         aria-selected="{{ isActive ? 'true' : 'false' }}"
                         {% if isDisabled %}disabled tabindex="-1"{% endif %}>
                     {% if variant == 'iconOnly' %}
@@ -85,7 +82,7 @@
                         </div>
                     {% elseif variant == 'vertical' %}
                         <div class="tabs__nav-item-label-wrapper justify-content-between">
-                            <span class="tabs__nav-item-label">{{ tabLabel|trans(tab.labelParameters|default({})) }}{{ tab.labelSuffix|default('')|raw }}</span>
+                            <span class="tabs__nav-item-label">{{ tabLabel|trans }}</span>
                             {{ _self.iconContent(tab, variant, false) }}
                         </div>
                         {{ _self.secondaryLabel(tab) }}
@@ -97,7 +94,7 @@
                                 {% else %}
                                     {{ _self.iconContent(tab, variant, isDismissable) }}
                                 {% endif %}
-                                <span class="tabs__nav-item-label">{{ tabLabel|trans(tab.labelParameters|default({})) }}</span>
+                                <span class="tabs__nav-item-label">{{ tabLabel|trans }}</span>
                             {% else %}
                                 {% if variant == 'line' %}
                                     {% if tab.renderTag is defined and tab.renderTag %}
@@ -105,9 +102,9 @@
                                     {% else %}
                                         {{ _self.iconContent(tab, variant, isDismissable) }}
                                     {% endif %}
-                                    <span class="tabs__nav-item-label">{{ tabLabel|trans(tab.labelParameters|default({})) }}</span>
+                                    <span class="tabs__nav-item-label">{{ tabLabel|trans }}</span>
                                 {% else %}
-                                    <span class="tabs__nav-item-label">{{ tabLabel|trans(tab.labelParameters|default({})) }}</span>
+                                    <span class="tabs__nav-item-label">{{ tabLabel|trans }}</span>
                                     {% if tab.renderTag is defined and tab.renderTag %}
                                         {{ _self.tagContent(tab, variant, isDismissable) }}
                                     {% else %}
@@ -123,19 +120,14 @@
                 </button>
             </li>
         {% endfor %}
-        {{ navExtra|default('')|raw }}
     </ul>
-{% endif %}
 
-{% if part != 'nav' %}
-    <div{% for attrName, attrValue in contentAttributes|default({}) %} {{ attrName }}="{{ attrValue }}"{% endfor %} class="tab-content{% if variant == 'contained' %} tab-content--contained{% elseif variant == 'vertical' %} tab-content--contained tab-content--vertical{% endif %}">
+    <div class="tab-content{% if variant == 'contained' %} tab-content--contained{% elseif variant == 'vertical' %} tab-content--contained tab-content--vertical{% endif %}">
         {% for tab in tabs %}
             {%- set tabLabel = tab.label|default(tab.title|default('')) -%}
             {%- set tabId = tab.id|default(_self.generateTabId(tabLabel)) -%}
             {%- set isActive = loop.index0 == selectedIndex -%}
             {{ _self.tabContent(tab, tabId, isActive, variant, layer) }}
         {% endfor %}
-        {{ contentExtra|default('')|raw }}
     </div>
-{% endif %}
-{% if part == 'both' %}</div>{% endif %}
+</div>
