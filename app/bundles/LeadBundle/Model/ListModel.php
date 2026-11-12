@@ -1467,10 +1467,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
         return $leadCounts;
     }
 
-    public function getActiveSegmentContactCount(int $segmentId): int
+    public function getActiveSegmentContactCount(int $segmentId, ?int $totalCount = null): int
     {
-        $total = $this->getRepository()->getLeadCount($segmentId);
-        $dnc   = $this->doNotContactRepository->getCount(null, null, null, $segmentId);
+        $total = $totalCount ?? $this->getRepository()->getLeadCount($segmentId);
+        $dnc   = $this->doNotContactRepository->getCount('email', null, null, $segmentId);
 
         return max(0, $total - $dnc);
     }

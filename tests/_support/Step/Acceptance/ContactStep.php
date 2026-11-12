@@ -131,7 +131,9 @@ final class ContactStep extends \AcceptanceTester
     public function selectOptionFromDropDownContactsPage(int|string $option): void
     {
         $I = $this;
-        $I->click("//*[@id='page-list-actions']");
+        $pageListActions = "//*[@id='page-list-actions']";
+        $I->waitForElementVisible($pageListActions, self::TIMEOUT);
+        $I->click($pageListActions);
 
         if (is_string($option) && !ctype_digit($option)) {
             $I->click("//button[@id='page-list-actions']/following-sibling::ul/li/a[contains(normalize-space(), \"{$option}\")]");

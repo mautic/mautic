@@ -68,7 +68,8 @@ class EventLogger
     {
         $log = new LeadEventLog();
 
-        if (!defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED')) {
+        // No IP for a form submitter Mautic doesn't track
+        if (!defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') && !$this->ipLookupHelper->isVisitorUntracked()) {
             $log->setIpAddress($this->ipLookupHelper->getIpAddress());
         }
 
@@ -80,7 +81,9 @@ class EventLogger
         }
         $log->setLead($contact);
 
-        if ($isInactiveEvent) {
+        if (Event::TYPE_CONDITION === $event->getEventType()) {
+            $log->setNonActionPathTaken(null);
+        } elseif ($isInactiveEvent) {
             $log->setNonActionPathTaken(true);
         }
 
@@ -182,6 +185,14 @@ class EventLogger
             $log->setIsScheduled(false);
             $log->setDateTriggered(new \DateTime());
             ChannelExtractor::setChannel($log, $event, $config);
+
+            if (!$isInactiveEntry) {
+                if (Event::TYPE_CONDITION === $event->getEventType()) {
+                    $log->setNonActionPathTaken(null);
+                } else {
+                    $log->setNonActionPathTaken(false);
+                }
+            }
 
             if ($isDecision) {
                 // Do not pre-persist decision logs as they must be evaluated first
