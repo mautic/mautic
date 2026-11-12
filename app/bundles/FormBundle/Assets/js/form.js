@@ -249,6 +249,7 @@ Mautic.formFieldOnLoad = function (container, response) {
         });
 
         //initialize tooltips
+        window.MauticBootstrapCompatibility?.mirrorLegacyMarkup(fieldContainer[0]);
         mQuery(fieldContainer).find("*[data-bs-toggle='tooltip'], *[data-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true}));
 
         //initialize ajax'd modals
@@ -320,6 +321,7 @@ Mautic.formActionOnLoad = function (container, response) {
             return Mautic.ajaxifyLink(this, event);
         });
         //initialize tooltips
+        window.MauticBootstrapCompatibility?.mirrorLegacyMarkup(mQuery(actionId)[0]);
         mQuery(actionId).find("*[data-bs-toggle='tooltip'], *[data-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true}));
 
         //initialize ajax'd modals
