@@ -164,11 +164,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     /**
      * Workaround for incorrectly spelled $isUniqueIdentifer.
-     *
-     * @var bool
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
-    private $isUniqueIdentifier = false;
+    private ?bool $isUniqueIdentifier = false;
 
     #[Groups(['leadfield:read', 'leadfield:write'])]
     #[ORM\Column(name: 'char_length_limit', type: 'integer', nullable: true)]
