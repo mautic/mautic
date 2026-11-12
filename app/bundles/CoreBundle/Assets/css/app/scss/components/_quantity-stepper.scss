@@ -21,10 +21,10 @@
 }
 
 .quantity-stepper--sm {
-    --quantity-stepper-height: 32px;
-    --quantity-stepper-button: 24px;
-    --quantity-stepper-value: 24px;
-    --quantity-stepper-padding: 4px;
+    --quantity-stepper-height: 28px;
+    --quantity-stepper-button: 20px;
+    --quantity-stepper-value: 20px;
+    --quantity-stepper-padding: 3px;
     --quantity-stepper-font-size: 12px;
 
     gap: 2px;
@@ -51,6 +51,8 @@
     background: transparent;
     color: var(--bs-secondary-color);
     font-size: calc(var(--quantity-stepper-font-size) + 1px);
+    outline: 2px solid transparent;
+    outline-offset: -2px;
     touch-action: manipulation;
     transition: background-color 0.15s, transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -64,7 +66,16 @@
 }
 
 .quantity-stepper__button:focus-visible {
-    outline: 1px solid var(--bs-body-color);
+    outline-color: var(--focus);
+}
+
+.quantity-stepper {
+    outline: 2px solid transparent;
+    outline-offset: -2px;
+}
+
+.quantity-stepper:has(.quantity-stepper__value:focus-visible) {
+    outline-color: var(--focus);
 }
 
 .quantity-stepper__button:disabled,
@@ -121,9 +132,7 @@
 
 .quantity-stepper__value:focus {
     color: inherit;
-    outline: 1px solid var(--bs-body-color);
-    outline-offset: -1px;
-    border-radius: var(--bs-border-radius-sm);
+    outline: 0;
 }
 
 .quantity-stepper__display {
