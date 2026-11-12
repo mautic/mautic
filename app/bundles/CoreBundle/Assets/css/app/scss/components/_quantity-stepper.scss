@@ -11,13 +11,8 @@
     height: var(--quantity-stepper-height);
     padding: 0 var(--quantity-stepper-padding);
     border-radius: var(--bs-border-radius-pill);
-    background-color: var(--bs-body-bg);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.04);
+    background-color: var(--field);
     user-select: none;
-}
-
-[data-bs-theme='dark'] .quantity-stepper {
-    box-shadow: 0 0 0 1px var(--bs-border-color);
 }
 
 .quantity-stepper--sm {
@@ -58,7 +53,7 @@
 }
 
 .quantity-stepper__button:not(:disabled):hover {
-    background-color: var(--bs-tertiary-bg);
+    background-color: var(--field-hover);
 }
 
 .quantity-stepper__button:not(:disabled):active {
