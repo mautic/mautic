@@ -197,18 +197,18 @@
               {{ customContent('details.stats.graph.below', _context) }}
 
               {% set tabsviewsdetails = [] %}
+              {% if showVariants %}
               {% set tabsviewsdetailsContent0 %}
                                 {{ variantContent|raw }}
                             
               {% endset %}
-              {% if showVariants %}
               {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'variants-container', 'label': 'mautic.core.variants', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
               {% endif %}
+              {% if showTranslations %}
               {% set tabsviewsdetailsContent1 %}
                                 {{ translationContent|raw }}
                             
               {% endset %}
-              {% if showTranslations %}
               {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'translation-container', 'label': 'mautic.core.translations', 'content': tabsviewsdetailsContent1, 'className': 'pa-16' ~ " " ~ (not showVariants ? 'active' : ''), 'itemClass': (not showVariants ? 'active' : '')}]) %}
               {% endif %}
               {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}
