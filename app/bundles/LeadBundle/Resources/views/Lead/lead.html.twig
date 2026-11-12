@@ -330,12 +330,12 @@
             ]) %}
 
             <div class="mt-12">
-                {{ include('@MauticCore/Components/tabs.html.twig', {
-                    'tabs': leadTabs,
-                    'variant': 'contained',
-                    'navAppend': customContent('tabs', _context),
-                    'contentAppend': customContent('tabs.content', _context),
-                }) }}
+                {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': leadTabs, 'variant': 'contained'}) }}
+                {% set customTabs = customContent('tabs', _context)|trim %}
+                {% if customTabs is not empty %}
+                    <ul class="nav nav-tabs nav-tabs--contained">{{ customTabs|raw }}</ul>
+                {% endif %}
+                <div class="tab-content">{{ customContent('tabs.content', _context) }}</div>
             </div>
         </div>
 
