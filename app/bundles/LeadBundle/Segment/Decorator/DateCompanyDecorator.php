@@ -58,16 +58,10 @@ final readonly class DateCompanyDecorator implements FilterDecoratorInterface
 
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
-        if (ContactSegmentFilterCrate::COMPANY_OBJECT === $contactSegmentFilterCrate->getObject()
-            && ContactSegmentFilterCrate::LEGACY_COMPANY_FILTER_SCOPE_VALUE === ($contactSegmentFilterCrate->getArray()[ContactSegmentFilterCrate::LEGACY_COMPANY_FILTER_SCOPE] ?? null)
-        ) {
-            return ComplexRelationValueFilterQueryBuilder::getServiceId();
-        }
-
         return match ($contactSegmentFilterCrate->getObject()) {
-            ContactSegmentFilterCrate::COMPANY_ALL_OBJECT => AnyCompanyRelationValueFilterQueryBuilder::getServiceId(),
-            ContactSegmentFilterCrate::COMPANY_OBJECT     => PrimaryCompanyRelationValueFilterQueryBuilder::getServiceId(),
-            default                                       => ComplexRelationValueFilterQueryBuilder::getServiceId(),
+            ContactSegmentFilterCrate::COMPANY_OBJECT         => AnyCompanyRelationValueFilterQueryBuilder::getServiceId(),
+            ContactSegmentFilterCrate::COMPANY_PRIMARY_OBJECT => PrimaryCompanyRelationValueFilterQueryBuilder::getServiceId(),
+            default                                           => ComplexRelationValueFilterQueryBuilder::getServiceId(),
         };
     }
 

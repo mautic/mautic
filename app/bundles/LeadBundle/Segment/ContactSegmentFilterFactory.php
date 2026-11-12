@@ -116,7 +116,6 @@ final class ContactSegmentFilterFactory
                 $filter['field'],
                 $filter['glue'],
                 $filter['operator'],
-                $filter[ContactSegmentFilterCrate::LEGACY_COMPANY_FILTER_SCOPE] ?? '',
             ]);
 
             if ('or' === strtolower($filter['glue']) && '=' === $filter['operator']) {

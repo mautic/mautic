@@ -120,9 +120,9 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             $event->addChoice($field->getObject(), $field->getAlias(), $choiceConfig);
 
             if (ContactSegmentFilterCrate::COMPANY_OBJECT === $field->getObject() && (null === $event->getRequest() || $event->isForSegmentation())) {
-                $companyAllConfig           = $choiceConfig;
-                $companyAllConfig['object'] = ContactSegmentFilterCrate::COMPANY_ALL_OBJECT;
-                $event->addChoice(ContactSegmentFilterCrate::COMPANY_ALL_OBJECT, $field->getAlias(), $companyAllConfig);
+                $companyPrimaryConfig           = $choiceConfig;
+                $companyPrimaryConfig['object'] = ContactSegmentFilterCrate::COMPANY_PRIMARY_OBJECT;
+                $event->addChoice(ContactSegmentFilterCrate::COMPANY_PRIMARY_OBJECT, $field->getAlias(), $companyPrimaryConfig);
             }
         });
     }

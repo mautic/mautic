@@ -106,7 +106,7 @@ final class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(6, $contactSegmentFilters);
     }
 
-    public function testLegacyAndNewCompanyFiltersAreNotGroupedTogether(): void
+    public function testAssociatedAndPrimaryCompanyFiltersAreNotGroupedTogether(): void
     {
         $tableSchemaColumnsCache = $this->createStub(TableSchemaColumnsCache::class);
         $container               = $this->createMock(Container::class);
@@ -130,7 +130,7 @@ final class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
         $leadList->setFilters([
             [
                 'glue'     => 'or',
-                'object'   => 'company',
+                'object'   => 'company_primary',
                 'field'    => 'companycountry',
                 'operator' => '=',
                 'filter'   => 'Germany',
@@ -141,7 +141,6 @@ final class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
                 'field'    => 'companycountry',
                 'operator' => '=',
                 'filter'   => 'France',
-                ContactSegmentFilterCrate::LEGACY_COMPANY_FILTER_SCOPE => ContactSegmentFilterCrate::LEGACY_COMPANY_FILTER_SCOPE_VALUE,
             ],
         ]);
 
