@@ -127,6 +127,12 @@ async function main() {
       `<p style="content:&quot;Hello&NewLine;world&quot;;">x</p>`,
     ],
     [
+      'AMP_DOUBLE_ENCODED_WITH_QUOTES',
+      `<p style="font-family:&quot;Segoe UI&quot;;content:'R&amp;amp;D';">x</p>`,
+      `<p style="font-family:'Segoe UI';content:'R&amp;amp;D';">x</p>`,
+    ],
+
+    [
       'ENCODED_BACKSLASH',
       `<p style="content:&quot;Hello&#92;&quot;world&quot;;">x</p>`,
       `<p style="content:&quot;Hello&#92;&quot;world&quot;;">x</p>`,

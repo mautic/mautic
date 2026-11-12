@@ -11,7 +11,7 @@ export default function normalizeInlineStyleEntities(mjml) {
     // Other references can hide CSS syntax. Leave those and comments untouched.
     if (
       !/&quot;/i.test(value) ||
-      /&(?!quot;|apos;|#0*(?:34|39);|#x0*(?:22|27);)/i.test(value) ||
+      /&(?!quot;|apos;|#0*(?:34|39);|amp;|#x0*(?:22|27);)/i.test(value) ||
       value.includes('/*')
     ) {
       return value;
