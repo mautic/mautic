@@ -372,11 +372,11 @@ Mautic.lazyLoadEventStatsOnCampaignDetail = function()  {
             mQuery('#conditions-container').remove();
         }
 
-        mQuery('ul#campaign_nav_header_ul li').removeClass('active');
-        mQuery('ul#campaign_nav_header_ul li').eq(0).addClass('active');
+        mQuery('ul#campaign_nav_header_ul .nav-link').removeClass('active').attr('aria-selected', 'false');
+        mQuery('ul#campaign_nav_header_ul .nav-link').eq(0).addClass('active').attr('aria-selected', 'true');
 
-        mQuery('div#campaign-tab-content .tab-pane').removeClass('active in');
-        mQuery('div#campaign-tab-content .tab-pane').eq(0).addClass('active in');
+        mQuery('div#campaign-tab-content .tab-pane').removeClass('show active');
+        mQuery('div#campaign-tab-content .tab-pane').eq(0).addClass('show active');
 
     });
 }
