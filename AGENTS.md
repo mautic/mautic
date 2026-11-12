@@ -92,6 +92,15 @@ MauticExampleBundle/
 - **Unit tests**: Extend `PHPUnit\Framework\TestCase`
 - **Functional tests**: Extend `Mautic\CoreBundle\Test\MauticMysqlTestCase` (provides `$this->em`, `$this->client`, database access)
 
+### Test Rules
+- Never write tests that read source files by path (readFileSync, vm.runInNewContext) to reach internals. They pin file layout, not behavior.
+- Never write tests that stub a library or helper and assert its exact call arguments, call order, or hard-coded style values (colours, coordinates, tick arrays). Assert the observable result through the public entry point.
+- Never add globals or exports only so a test can reach a helper.
+
+## Design System
+
+Before building or changing any UI, read `DESIGN.md` in the repository root.
+
 ## Coding Standards
 
 - **PHP 8.2+** with strict types, PSR-12/Symfony style

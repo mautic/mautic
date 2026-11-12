@@ -245,7 +245,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 $entityToNotDetach = [Integration::class, Plugin::class];
                 $loadedEntities    = $this->em->getUnitOfWork()->getIdentityMap();
                 foreach ($loadedEntities as $name => $loadedEntitySet) {
-                    if (!in_array($name, $entityToNotDetach, true)) {
+                    if (in_array($name, $entityToNotDetach, true)) {
                         continue;
                     }
 

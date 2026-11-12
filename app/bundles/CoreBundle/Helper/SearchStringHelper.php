@@ -226,6 +226,13 @@ final class SearchStringHelper
 
             // remove operators and empty values
             if (in_array($string, ['', 'OR', 'AND'])) {
+                if ($setUpNext) {
+                    // keep the current filter so the next term has a filter to write to
+                    $string = '';
+
+                    return;
+                }
+
                 unset($filters->{$baseName}[$keyCount]);
 
                 return;
