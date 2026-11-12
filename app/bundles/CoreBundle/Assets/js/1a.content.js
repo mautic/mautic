@@ -2607,6 +2607,7 @@ Mautic.resetFilters = function () {
     let currentSearchValue = searchInput.value || '';
     currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
     searchInput.value = currentSearchValue.trim();
+    searchInput.dispatchEvent(new Event('input', { bubbles: true }));
     searchInput.dataset.filters = JSON.stringify([]);
 
     const scopeSelect = document.querySelector("select[data-livesearch-scope-for='list-search']");
@@ -2618,9 +2619,6 @@ Mautic.resetFilters = function () {
         if (typeof mQuery !== 'undefined') {
             Mautic.refreshSearchScopeChosen(scopeSelect);
         }
-    }
-
-    if (typeof mQuery !== 'undefined') {
     }
 
     const activeFilters = document.querySelectorAll('.label.active');
@@ -2790,7 +2788,10 @@ document.addEventListener('input', (event) => {
     if (!field.matches || !field.matches('.form-field-with-action input')) return;
 
     const clear = field.closest('.form-field-with-action').querySelector('.form-field-clear');
-    if (clear) clear.hidden = field.value === '';
+    if (!clear) return;
+
+    const scopeSelect = field.id ? document.querySelector("select[data-livesearch-scope-for='" + field.id + "']") : null;
+    clear.hidden = field.value === '' && !(scopeSelect && scopeSelect.value);
 });
 
 document.addEventListener('click', (event) => {
