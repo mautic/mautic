@@ -17,98 +17,14 @@
                         <h4 class="fw-sb">{{ ('mautic.lead.field.group.'~group)|trans }}</h4>
                     </div>
                 {% endif %}
-                <div class="pa-16">
-                    {% if 'core' == group %}
-                        <div class="form-group mb-0">
-                            <div class="row">
-                                {% if form.companyname is defined %}
-                                    <div class="col-sm-{{ halfSize }}">{{ form_row(form.companyname) }}</div>
-                                {% endif %}
-                                {% if form.companyemail is defined %}
-                                    <div class="col-sm-{{ halfSize }}">{{ form_row(form.companyemail) }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <hr class="mnr-md mnl-md">
-                        {% if
-                              form.companyaddress1 is defined or
-                              form.companyaddress2 is defined or
-                              form.companycity is defined or
-                              form.companystate is defined or
-                              form.companyzipcode is defined or
-                              form.companycountry is defined
-                         %}
-                            <div class="form-group mb-0">
-                                <label class="form-label mb-5">{{ 'mautic.company.field.address'|trans }}</label>
-                                {% if form.companyaddress1 is defined %}
-                                    <div class="row mb-5">
-                                        <div class="col-sm-{{ fullSize }}">
-                                            {{ form_widget(form.companyaddress1, {'attr': {'placeholder': form.companyaddress1.vars.label}}) }}
-                                        </div>
-                                    </div>
-                                {% endif %}
-                                {% if form.companyaddress2 is defined %}
-                                    <div class="row mb-5">
-                                        <div class="col-sm-{{ fullSize }}">
-                                            {{ form_widget(form.companyaddress2, {'attr': {'placeholder': form.companyaddress2.vars.label}}) }}
-                                        </div>
-                                    </div>
-                                {% endif %}
-                                <div class="row mb-5">
-                                    {% if form.companycity is defined %}
-                                        <div class="col-sm-{{ halfSize }}">
-                                            {{ form_widget(form.companycity, {'attr': {'placeholder': form.companycity.vars.label}}) }}
-                                        </div>
-                                    {% endif %}
-                                    {% if form.companystate is defined %}
-                                        <div class="col-sm-{{ halfSize }}">
-                                            {{ form_widget(form.companystate, {'attr': {'placeholder': form.companystate.vars.label}}) }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="row mb-16">
-                                    {% if form.companyzipcode is defined %}
-                                        <div class="col-sm-{{ halfSize }}">
-                                            {{ form_widget(form.companyzipcode, {'attr': {'placeholder': form.companyzipcode.vars.label}}) }}
-                                        </div>
-                                    {% endif %}
-                                    {% if form.companycountry is defined %}
-                                        <div class="col-sm-{{ halfSize }}">
-                                            {{ form_widget(form.companycountry, {'attr': {'placeholder': form.companycountry.vars.label}}) }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="row">
-                                    <div  class="col-sm-{{ halfSize }}">
-                                        {{ form_row(form.score) }}
-                                    </div>
-                                    <div  class="col-sm-{{ halfSize }}">
-                                        {{ form_row(form.owner) }}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div  class="col-sm-{{ halfSize }}">
-                                        {{ form_row(form.projects) }}
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        <hr class="mnr-md mnl-md">
-                    {% endif %}
-                    <div class="form-group mb-0">
-                        <div class="row">
-                            {% for alias, field in groupFields %}
-                                {% if not form[alias].isRendered %}
-                                  <div class="col-sm-{{ fullSize }}">{{ form_row(form[alias]) }}</div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% if embedded is defined and not form['owner'].isRendered %}
-                        <hr class="mnr-md mnl-md">
-                        <div>{{ form_row(form.owner) }}</div>
-                    {% endif %}
-                </div>
+                {{ include('@MauticLead/Company/_form_group_fields.html.twig', {
+                    'form': form,
+                    'group': group,
+                    'groupFields': groupFields,
+                    'halfSize': halfSize,
+                    'fullSize': fullSize,
+                    'embedded': embedded is defined,
+                }) }}
             </div>
         {% endif %}
     {% endif %}
