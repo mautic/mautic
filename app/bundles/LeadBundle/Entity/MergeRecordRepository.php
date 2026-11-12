@@ -10,6 +10,18 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class MergeRecordRepository extends CommonRepository
 {
     /**
+     * @template T
+     *
+     * @param callable(): T $callback
+     *
+     * @return T
+     */
+    public function wrapInTransaction(callable $callback): mixed
+    {
+        return $this->getEntityManager()->wrapInTransaction($callback);
+    }
+
+    /**
      * @return Lead|null
      */
     public function findMergedContact($id)
