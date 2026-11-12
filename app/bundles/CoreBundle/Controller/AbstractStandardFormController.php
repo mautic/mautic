@@ -354,9 +354,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     {
         $isClone = false;
         $model   = $this->getFormModel();
-        if (!$model instanceof FormModel) {
-            throw new \Exception($model::class.' must extend '.FormModel::class);
-        }
 
         $entity = $this->getFormEntity('edit', $objectId, $isClone);
 
@@ -945,9 +942,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
         }
 
         $model = $this->getFormModel();
-        if (!$model instanceof FormModel) {
-            throw new \Exception($model::class.' must extend '.FormModel::class);
-        }
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
