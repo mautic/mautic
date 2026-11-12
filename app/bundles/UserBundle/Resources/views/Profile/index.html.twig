@@ -7,7 +7,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-12 height-auto">
+        <div class="col-md-3 height-auto">
             {% if me.getId() %}
             <div class="media">
                 <div class="float-start">
@@ -22,7 +22,6 @@
             <hr />
             {% endif %}
         </div>
-    </div>
 {% set profileContent %}
     {{ form_start(userForm) }}
     <div class="row pa-16 bdr-b">
@@ -245,9 +244,8 @@
     {'id': 'appearance', 'label': 'mautic.user.account.appearance', 'content': appearanceContent, 'className': 'rounded-0'},
     {'id': 'accessibility', 'label': 'mautic.user.account.accessibility', 'content': accessibilityContent, 'className': 'rounded-0'}
 ]) %}
-    <div class="row">
-        <div class="col-md-12 height-auto">
-            {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': profileTabs, 'variant': 'vertical'}) }}
+        <div class="col-md-9 height-auto">
+            {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': profileTabs, 'variant': 'line'}) }}
         </div>
     </div>
 </div>
