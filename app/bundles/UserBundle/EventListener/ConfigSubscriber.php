@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigSubscriber implements EventSubscriberInterface
 {
-    public const PRESERVED_OIDC_FIELDS = [
+    private const PRESERVED_OIDC_FIELDS = [
         'open_id_registered_user_role',
         'open_id_client_url',
         'open_id_client_id',

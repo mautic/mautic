@@ -37,20 +37,6 @@ final class ConfigSubscriberTest extends TestCase
         $this->subscriber = new ConfigSubscriber($clientFactory, $translator, $logger, $subjectIdRepository);
     }
 
-    private function expectPreservedFields(): void
-    {
-        $matcher = $this->exactly(2);
-        $this->configEvent->expects($matcher)
-            ->method('unsetIfEmpty')
-            ->willReturnCallback(function (array|string $fields) use ($matcher): void {
-                if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(ConfigSubscriber::PRESERVED_OIDC_FIELDS, $fields);
-                } else {
-                    $this->assertSame('saml_idp_own_password', $fields);
-                }
-            });
-    }
-
     /**
      * Setup config mock to disable OIDC validation and return the provided userconfig data.
      *
@@ -58,8 +44,6 @@ final class ConfigSubscriberTest extends TestCase
      */
     private function setupConfigMockWithOidcDisabled(array $userConfigData): void
     {
-        $this->expectPreservedFields();
-
         $this->configEvent->expects($this->exactly(2))
             ->method('getConfig')
             ->willReturnCallback(function ($bundle = null) use ($userConfigData): array {
@@ -71,27 +55,26 @@ final class ConfigSubscriberTest extends TestCase
             });
     }
 
-    public function testOwnPasswordIsNotWipedOutOnConfigSaveIfEmpty(): void
+    public function testEmptyPasswordAndOidcProviderFieldsArePreservedOnConfigSave(): void
     {
-        $this->expectPreservedFields();
+        $event = new ConfigEvent(['userconfig' => ['open_id_is_enabled' => 0]], new ParameterBag());
 
-        $this->configEvent->expects($this->exactly(2))
-            ->method('getConfig')
-            ->willReturnCallback(function ($bundle = null): array {
-                if (null === $bundle) {
-                    return ['userconfig' => ['open_id_is_enabled' => 0]];
-                }
+        $this->subscriber->onConfigSave($event);
 
-                return [];
-            });
-
-        $this->subscriber->onConfigSave($this->configEvent);
+        $this->assertEqualsCanonicalizing(
+            [
+                'open_id_registered_user_role',
+                'open_id_client_url',
+                'open_id_client_id',
+                'open_id_mapping_field',
+                'saml_idp_own_password',
+            ],
+            $event->getPreservedFields()
+        );
     }
 
     public function testMetadataFileIsDetectedAsXml(): void
     {
-        $this->expectPreservedFields();
-
         $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
