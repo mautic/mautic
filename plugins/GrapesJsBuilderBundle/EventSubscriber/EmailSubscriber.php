@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreSave;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
-use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
-use Mautic\EmailBundle\Event\EmailPostDeleteEvent;
-use Mautic\EmailBundle\Event\EmailPostSaveEvent;
-use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
@@ -35,16 +35,17 @@ final class EmailSubscriber
     /**
      * Stores the current MJML for use when managing drafts.
      */
-    #[AsEventListener(
-        event: EmailPreSaveEvent::class,
-    )]
-    public function onEmailPreSave(Events\EmailEvent $event): void
+    #[AsEventListener]
+    public function onEmailPreSave(EntityPreSave $event): void
     {
-        if (!$this->config->isPublished() || !$this->emailConfig->isDraftEnabled()) {
+        $email = $event->getEntity();
+        if (!$email instanceof Email) {
             return;
         }
 
-        $email = $event->getEmail();
+        if (!$this->config->isPublished() || !$this->emailConfig->isDraftEnabled()) {
+            return;
+        }
 
         $this->existingHtml = $email->getCustomHtml() ?? '';
 
@@ -56,31 +57,36 @@ final class EmailSubscriber
     /**
      * Add an entry.
      */
-    #[AsEventListener(
-        event: EmailPostSaveEvent::class,
-    )]
-    public function onEmailPostSave(Events\EmailEvent $event): void
+    #[AsEventListener]
+    public function onEmailPostSave(EntityPostSave $event): void
     {
+        $email = $event->getEntity();
+        if (!$email instanceof Email) {
+            return;
+        }
+
         if (!$this->config->isPublished()) {
             return;
         }
 
-        $this->grapesJsBuilderModel->addOrEditEntity($event->getEmail());
+        $this->grapesJsBuilderModel->addOrEditEntity($email);
     }
 
     /**
      * Delete an entry.
      */
-    #[AsEventListener(
-        event: EmailPostDeleteEvent::class,
-    )]
-    public function onEmailDelete(Events\EmailEvent $event): void
+    #[AsEventListener]
+    public function onEmailDelete(EntityPostDelete $event): void
     {
+        $email = $event->getEntity();
+        if (!$email instanceof Email) {
+            return;
+        }
+
         if (!$this->config->isPublished()) {
             return;
         }
 
-        $email           = $event->getEmail();
         $grapesJsBuilder = $this->grapesJsBuilderRepository->findOneBy(['email' => $email]);
 
         if ($grapesJsBuilder instanceof GrapesJsBuilder) {
