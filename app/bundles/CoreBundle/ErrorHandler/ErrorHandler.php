@@ -28,10 +28,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private $debugLogger;
 
-        /**
-         * @var LoggerInterface
-         */
-        private $displayErrors;
+        private ?bool $displayErrors = null;
 
         /**
          * @var LoggerInterface
@@ -324,17 +321,14 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 set_error_handler(self::$handler->handleError(...));
 
                 // Hide errors by default so we can format them
-                self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); // ini_get('display_errors'));
+                self::$handler->setDisplayErrors('dev' === $environment); // ini_get('display_errors'));
                 ini_set('display_errors', '0');
             }
 
             return self::$handler;
         }
 
-        /**
-         * @param mixed $displayErrors
-         */
-        public function setDisplayErrors($displayErrors): static
+        public function setDisplayErrors(bool $displayErrors): static
         {
             $this->displayErrors = $displayErrors;
 
