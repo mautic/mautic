@@ -1591,7 +1591,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->assertCount(1, $matchingAlerts);
-        $this->assertCount(1, $crawler->filter('a[href="#advanced-container"] span.text-danger'));
+        $this->assertCount(1, $crawler->filter('[data-bs-target="#advanced-container"].text-danger'));
     }
 
     public function testEmailWithMalformedLinkCannotBeSaved(): void
