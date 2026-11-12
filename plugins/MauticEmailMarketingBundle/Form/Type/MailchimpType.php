@@ -1,174 +1,112 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\PluginBundle\Form\Type\FieldsType;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PluginBundle\Model\PluginModel;
+use MauticPlugin\MauticEmailMarketingBundle\Client\MailchimpClient;
+use MauticPlugin\MauticEmailMarketingBundle\Exception\ApiException;
+use MauticPlugin\MauticEmailMarketingBundle\Helper\IntegrationKeys;
 use MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @extends AbstractType<array<mixed>>
+ * Mailchimp settings of a "Push contact to integration" action.
+ *
+ * @extends AbstractType<array<string, mixed>>
  */
 final class MailchimpType extends AbstractType
 {
     public function __construct(
-        private readonly IntegrationHelper $integrationHelper,
-        private readonly PluginModel $pluginModel,
-        private readonly RequestStack $requestStack,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly IntegrationKeys $integrationKeys,
+        private readonly MailchimpClient $client,
     ) {
     }
 
-    /**
-     * @param FormBuilderInterface<array<mixed>|null> $builder
-     * @param array<string, mixed>                    $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var MailchimpIntegration $mailchimp */
-        $mailchimp = $this->integrationHelper->getIntegrationObject('Mailchimp');
-
-        $api = $mailchimp->getApiHelper();
+        $keys  = $this->integrationKeys->get(MailchimpIntegration::NAME);
+        $error = null;
         try {
-            $lists   = $api->getLists();
-            $choices = [];
-            if (!empty($lists)) {
-                if ($lists['total_items']) {
-                    foreach ($lists['lists'] as $list) {
-                        $choices[$list['id']] = $list['name'];
-                    }
-                }
-
-                asort($choices);
-            }
-        } catch (\Exception $e) {
-            $choices = [];
-            $error   = $e->getMessage();
+            $lists = $this->client->getLists($keys);
+            asort($lists);
+        } catch (ApiException $e) {
+            $lists = [];
+            $error = $e->getMessage();
         }
 
-        $builder->add('list', ChoiceType::class, [
-            'choices'           => array_flip($choices), // Choice type expects labels as keys
-            'label'             => 'mautic.emailmarketing.list',
-            'required'          => false,
-            'attr'              => [
+        $listSettings = $builder->create('list_settings', FormType::class, ['label' => false]);
+        $listSettings->add('list', ChoiceType::class, [
+            'choices'  => array_flip($lists),
+            'label'    => 'mautic.emailmarketing.list',
+            'required' => false,
+            'attr'     => [
+                'class'    => 'form-control',
                 'tooltip'  => 'mautic.emailmarketing.list.tooltip',
-                'onchange' => 'Mautic.getIntegrationLeadFields(\'Mailchimp\', this, {"list": this.value});',
+                // Reloads these settings so the field mapping shows the selected list's merge fields
+                'onchange' => 'Mautic.getIntegrationConfig(mQuery(\'[name="\' + this.name.replace(\'[config][list_settings][list]\', \'[integration]\') + \'"]\')[0], {config: {list_settings: {list: this.value}}});',
             ],
         ]);
-
-        $builder->add('doubleOptin', YesNoButtonGroupType::class, [
+        $listSettings->add('doubleOptin', YesNoButtonGroupType::class, [
             'label' => 'mautic.mailchimp.double_optin',
-            'data'  => (!isset($options['data']['doubleOptin'])) ? true : $options['data']['doubleOptin'],
         ]);
-
-        $builder->add('sendWelcome', YesNoButtonGroupType::class, [
+        $listSettings->add('sendWelcome', YesNoButtonGroupType::class, [
             'label' => 'mautic.emailmarketing.send_welcome',
-            'data'  => (!isset($options['data']['sendWelcome'])) ? true : $options['data']['sendWelcome'],
         ]);
+        $builder->add($listSettings);
 
-        if (!empty($error)) {
-            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error): void {
-                $form = $event->getForm();
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($keys, $error): void {
+            $data                                 = is_array($event->getData()) ? $event->getData() : [];
+            $data['list_settings']              ??= [];
+            $data['list_settings']['doubleOptin'] ??= true;
+            $data['list_settings']['sendWelcome'] ??= true;
+            $event->setData($data);
 
-                $form['list']->addError(new FormError($error));
-            });
-        }
+            if (null !== $error) {
+                $event->getForm()->get('list_settings')->get('list')->addError(new FormError($error));
+            }
 
-        if (isset($options['form_area']) && 'integration' == $options['form_area']) {
-            $leadFields = $this->pluginModel->getLeadFields();
+            $this->addFieldMapping($event->getForm(), $keys, $data['list_settings']['list'] ?? null);
+        });
 
-            $formModifier = function (FormInterface $form, $data) use ($mailchimp, $leadFields): void {
-                $integrationName = $mailchimp->getName();
-                $session         = $this->requestStack->getSession();
-                $limit           = $session->get(
-                    'mautic.plugin.'.$integrationName.'.lead.limit',
-                    $this->coreParametersHelper->get('default_pagelimit')
-                );
-                $page     = $session->get('mautic.plugin.'.$integrationName.'.lead.page', 1);
-                $settings = [
-                    'silence_exceptions' => false,
-                    'feature_settings'   => [
-                        'list_settings' => $data,
-                    ],
-                    'ignore_field_cache' => 1 == $page && 'POST' !== $_SERVER['REQUEST_METHOD'],
-                ];
-                try {
-                    $fields = $mailchimp->getFormLeadFields($settings);
-
-                    if (!is_array($fields)) {
-                        $fields = [];
-                    }
-                    $error = '';
-                } catch (\Exception $e) {
-                    $fields = [];
-                    $error  = $e->getMessage();
-                    $page   = 1;
-                }
-
-                [$specialInstructions] = $mailchimp->getFormNotes('leadfield_match');
-                $form->add('leadFields', FieldsType::class, [
-                    'label'                => 'mautic.integration.leadfield_matches',
-                    'required'             => true,
-                    'mautic_fields'        => $leadFields,
-                    'integration'          => $mailchimp->getName(),
-                    'integration_object'   => $mailchimp,
-                    'limit'                => $limit,
-                    'page'                 => $page,
-                    'data'                 => $data,
-                    'integration_fields'   => $fields,
-                    'special_instructions' => $specialInstructions,
-                    'mapped'               => true,
-                    'error_bubbling'       => false,
-                ]);
-
-                if ($error) {
-                    $form->addError(new FormError($error));
-                }
-            };
-
-            $builder->addEventListener(
-                FormEvents::PRE_SET_DATA,
-                function (FormEvent $event) use ($formModifier): void {
-                    $data = $event->getData();
-                    if (isset($data['leadFields']['leadFields'])) {
-                        $data['leadFields'] = $data['leadFields']['leadFields'];
-                    }
-                    $formModifier($event->getForm(), $data);
-                }
-            );
-
-            $builder->addEventListener(
-                FormEvents::PRE_SUBMIT,
-                function (FormEvent $event) use ($formModifier): void {
-                    $data = $event->getData();
-                    if (isset($data['leadFields']['leadFields'])) {
-                        $data['leadFields'] = $data['leadFields']['leadFields'];
-                    }
-                    $formModifier($event->getForm(), $data);
-                }
-            );
-        }
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefined(['form_area']);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($keys): void {
+            $data = $event->getData();
+            $this->addFieldMapping($event->getForm(), $keys, is_array($data) ? ($data['list_settings']['list'] ?? null) : null);
+        });
     }
 
     public function getBlockPrefix(): string
     {
         return 'emailmarketing_mailchimp';
+    }
+
+    /**
+     * @param array<string, mixed> $keys
+     */
+    private function addFieldMapping(FormInterface $form, array $keys, mixed $listId): void
+    {
+        if (!is_string($listId) || '' === $listId) {
+            return;
+        }
+
+        try {
+            $fields = $this->client->getMergeFields($keys, $listId);
+        } catch (ApiException $e) {
+            $form->get('list_settings')->get('list')->addError(new FormError($e->getMessage()));
+
+            return;
+        }
+
+        $form->get('list_settings')->add('leadFields', FieldMappingType::class, [
+            'integration_fields' => $fields,
+        ]);
     }
 }
