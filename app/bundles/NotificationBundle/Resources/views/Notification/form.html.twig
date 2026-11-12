@@ -18,7 +18,13 @@
 {% endblock %}
 
 {% block content %}
-{% set notificationTabContent %}
+  {{ form_start(form) }}
+    <div class="box-layout">
+        <div class="col-md-9 height-auto">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="tab-content pa-16">
+                        <div class="tab-pane fade show active bdr-w-0" id="notification-container">
                             <div class="row">
                                 <div class="col-md-6">
                                     {{ form_row(form.name) }}
@@ -33,13 +39,8 @@
                                     }, with_context=false) }}
                                 </div>
                             </div>
-{% endset %}
-  {{ form_start(form) }}
-    <div class="box-layout">
-        <div class="col-md-9 height-auto">
-            <div class="row">
-                <div class="col-xs-12">
-                    {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': [{'id': 'notification-container', 'label': 'mautic.notification.notification', 'content': notificationTabContent, 'className': 'bdr-w-0 pa-16'}], 'part': 'content'}) }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
