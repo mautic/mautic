@@ -70,11 +70,15 @@ final class TriggerType extends AbstractType
             'points',
             NumberType::class,
             [
-                'label'      => 'mautic.point.trigger.form.points',
-                'label_attr' => ['class' => 'form-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
+                'label'        => 'mautic.point.trigger.form.points',
+                'label_attr'   => ['class' => 'form-label'],
+                'block_prefix' => 'quantity_stepper',
+                'attr'         => [
                     'tooltip' => 'mautic.point.trigger.form.points_descr',
+                    'min'     => -999999,
+                    'max'     => 999999,
+                    'digits'  => 5,
+                    'size'    => 'sm',
                 ],
                 'required' => false,
             ]

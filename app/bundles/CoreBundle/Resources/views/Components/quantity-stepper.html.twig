@@ -3,7 +3,8 @@
 {% set min = min|default(0) %}
 {% set max = max|default(99) %}
 {% set step = step|default(1) %}
-{% set value = value is defined and value is not null and value != '' ? value : (min > 1 ? min : 1) %}
+{% set fallback = min < 0 and max >= 0 ? 0 : (min > 1 ? min : 1) %}
+{% set value = value is defined and value is not null and value != '' ? value : fallback %}
 {% set disabled = disabled|default(false) %}
 {% set minLength = (min|abs ~ '')|length + (min < 0 ? 1 : 0) %}
 {% set maxLength = (max|abs ~ '')|length + (max < 0 ? 1 : 0) %}
