@@ -124,15 +124,13 @@ final class SmsControllerFunctionalTest extends MauticMysqlTestCase
         // Act & Assert - Parent view
         $crawler = $this->client->request(Request::METHOD_GET, '/s/sms/view/'.$parentSms->getId());
         $this->assertResponseIsSuccessful();
-        $this->assertCount(1, $crawler->filter('a[href="#translation-container"]'));
-        $this->client->click($crawler->selectLink('Translations')->link());
+        $this->assertCount(1, $crawler->filter('button[data-bs-target="#translation-container"]'));
         $this->assertSelectorTextContains('#translation-container', 'Child SMS');
 
         // Act & Assert - Child view
         $crawler = $this->client->request(Request::METHOD_GET, '/s/sms/view/'.$childSms->getId());
         $this->assertResponseIsSuccessful();
-        $this->assertCount(1, $crawler->filter('a[href="#translation-container"]'));
-        $this->client->click($crawler->selectLink('Translations')->link());
+        $this->assertCount(1, $crawler->filter('button[data-bs-target="#translation-container"]'));
         $this->assertSelectorTextContains('#translation-container', 'Parent SMS');
     }
 
