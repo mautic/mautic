@@ -377,10 +377,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         return $this->description;
     }
 
-    /**
-     * @param mixed $description
-     */
-    public function setDescription($description): void
+    public function setDescription(?string $description): void
     {
         $this->description = $description;
     }

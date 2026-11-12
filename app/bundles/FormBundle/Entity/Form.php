@@ -647,10 +647,7 @@ class Form extends FormEntity implements UuidInterface
         return $this->template;
     }
 
-    /**
-     * @param mixed $template
-     */
-    public function setTemplate($template): void
+    public function setTemplate(?string $template): void
     {
         $this->template = $template;
     }

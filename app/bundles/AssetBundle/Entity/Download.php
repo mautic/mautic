@@ -244,10 +244,7 @@ class Download
         return $this->source;
     }
 
-    /**
-     * @param mixed $source
-     */
-    public function setSource($source): void
+    public function setSource(?string $source): void
     {
         $this->source = $source;
     }
