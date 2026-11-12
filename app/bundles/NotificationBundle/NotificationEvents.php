@@ -35,38 +35,6 @@ final class NotificationEvents
     public const string NOTIFICATION_ON_SEND = 'mautic.notification_on_send';
 
     /**
-     * The mautic.notification_pre_save event is thrown right before a notification is persisted.
-     *
-     * The event listener receives a
-     * Mautic\NotificationBundle\Event\NotificationEvent instance.
-     */
-    public const string NOTIFICATION_PRE_SAVE = 'mautic.notification_pre_save';
-
-    /**
-     * The mautic.notification_post_save event is thrown right after a notification is persisted.
-     *
-     * The event listener receives a
-     * Mautic\NotificationBundle\Event\NotificationEvent instance.
-     */
-    public const string NOTIFICATION_POST_SAVE = 'mautic.notification_post_save';
-
-    /**
-     * The mautic.notification_pre_delete event is thrown prior to when a notification is deleted.
-     *
-     * The event listener receives a
-     * Mautic\NotificationBundle\Event\NotificationEvent instance.
-     */
-    public const string NOTIFICATION_PRE_DELETE = 'mautic.notification_pre_delete';
-
-    /**
-     * The mautic.notification_post_delete event is thrown after a notification is deleted.
-     *
-     * The event listener receives a
-     * Mautic\NotificationBundle\Event\NotificationEvent instance.
-     */
-    public const string NOTIFICATION_POST_DELETE = 'mautic.notification_post_delete';
-
-    /**
      * The mautic.notification.on_batch_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
