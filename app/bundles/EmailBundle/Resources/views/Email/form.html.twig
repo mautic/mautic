@@ -56,30 +56,7 @@
             <div class="row">
                 <div class="col-xs-12">
 
-                    <!-- tabs controls -->
-                    <ul class="nav nav-tabs nav-tabs-contained">
-                        <li class="active">
-                            <a href="#email-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">{{ 'mautic.core.form.theme'|trans }}</a>
-                        </li>
-                        <li>
-                            <a href="#advanced-container" role="tab" data-bs-toggle="tab" class="nav-link">
-                                {% if advancedTabHasErrors %}
-                                <span class="text-danger">
-                                    <i class="ri-alert-line" aria-hidden="true"></i> {{ 'mautic.core.advanced'|trans }}
-                                </span>{% else %}
-                                {{ 'mautic.core.advanced'|trans }}
-                                {% endif %}
-                            </a>
-                        </li>
-                        <li id="dynamic-content-tab" {{ (isCodeMode) ? '' : 'class="hidden"' }}>
-                            <a href="#dynamic-content-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.core.dynamicContent'|trans }}</a>
-                        </li>
-                        {{ customContent('email.tabs', _context) }}
-                    </ul>
-                    <!--/ tabs controls -->
-
-                    <div class="tab-content pa-16">
-                        <div class="tab-pane fade show active bdr-w-0" id="email-container">
+                    {% set themeContent %}
                             <div class="row">
                                 <div class="col-md-12">{{ form_row(form.template) }}</div>
                             </div>
@@ -88,8 +65,8 @@
                                 'themes' : themes,
                                 'active' : form.template.vars.value,
                             }) -}}
-                        </div>
-                        <div class="tab-pane fade bdr-w-0" id="advanced-container">
+                    {% endset %}
+                    {% set advancedContent %}
                             <div class="row">
                                 <div class="col-md-6">
                                     {{ form_row(form.fromName) }}
@@ -145,8 +122,8 @@
                                     {{ form_widget(form.plainText) }}
                                 </div>
                             </div>
-                        </div>
-                        <div class="tab-pane fade bdr-w-0" id="dynamic-content-container">
+                    {% endset %}
+                    {% set dynamicContentContent %}
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="row">
@@ -186,9 +163,19 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        {{ customContent('email.tabs.content', _context) }}
-                    </div>
+                    {% endset %}
+                    {% set customTabs %}{{ customContent('email.tabs', _context) }}{% endset %}
+                    {% set customTabsContent %}{{ customContent('email.tabs.content', _context) }}{% endset %}
+                    {{ include('@MauticCore/Components/tabs.html.twig', {
+                        'variant': 'contained',
+                        'tabs': [
+                            {'id': 'email-container', 'label': 'mautic.core.form.theme', 'content': themeContent, 'className': 'pa-16'},
+                            {'id': 'advanced-container', 'label': 'mautic.core.advanced', 'content': advancedContent, 'className': 'pa-16', 'hasError': advancedTabHasErrors},
+                            {'id': 'dynamic-content-container', 'label': 'mautic.core.dynamicContent', 'content': dynamicContentContent, 'className': 'pa-16', 'itemClass': isCodeMode ? '' : 'hidden', 'itemAttributes': {'id': 'dynamic-content-tab'}}
+                        ],
+                        'navExtra': customTabs,
+                        'contentExtra': customTabsContent
+                    }) }}
                 </div>
             </div>
         </div>
