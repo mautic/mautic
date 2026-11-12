@@ -5,7 +5,6 @@
     --quantity-stepper-padding: 4px;
     --quantity-stepper-font-size: 14px;
 
-    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -14,17 +13,6 @@
     border-radius: var(--bs-border-radius-pill);
     background-color: var(--field);
     user-select: none;
-}
-
-.quantity-stepper::after {
-    content: '';
-    position: absolute;
-    right: calc(var(--quantity-stepper-height) / 2);
-    bottom: 0;
-    left: calc(var(--quantity-stepper-height) / 2);
-    height: 1px;
-    background-color: var(--border-strong);
-    pointer-events: none;
 }
 
 .quantity-stepper--sm {
