@@ -1,0 +1,100 @@
+.quantity-stepper {
+    --quantity-stepper-height: 40px;
+    --quantity-stepper-button: 32px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-02);
+    height: var(--quantity-stepper-height);
+    padding: 0 var(--spacing-02);
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius-pill);
+    background-color: var(--bs-body-bg);
+}
+
+.quantity-stepper--sm {
+    --quantity-stepper-height: 32px;
+    --quantity-stepper-button: 24px;
+
+    font-size: var(--bs-font-size-sm);
+}
+
+.quantity-stepper--lg {
+    --quantity-stepper-height: 48px;
+    --quantity-stepper-button: 40px;
+}
+
+.quantity-stepper__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--quantity-stepper-button);
+    height: var(--quantity-stepper-button);
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--bs-body-color);
+    transition: background-color 0.15s, transform 0.1s;
+}
+
+.quantity-stepper__button:not(:disabled):hover {
+    background-color: var(--bs-secondary-bg);
+}
+
+.quantity-stepper__button:not(:disabled):active {
+    transform: scale(0.9);
+}
+
+.quantity-stepper__button:disabled,
+.quantity-stepper__button[aria-disabled='true'] {
+    opacity: 0.4;
+}
+
+.quantity-stepper__value {
+    width: 3ch;
+    min-width: 3ch;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-weight: var(--bs-font-weight-medium, 500);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.quantity-stepper__value::-webkit-inner-spin-button,
+.quantity-stepper__value::-webkit-outer-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+
+.quantity-stepper__value:focus-visible {
+    border-radius: var(--bs-border-radius-sm);
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+
+.quantity-stepper.is-limit .quantity-stepper__value {
+    color: var(--bs-danger);
+    animation: quantity-stepper-shake 0.3s;
+}
+
+@keyframes quantity-stepper-shake {
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-2px); }
+    80% { transform: translateX(2px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .quantity-stepper__button {
+        transition: none;
+    }
+
+    .quantity-stepper.is-limit .quantity-stepper__value {
+        animation: none;
+    }
+}
