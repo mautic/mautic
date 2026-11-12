@@ -125,15 +125,13 @@ final class MobileNotificationTranslationFunctionalTest extends MauticMysqlTestC
         // Act & Assert - Parent view
         $crawler = $this->client->request(Request::METHOD_GET, '/s/mobile_notifications/view/'.$parentNotification->getId());
         $this->assertResponseIsSuccessful();
-        $this->assertCount(1, $crawler->filter('a[href="#translation-container"]'));
-        $this->client->click($crawler->selectLink('Translations')->link());
+        $this->assertCount(1, $crawler->filter('button[data-bs-target="#translation-container"]'));
         $this->assertSelectorTextContains('#translation-container', 'Child Notification');
 
         // Act & Assert - Child view
         $crawler = $this->client->request(Request::METHOD_GET, '/s/mobile_notifications/view/'.$childNotification->getId());
         $this->assertResponseIsSuccessful();
-        $this->assertCount(1, $crawler->filter('a[href="#translation-container"]'));
-        $this->client->click($crawler->selectLink('Translations')->link());
+        $this->assertCount(1, $crawler->filter('button[data-bs-target="#translation-container"]'));
         $this->assertSelectorTextContains('#translation-container', 'Parent Notification');
     }
 
