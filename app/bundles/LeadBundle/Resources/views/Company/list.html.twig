@@ -70,6 +70,7 @@
 
 {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
     'searchValue': searchValue,
+    'searchPlaceholder': 'mautic.company.search.placeholder',
     'action': currentRoute,
     'page_actions': {
         'templateButtons': {'new': permissions['lead:leads:create']},
