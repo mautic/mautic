@@ -491,6 +491,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `MauticPlugin\MauticFocusBundle\Entity\StatRepository::getStats()` takes `string $type` and `?\DateTimeInterface $fromDate`.
     - `MauticPlugin\MauticFocusBundle\Helper\TokenHelper::findFocusTokens()` takes `string $content`.
     - `MauticPlugin\MauticFocusBundle\Model\FocusModel::getStats()` takes `?string $unit` and `?string $dateFormat`, and `MauticPlugin\MauticFocusBundle\Model\FocusModel::isLightColor()` takes `string $hex` and `int $level`.
+- `MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::getFullUrl()` declares native parameter types: it takes `string $fileName` and `string $separator`. Passing `null`, a value PHP cannot coerce to `string`, or any other type from a file with `declare(strict_types=1)` now throws a `TypeError`.
 
 - `Mautic\CoreBundle\Model\VariantModelTrait::$inConversion` now has the native `bool` type. A class using the trait that redeclares the property must declare it as `protected bool $inConversion = false;`, otherwise PHP fails with a compile-time error.
 - `Mautic\CategoryBundle\Entity\CategoryRepository::getCategoryList()` now types `$search` as `string|array` (a title prefix, or a list of category ids). Passing `null` or an integer now throws a `TypeError`; pass `''` for no search.
