@@ -44,7 +44,7 @@ final class LeadListRepositoryTest extends TestCase
     }
 
     #[DataProvider('dbalSearchCommandNegationProvider')]
-    public function testDynamicAndNegatedStaticSearchCommandsUseDbalCompatibleNegation(string $command, bool $not): void
+    public function testDynamicAndStaticSearchCommandsUseDbalCompatibleNegation(string $command, bool $not, bool $expectNegation): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(static fn (string $id): string => match ($id) {
@@ -61,7 +61,11 @@ final class LeadListRepositoryTest extends TestCase
         [$expression, $parameters] = $method->invoke($this->repository, $queryBuilder, $filter);
 
         $expression = (string) $expression;
-        $this->assertStringContainsString('NOT(', $expression);
+        if ($expectNegation) {
+            $this->assertStringContainsString('NOT(', $expression);
+        } else {
+            $this->assertStringNotContainsString('NOT(', $expression);
+        }
         $this->assertStringContainsString('l.filters IS NULL', $expression);
         $this->assertCount(2, $parameters);
         $this->assertSame([serialize([]), serialize(null)], array_values($parameters));
@@ -71,12 +75,14 @@ final class LeadListRepositoryTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{string, bool}>
+     * @return iterable<string, array{string, bool, bool}>
      */
     public static function dbalSearchCommandNegationProvider(): iterable
     {
-        yield 'dynamic segment'      => ['is:dynamic', false];
-        yield 'negated static segment' => ['is:static', true];
+        yield 'dynamic segment'                => ['is:dynamic', false, true];
+        yield 'negated dynamic segment'        => ['is:dynamic', true, false];
+        yield 'static segment'                 => ['is:static', false, false];
+        yield 'negated static segment'         => ['is:static', true, true];
     }
 
     public function testIsContactInAnySegmentFalse(): void
