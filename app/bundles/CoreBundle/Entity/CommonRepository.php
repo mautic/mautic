@@ -1098,9 +1098,8 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Build a mixed search expression using the usual boolean precedence: AND groups are evaluated before OR.
      *
-     * @param iterable<object>              $parseFilters
-     * @param QueryBuilder|DbalQueryBuilder $qb
-     * @param array<mixed>                  $parameters
+     * @param iterable<object> $parseFilters
+     * @param array<mixed>     $parameters
      */
     private function buildMixedOperatorExpression(iterable $parseFilters, QueryBuilder|DbalQueryBuilder $qb, array &$parameters, bool $containsOr): mixed
     {
