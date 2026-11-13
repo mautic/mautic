@@ -1,18 +1,18 @@
 {% block _config_themeconfig_widget %}
-<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.themeconfig'|trans }}</h4>
-<div class="text-muted small pb-md">{{ 'mautic.core.config.header.themeconfig.description'|trans }}</div>
+<h4 class="fw-sb mt-48 mb-5">{{ 'mautic.config.tab.themeconfig'|trans }}</h4>
+<div class="text-muted small pb-16">{{ 'mautic.core.config.header.themeconfig.description'|trans }}</div>
 <div class="row">
-    <div class="panel panel-default mb-md">
+    <div class="panel panel-default mb-16">
         <div class="panel-body">
-            <h3 class="pt-20">{{ 'mautic.user.account.appearance.accent_colors'|trans }}</h3>
-            <div class="form-text mb-lg">
+            <h3 class="pt-24">{{ 'mautic.user.account.appearance.accent_colors'|trans }}</h3>
+            <div class="form-text mb-24">
                 {{ 'mautic.user.account.appearance.accent_help'|trans }}
                 {% include '@MauticCore/Components/toggletip.html.twig' with {
                     title: 'mautic.user.account.appearance.accent_toggletip.title',
                     content: 'mautic.user.account.appearance.accent_toggletip.content',
                 } %}
             </div>
-            <div class="d-flex flex-wrap gap-lg mb-lg">
+            <div class="d-flex flex-wrap gap-24 mb-24">
                 {{ include('@MauticCore/FormTheme/Config/accent.html.twig', {
                     accents: [
                         { id: '01' },
@@ -49,7 +49,7 @@
                     <div class="row form-group">
     <div class="col-md-4">
         <label class="form-label" for="config_themeconfig_theme" data-bs-toggle="tooltip" data-bs-container="body" data-bs-placement="top" title="" data-bs-title="{{ 'mautic.core.config.theme.rounded_corners.tooltip'|trans }}">
-{{ 'mautic.core.config.theme.rounded_corners'|trans }}<i class="ri-question-line ml-3"></i></label>
+{{ 'mautic.core.config.theme.rounded_corners'|trans }}<i class="ri-question-line ms-3"></i></label>
 
 
 </div>

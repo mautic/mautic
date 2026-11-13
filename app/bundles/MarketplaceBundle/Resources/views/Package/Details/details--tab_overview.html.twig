@@ -3,7 +3,7 @@
     {% set description = packageDetail.packageBase.description|marketplace_markdown %}
 {% endif %}
 {% if description %}
-<div class="panel panel-default mt-sm">
+<div class="panel panel-default mt-12">
     <div class="panel-body marketplace-description">{{ description|purify }}</div>
 </div>
 {% endif %}
@@ -14,7 +14,7 @@
 </div>
 {% endif %}
 {% if packageDetail.packageBase.type != 'mautic-resource' %}
-<div class="panel panel-default mt-sm">
+<div class="panel panel-default mt-12">
     <div class="panel-heading">
         <div class="panel-title">{% trans %}marketplace.package.cli.install{% endtrans %}</div>
     </div>
