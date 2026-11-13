@@ -1474,6 +1474,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     }
 
                     if ($this->pendingCount) {
+                        if (null === $this->getPublishUp()) {
+                            return 'ready_to_send';
+                        }
+
                         return 'sending';
                     }
                 }
