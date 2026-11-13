@@ -525,12 +525,7 @@ class LeadListRepository extends CommonRepository
         ];
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
-     *
-     * @return array{mixed, array<string, string>}
-     */
-    private function negateExpression($q, $expr): object|string
+    private function negateExpression(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, mixed $expr): object|string
     {
         if ($q instanceof \Doctrine\ORM\QueryBuilder) {
             return $q->expr()->not($expr);
@@ -539,6 +534,11 @@ class LeadListRepository extends CommonRepository
         return sprintf('NOT(%s)', (string) $expr);
     }
 
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
+     *
+     * @return array{mixed, array<string, string>}
+     */
     private function getStaticSegmentExpression($q): array
     {
         $column         = sprintf('%s.filters', $this->getTableAlias());
