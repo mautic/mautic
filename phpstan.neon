@@ -222,15 +222,6 @@ parameters:
             paths:
                  - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/ApiKey/HttpFactoryTest.php
                  - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
-        -
-            message: '#Call to an undefined method Mautic\\IntegrationsBundle\\Auth\\Provider\\AuthCredentialsInterface::#'
-            path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth2ThreeLegged/HttpFactory.php
-        # getClient takes the generic AuthCredentialsInterface, private helpers keep the concrete one for its getters
-        -
-            identifier: typePerfect.narrowPrivateClassMethodParamType
-            paths:
-                - app/bundles/IntegrationsBundle/Auth/Provider/BasicAuth/HttpFactory.php
-                - app/bundles/IntegrationsBundle/Auth/Provider/Oauth1aTwoLegged/HttpFactory.php
 
         # deprecation
         -

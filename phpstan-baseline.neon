@@ -3133,30 +3133,6 @@ parameters:
 			path: app/bundles/InstallBundle/InstallFixtures/ORM/RoleData.php
 
 		-
-			message: '#^Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\BasicAuth\\HttpFactory\:\:credentialsAreConfigured\(\) expects Mautic\\IntegrationsBundle\\Auth\\Provider\\BasicAuth\\CredentialsInterface, Mautic\\IntegrationsBundle\\Auth\\Provider\\AuthCredentialsInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/IntegrationsBundle/Auth/Provider/BasicAuth/HttpFactory.php
-
-		-
-			message: '#^Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth1aTwoLegged\\HttpFactory\:\:buildClient\(\) expects Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth1aTwoLegged\\CredentialsInterface, Mautic\\IntegrationsBundle\\Auth\\Provider\\AuthCredentialsInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth1aTwoLegged/HttpFactory.php
-
-		-
-			message: '#^Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth1aTwoLegged\\HttpFactory\:\:credentialsAreConfigured\(\) expects Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth1aTwoLegged\\CredentialsInterface, Mautic\\IntegrationsBundle\\Auth\\Provider\\AuthCredentialsInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth1aTwoLegged/HttpFactory.php
-
-		-
-			message: '#^Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\HttpFactory\:\:credentialsAreConfigured\(\) expects Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\Credentials\\CredentialsInterface, Mautic\\IntegrationsBundle\\Auth\\Provider\\AuthCredentialsInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth2ThreeLegged/HttpFactory.php
-
-		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Auth\\Support\\Oauth2\\Token\\IntegrationToken\:\:__construct\(\) has parameter \$expiresAt with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
