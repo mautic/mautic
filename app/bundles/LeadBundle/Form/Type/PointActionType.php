@@ -23,6 +23,7 @@ final class PointActionType extends AbstractType
             [
                 'label'        => 'mautic.lead.lead.event.points',
                 'block_prefix' => 'quantity_stepper',
+                'html5'        => true,
                 'attr'         => [
                     'digits' => 5,
                     'size'   => 'sm',

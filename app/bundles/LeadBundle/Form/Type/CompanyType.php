@@ -62,6 +62,7 @@ final class CompanyType extends AbstractType
             [
                 'label'        => 'mautic.company.score',
                 'block_prefix' => 'quantity_stepper',
+                'html5'        => true,
                 'attr'         => [
                     'min'    => 0,
                     'digits' => 5,

@@ -42,6 +42,16 @@
         return Math.min(max, Math.max(min, number));
     }
 
+    function snap(input, number, direction) {
+        const {min, max} = bounds(input);
+        const step = Number(input.step) || 1;
+        const origin = Number.isFinite(min) ? min : 0;
+        const ratio = (clamp(input, number) - origin) / step;
+        const next = origin + (direction < 0 ? Math.floor(ratio) : Math.ceil(ratio)) * step;
+
+        return next > max ? next - step : next;
+    }
+
     function format(template, value) {
         return template.replace('%value%', value);
     }
@@ -136,7 +146,7 @@
         }
 
         const current = Number(input.value) || 0;
-        const next = clamp(input, current + delta);
+        const next = snap(input, current + delta, delta);
 
         if (next === current) {
             flashLimit(root);
@@ -242,7 +252,7 @@
         } else if ((event.key === 'Home' && Number.isFinite(min)) || (event.key === 'End' && Number.isFinite(max))) {
             event.preventDefault();
             const target = event.key === 'Home' ? min : max;
-            if (target !== Number(input.value)) {
+            if (input.value === '' || target !== Number(input.value)) {
                 setValue(root, target);
             }
         }

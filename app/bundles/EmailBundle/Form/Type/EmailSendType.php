@@ -164,6 +164,7 @@ final class EmailSendType extends AbstractType
                     [
                         'label'        => 'mautic.channel.message.send.attempts',
                         'block_prefix' => 'quantity_stepper',
+                        'html5'        => true,
                         'attr'         => [
                             'tooltip' => 'mautic.channel.message.send.attempts.tooltip',
                             'min'     => 0,

@@ -73,6 +73,7 @@ final class TriggerType extends AbstractType
                 'label'        => 'mautic.point.trigger.form.points',
                 'label_attr'   => ['class' => 'form-label'],
                 'block_prefix' => 'quantity_stepper',
+                'html5'        => true,
                 'attr'         => [
                     'tooltip' => 'mautic.point.trigger.form.points_descr',
                     'digits'  => 7,

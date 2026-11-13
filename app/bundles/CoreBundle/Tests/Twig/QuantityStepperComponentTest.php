@@ -66,6 +66,11 @@ final class QuantityStepperComponentTest extends TestCase
         $this->assertStringContainsString('value="4"', $output);
     }
 
+    public function testDefaultValueStaysInsideNegativeBounds(): void
+    {
+        $this->assertStringContainsString('value="-1"', $this->render(['name' => 'qty', 'min' => -10, 'max' => -1]));
+    }
+
     /**
      * @param array<string, mixed> $context
      */

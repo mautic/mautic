@@ -78,6 +78,7 @@ final class PointType extends AbstractType
                 'label'        => 'mautic.point.action.delta',
                 'label_attr'   => ['class' => 'form-label'],
                 'block_prefix' => 'quantity_stepper',
+                'html5'        => true,
                 'attr'         => [
                     'tooltip' => 'mautic.point.action.delta.help',
                     'digits'  => 7,

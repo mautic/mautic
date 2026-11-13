@@ -40,6 +40,7 @@ final class FormSubmitActionPointsChangeType extends AbstractType
             [
                 'label'        => 'mautic.lead.lead.submitaction.points',
                 'block_prefix' => 'quantity_stepper',
+                'html5'        => true,
                 'attr'         => [
                     'digits' => 5,
                     'size'   => 'sm',

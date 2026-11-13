@@ -22,6 +22,7 @@ final class CompanyChangeScoreActionType extends AbstractType
             [
                 'label'        => 'mautic.lead.lead.events.changecompanyscore',
                 'block_prefix' => 'quantity_stepper',
+                'html5'        => true,
                 'attr'         => [
                     'digits' => 5,
                     'size'   => 'sm',

@@ -60,6 +60,16 @@
     transform: scale(0.85);
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .quantity-stepper__button {
+        transition: background-color 0.15s;
+    }
+
+    .quantity-stepper__button:not(:disabled):active {
+        transform: none;
+    }
+}
+
 .quantity-stepper__button:focus-visible {
     outline-color: var(--focus);
 }

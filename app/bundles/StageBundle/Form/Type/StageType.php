@@ -51,6 +51,7 @@ final class StageType extends AbstractType
             'label'        => 'mautic.stage.action.weight',
             'label_attr'   => ['class' => 'form-label'],
             'block_prefix' => 'quantity_stepper',
+            'html5'        => true,
             'attr'         => [
                 'tooltip' => 'mautic.stage.action.weight.help',
                 'digits'  => 5,
