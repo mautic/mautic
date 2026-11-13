@@ -6,6 +6,8 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -20,6 +22,22 @@ final class CampaignEventLeadTagsType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            static function (FormEvent $event): void {
+                $data = $event->getData();
+
+                if (
+                    is_array($data)
+                    && isset($data['properties']['tags'])
+                    && empty($data['tags'])
+                ) {
+                    $data['tags'] = $data['properties']['tags'];
+                    $event->setData($data);
+                }
+            }
+        );
+
         $builder->add(
             'tags',
             TagType::class,
