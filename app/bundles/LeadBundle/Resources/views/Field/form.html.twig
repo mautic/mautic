@@ -32,7 +32,7 @@
 <div class="box-layout">
     <!-- container -->
     <div class="col-md-8 height-auto bdr-r">
-        <div class="pa-md">
+        <div class="pa-16">
             <div class="row">
                 <div class="col-md-6">{{ form_row(form.label) }}</div>
                 <div class="col-md-6">{{ form_row(form.alias) }}</div>
@@ -127,11 +127,11 @@
         ] %}
         {% set tilesHtml %}
         <div class="mb-32">
-            <div class="grid grid-cols-4 gap-sm">
+            <div class="grid grid-cols-4 gap-12">
             {% for type in itemTypes %}
                 {% for item in type.items %}
                     {% set tileContent %}
-                    <div class="mb-sm">
+                    <div class="mb-12">
                     {% include '@MauticCore/Helper/_tag.html.twig' with {
                         tags: [{
                             label: '',
@@ -143,9 +143,9 @@
                     </div>
                         <span class="type-heading-02 break-word">{{ item.heading|trans }}</span>
                         {% if item.copy is defined %}
-                            <span class="type-label-01 mt-sm break-word">{{ item.copy|trans }}</span>
+                            <span class="type-label-01 mt-12 break-word">{{ item.copy|trans }}</span>
                         {% endif %}
-                        <div class="mt-auto pt-md">
+                        <div class="mt-auto pt-16">
                         {% include '@MauticCore/Helper/_tag.html.twig' with {
                             tags: [{
                                 label: type.label,
@@ -177,7 +177,7 @@
 
             } only %}
         {% endset %}
-        <div class="pa-md">
+        <div class="pa-16">
         {% include '@MauticCore/Components/card.html.twig' with {
             heading: 'mautic.lead.field.shouldbe.heading',
             href: '',
@@ -199,7 +199,7 @@
         } only %}
     </div>
     <div class="col-md-4 height-auto">
-        <div class="pr-lg pl-lg pt-md pb-md">
+        <div class="pe-24 ps-24 pt-16 pb-16">
             <div class="row">
                 <div class="col-md-12" id="leadfield_order_container">{{ form_row(form.order) }}</div>
             </div>

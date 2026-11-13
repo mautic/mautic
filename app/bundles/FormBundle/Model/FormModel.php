@@ -620,10 +620,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             ],
         ];
         $ignoreTypes = $this->getCustomComponents()['viewOnlyFields'];
+        $platform    = $this->em->getConnection()->getDatabasePlatform();
         foreach ($fields as $f) {
             if (!in_array($f->getType(), $ignoreTypes)) {
                 $columns[] = [
-                    'name'    => $f->getAlias(),
+                    // Doctrine does not quote the column names in the schema changes by itself
+                    'name'    => $platform->quoteSingleIdentifier((string) $f->getAlias()),
                     'type'    => 'text',
                     'options' => [
                         'notnull' => false,
