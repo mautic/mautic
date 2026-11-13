@@ -480,13 +480,13 @@ class LeadListRepository extends CommonRepository
             case $this->translator->trans('mautic.lead.list.searchcommand.dynamic'):
             case $this->translator->trans('mautic.lead.list.searchcommand.dynamic', [], null, 'en_US'):
                 [$staticExpr, $forceParameters] = $this->getStaticSegmentExpression($q);
-                $expr                           = ($filter->not) ? $staticExpr : $q->expr()->not($staticExpr);
+                $expr                           = ($filter->not) ? $staticExpr : $this->negateExpression($q, $staticExpr);
                 break;
             case $this->translator->trans('mautic.lead.list.searchcommand.static'):
             case $this->translator->trans('mautic.lead.list.searchcommand.static', [], null, 'en_US'):
                 [$expr, $forceParameters] = $this->getStaticSegmentExpression($q);
                 if ($filter->not) {
-                    $expr = $q->expr()->not($expr);
+                    $expr = $this->negateExpression($q, $expr);
                 }
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
@@ -530,6 +530,15 @@ class LeadListRepository extends CommonRepository
      *
      * @return array{mixed, array<string, string>}
      */
+    private function negateExpression($q, $expr): object|string
+    {
+        if ($q instanceof \Doctrine\ORM\QueryBuilder) {
+            return $q->expr()->not($expr);
+        }
+
+        return sprintf('NOT(%s)', (string) $expr);
+    }
+
     private function getStaticSegmentExpression($q): array
     {
         $column         = sprintf('%s.filters', $this->getTableAlias());
