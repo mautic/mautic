@@ -21,13 +21,19 @@ final class AssetRepositoryFunctionalTest extends MauticMysqlTestCase
         $repository            = $this->em->getRepository(Asset::class);
         $this->assetRepository = $repository;
 
-        $this->createAsset('Photo', 'image/png');
-        $this->createAsset('Clip', 'video/mp4');
-        $this->createAsset('Song', 'audio/mpeg');
-        $this->createAsset('Report', 'application/pdf');
-        $this->createAsset('Notes', 'text/plain');
-        $this->createAsset('Archive', 'application/zip');
-        $this->createAsset('Unknown', null);
+        $this->createAsset('Photo', 'image/png', 'png');
+        $this->createAsset('Clip', 'video/mp4', 'mp4');
+        $this->createAsset('Song', 'audio/mpeg', 'mp3');
+        $this->createAsset('Report', 'application/pdf', 'pdf');
+        $this->createAsset('Notes', 'text/plain', 'txt');
+        $this->createAsset('Archive', 'application/zip', 'zip');
+        $this->createAsset('Unknown', null, null);
+        $this->createAsset('Layers', 'application/x-photoshop', 'psd');
+        $this->createAsset('Scanned', null, 'jpg');
+        $this->createAsset('Octet photo', 'application/octet-stream', 'png');
+        $this->createAsset('Generic zip', 'application/octet-stream', 'zip');
+        $this->createAsset('Charset notes', 'text/plain; charset=utf-8', 'txt');
+        $this->createAsset('Macro sheet', 'application/vnd.ms-excel.sheet.macroEnabled.12', 'xlsm');
         $this->em->flush();
     }
 
@@ -36,10 +42,10 @@ final class AssetRepositoryFunctionalTest extends MauticMysqlTestCase
      */
     public static function mimeCommandProvider(): iterable
     {
-        yield 'image' => ['is:image', ['Photo']];
+        yield 'image' => ['is:image', ['Layers', 'Octet photo', 'Photo', 'Scanned']];
         yield 'video' => ['is:video', ['Clip']];
         yield 'audio' => ['is:audio', ['Song']];
-        yield 'document' => ['is:document', ['Notes', 'Report']];
+        yield 'document' => ['is:document', ['Charset notes', 'Macro sheet', 'Notes', 'Report']];
     }
 
     /**
@@ -56,8 +62,8 @@ final class AssetRepositoryFunctionalTest extends MauticMysqlTestCase
      */
     public static function negatedMimeCommandProvider(): iterable
     {
-        yield 'image' => ['!is:image', ['Archive', 'Clip', 'Notes', 'Report', 'Song', 'Unknown']];
-        yield 'document' => ['!is:document', ['Archive', 'Clip', 'Photo', 'Song', 'Unknown']];
+        yield 'image' => ['!is:image', ['Archive', 'Charset notes', 'Clip', 'Generic zip', 'Macro sheet', 'Notes', 'Report', 'Song', 'Unknown']];
+        yield 'document' => ['!is:document', ['Archive', 'Clip', 'Generic zip', 'Layers', 'Octet photo', 'Photo', 'Scanned', 'Song', 'Unknown']];
     }
 
     /**
@@ -74,26 +80,28 @@ final class AssetRepositoryFunctionalTest extends MauticMysqlTestCase
      */
     private function getTitles(string $searchString): array
     {
+        /** @var Asset[] $assets */
         $assets = $this->assetRepository->getEntities([
             'filter'           => ['string' => $searchString, 'force' => []],
             'ignore_paginator' => true,
         ]);
         $titles = array_map(
             static fn (Asset $asset): string => $asset->getTitle(),
-            is_array($assets) ? $assets : iterator_to_array($assets)
+            $assets
         );
         sort($titles);
 
         return $titles;
     }
 
-    private function createAsset(string $title, ?string $mime): void
+    private function createAsset(string $title, ?string $mime, ?string $extension): void
     {
         $asset = new Asset();
         $asset->setTitle($title);
         $asset->setStorageLocation('remote');
         $asset->setRemotePath('https://example.com/'.strtolower($title));
         $asset->setMime($mime);
+        $asset->setExtension($extension);
         $this->em->persist($asset);
     }
 }

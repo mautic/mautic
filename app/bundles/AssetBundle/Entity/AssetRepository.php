@@ -92,11 +92,22 @@ class AssetRepository extends CommonRepository
         $command         = $field         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
-        $negationMatchesNullMime = false;
-        $mimeCommandMap  = [
-            'mautic.asset.asset.searchcommand.isimage' => 'image/%',
-            'mautic.asset.asset.searchcommand.isvideo' => 'video/%',
-            'mautic.asset.asset.searchcommand.isaudio' => 'audio/%',
+        $mediaCommandMap = [
+            'mautic.asset.asset.searchcommand.isimage' => [
+                ['image/%'],
+                ['application/photoshop', 'application/x-photoshop'],
+                ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'tif', 'tiff', 'psd'],
+            ],
+            'mautic.asset.asset.searchcommand.isvideo' => [
+                ['video/%'],
+                [],
+                ['mp4', 'webm', 'ogv', 'mov'],
+            ],
+            'mautic.asset.asset.searchcommand.isaudio' => [
+                ['audio/%'],
+                [],
+                ['mp3', 'wav', 'ogg', 'oga', 'm4a', 'aac', 'flac'],
+            ],
         ];
         switch ($command) {
             case $this->translator->trans('mautic.asset.asset.searchcommand.isexpired'):
@@ -131,44 +142,40 @@ class AssetRepository extends CommonRepository
             case $this->translator->trans('mautic.asset.asset.searchcommand.isvideo', [], null, 'en_US'):
             case $this->translator->trans('mautic.asset.asset.searchcommand.isaudio'):
             case $this->translator->trans('mautic.asset.asset.searchcommand.isaudio', [], null, 'en_US'):
-                foreach ($mimeCommandMap as $key => $pattern) {
+                foreach ($mediaCommandMap as $key => [$patterns, $exactMimes, $extensions]) {
                     if (in_array($command, [
                         $this->translator->trans($key),
                         $this->translator->trans($key, [], null, 'en_US'),
                     ], true)) {
-                        $expr                    = $q->expr()->like('a.mime', ":$unique");
-                        $forceParameters         = [$unique => $pattern];
-                        $negationMatchesNullMime = true;
+                        [$expr, $forceParameters] = $this->buildMediaExpression($patterns, $exactMimes, $extensions);
                         break;
                     }
                 }
                 break;
             case $this->translator->trans('mautic.asset.asset.searchcommand.isdocument'):
             case $this->translator->trans('mautic.asset.asset.searchcommand.isdocument', [], null, 'en_US'):
-                $documentMimeTypes = [
-                    'application/pdf',
-                    'application/msword',
-                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    'application/vnd.ms-excel',
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                    'application/vnd.ms-powerpoint',
-                    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                    'application/vnd.oasis.opendocument.text',
-                    'application/vnd.oasis.opendocument.spreadsheet',
-                    'application/vnd.oasis.opendocument.presentation',
-                    'application/rtf',
-                    'text/plain',
-                    'text/csv',
-                ];
-                $documentExpressions = [];
-                $forceParameters     = [];
-                foreach ($documentMimeTypes as $mime) {
-                    $documentUnique                   = $this->generateRandomParameterName();
-                    $documentExpressions[]            = $q->expr()->eq('a.mime', ":$documentUnique");
-                    $forceParameters[$documentUnique] = $mime;
-                }
-                $expr                    = '('.implode(' OR ', $documentExpressions).')';
-                $negationMatchesNullMime = true;
+                [$expr, $forceParameters] = $this->buildMediaExpression(
+                    [],
+                    [
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'application/vnd.ms-word.document.macroEnabled.12',
+                        'application/vnd.ms-excel',
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        'application/vnd.ms-excel.sheet.macroEnabled.12',
+                        'application/vnd.ms-powerpoint',
+                        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                        'application/vnd.ms-powerpoint.presentation.macroEnabled.12',
+                        'application/vnd.oasis.opendocument.text',
+                        'application/vnd.oasis.opendocument.spreadsheet',
+                        'application/vnd.oasis.opendocument.presentation',
+                        'application/rtf',
+                        'text/plain',
+                        'text/csv',
+                    ],
+                    ['pdf', 'doc', 'docx', 'docm', 'xls', 'xlsx', 'xlsm', 'ppt', 'pptx', 'pptm', 'odt', 'ods', 'odp', 'rtf', 'txt', 'csv']
+                );
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
@@ -184,9 +191,6 @@ class AssetRepository extends CommonRepository
 
         if ($expr && $filter->not) {
             $expr = $q->expr()->not($expr);
-            if ($negationMatchesNullMime) {
-                $expr = '('.$expr.' OR '.$q->expr()->isNull('a.mime').')';
-            }
         }
 
         if (!empty($forceParameters)) {
@@ -199,6 +203,46 @@ class AssetRepository extends CommonRepository
         }
 
         return [$expr, $parameters];
+    }
+
+    /**
+     * @param string[] $patterns
+     * @param string[] $exactMimes
+     * @param string[] $extensions
+     *
+     * @return array{0: string, 1: array<string, string>}
+     */
+    private function buildMediaExpression(array $patterns, array $exactMimes, array $extensions): array
+    {
+        $parameters  = [];
+        $comparisons = [];
+
+        foreach ($patterns as $pattern) {
+            $name          = $this->generateRandomParameterName();
+            $parameters[$name] = $pattern;
+            $comparisons[] = "(a.mime IS NOT NULL AND a.mime LIKE :{$name})";
+        }
+
+        foreach ($exactMimes as $mime) {
+            $exactName         = $this->generateRandomParameterName();
+            $prefixName        = $this->generateRandomParameterName();
+            $parameters[$exactName]  = $mime;
+            $parameters[$prefixName] = $mime.';%';
+            $comparisons[]     = "(a.mime IS NOT NULL AND (a.mime = :{$exactName} OR a.mime LIKE :{$prefixName}))";
+        }
+
+        $extensionComparisons = [];
+        foreach ($extensions as $extension) {
+            $name                   = $this->generateRandomParameterName();
+            $parameters[$name]      = $extension;
+            $extensionComparisons[] = "a.extension = :{$name}";
+        }
+
+        if ($extensionComparisons) {
+            $comparisons[] = "((a.mime IS NULL OR a.mime = '' OR a.mime = 'application/octet-stream') AND a.extension IS NOT NULL AND (".implode(' OR ', $extensionComparisons).'))';
+        }
+
+        return ['('.implode(' OR ', $comparisons).')', $parameters];
     }
 
     /**
