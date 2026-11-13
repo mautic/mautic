@@ -64,7 +64,7 @@
                     {% endif %}
                     {% if form.companycountry is defined %}
                         <div class="col-sm-{{ halfSize }}">
-                            {{ form_widget(form.companycountry, {'attr': {'placeholder': form.companycountry.vars.label}}) }}
+                            {{ form_widget(form.companycountry, {'attr': {'placeholder': form.companycountry.vars.label, 'aria-label': form.companycountry.vars.label}}) }}
                         </div>
                     {% endif %}
                 </div>

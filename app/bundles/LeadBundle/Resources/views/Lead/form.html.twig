@@ -67,7 +67,7 @@
                         </div>
                     {% endif %}
                     <div class="form-group mb-0">
-                        <label class="form-label mb-5">{{ form.email.vars.label }}</label>
+                        {{ form_label(form.email, null, {'label_attr': {'class': 'form-label mb-5'}}) }}
                         <div class="row">
                             <div class="col-sm-8">
                                 {{ form_widget(form.email, {'attr': {'placeholder': form.email.vars.label}}) }}
