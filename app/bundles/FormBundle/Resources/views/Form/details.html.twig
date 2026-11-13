@@ -132,8 +132,8 @@
             <!--/ form detail header -->
 
             <!-- form detail collapseable -->
-            <div class="collapse pr-md pl-md" id="form-details">
-                <div class="pr-md pl-md pb-md">
+            <div class="collapse pe-16 ps-16" id="form-details">
+                <div class="pe-16 ps-16 pb-16">
                     <div class="panel shd-none mb-0">
                         <table class="table table-hover mb-0">
                             <tbody>
@@ -158,7 +158,7 @@
             <!--/ form detail collapseable toggler -->
 
             <!-- stats -->
-            <div class="pa-md">
+            <div class="pa-16">
                 <div class="row">
                     <div class="col-sm-12">
                         {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
@@ -185,7 +185,7 @@
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-6 align-middle">
-                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                    <h5 class="text-white dark-md fw-sb mb-5">
                                         <span class="ri-download-line"></span>
                                         {{ 'mautic.form.graph.line.submissions'|trans }}
                                     </h5>
@@ -194,7 +194,7 @@
                                     {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'float-end'}) }}
                                 </div>
                             </div>
-                            <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                            <div class="d-flex flex-column pt-0 ps-16 pb-16 pe-16 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats['submissionsInTime'], 'chartType': 'line', 'chartHeight': 300}) }}
                             </div>
                         </div>
@@ -220,12 +220,12 @@
         </div>
 
         <!-- start: tab-content -->
-        <div class="tab-content pa-md">
+        <div class="tab-content pa-16">
             {% if showActions %}
                 <!-- #actions-container -->
                 <div class="tab-pane active fade in bdr-w-0" id="actions-container">
                     {% for group, groupActions in activeFormActions %}
-                        <h5 class="fw-sb mb-xs">{{ group|title }}</h5>
+                        <h5 class="fw-sb mb-5">{{ group|title }}</h5>
                         <ul class="list-group">
                             {# @var \Mautic\FormBundle\Entity\Action $action #}
                             {% for action in groupActions %}
@@ -243,7 +243,7 @@
                                             </div>
                                         {% endif %}
                                         <div class="col-md-7 align-middle">
-                                            <h5 class="fw-sb text-interactive mb-xs">{{ action.name }}</h5>
+                                            <h5 class="fw-sb text-interactive mb-5">{{ action.name }}</h5>
                                             <h6 class="text-white dark-sm">{{ action.description|purify }}</h6>
                                         </div>
                                         <div class="col-md-4 align-middle text-end">
@@ -260,8 +260,8 @@
 
             <!-- #fields-container -->
             <div class="tab-pane fade {% if not showActions %}active in{% endif %} bdr-w-0" id="fields-container">
-                <h5 class="fw-sb mb-xs">{{ 'mautic.form.field'|trans }}</h5>
-                <ul class="list-group mb-xs">
+                <h5 class="fw-sb mb-5">{{ 'mautic.form.field'|trans }}</h5>
+                <ul class="list-group mb-5">
                     {# @var \Mautic\FormBundle\Entity\Field $field #}
                     {% for field in activeFormFields %}
                       {% if not field.parent %}
@@ -272,7 +272,7 @@
                       {# @var \Mautic\FormBundle\Entity\Field $field #}
                       {% for fieldChild in activeFormFields %}
                           {% if fieldChild.parent == field.id %}
-                              <li class="list-group-item ml-20">
+                              <li class="list-group-item ms-24">
                                   {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': fieldChild}) }}
                               </li>
                           {% endif %}
@@ -289,9 +289,9 @@
     <!-- right section -->
     <div class="col-md-3 bdr-l height-auto">
         <!-- form HTML -->
-        <div class="pa-md">
+        <div class="pa-16">
             {% set aboveFoldContent %}
-                <h4 class="fw-b mb-lg">{{ 'mautic.form.form.header.copy'|trans }}</h4>
+                <h4 class="fw-b mb-24">{{ 'mautic.form.form.header.copy'|trans }}</h4>
                 {% include '@MauticCore/Components/pictogram.html.twig' with {
                     pictogram: 'embed',
                     size: 64,
@@ -300,9 +300,9 @@
             {% endset %}
 
             {% set belowFoldContent %}
-                <h5 class="mt-lg fw-b">{{ 'mautic.form.form.header.landingpages'|trans }}</h5>
-                <p class="mt-xs mb-lg">{{ 'mautic.form.form.help.landingpages'|trans }}</p>
-                <h5 class="mt-lg mb-sm fw-b">{{ 'mautic.form.form.header.external_cms'|trans }}</h5>
+                <h5 class="mt-24 fw-b">{{ 'mautic.form.form.header.landingpages'|trans }}</h5>
+                <p class="mt-5 mb-24">{{ 'mautic.form.form.help.landingpages'|trans }}</p>
+                <h5 class="mt-24 mb-12 fw-b">{{ 'mautic.form.form.header.external_cms'|trans }}</h5>
                 {% include '@MauticCore/Helper/button.html.twig' with {
                     buttons: [
                         {
@@ -339,11 +339,11 @@
         <!--/ form HTML -->
 
         <!-- preview URL -->
-        <div class="panel shd-none rounded-0 bdr-w-0 mt-sm mb-0">
+        <div class="panel shd-none rounded-0 bdr-w-0 mt-12 mb-0">
             <div class="panel-heading">
                 <div class="panel-title">{{ 'mautic.form.form.preview'|trans }}</div>
             </div>
-            <div class="panel-body pt-xs">
+            <div class="panel-body pt-5">
                 <div class="row">
                     <div class="form-group col-xs-12">
                         <div class="input-group">
@@ -393,7 +393,7 @@
             'variant': 'single',
             'innerText': ('<script type="text/javascript" src="' ~ url('mautic_form_generateform', {'id': activeForm.id}) ~ '"></script>')
         }) }}
-        <h3 class="pt-lg">{{ 'mautic.form.form.help.automaticcopy.iframe'|trans }}</h3>
+        <h3 class="pt-24">{{ 'mautic.form.form.help.automaticcopy.iframe'|trans }}</h3>
         {{ include('@MauticCore/Components/code-snippet.html.twig', {
             'variant': 'single',
             'innerText': ('<iframe src="' ~ url('mautic_form_preview', {'id': activeForm.id}) ~ '" width="300" height="300" title="' ~ ('mautic.form.form.iframe.title'|trans) ~ '"><p>Your browser does not support iframes.</p></iframe>')
@@ -420,14 +420,14 @@
     {% set manualCopyModalContent %}
         <p>{{ 'mautic.form.form.help.selfhosted'|trans }}</p>
 
-        <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.script'|trans }}</h4>
+        <h4 class="mt-12 mb-12">{{ 'mautic.form.form.help.selfhosted.script'|trans }}</h4>
         {{ include('@MauticCore/Components/code-snippet.html.twig', {
             'variant': 'multi',
             'innerText': formScript,
             'className': 'code-snippet--scrollable'
         }) }}
 
-        <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.body'|trans }}</h4>
+        <h4 class="mt-12 mb-12">{{ 'mautic.form.form.help.selfhosted.body'|trans }}</h4>
         {{ include('@MauticCore/Components/code-snippet.html.twig', {
             'variant': 'multi',
             'innerText': formContent,
