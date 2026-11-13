@@ -229,13 +229,12 @@ class FormController extends CommonFormController
         $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_form_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-        // Submission stats per time period
-        $timeStats = $this->submissionModel->getSubmissionsLineChartData(
+        // Submission stats per time period, from the recorded totals rather than the submission rows
+        $timeStats = $this->submissionModel->getSubmissionTotalsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
-            null,
-            ['form_id' => $objectId]
+            $activeForm
         );
 
         // Only show actions and fields that still exist
@@ -266,6 +265,7 @@ class FormController extends CommonFormController
                 'viewParameters' => [
                     'activeForm'       => $activeForm,
                     'submissionCounts' => $submissionCounts,
+                    'submissionTotal'  => $this->submissionModel->getSubmissionTotal($activeForm),
                     'page'             => $page,
                     'logs'             => $logs,
                     'permissions'      => $permissions,
