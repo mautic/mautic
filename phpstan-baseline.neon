@@ -571,24 +571,6 @@ parameters:
 			path: app/bundles/ChannelBundle/Model/MessageModel.php
 
 		-
-			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageModel\:\:getMarketingMessagesEventLogs\(\) has parameter \$dateFrom with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageModel.php
-
-		-
-			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageModel\:\:getMarketingMessagesEventLogs\(\) has parameter \$dateTo with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageModel.php
-
-		-
-			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageModel\:\:getMarketingMessagesEventLogs\(\) has parameter \$messageId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageModel.php
-
-		-
 			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageQueueModel\:\:getQueuedChannelCount\(\) has parameter \$channel with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
