@@ -1,54 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine;
 
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Mautic\CoreBundle\Doctrine\Type\ArrayType;
+use Mautic\CoreBundle\Tests\Unit\Doctrine\Source\ExampleClassDeprecatedOnWakeup;
+use Mautic\CoreBundle\Tests\Unit\Doctrine\Source\ExampleClassWithoutDeclaredProperty;
+use Mautic\CoreBundle\Tests\Unit\Doctrine\Source\ExampleClassWithPrivateProperty;
+use Mautic\CoreBundle\Tests\Unit\Doctrine\Source\ExampleClassWithProtectedProperty;
+use Mautic\CoreBundle\Tests\Unit\Doctrine\Source\ExampleClassWithPublicProperty;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 use PHPUnit\Framework\TestCase;
-
-final class ExampleClassWithPrivateProperty
-{
-    /**
-     * @phpstan-ignore-next-line
-     */
-    private string $test = 'value';
-}
-
-final class ExampleClassWithProtectedProperty
-{
-    /**
-     * @phpstan-ignore-next-line
-     */
-    private string $test = 'value';
-}
-
-final class ExampleClassWithPublicProperty
-{
-    /**
-     * @phpstan-ignore-next-line
-     */
-    public $test = 'value';
-}
-
-final class ExampleClassDeprecatedOnWakeup
-{
-    /**
-     * @phpstan-ignore-next-line
-     */
-    public $test = 'value';
-
-    public function __wakeup(): void
-    {
-        trigger_error('This shape is deprecated.', E_USER_DEPRECATED);
-    }
-}
-
-final class ExampleClassWithoutDeclaredProperty
-{
-}
 
 final class ArrayTypeTest extends TestCase
 {
@@ -103,7 +69,7 @@ final class ArrayTypeTest extends TestCase
     {
         $result = $this->arrayType->convertToDatabaseValue([new ExampleClassWithPublicProperty()], $this->platform);
         $this->assertEquals(
-            'a:1:{i:0;O:68:"Mautic\CoreBundle\Tests\Unit\Doctrine\ExampleClassWithPublicProperty":1:{s:4:"test";s:5:"value";}}',
+            'a:1:{i:0;O:75:"Mautic\CoreBundle\Tests\Unit\Doctrine\Source\ExampleClassWithPublicProperty":1:{s:4:"test";s:5:"value";}}',
             $result
         );
     }

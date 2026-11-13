@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\CoreBundle\Tests\Unit\Command\src;
+namespace Mautic\CoreBundle\Tests\Unit\Command\Source;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
