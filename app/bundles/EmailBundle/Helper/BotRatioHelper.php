@@ -12,6 +12,18 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class BotRatioHelper
 {
     /**
+     * Mail providers fetch tracking pixels on behalf of real readers.
+     *
+     * @var string[]
+     */
+    private const MAIL_PROVIDER_PROXY_MARKERS = [
+        'googleimageproxy',
+        'gmailimageproxy',
+        'via ggpht.com',
+        'yahoo! mail proxy',
+    ];
+
+    /**
      * @param string[] $blockedUserAgents
      * @param string[] $blockedIPAddresses
      */
@@ -71,12 +83,25 @@ class BotRatioHelper
 
     private function isUserAgentInIgnoreList(string $userAgent): bool
     {
-        if ($this->isBotByMatomoDetector($userAgent)) {
-            return true;
-        }
-
         foreach ($this->blockedUserAgents as $blockedUserAgent) {
             if (str_contains($userAgent, $blockedUserAgent)) {
+                return true;
+            }
+        }
+
+        if ($this->isMailProviderProxy($userAgent)) {
+            return false;
+        }
+
+        return $this->isBotByMatomoDetector($userAgent);
+    }
+
+    public function isMailProviderProxy(string $userAgent): bool
+    {
+        $userAgent = strtolower($userAgent);
+
+        foreach (self::MAIL_PROVIDER_PROXY_MARKERS as $marker) {
+            if (str_contains($userAgent, $marker)) {
                 return true;
             }
         }

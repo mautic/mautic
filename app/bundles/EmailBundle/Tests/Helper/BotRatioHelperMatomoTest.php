@@ -68,6 +68,50 @@ final class BotRatioHelperMatomoTest extends TestCase
         $this->assertTrue($result, 'Expected bot to be detected via ratio-based logic when Matomo returns false');
     }
 
+    public function testGgphtDomainAloneDoesNotMatchMailProviderProxy(): void
+    {
+        $deviceDetectorFactoryMock = $this->createStub(DeviceDetectorFactoryInterface::class);
+        $botRatioHelper            = new BotRatioHelper($deviceDetectorFactoryMock);
+
+        $this->assertFalse($botRatioHelper->isMailProviderProxy('Googlebot/2.1 (ggpht.com)'));
+    }
+
+    #[DataProvider('mailProviderProxyUserAgentsProvider')]
+    public function testMailProviderProxiesAreNotClassifiedAsBots(string $userAgent): void
+    {
+        $deviceDetectorFactoryMock = $this->createMock(DeviceDetectorFactoryInterface::class);
+        $deviceDetectorFactoryMock->expects($this->never())->method('create');
+
+        $botRatioHelper = new BotRatioHelper($deviceDetectorFactoryMock);
+        $emailStatMock  = $this->createMock(Stat::class);
+        $emailStatMock->method('getDateSent')->willReturn(new \DateTime('-1 second'));
+
+        $result = $botRatioHelper->isHitByBot(
+            $emailStatMock,
+            new \DateTime(),
+            new IpAddress('1.2.3.4'),
+            $userAgent
+        );
+
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function mailProviderProxyUserAgentsProvider(): iterable
+    {
+        yield 'Gmail image proxy' => [
+            'Mozilla/5.0 (Windows NT 5.1; rv:11.0) Gecko Firefox/11.0 (via ggpht.com GoogleImageProxy)',
+        ];
+        yield 'Gmail image proxy legacy signature' => [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) GmailImageProxy',
+        ];
+        yield 'Yahoo mail proxy' => [
+            'Yahoo! Mail Proxy',
+        ];
+    }
+
     /**
      * @return iterable<string, array{string, string}>
      */
