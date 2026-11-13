@@ -22,10 +22,7 @@ reviews:
   review_info: false
   in_progress_fortune: false
   enable_prompt_for_ai_agents: false
-  related_issues: false
   related_prs: false
-  assess_linked_issues: false
-  collapse_walkthrough: true
   finishing_touches:
     docstrings:
       enabled: false
@@ -34,6 +31,8 @@ reviews:
     fix_ci:
       enabled: false
     resolve_merge_conflict:
+      enabled: false
+    autofix:
       enabled: false
   auto_apply_labels: true
   labeling_instructions:
