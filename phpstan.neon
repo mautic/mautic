@@ -221,15 +221,6 @@ parameters:
             paths:
                  - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/ApiKey/HttpFactoryTest.php
                  - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
-        -
-            message: '#Call to an undefined method Mautic\\IntegrationsBundle\\Auth\\Provider\\AuthCredentialsInterface::#'
-            path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth2ThreeLegged/HttpFactory.php
-        # getClient takes the generic AuthCredentialsInterface, private helpers keep the concrete one for its getters
-        -
-            identifier: typePerfect.narrowPrivateClassMethodParamType
-            paths:
-                - app/bundles/IntegrationsBundle/Auth/Provider/BasicAuth/HttpFactory.php
-                - app/bundles/IntegrationsBundle/Auth/Provider/Oauth1aTwoLegged/HttpFactory.php
 
         # deprecation
         -
@@ -419,6 +410,8 @@ rules:
     - Symplify\PHPStanRules\Rules\RequireArrayShapeReturnRule
     - Utils\PHPStan\Rule\GenericTraitUseMustHaveGenericDocblockRule
     - Utils\PHPStan\Rule\BigIntIdParamMustBeIntOrStringRule
+    - Utils\PHPStan\Rule\BoolNullReturnDocblockToNativeTypeRule
+    - Utils\PHPStan\Rule\BoolNullPropertyDocblockToNativeTypeRule
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
     - Utils\PHPStan\Rule\NoServiceInEventConstructorRule
     - Utils\PHPStan\Rule\SingleArgumentDispatchRule
@@ -442,6 +435,14 @@ services:
             - phpstan.rules.rule
     -
         class: Utils\PHPStan\Collector\ReturnObjectDocblockCollector
+        tags:
+            - phpstan.collector
+    -
+        class: Utils\PHPStan\Collector\BoolNullReturnDocblockCollector
+        tags:
+            - phpstan.collector
+    -
+        class: Utils\PHPStan\Collector\BoolNullPropertyDocblockCollector
         tags:
             - phpstan.collector
     -

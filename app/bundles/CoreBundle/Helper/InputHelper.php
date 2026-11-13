@@ -25,10 +25,8 @@ final class InputHelper
      * Do not convert invalid values to false, but return null.
      *
      * @param bool|int|string|null $value
-     *
-     * @return bool|null
      */
-    public static function boolean($value)
+    public static function boolean($value): ?bool
     {
         return match (strtoupper((string) $value)) {
             'T', 'Y' => true,

@@ -166,7 +166,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
                 }
                 if (!empty($clickthrough['channel'])) {
                     if (1 === count($clickthrough['channel'])) {
-                        $channelId = reset($clickthrough['channel']);
+                        $channelId = (int) reset($clickthrough['channel']);
                         $channel   = key($clickthrough['channel']);
                     } else {
                         $channel   = $clickthrough['channel'][0];
@@ -176,7 +176,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
                     $download->setSourceId($channelId);
                 } elseif (!empty($clickthrough['source'])) {
                     $download->setSource($clickthrough['source'][0]);
-                    $download->setSourceId($clickthrough['source'][1]);
+                    $download->setSourceId((int) $clickthrough['source'][1]);
                 }
 
                 if (!empty($clickthrough['email'])) {

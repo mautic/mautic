@@ -114,13 +114,14 @@ final class CampaignSubscriberTest extends TestCase
     /**
      * @return PushContactInterface&MockObject
      */
-    private function createPublishedIntegration(bool $isPublished): PushContactInterface
+    private function createPublishedIntegration(bool $isPublished): MockObject
     {
         $settings = new Integration();
         $settings->setIsPublished($isPublished);
 
         $integration = $this->createMock(PushContactInterface::class);
-        $integration->method('getIntegrationConfiguration')->willReturn($settings);
+        $integration->method('getIntegrationConfiguration')
+            ->willReturn($settings);
 
         return $integration;
     }

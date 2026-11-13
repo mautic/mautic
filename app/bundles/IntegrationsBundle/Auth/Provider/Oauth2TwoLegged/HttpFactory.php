@@ -94,7 +94,7 @@ final class HttpFactory implements AuthProviderInterface
         return $credentials instanceof PasswordCredentialsGrantInterface || $credentials instanceof ClientCredentialsGrantInterface;
     }
 
-    private function credentialsAreConfigured(AuthCredentialsInterface $credentials): bool
+    private function credentialsAreConfigured(PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface $credentials): bool
     {
         if (empty($credentials->getAuthorizationUrl()) || empty($credentials->getClientId()) || empty($credentials->getClientSecret())) {
             return false;

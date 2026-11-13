@@ -310,10 +310,7 @@ class Trigger extends FormEntity implements UuidInterface
         return $this->points;
     }
 
-    /**
-     * @param mixed $points
-     */
-    public function setPoints($points): void
+    public function setPoints(?int $points): void
     {
         $this->isChanged('points', $points);
         $this->points = $points;
