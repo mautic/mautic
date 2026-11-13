@@ -28,7 +28,7 @@
             'delete': permissions['report:reports:deleteown'] or permissions['report:reports:deleteother'],
         },
       },
-        'quickFilters': {
+      'quickFilters': {
             'mautic.core.quick_filters.status': {
                 'conflictGroup': true,
                 'filters': [
@@ -67,7 +67,7 @@
                     }
                 ]
             }
-        },
+      },
   }) }}
       <div class="page-list">
         {{- include('@MauticReport/Report/_list.html.twig') -}}
