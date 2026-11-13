@@ -8,10 +8,8 @@ const scrollObserver = new ResizeObserver((entries) => entries.forEach(({target}
 
 const observeCodeBlocks = (root) => root.querySelectorAll('.code-block__body').forEach((body) => scrollObserver.observe(body));
 
-new MutationObserver((mutations) => mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
-    if (node.nodeType === Node.ELEMENT_NODE) observeCodeBlocks(node);
-}))).observe(document.documentElement, {childList: true, subtree: true});
 observeCodeBlocks(document);
+mQuery(document).on('mautic:onPageLoad:before', (event, container) => observeCodeBlocks(document.querySelector(container) || document));
 
 document.addEventListener('click', (event) => {
     const toggle = event.target.closest('[data-code-block-toggle]');
