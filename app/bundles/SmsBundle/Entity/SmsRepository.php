@@ -43,6 +43,9 @@ class SmsRepository extends CommonRepository
         return $this->getPublishedBroadcastsQuery($id)->toIterable();
     }
 
+    /**
+     * Builds the query for published segment broadcasts, optionally restricted by ID.
+     */
     private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
@@ -80,7 +83,7 @@ class SmsRepository extends CommonRepository
             )
             ->setParameter('smsId', $smsId)
             // Order by ID so we can query by greater than X contact ID when batching
-            ->orderBy('lll.lead_id');
+            ->orderBy('l.id', 'ASC');
 
         return $q;
     }
