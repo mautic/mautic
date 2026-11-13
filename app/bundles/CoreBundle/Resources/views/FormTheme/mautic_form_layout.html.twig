@@ -275,12 +275,12 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     <input type="hidden" name="_method" value="{{ method|escape }}" />
 {% endif %}
 {% if form.vars.errors|length > 0 %}
-<div class="has-error pa-10">
+<div class="has-error pa-12">
     {{ form_errors(form) }}
 </div>
 {% endif %}
 {% if form.vars.help|length > 0 %}
-<div class="pa-10">
+<div class="pa-12">
     {{ form_help(form) }}
 </div>
 {% endif %}
@@ -632,7 +632,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
         {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' form-text')|trim}) -%}
         <p id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
             {%- if form.vars.attr.help_icon is defined and form.vars.attr.help_icon is not empty -%}
-                <i class="{{ form.vars.attr.help_icon }} ri-lg mr-xs"></i>
+                <i class="{{ form.vars.attr.help_icon }} ri-lg me-5"></i>
             {%- endif -%}
             {%- if help is not empty -%}
                 {%- if help_html is same as(false) -%}
