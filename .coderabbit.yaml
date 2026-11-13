@@ -13,6 +13,50 @@ reviews:
     ignore_usernames:
       - "dependabot[bot]"
       - "allcontributors[bot]"
+  # Walkthrough sections that add noise to Mautic PRs.
+  changed_files_summary: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  suggested_reviewers: false
+  review_status: false
+  review_info: false
+  in_progress_fortune: false
+  enable_prompt_for_ai_agents: false
+  auto_apply_labels: true
+  labeling_instructions:
+    - label: "bug"
+      instructions: "Apply when the PR fixes incorrect behavior."
+    - label: "enhancement"
+      instructions: "Apply when the PR improves an existing feature without being a bug fix."
+    - label: "feature"
+      instructions: "Apply when the PR adds a new user-facing feature."
+    - label: "refactoring"
+      instructions: "Apply when the PR restructures code without changing behavior."
+    - label: "chore"
+      instructions: "Apply when the PR only maintains the repository (tooling, configuration, housekeeping)."
+    - label: "user-interface"
+      instructions: "Apply when the PR changes appearance, layout or interactivity (Twig, CSS/SCSS, JS)."
+    - label: "translations"
+      instructions: "Apply when the PR changes translation (*.ini) files."
+    - label: "automated-tests"
+      instructions: "Apply when the PR adds or changes unit, functional or e2e tests."
+    - label: "db-migrations"
+      instructions: "Apply when the PR adds or changes a Doctrine migration."
+    - label: "deprecation"
+      instructions: "Apply when the PR deprecates code, templates or configuration."
+    - label: "bc-break"
+      instructions: "Apply when the PR breaks backward compatibility or edits an UPGRADE-*.md file with removals."
+    - label: "API"
+      instructions: "Apply when the PR changes the REST API."
+    - label: "CI"
+      instructions: "Apply when the PR changes GitHub Actions workflows or other CI configuration."
+  mutually_exclusive_groups:
+    type:
+      - "bug"
+      - "enhancement"
+      - "feature"
+      - "refactoring"
+      - "chore"
   path_instructions:
     - path: "**/*.php"
       instructions: |
@@ -128,6 +172,10 @@ reviews:
     # Mautic relies on native types and keeps DocBlocks minimal, so a docstring
     # coverage threshold would warn on almost every PHP PR.
     docstrings:
+      mode: "off"
+    # Mautic PR descriptions follow the repository template; the check is
+    # always skipped.
+    description:
       mode: "off"
 knowledge_base:
   # Uses guideline files in the repo (such as AGENTS.md) as review context.
