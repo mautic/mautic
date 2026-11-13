@@ -416,6 +416,7 @@ rules:
     - Utils\PHPStan\Rule\SingleArgumentDispatchRule
     - Utils\PHPStan\Rule\NativeUnionParamMustHaveUnionDocblockRule
     - Utils\PHPStan\Rule\NoDuplicateParamDocblockRule
+    - Utils\PHPStan\Rule\EntityEventListenerMustCheckInstanceofRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
