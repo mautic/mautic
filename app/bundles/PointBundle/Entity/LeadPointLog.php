@@ -49,10 +49,7 @@ class LeadPointLog
         return $this->dateFired;
     }
 
-    /**
-     * @param mixed $dateFired
-     */
-    public function setDateFired($dateFired): void
+    public function setDateFired(?\DateTimeInterface $dateFired): void
     {
         $this->dateFired = $dateFired;
     }

@@ -120,10 +120,7 @@ class Stat
         return $this->dateAdded;
     }
 
-    /**
-     * @param mixed $dateAdded
-     */
-    public function setDateAdded($dateAdded): static
+    public function setDateAdded(?\DateTimeInterface $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
