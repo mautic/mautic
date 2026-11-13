@@ -13,6 +13,11 @@ Mautic.disabledFocusActions = function(opener) {
 };
 
 Mautic.focusOnLoad = function () {
+    // Initialize DWC-style contact filters tab
+    if (mQuery('div.dwc-filter').length) {
+        Mautic.dynamicFiltersOnLoad('div.dwc-filter');
+    }
+
     if (mQuery('.builder').length) {
         // Activate droppers
         mQuery('.btn-dropper').each(function  () {
