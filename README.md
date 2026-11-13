@@ -395,6 +395,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://mahmoudalawad.netlify.app"><img src="https://avatars.githubusercontent.com/u/76591349?v=4&size=100" width="100px" height="100px" alt="Mahmoud Alawad"/><br /><sub><b>Mahmoud Alawad</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=mahmoud-alawad" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://victormoni.vercel.app"><img src="https://avatars.githubusercontent.com/u/123900844?v=4&size=100" width="100px" height="100px" alt="Victor Moni"/><br /><sub><b>Victor Moni</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=VictorMoni" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
