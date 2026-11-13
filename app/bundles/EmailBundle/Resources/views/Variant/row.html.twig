@@ -32,13 +32,13 @@
             </a>
 
             {% if isWinner %}
-                <span class="badge bg-success text-white ml-2" title="{{ 'mautic.core.ab_test.winner'|trans }}">
+                <span class="badge bg-success text-white ms-2" title="{{ 'mautic.core.ab_test.winner'|trans }}">
                     {{ 'mautic.core.ab_test.winner'|trans }}
                 </span>
             {% endif %}
 
             {% if variant is instanceof('\\Mautic\\CoreBundle\\Entity\\TranslationEntityInterface') and variant.isTranslation() %}
-                <span class="ml-2" data-bs-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
+                <span class="ms-2" data-bs-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
                     <i class="ri-translate"></i>
                 </span>
             {% endif %}
