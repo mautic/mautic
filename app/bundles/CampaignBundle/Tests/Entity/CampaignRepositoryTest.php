@@ -31,9 +31,11 @@ final class CampaignRepositoryTest extends TestCase
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
-            'mautic.campaign.campaign.searchcommand.isexpired' => 'is:expired',
-            'mautic.campaign.campaign.searchcommand.ispending' => 'is:pending',
-            default                                            => $id,
+            'mautic.campaign.campaign.searchcommand.isexpired'         => 'is:expired',
+            'mautic.campaign.campaign.searchcommand.ispending'         => 'is:pending',
+            'mautic.campaign.campaign.searchcommand.source.form'       => 'source:form',
+            'mautic.campaign.campaign.searchcommand.source.segment'    => 'source:segment',
+            default                                                    => $id,
         });
 
         $this->repository->autowireCommonRepository($translator);
@@ -65,11 +67,65 @@ final class CampaignRepositoryTest extends TestCase
         $this->assertSame(['par1' => true], $params);
     }
 
-    public function testGetSearchCommandsContainsExpirationFilters(): void
+    public function testAddSearchCommandWhereClauseHandlesSegmentSourceFilter(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'source:segment', 'string' => '', 'not' => false, 'strict' => false];
+
+        $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
+
+        $this->assertSame('EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref cl WHERE cl.campaign_id = c.id)', (string) $expr);
+        $this->assertSame([], $params);
+    }
+
+    public function testAddSearchCommandWhereClauseHandlesFormSourceFilter(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'source:form', 'string' => '', 'not' => false, 'strict' => false];
+
+        $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
+
+        $this->assertSame('EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_form_xref cf WHERE cf.campaign_id = c.id)', (string) $expr);
+        $this->assertSame([], $params);
+    }
+
+    public function testAddSearchCommandWhereClauseHandlesNegatedSegmentSourceFilter(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'source:segment', 'string' => '', 'not' => true, 'strict' => false];
+
+        $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
+
+        $this->assertSame('NOT EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref cl WHERE cl.campaign_id = c.id)', (string) $expr);
+        $this->assertSame([], $params);
+    }
+
+    public function testAddSearchCommandWhereClauseHandlesNegatedFormSourceFilter(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'source:form', 'string' => '', 'not' => true, 'strict' => false];
+
+        $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
+
+        $this->assertSame('NOT EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_form_xref cf WHERE cf.campaign_id = c.id)', (string) $expr);
+        $this->assertSame([], $params);
+    }
+
+    public function testGetSearchCommandsContainsCampaignFilters(): void
     {
         $commands = $this->repository->getSearchCommands();
         $this->assertContains('mautic.campaign.campaign.searchcommand.isexpired', $commands);
         $this->assertContains('mautic.campaign.campaign.searchcommand.ispending', $commands);
+        $this->assertContains('mautic.campaign.campaign.searchcommand.source.segment', $commands);
+        $this->assertContains('mautic.campaign.campaign.searchcommand.source.form', $commands);
     }
 
     #[DataProvider('ormSearchCommandDataProvider')]
