@@ -24,7 +24,7 @@
         } %}
         {% endif %}
     </div>
-    <div id="{{ bodyId }}" class="code-block__body" role="group" aria-label="{{ ariaLabel|default(filename|default(language|default('code'))) }}">
+    <div id="{{ bodyId }}" class="code-block__body" role="group" aria-label="{{ ariaLabel|default(filename|default(language|default('code')))|e('html_attr') }}">
         <ol class="code-block__lines">
             {% for line in lines %}
             <li class="code-block__line"{% if collapsible and loop.index > collapsedLines %} hidden data-code-block-extra{% endif %}><code>{{ line|default(' ') }}</code></li>
@@ -32,7 +32,7 @@
         </ol>
     </div>
     {% if collapsible %}
-    <button type="button" class="code-block__toggle btn btn-xs btn-nospin" aria-expanded="false" aria-controls="{{ bodyId }}" data-code-block-toggle data-more="{{ 'mautic.core.code_block.more_lines'|trans({'%count%': lines|length - collapsedLines}) }}" data-less="{{ 'mautic.core.code_block.collapse'|trans }}">
+    <button type="button" class="code-block__toggle btn btn-xs btn-nospin" aria-expanded="false" aria-controls="{{ bodyId }}" data-code-block-toggle data-more="{{ 'mautic.core.code_block.more_lines'|trans({'%count%': lines|length - collapsedLines})|e('html_attr') }}" data-less="{{ 'mautic.core.code_block.collapse'|trans|e('html_attr') }}">
         <span data-code-block-label>{{ 'mautic.core.code_block.more_lines'|trans({'%count%': lines|length - collapsedLines}) }}</span><i class="ri-arrow-down-s-line" aria-hidden="true"></i>
     </button>
     {% endif %}
