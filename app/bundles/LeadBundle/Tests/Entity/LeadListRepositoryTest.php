@@ -21,6 +21,9 @@ final class LeadListRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
+    private const DYNAMIC_COMMAND = 'is:dynamic';
+    private const STATIC_COMMAND  = 'is:static';
+
     private LeadListRepository $repository;
 
     /**
@@ -48,8 +51,8 @@ final class LeadListRepositoryTest extends TestCase
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(static fn (string $id): string => match ($id) {
-            'mautic.lead.list.searchcommand.dynamic' => 'is:dynamic',
-            'mautic.lead.list.searchcommand.static'  => 'is:static',
+            'mautic.lead.list.searchcommand.dynamic' => self::DYNAMIC_COMMAND,
+            'mautic.lead.list.searchcommand.static'  => self::STATIC_COMMAND,
             default                                  => $id,
         });
         $this->repository->autowireCommonRepository($translator);
@@ -79,10 +82,10 @@ final class LeadListRepositoryTest extends TestCase
      */
     public static function dbalSearchCommandNegationProvider(): iterable
     {
-        yield 'dynamic segment'                => ['is:dynamic', false, true];
-        yield 'negated dynamic segment'        => ['is:dynamic', true, false];
-        yield 'static segment'                 => ['is:static', false, false];
-        yield 'negated static segment'         => ['is:static', true, true];
+        yield 'dynamic segment'                => [self::DYNAMIC_COMMAND, false, true];
+        yield 'negated dynamic segment'        => [self::DYNAMIC_COMMAND, true, false];
+        yield 'static segment'                 => [self::STATIC_COMMAND, false, false];
+        yield 'negated static segment'         => [self::STATIC_COMMAND, true, true];
     }
 
     public function testIsContactInAnySegmentFalse(): void
