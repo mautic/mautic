@@ -1,5 +1,5 @@
 {% if (showVariants or showTranslations) and ((entity.isVariant and not entity.isVariant(true)) or (entity.isTranslation and not entity.isTranslation(true))) %}
-<div class="pa-md mt-80">
+<div class="pa-16 mt-80">
     {% set cards = [] %}
 
     {% set cards = cards|merge([{

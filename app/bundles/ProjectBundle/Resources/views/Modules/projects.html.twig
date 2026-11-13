@@ -1,14 +1,14 @@
 {% if item.projects is not empty %}
-<div class="project-group d-inline-flex gap-3 mb-xs">
+<div class="project-group d-inline-flex gap-3 mb-5">
 {% for project in item.projects %}
 
     {% set projectPopover %}
-        <header class="project-popover__header mt-xs">
+        <header class="project-popover__header mt-5">
             <span class="project-popover__icon" aria-hidden="true"><i class="ri-archive-stack-line"></i></span>
             <h2 class="project-popover__title type-heading-02 text-interactive">{{ project.name|striptags }}</h2>
         </header>
 
-        <div class="project-popover__meta mb-md">
+        <div class="project-popover__meta mb-16">
             {% if project.dateModified is not empty %}
                 <span class="project-popover__meta-text type-label-01 text-secondary">
                     {{ 'mautic.project.popover.updated.on'|trans({'%date%': project.dateModified.date|date}) }}
@@ -16,7 +16,7 @@
             {% endif %}
         </div>
 
-        <p class="project-popover__description type-body-compact-01 mb-md">
+        <p class="project-popover__description type-body-compact-01 mb-16">
             {{ project.description|striptags|u.truncate(150, '...') }}
         </p>
 
@@ -33,7 +33,7 @@
                         size: 'sm',
                         wide: true,
                         attributes: {
-                            class: 'project-popover__action mb-xs'
+                            class: 'project-popover__action mb-5'
                         }
                     }
                 ]) %}
@@ -62,7 +62,7 @@
             {% endif %}
         </div>
 
-        <footer class="project-popover__footer type-label-01 text-placeholder mt-lg">
+        <footer class="project-popover__footer type-label-01 text-placeholder mt-24">
             <span class="project-popover__footer-text">{{ 'mautic.project.popover.footer.label'|trans }}</span>
         </footer>
     {% endset %}

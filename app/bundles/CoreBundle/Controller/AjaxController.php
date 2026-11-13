@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Factory\IpLookupFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ThemeFavoritesHelper;
 use Mautic\CoreBundle\Helper\TokenSorter;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
@@ -330,6 +331,31 @@ class AjaxController extends CommonController
         $this->notificationModel->clearNotification($id, 200);
 
         return $this->sendJsonResponse(['success' => 1]);
+    }
+
+    /**
+     * Adds a theme to or removes a theme from the favorite themes of the logged-in user.
+     */
+    public function setThemeFavoriteAction(Request $request, ThemeFavoritesHelper $themeFavoritesHelper): JsonResponse
+    {
+        // The CSRF token is only validated for AJAX POST requests. Thus, reject all other requests.
+        if (!$request->isXmlHttpRequest() || !$request->isMethod(Request::METHOD_POST)) {
+            return $this->sendJsonResponse(['success' => 0], Response::HTTP_BAD_REQUEST);
+        }
+
+        $theme = $request->request->getString('theme');
+        $type  = $request->request->getString('type');
+
+        try {
+            $themeFavoritesHelper->setFavorite($theme, $type, $request->request->getBoolean('favorite'));
+        } catch (\InvalidArgumentException) {
+            return $this->sendJsonResponse(['success' => 0], Response::HTTP_BAD_REQUEST);
+        }
+
+        return $this->sendJsonResponse([
+            'success'  => 1,
+            'favorite' => $themeFavoritesHelper->isFavorite($theme, $type),
+        ]);
     }
 
     public function getBuilderTokensAction(Request $request, TokenSorter $tokenSorter): JsonResponse
