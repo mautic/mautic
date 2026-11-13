@@ -19,6 +19,7 @@ trait TimelineTrait
      * @param array<mixed> $dateTimeColumns       Array of columns to be converted to \DateTime
      * @param mixed|null   $resultsParserCallback Callback to custom parse results
      * @param string|null  $secondaryOrdering     Name of column for secondary sort
+     * @param mixed|null   $postCallback          Callback to process results after fetching
      *
      * @return array<mixed>
      */
@@ -31,6 +32,7 @@ trait TimelineTrait
         $dateTimeColumns = [],
         $resultsParserCallback = null,
         ?string $secondaryOrdering = null,
+        $postCallback = null,
     ) {
         if (!empty($options['unitCounts'])) {
             [$tablePrefix, $column] = explode('.', $timestampColumn);
@@ -112,6 +114,10 @@ trait TimelineTrait
                     $resultsParserCallback($result);
                 }
             }
+        }
+
+        if (is_callable($postCallback)) {
+            $results = $postCallback($results);
         }
 
         if (!empty($options['paginated'])) {
