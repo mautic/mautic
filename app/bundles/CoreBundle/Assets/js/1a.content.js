@@ -2580,12 +2580,27 @@ Mautic.toggleFilter = function (element) {
         filtersInGroup.forEach(function (filterElement) {
             if (filterElement !== element) {
                 filterElement.classList.remove('active');
+                filterElement.setAttribute('aria-pressed', 'false');
             }
         });
     }
 
     // Toggle active class on the clicked element
     element.classList.toggle('active');
+    element.setAttribute('aria-pressed', element.classList.contains('active'));
+};
+
+/**
+ * Hands a quick-filter command held by the scope dropdown over to the popover selection.
+ */
+Mautic.releaseQuickFilterScope = function (searchInput) {
+    const scopeSelect = mQuery("select[data-livesearch-scope-for='" + searchInput.id + "']");
+    if (!scopeSelect.length || !Mautic.filterCommands.includes(scopeSelect.val())) {
+        return;
+    }
+
+    scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
+    Mautic.refreshSearchScopeChosen(scopeSelect);
 };
 
 /**
@@ -2594,6 +2609,7 @@ Mautic.toggleFilter = function (element) {
 Mautic.applyFilters = function () {
     Mautic.initFilterCommands();
     const searchInput = document.getElementById('list-search');
+    Mautic.releaseQuickFilterScope(searchInput);
     let currentSearchValue = searchInput.value || '';
     currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
 
@@ -2657,6 +2673,7 @@ Mautic.resetFilters = function () {
     const activeFilters = document.querySelectorAll('.label.active');
     activeFilters.forEach(function (filterElement) {
         filterElement.classList.remove('active');
+        filterElement.setAttribute('aria-pressed', 'false');
     });
 
     const selectFields = document.querySelectorAll('.popover-body select');
@@ -2712,7 +2729,7 @@ Mautic.getActiveFilterCommands = function (searchValue) {
         if (!searchInput) {
             return [];
         }
-        searchValue = searchInput.value || '';
+        searchValue = Mautic.getLiveSearchFilterValue(searchInput.id);
     }
 
     if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {
@@ -2764,6 +2781,7 @@ Mautic.initializePopoverFilters = function (popoverElement) {
         const label = popoverElement.querySelector(`.label[data-filter="${filterCommand}"]`);
         if (label) {
             label.classList.add('active');
+            label.setAttribute('aria-pressed', 'true');
         }
     });
 
