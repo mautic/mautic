@@ -72,9 +72,22 @@
   }
 
   &__toggle {
+    @include button-variant(
+      $background: transparent,
+      $text-color: var(--text-secondary),
+      $border-color: transparent,
+      $hover-background: var(--layer-hover),
+      $hover-text-color: var(--text-primary),
+      $active-background: var(--layer-hover),
+      $disabled-background: transparent,
+      $disabled-text-color: var(--text-disabled)
+    );
     width: 100%;
+    gap: var(--spacing-01);
+    justify-content: center;
     border-radius: 0;
     box-shadow: 0 -1px 0 var(--border-subtle);
+    font-size: var(--label-01-font-size);
 
     i {
       order: 0;
