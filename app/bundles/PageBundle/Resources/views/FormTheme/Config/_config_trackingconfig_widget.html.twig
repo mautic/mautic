@@ -70,10 +70,11 @@
                     </div>
                     <div class="tab-pane bdr-w-0" id="tracking-snippet-full">
                         <p class="text-muted small">{{ 'mautic.page.config.tracking.script.full.description'|trans }}</p>
-                        {% include '@MauticCore/Components/code-snippet.html.twig' with {
-                            variant: 'multi',
+                        {% include '@MauticCore/Components/code-block.html.twig' with {
                             ariaLabel: 'mautic.page.config.tracking.script.full.tab'|trans,
-                            innerText: '&lt;script&gt;
+                            filename: 'mautic-tracking.html',
+                            collapsedLines: 12,
+                            innerText: '<script>
     (function(w,d,t,e,r,n,a,m,s){w[\'MauticTrackingObject\']=n;
         w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
         m=d.getElementsByTagName(t)[0];a.async=1;a.src=e;
@@ -82,7 +83,7 @@
         };m.parentNode.insertBefore(a,m)
     })(window,document,\'script\',\'' ~ url('mautic_essential_js') ~ '\',\'' ~ url('mautic_tracking_js') ~ '\',\'mt\');
     mt(\'send\', \'pageview\');
-&lt;/script&gt;',
+</script>',
                         } %}
                     </div>
                 </div>
