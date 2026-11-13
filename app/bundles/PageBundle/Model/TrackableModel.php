@@ -59,6 +59,11 @@ class TrackableModel extends AbstractCommonModel
      */
     protected $usingClickthrough = true;
 
+    /**
+     * Whether new Trackable and Redirect entities found while parsing content are saved.
+     */
+    private bool $persistTrackables = true;
+
     private ?array $contactFieldUrlTokens = null;
 
     protected RedirectModel $redirectModel;
@@ -194,10 +199,10 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Save new entities
-        if (count($newRedirects)) {
+        if ($this->persistTrackables && count($newRedirects)) {
             $this->trackableRepository->saveEntities($newRedirects);
         }
-        if (count($newTrackables)) {
+        if ($this->persistTrackables && count($newTrackables)) {
             $this->trackableRepository->saveEntities($newTrackables);
         }
 
@@ -243,9 +248,37 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return array{string|string[],Redirect[]|Trackable[]}
      */
-    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, $usingClickthrough = true): array
+    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, bool $usingClickthrough = true): array
+    {
+        return $this->parseContentForTrackableTokens($content, $contentTokens, $channel, $channelId, $usingClickthrough, true);
+    }
+
+    /**
+     * Same as parseContentForTrackables(), for links that won't be tracked: the tokens are built so the links can
+     * still be replaced, get UTM tags or be shortened, but no new Trackable or Redirect entity is saved.
+     *
+     * @param string|string[] $content
+     * @param string[]        $contentTokens
+     * @param bool            $usingClickthrough See parseContentForTrackables()
+     *
+     * @return array{string|string[],Redirect[]|Trackable[]}
+     */
+    public function parseContentForTrackablesWithoutSaving($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, bool $usingClickthrough = true): array
+    {
+        return $this->parseContentForTrackableTokens($content, $contentTokens, $channel, $channelId, $usingClickthrough, false);
+    }
+
+    /**
+     * @param string|string[] $content
+     * @param string[]        $contentTokens
+     *
+     * @return array{string|string[],Redirect[]|Trackable[]}
+     */
+    private function parseContentForTrackableTokens($content, array $contentTokens, ?string $channel, int|string|null $channelId, bool $usingClickthrough, bool $persistTrackables): array
     {
         $this->usingClickthrough = $usingClickthrough;
+        // When the links won't be tracked, the entities are only needed to build the tokens, so nothing is stored
+        $this->persistTrackables = $persistTrackables;
 
         // Set do not track list for validateUrlIsTrackable()
         $this->doNotTrack = $this->getDoNotTrackList($content);
@@ -260,9 +293,13 @@ class TrackableModel extends AbstractCommonModel
             $content          = [$content];
         }
 
-        $trackableTokens = [];
-        foreach ($content as $key => $text) {
-            $content[$key] = $this->parseContent($text, $channel, $channelId, $trackableTokens);
+        try {
+            $trackableTokens = [];
+            foreach ($content as $key => $text) {
+                $content[$key] = $this->parseContent($text, $channel, $channelId, $trackableTokens);
+            }
+        } finally {
+            $this->persistTrackables = true;
         }
 
         return [
@@ -641,6 +678,10 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Simple redirects
+        if (!$this->persistTrackables) {
+            return $this->redirectModel->getRedirectsByUrlsWithoutSaving($trackableUrls);
+        }
+
         return $this->redirectModel->getRedirectsByUrls($trackableUrls);
     }
 

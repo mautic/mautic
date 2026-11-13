@@ -131,7 +131,30 @@ class RedirectModel extends FormModel
      *
      * @return array<Redirect>
      */
-    public function getRedirectsByUrls(array $urls)
+    public function getRedirectsByUrls(array $urls): array
+    {
+        return $this->findOrBuildRedirectsByUrls($urls, true);
+    }
+
+    /**
+     * Same as getRedirectsByUrls(), for links that won't be tracked: Redirect entities are built for the URLs that
+     * aren't known yet, but not saved.
+     *
+     * @param array<string> $urls
+     *
+     * @return array<Redirect>
+     */
+    public function getRedirectsByUrlsWithoutSaving(array $urls): array
+    {
+        return $this->findOrBuildRedirectsByUrls($urls, false);
+    }
+
+    /**
+     * @param array<string> $urls
+     *
+     * @return array<Redirect>
+     */
+    private function findOrBuildRedirectsByUrls(array $urls, bool $persistRedirects): array
     {
         /** @var array<Redirect> $redirects */
         $redirects   = $this->redirectRepository->findByUrls(array_values($urls));
@@ -162,7 +185,7 @@ class RedirectModel extends FormModel
         }
 
         // Save new entities
-        if (count($newEntities)) {
+        if ($persistRedirects && count($newEntities)) {
             $this->redirectRepository->saveEntities($newEntities);
         }
 
@@ -190,11 +213,16 @@ class RedirectModel extends FormModel
      */
     public function applyUtmTags(string $url, array $utmTags): string
     {
+        // An empty UTM value would only leave a stray "?" or "&" on the URL
+        $utmTags = array_filter(
+            $this->getUtmTagsForUrl($utmTags),
+            static fn ($value): bool => null !== $value && '' !== $value
+        );
+
         if ([] === $utmTags) {
             return $url;
         }
 
-        $utmTags         = $this->getUtmTagsForUrl($utmTags);
         $appendUtmString = http_build_query($utmTags, '', '&');
 
         return UrlHelper::appendQueryToUrl($url, $appendUtmString);
