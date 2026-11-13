@@ -385,97 +385,65 @@
               <!--/ stats -->
 
               <div class="stats-menu ps-16 mt-24">
-                  <!-- tabs controls -->
-                  <ul class="nav nav-tabs nav-tabs-contained">
-                      <li class="active">
-                          <a href="#stats-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">
-                              {{ 'mautic.email.thead.stats'|trans }}
-                          </a>
-                      </li>
-                      <li>
-                          <a href="#reads-map-container" role="tab" data-bs-toggle="tab" data-load="map" class="nav-link">
-                              {{ 'mautic.email.thead.maps'|trans }}
-                          </a>
-                      </li>
-                  </ul>
-                  <!--/ tabs controls -->
-
-                  <div class="date-range">
+                  <div class="date-range ms-auto">
                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
                           'dateRangeForm': dateRangeForm,
                       }) }}
                   </div>
               </div>
+              <div class="ps-16 mb-24">
+                  {% set tabsviewsdetails = [] %}
+                  {% set tabsviewsdetailsContent0 %}
+                                        <div id="emailGraphStats"
+                                             data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')})|e('html_attr') }}"
+                                        >
+                                            <div class="spinner">
+                                                <i class="ri-loader-3-line ri-spin"></i>
+                                            </div>
+                                        </div>
 
-              <div class="stats-menu__content tab-content pa-16 mb-24 shd-sm">
-                  <div class="tab-pane active bdr-w-0" id="stats-container">
-                      <div id="emailGraphStats"
-                           data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
-                      >
-                          <div class="spinner">
-                              <i class="ri-loader-3-line ri-spin"></i>
-                          </div>
-                      </div>
 
-                  </div>
-                  <div class="tab-pane bdr-w-0" id="reads-map-container"
-                       data-map-url="{{ path('mautic_email_map_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
-                  >
-                      <div class="spinner">
-                          <i class="ri-loader-3-line ri-spin"></i>
-                      </div>
-                  </div>
+                  {% endset %}
+                  {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'stats-container', 'label': 'mautic.email.thead.stats', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
+                  {% set tabsviewsdetailsContent1 %}
+                                        <div class="spinner">
+                                            <i class="ri-loader-3-line ri-spin"></i>
+                                        </div>
+
+                  {% endset %}
+                  {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'reads-map-container', 'label': 'mautic.email.thead.maps', 'content': tabsviewsdetailsContent1, 'className': 'pa-16', 'attributes': {'data-load': 'map'}, 'paneAttributes': {'data-map-url': path('mautic_email_map_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')})}}]) %}
+                  {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}
               </div>
 
               {{ customContent('details.stats.graph.below', _context) }}
 
-              <!-- tabs controls -->
-              <ul class="nav nav-tabs nav-tabs-contained">
-                  <li class="active">
-                      <a href="#clicks-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">
-                          {{ 'mautic.trackable.click_counts'|trans }}
-                      </a>
-                  </li>
-                  <li>
-                      <a href="#contacts-container" role="tab" data-bs-toggle="tab" class="nav-link">
-                          {{ 'mautic.email.associated.contacts'|trans }}
-                      </a>
-                  </li>
-                  {% if showTranslations %}
-                      <li>
-                          <a href="#translation-container" role="tab" data-bs-toggle="tab" class="nav-link">
-                              {{ 'mautic.core.translations'|trans }}
-                          </a>
-                      </li>
-                  {% endif %}
-              </ul>
-              <!--/ tabs controls -->
-          </div>
+              {% set tabsviewsdetails2 = [] %}
+              {% set tabsviewsdetails2Content0 %}
+                                {{- include('@MauticPage/Trackable/click_counts.html.twig', {
+                                    'trackables'  : trackables,
+                                    'entity'      : email,
+                                    'channel'     : 'email',
+                                    'clickCountsSortable' : true,
+                                    'clickCountsSorting'  : clickCountsSorting,
+                                }) -}}
 
-          <!-- start: tab-content -->
-          <div class="tab-content pa-16">
-              <div class="tab-pane active bdr-w-0" id="clicks-container">
-                  {{- include('@MauticPage/Trackable/click_counts.html.twig', {
-                      'trackables'  : trackables,
-                      'entity'      : email,
-                      'channel'     : 'email',
-                      'clickCountsSortable' : true,
-                      'clickCountsSorting'  : clickCountsSorting,
-                  }) -}}
-              </div>
+              {% endset %}
+              {% set tabsviewsdetails2 = tabsviewsdetails2|merge([{'id': 'clicks-container', 'label': 'mautic.trackable.click_counts', 'content': tabsviewsdetails2Content0, 'className': 'pa-16'}]) %}
+              {% set tabsviewsdetails2Content1 %}
+                                {{ contacts | raw }}
 
-              <div class="tab-pane bdr-w-0 page-list" id="contacts-container">
-                  {{ contacts | raw }}
-              </div>
-
-              <!-- #translation-container -->
+              {% endset %}
+              {% set tabsviewsdetails2 = tabsviewsdetails2|merge([{'id': 'contacts-container', 'label': 'mautic.email.associated.contacts', 'content': tabsviewsdetails2Content1, 'className': 'pa-16 page-list'}]) %}
               {% if showTranslations %}
-                  <div class="tab-pane bdr-w-0" id="translation-container">
-                      {{ translationContent|raw }}
-                  </div>
+              {% set tabsviewsdetails2Content2 %}
+                                    {{ translationContent|raw }}
+
+              {% endset %}
+              {% set tabsviewsdetails2 = tabsviewsdetails2|merge([{'id': 'translation-container', 'label': 'mautic.core.translations', 'content': tabsviewsdetails2Content2, 'className': 'pa-16'}]) %}
               {% endif %}
-              <!--/ #translation-container -->
+              {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails2, 'variant': 'contained'}) }}
           </div>
+
           {{ include('@MauticCore/Modules/suggested-actions.html.twig', {
               'entity': email,
               'routeBase': 'email',
