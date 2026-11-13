@@ -871,7 +871,7 @@ final class SubmissionModel extends CommonFormModel
 
     /**
      * How many submissions the form has recorded in all. Unlike the submission rows, this total stays when results
-     * are deleted and leaves out submissions made from the form's preview page.
+     * are deleted and leaves out submissions made from the form's preview in Mautic.
      */
     public function getSubmissionTotal(Form $form): int
     {

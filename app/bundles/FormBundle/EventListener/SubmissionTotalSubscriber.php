@@ -15,7 +15,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Keeps the submission totals that the form's stats are built from. A submission counts once it has gone through,
- * unless aggregate analytics are off or it was sent from the form's own preview page.
+ * unless aggregate analytics are off or it was sent from the form's preview in Mautic.
  */
 final readonly class SubmissionTotalSubscriber implements EventSubscriberInterface
 {
@@ -42,7 +42,7 @@ final readonly class SubmissionTotalSubscriber implements EventSubscriberInterfa
         $submission = $event->getSubmission();
         $form       = $submission->getForm();
 
-        if ($this->isSentFromThePreviewPage($submission, $form)) {
+        if ($this->isSentFromThePreviewInMautic($submission, $form)) {
             return;
         }
 
@@ -50,9 +50,10 @@ final readonly class SubmissionTotalSubscriber implements EventSubscriberInterfa
     }
 
     /**
-     * The preview page is the form's own public page, so a submission from there is a test, not a result.
+     * The Preview button in Mautic opens the form on its own page under /s/, so a submission from there is a test,
+     * not a result. The public /form/{id} page is what the iframe embed code loads, so submissions from it count.
      */
-    private function isSentFromThePreviewPage(Submission $submission, Form $form): bool
+    private function isSentFromThePreviewInMautic(Submission $submission, Form $form): bool
     {
         $refererPath = parse_url((string) $submission->getReferer(), PHP_URL_PATH);
 
@@ -60,7 +61,7 @@ final readonly class SubmissionTotalSubscriber implements EventSubscriberInterfa
             return false;
         }
 
-        $previewPath = $this->router->generate('mautic_form_preview', ['id' => $form->getId()]);
+        $previewPath = $this->router->generate('mautic_form_action', ['objectAction' => 'preview', 'objectId' => $form->getId()]);
 
         return rtrim($refererPath, '/') === rtrim($previewPath, '/');
     }

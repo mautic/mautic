@@ -18,6 +18,8 @@ final class SubmissionTotalSubscriberTest extends MauticMysqlTestCase
 {
     private Form $form;
 
+    private Form $otherForm;
+
     private SubmissionTotalSubscriber $subscriber;
 
     private SubmissionTotalRepository $submissionTotalRepository;
@@ -28,11 +30,8 @@ final class SubmissionTotalSubscriberTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $this->form = new Form();
-        $this->form->setName('Counted form');
-        $this->form->setAlias('counted-form');
-        $this->em->persist($this->form);
-        $this->em->flush();
+        $this->form      = $this->createForm('Counted form');
+        $this->otherForm = $this->createForm('Other form');
 
         $this->subscriber                = self::getContainer()->get(SubmissionTotalSubscriber::class);
         $this->submissionTotalRepository = self::getContainer()->get(SubmissionTotalRepository::class);
@@ -44,21 +43,24 @@ final class SubmissionTotalSubscriberTest extends MauticMysqlTestCase
     }
 
     /**
+     * The referers are templates: %1\$d is the submitted form's ID, %2\$d another form's ID.
+     *
      * @return iterable<string, array{string}>
      */
     public static function countedRefererProvider(): iterable
     {
         yield 'a landing page' => ['https://example.com/landing?utm_source=newsletter'];
         yield 'the form embedded on a page' => ['https://example.com/'];
-        yield 'another form\'s preview page' => ['http://localhost/form/%d0'];
+        yield 'the public page the iframe embed loads' => ['http://localhost/form/%1$d'];
+        yield 'another form\'s preview in Mautic' => ['http://localhost/s/forms/preview/%2$d'];
         yield 'no referer' => [''];
     }
 
     #[DataProvider('countedRefererProvider')]
     public function testASubmissionIsCountedInTheHourItWasMade(string $referer): void
     {
-        $this->subscriber->onFormSubmit($this->createEvent(sprintf($referer, $this->form->getId()), new \DateTime('2026-11-13 10:42:00')));
-        $this->subscriber->onFormSubmit($this->createEvent(sprintf($referer, $this->form->getId()), new \DateTime('2026-11-13 10:58:00')));
+        $this->subscriber->onFormSubmit($this->createEvent($this->referer($referer), new \DateTime('2026-11-13 10:42:00')));
+        $this->subscriber->onFormSubmit($this->createEvent($this->referer($referer), new \DateTime('2026-11-13 10:58:00')));
 
         $this->assertSame(2, $this->submissionTotalRepository->getTotal($this->form->getId()));
         $this->assertSame(
@@ -73,16 +75,16 @@ final class SubmissionTotalSubscriberTest extends MauticMysqlTestCase
      */
     public static function previewRefererProvider(): iterable
     {
-        yield 'the preview page' => ['http://localhost/form/%d'];
-        yield 'the preview page with a stylesheet' => ['http://localhost/form/%d?css=https://example.com/a.css'];
-        yield 'the preview page with a trailing slash' => ['http://localhost/form/%d/'];
-        yield 'the preview page on another host' => ['https://mautic.example.com/form/%d'];
+        yield 'the preview in Mautic' => ['http://localhost/s/forms/preview/%1$d'];
+        yield 'the preview with a query string' => ['http://localhost/s/forms/preview/%1$d?email=test@example.com'];
+        yield 'the preview with a trailing slash' => ['http://localhost/s/forms/preview/%1$d/'];
+        yield 'the preview on another host' => ['https://mautic.example.com/s/forms/preview/%1$d'];
     }
 
     #[DataProvider('previewRefererProvider')]
-    public function testASubmissionFromThePreviewPageIsNotCounted(string $referer): void
+    public function testASubmissionFromThePreviewInMauticIsNotCounted(string $referer): void
     {
-        $this->subscriber->onFormSubmit($this->createEvent(sprintf($referer, $this->form->getId()), new \DateTime()));
+        $this->subscriber->onFormSubmit($this->createEvent($this->referer($referer), new \DateTime()));
 
         $this->assertSame(0, $this->submissionTotalRepository->getTotal($this->form->getId()));
     }
@@ -92,6 +94,22 @@ final class SubmissionTotalSubscriberTest extends MauticMysqlTestCase
         $this->subscriber->onFormSubmit($this->createEvent('https://example.com/landing', new \DateTime()));
 
         $this->assertSame(0, $this->submissionTotalRepository->getTotal($this->form->getId()));
+    }
+
+    private function createForm(string $name): Form
+    {
+        $form = new Form();
+        $form->setName($name);
+        $form->setAlias(strtolower(str_replace(' ', '-', $name)));
+        $this->em->persist($form);
+        $this->em->flush();
+
+        return $form;
+    }
+
+    private function referer(string $template): string
+    {
+        return sprintf($template, $this->form->getId(), $this->otherForm->getId());
     }
 
     private function createEvent(string $referer, \DateTime $submittedAt): SubmissionEvent

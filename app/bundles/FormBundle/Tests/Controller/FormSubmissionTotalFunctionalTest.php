@@ -28,15 +28,21 @@ final class FormSubmissionTotalFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
     }
 
-    public function testASubmissionFromThePreviewPageIsAResultButIsNotRecordedInTheTotal(): void
+    public function testASubmissionFromThePublicFormPageIsRecorded(): void
     {
         $formId = $this->createForm();
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/form/'.$formId);
-        $form    = $crawler->selectButton('mauticform[submit]')->form();
-        $form['mauticform[email]']->setValue('preview@example.com');
-        $this->client->submit($form);
-        $this->assertResponseIsSuccessful();
+        // The public page is what the iframe embed code loads, so it is a real submission
+        $this->submitFromPage('/form/'.$formId, 'iframe@example.com');
+
+        $this->assertSubmissionCounts($formId, rows: 1, total: 1);
+    }
+
+    public function testASubmissionFromThePreviewInMauticIsAResultButIsNotRecordedInTheTotal(): void
+    {
+        $formId = $this->createForm();
+
+        $this->submitFromPage('/s/forms/preview/'.$formId, 'preview@example.com');
 
         $this->assertSubmissionCounts($formId, rows: 1, total: 0);
 
@@ -104,6 +110,16 @@ final class FormSubmissionTotalFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(201);
 
         return (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
+    }
+
+    private function submitFromPage(string $page, string $email): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, $page);
+        $this->assertResponseIsSuccessful();
+        $form = $crawler->selectButton('mauticform[submit]')->form();
+        $form['mauticform[email]']->setValue($email);
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
     }
 
     private function submitFromLandingPage(int $formId, string $email): void
