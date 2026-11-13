@@ -49,6 +49,8 @@ use Twig\Environment;
  */
 class FormModel extends CommonFormModel implements GlobalSearchInterface
 {
+    private const DONOTSUBMIT_BATCH_SIZE = 500;
+
     public function __construct(
         protected RequestStack $requestStack,
         protected Environment $twig,
@@ -728,6 +730,65 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         return $script;
+    }
+
+    /**
+     * @return \Generator<int, array<int, array<string, mixed>>>
+     */
+    public function findEmailFieldsWithMissingDonotSubmitValidation(): \Generator
+    {
+        $connection = $this->em->getConnection();
+        $tableName  = MAUTIC_TABLE_PREFIX.Field::TABLE_NAME;
+        $lastId     = 0;
+
+        do {
+            $batch = $connection->executeQuery(
+                'SELECT ff.id, ff.form_id, ff.validation
+                 FROM '.$tableName.' ff
+                 WHERE ff.type = ?
+                 AND ff.id > ?
+                 AND JSON_CONTAINS_PATH(COALESCE(ff.validation, ?), ?, ?) = 0
+                 ORDER BY ff.id
+                 LIMIT '.self::DONOTSUBMIT_BATCH_SIZE,
+                ['email', $lastId, '{}', 'one', '$.donotsubmit']
+            )->fetchAllAssociative();
+
+            if ([] === $batch) {
+                break;
+            }
+
+            $lastId       = (int) $batch[array_key_last($batch)]['id'];
+            $placeholders = implode(',', array_fill(0, count($batch), '?'));
+
+            $connection->executeStatement(
+                "UPDATE {$tableName}
+                 SET validation = JSON_SET(COALESCE(NULLIF(validation, JSON_ARRAY()), '{}'), '$.donotsubmit', true)
+                 WHERE id IN ($placeholders)
+                 AND JSON_CONTAINS_PATH(COALESCE(validation, '{}'), 'one', '$.donotsubmit') = 0",
+                array_column($batch, 'id')
+            );
+
+            yield $batch;
+        } while (self::DONOTSUBMIT_BATCH_SIZE === count($batch));
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $fieldsToUpdate
+     */
+    public function invalidateFormHtmlForUpdatedFields(array $fieldsToUpdate): void
+    {
+        if ([] === $fieldsToUpdate) {
+            return;
+        }
+
+        $formIds      = array_values(array_unique(array_map(intval(...), array_column($fieldsToUpdate, 'form_id'))));
+        $placeholders = implode(',', array_fill(0, count($formIds), '?'));
+        $tableName    = MAUTIC_TABLE_PREFIX.Form::TABLE_NAME;
+
+        $this->em->getConnection()->executeStatement(
+            "UPDATE {$tableName} SET cached_html = '' WHERE id IN ({$placeholders})",
+            $formIds
+        );
     }
 
     /**
