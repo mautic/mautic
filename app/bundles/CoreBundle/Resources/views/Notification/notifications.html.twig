@@ -6,7 +6,7 @@
     </a>
     <div class="dropdown-menu">
         <div class="panel panel-default">
-            <div class="panel-heading pt-sm">
+            <div class="panel-heading pt-12">
                 <div class="panel-title notification notification-title">
                     <h6 class="fw-sb d-flex justify-content-between align-items-center">{{ 'mautic.core.notifications'|trans }}
                         {% if notifications is not empty %}
@@ -29,14 +29,14 @@
                     </h6>
                 </div>
             </div>
-            <div class="pt-0 pb-xs ps-0 pe-0">
+            <div class="pt-0 pb-5 ps-0 pe-0">
                 <div class="scroll-content slimscroll d-flex flex-column" id="notifications">
                     {{ include('@MauticCore/Notification/notification_messages.html.twig', {
                         notifications: notifications,
                         updateMessage: updateMessage
                     }) }}
                     {% set class = notifications is not empty ? ' hide' : '' %}
-                    <div class="{{ class }} mautibot-image pa-lg d-flex flex-column align-items-center justify-content-center" id="notificationMautibot">
+                    <div class="{{ class }} mautibot-image pa-24 d-flex flex-column align-items-center justify-content-center" id="notificationMautibot">
                         <div class="fs-30">🦄</div>
                         <div class="text-secondary fw-sb">{{'mautic.core.notifications.empty'|trans}}</div>
                         <div class="text-secondary">{{'mautic.core.notifications.empty_extra'|trans}}</div>
