@@ -205,6 +205,7 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($checkedOut->format('Y-m-d H:i:s'), $lock['checked_out']);
         $this->assertSame($editor->getId(), (int) $lock['checked_out_by']);
 
+        $this->em->clear(Form::class);
         $crawler = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $this->assertCount(1, $crawler->filter('form[id^="mauticform_"]'));
