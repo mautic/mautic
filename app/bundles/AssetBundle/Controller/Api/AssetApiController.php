@@ -101,6 +101,11 @@ final class AssetApiController extends CommonApiController
             return $this->returnError('File of the asset is required.', Response::HTTP_BAD_REQUEST);
         }
 
+        // An asset left without the option keeps what it has: the global setting for a new one, its own option on a PUT
+        if (in_array($action, ['new', 'edit'], true) && !array_key_exists('trackDownloads', $this->entityRequestParameters)) {
+            $parameters['trackDownloads'] = $entity->getTrackDownloads();
+        }
+
         return $parameters;
     }
 }
