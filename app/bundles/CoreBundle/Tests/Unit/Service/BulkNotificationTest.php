@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Service;
 
-use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Service\BulkNotification;
+use Mautic\CoreBundle\Tests\Unit\Service\Source\NotificationModelFake;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\TestCase;
 
@@ -13,11 +13,11 @@ final class BulkNotificationTest extends TestCase
 {
     private BulkNotification $bulkNotification;
 
-    private NotificationModel $notificationModelFake;
+    private NotificationModelFake $notificationModelFake;
 
     protected function setUp(): void
     {
-        $this->notificationModelFake = $this->createNotificationModelFake();
+        $this->notificationModelFake = new NotificationModelFake();
         $this->bulkNotification      = new BulkNotification($this->notificationModelFake);
     }
 
@@ -60,27 +60,5 @@ final class BulkNotificationTest extends TestCase
         $this->assertSame($data[6], $notification[6]);
         $this->assertSame($data[0], $notification[7]);
         $this->assertSame($deduplicateDateTimeFrom, $notification[8]);
-    }
-
-    private function createNotificationModelFake(): NotificationModel
-    {
-        return new class() extends NotificationModel {
-            /**
-             * @var mixed[]
-             */
-            public array $notifications = [];
-
-            /**
-             * @noinspection PhpMissingParentConstructorInspection
-             */
-            public function __construct()
-            {
-            }
-
-            public function addNotification($message, $type = null, bool $isRead = false, $header = null, $iconClass = null, ?\DateTime $datetime = null, ?User $user = null, ?string $deduplicateValue = null, ?\DateTime $deduplicateDateTimeFrom = null): void
-            {
-                $this->notifications[] = func_get_args();
-            }
-        };
     }
 }
