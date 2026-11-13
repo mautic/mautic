@@ -72,24 +72,12 @@
   }
 
   &__toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-01);
     width: 100%;
-    padding: var(--spacing-02);
-    color: var(--text-secondary);
-    background: none;
-    border: 0;
-    border-top: 1px solid var(--border-subtle);
-    transition: var(--transition-all-productive);
-
-    &:hover {
-      color: var(--text-primary);
-      background: var(--layer-hover);
-    }
+    border-radius: 0;
+    box-shadow: 0 -1px 0 var(--border-subtle);
 
     i {
+      order: 0;
       transition: var(--transition-all-productive);
     }
 

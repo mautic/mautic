@@ -28,7 +28,7 @@
         </ol>
     </div>
     {% if collapsible %}
-    <button type="button" class="code-block__toggle btn-nospin type-label-01" aria-expanded="false" data-code-block-toggle data-more="{{ 'mautic.core.code_block.more_lines'|trans({'%count%': lines|length - collapsedLines}) }}" data-less="{{ 'mautic.core.code_block.collapse'|trans }}">
+    <button type="button" class="code-block__toggle btn btn-ghost btn-xs btn-nospin" aria-expanded="false" data-code-block-toggle data-more="{{ 'mautic.core.code_block.more_lines'|trans({'%count%': lines|length - collapsedLines}) }}" data-less="{{ 'mautic.core.code_block.collapse'|trans }}">
         <span data-code-block-label>{{ 'mautic.core.code_block.more_lines'|trans({'%count%': lines|length - collapsedLines}) }}</span><i class="ri-arrow-down-s-line" aria-hidden="true"></i>
     </button>
     {% endif %}
