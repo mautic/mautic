@@ -670,3 +670,20 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
         </div>
     </div>
 {% endblock %}
+
+{% block numberrange_widget %}
+    {% set errorAttr = { attr: { blockClass: 'm-0', itemClass: 'alert alert-danger m-0' } } %}
+    <div class="row-no-gutters">
+        <div class="col-xs-12 col-lg-6">
+            <div class="input-group">
+                {{ form_widget(form.number_from) }}
+                <span class="input-group-addon">{{ form_label(form.number_to) }}</span>
+            </div>
+            {{ form_errors(form.number_from, errorAttr) }}
+        </div>
+        <div class="col-xs-12 col-lg-6">
+            {{ form_widget(form.number_to) }}
+            {{ form_errors(form.number_to, errorAttr) }}
+        </div>
+    </div>
+{% endblock %}
