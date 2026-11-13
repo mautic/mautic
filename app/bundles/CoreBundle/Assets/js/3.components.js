@@ -33,5 +33,7 @@ document.addEventListener('click', (event) => {
     if (from === to) return;
 
     const duration = parseFloat(getComputedStyle(body).getPropertyValue('--duration-productive')) || 0;
-    body.animate({height: [`${from}px`, `${to}px`]}, {duration: duration * 2, easing: 'cubic-bezier(0.23, 1, 0.32, 1)'});
+    body.style.overflow = 'hidden';
+    const animation = body.animate({height: [`${from}px`, `${to}px`]}, {duration: duration * 2, easing: 'cubic-bezier(0.23, 1, 0.32, 1)'});
+    animation.onfinish = animation.oncancel = () => body.style.removeProperty('overflow');
 });
