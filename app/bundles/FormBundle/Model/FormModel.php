@@ -775,24 +775,20 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @param array<int, array<string, mixed>> $fieldsToUpdate
      */
-    public function enableDonotSubmitValidationOnEmailFields(array $fieldsToUpdate): void
+    public function invalidateFormHtmlForUpdatedFields(array $fieldsToUpdate): void
     {
         if ([] === $fieldsToUpdate) {
             return;
         }
 
-        $updatedFormIds = array_unique(array_column($fieldsToUpdate, 'form_id'));
+        $formIds      = array_values(array_unique(array_map(intval(...), array_column($fieldsToUpdate, 'form_id'))));
+        $placeholders = implode(',', array_fill(0, count($formIds), '?'));
+        $tableName    = MAUTIC_TABLE_PREFIX.Form::TABLE_NAME;
 
-        foreach ($updatedFormIds as $formId) {
-            $form = $this->getEntity($formId);
-
-            if (!$form) {
-                continue;
-            }
-
-            $form->setCachedHtml('');
-            $this->saveEntity($form, false);
-        }
+        $this->em->getConnection()->executeStatement(
+            "UPDATE {$tableName} SET cached_html = '' WHERE id IN ({$placeholders})",
+            $formIds
+        );
     }
 
     /**

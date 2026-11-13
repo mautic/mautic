@@ -552,7 +552,7 @@ final class ResultController extends CommonFormController
     private function enableDonotSubmitValidationOnUnconfiguredForms(FormModel $formModel): void
     {
         foreach ($formModel->findEmailFieldsWithMissingDonotSubmitValidation() as $fieldsToUpdate) {
-            $formModel->enableDonotSubmitValidationOnEmailFields($fieldsToUpdate);
+            $formModel->invalidateFormHtmlForUpdatedFields($fieldsToUpdate);
         }
     }
 

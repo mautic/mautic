@@ -140,11 +140,11 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
         $this->em->flush();
-        $lockedForm = $this->em->getRepository(Form::class)->find($formId);
         $checkedOut = new \DateTime('now');
-        $lockedForm->setCheckedOut($checkedOut);
-        $lockedForm->setCheckedOutBy($editor);
-        $this->em->flush();
+        $this->connection->executeStatement(
+            'UPDATE '.MAUTIC_TABLE_PREFIX.Form::TABLE_NAME.' SET checked_out = ?, checked_out_by = ?, checked_out_by_user = ? WHERE id = ?',
+            [$checkedOut->format('Y-m-d H:i:s'), $editor->getId(), $editor->getName(), $formId]
+        );
 
         $this->client->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
         $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}?tmpl=list");
@@ -177,6 +177,11 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
             ['{"blockfreeemail":true}', $formId, 'email']
         );
 
+        $this->connection->executeStatement(
+            'UPDATE '.MAUTIC_TABLE_PREFIX.Form::TABLE_NAME.' SET cached_html = ? WHERE id = ?',
+            ['stale', $formId]
+        );
+
         $this->client->request(
             Request::METHOD_POST,
             "/s/forms/results/{$formId}/batchMarkSpam?ids={$batchIds}"
@@ -188,6 +193,10 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
             [$formId, 'email']
         ), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue((bool) $repairedValidation['donotsubmit']);
+        $this->assertSame('', $this->connection->fetchOne(
+            'SELECT cached_html FROM '.MAUTIC_TABLE_PREFIX.Form::TABLE_NAME.' WHERE id = ?',
+            [$formId]
+        ));
 
         $lock = $this->connection->fetchAssociative(
             'SELECT checked_out, checked_out_by FROM '.MAUTIC_TABLE_PREFIX.Form::TABLE_NAME.' WHERE id = ?',
@@ -195,6 +204,10 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
         );
         $this->assertSame($checkedOut->format('Y-m-d H:i:s'), $lock['checked_out']);
         $this->assertSame($editor->getId(), (int) $lock['checked_out_by']);
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertCount(1, $crawler->filter('form[id^="mauticform_"]'));
 
         $this->loginOtherUser($editor);
         $this->client->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
