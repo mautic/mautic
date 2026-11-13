@@ -22,6 +22,19 @@ reviews:
   review_info: false
   in_progress_fortune: false
   enable_prompt_for_ai_agents: false
+  related_issues: false
+  related_prs: false
+  assess_linked_issues: false
+  collapse_walkthrough: true
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+    fix_ci:
+      enabled: false
+    resolve_merge_conflict:
+      enabled: false
   auto_apply_labels: true
   labeling_instructions:
     - label: "bug"
@@ -176,6 +189,10 @@ reviews:
     # Mautic PR descriptions follow the repository template; the check is
     # always skipped.
     description:
+      mode: "off"
+    title:
+      mode: "off"
+    issue_assessment:
       mode: "off"
 knowledge_base:
   # Uses guideline files in the repo (such as AGENTS.md) as review context.
