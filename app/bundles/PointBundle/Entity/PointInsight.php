@@ -7,12 +7,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PointInsightRepository::class)]
 #[ORM\Table(name: 'point_insights')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
-class PointInsight extends FormEntity
+class PointInsight extends FormEntity implements IdentifierInterface
 {
     public const string INSIGHT_TYPE_COMPARE_POINT_GROUPS = 'compare_point_groups';
 

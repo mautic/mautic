@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
@@ -50,7 +51,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 )]
 #[LeadFieldMinimumLength]
 #[UniqueEntity(fields: ['alias'], message: 'mautic.lead.field.alias.unique')]
-class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInterface
+class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInterface, IdentifierInterface
 {
     use UuidTrait;
 
