@@ -236,6 +236,12 @@ modal:
 pictogram: "Use for decorative illustrations, such as empty states, by name and size."
 ```
 
+### quantity-stepper
+
+```yaml
+quantity-stepper: "Use to set a small whole number, such as points or a count, within a known range, with buttons to step it up or down."
+```
+
 ### tile
 
 Use for a compact block of content with an optional button or click target. Tile is the main component to create a layer: place content inside a tile to add a new layer on top of the background.
