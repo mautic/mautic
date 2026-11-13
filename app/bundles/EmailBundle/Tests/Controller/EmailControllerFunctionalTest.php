@@ -1305,6 +1305,156 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($payload['plainText'], $content['email']['plainText']);
     }
 
+    public function testSaveRejectsPublishedEmailWithoutAnyBody(): void
+    {
+        // Entity rule: an active email needs HTML or plain text — or a theme
+        // that supplies the body at send time. With no theme and neither body
+        // field the publish attempt must fail validation.
+        $payload = [
+            'name'        => 'Published email without body',
+            'subject'     => 'Test subject',
+            'template'    => '',
+            'customHtml'  => '',
+            'plainText'   => '',
+            'emailType'   => 'template',
+            'isPublished' => 1,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+
+        $this->assertContains(
+            $response->getStatusCode(),
+            [Response::HTTP_BAD_REQUEST, Response::HTTP_UNPROCESSABLE_ENTITY],
+            $response->getContent()
+        );
+        $this->assertStringContainsString('Provide HTML or plain-text content', (string) $response->getContent());
+    }
+
+    public function testSaveAllowsPublishedEmailWithThemeOnlyBody(): void
+    {
+        // Compatibility: an active email whose body comes entirely from a
+        // rendered theme must keep saving — the theme supplies the HTML.
+        $payload = [
+            'name'        => 'Theme-only body email',
+            'subject'     => 'Test subject',
+            'template'    => 'blank',
+            'customHtml'  => '',
+            'plainText'   => '',
+            'emailType'   => 'template',
+            'isPublished' => 1,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+        $content = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('email', $content);
+        $this->assertSame('blank', $content['email']['template']);
+    }
+
+    public function testSaveAllowsInactiveDraftWithoutAnyBody(): void
+    {
+        // Incomplete inactive drafts are allowed; the rule gates activation.
+        $payload = [
+            'name'        => 'Draft email without body',
+            'subject'     => 'Test subject',
+            'template'    => '',
+            'customHtml'  => '',
+            'plainText'   => '',
+            'emailType'   => 'template',
+            'isPublished' => 0,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+    }
+
+    public function testSaveRejectsPublishingBodylessDraftOnUpdate(): void
+    {
+        // Update path: publishing an existing bodyless draft must fail the
+        // same way as creating it published.
+        $payload = [
+            'name'        => 'Draft published later',
+            'subject'     => 'Test subject',
+            'template'    => '',
+            'customHtml'  => '',
+            'plainText'   => '',
+            'emailType'   => 'template',
+            'isPublished' => 0,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+        $content = json_decode($response->getContent(), true);
+        $id      = $content['email']['id'];
+
+        $this->client->request(Request::METHOD_PATCH, "/api/emails/{$id}/edit", ['isPublished' => 1]);
+        $response = $this->client->getResponse();
+
+        $this->assertContains(
+            $response->getStatusCode(),
+            [Response::HTTP_BAD_REQUEST, Response::HTTP_UNPROCESSABLE_ENTITY],
+            $response->getContent()
+        );
+        $this->assertStringContainsString('Provide HTML or plain-text content', (string) $response->getContent());
+    }
+
+    public function testSaveRejectsScheduledActivationWithoutBody(): void
+    {
+        // Scheduled activation keeps the published flag set, so the rule must
+        // catch it as well.
+        $payload = [
+            'name'        => 'Scheduled email without body',
+            'subject'     => 'Test subject',
+            'template'    => '',
+            'customHtml'  => '',
+            'plainText'   => '',
+            'emailType'   => 'template',
+            'isPublished' => 1,
+            'publishUp'   => (new \DateTime('+2 days'))->format('Y-m-d H:i'),
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+
+        $this->assertContains(
+            $response->getStatusCode(),
+            [Response::HTTP_BAD_REQUEST, Response::HTTP_UNPROCESSABLE_ENTITY],
+            $response->getContent()
+        );
+        $this->assertStringContainsString('Provide HTML or plain-text content', (string) $response->getContent());
+    }
+
+    public function testUiFormShowsBodyRequiredErrorWhenPublishingWithoutBody(): void
+    {
+        // The violation anchors to customHtml, which the email form renders in
+        // its own error block even while the field stays hidden behind the
+        // builder — the error must be visible in the re-rendered form.
+        $crawler       = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $buttonCrawler = $crawler->selectButton('Save & Close');
+        $form          = $buttonCrawler->form();
+        $form->disableValidation();
+        $form['emailform[emailType]']->setValue('template');
+        $form['emailform[subject]']->setValue('Test subject');
+        $form['emailform[name]']->setValue('Published without body');
+        $form['emailform[template]']->setValue('');
+        $form['emailform[customHtml]']->setValue('');
+        $form['emailform[plainText]']->setValue('');
+        $form['emailform[isPublished]']->setValue('1');
+
+        $this->client->submit($form);
+
+        $this->assertStringContainsString(
+            'Provide HTML or plain-text content',
+            (string) $this->client->getResponse()->getContent()
+        );
+    }
+
     public function testSegmentEmailSendWithoutContinueSending(): void
     {
         $segment = $this->createSegment('Segment A', 'segment-a');
