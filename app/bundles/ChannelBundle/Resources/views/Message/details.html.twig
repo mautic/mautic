@@ -100,7 +100,7 @@
                     {% set messageTabContent %}
                         {% set message = ('all' is same as(channel)) ? 'mautic.channel.message.all_contacts' : 'mautic.channel.message.channel_contacts' %}
                         <div class="alert alert-info"><strong>{{ message|trans }}</strong></div>
-                        <div class="message-{{ channel }}">
+                        <div class="message-{{ channel|e('html_attr') }}">
                             {{ contacts|raw }}
                         </div>
                     {% endset %}

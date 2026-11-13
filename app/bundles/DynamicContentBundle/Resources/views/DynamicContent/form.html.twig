@@ -55,7 +55,7 @@
                                                 <div class="col-xs-5">
                                                     <div class="form-group">
                                                         <div class="available-filters mb-16 ps-0"
-                                                             data-prototype="{{ form_widget(form.filters.vars.prototype)|e }}"
+                                                             data-prototype="{{ form_widget(form.filters.vars.prototype)|e('html_attr') }}"
                                                              data-index="{{ index + 1 }}">
                                                             <select class="chosen form-control" id="available_filters">
                                                                 <option value=""></option>
@@ -75,9 +75,9 @@
                                                                                     id="available_{{ object }}_{{ value }}"
                                                                                     data-field-object="{{ object }}"
                                                                                     data-field-type="{{ params.properties.type }}"
-                                                                                    data-field-list="{{ list|json_encode }}"
-                                                                                    data-field-callback="{{ callback }}"
-                                                                                    data-field-operators="{{ operators|json_encode }}"
+                                                                                    data-field-list="{{ list|json_encode|e('html_attr') }}"
+                                                                                    data-field-callback="{{ callback|e('html_attr') }}"
+                                                                                    data-field-operators="{{ operators|json_encode|e('html_attr') }}"
                                                                                     class="segment-filter {{ icon }}">{{ params.label|trans }}</option>
                                                                         {% endfor %}
                                                                     </optgroup>
