@@ -105,11 +105,7 @@ Mautic.contentPreviewUrlGenerator = {
             } else {
                 this.contactId = value;
             }
-        } else if (value !== false) {
-            this.lastUsedObjectId = value;
-        }
-
-        if (elementId === 'content_preview_settings_company_id') {
+        } else if (elementId === 'content_preview_settings_company_id') {
             if (newValue === '') {
                 this.companyId = false;
             } else {
@@ -119,9 +115,7 @@ Mautic.contentPreviewUrlGenerator = {
             this.lastUsedObjectId = value;
         }
 
-        const mauticBaseUrl = window.location.origin;
-        const emailId       = window.location.pathname.split('/').pop();
-        let previewUrl = mauticBaseUrl + '/' + this.urlBase + '/' + emailId;
+        let previewUrl = window.location.origin + mauticBaseUrl + this.urlBase + '/' + this.lastUsedObjectId;
         let draftUrl  = previewUrl + '/draft';
 
         const parameters = {
