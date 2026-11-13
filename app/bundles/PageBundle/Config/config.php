@@ -104,6 +104,7 @@ return [
         'do_not_track_404_anonymous'            => false,
         'append_segment_id_tracking_url'        => false,
         'aggregate_analytics'                   => true,
+        'track_asset_downloads'                 => true,
         'validate_page_hit_required_data'       => false,
     ],
 ];
