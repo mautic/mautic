@@ -197,6 +197,14 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder::class, 'mautic.lead.query.builder.special.sessions');
     $services->set('mautic.lead.query.builder.complex_relation.value', Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder::class);
     $services->alias(Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder::class, 'mautic.lead.query.builder.complex_relation.value');
+    $services->set('mautic.lead.query.builder.complex_relation.primary_company', PrimaryCompanyRelationValueFilterQueryBuilder::class);
+    $services->alias(PrimaryCompanyRelationValueFilterQueryBuilder::class, 'mautic.lead.query.builder.complex_relation.primary_company');
+    $services->set('mautic.lead.query.builder.complex_relation.any_company', AnyCompanyRelationValueFilterQueryBuilder::class);
+    $services->alias(AnyCompanyRelationValueFilterQueryBuilder::class, 'mautic.lead.query.builder.complex_relation.any_company');
+    $services->set('mautic.lead.query.builder.complex_relation.primary_company_tag', Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyTagRelationValueFilterQueryBuilder::class);
+    $services->alias(Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyTagRelationValueFilterQueryBuilder::class, 'mautic.lead.query.builder.complex_relation.primary_company_tag');
+    $services->set('mautic.lead.query.builder.complex_relation.any_company_tag', Mautic\LeadBundle\Segment\Query\Filter\AnyCompanyTagRelationValueFilterQueryBuilder::class);
+    $services->alias(Mautic\LeadBundle\Segment\Query\Filter\AnyCompanyTagRelationValueFilterQueryBuilder::class, 'mautic.lead.query.builder.complex_relation.any_company_tag');
     $services->set('mautic.lead.query.builder.channel_click.value', Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder::class);
     $services->alias(Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder::class, 'mautic.lead.query.builder.channel_click.value');
     $services->set('mautic.helper.field.alias', Mautic\LeadBundle\Helper\FieldAliasHelper::class);

@@ -91,6 +91,13 @@
                                         {{ form_row(form.projects) }}
                                     </div>
                                 </div>
+                                {% if form.tags is defined %}
+                                    <div class="row">
+                                        <div class="col-sm-{{ fullSize }}">
+                                            {{ form_row(form.tags) }}
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
                         {% endif %}
                         <hr class="mnr-md mnl-md">
