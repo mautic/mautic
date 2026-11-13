@@ -90,10 +90,7 @@ class PushID
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function isEnabled()
+    public function isEnabled(): ?bool
     {
         return $this->enabled;
     }
@@ -105,10 +102,7 @@ class PushID
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function isMobile()
+    public function isMobile(): ?bool
     {
         return $this->mobile;
     }

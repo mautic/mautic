@@ -171,19 +171,13 @@ class Form extends FormEntity implements UuidInterface
     #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $template;
 
-    /**
-     * @var bool|null
-     */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     #[ORM\Column(name: 'in_kiosk_mode', type: 'boolean', nullable: true)]
-    private $inKioskMode = false;
+    private ?bool $inKioskMode = false;
 
-    /**
-     * @var bool|null
-     */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     #[ORM\Column(name: 'render_style', type: 'boolean', nullable: true)]
-    private $renderStyle = false;
+    private ?bool $renderStyle = false;
 
     /**
      * @var Collection<int, Submission>
@@ -196,12 +190,9 @@ class Form extends FormEntity implements UuidInterface
     #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     public int $submission_count = 0;
 
-    /**
-     * @var bool|null
-     */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     #[ORM\Column(name: 'no_index', type: 'boolean', nullable: true)]
-    private $noIndex = true;
+    private ?bool $noIndex = true;
 
     /**
      * @var int|null
@@ -383,10 +374,7 @@ class Form extends FormEntity implements UuidInterface
         return $this->cachedHtml;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getRenderStyle()
+    public function getRenderStyle(): ?bool
     {
         return $this->renderStyle;
     }
@@ -652,10 +640,7 @@ class Form extends FormEntity implements UuidInterface
         $this->template = $template;
     }
 
-    /**
-     * @return bool
-     */
-    public function getInKioskMode()
+    public function getInKioskMode(): ?bool
     {
         return $this->inKioskMode;
     }
@@ -670,10 +655,7 @@ class Form extends FormEntity implements UuidInterface
         $this->renderStyle = $renderStyle;
     }
 
-    /**
-     * @return bool
-     */
-    public function isInKioskMode()
+    public function isInKioskMode(): ?bool
     {
         return $this->inKioskMode;
     }
@@ -688,10 +670,7 @@ class Form extends FormEntity implements UuidInterface
         $this->noIndex = $sanitizedNoIndex;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getNoIndex()
+    public function getNoIndex(): ?bool
     {
         return $this->noIndex;
     }

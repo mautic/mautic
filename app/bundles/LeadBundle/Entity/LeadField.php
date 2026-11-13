@@ -158,20 +158,15 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     #[ORM\Column(name: 'is_publicly_updatable', type: 'boolean')]
     private $isPubliclyUpdatable = false;
 
-    /**
-     * @var bool|null
-     */
     #[Groups(['leadfield:read', 'leadfield:write'])]
     #[ORM\Column(name: 'is_unique_identifer', type: 'boolean', nullable: true)]
-    private $isUniqueIdentifer = false;
+    private ?bool $isUniqueIdentifer = false;
 
     /**
      * Workaround for incorrectly spelled $isUniqueIdentifer.
-     *
-     * @var bool
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
-    private $isUniqueIdentifier = false;
+    private ?bool $isUniqueIdentifier = false;
 
     #[Groups(['leadfield:read', 'leadfield:write'])]
     #[ORM\Column(name: 'char_length_limit', type: 'integer', nullable: true)]
@@ -580,10 +575,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     /**
      * Get the unique identifer state of the field.
-     *
-     * @return bool|null
      */
-    public function getIsUniqueIdentifer()
+    public function getIsUniqueIdentifer(): ?bool
     {
         return $this->isUniqueIdentifer;
     }
@@ -604,10 +597,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     /**
      * Wrapper for incorrectly spelled setIsUniqueIdentifer.
-     *
-     * @return bool
      */
-    public function getIsUniqueIdentifier()
+    public function getIsUniqueIdentifier(): ?bool
     {
         return $this->isUniqueIdentifer;
     }
