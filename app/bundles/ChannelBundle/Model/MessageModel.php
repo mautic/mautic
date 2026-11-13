@@ -188,14 +188,6 @@ final class MessageModel extends FormModel implements AjaxLookupModelInterface, 
     }
 
     /**
-     * @return mixed
-     */
-    public function getMarketingMessagesEventLogs($messageId, $dateFrom = null, $dateTo = null)
-    {
-        return $this->leadEventLogRepository->getEventLogs(['type' => 'message.send', 'dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'channel' => 'message', 'channelId' => $messageId]);
-    }
-
-    /**
      * Get the channel name from the database.
      *
      * @template T of object
