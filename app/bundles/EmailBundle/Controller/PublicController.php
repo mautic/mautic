@@ -137,6 +137,10 @@ final class PublicController extends CommonFormController
         LoggerInterface $logger,
         string $idHash,
     ): Response {
+        if (!$this->emailModel->allowsOpenTracking($idHash)) {
+            return TrackingPixelHelper::getResponse($request);
+        }
+
         try {
             $messageBus->dispatch(new EmailHitNotification($idHash, $request));
         } catch (\Exception $exception) {
