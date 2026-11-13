@@ -2715,7 +2715,7 @@ Mautic.getActiveFilterCommands = function (searchValue) {
         if (!searchInput) {
             return [];
         }
-        searchValue = searchInput.value || '';
+        searchValue = Mautic.getLiveSearchFilterValue(searchInput.id);
     }
 
     if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {
