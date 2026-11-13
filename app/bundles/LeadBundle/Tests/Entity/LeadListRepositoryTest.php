@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadListRepositoryTest extends TestCase
 {
@@ -166,6 +167,53 @@ final class LeadListRepositoryTest extends TestCase
         $queryResult        = [1, 2];
         $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
         $this->assertFalse($this->repository->isNotContactInAllSegments($contactId, $expectedSegmentIds));
+    }
+
+    public function testPreferenceSearchCommandUsesDbalColumnAndParameterValues(): void
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(static fn (string $id): string => $id);
+        $this->repository->autowireCommonRepository($translator);
+
+        $method = new \ReflectionMethod(LeadListRepository::class, 'addSearchCommandWhereClause');
+
+        foreach ([['not' => false, 'expected' => true], ['not' => true, 'expected' => false]] as $case) {
+            $filter = (object) [
+                'command' => 'mautic.lead.list.searchcommand.ispreference',
+                'string'  => '',
+                'strict'  => true,
+                'not'     => $case['not'],
+            ];
+            $queryBuilder = new QueryBuilder($this->connection);
+            [$expression, $parameters] = $method->invoke($this->repository, $queryBuilder, $filter);
+
+            $queryBuilder->select('l.id')->from('lead_lists', 'l')->where($expression);
+
+            $this->assertStringContainsString('l.is_preference_center', $queryBuilder->getSQL());
+            $this->assertSame([$case['expected']], array_values($parameters));
+        }
+    }
+
+    public function testPreferenceSearchCommandNegatesOrmExpression(): void
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(static fn (string $id): string => $id);
+        $this->repository->autowireCommonRepository($translator);
+
+        $method = new \ReflectionMethod(LeadListRepository::class, 'addSearchCommandWhereClause');
+        $filter = (object) [
+            'command' => 'mautic.lead.list.searchcommand.ispreference',
+            'string'  => '',
+            'strict'  => true,
+            'not'     => true,
+        ];
+        $this->entityManager->method('getExpressionBuilder')->willReturn(new Expr());
+        $queryBuilder = new \Doctrine\ORM\QueryBuilder($this->entityManager);
+        [$expression, $parameters] = $method->invoke($this->repository, $queryBuilder, $filter);
+        $queryBuilder->where($expression);
+
+        $this->assertSame([true], array_values($parameters));
+        $this->assertStringContainsString('NOT(l.isPreferenceCenter =', $queryBuilder->getDQL());
     }
 
     /**
