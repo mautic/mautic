@@ -203,7 +203,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $this->assertResponseIsSuccessful();
         $quickFilters = $this->getQuickFiltersCrawler();
-        $this->assertCount(4, $quickFilters->filter('[data-conflict-group="type"]'));
+        $this->assertCount(4, $quickFilters->filter('[data-conflict-group="mautic.asset.quick_filters.type"]'));
         $this->assertCount(1, $quickFilters->filter('[data-filter="is:image"]'));
     }
 
