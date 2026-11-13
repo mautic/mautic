@@ -105,7 +105,7 @@
                                                               {% if field.value is iterable and 'multiselect' == field.type %}
                                                                   {{ field.value|join(', ') }}
                                                               {% elseif 'url' == field.type %}
-                                                                  <a href="{{ field.value }}" target="_blank">{{ field.value }}</a>
+                                                                  <a href="{{ field.value|e('html_attr') }}" target="_blank">{{ field.value }}</a>
                                                               {% else %}
                                                                   {{ field.normalizedValue }}
                                                               {% endif %}
