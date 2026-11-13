@@ -299,6 +299,28 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 </div>
 {% endblock form_widget_compound %}
 
+{% block quantity_stepper_widget %}
+{% set suffix = attr.postaddon_text|default(null) %}
+{% set size = attr.size|default('md') %}
+{% set digits = attr.digits|default(null) %}
+{% set inputClass = (attr.class|default('') ~ ' quantity-stepper__value')|trim %}
+{% set stepValue = attr.step is defined and attr.step != 'any' ? attr.step : 1 %}
+{% set attr = attr|filter((value, key) => key not in ['size', 'digits', 'postaddon_text'])|merge({class: inputClass, inputmode: 'numeric', autocomplete: 'off', step: stepValue}) %}
+{% set inputAttributes %}{{ block('widget_attributes') }}{% endset %}
+{% if suffix %}<div class="d-flex align-items-center gap-2">{% endif %}
+{% embed '@MauticCore/Components/quantity-stepper.html.twig' with {
+    min: attr.min|default(null),
+    max: attr.max|default(null),
+    disabled: disabled or attr.readonly|default(false),
+    ariaLabel: label ? label : null
+} %}
+    {% block quantity_stepper_input %}
+        <input type="number" {{ inputAttributes|raw }} value="{{ value }}">
+    {% endblock %}
+{% endembed %}
+{% if suffix %}<span>{{ suffix|trans({}, translation_domain) }}</span></div>{% endif %}
+{% endblock quantity_stepper_widget %}
+
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_widget_simple.html.php #}
 {% block form_widget_simple %}
 {% set preaddonAttr = attr.preaddon_attr is defined ? attr.preaddon_attr : {} %}

@@ -29,13 +29,15 @@ final class FormFieldRatingType extends AbstractType
             'star_count',
             IntegerType::class,
             [
-                'label'      => 'mautic.form.field.form.rating_star_count',
-                'label_attr' => ['class' => 'form-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
+                'label'        => 'mautic.form.field.form.rating_star_count',
+                'label_attr'   => ['class' => 'form-label'],
+                'block_prefix' => 'quantity_stepper',
+                'attr'         => [
                     'tooltip' => 'mautic.form.field.help.rating_star_count',
                     'min'     => 1,
                     'max'     => 10,
+                    'digits'  => 2,
+                    'size'    => 'sm',
                 ],
                 'data'     => $options['data']['star_count'] ?? 5,
                 'required' => false,

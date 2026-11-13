@@ -1,0 +1,34 @@
+{% set id = id|default(name|default('quantity')|replace({'[': '-', ']': '', ' ': '-', '.': '-'})) %}
+{% set size = size|default('md') %}
+{% set min = min is defined ? min : 0 %}
+{% set max = max is defined ? max : 99 %}
+{% set step = step|default(1) %}
+{% set preferred = min is not null and min > 1 ? min : (min is not null and min < 0 ? 0 : 1) %}
+{% set fallback = max is not null and preferred > max ? max : preferred %}
+{% set value = value is defined ? value : fallback %}
+{% set disabled = disabled|default(false) %}
+{% set minLength = min is not null ? (min|abs ~ '')|length + (min < 0 ? 1 : 0) : 0 %}
+{% set maxLength = max is not null ? (max|abs ~ '')|length + (max < 0 ? 1 : 0) : 0 %}
+{% set reservedDigits = max([digits|default(0), minLength, maxLength, (value ~ '')|length, 2]) %}
+{% set labelText = labelText|default(null) %}
+{% set wrapperClass = wrapperClass|default(null) %}
+<div{% if wrapperClass %} class="{{ wrapperClass }}"{% endif %}>
+    {% if labelText %}
+    <label for="{{ id }}" class="form-label type-label-01">{{ labelText|trans }}</label>
+    {% endif %}
+    <div class="quantity-stepper quantity-stepper--{{ size }}" role="group" aria-label="{{ (ariaLabel|default('mautic.core.quantity_stepper.label'))|trans }}" data-quantity-stepper data-min-message="{{ 'mautic.core.quantity_stepper.min'|trans }}" data-max-message="{{ 'mautic.core.quantity_stepper.max'|trans }}">
+        <button type="button" class="quantity-stepper__button" data-quantity-step="-1" tabindex="-1" aria-label="{{ decreaseLabel|default('mautic.core.quantity_stepper.decrease')|trans }}"{{ disabled ? ' disabled' }}>
+            <i class="ri-subtract-line" aria-hidden="true"></i>
+        </button>
+        <span class="quantity-stepper__field" style="--quantity-stepper-digits: {{ reservedDigits }}">
+            {% block quantity_stepper_input %}
+            <input type="number" id="{{ id }}" name="{{ name|default('quantity') }}" class="quantity-stepper__value" value="{{ value }}"{% if min is not null %} min="{{ min }}"{% endif %}{% if max is not null %} max="{{ max }}"{% endif %} step="{{ step }}" inputmode="numeric" autocomplete="off"{{ disabled ? ' disabled' }}{{ required|default(false) ? ' required' }}>
+            {% endblock %}
+            <span class="quantity-stepper__display" aria-hidden="true"><span class="quantity-stepper__digit">{{ value }}</span></span>
+        </span>
+        <button type="button" class="quantity-stepper__button" data-quantity-step="1" tabindex="-1" aria-label="{{ increaseLabel|default('mautic.core.quantity_stepper.increase')|trans }}"{{ disabled ? ' disabled' }}>
+            <i class="ri-add-line" aria-hidden="true"></i>
+        </button>
+        <span class="visually-hidden" aria-live="polite" data-quantity-announcement></span>
+    </div>
+</div>

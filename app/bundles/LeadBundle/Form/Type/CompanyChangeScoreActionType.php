@@ -20,8 +20,13 @@ final class CompanyChangeScoreActionType extends AbstractType
             'score',
             NumberType::class,
             [
-                'label'       => 'mautic.lead.lead.events.changecompanyscore',
-                'attr'        => ['class' => 'form-control'],
+                'label'        => 'mautic.lead.lead.events.changecompanyscore',
+                'block_prefix' => 'quantity_stepper',
+                'html5'        => true,
+                'attr'         => [
+                    'digits' => 5,
+                    'size'   => 'sm',
+                ],
                 'label_attr'  => ['class' => 'form-label'],
                 'scale'       => 0,
                 'data'        => $options['data']['score'] ?? 0,

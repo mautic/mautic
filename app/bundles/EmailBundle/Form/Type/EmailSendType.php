@@ -162,10 +162,14 @@ final class EmailSendType extends AbstractType
                     'attempts',
                     NumberType::class,
                     [
-                        'label' => 'mautic.channel.message.send.attempts',
-                        'attr'  => [
-                            'class'        => 'form-control',
-                            'tooltip'      => 'mautic.channel.message.send.attempts.tooltip',
+                        'label'        => 'mautic.channel.message.send.attempts',
+                        'block_prefix' => 'quantity_stepper',
+                        'html5'        => true,
+                        'attr'         => [
+                            'tooltip' => 'mautic.channel.message.send.attempts.tooltip',
+                            'min'     => 0,
+                            'digits'  => 2,
+                            'size'    => 'sm',
                         ],
                         'data'       => $data,
                         'empty_data' => 0,

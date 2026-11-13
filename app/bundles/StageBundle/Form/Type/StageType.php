@@ -48,11 +48,14 @@ final class StageType extends AbstractType
                 'class' => 'form-control',
             ], ]);
         $builder->add('weight', NumberType::class, [
-            'label'      => 'mautic.stage.action.weight',
-            'label_attr' => ['class' => 'form-label'],
-            'attr'       => [
-                'class'   => 'form-control',
+            'label'        => 'mautic.stage.action.weight',
+            'label_attr'   => ['class' => 'form-label'],
+            'block_prefix' => 'quantity_stepper',
+            'html5'        => true,
+            'attr'         => [
                 'tooltip' => 'mautic.stage.action.weight.help',
+                'digits'  => 5,
+                'size'    => 'sm',
             ],
             'scale'    => 0,
             'required' => false,
