@@ -26,8 +26,22 @@
   }
 
   &__body {
+    position: relative;
     overflow-x: auto;
     padding: var(--spacing-04) 0;
+  }
+
+  &:has(&__toggle[aria-expanded='false']) &__body:after {
+    content: '';
+    position: sticky;
+    display: block;
+    left: 0;
+    bottom: 0;
+    height: 70px;
+    max-height: 100%;
+    margin-top: -70px;
+    background: linear-gradient(to top, var(--layer) 5%, transparent);
+    pointer-events: none;
   }
 
   &__lines {
