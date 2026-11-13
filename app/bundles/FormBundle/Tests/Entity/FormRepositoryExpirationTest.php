@@ -49,6 +49,7 @@ final class FormRepositoryExpirationTest extends TestCase
         [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
 
         $this->assertStringContainsString($expected, (string) $expr);
+        $this->assertStringNotContainsString("''", (string) $expr);
         $this->assertSame(['par1' => true], $params);
     }
 
