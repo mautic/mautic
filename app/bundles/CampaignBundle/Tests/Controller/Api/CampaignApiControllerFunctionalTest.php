@@ -13,6 +13,8 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -431,6 +433,25 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $responseData = json_decode($clientResponse->getContent(), true);
         $this->assertIsArray($responseData);
         $this->assertContains('Import successful: Imported campaigns are switched off by default.', $responseData);
+    }
+
+    public function testImportCampaignActionRejectsACraftedFieldAlias(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
+        $this->loginUser($user);
+
+        $payload = FixtureHelper::getPayload();
+        $payload[0][Field::ENTITY_NAME][0]['alias'] = 'review_field LONGTEXT, ADD review_extra';
+        $campaigns                                  = $this->em->getRepository(Campaign::class)->count([]);
+        $forms                                      = $this->em->getRepository(Form::class)->count([]);
+
+        $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], [], [], json_encode($payload));
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $this->assertStringContainsString('review_field LONGTEXT, ADD review_extra', (string) json_decode($this->client->getResponse()->getContent(), true)['error']);
+        $this->assertSame($campaigns, $this->em->getRepository(Campaign::class)->count([]));
+        $this->assertSame($forms, $this->em->getRepository(Form::class)->count([]));
     }
 
     public function testImportCampaignActionZip(): void
