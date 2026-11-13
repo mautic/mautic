@@ -17,11 +17,21 @@ final class TrackingConfigTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $getSnippet = static function (string $ariaLabel) use ($crawler): string {
-            $snippet = $crawler->filter(sprintf('pre[aria-label="%s"]', $ariaLabel));
+            $selector   = sprintf('pre[aria-label="%s"]', $ariaLabel);
+            $snippet    = $crawler->filter($selector);
+            $copyButton = $crawler->filter($selector.' ~ [data-copy]');
             Assert::assertCount(1, $snippet);
+            Assert::assertCount(1, $copyButton);
+            $snippetText = $snippet->text(null, false);
+            Assert::assertSame($snippetText, $copyButton->attr('data-copy'));
+            Assert::assertStringNotContainsString('&lt;', $snippetText);
 
-            return $snippet->text();
+            return $snippetText;
         };
+
+        $this->assertCount(0, $crawler->filter('.code-snippet--multi script'));
+        $this->assertCount(0, $crawler->filter('input[name="config[trackingconfig][focus_uses_mautic_tracking_consent]"]'));
+        $this->assertStringContainsString('Focus Items follow this consent too.', $crawler->filter('#tracking-snippet-consent')->text());
 
         $essential = $getSnippet('Essential script (before consent)');
         $this->assertStringContainsString('/mautic-essential.js', $essential);
