@@ -84,11 +84,8 @@ class Stat
     #[ORM\Column(type: Types::JSON)]
     private $details = [];
 
-    /**
-     * @var bool|null
-     */
     #[ORM\Column(name: 'is_failed', type: 'boolean', nullable: true)]
-    private $isFailed = false;
+    private ?bool $isFailed = false;
 
     /**
      * Prepares the metadata for API usage.
@@ -257,10 +254,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function isFailed()
+    public function isFailed(): ?bool
     {
         return $this->isFailed;
     }

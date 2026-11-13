@@ -251,10 +251,7 @@ class Stat
         return $this->retryCount;
     }
 
-    /**
-     * @param mixed $retryCount
-     */
-    public function setRetryCount($retryCount): void
+    public function setRetryCount(?int $retryCount): void
     {
         $this->retryCount = $retryCount;
     }
@@ -285,10 +282,7 @@ class Stat
         return $this->sourceId;
     }
 
-    /**
-     * @param mixed $sourceId
-     */
-    public function setSourceId($sourceId): void
+    public function setSourceId(?int $sourceId): void
     {
         $this->sourceId = (int) $sourceId;
     }
@@ -314,10 +308,7 @@ class Stat
         return $this->clickCount;
     }
 
-    /**
-     * @param mixed $clickCount
-     */
-    public function setClickCount($clickCount): static
+    public function setClickCount(?int $clickCount): static
     {
         $this->clickCount = $clickCount;
 

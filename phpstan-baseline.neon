@@ -6457,18 +6457,6 @@ parameters:
 			path: app/bundles/WebhookBundle/Model/WebhookModel.php
 
 		-
-			message: '#^Method MauticPlugin\\GrapesJsBuilderBundle\\Helper\\FileManager\:\:getFullUrl\(\) has parameter \$fileName with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Helper/FileManager.php
-
-		-
-			message: '#^Method MauticPlugin\\GrapesJsBuilderBundle\\Helper\\FileManager\:\:getFullUrl\(\) has parameter \$separator with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Helper/FileManager.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCloudStorageBundle\\Integration\\AmazonS3Integration\:\:getAdapter\(\) should return Gaufrette\\Adapter\\AwsS3 but returns Gaufrette\\Adapter\.$#'
 			identifier: return.type
 			count: 1
