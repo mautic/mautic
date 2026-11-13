@@ -7,7 +7,7 @@
     - fullSize
     - embedded (optional)
 #}
-<div class="pa-md">
+<div class="pa-16">
     {% if 'core' == group %}
         <div class="form-group mb-0">
             <div class="row">
@@ -29,22 +29,22 @@
               form.companycountry is defined
          %}
             <div class="form-group mb-0">
-                <label class="form-label mb-xs">{{ 'mautic.company.field.address'|trans }}</label>
+                <label class="form-label mb-5">{{ 'mautic.company.field.address'|trans }}</label>
                 {% if form.companyaddress1 is defined %}
-                    <div class="row mb-xs">
+                    <div class="row mb-5">
                         <div class="col-sm-{{ fullSize }}">
                             {{ form_widget(form.companyaddress1, {'attr': {'placeholder': form.companyaddress1.vars.label}}) }}
                         </div>
                     </div>
                 {% endif %}
                 {% if form.companyaddress2 is defined %}
-                    <div class="row mb-xs">
+                    <div class="row mb-5">
                         <div class="col-sm-{{ fullSize }}">
                             {{ form_widget(form.companyaddress2, {'attr': {'placeholder': form.companyaddress2.vars.label}}) }}
                         </div>
                     </div>
                 {% endif %}
-                <div class="row mb-xs">
+                <div class="row mb-5">
                     {% if form.companycity is defined %}
                         <div class="col-sm-{{ halfSize }}">
                             {{ form_widget(form.companycity, {'attr': {'placeholder': form.companycity.vars.label}}) }}
@@ -56,7 +56,7 @@
                         </div>
                     {% endif %}
                 </div>
-                <div class="row mb-md">
+                <div class="row mb-16">
                     {% if form.companyzipcode is defined %}
                         <div class="col-sm-{{ halfSize }}">
                             {{ form_widget(form.companyzipcode, {'attr': {'placeholder': form.companyzipcode.vars.label}}) }}

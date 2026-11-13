@@ -58,7 +58,7 @@
             'id'         : 'channel_' ~ channel,
             'label'      : config.label,
             'content'    : '<div style="min-height: 200px;">' ~ form_row(form.channels[channel]) ~ '</div>',
-            'className'  : 'pa-md',
+            'className'  : 'pa-16',
             'hasError'   : hasErrors,
             'renderIcon' : 'ri-checkbox-circle-line ' ~ (form.channels[channel].isEnabled.vars.data ? 'text-success' : 'text-secondary'),
         } %}
