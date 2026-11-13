@@ -31,6 +31,13 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    protected function setUp(): void
+    {
+        $this->configParams['form_track_submitters'] = !str_contains((string) $this->dataName(), 'submitters not tracked');
+
+        parent::setUp();
+    }
+
     /**
      * @return iterable<string, array{array<string, string>, bool}>
      */
@@ -38,6 +45,7 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
     {
         yield 'Do Not Track' => [['HTTP_DNT' => '1'], false];
         yield 'Global Privacy Control' => [['HTTP_SEC_GPC' => '1'], false];
+        yield 'trackable visitor, submitters not tracked' => [[], false];
         yield 'trackable visitor' => [[], true];
     }
 
@@ -85,8 +93,8 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectTracking, null !== $submission->getIpAddress());
         $this->assertSame($expectTracking, null !== $submission->getTrackingId());
 
-        // The query string of the page can carry identifiers, so only the page address is kept for an untracked visitor
-        $this->assertSame($expectTracking ? $referer : $page, $submission->getReferer());
+        // An untracked submitter's referer keeps the UTM tags for campaign attribution, and drops the email and the fragment
+        $this->assertSame($expectTracking ? $referer : $page.'?utm_source=newsletter', $submission->getReferer());
 
         // The submitted data is still saved to the contact
         $contact = $submission->getLead();
@@ -227,6 +235,51 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $this->assertNotInstanceOf(IpAddress::class, $this->em->getRepository(IpAddress::class)->findOneBy(['ipAddress' => '203.0.113.9']));
     }
 
+    public function testFormActionsUpdateTheExistingContactMatchedByEmailForUntrackedVisitor(): void
+    {
+        $existingContact = new Lead();
+        $existingContact->setEmail('returning@example.com');
+        $this->em->persist($existingContact);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', [
+            'name'        => 'Trackability form',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'fields'      => [[
+                'label'        => 'Email',
+                'type'         => 'email',
+                'alias'        => 'email',
+                'mappedObject' => 'contact',
+                'mappedField'  => 'email',
+            ]],
+            'actions'     => [
+                [
+                    'name'       => 'Adjust points',
+                    'type'       => 'lead.pointschange',
+                    'properties' => ['operator' => 'plus', 'points' => 3],
+                ],
+                [
+                    'name'       => 'Update contact',
+                    'type'       => 'lead.updatelead',
+                    'properties' => ['lastname' => 'Returning'],
+                ],
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, (string) $this->client->getResponse()->getContent());
+        $formId = (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
+
+        $this->logoutUser();
+        $this->submitForm($formId, ['mauticform[email]' => 'returning@example.com'], ['HTTP_DNT' => '1']);
+
+        $this->em->clear();
+        $contacts = $this->em->getRepository(Lead::class)->findAll();
+        $this->assertCount(1, $contacts);
+        $this->assertSame($existingContact->getId(), $contacts[0]->getId());
+        $this->assertSame(3, $contacts[0]->getPoints());
+        $this->assertSame('Returning', $contacts[0]->getLastname());
+    }
+
     /**
      * @return iterable<string, array{bool, array<string, string>, bool}>
      */
@@ -236,6 +289,9 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         yield 'standard form, Global Privacy Control' => [false, ['HTTP_SEC_GPC' => '1'], false];
         yield 'kiosk form, trackable visitor' => [true, [], false];
         yield 'kiosk form, Do Not Track' => [true, ['HTTP_DNT' => '1'], false];
+        yield 'standard form, trackable visitor, submitters not tracked' => [false, [], false];
+        yield 'kiosk form, trackable visitor, submitters not tracked' => [true, [], false];
+        yield 'standard form, Do Not Track, submitters not tracked' => [false, ['HTTP_DNT' => '1'], false];
         yield 'standard form, trackable visitor' => [false, [], true];
     }
 
