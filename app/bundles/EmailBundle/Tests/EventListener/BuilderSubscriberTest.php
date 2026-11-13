@@ -403,4 +403,50 @@ final class BuilderSubscriberTest extends TestCase
         $this->assertSame('/email/unsubscribe/testhash/test@example.com/'.$emailHash, $event->getTokens()['{unsubscribe_url}']);
         $this->assertSame('/email/resubscribe/testhash/test@example.com/'.$emailHash, $event->getTokens()['{resubscribe_url}']);
     }
+
+    public function testTheSameContentIsParsedAgainWhenTheEmailTrackingOptionChanges(): void
+    {
+        $trackableModel    = $this->createMock(TrackableModel::class);
+        $builderSubscriber = new BuilderSubscriber(
+            $this->coreParametersHelper,
+            $this->emailModel,
+            $trackableModel,
+            $this->createStub(RedirectModel::class),
+            $this->translator,
+            new MailHashHelper($this->coreParametersHelper),
+            new FromEmailHelper($this->coreParametersHelper, $this->leadRepository),
+            $this->createStub(TrackableRepository::class),
+            $this->createStub(RedirectRepository::class)
+        );
+
+        $content = '<a href="https://example.com/offer">Offer</a>';
+        $email   = new Email();
+        $email->setId(5);
+        $email->setTrackingEnabled(false);
+
+        // Nothing is saved while tracking is off, so turning it on must parse and save the entities instead of reusing the unsaved ones
+        $parseCalls = [];
+        $trackableModel->expects($this->once())
+            ->method('parseContentForTrackablesWithoutSaving')
+            ->willReturnCallback(static function (array $content) use (&$parseCalls): array {
+                $parseCalls[] = 'without saving';
+
+                return [$content, []];
+            });
+        $trackableModel->expects($this->once())
+            ->method('parseContentForTrackables')
+            ->willReturnCallback(static function (array $content) use (&$parseCalls): array {
+                $parseCalls[] = 'saving';
+
+                return [$content, []];
+            });
+
+        $builderSubscriber->convertUrlsToTokens(new EmailSendEvent(null, ['email' => $email, 'content' => $content, 'internalSend' => false]));
+        $builderSubscriber->convertUrlsToTokens(new EmailSendEvent(null, ['email' => $email, 'content' => $content, 'internalSend' => false]));
+
+        $email->setTrackingEnabled(true);
+        $builderSubscriber->convertUrlsToTokens(new EmailSendEvent(null, ['email' => $email, 'content' => $content, 'internalSend' => false]));
+
+        $this->assertSame(['without saving', 'saving'], $parseCalls, 'the second parse with tracking off is served from the cache, turning tracking on parses again');
+    }
 }

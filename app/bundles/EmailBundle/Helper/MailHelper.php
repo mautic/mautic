@@ -1274,7 +1274,7 @@ class MailHelper
         }
 
         // An email with tracking off gets no open pixel
-        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel || !$email->isTrackingEnabled());
+        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel || !$email->getTrackingEnabled());
 
         // Reset attachments
         $this->assets = $this->attachedAssets = [];
@@ -1446,7 +1446,7 @@ class MailHelper
             return false;
         }
 
-        return !$this->email instanceof Email || $this->email->isTrackingEnabled();
+        return !$this->email instanceof Email || $this->email->getTrackingEnabled();
     }
 
     /**

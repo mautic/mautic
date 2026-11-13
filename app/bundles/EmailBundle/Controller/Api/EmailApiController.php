@@ -138,7 +138,7 @@ final class EmailApiController extends CommonApiController
      * Sends the email to a specific lead.
      *
      * @param int $id     Email ID
-     * @param int $leadId Lead ID
+     * @param int $leadId
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -255,7 +255,7 @@ final class EmailApiController extends CommonApiController
 
             if (!array_key_exists('trackingEnabled', $parameters)) {
                 // A PUT that leaves the option out keeps the email's choice, so an update can't turn tracking back on by accident
-                $parameters['trackingEnabled'] = $entity->getId() ? $entity->isTrackingEnabled() : true;
+                $parameters['trackingEnabled'] = $entity->getId() ? $entity->getTrackingEnabled() : true;
             }
         }
 

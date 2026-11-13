@@ -131,7 +131,30 @@ class RedirectModel extends FormModel
      *
      * @return array<Redirect>
      */
-    public function getRedirectsByUrls(array $urls)
+    public function getRedirectsByUrls(array $urls): array
+    {
+        return $this->findOrBuildRedirectsByUrls($urls, true);
+    }
+
+    /**
+     * Same as getRedirectsByUrls(), for links that won't be tracked: Redirect entities are built for the URLs that
+     * aren't known yet, but not saved.
+     *
+     * @param array<string> $urls
+     *
+     * @return array<Redirect>
+     */
+    public function getRedirectsByUrlsWithoutSaving(array $urls): array
+    {
+        return $this->findOrBuildRedirectsByUrls($urls, false);
+    }
+
+    /**
+     * @param array<string> $urls
+     *
+     * @return array<Redirect>
+     */
+    private function findOrBuildRedirectsByUrls(array $urls, bool $persistRedirects): array
     {
         /** @var array<Redirect> $redirects */
         $redirects   = $this->redirectRepository->findByUrls(array_values($urls));
@@ -162,7 +185,7 @@ class RedirectModel extends FormModel
         }
 
         // Save new entities
-        if (count($newEntities)) {
+        if ($persistRedirects && count($newEntities)) {
             $this->redirectRepository->saveEntities($newEntities);
         }
 

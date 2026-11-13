@@ -24,6 +24,10 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
 
     private const ANALYTICS_CODE = '<script>/* analytics-code */</script>';
 
+    private const API_EMAIL_NAME = 'API tracking';
+
+    private const API_EDIT_URL = '/api/emails/%d/edit';
+
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -172,42 +176,32 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         $email = new Email();
         $email->setTrackingEnabled(false);
 
-        $this->assertFalse((clone $email)->isTrackingEnabled());
+        $this->assertFalse((clone $email)->getTrackingEnabled());
     }
 
     public function testTrackingOptionThroughTheApi(): void
     {
-        $this->client->request(Request::METHOD_POST, '/api/emails/new', [
-            'name'            => 'API tracking',
-            'subject'         => 'API tracking',
-            'emailType'       => 'template',
-            'customHtml'      => '<html><body>Hi</body></html>',
-            'trackingEnabled' => 0,
-        ]);
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $this->apiEmailPayload(['trackingEnabled' => 0]));
         $this->assertResponseStatusCodeSame(201, (string) $this->client->getResponse()->getContent());
-        $email = json_decode((string) $this->client->getResponse()->getContent(), true)['email'];
-        $this->assertFalse($email['trackingEnabled']);
+        $emailId = $this->apiEmail()['id'];
+        $this->assertFalse($this->apiEmail()['trackingEnabled']);
 
-        $this->client->request(Request::METHOD_PUT, sprintf('/api/emails/%d/edit', $email['id']), [
-            'name'       => 'API tracking',
-            'subject'    => 'API tracking',
-            'emailType'  => 'template',
-            'customHtml' => '<html><body>Hi</body></html>',
-            'language'   => 'en',
-        ]);
+        $this->client->request(Request::METHOD_PUT, sprintf(self::API_EDIT_URL, $emailId), $this->apiEmailPayload(['language' => 'en']));
         $this->assertResponseIsSuccessful((string) $this->client->getResponse()->getContent());
-        $this->assertFalse(json_decode((string) $this->client->getResponse()->getContent(), true)['email']['trackingEnabled'], 'a PUT without the option keeps tracking off');
+        $this->assertFalse($this->apiEmail()['trackingEnabled'], 'a PUT without the option keeps tracking off');
 
-        $this->client->request(Request::METHOD_PUT, sprintf('/api/emails/%d/edit', $email['id']), [
-            'name'            => 'API tracking',
-            'subject'         => 'API tracking',
-            'emailType'       => 'template',
-            'customHtml'      => '<html><body>Hi</body></html>',
-            'language'        => 'en',
-            'trackingEnabled' => 1,
-        ]);
+        $this->client->request(Request::METHOD_PATCH, sprintf(self::API_EDIT_URL, $emailId), ['subject' => 'API tracking patched']);
         $this->assertResponseIsSuccessful((string) $this->client->getResponse()->getContent());
-        $this->assertTrue(json_decode((string) $this->client->getResponse()->getContent(), true)['email']['trackingEnabled'], 'a PUT with the option turns tracking on');
+        $this->assertSame('API tracking patched', $this->apiEmail()['subject']);
+        $this->assertFalse($this->apiEmail()['trackingEnabled'], 'a PATCH without the option keeps tracking off');
+
+        $this->client->request(Request::METHOD_PUT, sprintf(self::API_EDIT_URL, $emailId), $this->apiEmailPayload(['language' => 'en', 'trackingEnabled' => 1]));
+        $this->assertResponseIsSuccessful((string) $this->client->getResponse()->getContent());
+        $this->assertTrue($this->apiEmail()['trackingEnabled'], 'a PUT with the option turns tracking on');
+
+        $this->client->request(Request::METHOD_PATCH, sprintf(self::API_EDIT_URL, $emailId), ['subject' => self::API_EMAIL_NAME]);
+        $this->assertResponseIsSuccessful((string) $this->client->getResponse()->getContent());
+        $this->assertTrue($this->apiEmail()['trackingEnabled'], 'a PATCH without the option keeps tracking on');
     }
 
     public function testEmailFormHasTheOptionAndDetailsShowItIsOff(): void
@@ -229,6 +223,29 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/emails/view/'.$email->getId());
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Opens and clicks aren&#039;t recorded for this email.', (string) $this->client->getResponse()->getContent());
+    }
+
+    /**
+     * @param array<string, mixed> $overrides
+     *
+     * @return array<string, mixed>
+     */
+    private function apiEmailPayload(array $overrides = []): array
+    {
+        return $overrides + [
+            'name'       => self::API_EMAIL_NAME,
+            'subject'    => self::API_EMAIL_NAME,
+            'emailType'  => 'template',
+            'customHtml' => '<html><body>Hi</body></html>',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function apiEmail(): array
+    {
+        return json_decode((string) $this->client->getResponse()->getContent(), true)['email'];
     }
 
     private function createSentStat(bool $trackingEnabled): Stat

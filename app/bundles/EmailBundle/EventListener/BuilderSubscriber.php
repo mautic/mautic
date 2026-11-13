@@ -274,7 +274,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             return true;
         }
 
-        return $email instanceof Email && !$email->isTrackingEnabled();
+        return $email instanceof Email && !$email->getTrackingEnabled();
     }
 
     /**
@@ -288,19 +288,17 @@ final class BuilderSubscriber implements EventSubscriberInterface
      */
     private function parseContentForUrls(EmailSendEvent $event, $emailId, bool $persistTrackables): array
     {
-        $cacheKey = $event->getContentHash().'-'.$emailId;
+        // The same content parsed with and without saving the entities must not share a cache entry
+        $cacheKey = $event->getContentHash().'-'.$emailId.'-'.($persistTrackables ? 'saved' : 'unsaved');
 
         // Prevent parsing the exact same content over and over
         if (!isset($this->convertedContent[$cacheKey])) {
+            $contents = [$event->getContent(), $event->getPlainText()];
+            $channel  = ($emailId) ? 'email' : null;
             // Links that aren't tracked leave no trackable or redirect rows behind
-            [$content, $trackables] = $this->pageTrackableModel->parseContentForTrackables(
-                [$event->getContent(), $event->getPlainText()],
-                $event->getTokens(),
-                ($emailId) ? 'email' : null,
-                $emailId,
-                true,
-                $persistTrackables
-            );
+            [$content, $trackables] = $persistTrackables
+                ? $this->pageTrackableModel->parseContentForTrackables($contents, $event->getTokens(), $channel, $emailId)
+                : $this->pageTrackableModel->parseContentForTrackablesWithoutSaving($contents, $event->getTokens(), $channel, $emailId);
             $this->convertedContent[$cacheKey] = [$content, $trackables];
 
             foreach ($trackables as $trackable) {

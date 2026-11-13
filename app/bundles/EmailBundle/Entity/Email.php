@@ -839,11 +839,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->trackingEnabled;
     }
 
-    public function isTrackingEnabled(): bool
-    {
-        return $this->trackingEnabled;
-    }
-
     public function setTrackingEnabled(bool $trackingEnabled): self
     {
         $this->isChanged('trackingEnabled', $trackingEnabled);
