@@ -37,23 +37,23 @@
                   </ul>
                   <!--/ tabs controls -->
 
-                  <div class="tab-content pa-md">
+                  <div class="tab-content pa-16">
                       <div class="tab-pane fade show active bdr-w-0" id="details-container">
                           <div class="row">
                               <div class="col-md-6">
-                                  <div class="pa-md">
+                                  <div class="pa-16">
                                       {{ form_row(form.name) }}
                                   </div>
                               </div>
                               <div class="col-md-6">
-                                  <div class="pa-md">
+                                  <div class="pa-16">
                                       {{ form_row(form.source) }}
                                   </div>
                               </div>
                           </div>
                           <div class="row">
                               <div class="col-md-12">
-                                  <div class="pa-md">
+                                  <div class="pa-16">
                                       {{ form_row(form.description) }}
                                   </div>
                               </div>
@@ -63,13 +63,13 @@
                       <div class="tab-pane fade bdr-w-0" id="data-container">
                           <div class="row">
                               <div class="col-md-6">
-                                  <div class="pa-md">
+                                  <div class="pa-16">
                                       <h4><strong>{{ 'mautic.report.report.form.columnselector'|trans }}</strong></h4>
                                       {{ form_row(form.columns) }}
                                   </div>
                               </div>
                               <div class="col-md-6">
-                                  <div class="ml-md">
+                                  <div class="ms-16">
                                       <h4><strong>{{ 'mautic.core.order'|trans }}</strong></h4>
                                       {{ form_row(form.tableOrder) }}
                                   </div>
@@ -77,7 +77,7 @@
                           </div>
                           <div class="row">
                               <div class="col-md-12">
-                                  <div class="pa-md">
+                                  <div class="pa-16">
                                       <h4><strong>{{ 'mautic.core.filters'|trans }}</strong></h4>
                                       {{ form_row(form.filters) }}
                                   </div>
@@ -90,13 +90,13 @@
                           </div>
                           <div class="row">
                               <div class="col-md-6">
-                                  <div class="pa-md">
+                                  <div class="pa-16">
                                       <h4><strong>{{ 'mautic.report.form.groupby'|trans }}</strong></h4>
                                       {{ form_row(form.groupBy) }}
                                   </div>
                               </div>
                               <div class="col-md-6">
-                                  <div class="pa-md">
+                                  <div class="pa-16">
                                       <h4><strong>{{ 'mautic.core.calculated.fields'|trans }}</strong></h4>
                                       {{ form_row(form.aggregators) }}
                                   </div>
@@ -106,7 +106,7 @@
                       <div class="tab-pane fade bdr-w-0 {% if not showGraphTab %}hide{% endif %}" id="graphs-container">
                           <div class="row">
                               <div class="col-md-6">
-                                  <div class="pa-md">
+                                  <div class="pa-16">
                                       {{ form_row(form.vars.form.children.settings.showGraphsAboveTable) }}
                                       {{ form_row(form.graphs) }}
                                   </div>
@@ -134,11 +134,11 @@
                                   </div>
                               </div>
                               <div class="col-sm-12 col-md-6">
-                                  <div class="schedule_form well well-sm mt-lg">
+                                  <div class="schedule_form well well-sm mt-24">
                                       <span id="schedule_preview_url" data-url="{{ path('mautic_report_schedule_preview') }}"></span>
                                       <div id="schedule_preview_data">
                                           <strong>{{ 'mautic.report.schedule.preview_data'|trans }}</strong>
-                                          <div id="schedule_preview_data_content" class="mt-sm"></div>
+                                          <div id="schedule_preview_data_content" class="mt-12"></div>
                                       </div>
                                   </div>
                               </div>
@@ -149,7 +149,7 @@
           </div>
       </div>
       <div class="col-md-3 height-auto bdr-l">
-          <div class="pr-lg pl-lg pt-md pb-md">
+          <div class="pe-24 ps-24 pt-16 pb-16">
               {{ form_row(form.isPublished) }}
               {{ form_row(form.system) }}
               {{ form_row(form.createdBy) }}
