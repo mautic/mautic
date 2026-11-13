@@ -62,7 +62,7 @@
                      {% if form[key].children|length > 0 %}
                        <div class="tab-pane in active bdr-w-0" id="{{ key }}">
                            <div>
-                            <div class="row pa-md bdr-b">
+                            <div class="row pa-16 bdr-b">
                                 <h4 class="fw-sb">{{ ('mautic.config.tab.' ~ key)|trans }}</h4>
                             </div>
                                {{ form_widget(form[key], {'formConfig': formConfigs[key]}) }}
