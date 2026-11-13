@@ -63,6 +63,15 @@
         return next > max ? next - step : next;
     }
 
+    function fromGrid(input, number, delta) {
+        const step = Number(input.step) || 1;
+        const base = stepBase(input);
+        const ratio = (number - base) / step;
+        const anchor = base + (delta < 0 ? Math.ceil(ratio) : Math.floor(ratio)) * step;
+
+        return anchor + delta;
+    }
+
     function format(template, value) {
         return template.replace('%value%', value);
     }
@@ -157,7 +166,7 @@
         }
 
         const current = Number(input.value) || 0;
-        const next = snap(input, current + delta, delta);
+        const next = snap(input, fromGrid(input, current, delta), delta);
 
         if (next === current) {
             flashLimit(root);
