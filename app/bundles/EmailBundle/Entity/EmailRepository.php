@@ -13,6 +13,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Entity\ResettableVariantsInterface;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
@@ -22,7 +23,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Email>
  */
-class EmailRepository extends CommonRepository
+class EmailRepository extends CommonRepository implements ResettableVariantsInterface
 {
     use ProjectRepositoryTrait;
     use QueryBuilderManipulatorTrait;
@@ -680,9 +681,8 @@ class EmailRepository extends CommonRepository
      * Resets variant_start_date, variant_read_count, variant_sent_count.
      *
      * @param string[]|string|int $relatedIds
-     * @param string              $date
      */
-    public function resetVariants($relatedIds, $date): void
+    public function resetVariants($relatedIds, string $date): void
     {
         if (!is_array($relatedIds)) {
             $relatedIds = [(string) $relatedIds];

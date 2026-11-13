@@ -5,13 +5,14 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Entity\ResettableVariantsInterface;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Page>
  */
-final class PageRepository extends CommonRepository
+final class PageRepository extends CommonRepository implements ResettableVariantsInterface
 {
     use ProjectRepositoryTrait;
 
@@ -219,7 +220,7 @@ final class PageRepository extends CommonRepository
     /**
      * Resets variant_start_date and variant_hits.
      */
-    public function resetVariants($relatedIds, $date): void
+    public function resetVariants($relatedIds, string $date): void
     {
         if (!is_array($relatedIds)) {
             $relatedIds = [(int) $relatedIds];
