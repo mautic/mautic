@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\DynamicContentBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -11,6 +12,8 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class Stat
 {
+    public const TABLE_NAME = 'dynamic_content_stats';
+
     /**
      * @var string
      */
@@ -61,11 +64,18 @@ class Stat
      */
     private $tokens = [];
 
+    private string $tokenPlacement = 'body';
+
+    /**
+     * @var array<string, mixed>
+     */
+    private array $sourceData = [];
+
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('dynamic_content_stats')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['dynamic_content_id', 'lead_id'], 'stat_dynamic_content_search')
             ->addIndex(['source', 'source_id'], 'stat_dynamic_content_source_search')
@@ -97,11 +107,22 @@ class Stat
             ->nullable()
             ->build();
 
+        $builder->createField('tokenPlacement', Types::STRING)
+            ->columnName('token_placement')
+            ->nullable(false)
+            ->length(10)
+            ->option('default', 'body')
+            ->build();
+
         $builder->addNullableField('sentCount', 'integer', 'sent_count');
 
         $builder->addNullableField('lastSent', 'datetime', 'last_sent');
 
         $builder->addNullableField('sentDetails', 'array', 'sent_details');
+
+        $builder->createField('sourceData', 'json')
+            ->columnName('source_data')
+            ->build();
     }
 
     /**
@@ -118,6 +139,7 @@ class Stat
                     'sentCount',
                     'lastSent',
                     'sourceId',
+                    'sourceData',
                     'lead',
                     'dynamicContent',
                 ]
@@ -292,5 +314,31 @@ class Stat
     public function setTokens($tokens): void
     {
         $this->tokens = $tokens;
+    }
+
+    public function getTokenPlacement(): string
+    {
+        return $this->tokenPlacement;
+    }
+
+    public function setTokenPlacement(string $tokenPlacement): void
+    {
+        $this->tokenPlacement = $tokenPlacement;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getSourceData(): array
+    {
+        return $this->sourceData;
+    }
+
+    /**
+     * @param array<string, mixed> $sourceData
+     */
+    public function setSourceData(array $sourceData): void
+    {
+        $this->sourceData = $sourceData;
     }
 }

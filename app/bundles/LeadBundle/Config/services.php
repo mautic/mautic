@@ -244,6 +244,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.tracker.contact', Mautic\LeadBundle\Tracker\ContactTracker::class);
     $services->alias('mautic.lead.field.settings.background_service', Mautic\LeadBundle\Field\BackgroundService::class);
     $services->alias('mautic.lead.report.dnc_report_service', Mautic\LeadBundle\Report\DncReportService::class);
+    $services->alias('mautic.lead.repository.tag', Mautic\LeadBundle\Entity\TagRepository::class);
     $services->alias('mautic.helper.segment.count.cache', Mautic\LeadBundle\Helper\SegmentCountCacheHelper::class);
     $services->alias('mautic.lead.export_scheduled_notification_subscriber', Mautic\LeadBundle\EventListener\ContactExportSchedulerNotificationSubscriber::class)
         ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\LeadBundle\EventListener\ContactExportSchedulerNotificationSubscriber::class.'" service instead.');

@@ -30,6 +30,11 @@ Mautic.emailOnLoad = function (container, response) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
     }
 
+    if (mQuery('#emailform_subject').length) {
+        const subject = mQuery('#emailform_subject');
+        Mautic.initAtWho(subject, subject.attr('data-token-callback'));
+    }
+
     if (mQuery('table.email-list').length) {
         var ids = [];
         mQuery('td.col-stats').each(function () {

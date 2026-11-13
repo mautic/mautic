@@ -119,7 +119,7 @@ trait CreateTestEntitiesTrait
     {
         $email = new Email();
         $email->setName($name);
-        $email->setSubject('Test Subject');
+        $email->setSubject($name);
         $email->setIsPublished(true);
 
         $this->em->persist($email);
