@@ -208,6 +208,10 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $this->assertCount(1, $crawler->filter('form[id^="mauticform_"]'));
+        $this->assertNotSame('', $this->connection->fetchOne(
+            'SELECT cached_html FROM '.MAUTIC_TABLE_PREFIX.Form::TABLE_NAME.' WHERE id = ?',
+            [$formId]
+        ));
 
         $this->loginOtherUser($editor);
         $this->client->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
