@@ -82,7 +82,7 @@
         </table>
 
 {% endset %}
-{% set tabsviewsfrequency = tabsviewsfrequency|merge([{'id': 'channels', 'label': 'mautic.lead.contact.channels', 'content': tabsviewsfrequencyContent0, 'className': 'pa-md'}]) %}
+{% set tabsviewsfrequency = tabsviewsfrequency|merge([{'id': 'channels', 'label': 'mautic.lead.contact.channels', 'content': tabsviewsfrequencyContent0, 'className': 'pa-16'}]) %}
 {% set tabsviewsfrequencyContent1 %}
         <table class="table" width="100%">
             <thead>
@@ -93,7 +93,7 @@
         </table>
 
 {% endset %}
-{% set tabsviewsfrequency = tabsviewsfrequency|merge([{'id': 'categories', 'label': 'mautic.lead.preferred.categories', 'content': tabsviewsfrequencyContent1, 'className': 'pa-md'}]) %}
+{% set tabsviewsfrequency = tabsviewsfrequency|merge([{'id': 'categories', 'label': 'mautic.lead.preferred.categories', 'content': tabsviewsfrequencyContent1, 'className': 'pa-16'}]) %}
 {% set tabsviewsfrequencyContent2 %}
         <table class="table" width="100%">
             <thead>
@@ -104,7 +104,7 @@
         </table>
 
 {% endset %}
-{% set tabsviewsfrequency = tabsviewsfrequency|merge([{'id': 'segments', 'label': 'mautic.lead.preferred.segments', 'content': tabsviewsfrequencyContent2, 'className': 'pa-md'}]) %}
+{% set tabsviewsfrequency = tabsviewsfrequency|merge([{'id': 'segments', 'label': 'mautic.lead.preferred.segments', 'content': tabsviewsfrequencyContent2, 'className': 'pa-16'}]) %}
 {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsfrequency, 'variant': 'contained'}) }}
 
 {{ form_end(form, render_rest = false) }}
