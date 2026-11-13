@@ -44,6 +44,21 @@ final class ProjectRepositoryAssociationSearchFunctionalTest extends MauticMysql
         $this->assertNotContains($projectWithEmail, $withoutEmails);
     }
 
+    public function testIsMineSearchCommandFiltersProjectsByOwner(): void
+    {
+        $ownProject   = $this->createProject('Owned project');
+        $otherProject = $this->createProject('Other owner project');
+
+        $this->em->getConnection()->update(MAUTIC_TABLE_PREFIX.Project::TABLE_NAME, ['created_by' => 999999], ['id' => $otherProject->getId()]);
+
+        $this->client->request('GET', '/api/projects?search='.urlencode('is:mine'));
+
+        $this->assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($ownProject->getName(), $content);
+        $this->assertStringNotContainsString($otherProject->getName(), $content);
+    }
+
     private function createProject(string $name): Project
     {
         $project = new Project();

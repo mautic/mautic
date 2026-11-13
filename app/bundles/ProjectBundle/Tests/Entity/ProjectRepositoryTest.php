@@ -50,6 +50,11 @@ final class ProjectRepositoryTest extends TestCase
         $this->assertContains('mautic.project.searchcommand.hasassets', $commands);
     }
 
+    public function testGetSearchCommandsIncludesOwnershipFilter(): void
+    {
+        $this->assertContains('mautic.core.searchcommand.ismine', $this->repository->getSearchCommands());
+    }
+
     #[\PHPUnit\Framework\Attributes\DataProvider('associationFilterProvider')]
     public function testAddSearchCommandWhereClauseHandlesAssociationFilters(string $command, string $expectedTable): void
     {

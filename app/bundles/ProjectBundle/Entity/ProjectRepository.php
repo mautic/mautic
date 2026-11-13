@@ -48,7 +48,7 @@ final class ProjectRepository extends CommonRepository
             }
         }
 
-        return [$expr, $parameters];
+        return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
 
     /**
@@ -89,7 +89,11 @@ final class ProjectRepository extends CommonRepository
      */
     public function getSearchCommands(): array
     {
-        return array_merge(array_keys(self::ASSOCIATION_FILTERS), parent::getSearchCommands());
+        return array_merge(
+            array_keys(self::ASSOCIATION_FILTERS),
+            ['mautic.core.searchcommand.ismine'],
+            parent::getSearchCommands()
+        );
     }
 
     /**
