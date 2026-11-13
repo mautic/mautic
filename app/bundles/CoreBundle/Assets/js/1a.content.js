@@ -2650,7 +2650,6 @@ Mautic.applyFilters = function () {
 Mautic.resetFilters = function () {
     Mautic.initFilterCommands();
     const searchInput = document.getElementById('list-search');
-    Mautic.releaseQuickFilterScope(searchInput);
     let currentSearchValue = searchInput.value || '';
     currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
     searchInput.value = currentSearchValue.trim();
