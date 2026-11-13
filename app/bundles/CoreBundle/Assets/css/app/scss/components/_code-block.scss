@@ -26,6 +26,7 @@
   }
 
   &__body {
+    @include outline();
     position: relative;
     overflow-x: auto;
     padding: var(--spacing-03) 0;
