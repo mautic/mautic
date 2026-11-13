@@ -45,7 +45,7 @@
         {% endif %}
     {% endfor %}
 
-    <div class="d-flex flex-column gap-xs">
+    <div class="d-flex flex-column gap-5">
         {% for header, pattern in filterGroups %}
             {% set groupFilters = pattern
                 ? quickFilters|filter(f => f.search matches '/' ~ pattern ~ '/')
@@ -54,7 +54,7 @@
 
             {% if groupFilters is not empty %}
                 <div class="dropdown-header{% if loop.first or visibleGroups|length == 1 %} mt-0{% endif %}">{{ header|trans }}</div>
-                <div class="d-flex gap-xs pi-md flex-wrap">
+                <div class="d-flex gap-5 pi-16 flex-wrap">
                     {% for filter in groupFilters %}
                         <button type="button" class="label label-outline label-selectable"
                         data-filter="{{ filter.search|trans }}"

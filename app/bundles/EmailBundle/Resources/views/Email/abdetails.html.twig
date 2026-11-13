@@ -1,6 +1,6 @@
 {% if 'list' == email.emailType and not email.isEnableAbTest() and email.getSentCount() == 0 %}
-    <div class="panel shd-none rounded-0 bdr-w-0 mt-sm mb-0">
-        <div class="panel-body pt-xs">
+    <div class="panel shd-none rounded-0 bdr-w-0 mt-12 mb-0">
+        <div class="panel-body pt-5">
             {% include '@MauticCore/Components/card.html.twig' with {
                 type: 'link',
                 heading: 'mautic.core.ab_test.create',
@@ -16,10 +16,10 @@
     </div>
 {% elseif email.isEnableAbTest() %}
     {# @var \Mautic\EmailBundle\Model\AbTest\EmailStatus emailStatus #}
-    <div class="panel shd-none rounded-0 bdr-w-0 mt-sm mb-0">
-        <div class="panel-body pt-xs">
+    <div class="panel shd-none rounded-0 bdr-w-0 mt-12 mb-0">
+        <div class="panel-body pt-5">
             <div class="tile" style="outline: 1px solid var(--border-tile);">
-                <div class="d-flex align-items-center justify-content-between mb-sm">
+                <div class="d-flex align-items-center justify-content-between mb-12">
                     <h3 class="type-heading-02 mb-0">{{ 'mautic.core.variants.abtest'|trans }}
                         {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': variants.parent, 'model': 'email', 'status': email.getPublishStatus(), 'size': 'ri-xl'}) -}}
                     </h3>
@@ -45,11 +45,11 @@
                 {# Status alerts and actions #}
                 {% if emailStatus.getStatus() == 'prepare' %}
                     {% if not emailStatus.hasChildren() %}
-                        <div class="alert alert-warning mt-md mb-md">
+                        <div class="alert alert-warning mt-16 mb-16">
                             {{ 'mautic.email.abtest.not_ready'|trans }}
                         </div>
                     {% else %}
-                        <div class="alert alert-info mt-md mb-md">
+                        <div class="alert alert-info mt-16 mb-16">
                             {{ 'mautic.email.ab.test.start.sending.start.tooltip'|trans({
                                 '%percentage%': variants.abTestSettings.totalWeight,
                                 '%hours%': variants.abTestSettings.sendWinnerDelay
@@ -57,7 +57,7 @@
                         </div>
                     {% endif %}
 
-                    <div class="d-flex flex-column gap-sm abtest-sidebar-actions">
+                    <div class="d-flex flex-column gap-12 abtest-sidebar-actions">
                         {% include '@MauticCore/Helper/button.html.twig' with {
                             buttons: [{
                                 label: 'mautic.email.ab_test.form.abtest.add',
@@ -90,12 +90,12 @@
                     </div>
 
                 {% elseif emailStatus.getStatus() == 'pending' %}
-                    <div class="alert alert-info mt-md mb-md">
+                    <div class="alert alert-info mt-16 mb-16">
                         {{ 'mautic.core.form.pending.start_at'|trans({
                             '%date%': dateToFullConcat(email.getPublishUp())
                         }) }}
                     </div>
-                    <div class="d-flex flex-column gap-sm abtest-sidebar-actions">
+                    <div class="d-flex flex-column gap-12 abtest-sidebar-actions">
                         {% include '@MauticCore/Helper/button.html.twig' with {
                             buttons: [{
                                 label: 'mautic.email.ab_test.form.abtest.add',
@@ -126,14 +126,14 @@
 
                 {% elseif emailStatus.getStatus() == 'running' %}
                     {% if variants.hoursLeftToDetermineWinner is not null %}
-                        <div class="alert alert-info mt-md mb-md">
+                        <div class="alert alert-info mt-16 mb-16">
                             {{ 'mautic.ab.test.hours.left.determine.winner'|trans({
                                 '%hours%': variants.hoursLeftToDetermineWinner.hours,
                                 '%minutes%': variants.hoursLeftToDetermineWinner.minutes
                             }) }}
                         </div>
                     {% endif %}
-                    <div class="mt-md">
+                    <div class="mt-16">
                         {% include '@MauticCore/Helper/button.html.twig' with {
                             buttons: [{
                                 label: 'mautic.core.ab_test.stats',
@@ -148,7 +148,7 @@
                     </div>
 
                 {% else %}
-                    <div class="mt-md">
+                    <div class="mt-16">
                         {% include '@MauticCore/Helper/button.html.twig' with {
                             buttons: [{
                                 label: 'mautic.core.ab_test.stats',
