@@ -13,7 +13,8 @@ use Symfony\Component\Console\Input\ArgvInput;
 
 /**
  * Form submission totals per hour, kept apart from the submission rows so the stats stay when results are deleted.
- * The table is created in up() and filled from the submissions made so far in postUp(), one day at a time.
+ * The table is created in up() and filled from the submissions made so far in postUp(), one day at a time from the
+ * newest day back to the oldest.
  */
 final class Version20261113100000 extends PreUpAssertionMigration
 {
@@ -69,6 +70,8 @@ final class Version20261113100000 extends PreUpAssertionMigration
     /**
      * Starts the totals from the submissions already made, so the stats look the same as before the upgrade. Each day
      * is one statement that sets the hour totals of that day, so a run that stopped halfway can simply be run again.
+     * The days go from the newest back to the oldest: a stopped run then leaves its gap at the old end, where no
+     * submission made in the meantime can land.
      */
     public function postUp(Schema $schema): void
     {
@@ -90,10 +93,10 @@ final class Version20261113100000 extends PreUpAssertionMigration
             return;
         }
 
-        $day     = (new \DateTimeImmutable((string) $range['first']))->setTime(0, 0);
-        $lastDay = (new \DateTimeImmutable((string) $range['last']))->setTime(0, 0);
+        $firstDay = (new \DateTimeImmutable((string) $range['first']))->setTime(0, 0);
+        $day      = (new \DateTimeImmutable((string) $range['last']))->setTime(0, 0);
 
-        while ($day <= $lastDay) {
+        while ($day >= $firstDay) {
             $nextDay = $day->modify('+1 day');
 
             $this->connection->executeStatement(
@@ -106,7 +109,7 @@ final class Version20261113100000 extends PreUpAssertionMigration
                 [$day->format('Y-m-d H:i:s'), $nextDay->format('Y-m-d H:i:s')]
             );
 
-            $day = $nextDay;
+            $day = $day->modify('-1 day');
         }
     }
 
@@ -118,18 +121,21 @@ final class Version20261113100000 extends PreUpAssertionMigration
     }
 
     /**
-     * The days are filled in order, so the totals are complete once the hour of the newest submission has its row.
+     * The days are filled from the newest back to the oldest, so the totals are complete once the oldest submission
+     * has its row. A submission made while the migration runs lands at the new end and cannot stand in for it.
      */
     private function isBackfillDone(): bool
     {
         $submissions = $this->getPrefixedTableName(Submission::TABLE_NAME);
+        $oldest      = $this->connection->fetchAssociative("SELECT `form_id`, `date_submitted` FROM `{$submissions}` ORDER BY `date_submitted` ASC LIMIT 1");
+
+        if (!is_array($oldest)) {
+            return true;
+        }
 
         return (bool) $this->connection->fetchOne(
-            "SELECT NOT EXISTS (SELECT 1 FROM `{$submissions}`)
-                OR EXISTS (
-                    SELECT 1 FROM `{$this->getPrefixedTableName()}` t
-                    WHERE t.`hour` = (SELECT DATE_FORMAT(MAX(`date_submitted`), '".self::HOUR_FORMAT."') FROM `{$submissions}`)
-                )"
+            "SELECT EXISTS (SELECT 1 FROM `{$this->getPrefixedTableName()}` WHERE `form_id` = ? AND `hour` = DATE_FORMAT(?, '".self::HOUR_FORMAT."'))",
+            [$oldest['form_id'], $oldest['date_submitted']]
         );
     }
 }

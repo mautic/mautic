@@ -46,12 +46,8 @@ final class FormSubmissionTotalFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSubmissionCounts($formId, rows: 1, total: 0);
 
-        $this->client->request(Request::METHOD_GET, '/s/forms');
-        $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('View One Result', (string) $this->client->getResponse()->getContent());
-
-        $crawler = $this->assertDetailsPageHasTheThreeCards($formId);
-        $this->assertSame('--', trim($crawler->filter('.lead-stats .fw-b')->eq(2)->text()), 'the recorded total card shows nothing yet');
+        $this->assertListLinksToTheResults($formId);
+        $this->assertCards($formId, rows: '1', contacts: '--', recorded: '--');
     }
 
     public function testSubmissionsFromAPageAreRecordedInTheTotalAndKeptWhenTheResultsAreDeleted(): void
@@ -69,9 +65,7 @@ final class FormSubmissionTotalFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSubmissionCounts($formId, rows: 0, total: 2);
 
-        $crawler = $this->assertDetailsPageHasTheThreeCards($formId);
-        $this->assertSame('--', trim($crawler->filter('.lead-stats .fw-b')->eq(0)->text()), 'the rows card follows the deleted results');
-        $this->assertSame('2', trim($crawler->filter('.lead-stats .fw-b')->eq(2)->text()), 'the recorded total card keeps the deleted results');
+        $this->assertCards($formId, rows: '--', contacts: '--', recorded: '2');
 
         $chartData = self::getContainer()->get(SubmissionModel::class)->getSubmissionTotalsLineChartData(
             null,
@@ -90,10 +84,8 @@ final class FormSubmissionTotalFunctionalTest extends MauticMysqlTestCase
         $this->assertSubmissionCounts($formId, rows: 1, total: 0);
 
         // Nothing is hidden, the rows are not analytics
-        $this->client->request(Request::METHOD_GET, '/s/forms');
-        $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('View One Result', (string) $this->client->getResponse()->getContent());
-        $this->assertDetailsPageHasTheThreeCards($formId);
+        $this->assertListLinksToTheResults($formId);
+        $this->assertCards($formId, rows: '1', contacts: '--', recorded: '--');
     }
 
     private function createForm(): int
@@ -145,15 +137,27 @@ final class FormSubmissionTotalFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($total, self::getContainer()->get(SubmissionModel::class)->getSubmissionTotal($form), 'the recorded total');
     }
 
-    private function assertDetailsPageHasTheThreeCards(int $formId): \Symfony\Component\DomCrawler\Crawler
+    /**
+     * The results tag in the form list is a link only when the form has results, so the link stands for "View N Results".
+     */
+    private function assertListLinksToTheResults(int $formId): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/forms');
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $crawler->filter('a#form-results-count-'.$formId.'[href$="/s/forms/results/'.$formId.'"]'), 'the results tag links to the results');
+    }
+
+    /**
+     * The three cards in their order: submission rows, associated contacts, recorded total. A zero shows as "--".
+     * The test form's field is not mapped to a contact field, so its submissions have no contact.
+     */
+    private function assertCards(int $formId, string $rows, string $contacts, string $recorded): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/forms/view/'.$formId);
         $this->assertResponseIsSuccessful();
 
-        $titles = $crawler->filter('.lead-stats .text-secondary.ellipsis')->each(static fn ($node): string => trim($node->text()));
-        $this->assertSame(['Total submissions', 'Associated contacts', 'Submissions recorded'], $titles);
+        $values = $crawler->filter('.lead-stats .fw-b')->each(static fn ($node): string => trim($node->text()));
+        $this->assertSame([$rows, $contacts, $recorded], $values);
         $this->assertCount(1, $crawler->filter('.ri-download-line'), 'the submissions chart');
-
-        return $crawler;
     }
 }
