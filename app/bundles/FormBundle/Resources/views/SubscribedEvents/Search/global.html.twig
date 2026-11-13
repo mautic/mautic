@@ -6,14 +6,14 @@
   {%- else -%}
     <a href="{{ url('mautic_form_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
       <span class="fw-sb">{{- item.name -}}</span>
-      <span class="ml-4 mr-sm">#{{ item.id }}</span>
+      <span class="ms-4 me-12">#{{ item.id }}</span>
         {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
             'entity': item,
             'status': 'available',
             'simplified': 'true'
         }) -}}
       <span class="float-end" data-bs-toggle="tooltip" title="{{ 'mautic.form.form.resultcount'|trans }}" data-bs-placement="left">
-        <i class="ri-file-list-2-line mr-2"></i>
+        <i class="ri-file-list-2-line me-2"></i>
         {{- item.resultCount -}}
       </span>
     </a>
