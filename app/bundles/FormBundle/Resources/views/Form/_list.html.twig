@@ -42,7 +42,7 @@
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'form',
-                        'orderBy': (aggregateAnalytics ?? true) ? 'submission_count' : '',
+                        'orderBy': 'submission_count',
                         'text': 'mautic.form.form.results',
                         'class': 'visible-md visible-lg col-form-submissions',
                 }) }}
@@ -135,12 +135,9 @@
                         {% endif %}
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set showSubmissionCount = aggregateAnalytics ?? true %}
                         {% include '@MauticCore/Helper/_tag.html.twig' with {
                             tags: [{
-                                label: showSubmissionCount
-                                    ? 'mautic.form.form.viewresults'|trans({'%count%': i['submission_count']})
-                                    : 'mautic.form.form.viewresults.nocount'|trans,
+                                label: 'mautic.form.form.viewresults'|trans({'%count%': i['submission_count']}),
                                 color: 'gray',
                                 size: 'sm',
                                 attributes: {
@@ -148,7 +145,7 @@
                                     href: path('mautic_form_action', {'objectAction': 'results', 'objectId': item.id}),
                                     'data-toggle': 'ajax',
                                     'data-menu-link': 'mautic_form_index'
-                                }|filter((v, k) => not showSubmissionCount or 0 != (i.submission_count) or (k != 'href' and k != 'data-toggle'))
+                                }|filter((v, k) => 0 != (i.submission_count) or (k != 'href' and k != 'data-toggle'))
                             }]
                         } %}
                     </td>

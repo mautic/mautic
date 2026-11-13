@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -22,6 +23,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\FormBundle\Entity\SubmissionTotalRepository;
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -197,6 +199,9 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $fieldHelper->method('getFieldFilter')->willReturn('string');
 
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturn($entityManager);
+
         $this->submissionModel = new SubmissionModel(
             $this->ipLookupHelper,
             $this->createStub(Environment::class),
@@ -228,6 +233,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(StageRepository::class), // $stageRepository
             $this->createStub(UserRepository::class), // $userRepository
+            new SubmissionTotalRepository($managerRegistry), // $submissionTotalRepository, final so it is built for real
         );
 
         $this->submissionModelReflection = new \ReflectionClass($this->submissionModel);

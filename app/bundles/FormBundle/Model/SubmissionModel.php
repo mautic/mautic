@@ -28,6 +28,8 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\FormBundle\Entity\SubmissionTotal;
+use Mautic\FormBundle\Entity\SubmissionTotalRepository;
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
@@ -104,6 +106,7 @@ final class SubmissionModel extends CommonFormModel
         private readonly LeadRepository $leadRepository,
         private readonly StageRepository $stageRepository,
         private readonly UserRepository $userRepository,
+        private readonly SubmissionTotalRepository $submissionTotalRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -844,6 +847,28 @@ final class SubmissionModel extends CommonFormModel
         }
 
         $data = $query->loadAndBuildTimeData($q);
+        $chart->setDataset($this->translator->trans('mautic.form.submission.count'), $data);
+
+        return $chart->render();
+    }
+
+    /**
+     * How many submissions the form has recorded in all. Unlike the submission rows, this total stays when results
+     * are deleted and leaves out submissions made from the form's preview page.
+     */
+    public function getSubmissionTotal(Form $form): int
+    {
+        return $this->submissionTotalRepository->getTotal($form->getId());
+    }
+
+    /**
+     * The recorded submissions over time, from the same totals as getSubmissionTotal().
+     */
+    public function getSubmissionTotalsLineChartData(?string $unit, \DateTime $dateFrom, \DateTime $dateTo, Form $form, ?string $dateFormat = null): array
+    {
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $data  = $query->fetchSumTimeData(SubmissionTotal::TABLE_NAME, 'hour', ['form_id' => $form->getId()], 'total');
         $chart->setDataset($this->translator->trans('mautic.form.submission.count'), $data);
 
         return $chart->render();
