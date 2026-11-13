@@ -101,7 +101,7 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
     public function testActionWithoutOwnerAsksToChooseOneInsteadOfShowingTheFirstUser(): void
     {
         $user = $this->getUser(self::ADMIN_USER);
-        $this->assertNotNull($user);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
 
         // A new action keeps preselecting the first user
         $uri = '/s/campaigns/events/new?type=lead.changeowner&eventType=action&campaignId='.self::TEMP_CAMPAIGN_ID.'&anchor=leadsource&anchorEventType=source';
