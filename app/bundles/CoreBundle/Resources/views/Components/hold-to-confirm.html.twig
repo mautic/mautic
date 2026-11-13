@@ -18,7 +18,7 @@
                 <circle class="hold-to-confirm__progress" pathLength="1" cx="{{ dimensions.ring / 2 }}" cy="{{ dimensions.ring / 2 }}" r="{{ (dimensions.ring - dimensions.stroke) / 2 }}" fill="none" stroke="currentColor" stroke-width="{{ dimensions.stroke }}" stroke-linecap="round" stroke-dasharray="1" stroke-dashoffset="1"/>
             </svg>
         </span>
-        <span class="hold-to-confirm__label"><span data-idle-label>{{ label|trans }}</span><span data-confirmed-label hidden>{{ confirmedLabel|trans }}</span></span>
+        <span class="hold-to-confirm__label"><span data-idle-label>{{ label|trans }}</span><span data-confirmed-label aria-hidden="true">{{ confirmedLabel|trans }}</span></span>
     </button>
     <span class="sr-only hold-to-confirm__status" role="status" aria-live="polite"></span>
 </span>

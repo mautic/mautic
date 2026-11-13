@@ -1,7 +1,6 @@
 (() => {
     if (window.MauticUI && window.MauticUI.HoldToConfirmButton) return;
 
-    const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     function emit(element, name, detail) {
         element.dispatchEvent(new CustomEvent(name, { bubbles: true, detail }));
     }
@@ -154,26 +153,11 @@
             this.setProgress(0);
         }
         swapLabel(confirmed) {
-            const outgoing = confirmed ? this.idleLabel : this.confirmedLabel;
-            const incoming = confirmed ? this.confirmedLabel : this.idleLabel;
-            this.element.querySelectorAll(".hold-to-confirm__label-out").forEach((ghost) => ghost.remove());
-            if (!reducedMotion()) {
-                outgoing.parentElement.style.setProperty("--hold-to-confirm-label-width", `${outgoing.offsetWidth}px`);
-                const ghost = outgoing.cloneNode(true);
-                ghost.classList.remove("hold-to-confirm__label-in");
-                ghost.classList.add("hold-to-confirm__label-out");
-                ghost.setAttribute("aria-hidden", "true");
-                const removeGhost = (event) => {
-                    if (event.target === ghost) ghost.remove();
-                };
-                for (const name of ["animationend", "animationcancel"]) {
-                    ghost.addEventListener(name, removeGhost, { signal: this.events.signal });
-                }
-                outgoing.parentElement.append(ghost);
+            for (const [label, hidden] of [[this.idleLabel, confirmed], [this.confirmedLabel, !confirmed]]) {
+                label.setAttribute("aria-hidden", String(hidden));
+                label.classList.toggle("hold-to-confirm__label-out", hidden);
+                label.classList.toggle("hold-to-confirm__label-in", !hidden);
             }
-            outgoing.hidden = true;
-            incoming.hidden = false;
-            incoming.classList.add("hold-to-confirm__label-in");
         }
         complete() {
             if (this.confirmed || !this.element.isConnected || this.button.disabled || document.hidden || this.sources.size === 0) return;
@@ -204,7 +188,6 @@
             this.events.abort();
             cancelAnimationFrame(this.frame);
             clearTimeout(this.resetTimer);
-            this.element.querySelectorAll(".hold-to-confirm__label-out").forEach((ghost) => ghost.remove());
         }
     }
     register("HoldToConfirmButton", '[data-component="hold-to-confirm"]', (element) => new HoldToConfirmButton(element));

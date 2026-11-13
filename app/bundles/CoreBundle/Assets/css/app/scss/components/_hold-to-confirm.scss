@@ -97,20 +97,23 @@
         transition: stroke-dashoffset 600ms var(--hold-to-confirm-easing);
     }
 
-    &__label {
+    &__button.btn &__label {
         position: relative;
-        display: inline-flex;
+        display: inline-grid;
         overflow: hidden;
         transition: opacity 200ms;
 
         > span {
             display: inline-block;
+            grid-area: 1 / 1;
+            justify-self: start;
             white-space: nowrap;
         }
 
-        > [hidden] { display: none; }
-
-        &:has(.hold-to-confirm__label-out) { min-width: var(--hold-to-confirm-label-width); }
+        > [aria-hidden='true'] {
+            visibility: hidden;
+            opacity: 0;
+        }
     }
 
     &__label-in {
@@ -118,9 +121,6 @@
     }
 
     &__label-out {
-        position: absolute;
-        top: 0;
-        left: 0;
         pointer-events: none;
         animation: hold-to-confirm-label-out 600ms var(--hold-to-confirm-easing) both;
     }
@@ -173,8 +173,8 @@
 }
 
 @keyframes hold-to-confirm-label-out {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(-6px); }
+    from { opacity: 1; transform: translateY(0); visibility: visible; }
+    to { opacity: 0; transform: translateY(-6px); visibility: hidden; }
 }
 
 @media (prefers-reduced-motion: reduce) {
