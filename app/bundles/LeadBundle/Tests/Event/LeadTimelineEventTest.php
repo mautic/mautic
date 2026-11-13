@@ -117,4 +117,21 @@ final class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame([1], array_column($event->getEvents(), 'contactId'));
     }
+
+    public function testEventsWithoutContactIdAreDroppedWithEmptyLeadIds(): void
+    {
+        $event = new LeadTimelineEvent(null, ['search' => '', 'includeEvents' => [], 'excludeEvents' => [], 'leadIds' => []]);
+
+        foreach ([['contactId' => null], ['contactId' => 0], []] as $i => $contact) {
+            $event->addEvent($contact + [
+                'event'      => 'foo',
+                'eventId'    => 'foo'.$i,
+                'eventLabel' => 'Foo',
+                'eventType'  => 'foo',
+                'timestamp'  => new \DateTime(),
+            ]);
+        }
+
+        $this->assertSame([], array_column($event->getEvents(), 'eventId'));
+    }
 }
