@@ -80,6 +80,14 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
             [$leadOne, $leadTwo, $leadThree, $leadFour],
             [$leadFive, $leadSix]
         );
+
+        // Mixed operators must keep the usual boolean precedence: AND is evaluated before OR.
+        $this->assertSearchResult(
+            urlencode('email:'.$leadOne->getEmail().' OR email:'.$leadFour->getEmail().' AND segment:'.$listOne->getAlias()),
+            [$leadOne],
+            [$leadTwo, $leadThree, $leadFour, $leadFive, $leadSix]
+        );
+
         $this->assertSearchResult('!segment%3A'.$listTwo->getAlias(), [$leadTwo, $leadThree], [$leadOne, $leadFour, $leadFive, $leadSix]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listTwo->getAlias()}'",

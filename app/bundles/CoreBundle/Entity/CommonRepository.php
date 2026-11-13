@@ -1056,6 +1056,18 @@ class CommonRepository extends ServiceEntityRepository
             $type = 'and';
         }
 
+        $operatorTypes = [];
+        foreach ($parseFilters as $filter) {
+            $operatorTypes[] = 'or' === ($filter->type ?? null) ? 'or' : 'and';
+        }
+
+        if (count(array_unique($operatorTypes)) > 1) {
+            $parameters = [];
+            $expressions = $this->buildMixedOperatorExpression($parseFilters, $qb, $parameters, $containsOr || in_array('or', $operatorTypes, true));
+
+            return [$expressions, $parameters];
+        }
+
         // SearchStringHelper stores the operator on the filter following it.
         // Inspect all filters as well so sparse or nested parser output cannot
         // accidentally turn an OR group into an AND group.
@@ -1076,6 +1088,56 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         return [$expressions, $parameters];
+    }
+
+    /**
+     * Build a mixed search expression using the usual boolean precedence: AND groups are evaluated before OR.
+     *
+     * @param iterable<object>             $parseFilters
+     * @param QueryBuilder|DbalQueryBuilder $qb
+     * @param array<mixed>                 $parameters
+     */
+    private function buildMixedOperatorExpression(iterable $parseFilters, $qb, array &$parameters, bool $containsOr): mixed
+    {
+        $andGroups = [];
+        $andGroup  = $qb->expr()->andX();
+
+        foreach ($parseFilters as $filter) {
+            if ($containsOr) {
+                $filter->containsOr = true;
+            }
+
+            [$expr, $params] = $this->getSearchFilterExpression($qb, $filter);
+            if ([] !== $params) {
+                $parameters = array_merge($parameters, $params);
+            }
+
+            if (!$expr) {
+                continue;
+            }
+
+            if ('or' === ($filter->type ?? null) && $andGroup->count()) {
+                $andGroups[] = $andGroup;
+                $andGroup    = $qb->expr()->andX();
+            }
+
+            $this->appendExpression($andGroup, $expr);
+        }
+
+        if ($andGroup->count()) {
+            $andGroups[] = $andGroup;
+        }
+
+        if (1 === count($andGroups)) {
+            return $andGroups[0];
+        }
+
+        $orExpression = $qb->expr()->orX();
+        foreach ($andGroups as $group) {
+            $orExpression->add($group);
+        }
+
+        return $orExpression;
     }
 
     /**
