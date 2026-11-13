@@ -201,7 +201,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             'points' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.event.points'),
                 'properties' => ['type' => 'number'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('number'),
                 'object'     => 'lead',
             ],
             'campaign' => [
@@ -573,6 +573,8 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         if ('segment' === $this->typeOperatorProvider->getContext()) {
             $this->behaviorOperators['datetime'][] = OperatorOptions::IN_LAST;
             $this->behaviorOperators['datetime'][] = OperatorOptions::IN_NEXT;
+            $this->behaviorOperators['number'][]   = OperatorOptions::BETWEEN;
+            $this->behaviorOperators['number'][]   = OperatorOptions::NOT_BETWEEN;
         }
 
         return $this->typeOperatorProvider->getOperatorsIncluding($this->behaviorOperators[$fieldType]);

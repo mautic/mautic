@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 final class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
@@ -21,7 +22,8 @@ final class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $expressionOperator = $filter->getOperator();
         $expression         = $queryBuilder->expr()->{$expressionOperator}('count(id)',
-            $filter->getParameterHolder($expressionValueAlias));
+            OperatorOptions::isBetween($expressionOperator) ? array_values($filter->getParameterValue()) : $filter->getParameterHolder($expressionValueAlias)
+        );
 
         $queryBuilder->setParameter($expressionValueAlias, (int) $filter->getParameterValue());
 

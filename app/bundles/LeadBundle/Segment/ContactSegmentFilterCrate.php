@@ -109,6 +109,8 @@ class ContactSegmentFilterCrate
             OperatorOptions::EXCLUDING_ALL,
             OperatorOptions::REGEXP,
             OperatorOptions::NOT_REGEXP,
+            OperatorOptions::BETWEEN,
+            OperatorOptions::NOT_BETWEEN,
         ];
 
         if (!in_array($this->operator, $excludeTypecastOperators, true)) {
