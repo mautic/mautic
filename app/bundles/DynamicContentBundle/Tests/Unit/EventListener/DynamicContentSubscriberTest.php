@@ -21,6 +21,7 @@ use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -332,7 +333,7 @@ HTML;
         yield 'plain token inside url' => ['https://example.com/?a={dwc=link-token}&b=1', 'https://example.com/?a=https://example.com/path&b=1'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('hrefTokenFormatProvider')]
+    #[DataProvider('hrefTokenFormatProvider')]
     public function testDecodeTokensReplacesHrefTokenInAnyEncoding(string $href, string $expectedHref): void
     {
         $content = '<html><body><a href="'.$href.'">Click here</a></body></html>';
@@ -364,7 +365,7 @@ HTML;
         $this->subscriber->decodeTokens($event);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('srcActionTokenProvider')]
+    #[DataProvider('srcActionTokenProvider')]
     public function testDecodeTokensReplacesSrcAndActionTokens(string $html, string $tag, string $attribute): void
     {
         $contact = new Lead();

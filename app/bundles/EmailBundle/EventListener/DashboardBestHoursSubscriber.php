@@ -22,7 +22,7 @@ final class DashboardBestHoursSubscriber extends MainDashboardSubscriber
      *
      * @var array<string, array<string, string>>
      */
-    protected $types = [
+    protected array $types = [
         'emails.best.hours' => [
             'formAlias' => DashboardBestHoursWidgetType::class,
         ],
@@ -30,10 +30,8 @@ final class DashboardBestHoursSubscriber extends MainDashboardSubscriber
 
     /**
      * Define permissions to see those widgets.
-     *
-     * @var array
      */
-    protected $permissions = [
+    protected array $permissions = [
         'email:emails:viewown',
         'email:emails:viewother',
     ];

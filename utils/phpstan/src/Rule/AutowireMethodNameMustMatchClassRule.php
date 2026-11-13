@@ -7,6 +7,7 @@ namespace Utils\PHPStan\Rule;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
+use PHPStan\Reflection\ClassReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -123,7 +124,7 @@ final class AutowireMethodNameMustMatchClassRule implements Rule
         }
 
         $classReflection = $scope->getClassReflection();
-        if (!$classReflection instanceof \PHPStan\Reflection\ClassReflection) {
+        if (!$classReflection instanceof ClassReflection) {
             return null;
         }
 
@@ -145,7 +146,7 @@ final class AutowireMethodNameMustMatchClassRule implements Rule
         }
 
         $classReflection = $scope->getClassReflection();
-        if (!$classReflection instanceof \PHPStan\Reflection\ClassReflection) {
+        if (!$classReflection instanceof ClassReflection) {
             return $shortClassName;
         }
 

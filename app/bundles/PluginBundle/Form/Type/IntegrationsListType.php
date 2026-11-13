@@ -2,6 +2,7 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
+use Mautic\IntegrationsBundle\Integration\Interfaces\PushContactInterface;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -64,6 +65,23 @@ final class IntegrationsListType extends AbstractType
             $form            = $event->getForm();
             $statusChoices   = [];
             $campaignChoices = [];
+
+            $integrationObject = isset($data['integration'], $integrationObjects[$data['integration']]) ? $integrationObjects[$data['integration']] : null;
+            if ($integrationObject instanceof PushContactInterface) {
+                $form->add(
+                    'config',
+                    $integrationObject->getPushContactConfigFormName(),
+                    [
+                        'label' => false,
+                        'attr'  => [
+                            'class' => 'integration-config-container',
+                        ],
+                        'data'  => $data['config'] ?? [],
+                    ]
+                );
+
+                return;
+            }
 
             if (!empty($data['integration'])) {
                 $integrationObject = $this->integrationHelper->getIntegrationObject($data['integration']);

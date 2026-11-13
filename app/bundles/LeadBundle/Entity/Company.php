@@ -12,10 +12,8 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -92,72 +90,84 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      * @var ?string
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'companyemail', type: 'string', length: 191, nullable: true)]
     private $email;
 
     /**
      * @var ?string
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'companyaddress1', type: 'string', length: 191, nullable: true)]
     private $address1;
 
     /**
      * @var ?string
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'companyaddress2', type: 'string', length: 191, nullable: true)]
     private $address2;
 
     /**
      * @var string|null
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'companyphone', type: 'string', length: 191, nullable: true)]
     private $phone;
 
     /**
      * @var string|null
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'companycity', type: 'string', length: 191, nullable: true)]
     private $city;
 
     /**
      * @var ?string
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'companystate', type: 'string', length: 191, nullable: true)]
     private $state;
 
     /**
      * @var string|null
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'companyzipcode', type: 'string', length: 191, nullable: true)]
     private $zipcode;
 
     /**
      * @var string|null
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'companycountry', type: 'string', length: 191, nullable: true)]
     private $country;
 
     /**
      * @var string|null
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'companyname', type: 'string', length: 191, nullable: true)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'companywebsite', type: 'string', length: 191, nullable: true)]
     private $website;
 
     /**
      * @var string|null
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'companyindustry', type: 'string', length: 191, nullable: true)]
     private $industry;
 
     /**
      * @var string|null
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'companydescription', type: 'text', nullable: true)]
     private $description;
 
     #[Groups(['company:read', 'company:write'])]
@@ -190,31 +200,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     public function setSocialCache(array $cache): void
     {
         $this->socialCache = $cache;
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::loadFixedFieldMetadata(
-            $builder,
-            [
-                'email',
-                'address1',
-                'address2',
-                'phone',
-                'city',
-                'state',
-                'zipcode',
-                'country',
-                'name',
-                'website',
-                'industry',
-                'description',
-            ],
-            FieldModel::$coreCompanyFields
-        );
-
     }
 
     /**

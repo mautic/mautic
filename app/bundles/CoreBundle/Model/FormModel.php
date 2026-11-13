@@ -6,6 +6,7 @@ use Doctrine\ORM\UnitOfWork;
 use Mautic\CoreBundle\Doctrine\ReservedWords;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Event\EntityTogglePublishEvent;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -153,7 +154,7 @@ class FormModel extends AbstractCommonModel
             $this->setTimestamps($entity, $isNew, $unlock);
 
             // Pre save single dispatcher
-            $preEvent                = $this->dispatchEventFromBatch('pre_save', $entity, $isNew);
+            $preEvent                = $this->dispatchEvent('pre_save', $entity, $isNew);
             $entitiesPreSaveParams[] = ['entity' => $entity, 'isNew' => $isNew, 'event' => $preEvent];
         }
 
@@ -176,7 +177,7 @@ class FormModel extends AbstractCommonModel
         $entitiesPostSaveParams = [];
         foreach ($entitiesPreSaveParams as &$entityParams) {
             // Post save single dispatcher after flush
-            $postEvent                = $this->dispatchEventFromBatch('post_save', $entityParams['entity'], $entityParams['isNew'], $entityParams['event']);
+            $postEvent                = $this->dispatchEvent('post_save', $entityParams['entity'], $entityParams['isNew'], $entityParams['event']);
             $entitiesPostSaveParams[] = ['entity' => $entityParams['entity'], 'isNew' => $entityParams['isNew'], 'event' => $postEvent];
         }
 
@@ -226,11 +227,11 @@ class FormModel extends AbstractCommonModel
 
             // set timestamp changes
             $this->setTimestamps($entity, false, false);
-        } elseif (method_exists($entity, 'setIsEnabled')) {
+        } elseif (method_exists($entity, 'setIsEnabled') && method_exists($entity, 'getIsEnabled')) {
             $entity->setIsEnabled(!$entity->getIsEnabled());
         }
 
-        $this->dispatchEvent('on_toggle_publish', $entity);
+        $this->dispatcher->dispatch(new EntityTogglePublishEvent($entity));
 
         // hit up event listeners
         $event = $this->dispatchEvent('pre_save', $entity);
@@ -384,21 +385,12 @@ class FormModel extends AbstractCommonModel
      * Dispatches events for child classes.
      *
      * @param TEntity $entity
-     * @param string $action
      */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         // ...
 
         return $event;
-    }
-
-    /**
-     * Dispatches events for child classes.
-     */
-    protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        return $this->dispatchEvent($action, $entity, $isNew, $event);
     }
 
     /**

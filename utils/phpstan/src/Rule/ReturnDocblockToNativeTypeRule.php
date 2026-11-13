@@ -25,10 +25,10 @@ use Utils\PHPStan\Collector\ReturnObjectDocblockCollector;
  *
  * @see \Utils\PHPStan\Tests\Rule\ReturnDocblockToNativeTypeRuleTest
  */
-final class ReturnDocblockToNativeTypeRule implements Rule
+final readonly class ReturnDocblockToNativeTypeRule implements Rule
 {
     public function __construct(
-        private readonly ReflectionProvider $reflectionProvider,
+        private ReflectionProvider $reflectionProvider,
     ) {
     }
 

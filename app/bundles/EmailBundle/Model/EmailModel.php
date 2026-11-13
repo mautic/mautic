@@ -14,6 +14,7 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
+use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -41,7 +42,6 @@ use Mautic\EmailBundle\Entity\StatDeviceRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
-use Mautic\EmailBundle\Event\EmailOnTogglePublishEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailPostDeleteEvent;
 use Mautic\EmailBundle\Event\EmailPostSaveEvent;
@@ -109,10 +109,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     protected $updatingTranslationChildren = false;
 
-    /**
-     * @var array
-     */
-    protected $emailSettings = [];
+    protected array $emailSettings = [];
 
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,
@@ -372,7 +369,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -383,7 +380,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             'post_save'         => EmailPostSaveEvent::class,
             'pre_delete'        => EmailPreDeleteEvent::class,
             'post_delete'       => EmailPostDeleteEvent::class,
-            'on_toggle_publish' => EmailOnTogglePublishEvent::class,
             default             => null,
         };
 
@@ -393,7 +389,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         if ($this->dispatcher->hasListeners($eventClass)) {
             if (!$event instanceof $eventClass) {
-                $event = new $eventClass($entity, $isNew);
+                $previousEvent = $event;
+                $event         = new $eventClass($entity, $isNew);
+
+                if ($previousEvent instanceof CommonEvent) {
+                    $event->inheritStateFrom($previousEvent);
+                }
             }
 
             $this->dispatcher->dispatch($event);

@@ -18,10 +18,8 @@ final class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Define the widget(s).
-     *
-     * @var array
      */
-    protected $types = [
+    protected array $types = [
         'asset.downloads.in.time'        => [],
         'unique.vs.repetitive.downloads' => [],
         'popular.assets'                 => [],
@@ -30,10 +28,8 @@ final class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Define permissions to see those widgets.
-     *
-     * @var array
      */
-    protected $permissions = [
+    protected array $permissions = [
         'asset:assets:viewown',
         'asset:assets:viewother',
     ];

@@ -15,6 +15,7 @@ use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Recurr\RecurrenceCollection;
 
 #[AllowMockObjectsWithoutExpectations]
 final class DateBuilderTest extends TestCase
@@ -81,7 +82,7 @@ final class DateBuilderTest extends TestCase
         $this->schedulerBuilder->expects($this->once())
             ->method('getNextEvent')
             ->with($schedulerEntity)
-            ->willReturn(new \Recurr\RecurrenceCollection());
+            ->willReturn(new RecurrenceCollection());
 
         $this->expectException(NoScheduleException::class);
 
@@ -93,7 +94,7 @@ final class DateBuilderTest extends TestCase
         $this->schedulerBuilder->expects($this->once())
             ->method('getNextEvents')
             ->with($this->isInstanceOf(SchedulerEntity::class), 1)
-            ->willReturn(new \Recurr\RecurrenceCollection());
+            ->willReturn(new RecurrenceCollection());
 
         $this->dateBuilder->getPreviewDays(true, SchedulerEnum::UNIT_NOW, '', '');
     }
@@ -103,7 +104,7 @@ final class DateBuilderTest extends TestCase
         $this->schedulerBuilder->expects($this->once())
             ->method('getNextEvents')
             ->with($this->isInstanceOf(SchedulerEntity::class), 10)
-            ->willReturn(new \Recurr\RecurrenceCollection());
+            ->willReturn(new RecurrenceCollection());
 
         $this->dateBuilder->getPreviewDays(true, SchedulerEnum::UNIT_MONTHLY, 'MON', '1');
     }

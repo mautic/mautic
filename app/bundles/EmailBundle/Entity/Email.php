@@ -16,7 +16,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -259,7 +258,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $revision = 1;
 
     #[Groups(['email:read', 'email:write'])]
-    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 
@@ -413,14 +412,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::addVariantMetadata($builder, self::class);
-
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -726,10 +717,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->fromAddress;
     }
 
-    /**
-     * @param mixed $fromAddress
-     */
-    public function setFromAddress($fromAddress): static
+    public function setFromAddress(?string $fromAddress): static
     {
         $this->isChanged('fromAddress', $fromAddress);
         $this->fromAddress = $fromAddress;
@@ -745,10 +733,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->fromName;
     }
 
-    /**
-     * @param mixed $fromName
-     */
-    public function setFromName($fromName): static
+    public function setFromName(?string $fromName): static
     {
         $this->isChanged('fromName', $fromName);
         $this->fromName = $fromName;
@@ -764,10 +749,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->replyToAddress;
     }
 
-    /**
-     * @param mixed $replyToAddress
-     */
-    public function setReplyToAddress($replyToAddress): static
+    public function setReplyToAddress(?string $replyToAddress): static
     {
         $this->isChanged('replyToAddress', $replyToAddress);
         $this->replyToAddress = $replyToAddress;
@@ -796,10 +778,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->bccAddress;
     }
 
-    /**
-     * @param mixed $bccAddress
-     */
-    public function setBccAddress($bccAddress): static
+    public function setBccAddress(?string $bccAddress): static
     {
         $this->isChanged('bccAddress', $bccAddress);
         $this->bccAddress = $bccAddress;
@@ -1041,10 +1020,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->emailType;
     }
 
-    /**
-     * @param mixed $emailType
-     */
-    public function setEmailType($emailType): static
+    public function setEmailType(?string $emailType): static
     {
         $this->emailType = $emailType;
 

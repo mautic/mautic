@@ -257,7 +257,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -275,9 +275,6 @@ final class PageModel extends FormModel implements GlobalSearchInterface
                 break;
             case 'post_delete':
                 $name = PageEvents::PAGE_POST_DELETE;
-                break;
-            case 'on_toggle_publish':
-                $name = PageEvents::PAGE_ON_TOGGLE_PUBLISH;
                 break;
             default:
                 return null;

@@ -19,6 +19,7 @@ use Mautic\AssetBundle\Event\AssetPreDeleteEvent;
 use Mautic\AssetBundle\Event\AssetPreSaveEvent;
 use Mautic\AssetBundle\Form\Type\AssetType;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
+use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -352,7 +353,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -372,7 +373,12 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
 
         if ($this->dispatcher->hasListeners($eventClass)) {
             if (!$event instanceof $eventClass) {
-                $event = new $eventClass($entity, $isNew);
+                $previousEvent = $event;
+                $event         = new $eventClass($entity, $isNew);
+
+                if ($previousEvent instanceof CommonEvent) {
+                    $event->inheritStateFrom($previousEvent);
+                }
             }
 
             $this->dispatcher->dispatch($event);

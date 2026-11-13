@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\SearchStringHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class SearchStringHelperTest extends TestCase
@@ -32,7 +33,7 @@ final class SearchStringHelperTest extends TestCase
     /**
      * @param array<int, array{command: string, string: string, type: string}> $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('multipleSpacesProvider')]
+    #[DataProvider('multipleSpacesProvider')]
     public function testMultipleSpacesBetweenTerms(string $searchString, array $expected): void
     {
         $result = SearchStringHelper::parseSearchString($searchString);

@@ -107,10 +107,7 @@ class LeadModel extends FormModel
 
     public const string CHANNEL_FEATURE = 'contact_preference';
 
-    /**
-     * @var array
-     */
-    protected $leadFields = [];
+    protected iterable $leadFields = [];
 
     protected $leadTrackingId;
 
@@ -119,10 +116,7 @@ class LeadModel extends FormModel
      */
     protected $leadTrackingCookieGenerated = false;
 
-    /**
-     * @var array
-     */
-    protected $availableLeadFields = [];
+    protected array $availableLeadFields = [];
 
     private bool $repoSetup = false;
 
@@ -298,17 +292,9 @@ class LeadModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         return $this->dispatchLeadEvent($action, $entity, $isNew, false);
-    }
-
-    /**
-     * @param Lead $entity
-     */
-    protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        return $this->dispatchLeadEvent($action, $entity, $isNew, true);
     }
 
     protected function dispatchBatchEvent(string $action, array $entitiesBatchParams, ?Event $event = null): ?Event
@@ -1417,7 +1403,7 @@ class LeadModel extends FormModel
             $this->modifyTags($lead, $tags, null, false);
         }
 
-        if (empty($this->leadFields)) {
+        if ($this->leadFields === []) {
             $this->leadFields = $this->leadFieldModel->getEntities(
                 [
                     'filter' => [

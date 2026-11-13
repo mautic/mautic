@@ -59,7 +59,6 @@ final class MessageQueueModel extends FormModel
     /**
      * @param int   $attempts
      * @param int   $priority
-     * @param mixed $messageQueue
      */
     public function processFrequencyRules(
         array &$leads,
@@ -68,7 +67,7 @@ final class MessageQueueModel extends FormModel
         $campaignEventId = null,
         $attempts = 3,
         $priority = MessageQueue::PRIORITY_NORMAL,
-        $messageQueue = null,
+        ?array $messageQueue = null,
         string $statTableName = 'email_stats',
         string $statContactColumn = 'lead_id',
         string $statSentColumn = 'date_sent',
@@ -313,7 +312,7 @@ final class MessageQueueModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, ?object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent(string $action, ?object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         switch ($action) {
             case 'process_message_queue':

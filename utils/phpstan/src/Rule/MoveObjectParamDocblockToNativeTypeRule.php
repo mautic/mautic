@@ -28,11 +28,11 @@ use Utils\PHPStan\ServiceTypeDetector;
  *
  * @see \Utils\PHPStan\Tests\Rule\MoveObjectParamDocblockToNativeTypeRuleTest
  */
-final class MoveObjectParamDocblockToNativeTypeRule implements Rule
+final readonly class MoveObjectParamDocblockToNativeTypeRule implements Rule
 {
     public function __construct(
-        private readonly ReflectionProvider $reflectionProvider,
-        private readonly ServiceTypeDetector $serviceTypeDetector,
+        private ReflectionProvider $reflectionProvider,
+        private ServiceTypeDetector $serviceTypeDetector,
     ) {
     }
 

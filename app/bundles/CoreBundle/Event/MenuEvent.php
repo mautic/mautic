@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class MenuEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $menuItems = ['children' => []];
+    private array $menuItems = ['children' => []];
 
     public function __construct(
         private readonly MenuHelper $helper,
@@ -33,8 +30,8 @@ final class MenuEvent extends Event
         $defaultPriority = $menuItems['priority'] ?? 9999;
         $items           = $menuItems['items'] ?? $menuItems;
 
-        $isRoot = isset($items['name']) && ('root' == $items['name'] || $items['name'] == $items['name']);
-        if (!$isRoot) {
+        $isNamedMenu = isset($items['name']);
+        if (!$isNamedMenu) {
             $this->helper->createMenuStructure($items, 0, $defaultPriority, $this->type);
 
             $this->menuItems['children'] = array_merge_recursive($this->menuItems['children'], $items);

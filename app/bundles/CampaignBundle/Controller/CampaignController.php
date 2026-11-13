@@ -65,7 +65,7 @@ final class CampaignController extends AbstractStandardFormController
     /**
      * @var array<string, mixed>
      */
-    private $addedSources = [];
+    private array $addedSources = [];
 
     /**
      * @var array<string, mixed>
@@ -80,7 +80,7 @@ final class CampaignController extends AbstractStandardFormController
     /**
      * @var array<string, mixed>
      */
-    private $connections = [];
+    private array $connections = [];
 
     /**
      * @var array<string, mixed>
@@ -982,7 +982,7 @@ final class CampaignController extends AbstractStandardFormController
         // Build and set Event entities
         $this->campaignModel->setEvents($entity, $this->campaignEvents, $this->connections, $this->deletedEvents);
 
-        if ('edit' === $action && null !== $this->connections) {
+        if ('edit' === $action) {
             if ([] !== $this->deletedEvents) {
                 $this->eventModel->deleteEvents($entity->getEvents()->toArray(), $this->deletedEvents);
             }

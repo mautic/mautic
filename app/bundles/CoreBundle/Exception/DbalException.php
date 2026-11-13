@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Exception;
 
+use Doctrine\DBAL\Exception;
+
 /**
  * A concrete database exception.
  *
@@ -11,6 +13,6 @@ namespace Mautic\CoreBundle\Exception;
  * no longer be instantiated. This implements it, which keeps the existing
  * catch (\Doctrine\DBAL\Exception) sites catching what they always did.
  */
-final class DbalException extends \Exception implements \Doctrine\DBAL\Exception
+final class DbalException extends \Exception implements Exception
 {
 }

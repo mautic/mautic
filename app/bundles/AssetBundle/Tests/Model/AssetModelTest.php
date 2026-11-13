@@ -10,6 +10,8 @@ use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
+use Mautic\AssetBundle\Event\AssetPostSaveEvent;
+use Mautic\AssetBundle\Event\AssetPreSaveEvent;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
@@ -124,6 +126,33 @@ final class AssetModelTest extends TestCase
             $this->createStub(DownloadRepository::class),
             $this->createStub(CategoryRepository::class),
         );
+    }
+
+    public function testPostSaveEventKeepsChangesReadInPreSaveEvent(): void
+    {
+        $asset = new Asset();
+        $asset->setTitle('New title');
+
+        $postSaveChanges = null;
+        $this->eventDispatcher->method('hasListeners')->willReturn(true);
+        $this->eventDispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(static function (object $event) use (&$postSaveChanges): object {
+                if ($event instanceof AssetPreSaveEvent) {
+                    $event->getChanges();
+                }
+
+                if ($event instanceof AssetPostSaveEvent) {
+                    $postSaveChanges = $event->getChanges();
+                }
+
+                return $event;
+            });
+
+        $this->assetModel->saveEntity($asset);
+
+        $this->assertIsArray($postSaveChanges);
+        $this->assertSame([null, 'New title'], $postSaveChanges['title']);
     }
 
     /**

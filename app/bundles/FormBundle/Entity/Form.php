@@ -105,7 +105,7 @@ class Form extends FormEntity implements UuidInterface
     private $alias;
 
     #[Groups(['form:read', 'form:write', 'campaign:read', 'email:read'])]
-    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 
@@ -647,10 +647,7 @@ class Form extends FormEntity implements UuidInterface
         return $this->template;
     }
 
-    /**
-     * @param mixed $template
-     */
-    public function setTemplate($template): void
+    public function setTemplate(?string $template): void
     {
         $this->template = $template;
     }
@@ -663,18 +660,12 @@ class Form extends FormEntity implements UuidInterface
         return $this->inKioskMode;
     }
 
-    /**
-     * @param mixed $inKioskMode
-     */
-    public function setInKioskMode($inKioskMode): void
+    public function setInKioskMode(?bool $inKioskMode): void
     {
         $this->inKioskMode = $inKioskMode;
     }
 
-    /**
-     * @param mixed $renderStyle
-     */
-    public function setRenderStyle($renderStyle): void
+    public function setRenderStyle(?bool $renderStyle): void
     {
         $this->renderStyle = $renderStyle;
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Event;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\Security\Provider\UserProvider;
@@ -38,7 +38,7 @@ abstract class AuthenticationEvent extends Event
     /**
      * @param bool                            $isLoginCheck          Event executed from the mautic_sso_login_check route typically used as the SSO callback
      * @param string                          $authenticatingService Service Service requesting authentication
-     * @param array<AbstractIntegration>|null $integrations
+     * @param array<UnifiedIntegrationInterface>|null $integrations
      */
     public function __construct(
         private string|User|null $user,
@@ -228,7 +228,7 @@ abstract class AuthenticationEvent extends Event
     }
 
     /**
-     * @return AbstractIntegration|bool
+     * @return UnifiedIntegrationInterface|false
      */
     public function getIntegration($integrationName)
     {

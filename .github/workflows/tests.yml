@@ -346,6 +346,10 @@ jobs:
           # decide what they are loaded against. .github/ stays on HEAD, so these two
           # scripts are still here even when the base predates them.
           git checkout -q "$base" -- app plugins composer.json composer.lock
+          # Checking the base out leaves behind any file HEAD added. Drop them, or a new
+          # class extending a class that is still final at the base breaks the base dump.
+          # The HEAD checkout below brings them back.
+          git diff -z --no-renames --name-only --diff-filter=A "$base" HEAD -- app plugins | xargs -0 -r rm -f
 
           # Sharing this branch's vendor/ is what makes the base need no install of its
           # own, and that holds only while both revisions agree on their dependencies.
@@ -376,8 +380,7 @@ jobs:
             --skip-type "Mautic\CoreBundle\Factory\PageHelperFactory" \
             --skip-type "Mautic\IntegrationsBundle\Migrations\Version_0_0_1" \
             --skip-type "Mautic\CoreBundle\EventListener\CommonStatsSubscriber" \
-            --skip-path "plugins/MauticFullContactBundle/Services/" \
-            --skip-path "plugins/MauticEmailMarketingBundle/Api/"
+            --skip-path "plugins/MauticFullContactBundle/Services/"
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
           composer validate --ansi
         else

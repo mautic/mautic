@@ -19,20 +19,14 @@ final class StorageExtension
      */
     private array $storage = [];
 
-    /**
-     * @param mixed $context
-     */
     #[AsTwigFunction(name: 'save', needsContext: true)]
-    public function save($context, string $name): void
+    public function save(array $context, string $name): void
     {
         $this->storage[$name] = $context;
     }
 
-    /**
-     * @param mixed $context
-     */
     #[AsTwigFunction(name: 'restore', needsContext: true)]
-    public function restore(&$context, string $name): void
+    public function restore(array &$context, string $name): void
     {
         $context = array_merge($context, $this->storage[$name]);
     }

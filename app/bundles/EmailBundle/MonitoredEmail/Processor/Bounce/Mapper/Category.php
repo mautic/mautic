@@ -11,7 +11,6 @@ final readonly class Category
         private string $type,
         private bool $isPermanent,
     ) {
-        return $this;
     }
 
     public function getCategory(): string

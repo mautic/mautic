@@ -1,15 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
-use Exception;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
+use Mautic\IntegrationsBundle\Exception\PushContactException;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
+use Mautic\IntegrationsBundle\Integration\Interfaces\PushContactInterface;
+use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\MauticEmailMarketingBundle\Client\MailchimpClient;
+use MauticPlugin\MauticEmailMarketingBundle\Exception\ApiException;
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType;
+use MauticPlugin\MauticEmailMarketingBundle\Helper\ContactFieldMapper;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class MailchimpIntegration extends EmailAbstractIntegration
+class MailchimpIntegration extends BasicIntegration implements BasicInterface, PushContactInterface
 {
+    public const string NAME = 'Mailchimp';
+
+    private const int MERGE_FIELDS_CACHE_TTL = 3600;
+
+    public function __construct(
+        private readonly MailchimpClient $client,
+        private readonly ContactFieldMapper $contactFieldMapper,
+        private readonly TranslatorInterface $translator,
+        private readonly CacheProviderInterface $cacheProvider,
+    ) {
+    }
+
     public function getName(): string
     {
-        return 'Mailchimp';
+        return self::NAME;
     }
 
     public function getDisplayName(): string
@@ -17,151 +40,82 @@ final class MailchimpIntegration extends EmailAbstractIntegration
         return 'MailChimp';
     }
 
-    public function getAuthenticationType(): string
+    public function getIcon(): string
     {
-        return (empty($this->keys['client_id'])) ? 'basic' : 'oauth2';
+        return 'plugins/MauticEmailMarketingBundle/Assets/img/mailchimp.png';
     }
 
-    /**
-     * Get the URL required to obtain an oauth2 access token.
-     */
-    public function getAccessTokenUrl(): string
+    public function getPushContactConfigFormName(): string
     {
-        return 'https://login.mailchimp.com/oauth2/token';
+        return MailchimpType::class;
     }
 
-    /**
-     * Get the authentication/login URL for oauth2 access.
-     */
-    public function getAuthenticationUrl(): string
+    public function pushContact(Lead $contact, array $config): void
     {
-        return 'https://login.mailchimp.com/oauth2/authorize';
-    }
-
-    public function getRequiredKeyFields(): array
-    {
-        return (empty($this->keys['client_id'])) ?
-            [
-                'username' => 'mautic.integration.keyfield.username',
-                'password' => 'mautic.integration.keyfield.api',
-            ] :
-            [
-                'client_id'     => 'mautic.integration.keyfield.clientid',
-                'client_secret' => 'mautic.integration.keyfield.clientsecret',
-            ];
-    }
-
-    public function authCallback(array $settings = [], array $parameters = []): string|false
-    {
-        $error = parent::authCallback($settings, $parameters);
-
-        if (empty($error)) {
-            // Now post to the metadata URL
-            $data = $this->makeRequest('https://login.mailchimp.com/oauth2/metadata');
-
-            return $this->extractAuthKeys($data, 'dc');
+        $listSettings = $config['list_settings'] ?? null;
+        if (!is_array($listSettings) || empty($listSettings['list'])) {
+            throw new PushContactException($this->translator->trans('mautic.emailmarketing.push.no_list', ['%integration%' => $this->getDisplayName()]));
         }
 
-        return $error;
-    }
-
-    /**
-     * @return mixed[]
-     */
-    public function getAvailableLeadFields(array $settings = []): array
-    {
-        if (isset($settings['list'])) {
-            // Ajax update
-            $listId = $settings['list'];
-        } elseif (!empty($settings['feature_settings']['list_settings']['list'])) {
-            // Form load
-            $listId = $settings['feature_settings']['list_settings']['list'];
-        } elseif (!empty($settings['list_settings']['list'])) {
-            // Push action
-            $listId = $settings['list_settings']['list'];
+        $mapping = ContactFieldMapper::normalize((array) ($listSettings['leadFields'] ?? []));
+        $data    = $this->contactFieldMapper->map($contact, $mapping, self::NAME);
+        if (empty($data['EMAIL'])) {
+            throw new PushContactException($this->translator->trans('mautic.emailmarketing.push.no_email', ['%integration%' => $this->getDisplayName()]));
         }
 
-        if (!empty($listId)) {
-            $settings['cache_suffix'] = $cacheSuffix = '.'.$listId;
-            if ($fields = parent::getAvailableLeadFields($settings)) {
-                return $fields;
-            }
+        $email = $data['EMAIL'];
+        unset($data['EMAIL']);
 
-            $fields = $this->getApiHelper()->getCustomFields($listId);
+        $keys   = $this->getIntegrationConfiguration()->getApiKeys();
+        $listId = (string) $listSettings['list'];
 
-            if (!empty($fields['merge_fields']) && count($fields['merge_fields'])) {
-                foreach ($fields['merge_fields'] as $field) {
-                    $leadFields[$field['tag']] = [
-                        'label'    => $field['name'],
-                        'type'     => 'string',
-                        'required' => $field['required'],
-                    ];
+        try {
+            $missingFields = array_diff_key($mapping, $data, ['EMAIL' => true]);
+            if ([] !== $missingFields) {
+                // Like the former integration, required merge fields without a value are sent as "Unknown"
+                $mergeFields = $this->getMergeFields($keys, $listId);
+                foreach (array_keys($missingFields) as $tag) {
+                    if (!empty($mergeFields[$tag]['required'])) {
+                        $data[$tag] = $this->translator->trans('mautic.integration.form.lead.unknown');
+                    }
                 }
             }
 
-            $leadFields['EMAIL'] = [
-                'label'    => 'Email',
-                'type'     => 'string',
-                'required' => true,
-            ];
-
-            $this->cache->set('leadFields'.$cacheSuffix, $leadFields);
-
-            return $leadFields;
+            $this->client->subscribe(
+                $keys,
+                $listId,
+                $email,
+                $data,
+                (bool) ($listSettings['doubleOptin'] ?? true),
+                (bool) ($listSettings['sendWelcome'] ?? true)
+            );
+        } catch (ApiException $e) {
+            throw new PushContactException($e->getMessage(), 0, $e);
         }
-
-        return [];
-    }
-
-    public function pushLead($lead, array $config = []): bool
-    {
-        $config     = $this->mergeConfigToFeatureSettings($config);
-        $mappedData = $this->populateLeadData($lead, $config);
-
-        if ($mappedData === []) {
-            return false;
-        }
-        if (empty($mappedData['EMAIL'])) {
-            return false;
-        }
-        if (!isset($config['list_settings'])) {
-            return false;
-        }
-
-        try {
-            if ($this->isAuthorized()) {
-                $email = $mappedData['EMAIL'];
-                unset($mappedData['EMAIL']);
-
-                $options                 = [];
-                $options['status']       = $config['list_settings']['doubleOptin'] ? 'pending' : 'subscribed';
-                $options['send_welcome'] = $config['list_settings']['sendWelcome'];
-                $listId                  = $config['list_settings']['list'];
-
-                $this->getApiHelper()->subscribeLead($email, $listId, $mappedData, $options);
-
-                return true;
-            }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
-        }
-
-        return false;
     }
 
     /**
-     * @return array<string, mixed>
+     * Cached per list, like the former integration, so a campaign does not fetch them for every contact.
+     *
+     * @param array<string, mixed> $keys
+     *
+     * @return array<string, array{label: string, required: bool}>
+     *
+     * @throws ApiException
      */
-    public function getFormSettings(): array
+    private function getMergeFields(array $keys, string $listId): array
     {
-        $settings                           = parent::getFormSettings();
-        $settings['dynamic_contact_fields'] = true;
+        $item = $this->cacheProvider->getItem('mailchimp.merge_fields.'.$listId);
+        if ($item->isHit()) {
+            /** @var array<string, array{label: string, required: bool}> */
+            return $item->get();
+        }
 
-        return $settings;
-    }
+        $mergeFields = $this->client->getMergeFields($keys, $listId);
+        $item->set($mergeFields);
+        $item->expiresAfter(self::MERGE_FIELDS_CACHE_TTL);
+        $this->cacheProvider->save($item);
 
-    public function getFormType(): string
-    {
-        return MailchimpType::class;
+        return $mergeFields;
     }
 }

@@ -14,7 +14,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
@@ -198,7 +197,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $redirectUrl;
 
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
-    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 
@@ -253,13 +252,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $this->translationChildren = new ArrayCollection();
         $this->variantChildren     = new ArrayCollection();
         $this->initializeProjects();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::addVariantMetadata($builder, self::class);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -726,10 +718,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->customHtml;
     }
 
-    /**
-     * @param mixed $customHtml
-     */
-    public function setCustomHtml($customHtml): void
+    public function setCustomHtml(?string $customHtml): void
     {
         $this->customHtml = $customHtml;
     }

@@ -15,13 +15,11 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
@@ -78,10 +76,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Used to determine social identity.
-     *
-     * @var array
      */
-    private $availableSocialFields = [];
+    private array $availableSocialFields = [];
 
     /**
      * @var int|string
@@ -93,51 +89,66 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $id;
 
     #[Groups(['contact:read', 'contact:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $title;
 
     #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $firstname;
 
     #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $lastname;
 
     #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $company;
 
     #[Groups(['contact:read', 'contact:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $position;
 
     #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $email;
 
     #[Groups(['contact:read', 'contact:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $phone;
 
     #[Groups(['contact:read', 'contact:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $mobile;
 
     #[Groups(['contact:read', 'contact:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $address1;
 
     #[Groups(['contact:read', 'contact:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $address2;
 
     #[Groups(['contact:read', 'contact:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $city;
 
     #[Groups(['contact:read', 'contact:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $state;
 
     #[Groups(['contact:read', 'contact:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $zipcode;
 
     /**
      * @var string|null
      */
     #[Groups(['contact:read', 'contact:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $timezone;
 
     #[Groups(['contact:read', 'contact:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $country;
 
     #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
@@ -228,10 +239,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     private $color;
 
-    /**
-     * @var LeadManipulator
-     */
-    private $manipulator;
+    private ?LeadManipulator $manipulator = null;
 
     /**
      * @var bool
@@ -311,10 +319,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Used to determine order of preferred channels.
-     *
-     * @var array
      */
-    private $channelRules = [];
+    private ?array $channelRules = null;
 
     public function __construct()
     {
@@ -330,33 +336,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->groupScores      = new ArrayCollection();
         $this->notes            = new ArrayCollection();
         $this->utmtags          = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::loadFixedFieldMetadata(
-            $builder,
-            [
-                'title',
-                'firstname',
-                'lastname',
-                'company',
-                'position',
-                'email',
-                'phone',
-                'mobile',
-                'address1',
-                'address2',
-                'city',
-                'state',
-                'zipcode',
-                'timezone',
-                'country',
-            ],
-            FieldModel::$coreFields
-        );
     }
 
     /**
@@ -1074,10 +1053,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return LeadManipulator|null
-     */
-    public function getManipulator()
+    public function getManipulator(): ?LeadManipulator
     {
         return $this->manipulator;
     }

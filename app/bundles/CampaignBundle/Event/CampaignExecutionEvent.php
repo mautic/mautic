@@ -14,10 +14,7 @@ class CampaignExecutionEvent extends Event
 {
     use ContextTrait;
 
-    /**
-     * @var array
-     */
-    protected $eventArray = [];
+    protected array $eventArray = [];
 
     /**
      * @var Lead|mixed

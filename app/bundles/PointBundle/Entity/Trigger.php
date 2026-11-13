@@ -116,7 +116,7 @@ class Trigger extends FormEntity implements UuidInterface
     private $triggerExistingLeads = false;
 
     #[Groups(['trigger:read', 'trigger:write'])]
-    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 
@@ -327,10 +327,7 @@ class Trigger extends FormEntity implements UuidInterface
         return $this->color;
     }
 
-    /**
-     * @param mixed $color
-     */
-    public function setColor($color): void
+    public function setColor(?string $color): void
     {
         $this->color = $color;
     }
@@ -343,10 +340,7 @@ class Trigger extends FormEntity implements UuidInterface
         return $this->triggerExistingLeads;
     }
 
-    /**
-     * @param mixed $triggerExistingLeads
-     */
-    public function setTriggerExistingLeads($triggerExistingLeads): void
+    public function setTriggerExistingLeads(?bool $triggerExistingLeads): void
     {
         $this->triggerExistingLeads = $triggerExistingLeads;
     }

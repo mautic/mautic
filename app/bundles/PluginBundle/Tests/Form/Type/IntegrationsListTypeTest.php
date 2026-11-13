@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Tests\Form\Type;
 
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\Interfaces\PushContactInterface;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Form\Type\IntegrationCampaignsType;
@@ -15,6 +18,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -275,4 +279,66 @@ final class IntegrationsListTypeTest extends TestCase
         $this->assertSame(4, $callsForm, 'Because callback is called twice due to coverage.');
         $this->assertSame(2, $calledCallback);
     }
+
+    public function testConfigIsThePushSettingsFormOfAnIntegrationsBundleIntegration(): void
+    {
+        $plugin = new Plugin();
+        $plugin->setName('plugin name');
+
+        $settings = new Integration();
+        $settings->setIsPublished(true);
+        $settings->setPlugin($plugin);
+
+        $integration = new class() extends BasicIntegration implements PushContactInterface {
+            public function getName(): string
+            {
+                return 'Foo';
+            }
+
+            public function getPushContactConfigFormName(): string
+            {
+                return FormType::class;
+            }
+
+            public function pushContact(Lead $contact, array $config): void
+            {
+            }
+        };
+        $integration->setIntegrationSettings($settings);
+
+        $integrationHelper = $this->createMock(IntegrationHelper::class);
+        $integrationHelper->expects($this->once())
+            ->method('getIntegrationObjects')
+            ->willReturn(['Foo' => $integration]);
+        $integrationHelper->expects($this->never())->method('getIntegrationObject');
+
+        $added = [];
+        $form  = $this->createMock(FormInterface::class);
+        $form->method('add')
+            ->willReturnCallback(static function (string $key, string $type, array $options) use (&$added, $form): FormInterface {
+                $added[$key] = [$type, $options['data']];
+
+                return $form;
+            });
+
+        $formEvent = $this->createStub(FormEvent::class);
+        $formEvent->method('getForm')->willReturn($form);
+        $formEvent->method('getData')->willReturn(['integration' => 'Foo', 'config' => ['list_settings' => ['list' => 'a1']]]);
+
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $builder->method('add')->willReturnSelf();
+        $builder->method('addEventListener')
+            ->willReturnCallback(static function (string $eventName, callable $callback) use ($formEvent, $builder): FormBuilderInterface {
+                if (FormEvents::PRE_SET_DATA === $eventName) {
+                    $callback($formEvent);
+                }
+
+                return $builder;
+            });
+
+        new IntegrationsListType($integrationHelper)->buildForm($builder, ['supported_features' => 'push_lead']);
+
+        $this->assertSame(['config' => [FormType::class, ['list_settings' => ['list' => 'a1']]]], $added);
+    }
 }
+

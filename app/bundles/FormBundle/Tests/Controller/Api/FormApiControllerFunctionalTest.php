@@ -35,22 +35,25 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                 'isRequired'   => true,
             ],
             [
-                'label'     => 'Number',
-                'type'      => 'number',
-                'alias'     => 'number',
-                'leadField' => 'points', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
+                'label'        => 'Number',
+                'type'         => 'number',
+                'alias'        => 'number',
+                'mappedObject' => 'contact',
+                'mappedField'  => 'points',
             ],
             [
-                'label'     => 'Company',
-                'type'      => 'text',
-                'alias'     => 'company',
-                'leadField' => 'company', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
+                'label'        => 'Company',
+                'type'         => 'text',
+                'alias'        => 'company',
+                'mappedObject' => 'contact',
+                'mappedField'  => 'company',
             ],
             [
-                'label'     => 'Company Phone',
-                'type'      => 'tel',
-                'alias'     => 'phone',
-                'leadField' => 'companyphone', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
+                'label'        => 'Company Phone',
+                'type'         => 'tel',
+                'alias'        => 'phone',
+                'mappedObject' => 'company',
+                'mappedField'  => 'companyphone',
             ],
             [
                 'label'        => 'Country',
@@ -118,7 +121,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertEquals($payload['fields'][$i]['label'], $response['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $response['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $response['form']['fields'][$i]['type']);
-            $this->assertEquals($expectedResponse['fields'][$i]['leadField'], $response['form']['fields'][$i]['leadField']);
             $this->assertEquals($expectedResponse['fields'][$i]['mappedField'], $response['form']['fields'][$i]['mappedField']);
             $this->assertEquals($expectedResponse['fields'][$i]['mappedObject'], $response['form']['fields'][$i]['mappedObject']);
         }
@@ -139,7 +141,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertEquals($payload['fields'][$i]['label'], $responsePatch['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $responsePatch['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $responsePatch['form']['fields'][$i]['type']);
-            $this->assertEquals($expectedResponse['fields'][$i]['leadField'], $responsePatch['form']['fields'][$i]['leadField']);
             $this->assertEquals($expectedResponse['fields'][$i]['mappedField'], $responsePatch['form']['fields'][$i]['mappedField']);
             $this->assertEquals($expectedResponse['fields'][$i]['mappedObject'], $responsePatch['form']['fields'][$i]['mappedObject']);
         }
@@ -158,22 +159,25 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                 'description' => 'Functional API test',
                 'fields'      => [
                     [
-                        'label'     => 'Email',
-                        'alias'     => 'email',
-                        'type'      => 'text',
-                        'leadField' => 'email',
+                        'label'        => 'Email',
+                        'alias'        => 'email',
+                        'type'         => 'text',
+                        'mappedObject' => 'contact',
+                        'mappedField'  => 'email',
                     ],
                     [
                         'label'        => 'Company Address',
                         'type'         => 'text',
                         'alias'        => 'companyaddress1',
-                        'leadField'    => 'companyaddress1',
+                        'mappedObject' => 'company',
+                        'mappedField'  => 'companyaddress1',
                     ],
                     [
                         'label'        => 'Company Phone',
                         'type'         => 'tel',
                         'alias'        => 'phone',
-                        'leadField'    => 'companyphone',
+                        'mappedObject' => 'company',
+                        'mappedField'  => 'companyphone',
                     ],
                     [
                         'label'        => 'Country',
@@ -190,21 +194,17 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                 'fields'       => [
                     [
                         'mappedObject' => 'contact',
-                        'leadField'    => 'email',
                         'mappedField'  => 'email',
                     ],
                     [
                         'mappedObject' => 'company',
-                        'leadField'    => 'companyaddress1',
                         'mappedField'  => 'companyaddress1',
                     ],
                     [
                         'mappedObject' => 'company',
-                        'leadField'    => 'companyphone',
                         'mappedField'  => 'companyphone',
                     ], [
                         'mappedObject' => 'contact',
-                        'leadField'    => 'country',
                         'mappedField'  => 'country',
                     ],
                 ],
@@ -230,13 +230,13 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                         'alias'        => 'companyemail1',
                         'mappedField'  => 'companyemail',
                         'mappedObject' => 'company',
-                        'leadField'    => 'companyemail',
                     ],
                     [
                         'label'        => 'Phone',
                         'type'         => 'tel',
                         'alias'        => 'phone',
-                        'leadField'    => 'position',
+                        'mappedObject' => 'contact',
+                        'mappedField'  => 'position',
                     ],
                 ],
                 'postAction'  => 'return',
@@ -246,17 +246,14 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                 'fields'       => [
                     [
                         'mappedObject' => 'contact',
-                        'leadField'    => 'lastname',
                         'mappedField'  => 'lastname',
                     ],
                     [
                         'mappedObject' => 'company',
-                        'leadField'    => 'companyemail',
                         'mappedField'  => 'companyemail',
                     ],
                     [
                         'mappedObject' => 'contact',
-                        'leadField'    => 'position',
                         'mappedField'  => 'position',
                     ],
                 ],
@@ -286,38 +283,22 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['fields'][0]['type'], $response['form']['fields'][0]['type']);
         $this->assertEquals($payload['fields'][0]['mappedObject'], $response['form']['fields'][0]['mappedObject']);
         $this->assertEquals($payload['fields'][0]['mappedField'], $response['form']['fields'][0]['mappedField']);
-        $this->assertEquals(
-            $payload['fields'][0]['mappedField'],
-            $response['form']['fields'][0]['leadField']
-        ); // @deprecated leadField was replaced by mappedField. Check for BC.
         $this->assertEquals($payload['fields'][0]['showLabel'], $response['form']['fields'][0]['showLabel']);
         $this->assertEquals($payload['fields'][0]['isRequired'], $response['form']['fields'][0]['isRequired']);
         $this->assertEquals($payload['fields'][1]['label'], $response['form']['fields'][1]['label']);
         $this->assertEquals($payload['fields'][1]['type'], $response['form']['fields'][1]['type']);
         $this->assertEquals('contact', $response['form']['fields'][1]['mappedObject']);
         $this->assertEquals('points', $response['form']['fields'][1]['mappedField']);
-        $this->assertEquals(
-            $payload['fields'][1]['leadField'],
-            $response['form']['fields'][1]['leadField']
-        ); // @deprecated leadField was replaced by mappedField. Check for BC.
         $this->assertTrue($response['form']['fields'][1]['showLabel']);
         $this->assertFalse($response['form']['fields'][1]['isRequired']);
         $this->assertEquals($payload['fields'][2]['label'], $response['form']['fields'][2]['label']);
         $this->assertEquals($payload['fields'][2]['type'], $response['form']['fields'][2]['type']);
         $this->assertEquals('contact', $response['form']['fields'][2]['mappedObject']);
         $this->assertEquals('company', $response['form']['fields'][2]['mappedField']);
-        $this->assertEquals(
-            $payload['fields'][2]['leadField'],
-            $response['form']['fields'][2]['leadField']
-        ); // @deprecated leadField was replaced by mappedField. Check for BC.
         $this->assertEquals($payload['fields'][3]['label'], $response['form']['fields'][3]['label']);
         $this->assertEquals($payload['fields'][3]['type'], $response['form']['fields'][3]['type']);
         $this->assertEquals('company', $response['form']['fields'][3]['mappedObject']);
         $this->assertEquals('companyphone', $response['form']['fields'][3]['mappedField']);
-        $this->assertEquals(
-            $payload['fields'][3]['leadField'],
-            $response['form']['fields'][3]['leadField']
-        ); // @deprecated leadField was replaced by mappedField. Check for BC.
 
         // Edit PATCH:
         $patchPayload = [
@@ -480,10 +461,11 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
             'description' => 'Functional API test',
             'fields'      => [
                 [
-                    'label'     => 'lab',
-                    'alias'     => 'email',
-                    'type'      => 'text',
-                    'leadField' => 'email',
+                    'label'        => 'lab',
+                    'alias'        => 'email',
+                    'type'         => 'text',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
                 ],
             ],
             'actions' => [
@@ -523,7 +505,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertEquals($payload['fields'][$i]['label'], $response['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $response['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $response['form']['fields'][$i]['type']);
-            $this->assertEquals($payload['fields'][$i]['leadField'], $response['form']['fields'][$i]['leadField']);
+            $this->assertEquals($payload['fields'][$i]['mappedField'], $response['form']['fields'][$i]['mappedField']);
         }
         $this->assertIsArray($response['form']['actions']);
         $this->assertCount(count($payload['actions']), $response['form']['actions']);
@@ -547,10 +529,11 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
             'description' => 'Functional API test',
             'fields'      => [
                 [
-                    'label'     => 'Email',
-                    'alias'     => 'email',
-                    'type'      => 'text',
-                    'leadField' => 'email',
+                    'label'        => 'Email',
+                    'alias'        => 'email',
+                    'type'         => 'text',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
                 ],
             ],
             'postAction'  => 'return',

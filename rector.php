@@ -25,19 +25,6 @@ return RectorConfig::configure()
     // ->withImportNames(importShortClasses: false)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
-        // to be used next on loadMetadata()
-        \Utils\Rector\LoadMetadataMauticHelperToAttributeRector::class,
-        // \Utils\Rector\LoadMetadataStaticHelperToAttributeRector::class,
-        \Utils\Rector\LoadMetadataColumnToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataAssociationToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataManyToManyToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataTableToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataRepositoryToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataIndexToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataLifecycleToDoctrineAttributeRector::class,
-        \Utils\Rector\LoadMetadataClassToDoctrineAttributeRector::class,
-        // \Utils\Rector\AddDoctrineOrmMappingAliasImportRector::class,
-
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
@@ -51,6 +38,7 @@ return RectorConfig::configure()
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
         '*/Fixture/*',
+        '*/Source/*',
 
         // form event subscribers register on the Form dispatcher via addEventSubscriber(), which needs EventSubscriberInterface;
         // SecurityController listens on kernel.request but a controller cannot expose a public non-action method;
@@ -66,17 +54,6 @@ return RectorConfig::configure()
 
         // prefer implicit compare on object|null
         Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector::class,
-
-        // importing Lead/Exception short names here shadows the local Entity\Lead and Executioner\Exception sub-namespaces
-        Rector\PostRector\Rector\NameImportingPostRector::class => [
-            __DIR__.'/app/bundles/CampaignBundle/Entity/LeadRepository.php',
-            __DIR__.'/app/bundles/CampaignBundle/Executioner/EventExecutioner.php',
-        ],
-
-        // createFromFormat() leaks a \DateTime|bool|null union that breaks the getDateTime() return contract
-        Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Helper/DateTimeHelper.php',
-        ],
 
         // adds dead "return false" after self::fail(); fixed upstream in rector-phpunit #801, drop after next tag
         Rector\PHPUnit\CodeQuality\Rector\MethodCall\WillReturnCallbackFallbackToReturnFalseRector::class => [
@@ -118,11 +95,6 @@ return RectorConfig::configure()
         // modified with reflection
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
             __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
-        ],
-
-        // test fixture
-        Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
     ])
     ->reportUnusedSkips();

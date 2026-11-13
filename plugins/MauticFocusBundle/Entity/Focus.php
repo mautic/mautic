@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\Put;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -59,7 +60,7 @@ class Focus extends FormEntity implements UuidInterface
     use ProjectTrait;
 
     /**
-     * @var int
+     * @var int|null
      */
     #[Groups(['focus:read'])]
     #[ORM\Id]
@@ -104,9 +105,9 @@ class Focus extends FormEntity implements UuidInterface
     private $name;
 
     #[Groups(['focus:read', 'focus:write'])]
-    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var string
@@ -239,10 +240,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    /**
-     * @param mixed $description
-     */
-    public function setDescription($description): static
+    public function setDescription(?string $description): static
     {
         $this->isChanged('description', $description);
 
@@ -259,7 +257,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->editor;
     }
 
-    public function setEditor($editor): static
+    public function setEditor(?string $editor): static
     {
         $this->isChanged('editor', $editor);
 
@@ -276,7 +274,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->html;
     }
 
-    public function setHtml($html): static
+    public function setHtml(?string $html): static
     {
         $this->isChanged('html', $html);
 
@@ -293,7 +291,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->htmlMode;
     }
 
-    public function setHtmlMode($htmlMode): static
+    public function setHtmlMode(?string $htmlMode): static
     {
         $this->isChanged('htmlMode', $htmlMode);
 
@@ -310,10 +308,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->name;
     }
 
-    /**
-     * @param mixed $name
-     */
-    public function setName($name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
 
@@ -322,18 +317,12 @@ class Focus extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
-    public function setCategory($category): static
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
 
@@ -423,10 +412,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->type;
     }
 
-    /**
-     * @param mixed $type
-     */
-    public function setType($type): static
+    public function setType(?string $type): static
     {
         $this->isChanged('type', $type);
 
@@ -443,10 +429,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->style;
     }
 
-    /**
-     * @param mixed $style
-     */
-    public function setStyle($style): static
+    public function setStyle(?string $style): static
     {
         $this->isChanged('style', $style);
 
@@ -463,10 +446,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->website;
     }
 
-    /**
-     * @param mixed $website
-     */
-    public function setWebsite($website): static
+    public function setWebsite(?string $website): static
     {
         $this->isChanged('website', $website);
 
@@ -507,10 +487,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->cache;
     }
 
-    /**
-     * @param mixed $cache
-     */
-    public function setCache($cache): static
+    public function setCache(?string $cache): static
     {
         $this->cache = $cache;
 

@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Mautic\Middleware\Tests\Dev;
 
 use Mautic\Middleware\Dev\IpRestrictMiddleware;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-final class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
+final class IpRestrictMiddlewareTest extends TestCase
 {
     private mixed $originalDdevTldValue;
 

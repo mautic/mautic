@@ -54,10 +54,8 @@ abstract class CommonRepository extends ServiceEntityRepository
 
     /**
      * Stores the parsed columns and their negate status for addAdvancedSearchWhereClause().
-     *
-     * @var array
      */
-    protected $advancedFilterCommands = [];
+    protected array $advancedFilterCommands = [];
 
     /**
      * @var User|null
@@ -599,23 +597,6 @@ abstract class CommonRepository extends ServiceEntityRepository
             ),
             $publishedUpExpression
         );
-    }
-
-    /**
-     * @deprecated use getPublishedByDateOrmExpression() or getPublishedByDateDbalExpression()
-     */
-    public function getPublishedByDateExpression(
-        QueryBuilder|DbalQueryBuilder $q,
-        ?string $alias = null,
-        bool $setNowParameter = true,
-        bool $setTrueParameter = true,
-        bool $allowNullForPublishedUp = true,
-    ): Andx|CompositeExpression {
-        if ($q instanceof QueryBuilder) {
-            return $this->getPublishedByDateOrmExpression($q, $alias, $setNowParameter, $setTrueParameter, $allowNullForPublishedUp);
-        }
-
-        return $this->getPublishedByDateDbalExpression($q, $alias, $setNowParameter, $setTrueParameter, $allowNullForPublishedUp);
     }
 
     /**

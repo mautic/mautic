@@ -1,20 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\NotificationBundle\Integration;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilder;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 
-final class OneSignalIntegration extends AbstractIntegration
+class OneSignalIntegration extends BasicIntegration implements BasicInterface
 {
-    protected bool $coreIntegration = true;
+    public const string NAME = 'OneSignal';
+
+    public const string FEATURE_MOBILE = 'mobile';
+
+    public const string FEATURE_LANDING_PAGE_ENABLED = 'landing_page_enabled';
+
+    public const string FEATURE_WELCOME_NOTIFICATION_ENABLED = 'welcome_notification_enabled';
+
+    public const string FEATURE_TRACKING_PAGE_ENABLED = 'tracking_page_enabled';
 
     public function getName(): string
     {
-        return 'OneSignal';
+        return self::NAME;
+    }
+
+    public function getDisplayName(): string
+    {
+        return self::NAME;
     }
 
     public function getIcon(): string
@@ -22,80 +34,29 @@ final class OneSignalIntegration extends AbstractIntegration
         return 'app/bundles/NotificationBundle/Assets/img/OneSignal.png';
     }
 
+    /**
+     * Plain list of feature slugs: the legacy IntegrationHelper stores it as-is for a new install
+     * and indexes features by value. The config form gets the slug => label map from ConfigSupport.
+     *
+     * @return string[]
+     */
     public function getSupportedFeatures(): array
     {
         return [
-            'mobile',
-            'landing_page_enabled',
-            'welcome_notification_enabled',
-            'tracking_page_enabled',
-        ];
-    }
-
-    public function getSupportedFeatureTooltips(): array
-    {
-        return [
-            'landing_page_enabled'  => 'mautic.integration.form.features.landing_page_enabled.tooltip',
-            'tracking_page_enabled' => 'mautic.integration.form.features.tracking_page_enabled.tooltip',
+            self::FEATURE_MOBILE,
+            self::FEATURE_LANDING_PAGE_ENABLED,
+            self::FEATURE_WELCOME_NOTIFICATION_ENABLED,
+            self::FEATURE_TRACKING_PAGE_ENABLED,
         ];
     }
 
     /**
-     * @return array<string, string>
+     * Settings saved by the "Features" tab (subdomain_name, platforms).
+     *
+     * @return array<string, mixed>
      */
-    public function getRequiredKeyFields(): array
+    public function getIntegrationFeatureSettings(): array
     {
-        return [
-            'app_id'        => 'mautic.notification.config.form.notification.app_id',
-            'safari_web_id' => 'mautic.notification.config.form.notification.safari_web_id',
-            'rest_api_key'  => 'mautic.notification.config.form.notification.rest_api_key',
-            'gcm_sender_id' => 'mautic.notification.config.form.notification.gcm_sender_id',
-        ];
-    }
-
-    public function getAuthenticationType(): string
-    {
-        return 'none';
-    }
-
-    /**
-     * @param Form|FormBuilder $builder
-     * @param string           $formArea
-     */
-    public function appendToForm($builder, array $data, $formArea): void
-    {
-        if ('features' == $formArea) {
-            $builder->add(
-                'subdomain_name',
-                TextType::class,
-                [
-                    'label'    => 'mautic.notification.form.subdomain_name.label',
-                    'required' => false,
-                    'attr'     => [
-                        'class' => 'form-control',
-                    ],
-                ]
-            );
-
-            $builder->add(
-                'platforms',
-                ChoiceType::class,
-                [
-                    'choices' => [
-                        'mautic.integration.form.platforms.ios'     => 'ios',
-                        'mautic.integration.form.platforms.android' => 'android',
-                    ],
-                    'attr'              => [
-                        'tooltip'      => 'mautic.integration.form.platforms.tooltip',
-                        'data-show-on' => '{"integration_details_supportedFeatures_0":"checked"}',
-                    ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.integration.form.platforms',
-                    'placeholder' => false,
-                    'required'    => false,
-                ]
-            );
-        }
+        return $this->getIntegrationSettings()?->getFeatureSettings()['integration'] ?? [];
     }
 }

@@ -15,9 +15,9 @@ use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationSendType;
 use Mautic\NotificationBundle\Form\Type\NotificationSendType;
+use Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -35,7 +35,7 @@ class CampaignSubscriber
     protected const int MAX_PLAYER_IDS_PER_REQUEST = 2000;
 
     public function __construct(
-        private readonly IntegrationHelper $integrationHelper,
+        private readonly OneSignalIntegrationHelper $oneSignalIntegrationHelper,
         private readonly NotificationModel $notificationModel,
         private readonly AbstractNotificationApi $notificationApi,
         private readonly EventDispatcherInterface $dispatcher,
@@ -50,9 +50,9 @@ class CampaignSubscriber
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
-        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+        $integration = $this->oneSignalIntegrationHelper->getPublishedIntegration();
 
-        if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
+        if (!$integration) {
             return;
         }
 

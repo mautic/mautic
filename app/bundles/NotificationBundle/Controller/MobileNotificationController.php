@@ -9,8 +9,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper;
 use Mautic\NotificationBundle\Model\NotificationModel;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -272,7 +272,7 @@ final class MobileNotificationController extends AbstractFormController
      *
      * @param Notification $entity
      */
-    public function newAction(Request $request, IntegrationHelper $integrationHelper, ?object $entity = null): Response
+    public function newAction(Request $request, OneSignalIntegrationHelper $oneSignalIntegrationHelper, ?object $entity = null): Response
     {
         if (!$entity instanceof Notification) {
             /** @var Notification $entity */
@@ -333,7 +333,7 @@ final class MobileNotificationController extends AbstractFormController
                         $template  = 'Mautic\NotificationBundle\Controller\MobileNotificationController::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $integrationHelper, $entity->getId(), true);
+                        return $this->editAction($request, $oneSignalIntegrationHelper, $entity->getId(), true);
                     }
                 }
             } else {
@@ -375,7 +375,7 @@ final class MobileNotificationController extends AbstractFormController
             }
         }
 
-        $integration = $integrationHelper->getIntegrationObject('OneSignal');
+        $integration = $oneSignalIntegrationHelper->getIntegration();
 
         return $this->delegateView(
             [
@@ -404,7 +404,7 @@ final class MobileNotificationController extends AbstractFormController
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
      */
-    public function editAction(Request $request, IntegrationHelper $integrationHelper, $objectId, $ignorePost = false, $forceTypeSelection = false): Response
+    public function editAction(Request $request, OneSignalIntegrationHelper $oneSignalIntegrationHelper, $objectId, $ignorePost = false, $forceTypeSelection = false): Response
     {
         $method  = $request->getMethod();
         $entity  = $this->notificationModel->getEntity($objectId);
@@ -536,7 +536,7 @@ final class MobileNotificationController extends AbstractFormController
             $this->notificationModel->lockEntity($entity);
         }
 
-        $integration = $integrationHelper->getIntegrationObject('OneSignal');
+        $integration = $oneSignalIntegrationHelper->getIntegration();
 
         return $this->delegateView(
             [
@@ -566,7 +566,7 @@ final class MobileNotificationController extends AbstractFormController
     /**
      * Clone an entity.
      */
-    public function cloneAction(Request $request, IntegrationHelper $integrationHelper, $objectId): Response
+    public function cloneAction(Request $request, OneSignalIntegrationHelper $oneSignalIntegrationHelper, $objectId): Response
     {
         $entity = $this->notificationModel->getEntity($objectId);
 
@@ -584,7 +584,7 @@ final class MobileNotificationController extends AbstractFormController
             $entity      = clone $entity;
         }
 
-        return $this->newAction($request, $integrationHelper, $entity);
+        return $this->newAction($request, $oneSignalIntegrationHelper, $entity);
     }
 
     /**

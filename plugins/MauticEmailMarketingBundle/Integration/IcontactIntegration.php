@@ -1,16 +1,55 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
-use Exception;
+use Mautic\IntegrationsBundle\Exception\PushContactException;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
+use Mautic\IntegrationsBundle\Integration\Interfaces\PushContactInterface;
 use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\MauticEmailMarketingBundle\Client\IcontactClient;
+use MauticPlugin\MauticEmailMarketingBundle\Exception\ApiException;
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
+use MauticPlugin\MauticEmailMarketingBundle\Helper\ContactFieldMapper;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class IcontactIntegration extends EmailAbstractIntegration
+class IcontactIntegration extends BasicIntegration implements BasicInterface, PushContactInterface
 {
+    public const string NAME = 'Icontact';
+
+    public const array FIELDS = [
+        'email',
+        'prefix',
+        'firstName',
+        'lastName',
+        'suffix',
+        'street',
+        'street2',
+        'city',
+        'state',
+        'postalCode',
+        'phone',
+        'fax',
+        'business',
+    ];
+
+    /**
+     * Prefix of the mapped custom fields, followed by the iContact custom field ID.
+     */
+    public const string CUSTOM_FIELD_PREFIX = 'cf_';
+
+    public function __construct(
+        private readonly IcontactClient $client,
+        private readonly ContactFieldMapper $contactFieldMapper,
+        private readonly TranslatorInterface $translator,
+    ) {
+    }
+
     public function getName(): string
     {
-        return 'Icontact';
+        return self::NAME;
     }
 
     public function getDisplayName(): string
@@ -18,205 +57,40 @@ final class IcontactIntegration extends EmailAbstractIntegration
         return 'iContact';
     }
 
-    public function getAuthenticationType(): string
+    public function getIcon(): string
     {
-        return 'rest';
+        return 'plugins/MauticEmailMarketingBundle/Assets/img/icontact.png';
     }
 
-    /**
-     * Get a list of keys required to make an API call.  Examples are key, clientId, clientSecret.
-     *
-     * @return array<string, string>
-     */
-    public function getRequiredKeyFields(): array
+    public function getPushContactConfigFormName(): string
     {
-        return [
-            'API-AppId'    => 'mautic.icontact.keyfield.appid',
-            'API-Username' => 'mautic.icontact.keyfield.username',
-            'API-Password' => 'mautic.icontact.keyfield.password',
-        ];
+        return IcontactType::class;
     }
 
-    public function getSecretKeys(): array
+    public function pushContact(Lead $contact, array $config): void
     {
-        return [
-            'API-Password',
-        ];
-    }
-
-    public function getApiUrl(): string
-    {
-        return 'https://app.icontact.com/icp/a';
-    }
-
-    /**
-     * Get account ID and client folder ID.
-     */
-    public function authCallback(array $settings = [], array $parameters = []): false|string
-    {
-        $url = $this->getApiUrl();
-
-        $response = $this->makeRequest($url, $parameters);
-
-        // Validation kind of error
-        if (isset($response['errors'][0])) {
-            return $response['errors'][0];
+        $listSettings = $config['list_settings'] ?? null;
+        if (!is_array($listSettings) || empty($listSettings['list'])) {
+            throw new PushContactException($this->translator->trans('mautic.emailmarketing.push.no_list', ['%integration%' => $this->getDisplayName()]));
         }
 
-        // Timeout kind of error
-        if (isset($response['errors']['message'])) {
-            return $response['errors']['message'];
+        $data = $this->contactFieldMapper->map($contact, ContactFieldMapper::normalize((array) ($listSettings['leadFields'] ?? [])), self::NAME);
+        if (empty($data['email'])) {
+            throw new PushContactException($this->translator->trans('mautic.emailmarketing.push.no_email', ['%integration%' => $this->getDisplayName()]));
         }
 
-        $keys = [];
-        if (!empty($response['accounts'])) {
-            $keys['accountId'] = $response['accounts'][0]['accountId'];
-
-            $url .= '/'.$keys['accountId'].'/c';
-            $response = $this->makeRequest($url, $parameters);
-
-            if (!empty($response['clientfolders'])) {
-                $keys['clientFolderId'] = $response['clientfolders'][0]['clientFolderId'];
-
-                return $this->extractAuthKeys($keys, 'clientFolderId');
+        // Custom fields are sent by their iContact ID
+        foreach ($data as $field => $value) {
+            if (str_starts_with($field, self::CUSTOM_FIELD_PREFIX)) {
+                unset($data[$field]);
+                $data[substr($field, strlen(self::CUSTOM_FIELD_PREFIX))] = $value;
             }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string $method
-     *
-     * @return mixed|string
-     */
-    public function makeRequest($url, array $parameters = [], $method = 'GET', array $settings = [])
-    {
-        $settings['headers'] = [
-            'Except:',
-            'Accept: application/json',
-            'Content-Type: application/json',
-            'Api-Version: 2.2',
-            'Api-AppId: '.$this->keys['API-AppId'],
-            'Api-Username: '.$this->keys['API-Username'],
-            'API-Password: '.$this->keys['API-Password'],
-        ];
-
-        return parent::makeRequest($url, $parameters, $method, $settings);
-    }
-
-    public function isAuthorized(): bool
-    {
-        $keys = $this->getRequiredKeyFields();
-        foreach ($keys as $k => $l) {
-            if (empty($this->keys[$k])) {
-                return false;
-            }
-        }
-
-        return !empty($this->keys['accountId']) && !empty($this->keys['clientFolderId']);
-    }
-
-    /**
-     * @return mixed[]
-     */
-    public function getAvailableLeadFields(array $settings = []): array
-    {
-        if (!$this->isAuthorized()) {
-            return [];
-        }
-
-        static $leadFields = [];
-
-        if (empty($leadFields)) {
-            $fields = [
-                'email',
-                'prefix',
-                'firstName',
-                'lastName',
-                'suffix',
-                'street',
-                'street2',
-                'city',
-                'state',
-                'postalCode',
-                'phone',
-                'fax',
-                'business',
-            ];
-
-            $leadFields = [];
-            foreach ($fields as $f) {
-                $leadFields[$f] = [
-                    'label'    => $this->translator->trans('mautic.icontact.field.'.$f),
-                    'type'     => 'string',
-                    'required' => 'email' === $f,
-                ];
-            }
-
-            $customfields = $this->getApiHelper()->getCustomFields();
-
-            if (!empty($customfields['customfields'])) {
-                foreach ($customfields['customfields'] as $field) {
-                    $leadFields['cf_'.$field['customFieldId']] = [
-                        'label'    => $field['publicName'],
-                        'type'     => 'string',
-                        'required' => false,
-                    ];
-                }
-            }
-        }
-
-        return $leadFields;
-    }
-
-    public function pushLead(Lead $lead, array $config = []): bool
-    {
-        $config = $this->mergeConfigToFeatureSettings($config);
-
-        $mappedData = $this->populateLeadData($lead, $config);
-
-        if ($mappedData === []) {
-            return false;
-        }
-        if (empty($mappedData['email'])) {
-            return false;
-        }
-        if (!isset($config['list_settings'])) {
-            return false;
         }
 
         try {
-            if ($this->isAuthorized()) {
-                $customfields = [];
-                foreach ($mappedData as $k => &$v) {
-                    if (str_starts_with($k, 'cf_')) {
-                        $customfields[str_replace('cf_', '', $k)] = (string) $v;
-                        unset($mappedData[$k]);
-                    } else {
-                        $v = (string) $v;
-                    }
-                }
-
-                $listId = $config['list_settings']['list'];
-
-                if ([] !== $customfields) {
-                    $mappedData += $customfields;
-                }
-
-                $this->getApiHelper()->subscribeLead($listId, $mappedData);
-
-                return true;
-            }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+            $this->client->subscribe($this->getIntegrationConfiguration()->getApiKeys(), (string) $listSettings['list'], $data);
+        } catch (ApiException $e) {
+            throw new PushContactException($e->getMessage(), 0, $e);
         }
-
-        return false;
-    }
-
-    public function getFormType(): string
-    {
-        return IcontactType::class;
     }
 }

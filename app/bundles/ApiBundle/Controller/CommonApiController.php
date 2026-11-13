@@ -33,10 +33,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class CommonApiController extends FetchCommonApiController
 {
-    /**
-     * @var array
-     */
-    protected $dataInputMasks = [];
+    protected array $dataInputMasks = [];
 
     /**
      * Model object for processing the entity.
@@ -45,15 +42,9 @@ class CommonApiController extends FetchCommonApiController
      */
     protected $model;
 
-    /**
-     * @var array
-     */
-    protected $routeParams = [];
+    protected array $routeParams = [];
 
-    /**
-     * @var array
-     */
-    protected $entityRequestParameters = [];
+    protected array $entityRequestParameters = [];
 
     public function __construct(
         CorePermissions $security,

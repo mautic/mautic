@@ -1,111 +1,89 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\PluginBundle\Form\Type\FieldsType;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PluginBundle\Model\PluginModel;
+use MauticPlugin\MauticEmailMarketingBundle\Client\IcontactClient;
+use MauticPlugin\MauticEmailMarketingBundle\Exception\ApiException;
+use MauticPlugin\MauticEmailMarketingBundle\Helper\IntegrationKeys;
 use MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @extends AbstractType<array<mixed>>
+ * iContact settings of a "Push contact to integration" action.
+ *
+ * @extends AbstractType<array<string, mixed>>
  */
 final class IcontactType extends AbstractType
 {
     public function __construct(
-        private readonly IntegrationHelper $integrationHelper,
-        private readonly PluginModel $pluginModel,
-        private readonly RequestStack $requestStack,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly IntegrationKeys $integrationKeys,
+        private readonly IcontactClient $client,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
-    /**
-     * @param FormBuilderInterface<array<mixed>|null> $builder
-     * @param array<string, mixed>                    $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var IcontactIntegration $object */
-        $object          = $this->integrationHelper->getIntegrationObject('Icontact');
-        $integrationName = $object->getName();
-        $session         = $this->requestStack->getSession();
-        $limit           = $session->get(
-            'mautic.plugin.'.$integrationName.'.lead.limit',
-            $this->coreParametersHelper->get('default_pagelimit')
-        );
-        $page = $session->get('mautic.plugin.'.$integrationName.'.lead.page', 1);
-
-        $api = $object->getApiHelper();
+        $keys   = $this->integrationKeys->get(IcontactIntegration::NAME);
+        $errors = [];
         try {
-            $lists = $api->getLists();
-
-            $choices = [];
-            if (!empty($lists['lists'])) {
-                foreach ($lists['lists'] as $list) {
-                    $choices[$list['listId']] = $list['name'];
-                }
-
-                asort($choices);
-            }
-        } catch (\Exception $e) {
-            $choices = [];
-            $error   = $e->getMessage();
-            $page    = 1;
+            $lists = $this->client->getLists($keys);
+            asort($lists);
+        } catch (ApiException $e) {
+            $lists    = [];
+            $errors[] = $e->getMessage();
         }
 
-        $builder->add('list', ChoiceType::class, [
-            'choices'           => array_flip($choices), // Choice type expects labels as keys
-            'label'             => 'mautic.emailmarketing.list',
-            'required'          => false,
-            'attr'              => [
+        $fields = [];
+        foreach (IcontactIntegration::FIELDS as $field) {
+            $fields[$field] = [
+                'label'    => $this->translator->trans('mautic.icontact.field.'.$field),
+                'required' => 'email' === $field,
+            ];
+        }
+
+        try {
+            foreach ($this->client->getCustomFields($keys) as $id => $name) {
+                $fields[IcontactIntegration::CUSTOM_FIELD_PREFIX.$id] = [
+                    'label'    => $name,
+                    'required' => false,
+                ];
+            }
+        } catch (ApiException $e) {
+            $errors[] = $e->getMessage();
+        }
+
+        $listSettings = $builder->create('list_settings', FormType::class, ['label' => false]);
+        $listSettings->add('list', ChoiceType::class, [
+            'choices'  => array_flip($lists),
+            'label'    => 'mautic.emailmarketing.list',
+            'required' => false,
+            'attr'     => [
+                'class'   => 'form-control',
                 'tooltip' => 'mautic.emailmarketing.list.tooltip',
             ],
         ]);
+        $listSettings->add('leadFields', FieldMappingType::class, [
+            'integration_fields' => $fields,
+        ]);
+        $builder->add($listSettings);
 
-        if (!empty($error)) {
-            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error): void {
-                $form = $event->getForm();
-
-                $form['list']->addError(new FormError($error));
+        if ([] !== $errors) {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, static function (FormEvent $event) use ($errors): void {
+                foreach (array_unique($errors) as $error) {
+                    $event->getForm()->get('list_settings')->get('list')->addError(new FormError($error));
+                }
             });
         }
-
-        if (isset($options['form_area']) && 'integration' == $options['form_area']) {
-            $leadFields = $this->pluginModel->getLeadFields();
-
-            $fields = $object->getFormLeadFields();
-
-            [$specialInstructions, $alertType] = $object->getFormNotes('leadfield_match');
-            $builder->add('leadFields', FieldsType::class, [
-                'label'                => 'mautic.integration.leadfield_matches',
-                'required'             => true,
-                'mautic_fields'        => $leadFields,
-                'integration'          => $object->getName(),
-                'integration_object'   => $object,
-                'limit'                => $limit,
-                'page'                 => $page,
-                'data'                 => $options['data'] ?? [],
-                'integration_fields'   => $fields,
-                'special_instructions' => $specialInstructions,
-                'mapped'               => true,
-                'error_bubbling'       => false,
-            ]);
-        }
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefined(['form_area']);
     }
 
     public function getBlockPrefix(): string

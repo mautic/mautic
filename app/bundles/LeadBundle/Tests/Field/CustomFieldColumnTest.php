@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field;
 
+use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -138,7 +139,7 @@ final class CustomFieldColumnTest extends TestCase
         $this->columnSchemaHelper->expects($this->once())
             ->method('addColumn');
 
-        $dbalException = new class('message', 1118) extends \Exception implements \Doctrine\DBAL\Driver\Exception {
+        $dbalException = new class('message', 1118) extends \Exception implements Exception {
             public function getSQLState(): string
             {
                 return 'some SQL state';
@@ -374,7 +375,7 @@ final class CustomFieldColumnTest extends TestCase
         $leadField = new LeadField();
         // Creating the entity from a form will hydrate this with 0/1 instead of a true/false
         // Testing that the getter now appropriately returns a bool for the type hinted getSchemaDefinitionNonStatic
-        $leadField->setIsUniqueIdentifier(1);
+        $leadField->setIsUniqueIdentifier(true);
         $leadField->setAlias('zip');
         $leadField->setType('text');
 
@@ -388,6 +389,7 @@ final class CustomFieldColumnTest extends TestCase
 
         $this->schemaDefinition->expects($this->once())
             ->method('getSchemaDefinitionNonStatic')
+            ->with('zip', 'text', true, 64)
             ->willReturn(['type' => 'string']);
 
         $this->columnSchemaHelper->expects($this->once())

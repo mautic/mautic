@@ -157,19 +157,14 @@ final class UserModel extends FormModel implements GlobalSearchInterface
         return $entity;
     }
 
-    /**
-     * @return User|null
-     */
-    public function getSystemAdministrator(): ?object
+    public function getSystemAdministrator(): ?User
     {
         $adminRole = $this->roleRepository->findOneBy(['isAdmin' => true]);
 
-        return $this->userRepository->findOneBy(
-            [
-                'role'        => $adminRole,
-                'isPublished' => true,
-            ]
-        );
+        return $this->userRepository->findOneBy([
+            'role'        => $adminRole,
+            'isPublished' => true,
+        ]);
     }
 
     /**
@@ -177,7 +172,7 @@ final class UserModel extends FormModel implements GlobalSearchInterface
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));

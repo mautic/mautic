@@ -14,10 +14,8 @@ final class FullContact_Company extends FullContact_Base
 {
     /**
      * Supported lookup methods.
-     *
-     * @var array
      */
-    protected $_supportedMethods = ['domain'];
+    protected array $_supportedMethods = ['domain'];
 
     protected $_resourceUri      = '/company/lookup.json';
 

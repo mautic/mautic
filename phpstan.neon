@@ -206,7 +206,6 @@ parameters:
         - '/Variable \$\w+ might not be defined\./'
         # test on purpose
         - '#Call to method PHPUnit\\Framework\\Assert::assertIsClosedResource\(\) with resource will always evaluate to true#'
-        - '#Parameter \$integration of method MauticPlugin\\MauticEmailMarketingBundle\\Api\\EmailMarketingApi::__construct\(\) has typehint with deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration#'
         # oAuth2 entities redeclare FOS parent properties whose declared types (interfaces, int) differ from the concrete Doctrine mapping
         -
             message: '#Property .+::\$(client|user) type mapping mismatch: property can contain .+but database expects#'
@@ -448,6 +447,10 @@ services:
             - phpstan.collector
     -
         class: Utils\PHPStan\Rule\NativeTypeForArrayOrIterableDocblockRule
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Utils\PHPStan\Rule\NativeTypeForArrayOrIterablePropertyRule
         tags:
             - phpstan.rules.rule
     -

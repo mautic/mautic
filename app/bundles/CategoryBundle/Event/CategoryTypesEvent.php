@@ -1,15 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CategoryBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 
 final class CategoryTypesEvent extends CommonEvent
 {
-    /**
-     * @var array
-     */
-    private $types = [];
+    private array $types = [];
 
     /**
      * Returns the array of Category Types.

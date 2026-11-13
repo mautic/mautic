@@ -31,7 +31,7 @@ class LeadTriggerLog
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
-    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\ManyToOne(targetEntity: IpAddress::class, cascade: ['persist', 'detach'])]
     #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private ?IpAddress $ipAddress = null;
 
@@ -75,10 +75,7 @@ class LeadTriggerLog
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
-    public function setLead($lead): void
+    public function setLead(Lead $lead): void
     {
         $this->lead = $lead;
     }
@@ -91,10 +88,7 @@ class LeadTriggerLog
         return $this->event;
     }
 
-    /**
-     * @param mixed $event
-     */
-    public function setEvent($event): void
+    public function setEvent(TriggerEvent $event): void
     {
         $this->event = $event;
     }
