@@ -101,8 +101,8 @@
     &[data-state='confirmed'] &__button.btn:not(:disabled):not(.disabled) {
         --focus: var(--hold-to-confirm-success);
         border-color: var(--hold-to-confirm-success);
-        background: var(--layer);
-        color: var(--hold-to-confirm-success);
+        background: var(--hold-to-confirm-success);
+        color: var(--text-inverse);
 
         i { color: inherit; }
     }
