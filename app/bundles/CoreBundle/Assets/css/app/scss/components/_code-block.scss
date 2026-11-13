@@ -9,7 +9,7 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--spacing-03);
-    padding: var(--spacing-02) var(--spacing-03);
+    padding: var(--spacing-03) var(--spacing-04);
     color: var(--text-secondary);
     border-bottom: 1px solid var(--border-subtle);
   }
@@ -27,7 +27,7 @@
 
   &__body {
     overflow-x: auto;
-    padding: var(--spacing-03) 0;
+    padding: var(--spacing-04) 0;
   }
 
   &__lines {
@@ -63,7 +63,7 @@
     justify-content: center;
     gap: var(--spacing-01);
     width: 100%;
-    padding: var(--spacing-02);
+    padding: var(--spacing-03);
     color: var(--text-secondary);
     background: none;
     border: 0;
