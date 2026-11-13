@@ -56,6 +56,7 @@ final class TrackingConfigTest extends MauticMysqlTestCase
         $this->assertNotFalse($trackingPosition);
         $this->assertLessThan($trackingPosition, $essentialPosition);
 
-        $this->assertCount(0, $crawler->filter('pre:contains("/mtc.js")'));
+        $this->assertGreaterThan(0, $crawler->filter('[data-code-block]')->count());
+        $this->assertCount(0, $crawler->filter('[data-code-block]:contains("/mtc.js")'));
     }
 }
