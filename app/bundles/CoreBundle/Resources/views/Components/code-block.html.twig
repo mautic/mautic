@@ -1,5 +1,5 @@
 {% set lines = innerText|trim('\n', 'right')|split('\n') %}
-{% set collapsedLines = collapsedLines|default(8) %}
+{% set collapsedLines = collapsedLines|default(5) %}
 {% set collapsible = lines|length > collapsedLines %}
 {% set blockId = 'code-block-' ~ random() %}
 {% set captionId = blockId ~ '-caption' %}
