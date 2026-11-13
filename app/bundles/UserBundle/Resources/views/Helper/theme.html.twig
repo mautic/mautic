@@ -1,10 +1,10 @@
 {% for theme in themes %}
-<div class="radio-option col-xs-12 col-md-4 mb-lg">
+<div class="radio-option col-xs-12 col-md-4 mb-24">
     <label class="d-flex flex-column" for="theme-{{ theme.id }}">
         {% if theme.preview ends with '.twig' %}
             {{ include(theme.preview) }}
         {% else %}
-            <img src="{{ asset(theme.preview) }}" alt="{{ theme.name|trans }} preview" aria-hidden="true" class="mb-sm">
+            <img src="{{ asset(theme.preview) }}" alt="{{ theme.name|trans }} preview" aria-hidden="true" class="mb-12">
         {% endif %}
         <div class="d-flex flex-row gap-3">
             <input type="radio" id="theme-{{ theme.id }}" name="theme" value="{{ theme.id }}"

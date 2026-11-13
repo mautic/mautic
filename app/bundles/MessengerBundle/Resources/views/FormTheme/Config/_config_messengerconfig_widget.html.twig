@@ -1,22 +1,22 @@
 {% block _config_messengerconfig_widget %}
-<div class="alert alert-info mt-md" role="alert">
+<div class="alert alert-info mt-16" role="alert">
     {% trans with {'%link%': 'https://symfony.com/doc/5.4/messenger.html#transport-configuration' } %}mautic.messenger.config.dsn_help_general{% endtrans %}
 </div>
 
-<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.messenger.config.dsn_email'|trans }}</h4>
-<div class="text-muted small pb-md">{{ 'mautic.core.config.header.messenger.email.description'|trans }}</div>
+<h4 class="fw-sb mt-48 mb-5">{{ 'mautic.messenger.config.dsn_email'|trans }}</h4>
+<div class="text-muted small pb-16">{{ 'mautic.core.config.header.messenger.email.description'|trans }}</div>
 <div class="row">
-    <div class="panel panel-default mb-md">
+    <div class="panel panel-default mb-16">
         <div class="panel-body">
             {{ formRowIfExists(form, 'messenger_dsn_email') }}
         </div>
     </div>
 </div>
 
-<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.messenger.config.dsn_hit'|trans }}</h4>
-<div class="text-muted small pb-md">{{ 'mautic.core.config.header.messenger.hit.description'|trans }}</div>
+<h4 class="fw-sb mt-48 mb-5">{{ 'mautic.messenger.config.dsn_hit'|trans }}</h4>
+<div class="text-muted small pb-16">{{ 'mautic.core.config.header.messenger.hit.description'|trans }}</div>
 <div class="row">
-    <div class="panel panel-default mb-md">
+    <div class="panel panel-default mb-16">
         <div class="panel-body">
             {{ formRowIfExists(form, 'messenger_dsn_hit') }}
         </div>
@@ -27,10 +27,10 @@
     {% trans with {'%link%': 'https://symfony.com/doc/5.4/messenger.html#retries-failures' } %}mautic.messenger.config.dsn_help_retry_strategy{% endtrans %}
 </div>
 
-<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.messenger.config.retry_strategy'|trans }}</h4>
-<div class="text-muted small pb-md">{{ 'mautic.core.config.header.messenger.retry.description'|trans }}</div>
+<h4 class="fw-sb mt-48 mb-5">{{ 'mautic.messenger.config.retry_strategy'|trans }}</h4>
+<div class="text-muted small pb-16">{{ 'mautic.core.config.header.messenger.retry.description'|trans }}</div>
 <div class="row">
-    <div class="panel panel-default mb-md">
+    <div class="panel panel-default mb-16">
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-12 col-lg-3">
@@ -54,10 +54,10 @@
     {% trans with {'%link%': 'https://symfony.com/doc/5.4/messenger.html#saving-retrying-failed-messages' } %}mautic.messenger.config.dsn_help_failed{% endtrans %}
 </div>
 
-<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.messenger.config.dsn_failed'|trans }}</h4>
-<div class="text-muted small pb-md">{{ 'mautic.core.config.header.messenger.failed.description'|trans }}</div>
+<h4 class="fw-sb mt-48 mb-5">{{ 'mautic.messenger.config.dsn_failed'|trans }}</h4>
+<div class="text-muted small pb-16">{{ 'mautic.core.config.header.messenger.failed.description'|trans }}</div>
 <div class="row">
-    <div class="panel panel-default mb-md">
+    <div class="panel panel-default mb-16">
         <div class="panel-body">
             {{ formRowIfExists(form, 'messenger_dsn_failed') }}   
         </div>
