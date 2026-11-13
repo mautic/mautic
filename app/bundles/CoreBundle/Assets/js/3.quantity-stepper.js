@@ -42,12 +42,23 @@
         return Math.min(max, Math.max(min, number));
     }
 
+    function stepBase(input) {
+        const {min} = bounds(input);
+        const initial = input.getAttribute('value');
+
+        if (Number.isFinite(min)) {
+            return min;
+        }
+
+        return initial !== null && initial.trim() !== '' && Number.isFinite(Number(initial)) ? Number(initial) : 0;
+    }
+
     function snap(input, number, direction) {
-        const {min, max} = bounds(input);
+        const {max} = bounds(input);
         const step = Number(input.step) || 1;
-        const origin = Number.isFinite(min) ? min : 0;
-        const ratio = (clamp(input, number) - origin) / step;
-        const next = origin + (direction < 0 ? Math.floor(ratio) : Math.ceil(ratio)) * step;
+        const base = stepBase(input);
+        const ratio = (clamp(input, number) - base) / step;
+        const next = base + (direction < 0 ? Math.floor(ratio) : Math.ceil(ratio)) * step;
 
         return next > max ? next - step : next;
     }
