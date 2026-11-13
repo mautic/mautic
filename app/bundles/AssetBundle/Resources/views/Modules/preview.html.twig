@@ -17,7 +17,7 @@
         </audio>
     {% else %}
         <div class="d-flex justify-content-center align-items-center text-helper">
-            <i class="{{ activeAsset.getIconClass() }} ri-lg mr-xs"></i>
+            <i class="{{ activeAsset.getIconClass() }} ri-lg me-5"></i>
             <span>{{ 'mautic.asset.no_preview'|trans }}</span>
         </div>
     {% endif %}
@@ -25,7 +25,7 @@
 
 {% if variant == 'interactive' %}
     {% if isPreviewable %}
-    <h5 class="fw-sb mb-xs">{{ 'mautic.asset.asset.preview'|trans }}</h5>
+    <h5 class="fw-sb mb-5">{{ 'mautic.asset.asset.preview'|trans }}</h5>
 
     <div class="asset-preview">
         {% if activeAsset.isImage() %}
@@ -79,7 +79,7 @@
     </div>
     {% else %}
     <div class="d-flex justify-content-center align-items-center text-helper">
-        <i class="{{ activeAsset.getIconClass() }} ri-lg mr-xs"></i>
+        <i class="{{ activeAsset.getIconClass() }} ri-lg me-5"></i>
         <span>{{ 'mautic.asset.no_preview'|trans }}</span>
     </div>
     {% endif %}
