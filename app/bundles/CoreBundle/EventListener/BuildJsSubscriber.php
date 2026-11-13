@@ -107,11 +107,50 @@ MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callback
         var query = '';
     }
     
-    var xhr = MauticJS.createCORSRequest(method, url);
     var response;
     
     callbackSuccess = callbackSuccess || function(response, xhr) { };
     callbackError = callbackError || function(response, xhr) { };
+
+    if (method === 'POST'
+        && url === MauticJS.pageTrackingCORSUrl
+        && typeof window.fetch === 'function'
+        && typeof window.Blob === 'function'
+        && new window.Blob([query]).size <= 60 * 1024
+    ) {
+        if (!MauticJS.CORSRequestsAllowed) {
+            callbackError({}, { status: 0 });
+
+            return false;
+        }
+
+        window.fetch(url, {
+            method: 'POST',
+            keepalive: true,
+            credentials: MauticJS.requestWithCredentials ? 'include' : 'same-origin',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: query
+        }).then(function(fetchResponse) {
+            var responseDetails = { status: fetchResponse.status };
+
+            fetchResponse.text().then(function(responseText) {
+                response = MauticJS.parseTextToJSON(responseText);
+                if (fetchResponse.status === 200) {
+                    callbackSuccess(response, responseDetails);
+                } else {
+                    callbackError(response, responseDetails);
+                }
+            }, function() {
+                callbackError({}, responseDetails);
+            });
+        }, function() {
+            callbackError({}, { status: 0 });
+        });
+
+        return;
+    }
+
+    var xhr = MauticJS.createCORSRequest(method, url);
 
     if (!xhr) {
         MauticJS.log('MauticJS.debug: Could not create an XMLHttpRequest instance.');
