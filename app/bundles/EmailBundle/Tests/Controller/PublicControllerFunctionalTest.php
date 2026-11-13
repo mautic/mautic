@@ -1094,7 +1094,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $secretHash = $this->getSecretHash('validation.errors@mautic.tld');
 
         $crawler = $this->client->request(Request::METHOD_GET, '/email/validate/unsubscribe/'.$secretHash.'/non-existing-tracking-hash');
-        $form    = $crawler->filter('input[name="validate_email[emailAddress]"]')->form(['validate_email[emailAddress]' => 'not-an-email']);
+        $form    = $crawler->filter('form')->form(['validate_email[emailAddress]' => 'not-an-email']);
         $crawler = $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
