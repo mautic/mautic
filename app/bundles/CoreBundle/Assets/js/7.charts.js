@@ -328,6 +328,9 @@ Mautic.renderFunnelChart = function(canvas) {
     const max = Math.max(...values);
     const palette = ['#0f62fe', '#0043ce', '#002d9c', '#001d6c', '#001141'];
     const color = (i) => palette[Math.min(i, palette.length - 1)];
+    const themed = getComputedStyle(canvas[0]);
+    const textPrimary = themed.getPropertyValue('--text-primary').trim();
+    const textSecondary = themed.getPropertyValue('--text-secondary').trim();
     const gap = 4;
     const bounds = (bar) => {
         const props = bar.getProps(['x', 'y', 'base', 'width'], true);
@@ -368,10 +371,14 @@ Mautic.renderFunnelChart = function(canvas) {
                 const {left, right} = bounds(bar);
                 const x = left + (i ? 10 : 0);
                 const width = right - x - gap;
-                ctx.fillStyle = '#161616';
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(x, chartArea.top, width, 40);
+                ctx.clip();
+                ctx.fillStyle = textPrimary;
                 ctx.font = `600 16px ${family}`;
                 ctx.fillText(values[i].toLocaleString(), x, chartArea.top);
-                ctx.fillStyle = '#525252';
+                ctx.fillStyle = textSecondary;
                 ctx.font = `12px ${family}`;
                 const share = i && values[i - 1] ? ` · ${Math.round(values[i] / values[i - 1] * 100)}%` : '';
                 let name = labels[i];
@@ -380,6 +387,7 @@ Mautic.renderFunnelChart = function(canvas) {
                 }
                 const text = name + share;
                 ctx.fillText(text, x, chartArea.top + 22);
+                ctx.restore();
             });
             ctx.restore();
         }

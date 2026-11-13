@@ -80,6 +80,10 @@ final class StageController extends AbstractFormController
             ]
         );
 
+        [$funnelStages, $funnelCounts] = $permissions['lead:leads:viewother']
+            ? $this->stageModel->getPublishedEntitiesWithContactCounts()
+            : [[], []];
+
         $request->getSession()->set('mautic.stage.filter', $search);
         if ($count && $count < ($start + 1)) {
             $lastPage  = $pageHelper->countPage($count);
@@ -112,6 +116,8 @@ final class StageController extends AbstractFormController
                     'filters'       => $categoryFilters['filters'],
                     'items'         => $stageEntities,
                     'contactCounts' => $contactCounts,
+                    'funnelStages'  => $funnelStages,
+                    'funnelCounts'  => $funnelCounts,
                     'actions'       => $actions['actions'],
                     'page'          => $page,
                     'limit'         => $limit,
