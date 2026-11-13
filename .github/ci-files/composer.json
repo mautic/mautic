@@ -136,7 +136,7 @@
         "url": "../app",
         "options": {
             "versions": {
-                "mautic/core-lib": "7.x-dev"
+                "mautic/core-lib": "8.x-dev"
             },
             "symlink": false
         }

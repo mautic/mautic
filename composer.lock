@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1f923f3758bb802a89c777713ea21362",
+    "content-hash": "36e93871e6e1797f3433f7c71f267742",
     "packages": [
         {
             "name": "api-platform/core",
@@ -5950,11 +5950,11 @@
         },
         {
             "name": "mautic/core-lib",
-            "version": "7.0.0-dev",
+            "version": "8.0.0-dev",
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "02565e9e24b9010ed330a6dc74dbaa53daa2c087"
+                "reference": "a4210284941aef981521a55b7519463d13fd71cc"
             },
             "require": {
                 "api-platform/core": "^4.3.0",
