@@ -23,7 +23,7 @@
   "require": {
     "composer/installers": "^2.3",
     "cweagans/composer-patches": "^1.7.3",
-    "mautic/core-lib": "^7.0"
+    "mautic/core-lib": "^8.0"
   },
   "require-dev": {
     "codeception/codeception": "^5.3.5",
@@ -124,7 +124,7 @@
       "url": "app",
       "options": {
         "versions": {
-            "mautic/core-lib": "7.0.0-dev"
+            "mautic/core-lib": "8.0.0-dev"
         }
       }
     },
