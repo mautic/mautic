@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
@@ -118,40 +119,22 @@ class FormRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired', [], null, 'en_US'):
-                if ($q instanceof \Doctrine\ORM\QueryBuilder) {
-                    $expr = new \Doctrine\ORM\Query\Expr\Andx([
-                        $q->expr()->eq('f.isPublished', ":{$unique}"),
-                        $q->expr()->isNotNull('f.publishDown'),
-                        $q->expr()->neq('f.publishDown', $q->expr()->literal('')),
-                        $q->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()'),
-                    ]);
-                } else {
-                    $expr = $q->expr()->and(
-                        $q->expr()->eq('f.isPublished', ":{$unique}"),
-                        $q->expr()->isNotNull('f.publishDown'),
-                        $q->expr()->neq('f.publishDown', $q->expr()->literal('')),
-                        $q->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()')
-                    );
-                }
+                $conditions = [
+                    $q->expr()->eq('f.isPublished', ":{$unique}"),
+                    $q->expr()->isNotNull('f.publishDown'),
+                    $q->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()'),
+                ];
+                $expr = $q instanceof QueryBuilder ? $q->expr()->andX(...$conditions) : $q->expr()->and(...$conditions);
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.ispending'):
             case $this->translator->trans('mautic.form.form.searchcommand.ispending', [], null, 'en_US'):
-                if ($q instanceof \Doctrine\ORM\QueryBuilder) {
-                    $expr = new \Doctrine\ORM\Query\Expr\Andx([
-                        $q->expr()->eq('f.isPublished', ":{$unique}"),
-                        $q->expr()->isNotNull('f.publishUp'),
-                        $q->expr()->neq('f.publishUp', $q->expr()->literal('')),
-                        $q->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()'),
-                    ]);
-                } else {
-                    $expr = $q->expr()->and(
-                        $q->expr()->eq('f.isPublished', ":{$unique}"),
-                        $q->expr()->isNotNull('f.publishUp'),
-                        $q->expr()->neq('f.publishUp', $q->expr()->literal('')),
-                        $q->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()')
-                    );
-                }
+                $conditions = [
+                    $q->expr()->eq('f.isPublished', ":{$unique}"),
+                    $q->expr()->isNotNull('f.publishUp'),
+                    $q->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()'),
+                ];
+                $expr = $q instanceof QueryBuilder ? $q->expr()->andX(...$conditions) : $q->expr()->and(...$conditions);
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.hasresults'):
