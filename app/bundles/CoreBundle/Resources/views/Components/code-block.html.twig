@@ -1,0 +1,35 @@
+{% set lines = innerText|trim('\n', 'right')|split('\n') %}
+{% set collapsedLines = collapsedLines|default(8) %}
+{% set collapsible = lines|length > collapsedLines %}
+<figure class="code-block{{ wrap|default(false) ? ' code-block--wrap' : '' }}{{ numbered|default(false) ? ' code-block--numbered' : '' }}" data-code-block data-collapsed-lines="{{ collapsedLines }}">
+    <figcaption class="code-block__header type-label-01">
+        <span class="code-block__filename"><i class="ri-file-code-line" aria-hidden="true"></i>{{ filename|default(language|default('code')) }}</span>
+        {% if hideCopyButton is not defined or not hideCopyButton %}
+        {% include '@MauticCore/Helper/button.html.twig' with {
+            buttons: [{
+            variant: 'icon',
+            size: 'xs',
+            icon: 'ri-file-copy-line',
+            icon_only: true,
+            label: copyButtonDescription|default('mautic.core.copy_code_snippet')|trans,
+            attributes: {
+                'data-copy': copyText|default(innerText)|escape('html_attr'),
+                'type': 'button',
+            },
+            }]
+        } %}
+        {% endif %}
+    </figcaption>
+    <div class="code-block__body" tabindex="0" role="region" aria-label="{{ ariaLabel|default(filename|default(language|default('code'))) }}">
+        <ol class="code-block__lines">
+            {% for line in lines %}
+            <li class="code-block__line"{% if collapsible and loop.index > collapsedLines %} hidden data-code-block-extra{% endif %}><code>{{ line|default(' ') }}</code></li>
+            {% endfor %}
+        </ol>
+    </div>
+    {% if collapsible %}
+    <button type="button" class="code-block__toggle btn-nospin type-label-01" aria-expanded="false" data-code-block-toggle data-more="{{ 'mautic.core.code_block.more_lines'|trans({'%count%': lines|length - collapsedLines}) }}" data-less="{{ 'mautic.core.code_block.collapse'|trans }}">
+        <span data-code-block-label>{{ 'mautic.core.code_block.more_lines'|trans({'%count%': lines|length - collapsedLines}) }}</span><i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+    </button>
+    {% endif %}
+</figure>

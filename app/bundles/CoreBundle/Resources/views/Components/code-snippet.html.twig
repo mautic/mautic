@@ -48,42 +48,4 @@
     } %}
     {% endif %}
 </div>
-
-{# === BLOCK VARIANT === #}
-{% elseif variant == 'block' %}
-{% set lines = innerText|trim('\n', 'right')|split('\n') %}
-{% set collapsedLines = collapsedLines|default(8) %}
-{% set collapsible = lines|length > collapsedLines %}
-<figure class="code-snippet code-snippet--block{{ wrap|default(false) ? ' code-snippet--wrap' : '' }}{{ numbered|default(false) ? ' code-snippet--numbered' : '' }}" data-code-block data-collapsed-lines="{{ collapsedLines }}">
-    <figcaption class="code-snippet__header type-label-01">
-        <span class="code-snippet__filename"><i class="ri-file-code-line" aria-hidden="true"></i>{{ filename|default(language|default('code')) }}</span>
-        {% if hideCopyButton is not defined or not hideCopyButton %}
-        {% include '@MauticCore/Helper/button.html.twig' with {
-            buttons: [{
-            variant: 'icon',
-            size: 'xs',
-            icon: 'ri-file-copy-line',
-            icon_only: true,
-            label: copyButtonDescription|default('mautic.core.copy_code_snippet')|trans,
-            attributes: {
-                'data-copy': copyText|default(innerText)|escape('html_attr'),
-                'type': 'button',
-            },
-            }]
-        } %}
-        {% endif %}
-    </figcaption>
-    <div class="code-snippet__body" tabindex="0" role="region" aria-label="{{ ariaLabel|default(filename|default(language|default('code'))) }}">
-        <ol class="code-snippet__lines" id="{{ id|default('code-block-' ~ random()) }}">
-            {% for line in lines %}
-            <li class="code-snippet__line"{% if collapsible and loop.index > collapsedLines %} hidden data-code-block-extra{% endif %}><code>{{ line|default(' ') }}</code></li>
-            {% endfor %}
-        </ol>
-    </div>
-    {% if collapsible %}
-    <button type="button" class="code-snippet__toggle btn-nospin type-label-01" aria-expanded="false" data-code-block-toggle data-more="{{ 'mautic.core.code_block.more_lines'|trans({'%count%': lines|length - collapsedLines}) }}" data-less="{{ 'mautic.core.code_block.collapse'|trans }}">
-        <span data-code-block-label>{{ 'mautic.core.code_block.more_lines'|trans({'%count%': lines|length - collapsedLines}) }}</span><i class="ri-arrow-down-s-line" aria-hidden="true"></i>
-    </button>
-    {% endif %}
-</figure>
 {% endif %}

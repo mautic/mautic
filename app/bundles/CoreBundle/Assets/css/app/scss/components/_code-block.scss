@@ -1,0 +1,120 @@
+.code-block {
+  margin: 0;
+  overflow: hidden;
+  background: var(--layer);
+  border: 1px solid var(--border-subtle);
+  border-radius: clamp(4px, var(--border-radius-sm), 6px);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-03);
+    padding: var(--spacing-02) var(--spacing-03);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  &__filename {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-02);
+    min-width: 0;
+    overflow: hidden;
+    font-family: var(--font-family-monospace);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__body {
+    overflow-x: auto;
+    padding: var(--spacing-03) 0;
+  }
+
+  &__lines {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: code-line;
+  }
+
+  &__line {
+    display: flex;
+    align-items: flex-start;
+    padding: 0 var(--spacing-04);
+    line-height: 1.8;
+    white-space: pre;
+
+    code {
+      padding: 0;
+      overflow: visible;
+      color: var(--text-primary);
+      background: none;
+      border-radius: 0;
+    }
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  &__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-01);
+    width: 100%;
+    padding: var(--spacing-02);
+    color: var(--text-secondary);
+    background: none;
+    border: 0;
+    border-top: 1px solid var(--border-subtle);
+
+    &:hover {
+      color: var(--text-primary);
+      background: var(--layer-hover);
+    }
+
+    i {
+      transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    &[aria-expanded='true'] i {
+      transform: rotate(180deg);
+    }
+  }
+
+  &--numbered &__line:before {
+    content: counter(code-line);
+    counter-increment: code-line;
+    flex: 0 0 auto;
+    width: 2ch;
+    margin-inline-end: var(--spacing-04);
+    color: var(--text-disabled);
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+    user-select: none;
+  }
+
+  &--wrap {
+    .code-block__body {
+      overflow-x: hidden;
+    }
+
+    .code-block__line {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+
+      code {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-block__toggle i {
+    transition: none;
+  }
+}
