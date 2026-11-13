@@ -2,7 +2,6 @@
   margin: 0;
   overflow: hidden;
   background: var(--layer);
-  border: 1px solid var(--border-subtle);
   border-radius: clamp(4px, var(--border-radius-sm), 6px);
 
   &__header {
@@ -69,6 +68,7 @@
     background: none;
     border: 0;
     border-top: 1px solid var(--border-subtle);
+    transition: var(--transition-all-productive);
 
     &:hover {
       color: var(--text-primary);
@@ -76,7 +76,7 @@
     }
 
     i {
-      transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+      transition: var(--transition-all-productive);
     }
 
     &[aria-expanded='true'] i {
