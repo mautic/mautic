@@ -414,6 +414,7 @@ rules:
     - Utils\PHPStan\Rule\NativeUnionParamMustHaveUnionDocblockRule
     - Utils\PHPStan\Rule\NoDuplicateParamDocblockRule
     - Utils\PHPStan\Rule\NoUselessAssertInstanceOfRule
+    - Utils\PHPStan\Rule\EntityEventListenerMustCheckInstanceofRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
