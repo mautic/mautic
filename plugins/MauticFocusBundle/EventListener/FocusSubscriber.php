@@ -124,12 +124,24 @@ final readonly class FocusSubscriber implements EventSubscriberInterface
 
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
     {
-        /** @var Lead $lead */
+        /** @var Lead|null $lead */
         $lead         = $event->getLead();
         $content      = $event->getContent();
         $clickthrough = $event->getClickthrough();
 
         if ($content) {
+            if (null === $lead) {
+                // Shown before consent: plain page and asset links, no tracked links and no contact tokens
+                $tokens = array_merge(
+                    $this->pageTokenHelper->findPageTokens($content),
+                    $this->assetTokenHelper->findAssetTokens($content),
+                    $event->getTokens(),
+                );
+                $event->setContent(str_replace(array_keys($tokens), array_values($tokens), $content));
+
+                return;
+            }
+
             $tokens = array_merge(
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough)

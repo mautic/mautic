@@ -2,7 +2,7 @@
   Variables
     - form
 #}
-<div class="ml-lg mr-lg mt-md pa-lg animation--slide-in-right">
+<div class="ms-24 me-24 mt-16 pa-24 animation--slide-in-right">
     {{ form_start(form) }}
     <div class="panel panel-info">
         <div class="panel-heading">
@@ -25,6 +25,7 @@
                 <div class="col-xs-4">
                     {% if form.create_new is defined %}{{ form_row(form.create_new) }}{% endif %}
                 </div>
+                {{ customContent('import.defaults', _context, '@MauticLead/Import/_mapping_form.html.twig') }}
             </div>
 
         </div>

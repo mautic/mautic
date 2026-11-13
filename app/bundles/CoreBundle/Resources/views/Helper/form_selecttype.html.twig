@@ -16,13 +16,13 @@
                 <div class="modal-loading-bar"></div>
             </div>
             <div class="modal-body form-select-modal">
-                <div class="d-flex row-no-gutters flex-xl-nowrap gap-md">
+                <div class="d-flex row-no-gutters flex-xl-nowrap gap-16">
                     <div class="col-md-6">
 
                         {% set typeOneContent %}
                         <h3 class="mb-48">{{ typeOneHeader|trans }}</h3>
                         {% if typeOnePictogram is defined and typeOnePictogram is not empty %}
-                            <div class="mb-md">
+                            <div class="mb-16">
                                 {% include '@MauticCore/Components/pictogram.html.twig' with {
                                     'pictogram': typeOnePictogram,
                                     'size': '64',
@@ -31,7 +31,7 @@
                             </div>
                         {% endif %}
                         {% if typeOneDescription is defined and typeOneDescription is not empty %}
-                            <div class="mb-md">{{ typeOneDescription|trans }}</div>
+                            <div class="mb-16">{{ typeOneDescription|trans }}</div>
                         {% endif %}
 
                         {% if typeOneTag is defined and typeOneTag is not empty %}
@@ -45,7 +45,7 @@
                     
 
                         {% if typeOneDifferences is defined and typeOneDifferences is not empty %}
-                            <div class="layer-two mt-sm text-secondary">
+                            <div class="layer-two mt-12 text-secondary">
                                 {% include '@MauticCore/Components/list--styled.html.twig' with {
                                     'type': 'unordered',
                                     'style': 'none',
@@ -66,7 +66,7 @@
                         {% set typeTwoContent %}
                         <h3 class="mb-48">{{ typeTwoHeader|trans }}</h3>
                         {% if typeTwoPictogram is defined and typeTwoPictogram is not empty %}
-                        <div class="mb-md">
+                        <div class="mb-16">
                             {% include '@MauticCore/Components/pictogram.html.twig' with {
                                 'pictogram': typeTwoPictogram,
                                 'size': '64',
@@ -75,7 +75,7 @@
                         </div>
                         {% endif %}
                         {% if typeTwoDescription is defined and typeTwoDescription is not empty %}
-                            <div class="mb-md">{{ typeTwoDescription|trans }}</div>
+                            <div class="mb-16">{{ typeTwoDescription|trans }}</div>
                         {% endif %}
 
                         {% if typeTwoTag is defined and typeTwoTag is not empty %}
@@ -88,7 +88,7 @@
                         {% endif %}
 
                         {% if typeTwoDifferences is defined and typeTwoDifferences is not empty %}
-                            <div class="layer-two mt-sm text-secondary">
+                            <div class="layer-two mt-12 text-secondary">
                                 {% include '@MauticCore/Components/list--styled.html.twig' with {
                                     'type': 'unordered',
                                     'style': 'none',

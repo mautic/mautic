@@ -11,8 +11,8 @@
       </div>
       <div class="modal-body modal-scroll-content">
         <div class="row">        
-          <h4 class="fw-sb mb-sm mt-md pi-md">{{ 'mautic.core.searchcommands.heading.operators'|trans }}</h4>
-          <div class="text-helper mb-md pi-md">
+          <h4 class="fw-sb mb-12 mt-16 pi-16">{{ 'mautic.core.searchcommands.heading.operators'|trans }}</h4>
+          <div class="text-helper mb-16 pi-16">
             {{'mautic.core.searchcommands.heading.operators.description'|trans}}</div>
           <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
             <!-- General operators -->
@@ -39,8 +39,8 @@
             </li>
           </ul>
 
-          <h4 class="fw-sb mb-sm mt-32 pi-md">{{ 'mautic.core.searchcommands.heading.commands'|trans }}</h4>
-          <div class="text-helper mb-md pi-md">{{'mautic.core.searchcommands.heading.commands.description'|trans}}</div>
+          <h4 class="fw-sb mb-12 mt-32 pi-16">{{ 'mautic.core.searchcommands.heading.commands'|trans }}</h4>
+          <div class="text-helper mb-16 pi-16">{{'mautic.core.searchcommands.heading.commands.description'|trans}}</div>
 
           {% set searchCommands = searchCommandList() %}
 
@@ -84,7 +84,7 @@
                               {% endif %}
 
                               {% if groupedCommands|length > 0 %}
-                                  <p class="fw-b mb-sm mt-md">{{ ('searchcommand.group.' ~ groupName)|trans }}</p>
+                                  <p class="fw-b mb-12 mt-16">{{ ('searchcommand.group.' ~ groupName)|trans }}</p>
                                   {% for command in groupedCommands %}
                                       {% set commandCode = command|trans %}
                                       {% set descriptionKey = command ~ '.description' %}
