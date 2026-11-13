@@ -1741,8 +1741,10 @@ Mautic.listOnLoad = function(container, response) {
     let segmentDependenciesLoaded = false;
     let jsPlumbData = null;
 
+    mQuery(document).off('shown.bs.tab.segmentDependencies hide.bs.tab.segmentDependencies');
+
     if (segmentDependenciesTab.length) {
-        mQuery(document).on('shown.bs.tab', '[data-bs-toggle="tab"]', function (e) {
+        mQuery(document).on('shown.bs.tab.segmentDependencies', '[data-bs-toggle="tab"]', function (e) {
             if (mQuery(e.target).attr('id') !== 'segment-dependencies') {
                 return;
             }
@@ -1772,7 +1774,7 @@ Mautic.listOnLoad = function(container, response) {
             }
         });
 
-        mQuery(document).on('hide.bs.tab', '[data-bs-toggle="tab"]', function (e) {
+        mQuery(document).on('hide.bs.tab.segmentDependencies', '[data-bs-toggle="tab"]', function (e) {
             if (mQuery(e.target).attr('id') === 'segment-dependencies') {
                 Mautic.cleanSegmentDependencies();
             }

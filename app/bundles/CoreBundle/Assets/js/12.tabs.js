@@ -22,7 +22,7 @@ Mautic.toggleTabPublished = function(el) {
  * @param tab
  */
 Mautic.publishTab = function(tab) {
-    mQuery('a[href="#'+Mautic.getTabId(tab)+'"]').find('.fa').removeClass('text-secondary').addClass('text-success');
+    Mautic.getTabStatusIcon(tab).removeClass('text-secondary').addClass('text-success');
 };
 
 /**
@@ -31,7 +31,19 @@ Mautic.publishTab = function(tab) {
  * @param tab
  */
 Mautic.unpublishTab = function(tab) {
-    mQuery('a[href="#'+Mautic.getTabId(tab)+'"]').find('.fa').removeClass('text-success').addClass('text-secondary');
+    Mautic.getTabStatusIcon(tab).removeClass('text-success').addClass('text-secondary');
+};
+
+/**
+ * Get the status icon of a tab, in the shared tabs component or in a legacy nav link
+ *
+ * @param tab
+ * @returns {*}
+ */
+Mautic.getTabStatusIcon = function(tab) {
+    const tabId = Mautic.getTabId(tab);
+
+    return mQuery(`[data-bs-target="#${tabId}"] .tabs__nav-item-icon:not(.ri-alert-line), a[href="#${tabId}"] .fa`);
 };
 
 /**
