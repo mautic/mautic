@@ -96,12 +96,12 @@ class AssetRepository extends CommonRepository
             'mautic.asset.asset.searchcommand.isimage' => [
                 ['image/%'],
                 ['application/photoshop', 'application/x-photoshop'],
-                ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'tif', 'tiff', 'psd'],
+                ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'tif', 'tiff', 'psd', 'ico'],
             ],
             'mautic.asset.asset.searchcommand.isvideo' => [
                 ['video/%'],
                 [],
-                ['mp4', 'webm', 'ogv', 'mov'],
+                ['mp4', 'webm', 'ogv', 'mov', 'wmv', 'avi', 'mkv', 'mpeg'],
             ],
             'mautic.asset.asset.searchcommand.isaudio' => [
                 ['audio/%'],

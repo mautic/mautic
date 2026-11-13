@@ -34,6 +34,11 @@ final class AssetRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->createAsset('Generic zip', 'application/octet-stream', 'zip');
         $this->createAsset('Charset notes', 'text/plain; charset=utf-8', 'txt');
         $this->createAsset('Macro sheet', 'application/vnd.ms-excel.sheet.macroEnabled.12', 'xlsm');
+        $this->createAsset('Generic doc', 'application/octet-stream', 'pdf');
+        $this->createAsset('Blank doc', '', 'docx');
+        $this->createAsset('Photoshop alias', 'application/photoshop', 'psd');
+        $this->createAsset('Generic clip', 'application/octet-stream', 'mp4');
+        $this->createAsset('Generic song', null, 'mp3');
         $this->em->flush();
     }
 
@@ -42,10 +47,10 @@ final class AssetRepositoryFunctionalTest extends MauticMysqlTestCase
      */
     public static function mimeCommandProvider(): iterable
     {
-        yield 'image' => ['is:image', ['Layers', 'Octet photo', 'Photo', 'Scanned']];
-        yield 'video' => ['is:video', ['Clip']];
-        yield 'audio' => ['is:audio', ['Song']];
-        yield 'document' => ['is:document', ['Charset notes', 'Macro sheet', 'Notes', 'Report']];
+        yield 'image' => ['is:image', ['Layers', 'Octet photo', 'Photo', 'Photoshop alias', 'Scanned']];
+        yield 'video' => ['is:video', ['Clip', 'Generic clip']];
+        yield 'audio' => ['is:audio', ['Generic song', 'Song']];
+        yield 'document' => ['is:document', ['Blank doc', 'Charset notes', 'Generic doc', 'Macro sheet', 'Notes', 'Report']];
     }
 
     /**
@@ -62,8 +67,8 @@ final class AssetRepositoryFunctionalTest extends MauticMysqlTestCase
      */
     public static function negatedMimeCommandProvider(): iterable
     {
-        yield 'image' => ['!is:image', ['Archive', 'Charset notes', 'Clip', 'Generic zip', 'Macro sheet', 'Notes', 'Report', 'Song', 'Unknown']];
-        yield 'document' => ['!is:document', ['Archive', 'Clip', 'Generic zip', 'Layers', 'Octet photo', 'Photo', 'Scanned', 'Song', 'Unknown']];
+        yield 'image' => ['!is:image', ['Archive', 'Blank doc', 'Charset notes', 'Clip', 'Generic clip', 'Generic doc', 'Generic song', 'Generic zip', 'Macro sheet', 'Notes', 'Report', 'Song', 'Unknown']];
+        yield 'document' => ['!is:document', ['Archive', 'Clip', 'Generic clip', 'Generic song', 'Generic zip', 'Layers', 'Octet photo', 'Photo', 'Photoshop alias', 'Scanned', 'Song', 'Unknown']];
     }
 
     /**
