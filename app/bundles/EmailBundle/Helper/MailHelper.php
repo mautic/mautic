@@ -223,13 +223,23 @@ class MailHelper
     protected $fatal = false;
 
     /**
-     * Set when setEmail() finds no usable message body (an MJML theme fallback
-     * was skipped and there is no plain text). Tracked separately from $fatal
-     * so a generic fatal recorded for one recipient (e.g. an invalid address in
-     * addTo()) cannot stick to later recipients' sends, while an unusable body
-     * still blocks every send/flush until reset() or clearErrors().
+     * Set when setEmail() finds no usable message body (a skipped MJML theme
+     * fallback with no plain text, or no resolved HTML and no plain text at
+     * all). Tracked separately from $fatal so a generic fatal recorded for one
+     * recipient (e.g. an invalid address in addTo()) cannot stick to later
+     * recipients' sends. This is message-level state: it is recomputed by
+     * setEmail() and cleared by reset(), deliberately NOT by clearErrors() —
+     * per-recipient error cleanup must not resurrect a send that has no body
+     * to deliver.
      */
     protected bool $unusableBody = false;
+
+    /**
+     * The refusal reason recorded when $unusableBody was set. Re-appended to
+     * the error list by every send/flush attempt the state blocks so a refused
+     * send stays observable after an intermediate clearErrors().
+     */
+    protected ?string $unusableBodyError = null;
 
     protected bool $skip = false;
 
@@ -342,7 +352,14 @@ class MailHelper
         }
 
         $this->dispatchPreSendEvent();
-        if (empty($this->fatal) && !$this->unusableBody) {
+        if ($this->unusableBody) {
+            // The body-invalid state survives clearErrors(), so every attempt
+            // it blocks re-records the refusal to keep the failed send (and
+            // this method's return value) observable.
+            if (null !== $this->unusableBodyError && !in_array($this->unusableBodyError, $this->errors, true)) {
+                $this->errors[] = $this->unusableBodyError;
+            }
+        } elseif (empty($this->fatal)) {
             if (!$isQueueFlush) {
                 // Search/replace tokens if this is not a queue flush
 
@@ -554,6 +571,11 @@ class MailHelper
     {
         // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
         $flushed = empty($this->fatal) && !$this->unusableBody;
+        if (!$flushed && $this->unusableBody && null !== $this->unusableBodyError && !in_array($this->unusableBodyError, $this->errors, true)) {
+            // A refused flush still reports why; the body-invalid state
+            // survives clearErrors() between attempts.
+            $this->errors[] = $this->unusableBodyError;
+        }
         if ($this->tokenizationEnabled && count($this->metadata) && $flushed) {
             $errors             = $this->errors;
             $errors['failures'] = [];
@@ -634,6 +656,7 @@ class MailHelper
         $this->internalSend     = false;
         $this->fatal            = false;
         $this->unusableBody     = false;
+        $this->unusableBodyError = null;
         $this->idHashState      = true;
 
         if ($cleanSlate) {
@@ -1261,6 +1284,15 @@ class MailHelper
 
         $this->email = $email;
 
+        // Composing a fresh message recomputes body usability: drop both the
+        // state and the refusal it recorded so a previous unusable compose
+        // cannot leak into this email's sends.
+        if (null !== $this->unusableBodyError) {
+            $this->errors = array_values(array_diff($this->errors, [$this->unusableBodyError]));
+        }
+        $this->unusableBody      = false;
+        $this->unusableBodyError = null;
+
         $subject = $email->getSubject();
 
         // Set message settings from the email
@@ -1306,29 +1338,38 @@ class MailHelper
                 ));
                 $customHtml       = '';
                 $skipHtmlFallback = true;
-
-                // When the theme fallback is skipped and there is no plain text
-                // either, the message has no usable body. Hard-fail setEmail()
-                // and track the unusable body (send() and flushQueue() check it
-                // before handing the message to the transport) so the send is
-                // aborted rather than delivering an empty email.
-                if (empty($plainText)) {
-                    $this->unusableBody = true;
-                    $this->errors[] = sprintf(
-                        'Email%s uses MJML theme "%s" with empty customHtml and no plain text; the email has no usable body and cannot be sent.',
-                        null !== $email->getId() ? ' ID '.$email->getId() : '',
-                        $template
-                    );
-                }
             } else {
                 $customHtml = $renderedHtml;
             }
         }
 
-        // A skipped fallback must not grow an image-only HTML part: appending the
-        // tracking pixel to the empty body would leave a single <img> that
+        // The message needs at least one usable body: an empty resolved HTML
+        // part is fine while plain text exists, but neither means there is
+        // nothing to send. Besides the skipped MJML fallback above this also
+        // covers records saved before the publish constraint and callers that
+        // bypass validation entirely. The state is recomputed here on compose
+        // and survives clearErrors() until reset() or a new setEmail().
+        $hasHtml = '' !== trim($customHtml ?? '');
+        $hasText = '' !== trim($email->getPlainText() ?? '');
+        if (!$hasHtml && !$hasText) {
+            $this->unusableBody      = true;
+            $this->unusableBodyError = $skipHtmlFallback
+                ? sprintf(
+                    'Email%s uses MJML theme "%s" with empty customHtml and no plain text; the email has no usable body and cannot be sent.',
+                    null !== $email->getId() ? ' ID '.$email->getId() : '',
+                    $template
+                )
+                : sprintf(
+                    'Email%s has neither HTML nor plain text content; the email has no usable body and cannot be sent.',
+                    null !== $email->getId() ? ' ID '.$email->getId() : ''
+                );
+            $this->errors[] = $this->unusableBodyError;
+        }
+
+        // An empty HTML part must not grow an image-only HTML part: appending
+        // the tracking pixel to an absent body would leave a single <img> that
         // HTML-preferring clients render instead of the plain text.
-        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel || $skipHtmlFallback);
+        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel || !$hasHtml);
 
         // Reset attachments
         $this->assets = $this->attachedAssets = [];
@@ -1616,9 +1657,12 @@ class MailHelper
      */
     public function clearErrors(): void
     {
-        $this->errors       = [];
-        $this->fatal        = false;
-        $this->unusableBody = false;
+        $this->errors = [];
+        $this->fatal  = false;
+        // $unusableBody deliberately survives error cleanup: it is
+        // message-level state recomputed by setEmail() and cleared by
+        // reset(). Clearing it here would let a follow-up queue() hand a
+        // body-less message to the transport after per-recipient cleanup.
     }
 
     /**

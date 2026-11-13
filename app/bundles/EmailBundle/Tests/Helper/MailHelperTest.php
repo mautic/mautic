@@ -1707,6 +1707,156 @@ MJML;
         $this->assertStringNotContainsString('<mjml>', $mailer->getBody());
     }
 
+    public function testUnusableBodySurvivesClearErrorsBetweenQueueAttempts(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(6))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['minify_email_html', null, false],
+            ['mailer_append_tracking_pixel', null, false],
+        ]);
+
+        $mjml = <<<'MJML'
+<mjml>
+    <mj-body>
+        <mj-section>
+            <mj-column>
+                <mj-text>Hello World!</mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>
+MJML;
+
+        $this->themeHelper->method('checkForTwigTemplate')
+            ->willReturn('@themes/blank/html/email.html.twig');
+        $this->themeHelper->method('renderThemeTemplate')
+            ->willReturn($mjml);
+
+        $transport = new SmtpTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+
+        $email = new Email();
+        $email->setSubject('MJML repeated send test');
+        $email->setTemplate('blank');
+        $email->setCustomHtml('');
+        // No plain text — the email has no usable body after the MJML skip.
+
+        $this->assertFalse($mailer->setEmail($email));
+
+        $this->assertTrue($mailer->addTo('first@example.com'));
+        // queue() refuses; its QUEUE_RESET_TO cleanup calls clearErrors().
+        $this->assertFalse($mailer->queue(true));
+        $this->assertFalse(isset($transport->sentMessage), 'The empty message must never reach the transport.');
+
+        // The body-invalid state must survive that error cleanup: a second
+        // queue() must refuse again instead of handing the message over.
+        $this->assertTrue($mailer->addTo('second@example.com'));
+        [$success, $errors] = $mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
+        $this->assertFalse($success, 'A send refused for an unusable body must still refuse after error cleanup.');
+        $this->assertFalse(isset($transport->sentMessage), 'The empty message must never reach the transport.');
+        $this->assertNotEmpty($errors, 'The repeated refusal must remain observable in the error list.');
+    }
+
+    public function testSetEmailFailsWhenEmailHasNoBodyAtAll(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['minify_email_html', null, false],
+            ['mailer_append_tracking_pixel', null, false],
+        ]);
+
+        $transport = new SmtpTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+
+        // No theme, no customHtml, no plain text — the shape of a record saved
+        // before the publish constraint or by a caller that bypasses it. The
+        // same presence semantics as the MJML skip must abort the send.
+        $email = new Email();
+        $email->setSubject('No body at all');
+        $email->setCustomHtml('');
+
+        $this->assertFalse($mailer->setEmail($email));
+        $this->assertNotEmpty($mailer->getErrors());
+
+        $this->assertTrue($mailer->addTo('first@example.com'));
+        $this->assertFalse($mailer->queue(true));
+        $this->assertFalse(isset($transport->sentMessage), 'The empty message must never reach the transport.');
+    }
+
+    public function testUsableEmailRecomposesAfterUnusableCompose(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(6))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['minify_email_html', null, false],
+            ['mailer_append_tracking_pixel', null, false],
+        ]);
+
+        $mjml = <<<'MJML'
+<mjml>
+    <mj-body>
+        <mj-section>
+            <mj-column>
+                <mj-text>Hello World!</mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>
+MJML;
+
+        $this->themeHelper->method('checkForTwigTemplate')
+            ->willReturn('@themes/blank/html/email.html.twig');
+        $this->themeHelper->method('renderThemeTemplate')
+            ->willReturn($mjml);
+
+        $transport = new SmtpTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+
+        $badEmail = new Email();
+        $badEmail->setSubject('Unusable');
+        $badEmail->setTemplate('blank');
+        $badEmail->setCustomHtml('');
+        $this->assertFalse($mailer->setEmail($badEmail));
+
+        // setEmail() composes the message, so it must recompute the body
+        // state: a usable email on the same mailer sends normally.
+        $goodEmail = new Email();
+        $goodEmail->setSubject('Usable');
+        $goodEmail->setCustomHtml('<p>Body</p>');
+        $this->assertTrue($mailer->setEmail($goodEmail));
+
+        $this->assertTrue($mailer->addTo('someone@example.com'));
+        $this->assertTrue($mailer->queue(true));
+        $this->assertTrue(isset($transport->sentMessage), 'A recomposed usable email must reach the transport.');
+    }
+
+    public function testPlainTextOnlyEmailWithoutThemeDoesNotGrowImageOnlyHtmlPart(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['minify_email_html', null, false],
+            // Tracking pixels enabled: appending one to the empty HTML part
+            // would leave an image-only HTML part that HTML-preferring clients
+            // render instead of the plain text.
+            ['mailer_append_tracking_pixel', null, true],
+        ]);
+
+        $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
+
+        // Plain-text-only email without a theme — no fallback involved, the
+        // presence check alone must keep the HTML part empty.
+        $email = new Email();
+        $email->setSubject('Plain text only');
+        $email->setCustomHtml('');
+        $email->setPlainText('Plain text body.');
+
+        $this->assertTrue($mailer->setEmail($email));
+        $this->assertSame('', $mailer->getBody());
+    }
+
     public function testSetEmailStillUsesHtmlThemeFallbackWhenCustomHtmlEmpty(): void
     {
         $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
