@@ -27,14 +27,18 @@
                     'delete': permissions['delete']
                 }
             },
-            'quickFilters': [
-                {
-                    'search': 'mautic.user.user.searchcommand.isadmin',
-                    'label': 'mautic.user.role.form.isadmin',
-                    'tooltip': 'mautic.core.search.quickfilter.is_admin',
-                    'icon': 'ri-admin-line'
+            'quickFilters': {
+                'mautic.core.quick_filters.others': {
+                    'filters': [
+                        {
+                            'search': 'mautic.user.user.searchcommand.isadmin',
+                            'label': 'mautic.user.role.form.isadmin',
+                            'tooltip': 'mautic.core.search.quickfilter.is_admin',
+                            'icon': 'ri-admin-line'
+                        }
+                    ]
                 }
-            ]
+            }
         }) -}}
             <div class="page-list">
                 {{ block('listResults') }}
