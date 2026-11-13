@@ -11,13 +11,18 @@ use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadListRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
+
+    private const DYNAMIC_COMMAND = 'is:dynamic';
+    private const STATIC_COMMAND  = 'is:static';
 
     private LeadListRepository $repository;
 
@@ -39,6 +44,48 @@ final class LeadListRepositoryTest extends TestCase
         $this->queryBuilderMock = $this->createMock(QueryBuilder::class);
         $this->expressionMock   = $this->createMock(Expr::class);
         $this->repository       = $this->configureRepository(LeadList::class);
+    }
+
+    #[DataProvider('dbalSearchCommandNegationProvider')]
+    public function testDynamicAndStaticSearchCommandsUseDbalCompatibleNegation(string $command, bool $not, bool $expectNegation): void
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(static fn (string $id): string => match ($id) {
+            'mautic.lead.list.searchcommand.dynamic' => self::DYNAMIC_COMMAND,
+            'mautic.lead.list.searchcommand.static'  => self::STATIC_COMMAND,
+            default                                  => $id,
+        });
+        $this->repository->autowireCommonRepository($translator);
+
+        $queryBuilder = new QueryBuilder($this->connection);
+        $filter       = (object) ['command' => $command, 'string' => '', 'not' => $not, 'strict' => false];
+        $method       = new \ReflectionMethod(LeadListRepository::class, 'addSearchCommandWhereClause');
+
+        [$expression, $parameters] = $method->invoke($this->repository, $queryBuilder, $filter);
+
+        $expression = (string) $expression;
+        if ($expectNegation) {
+            $this->assertStringContainsString('NOT(', $expression);
+        } else {
+            $this->assertStringNotContainsString('NOT(', $expression);
+        }
+        $this->assertStringContainsString('l.filters IS NULL', $expression);
+        $this->assertCount(2, $parameters);
+        $this->assertSame([serialize([]), serialize(null)], array_values($parameters));
+        foreach (array_keys($parameters) as $parameter) {
+            $this->assertStringContainsString(':'.$parameter, $expression);
+        }
+    }
+
+    /**
+     * @return iterable<string, array{string, bool, bool}>
+     */
+    public static function dbalSearchCommandNegationProvider(): iterable
+    {
+        yield 'dynamic segment'                => [self::DYNAMIC_COMMAND, false, true];
+        yield 'negated dynamic segment'        => [self::DYNAMIC_COMMAND, true, false];
+        yield 'static segment'                 => [self::STATIC_COMMAND, false, false];
+        yield 'negated static segment'         => [self::STATIC_COMMAND, true, true];
     }
 
     public function testIsContactInAnySegmentFalse(): void

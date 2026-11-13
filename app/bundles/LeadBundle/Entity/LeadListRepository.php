@@ -469,12 +469,25 @@ class LeadListRepository extends CommonRepository
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
+        $forceParameters = [];
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('l.isGlobal', ":{$unique}");
                 $forceParameters = [$unique => true];
+                break;
+            case $this->translator->trans('mautic.lead.list.searchcommand.dynamic'):
+            case $this->translator->trans('mautic.lead.list.searchcommand.dynamic', [], null, 'en_US'):
+                [$staticExpr, $forceParameters] = $this->getStaticSegmentExpression($q);
+                $expr                           = ($filter->not) ? $staticExpr : $this->negateExpression($q, $staticExpr);
+                break;
+            case $this->translator->trans('mautic.lead.list.searchcommand.static'):
+            case $this->translator->trans('mautic.lead.list.searchcommand.static', [], null, 'en_US'):
+                [$expr, $forceParameters] = $this->getStaticSegmentExpression($q);
+                if ($filter->not) {
+                    $expr = $this->negateExpression($q, $expr);
+                }
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
@@ -512,6 +525,49 @@ class LeadListRepository extends CommonRepository
         ];
     }
 
+    private function negateExpression(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, mixed $expr): object|string
+    {
+        if ($q instanceof \Doctrine\ORM\QueryBuilder) {
+            return $q->expr()->not($expr);
+        }
+
+        return sprintf('NOT(%s)', (string) $expr);
+    }
+
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
+     *
+     * @return array{mixed, array<string, string>}
+     */
+    private function getStaticSegmentExpression($q): array
+    {
+        $column         = sprintf('%s.filters', $this->getTableAlias());
+        $emptyParameter = $this->generateRandomParameterName();
+        $nullParameter  = $this->generateRandomParameterName();
+
+        if ($q instanceof \Doctrine\ORM\QueryBuilder) {
+            $expr = $q->expr()->orX(
+                $q->expr()->isNull($column),
+                $q->expr()->eq($column, ":$emptyParameter"),
+                $q->expr()->eq($column, ":$nullParameter")
+            );
+        } else {
+            $expr = $q->expr()->or(
+                $q->expr()->isNull($column),
+                $q->expr()->eq($column, ":$emptyParameter"),
+                $q->expr()->eq($column, ":$nullParameter")
+            );
+        }
+
+        return [
+            $expr,
+            [
+                $emptyParameter => serialize([]),
+                $nullParameter  => serialize(null),
+            ],
+        ];
+    }
+
     /**
      * @return string[]
      */
@@ -519,6 +575,8 @@ class LeadListRepository extends CommonRepository
     {
         $commands = [
             'mautic.lead.list.searchcommand.isglobal',
+            'mautic.lead.list.searchcommand.dynamic',
+            'mautic.lead.list.searchcommand.static',
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.name',
