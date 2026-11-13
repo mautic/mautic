@@ -30,6 +30,12 @@
     position: relative;
     overflow-x: auto;
     padding: var(--spacing-03) 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-secondary) transparent;
+
+    &:hover {
+      scrollbar-color: var(--text-primary) transparent;
+    }
   }
 
   &:has(&__toggle[aria-expanded='false']) &__body:after {
