@@ -39,6 +39,10 @@ final class AssetRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->createAsset('Photoshop alias', 'application/photoshop', 'psd');
         $this->createAsset('Generic clip', 'application/octet-stream', 'mp4');
         $this->createAsset('Generic song', null, 'mp3');
+        $this->createAsset('Generic icon', 'application/octet-stream', 'ico');
+        $this->createAsset('Generic widescreen', 'application/octet-stream', 'wmv');
+        $this->createAsset('Generic movie', null, 'mkv');
+        $this->createAsset('Mislabeled clip', 'application/zip', 'mp4');
         $this->em->flush();
     }
 
@@ -47,8 +51,8 @@ final class AssetRepositoryFunctionalTest extends MauticMysqlTestCase
      */
     public static function mimeCommandProvider(): iterable
     {
-        yield 'image' => ['is:image', ['Layers', 'Octet photo', 'Photo', 'Photoshop alias', 'Scanned']];
-        yield 'video' => ['is:video', ['Clip', 'Generic clip']];
+        yield 'image' => ['is:image', ['Generic icon', 'Layers', 'Octet photo', 'Photo', 'Photoshop alias', 'Scanned']];
+        yield 'video' => ['is:video', ['Clip', 'Generic clip', 'Generic movie', 'Generic widescreen']];
         yield 'audio' => ['is:audio', ['Generic song', 'Song']];
         yield 'document' => ['is:document', ['Blank doc', 'Charset notes', 'Generic doc', 'Macro sheet', 'Notes', 'Report']];
     }
@@ -67,15 +71,17 @@ final class AssetRepositoryFunctionalTest extends MauticMysqlTestCase
      */
     public static function negatedMimeCommandProvider(): iterable
     {
-        yield 'image' => ['!is:image', ['Archive', 'Blank doc', 'Charset notes', 'Clip', 'Generic clip', 'Generic doc', 'Generic song', 'Generic zip', 'Macro sheet', 'Notes', 'Report', 'Song', 'Unknown']];
-        yield 'document' => ['!is:document', ['Archive', 'Clip', 'Generic clip', 'Generic song', 'Generic zip', 'Layers', 'Octet photo', 'Photo', 'Photoshop alias', 'Scanned', 'Song', 'Unknown']];
+        yield 'image' => ['!is:image', ['Archive', 'Blank doc', 'Charset notes', 'Clip', 'Generic clip', 'Generic doc', 'Generic movie', 'Generic song', 'Generic widescreen', 'Generic zip', 'Macro sheet', 'Mislabeled clip', 'Notes', 'Report', 'Song', 'Unknown']];
+        yield 'video' => ['!is:video', ['Archive', 'Blank doc', 'Charset notes', 'Generic doc', 'Generic icon', 'Generic song', 'Generic zip', 'Layers', 'Macro sheet', 'Mislabeled clip', 'Notes', 'Octet photo', 'Photo', 'Photoshop alias', 'Report', 'Scanned', 'Song', 'Unknown']];
+        yield 'audio' => ['!is:audio', ['Archive', 'Blank doc', 'Charset notes', 'Clip', 'Generic clip', 'Generic doc', 'Generic icon', 'Generic movie', 'Generic widescreen', 'Generic zip', 'Layers', 'Macro sheet', 'Mislabeled clip', 'Notes', 'Octet photo', 'Photo', 'Photoshop alias', 'Report', 'Scanned', 'Unknown']];
+        yield 'document' => ['!is:document', ['Archive', 'Clip', 'Generic clip', 'Generic icon', 'Generic movie', 'Generic song', 'Generic widescreen', 'Generic zip', 'Layers', 'Mislabeled clip', 'Octet photo', 'Photo', 'Photoshop alias', 'Scanned', 'Song', 'Unknown']];
     }
 
     /**
      * @param string[] $expectedTitles
      */
     #[DataProvider('negatedMimeCommandProvider')]
-    public function testNegatedMimeCommandKeepsAssetsWithoutMime(string $searchString, array $expectedTitles): void
+    public function testNegatedMimeCommandReturnsAllNonMatchingAssets(string $searchString, array $expectedTitles): void
     {
         $this->assertSame($expectedTitles, $this->getTitles($searchString));
     }
