@@ -33,7 +33,7 @@ class HttpFactory implements AuthProviderInterface
 {
     public const string NAME = 'oauth2_three_legged';
 
-    private ?AuthCredentialsInterface $credentials = null;
+    private ?CredentialsInterface $credentials = null;
 
     private ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface|null $config = null;
 
@@ -52,6 +52,7 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
+     * @param CredentialsInterface                                                                                  $credentials
      * @param ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface $config
      *
      * @throws PluginNotConfiguredException
