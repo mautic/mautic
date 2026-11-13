@@ -2591,11 +2591,25 @@ Mautic.toggleFilter = function (element) {
 };
 
 /**
+ * Hands a quick-filter command held by the scope dropdown over to the popover selection.
+ */
+Mautic.releaseQuickFilterScope = function (searchInput) {
+    const scopeSelect = mQuery("select[data-livesearch-scope-for='" + searchInput.id + "']");
+    if (!scopeSelect.length || !Mautic.filterCommands.includes(scopeSelect.val())) {
+        return;
+    }
+
+    scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
+    Mautic.refreshSearchScopeChosen(scopeSelect);
+};
+
+/**
  * Applies the selected filters when the "Apply filters" button is clicked.
  */
 Mautic.applyFilters = function () {
     Mautic.initFilterCommands();
     const searchInput = document.getElementById('list-search');
+    Mautic.releaseQuickFilterScope(searchInput);
     let currentSearchValue = searchInput.value || '';
     currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
 
@@ -2636,6 +2650,7 @@ Mautic.applyFilters = function () {
 Mautic.resetFilters = function () {
     Mautic.initFilterCommands();
     const searchInput = document.getElementById('list-search');
+    Mautic.releaseQuickFilterScope(searchInput);
     let currentSearchValue = searchInput.value || '';
     currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
     searchInput.value = currentSearchValue.trim();
