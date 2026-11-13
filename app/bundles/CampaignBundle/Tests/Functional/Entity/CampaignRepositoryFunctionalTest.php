@@ -44,9 +44,11 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testExpiredAndPendingSearchCommandsFilterCampaigns(): void
     {
-        $expired = $this->createCampaignWithDates('Expired campaign', null, new \DateTime('-1 day'));
-        $pending = $this->createCampaignWithDates('Pending campaign', new \DateTime('+1 day'), null);
-        $active  = $this->createCampaignWithDates('Active campaign', null, null);
+        $expired        = $this->createCampaignWithDates('Expired campaign', null, new \DateTime('-1 day'));
+        $pending        = $this->createCampaignWithDates('Pending campaign', new \DateTime('+1 day'), null);
+        $activeEndsSoon = $this->createCampaignWithDates('Active campaign ending soon', null, new \DateTime('+1 day'));
+        $activeStarted  = $this->createCampaignWithDates('Active campaign started', new \DateTime('-1 day'), null);
+        $active         = $this->createCampaignWithDates('Active campaign', null, null);
         $this->em->flush();
 
         /** @var CampaignRepository $campaignRepo */
@@ -58,6 +60,8 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->assertContains($expired, $expiredResults);
         $this->assertNotContains($pending, $expiredResults);
+        $this->assertNotContains($activeEndsSoon, $expiredResults);
+        $this->assertNotContains($activeStarted, $expiredResults);
         $this->assertNotContains($active, $expiredResults);
 
         $pendingResults = $campaignRepo->getEntities([
@@ -66,10 +70,12 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->assertContains($pending, $pendingResults);
         $this->assertNotContains($expired, $pendingResults);
+        $this->assertNotContains($activeStarted, $pendingResults);
+        $this->assertNotContains($activeEndsSoon, $pendingResults);
         $this->assertNotContains($active, $pendingResults);
     }
 
-    private function createCampaignWithDates(string $name, ?\DateTimeInterface $publishUp, ?\DateTimeInterface $publishDown): Campaign
+    private function createCampaignWithDates(string $name, ?\DateTime $publishUp, ?\DateTime $publishDown): Campaign
     {
         $campaign = new Campaign();
         $campaign->setName($name);
