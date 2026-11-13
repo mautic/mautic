@@ -35,7 +35,9 @@ Hold the primary pointer, Space or Enter. Short clicks and right clicks do not c
 
 ## Adoption rules
 
-This branch supplies the adapted component and an [adoption audit](hold-to-confirm-danger-audit.md); it does not change existing delete handlers. Keep a clearly explained confirmation surface, affected item/count and a normal Cancel action. For users unable to sustain a press, retain an accessible confirmation alternative in the consuming flow; do not make this gesture the sole way to manage data.
+The account page (`/s/account`) uses the danger variant for **Restart all dismissed tips**, with the refresh icon and small size. Its UserBundle handler runs the existing `Mautic.resetDismissedElements()` only after the confirmation event, preserving the local-storage reset, restored tips and flash feedback. Short clicks and cancelled holds do not reset tips; the control returns to idle for reuse.
+
+This branch also supplies an [adoption audit](hold-to-confirm-danger-audit.md); it does not change existing delete handlers. Keep a clearly explained confirmation surface, affected item/count and a normal Cancel action. For users unable to sustain a press, retain an accessible confirmation alternative in the consuming flow; do not make this gesture the sole way to manage data.
 
 Integrations must preserve authorization, CSRF, POST semantics, batch selection prechecks, lock/dependency checks, loading/error feedback and focus return. Pass the existing action through its established helper after confirmation; do not turn a destructive endpoint into a GET link. Use `resetDelay: 0` and disable while a request is pending. Only a successful server response may claim deletion. Do not stack a second confirmation dialog after the hold.
 
@@ -53,4 +55,4 @@ The entire branch `app.scss` also compiles with Sass 1.93.2 and the base branch'
 
 The suite covers input cooperation, cancellation, reset, explicit zero/false, escaped labels, disabled/removal lifecycle, sizes, alias/dynamic variant changes, accessible names, reduced motion, beam activation and execution after PHP minification. A regression test includes Mautic's inherited button-span rules and checks the confirmed check stays centered.
 
-Visual verification uses a temporary in-page preview on the authenticated local Contacts route, with the real Mautic styles and the worktree's Twig-rendered markup/SCSS/JS. It verifies idle, hold, cancel and confirmed feedback without issuing a deletion. This is not an installed integration or an end-to-end deletion test, and no new pixel-identical-to-React claim is made after adapting to Mautic's design tokens.
+Visual verification uses the authenticated local Account route (`/s/account`) with the installed Twig integration, real Mautic styles and generated assets. Short clicks and cancelled holds leave a dismissed test tip hidden; a full hold clears `dismissedElements`, restores the tip, shows the existing flash and confirms exactly once. The control then resets for reuse. Component tests separately cover keyboard, reduced motion and removal behavior; no deletion endpoint is involved.

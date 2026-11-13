@@ -87,18 +87,14 @@
                             {% endif %}
                             <h3 id="learning" class="pt-24 mb-5">{{ 'mautic.user.config.title.experience_and_learning'|trans }}</h3>
                             <div class="text-secondary small pb-24">{{ 'mautic.user.config.title.experience_and_learning.description'|trans }}</div>
-                            {% include '@MauticCore/Helper/button.html.twig' with {
-                                buttons: [
-                                    {
-                                        label: 'mautic.user.config.title.experience_and_learning.reset_dismissed',
-                                        variant: 'tertiary',
-                                        size: 'sm',
-                                        icon: 'ri-refresh-line',
-                                        danger: true,
-                                        onclick: 'Mautic.resetDismissedElements()',
-                                    }
-                                ]
-                            } %}
+                            {% include '@MauticCore/Components/hold-to-confirm.html.twig' with {
+                                id: 'reset-dismissed-tips',
+                                label: 'mautic.user.config.title.experience_and_learning.reset_dismissed',
+                                confirmedLabel: 'mautic.user.config.title.experience_and_learning.tips_restarted',
+                                variant: 'danger',
+                                size: 'sm',
+                                icon: 'ri-refresh-line',
+                            } only %}
                         </div>
                     </div>
                     {{ form_row(userForm.preferences) }}
