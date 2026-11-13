@@ -1062,8 +1062,13 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         if (count(array_unique($operatorTypes)) > 1) {
-            $parameters = [];
-            $expressions = $this->buildMixedOperatorExpression($parseFilters, $qb, $parameters, $containsOr || in_array('or', $operatorTypes, true));
+            $parameters  = [];
+            $expressions = $this->buildMixedOperatorExpression(
+                $parseFilters,
+                $qb,
+                $parameters,
+                $containsOr || in_array('or', $operatorTypes, true)
+            );
 
             return [$expressions, $parameters];
         }
@@ -1100,7 +1105,7 @@ class CommonRepository extends ServiceEntityRepository
     private function buildMixedOperatorExpression(iterable $parseFilters, $qb, array &$parameters, bool $containsOr): mixed
     {
         $andGroups = [];
-        $andGroup  = $qb->expr()->andX();
+        $andGroup  = [];
 
         foreach ($parseFilters as $filter) {
             if ($containsOr) {
@@ -1116,28 +1121,35 @@ class CommonRepository extends ServiceEntityRepository
                 continue;
             }
 
-            if ('or' === ($filter->type ?? null) && $andGroup->count()) {
-                $andGroups[] = $andGroup;
-                $andGroup    = $qb->expr()->andX();
+            if ('or' === ($filter->type ?? null) && [] !== $andGroup) {
+                $andGroups[] = $this->combineSearchExpressions($qb, 'and', $andGroup);
+                $andGroup    = [];
             }
 
-            $this->appendExpression($andGroup, $expr);
+            $andGroup[] = $expr;
         }
 
-        if ($andGroup->count()) {
-            $andGroups[] = $andGroup;
+        if ([] !== $andGroup) {
+            $andGroups[] = $this->combineSearchExpressions($qb, 'and', $andGroup);
         }
 
         if (1 === count($andGroups)) {
             return $andGroups[0];
         }
 
-        $orExpression = $qb->expr()->orX();
-        foreach ($andGroups as $group) {
-            $orExpression->add($group);
+        return $this->combineSearchExpressions($qb, 'or', $andGroups);
+    }
+
+    /**
+     * @param array<mixed> $expressions
+     */
+    private function combineSearchExpressions($qb, string $operator, array $expressions): mixed
+    {
+        if ($qb instanceof DbalQueryBuilder) {
+            return 'and' === $operator ? $qb->expr()->and(...$expressions) : $qb->expr()->or(...$expressions);
         }
 
-        return $orExpression;
+        return 'and' === $operator ? $qb->expr()->andX(...$expressions) : $qb->expr()->orX(...$expressions);
     }
 
     /**
