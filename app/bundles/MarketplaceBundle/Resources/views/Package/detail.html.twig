@@ -188,18 +188,18 @@
     </div>
     <hr>
 
-    {% include '@MauticCore/Helper/nav_tabs.html.twig' with {
+    {% include '@MauticCore/Components/tabs.html.twig' with {
         'tabs': [
             {
-                'title': 'mautic.core.overview',
+                'label': 'mautic.core.overview',
                 'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_overview.html.twig')
             },
             {
-                'title': 'mautic.core.details',
+                'label': 'mautic.core.details',
                 'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_details.html.twig')
             }
         ],
-        'style': 'line'
+        'variant': 'line'
     } %}
 
     <div class="panel">
@@ -267,18 +267,18 @@
     </div>
     <hr>
 
-    {% include '@MauticCore/Helper/nav_tabs.html.twig' with {
+    {% include '@MauticCore/Components/tabs.html.twig' with {
         'tabs': [
             {
-                'title': 'marketplace.package.github.info',
+                'label': 'marketplace.package.github.info',
                 'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_github.html.twig')
             },
             {
-                'title': 'marketplace.package.packagist.info',
+                'label': 'marketplace.package.packagist.info',
                 'content': include('@bundles/MarketplaceBundle/Resources/views/Package/Details/details--tab_packagist.html.twig')
             }
         ],
-        'style': 'contained'
+        'variant': 'contained'
     } %}
 
 </div>

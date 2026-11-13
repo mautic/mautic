@@ -93,23 +93,13 @@
 
               {{ customContent('details.stats.graph.below', _context) }}
 
-              <!-- tabs controls -->
-              <ul class="nav nav-tabs nav-tabs-contained">
-                  <li class="active">
-                      <a href="#leads-container" role="tab" data-bs-toggle="tab" class="active nav-link">
-                          {{ 'mautic.lead.leads'|trans }}
-                      </a>
-                  </li>
-              </ul>
-              <!--/ tabs controls -->
-          </div>
+              {% set tabsviewsdetails = [] %}
+              {% set tabsviewsdetailsContent0 %}
+                                {{ monitorLeads|raw }}
 
-          <!-- start: tab-content -->
-          <div class="tab-content pa-16">
-              <!-- #events-container -->
-              <div class="tab-pane active fade in bdr-w-0 page-list" id="leads-container">
-                  {{ monitorLeads|raw }}
-              </div>
+              {% endset %}
+              {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'leads-container', 'label': 'mautic.lead.leads', 'content': tabsviewsdetailsContent0, 'className': 'pa-16 page-list'}]) %}
+              {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}
           </div>
 
       </div>

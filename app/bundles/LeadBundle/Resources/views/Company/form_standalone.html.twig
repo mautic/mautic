@@ -23,32 +23,31 @@
 
 {% block content %}
 {{ form_start(form) }}
-    <div class="box-layout">
-        <div class="col-md-3 height-auto">
-            <div class="pe-24 ps-24 pt-16 pb-16">
-                <ul class="list-group list-group-tabs">
-                    {% for g in groups %}
-                        {% if fields[g] is not empty %}
-                            <li class="list-group-item {% if loop.first %}active{% endif %}">
-                                <a href="#company-{{ g }}" class="{% if loop.first %}active {% endif %}nav-link list-group-item-heading steps" data-bs-toggle="tab">
-                                    {{ ('mautic.lead.field.group.'~g)|trans }}
-                                </a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <hr/>
-                {{ customContent('company.form.sidebar', _context) }}
-            </div>
-        </div>
-        <div class="col-md-9 height-auto bdr-l">
-            <div class="tab-content">
-                {{ include('@MauticLead/Company/form_fields.html.twig', {
+    {% set companyTabs = [] %}
+    {% for g in groups %}
+        {% if fields[g] is not empty %}
+            {% set groupContent %}
+                {{ include('@MauticLead/Company/_form_group_fields.html.twig', {
                     'form': form,
-                    'groups': groups,
-                    'fields': fields,
+                    'group': g,
+                    'groupFields': fields[g],
+                    'halfSize': 4,
+                    'fullSize': 8,
+                    'embedded': false,
                 }) }}
-            </div>
+            {% endset %}
+            {% set companyTabs = companyTabs|merge([{
+                'id': 'company-' ~ g,
+                'label': 'mautic.lead.field.group.' ~ g,
+                'content': groupContent,
+                'className': 'rounded-0 bdr-w-0'
+            }]) %}
+        {% endif %}
+    {% endfor %}
+    <div class="box-layout">
+        <div class="col-xs-12 height-auto">
+            {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': companyTabs, 'variant': 'vertical'}) }}
+            {{ customContent('company.form.sidebar', _context) }}
         </div>
     </div>
 {{ form_end(form) }}

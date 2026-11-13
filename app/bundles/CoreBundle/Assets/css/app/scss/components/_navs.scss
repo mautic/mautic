@@ -223,3 +223,286 @@
 .right-btn {inset-inline-end: 0;}
 .nav-tabs-wrapper.show-scroll-buttons .scroll-btn:disabled {display: none;}
 .nav-tabs-wrapper.show-scroll-buttons .scroll-btn {display: flex;}
+
+// Tabs component
+// --------------------------------------------------
+.tabs-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-inline-size: 0;
+
+  .nav-tabs {
+    display: flex;
+    flex-grow: 1;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    white-space: nowrap;
+    scroll-behavior: smooth;
+    border-bottom: 0;
+
+    .nav-item {
+      flex: 0 0 auto;
+
+      &.disabled {
+        cursor: not-allowed;
+      }
+    }
+
+    .nav-link {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      height: 100%;
+      line-height: 20px;
+      color: var(--text-secondary);
+      border: 0;
+      @include outline;
+
+      &:hover {
+        color: var(--text-primary);
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: transparent;
+      }
+
+      &.active {
+        overflow: hidden;
+        font-weight: 600;
+
+        &::after {
+          background-color: var(--border-interactive);
+        }
+      }
+    }
+
+    .tabs__nav-item-icon {
+      font-size: var(--typography-body-expressive);
+      font-weight: 400;
+    }
+
+    &.nav-tabs--default {
+      .nav-link {
+        background-color: transparent;
+        padding: 10px 16px;
+        margin-right: -2px;
+        border-radius: 0;
+
+        &::after {
+          top: auto;
+          bottom: 0;
+          background-color: var(--layer-accent);
+          transition: var(--transition-all-productive);
+        }
+
+        &:hover {
+          color: var(--text-primary);
+
+          &::after {
+            background-color: var(--layer-accent-hover);
+          }
+        }
+      }
+
+      .nav-link.active::after {
+        background-color: var(--border-interactive);
+      }
+
+      &.nav-tabs--icon-only {
+        .nav-link {
+          width: 40px;
+          aspect-ratio: 1 / 1;
+          padding: 0;
+          align-items: center;
+        }
+
+        .tabs__nav-item--icon-only__20 {
+          width: 48px;
+
+          .tabs__nav-item-icon {
+            font-size: 20px;
+          }
+        }
+      }
+    }
+
+    &.nav-tabs--contained {
+      .nav-link {
+        padding: 14px 16px;
+        background-color: var(--layer-accent);
+        border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
+
+        &:hover {
+          background-color: var(--layer-accent-hover);
+        }
+
+        &.active {
+          background-color: var(--layer);
+        }
+
+        &:disabled,
+        &.disabled {
+          color: var(--text-disabled);
+          background-color: var(--button-disabled);
+          pointer-events: none;
+        }
+      }
+
+      .nav-item .nav-link,
+      .nav-item .nav-link:hover {
+        border-right-color: var(--border-strong);
+      }
+
+      .nav-item:last-child .nav-link,
+      .nav-item .nav-link.active {
+        border-right-color: transparent;
+      }
+    }
+
+    &.nav-tabs--vertical {
+      flex-direction: row;
+      flex-grow: 1;
+      background-color: transparent;
+    }
+  }
+
+  .tabs__nav-item-label-wrapper {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .tabs__nav-item-secondary-label {
+    color: var(--text-secondary);
+    line-height: 1.2;
+  }
+
+  .tab-content {
+    &.tab-content--contained {
+      background-color: var(--layer);
+    }
+
+    &.tab-content--vertical {
+      display: block;
+      flex-grow: 0;
+    }
+  }
+
+  @media (min-width: $screen-lg-min) {
+    &.tabs-container--vertical {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      min-inline-size: 0;
+
+      > .nav-tabs-wrapper {
+        display: flex;
+        flex: 0 0 auto;
+        overflow: visible;
+        margin-bottom: 0;
+
+        > .scroll-btn {
+          display: none;
+        }
+      }
+    }
+
+    .nav-tabs {
+      flex-wrap: nowrap;
+    }
+
+    .nav-tabs.nav-tabs--vertical {
+      flex-direction: column;
+      flex: 0 0 auto;
+      position: relative;
+      background-color: var(--layer);
+      min-inline-size: 235px;
+
+      .nav-item {
+        margin-bottom: 0;
+      }
+
+      &::before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 1px;
+        background-color: var(--border-subtle);
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      .nav-item .nav-link {
+        align-items: flex-start;
+        padding: 0 16px;
+        min-height: 64px;
+        width: 100%;
+        position: relative;
+        background-color: var(--layer);
+        border-right: 0;
+        border-bottom: 1px solid var(--border-subtle);
+        margin-bottom: 0;
+        z-index: 1;
+
+        &:hover {
+          background-color: var(--layer-hover);
+          border-color: var(--border-subtle);
+        }
+
+        &::after {
+          width: 2px;
+          height: 100%;
+          background-color: var(--layer-accent);
+        }
+
+        &:hover::after {
+          background-color: var(--border-strong);
+        }
+
+        &.active {
+          z-index: 3;
+          background-color: var(--layer);
+          border-bottom-color: var(--border-subtle);
+          border-right-color: transparent;
+        }
+
+        &.active::after {
+          background-color: var(--border-interactive);
+        }
+
+        &.active::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: -1px;
+          bottom: 0;
+          width: 1px;
+          background-color: var(--layer);
+          z-index: 1;
+        }
+      }
+    }
+
+    .tab-content.tab-content--vertical {
+      display: block;
+      width: 100%;
+      min-inline-size: 0;
+    }
+  }
+}

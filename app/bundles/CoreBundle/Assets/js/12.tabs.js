@@ -22,7 +22,7 @@ Mautic.toggleTabPublished = function(el) {
  * @param tab
  */
 Mautic.publishTab = function(tab) {
-    mQuery('a[href="#'+Mautic.getTabId(tab)+'"]').find('.fa').removeClass('text-secondary').addClass('text-success');
+    Mautic.getTabStatusIcon(tab).removeClass('text-secondary').addClass('text-success');
 };
 
 /**
@@ -31,7 +31,19 @@ Mautic.publishTab = function(tab) {
  * @param tab
  */
 Mautic.unpublishTab = function(tab) {
-    mQuery('a[href="#'+Mautic.getTabId(tab)+'"]').find('.fa').removeClass('text-success').addClass('text-secondary');
+    Mautic.getTabStatusIcon(tab).removeClass('text-success').addClass('text-secondary');
+};
+
+/**
+ * Get the status icon of a tab, in the shared tabs component or in a legacy nav link
+ *
+ * @param tab
+ * @returns {*}
+ */
+Mautic.getTabStatusIcon = function(tab) {
+    const tabId = Mautic.getTabId(tab);
+
+    return mQuery(`[data-bs-target="#${tabId}"] .tabs__nav-item-icon:not(.ri-alert-line), a[href="#${tabId}"] .fa`);
 };
 
 /**
@@ -355,18 +367,18 @@ Mautic.deleteTab = function(deleteBtn) {
             const activeTab = tabStorage.getItem(storageKeys[index]);
             if (activeTab) {
                 // With the current tab key get an active tab.
-                const $tab = $navTabs.find('a[href="' + activeTab + '"]');
+                const $tab = $navTabs.find('[href="' + activeTab + '"], [data-bs-target="' + activeTab + '"]').first();
                 if ($tab.length) {
                     $tab.tab('show');
                 }
             } else {
                 // Or store the default, so the script will not end up with NULL value.
-                const href = $navTabs.find('.active a[data-bs-toggle="tab"]').attr('href');
-                tabStorage.setItem(storageKeys[index], href);
+                const $activeTrigger = $navTabs.find('.active[data-bs-toggle="tab"], .active [data-bs-toggle="tab"]').first();
+                tabStorage.setItem(storageKeys[index], $activeTrigger.attr('href') || $activeTrigger.attr('data-bs-target'));
             }
 
-            $navTabs.find('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
-                tabStorage.setItem(storageKeys[index], mQuery(e.target).attr('href'));
+            $navTabs.find('[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+                tabStorage.setItem(storageKeys[index], mQuery(e.target).attr('href') || mQuery(e.target).attr('data-bs-target'));
             });
         });
     };

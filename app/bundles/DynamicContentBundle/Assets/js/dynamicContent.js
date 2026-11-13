@@ -1,7 +1,7 @@
 Mautic.toggleDwcFilters = function () {
     mQuery("#dwcFiltersTab, #slotNameDiv").toggleClass("hide");
     if (mQuery("#dwcFiltersTab").hasClass('hide')) {
-        mQuery('.nav-tabs a[href="#details"]').click();
+        mQuery('.nav-tabs [data-bs-target="#details"], .nav-tabs a[href="#details"]').first().click();
     } else {
         Mautic.dynamicContentOnLoad();
     }
