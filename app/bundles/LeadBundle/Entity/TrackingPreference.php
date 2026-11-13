@@ -20,6 +20,8 @@ class TrackingPreference
      */
     public const PURPOSE_ACTIVITY = 'activity';
 
+    public const SOURCE_PREFERENCE_CENTRE = 'preference_centre';
+
     public const SOURCE_CONTACT_MERGE = 'contact_merge';
 
     private ?int $id = null;

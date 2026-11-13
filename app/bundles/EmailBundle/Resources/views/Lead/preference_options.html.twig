@@ -110,6 +110,11 @@
                     </div>
                 {% endif %}
 
+                {% if form.allow_activity_tracking is defined %}
+                    <hr />
+                    {{ include('@MauticCore/Slots/trackingpreference.html.twig') }}
+                {% endif %}
+
                 {% if successMessage is defined %}
                     <hr />
                     <div id="success-message-text">
