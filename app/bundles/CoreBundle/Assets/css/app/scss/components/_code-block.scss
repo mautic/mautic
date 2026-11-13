@@ -113,8 +113,16 @@
     gap: var(--spacing-01);
     justify-content: center;
     border-radius: 0;
-    box-shadow: 0 -1px 0 var(--border-subtle);
+    position: relative;
     font-size: var(--label-01-font-size);
+
+    &:before {
+      content: '';
+      position: absolute;
+      inset: 0 0 auto;
+      height: 1px;
+      background: var(--border-subtle);
+    }
 
     &:focus:not(:focus-visible) {
       outline: 2px var(--outline-style) var(--focus);

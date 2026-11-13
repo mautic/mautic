@@ -6,7 +6,21 @@ const scrollObserver = 'ResizeObserver' in window ? new ResizeObserver((entries)
     else target.removeAttribute('tabindex');
 })) : null;
 
-const observeCodeBlocks = (root) => scrollObserver && root.querySelectorAll('.code-block__body').forEach((body) => scrollObserver.observe(body));
+const observedBodies = new Set();
+
+const observeCodeBlocks = (root) => {
+    if (!scrollObserver) return;
+
+    observedBodies.forEach((body) => {
+        if (body.isConnected) return;
+        scrollObserver.unobserve(body);
+        observedBodies.delete(body);
+    });
+    root.querySelectorAll('.code-block__body').forEach((body) => {
+        observedBodies.add(body);
+        scrollObserver.observe(body);
+    });
+};
 
 observeCodeBlocks(document);
 mQuery(document).on('mautic:onPageLoad:before', (event, container) => observeCodeBlocks(document.querySelector(container) || document));
