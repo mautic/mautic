@@ -588,7 +588,8 @@ Mautic.updatePublishingToggle = function(element) {
         $publishUp = $form.find('input[name$="[publishUp]"]'),
         $publishDown = $form.find('input[name$="[publishDown]"]'),
         hasPublishUp = $publishUp.length && $publishUp.val().trim() !== '',
-        hasPublishDown = $publishDown.length && $publishDown.val().trim() !== '';
+        hasPublishDown = $publishDown.length && $publishDown.val().trim() !== '',
+        enableScheduleWhenInactive = $yesInput.data('enable-schedule-when-inactive') === true;
 
     // Toggle schedule options notice for Segment Emails based on isPublished state
     const $scheduleOptionsNotice = $form.find('#scheduleOptionsNotice');
@@ -612,7 +613,7 @@ Mautic.updatePublishingToggle = function(element) {
             togglePublishFields(true);
         } else {
             $textEl.text(hasPublishUp || hasPublishDown ? noneText : noText);
-            togglePublishFields(false);
+            togglePublishFields(enableScheduleWhenInactive);
         }
     } else {
         $textEl.text(isYes ? yesText : noText);
