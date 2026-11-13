@@ -1,7 +1,7 @@
 <div class="modal fade" id="{{ id }}" {% if preventCloseOnClickOutside is defined and preventCloseOnClickOutside %}data-backdrop="static"{% endif %} tabindex="-1" role="dialog" aria-label="{{ modalAriaLabel|default(modalLabel|default(modalHeading|default('')))|trans }}" aria-modal="true"{% if modalAttributes is defined %}{% for key, value in modalAttributes %} {{ key|e('html_attr') }}="{{ value|e('html_attr') }}"{% endfor %}{% endif %}>
     <div class="modal-dialog modal-{{ size|default('md') }}">
         <div class="modal-content">
-            <div class="modal-header {% if type is defined and type == 'expressive' %}pr-32 pl-32 pt-32 pb-0{% endif %}">
+            <div class="modal-header {% if type is defined and type == 'expressive' %}pe-32 ps-32 pt-32 pb-0{% endif %}">
                 <button type="button" aria-label="{{ closeButtonLabel|default('mautic.core.close'|trans) }}" class="modal-close-button btn-close" data-bs-dismiss="modal" data-bs-toggle="tooltip" data-bs-placement="left" title="{{ closeButtonLabel|default('mautic.core.close'|trans) }}"></button>
 
                 {% if modalLabel is defined %}
@@ -12,7 +12,7 @@
                     <h2 class="modal-header__heading type-heading-03">{{ modalHeading|trans }}</h2>
                 {% endif %}
             </div>
-            <div class="modal-body{% if isFullWidth is defined and isFullWidth and (type is not defined or type != 'expressive') %} p-0{% endif %}{% if type is defined and type == 'expressive' %} pr-32 pl-32{% endif %}{% if hasScrollingContent is defined and hasScrollingContent %} modal-scroll-content{% endif %}"{% if modalLabel is defined %} aria-label="{{ modalLabel|trans }}"{% else %} aria-label="{{ modalAriaLabel|default(modalHeading|default(''))|trans }}"{% endif %}>
+            <div class="modal-body{% if isFullWidth is defined and isFullWidth and (type is not defined or type != 'expressive') %} p-0{% endif %}{% if type is defined and type == 'expressive' %} pe-32 ps-32{% endif %}{% if hasScrollingContent is defined and hasScrollingContent %} modal-scroll-content{% endif %}"{% if modalLabel is defined %} aria-label="{{ modalLabel|trans }}"{% else %} aria-label="{{ modalAriaLabel|default(modalHeading|default(''))|trans }}"{% endif %}>
                 <div class="modal-body-content">
                     {{ modalContent|raw }}
                 </div>

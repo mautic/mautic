@@ -45,6 +45,20 @@ final class EntityExportEvent extends Event
     }
 
     /**
+     * Adds data to an entity already in the collection, like a plugin adding what it stores for the entity.
+     *
+     * @param array<string, mixed> $data
+     */
+    public function addEntityData(string $entityName, int $entityId, array $data): void
+    {
+        foreach ($this->entities[$entityName] ?? [] as $key => $entity) {
+            if ((int) ($entity['id'] ?? 0) === $entityId) {
+                $this->entities[$entityName][$key] = array_merge($entity, $data);
+            }
+        }
+    }
+
+    /**
      * @return array<string, array<string, mixed>>
      */
     public function getEntities(): array
@@ -53,13 +67,26 @@ final class EntityExportEvent extends Event
     }
 
     /**
-     * Add multiple entities to the collection.
+     * Add multiple entities to the collection. Entities already in it, by ID, are kept as they are.
      *
-     * @param array<string, array<string, mixed>> $entities
+     * @param array<string, array<mixed>> $entities
      */
     public function addEntities(array $entities): void
     {
-        $this->entities = array_merge($this->entities, $entities);
+        foreach ($entities as $entityName => $entityList) {
+            $existingIds = array_column($this->entities[$entityName] ?? [], 'id');
+
+            foreach ($entityList as $entity) {
+                if (isset($entity['id']) && in_array($entity['id'], $existingIds, true)) {
+                    continue;
+                }
+
+                $this->entities[$entityName][] = $entity;
+                if (isset($entity['id'])) {
+                    $existingIds[] = $entity['id'];
+                }
+            }
+        }
     }
 
     /**

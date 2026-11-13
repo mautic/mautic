@@ -291,6 +291,49 @@ final class ImportHelperTest extends TestCase
     }
 
     /**
+     * A large campaign export above the ratio-check threshold compresses around 1:15 and must still be read.
+     */
+    public function testReadFromZipAllowsLargeExport(): void
+    {
+        $events = [];
+        for ($i = 1; $i <= 12000; ++$i) {
+            $events[] = ['id' => $i, 'name' => 'Send email '.$i, 'type' => 'email.send', 'properties' => ['email' => $i % 50], 'order' => $i % 7];
+        }
+        $jsonData   = ['events' => $events];
+        $jsonOutput = json_encode($jsonData, JSON_THROW_ON_ERROR);
+        $this->assertGreaterThan(1024 * 1024, strlen($jsonOutput));
+
+        $zipFilePath   = $this->exportHelper->writeToZipFile($jsonOutput, [], '');
+        $this->paths[] = $zipFilePath;
+
+        $this->assertSame($jsonData, $this->importHelper->readZipFile($zipFilePath));
+    }
+
+    /**
+     * Only entity_data.json gets the relaxed ratio, so any other file compressing like a large export is rejected.
+     */
+    public function testReadFromZipRejectsOtherFilesBeyondTheDefaultRatio(): void
+    {
+        $lines = [];
+        for ($i = 1; $i <= 12000; ++$i) {
+            $lines[] = json_encode(['id' => $i, 'name' => 'Send email '.$i, 'type' => 'email.send', 'properties' => ['email' => $i % 50], 'order' => $i % 7], JSON_THROW_ON_ERROR);
+        }
+        $filePath = sys_get_temp_dir().'/large_export_'.uniqid().'.txt';
+        file_put_contents($filePath, implode("\n", $lines));
+        $this->assertGreaterThan(1024 * 1024, filesize($filePath));
+        $this->paths[] = $filePath;
+
+        $jsonOutput    = json_encode(['key' => 'value'], JSON_THROW_ON_ERROR);
+        $zipFilePath   = $this->exportHelper->writeToZipFile($jsonOutput, [$filePath], '');
+        $this->paths[] = $zipFilePath;
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Suspicious compression ratio');
+
+        $this->importHelper->readZipFile($zipFilePath);
+    }
+
+    /**
      * An entry whose uncompressed size exceeds the threshold and still compresses beyond the
      * allowed ratio is treated as a zip bomb and rejected.
      */
@@ -299,7 +342,7 @@ final class ImportHelperTest extends TestCase
         $tempDir = sys_get_temp_dir();
 
         // 2MB of a single repeated byte: well above the 1MB ratio-check threshold and compresses
-        // far beyond 1:10.
+        // far beyond 1:100.
         $bombPath = $tempDir.'/zip_bomb_'.uniqid().'.txt';
         file_put_contents($bombPath, str_repeat('A', 2 * 1024 * 1024));
         $this->paths[] = $bombPath;

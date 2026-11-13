@@ -78,7 +78,7 @@
                     </ul>
                     <!--/ tabs controls -->
 
-                    <div class="tab-content pa-md">
+                    <div class="tab-content pa-16">
                         <div class="tab-pane fade show active bdr-w-0" id="email-container">
                             <div class="row">
                                 <div class="col-md-12">{{ form_row(form.template) }}</div>
@@ -101,7 +101,7 @@
                                         <div class="float-start">
                                             {{ form_label(form.assetAttachments) }}
                                         </div>
-                                        <div class="text-end pr-10">
+                                        <div class="text-end pe-12">
                                             <span class="label label-info"
                                                   id="attachment-size">{{ attachmentSize }}</span>
                                         </div>
@@ -136,8 +136,8 @@
                                     <div class="float-start">
                                         {{ form_label(form.plainText) }}
                                     </div>
-                                    <div class="text-end pr-10">
-                                        <i class="ri-loader-3-line ri-spin ml-2 plaintext-spinner hide"></i>
+                                    <div class="text-end pe-12">
+                                        <i class="ri-loader-3-line ri-spin ms-2 plaintext-spinner hide"></i>
                                         <a class="small"
                                            onclick="Mautic.autoGeneratePlaintext();">{{ 'mautic.email.plaintext.generate'|trans }}</a>
                                     </div>
@@ -162,7 +162,7 @@
                                                             attributes: {
                                                                 'id': 'addNewDynamicContent',
                                                                 'role': 'tab',
-                                                                'class': 'mr-xs',
+                                                                'class': 'me-5',
                                                                 'type': 'button'
                                                             }
                                                         }
@@ -178,7 +178,7 @@
                                             {% endfor %}
                                             </ul>
                                         </div>
-                                        <div class="tab-content pa-md col-xs-9" id="dynamicContentContainer">
+                                        <div class="tab-content pa-16 col-xs-9" id="dynamicContentContainer">
                                           {% for dynamicContent in form.dynamicContent %}
                                               {{ form_widget(dynamicContent) }}
                                           {% endfor %}
@@ -193,7 +193,7 @@
             </div>
         </div>
         <div class="col-md-3 height-auto bdr-l">
-            <div class="pr-lg pl-lg pt-md pb-md">
+            <div class="pe-24 ps-24 pt-16 pb-16">
                 {{ form_row(form.subject) }}
                 {{ form_row(form.name) }}
                 {{ form_row(form.preheaderText) }}

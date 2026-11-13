@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+tone_instructions: "Be concise. Use short sentences and simple, plain words a non-native English speaker understands. Write more only when needed to explain a security, BC or data issue. No idioms, filler, praise or repetition."
 reviews:
   auto_review:
     enabled: true
@@ -13,6 +14,125 @@ reviews:
     ignore_usernames:
       - "dependabot[bot]"
       - "allcontributors[bot]"
+  # Walkthrough sections that add noise to Mautic PRs.
+  changed_files_summary: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  suggested_reviewers: false
+  review_info: false
+  in_progress_fortune: false
+  enable_prompt_for_ai_agents: false
+  related_prs: false
+  finishing_touches:
+    unit_tests:
+      enabled: false
+    fix_ci:
+      enabled: false
+    resolve_merge_conflict:
+      enabled: false
+    autofix:
+      enabled: false
+  auto_apply_labels: true
+  labeling_instructions:
+    - label: "bug"
+      instructions: "Apply when the PR fixes incorrect behavior."
+    - label: "enhancement"
+      instructions: "Apply when the PR improves an existing feature without being a bug fix."
+    - label: "feature"
+      instructions: "Apply when the PR adds a new user-facing feature."
+    - label: "refactoring"
+      instructions: "Apply when the PR restructures code without changing behavior."
+    - label: "chore"
+      instructions: "Apply when the PR only maintains the repository (tooling, configuration, housekeeping). Also apply to merge-up PRs, which merge a release branch or tag into a higher branch (for example 7.2 into 7.x, 7.x into 8.x, or 7.2.2 into 8.x). They have a title like 'Merge 7.x into 8.x' and their commits are mostly merges of already-merged PRs plus conflict fixes. Give merge-up PRs only this label, no others."
+    - label: "user-interface"
+      instructions: "Apply when the PR changes appearance, layout or interactivity (Twig, CSS/SCSS, JS)."
+    - label: "translations"
+      instructions: "Apply when the PR changes translation (*.ini) files."
+    - label: "automated-tests"
+      instructions: "Apply when the PR adds or changes unit, functional or e2e tests."
+    - label: "db-migrations"
+      instructions: "Apply when the PR adds or changes a Doctrine migration."
+    - label: "deprecation"
+      instructions: "Apply when the PR deprecates code, templates or configuration."
+    - label: "bc-break"
+      instructions: "Apply when the PR breaks backward compatibility or edits an UPGRADE-*.md file with removals."
+    - label: "API"
+      instructions: "Apply when the PR changes the REST API."
+    - label: "CI"
+      instructions: "Apply when the PR changes GitHub Actions workflows or other CI configuration."
+    - label: "plugin"
+      instructions: "Apply when the PR changes files under plugins/ or app/bundles/PluginBundle."
+    - label: "builder-grapesjs"
+      instructions: "Apply when the PR changes plugins/GrapesJsBuilderBundle."
+    - label: "focus-items"
+      instructions: "Apply when the PR changes plugins/MauticFocusBundle."
+    - label: "email"
+      instructions: "Apply when the PR changes app/bundles/EmailBundle."
+    - label: "email-integrations"
+      instructions: "Apply when the PR changes mail transports (app/bundles/EmailBundle/Mailer/Transport) or mail provider integrations."
+    - label: "forms"
+      instructions: "Apply when the PR changes app/bundles/FormBundle."
+    - label: "campaigns"
+      instructions: "Apply when the PR changes app/bundles/CampaignBundle."
+    - label: "contacts"
+      instructions: "Apply when the PR changes contact code in app/bundles/LeadBundle (Lead entity, contact controllers, model, views), not only segment, company, tag or field code."
+    - label: "segments"
+      instructions: "Apply when the PR changes app/bundles/LeadBundle/Segment or the LeadList entity, repository or views."
+    - label: "companies"
+      instructions: "Apply when the PR changes company code in app/bundles/LeadBundle (Company entity, model, controller, views)."
+    - label: "custom-fields"
+      instructions: "Apply when the PR changes app/bundles/LeadBundle/Field or the LeadField entity, model or views."
+    - label: "tags"
+      instructions: "Apply when the PR changes the Tag entity, model, controller or views in app/bundles/LeadBundle."
+    - label: "import-export"
+      instructions: "Apply when the PR changes contact or company import or export code."
+    - label: "landing-pages"
+      instructions: "Apply when the PR changes app/bundles/PageBundle."
+    - label: "assets"
+      instructions: "Apply when the PR changes app/bundles/AssetBundle."
+    - label: "reports"
+      instructions: "Apply when the PR changes app/bundles/ReportBundle."
+    - label: "dashboard"
+      instructions: "Apply when the PR changes app/bundles/DashboardBundle."
+    - label: "points-scoring"
+      instructions: "Apply when the PR changes app/bundles/PointBundle."
+    - label: "stages"
+      instructions: "Apply when the PR changes app/bundles/StageBundle."
+    - label: "sms"
+      instructions: "Apply when the PR changes app/bundles/SmsBundle."
+    - label: "webhooks"
+      instructions: "Apply when the PR changes app/bundles/WebhookBundle."
+    - label: "dynamic-content"
+      instructions: "Apply when the PR changes app/bundles/DynamicContentBundle."
+    - label: "categories"
+      instructions: "Apply when the PR changes app/bundles/CategoryBundle."
+    - label: "channels"
+      instructions: "Apply when the PR changes app/bundles/ChannelBundle, except marketing messages."
+    - label: "marketing-messages"
+      instructions: "Apply when the PR changes the marketing messages (Message entity, model, controller or views in app/bundles/ChannelBundle)."
+    - label: "configuration"
+      instructions: "Apply when the PR changes app/bundles/ConfigBundle or the configuration form of another bundle."
+    - label: "roles"
+      instructions: "Apply when the PR changes users, roles or permissions in app/bundles/UserBundle."
+    - label: "authentication"
+      instructions: "Apply when the PR changes login, SAML, SSO or API authentication (app/bundles/UserBundle/Security, app/bundles/ApiBundle auth)."
+    - label: "installation"
+      instructions: "Apply when the PR changes app/bundles/InstallBundle."
+    - label: "projects"
+      instructions: "Apply when the PR changes app/bundles/ProjectBundle."
+    - label: "marketplace"
+      instructions: "Apply when the PR changes app/bundles/MarketplaceBundle."
+    - label: "themes"
+      instructions: "Apply when the PR changes files under themes/."
+    - label: "tracking"
+      instructions: "Apply when the PR changes contact tracking (app/bundles/LeadBundle/Tracker, the tracking pixel or mtc.js)."
+  mutually_exclusive_groups:
+    type:
+      - "bug"
+      - "enhancement"
+      - "feature"
+      - "refactoring"
+      - "chore"
   path_instructions:
     - path: "**/*.php"
       instructions: |
@@ -128,6 +248,14 @@ reviews:
     # Mautic relies on native types and keeps DocBlocks minimal, so a docstring
     # coverage threshold would warn on almost every PHP PR.
     docstrings:
+      mode: "off"
+    # Mautic PR descriptions follow the repository template; the check is
+    # always skipped.
+    description:
+      mode: "off"
+    title:
+      mode: "off"
+    issue_assessment:
       mode: "off"
 knowledge_base:
   # Uses guideline files in the repo (such as AGENTS.md) as review context.
