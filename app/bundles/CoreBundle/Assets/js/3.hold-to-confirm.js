@@ -154,13 +154,14 @@
             this.renderBeam();
         }
         update(options) {
-            if (options.className !== void 0) this.button.className = `btn btn-tertiary hold-to-confirm__button ${options.className}`;
+            if (options.className !== void 0) this.button.className = `btn btn-tertiary btn-nospin hold-to-confirm__button ${options.className}`;
             if (options.beamClassName !== void 0) this.element.className = `hold-to-confirm ${options.beamClassName}`;
             if ("icon" in options) {
                 this.icon.replaceChildren(...options.icon ? [options.icon] : Array.from(this.defaultIcon.childNodes).map((node) => node.cloneNode(true)));
             }
             if (options.size !== void 0) {
                 this.element.dataset.size = options.size;
+                this.button.setAttribute('size', options.size);
                 const dimensions = { sm: { icon: 12, ring: 20, stroke: 2 }, md: { icon: 14, ring: 24, stroke: 2 }, lg: { icon: 17, ring: 30, stroke: 2.5 } }[options.size];
                 const symbol = this.element.querySelector(".hold-to-confirm__symbol");
                 symbol.style.width = `${dimensions.ring}px`;

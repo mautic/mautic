@@ -171,6 +171,24 @@ test('right click and a short native click do not confirm', async ({ page }) => 
   expect(await page.evaluate(() => window.confirms)).toBe(0);
 });
 
+test('native button appearance and spinner opt-out survive updates', async ({ page }) => {
+  await load(page, 'hold-to-confirm', { size: 'sm' });
+  const button = page.getByRole('button');
+  await expect(button).toHaveClass(/btn-nospin/);
+  await expect(button).toHaveAttribute('size', 'sm');
+  await page.addStyleTag({ content: '.btn {border-radius:3px;font-weight:400;padding:0 16px;gap:24px;font-size:14px;}' });
+  await expect(button).toHaveCSS('border-radius', '3px');
+  await expect(button).toHaveCSS('font-weight', '400');
+  await expect(button).toHaveCSS('font-size', '14px');
+  await expect(button).toHaveCSS('padding-left', '16px');
+  await expect(button).toHaveCSS('gap', '24px');
+  await page.evaluate(() => window.MauticUI.HoldToConfirmButton.get(document.querySelector('[data-component]')).update({ className: 'custom', size: 'lg' }));
+  await expect(button).toHaveClass(/btn-nospin/);
+  await expect(button).toHaveClass(/custom/);
+  await expect(button).toHaveAttribute('size', 'lg');
+  await expect(button).toHaveCSS('height', '48px');
+});
+
 test('window blur cancels a keyboard hold', async ({ page }) => {
   await load(page, 'hold-to-confirm', { duration: 200 });
   await monitor(page);

@@ -4,18 +4,10 @@
     align-self: flex-start;
     width: fit-content;
     height: fit-content;
-    border-radius: 9999px;
 
     &__button.btn {
         position: relative;
-        justify-content: center;
-        height: 40px;
-        gap: 8px;
         margin: 0;
-        padding: 0 16px 0 10px;
-        border-radius: inherit;
-        font-family: inherit;
-        font-weight: 500;
         touch-action: none;
         user-select: none;
 
@@ -42,23 +34,9 @@
         }
     }
 
-    &[data-size='sm'] &__button {
-        height: 32px;
-        gap: 6px;
-        padding-inline: 8px 12px;
-        font-size: 12px;
+    &[data-size='sm'] &__button i { font-size: 12px; }
 
-        i { font-size: 12px; }
-    }
-
-    &[data-size='lg'] &__button {
-        height: 48px;
-        gap: 10px;
-        padding-inline: 12px 20px;
-        font-size: 16px;
-
-        i { font-size: 17px; }
-    }
+    &[data-size='lg'] &__button i { font-size: 17px; }
 
     &__symbol {
         position: relative;

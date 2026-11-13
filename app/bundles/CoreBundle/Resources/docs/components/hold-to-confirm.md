@@ -1,6 +1,6 @@
 # Hold to confirm
 
-Native Twig and JavaScript adaptation of Acervo's Spectrum UI control. Production has no React, Motion, TypeScript build or custom font. The existing Mautic button classes provide typography, danger colors, hover, disabled state and theme tokens. Component SCSS only supplies its shape, sizes, progress and feedback. Native Web Animations samples the source spring parameters for press/release, icon pop and label roll; requestAnimationFrame drives the functional progress ring. The MIT BorderBeam CSS generator retains the beam palettes and geometry separately from the interaction controller.
+Native Twig and JavaScript adaptation of Acervo's Spectrum UI control. Production has no React, Motion, TypeScript build or custom font. The existing Mautic button classes provide typography, size, spacing, border radius, danger colors, hover, disabled state and theme tokens. Component SCSS only supplies the progress and feedback layout. The shared `btn-nospin` opt-out prevents the global click handler from replacing the action icon with a loading spinner; runtime class updates preserve it. Native Web Animations samples the source spring parameters for press/release, icon pop and label roll; requestAnimationFrame drives the functional progress ring. The MIT BorderBeam CSS generator retains the beam palettes and geometry separately from the interaction controller.
 
 ```twig
 {% include '@MauticCore/Components/hold-to-confirm.html.twig' with {
