@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,6 +18,65 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
     use CreateTestEntitiesTrait;
 
     protected $useCleanupRollback = false;
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testBatchSendExampleEmailsToCurrentUser(bool $isAjax): void
+    {
+        $firstEmail  = $this->createEmail();
+        $secondEmail = $this->createEmail();
+        $this->em->flush();
+
+        $ids = json_encode([$firstEmail->getId(), $secondEmail->getId(), $firstEmail->getId(), [], null, 0]);
+        $this->setCsrfHeader();
+        $this->client->request(Request::METHOD_POST, '/s/emails/batchSendExample?ids='.urlencode($ids), [], [], [
+            'HTTP_X-Requested-With' => $isAjax ? 'XMLHttpRequest' : '',
+        ]);
+
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('2 test emails were sent', $content);
+        $messages = self::getMailerMessages();
+        $this->assertCount(2, $messages);
+        $this->assertInstanceOf(MauticMessage::class, $messages[0]);
+        $this->assertInstanceOf(MauticMessage::class, $messages[1]);
+        $this->assertSame('[TEST] Email subject', $messages[0]->getSubject());
+        $this->assertSame('[TEST] Email subject', $messages[1]->getSubject());
+        $this->assertStringContainsString('2 test emails were sent to', $content);
+    }
+
+    #[TestWith([null, false, Response::HTTP_FORBIDDEN])]
+    #[TestWith(['invalid', false, Response::HTTP_FORBIDDEN])]
+    #[TestWith([null, true, Response::HTTP_OK])]
+    #[TestWith(['invalid', true, Response::HTTP_OK])]
+    public function testBatchSendExampleRejectsInvalidCsrfToken(?string $token, bool $isAjax, int $expectedStatus): void
+    {
+        $email = $this->createEmail();
+        $this->em->flush();
+
+        $ids = json_encode([$email->getId()]);
+        $this->client->request(Request::METHOD_POST, '/s/emails/batchSendExample?ids='.urlencode($ids), [], [], [
+            'HTTP_X-CSRF-Token'     => $token ?? '',
+            'HTTP_X-Requested-With' => $isAjax ? 'XMLHttpRequest' : '',
+        ]);
+
+        self::assertResponseStatusCodeSame($expectedStatus);
+        $this->assertCount(0, self::getMailerMessages());
+    }
+
+    public function testEmailListOffersBatchExampleSendingWithExplicitRecipient(): void
+    {
+        $this->createEmail();
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/emails');
+
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('/batchSendExample', $content);
+        $this->assertStringContainsString('Send tests to me', $content);
+        $this->assertStringContainsString('Send one test of each selected email to admin@yoursite.com?', $content);
+    }
 
     public function testSendExampleEmailWithContact(): void
     {
