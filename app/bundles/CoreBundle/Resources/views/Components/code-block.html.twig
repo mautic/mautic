@@ -1,9 +1,12 @@
 {% set lines = innerText|trim('\n', 'right')|split('\n') %}
 {% set collapsedLines = collapsedLines|default(8) %}
 {% set collapsible = lines|length > collapsedLines %}
-<figure class="code-block{{ wrap|default(false) ? ' code-block--wrap' : '' }}{{ numbered|default(false) ? ' code-block--numbered' : '' }}" data-code-block data-collapsed-lines="{{ collapsedLines }}">
-    <figcaption class="code-block__header type-label-01">
-        <span class="code-block__filename"><i class="ri-file-code-line" aria-hidden="true"></i>{{ filename|default(language|default('code')) }}</span>
+{% set blockId = 'code-block-' ~ random() %}
+{% set captionId = blockId ~ '-caption' %}
+{% set bodyId = blockId ~ '-body' %}
+<figure id="{{ blockId }}" aria-labelledby="{{ captionId }}" class="code-block{{ wrap|default(false) ? ' code-block--wrap' : '' }}{{ numbered|default(false) ? ' code-block--numbered' : '' }}" data-code-block data-collapsed-lines="{{ collapsedLines }}">
+    <div class="code-block__header type-label-01">
+        <span id="{{ captionId }}" class="code-block__filename"><i class="ri-file-code-line" aria-hidden="true"></i>{{ filename|default(language|default('code')) }}</span>
         {% if hideCopyButton is not defined or not hideCopyButton %}
         {% include '@MauticCore/Helper/button.html.twig' with {
             buttons: [{
@@ -19,8 +22,8 @@
             }]
         } %}
         {% endif %}
-    </figcaption>
-    <div class="code-block__body" tabindex="0" role="region" aria-label="{{ ariaLabel|default(filename|default(language|default('code'))) }}">
+    </div>
+    <div id="{{ bodyId }}" class="code-block__body" role="group" aria-label="{{ ariaLabel|default(filename|default(language|default('code'))) }}">
         <ol class="code-block__lines">
             {% for line in lines %}
             <li class="code-block__line"{% if collapsible and loop.index > collapsedLines %} hidden data-code-block-extra{% endif %}><code>{{ line|default(' ') }}</code></li>
@@ -28,7 +31,7 @@
         </ol>
     </div>
     {% if collapsible %}
-    <button type="button" class="code-block__toggle btn btn-ghost btn-xs btn-nospin" aria-expanded="false" data-code-block-toggle data-more="{{ 'mautic.core.code_block.more_lines'|trans({'%count%': lines|length - collapsedLines}) }}" data-less="{{ 'mautic.core.code_block.collapse'|trans }}">
+    <button type="button" class="code-block__toggle btn btn-ghost btn-xs btn-nospin" aria-expanded="false" aria-controls="{{ bodyId }}" data-code-block-toggle data-more="{{ 'mautic.core.code_block.more_lines'|trans({'%count%': lines|length - collapsedLines}) }}" data-less="{{ 'mautic.core.code_block.collapse'|trans }}">
         <span data-code-block-label>{{ 'mautic.core.code_block.more_lines'|trans({'%count%': lines|length - collapsedLines}) }}</span><i class="ri-arrow-down-s-line" aria-hidden="true"></i>
     </button>
     {% endif %}

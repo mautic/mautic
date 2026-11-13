@@ -1,6 +1,18 @@
 /**
- * Code block: animated expand/collapse of long code-block lines.
+ * Code block: keyboard access to horizontal scroll and animated expand/collapse.
  */
+const scrollObserver = new ResizeObserver((entries) => entries.forEach(({target}) => {
+    if (target.scrollWidth > target.clientWidth) target.setAttribute('tabindex', '0');
+    else target.removeAttribute('tabindex');
+}));
+
+const observeCodeBlocks = (root) => root.querySelectorAll('.code-block__body').forEach((body) => scrollObserver.observe(body));
+
+new MutationObserver((mutations) => mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
+    if (node.nodeType === Node.ELEMENT_NODE) observeCodeBlocks(node);
+}))).observe(document.documentElement, {childList: true, subtree: true});
+observeCodeBlocks(document);
+
 document.addEventListener('click', (event) => {
     const toggle = event.target.closest('[data-code-block-toggle]');
     if (!toggle) return;
