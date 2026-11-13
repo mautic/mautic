@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\LeadBundle\Controller\ListController;
+use Mautic\LeadBundle\Event\ContactLastActiveUpdatedEvent;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -111,6 +112,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $this->triggerModel = $triggerModel;
     }
 
+    #[Required]
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
@@ -1169,10 +1171,56 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             return;
         }
 
-        $dt     = new DateTimeHelper($lastActiveDate ?? '');
-        $fields = ['last_active' => $dt->toUtcString()];
+        $dt         = new DateTimeHelper($lastActiveDate ?? '');
+        $lastActive = $dt->toUtcString();
 
-        $this->getEntityManager()->getConnection()->update(MAUTIC_TABLE_PREFIX.'leads', $fields, ['id' => $leadId]);
+        $dispatchEvent      = $this->dispatcher?->hasListeners(ContactLastActiveUpdatedEvent::class) ?? false;
+        $previousLastActive = $dispatchEvent ? $this->getLastActive((int) $leadId) : null;
+
+        $affectedRows = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'leads')
+            ->set('last_active', ':lastActive')
+            ->where('id = :id')
+            ->andWhere('last_active IS NULL OR last_active <> :lastActive')
+            ->setParameter('lastActive', $lastActive)
+            ->setParameter('id', $leadId)
+            ->executeStatement();
+
+        // Keep an already loaded entity in sync without recording a change, so a later save compares against the stored value.
+        $unitOfWork = $this->getEntityManager()->getUnitOfWork();
+        $lead       = $unitOfWork->tryGetById($leadId, Lead::class);
+        if ($lead instanceof Lead) {
+            $stored  = new \DateTime($lastActive, new \DateTimeZone('UTC'));
+            $changes = $lead->getChanges();
+
+            if (isset($changes['dateLastActive'])) {
+                // A pending change keeps its new value, but is compared against the stored one.
+                $changes['dateLastActive'][0] = $stored;
+            } else {
+                $lead->setLastActive($stored);
+                // Doctrine must not see this as a change, otherwise a later flush could overwrite a newer value.
+                $unitOfWork->setOriginalEntityProperty(spl_object_id($lead), 'lastActive', $stored);
+            }
+
+            $lead->setChanges($changes);
+        }
+
+        if ($dispatchEvent && $affectedRows > 0) {
+            $this->dispatcher->dispatch(new ContactLastActiveUpdatedEvent((int) $leadId, $dt->getUtcDateTime(), $previousLastActive));
+        }
+    }
+
+    private function getLastActive(int $leadId): ?\DateTimeImmutable
+    {
+        $lastActive = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('l.last_active')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where('l.id = :id')
+            ->setParameter('id', $leadId)
+            ->executeQuery()
+            ->fetchOne();
+
+        return $lastActive ? new \DateTimeImmutable($lastActive, new \DateTimeZone('UTC')) : null;
     }
 
     /**

@@ -8,6 +8,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\UnitOfWork;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\Lead;
@@ -201,6 +202,16 @@ final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->expects($this->once())
             ->method('getConnection')
             ->willReturn($this->connection);
+        $this->connection->method('createQueryBuilder')
+            ->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
+        $this->connection->expects($this->once())
+            ->method('executeStatement')
+            ->with($this->stringContains('last_active IS NULL OR last_active <> :lastActive'))
+            ->willReturn(1);
+
+        $unitOfWork = $this->createMock(UnitOfWork::class);
+        $unitOfWork->method('tryGetById')->willReturn(false);
+        $this->entityManager->method('getUnitOfWork')->willReturn($unitOfWork);
 
         $this->repository->updateLastActive(1);
     }
