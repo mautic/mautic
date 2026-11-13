@@ -47,14 +47,14 @@ trait TimelineTrait
 
         if (!empty($options['fromDate']) && !empty($options['toDate'])) {
             $query->andWhere($timestampColumn.' BETWEEN :dateFrom AND :dateTo')
-                ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s'))
-                ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s'));
+                ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s.u'))
+                ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s.u'));
         } elseif (!empty($options['fromDate'])) {
             $query->andWhere($query->expr()->gte($timestampColumn, ':dateFrom'))
-                ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s'));
+                ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s.u'));
         } elseif (!empty($options['toDate'])) {
             $query->andWhere($query->expr()->lte($timestampColumn, ':dateTo'))
-                ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s'));
+                ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s.u'));
         }
 
         if (isset($options['leadIds'])) {
@@ -102,7 +102,7 @@ trait TimelineTrait
 
                 foreach ($dateTimeColumns as $col) {
                     if (isset($result[$col]) && !empty($result[$col])) {
-                        $dt           = new DateTimeHelper($result[$col], 'Y-m-d H:i:s', 'UTC');
+                        $dt           = new DateTimeHelper($result[$col], 'Y-m-d H:i:s.u', 'UTC');
                         $result[$col] = $dt->getLocalDateTime();
                         unset($dt);
                     }
