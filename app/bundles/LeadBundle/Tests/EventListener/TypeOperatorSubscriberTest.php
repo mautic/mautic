@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
@@ -17,6 +18,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Entity\StageRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -130,6 +132,10 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $operators = $event->getOperatorsForAllFieldTypes();
 
         // Test for random operators:
+        $this->assertContains(OperatorOptions::BETWEEN, $operators['datetime']['include']);
+        $this->assertContains(OperatorOptions::NOT_BETWEEN, $operators['datetime']['include']);
+        $this->assertContains(OperatorOptions::BETWEEN, $operators['date']['include']);
+        $this->assertContains(OperatorOptions::NOT_BETWEEN, $operators['date']['include']);
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['text']['include']);
         $this->assertNotContains(OperatorOptions::INCLUDING_ANY, $operators['text']['include']);
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['boolean']['include']);
@@ -519,5 +525,52 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->subscriber->onSegmentFilterFormHandleDefault($event);
+    }
+
+    #[DataProvider('operatorProvider')]
+    public function testOnSegmentFilterFormHandleDate(string $operator): void
+    {
+        $alias    = 'email_clicked_link_date';
+        $object   = 'behaviors';
+        $filter   = [
+            'date_from' => 'May 7, 2024',
+            'date_to'   => 'May 9, 2024',
+        ];
+        $details  = [
+            'properties'  => [
+                'type' => 'datetime',
+            ],
+        ];
+        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->method('getData')->willReturn(['filter' => $filter]);
+
+        $this->form->expects($this->once())
+            ->method('add')
+            ->with(
+                'filter',
+                DateRangeType::class,
+                [
+                    'label'              => false,
+                    'data'               => $filter,
+                    'show_apply_button'  => false,
+                    'set_default_values' => false,
+                ]
+            );
+
+        $this->subscriber->onSegmentFilterFormHandleDate($event);
+
+        $this->assertTrue($event->isPropagationStopped());
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    public static function operatorProvider(): array
+    {
+        return [
+            'between'     => [OperatorOptions::BETWEEN],
+            'not_between' => [OperatorOptions::NOT_BETWEEN],
+        ];
     }
 }
