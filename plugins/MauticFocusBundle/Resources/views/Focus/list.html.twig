@@ -55,6 +55,35 @@
                         }
                     ]
                 },
+                'mautic.focus.quick_filters.style': {
+                    'conflictGroup': true,
+                    'filters': [
+                        {
+                            'search': 'mautic.focus.focus.searchcommand.stylebar',
+                            'label': 'mautic.focus.style.bar',
+                            'tooltip': 'mautic.focus.focus.searchcommand.stylebar.description',
+                            'icon': 'ri-menu-line'
+                        },
+                        {
+                            'search': 'mautic.focus.focus.searchcommand.stylemodal',
+                            'label': 'mautic.focus.style.modal',
+                            'tooltip': 'mautic.focus.focus.searchcommand.stylemodal.description',
+                            'icon': 'ri-window-line'
+                        },
+                        {
+                            'search': 'mautic.focus.focus.searchcommand.stylenotification',
+                            'label': 'mautic.focus.style.notification',
+                            'tooltip': 'mautic.focus.focus.searchcommand.stylenotification.description',
+                            'icon': 'ri-notification-3-line'
+                        },
+                        {
+                            'search': 'mautic.focus.focus.searchcommand.stylefullpage',
+                            'label': 'mautic.focus.style.page',
+                            'tooltip': 'mautic.focus.focus.searchcommand.stylefullpage.description',
+                            'icon': 'ri-pages-line'
+                        }
+                    ]
+                },
                 'mautic.core.quick_filters.others': {
                     'filters': [
                         {
@@ -64,7 +93,7 @@
                             'icon': 'ri-folder-unknow-line'
                         }
                     ]
-                },
+                }
             },
             'searchScopes': searchScopes|default([]),
             'searchScopeHint': searchScopeHint|default(''),

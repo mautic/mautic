@@ -7,6 +7,7 @@ namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use Symfony\Component\DomCrawler\Crawler;
 
 final class FocusControllerTest extends MauticMysqlTestCase
 {
@@ -36,5 +37,20 @@ final class FocusControllerTest extends MauticMysqlTestCase
         $savedFocus = $this->em->find(Focus::class, $focus->getId());
         $this->assertInstanceOf(Focus::class, $savedFocus);
         $this->assertSame($project->getId(), $savedFocus->getProjects()->first()->getId());
+    }
+
+    public function testFocusIndexRendersStyleQuickFilterGroup(): void
+    {
+        $this->client->request('GET', '/s/focus');
+
+        $this->assertResponseIsSuccessful();
+        $quickFilters = $this->getQuickFiltersCrawler();
+        $this->assertCount(4, $quickFilters->filter('[data-conflict-group="mautic.focus.quick_filters.style"]'));
+        $this->assertCount(1, $quickFilters->filter('[data-filter="style:bar"]'));
+    }
+
+    private function getQuickFiltersCrawler(): Crawler
+    {
+        return new Crawler($this->client->getCrawler()->filter('[data-quick-filter]')->attr('data-bs-content'));
     }
 }
