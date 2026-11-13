@@ -333,8 +333,8 @@ final class LeadSubscriber implements EventSubscriberInterface
         ];
 
         // Following events takes the event from the lead itself, so not applicable for API
-        // where we are getting events for all leads.
-        if ($event->isForTimeline()) {
+        // where we are getting events for all leads, unless the leads are restricted by leadIds.
+        if ($event->isForTimeline() || [] !== $event->getLeadIds()) {
             $eventTypes['lead.create']     = 'mautic.lead.event.create';
             $eventTypes['lead.identified'] = 'mautic.lead.event.identified';
             $eventTypes['lead.ipadded']    = 'mautic.lead.event.ipadded';

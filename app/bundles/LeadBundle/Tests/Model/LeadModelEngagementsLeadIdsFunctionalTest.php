@@ -48,12 +48,17 @@ final class LeadModelEngagementsLeadIdsFunctionalTest extends MauticMysqlTestCas
         $this->createContactWithActivity('excluded@example.com', '10.0.0.2');
         $this->em->flush();
 
-        $this->client->request('GET', '/api/contacts/activity', ['filters' => ['includeEvents' => ['page.hit'], 'leadIds' => [$included->getId()]]]);
+        $this->client->request('GET', '/api/contacts/activity', ['filters' => ['includeEvents' => self::TYPES, 'leadIds' => [$included->getId()]]]);
         self::assertResponseIsSuccessful();
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertSame(1, (int) $response['total']);
-        $this->assertSame($included->getId(), (int) $response['events'][0]['contactId']);
+        $events   = $response['events'];
+        $this->assertSame(self::TYPES, array_values(array_intersect(self::TYPES, array_column($events, 'event'))));
+        $this->assertCount(count(self::TYPES), $events);
+        $this->assertSame(count(self::TYPES), (int) $response['total']);
+        foreach ($events as $event) {
+            $this->assertSame($included->getId(), (int) $event['contactId'], $event['event']);
+        }
     }
 
     private function createContactWithActivity(string $email, string $ip): Lead
