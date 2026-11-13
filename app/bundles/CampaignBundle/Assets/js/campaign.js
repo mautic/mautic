@@ -54,7 +54,7 @@ Mautic.campaignOnLoad = function (container, response) {
             mQuery("[data-campaign-event-insert-button]").off('click.ajax').on('click.ajax', Mautic.handleCampaignEventAjaxClick);
 
             // adding delete option ajax for sources
-            mQuery("#CampaignCanvas .list-campaign-source a[data-toggle='ajax-delete']").on("click.ajax", function (event) {
+            mQuery("#CampaignCanvas .list-campaign-source a[data-toggle='ajax-delete']").off('click.ajax').on("click.ajax", function (event) {
                 event.preventDefault();
                 mQuery('.btns-builder').find('button').prop('disabled', true);
                 extraData = {
@@ -392,23 +392,19 @@ Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, onlyDestroy)
     const $select = mQuery('#'+theSelect);
     const dataAttribute = 'tooltips';
 
-    // create a stack
-    if (undefined === $select.data(dataAttribute)) {
-        $select.data(dataAttribute, []);
-    }
-
     // remove existing tooltips before we create new ones.
-    const tooltips = $select.data(dataAttribute);
+    const tooltips = $select.data(dataAttribute) || [];
+
+    // Clear the stack first so another teardown cannot process the same tooltips.
+    $select.data(dataAttribute, []);
 
     mQuery.each(tooltips, function (index, $tooltip) {
         if (undefined === $tooltip) {
             return;
         }
 
-        $tooltip.tooltip('hide');
         $tooltip.tooltip('destroy');
     });
-    $select.data(dataAttribute, []);
 
     if (true === onlyDestroy) {
         return;
@@ -420,7 +416,7 @@ Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, onlyDestroy)
             // Initiate a tooltip on each option since chosen doesn't copy over the data attributes
             const chosenOption = '#' + theSelect + '_chosen .option_' + mQuery(this).attr('id');
 
-            const $tooltip = mQuery(chosenOption).tooltip({html: true, container: 'body', placement: 'left'});
+            const $tooltip = mQuery(chosenOption).tooltip({animation: false, html: true, container: 'body', placement: 'left'});
             $select.data(dataAttribute).push($tooltip);
         }
     });
@@ -730,7 +726,7 @@ Mautic.campaignSourceOnLoad = function (container, response) {
         Mautic.campaignBuilderInstance.draggable(domEventId, Mautic.campaignDragOptions);
 
         //activate new stuff
-        mQuery(eventId + " a[data-toggle='ajax']").click(function (event) {
+        mQuery(eventId + " a[data-toggle='ajax-delete']").off('click.ajax').on('click.ajax', function (event) {
             event.preventDefault();
             const extraData = {
                 'modifiedSources': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedSources),

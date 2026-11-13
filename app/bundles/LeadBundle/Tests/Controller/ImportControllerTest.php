@@ -275,6 +275,58 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->assertNotificationMessageContains(self::IMPORT_CANCELED_MESSAGE);
     }
 
+    public function testCompanyImportCanBeCancelled(): void
+    {
+        $import = $this->createQueuedImport();
+        $import->setObject('company')
+            ->setStatus(Import::MANUAL);
+        $this->em->flush();
+
+        $this->setImportSession('company', $import);
+
+        $this->client->request(Request::METHOD_GET, '/s/companies/import/cancel/0');
+
+        $this->assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
+
+        $this->em->clear();
+        $import = $this->em->getRepository(Import::class)->find($import->getId());
+
+        $this->assertInstanceOf(Import::class, $import);
+        $this->assertSame(Import::STOPPED, $import->getStatus());
+        $this->assertFalse($import->getIsPublished());
+    }
+
+    public function testCompanyImportCanBeQueued(): void
+    {
+        $import = $this->createQueuedImport();
+        $import->setObject('company')
+            ->setStatus(Import::MANUAL);
+        $this->em->flush();
+
+        $this->setImportSession('company', $import);
+
+        $this->client->request(Request::METHOD_GET, '/s/companies/import/queue/0');
+
+        $this->assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
+
+        $this->em->clear();
+        $import = $this->em->getRepository(Import::class)->find($import->getId());
+
+        $this->assertInstanceOf(Import::class, $import);
+        $this->assertSame(Import::QUEUED, $import->getStatus());
+    }
+
+    public function testQueueActionWithoutImportDoesNotCreateOne(): void
+    {
+        $repository = $this->em->getRepository(Import::class);
+        $count       = $repository->count([]);
+
+        $this->client->request(Request::METHOD_GET, '/s/contacts/import/queue/0');
+
+        $this->assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
+        $this->assertSame($count, $repository->count([]));
+    }
+
     public function testCancelActionNotifiesImportOwnerWhenAnotherUserCancels(): void
     {
         $ownerRole = $this->createRole(true);
@@ -442,6 +494,15 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $import;
+    }
+
+    private function setImportSession(string $object, Import $import): void
+    {
+        $this->client->request(Request::METHOD_GET, '/');
+        $session = $this->client->getRequest()->getSession();
+        $session->set('mautic.'.$object.'.import.id', $import->getId());
+        $session->set('mautic.'.$object.'.import.file', $import->getFile());
+        $session->save();
     }
 
     private function addCancellationNotification(?Import $import = null): void

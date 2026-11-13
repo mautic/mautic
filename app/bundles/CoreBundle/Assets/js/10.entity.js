@@ -35,10 +35,22 @@ Mautic.getEntityId = function() {
  */
 Mautic.reorderTableData = function (name, orderby, tmpl, target, baseUrl) {
     if (typeof baseUrl == 'undefined') {
+        // A pending list search updates the page URL when its response is rendered.
+        var searchRequest = Mautic.liveSearchXhr;
+        if (searchRequest && searchRequest.listTarget === target && searchRequest.state() === 'pending') {
+            searchRequest.always(function () {
+                // Rejections can be synchronous; let cleanup and a replacement search finish first.
+                setTimeout(function () {
+                    Mautic.reorderTableData(name, orderby, tmpl, target);
+                }, 0);
+            });
+            return;
+        }
         baseUrl = window.location.pathname;
 
         // Reset to first page by modifying the path
         baseUrl = baseUrl.replace(/\/\d+$/, '/1');
+        baseUrl += window.location.search;
     }
 
     // Start building the query parameters
@@ -56,7 +68,8 @@ Mautic.reorderTableData = function (name, orderby, tmpl, target, baseUrl) {
         params.push('orderby=' + encodeURIComponent(orderby));
     }
 
-    var route = baseUrl + (params.length ? '?' + params.join('&') : '');
+    var queryGlue = baseUrl.indexOf('?') === -1 ? '?' : '&';
+    var route = baseUrl + (params.length ? queryGlue + params.join('&') : '');
 
     Mautic.loadContent(route, '', 'POST', target);
 };
@@ -261,6 +274,7 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     delete Mautic.filterButtonClicked;
                 }
             });
+            Mautic.liveSearchXhr.listTarget = target;
         }
     }
 };
