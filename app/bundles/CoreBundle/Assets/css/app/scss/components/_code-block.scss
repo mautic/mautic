@@ -28,7 +28,7 @@
   &__body {
     position: relative;
     overflow-x: auto;
-    padding: var(--spacing-04) 0;
+    padding: var(--spacing-03) 0;
   }
 
   &:has(&__toggle[aria-expanded='false']) &__body:after {
@@ -77,7 +77,7 @@
     justify-content: center;
     gap: var(--spacing-01);
     width: 100%;
-    padding: var(--spacing-03);
+    padding: var(--spacing-02);
     color: var(--text-secondary);
     background: none;
     border: 0;
