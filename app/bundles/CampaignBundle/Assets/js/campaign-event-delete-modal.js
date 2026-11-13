@@ -26,11 +26,10 @@ Mautic.campaignEventDeleteModal = {
         this.warningDiv = mQuery('#campaignEventDeleteWarning');
 
         // Configure modal options for better UX
-        this.modal.modal({
-            show: false,       // Don't show on initialization
+        this.modal.each((index, element) => bootstrap.Modal.getOrCreateInstance(element, {
             backdrop: true,    // Allow clicking outside to close
             keyboard: true     // Allow ESC key to close
-        });
+        }));
 
         // Make sure any existing event handlers are removed
         this.finalConfirmButton.off('click');
@@ -366,7 +365,8 @@ Mautic.campaignEventDeleteModal = {
 
         // Store reference to the original button for cleanup
         const deleteButton = mQuery('#CampaignEvent_' + eventId).find('a[data-toggle="ajax-delete"]');
-        this.modal.data('sourceButton', deleteButton).modal(modalOptions).modal('show');
+        this.modal.data('sourceButton', deleteButton);
+        bootstrap.Modal.getOrCreateInstance(this.modal[0], modalOptions).show();
     },
 
     /**
@@ -431,7 +431,7 @@ Mautic.campaignEventDeleteModal = {
                 Mautic.stopIconSpinPostEvent();
                 if (response.success) {
                     // Close the modal on success
-                    this.modal.modal('hide');
+                    this.modal.each((index, element) => Mautic.hideModal(element));
                 } else {
                     // Show error message in modal
                     this.warningDiv.removeClass('alert-warning').addClass('alert-danger');
