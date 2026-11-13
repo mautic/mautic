@@ -14,12 +14,12 @@ use PHPUnit\Framework\TestCase;
 
 final class DateCompanyDecoratorTest extends TestCase
 {
-    public function testGetQueryTypeReturnsAnyCompanyServiceForCompanyAllObject(): void
+    public function testGetQueryTypeReturnsAnyCompanyServiceForCompanyObject(): void
     {
         $dateCompanyDecorator = $this->createDateCompanyDecorator();
 
         $crate = new ContactSegmentFilterCrate([
-            'object' => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+            'object' => ContactSegmentFilterCrate::COMPANY_OBJECT,
         ]);
 
         $this->assertSame(AnyCompanyRelationValueFilterQueryBuilder::getServiceId(), $dateCompanyDecorator->getQueryType($crate));
@@ -30,7 +30,7 @@ final class DateCompanyDecoratorTest extends TestCase
         $dateCompanyDecorator = $this->createDateCompanyDecorator();
 
         $crate = new ContactSegmentFilterCrate([
-            'object' => ContactSegmentFilterCrate::COMPANY_OBJECT,
+            'object' => ContactSegmentFilterCrate::COMPANY_PRIMARY_OBJECT,
         ]);
 
         $this->assertSame(PrimaryCompanyRelationValueFilterQueryBuilder::getServiceId(), $dateCompanyDecorator->getQueryType($crate));

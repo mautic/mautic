@@ -307,13 +307,13 @@ final class FilterOperatorSubscriberTest extends TestCase
                         'iconClass' => 'ri-shapes-line',
                     ],
                 ],
-                'company_all' => [
+                'company_primary' => [
                     'test_text' => [
                         'label'      => 'Test Text',
                         'properties' => [
                             'type' => 'text',
                         ],
-                        'object'    => 'company_all',
+                        'object'    => 'company_primary',
                         'operators' => [
                             'equals'    => '=',
                             'not equal' => '!=',
@@ -625,13 +625,13 @@ final class FilterOperatorSubscriberTest extends TestCase
                         'iconClass' => 'ri-shapes-line',
                     ],
                 ],
-                'company_all' => [
+                'company_primary' => [
                     'test_text' => [
                         'label'      => 'Test Text',
                         'properties' => [
                             'type' => 'text',
                         ],
-                        'object'    => 'company_all',
+                        'object'    => 'company_primary',
                         'operators' => [
                             'equals'    => '=',
                             'not equal' => '!=',
