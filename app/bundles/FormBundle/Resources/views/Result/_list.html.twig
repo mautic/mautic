@@ -91,13 +91,13 @@
                       {% endfor %}
                       {% if canBlockDomains and hasEmail %}
                           {% set custom = custom|merge([{
-                              'attr': {
-                                  'href': path('mautic_form_results_action', {'objectAction': 'markSpam', 'objectId': item.id, 'formId': formId}),
-                                  'data-toggle': 'ajax',
-                                  'data-method': 'POST',
+                              'confirm': {
+                                  'message': 'mautic.form.result.markspam.confirm'|trans,
+                                  'confirmText': 'mautic.form.result.markspam'|trans,
+                                  'confirmAction': path('mautic_form_results_action', {'objectAction': 'markSpam', 'objectId': item.id, 'formId': formId}),
+                                  'iconClass': 'ri-spam-2-line',
+                                  'btnText': 'mautic.form.result.markspam'|trans,
                               },
-                              'btnText': 'mautic.form.result.markspam'|trans,
-                              'iconClass': 'ri-spam-2-line',
                           }]) %}
                       {% endif %}
                       {{ include('@MauticCore/Helper/list_actions.html.twig', {

@@ -219,9 +219,7 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
             "/s/forms/results/{$formId}/batchMarkSpam?ids={$batchIds}",
         ] as $url) {
             $this->client->request(Request::METHOD_POST, $url);
-            $response = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
-            $this->assertArrayHasKey('error', $response, json_encode($response, JSON_THROW_ON_ERROR));
-            $this->assertSame(Response::HTTP_FORBIDDEN, $response['error']['code']);
+            $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
         }
 
         unset($this->configParams['do_not_submit_emails']);
