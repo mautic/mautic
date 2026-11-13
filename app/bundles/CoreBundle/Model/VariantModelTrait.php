@@ -7,10 +7,7 @@ use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
 trait VariantModelTrait
 {
-    /**
-     * @var bool
-     */
-    protected $inConversion = false;
+    protected bool $inConversion = false;
 
     /**
      * Prepare a variant for saving.

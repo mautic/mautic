@@ -2689,12 +2689,6 @@ parameters:
 			path: app/bundles/EmailBundle/MonitoredEmail/Processor/Bounce/BouncedEmail.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Processor\\Bounce\\Mapper\\Category\:\:__construct\(\) with return type void returns \$this\(Mautic\\EmailBundle\\MonitoredEmail\\Processor\\Bounce\\Mapper\\Category\) but should not return anything\.$#'
-			identifier: return.void
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Processor/Bounce/Mapper/Category.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Processor\\Bounce\\Mapper\\CategoryMapper\:\:map\(\) has parameter \$category with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
