@@ -4,6 +4,7 @@
     align-self: flex-start;
     width: fit-content;
     height: fit-content;
+    --hold-to-confirm-easing: cubic-bezier(.34, 1.56, .64, 1);
     --hold-to-confirm-success: color-mix(in srgb, var(--support-success) 60%, var(--text-primary));
 
     &__button.btn {
@@ -12,6 +13,8 @@
         gap: var(--spacing-03);
         touch-action: none;
         user-select: none;
+        transform: scale(1);
+        transition: var(--transition-all-productive), transform 600ms var(--hold-to-confirm-easing);
 
         i {
             order: initial;
@@ -53,9 +56,16 @@
     }
 
     &__icon {
+        opacity: 1;
+        transform: scale(1);
         display: inline-flex;
         align-items: center;
         justify-content: center;
+    }
+
+    &__icon,
+    &__check {
+        transition: transform 600ms var(--hold-to-confirm-easing), opacity 600ms;
     }
 
     &__check {
@@ -80,6 +90,11 @@
         transform: rotate(-90deg);
         opacity: 0;
         pointer-events: none;
+        transition: opacity 150ms;
+    }
+
+    &__progress {
+        transition: stroke-dashoffset 600ms var(--hold-to-confirm-easing);
     }
 
     &__label {
@@ -94,9 +109,48 @@
         }
 
         > [hidden] { display: none; }
+
+        &:has(.hold-to-confirm__label-out) { min-width: var(--hold-to-confirm-label-width); }
     }
 
-    &[data-state='holding'] &__label { opacity: .6; }
+    &__label-in {
+        animation: hold-to-confirm-label-in 600ms var(--hold-to-confirm-easing) both;
+    }
+
+    &__label-out {
+        position: absolute;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        animation: hold-to-confirm-label-out 600ms var(--hold-to-confirm-easing) both;
+    }
+
+    &[data-state='holding'] {
+        .hold-to-confirm__button.btn {
+            transform: scale(.97);
+            transition: var(--transition-all-productive), transform 200ms cubic-bezier(.22, 1, .36, 1);
+        }
+
+        .hold-to-confirm__ring,
+        .hold-to-confirm__progress { transition: none; }
+
+        .hold-to-confirm__label { opacity: .6; }
+    }
+
+    &[data-state='confirmed'] {
+        .hold-to-confirm__icon {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        .hold-to-confirm__check {
+            transform: scale(1);
+            opacity: 1;
+            transition-delay: 50ms;
+        }
+
+        .hold-to-confirm__label-in { animation-delay: 170ms; }
+    }
 
     &[data-state='confirmed'] &__button.btn:not(:disabled):not(.disabled) {
         --focus: var(--hold-to-confirm-success);
@@ -113,7 +167,19 @@
     }
 }
 
+@keyframes hold-to-confirm-label-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hold-to-confirm-label-out {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-6px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+    .hold-to-confirm[data-state='holding'] .hold-to-confirm__button.btn { transform: scale(1); }
+
     .hold-to-confirm *,
     .hold-to-confirm::before,
     .hold-to-confirm::after {
