@@ -1079,6 +1079,29 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    public function testEmailValidationPageKeepsSharedStylesheet(): void
+    {
+        $secretHash = $this->getSecretHash('validation.styles@mautic.tld');
+
+        $this->client->request(Request::METHOD_GET, '/email/validate/unsubscribe/'.$secretHash.'/non-existing-tracking-hash');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Bootstrap v3.3.7', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testEmailValidationErrorPageKeepsSharedStylesheet(): void
+    {
+        $secretHash = $this->getSecretHash('validation.errors@mautic.tld');
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/validate/unsubscribe/'.$secretHash.'/non-existing-tracking-hash');
+        $form    = $crawler->filter('input[name="validate_email[emailAddress]"]')->form(['validate_email[emailAddress]' => 'not-an-email']);
+        $crawler = $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $crawler->filter('.validate-alert'));
+        $this->assertStringContainsString('Bootstrap v3.3.7', (string) $this->client->getResponse()->getContent());
+    }
+
     private function getSecretHash(string $email): string
     {
         $mailHashHelper = self::getContainer()->get(MailHashHelper::class);
