@@ -8,6 +8,7 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -256,7 +257,7 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -267,7 +268,7 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -281,40 +282,22 @@ class CampaignRepository extends CommonRepository
         switch ($filter->command) {
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired', [], null, 'en_US'):
-                if ($q instanceof \Doctrine\ORM\QueryBuilder) {
-                    $expr = new Expr\Andx([
-                        $q->expr()->eq('c.isPublished', ":{$unique}"),
-                        $q->expr()->isNotNull('c.publishDown'),
-                        $q->expr()->neq('c.publishDown', $q->expr()->literal('')),
-                        $q->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()'),
-                    ]);
-                } else {
-                    $expr = $q->expr()->and(
-                        $q->expr()->eq('c.isPublished', ":{$unique}"),
-                        $q->expr()->isNotNull('c.publishDown'),
-                        $q->expr()->neq('c.publishDown', $q->expr()->literal('')),
-                        $q->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()')
-                    );
-                }
+                $conditions = [
+                    $q->expr()->eq('c.isPublished', ":{$unique}"),
+                    $q->expr()->isNotNull('c.publishDown'),
+                    $q->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()'),
+                ];
+                $expr = $q instanceof QueryBuilder ? $q->expr()->andX(...$conditions) : $q->expr()->and(...$conditions);
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending', [], null, 'en_US'):
-                if ($q instanceof \Doctrine\ORM\QueryBuilder) {
-                    $expr = new Expr\Andx([
-                        $q->expr()->eq('c.isPublished', ":{$unique}"),
-                        $q->expr()->isNotNull('c.publishUp'),
-                        $q->expr()->neq('c.publishUp', $q->expr()->literal('')),
-                        $q->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()'),
-                    ]);
-                } else {
-                    $expr = $q->expr()->and(
-                        $q->expr()->eq('c.isPublished', ":{$unique}"),
-                        $q->expr()->isNotNull('c.publishUp'),
-                        $q->expr()->neq('c.publishUp', $q->expr()->literal('')),
-                        $q->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()')
-                    );
-                }
+                $conditions = [
+                    $q->expr()->eq('c.isPublished', ":{$unique}"),
+                    $q->expr()->isNotNull('c.publishUp'),
+                    $q->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()'),
+                ];
+                $expr = $q instanceof QueryBuilder ? $q->expr()->andX(...$conditions) : $q->expr()->and(...$conditions);
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
