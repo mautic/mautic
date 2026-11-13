@@ -86,6 +86,7 @@ final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $email = new Email();
         $email->setName('Email A');
         $email->setSubject('Email A Subject');
+        $email->setCustomHtml('<p>Email A</p>');
         $email->setEmailType('list');
         $email->addList($leadList);
         $this->em->persist($email);
