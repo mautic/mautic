@@ -235,4 +235,24 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
 
         return [$entities, $contactCounts, count($paginator)];
     }
+
+    /**
+     * Fetch every published stage with its contact count, independent of list paging and filters.
+     *
+     * @return array{0: array<int, Stage>, 1: array<int, int>}
+     */
+    public function getPublishedEntitiesWithContactCounts(): array
+    {
+        $entities      = [];
+        $contactCounts = [];
+
+        foreach ($this->getRepository()->getPublishedWithContactCounts() as $row) {
+            /** @var Stage $stage */
+            $stage                          = $row[0];
+            $entities[]                     = $stage;
+            $contactCounts[$stage->getId()] = (int) $row['contactCount'];
+        }
+
+        return [$entities, $contactCounts];
+    }
 }

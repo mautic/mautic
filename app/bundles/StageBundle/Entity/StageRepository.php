@@ -41,6 +41,25 @@ class StageRepository extends CommonRepository
     }
 
     /**
+     * @return array<int, array{0: Stage, contactCount: int}>
+     */
+    public function getPublishedWithContactCounts(): array
+    {
+        $sq = $this->_em->createQueryBuilder()
+            ->select('count(l.id)')
+            ->from(Lead::class, 'l')
+            ->where('l.stage = s');
+
+        return $this->createQueryBuilder('s')
+            ->select('s', '('.$sq->getDql().') as contactCount')
+            ->where('s.isPublished = :published')
+            ->setParameter('published', true)
+            ->orderBy('s.weight', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @return array<int, array{id: int, name: string, weight: int}>
      */
     public function getStageWeights(): array
