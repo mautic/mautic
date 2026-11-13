@@ -66,6 +66,65 @@
                         'icon': 'ri-calendar-schedule-line'
                     }
                 ]
+            },
+            'mautic.report.quick_filters.datasource': {
+                'conflictGroup': true,
+                'filters': [
+                    {
+                        'search': ('mautic.report.report.searchcommand.source'|trans) ~ ':leads',
+                        'label': 'mautic.report.quickfilter.source.contacts.label',
+                        'tooltip': 'mautic.report.quickfilter.source.contacts.tooltip',
+                        'icon': 'ri-group-line'
+                    },
+                    {
+                        'search': ('mautic.report.report.searchcommand.source'|trans) ~ ':campaign_lead_event_log',
+                        'label': 'mautic.report.quickfilter.source.campaigns.label',
+                        'tooltip': 'mautic.report.quickfilter.source.campaigns.tooltip',
+                        'icon': 'ri-flag-line'
+                    },
+                    {
+                        'search': ('mautic.report.report.searchcommand.source'|trans) ~ ':assets',
+                        'label': 'mautic.report.quickfilter.source.assets.label',
+                        'tooltip': 'mautic.report.quickfilter.source.assets.tooltip',
+                        'icon': 'ri-folder-line'
+                    },
+                    {
+                        'search': ('mautic.report.report.searchcommand.source'|trans) ~ ':emails',
+                        'label': 'mautic.report.quickfilter.source.emails.label',
+                        'tooltip': 'mautic.report.quickfilter.source.emails.tooltip',
+                        'icon': 'ri-mail-line'
+                    },
+                    {
+                        'search': ('mautic.report.report.searchcommand.source'|trans) ~ ':forms',
+                        'label': 'mautic.report.quickfilter.source.forms.label',
+                        'tooltip': 'mautic.report.quickfilter.source.forms.tooltip',
+                        'icon': 'ri-clipboard-line'
+                    },
+                    {
+                        'search': ('mautic.report.report.searchcommand.source'|trans) ~ ':segment.log',
+                        'label': 'mautic.report.quickfilter.source.segment_log.label',
+                        'tooltip': 'mautic.report.quickfilter.source.segment_log.tooltip',
+                        'icon': 'ri-team-line'
+                    },
+                    {
+                        'search': ('mautic.report.report.searchcommand.source'|trans) ~ ':contact.dnc',
+                        'label': 'mautic.report.quickfilter.source.contact_dnc.label',
+                        'tooltip': 'mautic.report.quickfilter.source.contact_dnc.tooltip',
+                        'icon': 'ri-forbid-line'
+                    },
+                    {
+                        'search': ('mautic.report.report.searchcommand.source'|trans) ~ ':pages',
+                        'label': 'mautic.report.quickfilter.source.pages.label',
+                        'tooltip': 'mautic.report.quickfilter.source.pages.tooltip',
+                        'icon': 'ri-window-line'
+                    },
+                    {
+                        'search': ('mautic.report.report.searchcommand.source'|trans) ~ ':focus_stats',
+                        'label': 'mautic.report.quickfilter.source.focus_stats.label',
+                        'tooltip': 'mautic.report.quickfilter.source.focus_stats.tooltip',
+                        'icon': 'ri-focus-3-line'
+                    }
+                ]
             }
       },
   }) }}

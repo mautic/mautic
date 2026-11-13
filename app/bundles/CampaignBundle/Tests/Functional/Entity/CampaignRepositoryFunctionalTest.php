@@ -42,6 +42,52 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('100.0', $shareDetails[0]['segmentCampaignShare']);
     }
 
+    public function testExpiredAndPendingSearchCommandsFilterCampaigns(): void
+    {
+        $expired        = $this->createCampaignWithDates('Expired campaign', null, new \DateTime('-1 day'));
+        $pending        = $this->createCampaignWithDates('Pending campaign', new \DateTime('+1 day'), null);
+        $activeEndsSoon = $this->createCampaignWithDates('Active campaign ending soon', null, new \DateTime('+1 day'));
+        $activeStarted  = $this->createCampaignWithDates('Active campaign started', new \DateTime('-1 day'), null);
+        $active         = $this->createCampaignWithDates('Active campaign', null, null);
+        $this->em->flush();
+
+        /** @var CampaignRepository $campaignRepo */
+        $campaignRepo = $this->em->getRepository(Campaign::class);
+
+        $expiredResults = $campaignRepo->getEntities([
+            'filter'           => ['string' => 'is:expired'],
+            'ignore_paginator' => true,
+        ]);
+        $this->assertContains($expired, $expiredResults);
+        $this->assertNotContains($pending, $expiredResults);
+        $this->assertNotContains($activeEndsSoon, $expiredResults);
+        $this->assertNotContains($activeStarted, $expiredResults);
+        $this->assertNotContains($active, $expiredResults);
+
+        $pendingResults = $campaignRepo->getEntities([
+            'filter'           => ['string' => 'is:pending'],
+            'ignore_paginator' => true,
+        ]);
+        $this->assertContains($pending, $pendingResults);
+        $this->assertNotContains($expired, $pendingResults);
+        $this->assertNotContains($activeStarted, $pendingResults);
+        $this->assertNotContains($activeEndsSoon, $pendingResults);
+        $this->assertNotContains($active, $pendingResults);
+    }
+
+    private function createCampaignWithDates(string $name, ?\DateTime $publishUp, ?\DateTime $publishDown): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName($name);
+        $campaign->setIsPublished(true);
+        $campaign->setPublishUp($publishUp);
+        $campaign->setPublishDown($publishDown);
+
+        $this->em->persist($campaign);
+
+        return $campaign;
+    }
+
     private function createLead(string $email): Lead
     {
         $lead = new Lead();
