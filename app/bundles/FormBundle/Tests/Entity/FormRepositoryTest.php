@@ -31,9 +31,10 @@ final class FormRepositoryTest extends TestCase
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
-            'mautic.form.form.searchcommand.isexpired' => 'is:expired',
-            'mautic.form.form.searchcommand.ispending' => 'is:pending',
-            default                                            => $id,
+            'mautic.form.form.searchcommand.isexpired'  => 'is:expired',
+            'mautic.form.form.searchcommand.ispending'  => 'is:pending',
+            'mautic.form.form.searchcommand.hasactions' => 'has:actions',
+            default                                     => $id,
         });
 
         $this->repository->autowireCommonRepository($translator);
@@ -70,6 +71,26 @@ final class FormRepositoryTest extends TestCase
         $commands = $this->repository->getSearchCommands();
         $this->assertContains('mautic.form.form.searchcommand.isexpired', $commands);
         $this->assertContains('mautic.form.form.searchcommand.ispending', $commands);
+    }
+
+    public function testAddSearchCommandWhereClauseHandlesHasActionsFilter(): void
+    {
+        $this->entityManager->method('getExpressionBuilder')->willReturn(new Expr());
+        $this->entityManager->method('createQueryBuilder')->willReturnCallback(fn (): OrmQueryBuilder => new OrmQueryBuilder($this->entityManager));
+
+        $qb     = new OrmQueryBuilder($this->entityManager);
+        $filter = (object) ['command' => 'has:actions', 'string' => '', 'not' => false, 'strict' => false];
+
+        $method = new \ReflectionMethod(FormRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr] = $method->invoke($this->repository, $qb, $filter);
+
+        $this->assertStringContainsString('Mautic\\FormBundle\\Entity\\Action a WHERE a.form = f', (string) $expr);
+    }
+
+    public function testGetSearchCommandsContainsHasActions(): void
+    {
+        $this->assertContains('mautic.form.form.searchcommand.hasactions', $this->repository->getSearchCommands());
     }
 
     #[DataProvider('ormSearchCommandDataProvider')]

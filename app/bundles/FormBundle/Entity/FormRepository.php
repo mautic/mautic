@@ -152,6 +152,17 @@ class FormRepository extends CommonRepository
                     ->getDql();
                 $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 0);
                 break;
+            case $this->translator->trans('mautic.form.form.searchcommand.hasactions'):
+            case $this->translator->trans('mautic.form.form.searchcommand.hasactions', [], null, 'en_US'):
+                $sq       = $this->getEntityManager()->createQueryBuilder();
+                $subquery = $sq->select('count(a.id)')
+                    ->from(Action::class, 'a')
+                    ->where(
+                        $q->expr()->eq('a.form', 'f')
+                    )
+                    ->getDql();
+                $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 0);
+                break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
                 $expr            = $q->expr()->like('f.name', ':'.$unique);
@@ -265,6 +276,7 @@ class FormRepository extends CommonRepository
             'mautic.form.form.searchcommand.isexpired',
             'mautic.form.form.searchcommand.ispending',
             'mautic.form.form.searchcommand.hasresults',
+            'mautic.form.form.searchcommand.hasactions',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.name',
             'mautic.project.searchcommand.name',
