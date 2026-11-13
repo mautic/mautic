@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
-tone_instructions: "Be as concise as possible. One or two short sentences per comment. Use simple, plain words that a non-native English speaker understands. No filler, praise or repetition."
+tone_instructions: "Be concise. Use short sentences and simple, plain words a non-native English speaker understands. Write more only when needed to explain a security, BC or data issue. No idioms, filler, praise or repetition."
 reviews:
   auto_review:
     enabled: true
@@ -19,7 +19,6 @@ reviews:
   sequence_diagrams: false
   estimate_code_review_effort: false
   suggested_reviewers: false
-  review_status: false
   review_info: false
   in_progress_fortune: false
   enable_prompt_for_ai_agents: false
