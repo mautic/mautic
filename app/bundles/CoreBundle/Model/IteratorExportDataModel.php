@@ -105,6 +105,8 @@ class IteratorExportDataModel implements \Iterator
 
     private function getDataForExport(): void
     {
+        // Release the previous batch before fetching the next one
+        $this->data = null;
         $data       = new DataExporterHelper();
         $this->data = $data->getDataForExport(
             $this->total,

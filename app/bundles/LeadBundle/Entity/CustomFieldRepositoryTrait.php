@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\LeadBundle\Controller\ListController;
@@ -82,6 +83,12 @@ trait CustomFieldRepositoryTrait
 
             $dq->resetQueryPart('select');
             $this->buildSelectClause($dq, $args);
+
+            if (!empty($args['fieldValuesOnly'])) {
+                $results = $this->fetchFieldValueRows($dq->executeQuery(), $fields, $fixedFields);
+
+                return (!empty($args['withTotalCount'])) ? ['count' => $total, 'results' => $results] : $results;
+            }
 
             $results = $dq->executeQuery()->fetchAllAssociative();
             if (isset($args['route']) && ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) {
@@ -305,6 +312,35 @@ trait CustomFieldRepositoryTrait
             }
         }
         unset($r['owner_id']);
+    }
+
+    /**
+     * Columns match getProfileFields(): int id, then field values grouped in first-seen order.
+     *
+     * @param array<string, array<string, mixed>> $fields
+     * @param array<string, string>               $fixedFields
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function fetchFieldValueRows(Result $result, array $fields, array $fixedFields): array
+    {
+        $rows = [];
+
+        while (false !== ($row = $result->fetchAssociative())) {
+            $id = (int) $row['id'];
+            $this->removeNonFieldColumns($row, $fixedFields);
+
+            $grouped = [];
+            foreach ($row as $column => $value) {
+                if (isset($fields[$column])) {
+                    $grouped[$fields[$column]['group']][$fields[$column]['alias']] = $value;
+                }
+            }
+
+            $rows[$id] = array_merge(['id' => $id], ...array_values($grouped));
+        }
+
+        return $rows;
     }
 
     protected function formatFieldValues(array $values, bool $byGroup = true, string $object = 'lead'): array
