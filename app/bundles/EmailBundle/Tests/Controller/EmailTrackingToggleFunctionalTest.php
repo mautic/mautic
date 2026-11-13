@@ -28,6 +28,8 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
 
     private const API_EDIT_URL = '/api/emails/%d/edit';
 
+    private const LINK_URL = 'https://example.com/offer';
+
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -55,8 +57,8 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         $emptyUtmTags = ['utmSource' => '', 'utmMedium' => null, 'utmCampaign' => '', 'utmContent' => ''];
 
         yield 'tracking on' => [true, $emptyUtmTags, null];
-        yield 'tracking off' => [false, $emptyUtmTags, 'https://example.com/offer'];
-        yield 'tracking off with a UTM tag' => [false, ['utmSource' => 'newsletter'] + $emptyUtmTags, 'https://example.com/offer?utm_source=newsletter'];
+        yield 'tracking off' => [false, $emptyUtmTags, self::LINK_URL];
+        yield 'tracking off with a UTM tag' => [false, ['utmSource' => 'newsletter'] + $emptyUtmTags, self::LINK_URL.'?utm_source=newsletter'];
     }
 
     /**
@@ -74,7 +76,7 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         $email->setEmailType('list');
         $email->setLists([$segment]);
         $email->setTemplate('blank');
-        $email->setCustomHtml('<!DOCTYPE html><html><body><a href="https://example.com/offer">offer</a></body></html>');
+        $email->setCustomHtml('<!DOCTYPE html><html><body><a href="'.self::LINK_URL.'">offer</a></body></html>');
         $email->setUtmTags($utmTags);
         $email->setTrackingEnabled($trackingEnabled);
         $this->em->persist($email);
@@ -94,7 +96,7 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear();
         $trackables = $this->em->getRepository(Trackable::class)->findBy(['channel' => 'email', 'channelId' => $email->getId()]);
-        $redirects  = $this->em->getRepository(Redirect::class)->findBy(['url' => 'https://example.com/offer']);
+        $redirects  = $this->em->getRepository(Redirect::class)->findBy(['url' => self::LINK_URL]);
 
         if ($trackingEnabled) {
             $this->assertStringContainsString('/r/', $link[1], 'the link goes through a tracked link');
