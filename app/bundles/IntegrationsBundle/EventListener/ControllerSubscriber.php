@@ -6,6 +6,7 @@ namespace Mautic\IntegrationsBundle\EventListener;
 
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -16,6 +17,7 @@ final readonly class ControllerSubscriber
     public function __construct(
         private IntegrationsHelper $integrationsHelper,
         private ControllerResolverInterface $resolver,
+        private IntegrationHelper $integrationHelper,
     ) {
     }
 
@@ -31,7 +33,14 @@ final readonly class ControllerSubscriber
             $page            = $request->attributes->all()['page'] ?? $request->query->all()['page'] ?? $request->request->all()['page'] ?? null;
 
             try {
-                $this->integrationsHelper->getIntegration($integrationName);
+                try {
+                    $this->integrationsHelper->getIntegration($integrationName);
+                } catch (IntegrationNotFoundException) {
+                    // The settings row may not exist yet; the legacy helper creates the missing ones, as the plugin list does
+                    $this->integrationHelper->getIntegrationObject($integrationName);
+                    $this->integrationsHelper->getIntegration($integrationName);
+                }
+
                 $request->attributes->add(
                     [
                         'integration'   => $integrationName,

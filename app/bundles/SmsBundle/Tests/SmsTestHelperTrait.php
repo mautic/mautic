@@ -20,10 +20,7 @@ trait SmsTestHelperTrait
 
         $integration = $this->getContainer()->get(TwilioIntegration::class);
 
-        // Like any admin page, the plugin list creates the integration settings rows the config page loads.
-        $this->client->request(Request::METHOD_GET, '/s/plugins');
-
-        $crawler  = $this->client->request(Request::METHOD_GET, '/s/plugins/config/'.$integration->getName());
+        $crawler  = $this->client->request(Request::METHOD_GET, 's/plugins/config/'.$integration->getName());
         $response = $this->client->getResponse();
 
         Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());

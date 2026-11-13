@@ -11,8 +11,6 @@ final class PluginControllerTest extends MauticMysqlTestCase
 {
     public function testConfigurePluginSuccessValidation(): void
     {
-        // the plugin list creates the integration settings rows the config page loads
-        $this->client->request(Request::METHOD_GET, '/s/plugins');
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/plugins/config/Twilio');
         $form       = $crawler->filter('form')->form();
 
@@ -32,7 +30,6 @@ final class PluginControllerTest extends MauticMysqlTestCase
 
     public function testConfigurePluginValidationError(): void
     {
-        $this->client->request(Request::METHOD_GET, '/s/plugins');
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/plugins/config/Twilio');
         $form       = $crawler->filter('form')->form();
 

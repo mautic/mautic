@@ -64,10 +64,11 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
 
     public function testKeysAreRequiredOnlyWhilePublished(): void
     {
-        $this->testSymfonyCommand('mautic:plugins:install');
-        $this->client->request('GET', '/s/plugins');
+        // opens the config page directly: no settings row exists until the page creates it
+        $this->assertNull(self::getContainer()->get(IntegrationRepository::class)->findOneBy(['name' => TwilioIntegration::NAME]));
 
         $crawler     = $this->client->request('GET', '/s/plugins/config/Twilio');
+        $this->assertResponseIsSuccessful();
         $form        = $crawler->selectButton('integration_config[buttons][save]')->form();
         $isPublished = $form['integration_config[isPublished]'];
         $this->assertInstanceOf(ChoiceFormField::class, $isPublished);
