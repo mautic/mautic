@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\UnitOfWork;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
@@ -442,7 +443,7 @@ class FormModel extends AbstractCommonModel
      * @param string   $spaceCharacter    Character to replace spaces with
      * @param string[] $allowedCharacters Allowed characters in alias
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function cleanAlias(
         string $alias,

@@ -104,4 +104,57 @@ final class FormModelTest extends TestCase
             ++$countDispatch;
         }
     }
+
+    public function testSaveEntityToCheckDateAddedAndDateModified(): void
+    {
+        $corePermissionsMock      = $this->createStub(CorePermissions::class);
+        $dispatcherMock           = $this->createStub(EventDispatcherInterface::class);
+        $routerMock               = $this->createStub(UrlGeneratorInterface::class);
+        $translatorMock           = $this->createStub(Translator::class);
+        $userHelperMock           = $this->createStub(UserHelper::class);
+        $loggerMock               = $this->createStub(LoggerInterface::class);
+        $coreParametersHelperMock = $this->createStub(CoreParametersHelper::class);
+        $formRepository           = $this->createStub(FormRepository::class);
+
+        $formRepository
+            ->method('saveEntity')
+            ->willReturnCallback(function (Lead $lead): void {
+                if (!$lead->getId()) {
+                    $lead->setId(1);
+                }
+            });
+
+        $this
+            ->entityManagerMock
+            ->method('getRepository')
+            ->willReturn($formRepository);
+
+        $formModel = new FormModel(
+            $this->entityManagerMock,
+            $corePermissionsMock,
+            $dispatcherMock,
+            $routerMock,
+            $translatorMock,
+            $userHelperMock,
+            $loggerMock,
+            $coreParametersHelperMock,
+        );
+
+        // Step 1: Create a new entity and save it
+        $lead = new Lead();
+        $formModel->saveEntity($lead);
+
+        $dateModified1 = $lead->getDateModified();
+        $dateAdded1    = $lead->getDateAdded();
+
+        // Step 2: Update the existing entity and save it
+        $lead->setTitle('Lorem ipsum');
+        $formModel->saveEntity($lead);
+
+        $dateModified2 = $lead->getDateModified();
+        $dateAdded2    = $lead->getDateAdded();
+
+        $this->assertSame($dateAdded1, $dateAdded2, 'Date added should not be updated after saving the entity again');
+        $this->assertSame($dateModified1, $dateModified2, 'Date modified should not be updated after saving the entity again');
+    }
 }
