@@ -173,6 +173,7 @@ final class LeadSubscriber implements EventSubscriberInterface
                         ],
                         'contentTemplate' => $template,
                         'icon'            => 'ri-vidicon-2-line',
+                        'contactId'       => $hit['lead_id'],
                     ]
                 );
             }

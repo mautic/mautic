@@ -8,7 +8,7 @@
   <div class="row">
     {% if dashboards %}
         <div class="col-sm-6">
-            <div class="ml-sm mt-sm pa-sm">
+            <div class="ms-12 mt-12 pa-12">
                 <div class="panel panel-info">
                     <div class="panel-heading">
                         <div class="panel-title">{{ 'mautic.dashboard.predefined'|trans }}</div>
@@ -39,14 +39,14 @@
         </div>
     {% endif %}
       <div class="col-sm-6">
-          <div class="mr-sm mt-sm pa-sm">
+          <div class="me-12 mt-12 pa-12">
               <div class="panel panel-info">
                   <div class="panel-heading">
                       <div class="panel-title">{{ 'mautic.dashboard.import.start.instructions'|trans }}</div>
                   </div>
                   <div class="panel-body">
                       {{ form_start(form) }}
-                      <div class="input-group well mt-lg">
+                      <div class="input-group well mt-24">
                           {{ form_widget(form.file) }}
                           <span class="input-group-btn">
                               {{ form_widget(form.start) }}
