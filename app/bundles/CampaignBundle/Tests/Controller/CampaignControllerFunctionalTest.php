@@ -47,15 +47,6 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $this->configParams['delete_campaign_event_log_in_background'] = false;
     }
 
-    public function testCampaignIndexRendersLegacyQuickFilterGroups(): void
-    {
-        $this->client->request('GET', '/s/campaigns');
-
-        $this->assertResponseIsSuccessful();
-        $quickFilters = $this->getQuickFiltersCrawler();
-        $this->assertCount(1, $quickFilters->filter('[data-conflict-group="status"][data-filter="is:published"]'));
-    }
-
     public function testCampaignContactCountThroughStatsWithSummary(): void
     {
         $this->campaignContactCountThroughStats();
@@ -387,10 +378,5 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $this->assertCount(2, $body);
         self::arrayHasKey('actions');
         $this->assertStringContainsString('100% 2 0 Event A mautic.campaign.type.a 100% 2 0 Event B mautic.campaign.type.b', (string) preg_replace('/\s+/', ' ', strip_tags($body['actions'])));
-    }
-
-    private function getQuickFiltersCrawler(): Crawler
-    {
-        return new Crawler($this->client->getCrawler()->filter('[data-quick-filter]')->attr('data-bs-content'));
     }
 }

@@ -45,7 +45,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
         $quickFilters = $this->getQuickFiltersCrawler();
-        $this->assertCount(4, $quickFilters->filter('[data-conflict-group="style"]'));
+        $this->assertCount(4, $quickFilters->filter('[data-conflict-group="mautic.focus.quick_filters.style"]'));
         $this->assertCount(1, $quickFilters->filter('[data-filter="style:bar"]'));
     }
 
