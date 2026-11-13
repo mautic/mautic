@@ -188,6 +188,50 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(2, $smsFr->getSentCount(), 'Sent count for French translated SMS should be 2.');
     }
 
+    public function testWhitespaceOnlyNumberIsPersistedAsFailedWithoutIncreasingSentCount(): void
+    {
+        $sms = $this->createAnSms('Whitespace number SMS', 'Private message body');
+        $this->em->persist($sms);
+        $contact = $this->createLead('Whitespace', 'Number', '   ');
+
+        $smsId     = $sms->getId();
+        $contactId = $contact->getId();
+        $this->em->clear();
+
+        $sms     = $this->em->find(Sms::class, $smsId);
+        $contact = $this->em->find(Lead::class, $contactId);
+        $this->assertInstanceOf(Sms::class, $sms);
+        $this->assertInstanceOf(Lead::class, $contact);
+
+        $transportMock = $this->createMock(TransportChain::class);
+        $transportMock->expects($this->never())->method('sendBatchSms');
+        $this->getContainer()->set('mautic.sms.transport_chain', $transportMock);
+
+        /** @var SmsModel $smsModel */
+        $smsModel       = $this->getContainer()->get(SmsModel::class);
+        $loadedContacts = [];
+        $results        = $smsModel->sendSms($sms, $contact, [], $loadedContacts);
+
+        $this->assertSame([$contactId => $contact], $loadedContacts);
+        $this->assertSame(
+            [$contactId => ['sent' => false, 'status' => 'mautic.sms.campaign.failed.missing_number']],
+            $results,
+        );
+
+        $stats = $smsModel->getStatRepository()->findBy(['sms' => $smsId, 'lead' => $contactId]);
+        $this->assertCount(1, $stats);
+        $this->assertTrue($stats[0]->isFailed());
+        $this->assertSame(
+            ['failed' => ['Missing phone number for contact.']],
+            $stats[0]->getDetails(),
+        );
+
+        $this->em->clear();
+        $sms = $this->em->find(Sms::class, $smsId);
+        $this->assertInstanceOf(Sms::class, $sms);
+        $this->assertSame(0, $sms->getSentCount());
+    }
+
     private function createLead(string $firstname, string $lastname, string $mobile): Lead
     {
         $contact = new Lead();

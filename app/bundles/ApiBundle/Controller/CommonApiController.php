@@ -525,15 +525,16 @@ class CommonApiController extends FetchCommonApiController
                 array_key_exists('isPublished', $parameters)
                 || array_key_exists('publishUp', $parameters)
                 || array_key_exists('publishDown', $parameters)
+                || array_key_exists('continueSending', $parameters)
             )
             && $this->security->checkPermissionExists($this->permissionBase.':publish')) {
             if ($this->security->checkPermissionExists($this->permissionBase.':publishown')) {
                 if (!$this->checkEntityAccess($entity, 'publish')) {
                     if ('new' === $action) {
                         $parameters['isPublished'] = 0;
-                        unset($parameters['publishUp'], $parameters['publishDown']);
+                        unset($parameters['publishUp'], $parameters['publishDown'], $parameters['continueSending']);
                     } else {
-                        unset($parameters['isPublished'], $parameters['publishUp'], $parameters['publishDown']);
+                        unset($parameters['isPublished'], $parameters['publishUp'], $parameters['publishDown'], $parameters['continueSending']);
                     }
                 }
             }
