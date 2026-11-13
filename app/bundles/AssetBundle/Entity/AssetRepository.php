@@ -92,6 +92,23 @@ class AssetRepository extends CommonRepository
         $command         = $field         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
+        $mediaCommandMap = [
+            'mautic.asset.asset.searchcommand.isimage' => [
+                ['image/%'],
+                ['application/photoshop', 'application/x-photoshop'],
+                ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'tif', 'tiff', 'psd', 'ico'],
+            ],
+            'mautic.asset.asset.searchcommand.isvideo' => [
+                ['video/%'],
+                [],
+                ['mp4', 'webm', 'ogv', 'mov', 'wmv', 'avi', 'mkv', 'mpeg'],
+            ],
+            'mautic.asset.asset.searchcommand.isaudio' => [
+                ['audio/%'],
+                [],
+                ['mp3', 'wav', 'ogg', 'oga', 'm4a', 'aac', 'flac'],
+            ],
+        ];
         switch ($command) {
             case $this->translator->trans('mautic.asset.asset.searchcommand.isexpired'):
             case $this->translator->trans('mautic.asset.asset.searchcommand.isexpired', [], null, 'en_US'):
@@ -118,6 +135,47 @@ class AssetRepository extends CommonRepository
                 ];
                 $expr            = '('.$q->expr()->eq('a.language', ":{$unique}").' OR '.$q->expr()->like('a.language', ":{$langUnique}").')';
                 $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isimage'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isimage', [], null, 'en_US'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isvideo'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isvideo', [], null, 'en_US'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isaudio'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isaudio', [], null, 'en_US'):
+                foreach ($mediaCommandMap as $key => [$patterns, $exactMimes, $extensions]) {
+                    if (in_array($command, [
+                        $this->translator->trans($key),
+                        $this->translator->trans($key, [], null, 'en_US'),
+                    ], true)) {
+                        [$expr, $forceParameters] = $this->buildMediaExpression($patterns, $exactMimes, $extensions);
+                        break;
+                    }
+                }
+                break;
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isdocument'):
+            case $this->translator->trans('mautic.asset.asset.searchcommand.isdocument', [], null, 'en_US'):
+                [$expr, $forceParameters] = $this->buildMediaExpression(
+                    [],
+                    [
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'application/vnd.ms-word.document.macroEnabled.12',
+                        'application/vnd.ms-excel',
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        'application/vnd.ms-excel.sheet.macroEnabled.12',
+                        'application/vnd.ms-powerpoint',
+                        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                        'application/vnd.ms-powerpoint.presentation.macroEnabled.12',
+                        'application/vnd.oasis.opendocument.text',
+                        'application/vnd.oasis.opendocument.spreadsheet',
+                        'application/vnd.oasis.opendocument.presentation',
+                        'application/rtf',
+                        'text/plain',
+                        'text/csv',
+                    ],
+                    ['pdf', 'doc', 'docx', 'docm', 'xls', 'xlsx', 'xlsm', 'ppt', 'pptx', 'pptm', 'odt', 'ods', 'odp', 'rtf', 'txt', 'csv']
+                );
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
@@ -148,6 +206,46 @@ class AssetRepository extends CommonRepository
     }
 
     /**
+     * @param string[] $patterns
+     * @param string[] $exactMimes
+     * @param string[] $extensions
+     *
+     * @return array{0: string, 1: array<string, string>}
+     */
+    private function buildMediaExpression(array $patterns, array $exactMimes, array $extensions): array
+    {
+        $parameters  = [];
+        $comparisons = [];
+
+        foreach ($patterns as $pattern) {
+            $name          = $this->generateRandomParameterName();
+            $parameters[$name] = $pattern;
+            $comparisons[] = "(a.mime IS NOT NULL AND a.mime LIKE :{$name})";
+        }
+
+        foreach ($exactMimes as $mime) {
+            $exactName         = $this->generateRandomParameterName();
+            $prefixName        = $this->generateRandomParameterName();
+            $parameters[$exactName]  = $mime;
+            $parameters[$prefixName] = $mime.';%';
+            $comparisons[]     = "(a.mime IS NOT NULL AND (a.mime = :{$exactName} OR a.mime LIKE :{$prefixName}))";
+        }
+
+        $extensionComparisons = [];
+        foreach ($extensions as $extension) {
+            $name                   = $this->generateRandomParameterName();
+            $parameters[$name]      = $extension;
+            $extensionComparisons[] = "a.extension = :{$name}";
+        }
+
+        if ($extensionComparisons) {
+            $comparisons[] = "((a.mime IS NULL OR a.mime = '' OR a.mime = 'application/octet-stream') AND a.extension IS NOT NULL AND (".implode(' OR ', $extensionComparisons).'))';
+        }
+
+        return ['('.implode(' OR ', $comparisons).')', $parameters];
+    }
+
+    /**
      * @return string[]
      */
     public function getSearchCommands(): array
@@ -161,6 +259,10 @@ class AssetRepository extends CommonRepository
             'mautic.asset.asset.searchcommand.ispending',
             'mautic.core.searchcommand.category',
             'mautic.asset.asset.searchcommand.lang',
+            'mautic.asset.asset.searchcommand.isimage',
+            'mautic.asset.asset.searchcommand.isvideo',
+            'mautic.asset.asset.searchcommand.isdocument',
+            'mautic.asset.asset.searchcommand.isaudio',
             'mautic.project.searchcommand.name',
         ];
 
