@@ -113,6 +113,11 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
                 $alias       = $element['alias'] ?? $field->getAlias() ?? '';
                 $uniqueAlias = $this->fieldModel->generateUniqueFieldAlias($alias);
                 $field->setAlias($uniqueAlias);
+
+                // Field lists are keyed by label, so a field sharing the label of an existing one could not be selected
+                if ($uniqueAlias !== $alias && $this->leadFieldRepository->findOneBy(['label' => $field->getLabel(), 'object' => $field->getObject()])) {
+                    $field->setLabel(sprintf('%s (%s)', $field->getLabel(), $uniqueAlias));
+                }
             }
 
             $this->fieldModel->saveEntity($field);

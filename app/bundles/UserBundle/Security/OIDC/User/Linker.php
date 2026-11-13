@@ -21,7 +21,7 @@ final readonly class Linker implements LinkerInterface
     {
         $subjectId = $this->subjectIdRepository->findOneBy(['subjectID' => $identifier]);
 
-        if (!$subjectId) {
+        if (!$subjectId || $subjectId->getSubjectID() !== $identifier) {
             return null;
         }
 
