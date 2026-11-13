@@ -251,7 +251,7 @@
             change(root, deltas[event.key]);
         } else if ((event.key === 'Home' && Number.isFinite(min)) || (event.key === 'End' && Number.isFinite(max))) {
             event.preventDefault();
-            const target = event.key === 'Home' ? min : max;
+            const target = event.key === 'Home' ? min : snap(input, max, -1);
             if (input.value === '' || target !== Number(input.value)) {
                 setValue(root, target);
             }
