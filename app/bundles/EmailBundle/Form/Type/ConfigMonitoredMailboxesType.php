@@ -10,6 +10,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -20,9 +22,10 @@ use Symfony\Component\Validator\Constraints\Email;
  */
 final class ConfigMonitoredMailboxesType extends AbstractType
 {
-    public function __construct(
-        private readonly Mailbox $imapHelper,
-    ) {
+    public function __construct(Mailbox $imapHelper)
+    {
+        // Keep the historical constructor signature for third-party integrations.
+        unset($imapHelper);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -156,26 +159,19 @@ final class ConfigMonitoredMailboxesType extends AbstractType
                 ]
             );
 
-            $settings = (empty($options['data']['override_settings'])) ? $options['general_settings'] : $options['data'];
-
-            $this->imapHelper->setMailboxSettings($settings);
-
-            // Check for IMAP connection and get a folder list
+            // Keep form rendering independent from the monitored mailbox. The explicit test-connection
+            // action loads the live folder list, while an unavailable server must not block configuration.
             $choices = [
                 'INBOX' => 'INBOX',
                 'Trash' => 'Trash',
             ];
 
-            if ($this->imapHelper->isConfigured()) {
-                try {
-                    $folders = $this->imapHelper->getListingFolders();
-                    $choices = array_combine($folders, $folders);
-                } catch (\Exception) {
-                    // If the connection failed - add back the selected folder just in case it's a temporary connection issue
-                    if (!empty($options['data']['folder'])) {
-                        $choices[$options['data']['folder']] = $options['data']['folder'];
-                    }
-                }
+            // Preserve a previously selected custom folder until the connection is tested again.
+            if (!empty($options['data']['folder'])) {
+                $choices[$options['data']['folder']] = $options['data']['folder'];
+            }
+            if (!empty($options['default_folder'])) {
+                $choices[$options['default_folder']] = $options['default_folder'];
             }
 
             $builder->add(
@@ -191,6 +187,21 @@ final class ConfigMonitoredMailboxesType extends AbstractType
                     'required' => false,
                 ]
             );
+
+            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($choices): void {
+                $submitted = $event->getData();
+                $folder    = is_array($submitted) ? ($submitted['folder'] ?? null) : null;
+
+                if (!is_string($folder) || '' === trim($folder) || str_contains($folder, "\0") || array_key_exists($folder, $choices)) {
+                    return;
+                }
+
+                $form       = $event->getForm();
+                $folderForm = $form->get('folder');
+                $folderOpts = $folderForm->getConfig()->getOptions();
+                $folderOpts['choices'][$folder] = $folder;
+                $form->add('folder', ChoiceType::class, $folderOpts);
+            });
         }
 
         $builder->add(

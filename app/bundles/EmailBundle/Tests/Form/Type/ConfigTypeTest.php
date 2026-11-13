@@ -33,6 +33,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigTypeTest extends TypeTestCase
 {
+    private ?\PHPUnit\Framework\MockObject\MockObject $mailbox = null;
+
     protected function getExtensions(): array
     {
         // Some local environments do not have ext-imap loaded, but Mailbox uses these
@@ -71,7 +73,9 @@ final class ConfigTypeTest extends TypeTestCase
         $configType                     = new ConfigType($translator);
         $preferenceCenterList           = new PreferenceCenterListType($pageModelMock, $permsMock);
         $configMonitoredEmail           = new ConfigMonitoredEmailType(new EventDispatcher());
-        $configMonitoredMailboxes       = new ConfigMonitoredMailboxesType($this->createStub(Mailbox::class));
+        $this->mailbox = $this->createMock(Mailbox::class);
+        $this->mailbox->expects($this->never())->method('getListingFolders');
+        $configMonitoredMailboxes       = new ConfigMonitoredMailboxesType($this->mailbox);
         $dsnValidator                   = new DsnValidator($this->createStub(TransportFactory::class));
         $emailOrEmailTokenListValidator = new EmailOrEmailTokenListValidator($this->createStub(EmailValidator::class), $this->createStub(CustomFieldValidator::class));
         $validator                      = Validation::createValidatorBuilder()
@@ -136,5 +140,63 @@ final class ConfigTypeTest extends TypeTestCase
         $this->assertSame('email', $data['email_default_utm_medium']);
         $this->assertSame('spring-promo', $data['email_default_utm_campaign']);
         $this->assertSame('header-link', $data['email_default_utm_content']);
+    }
+
+    public function testBuildingMonitoredMailboxFormKeepsTheExistingFolderWithoutConnectingToImap(): void
+    {
+        $form = $this->factory->create(
+            ConfigMonitoredMailboxesType::class,
+            [
+                'host'     => 'imap.example.invalid',
+                'port'     => '993',
+                'user'     => 'monitor@example.invalid',
+                'password' => 'invalid-password',
+                'folder'   => 'Custom',
+            ],
+            [
+                'mailbox'          => 'EmailBundle_bounces',
+                'default_folder'   => 'INBOX',
+                'general_settings' => [],
+            ]
+        );
+
+        $this->assertTrue($form->has('folder'));
+        $this->assertSame(
+            ['INBOX' => 'INBOX', 'Trash' => 'Trash', 'Custom' => 'Custom'],
+            $form->get('folder')->getConfig()->getOption('choices')
+        );
+    }
+
+    public function testSubmittedFolderDiscoveredByConnectionTestCanBeSaved(): void
+    {
+        $form = $this->factory->create(
+            ConfigMonitoredMailboxesType::class,
+            [],
+            [
+                'mailbox'          => 'EmailBundle_bounces',
+                'default_folder'   => 'INBOX',
+                'general_settings' => [],
+            ]
+        );
+
+        $form->submit(['folder' => 'Archive']);
+
+        $this->assertTrue($form->isSynchronized());
+        $this->assertSame('Archive', $form->getData()['folder']);
+    }
+
+    public function testConfiguredDefaultFolderIsAvailableWithoutConnectingToImap(): void
+    {
+        $form = $this->factory->create(
+            ConfigMonitoredMailboxesType::class,
+            [],
+            [
+                'mailbox'          => 'EmailBundle_bounces',
+                'default_folder'   => 'Archive',
+                'general_settings' => [],
+            ]
+        );
+
+        $this->assertArrayHasKey('Archive', $form->get('folder')->getConfig()->getOption('choices'));
     }
 }
