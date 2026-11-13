@@ -4,10 +4,10 @@
 
 {# General Configuration #}
 {% if fieldKeys|filter(k => k in ['site_url', 'webroot', '404_page', 'cache_path', 'log_path', 'theme', 'image_path'])|length > 0 %}
-    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.core.config.header.general'|trans }}</h4>
-    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.general.description'|trans }}</div>
+    <h4 class="fw-sb mt-48 mb-5">{{ 'mautic.core.config.header.general'|trans }}</h4>
+    <div class="text-muted small pb-16">{{ 'mautic.core.config.header.general.description'|trans }}</div>
     <div class="row">
-        <div class="panel panel-default mb-md">
+        <div class="panel panel-default mb-16">
             <div class="panel-body">
                 <div class="row">
 
@@ -60,10 +60,10 @@
 {# Defaults Configuration #}
 {% if fieldKeys|filter(k => k in ['default_pagelist', 'timezone', 'locale', 'date_format_full', 'date_format_short',
 'date_format_dateonly', 'date_format_timeonly'])|length > 0 %}
-    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.core.config.header.defaults'|trans }}</h4>
-    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.defaults.description'|trans }}</div>
+    <h4 class="fw-sb mt-48 mb-5">{{ 'mautic.core.config.header.defaults'|trans }}</h4>
+    <div class="text-muted small pb-16">{{ 'mautic.core.config.header.defaults.description'|trans }}</div>
     <div class="row">
-        <div class="panel panel-default mb-md">
+        <div class="panel panel-default mb-16">
             <div class="panel-body">
                 <div class="row">
 
@@ -75,7 +75,7 @@
                     <div class="col-xs-12">{{ formRowIfExists(form, 'default_timezone') }}</div>
                     {% endif %}
 
-                    <div class="mt-lg">
+                    <div class="mt-24">
                         {% set paginationContent %}
                             {% if form.default_pagelimit is defined %}
                                 {{ formRowIfExists(form, 'default_pagelimit') }}
@@ -133,10 +133,10 @@
 
 {# CORS Configuration #}
 {% if fieldKeys|filter(k => k in ['cors_restrict_domains', 'trusted_hosts', 'trusted_proxies', 'headers_sts'])|length > 0 %}
-    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.core.config.header.cors'|trans }}</h4>
-    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.cors.description'|trans }}</div>
+    <h4 class="fw-sb mt-48 mb-5">{{ 'mautic.core.config.header.cors'|trans }}</h4>
+    <div class="text-muted small pb-16">{{ 'mautic.core.config.header.cors.description'|trans }}</div>
     <div class="row">
-        <div class="panel panel-default mb-md">
+        <div class="panel panel-default mb-16">
             <div class="panel-body">
                 <div class="row">
 
@@ -201,10 +201,10 @@
 {# Miscellaneous Configuration #}
 {% if fieldKeys|filter(k => k in ['ip_lookup_service', 'do_not_track_ips',
 'do_not_track_bots', 'transliterate_page_title'])|length > 0 %}
-    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.core.config.header.misc'|trans }}</h4>
-    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.misc.description'|trans }}</div>
+    <h4 class="fw-sb mt-48 mb-5">{{ 'mautic.core.config.header.misc'|trans }}</h4>
+    <div class="text-muted small pb-16">{{ 'mautic.core.config.header.misc.description'|trans }}</div>
     <div class="row">
-        <div class="panel panel-default mb-md">
+        <div class="panel panel-default mb-16">
             <div class="panel-body">
                 <div class="row">
 
@@ -314,10 +314,10 @@
 
 {# Update Configuration #}
 {% if fieldKeys|filter(k => k in ['update_stability', 'composer_updates'])|length > 0 %}
-    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.core.config.header.update'|trans }}</h4>
-    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.update.description'|trans }}</div>
+    <h4 class="fw-sb mt-48 mb-5">{{ 'mautic.core.config.header.update'|trans }}</h4>
+    <div class="text-muted small pb-16">{{ 'mautic.core.config.header.update.description'|trans }}</div>
     <div class="row">
-        <div class="panel panel-default mb-md">
+        <div class="panel panel-default mb-16">
             <div class="panel-body">
                 <div class="row">
 
