@@ -4,7 +4,7 @@
 {% set blockId = 'code-block-' ~ random() %}
 {% set captionId = blockId ~ '-caption' %}
 {% set bodyId = blockId ~ '-body' %}
-<figure id="{{ blockId }}" aria-labelledby="{{ captionId }}" class="code-block{{ wrap|default(false) ? ' code-block--wrap' : '' }}{{ numbered|default(false) ? ' code-block--numbered' : '' }}" data-code-block data-collapsed-lines="{{ collapsedLines }}">
+<figure id="{{ blockId }}" aria-labelledby="{{ captionId }}" class="code-block{{ wrap|default(false) ? ' code-block--wrap' : '' }}{{ numbered|default(false) ? ' code-block--numbered' : '' }}" data-code-block>
     <div class="code-block__header type-label-01">
         <span id="{{ captionId }}" class="code-block__filename"><i class="ri-file-code-line fs-14" aria-hidden="true"></i>{{ filename|default(language|default('code')) }}</span>
         {% if hideCopyButton is not defined or not hideCopyButton %}
@@ -18,6 +18,7 @@
             attributes: {
                 'data-copy': copyText|default(innerText)|escape('html_attr'),
                 'type': 'button',
+                'id': blockId ~ '-copy',
             },
             }]
         } %}

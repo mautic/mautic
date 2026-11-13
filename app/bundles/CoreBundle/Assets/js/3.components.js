@@ -1,12 +1,12 @@
 /**
  * Code block: keyboard access to horizontal scroll and animated expand/collapse.
  */
-const scrollObserver = new ResizeObserver((entries) => entries.forEach(({target}) => {
+const scrollObserver = 'ResizeObserver' in window ? new ResizeObserver((entries) => entries.forEach(({target}) => {
     if (target.scrollWidth > target.clientWidth) target.setAttribute('tabindex', '0');
     else target.removeAttribute('tabindex');
-}));
+})) : null;
 
-const observeCodeBlocks = (root) => root.querySelectorAll('.code-block__body').forEach((body) => scrollObserver.observe(body));
+const observeCodeBlocks = (root) => scrollObserver && root.querySelectorAll('.code-block__body').forEach((body) => scrollObserver.observe(body));
 
 observeCodeBlocks(document);
 mQuery(document).on('mautic:onPageLoad:before', (event, container) => observeCodeBlocks(document.querySelector(container) || document));
@@ -35,5 +35,8 @@ document.addEventListener('click', (event) => {
     const duration = parseFloat(getComputedStyle(body).getPropertyValue('--duration-productive')) || 0;
     body.style.overflow = 'hidden';
     const animation = body.animate({height: [`${from}px`, `${to}px`]}, {duration: duration * 2, easing: 'cubic-bezier(0.23, 1, 0.32, 1)'});
-    animation.onfinish = animation.oncancel = () => body.style.removeProperty('overflow');
+    const release = () => {
+        if (!body.getAnimations().length) body.style.removeProperty('overflow');
+    };
+    animation.onfinish = animation.oncancel = release;
 });
