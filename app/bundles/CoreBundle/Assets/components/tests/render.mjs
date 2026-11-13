@@ -20,7 +20,7 @@ export function render(name, options = {}) {
 }
 
 export async function load(page, name, options = {}, extra = '', minified = false) {
-    await page.setContent(`<style>:root {--focus: #0f62fe; --support-success: #24a148; --layer: #fff;} .btn {display:inline-flex;align-items:center;height:40px;border-radius:0;} .btn[size="sm"] {height:32px;} .btn[size="lg"] {height:48px;} .btn-tertiary span {height:40px;justify-content:space-between;} ${css}</style>${render(name, options)}${extra}`);
+    await page.setContent(`<style>:root {--focus: #0f62fe; --support-success: #24a148; --text-primary: #161616; --layer: #fff; --spacing-03: 8px;} .sr-only {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;} .btn {display:inline-flex;align-items:center;height:40px;border-radius:0;} .btn[size="sm"] {height:32px;} .btn[size="lg"] {height:48px;} .btn-tertiary span {display:flex;align-items:center;width:100%;height:40px;justify-content:space-between;gap:32px;} .btn span > span {margin-right:8px;} ${css}</style>${render(name, options)}${extra}`);
     const scripts = ['2.hold-to-confirm-beam.js', '3.hold-to-confirm.js'].map(file => resolve(core, 'Assets/js', file));
     if (minified) {
         const source = execFileSync('php', ['-r', String.raw`require $argv[1]; $minifier = new \MatthiasMullie\Minify\JS(); foreach (array_slice($argv, 2) as $file) { $minifier->add($file); } echo $minifier->minify();`, process.env.MAUTIC_VENDOR_AUTOLOAD ?? resolve(core, '../../../vendor/autoload.php'), ...scripts], {encoding: 'utf8'});

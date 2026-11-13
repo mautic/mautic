@@ -147,6 +147,18 @@ for (const [size, height] of [['sm', 32], ['md', 40], ['lg', 48]]) {
   test(`size ${size}`, async ({ page }) => {
     await load(page, 'hold-to-confirm', { size });
     await expect(page.getByRole('button')).toHaveCSS('height', `${height}px`);
+    const geometry = await page.locator('[data-component]').evaluate((element) => {
+      const button = element.querySelector('button');
+      const symbol = element.querySelector('.hold-to-confirm__symbol').getBoundingClientRect();
+      const label = element.querySelector('.hold-to-confirm__label').getBoundingClientRect();
+      const status = element.querySelector('[role="status"]');
+      return {gap: label.left - symbol.right, labelHeight: label.height, centerOffset: Math.abs(label.y + label.height / 2 - symbol.y - symbol.height / 2), statusWidth: status.getBoundingClientRect().width, statusInsideButton: button.contains(status)};
+    });
+    expect(geometry.gap).toBeCloseTo(8, 1);
+    expect(geometry.labelHeight).toBeLessThan(height - 4);
+    expect(geometry.centerOffset).toBeLessThan(1);
+    expect(geometry.statusWidth).toBe(1);
+    expect(geometry.statusInsideButton).toBe(false);
   });
 }
 
@@ -157,7 +169,37 @@ for (const variant of ['neutral', 'beam']) {
     await expect(page.locator('[data-component]')).toHaveAttribute('data-state', 'confirmed');
     await page.mouse.up();
     await expect(page.getByRole('button')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
-    await expect(page.getByRole('button')).toHaveCSS('color', 'rgb(36, 161, 72)');
+    await expect(page.getByRole('button')).toHaveCSS('color', 'color(srgb 0.119216 0.413333 0.203922)');
+  });
+}
+
+for (const variant of ['danger', 'neutral', 'beam']) {
+  test(`${variant} success focus, hover and disabled states stay consistent`, async ({ page }) => {
+    await load(page, 'hold-to-confirm', { variant, duration: 0, resetDelay: 0 });
+    await page.addStyleTag({content: '.btn:focus,.btn.focus {outline:2px solid var(--focus);box-shadow:inset 0 0 0 1px var(--focus);} .btn:hover,.btn:active,.btn.active {background:red;color:white;border-color:red;} .btn:disabled {background:gray;color:rgb(80,80,80);border-color:gray;}'});
+    const button = page.getByRole('button');
+    await button.focus();
+    await expect(button).toHaveCSS('outline-color', 'rgb(15, 98, 254)');
+    await press(page);
+    await expect(page.locator('[data-component]')).toHaveAttribute('data-state', 'confirmed');
+    await expect(button).toHaveCSS('outline-color', 'color(srgb 0.119216 0.413333 0.203922)');
+    await expect(button).toHaveCSS('border-color', 'color(srgb 0.119216 0.413333 0.203922)');
+    await expect(button).toHaveCSS('color', 'color(srgb 0.119216 0.413333 0.203922)');
+    await page.mouse.up();
+    await button.evaluate(element => element.classList.add('active', 'focus'));
+    await expect(button).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+    await expect(button).toHaveCSS('box-shadow', 'color(srgb 0.119216 0.413333 0.203922) 0px 0px 0px 1px inset');
+    await page.evaluate(() => window.MauticUI.HoldToConfirmButton.get(document.querySelector('[data-component]')).update({ disabled: true }));
+    await expect(button).toHaveCSS('color', 'rgb(80, 80, 80)');
+    await expect(button).toBeDisabled();
+    await button.evaluate(element => element.classList.remove('active', 'focus'));
+    await page.evaluate(() => {
+      const controller = window.MauticUI.HoldToConfirmButton.get(document.querySelector('[data-component]'));
+      controller.update({ disabled: false });
+      controller.reset();
+    });
+    await button.focus();
+    await expect(button).toHaveCSS('outline-color', 'rgb(15, 98, 254)');
   });
 }
 
@@ -181,7 +223,7 @@ test('native button appearance and spinner opt-out survive updates', async ({ pa
   await expect(button).toHaveCSS('font-weight', '400');
   await expect(button).toHaveCSS('font-size', '14px');
   await expect(button).toHaveCSS('padding-left', '16px');
-  await expect(button).toHaveCSS('gap', '24px');
+  await expect(button).toHaveCSS('gap', '8px');
   await page.evaluate(() => window.MauticUI.HoldToConfirmButton.get(document.querySelector('[data-component]')).update({ className: 'custom', size: 'lg' }));
   await expect(button).toHaveClass(/btn-nospin/);
   await expect(button).toHaveClass(/custom/);

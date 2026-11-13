@@ -4,17 +4,14 @@
     align-self: flex-start;
     width: fit-content;
     height: fit-content;
+    --hold-to-confirm-success: color-mix(in srgb, var(--support-success) 60%, var(--text-primary));
 
     &__button.btn {
         position: relative;
         margin: 0;
+        gap: var(--spacing-03);
         touch-action: none;
         user-select: none;
-
-        &:focus-visible {
-            outline: 2px solid var(--focus);
-            outline-offset: 2px;
-        }
 
         i {
             order: initial;
@@ -23,14 +20,23 @@
             line-height: 1;
         }
 
-        span {
+        .hold-to-confirm__symbol,
+        .hold-to-confirm__icon,
+        .hold-to-confirm__check,
+        .hold-to-confirm__label {
+            width: auto;
             height: auto;
+            margin: 0;
+            gap: 0;
             justify-content: center;
             line-height: normal;
         }
 
-        span > span {
+        .hold-to-confirm__label > span {
+            width: auto;
+            height: auto;
             margin: 0;
+            line-height: normal;
         }
     }
 
@@ -92,27 +98,18 @@
 
     &[data-state='holding'] &__label { opacity: .6; }
 
-    &[data-state='confirmed'] &__button.btn {
-        border-color: var(--support-success);
+    &[data-state='confirmed'] &__button.btn:not(:disabled):not(.disabled) {
+        --focus: var(--hold-to-confirm-success);
+        border-color: var(--hold-to-confirm-success);
         background: var(--layer);
-        color: var(--support-success);
+        color: var(--hold-to-confirm-success);
+
+        i { color: inherit; }
     }
 
     &[data-state='confirmed'] &__check path {
         stroke-dashoffset: 0;
         transition: stroke-dashoffset 250ms cubic-bezier(.22, 1, .36, 1) 50ms;
-    }
-
-    &__status {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
     }
 }
 
