@@ -54,7 +54,7 @@ Mautic.campaignOnLoad = function (container, response) {
             mQuery("[data-campaign-event-insert-button]").off('click.ajax').on('click.ajax', Mautic.handleCampaignEventAjaxClick);
 
             // adding delete option ajax for sources
-            mQuery("#CampaignCanvas .list-campaign-source a[data-toggle='ajax-delete']").on("click.ajax", function (event) {
+            mQuery("#CampaignCanvas .list-campaign-source a[data-toggle='ajax-delete']").off('click.ajax').on("click.ajax", function (event) {
                 event.preventDefault();
                 mQuery('.btns-builder').find('button').prop('disabled', true);
                 extraData = {
@@ -726,7 +726,7 @@ Mautic.campaignSourceOnLoad = function (container, response) {
         Mautic.campaignBuilderInstance.draggable(domEventId, Mautic.campaignDragOptions);
 
         //activate new stuff
-        mQuery(eventId + " a[data-toggle='ajax']").click(function (event) {
+        mQuery(eventId + " a[data-toggle='ajax-delete']").off('click.ajax').on('click.ajax', function (event) {
             event.preventDefault();
             const extraData = {
                 'modifiedSources': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedSources),
