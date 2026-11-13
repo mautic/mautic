@@ -174,7 +174,7 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
 
         $this->connection->executeStatement(
             'UPDATE '.MAUTIC_TABLE_PREFIX.Field::TABLE_NAME.' SET validation = ? WHERE form_id = ? AND alias = ?',
-            ['{"blockfreeemail":true}', $formId, 'email']
+            ['[]', $formId, 'email']
         );
 
         $this->connection->executeStatement(

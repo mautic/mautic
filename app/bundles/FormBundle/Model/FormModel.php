@@ -762,7 +762,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
             $connection->executeStatement(
                 "UPDATE {$tableName}
-                 SET validation = JSON_SET(COALESCE(NULLIF(validation, '[]'), '{}'), '$.donotsubmit', true)
+                 SET validation = JSON_SET(COALESCE(NULLIF(validation, JSON_ARRAY()), '{}'), '$.donotsubmit', true)
                  WHERE id IN ($placeholders)
                  AND JSON_CONTAINS_PATH(COALESCE(validation, '{}'), 'one', '$.donotsubmit') = 0",
                 array_column($batch, 'id')
