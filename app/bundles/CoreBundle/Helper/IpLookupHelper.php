@@ -145,7 +145,7 @@ class IpLookupHelper implements ResetInterface
      * current RequestStack. The entity remains safe to use for persistence while the request-specific
      * User-Agent classification is kept separate in isRequestTrackableForRequest().
      */
-    public function getIpAddressForRequest(Request $request): IpAddress
+    public function getIpAddressForRequest(Request $request, bool $lookupDetails = true): IpAddress
     {
         $isIpAnonymizationEnabled = (bool) $this->coreParametersHelper->get('anonymize_ip');
         $ip                         = $this->getIpAddressFromRequestObject($request);
@@ -160,7 +160,7 @@ class IpLookupHelper implements ResetInterface
             $ip = '*.*.*.*';
         }
 
-        $ipAddress = $this->getCachedIpAddress($ip, $isIpAnonymizationEnabled);
+        $ipAddress = $this->getCachedIpAddress($ip, $isIpAnonymizationEnabled, $lookupDetails);
         $ipAddress->setDoNotTrackList($this->getConfiguredDoNotTrackList());
 
         return $ipAddress;
@@ -190,31 +190,37 @@ class IpLookupHelper implements ResetInterface
             return false;
         }
 
-        $ipAddress = $this->getIpAddressForRequest($request);
-        if (!$ipAddress->isTrackable()) {
-            return false;
-        }
-
         $userAgent = $request->headers->get('User-Agent', '');
         foreach ($this->getDoNotTrackBots() as $bot) {
             if (str_contains($userAgent, $bot)) {
+                // Keep the IP persistence behaviour, but do not enrich a known bot IP remotely.
+                $this->getIpAddressForRequest($request, false);
+
                 return false;
             }
         }
 
         if (!$checkDeviceDetector) {
-            return true;
+            return $this->getIpAddressForRequest($request)->isTrackable();
         }
 
-        $cacheKey = $ipAddress->getIpAddress().'|'.(int) $checkDeviceDetector.'|'.hash('sha256', $userAgent);
+        $cacheKey = (int) $checkDeviceDetector.'|'.hash('sha256', $userAgent);
         if (isset($this->requestTrackability[$cacheKey])) {
-            return $this->requestTrackability[$cacheKey];
+            $isTrackableByUserAgent = $this->requestTrackability[$cacheKey];
+        } else {
+            $deviceDetector = $this->deviceDetectorFactory->create($userAgent);
+            $deviceDetector->parse();
+
+            $isTrackableByUserAgent = !$deviceDetector->isBot();
+            $this->requestTrackability[$cacheKey] = $isTrackableByUserAgent;
         }
 
-        $deviceDetector = $this->deviceDetectorFactory->create($userAgent);
-        $deviceDetector->parse();
+        $ipAddress = $this->getIpAddressForRequest($request, $isTrackableByUserAgent);
+        if (!$ipAddress->isTrackable()) {
+            return false;
+        }
 
-        return $this->requestTrackability[$cacheKey] = !$deviceDetector->isBot();
+        return $isTrackableByUserAgent;
     }
 
     /**
@@ -296,7 +302,7 @@ class IpLookupHelper implements ResetInterface
         }
     }
 
-    private function getCachedIpAddress(string $ip, bool $isIpAnonymizationEnabled): IpAddress
+    private function getCachedIpAddress(string $ip, bool $isIpAnonymizationEnabled, bool $lookupDetails = true): IpAddress
     {
         if (isset(self::$ipAddresses[$ip])) {
             return self::$ipAddresses[$ip];
@@ -313,7 +319,7 @@ class IpLookupHelper implements ResetInterface
         $ipAddress->setDoNotTrackList($this->getConfiguredDoNotTrackList());
 
         $details = $ipAddress->getIpDetails();
-        if ($ipAddress->isTrackable() && !$isIpAnonymizationEnabled && empty($details['city'])) {
+        if ($lookupDetails && $ipAddress->isTrackable() && !$isIpAnonymizationEnabled && empty($details['city'])) {
             if ($this->ipLookup) {
                 $details = $this->getIpDetails($ip);
                 $ipAddress->setIpDetails($details);
@@ -325,7 +331,13 @@ class IpLookupHelper implements ResetInterface
             $this->ipAddressRepository->saveEntity($ipAddress);
         }
 
-        return self::$ipAddresses[$ip] = $ipAddress;
+        // Do not cache an intentionally non-enriched address. A later legitimate
+        // request from the same IP must still be allowed to perform the lookup.
+        if ($lookupDetails || !$this->ipLookup || $isIpAnonymizationEnabled || !empty($details['city'])) {
+            self::$ipAddresses[$ip] = $ipAddress;
+        }
+
+        return $ipAddress;
     }
 
     /**

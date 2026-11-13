@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -116,6 +117,42 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->deviceDetector->method('isBot')->willReturn(true);
 
         $this->assertFalse($this->getIpHelper()->isRequestTrackableForRequest($request));
+    }
+
+    #[TestDox('Check that bot classification happens before remote IP enrichment')]
+    public function testBotsAreRejectedBeforeIpDetailsLookup(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.58']);
+        $request->headers->set('User-Agent', 'KnownBot/1.0');
+
+        $ipLookup = $this->createMock(AbstractLookup::class);
+        $ipLookup->expects($this->never())->method('getDetails');
+        $this->deviceDetector->method('isBot')->willReturn(true);
+
+        $helper = $this->getIpHelper(
+            request: $request,
+            mockIpLookup: $ipLookup,
+        );
+
+        $this->assertFalse($helper->isRequestTrackableForRequest($request));
+    }
+
+    #[TestDox('Device-detector bots are rejected before remote IP enrichment')]
+    public function testDeviceDetectorBotsAreRejectedBeforeIpDetailsLookup(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.59']);
+        $request->headers->set('User-Agent', 'Crawler/1.0');
+
+        $ipLookup = $this->createMock(AbstractLookup::class);
+        $ipLookup->expects($this->never())->method('getDetails');
+        $this->deviceDetector->method('isBot')->willReturn(true);
+
+        $helper = $this->getIpHelper(
+            request: $request,
+            mockIpLookup: $ipLookup,
+        );
+
+        $this->assertFalse($helper->isRequestTrackableForRequest($request));
     }
 
     #[TestDox('Check that the user-agent-dependent IP cache is reset between worker messages')]
@@ -272,6 +309,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         ?CoreParametersHelper $mockCoreParametersHelper = null,
         ?IpAddressRepository $mockRepository = null,
         ?callable $deviceDetectorFactoryCallback = null,
+        ?AbstractLookup $mockIpLookup = null,
     ): IpLookupHelper {
         $requestStack = new RequestStack();
 
@@ -300,7 +338,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
                 $deviceDetectorFactoryCallback ?? fn (): \PHPUnit\Framework\MockObject\MockObject => $this->deviceDetector
             );
 
-        $helper = new IpLookupHelper($requestStack, $mockRepository, $mockCoreParametersHelper, $this->deviceDetectorFactory);
+        $helper = new IpLookupHelper($requestStack, $mockRepository, $mockCoreParametersHelper, $this->deviceDetectorFactory, $mockIpLookup);
         $helper->reset();
 
         return $helper;
