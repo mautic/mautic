@@ -86,7 +86,7 @@
 <!--/ tabs controls -->
 
 {{- form_start(form) -}}
-<div class="tab-content pa-md">
+<div class="tab-content pa-16">
     <div class="tab-pane fade {% if 'details-container' == activeTab %}in active{% endif %} bdr-w-0" id="details-container">
         {{- form_row(form.isPublished) -}}
         {%- if form.virtual is defined %}{{ form_row(form.virtual) }}{% endif %}
@@ -105,7 +105,7 @@
                         {{ include('@MauticCore/Components/code-snippet.html.twig', {
                             variant: 'single',
                             innerText: callbackUrl,
-                            className: 'layer-two mt-sm'
+                            className: 'layer-two mt-12'
                         }) }}
                     </div>
                 {%- endif -%}
@@ -151,14 +151,14 @@
 
     {%- if hasFields -%}
         <div class="tab-pane fade {% if 'leadFieldsContainer' == activeTab %}in active{% endif %}  bdr-w-0" id="fields-container">
-            <h4 class="mb-sm">{{ fieldLabel|trans }}</h4>
+            <h4 class="mb-12">{{ fieldLabel|trans }}</h4>
             {{- fieldHtml|raw -}}
         </div>
     {%- endif -%}
 
     {%- if hasCompanyFields -%}
         <div class="tab-pane fade {% if 'companyFieldsContainer' == activeTab %}in active{% endif %} bdr-w-0" id="company-fields-container">
-            <h4 class="mb-sm">{{ 'mautic.integration.companyfield_matches'|trans }}</h4>
+            <h4 class="mb-12">{{ 'mautic.integration.companyfield_matches'|trans }}</h4>
             {{- companyFieldHtml|raw -}}
         </div>
     {%- endif -%}

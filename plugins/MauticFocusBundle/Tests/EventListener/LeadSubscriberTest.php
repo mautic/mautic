@@ -87,7 +87,7 @@ final class LeadSubscriberTest extends CommonMocks
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_NOTIFICATION, self::FOCUS_NAME, 'getStatsViewByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
-            FocusEventTypes::FOCUS_ON_VIEW, self::EVENT_TYPE_VIEW_NAME, self::FOCUS_NAME, $date, $lead
+            FocusEventTypes::FOCUS_ON_VIEW, self::EVENT_TYPE_VIEW_NAME, self::FOCUS_NAME, $date
         );
 
         $leadEvent  = new LeadTimelineEvent($lead);
@@ -140,7 +140,7 @@ final class LeadSubscriberTest extends CommonMocks
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_CLICK, self::FOCUS_NAME, 'getStatsClickByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
-            FocusEventTypes::FOCUS_ON_CLICK, self::EVENT_TYPE_CLICK_NAME, self::FOCUS_NAME, $date, $lead
+            FocusEventTypes::FOCUS_ON_CLICK, self::EVENT_TYPE_CLICK_NAME, self::FOCUS_NAME, $date
         );
 
         $leadEvent  = new LeadTimelineEvent($lead);
@@ -187,6 +187,7 @@ final class LeadSubscriberTest extends CommonMocks
             'results'=> [
                 [
                     'id'         => 1,
+                    'lead_id'    => 1,
                     'type'       => $statType,
                     'date_added' => $date,
                     'focus_id'   => 1,
@@ -211,7 +212,7 @@ final class LeadSubscriberTest extends CommonMocks
     /**
      * @return array<string, mixed>
      */
-    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, \DateTime $date, ?Lead $lead=null): array
+    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, \DateTime $date): array
     {
         $leadEventLogId = 1;
 
@@ -225,7 +226,7 @@ final class LeadSubscriberTest extends CommonMocks
             'eventType'       => $eventTypeName,
             'timestamp'       => $date,
             'icon'            => 'ri-search-line',
-            'contactId'       => $lead?->getId(),
+            'contactId'       => 1,
         ];
     }
 }
