@@ -1642,7 +1642,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
-        $mailer->setEmail($email, false, $assetAttachments, !$saveStat);
+        // A false setEmail() means the message cannot be composed (an MJML theme
+        // with no compiled customHtml and no plain text leaves no usable body).
+        // Abort before queueing to any recipient instead of delivering empty
+        // emails; the queue()/getErrors() handling below resets the error between
+        // recipients, so a mid-loop abort would not protect them.
+        if (!$mailer->setEmail($email, false, $assetAttachments, !$saveStat)) {
+            return $mailer->getErrors();
+        }
         $mailer->setCc($cc);
         $mailer->setBcc($bcc);
 
@@ -2282,9 +2289,19 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $mailer = $this->mailHelper->getMailer(true);
         $mailer->setLead($leadFields, true);
         $mailer->setTokens($tokens);
-        $mailer->setEmail($email, false, $assetAttachments, !$saveStat);
 
         $errors = [];
+
+        // A false setEmail() means the message cannot be composed (an MJML theme
+        // with no compiled customHtml and no plain text leaves no usable body).
+        // Report it as the sample send's error instead of queueing empty emails.
+        if (!$mailer->setEmail($email, false, $assetAttachments, !$saveStat)) {
+            $errorArray = $mailer->getErrors();
+            unset($errorArray['failures']);
+            $errors[] = implode('; ', $errorArray);
+
+            return $errors;
+        }
         foreach ($users as $user) {
             $idHash = uniqid();
             $mailer->setIdHash($idHash, $saveStat);

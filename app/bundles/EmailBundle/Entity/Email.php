@@ -547,6 +547,31 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                 }
             },
         ));
+
+        $metadata->addConstraint(new Callback(
+            static function (Email $email, ExecutionContextInterface $context): void {
+                // Incomplete inactive drafts are allowed: the rule gates
+                // activation, so it also covers emails scheduled to publish.
+                if (!$email->getIsPublished()) {
+                    return;
+                }
+
+                $hasHtml = '' !== trim($email->getCustomHtml() ?? '');
+                $hasText = '' !== trim($email->getPlainText() ?? '');
+                // An email whose HTML comes from a theme template holds no body
+                // of its own. Counting a selected theme as a body preserves the
+                // supported rendered-theme workflow; a theme that cannot
+                // produce HTML (e.g. uncompiled MJML) is stopped by the
+                // send-time guard in MailHelper::setEmail() instead.
+                $hasTheme = '' !== trim((string) $email->getTemplate());
+
+                if (!$hasHtml && !$hasText && !$hasTheme) {
+                    $context->buildViolation('mautic.email.body.required')
+                        ->atPath('customHtml')
+                        ->addViolation();
+                }
+            },
+        ));
     }
 
     /**
