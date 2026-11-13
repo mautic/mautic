@@ -7,11 +7,26 @@
 {% set codeMode = 'mautic_code_mode' %}
 {% set isCodeMode = active == codeMode %}
 {% if themes %}
-  <div class="row">
+  {% set favoriteThemes = getFavoriteThemes(type) %}
+  {% set hasVisibleFavorites = false %}
+  {% for themeKey, themeInfo in themes %}
+      {% if themeKey in favoriteThemes and themeInfo.visibility.hidden|default(false) is empty %}
+          {% set hasVisibleFavorites = true %}
+      {% endif %}
+  {% endfor %}
+  {% set sections = {'favorites': 'mautic.core.theme.favorites', 'others': 'mautic.core.theme.others'} %}
+  <div data-theme-select data-theme-type="{{ type }}">
+  {% for section, sectionLabel in sections %}
+  <h2 class="type-heading-02 mb-md{{ 'others' == section ? ' mt-lg' : '' }}" id="theme-select-{{ section }}-heading">{{ sectionLabel|trans }}</h2>
+  {% if 'favorites' == section %}
+      <p class="type-body-01 text-helper{{ hasVisibleFavorites ? ' hide' : '' }}" data-theme-favorites-placeholder>{{ 'mautic.core.theme.favorites.placeholder'|trans }}</p>
+  {% endif %}
+  <div class="row" role="group" aria-labelledby="theme-select-{{ section }}-heading" data-theme-section="{{ section }}">
 
       {% for themeKey, themeInfo in themes %}
           {% set isSelected = active is same as themeKey %}
-          {% if not isSelected or themeInfo.config.features is not defined or type in themeInfo.config.features %}
+          {% set isFavorite = themeKey in favoriteThemes %}
+          {% if isFavorite == ('favorites' == section) and (not isSelected or themeInfo.config.features is not defined or type in themeInfo.config.features) %}
             {% if (themeInfo.dir ~ '/thumbnail_' ~ type ~ '.png') is file %}
                 {% set thumbnailName, hasThumbnail = 'thumbnail_' ~ type ~ '.png', true %}
             {% else %}
@@ -19,10 +34,33 @@
                 {% set hasThumbnail = is_file(themeInfo.dir ~ '/' ~ thumbnailName) %}
             {% endif %}
             {% set thumbnailUrl = getAssetUrl(themeInfo.themesLocalDir ~ '/' ~ themeKey ~ '/' ~ thumbnailName) %}
-            <div class="col-md-3 theme-list {{ themeInfo.visibility.hidden|default(false) is empty ? '' : 'hide' }}">
+            {% set themeNameId = 'theme-name-' ~ themeKey %}
+            <div class="col-md-3 theme-list {{ themeInfo.visibility.hidden|default(false) is empty ? '' : 'hide' }}" data-theme-order="{{ loop.index0 }}">
                 <div class="panel panel-default {% if isSelected %}theme-selected{% endif %}">
                     <div class="panel-body text-center">
-                        <h3>{{ themeInfo.name }}</h3>
+                        <div class="d-flex align-items-center justify-content-center gap-xs">
+                            <h3 id="{{ themeNameId }}">{{ themeInfo.name }}</h3>
+                            {% include '@MauticCore/Helper/button.html.twig' with {
+                                buttons: [
+                                    {
+                                        label: isFavorite ? 'mautic.core.theme.favorite.remove' : 'mautic.core.theme.favorite.add',
+                                        variant: 'ghost',
+                                        icon_only: true,
+                                        icon: isFavorite ? 'ri-star-fill' : 'ri-star-line',
+                                        size: 'sm',
+                                        attributes: {
+                                            'type': 'button',
+                                            'id': ('theme-favorite-' ~ type ~ '-' ~ themeKey)|e('html_attr'),
+                                            'class': 'theme-favorite-toggle',
+                                            'data-theme-favorite': themeKey|e('html_attr'),
+                                            'data-label-add': 'mautic.core.theme.favorite.add'|trans|e('html_attr'),
+                                            'data-label-remove': 'mautic.core.theme.favorite.remove'|trans|e('html_attr'),
+                                            'aria-describedby': themeNameId|e('html_attr')
+                                        },
+                                    }
+                                ]
+                            } %}
+                        </div>
                         {% if hasThumbnail %}
                             <a href="#" data-bs-toggle="modal" data-bs-target="#theme-{{ themeKey }}">
                                 <div style="background-image: url({{ thumbnailUrl }});background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 250px"></div>
@@ -85,7 +123,7 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h4 class="modal-title" id="{{ themeKey }}">{{ themeInfo.name }}</h4>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'mautic.core.close'|trans }}"></button>
                                 </div>
                                 <div class="modal-body">
                                     <div style="background-image: url({{ thumbnailUrl }});background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
@@ -97,6 +135,7 @@
             </div>
           {% endif %}
       {% endfor %}
+    {% if 'others' == section %}
     <div class="col-md-3 theme-list">
         <div class="panel panel-default {% if isCodeMode %}theme-selected{% endif %}">
             <div class="panel-body text-center">
@@ -132,5 +171,8 @@
         </div>
     </div>
     <div class="clearfix"></div>
+    {% endif %}
+  </div>
+  {% endfor %}
   </div>
 {% endif %}
