@@ -3,14 +3,86 @@
     - focus (MauticPlugin\MauticFocusBundle\Entity\Focus)
     - preview (bool, default: false)
     - clickUrl (string)
+    - trackingEnabled (bool)
+    - trackingOnly (bool)
+    - trackingClickUrl (string|null)
+   - trackingPixelUrl (string)
+   - trackingUrl (string)
 #}
+{%- if trackingOnly -%}
+(function (window) {
+    var item = window.MauticFocusItems && window.MauticFocusItems[{{ focus.id }}];
+    if (!item || typeof item.activateTracking !== 'function') {
+        return;
+    }
+
+    var clickUrl = '{{ trackingClickUrl|default('')|e('js') }}';
+    var installTrackingHandlers = function () {
+        if (!item.iframeDoc) {
+            return;
+        }
+
+        if (clickUrl) {
+            var links = item.iframeDoc.getElementsByClassName('mf-link');
+            for (var linkIndex = 0; linkIndex < links.length; linkIndex++) {
+                links[linkIndex].href = clickUrl;
+            }
+        }
+
+        var forms = item.iframeDoc.querySelectorAll('.mauticform_wrapper > form[data-mautic-form]');
+        for (var formIndex = 0; formIndex < forms.length; formIndex++) {
+            if (forms[formIndex].querySelector('input[name="mauticform[focusId]"]')) {
+                continue;
+            }
+
+            var focusId = item.iframeDoc.createElement('input');
+            focusId.type = 'hidden';
+            focusId.name = 'mauticform[focusId]';
+            focusId.value = {{ focus.id }};
+            forms[formIndex].appendChild(focusId);
+        }
+    };
+
+    var activate = function () {
+        var activated = item.activateTracking({
+            install: installTrackingHandlers,
+            hooks: {
+                onEngage: function () {
+                    installTrackingHandlers();
+                    if (item.trackingViewSent) {
+                        return;
+                    }
+
+                    item.trackingViewSent = true;
+                    item.trackingPixel = new window.Image();
+                    item.trackingPixel.src = '{{ trackingPixelUrl|e('js') }}';
+                },
+                onConvert: installTrackingHandlers
+            }
+        });
+        if (activated && item.iframe && item.iframe.parentNode) {
+            item.trackingHooks.onEngage();
+        }
+    };
+
+    if (!item.runtimeReady) {
+        if (typeof item.queueTrackingActivation === 'function') {
+            item.queueTrackingActivation(activate);
+        }
+
+        return;
+    }
+
+    activate();
+})(window);
+{%- else -%}
 {%- set style = focus.style -%}
 {%- set props = focus.properties -%}
 {%- set useScrollEvent = (props.when in ['scroll_slight', 'scroll_middle', 'scroll_bottom']) -%}
 {%- set useUnloadEvent = ('leave' == props.when) -%}
 {%- set useTimeout = props.timeout|default(0) -%}
-{%- set animate = props.animate is not defined or (props.animate is defined and props.animate is not empty) -%}
-{%- set linkActivation = props.link_activation is not defined or (props.link_activation is defined and props.link_activation is not empty) -%}
+{%- set animate = props.animate is not defined or props.animate -%}
+{%- set linkActivation = props.link_activation is not defined or props.link_activation -%}
 {%- set clickUrl = clickUrl|default(props.content.link_url) -%}
 
 {%- if '5seconds' == props.when -%}
@@ -43,6 +115,14 @@
   {%- set iframeClass = 'mf-' ~ style ~ '-iframe' -%}
 {%- endif -%}
 (function (window) {
+    window.MauticFocusItems = window.MauticFocusItems || {};
+    if (window.MauticFocusItems[{{ focus.id }}]) {
+        {% if trackingEnabled %}
+        window.MauticFocusItems[{{ focus.id }}].loadTracking();
+        {% endif %}
+        return;
+    }
+
     if (typeof window.MauticFocusParentHeadStyleInserted == 'undefined') {
         window.MauticFocusParentHeadStyleInserted = false;
     }
@@ -51,19 +131,150 @@
         var Focus = {
             debug: {{ ('dev' == app.environment) ? 'true' : 'false' }},
             modalsDismissed: {},
-            ignoreConverted: {% if 'notification' is not same as focus.type and props.stop_after_conversion is defined and props.stop_after_conversion is not empty %}true{% else %}false{% endif %},
-            ignoreClosed: {% if props.stop_after_close is defined and props.stop_after_close is not empty %}true{% else %}false{% endif %},
+            ignoreConverted: {% if 'notification' is not same as focus.type and props.stop_after_conversion|default(false) %}true{% else %}false{% endif %},
+            ignoreClosed: {% if props.stop_after_close|default(false) %}true{% else %}false{% endif %},
+            initializing: false,
+            initialized: false,
+            runtimeReady: false,
+            trackingLoading: false,
+            trackingRequested: false,
+            trackingEnabled: {% if trackingEnabled %}true{% else %}false{% endif %},
+            waitingForTracking: false,
+            trackingScript: null,
+            pendingTrackingActivation: null,
+            // Frequency and dismissal values kept on the page until tracking is enabled
+            deferredCookies: {},
+            trackingHooks: {
+                onEngage: function () {},
+                onConvert: function () {}
+            },
 
-            // Initialize the focus
-            initialize: function () {
-                if (Focus.debug)
-                    console.log('initialize()');
+            loadTracking: function () {
+                if (Focus.trackingEnabled || Focus.trackingLoading) {
+                    return Focus.trackingScript;
+                }
 
-                Focus.insertStyleIntoHead();
+                Focus.trackingRequested = true;
+                if (!Focus.runtimeReady) {
+                    return null;
+                }
+
+                Focus.trackingLoading = true;
+                Focus.trackingScript = document.createElement('script');
+                Focus.trackingScript.async = true;
+                Focus.trackingScript.src = '{{ trackingUrl|e('js') }}';
+                Focus.trackingScript.onerror = function () {
+                    Focus.trackingLoading = false;
+                    Focus.trackingRequested = false;
+                    if (Focus.trackingScript.parentNode) {
+                        Focus.trackingScript.parentNode.removeChild(Focus.trackingScript);
+                    }
+                    Focus.trackingScript = null;
+                    if (Focus.waitingForTracking) {
+                        Focus.finishInitialization();
+                    }
+                };
+                Focus.trackingScript.onload = function () {
+                    Focus.trackingLoading = false;
+                    if (Focus.waitingForTracking) {
+                        Focus.finishInitialization();
+                    }
+                };
+                (document.head || document.getElementsByTagName('head')[0]).appendChild(Focus.trackingScript);
+
+                return Focus.trackingScript;
+            },
+
+            activateTracking: function (config) {
+                if (!Focus.runtimeReady || Focus.trackingEnabled) {
+                    return false;
+                }
+
+                config.install();
+                Focus.trackingHooks = config.hooks;
+                Focus.trackingLoading = false;
+                Focus.trackingRequested = false;
+                Focus.trackingEnabled = true;
+                Focus.writeDeferredCookies();
+
+                return true;
+            },
+
+            queueTrackingActivation: function (activate) {
+                if (Focus.trackingEnabled || Focus.pendingTrackingActivation) {
+                    return false;
+                }
+
+                Focus.trackingRequested = true;
+                Focus.pendingTrackingActivation = activate;
+
+                return true;
+            },
+
+            finishInitialization: function () {
+                if (Focus.initialized) {
+                    return false;
+                }
+
+                Focus.waitingForTracking = false;
                 Focus.registerFocusEvent();
 
                 // Add class to body
-                Focus.addClass(document.getElementsByTagName('body')[0], 'MauticFocus{{ style|capitalize }}');
+                Focus.addClass(document.body, 'MauticFocus{{ style|capitalize }}');
+
+                Focus.initialized = true;
+
+                return true;
+            },
+
+            // Initialize the focus
+            initialize: function () {
+                if (Focus.initializing || Focus.initialized || Focus.waitingForTracking) {
+                    return false;
+                }
+
+                if (!document.body) {
+                    Focus.initializing = true;
+                    var initializeWhenReady = function () {
+                        document.removeEventListener('DOMContentLoaded', initializeWhenReady);
+                        Focus.initializing = false;
+                        Focus.initialize();
+                    };
+                    document.addEventListener('DOMContentLoaded', initializeWhenReady);
+
+                    return false;
+                }
+
+                Focus.initializing = true;
+                if (Focus.debug)
+                    console.log('initialize()');
+
+                try {
+                    Focus.insertStyleIntoHead();
+                    Focus.runtimeReady = true;
+                    if (Focus.pendingTrackingActivation) {
+                        var activateTracking = Focus.pendingTrackingActivation;
+                        Focus.pendingTrackingActivation = null;
+                        activateTracking();
+                    }
+                    if (Focus.trackingRequested && !Focus.trackingEnabled) {
+                        Focus.waitingForTracking = true;
+                        Focus.loadTracking();
+                        if (!Focus.trackingEnabled) {
+                            return false;
+                        }
+                        Focus.waitingForTracking = false;
+                    }
+                    Focus.finishInitialization();
+                } catch (error) {
+                    Focus.runtimeReady = false;
+                    delete window.MauticFocusItems[{{ focus.id }}];
+                    throw error;
+                } finally {
+                    Focus.initializing = false;
+                }
+
+                return true;
             },
 
             // Register click events for toggling bar, closing windows, etc
@@ -324,11 +535,11 @@
             engageVisitor: function () {
                 var now = Math.floor(Date.now() / 1000);
 
-                if (Focus.cookies.hasItem('mautic_focus_{{ focus.id }}')) {
+                if (Focus.hasFocusCookie('mautic_focus_{{ focus.id }}')) {
                     if (Focus.debug)
                         console.log('Cookie exists thus checking frequency');
 
-                    var lastEngaged = parseInt(Focus.cookies.getItem('mautic_focus_{{ focus.id }}')),
+                    var lastEngaged = parseInt(Focus.getFocusCookie('mautic_focus_{{ focus.id }}')),
                         frequency = '{{ props.frequency }}',
                         engage;
 
@@ -493,8 +704,13 @@
                 if (Focus.debug)
                     console.log('mautic_focus_{{ focus.id }} cookie set for ' + now);
 
-                Focus.cookies.removeItem('mautic_focus_{{ focus.id }}');
-                Focus.cookies.setItem('mautic_focus_{{ focus.id }}', now, Infinity, '/');
+                if (Focus.trackingEnabled) {
+                    Focus.cookies.removeItem('mautic_focus_{{ focus.id }}');
+                }
+                Focus.setFocusCookie('mautic_focus_{{ focus.id }}', now, Infinity, '/');
+                if (Focus.trackingEnabled) {
+                    Focus.trackingHooks.onEngage();
+                }
 
                 {% if 'bar' == style %}
                 var collapser = document.getElementsByClassName('mf-bar-collapser-{{ focus.id }}');
@@ -642,11 +858,15 @@
 
             // Create cookie noting visitor has been converted if applicable
             convertVisitor: function () {
+                if (Focus.trackingEnabled) {
+                    Focus.trackingHooks.onConvert();
+                }
+
                 if (Focus.ignoreConverted) {
                     if (Focus.debug)
                         console.log('Visitor converted');
 
-                    Focus.cookies.setItem('mautic_focus_{{ focus.id }}', -1, Infinity, '/');
+                    Focus.setFocusCookie('mautic_focus_{{ focus.id }}', -1, Infinity, '/');
                 } else if (Focus.debug) {
                     console.log('Visitor converted but ignoreConverted not enabled');
                 }
@@ -670,8 +890,8 @@
             },
 
             getCloseCount() {
-                if (Focus.cookies.hasItem('mautic_focus_{{ focus.id }}_closed')) {
-                    return parseInt(Focus.cookies.getItem('mautic_focus_{{ focus.id }}_closed'))
+                if (Focus.hasFocusCookie('mautic_focus_{{ focus.id }}_closed')) {
+                    return parseInt(Focus.getFocusCookie('mautic_focus_{{ focus.id }}_closed'))
                 } else {
                     return 0;
                 }
@@ -679,7 +899,41 @@
 
             incrementCloseCount() {
                 var closeCount = Focus.getCloseCount();
-                Focus.cookies.setItem('mautic_focus_{{ focus.id }}_closed', ++closeCount);
+                Focus.setFocusCookie('mautic_focus_{{ focus.id }}_closed', ++closeCount);
+            },
+
+            // The frequency and dismissal cookies are only written once tracking is enabled
+            setFocusCookie: function (name, value, expires, path) {
+                if (!Focus.trackingEnabled) {
+                    Focus.deferredCookies[name] = {value, expires, path};
+
+                    return;
+                }
+
+                Focus.cookies.setItem(name, value, expires, path);
+            },
+
+            hasDeferredCookie: function (name) {
+                return Object.prototype.hasOwnProperty.call(Focus.deferredCookies, name);
+            },
+
+            hasFocusCookie: function (name) {
+                return Focus.hasDeferredCookie(name) || Focus.cookies.hasItem(name);
+            },
+
+            getFocusCookie: function (name) {
+                if (Focus.hasDeferredCookie(name)) {
+                    return String(Focus.deferredCookies[name].value);
+                }
+
+                return Focus.cookies.getItem(name);
+            },
+
+            writeDeferredCookies: function () {
+                Object.entries(Focus.deferredCookies).forEach(([name, cookie]) => {
+                    Focus.cookies.setItem(name, cookie.value, cookie.expires, cookie.path);
+                });
+                Focus.deferredCookies = {};
             },
 
             // Cookie handling
@@ -746,5 +1000,19 @@
     }
 
     // Initialize
-    MauticFocus{{ focus.id }}().initialize();
+    var focusItem = MauticFocus{{ focus.id }}();
+    window.MauticFocusItems[{{ focus.id }}] = focusItem;
+    {% if not trackingEnabled %}
+    // Focus tracking follows Mautic tracking, so it only loads once Mautic tracking is enabled on the page
+    var enableTrackingFromMautic = function () {
+        document.removeEventListener('mautic:tracking-enabled', enableTrackingFromMautic);
+        focusItem.loadTracking();
+    };
+    document.addEventListener('mautic:tracking-enabled', enableTrackingFromMautic);
+    if (window.MauticJS && window.MauticJS.trackingEnabled === true) {
+        enableTrackingFromMautic();
+    }
+    {% endif %}
+    focusItem.initialize();
 })(window);
+{%- endif -%}
