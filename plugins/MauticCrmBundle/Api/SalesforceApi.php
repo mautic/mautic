@@ -312,14 +312,14 @@ final class SalesforceApi extends CrmApi
     /**
      * Get Salesforce leads.
      *
-     * @param mixed  $query  String for a SOQL query or array to build query
+     * @param string|array  $query  String for a SOQL query or array to build query
      * @param string $object
      *
      * @return array{totalSize: int, records: array<mixed>}|mixed|string
      *
      * @throws ApiErrorException
      */
-    public function getLeads($query, $object)
+    public function getLeads(string|array $query, $object)
     {
         $queryUrl = $this->integration->getQueryUrl();
 
