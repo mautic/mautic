@@ -35,7 +35,7 @@ final class ObjectChangeDAO
         private readonly string $object,
         private int|string|null $objectId,
         private readonly string $mappedObject,
-        private int|string|null $mappedId,
+        private readonly int|string|null $mappedId,
         private ?\DateTimeInterface $changeDateTime = null,
     ) {
     }
@@ -69,10 +69,7 @@ final class ObjectChangeDAO
         $this->objectId = $objectId;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getObjectId()
+    public function getObjectId(): int|string|null
     {
         return $this->objectId;
     }
@@ -87,10 +84,8 @@ final class ObjectChangeDAO
 
     /**
      * Returns the ID for the object in this system that is being synced to the other.
-     *
-     * @return mixed
      */
-    public function getMappedObjectId()
+    public function getMappedObjectId(): int|string|null
     {
         return $this->mappedId;
     }

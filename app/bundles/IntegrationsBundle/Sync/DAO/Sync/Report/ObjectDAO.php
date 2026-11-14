@@ -15,7 +15,7 @@ final class ObjectDAO
 
     public function __construct(
         private readonly string $object,
-        private int|string|null $objectId,
+        private readonly int|string|null $objectId,
         private ?\DateTimeInterface $changeDateTime = null,
     ) {
     }
@@ -39,10 +39,7 @@ final class ObjectDAO
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getObjectId()
+    public function getObjectId(): int|string|null
     {
         return $this->objectId;
     }
