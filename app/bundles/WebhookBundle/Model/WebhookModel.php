@@ -37,7 +37,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 
 /**
  * @extends FormModel<Webhook>
@@ -589,34 +588,6 @@ final class WebhookModel extends FormModel
 
         // Use the global config value if it's not set in the Webhook
         return $this->eventsOrderByDir;
-    }
-
-    /**
-     * @param Webhook $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?SymfonyEvent $event = null): ?SymfonyEvent
-    {
-        if (!$entity instanceof Webhook) {
-            throw new MethodNotAllowedHttpException(['Webhook'], 'Entity must be of class Webhook()');
-        }
-
-        $event = match ($action) {
-            'pre_save'    => new Events\WebhookPreSaveEvent($entity, $isNew),
-            'post_save'   => new Events\WebhookPostSaveEvent($entity, $isNew),
-            'pre_delete'  => new Events\WebhookPreDeleteEvent($entity, $isNew),
-            'post_delete' => new Events\WebhookPostDeleteEvent($entity, $isNew),
-            default       => null,
-        };
-
-        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
-            return null;
-        }
-
-        $this->dispatcher->dispatch($event);
-
-        return $event;
     }
 
     public function serializeData($payload, array $groups = [], array $customExclusionStrategies = []): string

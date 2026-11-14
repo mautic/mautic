@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\AssetBundle\Entity\Asset;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -13,6 +16,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -103,5 +107,41 @@ final class FormModelTest extends TestCase
             }
             ++$countDispatch;
         }
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testPostSaveEventKeepsChangesReadInPreSaveEvent(): void
+    {
+        $asset = new Asset();
+        $asset->setTitle('New title');
+
+        $userHelper = $this->createStub(UserHelper::class);
+        $userHelper->method('getUser')->willReturn(new User());
+        $entityManager = $this->createStub(EntityManager::class);
+        $entityManager->method('getRepository')->willReturn($this->createStub(FormRepository::class));
+
+        $postSaveChanges = null;
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->method('hasListeners')->willReturn(true);
+        $eventDispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(static function (object $event) use (&$postSaveChanges): object {
+                if ($event instanceof EntityPreSave) {
+                    $event->getChanges();
+                }
+
+                if ($event instanceof EntityPostSave) {
+                    $postSaveChanges = $event->getChanges();
+                }
+
+                return $event;
+            });
+
+        $formModel = new class($entityManager, $this->createStub(CorePermissions::class), $eventDispatcher, $this->createStub(UrlGeneratorInterface::class), $this->createStub(Translator::class), $userHelper, $this->createStub(LoggerInterface::class), $this->createStub(CoreParametersHelper::class)) extends FormModel {
+        };
+        $formModel->saveEntity($asset);
+
+        $this->assertIsArray($postSaveChanges);
+        $this->assertSame([null, 'New title'], $postSaveChanges['title']);
     }
 }
