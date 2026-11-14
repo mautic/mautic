@@ -50,6 +50,17 @@ final readonly class PluginDatabase
             }
         }
 
+        $existingSequences = array_map(
+            static fn (string $name): string => strtolower($name),
+            $schemaManager->listSequenceNames()
+        );
+
+        foreach ($schema->getSequences() as $sequence) {
+            if (in_array(strtolower($sequence->getName()), $existingSequences, true)) {
+                $schema->dropSequence($sequence->getName());
+            }
+        }
+
         $installQueries = $schema->toSql($this->connection->getDatabasePlatform());
 
         foreach ($installQueries as $q) {
