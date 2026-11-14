@@ -1225,7 +1225,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @return mixed The limited string or the original value if not a string
      */
-    private function limitString($value)
+    private function limitString(mixed $value)
     {
         if (!is_string($value)) {
             return $value;

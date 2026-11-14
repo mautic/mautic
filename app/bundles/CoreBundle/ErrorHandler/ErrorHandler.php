@@ -28,7 +28,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private $debugLogger;
 
-        private ?bool $displayErrors = null;
+        /**
+         * @var LoggerInterface
+         */
+        private $displayErrors;
 
         /**
          * @var LoggerInterface
@@ -48,10 +51,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed               $log
          * @param string|array<mixed> $context
          */
-        public static function logDebugEntry($log, $context = 'null', bool $backtrace = false): void
+        public static function logDebugEntry(mixed $log, $context = 'null', bool $backtrace = false): void
         {
             if ($debugLogger = self::$handler->getDebugLogger()) {
                 if (!is_array($context)) {
@@ -321,7 +323,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 set_error_handler(self::$handler->handleError(...));
 
                 // Hide errors by default so we can format them
-                self::$handler->setDisplayErrors('dev' === $environment); // ini_get('display_errors'));
+                self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); // ini_get('display_errors'));
                 ini_set('display_errors', '0');
             }
 
@@ -355,10 +357,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $this;
         }
 
-        /**
-         * @param mixed $mainLogger
-         */
-        public function setMainLogger($mainLogger): static
+        public function setMainLogger(mixed $mainLogger): static
         {
             $this->mainLogger = $mainLogger;
 

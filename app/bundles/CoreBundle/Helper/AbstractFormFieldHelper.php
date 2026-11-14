@@ -84,7 +84,7 @@ abstract class AbstractFormFieldHelper
      *
      * @param mixed $list List to parse
      */
-    public static function parseList($list): array
+    public static function parseList(mixed $list): array
     {
         return static::parseChoiceList(
             self::parseListsWithParsers(
@@ -102,11 +102,9 @@ abstract class AbstractFormFieldHelper
     /**
      * Same as parseList method above but it will return labels as keys.
      *
-     * @param mixed $list
-     *
      * @return mixed[]
      */
-    public static function parseListForChoices($list): array
+    public static function parseListForChoices(mixed $list): array
     {
         return static::parseChoiceList(
             self::parseListsWithParsers(
@@ -123,11 +121,9 @@ abstract class AbstractFormFieldHelper
     }
 
     /**
-     * @param mixed $list
-     *
      * @return mixed[]
      */
-    public static function parseBooleanList($list): array
+    public static function parseBooleanList(mixed $list): array
     {
         return static::parseChoiceList(
             self::parseListsWithParsers(
@@ -235,12 +231,11 @@ abstract class AbstractFormFieldHelper
     }
 
     /**
-     * @param mixed                 $list
      * @param ListParserInterface[] $parsers
      *
      * @return mixed[]
      */
-    private static function parseListsWithParsers($list, array $parsers): array
+    private static function parseListsWithParsers(mixed $list, array $parsers): array
     {
         foreach ($parsers as $parser) {
             try {

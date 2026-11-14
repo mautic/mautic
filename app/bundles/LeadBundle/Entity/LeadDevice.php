@@ -136,10 +136,7 @@ class LeadDevice
         return $this->clientInfo;
     }
 
-    /**
-     * @param mixed $clientInfo
-     */
-    public function setClientInfo($clientInfo): void
+    public function setClientInfo(mixed $clientInfo): void
     {
         $this->clientInfo = $clientInfo;
     }

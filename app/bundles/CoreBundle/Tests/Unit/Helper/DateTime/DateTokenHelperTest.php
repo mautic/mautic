@@ -26,7 +26,7 @@ final class DateTokenHelperTest extends TestCase
     public function testGetTokens(): void
     {
         $coreParametersHelper = new class($this->createStub(ContainerInterface::class)) extends CoreParametersHelper {
-            public function get($name, $default = null): ?string
+            public function get($name, mixed $default = null): ?string
             {
                 return match ($name) {
                     'default_timezone' => DateTokenHelperTest::TIMEZONE,

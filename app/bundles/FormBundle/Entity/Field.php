@@ -276,10 +276,7 @@ class Field implements UuidInterface
             ->build();
     }
 
-    /**
-     * @param mixed $val
-     */
-    private function isChanged(string $prop, $val): void
+    private function isChanged(string $prop, mixed $val): void
     {
         if ($this->{$prop} != $val) {
             $this->changes[$prop] = [$this->{$prop}, $val];
@@ -629,10 +626,7 @@ class Field implements UuidInterface
         return $this->sessionId;
     }
 
-    /**
-     * @param mixed $sessionId
-     */
-    public function setSessionId($sessionId): void
+    public function setSessionId(mixed $sessionId): void
     {
         $this->sessionId = $sessionId;
     }

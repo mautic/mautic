@@ -22,7 +22,7 @@ final readonly class ContentExtension
      * @param ?string             $viewName The main identifier for the content requested. Will be etracted from $vars if get_defined
      */
     #[AsTwigFunction(name: 'customContent', isSafe: ['all'])]
-    public function getCustomContent($context = null, array $vars = [], ?string $viewName = null): string
+    public function getCustomContent(mixed $context = null, array $vars = [], ?string $viewName = null): string
     {
         return $this->contentHelper->getCustomContent($context, $vars, $viewName);
     }

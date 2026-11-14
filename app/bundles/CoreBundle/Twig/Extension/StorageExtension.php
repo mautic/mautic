@@ -26,7 +26,7 @@ final class StorageExtension
     }
 
     #[AsTwigFunction(name: 'restore', needsContext: true)]
-    public function restore(array &$context, string $name): void
+    public function restore(mixed &$context, string $name): void
     {
         $context = array_merge($context, $this->storage[$name]);
     }

@@ -28,7 +28,7 @@ trait TimelineTrait
         string $timestampColumn,
         array $serializedColumns = [],
         array $dateTimeColumns = [],
-        $resultsParserCallback = null,
+        mixed $resultsParserCallback = null,
         ?string $secondaryOrdering = null,
     ): array {
         if (!empty($options['unitCounts'])) {

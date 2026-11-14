@@ -18,10 +18,7 @@ final readonly class DecisionDispatcher
     ) {
     }
 
-    /**
-     * @param mixed $passthrough
-     */
-    public function dispatchRealTimeEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough): DecisionEvent
+    public function dispatchRealTimeEvent(DecisionAccessor $config, LeadEventLog $log, mixed $passthrough): DecisionEvent
     {
         $event = new DecisionEvent($config, $log, $passthrough);
         $this->dispatcher->dispatch($event, $config->getEventName());

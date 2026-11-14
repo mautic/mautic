@@ -232,7 +232,7 @@ final class LeadFieldRepository extends CommonRepository
      * @param mixed  $value        to compare with
      * @param string $operatorExpr for WHERE clause
      */
-    public function compareValue($lead, $field, $value, $operatorExpr, ?string $fieldType = null): bool
+    public function compareValue($lead, $field, mixed $value, $operatorExpr, ?string $fieldType = null): bool
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id')

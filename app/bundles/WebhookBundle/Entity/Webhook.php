@@ -471,7 +471,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * @param string $prop
      */
-    protected function isChanged($prop, $val): void
+    protected function isChanged($prop, mixed $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();

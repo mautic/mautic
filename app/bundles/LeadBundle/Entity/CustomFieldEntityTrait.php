@@ -92,7 +92,7 @@ trait CustomFieldEntityTrait
      *
      * @return $this
      */
-    public function addUpdatedField($alias, $value, $oldValue = null)
+    public function addUpdatedField($alias, mixed $value, $oldValue = null)
     {
         // Don't allow overriding ID
         if ('id' === $alias) {

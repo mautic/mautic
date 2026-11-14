@@ -26,7 +26,7 @@ final class UniqueCustomFieldValidator extends ConstraintValidator
     /**
      * @param Lead|Company|mixed $object
      */
-    public function validate($object, Constraint $constraint): void
+    public function validate(mixed $object, Constraint $constraint): void
     {
         \assert($constraint instanceof UniqueCustomField);
         \assert($object instanceof Lead || $object instanceof Company);

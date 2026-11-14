@@ -13,12 +13,9 @@ final class ObjectDAO
      */
     private array $fields = [];
 
-    /**
-     * @param mixed $objectId
-     */
     public function __construct(
         private readonly string $object,
-        private $objectId,
+        private readonly mixed $objectId,
         private ?\DateTimeInterface $changeDateTime = null,
     ) {
     }

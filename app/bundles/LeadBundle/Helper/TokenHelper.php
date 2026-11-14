@@ -180,11 +180,9 @@ final class TokenHelper
     }
 
     /**
-     * @param mixed $value
-     *
      * @return mixed|string
      */
-    private static function getNormalizeValue(string $alias, $value)
+    private static function getNormalizeValue(string $alias, mixed $value)
     {
         $field = array_merge(LeadRepository::getLeadFieldRepository()->getFields()[$alias], ['value' => $value]);
 

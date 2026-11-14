@@ -84,7 +84,6 @@ final readonly class ButtonExtension
      * @param array<string,string> $query
      * @param array<string,string> $editAttr
      * @param array<string,string> $routeVars
-     * @param mixed                $item
      */
     #[AsTwigFunction(name: 'buttonsAddFromTemplate', isSafe: ['all'])]
     public function addButtonsFromTemplate(
@@ -96,7 +95,7 @@ final readonly class ButtonExtension
         string $nameGetter,
         array $editAttr = [],
         array $routeVars = [],
-        $item = null,
+        mixed $item = null,
         ?string $tooltip = null,
     ): void {
         foreach ($templateButtons as $action => $enabled) {

@@ -12,13 +12,10 @@ final class UpdatedObjectMappingDAO
 
     private ?ObjectMapping $objectMapping = null;
 
-    /**
-     * @param mixed $integrationObjectId
-     */
     public function __construct(
         private readonly string $integration,
         private readonly string $integrationObjectName,
-        private $integrationObjectId,
+        private readonly mixed $integrationObjectId,
         \DateTimeInterface $objectModifiedDate,
     ) {
         $this->objectModifiedDate    = $objectModifiedDate instanceof \DateTimeImmutable ? new \DateTime(

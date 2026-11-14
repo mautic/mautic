@@ -51,11 +51,10 @@ abstract class CommonEntity implements \Stringable
 
     /**
      * @param string $prop
-     * @param mixed  $val
      *
      * @return void
      */
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, mixed $val)
     {
         $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
         $current = $this->{$getter}();

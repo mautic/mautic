@@ -206,11 +206,7 @@ trait MatchFilterForLeadTrait
         return in_array(true, $groups);
     }
 
-    /**
-     * @param mixed $leadVal
-     * @param mixed $filterVal
-     */
-    private function checkLeadValueIsInFilter($leadVal, $filterVal, bool $defaultFlag): bool
+    private function checkLeadValueIsInFilter(mixed $leadVal, mixed $filterVal, bool $defaultFlag): bool
     {
         $leadVal    = !is_array($leadVal) ? [$leadVal] : $leadVal;
         $filterVal  = !is_array($filterVal) ? [$filterVal] : $filterVal;
@@ -226,11 +222,7 @@ trait MatchFilterForLeadTrait
         return $retFlag;
     }
 
-    /**
-     * @param mixed $leadVal
-     * @param mixed $filterVal
-     */
-    private function checkAllLeadValuesAreInFilter($leadVal, $filterVal, bool $defaultFlag): bool
+    private function checkAllLeadValuesAreInFilter(mixed $leadVal, mixed $filterVal, bool $defaultFlag): bool
     {
         $leadVal       = !is_array($leadVal) ? [$leadVal] : $leadVal;
         $filterVal     = !is_array($filterVal) ? [$filterVal] : $filterVal;

@@ -24,11 +24,10 @@ class CoreParametersHelper
 
     /**
      * @param string $name
-     * @param mixed  $default
      *
      * @return mixed
      */
-    public function get($name, $default = null)
+    public function get($name, mixed $default = null)
     {
         $name = $this->stripMauticPrefix($name);
 

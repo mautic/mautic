@@ -226,18 +226,12 @@ final class MenuHelper
         return $passChecks;
     }
 
-    /**
-     * @param mixed $value
-     */
-    private function handleParametersChecks(string $name, $value): bool
+    private function handleParametersChecks(string $name, mixed $value): bool
     {
         return $this->getParameter($name) == $value;
     }
 
-    /**
-     * @param mixed $value
-     */
-    private function handleRequestChecks(string $name, $value): bool
+    private function handleRequestChecks(string $name, mixed $value): bool
     {
         return ($this->requestStack->getCurrentRequest()->attributes->all()[$name] ?? $this->requestStack->getCurrentRequest()->query->all()[$name] ?? $this->requestStack->getCurrentRequest()->request->all()[$name] ?? null) == $value;
     }

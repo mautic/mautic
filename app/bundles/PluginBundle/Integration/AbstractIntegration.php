@@ -1656,11 +1656,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param mixed      $data        Profile data from integration
      * @param bool|true  $persist     Set to false to not persist lead to the database in this method
-     * @param mixed|null $identifiers
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, ?array $socialCache = null, $identifiers = null)
+    public function getMauticLead(mixed $data, $persist = true, ?array $socialCache = null, mixed $identifiers = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -1800,10 +1799,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Convert and assign the data to assignable fields.
-     *
-     * @param mixed $data
      */
-    protected function matchUpData($data): array
+    protected function matchUpData(mixed $data): array
     {
         $info      = [];
         $available = $this->getAvailableLeadFields();
@@ -2124,11 +2121,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Cleans the identifier for api calls.
      *
-     * @param mixed $identifier
-     *
      * @return string
      */
-    protected function cleanIdentifier($identifier)
+    protected function cleanIdentifier(mixed $identifier)
     {
         if (is_array($identifier)) {
             foreach ($identifier as &$i) {

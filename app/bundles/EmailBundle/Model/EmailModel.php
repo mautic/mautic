@@ -969,7 +969,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getPendingLeads(
         Email $email,
-        $listId = null,
+        mixed $listId = null,
         bool $countOnly = false,
         $limit = null,
         bool $includeVariants = true,

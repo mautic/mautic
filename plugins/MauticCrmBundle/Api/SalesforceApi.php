@@ -319,7 +319,7 @@ final class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function getLeads($query, $object)
+    public function getLeads(mixed $query, $object)
     {
         $queryUrl = $this->integration->getQueryUrl();
 
@@ -417,13 +417,11 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param mixed $modifiedSince
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function getCampaignMembers($campaignId, $modifiedSince = null, $queryUrl = null)
+    public function getCampaignMembers($campaignId, mixed $modifiedSince = null, $queryUrl = null)
     {
         $defaultSettings = $this->requestSettings;
 
@@ -516,13 +514,12 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param mixed $response
      * @param bool  $isRetry
      *
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function analyzeResponse($response, $isRetry): void
+    private function analyzeResponse(mixed $response, $isRetry): void
     {
         if (is_array($response)) {
             if (!empty($response['errors'])) {
