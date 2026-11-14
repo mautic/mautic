@@ -1566,6 +1566,8 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\CoreBundle\Twig\Helper\FormatterHelper::simpleCsvToArray()` types `$csv` as `?string`. Pass a comma-separated string or `null`.
     - `Mautic\PluginBundle\Entity\IntegrationEntityRepository::getIntegrationsEntityId()` types `$startDate` and `$endDate` as `?string`. Passing a `\DateTimeInterface` now throws; pass a date string or `null`.
     - `MauticPlugin\MauticFocusBundle\Model\FocusModel::addStat()` types `$type` as `string`. Passing `null` now throws; pass a stat type such as `Stat::TYPE_FORM`.
+    - `Mautic\CoreBundle\Helper\ArrayHelper::getValue()` and `Mautic\CoreBundle\Helper\ArrayHelper::pickValue()` type `$key` as `int|string`. Passing `null`, which previously looked up the `''` key, now throws; pass `''` explicitly or skip the call.
+    - `Mautic\FormBundle\Entity\Field::setSessionId()` types `$sessionId` as `int|string|null` and `Mautic\FormBundle\Entity\Field::getSessionId()` declares the `int|string|null` return type. Pass the session id as `int` or `string`. If you extend `Field`, an override of `getSessionId()` needs a return type compatible with `int|string|null` (a narrower one like `: string` is fine), and an override of `setSessionId()` must keep `$sessionId` untyped or typed as `int|string|null`, otherwise PHP raises a fatal error.
 
 ### Native parameter and return types for plugin extension points
 
