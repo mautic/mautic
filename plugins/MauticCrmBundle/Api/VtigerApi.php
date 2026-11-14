@@ -3,7 +3,11 @@
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Integration\VtigerIntegration;
 
+/**
+ * @property VtigerIntegration $integration
+ */
 final class VtigerApi extends CrmApi
 {
     private string $element = 'Leads';
