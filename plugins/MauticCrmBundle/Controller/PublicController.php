@@ -3,7 +3,11 @@
 namespace MauticPlugin\MauticCrmBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
+use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
+use MauticPlugin\MauticCrmBundle\Hubspot\Client\HubspotClient;
+use MauticPlugin\MauticCrmBundle\Hubspot\Config;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,37 +15,48 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class PublicController extends CommonController
 {
-    public function contactDataAction(Request $request, LoggerInterface $mauticLogger, IntegrationHelper $integrationHelper): Response
+    /**
+     * HubSpot webhook: pulls the contacts and companies it notifies about.
+     */
+    public function contactDataAction(Request $request, LoggerInterface $mauticLogger, SyncServiceInterface $syncService, Config $config): Response
     {
-        $content = $request->getContent();
-        if (!empty($content)) {
-            $data = json_decode($content, true); // 2nd param to get as array
-        } else {
+        $data = json_decode($request->getContent(), true);
+        if (!is_array($data)) {
             return new Response('ERROR');
         }
 
-        $integration = 'Hubspot';
+        if (!$config->isPublished()) {
+            return new Response('OK');
+        }
 
-        $integrationObject = $integrationHelper->getIntegrationObject($integration);
-        \assert($integrationObject instanceof HubspotIntegration);
-
+        $objectIds = new ObjectIdsDAO();
+        $hasIds    = false;
         foreach ($data as $info) {
-            $object = explode('.', $info['subscriptionType']);
-            $id     = $info['objectId'];
+            // e.g. "contact.propertyChange"
+            $object = match (explode('.', (string) ($info['subscriptionType'] ?? ''))[0]) {
+                'contact' => HubspotClient::CONTACTS,
+                'company' => HubspotClient::COMPANIES,
+                default   => null,
+            };
 
-            try {
-                switch ($object[0]) {
-                    case 'contact':
-                        $executed = [];
-                        $integrationObject->getLeads($id, null, $executed);
-                        break;
-                    case 'company':
-                        $integrationObject->getCompanies($id);
-                        break;
-                }
-            } catch (\Exception $ex) {
-                $mauticLogger->log('error', 'ERROR on Hubspot webhook: '.$ex->getMessage());
+            if (null !== $object && !empty($info['objectId'])) {
+                $objectIds->addObjectId($object, (string) $info['objectId']);
+                $hasIds = true;
             }
+        }
+
+        if (!$hasIds) {
+            return new Response('OK');
+        }
+
+        try {
+            $syncService->processIntegrationSync(new InputOptionsDAO([
+                'integration'           => HubspotIntegration::NAME,
+                'disable-push'          => true,
+                'integration-object-id' => $objectIds,
+            ]));
+        } catch (\Exception $e) {
+            $mauticLogger->error('ERROR on Hubspot webhook: '.$e->getMessage());
         }
 
         return new Response('OK');

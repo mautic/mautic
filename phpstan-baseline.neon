@@ -6440,42 +6440,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Api/DynamicsApi.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\HubspotApi\:\:createLead\(\) has parameter \$lead with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Api/HubspotApi.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\HubspotApi\:\:createLead\(\) has parameter \$updateLink with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Api/HubspotApi.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\HubspotApi\:\:createProperty\(\) has parameter \$propertyName with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Api/HubspotApi.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\HubspotApi\:\:getCompanies\(\) has parameter \$id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Api/HubspotApi.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\HubspotApi\:\:getLeadFields\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Api/HubspotApi.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\HubspotApi\:\:request\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Api/HubspotApi.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\Salesforce\\Helper\\RequestUrl\:\:get\(\) has parameter \$apiUrl with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -6954,72 +6918,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:amendLeadDataBeforeMauticPopulate\(\) has parameter \$data with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:amendLeadDataBeforeMauticPopulate\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:amendLeadDataBeforePush\(\) has parameter \$mappedData with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:formatLeadDataForCreateOrUpdate\(\) has parameter \$lead with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:formatLeadDataForCreateOrUpdate\(\) has parameter \$updateLink with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:getCompanies\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:getCompanies\(\) has parameter \$executed with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:getLeads\(\) has parameter \$executed with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:getLeads\(\) has parameter \$query with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:getMauticLead\(\) should return Mautic\\LeadBundle\\Entity\\Lead but empty return statement found\.$#'
-			identifier: return.empty
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Parameter \#1 \$json of function json_decode expects string, object given\.$#'
-			identifier: argument.type
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\Salesforce\\CampaignMember\\Fetcher\:\:getQueryForUnknownObjects\(\) has parameter \$object with no type specified\.$#'

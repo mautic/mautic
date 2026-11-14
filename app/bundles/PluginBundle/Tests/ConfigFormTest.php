@@ -85,7 +85,6 @@ final class ConfigFormTest extends KernelTestCase
         $expected['Salesforce']  = $this->getOauthData('access_token');
         $expected['Sugarcrm']    = $this->getOauthData('access_token');
         $expected['Zoho']        = $this->getOauthData('access_token');
-        $expected['Hubspot']     = $this->getOauthData('hapikey');
 
         foreach ($plugins as $index => $integration) {
             if (!$integration instanceof AbstractIntegration) {
