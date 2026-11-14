@@ -1,4 +1,5 @@
 import mjml2html from 'mjml-browser';
+import normalizeInlineStyleEntities from './normalize-inline-style-entities';
 
 export default class MjmlService {
   /**
@@ -60,7 +61,7 @@ export default class MjmlService {
         // html needs to be beautified for the click tracking to work.
         // strict mode not working with e.g. id="" and data-type parameters that
         // are e.g. used for Dynamic Content
-        html = mjml2html(mjml, { beautify: true });
+        html = mjml2html(normalizeInlineStyleEntities(mjml), { beautify: true });
       }
     } catch (error) {
       console.warn(error);
