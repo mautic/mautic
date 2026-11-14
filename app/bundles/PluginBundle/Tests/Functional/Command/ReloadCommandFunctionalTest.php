@@ -45,7 +45,7 @@ final class ReloadCommandFunctionalTest extends MauticMysqlTestCase
 
     private function uninstallFocusPlugin(): void
     {
-		$platform = $connection->getDatabasePlatform();
+		$platform = $this->connection->getDatabasePlatform();
 
         if (!DatabasePlatform::isPostgreSQL($platform)) {
 			$this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
