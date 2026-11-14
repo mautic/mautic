@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -52,12 +53,31 @@ final class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('title1', $field->getAlias());
     }
 
+    #[DataProvider('deletedCoreAliasProvider')]
+    public function testDeletedCoreAliasIsReserved(string $alias, string $expected): void
+    {
+        $field = new LeadField();
+        $field->setAlias($alias);
+        $field = $this->helper->makeAliasUnique($field);
+
+        $this->assertEquals($expected, $field->getAlias());
+    }
+
+    /**
+     * @return \Iterator<string, array{string, string}>
+     */
+    public static function deletedCoreAliasProvider(): \Iterator
+    {
+        yield 'contact core alias' => ['fax', 'fax1'];
+        yield 'company core alias' => ['companyfax', 'companyfax1'];
+    }
+
     public function testUniqueAliasWithAliasEmpty(): void
     {
         $field = new LeadField();
-        $field->setName('phone');
+        $field->setName('nickname');
         $field = $this->helper->makeAliasUnique($field);
 
-        $this->assertEquals('phone', $field->getAlias());
+        $this->assertEquals('nickname', $field->getAlias());
     }
 }

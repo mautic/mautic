@@ -616,10 +616,7 @@ class LeadFieldRepository extends CommonRepository
      */
     private function getSystemDefaultAliases(): array
     {
-        return array_values(array_unique(array_merge(
-            array_keys(FieldModel::$coreFields),
-            array_keys(FieldModel::$coreCompanyFields)
-        )));
+        return FieldModel::getCoreAliases();
     }
 
     /**

@@ -601,6 +601,17 @@ class FieldModel extends FormModel
     }
 
     /**
+     * @return string[]
+     */
+    public static function getCoreAliases(): array
+    {
+        return array_values(array_unique(array_merge(
+            array_keys(self::$coreFields),
+            array_keys(self::$coreCompanyFields),
+        )));
+    }
+
+    /**
      * @param LeadField $entity
      * @param bool      $unlock
      *

@@ -32,7 +32,10 @@ class FieldAliasHelper
 
         // make sure alias is not already taken
         $testAlias = $alias;
-        $aliases   = $this->leadFieldRepository->getAliases($field->getId(), false, true, null);
+        $aliases   = array_merge(
+            $this->leadFieldRepository->getAliases($field->getId(), false, true, null),
+            FieldModel::getCoreAliases(),
+        );
         $count     = (int) in_array($testAlias, $aliases);
         $aliasTag  = $count;
 
