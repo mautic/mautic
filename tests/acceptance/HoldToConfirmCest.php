@@ -38,7 +38,7 @@ final class HoldToConfirmCest
     public function shortClickDoesNotRestartTips(\AcceptanceTester $I): void
     {
         $I->click(self::BUTTON);
-        $I->wait(1.5);
+        $I->waitForElement('[data-component="hold-to-confirm"][data-state="idle"]', \AcceptanceTester::TIMEOUT);
         $I->assertSame(self::DISMISSED_TIPS, $I->executeJS('return localStorage.getItem("dismissedElements");'));
     }
 
@@ -64,6 +64,48 @@ final class HoldToConfirmCest
         });
         $I->assertSame(self::DISMISSED_TIPS, $I->executeJS('return localStorage.getItem("dismissedElements");'));
         $I->seeElement('[data-component="hold-to-confirm"][data-state="idle"]');
+    }
+
+    public function secondTouchDoesNotCancelTheFirstHold(\AcceptanceTester $I): void
+    {
+        $I->executeInSelenium(static function (RemoteWebDriver $driver): void {
+            $button = $driver->findElement(WebDriverBy::cssSelector(self::BUTTON));
+            $origin = [JsonWireCompat::WEB_DRIVER_ELEMENT_IDENTIFIER => $button->getID()];
+            $driver->execute(DriverCommand::ACTIONS, [
+                'actions' => [
+                    [
+                        'type'       => 'pointer',
+                        'id'         => 'first-touch',
+                        'parameters' => ['pointerType' => 'touch'],
+                        'actions'    => [
+                            ['type' => 'pointerMove', 'origin' => $origin, 'x' => -5, 'y' => 0],
+                            ['type' => 'pointerDown', 'button' => 0],
+                            ['type' => 'pause', 'duration' => 200],
+                            ['type' => 'pause', 'duration' => 0],
+                            ['type' => 'pause', 'duration' => 0],
+                            ['type' => 'pause', 'duration' => 1500],
+                            ['type' => 'pointerUp', 'button' => 0],
+                        ],
+                    ],
+                    [
+                        'type'       => 'pointer',
+                        'id'         => 'second-touch',
+                        'parameters' => ['pointerType' => 'touch'],
+                        'actions'    => [
+                            ['type' => 'pointerMove', 'origin' => $origin, 'x' => 5, 'y' => 0],
+                            ['type' => 'pause', 'duration' => 0],
+                            ['type' => 'pause', 'duration' => 200],
+                            ['type' => 'pointerDown', 'button' => 0],
+                            ['type' => 'pointerMove', 'origin' => 'pointer', 'x' => 0, 'y' => -$button->getSize()->getHeight() * 2],
+                            ['type' => 'pause', 'duration' => 1500],
+                            ['type' => 'pointerUp', 'button' => 0],
+                        ],
+                    ],
+                ],
+            ]);
+        });
+        $I->assertSame('[]', $I->executeJS('return localStorage.getItem("dismissedElements");'));
+        $I->seeElement('[data-component="hold-to-confirm"][data-state="confirmed"]');
     }
 
     public function invalidSizeKeepsTheControlUsable(\AcceptanceTester $I): void
@@ -98,13 +140,13 @@ final class HoldToConfirmCest
         $I->executeInSelenium(static function (RemoteWebDriver $driver): void {
             $driver->action()->clickAndHold($driver->findElement(WebDriverBy::cssSelector(self::BUTTON)))->perform();
         });
-        $I->waitForJS('return localStorage.getItem("dismissedElements") === "[]";', 5);
+        $I->waitForJS('return localStorage.getItem("dismissedElements") === "[]";', \AcceptanceTester::TIMEOUT);
         $I->seeElement('[data-component="hold-to-confirm"][data-state="confirmed"]');
         $I->assertNotEmpty($I->grabTextFrom('.hold-to-confirm__status'));
         $I->executeInSelenium(static function (RemoteWebDriver $driver): void {
             $driver->action()->release()->perform();
         });
-        $I->waitForElement('[data-component="hold-to-confirm"][data-state="idle"]', 5);
+        $I->waitForElement('[data-component="hold-to-confirm"][data-state="idle"]', \AcceptanceTester::TIMEOUT);
         $I->assertSame([], $I->executeJS('return Mautic.dismissedElements;'));
     }
 }

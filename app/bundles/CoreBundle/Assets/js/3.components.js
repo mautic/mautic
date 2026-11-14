@@ -38,6 +38,7 @@
             this.element = element;
             this.events = new AbortController();
             this.sources = new Set();
+            this.pointerId = null;
             this.confirmed = false;
             this.button = element.querySelector("button");
             this.ring = element.querySelector(".hold-to-confirm__ring");
@@ -51,22 +52,27 @@
             this.resetDelay = Number.isFinite(Number(element.dataset.resetDelay)) ? Math.max(0, Number(element.dataset.resetDelay)) : 1500;
             const options = { signal: this.events.signal };
             this.button.addEventListener("pointerdown", (event) => {
+                if (event.button !== 0 || !event.isPrimary) return;
+                if (this.pointerId !== null || this.button.disabled || this.confirmed) return;
+                this.pointerId = event.pointerId;
                 try {
                     this.button.setPointerCapture(event.pointerId);
                 } catch (error) {
                     if (!(error instanceof DOMException)) throw error;
                 }
-                if (event.button === 0 && event.isPrimary) this.start("pointer");
+                this.start("pointer");
             }, options);
             this.button.addEventListener("pointermove", (event) => {
-                if (!this.sources.has("pointer")) return;
+                if (event.pointerId !== this.pointerId || !this.sources.has("pointer")) return;
                 const bounds = this.button.getBoundingClientRect();
                 if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) {
                     this.cancel("pointer");
                 }
             }, options);
             for (const name of ["pointerup", "pointerleave", "pointercancel", "lostpointercapture"]) {
-                this.button.addEventListener(name, () => this.cancel("pointer"), options);
+                this.button.addEventListener(name, (event) => {
+                    if (event.pointerId === this.pointerId) this.cancel("pointer");
+                }, options);
             }
             this.button.addEventListener("keydown", (event) => {
                 if (event.key !== " " && event.key !== "Enter") return;
@@ -151,6 +157,7 @@
             this.frame = requestAnimationFrame(tick);
         }
         cancel(source) {
+            if (!source || source === "pointer") this.pointerId = null;
             if (source) this.sources.delete(source);
             else this.sources.clear();
             if (this.sources.size > 0) return;
@@ -170,6 +177,7 @@
             if (this.confirmed || !this.element.isConnected || this.button.disabled || document.hidden || this.sources.size === 0) return;
             this.confirmed = true;
             this.sources.clear();
+            this.pointerId = null;
             this.setProgress(1);
             this.element.dataset.state = "confirmed";
             this.swapLabel(true);
@@ -183,6 +191,7 @@
             const wasConfirmed = this.confirmed;
             this.confirmed = false;
             this.sources.clear();
+            this.pointerId = null;
             clearTimeout(this.resetTimer);
             this.element.dataset.state = "idle";
             if (wasConfirmed) this.swapLabel(false);
