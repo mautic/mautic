@@ -42,6 +42,7 @@ final readonly class PluginDatabase
         $schemaTool    = new SchemaTool($this->em);
         $schema        = $schemaTool->getSchemaFromMetadata(array_values($metadata));
         $schemaManager = $this->connection->createSchemaManager();
+        $platform      = $this->connection->getDatabasePlatform();
 
         // Schema listeners (e.g. Symfony Messenger) add their own tables, which may already exist
         $existingTables = array_map(strtolower(...), $schemaManager->listTableNames());
@@ -51,18 +52,20 @@ final readonly class PluginDatabase
             }
         }
 
-        $existingSequences = [];
-        foreach ($schemaManager->listSequences() as $existingSequence) {
-            $existingSequences[] = strtolower($existingSequence->getName());
-        }
-
-        foreach ($schema->getSequences() as $sequence) {
-            if (in_array(strtolower($sequence->getName()), $existingSequences, true)) {
-                $schema->dropSequence($sequence->getName());
+        if (DatabasePlatform::isPostgreSQL($platform)) {
+            $existingSequences = [];
+            foreach ($schemaManager->listSequences() as $existingSequence) {
+                $existingSequences[] = strtolower($existingSequence->getName());
+            }
+    
+            foreach ($schema->getSequences() as $sequence) {
+                if (in_array(strtolower($sequence->getName()), $existingSequences, true)) {
+                    $schema->dropSequence($sequence->getName());
+                }
             }
         }
 
-        $installQueries = $schema->toSql($this->connection->getDatabasePlatform());
+        $installQueries = $schema->toSql($platform);
 
         foreach ($installQueries as $q) {
             // Check if the query is a DDL statement
