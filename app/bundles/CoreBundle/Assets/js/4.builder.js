@@ -126,6 +126,8 @@ Mautic.openServerBrowser = function(url, width, height) {
  * @param themeField
  */
 Mautic.initSelectTheme = function(themeField) {
+    Mautic.initThemeFavorites();
+
     var customHtml = mQuery('textarea.builder-html');
     var isNew = Mautic.isNewEntity('#page_sessionId, #emailform_sessionId');
     Mautic.showChangeThemeWarning = true;
@@ -191,6 +193,102 @@ Mautic.initSelectTheme = function(themeField) {
             currentLink.closest('.panel').find('.select-theme-selected').removeClass('hide');
             currentLink.addClass('hide');
         });
+    }
+};
+
+/**
+ * Initialize the star buttons that add themes to or remove themes from the favorite themes
+ */
+Mautic.initThemeFavorites = function() {
+    mQuery('[data-theme-select]').each(function() {
+        const themeSelect = mQuery(this);
+
+        themeSelect.find('[data-theme-favorite]').off('click.themeFavorite').on('click.themeFavorite', function(event) {
+            event.preventDefault();
+
+            const button = mQuery(this);
+            const favorite = !button.closest('[data-theme-section]').is('[data-theme-section="favorites"]');
+
+            // Queue the requests, so that fast clicks on more than one star do not overwrite each other
+            Mautic.ajaxActionRequest(
+                'setThemeFavorite',
+                {
+                    theme: button.attr('data-theme-favorite'),
+                    type: themeSelect.attr('data-theme-type'),
+                    favorite: favorite ? 1 : 0
+                },
+                function(response) {
+                    if (response && response.success) {
+                        Mautic.setThemeFavoriteState(themeSelect, button, !!response.favorite);
+                    }
+                },
+                false,
+                true
+            );
+        });
+    });
+};
+
+/**
+ * Move a theme to the favorite section or to the default section and update its star button
+ *
+ * @param themeSelect
+ * @param button
+ * @param isFavorite
+ */
+Mautic.setThemeFavoriteState = function(themeSelect, button, isFavorite) {
+    const icon = button.find('i');
+    const label = isFavorite ? button.attr('data-label-remove') : button.attr('data-label-add');
+    const hasTooltip = !!icon.data('bs.tooltip');
+
+    // Close the tooltip before the theme moves, because it does not follow the button
+    if (hasTooltip) {
+        icon.tooltip('hide');
+    }
+
+    icon.removeClass('ri-star-line ri-star-fill').addClass(isFavorite ? 'ri-star-fill' : 'ri-star-line');
+    icon.attr('title', label);
+    // Bootstrap copies the tooltip title to the aria-label of the icon
+    icon.filter('[aria-label]').attr('aria-label', label);
+    button.attr('aria-label', label);
+
+    if (hasTooltip) {
+        icon.tooltip('fixTitle');
+    }
+
+    Mautic.insertThemeCard(
+        themeSelect.find('[data-theme-section="' + (isFavorite ? 'favorites' : 'others') + '"]'),
+        button.closest('[data-theme-order]')
+    );
+
+    themeSelect.find('[data-theme-favorites-placeholder]').toggleClass(
+        'hide',
+        themeSelect.find('[data-theme-section="favorites"] .theme-list:not(.hide)').length > 0
+    );
+
+    button.trigger('focus');
+};
+
+/**
+ * Insert a theme card into a section at the position of its original sort order
+ *
+ * @param section
+ * @param card
+ */
+Mautic.insertThemeCard = function(section, card) {
+    const order = parseInt(card.attr('data-theme-order'), 10);
+    const cards = section.children('[data-theme-order]').not(card);
+    const nextCard = cards.filter(function() {
+        return parseInt(mQuery(this).attr('data-theme-order'), 10) > order;
+    }).first();
+
+    if (nextCard.length) {
+        card.insertBefore(nextCard);
+    } else if (cards.length) {
+        card.insertAfter(cards.last());
+    } else {
+        // The Code Mode card and the clearfix stay at the end of the section
+        section.prepend(card);
     }
 };
 

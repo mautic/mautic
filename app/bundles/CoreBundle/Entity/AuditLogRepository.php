@@ -156,9 +156,9 @@ class AuditLogRepository extends CommonRepository
     /**
      * Get array of objects which belongs to the object.
      *
-     * @param string|null $object
-     * @param string|null $id
-     * @param int         $limit
+     * @param string|null     $object
+     * @param int|string|null $id
+     * @param int             $limit
      *
      * @return array
      */
@@ -228,6 +228,13 @@ class AuditLogRepository extends CommonRepository
                     $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dateTimeHelper->toUtcString($dateTimeFormat)))
                 )
             );
+        }
+
+        if (!empty($options['leadIds'])) {
+            // Just a check to ensure reused IDs (happens with innodb) doesn't infect data
+            $sqb->innerJoin('l', MAUTIC_TABLE_PREFIX.'leads', 'ld', 'ld.id = l.object_id AND l.date_added >= ld.date_added')
+                ->andWhere($sqb->expr()->in('l.object_id', ':leadIds'))
+                ->addGroupBy('l.object_id');
         }
 
         $qb

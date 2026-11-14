@@ -1,6 +1,6 @@
 {% set common_header_content %}
-    <div class="content-item__header fw-b type-heading-02 mb-xs">{{ heading|trans }}</div>
-    <div class="content-item__copy type-body-compact-02 {% if cta is defined and cta %} mb-md{% endif %}">{{ copy|trans }}</div>
+    <div class="content-item__header fw-b type-heading-02 mb-5">{{ heading|trans }}</div>
+    <div class="content-item__copy type-body-compact-02 {% if cta is defined and cta %} mb-16{% endif %}">{{ copy|trans }}</div>
     {% if cta is defined and cta %}
         {% set cta = cta|merge({'variant': 'link', 'icon': 'ri-arrow-right-line', 'href': cta.link}) %}
         {% include '@MauticCore/Helper/button.html.twig' with {buttons: [cta]} %}
@@ -9,8 +9,8 @@
 
 {# === IMAGE TYPE === #}
 {% if type == 'image' %}
-    <div class="d-flex flex-column row-gap-xs mb-32">
-        <img src="{{ asset(image.src) }}" alt="{{ image.alt|trans }}" title="{{ image.alt|trans }}" class="mb-sm mt-xs flex-shrink-0">
+    <div class="d-flex flex-column row-gap-5 mb-32">
+        <img src="{{ asset(image.src) }}" alt="{{ image.alt|trans }}" title="{{ image.alt|trans }}" class="mb-12 mt-5 flex-shrink-0">
         <div>{{ common_header_content }}</div>
     </div>
 
@@ -23,7 +23,7 @@
 
 {# === PICTOGRAM TYPE === #}
 {% elseif type == 'pictogram' %}
-    <div class="d-flex {% if orientation is defined and orientation == 'horizontal' %}flex-md-row column-gap-lg {% endif %}flex-column row-gap-xs mb-32">
+    <div class="d-flex {% if orientation is defined and orientation == 'horizontal' %}flex-md-row column-gap-24 {% endif %}flex-column row-gap-5 mb-32">
         {% include '@MauticCore/Components/pictogram.html.twig' with {'pictogram': pictogram, 'size': 48} %}
         <div>{{ common_header_content }}</div>
     </div>
@@ -31,7 +31,7 @@
 {# === STATISTIC TYPE === #}
 {% elseif type == 'statistic' %}
     <div class="mb-32">
-        <div class="content-item__statistic type-fluid-display-03 mb-xs">{{ statistic }}</div>
+        <div class="content-item__statistic type-fluid-display-03 mb-5">{{ statistic }}</div>
         {{ common_header_content }}
     </div>
 
