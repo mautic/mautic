@@ -50,10 +50,10 @@ final readonly class PluginDatabase
             }
         }
 
-        $existingSequences = array_map(
-            static fn (string $name): string => strtolower($name),
-            $schemaManager->listSequenceNames()
-        );
+        $existingSequences = [];
+        foreach ($schemaManager->listSequences() as $existingSequence) {
+            $existingSequences[] = strtolower($existingSequence->getName());
+        }
 
         foreach ($schema->getSequences() as $sequence) {
             if (in_array(strtolower($sequence->getName()), $existingSequences, true)) {
