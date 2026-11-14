@@ -1,0 +1,210 @@
+(() => {
+    if (window.Mautic && window.Mautic.HoldToConfirmButton) return;
+
+    function emit(element, name, detail) {
+        element.dispatchEvent(new CustomEvent(name, { bubbles: true, detail }));
+    }
+    function register(name, selector, create) {
+        const controllers = new Map();
+        const mount = (root = document) => {
+            const candidates = Array.from(root.querySelectorAll(selector));
+            if (root instanceof HTMLElement && root.matches(selector)) candidates.unshift(root);
+            for (const element of candidates) {
+                if (!controllers.has(element)) controllers.set(element, create(element));
+            }
+        };
+        const start = () => {
+            mount();
+            new MutationObserver((mutations) => {
+                for (const mutation of mutations) {
+                    for (const node of mutation.addedNodes) {
+                        if (node instanceof HTMLElement) mount(node);
+                    }
+                }
+                for (const [element, controller] of controllers) {
+                    if (element.isConnected) continue;
+                    controller.destroy();
+                    controllers.delete(element);
+                }
+            }).observe(document.documentElement, { childList: true, subtree: true });
+        };
+        window.Mautic = window.Mautic || {};
+        window.Mautic[name] = { get: (element) => controllers.get(element), mount };
+        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });
+        else start();
+    }
+    class HoldToConfirmButton {
+        constructor(element) {
+            this.element = element;
+            this.events = new AbortController();
+            this.sources = new Set();
+            this.pointerId = null;
+            this.confirmed = false;
+            this.button = element.querySelector("button");
+            this.ring = element.querySelector(".hold-to-confirm__ring");
+            this.progressCircle = element.querySelector(".hold-to-confirm__progress");
+            this.icon = element.querySelector(".hold-to-confirm__icon");
+            this.defaultIcon = this.icon.cloneNode(true);
+            this.idleLabel = element.querySelector("[data-idle-label]");
+            this.confirmedLabel = element.querySelector("[data-confirmed-label]");
+            this.status = element.querySelector('[role="status"]');
+            this.duration = Number.isFinite(Number(element.dataset.duration)) ? Math.max(0, Number(element.dataset.duration)) : 1200;
+            this.resetDelay = Number.isFinite(Number(element.dataset.resetDelay)) ? Math.max(0, Number(element.dataset.resetDelay)) : 1500;
+            const options = { signal: this.events.signal };
+            this.button.addEventListener("pointerdown", (event) => {
+                if (event.button !== 0 || !event.isPrimary) return;
+                if (this.pointerId !== null || this.button.disabled || this.confirmed) return;
+                this.pointerId = event.pointerId;
+                try {
+                    this.button.setPointerCapture(event.pointerId);
+                } catch (error) {
+                    if (!(error instanceof DOMException)) throw error;
+                }
+                this.start("pointer");
+            }, options);
+            this.button.addEventListener("pointermove", (event) => {
+                if (event.pointerId !== this.pointerId || !this.sources.has("pointer")) return;
+                const bounds = this.button.getBoundingClientRect();
+                if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) {
+                    this.cancel("pointer");
+                }
+            }, options);
+            for (const name of ["pointerup", "pointerleave", "pointercancel", "lostpointercapture"]) {
+                this.button.addEventListener(name, (event) => {
+                    if (event.pointerId === this.pointerId) this.cancel("pointer");
+                }, options);
+            }
+            this.button.addEventListener("keydown", (event) => {
+                if (event.key !== " " && event.key !== "Enter") return;
+                event.preventDefault();
+                if (!event.repeat) this.start("keyboard");
+            }, options);
+            this.button.addEventListener("keyup", (event) => {
+                if (event.key !== " " && event.key !== "Enter") return;
+                event.preventDefault();
+                this.cancel("keyboard");
+            }, options);
+            this.button.addEventListener("blur", () => this.cancel(), options);
+            this.button.addEventListener("contextmenu", (event) => event.preventDefault(), options);
+            window.addEventListener("blur", () => this.cancel(), options);
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden) this.cancel();
+            }, options);
+        }
+        update(options) {
+            if (options.className !== void 0) this.button.className = `btn btn-tertiary btn-nospin hold-to-confirm__button ${options.className}`;
+            if ("icon" in options) {
+                this.icon.replaceChildren(...options.icon ? [options.icon] : Array.from(this.defaultIcon.childNodes).map((node) => node.cloneNode(true)));
+            }
+            if (["sm", "md", "lg"].includes(options.size)) {
+                this.element.dataset.size = options.size;
+                this.button.setAttribute('size', options.size);
+                const dimensions = { sm: { icon: 12, ring: 20, stroke: 2 }, md: { icon: 14, ring: 24, stroke: 2 }, lg: { icon: 17, ring: 30, stroke: 2.5 } }[options.size];
+                const symbol = this.element.querySelector(".hold-to-confirm__symbol");
+                symbol.style.width = `${dimensions.ring}px`;
+                symbol.style.height = `${dimensions.ring}px`;
+                this.ring.setAttribute("viewBox", `0 0 ${dimensions.ring} ${dimensions.ring}`);
+                this.ring.setAttribute("width", String(dimensions.ring));
+                this.ring.setAttribute("height", String(dimensions.ring));
+                for (const circle of this.ring.querySelectorAll("circle")) {
+                    circle.setAttribute("cx", String(dimensions.ring / 2));
+                    circle.setAttribute("cy", String(dimensions.ring / 2));
+                    circle.setAttribute("r", String((dimensions.ring - dimensions.stroke) / 2));
+                    circle.setAttribute("stroke-width", String(dimensions.stroke));
+                }
+                for (const svg of this.element.querySelectorAll("[data-default-icon], .hold-to-confirm__check svg")) {
+                    svg.setAttribute("width", String(dimensions.icon));
+                    svg.setAttribute("height", String(dimensions.icon));
+                }
+            }
+            if (options.duration !== void 0 && Number.isFinite(options.duration)) {
+                this.cancel();
+                this.duration = Math.max(0, options.duration);
+            }
+            if (options.resetDelay !== void 0 && Number.isFinite(options.resetDelay)) this.resetDelay = Math.max(0, options.resetDelay);
+            if ("onConfirm" in options) this.onConfirm = options.onConfirm;
+            if (options.disabled !== void 0) {
+                this.button.disabled = options.disabled;
+                if (options.disabled) this.cancel();
+            }
+            if (options.label !== void 0) this.idleLabel.textContent = options.label;
+            if (options.confirmedLabel !== void 0) this.confirmedLabel.textContent = options.confirmedLabel;
+            if (options.variant !== void 0) this.element.dataset.variant = options.variant === "neutral" ? "neutral" : "danger";
+            this.button.setAttribute("aria-label", this.element.dataset.instructions.replace("%label%", this.idleLabel.textContent || "").replace("%seconds%", (this.duration / 1e3).toFixed(1).replace(/\.0$/, "")));
+            this.button.classList.toggle('btn-danger', this.element.dataset.variant === 'danger');
+        }
+        setProgress(value) {
+            this.progressCircle.style.strokeDashoffset = String(1 - value);
+            this.ring.style.opacity = String(Math.max(0, Math.min(1, value / 0.04)));
+        }
+        start(source) {
+            if (!this.element.isConnected || this.button.disabled || this.confirmed) return;
+            const alreadyHolding = this.sources.size > 0;
+            this.sources.add(source);
+            if (alreadyHolding) return;
+            cancelAnimationFrame(this.frame);
+            const progress = Math.max(0, Math.min(1, 1 - parseFloat(getComputedStyle(this.progressCircle).strokeDashoffset)));
+            this.element.dataset.state = "holding";
+            this.setProgress(progress);
+            const start = performance.now();
+            const duration = this.duration * (1 - progress);
+            const tick = (now) => {
+                const fraction = duration ? Math.max(0, Math.min(1, (now - start) / duration)) : 1;
+                this.setProgress(progress + (1 - progress) * fraction);
+                if (fraction < 1) this.frame = requestAnimationFrame(tick);
+                else this.complete();
+            };
+            this.frame = requestAnimationFrame(tick);
+        }
+        cancel(source) {
+            if (!source || source === "pointer") this.pointerId = null;
+            if (source) this.sources.delete(source);
+            else this.sources.clear();
+            if (this.sources.size > 0) return;
+            if (this.confirmed) return;
+            cancelAnimationFrame(this.frame);
+            this.element.dataset.state = "idle";
+            this.setProgress(0);
+        }
+        swapLabel(confirmed) {
+            for (const [label, hidden] of [[this.idleLabel, confirmed], [this.confirmedLabel, !confirmed]]) {
+                label.setAttribute("aria-hidden", String(hidden));
+                label.classList.toggle("hold-to-confirm__label-out", hidden);
+                label.classList.toggle("hold-to-confirm__label-in", !hidden);
+            }
+        }
+        complete() {
+            if (this.confirmed || !this.element.isConnected || this.button.disabled || document.hidden || this.sources.size === 0) return;
+            this.confirmed = true;
+            this.sources.clear();
+            this.pointerId = null;
+            this.setProgress(1);
+            this.element.dataset.state = "confirmed";
+            this.swapLabel(true);
+            this.status.textContent = this.confirmedLabel.textContent;
+            this.button.setAttribute("aria-label", this.confirmedLabel.textContent || "");
+            if (this.onConfirm) this.onConfirm();
+            emit(this.element, "mautic:hold-to-confirm:confirm", {});
+            if (this.resetDelay > 0) this.resetTimer = setTimeout(() => this.reset(), this.resetDelay);
+        }
+        reset() {
+            const wasConfirmed = this.confirmed;
+            this.confirmed = false;
+            this.sources.clear();
+            this.pointerId = null;
+            clearTimeout(this.resetTimer);
+            this.element.dataset.state = "idle";
+            if (wasConfirmed) this.swapLabel(false);
+            this.status.textContent = "";
+            this.update({});
+            cancelAnimationFrame(this.frame);
+            this.setProgress(0);
+        }
+        destroy() {
+            this.events.abort();
+            cancelAnimationFrame(this.frame);
+            clearTimeout(this.resetTimer);
+        }
+    }
+    register("HoldToConfirmButton", '[data-component="hold-to-confirm"]', (element) => new HoldToConfirmButton(element));
+})();
