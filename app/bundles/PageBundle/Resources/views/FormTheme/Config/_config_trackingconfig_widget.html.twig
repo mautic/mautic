@@ -20,16 +20,16 @@
                 </ul>
                 <div class="tab-content pa-16">
                     <div class="tab-pane bdr-w-0 active in" id="tracking-snippet-consent">
-                        <p class="text-muted small">{{ 'mautic.page.config.tracking.script.consent.description'|trans }}</p>
                         <div class="alert alert-info" role="alert">
                             {{ 'mautic.page.config.tracking.script.consent.focus_notice'|trans }}
                         </div>
                         <h5 class="fw-sb mb-5">{{ 'mautic.page.config.tracking.script.essential.label'|trans }}</h5>
                         <p class="text-muted small">{{ 'mautic.page.config.tracking.script.essential.description'|trans }}</p>
-                        {% include '@MauticCore/Components/code-snippet.html.twig' with {
-                            variant: 'multi',
+                        {% include '@MauticCore/Components/code-block.html.twig' with {
                             ariaLabel: 'mautic.page.config.tracking.script.essential.label'|trans,
-                            innerText: '&lt;script&gt;
+                            filename: 'mautic.page.config.tracking.script.essential.block'|trans,
+                            numbered: true,
+                            innerText: '<script>
     (function(w,d,t,u,a,m){
         if (d.getElementById(\'mautic-essential-script\')) return;
         a=d.createElement(t),m=d.getElementsByTagName(t)[0];
@@ -40,14 +40,15 @@
             }
         };m.parentNode.insertBefore(a,m)
     })(window,document,\'script\',\'' ~ url('mautic_essential_js') ~ '\');
-&lt;/script&gt;',
+</script>',
                         } %}
                         <h5 class="fw-sb mt-24 mb-5">{{ 'mautic.page.config.tracking.script.tracking.label'|trans }}</h5>
                         <p class="text-muted small">{{ 'mautic.page.config.tracking.script.tracking.description'|trans }}</p>
-                        {% include '@MauticCore/Components/code-snippet.html.twig' with {
-                            variant: 'multi',
+                        {% include '@MauticCore/Components/code-block.html.twig' with {
                             ariaLabel: 'mautic.page.config.tracking.script.tracking.label'|trans,
-                            innerText: '&lt;script&gt;
+                            filename: 'mautic.page.config.tracking.script.tracking.block'|trans,
+                            numbered: true,
+                            innerText: '<script>
     (function(w,d,t,u,n,a,m){
         function enableTracking(){
             if (!w.MauticJS || w.MauticJS.runtimeReady !== true) return;
@@ -65,15 +66,16 @@
             d.addEventListener(\'mauticEssentialReady\',enableTracking)
         }
     })(window,document,\'script\',\'' ~ url('mautic_tracking_js') ~ '\',\'mt\');
-&lt;/script&gt;',
+</script>',
                         } %}
                     </div>
                     <div class="tab-pane bdr-w-0" id="tracking-snippet-full">
                         <p class="text-muted small">{{ 'mautic.page.config.tracking.script.full.description'|trans }}</p>
-                        {% include '@MauticCore/Components/code-snippet.html.twig' with {
-                            variant: 'multi',
+                        {% include '@MauticCore/Components/code-block.html.twig' with {
                             ariaLabel: 'mautic.page.config.tracking.script.full.tab'|trans,
-                            innerText: '&lt;script&gt;
+                            filename: 'mautic.page.config.tracking.script.full.block'|trans,
+                            numbered: true,
+                            innerText: '<script>
     (function(w,d,t,e,r,n,a,m,s){w[\'MauticTrackingObject\']=n;
         w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
         m=d.getElementsByTagName(t)[0];a.async=1;a.src=e;
@@ -82,7 +84,7 @@
         };m.parentNode.insertBefore(a,m)
     })(window,document,\'script\',\'' ~ url('mautic_essential_js') ~ '\',\'' ~ url('mautic_tracking_js') ~ '\',\'mt\');
     mt(\'send\', \'pageview\');
-&lt;/script&gt;',
+</script>',
                         } %}
                     </div>
                 </div>
