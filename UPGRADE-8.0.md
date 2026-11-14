@@ -1141,7 +1141,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `LeadBundle\Entity\LeadFieldRepository` | `getFieldAliases()`, `getFieldsByType()` | `string` |
     | `LeadBundle\Entity\LeadFieldRepository` | `getPropertyByField()` | `string`, `Mautic\CoreBundle\Doctrine\Query\QueryBuilder` |
     | `LeadBundle\Entity\LeadFieldRepository` | `compareDateValue()` (second parameter) | `string` |
-    | `LeadBundle\Entity\LeadRepository` | `applySearchQueryRelationship()` (`$whereExpression`, `$having`) | `string\|CompositeExpression\|null` |
+    | `LeadBundle\Entity\LeadRepository` | `applySearchQueryRelationship()` (`$whereExpression`, `$having`) | `string\|Doctrine\DBAL\Query\Expression\CompositeExpression\|null` |
     | `LeadBundle\Entity\MergeRecordRepository` | `moveMergeRecord()` | `int`, `int` |
     | `LeadBundle\Entity\StagesChangeLogRepository` | `getCurrentLeadStage()` | `int` |
     | `LeadBundle\Event\ContactIdentificationEvent` | `setIdentifiedContact()` (second parameter) | `string` |
