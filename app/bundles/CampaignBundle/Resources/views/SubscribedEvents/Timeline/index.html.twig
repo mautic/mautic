@@ -22,9 +22,9 @@
     {% set item = item|merge({'isScheduled': true}) %}
 {% endif %}
 
-<div class="mt-10">
+<div class="mt-12">
     {% if (item.isScheduled) %}
-        <p class="mt-0 mb-10 text-info" id="timeline-campaign-event-{{ item.event_id }}">
+        <p class="mt-0 mb-12 text-info" id="timeline-campaign-event-{{ item.event_id }}">
         <span id="timeline-campaign-event-text-{{ item.event_id }}"{{ cancelled ? ' class="text-warning"' : '' }}>
             <i class="ri-time-line"></i>
             <span class="timeline-campaign-event-scheduled-{{ item.event_id }}{{ cancelled ? ' hide' : '' }}">
@@ -61,25 +61,25 @@
         {% if (item.isScheduled) %}
             <hr/>
         {% endif %}
-        <p class="text-danger mt-0 mb-10"><i class="ri-alert-line"></i> {{ 'mautic.campaign.event.last_error'|trans }}
+        <p class="text-danger mt-0 mb-12"><i class="ri-alert-line"></i> {{ 'mautic.campaign.event.last_error'|trans }}
             :<br/>{{ errors|purify }}</p>
     {% endif %}
     
     {% if (item.metadata.timeline is defined and item.metadata.timeline is not empty or item.campaign_description or item.event_description) %}
         <hr/>
         {% if (item.metadata.timeline is defined and item.metadata.timeline is not empty) %}
-            <p class="mt-0 mb-10">{{ item.metadata.timeline }}</p>
+            <p class="mt-0 mb-12">{{ item.metadata.timeline }}</p>
         {% endif %}
         
         {% if (item.campaign_description) %}
-            <p class="mt-0 mb-10">{{ 'mautic.campaign.campaign.description'|trans({'%description%' : item.campaign_description})|purify }}</p>
+            <p class="mt-0 mb-12">{{ 'mautic.campaign.campaign.description'|trans({'%description%' : item.campaign_description})|purify }}</p>
         {% endif %}
         {% if (item.event_description) %}
-            <p class="mt-0 mb-10">{{ 'mautic.campaign.campaign.description'|trans({'%description%' : item.event_description})|purify }}</p>
+            <p class="mt-0 mb-12">{{ 'mautic.campaign.campaign.description'|trans({'%description%' : item.event_description})|purify }}</p>
         {% endif %}
     {% endif %}
     {% if eventDetails != false %}
-        <h6 class="mt-lg mb-sm">
+        <h6 class="mt-24 mb-12">
             {% set props = eventDetails.properties|default({}) %}
             {% if props.field is defined and props.operator is defined and props.comparisonValue is defined and props.value is defined %}
                 {% set comparisonValue = props.comparisonValue is iterable ? props.comparisonValue|join(',') : props.comparisonValue %}

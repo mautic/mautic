@@ -26,7 +26,7 @@
             data-bs-html="true"
           {% endif %}
         >
-        <h3 class="type-heading-01 mb-sm">
+        <h3 class="type-heading-01 mb-12">
           {% if event.eventLabelHref is defined and event.eventLabelHref is not empty %}
             <a href="{{ event.eventLabelHref|e('html_attr') }}" target="_blank" rel="noopener noreferrer">{{ event.eventLabel|purify }}</a>
           {% else %}
@@ -38,7 +38,7 @@
               <span class="event-description">{{ event.eventDescription|purify }}</span>
             </div>
           {% endif %}
-          <div class="event-timestamp type-label-01 text-secondary mt-xs">
+          <div class="event-timestamp type-label-01 text-secondary mt-5">
             <span data-bs-toggle="tooltip" title="{{ dateToFull(event.timestamp)|e('html_attr') }}">{{ dateToHumanized(event.timestamp, 'local') }}</span>
           </div>
         </{{ panelTag }}>

@@ -106,8 +106,8 @@
             <!-- page detail header -->
             <!-- segment detail collapseable toggler -->
             {% include '@MauticCore/Helper/description--expanded.html.twig' with {'description': list.description} %}
-            <div class="collapse pr-md pl-md" id="segment-details">
-                <div class="pr-md pl-md pb-md">
+            <div class="collapse pe-16 ps-16" id="segment-details">
+                <div class="pe-16 ps-16 pb-16">
                     <div class="panel shd-none mb-0">
                         <table class="table table-hover mb-0">
                             <tbody>
@@ -138,7 +138,7 @@
             <!-- some stats -->
 
             <!--/ stats -->
-            <div class="pa-md">
+            <div class="pa-16">
                 <div class="row">
                     <div class="col-sm-12">
                         {% if securityIsGranted('lead:leads:viewown') %}
@@ -149,7 +149,7 @@
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-md-3 align-middle">
-                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                    <h5 class="text-white dark-md fw-sb mb-5">
                                         <span class="ri-line-chart-fill"></span>
                                         {{ 'mautic.segment.stats'|trans }}
                                     </h5>
@@ -161,7 +161,7 @@
                                     }) }}
                                 </div>
                             </div>
-                            <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                            <div class="d-flex flex-column pt-0 ps-16 pb-16 pe-16 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {
                                       'chartData': stats,
                                       'chartType': 'line',
@@ -209,7 +209,7 @@
         </div>
 
         <!-- start: tab-content -->
-        <div class="tab-content pa-md">
+        <div class="tab-content pa-16">
             <div class="tab-pane active bdr-w-0 page-list"
                  id="contacts-container"
                  data-target-url="{{ path('mautic_segment_contacts', {'objectId': list.id, 'page': app.session.get('mautic.segment.contact.page', 1)}) }}">

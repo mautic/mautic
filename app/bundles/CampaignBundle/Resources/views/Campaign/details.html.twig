@@ -79,8 +79,8 @@
             <!--/ campaign detail header -->
 
             <!-- campaign detail collapseable -->
-            <div class="collapse pr-md pl-md" id="campaign-details">
-                <div class="pr-md pl-md pb-md">
+            <div class="collapse pe-16 ps-16" id="campaign-details">
+                <div class="pe-16 ps-16 pb-16">
                     <div class="panel shd-none mb-0">
                         <table class="table table-hover mb-0">
                             <tbody>
@@ -137,7 +137,7 @@
 
             {{ customContent('left.section.top', _context) }}
             {% if securityIsGranted('lead:leads:viewown') %}
-                <div class="pa-md">
+                <div class="pa-16">
                     <div class="row">
                         <div class="col-sm-12">
                             {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
@@ -156,7 +156,7 @@
             {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
             {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
             <!-- some stats -->
-            <div class="stats-menu pl-md mt-lg">
+            <div class="stats-menu ps-16 mt-24">
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs nav-tabs-contained">
                     <li class="active">
@@ -184,7 +184,7 @@
                     }) }}
                 </div>
             </div>
-            <div class="stats-menu__content tab-content pa-md mb-lg shd-sm">
+            <div class="stats-menu__content tab-content pa-16 mb-24 shd-sm">
                 <div class="tab-pane active bdr-w-0" id="stats-container">
                     <div id="campaign-graph-div" data-target-url="{{ path('mautic_campaign_graph', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
                         <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
@@ -201,7 +201,7 @@
                 <div class="tab-pane bdr-w-0" id="campaign-email-stats">
                     <div class="row">
                         <div class="col-md-6">
-                            <h4 class="text-muted ml-20 mb-md">{{ 'mautic.campaign.email_stats.weekday' | trans }}</h4>
+                            <h4 class="text-muted ms-24 mb-16">{{ 'mautic.campaign.email_stats.weekday' | trans }}</h4>
                             <div data-campaign-email-stats-weekdays="{{ path('mautic_campaign_metrics_email_weekdays', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
                                 <div class="d-flex justify-content-center align-items-center">
                                     <div class="spinner fs-42">
@@ -211,7 +211,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <h4 class="text-muted ml-20 mb-md">{{ 'mautic.campaign.email_stats.hour' | trans }}</h4>
+                            <h4 class="text-muted ms-24 mb-16">{{ 'mautic.campaign.email_stats.hour' | trans }}</h4>
                             <div data-campaign-email-stats-hours="{{ path('mautic_campaign_metrics_email_hours', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
                                 <div class="d-flex justify-content-center align-items-center">
                                     <div class="spinner fs-42">
@@ -261,7 +261,7 @@
         </div>
 
         <!-- start: tab-content -->
-        <div class="tab-content pa-md" id="campaign-tab-content"
+        <div class="tab-content pa-16" id="campaign-tab-content"
              data-event-target-url="{{ path('mautic_campaign_event_stats', {'objectId' : campaign.id, 'dateFromValue' : dateFrom|date('Y-m-d'), 'dateToValue' : dateTo|date('Y-m-d')}) }}">
             <!-- #events-container -->
                 <div class="active tab-pane fade in bdr-w-0" id="preview-container">

@@ -6,7 +6,7 @@
 #}
 {{ form_start(form) }}
     <div class="box-layout">
-        <ul class="nav nav-tabs nav-tabs-contained mt-10">
+        <ul class="nav nav-tabs nav-tabs-contained mt-12">
             {% for g in groups %}
                 {% if fields[g] is not empty %}
                     <li class="{% if loop.first %}active{% endif %}">
@@ -16,7 +16,7 @@
             {% endfor %}
         </ul>
     </div>
-    <div class="tab-content pa-md">
+    <div class="tab-content pa-16">
         {{ include('@MauticLead/Company/form_fields.html.twig', {'form': form, 'groups': groups, 'fields': fields, 'embedded': true}) }}
     </div>
     </div>
