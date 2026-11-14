@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\PluginBundle\Tests\Functional\Command;
 
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Plugin;
 
@@ -44,11 +45,19 @@ final class ReloadCommandFunctionalTest extends MauticMysqlTestCase
 
     private function uninstallFocusPlugin(): void
     {
-        $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
+		$platform = $connection->getDatabasePlatform();
+
+        if (!DatabasePlatform::isPostgreSQL($platform)) {
+			$this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
+		}
+
         foreach (['focus_projects_xref', 'focus_stats', 'focus'] as $table) {
-            $this->connection->executeStatement("DROP TABLE IF EXISTS `{$this->prefix}{$table}`");
+            $this->connection->executeStatement("DROP TABLE IF EXISTS `{$this->prefix}{$table}` CASCADE");
         }
-        $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
+
+        if (!DatabasePlatform::isPostgreSQL($platform)) {
+			$this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
+		}
 
         $this->connection->delete($this->prefix.'plugins', ['bundle' => 'MauticFocusBundle']);
     }
