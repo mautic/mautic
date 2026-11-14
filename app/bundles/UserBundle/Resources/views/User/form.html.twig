@@ -22,40 +22,40 @@
 		<!-- container -->
 		{{ form_start(form) }}
 		<div class="col-md-9 height-auto bdr-r">
-			<div class="pa-md">
+			<div class="pa-16">
 				<div class="form-group mb-0">
 					<div class="row">
 						<div class="col-sm-6{{ form.firstName.vars.errors|length ? ' has-error' : '' }}">
-							<h3 class="mb-lg mt-lg">{{ 'mautic.user.config.title.personal_information'|trans }}</h3>
+							<h3 class="mb-24 mt-24">{{ 'mautic.user.config.title.personal_information'|trans }}</h3>
 							<div class="form-group">
-								<label class="form-label mb-xs">{{ form_label(form.firstName) }}</label>
+								<label class="form-label mb-5">{{ form_label(form.firstName) }}</label>
 								{{ form_widget(form.firstName, {'attr' : {'placeholder' : form.firstName.vars.label }}) }}
 								{{ form_errors(form.firstName) }}
 							</div>
 							<div class="form-group{{ form.lastName.vars.errors|length ? ' has-error' : '' }}">
-								<label class="form-label mb-xs">{{ form_label(form.lastName) }}</label>
+								<label class="form-label mb-5">{{ form_label(form.lastName) }}</label>
 								{{ form_widget(form.lastName, {'attr' : {'placeholder' : form.lastName.vars.label }}) }}
 								{{ form_errors(form.lastName) }}
 							</div>
 							<div class="form-group{{ form.role.vars.errors|length ? ' has-error' : '' }}">
-								<label class="form-label mb-xs">{{ form_label(form.role) }}</label>
+								<label class="form-label mb-5">{{ form_label(form.role) }}</label>
 								{{ form_widget(form.role, {'attr' : {'placeholder' : form.role.vars.label }}) }}
 								{{ form_errors(form.role) }}
 							</div>
-							<div class="form-group pb-lg{{ form.position.vars.errors|length ? ' has-error' : '' }}">
-								<label class="form-label mb-xs">{{ form_label(form.position) }}</label>
+							<div class="form-group pb-24{{ form.position.vars.errors|length ? ' has-error' : '' }}">
+								<label class="form-label mb-5">{{ form_label(form.position) }}</label>
 								{{ form_widget(form.position, {'attr' : {'placeholder' : form.position.vars.label }}) }}
 								{{ form_errors(form.position) }}
 							</div>
-							<div class="form-group pt-md{{ form.signature.vars.errors|length ? ' has-error' : '' }}">
-								<label class="form-label mb-xs">{{ form_label(form.signature) }}</label>
+							<div class="form-group pt-16{{ form.signature.vars.errors|length ? ' has-error' : '' }}">
+								<label class="form-label mb-5">{{ form_label(form.signature) }}</label>
 								{{ form_widget(form.signature, {'attr' : {'placeholder' : form.signature.vars.label }}) }}
 								{{ form_errors(form.signature) }}
 								<p class="help-text">{{ 'mautic.user.config.signature.admin.helper'|trans }} </p>
 							</div>
 						</div>
 						<div class="col-sm-6">
-							<h3 class="mb-lg mt-lg">{{ 'mautic.user.config.title.account_data_security'|trans }}</h3>
+							<h3 class="mb-24 mt-24">{{ 'mautic.user.config.title.account_data_security'|trans }}</h3>
 							<div class="form-group{{ form.username.vars.errors|length ? ' has-error' : '' }}">
 									{{ form_label(form.username) }}
 									{{ form_widget(form.username, {'attr' : {'placeholder' : form.username.vars.label }}) }}
@@ -79,8 +79,8 @@
 			</div>
 		</div>
 		<div class="col-md-3 height-auto">
-			<div class="pr-lg pl-lg pt-md pb-md">
-				<h3 class="mb-lg mt-lg">{{ 'mautic.user.config.title.locale'|trans }}</h3>
+			<div class="pe-24 ps-24 pt-16 pb-16">
+				<h3 class="mb-24 mt-24">{{ 'mautic.user.config.title.locale'|trans }}</h3>
 				{{ form_rest(form) }}
 			</div>
 		</div>

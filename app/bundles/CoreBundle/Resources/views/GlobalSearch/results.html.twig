@@ -1,5 +1,5 @@
 <div aria-hidden="true"
-    class="gsearch--interaction-helper d-flex justify-content-between pr-md pl-md pt-sm pb-sm text-secondary">
+    class="gsearch--interaction-helper d-flex justify-content-between pe-16 ps-16 pt-12 pb-12 text-secondary">
     <div class="gsearch--interaction-navigate d-flex align-items-center gap-5">
         <span class="fs-16">{{ 'mautic.core.navigate'|trans }}</span>
         <kbd><i class="ri-arrow-up-line"></i></kbd>
@@ -20,7 +20,7 @@
                 <hr>
             {% endif %}
 
-            <div class="text-secondary pl-md pr-md ml-2 mr-2 mb-xs d-flex gap-xs{% if loop.first %} mt-md{% endif %}">
+            <div class="text-secondary ps-16 pe-16 ms-2 me-2 mb-5 d-flex gap-5{% if loop.first %} mt-16{% endif %}">
                 {{ header }}
                 {% if result.count is defined and result.count is not empty %}
                     <span class="label label-gray fs-10 gs-count-badge" size="sm">{{ result.count }}</span>
@@ -41,7 +41,7 @@
         {%- endfor %}
     {% else %}
         <!-- No results message -->
-        <div class="text-center text-secondary mt-sm">
+        <div class="text-center text-secondary mt-12">
             {{ random([
                 'mautic.core.search_everything.no_results.nothing_found',
                 'mautic.core.search_everything.no_results.nothing_yet',

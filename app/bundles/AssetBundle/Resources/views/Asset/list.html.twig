@@ -43,44 +43,58 @@
                         },
                     ] : [],
                 },
-                'quickFilters': [
-                    {
-                        'search': 'mautic.core.searchcommand.isuncategorized',
-                        'label': 'mautic.core.form.uncategorized',
-                        'tooltip': 'mautic.core.search.quickfilter.is_uncategorized',
-                        'icon': 'ri-folder-unknow-line'
+                'quickFilters': {
+                    'mautic.core.quick_filters.status': {
+                        'conflictGroup': true,
+                        'filters': [
+                            {
+                                'search': 'mautic.core.searchcommand.ispublished',
+                                'label': 'mautic.core.form.available',
+                                'tooltip': 'mautic.core.search.quickfilter.is_published',
+                                'icon': 'ri-check-line'
+                            },
+                            {
+                                'search': 'mautic.core.searchcommand.isunpublished',
+                                'label': 'mautic.core.form.unavailable',
+                                'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
+                                'icon': 'ri-close-line'
+                            },
+                            {
+                                'search': 'mautic.asset.asset.searchcommand.isexpired',
+                                'label': 'mautic.core.form.no_longer_available',
+                                'tooltip': 'mautic.asset.asset.searchcommand.isexpired.description',
+                                'icon': 'ri-time-line'
+                            },
+                            {
+                                'search': 'mautic.asset.asset.searchcommand.ispending',
+                                'label': 'mautic.core.form.not_yet_available',
+                                'tooltip': 'mautic.asset.asset.searchcommand.ispending.description',
+                                'icon': 'ri-timer-line'
+                            }
+                        ]
                     },
-                    {
-                        'search': 'mautic.core.searchcommand.ispublished',
-                        'label': 'mautic.core.form.available',
-                        'tooltip': 'mautic.core.search.quickfilter.is_published',
-                        'icon': 'ri-check-line'
+                    'mautic.core.quick_filters.ownership': {
+                        'conflictGroup': true,
+                        'filters': [
+                            {
+                                'search': 'mautic.core.searchcommand.ismine',
+                                'label': 'mautic.core.searchcommand.ismine.label',
+                                'tooltip': 'mautic.core.searchcommand.ismine.description',
+                                'icon': 'ri-user-line'
+                            }
+                        ]
                     },
-                    {
-                        'search': 'mautic.core.searchcommand.isunpublished',
-                        'label': 'mautic.core.form.unavailable',
-                        'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
-                        'icon': 'ri-close-line'
+                    'mautic.core.quick_filters.others': {
+                        'filters': [
+                            {
+                                'search': 'mautic.core.searchcommand.isuncategorized',
+                                'label': 'mautic.core.form.uncategorized',
+                                'tooltip': 'mautic.core.search.quickfilter.is_uncategorized',
+                                'icon': 'ri-folder-unknow-line'
+                            }
+                        ]
                     },
-                    {
-                        'search': 'mautic.core.searchcommand.ismine',
-                        'label': 'mautic.core.searchcommand.ismine.label',
-                        'tooltip': 'mautic.core.searchcommand.ismine.description',
-                        'icon': 'ri-user-line'
-                    },
-                    {
-                        'search': 'mautic.asset.asset.searchcommand.isexpired',
-                        'label': 'mautic.core.form.no_longer_available',
-                        'tooltip': 'mautic.asset.asset.searchcommand.isexpired.description',
-                        'icon': 'ri-time-line'
-                    },
-                    {
-                        'search': 'mautic.asset.asset.searchcommand.ispending',
-                        'label': 'mautic.core.form.not_yet_available',
-                        'tooltip': 'mautic.asset.asset.searchcommand.ispending.description',
-                        'icon': 'ri-timer-line'
-                    }
-                ],
+                },
                 'searchScopes': searchScopes|default([]),
                 'searchScopeHint': searchScopeHint|default(''),
             }) -}}
@@ -279,7 +293,7 @@
     {% else %}
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
-                <div class="mb-md">
+                <div class="mb-16">
                     {% include '@MauticCore/Components/pictogram.html.twig' with {
                         'pictogram': 'cloud--assets',
                         'size': '80'

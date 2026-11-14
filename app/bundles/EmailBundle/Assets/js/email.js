@@ -553,7 +553,7 @@ Mautic.toggleMailerIsOwnerWarningMessage = function(radioSelector) {
         let warning = mQuery('<div/>');
         warning.attr('id', warningMessageId);
         warning.html(checkedRadio.attr('data-warning'));
-        warning.addClass('alert alert-warning mt-md');
+        warning.addClass('alert alert-warning mt-16');
         checkedRadio.closest('.form-group').append(warning);
     }
 }

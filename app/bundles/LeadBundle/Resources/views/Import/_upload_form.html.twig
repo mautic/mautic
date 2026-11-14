@@ -10,14 +10,14 @@
                 pictogram: 'upload--02',
                 size: 64
             } %}
-            <h2 class="mt-lg mb-xs">{{ 'mautic.lead.import.start.instructions.choose_file'|trans }}</h2>
-            <div class="text-secondary mb-lg">{{ 'mautic.lead.import.start.instructions.upload_size'|trans({'%size%': uploadMaxFilesize}) }}</div>
+            <h2 class="mt-24 mb-5">{{ 'mautic.lead.import.start.instructions.choose_file'|trans }}</h2>
+            <div class="text-secondary mb-24">{{ 'mautic.lead.import.start.instructions.upload_size'|trans({'%size%': uploadMaxFilesize}) }}</div>
             <div class="row">
                 <div class="panel">
                     <div class="panel-body">
                         {{ form_start(form) }}
                         <div class="small text-secondary"> {{ 'mautic.lead.import.start.instructions.format'|trans }}: CSV</div>
-                        <div class="input-group well mt-xs">
+                        <div class="input-group well mt-5">
                             {{ form_widget(form.file, {'label': 'mautic.lead.import.csv.parser.config'}) }}
                             <span class="input-group-btn">
                                 {{ form_widget(form.start) }}
@@ -25,15 +25,15 @@
                         </div>
                         <div class="row">
                             {% set sampleContent %}
-                                <div class="d-flex flex-lg-row flex-column flex-wrap flex-lg-nowrap gap-md">
+                                <div class="d-flex flex-lg-row flex-column flex-wrap flex-lg-nowrap gap-16">
                                     {{ form_row(form.batchlimit) }}
                                     {{ form_row(form.delimiter) }}
                                     {{ form_row(form.enclosure) }}
                                     {{ form_row(form.escape) }}
                                 </div>
-                                <div class="tile mt-lg">
-                                    <div class="row-no-gutters gap-sm flex-lg-nowrap">
-                                        <div class="col-md-8 gap-xs">
+                                <div class="tile mt-24">
+                                    <div class="row-no-gutters gap-12 flex-lg-nowrap">
+                                        <div class="col-md-8 gap-5">
                                             <h5 class="fw-b"> {{'mautic.lead.import.start.instructions.sample'|trans }}</h5>
                                             <span> {{ 'mautic.lead.import.start.instructions.sample.description'|trans }}</span>
                                         </div>

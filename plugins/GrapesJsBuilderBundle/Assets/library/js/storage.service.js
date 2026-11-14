@@ -87,7 +87,7 @@ export default class StorageService {
 
         const restoreButton = document.createElement('button');
         restoreButton.innerHTML = '<i class="ri-arrow-go-back-line"></i> ' + Mautic.translate('mautic.core.builder.storage.restore.button')
-        restoreButton.className = 'btn btn-primary btn-sm ml-md';
+        restoreButton.className = 'btn btn-primary btn-sm ms-16';
 
         const dismissButton = document.createElement('button');
         dismissButton.innerHTML = Mautic.translate('mautic.core.builder.storage.dismiss.button')
