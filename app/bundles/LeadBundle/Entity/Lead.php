@@ -1004,10 +1004,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->socialCache;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getColor()
+    public function getColor(): ?string
     {
         return $this->color;
     }

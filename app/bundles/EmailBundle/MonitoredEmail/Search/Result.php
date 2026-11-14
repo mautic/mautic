@@ -57,10 +57,7 @@ final class Result
         $this->contacts = $contacts;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->email;
     }
