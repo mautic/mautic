@@ -556,10 +556,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     public function setLastLogin(?\DateTimeInterface $lastLogin = null): void
     {
-        if (empty($lastLogin)) {
-            $lastLogin = new \DateTime();
-        }
-        $this->lastLogin = $lastLogin;
+        $this->lastLogin = $lastLogin ?? new \DateTime();
     }
 
     /**
@@ -572,10 +569,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     public function setLastActive(?\DateTimeInterface $lastActive = null): void
     {
-        if (empty($lastActive)) {
-            $lastActive = new \DateTime();
-        }
-        $this->lastActive = $lastActive;
+        $this->lastActive = $lastActive ?? new \DateTime();
     }
 
     /**

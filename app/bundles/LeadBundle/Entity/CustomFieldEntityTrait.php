@@ -2,8 +2,6 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 
@@ -242,24 +240,5 @@ trait CustomFieldEntityTrait
         $this->eventData[$key] = $value;
 
         return $this;
-    }
-
-    protected static function loadFixedFieldMetadata(ClassMetadataBuilder $builder, array $fields, array $customFieldDefinitions): void
-    {
-        foreach ($fields as $fieldProperty) {
-            $field = (defined('self::FIELD_ALIAS')) ? self::FIELD_ALIAS.$fieldProperty : $fieldProperty;
-
-            $type = 'text';
-            if (isset($customFieldDefinitions[$field]) && !empty($customFieldDefinitions[$field]['type'])) {
-                $type = $customFieldDefinitions[$field]['type'];
-            }
-
-            $builder->addNamedField(
-                $fieldProperty,
-                SchemaDefinition::getSchemaDefinition($field, $type, !empty($customFieldDefinitions[$field]['unique']))['type'],
-                $field,
-                true
-            );
-        }
     }
 }
