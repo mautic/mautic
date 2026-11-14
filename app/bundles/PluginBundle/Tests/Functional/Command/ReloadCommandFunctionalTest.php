@@ -45,19 +45,20 @@ final class ReloadCommandFunctionalTest extends MauticMysqlTestCase
 
     private function uninstallFocusPlugin(): void
     {
-		$platform = $this->connection->getDatabasePlatform();
+        $platform = $this->connection->getDatabasePlatform();
 
         if (!DatabasePlatform::isPostgreSQL($platform)) {
-			$this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
-		}
+            $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
+        }
 
         foreach (['focus_projects_xref', 'focus_stats', 'focus'] as $table) {
-            $this->connection->executeStatement("DROP TABLE IF EXISTS `{$this->prefix}{$table}` CASCADE");
+            $quoted = DatabasePlatform::quoteIdentifier($platform, $this->prefix.$table);
+            $this->connection->executeStatement("DROP TABLE IF EXISTS {$quoted} CASCADE");
         }
 
         if (!DatabasePlatform::isPostgreSQL($platform)) {
-			$this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
-		}
+            $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
+        }
 
         $this->connection->delete($this->prefix.'plugins', ['bundle' => 'MauticFocusBundle']);
     }
