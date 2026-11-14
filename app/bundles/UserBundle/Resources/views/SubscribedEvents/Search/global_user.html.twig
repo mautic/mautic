@@ -4,12 +4,12 @@
 </a>
 {% else %}
 <div class="d-flex align-items-center">
-    <span class="float-start mr-sm pt-xs" style="width:36px">
+    <span class="float-start me-12 pt-5" style="width:36px">
         <span class="img-wrapper rounded"><img src="{{ userAvatar(item.getId()) }}" alt="" /></span>
     </span>
     <div class="d-flex flex-column">
         <div>
-            <a class="fw-sb mr-4" href="{{ url('mautic_user_action', {'objectAction' : 'edit', 'objectId' : item.getId()}) }}">
+            <a class="fw-sb me-4" href="{{ url('mautic_user_action', {'objectAction' : 'edit', 'objectId' : item.getId()}) }}">
                 {{ item.getName() }}
             </a>
             {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {

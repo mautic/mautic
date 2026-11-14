@@ -740,14 +740,14 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // Check if preview panel exists
-        $previewPanel = $crawler->filter('div.panel.shd-none.rounded-0.bdr-w-0.mt-sm.mb-0');
+        $previewPanel = $crawler->filter('div.panel.shd-none.rounded-0.bdr-w-0.mt-12.mb-0');
 
         if ($previewPanel->count() > 0) {
             // If preview panel exists, verify its structure
             $panelHeading = $previewPanel->filter('.panel-heading .panel-title:contains("Preview")');
             $this->assertCount(1, $panelHeading, 'Preview panel should have correct heading structure');
 
-            $panelBody = $previewPanel->filter('.panel-body.pt-xs');
+            $panelBody = $previewPanel->filter('.panel-body.pt-5');
             $this->assertCount(1, $panelBody, 'Preview panel should have correct body structure');
         }
     }

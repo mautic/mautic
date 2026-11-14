@@ -61,6 +61,7 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Helper\ContactTrackingPreferenceHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -143,6 +144,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         private readonly LeadRepository $leadRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
         private readonly CompanyRepository $companyRepository,
+        private readonly ContactTrackingPreferenceHelper $contactTrackingPreferenceHelper,
     ) {
         $this->connection = $em->getConnection(); // Necessary for FilterTrait
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -440,6 +442,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return;
         }
 
+        // A contact who turned tracking off still gets the image, but the open isn't recorded on them. This goes first,
+        // since the trackability check stores the visitor's IP address. Checked again here for a hit queued before the
+        // contact turned tracking off.
+        if (!$this->contactAllowsOpenTracking($stat)) {
+            return;
+        }
+
         if (!$this->ipLookupHelper->isRequestTrackable()) {
             return;
         }
@@ -662,6 +671,24 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function getEmailStatus(string $idHash): ?Stat
     {
         return $this->getStatRepository()->getEmailStatus($idHash);
+    }
+
+    /**
+     * Whether an open of this email may be recorded, checked before the hit is queued so nothing about a contact who
+     * turned tracking off (IP address, user agent, cookies) ends up in the queue. An unknown hash is left to hitEmail().
+     */
+    public function allowsOpenTracking(string $idHash): bool
+    {
+        $stat = $this->getEmailStatus($idHash);
+
+        return null === $stat || $this->contactAllowsOpenTracking($stat);
+    }
+
+    private function contactAllowsOpenTracking(Stat $stat): bool
+    {
+        $contact = $stat->getLead();
+
+        return null === $contact || $this->contactTrackingPreferenceHelper->allowsActivityTracking($contact);
     }
 
     /**

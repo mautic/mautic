@@ -60,7 +60,8 @@ final class EmailReplyRepository extends CommonRepository implements EmailReplyR
             'storedSubject, email.subject',
             'reply.date_replied', // 'reply.id', // THIS IS BUG
             [],
-            ['date_replied']
+            ['date_replied'],
+            leadIdColumn: 'stat.lead_id',
         );
     }
 

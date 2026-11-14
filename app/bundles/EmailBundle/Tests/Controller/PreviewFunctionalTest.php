@@ -7,12 +7,15 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -470,6 +473,149 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $content = $this->client->getResponse()->getContent();
         $this->assertStringNotContainsString($errorMsg, (string) $content);
         $this->assertStringContainsString(sprintf('Contact emails is %s', $lead->getEmail()), $this->getIframeContent($crawler));
+    }
+
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testPreviewEmailForCompanyHidesCompanyFromAnonymousVisitor(): void
+    {
+        $company = $this->createPreviewCompany('Secret Company');
+
+        $email = $this->createEmail();
+        $email->setName('Email name');
+        $email->setCustomHtml('<html><body>Company Name: {contactfield=companyname}</body></html>');
+        $this->em->flush();
+
+        $previewUrl  = "/email/preview/{$email->getId()}?companyId={$company->getId()}";
+        $downloadUrl = "/email/download/preview/{$email->getId()}/real/html?companyId={$company->getId()}";
+
+        // Admin user
+        $this->assertPageContent($previewUrl, 'Company Name: Secret Company');
+        $response = $this->getUrlResponse($downloadUrl);
+        $this->assertStringContainsString('secret-company-email-name.html', (string) $response->headers->get('content-disposition'));
+
+        $this->logoutUser();
+
+        // Anonymous visitor
+        $this->assertPageContent($previewUrl, 'Company Name: [Company Name]');
+        $response = $this->getUrlResponse($downloadUrl);
+        $this->assertStringContainsString('email-name.html', (string) $response->headers->get('content-disposition'));
+        $this->assertStringNotContainsString('secret', (string) $response->headers->get('content-disposition'));
+        $this->assertStringNotContainsString('Secret Company', (string) $response->getContent());
+    }
+
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testPreviewEmailForUnauthorizedCompany(): void
+    {
+        $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $admin);
+
+        $user           = $this->createNonAdminUser(['viewown', 'create'], 34);
+        $otherCompany   = $this->createPreviewCompany('Other Company', $admin);
+        $ownCompany     = $this->createPreviewCompany('Own Company', $user);
+        $createdCompany = $this->createPreviewCompany('Created Company', null, $user);
+
+        $contactCompany = $this->createCompany('Contact Company', 'hello@contact.tld');
+        $contactCompany->setOwner($admin);
+        $this->em->persist($contactCompany);
+        $contact = $this->createLead('Jack');
+        $contact->setOwner($user);
+        $this->createPrimaryCompanyForLead($contact, $contactCompany);
+
+        $email = $this->createEmail();
+        $email->setName('Email name');
+        $email->setCustomHtml('<html><body>Company Name: {contactfield=companyname}</body></html>');
+        $this->em->flush();
+
+        $this->loginNonAdminUser($user);
+        $errorMsg = 'You do not have access to this company.';
+
+        // Company owned by another user
+        $this->assertPageContent("/email/preview/{$email->getId()}?companyId={$otherCompany->getId()}", 'Company Name: [Company Name]');
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/email/download/preview/{$email->getId()}?companyId={$otherCompany->getId()}");
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($errorMsg, $content);
+        $this->assertStringNotContainsString('Other Company', $content);
+        $this->assertStringContainsString('Company Name: [Company Name]', $this->getIframeContent($crawler));
+
+        // A denied company falls back to the contact's companies, like a request without companyId
+        $this->assertPageContent("/email/preview/{$email->getId()}?contactId={$contact->getId()}&companyId={$otherCompany->getId()}", 'Company Name: Contact Company');
+
+        // Company owned by the user
+        $crawler = $this->client->request(Request::METHOD_GET, "/email/download/preview/{$email->getId()}?companyId={$ownCompany->getId()}");
+        $this->assertStringNotContainsString($errorMsg, (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Company Name: Own Company', $this->getIframeContent($crawler));
+
+        // Company without an owner, created by the user
+        $crawler = $this->client->request(Request::METHOD_GET, "/email/download/preview/{$email->getId()}?companyId={$createdCompany->getId()}");
+        $this->assertStringNotContainsString($errorMsg, (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Company Name: Created Company', $this->getIframeContent($crawler));
+
+        // HTML download of a company owned by another user. Last, because its flash message is shown on the next page.
+        $response = $this->getUrlResponse("/email/download/preview/{$email->getId()}/real/html?companyId={$otherCompany->getId()}");
+        $this->assertStringContainsString('email-name.html', (string) $response->headers->get('content-disposition'));
+        $this->assertStringNotContainsString('other', (string) $response->headers->get('content-disposition'));
+        $this->assertStringNotContainsString('Other Company', (string) $response->getContent());
+    }
+
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testPreviewEmailForCompanyOfOtherUserWithViewOtherPermission(): void
+    {
+        $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $admin);
+
+        $user    = $this->createNonAdminUser(['viewother'], 4);
+        $company = $this->createPreviewCompany('Other Company', $admin);
+
+        $email = $this->createEmail();
+        $email->setCustomHtml('<html><body>Company Name: {contactfield=companyname}</body></html>');
+        $this->em->flush();
+
+        $this->loginNonAdminUser($user);
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/email/download/preview/{$email->getId()}?companyId={$company->getId()}");
+        $this->assertStringNotContainsString('You do not have access to this company.', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Company Name: Other Company', $this->getIframeContent($crawler));
+    }
+
+    /**
+     * Company tokens are rendered only for a company that is primary for a contact.
+     */
+    private function createPreviewCompany(string $name, ?User $owner = null, ?User $createdBy = null): Company
+    {
+        $company = $this->createCompany($name, 'hello@company.tld');
+        $company->setOwner($owner);
+        if ($createdBy) {
+            $company->setCreatedBy($createdBy);
+        }
+        $this->em->persist($company);
+        $this->createPrimaryCompanyForLead($this->createLead('Jane'), $company);
+
+        return $company;
+    }
+
+    /**
+     * @param string[] $leadPermissions
+     */
+    private function createNonAdminUser(array $leadPermissions, int $leadBitwise): User
+    {
+        $role = $this->createRole(false, ['email:emails' => ['full'], 'lead:leads' => $leadPermissions]);
+        $this->createPermission('lead:leads', $role, $leadBitwise);
+        $this->createPermission('email:emails', $role, 1024);
+        $user = $this->createUser($role);
+        $this->em->flush();
+
+        return $user;
+    }
+
+    private function loginNonAdminUser(User $user): void
+    {
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
     }
 
     private function getUrlResponse(string $url): Response

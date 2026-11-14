@@ -26,8 +26,8 @@
 {% block pageTitle %}{{ pageTitle }}{% endblock %}
 
 {% block _content %}
-    <div class="pa-20 mautibot-error{% if isInline %} inline well{% endif %}">
-        <div class="row mt-lg pa-md">
+    <div class="pa-24 mautibot-error{% if isInline %} inline well{% endif %}">
+        <div class="row mt-24 pa-16">
             {% if isInline %}
                 <div class="mautibot-content col-xs-12">
                     <h1><i class="ri-alert-line ri-fw text-danger"></i>{{ message|trans({'%code%': status_code}) }}</h1>

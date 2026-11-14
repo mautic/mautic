@@ -33,6 +33,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
     use ExpressionHelperTrait;
     use OperatorListTrait;
+    use TimelineTrait;
 
     private const EXISTS_EXPRESSION     = 'EXISTS';
 
@@ -1354,6 +1355,23 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function getTableAlias(): string
     {
         return 'l';
+    }
+
+    /**
+     * Timeline entries for the contacts in $options['leadIds'] based on a date column of the contact (date_added, date_identified).
+     *
+     * @param array<string, mixed> $options
+     *
+     * @return array<mixed>
+     */
+    public function getTimelineDates(string $dateColumn, array $options): array
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('l.id AS lead_id, l.'.$dateColumn)
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where($qb->expr()->isNotNull('l.'.$dateColumn));
+
+        return $this->getTimelineResults($qb, $options, 'l.'.$dateColumn, 'l.'.$dateColumn, [], [$dateColumn], null, 'l.id', 'l.id');
     }
 
     /**
