@@ -10,6 +10,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\ChannelBundle\Entity\Message;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -48,7 +49,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     protected $useCleanupRollback = false;
 
     #[DataProvider('dataForGlobalSearch')]
-    public function testGlobalSearch(string $searchString, mixed $entity, string $expectedLink): void
+    public function testGlobalSearch(string $searchString, IdentifierInterface $entity, string $expectedLink): void
     {
         $this->em->persist($entity);
 
@@ -66,7 +67,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return iterable<string, array{string, mixed}>
+     * @return iterable<string, array{string, IdentifierInterface, string}>
      */
     public static function dataForGlobalSearch(): iterable
     {

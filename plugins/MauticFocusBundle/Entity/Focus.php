@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\FormBundle\Entity\Form;
@@ -54,7 +55,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
     joinTable: new ORM\JoinTable(name: 'focus_projects_xref'),
 )])]
-class Focus extends FormEntity implements UuidInterface
+class Focus extends FormEntity implements UuidInterface, IdentifierInterface
 {
     use UuidTrait;
     use ProjectTrait;
