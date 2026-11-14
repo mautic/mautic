@@ -12,16 +12,16 @@ Variables:
 {% elseif 'meeting' == note.type %}
 {% set icon = 'ri-video-chat-line' %}
 {% endif %}
-<li class="note-single mb-lg" id="LeadNote{{ note.id }}">
-    <div class="note-body d-flex p-0 mb-md">
+<li class="note-single mb-24" id="LeadNote{{ note.id }}">
+    <div class="note-body d-flex p-0 mb-16">
         <div class="height-auto icon text-end">
             <div class="icon-wrapper d-flex align-items-center justify-content-center"><i class="ri-lg fs-22 {{ icon }}"></i></div>
         </div>
-        <div class="tile media-body pa-lg">
+        <div class="tile media-body pa-24">
 
-            <div class="d-flex justify-content-between align-items-center mb-md flex-wrap flex-xl-nowrap">
-                <span class="fw-b ellipsis"><i class="ri-user-6-line mr-xs"></i>{{ note.createdByUser }}</span>
-                <div class="d-flex flex-grow-1 align-items-center justify-content-between justify-content-xl-end gap-sm">
+            <div class="d-flex justify-content-between align-items-center mb-16 flex-wrap flex-xl-nowrap">
+                <span class="fw-b ellipsis"><i class="ri-user-6-line me-5"></i>{{ note.createdByUser }}</span>
+                <div class="d-flex flex-grow-1 align-items-center justify-content-between justify-content-xl-end gap-12">
                     <span class="small text-secondary">{{ dateToFullConcat(note.dateTime) }}</span>
                     <div class="float-end btn-group">
                         {% if permissions['edit'] %}

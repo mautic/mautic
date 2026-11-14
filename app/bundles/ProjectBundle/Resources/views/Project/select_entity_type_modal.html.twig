@@ -1,12 +1,12 @@
 <div class="row">
     <div class="col-md-12">
-        <div class="mb-lg">
+        <div class="mb-24">
             <p class="text-muted">{{ 'mautic.project.select_entity_type.description'|trans }}</p>
         </div>
         
         <div class="row">
             {% for entityType, entityData in entityTypes %}
-                <div class="col-md-6 mb-sm">
+                <div class="col-md-6 mb-12">
                     {% include '@MauticCore/Components/tile.html.twig' with {
                         type: 'clickable',
                         content: '<div class="d-flex justify-content-between align-items-center"><div class="tile-title">' ~ entityData.label|trans ~ '</div></div>',

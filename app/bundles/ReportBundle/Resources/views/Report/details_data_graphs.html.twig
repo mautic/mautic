@@ -1,5 +1,5 @@
 {% if graphOrder is not empty and graphs is not empty %}
-    <div class="mt-lg pa-md" style="clear: both">
+    <div class="mt-24 pa-16" style="clear: both">
         <div class="row equal">
             {%- set rowCount = 0 -%}
             {% for key in graphOrder|filter(v => graphs[v].data is defined) %}

@@ -8,7 +8,7 @@
 {% set id = ('inprogress' != status) ? 'emailSendProgressComplete' : 'emailSendProgress' %}
 
 {% block content %}
-    <div class="row ma-lg email-send-progress" id="{{ id }}">
+    <div class="row ma-24 email-send-progress" id="{{ id }}">
         <div class="col-sm-offset-3 col-sm-6">
             <div class="panel panel-{{ ('inprogress' != status) ? 'success' : 'danger' }}">
                 <div class="panel-heading">
@@ -20,7 +20,7 @@
                     {% if 'inprogress' != status %}
                         <h4>{{ 'mautic.email.send.stats'|trans({'%sent%': stats.sent, '%failed%': stats.failed}) }}</h4>
                     {% endif %}
-                    <div class="progress mt-md" style="height:50px;">
+                    <div class="progress mt-16" style="height:50px;">
                         <div class="progress-bar-send progress-bar progress-bar-striped{% if 'inprogress' == status %}{{ ' active' }}{% endif %}"
                              role="progressbar"
                              aria-valuenow="{{ progress[0] }}"
@@ -52,13 +52,13 @@
                     </span>
                     {% if 'inprogress' == status %}
                         <div>
-                            <a class="text-danger mt-md"
+                            <a class="text-danger mt-16"
                                href="{{ path('mautic_email_action', {'objectAction': 'send', 'objectId': email.id}) }}"
                                data-toggle="ajax">{{ 'mautic.core.form.cancel'|trans }}</a>
                         </div>
                     {% else %}
                         <div>
-                            <a class="text-success mt-md"
+                            <a class="text-success mt-16"
                                href="{{ path('mautic_email_action', {'objectAction': 'view', 'objectId': email.id}) }}"
                                data-toggle="ajax">{{ 'mautic.core.form.done'|trans }}</a>
                         </div>
