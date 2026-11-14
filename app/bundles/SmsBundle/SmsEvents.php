@@ -29,7 +29,7 @@ final class SmsEvents
      * The mautic.sms.on_campaign_trigger_batch_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * Mautic\CampaignBundle\Event\PendingEvent
      */
     public const string ON_CAMPAIGN_TRIGGER_BATCH_ACTION = 'mautic.sms.on_campaign_trigger_batch_action';
 

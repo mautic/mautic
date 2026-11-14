@@ -82,8 +82,8 @@ final readonly class CampaignSubscriber
     )]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
-        $eventConfig  = $event->getConfig();
-        $eventDetails = $event->getEventDetails();
+        $eventConfig  = $event->getEvent()->getProperties();
+        $eventDetails = $event->getPassthrough();
         /** @var Lead $lead */
         $lead = $event->getLead();
 
