@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\IntegrationsBundle\Migration\Engine;
 use Mautic\PluginBundle\Entity\Plugin;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
