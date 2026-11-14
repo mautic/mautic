@@ -1,5 +1,5 @@
 (() => {
-    if (window.MauticUI && window.MauticUI.HoldToConfirmButton) return;
+    if (window.Mautic && window.Mautic.HoldToConfirmButton) return;
 
     function emit(element, name, detail) {
         element.dispatchEvent(new CustomEvent(name, { bubbles: true, detail }));
@@ -28,8 +28,8 @@
                 }
             }).observe(document.documentElement, { childList: true, subtree: true });
         };
-        window.MauticUI = window.MauticUI || {};
-        window.MauticUI[name] = { get: (element) => controllers.get(element), mount };
+        window.Mautic = window.Mautic || {};
+        window.Mautic[name] = { get: (element) => controllers.get(element), mount };
         if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });
         else start();
     }
@@ -58,6 +58,13 @@
                 }
                 if (event.button === 0 && event.isPrimary) this.start("pointer");
             }, options);
+            this.button.addEventListener("pointermove", (event) => {
+                if (!this.sources.has("pointer")) return;
+                const bounds = this.button.getBoundingClientRect();
+                if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) {
+                    this.cancel("pointer");
+                }
+            }, options);
             for (const name of ["pointerup", "pointerleave", "pointercancel", "lostpointercapture"]) {
                 this.button.addEventListener(name, () => this.cancel("pointer"), options);
             }
@@ -83,7 +90,7 @@
             if ("icon" in options) {
                 this.icon.replaceChildren(...options.icon ? [options.icon] : Array.from(this.defaultIcon.childNodes).map((node) => node.cloneNode(true)));
             }
-            if (options.size !== void 0) {
+            if (["sm", "md", "lg"].includes(options.size)) {
                 this.element.dataset.size = options.size;
                 this.button.setAttribute('size', options.size);
                 const dimensions = { sm: { icon: 12, ring: 20, stroke: 2 }, md: { icon: 14, ring: 24, stroke: 2 }, lg: { icon: 17, ring: 30, stroke: 2.5 } }[options.size];
