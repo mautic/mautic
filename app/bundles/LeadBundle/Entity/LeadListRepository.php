@@ -341,7 +341,7 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @return array{total: int, manuallyAdded: int, filterAdded: int|null}
+     * @return array{total: int, manuallyAdded: int, filterAdded: int|null, manuallyRemoved: int}
      */
     public function getSegmentStatistics(int $listId, bool $includeFilterAdded): array
     {
@@ -366,10 +366,20 @@ class LeadListRepository extends CommonRepository
             ->executeQuery()
             ->fetchAssociative() ?: [];
 
+        $manuallyRemoved = (int) $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('COUNT(l.lead_id)')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
+            ->where('l.leadlist_id = :listId', 'l.manually_removed = :true')
+            ->setParameter('listId', $listId)
+            ->setParameter('true', true, 'boolean')
+            ->executeQuery()
+            ->fetchOne();
+
         return [
-            'total'         => (int) ($stats['total_count'] ?? 0),
-            'manuallyAdded' => (int) ($stats['manually_added_count'] ?? 0),
-            'filterAdded'   => $includeFilterAdded ? (int) ($stats['filter_added_count'] ?? 0) : null,
+            'total'           => (int) ($stats['total_count'] ?? 0),
+            'manuallyAdded'   => (int) ($stats['manually_added_count'] ?? 0),
+            'filterAdded'     => $includeFilterAdded ? (int) ($stats['filter_added_count'] ?? 0) : null,
+            'manuallyRemoved' => $manuallyRemoved,
         ];
     }
 

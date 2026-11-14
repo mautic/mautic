@@ -29,4 +29,10 @@
         'tooltip': 'mautic.lead.segments.filter.added.contacts.tooltip'|trans
     }]) %}
 {% endif %}
+{% set segmentCards = segmentCards|merge([{
+    'title': 'mautic.lead.segments.manually.removed.contacts'|trans,
+    'value': manuallyRemovedSegmentCount,
+    'icon': 'ri-user-unfollow-line',
+    'tooltip': 'mautic.lead.segments.manually.removed.contacts.tooltip'|trans
+}]) %}
 {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': segmentCards}) }}
