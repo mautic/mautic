@@ -16,6 +16,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
@@ -56,7 +57,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     ]
 )]
 #[UniqueCustomField(object: 'lead')]
-class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface, SkipModifiedInterface
+class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface, SkipModifiedInterface, IdentifierInterface
 {
     use CustomFieldEntityTrait;
 
