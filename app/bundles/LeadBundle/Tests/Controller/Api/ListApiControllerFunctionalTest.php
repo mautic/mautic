@@ -98,7 +98,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame($expectedResponseCode);
 
         if ($expectedErrorMessage) {
-            $this->assertStringContainsString($expectedErrorMessage, (string) json_decode($this->client->getResponse()->getContent(), true)['errors'][0]['message'], $this->client->getResponse()->getContent());
+            $this->assertStringContainsStringIgnoringCase($expectedErrorMessage, (string) json_decode($this->client->getResponse()->getContent(), true)['errors'][0]['message'], $this->client->getResponse()->getContent());
         }
     }
 
@@ -829,20 +829,22 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $now     = new \DateTime();
         $inLast  = OperatorOptions::IN_LAST === $operator;
 
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+
         $contactA = new Lead();
-        $contactA->setDateModified((clone $now)->modify($inLast ? '-1 hour' : '+1 hour'));
+        $contactA->setDateModified(\DateTime::createFromImmutable($now->modify($inLast ? '-1 hour' : '+1 hour')));
 
         $contactB = new Lead();
-        $contactB->setDateModified((clone $now)->modify($inLast ? '+2 days' : '+23 hours'));
+        $contactB->setDateModified(\DateTime::createFromImmutable($now->modify($inLast ? '+2 days' : '+23 hours')));
 
         $contactC = new Lead();
-        $contactC->setDateModified((clone $now)->modify($inLast ? '-23 hours' : '-1 day'));
+        $contactC->setDateModified(\DateTime::createFromImmutable($now->modify($inLast ? '-23 hours' : '-1 day')));
 
         $contactD = new Lead();
-        $contactD->setDateModified((clone $now)->modify('-2 days'));
+        $contactD->setDateModified(\DateTime::createFromImmutable($now->modify('-2 days')));
 
         $contactE = new Lead();
-        $contactE->setDateModified((clone $now)->modify('+3 days'));
+        $contactE->setDateModified(\DateTime::createFromImmutable($now->modify('+3 days')));
 
         $this->em->persist($contactA);
         $this->em->persist($contactB);

@@ -11,6 +11,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
     private const TEMP_CAMPAIGN_ID = 'mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775';
 
     public function testCampaignBuilderWithChangeOwnerActionDoesNotBreakOtherEventLinks(): void
@@ -99,6 +100,9 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
 
     public function testActionWithoutOwnerAsksToChooseOneInsteadOfShowingTheFirstUser(): void
     {
+        $user = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
+
         // A new action keeps preselecting the first user
         $uri = '/s/campaigns/events/new?type=lead.changeowner&eventType=action&campaignId='.self::TEMP_CAMPAIGN_ID.'&anchor=leadsource&anchorEventType=source';
         $this->client->xmlHttpRequest('GET', $uri);
@@ -106,8 +110,8 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(0, $this->getOwnerSelect()->filter('option[value=""]'));
 
         // An action with an owner keeps it
-        $this->editChangeOwnerAction(1);
-        $this->assertSame(['1'], $this->getOwnerSelect()->filter('option[selected]')->each(fn (Crawler $option): string => (string) $option->attr('value')));
+        $this->editChangeOwnerAction($user->getId());
+        $this->assertSame([(string) $user->getId()], $this->getOwnerSelect()->filter('option[selected]')->each(fn (Crawler $option): string => (string) $option->attr('value')));
         $this->assertCount(0, $this->getOwnerSelect()->filter('option[value=""]'));
 
         // An imported action has no owner, as users cannot be identified on another instance

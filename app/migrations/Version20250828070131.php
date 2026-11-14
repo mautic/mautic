@@ -44,7 +44,10 @@ final class Version20250828070131 extends PreUpAssertionMigration
     {
         $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP FOREIGN KEY FK_SMS_TRANSLATION_PARENT');
 
-        $this->addSql('DROP INDEX IDX_SMS_TRANSLATION_PARENT ON '.$this->getPrefixedTableName());
+        $this->dropIndex(
+            $this->getPrefixedTableName(),
+            'IDX_SMS_TRANSLATION_PARENT'
+        );
 
         $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP COLUMN translation_parent_id');
     }

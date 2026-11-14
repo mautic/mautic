@@ -16,7 +16,8 @@ final class ComplexRelationValueFilterQueryBuilderTest extends AbstractRelationV
 
         $this->queryBuilder = new ComplexRelationValueFilterQueryBuilder(
             $this->randomParameter,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->connectionMock
         );
     }
 

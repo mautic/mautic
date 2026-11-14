@@ -217,14 +217,13 @@ class BuilderEvent extends Event
      *
      * @deprecated use BuilderTokenHelper::getFormattedTokens and $this->addTokens
      *
-     * @param string $labelColumn
      * @param string $valueColumn
      * @param bool   $convertToLinks If true, the tokens will be converted to links
      */
     public function addTokensFromHelper(
         BuilderTokenHelper $tokenHelper,
         $tokens,
-        $labelColumn = 'name',
+        string $labelColumn = 'name',
         $valueColumn = 'id',
         $convertToLinks = false,
     ): void {
@@ -244,7 +243,7 @@ class BuilderEvent extends Event
      *
      * @deprecated use BuilderTokenHelper::getFormattedTokens
      */
-    public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, $labelColumn = 'name', $valueColumn = 'id'): ?array
+    public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, string $labelColumn = 'name', $valueColumn = 'id'): ?array
     {
         return $tokenHelper->getTokens(
             $tokens,

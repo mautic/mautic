@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class ImportUrlValidationTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
+
     protected $useCleanupRollback = false;
 
     private string $csvFile;
@@ -87,11 +89,13 @@ final class ImportUrlValidationTest extends MauticMysqlTestCase
 
     private function createCsvContactImport(): Import
     {
+        $userCreator = $this->getUser(self::ADMIN_USER);
+
         $now    = new \DateTime();
         $import = new Import();
         $import->setIsPublished(true);
         $import->setDateAdded($now);
-        $import->setCreatedBy(1);
+        $import->setCreatedBy($userCreator->getId());
         $import->setDir('/tmp');
         $import->setFile(basename($this->csvFile));
         $import->setOriginalFile(basename($this->csvFile));

@@ -27,12 +27,13 @@ class OidcSubjectId
             ->makePrimaryKey()
             ->build();
 
+        // Collation is applied by OidcSubjectIdCollationListener on MySQL only.
+        // PostgreSQL default string comparison is already case-sensitive.
         $builder->createField('subjectID', 'string')
             ->columnName('subject_id')
             ->length(255)
             ->nullable()
             ->unique()
-            ->option('collation', 'utf8mb4_bin')
             ->build();
     }
 

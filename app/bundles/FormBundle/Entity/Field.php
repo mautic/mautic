@@ -439,7 +439,7 @@ class Field implements UuidInterface
     public function setIsRequired($isRequired): static
     {
         $this->isChanged('isRequired', $isRequired);
-        $this->isRequired = $isRequired;
+        $this->isRequired = (bool) $isRequired;
 
         return $this;
     }
@@ -620,7 +620,7 @@ class Field implements UuidInterface
     public function setShowLabel($showLabel): static
     {
         $this->isChanged('showLabel', $showLabel);
-        $this->showLabel = $showLabel;
+        $this->showLabel = null === $showLabel ? null : (bool) $showLabel;
 
         return $this;
     }
@@ -667,7 +667,7 @@ class Field implements UuidInterface
      */
     public function setIsCustom($isCustom): static
     {
-        $this->isCustom = $isCustom;
+        $this->isCustom = (bool) $isCustom;
 
         return $this;
     }
@@ -789,7 +789,7 @@ class Field implements UuidInterface
      */
     public function setShowWhenValueExists($showWhenValueExists): void
     {
-        $this->showWhenValueExists = $showWhenValueExists;
+        $this->showWhenValueExists = null === $showWhenValueExists ? null : (bool) $showWhenValueExists;
     }
 
     /**

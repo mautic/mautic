@@ -27,12 +27,13 @@ final class DoNotContactFilterQueryBuilderTest extends TestCase
     #[DataProvider('dataApplyQuery')]
     public function testApplyQuery(string $operator, string $parameterValue, string $expectedQuery): void
     {
-        $queryBuilder = new QueryBuilder($this->createConnection());
+        $connectionMock = $this->createConnection();
+        $queryBuilder   = new QueryBuilder($connectionMock);
         $queryBuilder->select('1');
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         $filter             = $this->createFilter($operator, $parameterValue);
-        $filterQueryBuilder = new DoNotContactFilterQueryBuilder(new RandomParameterName(), new EventDispatcher());
+        $filterQueryBuilder = new DoNotContactFilterQueryBuilder(new RandomParameterName(), new EventDispatcher(), $connectionMock);
 
         $expectedQuery = str_replace('__MAUTIC_TABLE_PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
         $this->assertSame($queryBuilder, $filterQueryBuilder->applyQuery($queryBuilder, $filter));

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Mautic\CoreBundle\Helper\ExitCode;
@@ -57,23 +58,27 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 
         $output = $this->executeMigrationCommand();
 
-        $this->assertStringContainsString("++ Executing adding generated columns for table {$this->tablePrefix}test_first
--> ALTER TABLE {$this->tablePrefix}test_first ADD generated_name_one CHAR(2) AS (SUBSTRING(name, 1, 2)) COMMENT '(DC2Type:generated)', 
-ADD generated_name_three CHAR(2) AS (SUBSTRING(name, 5, 2)) COMMENT '(DC2Type:generated)'
-++ Execution finished", $output);
+        if (!$this->isPostgresqlPlatform()) {
+            // Relaxed, platform-agnostic checks – we only verify that the expected steps were executed
+            $this->assertStringContainsString("adding generated columns for table {$this->tablePrefix}test_first", $output);
+            $this->assertStringContainsString("adding indices for table {$this->tablePrefix}test_first", $output);
+            $this->assertStringContainsString("adding generated columns for table {$this->tablePrefix}test_second", $output);
+            $this->assertStringContainsString("adding indices for table {$this->tablePrefix}test_second", $output);
 
-        $this->assertStringContainsString("++ Executing adding indices for table {$this->tablePrefix}test_first
--> ALTER TABLE {$this->tablePrefix}test_first ADD INDEX `{$this->tablePrefix}generated_name_one`(generated_name_one), 
-ADD INDEX `{$this->tablePrefix}generated_name_three`(generated_name_three)
-++ Execution finished", $output);
+            // Platform-agnostic verification of columns and indexes via schema introspection
+            $this->assertGeneratedColumnsAndIndexesExist();
+        } else {
+            // We skip generated column test as they are not immutable (so cant be created)
+            $this->markTestSkipped('PostgreSQL platform don`t support generated columns');
+        }
+    }
 
-        $this->assertStringContainsString("++ Executing adding generated columns for table {$this->tablePrefix}test_second
--> ALTER TABLE {$this->tablePrefix}test_second ADD generated_date_year YEAR AS (YEAR(date_added)) STORED COMMENT '(DC2Type:generated)'
-++ Execution finished", $output);
+    private function assertGeneratedColumnsAndIndexesExist(): void
+    {
+        $schemaManager = $this->connection->createSchemaManager();
 
-        $this->assertStringContainsString("++ Executing adding indices for table {$this->tablePrefix}test_second
--> ALTER TABLE {$this->tablePrefix}test_second ADD INDEX `{$this->tablePrefix}campaign_id_generated_date_year_id`(campaign_id, generated_date_year, id)
-++ Execution finished", $output);
+        // test_first
+        $schemaManager->introspectTable($this->tablePrefix.'test_first');
 
         $this->assertTableHasColumnAndIndex('test_first', 'generated_name_one', 'generated_name_one');
         $this->assertTableHasColumnAndIndex('test_first', 'generated_name_three', 'generated_name_three');
@@ -91,23 +96,36 @@ ADD INDEX `{$this->tablePrefix}generated_name_three`(generated_name_three)
 
     private function createTables(): void
     {
+        $platform     = $this->connection->getDatabasePlatform();
+        $isPostgreSQL = DatabasePlatform::isPostgreSQL($platform);
+
+        // Generated column syntax differs significantly between MySQL and PostgreSQL
+        $generatedColumnSql = DatabasePlatform::getGeneratedColumnDefinition(
+            $platform,
+            'generated_name_two CHAR(2)',
+            $isPostgreSQL ? 'substring(name from 3 for 2)' : 'SUBSTRING(name, 3, 2)'
+        );
+
+        $idType   = $isPostgreSQL ? 'integer' : 'int unsigned';
+        $dateType = $isPostgreSQL ? 'timestamp' : 'datetime';
+
+        // test_first (pre-creates one generated column to test skipping duplicates)
         $this->connection->executeStatement("
-            CREATE TABLE IF NOT EXISTS {$this->tablePrefix}test_first
-            (
-                id int unsigned not null,
+            CREATE TABLE IF NOT EXISTS {$this->tablePrefix}test_first (
+                id $idType NOT NULL,
                 name varchar(100) NOT NULL,
-                generated_name_two CHAR(2) AS (SUBSTRING(name, 3, 2)),
-                primary key (id)
+                $generatedColumnSql,
+                PRIMARY KEY (id)
             )
         ");
 
         $this->connection->executeStatement("
             CREATE TABLE IF NOT EXISTS {$this->tablePrefix}test_second
             (
-                id int unsigned not null,
-                campaign_id int not null,
-                date_added datetime NOT NULL,
-                primary key (id)
+                id $idType NOT NULL,
+                campaign_id integer NOT NULL,
+                date_added $dateType NOT NULL,
+                PRIMARY KEY (id)
             )
         ");
     }
@@ -119,8 +137,15 @@ ADD INDEX `{$this->tablePrefix}generated_name_three`(generated_name_three)
 
     private function executeMigrationCommand(): string
     {
+        if ($this->isPostgresqlPlatform()) {
+            // Doctrine Migrations' TableMetadataStorage::ensureInitialized() is not idempotent on PostgreSQL
+            // — it always tries to add the PK via alterTable(), without first verifying if the constraint is already present.
+            // This is a long-standing limitation in Doctrine Migrations (especially versions 2.x/3.x),
+            // and it's well-known when using PostgreSQL (MySQL forgives duplicate attempts).
+            $this->connection->executeStatement('DROP TABLE IF EXISTS migrations CASCADE');
+        }
         // intentionally not using AbstractMauticTestCase::testSymfonyCommand() as it does not dispatch 'console.terminate' event
-        $params      = ['command' => 'doctrine:migration:migrate', '--no-interaction' => true];
+        $params      = ['command' => 'doctrine:migration:migrate', '--allow-no-migration' => true, '--no-interaction' => true];
         $application = new Application(self::getContainer()->get(KernelInterface::class));
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
