@@ -248,10 +248,9 @@ final class InputHelper
      * Removes all characters except those allowed in URLs.
      *
      * @param array<string>|null $allowedProtocols
-     * @param mixed              $defaultProtocol
      * @param array<string>      $removeQuery
      */
-    public static function url(?string $value, ?bool $urldecode = false, ?array $allowedProtocols = null, $defaultProtocol = null, array $removeQuery = [], bool $ignoreFragment = false): string|false
+    public static function url(?string $value, ?bool $urldecode = false, ?array $allowedProtocols = null, ?string $defaultProtocol = null, array $removeQuery = [], bool $ignoreFragment = false): string|false
     {
         if ($urldecode) {
             $value = urldecode($value);
