@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -62,7 +63,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
     joinTable: new ORM\JoinTable(name: 'sms_projects_xref'),
 )])]
-class Sms extends FormEntity implements UuidInterface, TranslationEntityInterface
+class Sms extends FormEntity implements UuidInterface, TranslationEntityInterface, IdentifierInterface
 {
     use UuidTrait;
     use ProjectTrait;
