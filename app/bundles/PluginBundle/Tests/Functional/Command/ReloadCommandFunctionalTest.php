@@ -56,7 +56,12 @@ final class ReloadCommandFunctionalTest extends MauticMysqlTestCase
             $this->connection->executeStatement("DROP TABLE IF EXISTS {$quoted} CASCADE");
         }
 
-        if (!DatabasePlatform::isPostgreSQL($platform)) {
+        if (DatabasePlatform::isPostgreSQL($platform)) {
+            foreach (['focus_id_seq', 'focus_stats_id_seq'] as $sequence) {
+                $quoted = DatabasePlatform::quoteIdentifier($platform, $this->prefix.$sequence);
+                $this->connection->executeStatement("DROP SEQUENCE IF EXISTS {$quoted} CASCADE");
+            }
+        } else {
             $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
         }
 
