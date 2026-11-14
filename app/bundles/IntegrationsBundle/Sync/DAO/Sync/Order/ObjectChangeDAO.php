@@ -26,17 +26,16 @@ final class ObjectChangeDAO
     ];
 
     /**
-     * @param mixed              $objectId
      * @param string             $mappedObject   Name of the source object type
-     * @param mixed              $mappedId       ID of the source object
+     * @param int|string|null              $mappedId       ID of the source object
      * @param \DateTimeInterface $changeDateTime Date\Time the object was last changed
      */
     public function __construct(
         private readonly string $integration,
         private readonly string $object,
-        private $objectId,
+        private int|string|null $objectId,
         private readonly string $mappedObject,
-        private $mappedId,
+        private int|string|null $mappedId,
         private ?\DateTimeInterface $changeDateTime = null,
     ) {
     }
@@ -65,10 +64,7 @@ final class ObjectChangeDAO
         return $this->object;
     }
 
-    /**
-     * @param mixed $objectId
-     */
-    public function setObjectId($objectId): void
+    public function setObjectId(int|string|null $objectId): void
     {
         $this->objectId = $objectId;
     }
