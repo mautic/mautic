@@ -39,11 +39,12 @@ final readonly class PluginDatabase
             return;
         }
 
-        $schemaTool = new SchemaTool($this->em);
-        $schema     = $schemaTool->getSchemaFromMetadata(array_values($metadata));
+        $schemaTool    = new SchemaTool($this->em);
+        $schema        = $schemaTool->getSchemaFromMetadata(array_values($metadata));
+        $schemaManager = $this->connection->createSchemaManager();
 
         // Schema listeners (e.g. Symfony Messenger) add their own tables, which may already exist
-        $existingTables = array_map(strtolower(...), $this->connection->createSchemaManager()->listTableNames());
+        $existingTables = array_map(strtolower(...), $schemaManager->listTableNames());
         foreach ($schema->getTables() as $table) {
             if (in_array(strtolower($table->getName()), $existingTables, true)) {
                 $schema->dropTable($table->getName());
