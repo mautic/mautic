@@ -606,10 +606,7 @@ class Field implements UuidInterface
         return $this->customParameters;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getSessionId()
+    public function getSessionId(): int|string|null
     {
         return $this->sessionId;
     }
