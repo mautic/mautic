@@ -25,10 +25,7 @@ final class ApiErrorException extends \Exception
         return $this->contactId;
     }
 
-    /**
-     * @param mixed $contactId
-     */
-    public function setContactId($contactId): static
+    public function setContactId(int|string|null $contactId): static
     {
         $this->contactId = $contactId;
 
