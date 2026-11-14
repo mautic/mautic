@@ -1,21 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Integration;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilder;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 
-final class TwilioIntegration extends AbstractIntegration
+class TwilioIntegration extends BasicIntegration implements BasicInterface
 {
-    protected bool $coreIntegration = true;
+    public const string NAME = 'Twilio';
 
     public function getName(): string
     {
-        return 'Twilio';
+        return self::NAME;
+    }
+
+    public function getDisplayName(): string
+    {
+        return self::NAME;
     }
 
     public function getIcon(): string
@@ -23,78 +26,13 @@ final class TwilioIntegration extends AbstractIntegration
         return 'app/bundles/SmsBundle/Assets/img/Twilio.png';
     }
 
-    public function getSecretKeys(): array
-    {
-        return ['password'];
-    }
-
     /**
-     * @return array<string, string>
+     * Settings saved by the "Features" tab (messaging_service_sid, frequency_number, frequency_time).
+     *
+     * @return array<string, mixed>
      */
-    public function getRequiredKeyFields(): array
+    public function getIntegrationFeatureSettings(): array
     {
-        return [
-            'username' => 'mautic.sms.config.form.sms.username',
-            'password' => 'mautic.sms.config.form.sms.password',
-        ];
-    }
-
-    public function getAuthenticationType(): string
-    {
-        return 'none';
-    }
-
-    /**
-     * @param Form|FormBuilder $builder
-     * @param string           $formArea
-     */
-    public function appendToForm($builder, array $data, $formArea): void
-    {
-        if ('features' == $formArea) {
-            $builder->add(
-                'messaging_service_sid',
-                TextType::class,
-                [
-                    'label'      => 'mautic.sms.config.form.sms.messaging_service_sid',
-                    'label_attr' => ['class' => 'control-label'],
-                    'required'   => false,
-                    'attr'       => [
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.sms.config.form.sms.messaging_service_sid.tooltip',
-                    ],
-                ]
-            );
-            $builder->add(
-                'frequency_number',
-                NumberType::class,
-                [
-                    'scale'      => 0,
-                    'label'      => 'mautic.sms.list.frequency.number',
-                    'label_attr' => ['class' => 'control-label'],
-                    'required'   => false,
-                    'attr'       => [
-                        'class' => 'form-control frequency',
-                    ],
-                ]
-            );
-            $builder->add(
-                'frequency_time',
-                ChoiceType::class,
-                [
-                    'choices' => [
-                        'day'   => 'DAY',
-                        'week'  => 'WEEK',
-                        'month' => 'MONTH',
-                    ],
-                    'label'             => 'mautic.lead.list.frequency.times',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'required'          => false,
-                    'multiple'          => false,
-                    'attr'              => [
-                        'class' => 'form-control frequency',
-                    ],
-                ]
-            );
-        }
+        return $this->getIntegrationSettings()?->getFeatureSettings()['integration'] ?? [];
     }
 }

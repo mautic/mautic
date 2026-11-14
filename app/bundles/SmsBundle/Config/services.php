@@ -38,7 +38,8 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$primaryTransport', param('mautic.sms_transport'));
 
     $services->set(TwilioCallback::class)->tag('mautic.sms_callback_handler');
-    $services->set('mautic.integration.twilio', TwilioIntegration::class);
+    // resolved dynamically by Mautic\PluginBundle\Helper\IntegrationHelper via "mautic.integration.{name}" service id
+    $services->alias('mautic.integration.twilio', TwilioIntegration::class);
 
     $services->set(SmsPermissions::class);
 };
