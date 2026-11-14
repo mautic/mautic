@@ -21,10 +21,7 @@ final class BouncedEmail
      */
     private $ruleNumber;
 
-    /**
-     * @var string|null
-     */
-    private $bounceType;
+    private ?string $bounceType = null;
 
     private bool $final = false;
 

@@ -234,10 +234,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Used to populate trigger color.
-     *
-     * @var string
      */
-    private $color;
+    private ?string $color = null;
 
     private ?LeadManipulator $manipulator = null;
 

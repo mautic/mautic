@@ -16,10 +16,7 @@ final class Result
      */
     private array $contacts = [];
 
-    /**
-     * @var string
-     */
-    private $email;
+    private ?string $email = null;
 
     public function getStat(): ?Stat
     {
