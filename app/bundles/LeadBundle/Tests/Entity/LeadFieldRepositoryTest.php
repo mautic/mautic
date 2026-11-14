@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
@@ -13,9 +14,11 @@ use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadFieldRepositoryTest extends TestCase
 {
@@ -368,6 +371,46 @@ final class LeadFieldRepositoryTest extends TestCase
             ->willReturn($leadField);
 
         $this->assertSame($leadField, $this->repository->getFieldThatIsMissingColumn());
+    }
+
+    public function testSearchCommandsGenerateSystemAndCustomExpressions(): void
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(static fn (string $id): string => $id);
+        $this->repository->autowireCommonRepository($translator);
+
+        $method = new \ReflectionMethod(LeadFieldRepository::class, 'addSearchCommandWhereClause');
+
+        $filter = (object) [
+            'command' => 'mautic.lead.field.searchcommand.issystemdefault',
+            'string'  => '',
+            'strict'  => true,
+            'not'     => false,
+        ];
+
+        $expectedAliases = array_values(array_unique(array_merge(
+            array_keys(FieldModel::$coreFields),
+            array_keys(FieldModel::$coreCompanyFields)
+        )));
+
+        $systemQueryBuilder = new QueryBuilder($this->connection);
+        [$systemExpr, $systemParameters] = $method->invoke($this->repository, $systemQueryBuilder, $filter);
+        $systemQueryBuilder->where($systemExpr);
+
+        $this->assertSame([], $systemParameters);
+        $this->assertStringContainsString('f.alias IN', $systemQueryBuilder->getSQL());
+        $this->assertEqualsCanonicalizing($expectedAliases, array_values($systemQueryBuilder->getParameters())[0]);
+        $this->assertSame(ArrayParameterType::STRING, array_values($systemQueryBuilder->getParameterTypes())[0]);
+
+        $customFilter          = clone $filter;
+        $customFilter->command = 'mautic.lead.field.searchcommand.isusercreated';
+        $customQueryBuilder    = new QueryBuilder($this->connection);
+        [$customExpr, $customParameters] = $method->invoke($this->repository, $customQueryBuilder, $customFilter);
+        $customQueryBuilder->where($customExpr);
+
+        $this->assertSame([], $customParameters);
+        $this->assertStringContainsString('NOT', $customQueryBuilder->getSQL());
+        $this->assertEqualsCanonicalizing($expectedAliases, array_values($customQueryBuilder->getParameters())[0]);
     }
 
     private function createQueryMock(): MockObject
