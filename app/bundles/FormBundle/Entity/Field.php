@@ -614,10 +614,7 @@ class Field implements UuidInterface
         return $this->sessionId;
     }
 
-    /**
-     * @param mixed $sessionId
-     */
-    public function setSessionId($sessionId): void
+    public function setSessionId(int|string $sessionId): void
     {
         $this->sessionId = $sessionId;
     }
