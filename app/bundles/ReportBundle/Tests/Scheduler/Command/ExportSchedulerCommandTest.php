@@ -10,7 +10,9 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class ExportSchedulerCommandTest extends MauticMysqlTestCase
 {
     /**

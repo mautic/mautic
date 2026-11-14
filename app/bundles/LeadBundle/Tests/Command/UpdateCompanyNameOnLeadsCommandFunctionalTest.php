@@ -9,7 +9,9 @@ use Mautic\LeadBundle\Command\UpdateCompanyNameOnLeadsCommand;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class UpdateCompanyNameOnLeadsCommandFunctionalTest extends MauticMysqlTestCase
 {
     use TestEntityCreationTrait;

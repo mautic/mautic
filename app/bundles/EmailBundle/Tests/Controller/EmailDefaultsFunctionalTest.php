@@ -9,6 +9,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  * These tests run with the config params set so they do not bleed into the
  * unrelated tests in EmailFunctionalTest.
  */
+#[Group('non-parallel')]
 final class EmailDefaultsFunctionalTest extends MauticMysqlTestCase
 {
     public const string SAVE_AND_CLOSE = 'Save & Close';

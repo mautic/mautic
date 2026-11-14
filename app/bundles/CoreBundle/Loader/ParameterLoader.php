@@ -126,6 +126,12 @@ final class ParameterLoader
         $paths = [];
         include $root.'/config/paths.php';
 
+        // Parallel test runs (paratest) give each worker its own local config file so the
+        // per-test backup/restore of config/local.php does not race between processes.
+        if (false !== ($workerConfigFile = getenv('MAUTIC_LOCAL_CONFIG_FILE')) && '' !== $workerConfigFile) {
+            $paths['local_config'] = $workerConfigFile;
+        }
+
         if (!isset($paths['local_config'])) {
             if ($updateDefaultParameters) {
                 self::$defaultParameters['local_config_path'] = $projectRoot.'/config/local.php';

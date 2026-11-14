@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class FieldModelDeleteTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
