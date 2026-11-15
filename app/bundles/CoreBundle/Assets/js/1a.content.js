@@ -345,14 +345,14 @@ Mautic.onPageLoad = function (container, response, inModal) {
         if (bootstrap.Tab.getInstance(element)) {
             return;
         }
-        const selector = element.getAttribute('data-bs-target') || element.getAttribute('href');
-        const pane = selector && selector.startsWith('#') ? document.getElementById(selector.slice(1)) : null;
-        element.classList.toggle('active', Boolean(pane && pane.classList.contains('active')));
+        const selector = element.dataset.bsTarget || element.getAttribute('href');
+        const pane = selector?.startsWith('#') ? document.getElementById(selector.slice(1)) : null;
+        element.classList.toggle('active', Boolean(pane?.classList.contains('active')));
         bootstrap.Tab.getOrCreateInstance(element);
     });
 
     //initialize tooltips
-    var pageTooltips = mQuery(container + " *[data-bs-toggle='tooltip']");
+    const pageTooltips = mQuery(container + " *[data-bs-toggle='tooltip']");
     pageTooltips.each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true, container: 'body'}));
 
     // Enable tooltips on checkbox & radio input's to
