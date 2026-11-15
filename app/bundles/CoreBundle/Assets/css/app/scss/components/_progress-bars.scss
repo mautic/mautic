@@ -54,7 +54,7 @@
 // Progress bar component (Components/progress-bar.html.twig)
 // -------------------------
 .progress-component {
-  --progress-component-color: var(--interactive);
+  --progress-component-color: var(--text-secondary);
 
   min-width: 48px;
 
@@ -116,10 +116,6 @@
 
   &--error {
     --progress-component-color: var(--text-error);
-
-    .progress-component__helper {
-      color: var(--text-error);
-    }
   }
 
   &--finished &__status-icon,
@@ -143,6 +139,10 @@
       background-image: linear-gradient(90deg, CanvasText 12.5%, transparent 12.5%);
     }
   }
+}
+
+:root[theme="solarized-dark"] .progress-component--error {
+  --progress-component-color: var(--support-error);
 }
 
 @keyframes progress-component-indeterminate {

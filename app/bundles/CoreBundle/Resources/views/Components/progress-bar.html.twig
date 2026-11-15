@@ -69,7 +69,7 @@
         aria-labelledby="{{ baseId|escape('html_attr') }}-label"
         {% if helperText %}aria-describedby="{{ baseId|escape('html_attr') }}-helper"{% endif %}
         aria-busy="{{ not isFinished and not isError ? 'true' : 'false' }}"
-        {% if not isIndeterminate %}aria-valuemin="0" aria-valuemax="{{ maximum }}" aria-valuenow="{{ currentValue }}"{% endif %}>
+        {% if not isIndeterminate and not isError %}aria-valuemin="0" aria-valuemax="{{ maximum }}" aria-valuenow="{{ currentValue }}"{% endif %}>
         <div class="{{ barClasses|join(' ')|e }}" style="width: {{ percentage }}%"></div>
     </div>
     {% if helperText %}

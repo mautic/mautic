@@ -84,7 +84,8 @@ final class ProgressBarComponentTest extends TestCase
 
         $this->assertStringContainsString('progress-component--error', $output);
         $this->assertMatchesRegularExpression('/<span[^>]*aria-live="polite"[^>]*>Upload failed<\/span>/', $output);
-        $this->assertStringContainsString('aria-valuenow="0"', $output);
+        $this->assertStringNotContainsString('aria-valuenow', $output);
+        $this->assertStringContainsString('aria-busy="false"', $output);
         $this->assertStringContainsString('style="width: 100%"', $output);
         $this->assertStringContainsString('ri-error-warning-fill', $output);
     }
@@ -105,7 +106,6 @@ final class ProgressBarComponentTest extends TestCase
         $this->assertStringContainsString('aria-describedby="send-helper"', $output);
         $this->assertStringContainsString('id="send-helper"', $output);
         $this->assertMatchesRegularExpression('/<span[^>]*aria-live="polite"[^>]*>1 of 4<\/span>/', $output);
-        $this->assertStringNotContainsString('mautic.core.progress_bar.loading', $output);
         $this->assertStringNotContainsString('aria-describedby', $this->render(['label' => 'Send', 'value' => 1]));
     }
 
