@@ -70,9 +70,11 @@ Variables
             <div class="panel-heading mt-12">
                 {% include '@MauticCore/Components/progress-bar.html.twig' with {
                     label: 'mautic.lead.import.leads'|trans({'%object%': objectName}),
-                    helperText: 'mautic.core.progress_bar.count'|trans({'%current%': progress.done, '%total%': progress.total}),
+                    helperText: complete
+                        ? 'mautic.core.progress_bar.done'
+                        : (progress.done > 0 ? 'mautic.core.progress_bar.count'|trans({'%current%': progress.done, '%total%': progress.total}) : 'mautic.core.progress_bar.preparing'),
                     size: 'small',
-                    value: progress.done,
+                    value: progress.done > 0 ? progress.done : null,
                     max: progress.total,
                     status: complete ? 'finished' : 'active',
                     className: 'mt-24'
