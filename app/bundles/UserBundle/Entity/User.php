@@ -389,7 +389,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->firstName;
     }
 
-    public function setLastName(string $lastName): static
+    public function setLastName(?string $lastName): static
     {
         $this->isChanged('lastName', $lastName);
         $this->lastName = $lastName;

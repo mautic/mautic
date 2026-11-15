@@ -530,7 +530,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->redirectType;
     }
 
-    public function setRedirectUrl(string $redirectUrl): static
+    public function setRedirectUrl(?string $redirectUrl): static
     {
         $this->isChanged('redirectUrl', $redirectUrl);
         $this->redirectUrl = $redirectUrl;
