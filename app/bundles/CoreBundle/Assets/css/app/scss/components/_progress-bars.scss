@@ -68,7 +68,6 @@
 
   .progress-component__track {
     --bs-progress-height: 8px;
-    --bs-progress-bg: var(--border-subtle);
     --bs-progress-bar-bg: var(--progress-component-color);
     --bs-progress-bar-transition: width var(--duration-productive) var(--easing-standard-productive);
 
@@ -100,6 +99,10 @@
   @media (prefers-reduced-motion: reduce) {
     &--indeterminate .progress-component__track::after {
       animation: none;
+    }
+
+    .progress-component__track .progress-bar {
+      transition: none;
     }
   }
 

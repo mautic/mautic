@@ -69,14 +69,13 @@
         aria-labelledby="{{ baseId|escape('html_attr') }}-label"
         {% if helperText %}aria-describedby="{{ baseId|escape('html_attr') }}-helper"{% endif %}
         aria-busy="{{ not isFinished and not isError ? 'true' : 'false' }}"
-        {% if isError %}aria-invalid="true"{% endif %}
         {% if not isIndeterminate %}aria-valuemin="0" aria-valuemax="{{ maximum }}" aria-valuenow="{{ currentValue }}"{% endif %}>
         <div class="{{ barClasses|join(' ')|e }}" style="width: {{ percentage }}%"></div>
     </div>
     {% if helperText %}
         <div class="progress-component__helper type-helper-text-01 mt-8{{ isIndented ? ' px-16' : '' }}{{ isInline ? ' visually-hidden' : '' }}" id="{{ baseId|escape('html_attr') }}-helper">
             <span class="progress-component__helper-text">{{ helperText|trans }}</span>
-            <span class="visually-hidden" aria-live="polite">{{ (isFinished ? 'mautic.core.progress_bar.done' : 'mautic.core.progress_bar.loading')|trans }}</span>
+            <span class="visually-hidden" aria-live="polite">{{ (isFinished ? 'mautic.core.progress_bar.done' : (isError ? 'mautic.core.progress_bar.error' : 'mautic.core.progress_bar.loading'))|trans }}</span>
         </div>
     {% endif %}
 </div>

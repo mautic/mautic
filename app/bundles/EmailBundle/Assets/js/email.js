@@ -191,7 +191,7 @@ Mautic.emailSendOnUnload = function () {
 
 Mautic.sendEmailBatch = function () {
     const progressContainer = mQuery('.email-send-progress');
-    var data = 'id=' + progressContainer.data('email') + '&pending=' + progressContainer.data('pending') + '&batchlimit=' + progressContainer.data('batchlimit');
+    const data = 'id=' + progressContainer.data('email') + '&pending=' + progressContainer.data('pending') + '&batchlimit=' + progressContainer.data('batchlimit');
     Mautic.sendEmailBatchXhr = Mautic.ajaxActionRequest('email:sendBatch', data, function (response) {
         if (response.progress) {
             if (response.progress[0] > 0) {

@@ -75,12 +75,12 @@ final class ProgressBarComponentTest extends TestCase
         $this->assertStringContainsString('style="width: 100%"', $output);
     }
 
-    public function testErrorFillsTheBarAndIsMarkedInvalid(): void
+    public function testErrorFillsTheBarAndIsAnnounced(): void
     {
         $output = $this->render(['label' => 'Failed', 'value' => 10, 'status' => 'error', 'helperText' => 'Upload failed']);
 
         $this->assertStringContainsString('progress-component--error', $output);
-        $this->assertStringContainsString('aria-invalid="true"', $output);
+        $this->assertStringContainsString('aria-live="polite">mautic.core.progress_bar.error', $output);
         $this->assertStringContainsString('aria-valuenow="0"', $output);
         $this->assertStringContainsString('style="width: 100%"', $output);
         $this->assertStringContainsString('ri-error-warning-fill', $output);
