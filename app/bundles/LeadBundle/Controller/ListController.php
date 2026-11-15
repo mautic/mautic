@@ -664,7 +664,10 @@ final class ListController extends AbstractStandardFormController
         return $this->changeList($request, $objectId, 'add');
     }
 
-    protected function changeList(Request $request, $listId, $action): Response
+    /**
+     * @param 'add'|'remove' $action
+     */
+    protected function changeList(Request $request, $listId, string $action): Response
     {
         $page      = $request->getSession()->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
@@ -713,13 +716,13 @@ final class ListController extends AbstractStandardFormController
             } elseif ($this->leadModel->isLocked($lead)) {
                 return $this->isLocked($postActionVars, $lead, 'lead');
             } else {
-                $function = ('remove' == $action) ? 'removeLead' : 'addLead';
+                $function = ('remove' === $action) ? 'removeLead' : 'addLead';
                 $this->listModel->{$function}($lead, $list, true);
 
                 $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
                 $flashes[]  = [
                     'type' => 'notice',
-                    'msg'  => ('remove' == $action) ? 'mautic.lead.lead.notice.removedfromlists' :
+                    'msg'  => ('remove' === $action) ? 'mautic.lead.lead.notice.removedfromlists' :
                         'mautic.lead.lead.notice.addedtolists',
                     'msgVars' => [
                         '%name%' => $identifier,
@@ -945,7 +948,7 @@ final class ListController extends AbstractStandardFormController
         );
     }
 
-    protected function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, string $action): array
     {
         if ('index' === $action) {
             $args['viewParameters']['filters'] = $this->listFilters;

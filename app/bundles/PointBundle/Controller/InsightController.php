@@ -53,11 +53,10 @@ final class InsightController extends AbstractStandardFormController
 
     /**
      * @param array<string, mixed> $args
-     * @param string               $action
      *
      * @return array<string, mixed>
      */
-    protected function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, string $action): array
     {
         if ('index' === $action && null !== $this->indexSearchScopes) {
             $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;

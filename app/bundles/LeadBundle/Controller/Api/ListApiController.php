@@ -282,12 +282,12 @@ final class ListApiController extends CommonApiController
      *
      * @param string $action view|create|edit|publish|delete
      */
-    protected function checkEntityAccess(?object $entity, $action = 'view'): bool
+    protected function checkEntityAccess(?object $entity, string $action = 'view'): bool
     {
-        if ('create' == $action || 'edit' == $action || 'view' == $action) {
+        if ('create' === $action || 'edit' === $action || 'view' === $action) {
             return $this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN);
         }
-        if ('delete' == $action) {
+        if ('delete' === $action) {
             return $this->security->hasEntityAccess(
                 true,
                 LeadPermissions::LISTS_DELETE_OTHER,
