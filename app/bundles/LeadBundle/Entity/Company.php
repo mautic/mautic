@@ -328,7 +328,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this->owner ?? $this->getCreatedBy();
     }
 
-    public function setScore(?int $score): static
+    public function setScore(int $score): static
     {
         $score = (int) $score;
 

@@ -93,7 +93,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
         return $this->id;
     }
 
-    public function setBundle(?string $bundle): static
+    public function setBundle(string $bundle): static
     {
         $this->bundle = $bundle;
 
@@ -108,7 +108,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
         return $this->bundle;
     }
 
-    public function setBitwise(?int $bitwise): static
+    public function setBitwise(int $bitwise): static
     {
         $this->bitwise = $bitwise;
 
@@ -138,7 +138,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
         return $this->role;
     }
 
-    public function setName(?string $name): static
+    public function setName(string $name): static
     {
         $this->name = $name;
 

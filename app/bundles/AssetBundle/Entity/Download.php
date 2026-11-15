@@ -148,7 +148,7 @@ class Download
         return $this->dateDownload;
     }
 
-    public function setCode(?int $code): static
+    public function setCode(int $code): static
     {
         $this->code = $code;
 
@@ -205,7 +205,7 @@ class Download
         return $this->ipAddress;
     }
 
-    public function setTrackingId(?string $trackingId): static
+    public function setTrackingId(string $trackingId): static
     {
         $this->trackingId = $trackingId;
 

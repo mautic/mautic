@@ -188,7 +188,7 @@ class LeadDevice
         return $this->deviceOsName;
     }
 
-    public function setDeviceOsName(?string $deviceOsName): static
+    public function setDeviceOsName(string $deviceOsName): static
     {
         $this->deviceOsName = $deviceOsName;
 
@@ -284,7 +284,7 @@ class LeadDevice
         return $this->trackingId;
     }
 
-    public function setTrackingId(?string $trackingId): static
+    public function setTrackingId(string $trackingId): static
     {
         $this->trackingId = $trackingId;
 

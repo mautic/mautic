@@ -346,7 +346,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->id;
     }
 
-    public function setTitle(?string $title): static
+    public function setTitle(string $title): static
     {
         $this->isChanged('title', $title);
         $this->title = $title;
@@ -362,7 +362,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->title;
     }
 
-    public function setAlias(?string $alias): static
+    public function setAlias(string $alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -429,7 +429,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->publishDown;
     }
 
-    public function setHits(?int $hits): static
+    public function setHits(int $hits): static
     {
         $this->hits = $hits;
 
@@ -444,7 +444,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getHits') : $this->hits;
     }
 
-    public function setRevision(?int $revision): static
+    public function setRevision(int $revision): static
     {
         $this->revision = $revision;
 
@@ -459,7 +459,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->revision;
     }
 
-    public function setMetaDescription(?string $metaDescription): static
+    public function setMetaDescription(string $metaDescription): static
     {
         $this->isChanged('metaDescription', $metaDescription);
         $this->metaDescription = $metaDescription;
@@ -530,7 +530,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->redirectType;
     }
 
-    public function setRedirectUrl(?string $redirectUrl): static
+    public function setRedirectUrl(string $redirectUrl): static
     {
         $this->isChanged('redirectUrl', $redirectUrl);
         $this->redirectUrl = $redirectUrl;
@@ -609,7 +609,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->sessionId;
     }
 
-    public function setTemplate(?string $template): static
+    public function setTemplate(string $template): static
     {
         $this->isChanged('template', $template);
         $this->template = $template;

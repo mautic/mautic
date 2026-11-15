@@ -144,7 +144,7 @@ class LeadCategory
         return $this->manuallyRemoved;
     }
 
-    public function setManuallyRemoved(?bool $manuallyRemoved): void
+    public function setManuallyRemoved(bool $manuallyRemoved): void
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }

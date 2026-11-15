@@ -88,7 +88,7 @@ class IntegrationEntity extends CommonEntity
         return $this->integration;
     }
 
-    public function setIntegration(?string $integration): static
+    public function setIntegration(string $integration): static
     {
         $this->integration = $integration;
 
@@ -103,7 +103,7 @@ class IntegrationEntity extends CommonEntity
         return $this->integrationEntity;
     }
 
-    public function setIntegrationEntity(?string $integrationEntity): static
+    public function setIntegrationEntity(string $integrationEntity): static
     {
         $this->integrationEntity = $integrationEntity;
 
@@ -172,7 +172,7 @@ class IntegrationEntity extends CommonEntity
         return $this->internalEntity;
     }
 
-    public function setInternalEntity(?string $internalEntity): static
+    public function setInternalEntity(string $internalEntity): static
     {
         $this->internalEntity = $internalEntity;
 

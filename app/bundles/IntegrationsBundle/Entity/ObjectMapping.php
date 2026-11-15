@@ -120,7 +120,7 @@ class ObjectMapping
         return $this->integration;
     }
 
-    public function setIntegration(?string $integration): static
+    public function setIntegration(string $integration): static
     {
         $this->integration = $integration;
 
@@ -135,7 +135,7 @@ class ObjectMapping
         return $this->internalObjectName;
     }
 
-    public function setInternalObjectName(?string $internalObjectName): static
+    public function setInternalObjectName(string $internalObjectName): static
     {
         $this->internalObjectName = $internalObjectName;
 
@@ -147,7 +147,7 @@ class ObjectMapping
         return (int) $this->internalObjectId;
     }
 
-    public function setInternalObjectId(?int $internalObjectId): static
+    public function setInternalObjectId(int $internalObjectId): static
     {
         $this->internalObjectId = (string) $internalObjectId;
 
@@ -162,7 +162,7 @@ class ObjectMapping
         return $this->integrationObjectName;
     }
 
-    public function setIntegrationObjectName(?string $integrationObjectName): static
+    public function setIntegrationObjectName(string $integrationObjectName): static
     {
         $this->integrationObjectName = $integrationObjectName;
 
@@ -177,7 +177,7 @@ class ObjectMapping
         return $this->integrationObjectId;
     }
 
-    public function setIntegrationObjectId(int|string|null $integrationObjectId): static
+    public function setIntegrationObjectId(int|string $integrationObjectId): static
     {
         $this->integrationObjectId = $integrationObjectId;
 

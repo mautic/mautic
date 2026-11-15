@@ -87,7 +87,7 @@ class Trackable
         return $this->channel;
     }
 
-    public function setChannel(?string $channel): static
+    public function setChannel(string $channel): static
     {
         $this->channel = $channel;
 
@@ -120,7 +120,7 @@ class Trackable
         return $this->hits;
     }
 
-    public function setHits(?int $hits): static
+    public function setHits(int $hits): static
     {
         $this->hits = $hits;
 
@@ -135,7 +135,7 @@ class Trackable
         return $this->uniqueHits;
     }
 
-    public function setUniqueHits(?int $uniqueHits): static
+    public function setUniqueHits(int $uniqueHits): static
     {
         $this->uniqueHits = $uniqueHits;
 

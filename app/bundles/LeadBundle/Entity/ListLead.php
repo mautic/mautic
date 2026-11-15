@@ -99,7 +99,7 @@ class ListLead
         return $this->manuallyRemoved;
     }
 
-    public function setManuallyRemoved(?bool $manuallyRemoved): void
+    public function setManuallyRemoved(bool $manuallyRemoved): void
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }
@@ -120,7 +120,7 @@ class ListLead
         return $this->manuallyAdded;
     }
 
-    public function setManuallyAdded(?bool $manuallyAdded): void
+    public function setManuallyAdded(bool $manuallyAdded): void
     {
         $this->manuallyAdded = $manuallyAdded;
     }

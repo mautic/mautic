@@ -125,7 +125,7 @@ class Widget extends FormEntity
         return $this->type;
     }
 
-    public function setWidth(?int $width): static
+    public function setWidth(int $width): static
     {
         $this->width = (int) $width;
         $this->isChanged('width', $this->width);
@@ -141,7 +141,7 @@ class Widget extends FormEntity
         return $this->width;
     }
 
-    public function setHeight(?int $height): static
+    public function setHeight(int $height): static
     {
         $this->height = (int) $height;
         $this->isChanged('height', $this->height);
@@ -176,7 +176,7 @@ class Widget extends FormEntity
         return $this->height;
     }
 
-    public function setOrdering(?int $ordering): static
+    public function setOrdering(int $ordering): static
     {
         $this->ordering = (int) $ordering;
         $this->isChanged('ordering', $this->ordering);
@@ -205,7 +205,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    public function setTemplate(?string $template): static
+    public function setTemplate(string $template): static
     {
         $this->isChanged('template', $template);
         $this->template = $template;
@@ -231,7 +231,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    public function setErrorMessage(?string $errorMessage): static
+    public function setErrorMessage(string $errorMessage): static
     {
         $this->errorMessage = $errorMessage;
 
@@ -246,7 +246,7 @@ class Widget extends FormEntity
     /**
      * Set cached flag.
      */
-    public function setCached(?bool $cached): static
+    public function setCached(bool $cached): static
     {
         $this->cached = $cached;
 

@@ -136,7 +136,7 @@ class MessageQueue
         return $this->attempts;
     }
 
-    public function setAttempts(?int $attempts): void
+    public function setAttempts(int $attempts): void
     {
         $this->attempts = $attempts;
     }
@@ -162,7 +162,7 @@ class MessageQueue
         return $this->channel;
     }
 
-    public function setChannel(?string $channel): void
+    public function setChannel(string $channel): void
     {
         $this->channel = $channel;
     }
@@ -257,7 +257,7 @@ class MessageQueue
         return $this->maxAttempts;
     }
 
-    public function setMaxAttempts(?int $maxAttempts): void
+    public function setMaxAttempts(int $maxAttempts): void
     {
         $this->maxAttempts = $maxAttempts;
     }
@@ -270,7 +270,7 @@ class MessageQueue
         return $this->priority;
     }
 
-    public function setPriority(?int $priority): void
+    public function setPriority(int $priority): void
     {
         $this->priority = $priority;
     }
@@ -293,7 +293,7 @@ class MessageQueue
         return $this->status;
     }
 
-    public function setStatus(?string $status): void
+    public function setStatus(string $status): void
     {
         $this->status = $status;
     }

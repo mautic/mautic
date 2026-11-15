@@ -312,7 +312,7 @@ class Form extends FormEntity implements UuidInterface
         return $this->id;
     }
 
-    public function setName(?string $name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -328,7 +328,7 @@ class Form extends FormEntity implements UuidInterface
         return $this->name;
     }
 
-    public function setDescription(?string $description): static
+    public function setDescription(string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -392,7 +392,7 @@ class Form extends FormEntity implements UuidInterface
         return $this->postAction;
     }
 
-    public function setPostActionProperty(?string $postActionProperty): static
+    public function setPostActionProperty(string $postActionProperty): static
     {
         $this->isChanged('postActionProperty', $postActionProperty);
         $this->postActionProperty = $postActionProperty;
@@ -535,7 +535,7 @@ class Form extends FormEntity implements UuidInterface
         );
     }
 
-    public function setAlias(?string $alias): static
+    public function setAlias(string $alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -748,7 +748,7 @@ class Form extends FormEntity implements UuidInterface
         return $this->usesProgressiveProfiling;
     }
 
-    public function setProgressiveProfilingLimit(?int $progressiveProfilingLimit): static
+    public function setProgressiveProfilingLimit(int $progressiveProfilingLimit): static
     {
         $this->isChanged('progressiveProfilingLimit', $progressiveProfilingLimit);
         $this->progressiveProfilingLimit = $progressiveProfilingLimit;

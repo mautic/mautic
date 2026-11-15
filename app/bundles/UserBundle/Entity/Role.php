@@ -133,7 +133,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
         return $this->id;
     }
 
-    public function setName(?string $name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -177,7 +177,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
         return $this->permissions;
     }
 
-    public function setDescription(?string $description): static
+    public function setDescription(string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;

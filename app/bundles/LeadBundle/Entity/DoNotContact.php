@@ -142,7 +142,7 @@ class DoNotContact
         return $this->reason;
     }
 
-    public function setReason(?int $reason): static
+    public function setReason(int $reason): static
     {
         $this->reason = $reason;
 
@@ -172,7 +172,7 @@ class DoNotContact
         return $this->channel;
     }
 
-    public function setChannel(?string $channel): static
+    public function setChannel(string $channel): static
     {
         $this->channel = $channel;
 

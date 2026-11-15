@@ -189,7 +189,7 @@ class Action implements UuidInterface
         return $this->form;
     }
 
-    public function setType(?string $type): static
+    public function setType(string $type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -229,7 +229,7 @@ class Action implements UuidInterface
         return $this->description;
     }
 
-    public function setName(?string $name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;

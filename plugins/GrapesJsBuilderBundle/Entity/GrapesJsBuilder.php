@@ -68,7 +68,7 @@ class GrapesJsBuilder
         return $this->customMjml;
     }
 
-    public function setCustomMjml(?string $customMjml): static
+    public function setCustomMjml(string $customMjml): static
     {
         $this->customMjml = $customMjml;
 

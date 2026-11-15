@@ -385,7 +385,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->content;
     }
 
-    public function setContent(?string $content): static
+    public function setContent(string $content): static
     {
         $this->isChanged('content', $content);
         $this->content = $content;
@@ -424,7 +424,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->isCampaignBased;
     }
 
-    public function setIsCampaignBased(?bool $isCampaignBased): static
+    public function setIsCampaignBased(bool $isCampaignBased): static
     {
         $this->isChanged('isCampaignBased', $isCampaignBased);
         $this->isCampaignBased = $isCampaignBased;
@@ -440,7 +440,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->slotName;
     }
 
-    public function setSlotName(?string $slotName): static
+    public function setSlotName(string $slotName): static
     {
         $this->isChanged('slotName', $slotName);
         $this->slotName = $slotName;

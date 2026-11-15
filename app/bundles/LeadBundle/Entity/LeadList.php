@@ -296,7 +296,7 @@ class LeadList extends FormEntity implements UuidInterface
         return array_any($this->getFilters(), fn ($filter): bool => $filter['type'] === $type);
     }
 
-    public function setIsGlobal(bool|int|string|null $isGlobal): static
+    public function setIsGlobal(bool|int|string $isGlobal): static
     {
         $this->isChanged('isGlobal', (bool) $isGlobal);
         $this->isGlobal = (bool) $isGlobal;
@@ -368,7 +368,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->isPreferenceCenter;
     }
 
-    public function setIsPreferenceCenter(bool|int|string|null $isPreferenceCenter): void
+    public function setIsPreferenceCenter(bool|int|string $isPreferenceCenter): void
     {
         $this->isChanged('isPreferenceCenter', (bool) $isPreferenceCenter);
         $this->isPreferenceCenter = (bool) $isPreferenceCenter;

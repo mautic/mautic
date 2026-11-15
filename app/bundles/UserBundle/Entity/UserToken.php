@@ -70,7 +70,7 @@ class UserToken
         return $this->authorizator;
     }
 
-    public function setAuthorizator(?string $authorizator): static
+    public function setAuthorizator(string $authorizator): static
     {
         $this->authorizator = $authorizator;
 
@@ -120,7 +120,7 @@ class UserToken
         return $this->oneTimeOnly;
     }
 
-    public function setOneTimeOnly(?bool $oneTimeOnly = true): static
+    public function setOneTimeOnly(bool $oneTimeOnly = true): static
     {
         $this->oneTimeOnly = $oneTimeOnly;
 

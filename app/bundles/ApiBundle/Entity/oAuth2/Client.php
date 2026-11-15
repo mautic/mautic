@@ -112,7 +112,7 @@ class Client extends BaseClient
         return $this->id;
     }
 
-    public function setName(?string $name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
 

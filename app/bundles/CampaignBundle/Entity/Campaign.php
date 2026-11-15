@@ -301,7 +301,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return $changes;
     }
 
-    public function setDescription(?string $description): static
+    public function setDescription(string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -616,7 +616,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return $this->allowRestart;
     }
 
-    public function setAllowRestart(?bool $allowRestart): static
+    public function setAllowRestart(bool $allowRestart): static
     {
         $allowRestart = (bool) $allowRestart;
         $this->isChanged('allowRestart', $allowRestart);

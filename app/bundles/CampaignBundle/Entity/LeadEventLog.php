@@ -227,7 +227,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->isScheduled;
     }
 
-    public function setIsScheduled(?bool $isScheduled): static
+    public function setIsScheduled(bool $isScheduled): static
     {
         $this->previousScheduledState ??= $this->isScheduled;
 
@@ -386,7 +386,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->rotation;
     }
 
-    public function setRotation(?int $rotation): static
+    public function setRotation(int $rotation): static
     {
         $this->rotation = (int) $rotation;
 

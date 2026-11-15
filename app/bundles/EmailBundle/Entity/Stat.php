@@ -247,7 +247,7 @@ class Stat
         return $this->isRead;
     }
 
-    public function setIsRead(?bool $isRead): void
+    public function setIsRead(bool $isRead): void
     {
         $this->addChange('isRead', $this->isRead, $isRead);
         $this->isRead = $isRead;
@@ -294,7 +294,7 @@ class Stat
         return $this->retryCount;
     }
 
-    public function setRetryCount(?int $retryCount): void
+    public function setRetryCount(int $retryCount): void
     {
         $this->addChange('retryCount', $this->retryCount, $retryCount);
         $this->retryCount = $retryCount;
@@ -317,7 +317,7 @@ class Stat
         return $this->isFailed;
     }
 
-    public function setIsFailed(?bool $isFailed): void
+    public function setIsFailed(bool $isFailed): void
     {
         $this->addChange('isFailed', $this->isFailed, $isFailed);
         $this->isFailed = $isFailed;
@@ -353,7 +353,7 @@ class Stat
         return $this->viewedInBrowser;
     }
 
-    public function setViewedInBrowser(?bool $viewedInBrowser): void
+    public function setViewedInBrowser(bool $viewedInBrowser): void
     {
         $this->addChange('viewedInBrowser', $this->viewedInBrowser, $viewedInBrowser);
         $this->viewedInBrowser = $viewedInBrowser;
@@ -405,7 +405,7 @@ class Stat
         return $this->openCount;
     }
 
-    public function setOpenCount(?int $openCount): static
+    public function setOpenCount(int $openCount): static
     {
         $this->addChange('openCount', $this->openCount, $openCount);
         $this->openCount = $openCount;
@@ -413,7 +413,7 @@ class Stat
         return $this;
     }
 
-    public function addOpenDetails(array|string|null $details): void
+    public function addOpenDetails(array|string $details): void
     {
         if (self::MAX_OPEN_DETAILS > $this->openCount) {
             $this->openDetails[] = $details;

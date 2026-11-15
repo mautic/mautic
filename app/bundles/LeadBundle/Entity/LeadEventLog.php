@@ -153,7 +153,7 @@ class LeadEventLog
         return $this->userId;
     }
 
-    public function setObject(?string $object): static
+    public function setObject(string $object): static
     {
         $this->object = $object;
 
@@ -186,7 +186,7 @@ class LeadEventLog
         return $this->objectId;
     }
 
-    public function setAction(?string $action): static
+    public function setAction(string $action): static
     {
         $this->action = $action;
 
@@ -213,7 +213,7 @@ class LeadEventLog
      *
      * @param string $value
      */
-    public function addProperty(?string $key, $value): static
+    public function addProperty(string $key, $value): static
     {
         $this->properties[$key] = $value;
 
@@ -243,7 +243,7 @@ class LeadEventLog
         return $this->dateAdded;
     }
 
-    public function setBundle(?string $bundle): static
+    public function setBundle(string $bundle): static
     {
         $this->bundle = $bundle;
 

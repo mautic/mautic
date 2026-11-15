@@ -188,7 +188,7 @@ class FrequencyRule extends CommonEntity
         return $this->channel;
     }
 
-    public function setChannel(?string $channel): static
+    public function setChannel(string $channel): static
     {
         $this->isChanged('channel', $channel);
 

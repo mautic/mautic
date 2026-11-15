@@ -323,7 +323,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return $this->message;
     }
 
-    public function setMessage(?string $message): void
+    public function setMessage(string $message): void
     {
         $this->isChanged('message', $message);
         $this->message = $message;

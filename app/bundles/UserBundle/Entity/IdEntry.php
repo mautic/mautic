@@ -39,7 +39,7 @@ class IdEntry
         return $this->entityId;
     }
 
-    public function setEntityId(?string $entityId): static
+    public function setEntityId(string $entityId): static
     {
         $this->entityId = $entityId;
 
@@ -69,7 +69,7 @@ class IdEntry
         return $this->id;
     }
 
-    public function setId(?string $id): static
+    public function setId(string $id): static
     {
         $this->id =  $id;
 

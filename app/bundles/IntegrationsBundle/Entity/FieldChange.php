@@ -78,7 +78,7 @@ class FieldChange
         return $this->integration;
     }
 
-    public function setIntegration(?string $integration): static
+    public function setIntegration(string $integration): static
     {
         $this->integration = $integration;
 

@@ -231,7 +231,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         $this->id = $id;
     }
 
-    public function setName(?string $name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -266,7 +266,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         return $this->system;
     }
 
-    public function setSource(?string $source): static
+    public function setSource(string $source): static
     {
         $this->isChanged('source', $source);
         $this->source = $source;
@@ -479,7 +479,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         return $this->isScheduled;
     }
 
-    public function setIsScheduled(?bool $isScheduled): void
+    public function setIsScheduled(bool $isScheduled): void
     {
         $this->isChanged('isScheduled', $isScheduled);
 

@@ -484,7 +484,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return get_object_vars($this);
     }
 
-    public function setId(?int $id): static
+    public function setId(int $id): static
     {
         $this->id = (string) $id;
 
@@ -650,7 +650,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * Point changes are tracked and will be persisted as a direct DB query to avoid PHP memory overwrites with concurrent requests
      * The risk in this is that the $changes['points'] may not be accurate but at least no points are lost.
      */
-    public function adjustPoints(?int $points, ?string $operator = self::POINTS_ADD): static
+    public function adjustPoints(int $points, string $operator = self::POINTS_ADD): static
     {
         if (!$points = (int) $points) {
             return $this;
@@ -699,7 +699,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->pointChanges;
     }
 
-    public function setPoints(?int $points): static
+    public function setPoints(int $points): static
     {
         $this->isChanged('points', $points);
         $this->points = (int) $points;
@@ -1054,7 +1054,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @param bool $newlyCreated Created
      */
-    public function setNewlyCreated(?bool $newlyCreated): void
+    public function setNewlyCreated(bool $newlyCreated): void
     {
         $this->newlyCreated = $newlyCreated;
     }
@@ -1067,7 +1067,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->notes;
     }
 
-    public function setPreferredProfileImage(?string $source): void
+    public function setPreferredProfileImage(string $source): void
     {
         $this->preferredProfileImage = $source;
     }
@@ -1466,7 +1466,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->timezone;
     }
 
-    public function setTimezone(?string $timezone): static
+    public function setTimezone(string $timezone): static
     {
         $this->isChanged('timezone', $timezone);
         $this->timezone = $timezone;

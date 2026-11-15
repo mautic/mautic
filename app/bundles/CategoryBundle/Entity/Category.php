@@ -125,7 +125,7 @@ class Category extends FormEntity implements UuidInterface
         return $this->id;
     }
 
-    public function setTitle(?string $title): static
+    public function setTitle(string $title): static
     {
         $this->isChanged('title', $title);
         $this->title = $title;
@@ -141,7 +141,7 @@ class Category extends FormEntity implements UuidInterface
         return $this->title;
     }
 
-    public function setAlias(?string $alias): static
+    public function setAlias(string $alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -157,7 +157,7 @@ class Category extends FormEntity implements UuidInterface
         return $this->alias;
     }
 
-    public function setDescription(?string $description): static
+    public function setDescription(string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -173,7 +173,7 @@ class Category extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    public function setColor(?string $color): void
+    public function setColor(string $color): void
     {
         $this->isChanged('color', $color);
         $this->color = $color;
@@ -187,7 +187,7 @@ class Category extends FormEntity implements UuidInterface
         return $this->color;
     }
 
-    public function setBundle(?string $bundle): void
+    public function setBundle(string $bundle): void
     {
         $this->isChanged('bundle', $bundle);
         $this->bundle = $bundle;

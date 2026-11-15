@@ -90,7 +90,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
         return $this->id;
     }
 
-    public function setName(?string $name): static
+    public function setName(string $name): static
     {
         $this->name = $name;
 
@@ -105,7 +105,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
         return $this->name;
     }
 
-    public function setBundle(?string $bundle): void
+    public function setBundle(string $bundle): void
     {
         $this->bundle = $bundle;
     }
