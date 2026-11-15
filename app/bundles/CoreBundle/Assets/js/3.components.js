@@ -14,10 +14,9 @@ Mautic.updateProgressBar = function (container, value, percent, max) {
 
     if (component.hasClass('progress-component--indeterminate')) {
         component.removeClass('progress-component--indeterminate');
-        track.attr({'aria-valuemin': 0, 'aria-valuemax': max});
     }
 
-    track.attr('aria-valuenow', value);
+    track.attr({'aria-valuemin': 0, 'aria-valuemax': max, 'aria-valuenow': value});
     track.find('.progress-bar').css('width', percent + '%');
     component.find('.progress-component__helper-text').text(
         Mautic.translate('mautic.core.progress_bar.count', {current: value, total: max})
