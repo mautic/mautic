@@ -213,10 +213,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTemplate()
+    public function getTemplate(): ?string
     {
         return $this->template;
     }
@@ -241,10 +238,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getErrorMessage()
+    public function getErrorMessage(): ?string
     {
         return $this->errorMessage;
     }
@@ -261,10 +255,8 @@ class Widget extends FormEntity
 
     /**
      * Get cached.
-     *
-     * @return bool
      */
-    public function isCached()
+    public function isCached(): ?bool
     {
         return $this->cached;
     }

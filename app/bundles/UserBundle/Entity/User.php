@@ -273,20 +273,15 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->password;
     }
 
-    /**
-     * @return ?string
-     */
-    public function getPlainPassword()
+    public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
 
     /**
      * Get current password (that a user has typed into a form).
-     *
-     * @return ?string
      */
-    public function getCurrentPassword()
+    public function getCurrentPassword(): ?string
     {
         return $this->currentPassword;
     }

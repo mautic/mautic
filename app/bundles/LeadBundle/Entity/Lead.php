@@ -1046,10 +1046,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->manipulator;
     }
 
-    /**
-     * @return bool
-     */
-    public function isNewlyCreated()
+    public function isNewlyCreated(): ?bool
     {
         return $this->newlyCreated;
     }
