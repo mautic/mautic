@@ -152,4 +152,31 @@ final class CampaignRepositoryTest extends TestCase
         yield ['is:expired', 'c.publishDown < CURRENT_TIMESTAMP()'];
         yield ['is:pending', 'c.publishUp > CURRENT_TIMESTAMP()'];
     }
+
+    #[DataProvider('ormSourceCommandDataProvider')]
+    public function testAddSearchCommandWhereClauseBuildsSourceFiltersWithOrmQueryBuilder(string $command, bool $not, string $expected): void
+    {
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->method('getExpressionBuilder')->willReturn(new Expr());
+        $qb            = new OrmQueryBuilder($entityManager);
+        $filter        = (object) ['command' => $command, 'string' => '', 'not' => $not, 'strict' => false];
+
+        $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
+
+        $this->assertSame($expected, (string) $expr);
+        $this->assertSame([], $params);
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: bool, 2: string}>
+     */
+    public static function ormSourceCommandDataProvider(): iterable
+    {
+        yield ['source:segment', false, 'c.lists IS NOT EMPTY'];
+        yield ['source:segment', true, 'c.lists IS EMPTY'];
+        yield ['source:form', false, 'c.forms IS NOT EMPTY'];
+        yield ['source:form', true, 'c.forms IS EMPTY'];
+    }
 }
