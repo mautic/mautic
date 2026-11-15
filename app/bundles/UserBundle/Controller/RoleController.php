@@ -371,9 +371,8 @@ final class RoleController extends AbstractFormController
      * Generate's role edit form and processes post data.
      *
      * @param int  $objectId
-     * @param bool $ignorePost
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_EDIT)) {
             $this->throwAccessDenied();

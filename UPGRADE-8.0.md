@@ -1182,6 +1182,28 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     `ContactIdentificationEvent::getIdentifier()` now returns `?string` and `ListPreProcessListEvent::getResult()` returns `?bool`.
 
 - The `$action` parameter of controller helpers now declares a native `string` type: `AbstractStandardFormController::afterEntitySave()`, `afterFormProcessed()`, `beforeEntitySave()`, `beforeFormProcessed()`, `checkActionPermission()`, `getFormEntity()`, `getFormView()`, `getPostActionRedirectArguments()`, `getPostActionControllerAction()` and `getViewArguments()`, `FetchCommonApiController::checkEntityAccess()` and `ListController::changeList()`, plus their overrides in core controllers. Callers that pass a non-string action now get a `TypeError`. Plugin controllers that override one of these methods may keep the parameter untyped or declare `string`.
+
+- Controller methods across bundles now declare native `bool` parameter types for their `$ignorePost`, `$forceTypeSelection`, `$isPost` and `$isClone` flags. Callers in files with `declare(strict_types=1)` that pass another type (e.g. `0`/`1` or `null`) now get a `TypeError` - cast the argument to `bool`. Plugin controllers that extend these classes and override one of these methods must keep the override compatible - drop the parameter type or use `bool`.
+
+    | Class | Method | New parameter types |
+    | --- | --- | --- |
+    | `Mautic\ApiBundle\Controller\ClientController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\AssetBundle\Controller\AssetController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\CampaignBundle\Controller\CampaignController` | `beforeFormProcessed()` (`$isPost`) | `bool` |
+    | `Mautic\CategoryBundle\Controller\CategoryController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\CoreBundle\Controller\AbstractStandardFormController` | `beforeFormProcessed()` (`$isPost`), `getFormEntity()` (`&$isClone`) | `bool` |
+    | `Mautic\DynamicContentBundle\Controller\DynamicContentController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\FormBundle\Controller\FormController` | `editAction()` (`$ignorePost`, `$forceTypeSelection`) | `bool` |
+    | `Mautic\NotificationBundle\Controller\MobileNotificationController` | `editAction()` (`$ignorePost`, `$forceTypeSelection`) | `bool` |
+    | `Mautic\NotificationBundle\Controller\NotificationController` | `editAction()` (`$ignorePost`, `$forceTypeSelection`) | `bool` |
+    | `Mautic\ReportBundle\Controller\ReportController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\SmsBundle\Controller\SmsController` | `editAction()` (`$ignorePost`, `$forceTypeSelection`) | `bool` |
+    | `Mautic\StageBundle\Controller\StageController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\UserBundle\Controller\RoleController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\UserBundle\Controller\UserController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\WebhookBundle\Controller\WebhookController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `MauticPlugin\MauticFocusBundle\Controller\FocusController` | `editAction()` (`$ignorePost`) | `bool` |
+
 - Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
 
     | Class | Method | New parameter types |
