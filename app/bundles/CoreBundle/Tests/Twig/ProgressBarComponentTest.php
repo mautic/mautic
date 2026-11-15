@@ -27,7 +27,9 @@ final class ProgressBarComponentTest extends TestCase
 
         $this->assertStringContainsString('role="progressbar"', $output);
         $this->assertStringContainsString('aria-labelledby="import-label"', $output);
-        $this->assertStringContainsString('aria-valuemin="0" aria-valuemax="80" aria-valuenow="40"', $output);
+        $this->assertStringContainsString('aria-valuemin="0"', $output);
+        $this->assertStringContainsString('aria-valuemax="80"', $output);
+        $this->assertStringContainsString('aria-valuenow="40"', $output);
         $this->assertStringContainsString('style="width: 50%"', $output);
         $this->assertStringContainsString('progress-component--big', $output);
         $this->assertStringNotContainsString('progress-bar-striped', $output);
@@ -71,7 +73,8 @@ final class ProgressBarComponentTest extends TestCase
     {
         $output = $this->render(['label' => 'Empty', 'value' => 0, 'max' => 0, 'status' => 'finished']);
 
-        $this->assertStringContainsString('aria-valuemax="100" aria-valuenow="100"', $output);
+        $this->assertStringContainsString('aria-valuemax="100"', $output);
+        $this->assertStringContainsString('aria-valuenow="100"', $output);
         $this->assertStringContainsString('style="width: 100%"', $output);
     }
 
@@ -80,7 +83,7 @@ final class ProgressBarComponentTest extends TestCase
         $output = $this->render(['label' => 'Failed', 'value' => 10, 'status' => 'error', 'helperText' => 'Upload failed']);
 
         $this->assertStringContainsString('progress-component--error', $output);
-        $this->assertStringContainsString('class="progress-component__helper-text" aria-live="polite">Upload failed', $output);
+        $this->assertMatchesRegularExpression('/<span[^>]*aria-live="polite"[^>]*>Upload failed<\/span>/', $output);
         $this->assertStringContainsString('aria-valuenow="0"', $output);
         $this->assertStringContainsString('style="width: 100%"', $output);
         $this->assertStringContainsString('ri-error-warning-fill', $output);
@@ -92,7 +95,7 @@ final class ProgressBarComponentTest extends TestCase
 
         $this->assertStringContainsString('aria-describedby="failed-helper"', $output);
         $this->assertStringContainsString('id="failed-helper"', $output);
-        $this->assertStringContainsString('aria-live="polite">mautic.core.progress_bar.error', $output);
+        $this->assertMatchesRegularExpression('/<span[^>]*aria-live="polite"[^>]*>mautic\.core\.progress_bar\.error<\/span>/', $output);
     }
 
     public function testHelperTextIsLinkedAndAnnounced(): void
@@ -101,8 +104,8 @@ final class ProgressBarComponentTest extends TestCase
 
         $this->assertStringContainsString('aria-describedby="send-helper"', $output);
         $this->assertStringContainsString('id="send-helper"', $output);
-        $this->assertStringContainsString('class="progress-component__helper-text" aria-live="polite">1 of 4', $output);
-        $this->assertStringNotContainsString('aria-live="polite">mautic.core.progress_bar.loading', $output);
+        $this->assertMatchesRegularExpression('/<span[^>]*aria-live="polite"[^>]*>1 of 4<\/span>/', $output);
+        $this->assertStringNotContainsString('mautic.core.progress_bar.loading', $output);
         $this->assertStringNotContainsString('aria-describedby', $this->render(['label' => 'Send', 'value' => 1]));
     }
 
@@ -111,10 +114,10 @@ final class ProgressBarComponentTest extends TestCase
         $active = $this->render(['label' => 'Inline', 'value' => 1, 'type' => 'inline', 'helperText' => 'Hidden']);
         $finished = $this->render(['label' => 'Inline', 'type' => 'inline', 'status' => 'finished']);
 
-        $this->assertStringContainsString('progress-component--inline d-flex', $active);
-        $this->assertStringContainsString('type-helper-text-01 mt-8 visually-hidden', $active);
-        $this->assertStringContainsString('progress progress-component__track flex-grow-1 visually-hidden', $finished);
-        $this->assertStringNotContainsString('progress-component__track flex-grow-1 visually-hidden', $active);
+        $this->assertTrue($this->hasElementWithClasses($active, ['progress-component--inline', 'd-flex']));
+        $this->assertTrue($this->hasElementWithClasses($active, ['progress-component__helper', 'visually-hidden']));
+        $this->assertTrue($this->hasElementWithClasses($finished, ['progress-component__track', 'flex-grow-1', 'visually-hidden']));
+        $this->assertFalse($this->hasElementWithClasses($active, ['progress-component__track', 'flex-grow-1', 'visually-hidden']));
     }
 
     public function testSizeIndentedAndHiddenLabel(): void
@@ -123,7 +126,7 @@ final class ProgressBarComponentTest extends TestCase
 
         $this->assertStringContainsString('progress-component--small', $output);
         $this->assertStringContainsString('progress-component--indented', $output);
-        $this->assertStringContainsString('px-16 visually-hidden', $output);
+        $this->assertTrue($this->hasElementWithClasses($output, ['px-16', 'visually-hidden']));
     }
 
     public function testLabelIsEscaped(): void
@@ -140,5 +143,21 @@ final class ProgressBarComponentTest extends TestCase
     private function render(array $context): string
     {
         return $this->twig->render('Components/progress-bar.html.twig', $context);
+    }
+
+    /**
+     * @param list<string> $classes
+     */
+    private function hasElementWithClasses(string $output, array $classes): bool
+    {
+        preg_match_all('/class="([^"]*)"/', $output, $matches);
+
+        foreach ($matches[1] as $value) {
+            if ([] === array_diff($classes, explode(' ', $value))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
