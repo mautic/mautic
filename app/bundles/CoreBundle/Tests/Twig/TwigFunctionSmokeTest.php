@@ -92,7 +92,7 @@ final class TwigFunctionSmokeTest extends KernelTestCase
             ->render(['path' => $assetFilePath]);
 
         $this->assertStringStartsWith('<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\'', $rendered);
-        $this->assertStringContainsString($assetFilePath, $rendered);
+        $this->assertStringContainsString($assetFilePath, (string) $rendered);
         $this->assertStringEndsWith("', 'integrationsConfigOnLoad', 'integrationsConfigOnLoad');</script>", $rendered);
 
         $renderedWithoutCallbacks = $twigEnvironment->createTemplate('{{ includeScript(path) }}')

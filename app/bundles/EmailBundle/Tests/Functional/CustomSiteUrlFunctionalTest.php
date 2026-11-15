@@ -41,7 +41,7 @@ final class CustomSiteUrlFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var MessageLoggerListener $messageLogger */
-        $messageLogger = self::getContainer()->get('mailer.message_logger_listener'); // @phpstan-ignore mautic.noContainerGet
+        $messageLogger = $this->getService('mailer.message_logger_listener');
 
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest(

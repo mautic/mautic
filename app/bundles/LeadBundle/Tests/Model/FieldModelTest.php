@@ -262,7 +262,7 @@ final class FieldModelTest extends MauticMysqlTestCase
     {
         // DBAL 4 dropped the SQL logger, so the queries are read off doctrine-bundle's
         // debug middleware instead
-        $debugDataHolder = $this->getContainer()->get('doctrine.debug_data_holder');
+        $debugDataHolder = $this->getService('doctrine.debug_data_holder');
         $this->assertInstanceOf(DebugDataHolder::class, $debugDataHolder);
 
         $fieldModel = $this->getService(FieldModel::class);

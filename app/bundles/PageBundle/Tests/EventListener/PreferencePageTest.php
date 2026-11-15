@@ -36,11 +36,13 @@ final class PreferencePageTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $container         = self::getContainer();
-        $this->dispatcher  = $container->get(EventDispatcherInterface::class);
-        $this->formFactory = $container->get(FormFactoryInterface::class);
-        $this->leadModel   = $container->get(LeadModel::class);
-        $this->disableTranslations($container->get('translator.default'));
+        $this->dispatcher  = $this->getService(EventDispatcherInterface::class);
+        $this->formFactory = $this->getService(FormFactoryInterface::class);
+        $this->leadModel   = $this->getService(LeadModel::class);
+
+        /** @var MauticResourceTranslator $translator */
+        $translator = $this->getService('translator.default');
+        $this->disableTranslations($translator);
     }
 
     public function testDefaultLabelsWithoutForm(): void

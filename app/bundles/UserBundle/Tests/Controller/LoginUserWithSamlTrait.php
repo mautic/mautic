@@ -16,13 +16,12 @@ trait LoginUserWithSamlTrait
     {
         $firewallContext = 'mautic';
         $token           = new TestBrowserToken($user->getRoles(), $user, $firewallContext);
-        $container       = $this->getContainer();
         /** @var TokenStorageInterface $tokenStorage */
-        $tokenStorage = $container->get('security.untracked_token_storage');
+        $tokenStorage = $this->getService('security.untracked_token_storage');
         $tokenStorage->setToken($token);
 
         /** @var SessionFactory $sessionFactoryService */
-        $sessionFactoryService = self::getContainer()->get('session.factory');
+        $sessionFactoryService = $this->getService('session.factory');
         /** @var SessionInterface $session */
         $session = $sessionFactoryService->createSession();
         $session->set('samlsso', true);

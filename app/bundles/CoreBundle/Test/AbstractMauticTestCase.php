@@ -135,9 +135,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
     /**
      * @template TService of object
      *
-     * @param class-string<TService> $serviceId
+     * @param class-string<TService>|string $serviceId
      *
-     * @return TService
+     * @return ($serviceId is class-string<TService> ? TService : object)
      */
     protected function getService(string $serviceId): object
     {
