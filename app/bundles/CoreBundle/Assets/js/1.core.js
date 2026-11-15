@@ -912,7 +912,6 @@ var Mautic = {
         if (component.hasClass('progress-component--indeterminate')) {
             component.removeClass('progress-component--indeterminate');
             track.attr({'aria-valuemin': 0, 'aria-valuemax': max});
-            track.find('.progress-bar').removeClass('progress-bar-striped progress-bar-animated');
         }
 
         track.attr('aria-valuenow', value);
