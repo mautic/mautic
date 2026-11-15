@@ -50,3 +50,69 @@
     background-color: lighten($sidebar-left-bg, 3%);
   }
 }
+
+// Progress bar component (Components/progress-bar.html.twig)
+// -------------------------
+.progress-component {
+  --progress-component-color: var(--interactive);
+
+  min-width: 48px;
+
+  &__label {
+    color: var(--text-primary);
+  }
+
+  &__helper {
+    color: var(--text-secondary);
+  }
+
+  .progress-component__track {
+    --bs-progress-height: 8px;
+    --bs-progress-bg: var(--border-subtle);
+    --bs-progress-bar-bg: var(--progress-component-color);
+    --bs-progress-bar-transition: width var(--duration-productive) var(--easing-standard-productive);
+
+    height: var(--bs-progress-height);
+    min-width: 48px;
+    margin-top: 0;
+
+    .progress-bar {
+      background-color: var(--bs-progress-bar-bg);
+      transition: var(--bs-progress-bar-transition);
+    }
+  }
+
+  &--small .progress-component__track {
+    --bs-progress-height: 4px;
+  }
+
+  &--finished {
+    --progress-component-color: var(--support-success);
+  }
+
+  &--error {
+    --progress-component-color: var(--support-error);
+
+    .progress-component__helper {
+      color: var(--text-error);
+    }
+  }
+
+  &--finished &__status-icon,
+  &--error &__status-icon {
+    color: var(--progress-component-color);
+  }
+
+  @media (forced-colors: active) {
+    .progress-component__track {
+      forced-color-adjust: none;
+      background-color: Canvas;
+      outline: 2px solid transparent;
+      outline-offset: -2px;
+    }
+
+    .progress-bar {
+      background-color: CanvasText;
+    }
+  }
+}

@@ -1,0 +1,83 @@
+{#
+  Carbon-style progress bar built on Bootstrap's .progress.
+
+  label       Required. Describes what is progressing.
+  value       Current value. Omit for the indeterminate state.
+  max         Maximum value. Default 100.
+  size        'big' (default, 8px) or 'small' (4px).
+  type        'default', 'inline' or 'indented'.
+  status      'active' (default), 'finished' or 'error'.
+  helperText  Textual representation of the progress.
+  hideLabel   Visually hides the label, keeping it for assistive technology.
+  className   Extra classes for the wrapper.
+  id          Base id used to link label and helper text.
+#}
+{% set size = size|default('big') %}
+{% set type = type|default('default') %}
+{% set status = status|default('active') %}
+{% set maximum = max|default(100) %}
+{% set isFinished = 'finished' == status %}
+{% set isError = 'error' == status %}
+{% set currentValue = value|default(null) %}
+{% set isIndeterminate = not isFinished and not isError and null is same as currentValue %}
+{% if isFinished %}
+    {% set currentValue = maximum %}
+{% elseif isError %}
+    {% set currentValue = 0 %}
+{% elseif not isIndeterminate %}
+    {% set currentValue = min(max(currentValue, 0), maximum) %}
+{% endif %}
+{% set percentage = isIndeterminate ? 100 : (isError ? 100 : (maximum > 0 ? (currentValue / maximum * 100)|round(2) : 0)) %}
+{% set baseId = id|default('progress-bar-' ~ random(1000000)) %}
+{% set isInline = 'inline' == type %}
+{% set isIndented = 'indented' == type %}
+{% set helperText = helperText|default('') %}
+
+{% set classes = ['progress-component', 'progress-component--' ~ size, 'progress-component--' ~ type] %}
+{% if isFinished %}{% set classes = classes|merge(['progress-component--finished']) %}{% endif %}
+{% if isError %}{% set classes = classes|merge(['progress-component--error']) %}{% endif %}
+{% if isIndeterminate %}{% set classes = classes|merge(['progress-component--indeterminate']) %}{% endif %}
+{% if isInline %}{% set classes = classes|merge(['d-flex', 'align-items-center']) %}{% endif %}
+{% if className|default('') %}{% set classes = classes|merge([className]) %}{% endif %}
+
+{% set labelClasses = ['progress-component__label', 'type-body-compact-01', 'd-flex', 'justify-content-between', 'align-items-center'] %}
+{% if isInline %}
+    {% set labelClasses = labelClasses|merge(['flex-shrink-0', 'me-16']) %}
+{% else %}
+    {% set labelClasses = labelClasses|merge(['mb-8']) %}
+{% endif %}
+{% if isIndented %}{% set labelClasses = labelClasses|merge(['px-16']) %}{% endif %}
+{% if hideLabel|default(false) %}{% set labelClasses = labelClasses|merge(['visually-hidden']) %}{% endif %}
+
+{% set trackClasses = ['progress', 'progress-component__track'] %}
+{% if isInline %}{% set trackClasses = trackClasses|merge(['flex-grow-1']) %}{% endif %}
+{% if isInline and (isFinished or isError) %}{% set trackClasses = trackClasses|merge(['visually-hidden']) %}{% endif %}
+
+{% set barClasses = ['progress-bar'] %}
+{% if isIndeterminate %}{% set barClasses = barClasses|merge(['progress-bar-striped', 'progress-bar-animated']) %}{% endif %}
+
+<div class="{{ classes|join(' ')|e }}">
+    <div class="{{ labelClasses|join(' ')|e }}" id="{{ baseId|escape('html_attr') }}-label">
+        <span class="text-truncate">{{ label|trans }}</span>
+        {% if isFinished %}
+            <i class="progress-component__status-icon ri-checkbox-circle-fill ms-8 flex-shrink-0" aria-hidden="true"></i>
+        {% elseif isError %}
+            <i class="progress-component__status-icon ri-error-warning-fill ms-8 flex-shrink-0" aria-hidden="true"></i>
+        {% endif %}
+    </div>
+    <div class="{{ trackClasses|join(' ')|e }}"
+        role="progressbar"
+        aria-labelledby="{{ baseId|escape('html_attr') }}-label"
+        {% if helperText %}aria-describedby="{{ baseId|escape('html_attr') }}-helper"{% endif %}
+        aria-busy="{{ not isFinished and not isError ? 'true' : 'false' }}"
+        {% if isError %}aria-invalid="true"{% endif %}
+        {% if not isIndeterminate %}aria-valuemin="0" aria-valuemax="{{ maximum }}" aria-valuenow="{{ currentValue }}"{% endif %}>
+        <div class="{{ barClasses|join(' ')|e }}" style="width: {{ percentage }}%"></div>
+    </div>
+    {% if helperText %}
+        <div class="progress-component__helper type-helper-text-01 mt-8{{ isIndented ? ' px-16' : '' }}{{ isInline ? ' visually-hidden' : '' }}" id="{{ baseId|escape('html_attr') }}-helper">
+            {{ helperText|trans }}
+            <span class="visually-hidden" aria-live="polite">{{ (isFinished ? 'mautic.core.progress_bar.done' : 'mautic.core.progress_bar.loading')|trans }}</span>
+        </div>
+    {% endif %}
+</div>
