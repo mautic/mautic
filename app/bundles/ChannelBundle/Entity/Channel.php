@@ -156,7 +156,7 @@ class Channel extends CommonEntity implements UuidInterface
         return $this->channelId;
     }
 
-    public function setChannelId(?int $channelId): static
+    public function setChannelId(int|string|null $channelId): static
     {
         if (empty($channelId)) {
             $channelId = null;
