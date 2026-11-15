@@ -373,7 +373,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this;
     }
 
-    public function setFirstName(string $firstName): static
+    public function setFirstName(?string $firstName): static
     {
         $this->isChanged('firstName', $firstName);
         $this->firstName = $firstName;
@@ -473,7 +473,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->position;
     }
 
-    public function setTimezone(string $timezone): static
+    public function setTimezone(?string $timezone): static
     {
         $this->isChanged('timezone', $timezone);
         $this->timezone = $timezone;

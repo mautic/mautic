@@ -328,7 +328,7 @@ class Form extends FormEntity implements UuidInterface
         return $this->name;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;

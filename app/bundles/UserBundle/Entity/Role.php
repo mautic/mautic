@@ -177,7 +177,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
         return $this->permissions;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;

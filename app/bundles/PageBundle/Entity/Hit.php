@@ -347,7 +347,7 @@ class Hit
         return $this->code;
     }
 
-    public function setReferer(string $referer): static
+    public function setReferer(?string $referer): static
     {
         $this->referer = $referer;
 

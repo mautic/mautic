@@ -459,7 +459,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->revision;
     }
 
-    public function setMetaDescription(string $metaDescription): static
+    public function setMetaDescription(?string $metaDescription): static
     {
         $this->isChanged('metaDescription', $metaDescription);
         $this->metaDescription = $metaDescription;
@@ -609,7 +609,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->sessionId;
     }
 
-    public function setTemplate(string $template): static
+    public function setTemplate(?string $template): static
     {
         $this->isChanged('template', $template);
         $this->template = $template;

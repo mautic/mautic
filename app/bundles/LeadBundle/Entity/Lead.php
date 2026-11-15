@@ -1067,7 +1067,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->notes;
     }
 
-    public function setPreferredProfileImage(string $source): void
+    public function setPreferredProfileImage(?string $source): void
     {
         $this->preferredProfileImage = $source;
     }
@@ -1466,7 +1466,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->timezone;
     }
 
-    public function setTimezone(string $timezone): static
+    public function setTimezone(?string $timezone): static
     {
         $this->isChanged('timezone', $timezone);
         $this->timezone = $timezone;
