@@ -898,6 +898,19 @@ var Mautic = {
     },
 
     /**
+     * Updates a progress bar rendered by Components/progress-bar.html.twig
+     *
+     * @param container Selector or element wrapping the component
+     * @param value     Current value
+     * @param percent   Current percentage (0-100)
+     */
+    updateProgressBar: function (container, value, percent) {
+        const track = mQuery(container).find('[role="progressbar"]');
+        track.attr('aria-valuenow', value);
+        track.find('.progress-bar').css('width', percent + '%');
+    },
+
+    /**
      * Sets flashes
      * @param flashes The flash message HTML to append
      * @param autoClose Optional boolean to determine if the flash should automatically close, defaults to true
