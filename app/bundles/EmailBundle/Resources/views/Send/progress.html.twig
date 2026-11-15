@@ -20,7 +20,8 @@
                         <h4>{{ 'mautic.email.send.stats'|trans({'%sent%': stats.sent, '%failed%': stats.failed}) }}</h4>
                     {% endif %}
                     {% include '@MauticCore/Components/progress-bar.html.twig' with {
-                        label: 'mautic.core.progress',
+                        label: 'mautic.email.send.sending_emails',
+                        helperText: 'mautic.core.progress_bar.count'|trans({'%current%': progress[0], '%total%': progress[1]}),
                         value: progress[0],
                         max: progress[1],
                         status: 'inprogress' == status ? 'active' : 'finished',
@@ -41,9 +42,6 @@
                 {% endif %}
 
                 <div class="panel-footer text-center">
-                    <span class="small">
-                      <span class="imported-count">{{ progress[0] }}</span> / <span class="total-count">{{ progress[1] }}</span>
-                    </span>
                     {% if 'inprogress' == status %}
                         <div>
                             <a class="text-danger mt-16"

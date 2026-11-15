@@ -1254,8 +1254,7 @@ Mautic.reloadLeadImportProgress = function() {
         Mautic.ajaxActionRequest('lead:getImportProgress', {}, function(response) {
             if (response.progress) {
                 if (response.progress[0] > 0) {
-                    mQuery('.imported-count').html(response.progress[0]);
-                    Mautic.updateProgressBar('#leadImportProgress', response.progress[0], response.percent);
+                    Mautic.updateProgressBar('#leadImportProgress', response.progress[0], response.percent, response.progress[1]);
                 }
             }
         }, false, false, "GET");

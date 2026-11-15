@@ -195,8 +195,7 @@ Mautic.sendEmailBatch = function () {
     Mautic.sendEmailBatchXhr = Mautic.ajaxActionRequest('email:sendBatch', data, function (response) {
         if (response.progress) {
             if (response.progress[0] > 0) {
-                mQuery('.imported-count').html(response.progress[0]);
-                Mautic.updateProgressBar(progressContainer, response.progress[0], response.percent);
+                Mautic.updateProgressBar(progressContainer, response.progress[0], response.percent, response.progress[1]);
             }
 
             if (response.progress[0] >= response.progress[1]) {
