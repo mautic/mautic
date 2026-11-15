@@ -193,7 +193,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
      *
      * @return mixed
      */
-    public function buildAvailableReports($context, ?string $reportSource = null)
+    public function buildAvailableReports(string $context, ?string $reportSource = null)
     {
         if (empty($this->reportBuilderData[$context])) {
             // Check to see if all has been obtained
@@ -234,10 +234,8 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Builds the table lookup data for the report forms.
-     *
-     * @param string $context
      */
-    public function getTableData($context = 'all', ?string $reportSource = null): array
+    public function getTableData(string $context = 'all', ?string $reportSource = null): array
     {
         $data = $this->buildAvailableReports($context, $reportSource);
 

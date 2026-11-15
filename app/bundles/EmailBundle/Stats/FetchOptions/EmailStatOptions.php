@@ -130,10 +130,7 @@ final class EmailStatOptions extends FetchOptions
         return $this->unit;
     }
 
-    /**
-     * @param string $unit
-     */
-    public function setUnit($unit): static
+    public function setUnit(string $unit): static
     {
         $this->unit = $unit;
 

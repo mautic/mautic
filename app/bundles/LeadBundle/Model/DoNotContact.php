@@ -30,10 +30,9 @@ class DoNotContact implements MauticModelInterface
      * Remove a Lead's DNC entry based on channel.
      *
      * @param int|Lead $contact
-     * @param string   $channel
      * @param int|null $reason
      */
-    public function removeDncForContact($contact, $channel, bool $persist = true, $reason = null): bool
+    public function removeDncForContact($contact, string $channel, bool $persist = true, $reason = null): bool
     {
         if (is_numeric($contact)) {
             $contact = $this->leadModel->getEntity($contact);
@@ -77,7 +76,7 @@ class DoNotContact implements MauticModelInterface
     public function addDncForContact(
         $contact,
         $channel,
-        $reason = DNC::BOUNCED,
+        int $reason = DNC::BOUNCED,
         ?string $comments = '',
         bool $persist = true,
         bool $checkCurrentStatus = true,
@@ -137,15 +136,13 @@ class DoNotContact implements MauticModelInterface
     }
 
     /**
-     * @param string $channel
-     *
      * @return int
      *
      * @see DNC This method can return boolean false, so be
      *                                             sure to always compare the return value against
      *                                             the class constants of DoNotContact
      */
-    public function isContactable(Lead $contact, $channel)
+    public function isContactable(Lead $contact, string $channel)
     {
         if (is_array($channel)) {
             $channel = key($channel);

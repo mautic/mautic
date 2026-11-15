@@ -18,13 +18,9 @@ final class EncodedValueDAO
 
     public const string BOOLEAN_TYPE  = 'boolean';
 
-    /**
-     * @param string $type
-     * @param string $value
-     */
     public function __construct(
-        private $type,
-        private $value,
+        private string $type,
+        private string $value,
     ) {
     }
 

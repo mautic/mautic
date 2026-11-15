@@ -172,11 +172,9 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param string $url
-     *
      * @return string|array{focus: string, form: string}
      */
-    public function getContent(array $focus, bool $isPreview = false, $url = '#')
+    public function getContent(array $focus, bool $isPreview = false, string $url = '#')
     {
         $form = (!empty($focus['form']) && 'form' === $focus['type']) ? $this->formModel->getEntity($focus['form']) : null;
 

@@ -391,10 +391,8 @@ final class WebhookModel extends FormModel
     /**
      * Unpublish the webhook so it will stop emit the requests
      * and notify user about it.
-     *
-     * @param string $reason
      */
-    public function killWebhook(Webhook $webhook, $reason = 'mautic.webhook.stopped.reason'): void
+    public function killWebhook(Webhook $webhook, string $reason = 'mautic.webhook.stopped.reason'): void
     {
         $webhook->setIsPublished(false);
         $this->saveEntity($webhook);
@@ -431,7 +429,7 @@ final class WebhookModel extends FormModel
      * @param string $note
      *                           $runtime variable unit is in seconds
      */
-    public function addLog(Webhook $webhook, $statusCode, $runtime, ?string $note = null): void
+    public function addLog(Webhook $webhook, $statusCode, int $runtime, ?string $note = null): void
     {
         if (!$webhook->getId()) {
             return;

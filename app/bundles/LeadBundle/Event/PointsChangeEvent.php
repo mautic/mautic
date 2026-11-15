@@ -13,7 +13,7 @@ final class PointsChangeEvent extends CommonEvent
 
     private readonly int $new;
 
-    public function __construct(Lead &$lead, $old, $new)
+    public function __construct(Lead &$lead, int $old, int $new)
     {
         $this->entity = &$lead;
         $this->old    = (int) $old;

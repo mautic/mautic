@@ -899,11 +899,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param bool $includeVariants
-     *
      * @throws InvalidStatHelperException
      */
-    public function getEmailGeneralStats($email, $includeVariants, $unit, \DateTime $dateFrom, \DateTime $dateTo): array
+    public function getEmailGeneralStats($email, bool $includeVariants, $unit, \DateTime $dateFrom, \DateTime $dateTo): array
     {
         $dateTo = (clone $dateTo)->setTime(23, 59, 59);
 
@@ -1068,7 +1066,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * Send an email to lead lists.
      *
      * @param LeadList[]|null $lists
-     * @param int|null $limit
      * @param int|null $batch        True to process and batch all pending leads
      * @param int      $minContactId
      * @param int      $maxContactId
@@ -1078,8 +1075,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function sendEmailToLists(
         Email $email,
         ?array $lists = null,
-        $limit = null,
-        $batch = null,
+        ?int $limit = null,
+        ?int $batch = null,
         ?OutputInterface $output = null,
         $minContactId = null,
         $maxContactId = null,
@@ -1779,10 +1776,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
     }
 
-    /**
-     * @param int $reason
-     */
-    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, ?string $comments = '', bool $flush = true, $leadId = null): array
+    public function setEmailDoNotContact($email, int $reason = DoNotContact::BOUNCED, ?string $comments = '', bool $flush = true, $leadId = null): array
     {
         if (null === $leadId) {
             $leadId = (array) $this->leadRepository->getLeadByEmail($email, true);
@@ -1832,7 +1826,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         \DateTime $dateTo,
         array $filter = [],
         bool $canViewOthers = true,
-        $timeFormat = 24,
+        int $timeFormat = 24,
     ): array {
         $companyId  = ArrayHelper::pickValue('companyId', $filter);
         $campaignId = ArrayHelper::pickValue('campaignId', $filter);
@@ -2094,10 +2088,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * Get a list of upcoming emails.
-     *
-     * @param int $limit
      */
-    public function getUpcomingEmails($limit = 10, bool $canViewOthers = true): array
+    public function getUpcomingEmails(int $limit = 10, bool $canViewOthers = true): array
     {
         $this->leadEventLogRepository->setCurrentUser($this->userHelper->getUser());
 

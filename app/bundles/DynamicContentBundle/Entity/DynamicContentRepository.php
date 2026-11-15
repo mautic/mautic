@@ -119,10 +119,8 @@ final class DynamicContentRepository extends CommonRepository
 
     /**
      * Up the sent counts.
-     *
-     * @param int $increaseBy
      */
-    public function upSentCount($id, $increaseBy = 1): void
+    public function upSentCount($id, int $increaseBy = 1): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

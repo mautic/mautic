@@ -24,7 +24,7 @@ final class FullContact_Location extends FullContact_Base
      *
      * @param string $casing -> valid values are uppercase, lowercase, titlecase
      */
-    public function normalizer($place, $includeZeroPopulation = false, $casing = 'titlecase'): ?\stdClass
+    public function normalizer($place, bool $includeZeroPopulation = false, string $casing = 'titlecase'): ?\stdClass
     {
         $includeZeroPopulation = ($includeZeroPopulation) ? 'true' : 'false';
 
@@ -35,7 +35,7 @@ final class FullContact_Location extends FullContact_Base
         return $this->response_obj;
     }
 
-    public function enrichment($place, $includeZeroPopulation = false, $casing = 'titlecase'): ?\stdClass
+    public function enrichment($place, bool $includeZeroPopulation = false, string $casing = 'titlecase'): ?\stdClass
     {
         $includeZeroPopulation = ($includeZeroPopulation) ? 'true' : 'false';
 

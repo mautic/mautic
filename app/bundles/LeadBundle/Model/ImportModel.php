@@ -256,7 +256,7 @@ class ImportModel extends FormModel
      *
      * @param int $limit Number of records to import before delaying the import
      */
-    public function process(Import $import, Progress $progress, $limit = 0): bool
+    public function process(Import $import, Progress $progress, int $limit = 0): bool
     {
         try {
             $file = new \SplFileObject($import->getFilePath());
@@ -510,7 +510,7 @@ class ImportModel extends FormModel
      * @param string               $dateFormat
      * @param array<string, mixed> $filter
      */
-    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, array $filter = []): array
+    public function getImportedRowsLineChartData(string $unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, array $filter = []): array
     {
         $filter['object'] = 'import';
         $filter['bundle'] = 'lead';

@@ -34,7 +34,7 @@ final class Fetcher
     public function __construct(
         private readonly IntegrationEntityRepository $repo,
         private readonly Organizer $organizer,
-        private $campaignId,
+        private string $campaignId,
     ) {
         $this->fetchLeads();
         $this->fetchContacts();
@@ -46,7 +46,7 @@ final class Fetcher
      * @throws NoObjectsToFetchException
      * @throws InvalidObjectException
      */
-    public function getQueryForUnknownObjects(array $fields, $object): string
+    public function getQueryForUnknownObjects(array $fields, string $object): string
     {
         return match ($object) {
             Lead::OBJECT    => QueryBuilder::getLeadQuery($fields, $this->unknownLeadIds),

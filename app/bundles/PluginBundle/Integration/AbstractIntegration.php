@@ -365,7 +365,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return null|mixed[]
      */
-    public function mergeApiKeys(array $mergeKeys, $withKeys = [], $return = false): ?array
+    public function mergeApiKeys(array $mergeKeys, $withKeys = [], bool $return = false): ?array
     {
         if (empty($withKeys)) {
             $withKeys = $this->keys;
@@ -571,11 +571,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Extract the tokens returned by the oauth callback.
      *
      * @param string $data
-     * @param bool   $postAuthorization
-     *
      * @return mixed
      */
-    public function parseCallbackResponse($data, $postAuthorization = false)
+    public function parseCallbackResponse($data, bool $postAuthorization = false)
     {
         // remove control characters that will break json_decode from parsing
         $data = preg_replace('/[[:cntrl:]]/', '', $data);
@@ -646,12 +644,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Make a basic call using cURL to get the data.
      *
      * @param string               $url
-     * @param string               $method
      * @param array<string, mixed> $settings   Set $settings['return_raw'] to receive a ResponseInterface
      *
      * @return mixed|string|ResponseInterface
      */
-    public function makeRequest($url, array $parameters = [], $method = 'GET', array $settings = [])
+    public function makeRequest($url, array $parameters = [], string $method = 'GET', array $settings = [])
     {
         // If not authorizing the session itself, check isAuthorized which will refresh tokens if applicable
         if (empty($settings['authorize_session'])) {
@@ -824,16 +821,13 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $this->parseCallbackResponse($result->getBody(), !empty($settings['authorize_session']));
     }
 
-    /**
-     * @param bool $persist
-     */
     public function createIntegrationEntity(
-        $integrationEntity,
+        string $integrationEntity,
         $integrationEntityId,
         $internalEntity,
         $internalEntityId,
         ?array $internal = null,
-        $persist = true,
+        bool $persist = true,
     ): ?IntegrationEntity {
         $date = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
             : new DateTime();
@@ -1454,10 +1448,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $missingRequiredFields;
     }
 
-    /**
-     * @param string $fieldType
-     */
-    public function getRequiredFields(array $fields, $fieldType = ''): array
+    public function getRequiredFields(array $fields, string $fieldType = ''): array
     {
         // use $fieldType to determine if email should be required. we use email as unique identifier for contacts only,
         // if any other fieldType use integrations own field types
@@ -1660,7 +1651,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, ?array $socialCache = null, $identifiers = null)
+    public function getMauticLead($data, bool $persist = true, ?array $socialCache = null, $identifiers = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -1785,11 +1776,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Used to match local field name with remote field name.
      *
      * @param string $field
-     * @param string $subfield
-     *
      * @return mixed
      */
-    public function matchFieldName($field, $subfield = '')
+    public function matchFieldName($field, string $subfield = '')
     {
         if (!empty($field) && !empty($subfield)) {
             return $subfield.ucfirst($field);
@@ -2138,11 +2127,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param string $fieldType
-     *
      * @return bool|float|string
      */
-    public function cleanPushData($value, $fieldType = self::FIELD_TYPE_STRING)
+    public function cleanPushData($value, string $fieldType = self::FIELD_TYPE_STRING)
     {
         return Cleaner::clean($value, $fieldType);
     }
@@ -2160,7 +2147,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * @throws ApiErrorException
      * @throws Exception
      */
-    protected function cleanupFromSync(&$leadsToSync = [], $error = false)
+    protected function cleanupFromSync(&$leadsToSync = [], bool $error = false)
     {
         $duplicates = 0;
         if ($this->mauticDuplicates) {
@@ -2250,12 +2237,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * @param CommonEntity|null    $entity
-     * @param bool                 $ignoreEntityChanges
      * @param array<string, mixed> $params
      *
      * @return bool|DateTime|null
      */
-    protected function getLastSyncDate(?object $entity = null, array $params = [], $ignoreEntityChanges = true)
+    protected function getLastSyncDate(?object $entity = null, array $params = [], bool $ignoreEntityChanges = true)
     {
         $isNew = ($entity instanceof FormEntity) && $entity->isNew();
         if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
@@ -2322,11 +2308,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param string $channel
-     *
      * @return int
      */
-    public function getLeadDoNotContact($leadId, $channel = 'email')
+    public function getLeadDoNotContact($leadId, string $channel = 'email')
     {
         $isDoNotContact = 0;
         if (($lead = $this->leadModel->getEntity($leadId)) instanceof Lead) {

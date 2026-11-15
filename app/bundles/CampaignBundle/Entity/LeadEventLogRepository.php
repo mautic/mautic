@@ -571,9 +571,8 @@ final class LeadEventLogRepository extends CommonRepository
     /**
      * @param int $contactId
      * @param int $campaignId
-     * @param int $rotation
      */
-    public function hasBeenInCampaignRotation($contactId, $campaignId, $rotation): bool
+    public function hasBeenInCampaignRotation($contactId, $campaignId, int $rotation): bool
     {
         $qb = $this->getReplicaConnection()->createQueryBuilder();
         $qb->select('log.rotation')

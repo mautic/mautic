@@ -14,11 +14,8 @@ final class LeadEventLogRepository extends CommonRepository
 
     /**
      * Returns paginator with failed rows.
-     *
-     * @param string $bundle
-     * @param string $object
      */
-    public function getFailedRows($importId, array $args = [], $bundle = 'lead', $object = 'import'): array
+    public function getFailedRows($importId, array $args = [], string $bundle = 'lead', string $object = 'import'): array
     {
         return $this->getSpecificRows($importId, 'failed', $args, $bundle, $object);
     }
@@ -42,11 +39,8 @@ final class LeadEventLogRepository extends CommonRepository
 
     /**
      * Returns paginator with specific type of rows.
-     *
-     * @param string $bundle
-     * @param string $object
      */
-    public function getSpecificRows($objectId, $action, array $args = [], $bundle = 'lead', $object = 'import'): array
+    public function getSpecificRows($objectId, string $action, array $args = [], string $bundle = 'lead', string $object = 'import'): array
     {
         return $this->getEntities(
             array_merge(
@@ -87,12 +81,12 @@ final class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param ?string              $bundle
-     * @param ?string              $object
      * @param array|string|null    $actions
      * @param array<string, mixed> $options
+     * @param 'integrations'|'lead'|null $bundle
+     * @param 'api-batch'|'api-single'|'import'|null $object
      */
-    public function getEvents(?Lead $contact = null, $bundle = null, $object = null, $actions = null, array $options = []): array
+    public function getEvents(?Lead $contact = null, ?string $bundle = null, ?string $object = null, $actions = null, array $options = []): array
     {
         $alias = $this->getTableAlias();
         $qb    = $this->getEntityManager()->getConnection()->createQueryBuilder()

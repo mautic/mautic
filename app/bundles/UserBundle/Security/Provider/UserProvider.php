@@ -85,7 +85,7 @@ final readonly class UserProvider implements UserProviderInterface
      *
      * @throws BadCredentialsException
      */
-    public function saveUser(User $user, $createIfNotExists = true): User
+    public function saveUser(User $user, bool $createIfNotExists = true): User
     {
         $isNew = !$user->getId();
 

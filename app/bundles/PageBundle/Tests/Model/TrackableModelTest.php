@@ -766,7 +766,7 @@ TEXT;
     /**
      * @param array<int, string>|string $urls
      */
-    protected function generateContent($urls, string $type, bool $useMap = false): string
+    protected function generateContent(array|string $urls, string $type, bool $useMap = false): string
     {
         $content = '';
         if (!is_array($urls)) {

@@ -174,11 +174,8 @@ final class SmsRepository extends CommonRepository
 
     /**
      * Up the click/sent counts.
-     *
-     * @param string $type
-     * @param int    $increaseBy
      */
-    public function upCount($id, $type = 'sent', $increaseBy = 1): void
+    public function upCount($id, string $type = 'sent', int $increaseBy = 1): void
     {
         try {
             $q = $this->getEntityManager()->getConnection()->createQueryBuilder();

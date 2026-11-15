@@ -69,7 +69,7 @@ final class HubspotApi extends CrmApi
     /**
      * @return mixed
      */
-    public function getLeadFields($object = 'contacts')
+    public function getLeadFields(string $object = 'contacts')
     {
         if ('company' == $object) {
             $object = 'companies'; // hubspot company object name
@@ -85,7 +85,7 @@ final class HubspotApi extends CrmApi
      *
      * @return mixed
      */
-    public function createLead(array $data, $lead, $updateLink = false)
+    public function createLead(array $data, $lead, bool $updateLink = false)
     {
         /*
          * As Hubspot integration requires a valid email

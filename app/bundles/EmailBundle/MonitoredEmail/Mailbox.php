@@ -213,11 +213,9 @@ final class Mailbox
     /**
      * Switch to another configured monitored mailbox.
      *
-     * @param string $mailbox
-     *
      * @throws MailboxException
      */
-    public function switchMailbox($bundle, $mailbox = ''): void
+    public function switchMailbox($bundle, string $mailbox = ''): void
     {
         $key = $bundle.(!empty($mailbox) ? '_'.$mailbox : '');
 
@@ -288,13 +286,11 @@ final class Mailbox
     /**
      * Get settings.
      *
-     * @param string $mailbox
-     *
      * @return mixed
      *
      * @throws MailboxException
      */
-    public function getMailboxSettings($bundle = null, $mailbox = '')
+    public function getMailboxSettings(?string $bundle = null, string $mailbox = '')
     {
         if (null == $bundle) {
             return $this->settings;
@@ -319,11 +315,8 @@ final class Mailbox
 
     /**
      * Set custom connection arguments of imap_open method. See http://php.net/imap_open.
-     *
-     * @param int $options
-     * @param int $retriesNum
      */
-    public function setConnectionArgs($options = 0, $retriesNum = 0, ?array $params = null): void
+    public function setConnectionArgs(int $options = 0, int $retriesNum = 0, ?array $params = null): void
     {
         $this->imapOptions    = $options;
         $this->imapRetriesNum = $retriesNum;
@@ -510,7 +503,7 @@ final class Mailbox
      *
      * @return array Mails ids
      */
-    public function searchMailbox($criteria = self::CRITERIA_ALL): array
+    public function searchMailbox(string $criteria = self::CRITERIA_ALL): array
     {
         if (preg_match('/'.self::CRITERIA_UID.' ((\d+):(\d+|\*))/', $criteria, $matches)) {
             // PHP imap_search does not support UID n:* so use imap_fetch_overview instead
@@ -530,10 +523,8 @@ final class Mailbox
 
     /**
      * Save mail body.
-     *
-     * @param string $filename
      */
-    public function saveMail($mailId, $filename = 'email.eml'): bool
+    public function saveMail($mailId, string $filename = 'email.eml'): bool
     {
         return imap_savebody($this->getImapStream(), $filename, $mailId, '', FT_UID);
     }
@@ -615,7 +606,7 @@ final class Mailbox
      *
      * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
      */
-    public function setFlag(array $mailsIds, $flag): bool
+    public function setFlag(array $mailsIds, string $flag): bool
     {
         return imap_setflag_full($this->getImapStream(), implode(',', $mailsIds), $flag, ST_UID);
     }
@@ -625,7 +616,7 @@ final class Mailbox
      *
      * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
      */
-    public function clearFlag(array $mailsIds, $flag): bool
+    public function clearFlag(array $mailsIds, string $flag): bool
     {
         return imap_clearflag_full($this->getImapStream(), implode(',', $mailsIds), $flag, ST_UID);
     }
@@ -703,11 +694,9 @@ final class Mailbox
      *  SORTCC - mailbox in first cc address
      *  SORTSIZE - size of mail in octets
      *
-     * @param int $criteria
-     *
      * @return array Mails ids
      */
-    public function sortMails($criteria = SORTARRIVAL, bool $reverse = true): array|bool
+    public function sortMails(int $criteria = SORTARRIVAL, bool $reverse = true): array|bool
     {
         return imap_sort($this->getImapStream(), $criteria, $reverse, SE_UID);
     }
@@ -841,7 +830,7 @@ final class Mailbox
         return $mail;
     }
 
-    private function initMailPart(Message $mail, $partStructure, $partNum, bool $markAsSeen = true, bool $isDsn = false, bool $isFbl = false): void
+    private function initMailPart(Message $mail, $partStructure, int $partNum, bool $markAsSeen = true, bool $isDsn = false, bool $isFbl = false): void
     {
         $options = FT_UID;
         if (!$markAsSeen) {

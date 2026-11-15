@@ -11,12 +11,10 @@ use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 final class ConnectwiseApi extends CrmApi
 {
     /**
-     * @param string $endpoint
-     *
      * @return mixed|string
      * @throws ApiErrorException
      */
-    private function request($endpoint, array $parameters = [], string $method = 'GET')
+    private function request(string $endpoint, array $parameters = [], string $method = 'GET')
     {
         $apiUrl = $this->integration->getApiUrl();
 
@@ -57,14 +55,13 @@ final class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @param int                  $page
      * @param array<string, mixed> $params
      *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function getCompanies(array $params, $page = 1)
+    public function getCompanies(array $params, int $page = 1)
     {
         $query = [
             'page'     => $page,
@@ -84,14 +81,13 @@ final class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @param int                  $page
      * @param array<string, mixed> $params
      *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function getContacts(array $params, $page = 1)
+    public function getContacts(array $params, int $page = 1)
     {
         $query = [
             'page'     => $page,
@@ -142,13 +138,11 @@ final class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @param int $page
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function getCampaignMembers($campaignId, $page = 1)
+    public function getCampaignMembers($campaignId, int $page = 1)
     {
         return $this->request('marketing/groups/'.$campaignId.'/contacts', ['page' => $page, 'pageSize' => ConnectwiseIntegration::PAGESIZE]);
     }
@@ -181,8 +175,9 @@ final class ConnectwiseApi extends CrmApi
 
     /**
      * @throws ApiErrorException
+     * @param 'marketing/groups'|'sales/activities/types'|'system/members'|'test' $endpoint
      */
-    public function fetchAllRecords($endpoint): array
+    public function fetchAllRecords(string $endpoint): array
     {
         $page        = 1;
         $pageSize    = ConnectwiseIntegration::PAGESIZE;

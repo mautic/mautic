@@ -55,7 +55,7 @@ class ReportBuilderEvent extends AbstractReportEvent
      * @param string               $context Context for data
      * @param array<string, mixed> $data    Data array for the table
      */
-    public function addTable($context, array $data, $group = null): static
+    public function addTable(string $context, array $data, ?string $group = null): static
     {
         $data['group'] = (null == $group) ? $context : $group;
 
@@ -112,8 +112,9 @@ class ReportBuilderEvent extends AbstractReportEvent
      * @param string[] $removeColumns
      *
      * @return array<string,array<string,string>>
+     * @param 'mautic_asset_action'|'mautic_campaign_action'|'mautic_email_action'|'mautic_form_action'|'mautic_mobile_notification_action'|'mautic_page_action'|null $idLink
      */
-    public function getStandardColumns(string $prefix, array $removeColumns = [], $idLink = null): array
+    public function getStandardColumns(string $prefix, array $removeColumns = [], ?string $idLink = null): array
     {
         return $this->reportHelper->getStandardColumns($prefix, $removeColumns, (string) $idLink);
     }
@@ -121,7 +122,7 @@ class ReportBuilderEvent extends AbstractReportEvent
     /**
      * Returns lead columns.
      */
-    public function getLeadColumns($prefix = 'l.'): array
+    public function getLeadColumns(string $prefix = 'l.'): array
     {
         $fields = [];
 
@@ -144,10 +145,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Get IP Address column.
-     *
-     * @param string $prefix
      */
-    public function getIpColumn($prefix = 'i.'): array
+    public function getIpColumn(string $prefix = 'i.'): array
     {
         return [
             $prefix.'ip_address' => [
@@ -159,10 +158,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Add category columns.
-     *
-     * @param string $prefix
      */
-    public function getCategoryColumns($prefix = 'c.'): array
+    public function getCategoryColumns(string $prefix = 'c.'): array
     {
         return [
             $prefix.'id' => [
@@ -265,7 +262,10 @@ class ReportBuilderEvent extends AbstractReportEvent
         return $channelColumns;
     }
 
-    public function addGraph($context, $type, $graphId, array $options = []): static
+    /**
+     * @param 'line'|'pie'|'table' $type
+     */
+    public function addGraph(string $context, string $type, string $graphId, array $options = []): static
     {
         if (in_array($type, $this->supportedGraphs)) {
             $this->graphArray[$context][$graphId] = [

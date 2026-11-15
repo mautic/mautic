@@ -238,10 +238,7 @@ final class PageRepository extends CommonRepository implements ResettableVariant
             ->executeStatement();
     }
 
-    /**
-     * @param int $increaseBy
-     */
-    public function upHitCount($id, $increaseBy = 1, bool $unique = false, bool $variant = false): void
+    public function upHitCount($id, int $increaseBy = 1, bool $unique = false, bool $variant = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
