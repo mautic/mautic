@@ -1093,7 +1093,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $originalLimit = $limit;
-        $progress      = false;
+        $progress      = null;
 
         // Get a total number of contacts to be updated and/or created for the progress counter
         $totalToUpdate = array_sum(
@@ -1244,12 +1244,12 @@ final class SalesforceIntegration extends CrmAbstractIntegration
             $this->makeCompositeRequest($mauticData, $totalUpdated, $totalCreated, $totalErrors);
 
             // Stop gap - if 100% let's kill the script
-            if ($progress && $progress->getProgressPercent() >= 1) {
+            if ($progress instanceof ProgressBar && $progress->getProgressPercent() >= 1) {
                 break;
             }
         }
 
-        if ($progress) {
+        if ($progress instanceof ProgressBar) {
             $progress->finish();
             $output->writeln('');
         }
@@ -1613,7 +1613,6 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @api protected to allow mocking
      *
      * @param array<string, mixed> $fieldMapping
-     * @param ProgressBar|null      $progress
      *
      * @throws ApiErrorException
      */
@@ -1625,7 +1624,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         ?string $fromDate,
         ?string $toDate,
         &$totalCount,
-        $progress = null,
+        ?ProgressBar $progress = null,
     ): array {
         $leadsToCreate = $this->integrationEntityRepository->findLeadsToCreate(
             'Salesforce',
@@ -2060,7 +2059,6 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @param array<string, mixed> $processedLeads
      * @param array<string, mixed> $trackedContacts
      * @param array<string, mixed> $sfEntityRecords
-     * @param ProgressBar|null      $progress
      */
     private function prepareMauticContactsToUpdate(
         array &$mauticData,
@@ -2071,7 +2069,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         array $objectFields,
         $mauticLeadFieldString,
         array $sfEntityRecords,
-        $progress = null,
+        ?ProgressBar $progress = null,
     ): void {
         foreach ($sfEntityRecords['records'] as $sfKey => $sfEntityRecord) {
             $skipObject = false;
@@ -2153,7 +2151,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
             if (!$skipObject) {
                 // Only progress if we have a unique Lead and not updating a Salesforce entry duplicate
                 if (!isset($processedLeads[$key])) {
-                    if ($progress) {
+                    if ($progress instanceof ProgressBar) {
                         $progress->advance();
                     }
 
@@ -2776,12 +2774,12 @@ final class SalesforceIntegration extends CrmAbstractIntegration
             $this->makeCompositeRequest($mauticData, $totalUpdated, $totalCreated, $totalErrors);
 
             // Stop gap - if 100% let's kill the script
-            if ($progress && $progress->getProgressPercent() >= 1) {
+            if ($progress instanceof ProgressBar && $progress->getProgressPercent() >= 1) {
                 break;
             }
         }
 
-        if ($progress) {
+        if ($progress instanceof ProgressBar) {
             $progress->finish();
             $output->writeln('');
         }
@@ -2801,7 +2799,6 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array<string, array<string, mixed[]>> $objectFields
      * @param array<string, mixed>                  $sfEntityRecords
-     * @param ProgressBar|null                      $progress
      */
     private function prepareMauticCompaniesToUpdate(
         array &$mauticData,
@@ -2810,7 +2807,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         &$companiesToSync,
         array $objectFields,
         array $sfEntityRecords,
-        $progress = null,
+        ?ProgressBar $progress = null,
     ): void {
         foreach ($sfEntityRecords['records'] as $sfEntityRecord) {
             $syncCompany = false;
@@ -2859,7 +2856,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             if (!isset($processedCompanies[$key])) {
-                if ($progress) {
+                if ($progress instanceof ProgressBar) {
                     $progress->advance();
                 }
                 // Mark that this lead has been processed
@@ -2963,9 +2960,6 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return 0 === $toUpdateCount;
     }
 
-    /**
-     * @param ProgressBar|null $progress
-     */
     private function getMauticEntitesToCreate(
         array &$checkIdsInSF,
         string $mauticCompanyFieldString,
@@ -2973,7 +2967,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         ?string $fromDate,
         ?string $toDate,
         &$totalCount,
-        $progress = null,
+        ?ProgressBar $progress = null,
     ): void {
         $entitiesToCreate = $this->integrationEntityRepository->findLeadsToCreate(
             'Salesforce',
@@ -2988,7 +2982,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         foreach ($entitiesToCreate as $entity) {
             if (isset($entity['companyname'])) {
                 $checkIdsInSF[$entity['internal_entity_id']] = $entity;
-            } elseif ($progress) {
+            } elseif ($progress instanceof ProgressBar) {
                 $progress->advance();
             }
         }
