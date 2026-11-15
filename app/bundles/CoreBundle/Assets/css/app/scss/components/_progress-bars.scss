@@ -111,11 +111,11 @@
   }
 
   &--finished {
-    --progress-component-color: var(--support-success);
+    --progress-component-color: var(--text-primary);
   }
 
   &--error {
-    --progress-component-color: var(--support-error);
+    --progress-component-color: var(--text-error);
 
     .progress-component__helper {
       color: var(--text-error);
@@ -135,8 +135,12 @@
       outline-offset: -2px;
     }
 
-    .progress-bar {
+    .progress-component__track .progress-bar {
       background-color: CanvasText;
+    }
+
+    &--indeterminate .progress-component__track::after {
+      background-image: linear-gradient(90deg, CanvasText 12.5%, transparent 12.5%);
     }
   }
 }
