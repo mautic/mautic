@@ -39,13 +39,11 @@ final class ContactSegmentFilterDictionary
     }
 
     /**
-     * @param string $filterKey
-     *
      * @return mixed[]
      *
      * @throws FilterNotFoundException
      */
-    public function getFilter($filterKey): array
+    public function getFilter(string $filterKey): array
     {
         if (array_key_exists($filterKey, $this->getFilters())) {
             return $this->filters[$filterKey];
@@ -55,14 +53,12 @@ final class ContactSegmentFilterDictionary
     }
 
     /**
-     * @param string $filterKey
-     * @param string $property
-     *
      * @return string|int
      *
      * @throws FilterNotFoundException
+     * @param 'field'|'foreign_table'|'foreign_table_field'|'func'|'type'|'where' $property
      */
-    public function getFilterProperty($filterKey, $property)
+    public function getFilterProperty(string $filterKey, string $property)
     {
         $filter = $this->getFilter($filterKey);
 

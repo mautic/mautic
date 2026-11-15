@@ -247,10 +247,7 @@ class Stat
         return $this->isRead;
     }
 
-    /**
-     * @param bool $isRead
-     */
-    public function setIsRead($isRead): void
+    public function setIsRead(bool $isRead): void
     {
         $this->addChange('isRead', $this->isRead, $isRead);
         $this->isRead = $isRead;
@@ -277,7 +274,7 @@ class Stat
     /**
      * @param string|null $trackingHash
      */
-    public function setTrackingHash($trackingHash): void
+    public function setTrackingHash(string $trackingHash): void
     {
         $this->trackingHash = $trackingHash;
     }
@@ -300,10 +297,7 @@ class Stat
         return $this->retryCount;
     }
 
-    /**
-     * @param int $retryCount
-     */
-    public function setRetryCount($retryCount): void
+    public function setRetryCount(int $retryCount): void
     {
         $this->addChange('retryCount', $this->retryCount, $retryCount);
         $this->retryCount = $retryCount;
@@ -326,10 +320,7 @@ class Stat
         return $this->isFailed;
     }
 
-    /**
-     * @param bool $isFailed
-     */
-    public function setIsFailed($isFailed): void
+    public function setIsFailed(bool $isFailed): void
     {
         $this->addChange('isFailed', $this->isFailed, $isFailed);
         $this->isFailed = $isFailed;
@@ -354,7 +345,7 @@ class Stat
     /**
      * @param string|null $emailAddress
      */
-    public function setEmailAddress($emailAddress): void
+    public function setEmailAddress(string $emailAddress): void
     {
         $this->addChange('emailAddress', $this->emailAddress, $emailAddress);
         $this->emailAddress = $emailAddress;
@@ -368,10 +359,7 @@ class Stat
         return $this->viewedInBrowser;
     }
 
-    /**
-     * @param bool $viewedInBrowser
-     */
-    public function setViewedInBrowser($viewedInBrowser): void
+    public function setViewedInBrowser(bool $viewedInBrowser): void
     {
         $this->addChange('viewedInBrowser', $this->viewedInBrowser, $viewedInBrowser);
         $this->viewedInBrowser = $viewedInBrowser;
@@ -388,7 +376,7 @@ class Stat
     /**
      * @param string|null $source
      */
-    public function setSource($source): void
+    public function setSource(string $source): void
     {
         $this->addChange('source', $this->source, $source);
         $this->source = $source;
@@ -405,7 +393,7 @@ class Stat
     /**
      * @param int|null $sourceId
      */
-    public function setSourceId($sourceId): void
+    public function setSourceId(int $sourceId): void
     {
         $this->addChange('sourceId', $this->sourceId, (int) $sourceId);
         $this->sourceId = (int) $sourceId;
@@ -429,10 +417,7 @@ class Stat
         return $this->openCount;
     }
 
-    /**
-     * @param int $openCount
-     */
-    public function setOpenCount($openCount): static
+    public function setOpenCount(int $openCount): static
     {
         $this->addChange('openCount', $this->openCount, $openCount);
         $this->openCount = $openCount;
@@ -440,10 +425,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @param string $details
-     */
-    public function addOpenDetails($details): void
+    public function addOpenDetails(string $details): void
     {
         if (self::MAX_OPEN_DETAILS > $this->openCount) {
             $this->openDetails[] = $details;

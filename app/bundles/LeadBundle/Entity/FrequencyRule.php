@@ -154,7 +154,7 @@ class FrequencyRule extends CommonEntity
     /**
      * @param int|null $frequencyNumber
      */
-    public function setFrequencyNumber($frequencyNumber): static
+    public function setFrequencyNumber(int $frequencyNumber): static
     {
         $this->isChanged('frequencyNumber', $frequencyNumber);
 
@@ -174,7 +174,7 @@ class FrequencyRule extends CommonEntity
     /**
      * @param string|null $frequencyTime
      */
-    public function setFrequencyTime($frequencyTime): static
+    public function setFrequencyTime(string $frequencyTime): static
     {
         $this->isChanged('frequencyTime', $frequencyTime);
 
@@ -191,10 +191,7 @@ class FrequencyRule extends CommonEntity
         return $this->channel;
     }
 
-    /**
-     * @param string $channel
-     */
-    public function setChannel($channel): static
+    public function setChannel(string $channel): static
     {
         $this->isChanged('channel', $channel);
 

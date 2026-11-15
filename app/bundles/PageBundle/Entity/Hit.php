@@ -332,10 +332,7 @@ class Hit
         return $this->organization;
     }
 
-    /**
-     * @param int $code
-     */
-    public function setCode($code): static
+    public function setCode(int $code): static
     {
         $this->code = $code;
 
@@ -350,10 +347,7 @@ class Hit
         return $this->code;
     }
 
-    /**
-     * @param string $referer
-     */
-    public function setReferer($referer): static
+    public function setReferer(string $referer): static
     {
         $this->referer = $referer;
 
@@ -368,10 +362,7 @@ class Hit
         return $this->referer;
     }
 
-    /**
-     * @param string $url
-     */
-    public function setUrl($url): static
+    public function setUrl(string $url): static
     {
         $this->url = $url;
 
@@ -386,10 +377,7 @@ class Hit
         return $this->url;
     }
 
-    /**
-     * @param string $urlTitle
-     */
-    public function setUrlTitle($urlTitle): static
+    public function setUrlTitle(string $urlTitle): static
     {
         $urlTitle       = mb_strlen($urlTitle) <= 191 ? $urlTitle : mb_substr($urlTitle, 0, 191);
         $this->urlTitle = $urlTitle;
@@ -465,10 +453,7 @@ class Hit
         return $this->ipAddress;
     }
 
-    /**
-     * @param string $trackingId
-     */
-    public function setTrackingId($trackingId): static
+    public function setTrackingId(string $trackingId): static
     {
         $this->trackingId = $trackingId;
 
@@ -539,10 +524,7 @@ class Hit
         return $this->source;
     }
 
-    /**
-     * @param string $source
-     */
-    public function setSource($source): static
+    public function setSource(string $source): static
     {
         $this->source = $source;
 

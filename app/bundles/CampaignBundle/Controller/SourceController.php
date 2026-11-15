@@ -44,10 +44,7 @@ final class SourceController extends CommonFormController
      */
     private $modifiedSources = [];
 
-    /**
-     * @param int $objectId
-     */
-    public function newAction(Request $request, $objectId = 0): JsonResponse|Response
+    public function newAction(Request $request, int $objectId = 0): JsonResponse|Response
     {
         $success = 0;
         $valid   = $cancelled   = false;

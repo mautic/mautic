@@ -107,13 +107,12 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
     /**
      * Get a list of leads based on field value.
      *
-     * @param string          $field
      * @param string[]|string $value
      * @param ?int            $ignoreId
      *
      * @return Lead[]
      */
-    public function getLeadsByFieldValue($field, $value, $ignoreId = null, bool $indexByColumn = false): array
+    public function getLeadsByFieldValue(string $field, $value, $ignoreId = null, bool $indexByColumn = false): array
     {
         $results = $this->getEntities([
             'qb'               => $this->buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId),
@@ -573,7 +572,6 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
      * @param array<string, mixed> $args             same as getEntity/getEntities
      * @param string               $joinTable
      * @param int                  $entityId
-     * @param string               $entityColumnName
      * @param array|null           $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
      */
     public function getEntityContacts(
@@ -581,9 +579,9 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         $joinTable,
         $entityId,
         ?array $filters = [],
-        $entityColumnName = 'id',
+        string $entityColumnName = 'id',
         ?array $additionalJoins = null,
-        $contactColumnName = 'lead_id',
+        string $contactColumnName = 'lead_id',
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
     ): array {
@@ -1033,10 +1031,8 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
 
     /**
      * Updates lead's lastActive with now date/time.
-     *
-     * @param int $leadId
      */
-    public function updateLastActive($leadId, ?\DateTimeInterface $lastActiveDate = null): void
+    public function updateLastActive(?int $leadId, ?\DateTimeInterface $lastActiveDate = null): void
     {
         if (!$leadId) {
             // Prevent unnecessary queries like:
@@ -1317,10 +1313,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         $q->groupBy('l.id');
     }
 
-    /**
-     * @param int $tries
-     */
-    protected function updateContactPoints(array $changes, $id, $tries = 1): int
+    protected function updateContactPoints(array $changes, $id, int $tries = 1): int
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')

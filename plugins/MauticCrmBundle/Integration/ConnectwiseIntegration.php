@@ -421,7 +421,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
         return $this->getRecords($params, 'company');
     }
 
-    public function getRecords($params, $object): int
+    public function getRecords($params, string $object): int
     {
         if (!$this->isAuthorized()) {
             return 0;
@@ -528,7 +528,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * @param Lead|Company $entity
      */
-    public function saveSyncedData(object $entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
+    public function saveSyncedData(object $entity, $object, string $mauticObjectReference, $integrationEntityId): IntegrationEntity
     {
         $integrationEntities = $this->integrationEntityRepository->getIntegrationEntities(
             $this->getName(),
@@ -904,7 +904,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
         }
     }
 
-    public function getRecordList($records, $index = null): array
+    public function getRecordList($records, ?string $index = null): array
     {
         $recordList = [];
 

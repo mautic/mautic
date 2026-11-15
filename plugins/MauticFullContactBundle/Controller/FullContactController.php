@@ -31,11 +31,9 @@ final class FullContactController extends FormController
     }
 
     /**
-     * @param string $objectId
-     *
      * @throws \InvalidArgumentException
      */
-    public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
+    public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, string $objectId = ''): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data     = $request->request->all()['fullcontact_lookup'] ?? [];
@@ -275,11 +273,9 @@ final class FullContactController extends FormController
     /* COMPANY */
 
     /**
-     * @param string $objectId
-     *
      * @throws \InvalidArgumentException
      */
-    public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
+    public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, string $objectId = ''): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data     = $request->request->all()['fullcontact_lookup'] ?? [];

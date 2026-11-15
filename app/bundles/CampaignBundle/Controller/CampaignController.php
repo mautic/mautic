@@ -997,12 +997,11 @@ final class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param string          $action
      * @param string|int|null $objectId
      *
      * @return int|string|null
      */
-    protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null)
+    protected function getCampaignSessionId(Campaign $campaign, string $action, $objectId = null)
     {
         if (null !== $this->sessionId) {
             return $this->sessionId;

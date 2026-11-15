@@ -241,7 +241,7 @@ final class LeadTimelineEvent extends Event
      * @param string $eventTypeKey  Identifier of the event type
      * @param string $eventTypeName Name of the event type for humans
      */
-    public function addEventType($eventTypeKey, $eventTypeName): void
+    public function addEventType(string $eventTypeKey, $eventTypeName): void
     {
         $this->eventTypes[$eventTypeKey] = $eventTypeName;
     }
@@ -326,7 +326,7 @@ final class LeadTimelineEvent extends Event
     /**
      * Determine if an event type should be included.
      */
-    public function isApplicable($eventType, bool $inclusive = false): bool
+    public function isApplicable(string $eventType, bool $inclusive = false): bool
     {
         if ($this->fetchTypesOnly) {
             return false;
@@ -403,7 +403,7 @@ final class LeadTimelineEvent extends Event
      *
      * @param int|array $count
      */
-    public function addToCounter($eventType, $count): void
+    public function addToCounter(string $eventType, int $count): void
     {
         $this->totalEvents[$eventType] ??= 0;
 
@@ -428,7 +428,7 @@ final class LeadTimelineEvent extends Event
     /**
      * Subtract from the total counter if there is an event that was skipped for whatever reason.
      */
-    public function subtractFromCounter(string $eventType, $count = 1): void
+    public function subtractFromCounter(string $eventType, int $count = 1): void
     {
         $this->totalEvents[$eventType] -= $count;
     }

@@ -104,12 +104,12 @@ abstract class AbstractEventAccessor
     }
 
     /**
-     * @param string $property
      * @param mixed  $default
      *
      * @return mixed
+     * @param 'channel'|'channelIdField'|'connectionRestrictions'|'description'|'formTheme'|'formType'|'formTypeOptions'|'label'|'timelineTemplate' $property
      */
-    protected function getProperty($property, $default = null)
+    protected function getProperty(string $property, $default = null)
     {
         return $this->config[$property] ?? $default;
     }

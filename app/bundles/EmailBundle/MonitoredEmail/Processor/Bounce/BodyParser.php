@@ -33,10 +33,8 @@ final class BodyParser
 
     /**
      * @todo - refactor to get rid of the if/else statements
-     *
-     * @param string $knownEmail
      */
-    public function parse($body, $knownEmail = ''): array
+    public function parse($body, string $knownEmail = ''): array
     {
         // initialize the result array
         $result = [

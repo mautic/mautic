@@ -10,12 +10,9 @@ final class ContactStep extends \AcceptanceTester
     /**
      * Fill out the contact form with the provided details.
      *
-     * @param string $firstName
-     * @param string $lastName
      * @param string $email
-     * @param string $tag
      */
-    public function fillContactForm($firstName, $lastName, $email, $tag): void
+    public function fillContactForm(string $firstName, string $lastName, $email, string $tag): void
     {
         $I = $this;
         // Wait for the first name field to be visible
@@ -37,7 +34,7 @@ final class ContactStep extends \AcceptanceTester
      *
      * @return string the name of the contact
      */
-    public function grabContactNameFromList($place)
+    public function grabContactNameFromList(int $place)
     {
         $I           = $this;
         $xpath       = "//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]";
@@ -51,7 +48,7 @@ final class ContactStep extends \AcceptanceTester
     /**
      * Select an option from the dropdown menu for a specific contact.
      */
-    public function selectOptionFromDropDown($place, $option): void
+    public function selectOptionFromDropDown(int $place, int $option): void
     {
         $I = $this;
         // Click the dropdown menu
@@ -64,7 +61,7 @@ final class ContactStep extends \AcceptanceTester
     /**
      * Select a contact from the contact list.
      */
-    public function selectContactFromList($place): void
+    public function selectContactFromList(int $place): void
     {
         $I     = $this;
         $xpath = "//*[@id='leadTable']/tbody/tr[{$place}]/td[1]/div/span/input";
@@ -100,7 +97,7 @@ final class ContactStep extends \AcceptanceTester
     /**
      * Select an option from the dropdown menu for multiple selected contacts.
      */
-    public function selectOptionFromDropDownForMultipleSelections($option): void
+    public function selectOptionFromDropDownForMultipleSelections(string $option): void
     {
         $I = $this;
         // Click the dropdown button for bulk actions
@@ -175,7 +172,7 @@ final class ContactStep extends \AcceptanceTester
      *
      * @param int $place the position of the contact in the list (starting from 1)
      */
-    public function checkOwner($place): void
+    public function checkOwner(int $place): void
     {
         $I = $this;
         // Navigate to the contacts page
@@ -197,7 +194,7 @@ final class ContactStep extends \AcceptanceTester
      *
      * @param int $place the position of the contact in the list (starting from 1)
      */
-    public function verifyOwner($place): void
+    public function verifyOwner(int $place): void
     {
         $I = $this;
         // Navigate to the contacts page

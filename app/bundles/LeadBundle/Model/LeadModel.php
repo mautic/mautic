@@ -618,8 +618,9 @@ class LeadModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
+     * @param 'contact'|'user' $type
      */
-    public function getLookupResults($type, string|array|null $filter = '', int|string|null $limit = 10, int $start = 0): array
+    public function getLookupResults(string $type, string|array|null $filter = '', int|string|null $limit = 10, int $start = 0): array
     {
         $results    = [];
 
@@ -859,9 +860,8 @@ class LeadModel extends FormModel
      * Add lead to Stage.
      *
      * @param array|Lead $lead
-     * @param bool       $manuallyAdded
      */
-    public function addToStages($lead, Stage $stage, $manuallyAdded = true): static
+    public function addToStages($lead, Stage $stage, bool $manuallyAdded = true): static
     {
         $origin = is_string($manuallyAdded)
             ? $manuallyAdded
@@ -923,9 +923,8 @@ class LeadModel extends FormModel
      * Remove lead from Stage.
      *
      * @param array|Lead $lead
-     * @param bool       $manuallyRemoved
      */
-    public function removeFromStages($lead, Stage $stage, $manuallyRemoved = true): static
+    public function removeFromStages($lead, Stage $stage, bool $manuallyRemoved = true): static
     {
         $origin = is_string($manuallyRemoved)
             ? $manuallyRemoved

@@ -234,7 +234,7 @@ class FormEntity extends CommonEntity
     /**
      * @param User|int|null $createdBy
      */
-    public function setCreatedBy($createdBy = null): static
+    public function setCreatedBy(?int $createdBy = null): static
     {
         if (null != $createdBy && !$createdBy instanceof User) {
             $this->createdBy = $createdBy;

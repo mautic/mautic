@@ -56,12 +56,10 @@ final class VideoModel extends FormModel
     }
 
     /**
-     * @param string $code
-     *
      * @throws ORMException
      * @throws \Exception
      */
-    public function hitVideo(Request $request, $code = '200'): void
+    public function hitVideo(Request $request, string $code = '200'): void
     {
         // don't skew results with in-house hits
         if (!$this->security->isAnonymous()) {

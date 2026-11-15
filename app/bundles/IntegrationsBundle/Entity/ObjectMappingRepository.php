@@ -27,7 +27,7 @@ final class ObjectMappingRepository extends CommonRepository
         return $this->doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName, $lock);
     }
 
-    public function getIntegrationObject($integration, $internalObjectName, $internalObjectId, $integrationObjectName): ?array
+    public function getIntegrationObject($integration, string $internalObjectName, $internalObjectId, $integrationObjectName): ?array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('*')

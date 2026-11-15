@@ -16,7 +16,6 @@ final class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param string                                               $moduleobject
      * @param array<string, mixed>                                 $parameters
      * @param array<string, string|array<string|int, string|bool>> $settings
      *
@@ -24,7 +23,7 @@ final class DynamicsApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    private function request(string $operation, array $parameters = [], string $method = 'GET', $moduleobject = 'contacts', array $settings = [])
+    private function request(string $operation, array $parameters = [], string $method = 'GET', string $moduleobject = 'contacts', array $settings = [])
     {
         if ('company' === $moduleobject) {
             $moduleobject = 'accounts';
@@ -68,7 +67,7 @@ final class DynamicsApi extends CrmApi
      *
      * @return mixed
      */
-    public function getLeadFields($object = 'contacts')
+    public function getLeadFields(string $object = 'contacts')
     {
         if ('company' === $object) {
             $object = 'accounts'; // Dynamics object name
@@ -90,7 +89,7 @@ final class DynamicsApi extends CrmApi
     /**
      * @param mixed[] $data
      */
-    public function createLead(array $data, Lead $lead, $object = 'contacts'): ResponseInterface
+    public function createLead(array $data, Lead $lead, string $object = 'contacts'): ResponseInterface
     {
         return $this->request('', $data, 'POST', $object);
     }
@@ -130,11 +129,8 @@ final class DynamicsApi extends CrmApi
 
     /**
      * Batch create leads.
-     *
-     * @param string $object
-     * @param bool   $isUpdate
      */
-    public function createLeads(array $data, $object = 'contacts', $isUpdate = false): array
+    public function createLeads(array $data, string $object = 'contacts', bool $isUpdate = false): array
     {
         if (0 === count($data)) {
             return [];
@@ -190,7 +186,7 @@ final class DynamicsApi extends CrmApi
         return $this->parseRawHttpResponse($response);
     }
 
-    public function updateLeads(array $data, $object = 'contacts'): array
+    public function updateLeads(array $data, string $object = 'contacts'): array
     {
         return $this->createLeads($data, $object, true);
     }

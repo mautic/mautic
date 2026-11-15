@@ -104,7 +104,7 @@ class Notification
     /**
      * @param string|null $type
      */
-    public function setType($type): void
+    public function setType(string $type): void
     {
         $this->type = $type;
     }
@@ -120,7 +120,7 @@ class Notification
     /**
      * @param string|null $message
      */
-    public function setMessage($message): void
+    public function setMessage(string $message): void
     {
         $this->message = $message;
     }
@@ -168,7 +168,7 @@ class Notification
     /**
      * @param bool|null $isRead
      */
-    public function setIsRead($isRead): void
+    public function setIsRead(bool $isRead): void
     {
         $this->isRead = (bool) $isRead;
     }

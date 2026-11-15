@@ -13,14 +13,14 @@ final class SugarcrmApi extends CrmApi
     private string $object = 'Leads';
 
     /**
-     * @param string               $method
      * @param array<string, mixed> $data
      *
      * @return mixed|string
      *
      * @throws ApiErrorException
+     * @param 'GET'|'POST'|'PUT' $method
      */
-    public function request($sMethod, array $data = [], $method = 'GET', $object = null)
+    public function request(string $sMethod, array $data = [], string $method = 'GET', ?string $object = null)
     {
         if (!$object) {
             $object = $this->object;
@@ -552,12 +552,11 @@ final class SugarcrmApi extends CrmApi
     /**
      * Get SugarCRM leads.
      *
-     * @param string               $object
      * @param array<string, mixed> $query
      *
      * @return mixed
      */
-    public function getLeads(array $query, $object)
+    public function getLeads(array $query, string $object)
     {
         $tokenData       = $this->integration->getKeys();
         $availableFields = $this->integration->getIntegrationSettings()->getFeatureSettings();

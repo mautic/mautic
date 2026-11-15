@@ -172,11 +172,9 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param string $url
-     *
      * @return string|array{focus: string, form: string}
      */
-    public function getContent(array $focus, bool $isPreview = false, $url = '#')
+    public function getContent(array $focus, bool $isPreview = false, string $url = '#')
     {
         $form = (!empty($focus['form']) && 'form' === $focus['type']) ? $this->formModel->getEntity($focus['form']) : null;
 
@@ -265,11 +263,10 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
     /**
      * Add a stat entry.
      *
-     * @param mixed                                                    $type
      * @param mixed                                                    $data
      * @param array<int|string|array<int|string>>|Lead|Submission|null $lead
      */
-    public function addStat(Focus $focus, $type, $data = null, $lead = null): ?Stat
+    public function addStat(Focus $focus, string $type, $data = null, $lead = null): ?Stat
     {
         if (empty($lead)) {
             return null;

@@ -147,9 +147,8 @@ final class OrderDAO
      * @param mixed  $oldObjectId
      * @param string $oldObjectName
      * @param string $newObjectName
-     * @param mixed  $newObjectId
      */
-    public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null): void
+    public function remapObject($oldObjectName, $oldObjectId, $newObjectName, ?string $newObjectId = null): void
     {
         $newObjectId ??= $oldObjectId;
 

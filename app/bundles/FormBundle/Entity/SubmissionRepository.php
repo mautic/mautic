@@ -336,7 +336,7 @@ final class SubmissionRepository extends CommonRepository
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    public function getMostSubmitted(DbalQueryBuilder $query, int $limit = 10, int $offset = 0, $column = 'fs.id', $as = 'submissions'): array
+    public function getMostSubmitted(DbalQueryBuilder $query, int $limit = 10, int $offset = 0, string $column = 'fs.id', string $as = 'submissions'): array
     {
         $asSelect = ($as) ? ' as '.$as : '';
 

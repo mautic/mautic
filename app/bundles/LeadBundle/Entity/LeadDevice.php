@@ -136,10 +136,7 @@ class LeadDevice
         return $this->clientInfo;
     }
 
-    /**
-     * @param mixed $clientInfo
-     */
-    public function setClientInfo($clientInfo): void
+    public function setClientInfo(string $clientInfo): void
     {
         $this->clientInfo = $clientInfo;
     }
@@ -165,7 +162,7 @@ class LeadDevice
         return $this->deviceBrand;
     }
 
-    public function setDeviceBrand($brand): void
+    public function setDeviceBrand(string $brand): void
     {
         $this->deviceBrand = $brand;
     }
@@ -191,10 +188,7 @@ class LeadDevice
         return $this->deviceOsName;
     }
 
-    /**
-     * @param string $deviceOsName
-     */
-    public function setDeviceOsName($deviceOsName): static
+    public function setDeviceOsName(string $deviceOsName): static
     {
         $this->deviceOsName = $deviceOsName;
 
@@ -290,10 +284,7 @@ class LeadDevice
         return $this->trackingId;
     }
 
-    /**
-     * @param string $trackingId
-     */
-    public function setTrackingId($trackingId): static
+    public function setTrackingId(string $trackingId): static
     {
         $this->trackingId = $trackingId;
 

@@ -223,10 +223,7 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
         return $commands;
     }
 
-    /**
-     * @param string $id
-     */
-    public function getCompanies(bool $user = false, $id = ''): array
+    public function getCompanies(bool $user = false, string $id = ''): array
     {
         $q                = $this->getEntityManager()->getConnection()->createQueryBuilder();
         static $companies = [];
@@ -402,14 +399,11 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
         return $query->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @param string $valueColumn
-     */
     public function getAjaxSimpleList(
         ?CompositeExpression $expr = null,
         array $parameters = [],
         $labelColumn = null,
-        $valueColumn = 'id',
+        string $valueColumn = 'id',
         int $limit = 10,
         int $start = 0,
     ): array {

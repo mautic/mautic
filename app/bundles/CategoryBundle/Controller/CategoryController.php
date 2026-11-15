@@ -25,17 +25,13 @@ final class CategoryController extends AbstractFormController
         $this->categoryModel = $categoryModel;
     }
 
-    /**
-     * @param int    $objectId
-     * @param string $objectModel
-     */
     #[Route(
         path: '/s/categories/{bundle}/{objectAction}/{objectId}',
         name: 'mautic_category_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['bundle' => 'category', 'objectId' => 0],
     )]
-    public function executeCategoryAction(Request $request, $bundle, $objectAction, $objectId = 0, $objectModel = ''): Response
+    public function executeCategoryAction(Request $request, $bundle, $objectAction, int $objectId = 0, string $objectModel = ''): Response
     {
         if (method_exists($this, $objectAction.'Action')) {
             return $this->forward(
@@ -295,7 +291,7 @@ final class CategoryController extends AbstractFormController
     /**
      * Generates edit form and processes post data.
      */
-    public function editAction(Request $request, ?string $bundle, $objectId, $ignorePost = false): JsonResponse|Response
+    public function editAction(Request $request, ?string $bundle, $objectId, bool $ignorePost = false): JsonResponse|Response
     {
         $session = $request->getSession();
         $entity    = $this->categoryModel->getEntity($objectId);

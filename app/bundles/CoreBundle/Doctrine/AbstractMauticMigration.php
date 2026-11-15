@@ -151,8 +151,9 @@ abstract class AbstractMauticMigration extends AbstractMigration
      * Generate the  name for the property.
      *
      * @return string
+     * @param 'fk'|'idx' $type
      */
-    protected function generatePropertyName($table, $type, array $columnNames)
+    protected function generatePropertyName($table, string $type, array $columnNames)
     {
         $columnNames = array_merge([$this->prefix.$table], $columnNames);
         $hash        = implode(

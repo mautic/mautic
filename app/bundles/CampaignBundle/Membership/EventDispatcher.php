@@ -15,17 +15,14 @@ final readonly class EventDispatcher
     ) {
     }
 
-    /**
-     * @param string $action
-     */
-    public function dispatchMembershipChange(Lead $contact, Campaign $campaign, $action): void
+    public function dispatchMembershipChange(Lead $contact, Campaign $campaign, string $action): void
     {
         $this->dispatcher->dispatch(
             new CampaignSingleLeadChangeEvent($campaign, $contact, $action)
         );
     }
 
-    public function dispatchBatchMembershipChange(array $contacts, Campaign $campaign, $action): void
+    public function dispatchBatchMembershipChange(array $contacts, Campaign $campaign, string $action): void
     {
         $this->dispatcher->dispatch(
             new CampaignBatchLeadChangeEvent($campaign, $contacts, $action)

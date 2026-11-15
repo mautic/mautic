@@ -89,15 +89,17 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Called after the entity has been persisted allowing for custom preperation of $entity prior to viewAction.
+     * @param 'edit'|'new' $action
      */
-    protected function afterEntitySave(object $entity, Form $form, $action, $pass = null): void
+    protected function afterEntitySave(object $entity, Form $form, string $action, $pass = null): void
     {
     }
 
     /**
      * Called after the form is validated on POST.
+     * @param 'edit'|'new' $action
      */
-    protected function afterFormProcessed($isValid, object $entity, Form $form, $action, bool $isClone = false): void
+    protected function afterFormProcessed($isValid, object $entity, Form $form, string $action, bool $isClone = false): void
     {
     }
 
@@ -176,23 +178,26 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * Modify entity prior to persisting or perform custom validation on the form.
      *
      * @return mixed Whatever is returned will be passed into afterEntitySave; pass false to fail validation
+     * @param 'edit'|'new' $action
      */
-    protected function beforeEntitySave(object $entity, Form $form, $action, $objectId = null, bool $isClone = false): bool
+    protected function beforeEntitySave(object $entity, Form $form, string $action, $objectId = null, bool $isClone = false): bool
     {
         return true;
     }
 
     /**
      * Do anything necessary before the form is checked for POST and processed.
+     * @param 'edit'|'new' $action
      */
-    protected function beforeFormProcessed(object $entity, Form $form, $action, $isPost, $objectId = null, bool $isClone = false): void
+    protected function beforeFormProcessed(object $entity, Form $form, string $action, bool $isPost, $objectId = null, bool $isClone = false): void
     {
     }
 
     /**
      * @return bool|mixed
+     * @param 'batchDelete'|'clone'|'create'|'delete'|'edit'|'index'|'new'|'view' $action
      */
-    protected function checkActionPermission($action, ?object $entity = null, $objectId = null)
+    protected function checkActionPermission(string $action, ?object $entity = null, $objectId = null)
     {
         $permissionUser = 0;
 
@@ -524,9 +529,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param bool $isClone
+     * @param 'edit'|'new' $action
      */
-    protected function getFormEntity($action, &$objectId = null, &$isClone = false)
+    protected function getFormEntity(string $action, &$objectId = null, bool & $isClone = false)
     {
         $model = $this->getModel($this->getModelName());
 
@@ -554,8 +559,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Set custom form themes, etc.
+     * @param 'edit'|'new' $action
      */
-    protected function getFormView(FormInterface $form, $action): FormView
+    protected function getFormView(FormInterface $form, string $action): FormView
     {
         return $form->createView();
     }
@@ -617,16 +623,18 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * Amend the parameters sent through postActionRedirect.
      *
      * @param array<array<string, mixed>, mixed> $args
+     * @param 'batchDelete'|'delete'|'edit'|'index'|'new'|'view' $action
      */
-    protected function getPostActionRedirectArguments(array $args, $action): array
+    protected function getPostActionRedirectArguments(array $args, string $action): array
     {
         return $args;
     }
 
     /**
      * @return string
+     * @param 'batchDelete'|'delete'|'edit'|'index'|'new'|'view' $action
      */
-    protected function getPostActionControllerAction($action)
+    protected function getPostActionControllerAction(string $action)
     {
         return 'index';
     }
@@ -677,8 +685,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * Get the template file.
      *
      * @return string
+     * @param 'details.html.twig'|'form.html.twig'|'list.html.twig' $file
      */
-    protected function getTemplateName($file)
+    protected function getTemplateName(string $file)
     {
         $namespaces = [
             $this->getTemplateBase(),
@@ -708,8 +717,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * Get custom or core translation.
      *
      * @return string
+     * @param 'error.notfound'|'notice.batch_deleted' $string
      */
-    protected function getTranslatedString($string)
+    protected function getTranslatedString(string $string)
     {
         return $this->translator->hasId($this->getTranslationBase().'.'.$string) ? $this->getTranslationBase()
             .'.'.$string : 'mautic.core.'.$string;
@@ -729,8 +739,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * Amend the parameters sent through delegateView.
      *
      * @param array<array<string, mixed>, mixed> $args
+     * @param 'edit'|'index'|'new'|'view' $action
      */
-    protected function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, string $action): array
     {
         return $args;
     }
@@ -1049,11 +1060,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * @param string|null $logObject
      * @param string|null $logBundle
      * @param string|null $listPage
-     * @param string      $itemName
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    protected function viewStandard(Request $request, $objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item')
+    protected function viewStandard(Request $request, $objectId, $logObject = null, $logBundle = null, $listPage = null, string $itemName = 'item')
     {
         $model    = $this->getModel($this->getModelName());
         $entity   = $model->getEntity($objectId);

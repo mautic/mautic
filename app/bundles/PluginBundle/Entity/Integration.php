@@ -83,10 +83,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->name;
     }
 
-    /**
-     * @param mixed $name
-     */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
 

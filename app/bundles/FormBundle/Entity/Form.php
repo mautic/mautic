@@ -312,10 +312,7 @@ class Form extends FormEntity implements UuidInterface
         return $this->id;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -331,10 +328,7 @@ class Form extends FormEntity implements UuidInterface
         return $this->name;
     }
 
-    /**
-     * @param string $description
-     */
-    public function setDescription($description): static
+    public function setDescription(string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -345,7 +339,7 @@ class Form extends FormEntity implements UuidInterface
     /**
      * @return string|null
      */
-    public function getDescription(bool $truncate = false, $length = 45)
+    public function getDescription(bool $truncate = false, int $length = 45)
     {
         if ($truncate) {
             if (strlen($this->description) > $length) {
@@ -398,10 +392,7 @@ class Form extends FormEntity implements UuidInterface
         return $this->postAction;
     }
 
-    /**
-     * @param string $postActionProperty
-     */
-    public function setPostActionProperty($postActionProperty): static
+    public function setPostActionProperty(string $postActionProperty): static
     {
         $this->isChanged('postActionProperty', $postActionProperty);
         $this->postActionProperty = $postActionProperty;
@@ -544,10 +535,7 @@ class Form extends FormEntity implements UuidInterface
         );
     }
 
-    /**
-     * @param string $alias
-     */
-    public function setAlias($alias): static
+    public function setAlias(string $alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -760,10 +748,7 @@ class Form extends FormEntity implements UuidInterface
         return $this->usesProgressiveProfiling;
     }
 
-    /**
-     * @param int $progressiveProfilingLimit
-     */
-    public function setProgressiveProfilingLimit($progressiveProfilingLimit): static
+    public function setProgressiveProfilingLimit(int $progressiveProfilingLimit): static
     {
         $this->isChanged('progressiveProfilingLimit', $progressiveProfilingLimit);
         $this->progressiveProfilingLimit = $progressiveProfilingLimit;

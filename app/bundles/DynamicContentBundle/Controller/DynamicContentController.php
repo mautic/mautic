@@ -257,7 +257,7 @@ final class DynamicContentController extends AbstractFormController
      *
      * @param bool|false $ignorePost
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
     {
         $entity = $this->dynamicContentModel->getEntity($objectId);
         $page   = $request->getSession()->get('mautic.dynamicContent.page', 1);

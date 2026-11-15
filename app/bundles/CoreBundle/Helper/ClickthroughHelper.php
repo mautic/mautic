@@ -19,7 +19,7 @@ final class ClickthroughHelper
      *
      * @return mixed[]
      */
-    public static function decodeArrayFromUrl($string, bool $urlDecode = true): array
+    public static function decodeArrayFromUrl(string $string, bool $urlDecode = true): array
     {
         $raw     = $urlDecode ? urldecode($string) : $string;
         $decoded = base64_decode($raw);

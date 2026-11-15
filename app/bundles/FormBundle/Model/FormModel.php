@@ -390,9 +390,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      * Get results for a form and lead.
      *
      * @param int $leadId
-     * @param int $limit
      */
-    public function getLeadSubmissions(Form $form, $leadId, $limit = 200): array
+    public function getLeadSubmissions(Form $form, $leadId, int $limit = 200): array
     {
         return $this->formRepository->getFormResults(
             $form,

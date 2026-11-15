@@ -135,10 +135,7 @@ class Lead
         return $this->manuallyRemoved;
     }
 
-    /**
-     * @param bool $manuallyRemoved
-     */
-    public function setManuallyRemoved($manuallyRemoved): void
+    public function setManuallyRemoved(bool $manuallyRemoved): void
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }
@@ -159,10 +156,7 @@ class Lead
         return $this->manuallyAdded;
     }
 
-    /**
-     * @param bool $manuallyAdded
-     */
-    public function setManuallyAdded($manuallyAdded): void
+    public function setManuallyAdded(bool $manuallyAdded): void
     {
         $this->manuallyAdded = $manuallyAdded;
     }
@@ -183,10 +177,7 @@ class Lead
         return $this->rotation;
     }
 
-    /**
-     * @param int $rotation
-     */
-    public function setRotation($rotation): static
+    public function setRotation(int $rotation): static
     {
         $this->rotation = (int) $rotation;
 

@@ -1345,7 +1345,7 @@ final class EmailController extends AbstractStandardFormController
     /**
      * Make the variant the main.
      */
-    public function winnerAction(Request $request, $objectId): Response
+    public function winnerAction(Request $request, int $objectId): Response
     {
         // todo - add confirmation to button click
         $page      = $request->getSession()->get('mautic.email', 1);
@@ -1422,7 +1422,7 @@ final class EmailController extends AbstractStandardFormController
     /**
      * Manually sends emails.
      */
-    public function sendAction(Request $request, $objectId): Response|RedirectResponse
+    public function sendAction(Request $request, int $objectId): Response|RedirectResponse
     {
         $entity  = $this->emailModel->getEntity($objectId);
         $session = $request->getSession();
@@ -1721,7 +1721,7 @@ final class EmailController extends AbstractStandardFormController
      * Generating the modal box content for
      * the send multiple example email option.
      */
-    public function sendExampleAction(Request $request, $objectId, CorePermissions $security, EmailModel $model, FakeContactHelper $fakeLeadHelper): Response
+    public function sendExampleAction(Request $request, int $objectId, CorePermissions $security, EmailModel $model, FakeContactHelper $fakeLeadHelper): Response
     {
         $entity = $model->getEntity($objectId);
 

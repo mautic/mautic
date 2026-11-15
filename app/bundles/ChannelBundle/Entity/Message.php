@@ -154,7 +154,7 @@ class Message extends FormEntity implements UuidInterface
     /**
      * @param ?string $name
      */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -173,7 +173,7 @@ class Message extends FormEntity implements UuidInterface
     /**
      * @param ?string $description
      */
-    public function setDescription($description): static
+    public function setDescription(string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;

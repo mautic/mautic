@@ -589,10 +589,10 @@ final class LeadApiController extends CommonApiController
      * Add/Remove a UTM Tagset to/from the contact.
      *
      * @param int              $id
-     * @param string           $method
      * @param array<mixed>|int $data
+     * @param 'addUTMTags'|'removeUtmTags' $method
      */
-    protected function applyUtmTagsAction($id, $method, $data): Response
+    protected function applyUtmTagsAction($id, string $method, $data): Response
     {
         $entity = $this->model->getEntity((int) $id);
 

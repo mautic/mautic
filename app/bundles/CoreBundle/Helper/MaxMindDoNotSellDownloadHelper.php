@@ -20,8 +20,11 @@ final class MaxMindDoNotSellDownloadHelper
      */
     private $listPath;
 
+    /**
+     * @param 'id'|'id:license' $auth
+     */
     public function __construct(
-        $auth,
+        string $auth,
         private readonly LoggerInterface $logger,
         private readonly HttpClientInterface $httpClient,
         CoreParametersHelper $coreParametersHelper,

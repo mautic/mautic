@@ -47,10 +47,7 @@ final class FocusController extends AbstractStandardFormController
         return 'focus';
     }
 
-    /**
-     * @param int $page
-     */
-    public function indexAction(Request $request, FocusSearchScopeProvider $focusSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, FocusSearchScopeProvider $focusSearchScopeProvider, int $page = 1): Response
     {
         $this->indexSearchScopes = $focusSearchScopeProvider->getScopes();
 
@@ -69,9 +66,8 @@ final class FocusController extends AbstractStandardFormController
      * Generates edit form and processes post data.
      *
      * @param int  $objectId
-     * @param bool $ignorePost
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
     {
         return parent::editStandard($request, $objectId, $ignorePost);
     }
