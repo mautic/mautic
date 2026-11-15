@@ -43,7 +43,7 @@ final class UnsubscribedHelperTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->unsubscribedHelper = self::getContainer()->get(UnsubscribedHelper::class);
+        $this->unsubscribedHelper = $this->getService(UnsubscribedHelper::class);
 
         $this->createUsers();
         $this->createEmailAndCampaign();
@@ -261,7 +261,7 @@ final class UnsubscribedHelperTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Get the campaign event we created in createEmailAndCampaign
-        $event = $this->getContainer()->get(EventRepository::class)
+        $event = $this->getService(EventRepository::class)
             ->findOneBy(['campaign' => $this->campaign]);
 
         // Create campaign_lead_event_log entries (required for campaign filter)

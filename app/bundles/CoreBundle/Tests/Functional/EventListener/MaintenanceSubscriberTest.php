@@ -47,11 +47,9 @@ final class MaintenanceSubscriberTest extends MauticMysqlTestCase
               (1, 'notice', NULL, 'Membership has been rebuilt.', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL);"
         );
 
-        /** @var TranslatorInterface $translator */
-        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
 
-        /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
 
         $event = $dispatcher->dispatch(new MaintenanceEvent(2, false, false));
         $stats = $event->getStats();

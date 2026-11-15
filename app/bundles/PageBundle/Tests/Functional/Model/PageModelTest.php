@@ -45,7 +45,7 @@ final class PageModelTest extends MauticMysqlTestCase
         $this->configParams['bot_helper_blocked_user_agents']  = self::BOT_BLOCKED_USER_AGENTS;
         $this->configParams['site_url']                        = 'https://mautic-cloud.local';
         parent::setUp();
-        $this->pageHitRepository = self::getContainer()->get(HitRepository::class);
+        $this->pageHitRepository = $this->getService(HitRepository::class);
         $this->logoutUser();
     }
 
@@ -229,8 +229,7 @@ final class PageModelTest extends MauticMysqlTestCase
         $this->em->persist($redirect);
         $this->em->flush();
 
-        /** @var RedirectModel $redirectModel */
-        $redirectModel = $this->getContainer()->get(RedirectModel::class);
+        $redirectModel = $this->getService(RedirectModel::class);
         $redirectURL   = $redirectModel->generateRedirectUrl($redirect, $clickThrough);
         // Send Request
         $server = [

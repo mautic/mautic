@@ -97,7 +97,7 @@ abstract class AbstractAssetTestCase extends MauticMysqlTestCase
      */
     protected function generateCsv(): void
     {
-        $uploadDir  = static::getContainer()->get(CoreParametersHelper::class)->get('upload_dir') ?? sys_get_temp_dir();
+        $uploadDir  = $this->getService(CoreParametersHelper::class)->get('upload_dir') ?? sys_get_temp_dir();
         $tmpFile    = tempnam($uploadDir, 'mautic_asset_test_');
         $file       = fopen($tmpFile, 'w');
 

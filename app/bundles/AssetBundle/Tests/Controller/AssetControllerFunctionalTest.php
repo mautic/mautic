@@ -67,7 +67,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $createErrors = $crawlerAfterSubmit->filter('div.has-error')->each(static fn ($node): string => trim($node->text()));
         $this->assertCount(0, $createErrors, 'Expected no validation errors for valid remote image URL with query string, got: '.implode(' | ', $createErrors));
 
-        $asset = $this->getContainer()->get(AssetRepository::class)->findOneBy(['title' => $title]);
+        $asset = $this->getService(AssetRepository::class)->findOneBy(['title' => $title]);
         $this->assertInstanceOf(Asset::class, $asset, 'Asset should be created successfully');
 
         $crawlerEdit = $this->client->request(Request::METHOD_GET, '/s/assets/edit/'.$asset->getId());
@@ -137,7 +137,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
             (string) $this->client->getResponse()->getContent()
         );
 
-        $asset = $this->getContainer()->get(AssetRepository::class)->findOneBy(['title' => $assetTitle]);
+        $asset = $this->getService(AssetRepository::class)->findOneBy(['title' => $assetTitle]);
         $this->assertInstanceOf(Asset::class, $asset);
         $this->assertSame('zip', strtolower((string) $asset->getExtension()));
 
@@ -392,7 +392,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     private function getUser(string $username): User
     {
-        $repository = $this->getContainer()->get(UserRepository::class);
+        $repository = $this->getService(UserRepository::class);
 
         return $repository->findOneBy(['username' => $username]);
     }
@@ -417,8 +417,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         // Set new permissions
         $role->setIsAdmin(false);
-        /** @var RoleModel $roleModel */
-        $roleModel = self::getContainer()->get(RoleModel::class);
+        $roleModel = $this->getService(RoleModel::class);
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);

@@ -12,8 +12,7 @@ final class PageRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     public function testResetVariants(): void
     {
-        /** @var PageModel $pageModel */
-        $pageModel = self::getContainer()->get(PageModel::class);
+        $pageModel = $this->getService(PageModel::class);
 
         // Create parent page.
         $parentPage = new Page();

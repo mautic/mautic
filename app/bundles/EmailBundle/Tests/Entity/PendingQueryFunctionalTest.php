@@ -22,7 +22,7 @@ final class PendingQueryFunctionalTest extends MauticMysqlTestCase
 {
     public function testDelayedSends(): void
     {
-        $emailRepository = self::getContainer()->get(EmailRepository::class);
+        $emailRepository = $this->getService(EmailRepository::class);
 
         $contactCount  = 4;
         $oneBatchCount = $contactCount / 2;
@@ -58,8 +58,7 @@ final class PendingQueryFunctionalTest extends MauticMysqlTestCase
             $contacts[] = $contact;
         }
 
-        /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get(LeadModel::class);
+        $contactModel = $this->getService(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntities($contacts);
 

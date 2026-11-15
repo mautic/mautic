@@ -41,12 +41,10 @@ final class SyncServiceTest extends MauticMysqlTestCase
         $settings->setIsPublished(true);
         $exampleIntegration->setIntegrationConfiguration($settings);
 
-        /** @var SyncIntegrationsHelper $syncIntegrationsHelper */
-        $syncIntegrationsHelper = $this->getContainer()->get(SyncIntegrationsHelper::class);
+        $syncIntegrationsHelper = $this->getService(SyncIntegrationsHelper::class);
         $syncIntegrationsHelper->addIntegration($exampleIntegration);
 
-        /** @var SyncService $syncService */
-        $syncService = $this->getContainer()->get(SyncService::class);
+        $syncService = $this->getService(SyncService::class);
 
         $syncService->processIntegrationSync(ExampleIntegration::NAME);
         $payload = $dataExchange->getOrderPayload();

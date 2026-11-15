@@ -21,13 +21,11 @@ final class CompanyModelFunctionalTest extends MauticMysqlTestCase
         $company = $this->createCompany('Company A', 'contact@company_a.com');
         $this->em->flush();
 
-        /** @var CompanyLeadRepository $companyLeadRepo */
-        $companyLeadRepo = $this->getContainer()->get(CompanyLeadRepository::class);
+        $companyLeadRepo = $this->getService(CompanyLeadRepository::class);
 
         $this->assertEquals(0, $companyLeadRepo->count([]));
 
-        /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $companyModel = $this->getService(CompanyModel::class);
         $companyModel->addLeadToCompany($company, $lead->convertToArray());
 
         $this->assertEquals(1, $companyLeadRepo->count([]));

@@ -18,8 +18,7 @@ final class FormCaptchaHoneypotFunctionalTest extends MauticMysqlTestCase
     {
         $formId = $this->createFormWithHoneypotCaptcha();
 
-        /** @var FormModel $formModel */
-        $formModel = self::getContainer()->get(FormModel::class);
+        $formModel = $this->getService(FormModel::class);
         $form      = $formModel->getEntity($formId);
         $this->assertInstanceOf(Form::class, $form);
 
@@ -50,8 +49,7 @@ final class FormCaptchaHoneypotFunctionalTest extends MauticMysqlTestCase
     {
         $formId = $this->createFormWithHoneypotCaptcha('class="custom-class"');
 
-        /** @var FormModel $formModel */
-        $formModel = self::getContainer()->get(FormModel::class);
+        $formModel = $this->getService(FormModel::class);
         $form      = $formModel->getEntity($formId);
         $this->assertInstanceOf(Form::class, $form);
 

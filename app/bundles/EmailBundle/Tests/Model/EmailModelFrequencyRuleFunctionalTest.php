@@ -101,11 +101,11 @@ final class EmailModelFrequencyRuleFunctionalTest extends MauticMysqlTestCase
         ]));
 
         // Re-authenticate: setUpSymfony() destroys the previous client and its security token.
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
-        $emailModel = self::getContainer()->get(EmailModel::class);
+        $emailModel = $this->getService(EmailModel::class);
         $this->assertInstanceOf(EmailModel::class, $emailModel);
         $this->emailModel = $emailModel;
     }
@@ -180,7 +180,7 @@ final class EmailModelFrequencyRuleFunctionalTest extends MauticMysqlTestCase
 
     private function assertEmailIsNotPostponed(): void
     {
-        $messageQueueRepository = $this->getContainer()->get(MessageQueueRepository::class);
+        $messageQueueRepository = $this->getService(MessageQueueRepository::class);
         $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
 
         $this->assertSame(0, $messageQueueRepository->count([]), 'Email should not be postponed.');
@@ -188,7 +188,7 @@ final class EmailModelFrequencyRuleFunctionalTest extends MauticMysqlTestCase
 
     private function assertEmailIsPostponed(Email $email, Lead $contact): void
     {
-        $messageQueueRepository = $this->getContainer()->get(MessageQueueRepository::class);
+        $messageQueueRepository = $this->getService(MessageQueueRepository::class);
         $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
 
         $queuedMessages = $messageQueueRepository->findBy([]);

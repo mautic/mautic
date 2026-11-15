@@ -54,7 +54,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             false
         )->getReferenceRepository();
 
-        $this->contactSegmentService = self::getContainer()->get(ContactSegmentService::class);
+        $this->contactSegmentService = $this->getService(ContactSegmentService::class);
     }
 
     protected function beforeBeginTransaction(): void

@@ -70,9 +70,9 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         $contactExportScheduler   = $this->checkContactExportScheduler(1)[0];
         $contactExportSchedulerId = $contactExportScheduler->getId();
         $this->assertNotNull($contactExportSchedulerId);
-        $requestingAdmin        = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $requestingAdmin        = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
 
-        $requesterNotifications = $this->getContainer()->get(NotificationRepository::class)->findBy(
+        $requesterNotifications = $this->getService(NotificationRepository::class)->findBy(
             [
                 'user'   => $requestingAdmin,
                 'header' => 'mautic.lead.export.being.prepared.header',
@@ -80,7 +80,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         );
         $this->assertCount(1, $requesterNotifications);
 
-        $adminNotifications = $this->getContainer()->get(NotificationRepository::class)->findBy(
+        $adminNotifications = $this->getService(NotificationRepository::class)->findBy(
             [
                 'user'   => $secondaryAdmin,
                 'header' => 'mautic.lead.export.admin.notification.header',
@@ -89,7 +89,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         $this->assertCount(0, $adminNotifications);
 
         /** @var AuditLog|null $createAuditLog */
-        $createAuditLog = $this->getContainer()->get(AuditLogRepository::class)->findOneBy(
+        $createAuditLog = $this->getService(AuditLogRepository::class)->findOneBy(
             [
                 'object'   => 'ContactExportScheduler',
                 'objectId' => $contactExportSchedulerId,
@@ -102,7 +102,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         $this->checkContactExportScheduler(0);
 
         /** @var AuditLog|null $sendEmailAuditLog */
-        $sendEmailAuditLog = $this->getContainer()->get(AuditLogRepository::class)->findOneBy(
+        $sendEmailAuditLog = $this->getService(AuditLogRepository::class)->findOneBy(
             [
                 'object'   => 'ContactExportScheduler',
                 'objectId' => $contactExportSchedulerId,
@@ -111,8 +111,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         );
         $this->assertInstanceOf(AuditLog::class, $sendEmailAuditLog);
 
-        /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
+        $coreParametersHelper = $this->getService(CoreParametersHelper::class);
         $zipFileName          = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()->format('Y_m_d_H_i_s').'.zip';
         $this->filePaths[]    = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
         $downloadLink         = $this->router->generate(
@@ -147,7 +146,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
             $contacts[] = $contact;
         }
 
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
         $leadModel->saveEntities($contacts);
     }
 
@@ -156,7 +155,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
      */
     private function checkContactExportScheduler(int $count): array
     {
-        $repo    = $this->getContainer()->get(ContactExportSchedulerRepository::class);
+        $repo    = $this->getService(ContactExportSchedulerRepository::class);
         $allRows = $repo->findAll();
         $this->assertCount($count, $allRows);
 
@@ -165,7 +164,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
 
     private function setAdminUser(): void
     {
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', 'admin');
@@ -190,7 +189,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         $user->setLastName('Last');
         $user->setUsername($username);
         $user->setEmail($email);
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);

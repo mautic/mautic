@@ -32,7 +32,7 @@ final class SmsControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // Assert
-        $childSms = $this->getContainer()->get(SmsRepository::class)->findOneBy(['name' => 'Child SMS']);
+        $childSms = $this->getService(SmsRepository::class)->findOneBy(['name' => 'Child SMS']);
         $this->assertInstanceOf(Sms::class, $childSms);
         $this->assertInstanceOf(Sms::class, $childSms->getTranslationParent());
         $this->assertSame($parentSms->getId(), $childSms->getTranslationParent()->getId());

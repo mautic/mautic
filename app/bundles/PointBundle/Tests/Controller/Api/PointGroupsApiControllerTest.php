@@ -18,7 +18,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
     public function testPointGroupCRUDActions(): void
     {
         /** @var Translator $translator */
-        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
 
         // Create a new point group
         $this->client->request(Request::METHOD_POST, '/api/points/groups/new', [
@@ -90,7 +90,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
     public function testContactGroupPointsActions(): void
     {
         /** @var Translator $translator */
-        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
 
         // Arrange
         $contact     = $this->createContact('test@example.com');
@@ -194,7 +194,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
      */
     private function assertPointsChangeLogEntries(Lead $contact, array $expectedEntries): void
     {
-        $logs = $this->getContainer()->get(PointsChangeLogRepository::class)->findBy(['lead' => $contact->getId()]);
+        $logs = $this->getService(PointsChangeLogRepository::class)->findBy(['lead' => $contact->getId()]);
         $this->assertCount(count($expectedEntries), $logs);
         foreach ($expectedEntries as $index => $expectedEntry) {
             $this->assertEquals($expectedEntry['delta'], $logs[$index]->getDelta());

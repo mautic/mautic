@@ -18,11 +18,9 @@ final class UpdateCompanyNameOnLeadsCommandFunctionalTest extends MauticMysqlTes
 
     public function testUpdateCompanies(): void
     {
-        /** @var CompanyRepository $companyRepository */
-        $companyRepository = $this->getContainer()->get(CompanyRepository::class);
+        $companyRepository = $this->getService(CompanyRepository::class);
 
-        /** @var LeadRepository $contactRepository */
-        $contactRepository = $this->getContainer()->get(LeadRepository::class);
+        $contactRepository = $this->getService(LeadRepository::class);
 
         $contact1 = $this->createContact();
         $contact2 = $this->createContact();

@@ -100,8 +100,7 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
             'date_fired' => '2026-01-02 00:00:00',
         ]);
 
-        /** @var StageModel $stageModel */
-        $stageModel = self::getContainer()->get(StageModel::class);
+        $stageModel = $this->getService(StageModel::class);
         $stageModel->stageMerge($primaryStage, $mergedStage);
         $this->em->clear();
 

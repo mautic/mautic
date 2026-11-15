@@ -199,7 +199,7 @@ final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $formId   = $response['form']['id'];
 
-        return $this->getContainer()->get(FormRepository::class)->find($formId);
+        return $this->getService(FormRepository::class)->find($formId);
     }
 
     /**

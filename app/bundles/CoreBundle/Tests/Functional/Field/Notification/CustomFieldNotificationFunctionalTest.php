@@ -27,16 +27,15 @@ final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->translator = $this->getContainer()->get(TranslatorInterface::class);
-        $this->notifier   = $this->getContainer()->get(CustomFieldNotification::class);
+        $this->translator = $this->getService(TranslatorInterface::class);
+        $this->notifier   = $this->getService(CustomFieldNotification::class);
         $this->leadField  = $this->createCustomField();
     }
 
     public function testNoNotificationWhenLeadFieldCanNotUpdateForInvalidUser(): void
     {
         $this->notifier->customFieldCannotBeUpdated($this->leadField, -1);
-        /** @var NotificationRepository $notificationRepo */
-        $notificationRepo   = $this->getContainer()->get(NotificationRepository::class);
+        $notificationRepo   = $this->getService(NotificationRepository::class);
         /** @var Paginator<Notification> $notifications */
         $notifications      = $notificationRepo->getEntities([]);
 
@@ -47,8 +46,7 @@ final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
     {
         $this->notifier->customFieldCannotBeUpdated($this->leadField, 1);
 
-        /** @var NotificationRepository $notificationRepo */
-        $notificationRepo   = $this->getContainer()->get(NotificationRepository::class);
+        $notificationRepo   = $this->getService(NotificationRepository::class);
         $notifications      = $notificationRepo->getNotifications(1);
         $this->assertCount(1, $notifications);
 
@@ -67,8 +65,7 @@ final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
         $field->setAlias('custom_field_test');
         $field->setCharLengthLimit(64);
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntity($field);
         $fieldModel->getRepository()->detachEntity($field);
 

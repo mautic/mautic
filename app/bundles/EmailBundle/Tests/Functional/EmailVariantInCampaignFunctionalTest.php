@@ -38,8 +38,7 @@ final class EmailVariantInCampaignFunctionalTest extends MauticMysqlTestCase
         $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
         $this->assertStringContainsString('2 total events(s) to be processed in batches', $commandResult->getDisplay());
 
-        /** @var StatRepository $emailStatRepository */
-        $emailStatRepository = $this->getContainer()->get(StatRepository::class);
+        $emailStatRepository = $this->getService(StatRepository::class);
 
         // The email should be sent only once to the contact (either parent or variant,
         // depending on A/B test weight distribution)

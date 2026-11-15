@@ -38,7 +38,7 @@ final class RemovedSocialBundleTest extends MauticMysqlTestCase
             $this->assertSame(['existing_setting' => 'preserved'], $integration->getFeatureSettings());
         }
 
-        $integrations = self::getContainer()->get(IntegrationHelper::class)->getIntegrationObjects();
+        $integrations = $this->getService(IntegrationHelper::class)->getIntegrationObjects();
         $this->assertArrayNotHasKey('Twitter', $integrations);
         $this->assertArrayHasKey('Salesforce', $integrations);
 

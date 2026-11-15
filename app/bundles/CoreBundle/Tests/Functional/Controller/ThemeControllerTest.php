@@ -23,10 +23,10 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         $this->configParams['legacy_builder_enabled'] = true;
         parent::setUp();
 
-        $this->pathsHelper = $this->getContainer()->get(PathsHelper::class);
+        $this->pathsHelper = $this->getService(PathsHelper::class);
         $this->assertInstanceOf(PathsHelper::class, $this->pathsHelper);
 
-        $this->filesystem  = $this->getContainer()->get(Filesystem::class);
+        $this->filesystem  = $this->getService(Filesystem::class);
         $this->assertInstanceOf(Filesystem::class, $this->filesystem);
 
         $themePath = $this->pathsHelper->getThemesPath();
@@ -72,7 +72,7 @@ final class ThemeControllerTest extends MauticMysqlTestCase
 
     public function testBatchDeleteActionWithNonCoreTheme(): void
     {
-        $themeHelper = self::getContainer()->get(ThemeHelper::class);
+        $themeHelper = $this->getService(ThemeHelper::class);
         $this->assertInstanceOf(ThemeHelper::class, $themeHelper);
         $themeHelper->copy('blank', 'blanktest');
         $themeHelper->copy('blank', 'auroratest');
@@ -121,7 +121,7 @@ final class ThemeControllerTest extends MauticMysqlTestCase
 
         // Reboot kernel to reload all themes
         self::bootKernel();
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 

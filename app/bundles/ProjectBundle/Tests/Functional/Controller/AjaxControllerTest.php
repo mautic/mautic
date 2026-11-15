@@ -21,8 +21,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
             'Red Project',
         ];
 
-        /** @var ProjectModel $projectModel */
-        $projectModel = self::getContainer()->get(ProjectModel::class);
+        $projectModel = $this->getService(ProjectModel::class);
 
         $projects = array_map(
             static function (string $projectName) use ($projectModel): Project {
@@ -65,13 +64,12 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
     public function testCreatingDuplicateProject(): void
     {
-        /** @var ProjectModel $projectModel */
-        $projectModel = self::getContainer()->get(ProjectModel::class);
+        $projectModel = $this->getService(ProjectModel::class);
         $this->assertInstanceOf(ProjectModel::class, $projectModel);
 
         $this->assertCount(
             0,
-            $this->getContainer()->get(ProjectRepository::class)->findAll(),
+            $this->getService(ProjectRepository::class)->findAll(),
             'There should be no projects at the beginning of the test.'
         );
 
@@ -81,7 +79,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->assertCount(
             1,
-            $this->getContainer()->get(ProjectRepository::class)->findAll(),
+            $this->getService(ProjectRepository::class)->findAll(),
             'There should be 1 project after creating the first one.'
         );
 
@@ -96,7 +94,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->assertCount(
             1,
-            $this->getContainer()->get(ProjectRepository::class)->findAll(),
+            $this->getService(ProjectRepository::class)->findAll(),
             'There should be still 1 project after an attempt to create a duplicate project.'
         );
 
@@ -111,7 +109,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->assertCount(
             2,
-            $this->getContainer()->get(ProjectRepository::class)->findAll(),
+            $this->getService(ProjectRepository::class)->findAll(),
             'There should be 2 projects after an attempt to create a unique project.'
         );
     }
@@ -126,8 +124,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     #[DataProvider('xssPayloadsProvider')]
     public function testProjectNamesAreEscapedInAjaxResponse(string $xssPayload, string $dangerousSubstring): void
     {
-        /** @var ProjectModel $projectModel */
-        $projectModel = self::getContainer()->get(ProjectModel::class);
+        $projectModel = $this->getService(ProjectModel::class);
         $this->assertInstanceOf(ProjectModel::class, $projectModel);
 
         // Create a project with an XSS payload in the name
@@ -219,8 +216,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     #[DataProvider('specialCharacterProjectNamesProvider')]
     public function testProjectNamesWithSpecialCharactersAreEscapedAndFunctional(string $projectName): void
     {
-        /** @var ProjectModel $projectModel */
-        $projectModel = self::getContainer()->get(ProjectModel::class);
+        $projectModel = $this->getService(ProjectModel::class);
         $this->assertInstanceOf(ProjectModel::class, $projectModel);
 
         // Create a project with special characters

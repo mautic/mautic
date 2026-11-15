@@ -12,7 +12,7 @@ final class SysinfoControllerTest extends MauticMysqlTestCase
 {
     public function testDbInfoIsShown(): void
     {
-        $sysinfoModel = self::getContainer()->get(SysinfoModel::class);
+        $sysinfoModel = $this->getService(SysinfoModel::class);
         $this->assertInstanceOf(SysinfoModel::class, $sysinfoModel);
         $dbInfo = $sysinfoModel->getDbInfo();
 

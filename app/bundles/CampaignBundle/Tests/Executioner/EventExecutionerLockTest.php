@@ -41,8 +41,8 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
         parent::setUp();
 
-        $this->eventExecutioner = self::getContainer()->get(EventExecutioner::class);
-        $this->eventDispatcher  = self::getContainer()->get(EventDispatcherInterface::class);
+        $this->eventExecutioner = $this->getService(EventExecutioner::class);
+        $this->eventDispatcher  = $this->getService(EventDispatcherInterface::class);
 
         $this->logger           = self::getContainer()->get('monolog.logger.mautic');
         $this->originalHandlers = $this->logger->getHandlers();
@@ -70,7 +70,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $this->eventExecutioner->executeForContacts($event, $contacts);
         $this->assertSame(self::ADD_POINTS, $contact->getPoints(), 'Points should be added.');
 
-        $logs = $this->getContainer()->get(LeadEventLogRepository::class)->findAll();
+        $logs = $this->getService(LeadEventLogRepository::class)->findAll();
         $this->assertCount(1, $logs);
 
         $log = reset($logs);
@@ -96,7 +96,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $contacts = new ArrayCollection([$contact->getId() => $contact]);
         $this->eventExecutioner->executeForContacts($event, $contacts);
 
-        $logs = $this->getContainer()->get(LeadEventLogRepository::class)->findAll();
+        $logs = $this->getService(LeadEventLogRepository::class)->findAll();
         $this->assertCount(1, $logs);
 
         $log = reset($logs);
@@ -123,7 +123,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $this->eventExecutioner->executeForContacts($event, $contacts);
         $this->assertSame(0, $contact->getPoints(), 'Points should not be added as the execution failed.');
 
-        $logs = $this->getContainer()->get(LeadEventLogRepository::class)->findAll();
+        $logs = $this->getService(LeadEventLogRepository::class)->findAll();
         $this->assertCount(1, $logs);
 
         $log = reset($logs);

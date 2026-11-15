@@ -39,7 +39,7 @@ final class DynamicContentControllerTest extends MauticMysqlTestCase
             ->setSlotName('slot Name')
             ->setFilters($filters);
 
-        $model = self::getContainer()->get(DynamicContentModel::class);
+        $model = $this->getService(DynamicContentModel::class);
         $model->saveEntity($dwc);
 
         $this->dwc = $dwc;
@@ -60,7 +60,7 @@ final class DynamicContentControllerTest extends MauticMysqlTestCase
         $this->client->submit($dwcForm);
 
         $clientResponse         = $this->client->getResponse();
-        $model                  = self::getContainer()->get(DynamicContentModel::class);
+        $model                  = $this->getService(DynamicContentModel::class);
         $dynamicContent         = $model->getEntity($this->dwc->getId());
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertContains((string) $tag1->getId(), $dynamicContent->getFilters()[0]['filter']);
@@ -71,7 +71,7 @@ final class DynamicContentControllerTest extends MauticMysqlTestCase
         $tag = new Tag();
         $tag->setTag($tagName);
 
-        $tagModel = self::getContainer()->get(TagModel::class);
+        $tagModel = $this->getService(TagModel::class);
         $tagModel->saveEntity($tag);
 
         return $tag;

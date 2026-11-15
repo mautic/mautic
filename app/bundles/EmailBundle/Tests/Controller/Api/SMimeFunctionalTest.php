@@ -121,7 +121,7 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
         $privateKeyContent = file_get_contents($privateKeyPath);
 
         // Encrypt it using the EncryptionHelper
-        $encryptionHelper = $this->getContainer()->get(EncryptionHelper::class);
+        $encryptionHelper = $this->getService(EncryptionHelper::class);
         $encryptedContent = $encryptionHelper->encrypt($privateKeyContent);
 
         // Write the encrypted content to .pem.enc file

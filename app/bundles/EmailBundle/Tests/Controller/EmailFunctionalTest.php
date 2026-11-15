@@ -102,7 +102,7 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
         ], $email->getExcludedLists());
 
         // assert audit log
-        $auditLogs = $this->getContainer()->get(AuditLogRepository::class)->findBy([
+        $auditLogs = $this->getService(AuditLogRepository::class)->findBy([
             'bundle' => 'email',
             'object' => 'email',
         ]);
@@ -157,7 +157,7 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame($preferenceCenterTwo->getId(), $email->getPreferenceCenter()->getId());
 
-        $auditLogs = $this->getContainer()->get(AuditLogRepository::class)->findBy([
+        $auditLogs = $this->getService(AuditLogRepository::class)->findBy([
             'bundle' => 'email',
             'object' => 'email',
         ]);

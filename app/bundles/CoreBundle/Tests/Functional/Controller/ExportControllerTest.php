@@ -81,7 +81,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         ];
         $report->setColumns($coulmns);
 
-        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
@@ -144,7 +144,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);

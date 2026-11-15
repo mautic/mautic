@@ -62,7 +62,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('flashes', $response);
 
         $this->em->clear();
-        $updatedCompany = $this->getContainer()->get(CompanyRepository::class)->find($company->getId());
+        $updatedCompany = $this->getService(CompanyRepository::class)->find($company->getId());
         $this->assertInstanceOf(Company::class, $updatedCompany);
         $this->assertSame($owner->getId(), $updatedCompany->getOwner()->getId());
     }
@@ -102,7 +102,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername(self::USERNAME);
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);

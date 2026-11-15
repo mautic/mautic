@@ -27,7 +27,7 @@ final class WebhookQueueFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($payload, gzuncompress($payloadDbValues['payload_compressed']));
 
         $this->em->clear();
-        $webhookQueue = $this->getContainer()->get(WebhookQueueRepository::class)
+        $webhookQueue = $this->getService(WebhookQueueRepository::class)
             ->find($webhookQueue->getId());
         $this->assertInstanceOf(WebhookQueue::class, $webhookQueue);
 

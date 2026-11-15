@@ -93,7 +93,7 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertSame('inline; filename="Product brochure.png"', $response->headers->get('Content-Disposition'));
         $this->assertSame($this->expectedPngContent, $content);
 
-        $downloadRepo = $this->getContainer()->get(DownloadRepository::class);
+        $downloadRepo = $this->getService(DownloadRepository::class);
 
         $download = $downloadRepo->findOneBy(['asset' => $this->asset]);
         $this->assertInstanceOf(Download::class, $download);
@@ -186,8 +186,7 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
     {
         $this->logoutUser();
         $asset                = $this->createAsset(['title' => 'Missing Local File Asset']);
-        /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
+        $coreParametersHelper = $this->getService(CoreParametersHelper::class);
         $asset->setUploadDir($coreParametersHelper->get('upload_dir'));
         $this->em->flush();
 

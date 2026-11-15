@@ -181,7 +181,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
         $user->setRole($role);
@@ -231,7 +231,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertArrayHasKey('username', $responseData);
 
             // Verify the user was actually created in the database
-            $userRepository = $this->getContainer()->get(UserRepository::class);
+            $userRepository = $this->getService(UserRepository::class);
             $user           = $userRepository->find($responseData['id']);
 
             $this->assertInstanceOf(User::class, $user);
@@ -241,7 +241,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertSame($userData['email'], $user->getEmail());
 
             // Verify the password was hashed correctly by checking if we can verify it
-            $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+            $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
             $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
             $this->assertTrue(
                 $hasher->verify($user->getPassword(), $userData['plainPassword']),

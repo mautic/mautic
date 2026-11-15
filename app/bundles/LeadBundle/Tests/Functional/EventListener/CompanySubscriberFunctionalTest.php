@@ -25,8 +25,7 @@ final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
      */
     public function testCreateCompany(): void
     {
-        /** @var UserModel $userModel */
-        $userModel = self::getContainer()->get(UserModel::class);
+        $userModel = $this->getService(UserModel::class);
         $users     = $userModel->getRepository()->findAll();
         $user      = reset($users);
         $this->assertInstanceOf(User::class, $user);
@@ -34,11 +33,10 @@ final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
         $company = new Company();
         $company->setName('Test company');
         $company->setOwner($user);
-        /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $companyModel = $this->getService(CompanyModel::class);
         $companyModel->saveEntity($company);
 
-        $auditLogRepository = $this->getContainer()->get(AuditLogRepository::class);
+        $auditLogRepository = $this->getService(AuditLogRepository::class);
         $auditLogs          = $auditLogRepository->findOneBy(['bundle' => 'lead', 'object' => 'company', 'action' => 'create', 'objectId' => $company->getId()]);
         $this->assertInstanceOf(AuditLog::class, $auditLogs);
         $auditLogDetail = $auditLogs->getDetails();
@@ -50,19 +48,17 @@ final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
     {
         $company = new Company();
         $company->setName('Test Delete Company');
-        /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $companyModel = $this->getService(CompanyModel::class);
         $companyModel->saveEntity($company);
 
         $lead = new Lead();
         $lead->setFirstname('Test name');
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
         $leadModel->saveEntity($lead);
         $companyModel->addLeadToCompany($company, $lead);
         $leadModel->saveEntity($lead);
 
-        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+        $leadRepository = $this->getService(LeadRepository::class);
         $lead           = $leadRepository->findOneBy(['firstname' => 'Test name']);
         $this->assertInstanceOf(Lead::class, $lead);
         $this->assertSame('Test Delete Company', $lead->getCompany());

@@ -43,7 +43,7 @@ final class SimplePaginatorTest extends MauticMysqlTestCase
         $this->em->persist($ipAddress3);
         $this->em->flush();
 
-        $repository = self::getContainer()->get(IpAddressRepository::class);
+        $repository = $this->getService(IpAddressRepository::class);
 
         $paginator  = $repository->getEntities([
             'use_simple_paginator' => true,

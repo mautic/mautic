@@ -70,7 +70,7 @@ final class ThemeHelperSandboxTest extends MauticMysqlTestCase
         $this->assertIsCallable(self::class.'::recordCallbackInvocation');
         $callback    = json_encode(self::class.'::recordCallbackInvocation', JSON_THROW_ON_ERROR);
         $themeName   = $this->createMaliciousTheme('{% block content %}{{ [1, 2]|'.$filter.'('.$callback.') }}{% endblock %}');
-        $themeHelper = self::getContainer()->get(ThemeHelper::class);
+        $themeHelper = $this->getService(ThemeHelper::class);
 
         try {
             $themeHelper->renderThemeTemplate('@themes/'.$themeName.'/html/page.html.twig', []);
@@ -193,7 +193,7 @@ final class ThemeHelperSandboxTest extends MauticMysqlTestCase
      */
     public function testRealShippedThemeRendersThroughSandbox(): void
     {
-        $themeHelper = self::getContainer()->get(ThemeHelper::class);
+        $themeHelper = $this->getService(ThemeHelper::class);
 
         $page = $this->createPage('blank');
 

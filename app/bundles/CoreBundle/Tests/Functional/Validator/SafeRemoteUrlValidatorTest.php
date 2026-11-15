@@ -34,7 +34,7 @@ final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessageMatches('/Expected argument of type "Mautic\\\\CoreBundle\\\\Validator\\\\SafeRemoteUrl"/');
 
-        $validator  = new SafeRemoteUrlValidator(self::getContainer()->get(CoreParametersHelper::class));
+        $validator  = new SafeRemoteUrlValidator($this->getService(CoreParametersHelper::class));
         $validator->validateInContext('value', new NotBlank(), $this->createStub(ExecutionContextInterface::class));
     }
 
@@ -53,7 +53,7 @@ final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
     #[DataProvider('dataTestWithValidateRemoteDomainsDisabled')]
     public function testWithValidateRemoteDomainsDisabled(mixed $value): void
     {
-        $validator = self::getContainer()->get(ValidatorInterface::class);
+        $validator = $this->getService(ValidatorInterface::class);
         $errors    = $validator->validate($value, new SafeRemoteUrl());
 
         $this->assertCount(0, $errors);
@@ -76,7 +76,7 @@ final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
     #[DataProvider('dataTestWithValidateRemoteDomainsEnabled')]
     public function testWithValidateRemoteDomainsEnabled(mixed $value, bool $valid): void
     {
-        $validator = self::getContainer()->get(ValidatorInterface::class);
+        $validator = $this->getService(ValidatorInterface::class);
         $errors    = $validator->validate($value, new SafeRemoteUrl());
 
         $this->assertCount($valid ? 0 : 1, $errors);

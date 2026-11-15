@@ -38,8 +38,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        /** @var EmailModel $emailModel */
-        $emailModel = self::getContainer()->get(EmailModel::class);
+        $emailModel = $this->getService(EmailModel::class);
         $this->assertInstanceOf(EmailModel::class, $emailModel);
         $this->emailModel = $emailModel;
     }
@@ -75,7 +74,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment]);
 
         // Emulate email reads
-        $statRepository = $this->getContainer()->get(StatRepository::class);
+        $statRepository = $this->getService(StatRepository::class);
         $stats          = $statRepository->findBy([
             'email' => $email,
             'lead'  => $contacts,
@@ -133,8 +132,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
             $contacts[] = $contact;
         }
 
-        /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get(LeadModel::class);
+        $contactModel = $this->getService(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntities($contacts);
 
@@ -559,7 +557,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->addContactsToSegment(array_slice($contacts, 2, 3), $segment);
 
-        self::getContainer()->get(EventDispatcherInterface::class)->dispatch(new ListChangeEvent($contacts[2], $segment, true));
+        $this->getService(EventDispatcherInterface::class)->dispatch(new ListChangeEvent($contacts[2], $segment, true));
 
         $loadedEmail = $this->emailModel->getEntity($email->getId());
         $this->assertInstanceOf(Email::class, $loadedEmail);
@@ -576,7 +574,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->emailModel->getPendingLeads($email, null, true);
 
-        $listModel = self::getContainer()->get(ListModel::class);
+        $listModel = $this->getService(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $listModel);
 
         foreach (array_slice($contacts, 2, 3) as $contact) {
@@ -598,7 +596,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->emailModel->getPendingLeads($email, null, true);
 
-        $listModel = self::getContainer()->get(ListModel::class);
+        $listModel = $this->getService(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $listModel);
 
         foreach (array_slice($contacts, 2, 3) as $contact) {
@@ -714,7 +712,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var Email $winnerReloaded */
-        $winnerReloaded = $this->getContainer()->get(EmailRepository::class)->find($winner->getId());
+        $winnerReloaded = $this->getService(EmailRepository::class)->find($winner->getId());
 
         $this->assertInstanceOf(Email::class, $winnerReloaded);
         $this->assertNotInstanceOf(VariantEntityInterface::class, $winnerReloaded->getVariantParent());

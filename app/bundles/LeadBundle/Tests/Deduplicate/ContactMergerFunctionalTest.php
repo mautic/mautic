@@ -18,12 +18,10 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 {
     public function testMergedContactFound(): void
     {
-        /** @var LeadModel $model */
-        $model = self::getContainer()->get(LeadModel::class);
+        $model = $this->getService(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $model);
 
-        /** @var ContactMerger $merger */
-        $merger = self::getContainer()->get(ContactMerger::class);
+        $merger = $this->getService(ContactMerger::class);
         $this->assertInstanceOf(ContactMerger::class, $merger);
 
         $bob = new Lead();
@@ -77,15 +75,13 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
     public function testMergedContactsPointsAreAccurate(): void
     {
-        /** @var LeadModel $model */
-        $model = self::getContainer()->get(LeadModel::class);
+        $model = $this->getService(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $model);
 
-        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $em = $this->getService(EntityManagerInterface::class);
         $this->assertInstanceOf(EntityManager::class, $em);
 
-        /** @var ContactMerger $merger */
-        $merger = self::getContainer()->get(ContactMerger::class);
+        $merger = $this->getService(ContactMerger::class);
         $this->assertInstanceOf(ContactMerger::class, $merger);
 
         // Startout Jane with 50 points
@@ -153,20 +149,16 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
     public function testMergedContactKeepsCompanyAssociations(): void
     {
-        /** @var LeadModel $model */
-        $model = self::getContainer()->get(LeadModel::class);
+        $model = $this->getService(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $model);
 
-        /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $companyModel = $this->getService(CompanyModel::class);
         $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
-        /** @var ContactMerger $merger */
-        $merger = self::getContainer()->get(ContactMerger::class);
+        $merger = $this->getService(ContactMerger::class);
         $this->assertInstanceOf(ContactMerger::class, $merger);
 
-        /** @var CompanyLeadRepository $companyLeadRepository */
-        $companyLeadRepository = self::getContainer()->get(CompanyLeadRepository::class);
+        $companyLeadRepository = $this->getService(CompanyLeadRepository::class);
         $this->assertInstanceOf(CompanyLeadRepository::class, $companyLeadRepository);
 
         // Jane is a known contact associated with a primary company

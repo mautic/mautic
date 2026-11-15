@@ -22,8 +22,7 @@ abstract class OwnershipScopedApiAuthorizationTestBase extends MauticMysqlTestCa
         $role->setName('role_'.$username);
         $role->setIsAdmin(false);
 
-        /** @var RoleModel $roleModel */
-        $roleModel = static::getContainer()->get(RoleModel::class);
+        $roleModel = $this->getService(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
 
         $user = new User();
@@ -33,7 +32,7 @@ abstract class OwnershipScopedApiAuthorizationTestBase extends MauticMysqlTestCa
         $user->setLastName('User');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
 

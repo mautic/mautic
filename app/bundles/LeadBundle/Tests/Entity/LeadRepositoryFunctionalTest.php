@@ -24,8 +24,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testPointsAreAdded(): void
     {
-        /** @var LeadModel $model */
-        $model = self::getContainer()->get(LeadModel::class);
+        $model = $this->getService(LeadModel::class);
 
         $this->lead->adjustPoints(100);
 
@@ -39,8 +38,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testPointsAreSubtracted(): void
     {
-        /** @var LeadModel $model */
-        $model = self::getContainer()->get(LeadModel::class);
+        $model = $this->getService(LeadModel::class);
 
         $this->lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
 
@@ -54,8 +52,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testPointsAreMultiplied(): void
     {
-        /** @var LeadModel $model */
-        $model = self::getContainer()->get(LeadModel::class);
+        $model = $this->getService(LeadModel::class);
 
         $this->lead->adjustPoints(2, Lead::POINTS_MULTIPLY);
 
@@ -69,8 +66,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testPointsAreDivided(): void
     {
-        /** @var LeadModel $model */
-        $model = self::getContainer()->get(LeadModel::class);
+        $model = $this->getService(LeadModel::class);
 
         $this->lead->adjustPoints(2, Lead::POINTS_DIVIDE);
 
@@ -84,8 +80,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testMixedOperatorPointsAreCalculated(): void
     {
-        /** @var LeadModel $model */
-        $model = self::getContainer()->get(LeadModel::class);
+        $model = $this->getService(LeadModel::class);
 
         $this->lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
         $this->lead->adjustPoints(120, Lead::POINTS_ADD);
@@ -102,8 +97,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testMixedModelAndRepositorySavesDoNotDoublePoints(): void
     {
-        /** @var LeadModel $model */
-        $model = self::getContainer()->get(LeadModel::class);
+        $model = $this->getService(LeadModel::class);
         $this->lead->adjustPoints(120, Lead::POINTS_ADD);
         $model->saveEntity($this->lead);
         // Changes should be stored with points
@@ -115,7 +109,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayNotHasKey('points', $changes);
         // Points should remain the same
         $model->saveEntity($this->lead);
-        self::getContainer()->get(LeadRepository::class)->saveEntity($this->lead);
+        $this->getService(LeadRepository::class)->saveEntity($this->lead);
         $this->assertEquals(220, $this->lead->getPoints());
     }
 
@@ -129,8 +123,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
             $contactIds[] = $this->lead->getId();
         }
 
-        /** @var LeadRepository $repo */
-        $repo     = $this->getContainer()->get(LeadRepository::class);
+        $repo     = $this->getService(LeadRepository::class);
         $contacts = $repo->getContacts($contactIds);
 
         $this->assertCount($expectedCount, $contacts);
@@ -255,8 +248,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testIfLeadExists(): void
     {
-        /** @var LeadRepository $repo */
-        $repo = $this->getContainer()->get(LeadRepository::class);
+        $repo = $this->getService(LeadRepository::class);
 
         $this->assertFalse($repo->exists('654'));
 

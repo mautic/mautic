@@ -276,7 +276,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        $submissionRepository = self::getContainer()->get(SubmissionRepository::class);
+        $submissionRepository = $this->getService(SubmissionRepository::class);
         $this->assertInstanceOf(SubmissionRepository::class, $submissionRepository);
 
         $submissions = $submissionRepository->findBy(['form' => $formId]);
@@ -359,8 +359,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        /** @var SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->getContainer()->get(SubmissionRepository::class);
+        $submissionRepository = $this->getService(SubmissionRepository::class);
 
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $formId]);
@@ -459,7 +458,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         // Ensure the submission was created properly.
-        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findAll();
+        $submissions = $this->getService(SubmissionRepository::class)->findAll();
         $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
@@ -552,7 +551,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         // Ensure the submission was created properly.
-        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findAll();
+        $submissions = $this->getService(SubmissionRepository::class)->findAll();
 
         // It should not create a submission now as the required field is now visible and empty.
         $this->assertCount(0, $submissions);
@@ -660,8 +659,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $campaignSources = ['forms' => [$formId => $formId]];
 
-        /** @var CampaignModel $campaignModel */
-        $campaignModel = self::getContainer()->get(CampaignModel::class);
+        $campaignModel = $this->getService(CampaignModel::class);
 
         $campaign = new Campaign();
         $campaign->setName('Test Campaign');
@@ -681,7 +679,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
 
-        $campaignLeads = $this->getContainer()->get(LeadRepository::class)->findBy(['campaign' => $campaign->getId()]);
+        $campaignLeads = $this->getService(LeadRepository::class)->findBy(['campaign' => $campaign->getId()]);
         $this->assertCount(1, $campaignLeads);
     }
 
@@ -737,7 +735,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         // Ensure the submission was created properly.
-        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findAll();
+        $submissions = $this->getService(SubmissionRepository::class)->findAll();
 
         $this->assertCount(1, $submissions);
 
@@ -776,8 +774,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $role->setIsAdmin(false);
         $role->setRawPermissions(['form:forms' => ['viewown']]);
 
-        /** @var RoleRepository $roleRepository */
-        $roleRepository = $this->getContainer()->get(RoleRepository::class);
+        $roleRepository = $this->getService(RoleRepository::class);
         $roleRepository->saveEntity($role);
 
         $user = new User();
@@ -787,12 +784,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('test');
         $user->setRole($role);
 
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($this->getUserPlainPassword()));
 
-        /** @var UserRepository $userRepo */
-        $userRepo = $this->getContainer()->get(UserRepository::class);
+        $userRepo = $this->getService(UserRepository::class);
         $userRepo->saveEntities([$user]);
 
         return $user;
@@ -845,7 +841,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($htmlForm);
 
         // Ensure the submission was created properly.
-        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findAll();
+        $submissions = $this->getService(SubmissionRepository::class)->findAll();
         $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
@@ -912,7 +908,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         // Ensure the submission was created properly.
-        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findAll();
+        $submissions = $this->getService(SubmissionRepository::class)->findAll();
         $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
@@ -1572,8 +1568,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Deleting the submission decrements the counter symmetrically (via the postRemove listener).
         $submissionId    = $finalSubmissionsData['submissions'][0]['id'];
-        /** @var SubmissionModel $submissionModel */
-        $submissionModel = self::getContainer()->get(SubmissionModel::class);
+        $submissionModel = $this->getService(SubmissionModel::class);
         $submission      = $submissionModel->getEntity($submissionId);
         $this->assertInstanceOf(Submission::class, $submission);
         $submissionModel->deleteEntity($submission);
@@ -1635,8 +1630,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        /** @var SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->getContainer()->get(SubmissionRepository::class);
+        $submissionRepository = $this->getService(SubmissionRepository::class);
 
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $formId]);
@@ -1668,8 +1662,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->submitForm($form);
 
-        /** @var SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->getContainer()->get(SubmissionRepository::class);
+        $submissionRepository = $this->getService(SubmissionRepository::class);
 
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $form['id']]);
@@ -1703,8 +1696,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             $this->submitForm($form);
         }
 
-        /** @var SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->getContainer()->get(SubmissionRepository::class);
+        $submissionRepository = $this->getService(SubmissionRepository::class);
 
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $form['id']]);

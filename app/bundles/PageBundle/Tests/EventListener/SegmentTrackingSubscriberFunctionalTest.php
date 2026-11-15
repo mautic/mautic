@@ -32,7 +32,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         $this->configParams['append_segment_id_tracking_url'] = 'testFeatureFlagIsDisabled' !== $this->name();
         parent::setUp();
-        $this->dispatcher = $this->getContainer()->get(EventDispatcherInterface::class);
+        $this->dispatcher = $this->getService(EventDispatcherInterface::class);
     }
 
     public function testFeatureFlagIsDisabled(): void
@@ -124,7 +124,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $segments   = $this->getContactSegments($lead);
         $segmentIds = array_keys($segments);
 
-        $listLead = $this->getContainer()->get(ListLeadRepository::class)->findOneBy([
+        $listLead = $this->getService(ListLeadRepository::class)->findOneBy([
             'lead' => $lead,
             'list' => $segmentIds[0],
         ]);
@@ -194,7 +194,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $segments = $this->getContactSegments($lead);
 
         $firstSegmentId = array_key_first($segments);
-        $segment        = $this->getContainer()->get(LeadListRepository::class)->find($firstSegmentId);
+        $segment        = $this->getService(LeadListRepository::class)->find($firstSegmentId);
         $this->assertInstanceOf(LeadList::class, $segment);
         $segment->setIsPublished(false);
         $this->em->persist($segment);
@@ -252,7 +252,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertContains((string) $newSegment->getId(), $segmentIds2, 'New segment ID should be included');
 
         $firstSegmentId = array_key_first($initialSegments);
-        $listLead       = $this->getContainer()->get(ListLeadRepository::class)->findOneBy([
+        $listLead       = $this->getService(ListLeadRepository::class)->findOneBy([
             'lead' => $lead->getId(),
             'list' => $firstSegmentId,
         ]);
@@ -317,7 +317,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        return $this->getContainer()->get(LeadRepository::class)->find($lead->getId());
+        return $this->getService(LeadRepository::class)->find($lead->getId());
     }
 
     /**
@@ -327,8 +327,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function getContactSegments(Lead $lead): array
     {
-        /** @var LeadListRepository $repository */
-        $repository = $this->getContainer()->get(LeadListRepository::class);
+        $repository = $this->getService(LeadListRepository::class);
 
         return $repository->getLeadLists($lead->getId(), false, true);
     }

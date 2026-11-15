@@ -32,7 +32,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         if ('testRestrictedAssetFieldIsNotRenderedInConfigForm' === $this->name()) {
-            $translator        = self::getContainer()->get(TranslatorInterface::class);
+            $translator        = $this->getService(TranslatorInterface::class);
             $restrictionHelper = new RestrictionHelper(
                 $translator,
                 ['upload_dir'],
@@ -102,7 +102,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     private function getConfigPath(): string
     {
         /** @var \AppKernel $kernel */
-        $kernel = self::getContainer()->get(KernelInterface::class);
+        $kernel = $this->getService(KernelInterface::class);
 
         return $kernel->getLocalConfigFile();
     }

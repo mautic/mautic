@@ -24,7 +24,7 @@ final class DoNotContactRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $repository = $this->getContainer()->get(DoNotContactRepository::class);
+        $repository = $this->getService(DoNotContactRepository::class);
         $this->assertInstanceOf(DoNotContactRepository::class, $repository);
 
         $allDncRecords = $repository->getChannelList(null);

@@ -38,9 +38,9 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->listModel  = self::getContainer()->get(ListModel::class);
+        $this->listModel  = $this->getService(ListModel::class);
         $this->prefix     = self::getContainer()->getParameter('mautic.db_table_prefix');
-        $this->translator = self::getContainer()->get(TranslatorInterface::class);
+        $this->translator = $this->getService(TranslatorInterface::class);
     }
 
     protected function beforeBeginTransaction(): void
@@ -643,8 +643,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
-        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
+        $segmentCountCacheHelper = $this->getService(SegmentCountCacheHelper::class);
         $segmentCountCacheHelper->setSegmentContactCount($segment->getId(), 2);
 
         $this->client->request(Request::METHOD_GET, '/api/segments');
@@ -855,7 +854,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(0, $commandTester->getStatusCode());
 
-        $members = $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment->getId()]);
+        $members = $this->getService(ListLeadRepository::class)->findBy(['list' => $segment->getId()]);
 
         $this->assertCount($expected, $members);
 
@@ -916,7 +915,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(0, $commandTester->getStatusCode());
 
-        $members = $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment->getId()]);
+        $members = $this->getService(ListLeadRepository::class)->findBy(['list' => $segment->getId()]);
 
         $this->assertCount($expectedCount, $members);
 
@@ -956,8 +955,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $field->setLabel('Company Created At');
         $field->setAlias('company_created_at');
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntity($field);
 
         $timeStamp = new \DateTime();
@@ -967,8 +965,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             $timeStamp->modify('+1 day');
         }
 
-        /** @var CompanyRepository $companyRepo */
-        $companyRepo = $this->getContainer()->get(CompanyRepository::class);
+        $companyRepo = $this->getService(CompanyRepository::class);
         $company     = new Company();
         $company->setName($name);
         $company->addUpdatedField('company_created_at', $timeStamp->format('Y-m-d H:i:s'));

@@ -32,7 +32,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
     public function testEditPageWithUnmatchedActivity(string $object, string $action): void
     {
         // Non-empty profile values prevent unrelated users matching empty audit details.
-        foreach (self::getContainer()->get(UserRepository::class)->findAll() as $user) {
+        foreach ($this->getService(UserRepository::class)->findAll() as $user) {
             $user->setFirstName('Existing');
             $user->setLastName('User');
             $user->setPosition('Existing position');

@@ -116,8 +116,8 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $matchingSegment    = $this->getContainer()->get(LeadListRepository::class)->find($matchingSegment->getId());
-        $nonMatchingSegment = $this->getContainer()->get(LeadListRepository::class)->find($nonMatchingSegment->getId());
+        $matchingSegment    = $this->getService(LeadListRepository::class)->find($matchingSegment->getId());
+        $nonMatchingSegment = $this->getService(LeadListRepository::class)->find($nonMatchingSegment->getId());
 
         $this->assertSame('os', $matchingSegment?->getCategory()?->getAlias());
         $this->assertSame('hardware', $nonMatchingSegment?->getCategory()?->getAlias());
@@ -709,7 +709,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     private function loginOtherUser(string $name): void
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => $name]);
+        $user = $this->getService(UserRepository::class)->findOneBy(['username' => $name]);
         $this->assertInstanceOf(User::class, $user);
 
         $this->loginUser($user);
@@ -737,7 +737,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName($userDetails['last-name']);
         $user->setRole($role);
 
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
 

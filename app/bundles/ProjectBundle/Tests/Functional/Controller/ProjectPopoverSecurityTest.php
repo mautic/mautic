@@ -18,8 +18,7 @@ final class ProjectPopoverSecurityTest extends MauticMysqlTestCase
         $xssNamePayload        = '<img src=x onerror=alert("project-name-xss-marker")>';
         $xssDescriptionPayload = '<script>alert("project-desc-script-marker")</script><img src=x onerror=alert("project-desc-onerror-marker")>';
 
-        /** @var ProjectModel $projectModel */
-        $projectModel = self::getContainer()->get(ProjectModel::class);
+        $projectModel = $this->getService(ProjectModel::class);
         $project      = new Project();
         $project->setName($xssNamePayload);
         $project->setDescription($xssDescriptionPayload);
@@ -32,8 +31,7 @@ final class ProjectPopoverSecurityTest extends MauticMysqlTestCase
         $email->setTemplate('blank');
         $email->addProject($project);
 
-        /** @var EmailModel $emailModel */
-        $emailModel = self::getContainer()->get(EmailModel::class);
+        $emailModel = $this->getService(EmailModel::class);
         $emailModel->saveEntity($email);
 
         $this->client->request(Request::METHOD_GET, '/s/emails/view/'.$email->getId());

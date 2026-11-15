@@ -13,7 +13,7 @@ final class DeduplicateIdsCommandFunctionalTest extends MauticMysqlTestCase
 {
     public function testDeduplicateCommandWithContactIdsParam(): void
     {
-        $contactRepository = $this->getContainer()->get(LeadRepository::class);
+        $contactRepository = $this->getService(LeadRepository::class);
 
         $this->assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 

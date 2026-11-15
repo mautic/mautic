@@ -65,7 +65,7 @@ final class ClientControllerTest extends MauticMysqlTestCase
         $content = $this->client->getResponse()->getContent();
         $this->assertResponseIsSuccessful();
 
-        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
 
         // Check for total item count in pagination
         $this->assertStringContainsString(

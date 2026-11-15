@@ -37,7 +37,7 @@ final class PushContactTest extends MauticMysqlTestCase
         $integration->setIsPublished(true);
         $integration->setSupportedFeatures(['push_lead']);
         // Encrypted key by key, as the former integration saved them
-        $integration->setApiKeys(self::getContainer()->get(EncryptionService::class)->encrypt([
+        $integration->setApiKeys($this->getService(EncryptionService::class)->encrypt([
             'username' => 'mautic',
             'password' => self::API_KEY,
         ]));
@@ -58,7 +58,7 @@ final class PushContactTest extends MauticMysqlTestCase
         $contactId = $contact->getId();
         $this->em->clear();
 
-        $pushed = self::getContainer()->get(EventHelper::class)->pushLead([
+        $pushed = $this->getService(EventHelper::class)->pushLead([
             'integration' => 'Mailchimp',
             'config'      => [
                 'list_settings' => [
@@ -104,7 +104,7 @@ final class PushContactTest extends MauticMysqlTestCase
         $contactId = $contact->getId();
         $this->em->clear();
 
-        $pushed = self::getContainer()->get(EventHelper::class)->pushLead([
+        $pushed = $this->getService(EventHelper::class)->pushLead([
             'integration' => 'Mailchimp',
             'config'      => [
                 'list_settings' => [
@@ -162,7 +162,7 @@ final class PushContactTest extends MauticMysqlTestCase
 
     private function mockResponses(MockResponse ...$responses): void
     {
-        $httpClient = self::getContainer()->get(MockHttpClient::class);
+        $httpClient = $this->getService(MockHttpClient::class);
         $this->assertInstanceOf(MockHttpClient::class, $httpClient);
         $httpClient->setResponseFactory(function (string $method, string $url, array $options) use (&$responses): MockResponse {
             $this->requests[] = ['method' => $method, 'url' => strtok($url, '?'), 'options' => $options];

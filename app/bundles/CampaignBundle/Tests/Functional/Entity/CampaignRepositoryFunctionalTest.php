@@ -32,8 +32,7 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->addContactToCampaign($campaign, $contacts);
 
         // Call getCampaignsSegmentShare
-        /** @var CampaignRepository $campaignRepo */
-        $campaignRepo = $this->getContainer()->get(CampaignRepository::class);
+        $campaignRepo = $this->getService(CampaignRepository::class);
 
         $shareDetails = $campaignRepo->getCampaignsSegmentShare($segment->getId(), [$campaign->getId()]);
 

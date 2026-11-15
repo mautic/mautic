@@ -17,11 +17,10 @@ final class EmailAddressValidatorTest extends AbstractMauticTestCase
     #[DataProvider('provider')]
     public function testValidate(?string $value, int $expectedViolationCount): void
     {
-        /** @var EmailAddressValidator $emailAddressValidator */
-        $emailAddressValidator = self::getContainer()->get(EmailAddressValidator::class);
+        $emailAddressValidator = $this->getService(EmailAddressValidator::class);
         $this->assertInstanceOf(EmailAddressValidator::class, $emailAddressValidator);
 
-        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $context = new ExecutionContext($this->createStub(ValidatorInterface::class), null, $translator);

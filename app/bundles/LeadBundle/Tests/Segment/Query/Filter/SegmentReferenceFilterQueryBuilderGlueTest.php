@@ -66,7 +66,7 @@ final class SegmentReferenceFilterQueryBuilderGlueTest extends MauticMysqlTestCa
 
         $this->testSymfonyCommand('mautic:segments:update', ['--list-id' => $segmentD->getId()]);
 
-        $leadCount = $this->getContainer()->get(ListLeadRepository::class)->getContactsCountBySegment($segmentD->getId());
+        $leadCount = $this->getService(ListLeadRepository::class)->getContactsCountBySegment($segmentD->getId());
         $this->assertSame(4, $leadCount, 'Segment must contain all the leads.');
     }
 }

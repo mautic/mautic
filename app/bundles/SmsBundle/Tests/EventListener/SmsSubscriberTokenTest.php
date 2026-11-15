@@ -27,12 +27,10 @@ final class SmsSubscriberTokenTest extends MauticMysqlTestCase
     public function testSmsTokenReplacement(): void
     {
         $transport = $this->configureTwilioWithArrayTransport();
-        /** @var SmsModel $smsModel */
-        $smsModel  = $this->getContainer()->get(SmsModel::class);
+        $smsModel  = $this->getService(SmsModel::class);
         $this->assertInstanceOf(SmsModel::class, $smsModel);
 
-        /** @var LeadModel $contactModel */
-        $contactModel = $this->getContainer()->get(LeadModel::class);
+        $contactModel = $this->getService(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $contactModel);
 
         $page = new Page();

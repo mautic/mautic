@@ -52,9 +52,9 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->truncateTables('leads', 'webhooks', 'webhook_queue', 'webhook_events');
 
-        $this->webhookQueueRepository       = self::getContainer()->get(WebhookQueueRepository::class);
-        $this->notificationRepository       = self::getContainer()->get(NotificationRepository::class);
-        $this->webhhokRepository            = $this->getContainer()->get(WebhookRepository::class);
+        $this->webhookQueueRepository       = $this->getService(WebhookQueueRepository::class);
+        $this->notificationRepository       = $this->getService(NotificationRepository::class);
+        $this->webhhokRepository            = $this->getService(WebhookRepository::class);
     }
 
     /**
@@ -67,7 +67,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
     public function testWebhookWorkflowWithCommandProcess(): void
     {
-        $webhookQueueRepository = $this->getContainer()->get(WebhookQueueRepository::class);
+        $webhookQueueRepository = $this->getService(WebhookQueueRepository::class);
         $this->assertInstanceOf(WebhookQueueRepository::class, $webhookQueueRepository);
         $this->mockSuccessfulWebhookResponse(2);
         $webhook = $this->createWebhook();

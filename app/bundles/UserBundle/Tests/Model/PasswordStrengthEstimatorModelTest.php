@@ -23,9 +23,9 @@ final class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->passwordHasher = self::getContainer()->get(PasswordHasherFactoryInterface::class);
-        $this->roleRepository = self::getContainer()->get(RoleRepository::class);
-        $this->validator      = self::getContainer()->get(ValidatorInterface::class);
+        $this->passwordHasher = $this->getService(PasswordHasherFactoryInterface::class);
+        $this->roleRepository = $this->getService(RoleRepository::class);
+        $this->validator      = $this->getService(ValidatorInterface::class);
     }
 
     public function testThatItIsNotPossibleToCreateAnUserWithAWeakPassword(): void

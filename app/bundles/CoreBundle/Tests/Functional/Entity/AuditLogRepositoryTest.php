@@ -19,8 +19,7 @@ final class AuditLogRepositoryTest extends MauticMysqlTestCase
     #[DataProvider('dataForGetAuditLogsForLeads')]
     public function testGetAuditLogsForSingleLead(array $filters, int $expectedCount): void
     {
-        /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get(LeadModel::class);
+        $contactModel = $this->getService(LeadModel::class);
 
         $contact = new Lead();
         $contact->setEmail('john@doe.com');
@@ -39,8 +38,7 @@ final class AuditLogRepositoryTest extends MauticMysqlTestCase
         $this->em->persist($doNotContact);
         $contact->addDoNotContactEntry($doNotContact);
 
-        /** @var AuditLogRepository $alRepo */
-        $alRepo = $this->getContainer()->get(AuditLogRepository::class);
+        $alRepo = $this->getService(AuditLogRepository::class);
 
         $this->assertCount($expectedCount, $alRepo->getAuditLogsForLeads([$contact->getId()], $filters));
     }

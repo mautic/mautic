@@ -133,8 +133,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
 
         // Set new permissions
         $role->setIsAdmin(false);
-        /** @var RoleModel $roleModel */
-        $roleModel = self::getContainer()->get(RoleModel::class);
+        $roleModel = $this->getService(RoleModel::class);
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
@@ -150,7 +149,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
         $user->setRole($role);
@@ -191,7 +190,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
             $report->setCreatedByUser($createBy);
         }
 
-        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         return $report;
     }

@@ -266,8 +266,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $contactB = $this->createContact(self::CONTACT_B_EMAIL);
         $contactC = $this->createContact(self::CONTACT_C_EMAIL);
 
-        /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get(LeadModel::class);
+        $contactModel = $this->getService(LeadModel::class);
 
         foreach ([$contactA, $contactB] as $contact) {
             $contactModel->setFieldValues($contact, ['preferred_locale' => 'en_GB'], true, false);
@@ -319,8 +318,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $contactF = $this->createContact('fourth@matching.email');
         $contactG = $this->createContact('fifth@matching.email');
 
-        /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get(LeadModel::class);
+        $contactModel = $this->getService(LeadModel::class);
 
         foreach ([$contactA, $contactB, $contactC, $contactE, $contactF, $contactG] as $contact) {
             $contactModel->setFieldValues($contact, ['preferred_locale' => 'en_GB'], true, false);
@@ -404,10 +402,10 @@ final class LeadControllerTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         /** @var Lead $contact */
-        $contact = $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => 'john_23657@doe.com']);
+        $contact = $this->getService(LeadRepository::class)->findOneBy(['email' => 'john_23657@doe.com']);
 
         /** @var AuditLog $auditLog */
-        $auditLog = $this->getContainer()->get(AuditLogRepository::class)->findOneBy(['object' => 'lead', 'objectId' => $contact, 'userId' => 1]);
+        $auditLog = $this->getService(AuditLogRepository::class)->findOneBy(['object' => 'lead', 'objectId' => $contact, 'userId' => 1]);
 
         $this->assertArrayHasKey('fields', $auditLog->getDetails(), json_encode($auditLog, JSON_PRETTY_PRINT));
 
@@ -430,11 +428,10 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString('Contact export scheduled for CSV file type.', (string) $clientResponse->getContent());
-        $contactExportScheduler = $this->getContainer()->get(ContactExportSchedulerRepository::class)->findOneBy([]);
+        $contactExportScheduler = $this->getService(ContactExportSchedulerRepository::class)->findOneBy([]);
         $this->assertInstanceOf(ContactExportScheduler::class, $contactExportScheduler);
         $data                   = $contactExportScheduler->getData();
-        /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
+        $coreParametersHelper = $this->getService(CoreParametersHelper::class);
 
         $this->assertSame([
             'start'  => 0,
@@ -543,7 +540,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
     {
         $crawler             = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
-        $expectedPlaceholder = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.lead.field.timezone');
+        $expectedPlaceholder = $this->getService(TranslatorInterface::class)->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
 
         // Test that a locale option is present correctly.
@@ -562,8 +559,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
     public function testAddContactsErrorMessage(): void
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel     = self::getContainer()->get(FieldModel::class);
+        $fieldModel     = $this->getService(FieldModel::class);
         $firstnameField = $fieldModel->getEntity(2);
         $this->assertInstanceOf(LeadField::class, $firstnameField);
         $firstnameField->setIsRequired(true);
@@ -646,7 +642,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $email = $this->getMailerMessage();
         $this->assertInstanceOf(MauticMessage::class, $email);
 
-        $userHelper = self::getContainer()->get(UserHelper::class);
+        $userHelper = $this->getService(UserHelper::class);
         $user       = $userHelper->getUser();
 
         $this->assertSame('Ahoy contact@an.email', $email->getSubject());
@@ -696,7 +692,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $email = $this->getMailerMessage();
         $this->assertInstanceOf(MauticMessage::class, $email);
 
-        $userHelper = self::getContainer()->get(UserHelper::class);
+        $userHelper = $this->getService(UserHelper::class);
         $user       = $userHelper->getUser();
 
         $this->assertSame('Ahoy contact@an.email', $email->getSubject());
@@ -950,10 +946,8 @@ EMAIL;
 
     public function testContactCompanyEditShowsOldCompanyNameInAuditLog(): void
     {
-        /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get(CompanyModel::class);
-        /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get(LeadModel::class);
+        $companyModel = $this->getService(CompanyModel::class);
+        $contactModel = $this->getService(LeadModel::class);
 
         // Create companies
         $company = new Company()
@@ -993,8 +987,7 @@ EMAIL;
 
     public function testSetNullCompanyToContact(): void
     {
-        /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get(LeadModel::class);
+        $contactModel = $this->getService(LeadModel::class);
 
         $company = new Company();
         $company->setName('Doe Corp');
@@ -1020,7 +1013,7 @@ EMAIL;
         self::assertResponseIsSuccessful();
 
         /** @var Lead $contact */
-        $contact = $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => 'john_23657@doe.com']);
+        $contact = $this->getService(LeadRepository::class)->findOneBy(['email' => 'john_23657@doe.com']);
 
         $companies  = $this->getCompanyLeads($contact->getId());
         $collection = new Collection($companies);
@@ -1040,7 +1033,7 @@ EMAIL;
 
     private function getContactAuditLogForSpecificAction(Lead $contact, string $action): AuditLog
     {
-        return $this->getContainer()->get(AuditLogRepository::class)->findOneBy([
+        return $this->getService(AuditLogRepository::class)->findOneBy([
             'bundle'   => 'lead',
             'object'   => 'lead',
             'objectId' => $contact->getId(),
@@ -1205,7 +1198,7 @@ EMAIL;
             $this->assertEquals($scoresMap[$score->getGroup()->getId()], $score->getScore());
         }
 
-        $logs = $this->getContainer()->get(PointsChangeLogRepository::class)->findBy(['lead' => $contact->getId()]);
+        $logs = $this->getService(PointsChangeLogRepository::class)->findBy(['lead' => $contact->getId()]);
         $this->assertCount(2, $logs);
         foreach ($logs as $log) {
             $this->assertEquals($scoresMap[$log->getGroup()->getId()], $log->getDelta());
@@ -1270,10 +1263,10 @@ EMAIL;
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $this->assertStringContainsString('1 contact affected', (string) $clientResponse->getContent());
 
-        $dncRepository = $this->getContainer()->get(DoNotContactRepository::class);
+        $dncRepository = $this->getService(DoNotContactRepository::class);
         $this->assertInstanceOf(DoNotContactRepository::class, $dncRepository);
 
-        $contactRepository = $this->getContainer()->get(LeadRepository::class);
+        $contactRepository = $this->getService(LeadRepository::class);
         $this->assertInstanceOf(LeadRepository::class, $contactRepository);
 
         $dnc = $dncRepository->findOneBy(['lead' => $contact]);
@@ -1303,7 +1296,7 @@ EMAIL;
         $this->assertGreaterThan(10000, strlen($content), $content);
 
         /** @var AuditLog $auditLog */
-        $auditLog = $this->getContainer()->get(AuditLogRepository::class)->findOneBy([
+        $auditLog = $this->getService(AuditLogRepository::class)->findOneBy([
             'object' => 'ContactExports',
             'bundle' => 'lead',
             'userId' => 1,

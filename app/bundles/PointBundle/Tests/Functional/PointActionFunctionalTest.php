@@ -20,8 +20,7 @@ final class PointActionFunctionalTest extends MauticMysqlTestCase
     {
         $this->logoutUser();
 
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
 
         $lead  = $this->createLead('john@doe.email');
         $email = $this->createEmail();
@@ -41,8 +40,7 @@ final class PointActionFunctionalTest extends MauticMysqlTestCase
     {
         $this->logoutUser();
 
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
 
         $lead   = $this->createLead('john@doe.email');
         $email  = $this->createEmail();
@@ -64,8 +62,7 @@ final class PointActionFunctionalTest extends MauticMysqlTestCase
 
     public function testPointActionEarlyReturnWhenNoPointsAvailable(): void
     {
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
 
         $lead  = $this->createLead('jane@doe.email');
         $email = $this->createEmail();
@@ -105,8 +102,7 @@ final class PointActionFunctionalTest extends MauticMysqlTestCase
         Email $email,
         string $trackingHash,
     ): Stat {
-        /** @var StatRepository $statRepository */
-        $statRepository = self::getContainer()->get(StatRepository::class);
+        $statRepository = $this->getService(StatRepository::class);
 
         $stat = new Stat();
         $stat->setTrackingHash($trackingHash);

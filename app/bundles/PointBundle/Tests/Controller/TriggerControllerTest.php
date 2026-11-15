@@ -31,11 +31,10 @@ final class TriggerControllerTest extends MauticMysqlTestCase
 
     public function testCloneAction(): void
     {
-        /** @var TriggerModel $triggerModel */
-        $triggerModel = self::getContainer()->get(TriggerModel::class);
+        $triggerModel = $this->getService(TriggerModel::class);
 
         $triggerRepo      = $triggerModel->getRepository();
-        $triggerEventRepo = self::getContainer()->get(TriggerEventRepository::class);
+        $triggerEventRepo = $this->getService(TriggerEventRepository::class);
 
         $trigger = $this->createTrigger('Trigger', 5);
         $this->createAddTagEvent('tag1', $trigger);

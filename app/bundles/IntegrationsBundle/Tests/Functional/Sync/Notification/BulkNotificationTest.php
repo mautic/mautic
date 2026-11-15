@@ -17,12 +17,12 @@ final class BulkNotificationTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->bulkNotification = self::getContainer()->get(BulkNotification::class);
+        $this->bulkNotification = $this->getService(BulkNotification::class);
     }
 
     public function testNotifications(): void
     {
-        $notificationRepository = $this->getContainer()->get(NotificationRepository::class);
+        $notificationRepository = $this->getService(NotificationRepository::class);
 
         $this->bulkNotification->addNotification('dup1', 'message 1', 'Integration name', 'Lead', 'lead', 0, 'link 1');
         $this->bulkNotification->addNotification('dup2', 'message 2', 'Integration name', 'Lead', 'lead', 0, 'link 2');

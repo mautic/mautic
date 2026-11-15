@@ -26,7 +26,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->scheduledExecutioner = self::getContainer()->get(TestScheduledExecutioner::class);
+        $this->scheduledExecutioner = $this->getService(TestScheduledExecutioner::class);
         $this->assertInstanceOf(ScheduledExecutioner::class, $this->scheduledExecutioner);
     }
 
@@ -123,14 +123,14 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($log);
         $this->em->flush();
 
-        $optimisticLockService = self::getContainer()->get(OptimisticLockServiceInterface::class);
+        $optimisticLockService = $this->getService(OptimisticLockServiceInterface::class);
         $this->assertInstanceOf(OptimisticLockServiceInterface::class, $optimisticLockService);
         $this->assertTrue($optimisticLockService->acquireLock($log));
         $this->assertSame(2, $log->getVersion());
 
         $this->em->clear();
 
-        $scheduledLogs = self::getContainer()->get(LeadEventLogRepository::class)->getScheduled(
+        $scheduledLogs = $this->getService(LeadEventLogRepository::class)->getScheduled(
             $event->getId(),
             new \DateTime(),
             new ContactLimiter(100, 0, 0, 0),
@@ -478,7 +478,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
             'Campaign member rotation should be incremented during redirection.'
         );
 
-        $updatedLog = $this->getContainer()->get(LeadEventLogRepository::class)->findOneBy([
+        $updatedLog = $this->getService(LeadEventLogRepository::class)->findOneBy([
             'lead'     => $contact,
             'campaign' => $campaign,
         ]);

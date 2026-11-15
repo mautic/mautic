@@ -36,7 +36,7 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
     {
         parent::setUp();
         /** @var \AppKernel $kernel */
-        $kernel                   = self::getContainer()->get(KernelInterface::class);
+        $kernel                   = $this->getService(KernelInterface::class);
         $this->localConfigPath    = $kernel->getLocalConfigFile();
         $this->defaultMemoryLimit = ini_get('memory_limit');
         $this->logDir             = self::getContainer()->getParameter('kernel.logs_dir');
@@ -116,7 +116,7 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Mautic is installed', $successText);
 
         // Assert that the fixtures were loaded
-        $fieldRepository = $this->getContainer()->get(LeadFieldRepository::class);
+        $fieldRepository = $this->getService(LeadFieldRepository::class);
 
         $emailField = $fieldRepository->findOneBy(['alias' => 'email']);
         $this->assertInstanceOf(LeadField::class, $emailField);
@@ -126,7 +126,7 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
     public function testInstallRequirementsAndRecommendations(): void
     {
         $limit                 = FileHelper::convertPHPSizeToBytes(CheckStep::RECOMMENDED_MEMORY_LIMIT);
-        $expectedMemoryMessage = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.install.memory.limit', ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT]);
+        $expectedMemoryMessage = $this->getService(TranslatorInterface::class)->trans('mautic.install.memory.limit', ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT]);
 
         // set the memory limit lower than the recommended value.
         ini_set('memory_limit', (string) ($limit - 1));
@@ -156,7 +156,7 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertDirectoryExists($this->logDir, 'The installer should create the log directory rather than refuse to run.');
 
-        $unwritableMessage = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.install.directory.unwritable', ['%path%' => $this->logDir]);
+        $unwritableMessage = $this->getService(TranslatorInterface::class)->trans('mautic.install.directory.unwritable', ['%path%' => $this->logDir]);
         $this->assertStringNotContainsString($unwritableMessage, $crawler->filter('body')->html());
 
         // The check step renders its "next" button only when there are no major problems.

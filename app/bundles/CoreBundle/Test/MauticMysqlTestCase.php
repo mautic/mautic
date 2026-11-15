@@ -54,7 +54,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $this->markDatabasePrepared();
         }
 
-        $userRepository = $this->getContainer()->get(UserRepository::class);
+        $userRepository = $this->getService(UserRepository::class);
 
         $user = $userRepository->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
         $this->loginUser($user); // also creates session
@@ -386,7 +386,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function clearCache(): void
     {
-        $cacheProvider = static::getContainer()->get(CacheProvider::class);
+        $cacheProvider = $this->getService(CacheProvider::class);
         $this->assertInstanceOf(CacheItemPoolInterface::class, $cacheProvider);
         $cacheProvider->clear();
     }

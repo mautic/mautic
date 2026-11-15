@@ -78,8 +78,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $segment = $this->em->find(LeadList::class, $segment->getId());
         $assert($segment, $output->getDisplay());
 
-        /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
+        $leadListRepository = $this->getService(LeadListRepository::class);
 
         $this->assertSame(1, $leadListRepository->getLeadCount([$segment->getId()]));
     }
@@ -184,12 +183,10 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->assertNotInstanceOf(\DateTimeInterface::class, $segment->getLastBuiltDate());
         $this->assertTrue($segment->needsRebuild());
 
-        /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
+        $leadListRepository = $this->getService(LeadListRepository::class);
         $this->assertSame(1, $leadListRepository->getLeadCount([$segmentId]));
 
-        /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
-        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
+        $segmentCountCacheHelper = $this->getService(SegmentCountCacheHelper::class);
         $this->assertSame(1, $segmentCountCacheHelper->getSegmentContactCount($segmentId));
 
         // Drain the remaining contacts; the final capped run should mark the rebuild finished.
@@ -252,10 +249,8 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $segmentId = $segment->getId();
         $this->em->clear();
 
-        /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
-        /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
-        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
+        $leadListRepository = $this->getService(LeadListRepository::class);
+        $segmentCountCacheHelper = $this->getService(SegmentCountCacheHelper::class);
 
         $this->assertSame(3, $leadListRepository->getLeadCount([$segmentId]));
 
@@ -490,7 +485,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $segment->setLastBuiltTime(1.0);
 
         foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
-            $contact = $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => $email]);
+            $contact = $this->getService(LeadRepository::class)->findOneBy(['email' => $email]);
             $this->createListLead($segment, $contact);
         }
 
@@ -519,8 +514,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         /** @var LeadList $segment */
         $segment = $this->em->find(LeadList::class, $segmentId);
-        /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
+        $leadListRepository = $this->getService(LeadListRepository::class);
 
         $this->assertSame(4, $leadListRepository->getLeadCount([$segmentId]));
         $this->assertNotInstanceOf(\DateTimeInterface::class, $segment->getLastBuiltDate());
@@ -587,7 +581,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         }
 
         foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
-            $contact = $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => $email]);
+            $contact = $this->getService(LeadRepository::class)->findOneBy(['email' => $email]);
             $this->createListLead($baseSegment, $contact);
             $this->createListLead($dependentSegment, $contact);
         }
@@ -614,8 +608,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         /** @var LeadList $baseSegment */
         $baseSegment = $this->em->find(LeadList::class, $baseSegmentId);
-        /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
+        $leadListRepository = $this->getService(LeadListRepository::class);
 
         $this->assertSame(4, $leadListRepository->getLeadCount([$baseSegmentId]));
         $this->assertNotInstanceOf(\DateTimeInterface::class, $baseSegment->getLastBuiltDate());
@@ -713,8 +706,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
-        /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
+        $leadListRepository = $this->getService(LeadListRepository::class);
 
         $this->assertSame($expected, $leadListRepository->getLeadCount([$segment->getId()]));
     }
@@ -740,8 +732,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
     {
         $fieldAlias = 'test_inc_ex_field';
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
         $this->assertEmpty($fields, 'There are no Custom Fields.');
@@ -788,7 +779,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         }
 
         $contact->addUpdatedField($fieldAlias, $contactValue);
-        $contactModel = self::getContainer()->get(LeadModel::class);
+        $contactModel = $this->getService(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
 
@@ -834,8 +825,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
-        /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
+        $leadListRepository = $this->getService(LeadListRepository::class);
 
         $this->assertSame($expected, $leadListRepository->getLeadCount([$segment->getId()]));
     }
@@ -848,8 +838,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
     {
         $fieldAlias = 'test_inc_ex_single_field';
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
         $this->assertEmpty($fields, 'There are no Custom Fields.');
@@ -896,7 +885,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         }
 
         $contact->addUpdatedField($fieldAlias, $contactValue);
-        $contactModel = self::getContainer()->get(LeadModel::class);
+        $contactModel = $this->getService(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
 
@@ -942,8 +931,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
-        /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
+        $leadListRepository = $this->getService(LeadListRepository::class);
 
         $this->assertSame($expected, $leadListRepository->getLeadCount([$segment->getId()]));
     }
@@ -972,8 +960,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
     {
         $fieldAlias = 'test_company_inc_ex_single_field';
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         $leadField = new LeadField();
         $leadField->setName('Test Company Field')
@@ -1002,7 +989,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $company->setName('Test Company');
         $company->addUpdatedField($fieldAlias, $companyValue);
 
-        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $companyModel = $this->getService(CompanyModel::class);
         $this->assertInstanceOf(CompanyModel::class, $companyModel);
         $companyModel->saveEntity($company);
 
@@ -1047,8 +1034,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
-        /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
+        $leadListRepository = $this->getService(LeadListRepository::class);
 
         $this->assertSame($expected, $leadListRepository->getLeadCount([$segment->getId()]));
     }
@@ -1062,8 +1048,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
     {
         $fieldAlias = 'test_company_inc_ex_field';
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         $leadField = new LeadField();
         $leadField->setName('Test Company Field')
@@ -1096,7 +1081,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $company->setName('Test Company');
         $company->addUpdatedField($fieldAlias, $companyValue);
 
-        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $companyModel = $this->getService(CompanyModel::class);
         $this->assertInstanceOf(CompanyModel::class, $companyModel);
         $companyModel->saveEntity($company);
 
@@ -1139,8 +1124,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
-        /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
+        $leadListRepository = $this->getService(LeadListRepository::class);
 
         $this->assertSame($expected, (int) $leadListRepository->getLeadCount([$segment->getId()]));
     }
@@ -1214,8 +1198,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
-        /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
+        $leadListRepository = $this->getService(LeadListRepository::class);
 
         $this->assertSame($expected, $leadListRepository->getLeadCount([$segmentD->getId()]));
     }

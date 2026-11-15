@@ -20,7 +20,7 @@ final class PageHitCookieTest extends MauticMysqlTestCase
         $this->configParams['messenger_dsn_email'] = 'sync://';
 
         parent::setUp();
-        $this->hitRepository = self::getContainer()->get(HitRepository::class);
+        $this->hitRepository = $this->getService(HitRepository::class);
     }
 
     public function testPageHitCookieContainsValidHitIdAndUpdatesDateLeft(): void

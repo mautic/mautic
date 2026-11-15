@@ -32,8 +32,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        /** @var TagModel $tagModel */
-        $tagModel            = self::getContainer()->get(TagModel::class);
+        $tagModel            = $this->getService(TagModel::class);
         $this->tagRepository = $tagModel->getRepository();
 
         $tags = ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'];
@@ -355,8 +354,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $this->assertSame(2, $this->countLeadTagAssociations($secondaryTagId));
 
         // Test the actual merge functionality by calling the model directly
-        /** @var TagModel $tagModel */
-        $tagModel = self::getContainer()->get(TagModel::class);
+        $tagModel = $this->getService(TagModel::class);
         $tagModel->tagMerge($primaryTag, $secondaryTag);
 
         $this->em->clear();
@@ -395,8 +393,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $pointTriggerEventId   = (int) $pointTriggerEvent->getId();
         $reportId              = (int) $report->getId();
 
-        /** @var TagModel $tagModel */
-        $tagModel = self::getContainer()->get(TagModel::class);
+        $tagModel = $this->getService(TagModel::class);
         $tagModel->tagMerge($primaryTag, $secondaryTag);
 
         $this->em->clear();

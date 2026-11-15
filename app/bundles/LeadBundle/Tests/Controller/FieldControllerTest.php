@@ -40,7 +40,7 @@ final class FieldControllerTest extends MauticMysqlTestCase
         $form['leadfield[label]']->setValue($label);
         $this->client->submit($form);
 
-        $field = $this->getContainer()->get(LeadFieldRepository::class)->findOneBy(['label' => $label]);
+        $field = $this->getService(LeadFieldRepository::class)->findOneBy(['label' => $label]);
         $this->assertInstanceOf(LeadField::class, $field);
     }
 
@@ -51,10 +51,10 @@ final class FieldControllerTest extends MauticMysqlTestCase
         $field->setAlias('field_to_be_cloned');
         $field->setType('text');
 
-        self::getContainer()->get(LeadFieldRepository::class)->saveEntity($field);
+        $this->getService(LeadFieldRepository::class)->saveEntity($field);
         $this->em->clear();
 
-        $field = $this->getContainer()->get(LeadFieldRepository::class)->findOneBy(['alias' => 'field_to_be_cloned']);
+        $field = $this->getService(LeadFieldRepository::class)->findOneBy(['alias' => 'field_to_be_cloned']);
         $this->assertInstanceOf(LeadField::class, $field);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/clone/'.$field->getId());
@@ -68,7 +68,7 @@ final class FieldControllerTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseStatusCodeSame(200);
 
-        $clonedField = $this->getContainer()->get(LeadFieldRepository::class)->findOneBy(['label' => 'Cloned Field']);
+        $clonedField = $this->getService(LeadFieldRepository::class)->findOneBy(['label' => 'Cloned Field']);
         $this->assertInstanceOf(LeadField::class, $clonedField);
         $this->assertNotEquals($field->getId(), $clonedField->getId());
     }
@@ -109,7 +109,7 @@ final class FieldControllerTest extends MauticMysqlTestCase
         $form['leadfield[charLengthLimit]']->setValue('191');
         $this->client->submit($form);
 
-        $field = $this->getContainer()->get(LeadFieldRepository::class)->findOneBy(['label' => $label]);
+        $field = $this->getService(LeadFieldRepository::class)->findOneBy(['label' => $label]);
         $this->assertInstanceOf(LeadField::class, $field);
     }
 
@@ -133,11 +133,10 @@ final class FieldControllerTest extends MauticMysqlTestCase
         $form['leadfield[type]']->setValue($type);
         $this->client->submit($form);
 
-        $field = $this->getContainer()->get(LeadFieldRepository::class)->findOneBy(['label' => $label]);
+        $field = $this->getService(LeadFieldRepository::class)->findOneBy(['label' => $label]);
         $this->assertInstanceOf(LeadField::class, $field);
 
-        /** @var ColumnSchemaHelper $helper */
-        $helper = $this->getContainer()->get(ColumnSchemaHelper::class);
+        $helper = $this->getService(ColumnSchemaHelper::class);
 
         // Table name to check the fields.
         $name         = 'leads';

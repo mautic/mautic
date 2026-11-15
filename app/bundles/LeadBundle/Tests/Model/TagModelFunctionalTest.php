@@ -13,8 +13,7 @@ final class TagModelFunctionalTest extends MauticMysqlTestCase
 {
     public function testDeleteOrphanTags(): void
     {
-        /** @var TagModel $model */
-        $model = self::getContainer()->get(TagModel::class);
+        $model = $this->getService(TagModel::class);
 
         $tags = [
             'tag1',

@@ -97,7 +97,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function setUp(): void
     {
         $this->setUpSymfony($this->configParams);
-        $this->databaseTool = static::getContainer()->get(DatabaseToolCollection::class)->get();
+        $this->databaseTool = $this->getService(DatabaseToolCollection::class)->get();
     }
 
     protected function tearDown(): void
@@ -123,13 +123,25 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
-        $this->em = static::getContainer()->get(ManagerRegistry::class)->getManager();
+        $this->em = $this->getService(ManagerRegistry::class)->getManager();
         $this->connection = $this->em->getConnection();
-        $this->router     = static::getContainer()->get(RouterInterface::class);
+        $this->router     = $this->getService(RouterInterface::class);
         $scheme           = $this->router->getContext()->getScheme();
         $secure           = 0 === strcasecmp($scheme, 'https');
 
         $this->client->setServerParameter('HTTPS', (string) $secure);
+    }
+
+    /**
+     * @template TService of object
+     *
+     * @param class-string<TService> $serviceId
+     *
+     * @return TService
+     */
+    protected function getService(string $serviceId): object
+    {
+        return static::getContainer()->get($serviceId);
     }
 
     public function loginUser(User $user): void
@@ -164,7 +176,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
         $output = new BufferedOutput();
 
-        $application = new Application(static::getContainer()->get(KernelInterface::class));
+        $application = new Application($this->getService(KernelInterface::class));
         $application->setAutoExit(false);
         $application->run($input, $output);
     }
@@ -184,7 +196,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function getCsrfToken(string $intention): string
     {
-        return $this->client->getContainer()->get(CsrfTokenManagerInterface::class)->refreshToken($intention)->getValue();
+        return $this->getService(CsrfTokenManagerInterface::class)->refreshToken($intention)->getValue();
     }
 
     /**
@@ -204,7 +216,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function testSymfonyCommand(string $name, array $params = [], ?Command $command = null): CommandTester
     {
-        $kernel      = static::getContainer()->get(KernelInterface::class);
+        $kernel      = $this->getService(KernelInterface::class);
         $application = new Application($kernel);
 
         if ($command) {

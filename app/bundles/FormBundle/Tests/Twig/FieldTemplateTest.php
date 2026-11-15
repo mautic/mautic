@@ -157,7 +157,7 @@ final class FieldTemplateTest extends MauticMysqlTestCase
 
     private function renderTextField(Field $field): string
     {
-        $twig     = $this->getContainer()->get(Environment::class);
+        $twig     = $this->getService(Environment::class);
         $template = $twig->load(self::TEXT_FIELD_TEMPLATE);
 
         return $template->render([
@@ -193,7 +193,7 @@ final class FieldTemplateTest extends MauticMysqlTestCase
 
     private function renderRadioGroupField(Field $field): string
     {
-        $twig     = $this->getContainer()->get(Environment::class);
+        $twig     = $this->getService(Environment::class);
         $template = $twig->load(self::RADIO_GROUP_FIELD_TEMPLATE);
 
         return $template->render([
@@ -206,7 +206,7 @@ final class FieldTemplateTest extends MauticMysqlTestCase
 
     private function renderFreeHtmlField(Field $field, bool $inBuilder = false): string
     {
-        $twig     = $this->getContainer()->get(Environment::class);
+        $twig     = $this->getService(Environment::class);
         $template = $twig->load(self::FREE_HTML_FIELD_TEMPLATE);
 
         return $template->render([
@@ -221,7 +221,7 @@ final class FieldTemplateTest extends MauticMysqlTestCase
 
     private function renderFreeTextField(Field $field, bool $inBuilder = false): string
     {
-        $twig     = $this->getContainer()->get(Environment::class);
+        $twig     = $this->getService(Environment::class);
         $template = $twig->load(self::FREE_TEXT_FIELD_TEMPLATE);
 
         return $template->render([

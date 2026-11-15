@@ -87,13 +87,11 @@ final class FocusFormAutoFillTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Step 4: Track the contact using setSystemContact (bypasses HTTP request requirement)
-        /** @var ContactTracker $contactTracker */
-        $contactTracker = self::getContainer()->get(ContactTracker::class);
+        $contactTracker = $this->getService(ContactTracker::class);
         $contactTracker->setSystemContact($contact);
 
         // Step 5: Generate Focus content directly
-        /** @var FocusModel $focusModel */
-        $focusModel = self::getContainer()->get(FocusModel::class);
+        $focusModel = $this->getService(FocusModel::class);
         $content    = $focusModel->getContent($focus->toArray());
 
         // Step 6: Verify the generated form HTML contains auto-filled email value

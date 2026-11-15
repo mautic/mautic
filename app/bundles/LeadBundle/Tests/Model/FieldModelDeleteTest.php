@@ -21,8 +21,7 @@ final class FieldModelDeleteTest extends MauticMysqlTestCase
 
     public function testBatchDeleteFields(): void
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         $leadField = new LeadField();
         $leadField->setName('Test Lead Field')
@@ -40,7 +39,7 @@ final class FieldModelDeleteTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($companyField);
         $this->em->flush();
 
-        $leadFieldRepository = $this->getContainer()->get(LeadFieldRepository::class);
+        $leadFieldRepository = $this->getService(LeadFieldRepository::class);
         $this->assertInstanceOf(LeadFieldRepository::class, $leadFieldRepository);
 
         $this->assertCount(1, $leadFieldRepository->findBy(['alias' => 'test_lead_field']));

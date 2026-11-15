@@ -21,7 +21,7 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         $this->submitFormWithCompanies($formId, $formAlias, 'test@acquia.cz', 'Luk', 'Doe', 'Acquia', 'Keplerova');
 
         // Check the address.
-        $companyRepository = $this->getContainer()->get(CompanyRepository::class);
+        $companyRepository = $this->getService(CompanyRepository::class);
         $companiesOriginal = $companyRepository->findBy(['address1' => 'Keplerova']);
         $this->assertCount(1, $companiesOriginal);
 
@@ -42,7 +42,7 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         $this->submitFormWithoutCompanies($formId, $formAlias, 'test@acquia.cz', 'Luk', 'Doe Smith');
 
         // Check the contact.
-        $contactRepository = $this->getContainer()->get(LeadRepository::class);
+        $contactRepository = $this->getService(LeadRepository::class);
         $contactsOriginal  = $contactRepository->findBy(['lastname' => 'Doe Smith']);
         $this->assertCount(1, $contactsOriginal);
 

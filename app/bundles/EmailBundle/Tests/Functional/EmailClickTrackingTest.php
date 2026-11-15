@@ -48,7 +48,7 @@ final class EmailClickTrackingTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/test-page?&ct=YToxOntzOjQ6InN0YXQiO3M6MjI6IjY3MTY3ZjU3YTRjMDUyNjU5MzYwOTEiO30%3D');
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
-        $pageHitRepository = $this->getContainer()->get(HitRepository::class);
+        $pageHitRepository = $this->getService(HitRepository::class);
         $this->assertInstanceOf(HitRepository::class, $pageHitRepository);
 
         $hit = $pageHitRepository->findOneBy(['page' => $page]);

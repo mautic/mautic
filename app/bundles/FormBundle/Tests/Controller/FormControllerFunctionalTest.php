@@ -162,8 +162,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         // copy all from $translationsPath to $languagePath
         $filesystem->mirror($translationsPath, $languagePath);
 
-        /** @var LanguageHelper $languageHelper */
-        $languageHelper = $this->getContainer()->get(LanguageHelper::class);
+        $languageHelper = $this->getService(LanguageHelper::class);
 
         $formPayload = [
             'name'       => 'Test Form',
@@ -411,7 +410,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
-        $translator = $this->getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         foreach ($expectedMessages as $expectedMessage) {
@@ -642,7 +641,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $forms = $this->getContainer()->get(FormRepository::class)->findBy([], ['id' => 'ASC']);
+        $forms = $this->getService(FormRepository::class)->findBy([], ['id' => 'ASC']);
         $this->assertCount(2, $forms);
 
         $originalForm = $forms[0];

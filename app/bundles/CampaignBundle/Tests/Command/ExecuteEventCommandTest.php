@@ -47,7 +47,7 @@ final class ExecuteEventCommandTest extends AbstractCampaignCommand
         $lastId = array_pop($logIds);
 
         // Wait 6 seconds to go past scheduled time
-        self::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        $this->getService(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
 
         $this->testSymfonyCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
 
@@ -92,7 +92,7 @@ final class ExecuteEventCommandTest extends AbstractCampaignCommand
         $this->em->flush();
         $this->em->clear();
 
-        $leadEventLogRepository = $this->getContainer()->get(LeadEventLogRepository::class);
+        $leadEventLogRepository = $this->getService(LeadEventLogRepository::class);
         $this->assertInstanceOf(LeadEventLogRepository::class, $leadEventLogRepository);
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
@@ -141,7 +141,7 @@ final class ExecuteEventCommandTest extends AbstractCampaignCommand
         $this->em->flush();
         $this->em->clear();
 
-        $leadEventLogRepository = $this->getContainer()->get(LeadEventLogRepository::class);
+        $leadEventLogRepository = $this->getService(LeadEventLogRepository::class);
         $this->assertInstanceOf(LeadEventLogRepository::class, $leadEventLogRepository);
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
@@ -188,7 +188,7 @@ final class ExecuteEventCommandTest extends AbstractCampaignCommand
 
         $this->assertStringContainsString('1 total event was scheduled', $commandResult->getDisplay());
 
-        $leadEventLogRepository = $this->getContainer()->get(LeadEventLogRepository::class);
+        $leadEventLogRepository = $this->getService(LeadEventLogRepository::class);
         $this->assertInstanceOf(LeadEventLogRepository::class, $leadEventLogRepository);
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);

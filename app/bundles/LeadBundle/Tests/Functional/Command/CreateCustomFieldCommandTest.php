@@ -31,7 +31,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $this->em->persist($leadField);
         $this->em->flush();
 
-        $kernel = self::getContainer()->get(KernelInterface::class);
+        $kernel = $this->getService(KernelInterface::class);
         $this->assertInstanceOf(KernelInterface::class, $kernel);
 
         $expectedUserId          = 1;
@@ -85,7 +85,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $this->em->persist($leadField2);
         $this->em->flush();
 
-        $kernel = self::getContainer()->get(KernelInterface::class);
+        $kernel = $this->getService(KernelInterface::class);
         $this->assertInstanceOf(KernelInterface::class, $kernel);
 
         $expectedUserId          = 1;

@@ -36,7 +36,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $this->configRoute = self::getContainer()->get(RouterInterface::class)->generate('mautic_plugin_config', ['name' => 'Outlook']);
+        $this->configRoute = $this->getService(RouterInterface::class)->generate('mautic_plugin_config', ['name' => 'Outlook']);
     }
 
     public function testConfigFormRendersSecretFieldAndCopyableMauticUrl(): void
@@ -70,15 +70,13 @@ final class ConfigControllerTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $integration = $this->getContainer()->get(IntegrationRepository::class)->findOneBy(['name' => 'Outlook']);
+        $integration = $this->getService(IntegrationRepository::class)->findOneBy(['name' => 'Outlook']);
         $this->assertInstanceOf(Integration::class, $integration);
         $this->assertTrue($integration->getIsPublished());
         $this->assertNotSame(self::SECRET, $integration->getApiKeys()['secret'] ?? null);
 
-        /** @var IntegrationsHelper $integrationsHelper */
-        $integrationsHelper = self::getContainer()->get(IntegrationsHelper::class);
-        /** @var ConfigSupport $configSupport */
-        $configSupport = self::getContainer()->get(ConfigSupport::class);
+        $integrationsHelper = $this->getService(IntegrationsHelper::class);
+        $configSupport = $this->getService(ConfigSupport::class);
         $decrypted     = $integrationsHelper->getIntegrationConfiguration($configSupport);
         $this->assertSame(self::SECRET, $decrypted->getApiKeys()['secret']);
 

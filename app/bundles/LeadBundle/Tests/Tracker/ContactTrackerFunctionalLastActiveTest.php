@@ -42,7 +42,7 @@ final class ContactTrackerFunctionalLastActiveTest extends MauticMysqlTestCase
         $this->logoutUser();
 
         if ($skip) {
-            $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+            $eventDispatcher = $this->getService(EventDispatcherInterface::class);
             $eventDispatcher->addListener(LeadGetCurrentEvent::class, function (LeadGetCurrentEvent $event): void {
                 $event->skipContactLastActiveLogged();
             });
@@ -79,8 +79,8 @@ final class ContactTrackerFunctionalLastActiveTest extends MauticMysqlTestCase
                 'lead'   => $lead->getId(),
             ]),
         ]);
-        $pageModel       = self::getContainer()->get(PageModel::class);
-        $trackerHelper   = self::getContainer()->get(ContactRequestHelper::class);
+        $pageModel       = $this->getService(PageModel::class);
+        $trackerHelper   = $this->getService(ContactRequestHelper::class);
         $query           = $pageModel->getHitQuery($request, $page);
         $trackerHelper->getContactFromQuery($query);
 
@@ -89,7 +89,7 @@ final class ContactTrackerFunctionalLastActiveTest extends MauticMysqlTestCase
 
     private function isLastActiveDateSet(int $id): bool
     {
-        return (bool) $this->getContainer()->get(LeadRepository::class)->createQueryBuilder('l')
+        return (bool) $this->getService(LeadRepository::class)->createQueryBuilder('l')
             ->select('l.lastActive')
             ->where('l.id = :id')
             ->setParameter('id', $id)

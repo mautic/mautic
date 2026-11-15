@@ -40,7 +40,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
     public function testScheduleImport(): void
     {
         $this->generateSmallCSV();
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $tagName = 'tag1';
@@ -68,7 +68,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($importForm);
 
-        $importData = $this->getContainer()->get(ImportRepository::class)->findOneBy(['object' => 'lead']);
+        $importData = $this->getService(ImportRepository::class)->findOneBy(['object' => 'lead']);
         $this->assertInstanceOf(Import::class, $importData);
         $importProperty = $importData->getProperties();
         $this->assertSame([$tagName], $importProperty['defaults']['tags']);
@@ -109,8 +109,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $output = $this->createAndExecuteImport($import);
         $this->assertStringContainsString($expectedOutput, $output->getDisplay());
 
-        /** @var LeadRepository $leadRepository */
-        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+        $leadRepository = $this->getService(LeadRepository::class);
         $leadCount      = $leadRepository->count(['firstname' => 'John']);
         $this->assertSame(3, $leadCount);
 
@@ -126,10 +125,10 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
     public function testImportWithSpecialCharacterTag(): void
     {
         $this->generateSmallCSV();
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->client->loginUser($user, 'mautic');
 
-        $tagRepository  = $this->getContainer()->get(TagRepository::class);
+        $tagRepository  = $this->getService(TagRepository::class);
         $tagCountBefore = $tagRepository->count([]);
 
         $tagName = 'R&R';
@@ -152,7 +151,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $importForm->setValues(['lead_field_import[tags]' => [$tag->getId()]]);
         $this->client->submit($importForm);
 
-        $import = $this->getContainer()->get(ImportRepository::class)->findOneBy(['object' => 'lead']);
+        $import = $this->getService(ImportRepository::class)->findOneBy(['object' => 'lead']);
         $output = $this->testSymfonyCommand('mautic:import', [
             '-e'      => 'dev',
             '--id'    => $import->getId(),
@@ -161,7 +160,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertStringContainsString('4 lines were processed, 3 items created, 0 items updated, 1 items ignored', $output->getDisplay());
 
-        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+        $leadRepository = $this->getService(LeadRepository::class);
         $leads          = $leadRepository->findBy(['firstname' => 'John']);
         $this->assertCount(3, $leads);
 
@@ -218,13 +217,12 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertStringContainsString($expectedOutput, $output->getDisplay());
 
-        /** @var LeadRepository $leadRepository */
-        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+        $leadRepository = $this->getService(LeadRepository::class);
         $leadCount      = $leadRepository->count(['firstname' => 'John']);
         $this->assertSame(2, $leadCount);
 
         // Recheck import entity for ignored count
-        $importEntity = $this->getContainer()->get(ImportRepository::class)->find($import->getId());
+        $importEntity = $this->getService(ImportRepository::class)->find($import->getId());
         $this->assertSame(5, $importEntity->getIgnoredCount());
     }
 
@@ -268,7 +266,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->assertSelectorExists('.alert.alert-danger a.text-danger');
-        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $this->assertSelectorTextContains(
@@ -294,8 +292,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $output = $this->createAndExecuteImport($import);
         $this->assertStringContainsString('2 items created', $output->getDisplay());
 
-        /** @var LeadRepository $leadRepository */
-        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+        $leadRepository = $this->getService(LeadRepository::class);
         $lead           = $leadRepository->findOneBy(['email' => 'john1@doe.email']);
 
         $this->assertInstanceOf(Lead::class, $lead);
@@ -320,13 +317,12 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $output = $this->createAndExecuteImport($import);
         $this->assertStringContainsString('2 items ignored', $output->getDisplay());
 
-        $importEntity = $this->getContainer()->get(ImportRepository::class)->find($import->getId());
+        $importEntity = $this->getService(ImportRepository::class)->find($import->getId());
         $this->assertInstanceOf(Import::class, $importEntity);
         $this->assertSame(1, $importEntity->getInsertedCount());
         $this->assertSame(2, $importEntity->getIgnoredCount());
 
-        /** @var LeadRepository $leadRepository */
-        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+        $leadRepository = $this->getService(LeadRepository::class);
         $validLead      = $leadRepository->findOneBy(['email' => 'john1@doe.email']);
 
         $this->assertInstanceOf(Lead::class, $validLead);
@@ -346,8 +342,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $field->setName($alias);
         $field->setProperties($properties);
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 
@@ -401,9 +396,8 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $this->getContainer()->get(UserTokenSetter::class)->setUser($import->getCreatedBy());
-        /** @var ImportModel $importModel */
-        $importModel = self::getContainer()->get(ImportModel::class);
+        $this->getService(UserTokenSetter::class)->setUser($import->getCreatedBy());
+        $importModel = $this->getService(ImportModel::class);
         $importModel->saveEntity($import);
 
         return $import;
@@ -458,8 +452,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $tag = new Tag();
         $tag->setTag($tagName);
 
-        /** @var TagModel $tagModel */
-        $tagModel = self::getContainer()->get(TagModel::class);
+        $tagModel = $this->getService(TagModel::class);
         $tagModel->saveEntity($tag);
 
         return $tag;
