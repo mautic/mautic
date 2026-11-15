@@ -63,7 +63,7 @@ class Widget extends FormEntity
 
     private ?string $errorMessage = null;
 
-    private ?bool $cached = false;
+    private bool $cached = false;
 
     /**
      * @var int
@@ -256,7 +256,7 @@ class Widget extends FormEntity
     /**
      * Get cached.
      */
-    public function isCached(): ?bool
+    public function isCached(): bool
     {
         return $this->cached;
     }

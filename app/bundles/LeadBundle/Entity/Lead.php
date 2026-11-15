@@ -241,7 +241,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     private ?LeadManipulator $manipulator = null;
 
-    private ?bool $newlyCreated = false;
+    private bool $newlyCreated = false;
 
     /**
      * @var \DateTimeInterface
@@ -1046,7 +1046,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->manipulator;
     }
 
-    public function isNewlyCreated(): ?bool
+    public function isNewlyCreated(): bool
     {
         return $this->newlyCreated;
     }

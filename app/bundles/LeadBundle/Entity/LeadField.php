@@ -354,7 +354,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * @param string|array<string>|null $defaultValue
+     * @param string|array<string> $defaultValue
      */
     public function setDefaultValue(array|string $defaultValue): static
     {
