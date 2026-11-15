@@ -27,7 +27,7 @@
 {% elseif not isIndeterminate %}
     {% set currentValue = min(max(currentValue, 0), maximum) %}
 {% endif %}
-{% set percentage = isIndeterminate ? 100 : (isError ? 100 : (currentValue / maximum * 100)|round(2)) %}
+{% set percentage = isIndeterminate ? 0 : (isError ? 100 : (currentValue / maximum * 100)|round(2)) %}
 {% set baseId = id|default('progress-bar-' ~ random(1000000)) %}
 {% set isInline = 'inline' == type %}
 {% set isIndented = 'indented' == type %}
@@ -54,7 +54,6 @@
 {% if isInline and (isFinished or isError) %}{% set trackClasses = trackClasses|merge(['visually-hidden']) %}{% endif %}
 
 {% set barClasses = ['progress-bar'] %}
-{% if isIndeterminate %}{% set barClasses = barClasses|merge(['progress-bar-striped', 'progress-bar-animated']) %}{% endif %}
 
 <div class="{{ classes|join(' ')|e }}">
     <div class="{{ labelClasses|join(' ')|e }}" id="{{ baseId|escape('html_attr') }}-label">

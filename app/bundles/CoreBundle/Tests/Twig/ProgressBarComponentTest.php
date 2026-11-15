@@ -44,7 +44,7 @@ final class ProgressBarComponentTest extends TestCase
         $output = $this->render(['label' => 'Working']);
 
         $this->assertStringContainsString('progress-component--indeterminate', $output);
-        $this->assertStringContainsString('progress-bar-striped progress-bar-animated', $output);
+        $this->assertStringContainsString('style="width: 0%"', $output);
         $this->assertStringNotContainsString('aria-valuenow', $output);
         $this->assertStringContainsString('aria-busy="true"', $output);
     }
