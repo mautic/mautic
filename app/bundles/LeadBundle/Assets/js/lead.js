@@ -366,20 +366,6 @@ Mautic.leadlistOnLoad = function(container, response) {
         });
     }
 
-    // segment contact filters
-    var segmentContactForm = mQuery('#segment-contact-filters');
-
-    if (segmentContactForm.length) {
-        segmentContactForm.on('change', function() {
-            segmentContactForm.submit();
-        }).on('keyup', function() {
-            segmentContactForm.delay(200).submit();
-        }).on('submit', function(e) {
-            e.preventDefault();
-            Mautic.refreshSegmentContacts(segmentContactForm);
-        });
-    }
-
     jQuery(document).ajaxComplete(function(){
         Mautic.ajaxifyForm('daterange');
     });
@@ -1089,13 +1075,6 @@ Mautic.refreshLeadNotes = function(form) {
     });
 };
 
-Mautic.refreshSegmentContacts = function(form) {
-    Mautic.postForm(mQuery(form), function (response) {
-        response.target = '#contacts-container';
-        Mautic.processPageContent(response);
-    });
-};
-
 Mautic.toggleLeadList = function(toggleId, leadId, listId) {
     var action = mQuery('#' + toggleId).hasClass('ri-toggle-fill') ? 'remove' : 'add';
     var query = "action=lead:toggleLeadList&leadId=" + leadId + "&listId=" + listId + "&listAction=" + action;
@@ -1728,7 +1707,6 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
 };
 
 Mautic.listOnLoad = function(container, response) {
-    Mautic.loadAndProcessPageContent('#contacts-container');
     Mautic.loadAndProcessPageContent('#segment-stats');
 
     const segmentDependenciesTab = mQuery('a#segment-dependencies');
