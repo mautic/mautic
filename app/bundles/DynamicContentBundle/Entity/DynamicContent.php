@@ -440,9 +440,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->slotName;
     }
 
-    /**
-     * @param ''|'Segment1_Slot'|'slot-a'|'slot-name'|'slot1'|'test' $slotName
-     */
     public function setSlotName(?string $slotName): static
     {
         $this->isChanged('slotName', $slotName);

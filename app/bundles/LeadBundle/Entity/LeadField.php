@@ -354,9 +354,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * @param string|array<string> $defaultValue
+     * @param string|array<string>|null $defaultValue
      */
-    public function setDefaultValue(?string $defaultValue): static
+    public function setDefaultValue(array|string|null $defaultValue): static
     {
         $defaultValue = is_array($defaultValue) ? implode('|', $defaultValue) : $defaultValue;
         $this->isChanged('defaultValue', $defaultValue);

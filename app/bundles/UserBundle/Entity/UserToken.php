@@ -70,9 +70,6 @@ class UserToken
         return $this->authorizator;
     }
 
-    /**
-     * @param 'reset-password'|'test-secret' $authorizator
-     */
     public function setAuthorizator(?string $authorizator): static
     {
         $this->authorizator = $authorizator;
