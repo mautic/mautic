@@ -10,7 +10,6 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**
  * Builds the users and widgets a "does this widget honour viewother" test needs.
@@ -46,9 +45,10 @@ trait DashboardWidgetPermissionTrait
         $user->setLastName('Test');
         $user->setRole($role);
 
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
-        $user->setPassword($hasher->hash('Maut1cR0cks!'));
+        $passwordHasherFactory = self::getService(PasswordHasherFactoryInterface::class);
+
+        $passwordHasher = $passwordHasherFactory->getPasswordHasher($user);
+        $user->setPassword($passwordHasher->hash('Maut1cR0cks!'));
 
         $this->em->persist($user);
 

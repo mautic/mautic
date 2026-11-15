@@ -8,7 +8,6 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 trait ApiTestUserTrait
 {
@@ -33,9 +32,10 @@ trait ApiTestUserTrait
         $user->setEmail('lead.api.'.uniqid().'@example.com');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
-        $user->setPassword($hasher->hash('Maut1cR0cks!'));
+        $passwordHasherFactory = self::getService(PasswordHasherFactoryInterface::class);
+
+        $passwordHasher = $passwordHasherFactory->getPasswordHasher($user);
+        $user->setPassword($passwordHasher->hash('Maut1cR0cks!'));
 
         $this->em->persist($user);
         $this->em->flush();
