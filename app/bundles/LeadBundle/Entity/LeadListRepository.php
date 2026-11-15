@@ -366,10 +366,14 @@ class LeadListRepository extends CommonRepository
             ->executeQuery()
             ->fetchAssociative() ?: [];
 
-        $manuallyRemoved = (int) $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $removedQueryBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $manuallyRemoved     = (int) $removedQueryBuilder
             ->select('COUNT(l.lead_id)')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
-            ->where('l.leadlist_id = :listId', 'l.manually_removed = :true')
+            ->where(
+                $removedQueryBuilder->expr()->eq('l.leadlist_id', ':listId'),
+                $removedQueryBuilder->expr()->eq('l.manually_removed', ':true')
+            )
             ->setParameter('listId', $listId)
             ->setParameter('true', true, 'boolean')
             ->executeQuery()
