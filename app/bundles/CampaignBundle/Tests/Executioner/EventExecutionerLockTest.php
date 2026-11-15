@@ -43,9 +43,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $this->eventExecutioner = $this->getService(EventExecutioner::class);
         $this->eventDispatcher  = $this->getService(EventDispatcherInterface::class);
 
-        /** @var Logger $logger */
-        $logger                 = $this->getService('monolog.logger.mautic');
-        $this->logger           = $logger;
+        $this->logger           = $this->getService('monolog.logger.mautic');
         $this->originalHandlers = $this->logger->getHandlers();
         $this->logger->setHandlers([$this->testHandler = new TestHandler()]);
     }

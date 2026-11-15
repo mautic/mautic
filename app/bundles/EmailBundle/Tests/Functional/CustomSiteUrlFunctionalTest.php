@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mailer\EventListener\MessageLoggerListener;
 use Symfony\Component\Mime\Message;
 
 final class CustomSiteUrlFunctionalTest extends MauticMysqlTestCase
@@ -40,7 +39,6 @@ final class CustomSiteUrlFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        /** @var MessageLoggerListener $messageLogger */
         $messageLogger = $this->getService('mailer.message_logger_listener');
 
         $this->setCsrfHeader();

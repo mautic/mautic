@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Test;
 
+use Doctrine\Bundle\DoctrineBundle\Middleware\BacktraceDebugDataHolder;
 use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
+use Mautic\CoreBundle\Translation\MauticResourceTranslator;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\UserBundle\Entity\User;
+use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -20,10 +23,13 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Mailer\EventListener\MessageLoggerListener;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 abstract class AbstractMauticTestCase extends WebTestCase
@@ -135,9 +141,33 @@ abstract class AbstractMauticTestCase extends WebTestCase
     /**
      * @template TService of object
      *
-     * @param class-string<TService>|string $serviceId
+     * @param class-string<TService>
+     *     |'doctrine.debug_data_holder'
+     *     |'mailer.message_logger_listener'
+     *     |'monolog.logger.mautic'
+     *     |'security.untracked_token_storage'
+     *     |'session.factory'
+     *     |'translator.default' $serviceId
      *
-     * @return ($serviceId is class-string<TService> ? TService : object)
+     * @return (
+     *     $serviceId is 'doctrine.debug_data_holder' ? BacktraceDebugDataHolder
+     *     : (
+     *         $serviceId is 'mailer.message_logger_listener' ? MessageLoggerListener
+     *         : (
+     *             $serviceId is 'monolog.logger.mautic' ? Logger
+     *             : (
+     *                 $serviceId is 'security.untracked_token_storage' ? TokenStorage
+     *                 : (
+     *                     $serviceId is 'session.factory' ? SessionFactory
+     *                     : (
+     *                         $serviceId is 'translator.default' ? MauticResourceTranslator
+     *                         : TService
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
      */
     protected function getService(string $serviceId): object
     {
