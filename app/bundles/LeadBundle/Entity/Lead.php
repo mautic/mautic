@@ -699,10 +699,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->pointChanges;
     }
 
-    public function setPoints(int $points): static
+    public function setPoints(?int $points): static
     {
         $this->isChanged('points', $points);
-        $this->points = $points;
+        $this->points = (int) $points;
 
         // Something is setting points directly so reset points updated by database
         $this->resetPointChanges();
