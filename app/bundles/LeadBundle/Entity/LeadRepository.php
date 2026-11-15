@@ -1062,7 +1062,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 if ($string === $anyKeyword || $string === $anyKeywordEn) {
                     $returnParameter = false;
                 } else {
-                    $sq->andWhere($q->expr()->eq('dnc.channel', ":{$unique}"));
+                    $sq->andWhere($q->expr()->eq('dnc.channel', ":$unique"));
                     $returnParameter = true;
                 }
                 $expr           = $this->getExistsExpression($filter->not).' ('.$sq->getSQL().')';
