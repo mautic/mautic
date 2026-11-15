@@ -21,12 +21,14 @@
                     {% endif %}
                     {% include '@MauticCore/Components/progress-bar.html.twig' with {
                         label: 'mautic.email.send.sending_emails',
-                        helperText: 'inprogress' != status
-                            ? 'mautic.core.progress_bar.done'
-                            : (progress[0] > 0 ? 'mautic.core.progress_bar.count'|trans({'%current%': progress[0], '%total%': progress[1]}) : 'mautic.core.progress_bar.preparing'),
+                        helperText: 'with_errors' == status
+                            ? 'mautic.core.progress_bar.error'
+                            : ('inprogress' != status
+                                ? 'mautic.core.progress_bar.done'
+                                : (progress[0] > 0 ? 'mautic.core.progress_bar.count'|trans({'%current%': progress[0], '%total%': progress[1]}) : 'mautic.core.progress_bar.preparing')),
                         value: progress[0] > 0 ? progress[0] : null,
                         max: progress[1],
-                        status: 'inprogress' == status ? 'active' : 'finished',
+                        status: 'inprogress' == status ? 'active' : ('with_errors' == status ? 'error' : 'finished'),
                         className: 'mt-16'
                     } %}
                 </div>

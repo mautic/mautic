@@ -80,10 +80,19 @@ final class ProgressBarComponentTest extends TestCase
         $output = $this->render(['label' => 'Failed', 'value' => 10, 'status' => 'error', 'helperText' => 'Upload failed']);
 
         $this->assertStringContainsString('progress-component--error', $output);
-        $this->assertStringContainsString('aria-live="polite">mautic.core.progress_bar.error', $output);
+        $this->assertStringContainsString('class="progress-component__helper-text" aria-live="polite">Upload failed', $output);
         $this->assertStringContainsString('aria-valuenow="0"', $output);
         $this->assertStringContainsString('style="width: 100%"', $output);
         $this->assertStringContainsString('ri-error-warning-fill', $output);
+    }
+
+    public function testErrorWithoutHelperTextHasAccessibleDescription(): void
+    {
+        $output = $this->render(['label' => 'Failed', 'status' => 'error', 'id' => 'failed']);
+
+        $this->assertStringContainsString('aria-describedby="failed-helper"', $output);
+        $this->assertStringContainsString('id="failed-helper"', $output);
+        $this->assertStringContainsString('aria-live="polite">mautic.core.progress_bar.error', $output);
     }
 
     public function testHelperTextIsLinkedAndAnnounced(): void
@@ -92,7 +101,8 @@ final class ProgressBarComponentTest extends TestCase
 
         $this->assertStringContainsString('aria-describedby="send-helper"', $output);
         $this->assertStringContainsString('id="send-helper"', $output);
-        $this->assertStringContainsString('aria-live="polite">mautic.core.progress_bar.loading', $output);
+        $this->assertStringContainsString('class="progress-component__helper-text" aria-live="polite">1 of 4', $output);
+        $this->assertStringNotContainsString('aria-live="polite">mautic.core.progress_bar.loading', $output);
         $this->assertStringNotContainsString('aria-describedby', $this->render(['label' => 'Send', 'value' => 1]));
     }
 

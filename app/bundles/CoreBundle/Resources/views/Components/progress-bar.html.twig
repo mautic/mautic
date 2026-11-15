@@ -31,7 +31,7 @@
 {% set baseId = id|default('progress-bar-' ~ random(1000000)) %}
 {% set isInline = 'inline' == type %}
 {% set isIndented = 'indented' == type %}
-{% set helperText = helperText|default('') %}
+{% set helperText = helperText|default(isError ? 'mautic.core.progress_bar.error' : '') %}
 
 {% set classes = ['progress-component', 'progress-component--' ~ size, 'progress-component--' ~ type] %}
 {% if isFinished %}{% set classes = classes|merge(['progress-component--finished']) %}{% endif %}
@@ -74,8 +74,7 @@
     </div>
     {% if helperText %}
         <div class="progress-component__helper type-helper-text-01 mt-8{{ isIndented ? ' px-16' : '' }}{{ isInline ? ' visually-hidden' : '' }}" id="{{ baseId|escape('html_attr') }}-helper">
-            <span class="progress-component__helper-text">{{ helperText|trans }}</span>
-            <span class="visually-hidden" aria-live="polite">{{ (isFinished ? 'mautic.core.progress_bar.done' : (isError ? 'mautic.core.progress_bar.error' : 'mautic.core.progress_bar.loading'))|trans }}</span>
+            <span class="progress-component__helper-text" aria-live="polite">{{ helperText|trans }}</span>
         </div>
     {% endif %}
 </div>
