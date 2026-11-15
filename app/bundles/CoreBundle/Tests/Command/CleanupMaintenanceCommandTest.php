@@ -43,7 +43,8 @@ final class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--days-old' => 180, '--no-interaction' => true]);
 
-        $this->assertNotNull(
+        $this->assertInstanceOf(
+            \Mautic\LeadBundle\Entity\Lead::class,
             $this->getService(LeadModel::class)->getEntity($contactId),
             'Keep an unidentified lead that is still considered active'
         );
@@ -60,7 +61,8 @@ final class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
         $contactId            = $NotPurgeableContact->getId();
 
         $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--gdpr' => 1, '--no-interaction' => true]);
-        $this->assertNotNull(
+        $this->assertInstanceOf(
+            \Mautic\LeadBundle\Entity\Lead::class,
             $this->getService(LeadModel::class)->getEntity($contactId),
             'Keep an identified contact that is still considered active.'
         );
@@ -81,7 +83,8 @@ final class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
         $contactId            = $NotPurgeableContact->getId();
 
         $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--gdpr' => 1, '--no-interaction' => true]);
-        $this->assertNotNull(
+        $this->assertInstanceOf(
+            \Mautic\LeadBundle\Entity\Lead::class,
             $this->getService(LeadModel::class)->getEntity($contactId),
             'Keep an identified contact that is still considered active because of custom "gdpr_user_purge_threshold".'
         );

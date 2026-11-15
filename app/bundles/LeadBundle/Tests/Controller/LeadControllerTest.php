@@ -649,6 +649,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertMatchesRegularExpression('#Your email is <b>contact@an\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]*" alt="" \/>#', $email->getHtmlBody());
         $this->assertSame('Your email is contact@an.email', $email->getTextBody());
         $this->assertCount(1, $email->getFrom());
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $this->assertSame($user->getName(), $email->getFrom()[0]->getName());
         $this->assertSame($user->getEmail(), $email->getFrom()[0]->getAddress());
         $this->assertCount(1, $email->getTo());
@@ -704,6 +705,7 @@ EMAIL;
 
         $this->assertSame($expectedText, $email->getTextBody());
         $this->assertCount(1, $email->getFrom());
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $this->assertSame($user->getName(), $email->getFrom()[0]->getName());
         $this->assertSame($user->getEmail(), $email->getFrom()[0]->getAddress());
         $this->assertCount(1, $email->getTo());
