@@ -59,20 +59,11 @@ class Widget extends FormEntity
     #[ORM\Column(type: ArrayType::ARRAY, nullable: true)]
     private $params = [];
 
-    /**
-     * @var string
-     */
-    private $template;
+    private ?string $template = null;
 
-    /**
-     * @var string
-     */
-    private $errorMessage;
+    private ?string $errorMessage = null;
 
-    /**
-     * @var bool
-     */
-    private $cached = false;
+    private ?bool $cached = false;
 
     /**
      * @var int

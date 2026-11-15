@@ -74,21 +74,17 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     /**
      * Used for when updating the password.
-     *
-     * @var ?string
      */
     #[Groups(['user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.password.notblank', groups: ['CheckPasswordNotBlank'])]
     #[Assert\Length(min: 6, minMessage: 'mautic.user.user.password.minlength', groups: ['CheckPassword'])]
     #[NotWeak(message: 'mautic.user.user.password.weak', groups: ['CheckPassword'])]
-    private $plainPassword;
+    private ?string $plainPassword = null;
 
     /**
      * Used for updating account.
-     *
-     * @var ?string
      */
-    private $currentPassword;
+    private ?string $currentPassword = null;
 
     /**
      * @var string
@@ -179,8 +175,11 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     #[ORM\Column(type: 'text', nullable: true)]
     private $signature;
 
+    /**
+     * @param bool $guest
+     */
     public function __construct(
-        private bool $guest = false,
+        private $guest = false,
     ) {
     }
 

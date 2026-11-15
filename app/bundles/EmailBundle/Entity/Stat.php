@@ -496,9 +496,8 @@ class Stat
 
     /**
      * @param mixed $currentValue
-     * @param mixed $newValue
      */
-    private function addChange(string $property, $currentValue, $newValue): void
+    private function addChange(string $property, $currentValue, \DateTime|bool|int|float|string|null $newValue): void
     {
         if ($currentValue === $newValue) {
             return;
