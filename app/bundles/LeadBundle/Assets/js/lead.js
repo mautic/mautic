@@ -1717,17 +1717,21 @@ Mautic.listOnLoad = function(container, response) {
         const showSegmentDependencies = function () {
             if (!segmentDependenciesLoaded) {
                 segmentDependenciesLoaded = true;
+                const requestedSegmentId = mQuery('input#entityId').val();
                 mQuery.ajax({
                     showLoadingBar: true,
                     url: mauticAjaxUrl,
                     type: 'GET',
                     data: {
                         action: 'lead:getSegmentDependencyTree',
-                        id: mQuery('input#entityId').val()
+                        id: requestedSegmentId
                     },
                     dataType: 'json',
                     success: function (response) {
                         Mautic.stopPageLoadingBar();
+                        if (mQuery('input#entityId').val() !== requestedSegmentId) {
+                            return;
+                        }
                         Mautic.renderSegmentTree('#segment-dependencies-container', response);
                         jsPlumbData = response;
                     },

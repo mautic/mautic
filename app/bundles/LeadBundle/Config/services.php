@@ -229,6 +229,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.repository.stages_lead_log', Mautic\LeadBundle\Entity\StagesChangeLogRepository::class);
     $services->alias('mautic.lead.repository.dnc', Mautic\LeadBundle\Entity\DoNotContactRepository::class);
     $services->alias('mautic.lead.repository.lead', Mautic\LeadBundle\Entity\LeadRepository::class);
+    $services->alias('mautic.lead.repository.list_lead', Mautic\LeadBundle\Entity\ListLeadRepository::class);
     $services->alias('mautic.lead.repository.frequency_rule', Mautic\LeadBundle\Entity\FrequencyRuleRepository::class);
     $services->alias('mautic.lead.repository.lead_event_log', Mautic\LeadBundle\Entity\LeadEventLogRepository::class);
     $services->alias('mautic.lead.repository.lead_device', Mautic\LeadBundle\Entity\LeadDeviceRepository::class);
