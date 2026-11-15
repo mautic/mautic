@@ -147,10 +147,31 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->assertSearchResult('segment_source%3Amanually_added%20!segment%3A'.$list->getAlias(), [], [$leadOne, $leadTwo, $leadThree]);
     }
 
-    /**
-     * @param string[] $expectedQueries
-     * @param string[] $previousQueries
-     */
+    public function testSegmentSourceSearchManuallyRemoved(): void
+    {
+        $leadOne = $this->createLead('one');
+        $leadTwo = $this->createLead('two');
+        $leadThree = $this->createLead('three');
+
+        $list = $this->createLeadList('removed-list', [], $leadOne, $leadTwo);
+
+        $listLead = new ListLead();
+        $listLead->setLead($leadThree);
+        $listLead->setList($list);
+        $listLead->setDateAdded(new \DateTime());
+        $listLead->setManuallyRemoved(true);
+        $this->em->persist($listLead);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->client->enableProfiler();
+
+        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20segment_source%3Amanually_removed', [$leadThree], [$leadOne, $leadTwo]);
+        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20segment_source%3Afilter_added', [$leadOne, $leadTwo], [$leadThree]);
+        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20!segment_source%3Amanually_removed', [$leadOne, $leadTwo], [$leadThree]);
+    }
+
     private function assertQueries(array $expectedQueries, array &$previousQueries): void
     {
         /** @var DoctrineDataCollector $dbCollector */
