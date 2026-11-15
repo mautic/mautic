@@ -207,7 +207,7 @@ final class MessageController extends AbstractStandardFormController
         return '@MauticChannel/Message';
     }
 
-    protected function getFormView(FormInterface $form, $view): FormView
+    protected function getFormView(FormInterface $form, string $view): FormView
     {
         return $form->createView();
     }
