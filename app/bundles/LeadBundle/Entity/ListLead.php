@@ -99,10 +99,7 @@ class ListLead
         return $this->manuallyRemoved;
     }
 
-    /**
-     * @param bool $manuallyRemoved
-     */
-    public function setManuallyRemoved($manuallyRemoved): void
+    public function setManuallyRemoved(?bool $manuallyRemoved): void
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }
@@ -123,10 +120,7 @@ class ListLead
         return $this->manuallyAdded;
     }
 
-    /**
-     * @param bool $manuallyAdded
-     */
-    public function setManuallyAdded($manuallyAdded): void
+    public function setManuallyAdded(?bool $manuallyAdded): void
     {
         $this->manuallyAdded = $manuallyAdded;
     }

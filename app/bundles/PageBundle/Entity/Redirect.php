@@ -88,10 +88,7 @@ class Redirect extends FormEntity
         return $this->redirectId;
     }
 
-    /**
-     * @param string $redirectId
-     */
-    public function setRedirectId($redirectId = null): void
+    public function setRedirectId(?string $redirectId = null): void
     {
         $redirectId ??= substr(hash('sha1', uniqid(mt_rand())), 0, 25);
         $this->redirectId = $redirectId;
@@ -102,18 +99,12 @@ class Redirect extends FormEntity
         return trim($this->url);
     }
 
-    /**
-     * @param string $url
-     */
-    public function setUrl($url): void
+    public function setUrl(?string $url): void
     {
         $this->url = trim($url);
     }
 
-    /**
-     * @param int $hits
-     */
-    public function setHits($hits): self
+    public function setHits(?int $hits): self
     {
         $this->hits = $hits;
 
@@ -128,10 +119,7 @@ class Redirect extends FormEntity
         return $this->hits;
     }
 
-    /**
-     * @param int $uniqueHits
-     */
-    public function setUniqueHits($uniqueHits): self
+    public function setUniqueHits(?int $uniqueHits): self
     {
         $this->uniqueHits = $uniqueHits;
 

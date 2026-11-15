@@ -299,10 +299,7 @@ class Field implements UuidInterface
         return $this->id;
     }
 
-    /**
-     * @param string $label
-     */
-    public function setLabel($label): static
+    public function setLabel(?string $label): static
     {
         $this->isChanged('label', $label);
         $this->label = $label;
@@ -318,10 +315,7 @@ class Field implements UuidInterface
         return $this->label;
     }
 
-    /**
-     * @param string $alias
-     */
-    public function setAlias($alias): static
+    public function setAlias(?string $alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -337,10 +331,7 @@ class Field implements UuidInterface
         return $this->alias;
     }
 
-    /**
-     * @param string $type
-     */
-    public function setType($type): static
+    public function setType(?string $type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -375,10 +366,7 @@ class Field implements UuidInterface
         return $this->defaultValue;
     }
 
-    /**
-     * @param bool $isRequired
-     */
-    public function setIsRequired($isRequired): static
+    public function setIsRequired(?bool $isRequired): static
     {
         $this->isChanged('isRequired', $isRequired);
         $this->isRequired = $isRequired;
@@ -404,10 +392,7 @@ class Field implements UuidInterface
         return $this->isRequired;
     }
 
-    /**
-     * @param int $order
-     */
-    public function setOrder($order): static
+    public function setOrder(?int $order): static
     {
         $this->isChanged('order', $order);
         $this->order = $order;

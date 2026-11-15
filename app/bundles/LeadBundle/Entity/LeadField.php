@@ -301,10 +301,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         return $this->isCloned;
     }
 
-    /**
-     * @param string $label
-     */
-    public function setLabel($label): static
+    public function setLabel(?string $label): static
     {
         $this->isChanged('label', $label);
         $this->label = $label;
@@ -322,10 +319,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     /**
      * Proxy function to setLabel().
-     *
-     * @param string $label
      */
-    public function setName($label): static
+    public function setName(?string $label): static
     {
         $this->isChanged('label', $label);
 
@@ -342,10 +337,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         return $this->label;
     }
 
-    /**
-     * @param string $type
-     */
-    public function setType($type): static
+    public function setType(?string $type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -364,7 +356,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     /**
      * @param string|array<string> $defaultValue
      */
-    public function setDefaultValue($defaultValue): static
+    public function setDefaultValue(?string $defaultValue): static
     {
         $defaultValue = is_array($defaultValue) ? implode('|', $defaultValue) : $defaultValue;
         $this->isChanged('defaultValue', $defaultValue);
@@ -381,10 +373,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         return $this->defaultValue;
     }
 
-    /**
-     * @param bool $isRequired
-     */
-    public function setIsRequired($isRequired): static
+    public function setIsRequired(?bool $isRequired): static
     {
         $this->isChanged('isRequired', $isRequired);
         $this->isRequired = $isRequired;
@@ -498,10 +487,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         return $this->customFieldObject->getObject();
     }
 
-    /**
-     * @param string $object
-     */
-    public function setObject($object): static
+    public function setObject(?string $object): static
     {
         $this->isChanged('object', $object);
         $this->object = $object;
@@ -611,10 +597,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         return $this->setIsUniqueIdentifer($isUniqueIdentifier);
     }
 
-    /**
-     * @param string $alias
-     */
-    public function setAlias($alias): static
+    public function setAlias(?string $alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;

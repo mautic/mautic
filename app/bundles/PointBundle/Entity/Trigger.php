@@ -216,10 +216,7 @@ class Trigger extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;

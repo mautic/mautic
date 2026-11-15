@@ -74,10 +74,7 @@ class LeadNote extends FormEntity
         return $this->id;
     }
 
-    /**
-     * @param string $text
-     */
-    public function setText($text): static
+    public function setText(?string $text): static
     {
         $this->isChanged('text', $text);
         $this->text = $text;
