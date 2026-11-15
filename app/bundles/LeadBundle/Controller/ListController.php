@@ -28,7 +28,6 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class ListController extends FormController
 {
     use CategoryListFiltersTrait;
-    use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
     private LeadListRepository $leadListRepository;

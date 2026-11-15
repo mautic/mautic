@@ -1714,11 +1714,7 @@ Mautic.listOnLoad = function(container, response) {
     let jsPlumbData = null;
 
     if (segmentDependenciesTab.length) {
-        mQuery(document).on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
-            if (mQuery(e.target).attr('id') !== 'segment-dependencies') {
-                return;
-            }
-
+        const showSegmentDependencies = function () {
             if (!segmentDependenciesLoaded) {
                 segmentDependenciesLoaded = true;
                 mQuery.ajax({
@@ -1742,7 +1738,17 @@ Mautic.listOnLoad = function(container, response) {
             } else if (jsPlumbData) {
                 Mautic.renderSegmentTree('#segment-dependencies-container', jsPlumbData);
             }
+        };
+
+        mQuery(document).on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
+            if (mQuery(e.target).attr('id') === 'segment-dependencies') {
+                showSegmentDependencies();
+            }
         });
+
+        if (segmentDependenciesTab.hasClass('active')) {
+            showSegmentDependencies();
+        }
 
         mQuery(document).on('hide.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
             if (mQuery(e.target).attr('id') === 'segment-dependencies') {
