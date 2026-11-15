@@ -88,6 +88,24 @@ final class RedirectClickCountFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], array_intersect(['mautic_device_id', 'mtc_id', 'mautic_referer_id'], $cookies));
     }
 
+    public function testTheLinkedPageMayStillTrackTheVisitorWhileLinkTrackingOff(): void
+    {
+        [$redirect, $contact] = $this->createLink();
+
+        $this->click($redirect, $contact, ['REMOTE_ADDR' => '203.0.113.42']);
+
+        $this->assertSame('', $this->getBlockedTrackingCookieValue(), 'only the click goes untracked, not the visitor');
+    }
+
+    public function testTheLinkedPageIsToldNotToTrackAnUntrackableVisitorWhileLinkTrackingOff(): void
+    {
+        [$redirect, $contact] = $this->createLink();
+
+        $this->click($redirect, $contact, ['REMOTE_ADDR' => '203.0.113.42', 'HTTP_DNT' => '1']);
+
+        $this->assertSame('1', $this->getBlockedTrackingCookieValue());
+    }
+
     public function testTrackedClickIsCounted(): void
     {
         [$redirect, $contact] = $this->createLink();
@@ -219,6 +237,17 @@ final class RedirectClickCountFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND, 'the link works either way');
 
         return (string) $this->client->getResponse()->headers->get('Location');
+    }
+
+    private function getBlockedTrackingCookieValue(): string
+    {
+        foreach ($this->client->getResponse()->headers->getCookies() as $cookie) {
+            if ('Blocked-Tracking' === $cookie->getName()) {
+                return (string) $cookie->getValue();
+            }
+        }
+
+        $this->fail('every redirect sets the Blocked-Tracking cookie');
     }
 
     /**

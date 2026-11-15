@@ -505,12 +505,13 @@ final class PublicController extends AbstractFormController
         // A request isn't trackable when it came from a configured "do not track" IP or user agent, which keeps
         // simulated clicks from 3rd party services such as URL shorteners out, or carries a privacy signal.
         // With link click tracking off, every click is handled as untracked.
-        // The setting goes first and the visitor is only looked up when trackable, since the lookup stores their IP address.
-        $isRequestTrackable = $this->coreParametersHelper->get('track_link_clicks', true) && $ipLookupHelper->isRequestTrackable();
+        // The visitor is only looked up when the click is tracked, since the lookup stores their IP address.
+        $isRequestTrackable = $ipLookupHelper->isRequestTrackable();
+        $isClickTrackable   = $isRequestTrackable && $this->coreParametersHelper->get('track_link_clicks', true);
 
         $isHitTrackable = false;
         if (null !== $ct && '' !== $ct) {
-            if ($isRequestTrackable) {
+            if ($isClickTrackable) {
                 // Search replace lead fields in the URL
                 try {
                     $lead           = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
@@ -551,7 +552,7 @@ final class PublicController extends AbstractFormController
 
         // A click from a message is still counted, with nothing that links it to the visitor. A clickthrough
         // that doesn't decode counts as no clickthrough.
-        $clickthrough = $isRequestTrackable ? [] : $this->decodeClickthrough($ct);
+        $clickthrough = $isClickTrackable ? [] : $this->decodeClickthrough($ct);
         if ([] !== $clickthrough) {
             try {
                 $pageModel->countUntrackedClick($redirect, $clickthrough);
@@ -567,8 +568,12 @@ final class PublicController extends AbstractFormController
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
         }
 
+        // The cookie tells the page or asset the link leads to whether this visitor is tracked. With link click
+        // tracking off the click isn't recorded, but the visitor still may be, so it follows the request and not the setting.
+        $isTrackingBlocked = $isClickTrackable ? !$isHitTrackable : !$isRequestTrackable;
+
         $response =  $this->redirect($url);
-        $response->headers->setCookie(new Cookie('Blocked-Tracking', (string) !$isHitTrackable, strtotime('now + 15 seconds')));
+        $response->headers->setCookie(new Cookie('Blocked-Tracking', (string) $isTrackingBlocked, strtotime('now + 15 seconds')));
 
         return $response;
     }
