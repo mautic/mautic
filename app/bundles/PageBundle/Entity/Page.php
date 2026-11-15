@@ -362,7 +362,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->title;
     }
 
-    public function setAlias(string $alias): static
+    public function setAlias(?string $alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;

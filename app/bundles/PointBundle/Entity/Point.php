@@ -209,7 +209,7 @@ class Point extends FormEntity implements UuidInterface
         return $this->properties;
     }
 
-    public function setType(string $type): static
+    public function setType(?string $type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -249,7 +249,7 @@ class Point extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;

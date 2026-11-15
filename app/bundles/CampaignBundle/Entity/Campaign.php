@@ -301,7 +301,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return $changes;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;

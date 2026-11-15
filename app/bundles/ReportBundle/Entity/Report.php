@@ -231,7 +231,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         $this->id = $id;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;

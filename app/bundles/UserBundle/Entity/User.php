@@ -457,7 +457,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->activePermissions;
     }
 
-    public function setPosition(string $position): static
+    public function setPosition(?string $position): static
     {
         $this->isChanged('position', $position);
         $this->position = $position;
@@ -561,7 +561,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $this->preferences = $preferences;
     }
 
-    public function setSignature(string $signature): static
+    public function setSignature(?string $signature): static
     {
         $this->isChanged('signature', $signature);
         $this->signature = $signature;

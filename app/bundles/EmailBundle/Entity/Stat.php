@@ -294,7 +294,7 @@ class Stat
         return $this->retryCount;
     }
 
-    public function setRetryCount(int $retryCount): void
+    public function setRetryCount(?int $retryCount): void
     {
         $this->addChange('retryCount', $this->retryCount, $retryCount);
         $this->retryCount = $retryCount;
@@ -405,7 +405,7 @@ class Stat
         return $this->openCount;
     }
 
-    public function setOpenCount(int $openCount): static
+    public function setOpenCount(?int $openCount): static
     {
         $this->addChange('openCount', $this->openCount, $openCount);
         $this->openCount = $openCount;
