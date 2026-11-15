@@ -16,8 +16,8 @@
     {% if labelText %}
     <label for="{{ id }}" class="form-label type-label-01">{{ labelText|trans }}</label>
     {% endif %}
-    <div class="quantity-stepper quantity-stepper--{{ size }}" role="group" aria-label="{{ (ariaLabel|default('mautic.core.quantity_stepper.label'))|trans }}" data-quantity-stepper data-min-message="{{ 'mautic.core.quantity_stepper.min'|trans }}" data-max-message="{{ 'mautic.core.quantity_stepper.max'|trans }}">
-        <button type="button" class="quantity-stepper__button" data-quantity-step="-1" tabindex="-1" aria-label="{{ decreaseLabel|default('mautic.core.quantity_stepper.decrease')|trans }}"{{ disabled ? ' disabled' }}>
+    <div class="quantity-stepper quantity-stepper--{{ size }}" role="group" aria-label="{{ (ariaLabel|default('mautic.core.quantity_stepper.label'))|trans|e('html_attr') }}" data-quantity-stepper data-min-message="{{ 'mautic.core.quantity_stepper.min'|trans|e('html_attr') }}" data-max-message="{{ 'mautic.core.quantity_stepper.max'|trans|e('html_attr') }}">
+        <button type="button" class="quantity-stepper__button" data-quantity-step="-1" tabindex="-1" aria-label="{{ decreaseLabel|default('mautic.core.quantity_stepper.decrease')|trans|e('html_attr') }}"{{ disabled ? ' disabled' }}>
             <i class="ri-subtract-line" aria-hidden="true"></i>
         </button>
         <span class="quantity-stepper__field" style="--quantity-stepper-digits: {{ reservedDigits }}">
@@ -26,7 +26,7 @@
             {% endblock %}
             <span class="quantity-stepper__display" aria-hidden="true"><span class="quantity-stepper__digit">{{ value }}</span></span>
         </span>
-        <button type="button" class="quantity-stepper__button" data-quantity-step="1" tabindex="-1" aria-label="{{ increaseLabel|default('mautic.core.quantity_stepper.increase')|trans }}"{{ disabled ? ' disabled' }}>
+        <button type="button" class="quantity-stepper__button" data-quantity-step="1" tabindex="-1" aria-label="{{ increaseLabel|default('mautic.core.quantity_stepper.increase')|trans|e('html_attr') }}"{{ disabled ? ' disabled' }}>
             <i class="ri-add-line" aria-hidden="true"></i>
         </button>
         <span class="visually-hidden" aria-live="polite" data-quantity-announcement></span>
