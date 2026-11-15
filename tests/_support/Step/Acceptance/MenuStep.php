@@ -8,7 +8,7 @@ use Page\Acceptance\MenuPage;
 
 final class MenuStep extends \AcceptanceTester
 {
-    public function loginAsAdmin($I): void
+    public function loginAsAdmin(\AcceptanceTester $I): void
     {
         $I->login(MenuPage::$ADMIN_USER, MenuPage::$ADMIN_PASSWORD);
         $I->amOnPage(MenuPage::$URL);
