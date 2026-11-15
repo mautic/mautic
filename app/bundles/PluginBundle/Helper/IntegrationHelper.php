@@ -61,7 +61,6 @@ final class IntegrationHelper
      *
      * @param array|string      $specificIntegrations
      * @param string[]|string|null $withFeatures
-     * @param bool         $alphabetical
      * @param int|null     $pluginFilter
      * @param bool|false   $publishedOnly
      *
@@ -69,7 +68,7 @@ final class IntegrationHelper
      *
      * @throws ORMException
      */
-    public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false): array
+    public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, bool $alphabetical = false, $pluginFilter = null, bool $publishedOnly = false): array
     {
         // Build the service classes
         if ([] === $this->available) {
@@ -314,7 +313,7 @@ final class IntegrationHelper
      *
      * @return AbstractIntegration|false
      */
-    public function getIntegrationObject($name)
+    public function getIntegrationObject(string $name)
     {
         $integrationObjects = $this->getIntegrationObjects($name);
 
@@ -355,7 +354,7 @@ final class IntegrationHelper
      *
      * @todo Extend this method to allow plugins to add URLs to these arrays
      */
-    public function getSocialProfileUrlRegex($find = true): array
+    public function getSocialProfileUrlRegex(bool $find = true): array
     {
         if ($find) {
             // regex to find a match
@@ -409,12 +408,9 @@ final class IntegrationHelper
      * Get the user's social profile data from cache or integrations if indicated.
      *
      * @param Lead   $lead
-     * @param bool   $refresh
      * @param string $specificIntegration
-     * @param bool   $persistLead
-     * @param bool   $returnSettings
      */
-    public function getUserProfiles(object $lead, array $fields = [], $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false): array
+    public function getUserProfiles(object $lead, array $fields = [], bool $refresh = false, $specificIntegration = null, bool $persistLead = true, bool $returnSettings = false): array
     {
         $socialCache     = $lead->getSocialCache();
         $featureSettings = [];
@@ -482,10 +478,7 @@ final class IntegrationHelper
         return ($returnSettings) ? [$socialCache, $featureSettings] : $socialCache;
     }
 
-    /**
-     * @param bool $integration
-     */
-    public function clearIntegrationCache(object $lead, $integration = false): array
+    public function clearIntegrationCache(object $lead, bool $integration = false): array
     {
         $socialCache = $lead->getSocialCache();
         if (!empty($integration)) {

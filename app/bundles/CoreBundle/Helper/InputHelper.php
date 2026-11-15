@@ -311,7 +311,7 @@ final class InputHelper
     /**
      * Removes all characters except those allowed in emails.
      */
-    public static function email($value, bool $urldecode = false): string
+    public static function email(string $value, bool $urldecode = false): string
     {
         if ($urldecode) {
             $value = urldecode($value);
@@ -468,7 +468,7 @@ final class InputHelper
     /**
      * Converts UTF8 into Latin.
      */
-    public static function transliterate($value): string|false
+    public static function transliterate(?string $value): string|false
     {
         $transId = 'Any-Latin; Latin-ASCII';
         if (function_exists('transliterator_transliterate') && $trans = \Transliterator::create($transId)) {

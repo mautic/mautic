@@ -36,9 +36,8 @@ final class PieChart extends AbstractChart implements ChartInterface
      * Define a dataset by name and count number. Method will add the rest.
      *
      * @param string $label
-     * @param int    $value
      */
-    public function setDataset($label, $value): static
+    public function setDataset($label, int $value): static
     {
         $this->totalCount += $value;
         $this->datasets[] = $value;
@@ -50,12 +49,9 @@ final class PieChart extends AbstractChart implements ChartInterface
     /**
      * Adds to the label also the value and the percentage.
      *
-     * @param string $label
-     * @param int    $value
-     *
      * @return string
      */
-    public function buildFullLabel($label, $value)
+    public function buildFullLabel(string $label, int $value)
     {
         if (!$this->totalCount) {
             return $label;
