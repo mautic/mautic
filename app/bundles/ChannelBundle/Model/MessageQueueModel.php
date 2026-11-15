@@ -62,7 +62,7 @@ final class MessageQueueModel extends FormModel
     public function processFrequencyRules(
         array &$leads,
         string $channel,
-        string $channelId,
+        int|string $channelId,
         $campaignEventId = null,
         int $attempts = 3,
         int $priority = MessageQueue::PRIORITY_NORMAL,

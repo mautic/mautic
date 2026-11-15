@@ -136,7 +136,7 @@ class LeadDevice
         return $this->clientInfo;
     }
 
-    public function setClientInfo(string $clientInfo): void
+    public function setClientInfo(array|string|null $clientInfo): void
     {
         $this->clientInfo = $clientInfo;
     }

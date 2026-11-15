@@ -220,7 +220,7 @@ final class StatRepository extends CommonRepository
      * @param array<int,int|string>|int|null $emailIds
      * @param array<int,int|string>|int|null $listId
      */
-    public function getReadCount(?int $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
+    public function getReadCount(array|int|null $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
         return $this->getStatusCount('is_read', $emailIds, $listId, $chartQuery, $combined);
     }

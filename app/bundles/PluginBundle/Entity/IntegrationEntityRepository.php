@@ -159,7 +159,7 @@ final class IntegrationEntityRepository extends CommonRepository
         string $integration,
         string $internalEntity,
         string $leadFields,
-        int $limit = 25,
+        int|false $limit = 25,
         $fromDate = null,
         $toDate = null,
         $integrationEntity = ['Contact', 'Lead'],
@@ -298,7 +298,7 @@ final class IntegrationEntityRepository extends CommonRepository
         return $leads;
     }
 
-    public function findLeadsToCreate($integration, $leadFields, int $limit = 25, $fromDate = null, $toDate = null, string $internalEntity = 'lead'): int|array
+    public function findLeadsToCreate($integration, $leadFields, int|false $limit = 25, $fromDate = null, $toDate = null, string $internalEntity = 'lead'): int|array
     {
         if ('company' == $internalEntity) {
             $joinTable = 'companies';

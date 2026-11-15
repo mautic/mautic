@@ -8,7 +8,7 @@ final readonly class ExportOption
 {
     private int $reportId;
 
-    public function __construct(?int $reportId)
+    public function __construct(int|string|null $reportId)
     {
         if (null !== $reportId && !is_numeric($reportId)) {
             throw new \InvalidArgumentException();

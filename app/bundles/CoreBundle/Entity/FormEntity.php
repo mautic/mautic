@@ -231,10 +231,7 @@ class FormEntity extends CommonEntity
         return $this->checkedOut;
     }
 
-    /**
-     * @param User|int|null $createdBy
-     */
-    public function setCreatedBy(?int $createdBy = null): static
+    public function setCreatedBy(User|int|null $createdBy = null): static
     {
         if (null != $createdBy && !$createdBy instanceof User) {
             $this->createdBy = $createdBy;

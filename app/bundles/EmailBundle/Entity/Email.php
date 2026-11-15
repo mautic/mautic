@@ -541,10 +541,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->description;
     }
 
-    /**
-     * @param ?string $description
-     */
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;

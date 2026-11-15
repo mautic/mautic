@@ -1355,7 +1355,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->phone;
     }
 
-    public function setPhone(string $phone): static
+    public function setPhone(?string $phone): static
     {
         $this->isChanged('phone', $phone);
         $this->phone = $phone;
@@ -1446,7 +1446,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->state;
     }
 
-    public function setState(string $state): static
+    public function setState(?string $state): static
     {
         $this->isChanged('state', $state);
         $this->state = $state;

@@ -333,12 +333,8 @@ class CorePermissions implements ResetInterface
 
     /**
      * Checks if the user has access to the requested entity.
-     *
-     * @param string|bool $ownPermission
-     * @param string|bool $otherPermission
-     * @param User|int    $ownerId
      */
-    public function hasEntityAccess(string $ownPermission, string $otherPermission, int $ownerId = 0): bool
+    public function hasEntityAccess(bool|string $ownPermission, bool|string $otherPermission, User|int|null $ownerId = 0): bool
     {
         $user = $this->userHelper->getUser();
         if (!is_object($user)) {

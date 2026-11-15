@@ -400,10 +400,8 @@ final class LeadTimelineEvent extends Event
 
     /**
      * Add to the event counters.
-     *
-     * @param int|array $count
      */
-    public function addToCounter(string $eventType, int $count): void
+    public function addToCounter(string $eventType, array|int $count): void
     {
         $this->totalEvents[$eventType] ??= 0;
 

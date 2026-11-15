@@ -122,7 +122,7 @@ final class DashboardController extends AbstractFormController
         path: '/s/dashboard/widget/{widgetId}',
         name: 'mautic_dashboard_widget',
     )]
-    public function widgetAction(Request $request, WidgetService $widgetService, Environment $twig, int $widgetId): JsonResponse
+    public function widgetAction(Request $request, WidgetService $widgetService, Environment $twig, int|string $widgetId): JsonResponse
     {
         if (!$request->isXmlHttpRequest()) {
             throw new NotFoundHttpException('Not found.');

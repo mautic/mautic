@@ -11,7 +11,7 @@ final class ValueNotMergeableException extends \Exception
      */
     public function __construct(
         private $newerValue,
-        private bool $olderValue,
+        private mixed $olderValue,
     ) {
         parent::__construct();
     }

@@ -449,10 +449,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this->city;
     }
 
-    /**
-     * @param string|null $city
-     */
-    public function setCity(string $city): static
+    public function setCity(?string $city): static
     {
         $this->isChanged('companycity', $city);
         $this->city = $city;

@@ -154,7 +154,7 @@ class FrequencyRule extends CommonEntity
     /**
      * @param int|null $frequencyNumber
      */
-    public function setFrequencyNumber(int $frequencyNumber): static
+    public function setFrequencyNumber(int|string|null $frequencyNumber): static
     {
         $this->isChanged('frequencyNumber', $frequencyNumber);
 

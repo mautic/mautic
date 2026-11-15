@@ -562,7 +562,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param bool|null $isPreferenceCenter
      */
-    public function setIsPreferenceCenter(bool $isPreferenceCenter): static
+    public function setIsPreferenceCenter(bool|int|string|null $isPreferenceCenter): static
     {
         $sanitizedValue = null === $isPreferenceCenter ? null : (bool) $isPreferenceCenter;
         $this->isChanged('isPreferenceCenter', $sanitizedValue);

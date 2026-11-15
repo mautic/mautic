@@ -110,7 +110,7 @@ final class InputHelper
      * @param mixed $value
      * @return mixed
      */
-    public static function _($value, string $mask = 'clean', bool $urldecode = false)
+    public static function _($value, array|string $mask = 'clean', bool $urldecode = false)
     {
         if (is_array($value)) {
             foreach ($value as $k => &$v) {
@@ -468,7 +468,7 @@ final class InputHelper
     /**
      * Converts UTF8 into Latin.
      */
-    public static function transliterate(string $value): string|false
+    public static function transliterate(?string $value): string|false
     {
         $transId = 'Any-Latin; Latin-ASCII';
         if (function_exists('transliterator_transliterate') && $trans = \Transliterator::create($transId)) {

@@ -177,7 +177,7 @@ class ObjectMapping
         return $this->integrationObjectId;
     }
 
-    public function setIntegrationObjectId(string $integrationObjectId): static
+    public function setIntegrationObjectId(int|string $integrationObjectId): static
     {
         $this->integrationObjectId = $integrationObjectId;
 

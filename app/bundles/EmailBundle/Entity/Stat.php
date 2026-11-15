@@ -425,7 +425,7 @@ class Stat
         return $this;
     }
 
-    public function addOpenDetails(string $details): void
+    public function addOpenDetails(array|string $details): void
     {
         if (self::MAX_OPEN_DETAILS > $this->openCount) {
             $this->openDetails[] = $details;

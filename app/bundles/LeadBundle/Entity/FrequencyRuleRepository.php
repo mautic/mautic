@@ -11,15 +11,11 @@ use Mautic\EmailBundle\Entity\Stat;
  */
 final class FrequencyRuleRepository extends CommonRepository
 {
-    /**
-     * @param string|null $defaultFrequencyNumber
-     * @param string|null $defaultFrequencyTime
-     */
     public function getAppliedFrequencyRules(
         string $channel,
         array $leadIds,
-        string $defaultFrequencyNumber,
-        string $defaultFrequencyTime,
+        ?string $defaultFrequencyNumber,
+        ?string $defaultFrequencyTime,
         string $statTable = 'email_stats',
         string $statContactColumn = 'lead_id',
         string $statSentColumn = 'date_sent',

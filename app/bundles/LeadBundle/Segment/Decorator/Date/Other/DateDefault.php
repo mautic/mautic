@@ -14,7 +14,7 @@ final class DateDefault implements FilterDecoratorInterface
 
     public function __construct(
         private readonly DateDecorator $dateDecorator,
-        private string $originalValue,
+        private ?string $originalValue,
     ) {
     }
 
