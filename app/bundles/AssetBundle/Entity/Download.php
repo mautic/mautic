@@ -205,7 +205,7 @@ class Download
         return $this->ipAddress;
     }
 
-    public function setTrackingId(string $trackingId): static
+    public function setTrackingId(?string $trackingId): static
     {
         $this->trackingId = $trackingId;
 

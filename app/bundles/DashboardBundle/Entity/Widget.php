@@ -176,9 +176,9 @@ class Widget extends FormEntity
         return $this->height;
     }
 
-    public function setOrdering(int $ordering): static
+    public function setOrdering(?int $ordering): static
     {
-        $this->ordering = $ordering;
+        $this->ordering = (int) $ordering;
         $this->isChanged('ordering', $this->ordering);
 
         return $this;
@@ -205,7 +205,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    public function setTemplate(string $template): static
+    public function setTemplate(?string $template): static
     {
         $this->isChanged('template', $template);
         $this->template = $template;

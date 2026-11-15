@@ -385,7 +385,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->content;
     }
 
-    public function setContent(string $content): static
+    public function setContent(?string $content): static
     {
         $this->isChanged('content', $content);
         $this->content = $content;

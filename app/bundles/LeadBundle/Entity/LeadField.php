@@ -354,9 +354,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * @param string|array<string> $defaultValue
+     * @param string|array<string>|null $defaultValue
      */
-    public function setDefaultValue(array|string $defaultValue): static
+    public function setDefaultValue(array|string|null $defaultValue): static
     {
         $defaultValue = is_array($defaultValue) ? implode('|', $defaultValue) : $defaultValue;
         $this->isChanged('defaultValue', $defaultValue);
@@ -487,7 +487,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         return $this->customFieldObject->getObject();
     }
 
-    public function setObject(string $object): static
+    public function setObject(?string $object): static
     {
         $this->isChanged('object', $object);
         $this->object = $object;
