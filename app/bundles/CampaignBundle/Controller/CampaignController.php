@@ -841,10 +841,9 @@ final class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param string    $action
      * @param bool|null $persistConnections
      */
-    protected function afterEntitySave(object $entity, FormInterface $form, $action, $persistConnections = null): void
+    protected function afterEntitySave(object $entity, FormInterface $form, string $action, $persistConnections = null): void
     {
         if ($persistConnections) {
             // Update canvas settings with new event IDs then save
@@ -858,7 +857,7 @@ final class CampaignController extends AbstractStandardFormController
     /**
      * @param Campaign $entity
      */
-    protected function afterFormProcessed($isValid, object $entity, FormInterface $form, $action, bool $isClone = false): void
+    protected function afterFormProcessed($isValid, object $entity, FormInterface $form, string $action, bool $isClone = false): void
     {
         if (!$isValid) {
             // Add the canvas settings to the entity to be able to rebuild it
@@ -873,7 +872,7 @@ final class CampaignController extends AbstractStandardFormController
      *
      * @param Campaign $entity
      */
-    protected function beforeFormProcessed(object $entity, FormInterface $form, $action, $isPost, $objectId = null, bool $isClone = false): void
+    protected function beforeFormProcessed(object $entity, FormInterface $form, string $action, $isPost, $objectId = null, bool $isClone = false): void
     {
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
 
@@ -942,7 +941,7 @@ final class CampaignController extends AbstractStandardFormController
     /**
      * @param Campaign $entity
      */
-    protected function beforeEntitySave(object $entity, FormInterface $form, $action, $objectId = null, bool $isClone = false): bool
+    protected function beforeEntitySave(object $entity, FormInterface $form, string $action, $objectId = null, bool $isClone = false): bool
     {
         if ([] === $this->campaignEvents) {
             // set the error
@@ -997,12 +996,11 @@ final class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param string          $action
      * @param string|int|null $objectId
      *
      * @return int|string|null
      */
-    protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null)
+    protected function getCampaignSessionId(Campaign $campaign, string $action, $objectId = null)
     {
         if (null !== $this->sessionId) {
             return $this->sessionId;
@@ -1207,11 +1205,9 @@ final class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param string $action
-     *
      * @throws CacheException
      */
-    protected function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, string $action): array
     {
         switch ($action) {
             case 'index':

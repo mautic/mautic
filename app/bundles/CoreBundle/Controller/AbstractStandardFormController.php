@@ -88,16 +88,18 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
+     * @param 'edit'|'new' $action
      * Called after the entity has been persisted allowing for custom preperation of $entity prior to viewAction.
      */
-    protected function afterEntitySave(object $entity, Form $form, $action, $pass = null): void
+    protected function afterEntitySave(object $entity, Form $form, string $action, $pass = null): void
     {
     }
 
     /**
+     * @param 'edit'|'new' $action
      * Called after the form is validated on POST.
      */
-    protected function afterFormProcessed($isValid, object $entity, Form $form, $action, bool $isClone = false): void
+    protected function afterFormProcessed($isValid, object $entity, Form $form, string $action, bool $isClone = false): void
     {
     }
 
@@ -173,26 +175,29 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
+     * @param 'edit'|'new' $action
      * Modify entity prior to persisting or perform custom validation on the form.
      *
      * @return mixed Whatever is returned will be passed into afterEntitySave; pass false to fail validation
      */
-    protected function beforeEntitySave(object $entity, Form $form, $action, $objectId = null, bool $isClone = false): bool
+    protected function beforeEntitySave(object $entity, Form $form, string $action, $objectId = null, bool $isClone = false): bool
     {
         return true;
     }
 
     /**
+     * @param 'edit'|'new' $action
      * Do anything necessary before the form is checked for POST and processed.
      */
-    protected function beforeFormProcessed(object $entity, Form $form, $action, $isPost, $objectId = null, bool $isClone = false): void
+    protected function beforeFormProcessed(object $entity, Form $form, string $action, $isPost, $objectId = null, bool $isClone = false): void
     {
     }
 
     /**
+     * @param 'batchDelete'|'clone'|'create'|'delete'|'edit'|'index'|'new'|'view' $action
      * @return bool|mixed
      */
-    protected function checkActionPermission($action, ?object $entity = null, $objectId = null)
+    protected function checkActionPermission(string $action, ?object $entity = null, $objectId = null)
     {
         $permissionUser = 0;
 
@@ -524,9 +529,10 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
+     * @param 'edit'|'new' $action
      * @param bool $isClone
      */
-    protected function getFormEntity($action, &$objectId = null, &$isClone = false)
+    protected function getFormEntity(string $action, &$objectId = null, &$isClone = false)
     {
         $model = $this->getModel($this->getModelName());
 
@@ -553,9 +559,10 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
+     * @param 'edit'|'new' $action
      * Set custom form themes, etc.
      */
-    protected function getFormView(FormInterface $form, $action): FormView
+    protected function getFormView(FormInterface $form, string $action): FormView
     {
         return $form->createView();
     }
@@ -617,16 +624,18 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * Amend the parameters sent through postActionRedirect.
      *
      * @param array<array<string, mixed>, mixed> $args
+     * @param 'batchDelete'|'delete'|'edit'|'index'|'new'|'view' $action
      */
-    protected function getPostActionRedirectArguments(array $args, $action): array
+    protected function getPostActionRedirectArguments(array $args, string $action): array
     {
         return $args;
     }
 
     /**
+     * @param 'batchDelete'|'delete'|'edit'|'index'|'new'|'view' $action
      * @return string
      */
-    protected function getPostActionControllerAction($action)
+    protected function getPostActionControllerAction(string $action)
     {
         return 'index';
     }
@@ -729,8 +738,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * Amend the parameters sent through delegateView.
      *
      * @param array<array<string, mixed>, mixed> $args
+     * @param 'edit'|'index'|'new'|'view' $action
      */
-    protected function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, string $action): array
     {
         return $args;
     }

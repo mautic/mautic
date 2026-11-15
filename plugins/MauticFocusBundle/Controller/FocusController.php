@@ -115,7 +115,7 @@ final class FocusController extends AbstractStandardFormController
     /**
      * @throws \Exception
      */
-    protected function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, string $action): array
     {
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
 
@@ -124,7 +124,7 @@ final class FocusController extends AbstractStandardFormController
             $this->indexSearchScopes                = null;
         }
 
-        if ('view' == $action) {
+        if ('view' === $action) {
             /** @var Focus $item */
             $item = $args['viewParameters']['item'];
 
@@ -185,7 +185,7 @@ final class FocusController extends AbstractStandardFormController
     /**
      * @return mixed[]
      */
-    protected function getPostActionRedirectArguments(array $args, $action): array
+    protected function getPostActionRedirectArguments(array $args, string $action): array
     {
         $focus        = $this->getCurrentRequest()->request->all()['focus'] ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
