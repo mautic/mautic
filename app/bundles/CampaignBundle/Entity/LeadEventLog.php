@@ -388,7 +388,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     public function setRotation(int $rotation): static
     {
-        $this->rotation = (int) $rotation;
+        $this->rotation = $rotation;
 
         return $this;
     }

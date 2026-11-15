@@ -127,7 +127,7 @@ class Widget extends FormEntity
 
     public function setWidth(int $width): static
     {
-        $this->width = (int) $width;
+        $this->width = $width;
         $this->isChanged('width', $this->width);
 
         return $this;
@@ -143,7 +143,7 @@ class Widget extends FormEntity
 
     public function setHeight(int $height): static
     {
-        $this->height = (int) $height;
+        $this->height = $height;
         $this->isChanged('height', $this->height);
 
         return $this;
@@ -178,7 +178,7 @@ class Widget extends FormEntity
 
     public function setOrdering(int $ordering): static
     {
-        $this->ordering = (int) $ordering;
+        $this->ordering = $ordering;
         $this->isChanged('ordering', $this->ordering);
 
         return $this;

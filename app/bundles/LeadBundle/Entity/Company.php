@@ -330,8 +330,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     public function setScore(int $score): static
     {
-        $score = (int) $score;
-
         $this->isChanged('score', $score);
         $this->score = $score;
 

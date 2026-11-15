@@ -652,7 +652,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function adjustPoints(int $points, string $operator = self::POINTS_ADD): static
     {
-        if (!$points = (int) $points) {
+        if (0 === $points) {
             return $this;
         }
 
@@ -702,7 +702,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public function setPoints(int $points): static
     {
         $this->isChanged('points', $points);
-        $this->points = (int) $points;
+        $this->points = $points;
 
         // Something is setting points directly so reset points updated by database
         $this->resetPointChanges();
