@@ -2651,7 +2651,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         ];
 
         $originalLimit = $limit;
-        $progress      = false;
+        $progress      = null;
 
         // Get a total number of companies to be updated and/or created for the progress counter
         $totalToUpdate = array_sum(
