@@ -20,8 +20,7 @@
                         <h4>{{ 'mautic.email.send.stats'|trans({'%sent%': stats.sent, '%failed%': stats.failed}) }}</h4>
                     {% endif %}
                     {% include '@MauticCore/Components/progress-bar.html.twig' with {
-                        label: ('mautic.email.send.' ~ status)|trans({'%subject%': email.getSubject()}),
-                        hideLabel: true,
+                        label: 'mautic.core.progress',
                         value: progress[0],
                         max: progress[1],
                         status: 'inprogress' == status ? 'active' : 'finished',
