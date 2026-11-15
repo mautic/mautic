@@ -102,10 +102,7 @@ final class FrequencyRuleRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @param string $channel
-     */
-    private function getCustomFrequencyRuleViolations($channel, array $leadIds, string $statTable, string $statContactColumn, string $statSentColumn): array
+    private function getCustomFrequencyRuleViolations(string $channel, array $leadIds, string $statTable, string $statContactColumn, string $statSentColumn): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -147,14 +144,10 @@ final class FrequencyRuleRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @param string $defaultFrequencyNumber
-     * @param string $defaultFrequencyTime
-     */
     private function getDefaultFrequencyRuleViolations(
         array $leadIds,
-        $defaultFrequencyNumber,
-        $defaultFrequencyTime,
+        ?string $defaultFrequencyNumber,
+        ?string $defaultFrequencyTime,
         string $statTable,
         string $statContactColumn,
         string $statSentColumn,

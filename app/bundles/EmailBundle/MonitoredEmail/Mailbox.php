@@ -148,9 +148,9 @@ final class Mailbox
 
     private $imapFolder     = 'INBOX';
 
-    private $imapOptions    = 0;
+    private int $imapOptions    = 0;
 
-    private $imapRetriesNum = 0;
+    private int $imapRetriesNum = 0;
 
     private ?array $imapParams     = [];
 
@@ -830,7 +830,7 @@ final class Mailbox
         return $mail;
     }
 
-    private function initMailPart(Message $mail, $partStructure, int $partNum, bool $markAsSeen = true, bool $isDsn = false, bool $isFbl = false): void
+    private function initMailPart(Message $mail, $partStructure, $partNum, bool $markAsSeen = true, bool $isDsn = false, bool $isFbl = false): void
     {
         $options = FT_UID;
         if (!$markAsSeen) {

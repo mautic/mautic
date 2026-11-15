@@ -56,9 +56,6 @@ final class MessageQueueModel extends FormModel
         return $this->messageQueueRepository;
     }
 
-    /**
-     * @param 'email'|'sms' $channel
-     */
     public function processFrequencyRules(
         array &$leads,
         string $channel,
@@ -166,7 +163,7 @@ final class MessageQueueModel extends FormModel
         return true;
     }
 
-    public function sendMessages(?string $channel = null, ?int $channelId = null, int $limit = 50): int
+    public function sendMessages($channel = null, $channelId = null, int $limit = 50): int
     {
         // Note when the process started for batch purposes
         $processStarted = new \DateTime();

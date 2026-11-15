@@ -17,9 +17,6 @@ final class MailboxContainer
     ) {
     }
 
-    /**
-     * @param 'mailbox1'|'mailbox2' $mailbox
-     */
     public function addCriteria(string $criteria, string $mailbox): void
     {
         $this->criteria[$criteria] ??= [];

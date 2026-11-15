@@ -1161,7 +1161,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                     $failedRecipientsByList[$options['listId']] = $listErrors;
                 }
 
-                if (null !== $limit && 0 == $limit) {
+                if (null !== $limit && 0 === $limit) {
                     break;
                 }
 
@@ -1833,7 +1833,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
 
         $format = '%H:00';
-        if (12 == $timeFormat) {
+        if (12 === $timeFormat) {
             $format = '%h %p';
         }
 

@@ -175,7 +175,6 @@ final class ConnectwiseApi extends CrmApi
 
     /**
      * @throws ApiErrorException
-     * @param 'marketing/groups'|'sales/activities/types'|'system/members'|'test' $endpoint
      */
     public function fetchAllRecords(string $endpoint): array
     {

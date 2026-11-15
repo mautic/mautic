@@ -28,18 +28,12 @@ class LeadBuildSearchEvent extends CommonEvent
     ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getString()
+    public function getString(): string
     {
         return $this->string;
     }
 
-    /**
-     * @return string
-     */
-    public function getCommand()
+    public function getCommand(): string
     {
         return $this->command;
     }

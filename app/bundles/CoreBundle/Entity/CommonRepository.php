@@ -401,8 +401,10 @@ abstract class CommonRepository extends ServiceEntityRepository
 
     /**
      * Get a single entity.
+     *
+     * @param int $id
      */
-    public function getEntity(int $id = 0): ?object
+    public function getEntity($id = 0): ?object
     {
         try {
             if (is_array($id)) {
@@ -684,7 +686,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      *
      * @return mixed[]
      */
-    public function getSimpleList(?CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, string $valueColumn = 'id', $extraColumns = null, int $limit = 0): array
+    public function getSimpleList(?CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id', $extraColumns = null, $limit = 0): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

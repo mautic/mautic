@@ -200,7 +200,7 @@ class CorePermissions implements ResetInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function isGranted($requestedPermission, string $mode = 'MATCH_ALL', $userEntity = null, bool $allowUnknown = false): bool|array
+    public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, bool $allowUnknown = false): bool|array
     {
         // Initialize all permission classes if
         $this->getPermissionObjects();
@@ -276,7 +276,7 @@ class CorePermissions implements ResetInterface
      *
      * @return bool
      */
-    public function checkPermissionExists(string $permission)
+    public function checkPermissionExists($permission)
     {
         // Generate all permission objects in case they haven't been already.
         $this->getPermissionObjects();

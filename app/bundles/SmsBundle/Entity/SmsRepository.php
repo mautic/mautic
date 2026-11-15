@@ -181,7 +181,7 @@ final class SmsRepository extends CommonRepository
             $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
             $q->update(MAUTIC_TABLE_PREFIX.'sms_messages')
-                ->set($type.'_count', $type.'_count + '.(int) $increaseBy)
+                ->set($type.'_count', $type.'_count + '.$increaseBy)
                 ->where('id = '.(int) $id);
 
             $q->executeStatement();

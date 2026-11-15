@@ -151,7 +151,6 @@ abstract class AbstractMauticMigration extends AbstractMigration
      * Generate the  name for the property.
      *
      * @return string
-     * @param 'fk'|'idx' $type
      */
     protected function generatePropertyName($table, string $type, array $columnNames)
     {

@@ -1312,7 +1312,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     public function getObjectDataToUpdate($checkEmailsInSugar, array &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, string $object = 'Leads'): array
     {
         $config     = $this->mergeConfigToFeatureSettings([]);
-        $queryParam = ('Leads' == $object) ? 'checkemail' : 'checkemail_contacts';
+        $queryParam = ('Leads' === $object) ? 'checkemail' : 'checkemail_contacts';
 
         $sugarLead         = $this->getApiHelper()->getLeads([$queryParam => array_keys($checkEmailsInSugar), 'offset' => 0, 'max_results' => 1000], $object);
         $deletedSugarLeads = $sugarLeadRecords = [];
@@ -1379,8 +1379,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                                 $this->buildCompositeBody(
                                     $mauticData,
                                     $availableFields,
-                                    $isConverted || ('Contacts' == $object) ? $contactSugarFields : $leadSugarFields,
-                                    $isConverted || ('Contacts' == $object) ? 'Contacts' : 'Leads',
+                                    $isConverted || ('Contacts' === $object) ? $contactSugarFields : $leadSugarFields,
+                                    $isConverted || ('Contacts' === $object) ? 'Contacts' : 'Leads',
                                     $checkEmailsInSugar[$key],
                                     $ownerAssignedUserIdByEmail,
                                     $isConverted ? $sugarLeadRecord['contact_id'] : $sugarLeadRecord['id']

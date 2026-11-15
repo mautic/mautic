@@ -596,6 +596,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
      * @param array<string, mixed> $args             same as getEntity/getEntities
      * @param string               $joinTable
      * @param int                  $entityId
+     * @param string               $entityColumnName
      * @param array|null           $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
      */
     public function getEntityContacts(
@@ -603,9 +604,9 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         $joinTable,
         $entityId,
         ?array $filters = [],
-        string $entityColumnName = 'id',
+        $entityColumnName = 'id',
         ?array $additionalJoins = null,
-        string $contactColumnName = 'lead_id',
+        $contactColumnName = 'lead_id',
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
     ): array {

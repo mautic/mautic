@@ -194,7 +194,6 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
 
     /**
      * @param string      $type
-     * @param 'columnName'|'column_name' $name
      */
     public function addNullableField(string $name, $type = Types::STRING, ?string $columnName = null): static
     {

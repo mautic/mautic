@@ -90,7 +90,7 @@ final class TrackableRepository extends CommonRepository
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'channel_url_trackables')
-            ->set('hits', 'hits + '.(int) $increaseBy)
+            ->set('hits', 'hits + '.$increaseBy)
             ->where(
                 $q->expr()->and(
                     $q->expr()->eq('redirect_id', (string) ((int) $redirectId)),
@@ -101,7 +101,7 @@ final class TrackableRepository extends CommonRepository
             ->setParameter('channel', $channel);
 
         if ($unique) {
-            $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
+            $q->set('unique_hits', 'unique_hits + '.$increaseBy);
         }
 
         $q->executeStatement();

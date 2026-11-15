@@ -445,7 +445,7 @@ final class LeadTimelineEvent extends Event
                 $this->totalEvents[$eventType] = array_sum($count);
             }
         } else {
-            $this->totalEvents[$eventType] += (int) $count;
+            $this->totalEvents[$eventType] += $count;
         }
     }
 

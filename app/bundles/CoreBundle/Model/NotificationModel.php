@@ -79,10 +79,10 @@ class NotificationModel extends FormModel
      */
     public function addNotification(
         $message,
-        ?string $type = null,
+        $type = null,
         bool $isRead = false,
-        ?string $header = null,
-        ?string $iconClass = null,
+        $header = null,
+        $iconClass = null,
         ?\DateTime $datetime = null,
         ?User $user = null,
         ?string $deduplicateValue = null,

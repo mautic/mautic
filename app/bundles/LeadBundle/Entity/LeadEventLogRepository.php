@@ -83,8 +83,6 @@ final class LeadEventLogRepository extends CommonRepository
     /**
      * @param array|string|null    $actions
      * @param array<string, mixed> $options
-     * @param 'integrations'|'lead'|null $bundle
-     * @param 'api-batch'|'api-single'|'import'|null $object
      */
     public function getEvents(?Lead $contact = null, ?string $bundle = null, ?string $object = null, $actions = null, array $options = []): array
     {

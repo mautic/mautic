@@ -202,7 +202,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
                 $this->reportBuilderData[$context]['graphs'] = $this->reportBuilderData['all']['graphs'][$context] ?? [];
             } else {
                 // build them
-                $eventContext = ('all' == $context) ? '' : $context;
+                $eventContext = ('all' === $context) ? '' : $context;
 
                 $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper, $reportSource);
                 $this->dispatcher->dispatch($event);
@@ -210,7 +210,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
                 $tables = $event->getTables();
                 $graphs = $event->getGraphs();
 
-                if ('all' == $context) {
+                if ('all' === $context) {
                     $this->reportBuilderData[$context]['tables'] = $tables;
                     $this->reportBuilderData[$context]['graphs'] = $graphs;
                 } else {

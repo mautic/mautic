@@ -461,9 +461,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param 'mautic'|'mautic_company' $priorityObject
+     * @param string $priorityObject
      */
-    protected function getPriorityFieldsForMautic(array $config, $entityObject = null, string $priorityObject = 'mautic'): array
+    protected function getPriorityFieldsForMautic(array $config, $entityObject = null, $priorityObject = 'mautic'): array
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 1),
@@ -471,7 +471,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         );
     }
 
-    protected function getPriorityFieldsForIntegration(array $config, $entityObject = null, string $priorityObject = 'mautic'): array
+    /**
+     * @param string $priorityObject
+     */
+    protected function getPriorityFieldsForIntegration(array $config, $entityObject = null, $priorityObject = 'mautic'): array
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 0),
@@ -613,7 +616,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     {
         // We must not convert boolean values to string, otherwise "false" will be converted to an empty string.
         // "False" has to be converted to 0 instead.
-        if (('text' == $fieldType) && !is_bool($value)) {
+        if (('text' === $fieldType) && !is_bool($value)) {
             return substr($value, 0, 255);
         }
 

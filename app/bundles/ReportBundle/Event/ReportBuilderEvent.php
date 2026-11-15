@@ -112,7 +112,6 @@ class ReportBuilderEvent extends AbstractReportEvent
      * @param string[] $removeColumns
      *
      * @return array<string,array<string,string>>
-     * @param 'mautic_asset_action'|'mautic_campaign_action'|'mautic_email_action'|'mautic_form_action'|'mautic_mobile_notification_action'|'mautic_page_action'|null $idLink
      */
     public function getStandardColumns(string $prefix, array $removeColumns = [], ?string $idLink = null): array
     {
@@ -262,9 +261,6 @@ class ReportBuilderEvent extends AbstractReportEvent
         return $channelColumns;
     }
 
-    /**
-     * @param 'line'|'pie'|'table' $type
-     */
     public function addGraph(string $context, string $type, string $graphId, array $options = []): static
     {
         if (in_array($type, $this->supportedGraphs)) {

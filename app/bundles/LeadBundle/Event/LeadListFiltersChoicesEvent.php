@@ -55,7 +55,6 @@ final class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
      * Please refer to ListModel.php, inside getChoiceFields method, for examples of choices.
      *
      * @param mixed[] $choiceConfig
-     * @param 'behaviors'|'groups'|'lead' $object
      */
     public function addChoice(string $object, string $choiceKey, array $choiceConfig): void
     {

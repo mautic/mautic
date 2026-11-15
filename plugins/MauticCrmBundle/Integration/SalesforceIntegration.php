@@ -1710,7 +1710,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
             // use a composite patch here that can update and create (one query) every 200 records
             if (isset($objectFields['update'])) {
                 $fields = ($objectId) ? $objectFields['update'] : $objectFields['create'];
-                if (isset($entity['company']) && isset($entity['integration_entity']) && 'Contact' == $object) {
+                if (isset($entity['company']) && isset($entity['integration_entity']) && 'Contact' === $object) {
                     $accountId = $this->getCompanyName($entity['company'], 'Id', 'Name');
 
                     if (!$accountId) {
@@ -2593,9 +2593,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         foreach ($leadIds as $leadId) {
             $lead = $this->leadModel->getEntity($leadId);
 
-            if (true == $newDncValue) {
+            if ($newDncValue) {
                 $this->doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, 'Set by Salesforce', true, true, true);
-            } elseif (false == $newDncValue) {
+            } elseif (false === $newDncValue) {
                 $this->doNotContact->removeDncForContact($lead->getId(), 'email', true);
             }
         }
@@ -3033,9 +3033,6 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return array_merge($resultsByName, $resultsById);
     }
 
-    /**
-     * @param 'Id'|'Name' $field
-     */
     public function getCompanyName($accountId, string $field, string $searchBy = 'Id')
     {
         $companyField   = null;

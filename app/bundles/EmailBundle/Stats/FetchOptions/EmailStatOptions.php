@@ -27,10 +27,7 @@ final class EmailStatOptions extends FetchOptions
 
     private bool $canViewOthers = false;
 
-    /**
-     * @var string
-     */
-    private $unit;
+    private ?string $unit = null;
 
     public function setEmailIds(array $ids): static
     {

@@ -56,7 +56,6 @@ final class ContactSegmentFilterDictionary
      * @return string|int
      *
      * @throws FilterNotFoundException
-     * @param 'field'|'foreign_table'|'foreign_table_field'|'func'|'type'|'where' $property
      */
     public function getFilterProperty(string $filterKey, string $property)
     {

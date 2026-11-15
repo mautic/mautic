@@ -58,7 +58,7 @@ final class SalesforceApi extends CrmApi
         $requestUrl = RequestUrl::get($this->integration->getApiUrl(), $queryUrl, $operation, $object);
 
         $settings   = $this->requestSettings;
-        if ('PATCH' == $method) {
+        if ('PATCH' === $method) {
             $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
         }
 
@@ -513,12 +513,11 @@ final class SalesforceApi extends CrmApi
 
     /**
      * @param mixed $response
-     * @param bool  $isRetry
      *
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function analyzeResponse($response, $isRetry): void
+    private function analyzeResponse($response, bool $isRetry): void
     {
         if (is_array($response)) {
             if (!empty($response['errors'])) {

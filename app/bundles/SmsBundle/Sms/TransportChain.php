@@ -22,10 +22,6 @@ class TransportChain
     ) {
     }
 
-    /**
-     * @param 'mautic.test.twilio.mock'|'mautic.transport.test' $alias
-     * @param 'mautic.test.twilio.mock'|'mautic.transport.test' $translatableAlias
-     */
     public function addTransport(string $alias, TransportInterface $transport, string $translatableAlias, string $integrationAlias): static
     {
         $this->transports[$alias]['alias']            = $translatableAlias;

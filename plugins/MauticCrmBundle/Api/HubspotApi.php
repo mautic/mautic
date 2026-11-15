@@ -71,7 +71,7 @@ final class HubspotApi extends CrmApi
      */
     public function getLeadFields(string $object = 'contacts')
     {
-        if ('company' == $object) {
+        if ('company' === $object) {
             $object = 'companies'; // hubspot company object name
         }
 

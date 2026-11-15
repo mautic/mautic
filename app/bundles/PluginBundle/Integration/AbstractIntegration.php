@@ -1651,7 +1651,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return Lead
      */
-    public function getMauticLead($data, bool $persist = true, ?array $socialCache = null, $identifiers = null)
+    public function getMauticLead($data, $persist = true, ?array $socialCache = null, $identifiers = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -2147,7 +2147,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * @throws ApiErrorException
      * @throws Exception
      */
-    protected function cleanupFromSync(&$leadsToSync = [], bool $error = false)
+    protected function cleanupFromSync(&$leadsToSync = [], $error = false)
     {
         $duplicates = 0;
         if ($this->mauticDuplicates) {

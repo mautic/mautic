@@ -99,7 +99,6 @@ abstract class AbstractEventAccessor
      * @param mixed  $default
      *
      * @return mixed
-     * @param 'channel'|'channelIdField'|'connectionRestrictions'|'description'|'formTheme'|'formType'|'formTypeOptions'|'label'|'timelineTemplate' $property
      */
     protected function getProperty(string $property, $default = null)
     {

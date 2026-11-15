@@ -18,7 +18,6 @@ final class SugarcrmApi extends CrmApi
      * @return mixed|string
      *
      * @throws ApiErrorException
-     * @param 'GET'|'POST'|'PUT' $method
      */
     public function request(string $sMethod, array $data = [], string $method = 'GET', ?string $object = null)
     {
@@ -570,7 +569,7 @@ final class SugarcrmApi extends CrmApi
             default:
                 $mixedFields = array_filter($availableFields['leadFields']);
                 $fields      = [];
-                $object      = ('Contacts' == $object) ? 'Contacts' : 'Leads';
+                $object      = ('Contacts' === $object) ? 'Contacts' : 'Leads';
                 foreach ($mixedFields as $sugarField => $mField) {
                     if (str_contains($sugarField, '__'.$object)) {
                         $fields[] = str_replace('__'.$object, '', $sugarField);

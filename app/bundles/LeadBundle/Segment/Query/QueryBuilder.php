@@ -123,9 +123,6 @@ final class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    /**
-     * @param 'inner'|'left'|'right'|null $joinType
-     */
     public function getTableAlias(string $table, ?string $joinType = null): array|bool|string
     {
         if (null === $joinType) {

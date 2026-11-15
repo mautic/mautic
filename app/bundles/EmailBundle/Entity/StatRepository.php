@@ -237,7 +237,6 @@ final class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
-     * @param 'is_failed'|'is_read'|'is_sent' $column
      */
     public function getStatusCount(string $column, $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {

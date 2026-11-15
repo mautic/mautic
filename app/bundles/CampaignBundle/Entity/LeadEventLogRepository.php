@@ -586,7 +586,7 @@ final class LeadEventLogRepository extends CommonRepository
             )
             ->setParameter('contactId', (int) $contactId)
             ->setParameter('campaignId', (int) $campaignId)
-            ->setParameter('rotation', (int) $rotation)
+            ->setParameter('rotation', $rotation)
             ->setMaxResults(1);
 
         $results = $qb->executeQuery()->fetchAllAssociative();
