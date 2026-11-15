@@ -418,6 +418,7 @@ rules:
     - Utils\PHPStan\Rule\SingleArgumentDispatchRule
     - Utils\PHPStan\Rule\NativeUnionParamMustHaveUnionDocblockRule
     - Utils\PHPStan\Rule\NoDuplicateParamDocblockRule
+    - Utils\PHPStan\Rule\NoUselessAssertInstanceOfRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
