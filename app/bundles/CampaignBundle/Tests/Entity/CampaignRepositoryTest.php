@@ -67,56 +67,29 @@ final class CampaignRepositoryTest extends TestCase
         $this->assertSame(['par1' => true], $params);
     }
 
-    public function testAddSearchCommandWhereClauseHandlesSegmentSourceFilter(): void
+    #[DataProvider('dbalSourceCommandDataProvider')]
+    public function testAddSearchCommandWhereClauseBuildsSourceFiltersWithDbalQueryBuilder(string $command, bool $not, string $expected): void
     {
         $qb     = $this->connection->createQueryBuilder();
-        $filter = (object) ['command' => 'source:segment', 'string' => '', 'not' => false, 'strict' => false];
+        $filter = (object) ['command' => $command, 'string' => '', 'not' => $not, 'strict' => false];
 
         $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
 
         [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
 
-        $this->assertSame('EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref cl WHERE cl.campaign_id = c.id)', (string) $expr);
+        $this->assertSame(sprintf($expected, MAUTIC_TABLE_PREFIX), (string) $expr);
         $this->assertSame([], $params);
     }
 
-    public function testAddSearchCommandWhereClauseHandlesFormSourceFilter(): void
+    /**
+     * @return iterable<array{0: string, 1: bool, 2: string}>
+     */
+    public static function dbalSourceCommandDataProvider(): iterable
     {
-        $qb     = $this->connection->createQueryBuilder();
-        $filter = (object) ['command' => 'source:form', 'string' => '', 'not' => false, 'strict' => false];
-
-        $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
-
-        [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
-
-        $this->assertSame('EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_form_xref cf WHERE cf.campaign_id = c.id)', (string) $expr);
-        $this->assertSame([], $params);
-    }
-
-    public function testAddSearchCommandWhereClauseHandlesNegatedSegmentSourceFilter(): void
-    {
-        $qb     = $this->connection->createQueryBuilder();
-        $filter = (object) ['command' => 'source:segment', 'string' => '', 'not' => true, 'strict' => false];
-
-        $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
-
-        [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
-
-        $this->assertSame('NOT EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref cl WHERE cl.campaign_id = c.id)', (string) $expr);
-        $this->assertSame([], $params);
-    }
-
-    public function testAddSearchCommandWhereClauseHandlesNegatedFormSourceFilter(): void
-    {
-        $qb     = $this->connection->createQueryBuilder();
-        $filter = (object) ['command' => 'source:form', 'string' => '', 'not' => true, 'strict' => false];
-
-        $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
-
-        [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
-
-        $this->assertSame('NOT EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_form_xref cf WHERE cf.campaign_id = c.id)', (string) $expr);
-        $this->assertSame([], $params);
+        yield ['source:segment', false, 'EXISTS(SELECT 1 FROM %1$scampaign_leadlist_xref cl WHERE cl.campaign_id = c.id)'];
+        yield ['source:segment', true, 'NOT EXISTS(SELECT 1 FROM %1$scampaign_leadlist_xref cl WHERE cl.campaign_id = c.id)'];
+        yield ['source:form', false, 'EXISTS(SELECT 1 FROM %1$scampaign_form_xref cf WHERE cf.campaign_id = c.id)'];
+        yield ['source:form', true, 'NOT EXISTS(SELECT 1 FROM %1$scampaign_form_xref cf WHERE cf.campaign_id = c.id)'];
     }
 
     public function testGetSearchCommandsContainsCampaignFilters(): void

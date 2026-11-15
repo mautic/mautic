@@ -26,6 +26,8 @@ final class CampaignSearchScopeProviderTest extends SearchScopeProviderTestCase
         $campaignModel->method('getCommandList')
             ->willReturn([
                 'mautic.core.searchcommand.ismine',
+                'mautic.campaign.campaign.searchcommand.source.segment',
+                'mautic.campaign.campaign.searchcommand.source.form',
             ]);
 
         return new CampaignSearchScopeProvider($campaignModel, $translator);

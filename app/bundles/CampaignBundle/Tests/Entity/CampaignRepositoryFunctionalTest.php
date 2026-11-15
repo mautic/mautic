@@ -173,10 +173,10 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    private function createCampaign(): Campaign
+    private function createCampaign(string $name = 'Test campaign'): Campaign
     {
         $campaign = new Campaign();
-        $campaign->setName('Test campaign');
+        $campaign->setName($name);
         $campaign->setIsPublished(true);
         $this->em->persist($campaign);
 
@@ -221,11 +221,11 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $form->setAlias('source-form');
         $this->em->persist($form);
 
-        $segmentCampaign = $this->createSourceCampaign('Segment source');
+        $segmentCampaign = $this->createCampaign('Segment source');
         $segmentCampaign->addList($segment);
-        $formCampaign = $this->createSourceCampaign('Form source');
+        $formCampaign = $this->createCampaign('Form source');
         $formCampaign->addForm($form);
-        $plainCampaign = $this->createSourceCampaign('No source');
+        $plainCampaign = $this->createCampaign('No source');
         $this->em->flush();
 
         $campaignIds = [$segmentCampaign->getId(), $formCampaign->getId(), $plainCampaign->getId()];
@@ -234,16 +234,6 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertEqualsCanonicalizing([$formCampaign->getId(), $plainCampaign->getId()], $this->getMatchingCampaignIds('!source:segment', $campaignIds));
         $this->assertEqualsCanonicalizing([$formCampaign->getId()], $this->getMatchingCampaignIds('source:form', $campaignIds));
         $this->assertEqualsCanonicalizing([$segmentCampaign->getId(), $plainCampaign->getId()], $this->getMatchingCampaignIds('!source:form', $campaignIds));
-    }
-
-    private function createSourceCampaign(string $name): Campaign
-    {
-        $campaign = new Campaign();
-        $campaign->setName($name);
-        $campaign->setIsPublished(true);
-        $this->em->persist($campaign);
-
-        return $campaign;
     }
 
     /**
