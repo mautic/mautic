@@ -1714,7 +1714,7 @@ Mautic.listOnLoad = function(container, response) {
     let jsPlumbData = null;
 
     if (segmentDependenciesTab.length) {
-        const showSegmentDependencies = function () {
+        const showSegmentDependencies = () => {
             if (!segmentDependenciesLoaded) {
                 segmentDependenciesLoaded = true;
                 const requestedSegmentId = mQuery('input#entityId').val();
@@ -1730,6 +1730,7 @@ Mautic.listOnLoad = function(container, response) {
                     success: function (response) {
                         Mautic.stopPageLoadingBar();
                         if (mQuery('input#entityId').val() !== requestedSegmentId) {
+                            segmentDependenciesLoaded = false;
                             return;
                         }
                         Mautic.renderSegmentTree('#segment-dependencies-container', response);
