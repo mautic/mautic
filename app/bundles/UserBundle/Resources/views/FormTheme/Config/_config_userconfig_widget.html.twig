@@ -3,10 +3,10 @@
 {% set fieldKeys = fields|keys %}
 
 
-    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.open_id.config.header'|trans }}</h4>
-    <div class="text-muted small pb-md">{{ 'mautic.open_id.config.header.description'|trans }}</div>
+    <h4 class="fw-sb mt-48 mb-5">{{ 'mautic.open_id.config.header'|trans }}</h4>
+    <div class="text-muted small pb-16">{{ 'mautic.open_id.config.header.description'|trans }}</div>
     <div class="row">
-        <div class="panel panel-default mb-md">
+        <div class="panel panel-default mb-16">
             <div class="panel-body">
                 {% if fields.open_id_is_enabled is defined %}
                     <div class="row">
@@ -76,10 +76,10 @@
     </div>
 
 {% if fieldKeys|filter(v => v in ['saml_idp_metadata', 'saml_idp_own_certificate', 'saml_idp_own_private_key', 'saml_idp_own_password'])|length > 0 %}
-    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.user.config.header.saml'|trans }}</h4>
-    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.saml.description'|trans }}</div>
+    <h4 class="fw-sb mt-48 mb-5">{{ 'mautic.user.config.header.saml'|trans }}</h4>
+    <div class="text-muted small pb-16">{{ 'mautic.core.config.header.saml.description'|trans }}</div>
     <div class="row">
-        <div class="panel panel-default mb-md">
+        <div class="panel panel-default mb-16">
             <div class="panel-body">
                 <div class="row">
                     {% if fields.saml_idp_entity_id is defined %}

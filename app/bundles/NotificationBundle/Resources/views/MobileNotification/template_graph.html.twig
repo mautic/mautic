@@ -2,13 +2,13 @@
 some stats: need more input on what type of form data to show.
 delete if it is not require
 #}
-<div class="pa-md">
+<div class="pa-16">
     <div class="row">
         <div class="col-sm-12">
             <div class="panel">
                 <div class="panel-body box-layout">
                     <div class="col-xs-4 align-middle">
-                        <h5 class="text-white dark-md fw-sb mb-xs">
+                        <h5 class="text-white dark-md fw-sb mb-5">
                             <span class="ri-mail-line"></span>
                             {{ 'mautic.notification.stats'|trans }}
                         </h5>
@@ -18,7 +18,7 @@ delete if it is not require
                         {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'callback': 'updateNotificationStatsChart'}) }}
                     </div>
                 </div>
-                <div class="pt-0 pl-15 pb-10 pr-15">
+                <div class="pt-0 ps-16 pb-12 pe-16">
                     <div>
                         <canvas id="stat-chart" height="300"></canvas>
                     </div>
