@@ -906,8 +906,15 @@ var Mautic = {
      * @param max       Maximum value, used for the helper text
      */
     updateProgressBar: function (container, value, percent, max) {
-        const component = mQuery(container);
+        const component = mQuery(container).find('.progress-component').addBack('.progress-component');
         const track = component.find('[role="progressbar"]');
+
+        if (component.hasClass('progress-component--indeterminate')) {
+            component.removeClass('progress-component--indeterminate');
+            track.attr({'aria-valuemin': 0, 'aria-valuemax': max});
+            track.find('.progress-bar').removeClass('progress-bar-striped progress-bar-animated');
+        }
+
         track.attr('aria-valuenow', value);
         track.find('.progress-bar').css('width', percent + '%');
         component.find('.progress-component__helper-text').text(
