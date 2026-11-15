@@ -2797,7 +2797,7 @@ document.addEventListener('input', (event) => {
     if (!clear) return;
 
     const scopeSelect = field.id ? document.querySelector("select[data-livesearch-scope-for='" + field.id + "']") : null;
-    clear.hidden = field.value === '' && !(scopeSelect && scopeSelect.value);
+    clear.hidden = field.value === '' && !scopeSelect?.value;
 });
 
 document.addEventListener('click', (event) => {
