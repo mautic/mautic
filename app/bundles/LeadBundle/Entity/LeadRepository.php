@@ -81,9 +81,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /** @var list<int> Segment IDs resolved from the current search query's list/segment command */
     private array $activeSearchSegmentIds = [];
 
-    /**
-     * @var array<string, list<int>>
-     */
+    /** @var array<string, list<int>> */
     private array $searchSegmentIdsByAlias = [];
 
     private bool $searchSegmentContextInitialized = false;
@@ -860,12 +858,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 break;
             case $this->translator->trans(self::SOURCE_SEARCH_COMMAND):
             case $this->translator->trans(self::SOURCE_SEARCH_COMMAND, [], null, 'en_US'):
-                $manuallyAddedValue   = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added');
-                $manuallyAddedValueEn = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added', [], null, 'en_US');
+                $manuallyAddedValue     = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added');
+                $manuallyAddedValueEn   = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added', [], null, 'en_US');
                 $manuallyRemovedValue   = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_removed');
                 $manuallyRemovedValueEn = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_removed', [], null, 'en_US');
-                $filterAddedValue     = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added');
-                $filterAddedValueEn   = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added', [], null, 'en_US');
+                $filterAddedValue       = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added');
+                $filterAddedValueEn     = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added', [], null, 'en_US');
 
                 $manuallyRemoved = false;
 
@@ -897,18 +895,18 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         $q->expr()->and(
                             $q->expr()->eq('l.id', 'lls.lead_id'),
                             $q->expr()->eq('lls.manually_removed', $manuallyRemoved ? 1 : 0),
-                            $q->expr()->in('lls.leadlist_id', ":lls_seg_{$unique}")
+                            $q->expr()->in('lls.leadlist_id', ":lls_seg_$unique")
                         )
                     );
 
                 if (!$manuallyRemoved) {
-                    $sq->andWhere($q->expr()->eq('lls.manually_added', ":{$unique}"));
+                    $sq->andWhere($q->expr()->eq('lls.manually_added', ":$unique"));
                     $q->setParameter($unique, $manuallyAddedParam, 'integer');
                 }
 
                 $filter->strict = true;
                 $q->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
-                $q->setParameter("lls_seg_{$unique}", $activeSegmentIds, ArrayParameterType::INTEGER);
+                $q->setParameter("lls_seg_$unique", $activeSegmentIds, ArrayParameterType::INTEGER);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id', [], null, 'en_US'):
@@ -1064,7 +1062,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 if ($string === $anyKeyword || $string === $anyKeywordEn) {
                     $returnParameter = false;
                 } else {
-                    $sq->andWhere($q->expr()->eq('dnc.channel', ":{$unique}"));
+                    $sq->andWhere($q->expr()->eq('dnc.channel', ":$unique"));
                     $returnParameter = true;
                 }
                 $expr           = $this->getExistsExpression($filter->not).' ('.$sq->getSQL().')';
