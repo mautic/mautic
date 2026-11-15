@@ -15,7 +15,7 @@
 {% set size = size|default('big') %}
 {% set type = type|default('default') %}
 {% set status = status|default('active') %}
-{% set maximum = max|default(100) %}
+{% set maximum = max|default(100) > 0 ? max|default(100) : 100 %}
 {% set isFinished = 'finished' == status %}
 {% set isError = 'error' == status %}
 {% set currentValue = value|default(null) %}
@@ -27,7 +27,7 @@
 {% elseif not isIndeterminate %}
     {% set currentValue = min(max(currentValue, 0), maximum) %}
 {% endif %}
-{% set percentage = isIndeterminate ? 100 : (isError ? 100 : (maximum > 0 ? (currentValue / maximum * 100)|round(2) : 0)) %}
+{% set percentage = isIndeterminate ? 100 : (isError ? 100 : (currentValue / maximum * 100)|round(2)) %}
 {% set baseId = id|default('progress-bar-' ~ random(1000000)) %}
 {% set isInline = 'inline' == type %}
 {% set isIndented = 'indented' == type %}

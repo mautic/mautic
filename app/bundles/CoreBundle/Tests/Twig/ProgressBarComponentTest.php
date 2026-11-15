@@ -67,6 +67,14 @@ final class ProgressBarComponentTest extends TestCase
         $this->assertStringContainsString('aria-busy="false"', $output);
     }
 
+    public function testEmptyMaximumFallsBackToTheDefaultRange(): void
+    {
+        $output = $this->render(['label' => 'Empty', 'value' => 0, 'max' => 0, 'status' => 'finished']);
+
+        $this->assertStringContainsString('aria-valuemax="100" aria-valuenow="100"', $output);
+        $this->assertStringContainsString('style="width: 100%"', $output);
+    }
+
     public function testErrorFillsTheBarAndIsMarkedInvalid(): void
     {
         $output = $this->render(['label' => 'Failed', 'value' => 10, 'status' => 'error', 'helperText' => 'Upload failed']);
