@@ -870,8 +870,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 if (in_array($string, [$manuallyAddedValue, $manuallyAddedValueEn], true)) {
                     $manuallyAddedParam = 1;
                 } elseif (in_array($string, [$manuallyRemovedValue, $manuallyRemovedValueEn], true)) {
-                    $manuallyAddedParam = null;
-                    $manuallyRemoved    = true;
+                    $manuallyRemoved = true;
                 } elseif (in_array($string, [$filterAddedValue, $filterAddedValueEn], true)) {
                     $manuallyAddedParam = 0;
                 } else {
@@ -1062,7 +1061,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 if ($string === $anyKeyword || $string === $anyKeywordEn) {
                     $returnParameter = false;
                 } else {
-                    $sq->andWhere($q->expr()->eq('dnc.channel', ":$unique"));
+                    $sq->andWhere($q->expr()->eq('dnc.channel', ":{$unique}"));
                     $returnParameter = true;
                 }
                 $expr           = $this->getExistsExpression($filter->not).' ('.$sq->getSQL().')';

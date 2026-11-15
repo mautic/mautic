@@ -159,15 +159,15 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $listLead->setLead($leadThree);
         $listLead->setList($list);
         $listLead->setDateAdded(new \DateTime());
+        $listLead->setManuallyAdded(true);
         $listLead->setManuallyRemoved(true);
         $this->em->persist($listLead);
 
         $this->em->flush();
         $this->em->clear();
 
-        $this->client->enableProfiler();
-
         $this->assertSearchResult('segment%3A'.$list->getAlias().'%20segment_source%3Amanually_removed', [$leadThree], [$leadOne, $leadTwo]);
+        $this->assertSearchResult('segment_source%3Amanually_removed%20segment%3A'.$list->getAlias(), [$leadThree], [$leadOne, $leadTwo]);
         $this->assertSearchResult('segment%3A'.$list->getAlias().'%20segment_source%3Afilter_added', [$leadOne, $leadTwo], [$leadThree]);
         $this->assertSearchResult('segment%3A'.$list->getAlias().'%20!segment_source%3Amanually_removed', [$leadOne, $leadTwo], [$leadThree]);
     }
