@@ -11,7 +11,6 @@ use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Mautic\UserBundle\Entity\UserRepository;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
@@ -387,7 +386,6 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function clearCache(): void
     {
         $cacheProvider = $this->getService(CacheProvider::class);
-        $this->assertInstanceOf(CacheItemPoolInterface::class, $cacheProvider);
         $cacheProvider->clear();
     }
 

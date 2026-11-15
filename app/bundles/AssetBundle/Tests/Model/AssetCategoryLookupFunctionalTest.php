@@ -52,7 +52,6 @@ final class AssetCategoryLookupFunctionalTest extends MauticMysqlTestCase
     private function lookup(string $search): array
     {
         $model = $this->getService(AssetModel::class);
-        $this->assertInstanceOf(AssetModel::class, $model);
 
         return array_values(array_map(
             static fn (array $row): string => (string) ($row['title'] ?? ''),

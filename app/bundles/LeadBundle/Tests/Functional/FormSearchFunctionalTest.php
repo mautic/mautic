@@ -27,7 +27,6 @@ final class FormSearchFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $leadRepository = $this->getService(LeadRepository::class);
-        $this->assertInstanceOf(LeadRepository::class, $leadRepository);
         $this->assertContains('mautic.lead.lead.searchcommand.form', $leadRepository->getSearchCommands());
 
         $this->assertSearchResult('form%3Anewsletter-form', [$submittedContact], [$otherSubmittedContact, $notSubmittedContact]);

@@ -44,15 +44,12 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['delete_segment_in_background']               = false;
         parent::setUp();
         $this->listModel = $this->getService(ListModel::class);
-        $this->assertInstanceOf(ListModel::class, $this->listModel);
         $this->listRepo = $this->listModel->getRepository();
         $leadModel = $this->getService(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $leadModel);
         $this->segmentCountCacheHelper = $this->getService(SegmentCountCacheHelper::class);
         $this->leadRepo                = $leadModel->getRepository();
         $this->prefix                  = self::getContainer()->getParameter('mautic.db_table_prefix');
         $this->translator              = $this->getService(TranslatorInterface::class);
-        $this->assertInstanceOf(TranslatorInterface::class, $this->translator);
     }
 
     public function testBCSegmentWithPageHitInLeadObject(): void
@@ -100,7 +97,6 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $project->setName('Test Project');
 
         $projectModel = $this->getService(ProjectModel::class);
-        $this->assertInstanceOf(ProjectModel::class, $projectModel);
         $projectModel->saveEntity($project);
 
         $this->em->clear();

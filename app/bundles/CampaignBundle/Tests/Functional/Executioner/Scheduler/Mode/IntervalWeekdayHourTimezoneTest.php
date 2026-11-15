@@ -60,7 +60,6 @@ final class IntervalWeekdayHourTimezoneTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $intervalScheduler = $this->getService(Interval::class);
-        $this->assertInstanceOf(Interval::class, $intervalScheduler);
 
         $contacts = new ArrayCollection([$contact]);
 

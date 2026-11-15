@@ -133,7 +133,6 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $htmlField->setGroup('core');
 
         $fieldModel = $this->getService(FieldModel::class);
-        $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $fieldModel->saveEntity($htmlField);
 
         $payload = '<p>Safe Bio</p><script>alert("xss")</script><img src=x onerror=alert(1)><a href="javascript:alert(2)">bad</a><a href="https://example.com">good</a>';
@@ -143,7 +142,6 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $lead->addUpdatedField('html_bio', $payload);
 
         $leadModel = $this->getService(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $leadModel);
         $leadModel->saveEntity($lead);
 
         $this->em->clear();

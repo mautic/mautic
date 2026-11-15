@@ -78,7 +78,6 @@ final class ColumnSchemaHelperFunctionalTest extends MauticMysqlTestCase
         $field->setCharLengthLimit(64);
 
         $fieldModel = $this->getService(FieldModel::class);
-        $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $fieldModel->saveEntity($field);
         $fieldModel->getRepository()->detachEntity($field);
 

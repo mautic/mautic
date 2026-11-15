@@ -27,7 +27,6 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->scheduledExecutioner = $this->getService(TestScheduledExecutioner::class);
-        $this->assertInstanceOf(ScheduledExecutioner::class, $this->scheduledExecutioner);
     }
 
     public function testEventsAreExecuted(): void
@@ -124,7 +123,6 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $optimisticLockService = $this->getService(OptimisticLockServiceInterface::class);
-        $this->assertInstanceOf(OptimisticLockServiceInterface::class, $optimisticLockService);
         $this->assertTrue($optimisticLockService->acquireLock($log));
         $this->assertSame(2, $log->getVersion());
 

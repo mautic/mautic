@@ -39,7 +39,6 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $emailModel = $this->getService(EmailModel::class);
-        $this->assertInstanceOf(EmailModel::class, $emailModel);
         $this->emailModel = $emailModel;
     }
 
@@ -133,7 +132,6 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         }
 
         $contactModel = $this->getService(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntities($contacts);
 
         return $contacts;
@@ -575,7 +573,6 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->emailModel->getPendingLeads($email, null, true);
 
         $listModel = $this->getService(ListModel::class);
-        $this->assertInstanceOf(ListModel::class, $listModel);
 
         foreach (array_slice($contacts, 2, 3) as $contact) {
             $listModel->addLead($contact, $segment, true);
@@ -597,7 +594,6 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->emailModel->getPendingLeads($email, null, true);
 
         $listModel = $this->getService(ListModel::class);
-        $this->assertInstanceOf(ListModel::class, $listModel);
 
         foreach (array_slice($contacts, 2, 3) as $contact) {
             $listModel->addLead($contact, $segment, true);
@@ -714,7 +710,6 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         /** @var Email $winnerReloaded */
         $winnerReloaded = $this->getService(EmailRepository::class)->find($winner->getId());
 
-        $this->assertInstanceOf(Email::class, $winnerReloaded);
         $this->assertNotInstanceOf(VariantEntityInterface::class, $winnerReloaded->getVariantParent());
         $this->assertSame('2026-01-01 00:00:00', $winnerReloaded->getPublishUp()?->format('Y-m-d H:i:s'));
         $this->assertSame('2026-01-31 23:59:59', $winnerReloaded->getPublishDown()?->format('Y-m-d H:i:s'));

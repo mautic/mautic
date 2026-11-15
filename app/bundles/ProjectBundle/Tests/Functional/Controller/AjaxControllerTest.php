@@ -65,7 +65,6 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     public function testCreatingDuplicateProject(): void
     {
         $projectModel = $this->getService(ProjectModel::class);
-        $this->assertInstanceOf(ProjectModel::class, $projectModel);
 
         $this->assertCount(
             0,
@@ -125,7 +124,6 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     public function testProjectNamesAreEscapedInAjaxResponse(string $xssPayload, string $dangerousSubstring): void
     {
         $projectModel = $this->getService(ProjectModel::class);
-        $this->assertInstanceOf(ProjectModel::class, $projectModel);
 
         // Create a project with an XSS payload in the name
         $project = new Project();
@@ -217,7 +215,6 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     public function testProjectNamesWithSpecialCharactersAreEscapedAndFunctional(string $projectName): void
     {
         $projectModel = $this->getService(ProjectModel::class);
-        $this->assertInstanceOf(ProjectModel::class, $projectModel);
 
         // Create a project with special characters
         $project = new Project();

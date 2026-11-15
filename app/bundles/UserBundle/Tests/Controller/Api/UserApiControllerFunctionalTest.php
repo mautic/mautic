@@ -13,7 +13,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -182,7 +181,6 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
         $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
         $user->setRole($role);
         $this->em->persist($user);
@@ -242,7 +240,6 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
             // Verify the password was hashed correctly by checking if we can verify it
             $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-            $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
             $this->assertTrue(
                 $hasher->verify($user->getPassword(), $userData['plainPassword']),
                 'Password should be properly hashed and verifiable'

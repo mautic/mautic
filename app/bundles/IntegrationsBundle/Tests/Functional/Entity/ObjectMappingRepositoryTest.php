@@ -85,7 +85,6 @@ final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
         $this->assertSame(1, $this->repository->count([]));
 
         $objectMapping = $this->repository->findAll()[0];
-        $this->assertInstanceOf(ObjectMapping::class, $objectMapping);
 
         $this->assertSame(self::INTEGRATION, $objectMapping->getIntegration());
         $this->assertSame(self::INTEGRATION_OBJECT_NAME, $objectMapping->getIntegrationObjectName());

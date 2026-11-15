@@ -42,7 +42,6 @@ final class CustomSiteUrlFunctionalTest extends MauticMysqlTestCase
 
         /** @var MessageLoggerListener $messageLogger */
         $messageLogger = self::getContainer()->get('mailer.message_logger_listener'); // @phpstan-ignore mautic.noContainerGet
-        $this->assertInstanceOf(MessageLoggerListener::class, $messageLogger);
 
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest(

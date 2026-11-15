@@ -29,7 +29,6 @@ use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportControllerTest extends MauticMysqlTestCase
@@ -145,7 +144,6 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Import process was successfully created.', $crawler->html());
 
         $importRepository = $this->getService(ImportRepository::class);
-        $this->assertInstanceOf(ImportRepository::class, $importRepository);
         $importEntity = $importRepository->findOneBy(['originalFile' => $filename]);
 
         $this->assertInstanceOf(Import::class, $importEntity);
@@ -166,7 +164,6 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->assertSame(Import::IMPORTED, $importEntity->getStatus());
 
         $leadRepository = $this->getService(LeadRepository::class);
-        $this->assertInstanceOf(LeadRepository::class, $leadRepository);
 
         /** @var Lead[] $contacts */
         $contacts = $leadRepository->findBy([], ['id' => 'asc']);
@@ -175,7 +172,6 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->assertSame('Existing-owned-after', $contacts[1]->getFirstname(), 'This contact should be updated as the user has permission to edit own.');
 
         $eventLogRepository = $this->getService(LeadEventLogRepository::class);
-        $this->assertInstanceOf(LeadEventLogRepository::class, $eventLogRepository);
 
         /** @var LeadEventLog[] $logs */
         $logs = $eventLogRepository->findBy(['bundle' => 'lead', 'object' => 'import'], ['id' => 'asc']);
@@ -537,7 +533,6 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $user->setUsername($username);
         $user->setEmail($email);
         $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
         $this->em->persist($user);

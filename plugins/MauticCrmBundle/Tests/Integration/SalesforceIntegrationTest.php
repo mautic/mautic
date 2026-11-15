@@ -275,7 +275,6 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $lastSync = $lastSyncMethod->invokeArgs($sf, []);
 
         // should be teh same as MAUTIC_DATE_MODIFIED_OVERRIDE override
-        $this->assertInstanceOf(\DateTime::class, $lastSync);
         $this->assertEquals(MAUTIC_DATE_MODIFIED_OVERRIDE, $lastSync->format('U'));
 
         $lead          = new Lead();

@@ -780,7 +780,6 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $contact->addUpdatedField($fieldAlias, $contactValue);
         $contactModel = $this->getService(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
 
         $segmentValue = [];
@@ -886,7 +885,6 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $contact->addUpdatedField($fieldAlias, $contactValue);
         $contactModel = $this->getService(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
 
         $segmentValue = [];
@@ -990,7 +988,6 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $company->addUpdatedField($fieldAlias, $companyValue);
 
         $companyModel = $this->getService(CompanyModel::class);
-        $this->assertInstanceOf(CompanyModel::class, $companyModel);
         $companyModel->saveEntity($company);
 
         $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');
@@ -1082,7 +1079,6 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $company->addUpdatedField($fieldAlias, $companyValue);
 
         $companyModel = $this->getService(CompanyModel::class);
-        $this->assertInstanceOf(CompanyModel::class, $companyModel);
         $companyModel->saveEntity($company);
 
         $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');

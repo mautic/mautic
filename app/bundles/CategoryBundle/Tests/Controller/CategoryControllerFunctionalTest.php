@@ -13,7 +13,6 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
@@ -316,7 +315,6 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
         $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('mautic'));
         $user->setRole($role);
 

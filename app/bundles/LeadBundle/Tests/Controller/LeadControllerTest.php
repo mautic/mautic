@@ -1266,10 +1266,8 @@ EMAIL;
         $this->assertStringContainsString('1 contact affected', (string) $clientResponse->getContent());
 
         $dncRepository = $this->getService(DoNotContactRepository::class);
-        $this->assertInstanceOf(DoNotContactRepository::class, $dncRepository);
 
         $contactRepository = $this->getService(LeadRepository::class);
-        $this->assertInstanceOf(LeadRepository::class, $contactRepository);
 
         $dnc = $dncRepository->findOneBy(['lead' => $contact]);
         $this->assertInstanceOf(DoNotContact::class, $dnc);

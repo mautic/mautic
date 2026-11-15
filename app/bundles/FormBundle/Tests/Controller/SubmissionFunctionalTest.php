@@ -26,7 +26,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
 final class SubmissionFunctionalTest extends MauticMysqlTestCase
@@ -277,7 +276,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         );
 
         $submissionRepository = $this->getService(SubmissionRepository::class);
-        $this->assertInstanceOf(SubmissionRepository::class, $submissionRepository);
 
         $submissions = $submissionRepository->findBy(['form' => $formId]);
 
@@ -785,7 +783,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($this->getUserPlainPassword()));
 
         $userRepo = $this->getService(UserRepository::class);

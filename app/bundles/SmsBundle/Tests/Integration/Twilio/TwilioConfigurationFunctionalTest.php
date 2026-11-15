@@ -19,7 +19,6 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         $this->configureTwilioWithArrayTransport();
 
         $integration = $this->getService(TwilioIntegration::class);
-        $this->assertInstanceOf(TwilioIntegration::class, $integration);
 
         $integrationRepository = $this->getService(IntegrationRepository::class);
 

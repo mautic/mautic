@@ -14,7 +14,6 @@ final class MenuExtensionTest extends AbstractMauticTestCase
     public function testParseMenuAttributes(): void
     {
         $menuExtension = $this->getService(MenuExtension::class);
-        $this->assertInstanceOf(MenuExtension::class, $menuExtension);
 
         $menuAttributes = [
             'id'    => 'myId',
@@ -30,7 +29,6 @@ final class MenuExtensionTest extends AbstractMauticTestCase
     public function testBuildMenuClasses(): void
     {
         $menuExtension = $this->getService(MenuExtension::class);
-        $this->assertInstanceOf(MenuExtension::class, $menuExtension);
 
         // create a menu and menu items to test with
         $factory = new MenuFactory();

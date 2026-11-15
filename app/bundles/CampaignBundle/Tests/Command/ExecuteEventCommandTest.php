@@ -93,7 +93,6 @@ final class ExecuteEventCommandTest extends AbstractCampaignCommand
         $this->em->clear();
 
         $leadEventLogRepository = $this->getService(LeadEventLogRepository::class);
-        $this->assertInstanceOf(LeadEventLogRepository::class, $leadEventLogRepository);
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
         $this->assertInstanceOf(LeadEventLog::class, $log);
@@ -142,7 +141,6 @@ final class ExecuteEventCommandTest extends AbstractCampaignCommand
         $this->em->clear();
 
         $leadEventLogRepository = $this->getService(LeadEventLogRepository::class);
-        $this->assertInstanceOf(LeadEventLogRepository::class, $leadEventLogRepository);
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
         $this->assertInstanceOf(LeadEventLog::class, $log);
@@ -189,7 +187,6 @@ final class ExecuteEventCommandTest extends AbstractCampaignCommand
         $this->assertStringContainsString('1 total event was scheduled', $commandResult->getDisplay());
 
         $leadEventLogRepository = $this->getService(LeadEventLogRepository::class);
-        $this->assertInstanceOf(LeadEventLogRepository::class, $leadEventLogRepository);
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
         $this->assertInstanceOf(LeadEventLog::class, $log);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Model;
 
-use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
@@ -106,7 +105,6 @@ final class EmailModelFrequencyRuleFunctionalTest extends MauticMysqlTestCase
         $this->loginUser($user);
 
         $emailModel = $this->getService(EmailModel::class);
-        $this->assertInstanceOf(EmailModel::class, $emailModel);
         $this->emailModel = $emailModel;
     }
 
@@ -181,7 +179,6 @@ final class EmailModelFrequencyRuleFunctionalTest extends MauticMysqlTestCase
     private function assertEmailIsNotPostponed(): void
     {
         $messageQueueRepository = $this->getService(MessageQueueRepository::class);
-        $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
 
         $this->assertSame(0, $messageQueueRepository->count([]), 'Email should not be postponed.');
     }
@@ -189,13 +186,11 @@ final class EmailModelFrequencyRuleFunctionalTest extends MauticMysqlTestCase
     private function assertEmailIsPostponed(Email $email, Lead $contact): void
     {
         $messageQueueRepository = $this->getService(MessageQueueRepository::class);
-        $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
 
         $queuedMessages = $messageQueueRepository->findBy([]);
         $this->assertCount(1, $queuedMessages, 'Email should be postponed.');
 
         $queuedMessage = reset($queuedMessages);
-        $this->assertInstanceOf(MessageQueue::class, $queuedMessage);
         $this->assertSame('email', $queuedMessage->getChannel());
         $this->assertSame($email->getId(), $queuedMessage->getChannelId());
         $this->assertSame($contact, $queuedMessage->getLead());

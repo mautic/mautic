@@ -9,7 +9,6 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 abstract class OwnershipScopedApiAuthorizationTestBase extends MauticMysqlTestCase
 {
@@ -33,7 +32,6 @@ abstract class OwnershipScopedApiAuthorizationTestBase extends MauticMysqlTestCa
         $user->setRole($role);
 
         $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
 
         $this->em->persist($role);

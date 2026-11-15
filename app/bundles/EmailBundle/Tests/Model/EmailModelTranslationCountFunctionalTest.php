@@ -31,7 +31,6 @@ final class EmailModelTranslationCountFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $emailModel = $this->getService(EmailModel::class);
-        $this->assertInstanceOf(EmailModel::class, $emailModel);
 
         // Re-fetch the email to get the updated stats
         $email = $emailModel->getEntity($email->getId());
@@ -63,7 +62,6 @@ final class EmailModelTranslationCountFunctionalTest extends MauticMysqlTestCase
     private function createContacts(): array
     {
         $contactModel = $this->getService(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $contactModel);
 
         $contacts = [];
 

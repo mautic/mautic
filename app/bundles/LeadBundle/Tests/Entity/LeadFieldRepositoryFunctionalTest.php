@@ -161,13 +161,11 @@ final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         );
 
         $fieldModel = $this->getService(FieldModel::class);
-        $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $fieldModel->saveEntity($field);
 
         $lead = new Lead();
         $lead->addUpdatedField('colors', 'green|blue');
         $contactModel = $this->getService(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $contactModel);
 
         $contactModel->saveEntity($lead);
         $repository = $fieldModel->getRepository();
@@ -201,13 +199,11 @@ final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         );
 
         $fieldModel = $this->getService(FieldModel::class);
-        $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $fieldModel->saveEntity($field);
 
         $lead = new Lead();
         $lead->addUpdatedField('job_title', self::ADMINISTRATOR_VALUE);
         $contactModel = $this->getService(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $contactModel);
 
         $contactModel->saveEntity($lead);
         $repository = $fieldModel->getRepository();

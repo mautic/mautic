@@ -66,7 +66,6 @@ final class PageHitCookieTest extends MauticMysqlTestCase
         $this->em->refresh($firstHit);
 
         $this->assertNotNull($firstHit->getDateLeft(), 'First hit should have date_left updated after second hit');
-        $this->assertInstanceOf(\DateTimeInterface::class, $firstHit->getDateLeft(), 'date_left should be a DateTime object');
 
         // Verify second hit was created
         $allHits = $this->hitRepository->findBy(['page' => $page->getId()], ['dateHit' => 'ASC']);

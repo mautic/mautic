@@ -7,7 +7,6 @@ namespace Mautic\CampaignBundle\Tests\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
@@ -74,7 +73,6 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $this->assertCount(1, $logs);
 
         $log = reset($logs);
-        $this->assertInstanceOf(LeadEventLog::class, $log);
         $this->assertSame(2, $log->getVersion(), 'Version should be incremented.');
 
         $this->eventExecutioner->executeLogs($event, new ArrayCollection($logs));
@@ -100,7 +98,6 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $this->assertCount(1, $logs);
 
         $log = reset($logs);
-        $this->assertInstanceOf(LeadEventLog::class, $log);
         $this->assertSame(2, $log->getVersion(), 'Version should be incremented.');
 
         $this->eventExecutioner->executeLogs($event, new ArrayCollection($logs));
@@ -127,7 +124,6 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $this->assertCount(1, $logs);
 
         $log = reset($logs);
-        $this->assertInstanceOf(LeadEventLog::class, $log);
         $this->assertSame(1, $log->getVersion(), 'Version should be reset when execution failed.');
 
         $this->makeEventExecutionPass($listener);

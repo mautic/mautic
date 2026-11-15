@@ -140,10 +140,8 @@ final class CompanyControllerTest extends MauticMysqlTestCase
     public function testListCompanyContacts(): void
     {
         $companyModel = $this->getService(CompanyModel::class);
-        $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
         $leadModel = $this->getService(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $leadModel);
 
         $company1 = $companyModel->getEntity($this->company1Id);
 
@@ -370,7 +368,6 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
 
         $companyModel = $this->getService(CompanyModel::class);
-        $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
         $company     = $companyModel->getEntity($this->company1Id);
         $this->assertInstanceOf(Company::class, $company);
@@ -403,7 +400,6 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $content = $clientResponse->getContent();
 
         $companyModel = $this->getService(CompanyModel::class);
-        $this->assertInstanceOf(CompanyModel::class, $companyModel);
         $company1 = $companyModel->getEntity($this->company1Id);
         $company2 = $companyModel->getEntity($this->company2Id);
         $this->assertInstanceOf(Company::class, $company1);
@@ -431,7 +427,6 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $companyModel = $this->getService(CompanyModel::class);
-        $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
         $company = $companyModel->getEntity($this->company1Id);
 

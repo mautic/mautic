@@ -9,7 +9,6 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class UserLogoutFunctionalTest extends MauticMysqlTestCase
 {
@@ -27,7 +26,6 @@ final class UserLogoutFunctionalTest extends MauticMysqlTestCase
         $user->setEmail('john.doe@email.com');
         $user->setRole($role);
         $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $this->em->persist($user);
 

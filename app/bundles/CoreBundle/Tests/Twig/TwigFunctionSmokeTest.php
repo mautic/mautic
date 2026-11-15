@@ -53,7 +53,6 @@ final class TwigFunctionSmokeTest extends KernelTestCase
     public function testKnownTwigFunctionsAreLoadedInEnvironment(): void
     {
         $twigEnvironment = self::getContainer()->get(Environment::class);
-        $this->assertInstanceOf(Environment::class, $twigEnvironment);
 
         foreach (self::EXPECTED_FUNCTIONS as $name) {
             $this->assertInstanceOf(
@@ -70,7 +69,6 @@ final class TwigFunctionSmokeTest extends KernelTestCase
     public function testGetClassFunctionRendersShortClassName(): void
     {
         $twigEnvironment = self::getContainer()->get(Environment::class);
-        $this->assertInstanceOf(Environment::class, $twigEnvironment);
 
         $rendered = $twigEnvironment->createTemplate('{{ get_class(class) }}')
             ->render(['class' => TelType::class]);
@@ -87,7 +85,6 @@ final class TwigFunctionSmokeTest extends KernelTestCase
     public function testIncludeScriptFunctionRendersScriptTag(): void
     {
         $twigEnvironment = self::getContainer()->get(Environment::class);
-        $this->assertInstanceOf(Environment::class, $twigEnvironment);
 
         $assetFilePath = 'app/bundles/IntegrationsBundle/Assets/js/integrations.js';
 
@@ -107,7 +104,6 @@ final class TwigFunctionSmokeTest extends KernelTestCase
     public function testDeclaredTwigFunctionsAreLoadedInEnvironment(): void
     {
         $twigEnvironment = self::getContainer()->get(Environment::class);
-        $this->assertInstanceOf(Environment::class, $twigEnvironment);
 
         $declaredFunctionCount = 0;
         $missingFunctions      = [];

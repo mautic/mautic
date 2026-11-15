@@ -163,7 +163,6 @@ final class PushContactTest extends MauticMysqlTestCase
     private function mockResponses(MockResponse ...$responses): void
     {
         $httpClient = $this->getService(MockHttpClient::class);
-        $this->assertInstanceOf(MockHttpClient::class, $httpClient);
         $httpClient->setResponseFactory(function (string $method, string $url, array $options) use (&$responses): MockResponse {
             $this->requests[] = ['method' => $method, 'url' => strtok($url, '?'), 'options' => $options];
 

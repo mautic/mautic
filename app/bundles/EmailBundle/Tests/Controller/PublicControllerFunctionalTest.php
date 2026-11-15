@@ -147,7 +147,6 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         // Assert that the contact has the DNC record now.
         $dncRepository = $this->getService(DoNotContactRepository::class);
-        $this->assertInstanceOf(DoNotContactRepository::class, $dncRepository);
         $dncRecords = $dncRepository->findBy(['lead' => $lead->getId()]);
         $this->assertCount(1, $dncRecords);
         $this->assertSame(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason());

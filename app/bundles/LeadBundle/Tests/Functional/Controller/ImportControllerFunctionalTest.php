@@ -267,7 +267,6 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSelectorExists('.alert.alert-danger a.text-danger');
         $translator = $this->getService(TranslatorInterface::class);
-        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $this->assertSelectorTextContains(
             '.alert.alert-danger a.text-danger',

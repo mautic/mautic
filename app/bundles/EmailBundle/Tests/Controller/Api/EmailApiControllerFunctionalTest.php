@@ -26,7 +26,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -627,7 +626,6 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
 
         $user->setPassword($hasher->hash('password'));
         $this->em->persist($user);

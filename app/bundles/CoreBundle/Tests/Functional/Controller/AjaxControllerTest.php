@@ -38,7 +38,6 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class AjaxControllerTest extends MauticMysqlTestCase
@@ -575,7 +574,6 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
 
         $this->em->persist($user);

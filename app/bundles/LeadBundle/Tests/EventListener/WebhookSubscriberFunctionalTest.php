@@ -34,13 +34,10 @@ final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
     public function testOnSegmentChange(): void
     {
         $contactRepository = $this->getService(LeadRepository::class);
-        $this->assertInstanceOf(LeadRepository::class, $contactRepository);
 
         $segmentModel = $this->getService(ListModel::class);
-        $this->assertInstanceOf(ListModel::class, $segmentModel);
 
         $webhookQueueRepository = $this->getService(WebhookQueueRepository::class);
-        $this->assertInstanceOf(WebhookQueueRepository::class, $webhookQueueRepository);
 
         $webhook = $this->createWebhook();
 

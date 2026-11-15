@@ -44,10 +44,8 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_CONFLICT, $error['code']);
 
         $translator = $this->getService(TranslatorInterface::class);
-        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $coreParametersHelper = $this->getService(CoreParametersHelper::class);
-        $this->assertInstanceOf(CoreParametersHelper::class, $coreParametersHelper);
         $dateFormat = $coreParametersHelper->get('date_format_dateonly');
         $timeFormat = $coreParametersHelper->get('date_format_timeonly');
 
@@ -116,10 +114,8 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_CONFLICT, $error['code']);
 
         $translator = $this->getService(TranslatorInterface::class);
-        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $coreParametersHelper = $this->getService(CoreParametersHelper::class);
-        $this->assertInstanceOf(CoreParametersHelper::class, $coreParametersHelper);
         $dateFormat = $coreParametersHelper->get('date_format_dateonly');
         $timeFormat = $coreParametersHelper->get('date_format_timeonly');
 

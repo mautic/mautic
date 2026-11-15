@@ -31,7 +31,6 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->inactiveExecutioner = $this->getService(TestInactiveExecutioner::class);
-        $this->assertInstanceOf(InactiveExecutioner::class, $this->inactiveExecutioner);
     }
 
     public function testDecisionRedirectionToAlreadyExecutedAction(): void

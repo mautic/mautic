@@ -48,7 +48,6 @@ final class AssetModelFunctionalTest extends MauticMysqlTestCase
         $expectedUrl = 'https://localhost/asset/'.$slug.$expectedQuery;
 
         $assetModel = $this->getService(AssetModel::class);
-        $this->assertInstanceOf(AssetModel::class, $assetModel);
         $generatedUrl = $assetModel->generateUrl($asset, $absolute, $clickthrough, $stream);
 
         $this->assertSame($expectedUrl, $generatedUrl);
@@ -118,7 +117,6 @@ final class AssetModelFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('1:the-alias', $asset->getSlug());
 
         $assetModel = $this->getService(AssetModel::class);
-        $this->assertInstanceOf(AssetModel::class, $assetModel);
         $generatedUrl = $assetModel->generateUrl($asset, true, []);
         $this->assertSame('https://localhost/asset/1:the-alias', $generatedUrl);
     }
@@ -158,7 +156,6 @@ final class AssetModelFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $assetModel = $this->getService(AssetModel::class);
-        $this->assertInstanceOf(AssetModel::class, $assetModel);
 
         $ownOnlyList = $assetModel->getAssetList(10, $dateFrom, $dateTo, [], ['canViewOthers' => false]);
         $allList     = $assetModel->getAssetList(10, $dateFrom, $dateTo, [], ['canViewOthers' => true]);

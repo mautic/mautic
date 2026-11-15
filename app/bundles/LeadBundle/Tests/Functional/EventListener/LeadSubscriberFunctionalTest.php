@@ -41,7 +41,6 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
         $leadMergeEvent = new LeadPostMergeEvent($contactB, $contactA);
 
         $subscriber = $this->getService(LeadSubscriber::class);
-        $this->assertInstanceOf(LeadSubscriber::class, $subscriber);
 
         $subscriber->onLeadMerge($leadMergeEvent);
 

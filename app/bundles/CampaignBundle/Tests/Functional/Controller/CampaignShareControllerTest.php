@@ -127,7 +127,6 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
     public function testConcurrentShareBuildsDoNotClobberEachOther(): void
     {
         $shareService = $this->getService(CampaignShareService::class);
-        $this->assertInstanceOf(CampaignShareService::class, $shareService);
 
         $campaignOne = new Campaign();
         $campaignOne->setName('Concurrent Campaign One');
@@ -209,7 +208,6 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
     public function testShareDownloadServesStoredZip(): void
     {
         $shareService = $this->getService(CampaignShareService::class);
-        $this->assertInstanceOf(CampaignShareService::class, $shareService);
         $shareDir = $shareService->getShareDir();
 
         if (!is_dir($shareDir)) {
@@ -240,7 +238,6 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
     public function testShareDownloadReturnsGoneForExpiredFile(): void
     {
         $shareService = $this->getService(CampaignShareService::class);
-        $this->assertInstanceOf(CampaignShareService::class, $shareService);
         $shareDir = $shareService->getShareDir();
 
         if (!is_dir($shareDir)) {

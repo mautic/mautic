@@ -19,10 +19,8 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
     public function testMergedContactFound(): void
     {
         $model = $this->getService(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $model);
 
         $merger = $this->getService(ContactMerger::class);
-        $this->assertInstanceOf(ContactMerger::class, $merger);
 
         $bob = new Lead();
         $bob->setFirstname('Bob')
@@ -76,13 +74,11 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
     public function testMergedContactsPointsAreAccurate(): void
     {
         $model = $this->getService(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $model);
 
         $em = $this->getService(EntityManagerInterface::class);
         $this->assertInstanceOf(EntityManager::class, $em);
 
         $merger = $this->getService(ContactMerger::class);
-        $this->assertInstanceOf(ContactMerger::class, $merger);
 
         // Startout Jane with 50 points
         $jane = new Lead();
@@ -150,16 +146,12 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
     public function testMergedContactKeepsCompanyAssociations(): void
     {
         $model = $this->getService(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $model);
 
         $companyModel = $this->getService(CompanyModel::class);
-        $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
         $merger = $this->getService(ContactMerger::class);
-        $this->assertInstanceOf(ContactMerger::class, $merger);
 
         $companyLeadRepository = $this->getService(CompanyLeadRepository::class);
-        $this->assertInstanceOf(CompanyLeadRepository::class, $companyLeadRepository);
 
         // Jane is a known contact associated with a primary company
         $jane = new Lead();

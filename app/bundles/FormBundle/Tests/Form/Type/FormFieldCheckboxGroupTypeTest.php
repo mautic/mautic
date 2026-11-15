@@ -8,7 +8,6 @@ use Mautic\FormBundle\Form\Type\FormFieldCheckboxGroupType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -187,7 +186,6 @@ final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
         $this->assertCount(1, $form->getErrors(true));
 
         $errors = $form->getErrors(true);
-        $this->assertInstanceOf(FormError::class, $errors[0]);
         $this->assertSame('Maximum must be greater than or equal to minimum', $errors[0]->getMessage());
     }
 

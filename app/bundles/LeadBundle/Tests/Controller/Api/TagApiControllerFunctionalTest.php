@@ -122,7 +122,6 @@ final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testSearchMatchesTagDescription(): void
     {
         $tagRepository = $this->getService(TagRepository::class);
-        $this->assertInstanceOf(TagRepository::class, $tagRepository);
 
         $matchingTag = new Tag('alpha_tag')->setDescription('Contains the test keyword.');
         $otherTag    = new Tag('beta_tag')->setDescription('No relevant text here.');

@@ -68,7 +68,6 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
     public function testWebhookWorkflowWithCommandProcess(): void
     {
         $webhookQueueRepository = $this->getService(WebhookQueueRepository::class);
-        $this->assertInstanceOf(WebhookQueueRepository::class, $webhookQueueRepository);
         $this->mockSuccessfulWebhookResponse(2);
         $webhook = $this->createWebhook();
         // Ensure we have a clean slate. There should be no rows waiting to be processed at this point.

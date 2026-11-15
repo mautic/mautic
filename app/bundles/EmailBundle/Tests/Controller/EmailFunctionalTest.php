@@ -109,7 +109,6 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $auditLogs);
         /** @var AuditLog $auditLog */
         $auditLog = reset($auditLogs);
-        $this->assertInstanceOf(AuditLog::class, $auditLog);
         $details = $auditLog->getDetails();
         $this->assertIsArray($details);
         $this->assertArrayHasKey('lists', $details);
@@ -165,7 +164,6 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
 
         /** @var AuditLog $auditLog */
         $auditLog = reset($auditLogs);
-        $this->assertInstanceOf(AuditLog::class, $auditLog);
 
         $details = $auditLog->getDetails();
         $this->assertIsArray($details);

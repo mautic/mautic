@@ -411,7 +411,6 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $translator = $this->getService(TranslatorInterface::class);
-        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         foreach ($expectedMessages as $expectedMessage) {
             $translatedMessage = $translator->trans($expectedMessage['message'], $expectedMessage['message_arg']);

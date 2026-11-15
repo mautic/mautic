@@ -14,7 +14,6 @@ use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ReportApiControllerTest extends MauticMysqlTestCase
 {
@@ -134,7 +133,6 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         // Set new permissions
         $role->setIsAdmin(false);
         $roleModel = $this->getService(RoleModel::class);
-        $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
@@ -150,7 +148,6 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
         $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
         $user->setRole($role);
 

@@ -114,7 +114,6 @@ final class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
     {
         // Add 1 segment
         $segmentRepo = $this->getService(LeadListRepository::class);
-        $this->assertInstanceOf(LeadListRepository::class, $segmentRepo);
 
         $segment = new LeadList();
         $filters = [

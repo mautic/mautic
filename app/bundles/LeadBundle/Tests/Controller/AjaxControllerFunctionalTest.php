@@ -89,14 +89,12 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $contact  = $this->createContact('blabla@contact.email');
 
         $userRepository = $this->getService(UserRepository::class);
-        $this->assertInstanceOf(UserRepository::class, $userRepository);
 
         $role = new Role();
         $role->setName('No-campaign-edit-access');
         $role->setIsAdmin(false);
 
         $roleRepository = $this->getService(RoleRepository::class);
-        $this->assertInstanceOf(RoleRepository::class, $roleRepository);
         $roleRepository->saveEntity($role);
 
         $user = new User();
@@ -487,7 +485,6 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         /** @var User $adminUser */
         $adminUser = $userRepository->findOneBy(['username' => 'admin']);
-        $this->assertInstanceOf(User::class, $adminUser);
 
         $salesUser = $userRepository->findOneBy(['username' => 'sales']);
         $this->assertInstanceOf(User::class, $salesUser);

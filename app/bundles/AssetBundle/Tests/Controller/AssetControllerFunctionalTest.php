@@ -418,7 +418,6 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         // Set new permissions
         $role->setIsAdmin(false);
         $roleModel = $this->getService(RoleModel::class);
-        $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();

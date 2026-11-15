@@ -48,7 +48,6 @@ final class PointSubscriberFunctionalTest extends MauticMysqlTestCase
         $event = new EmailSendEvent(null, ['email' => $email, 'lead' => $leadArray]);
 
         $dispatcher = $this->getService(EventDispatcherInterface::class);
-        $this->assertInstanceOf(EventDispatcherInterface::class, $dispatcher);
         $this->assertSame($deletedLeadId, $event->getLead()['id']);
 
         $dispatcher->dispatch($event);

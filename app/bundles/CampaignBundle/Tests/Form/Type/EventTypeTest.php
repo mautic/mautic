@@ -22,7 +22,6 @@ final class EventTypeTest extends TestCase
         /** @var \DateTime $parsed */
         $parsed = $method->invoke($type, ['triggerHour' => $value], 'triggerHour');
 
-        $this->assertInstanceOf(\DateTime::class, $parsed);
         $this->assertSame($expected, $parsed->format('H:i'));
     }
 

@@ -20,7 +20,6 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestCase
@@ -190,7 +189,6 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         $user->setUsername($username);
         $user->setEmail($email);
         $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
         $user->setIsPublished(true);

@@ -28,7 +28,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -1551,7 +1550,6 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($this->getUserPlainPassword()));
         $this->em->persist($user);
 

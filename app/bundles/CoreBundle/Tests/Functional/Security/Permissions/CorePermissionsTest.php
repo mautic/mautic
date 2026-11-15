@@ -31,7 +31,6 @@ final class CorePermissionsTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $permissions = $this->getService(CorePermissions::class);
-        $this->assertInstanceOf(CorePermissions::class, $permissions);
         $permissions->setPermissionObject($this->createVirtualPermission($grant));
 
         $this->assertSame($grant, $permissions->isGranted('test:group:action', 'MATCH_ALL', $user));

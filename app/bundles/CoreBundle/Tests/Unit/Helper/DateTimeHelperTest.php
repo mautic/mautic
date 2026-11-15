@@ -104,7 +104,6 @@ final class DateTimeHelperTest extends TestCase
 
         // Test default behavior with 'now' as compare and no format
         $interval = $dateTimeHelper->getDiff();
-        $this->assertInstanceOf(\DateInterval::class, $interval);
 
         // Test with custom compare date and no format
         $customDate = new \DateTime('2023-01-02 12:00:00', new \DateTimeZone('UTC'));

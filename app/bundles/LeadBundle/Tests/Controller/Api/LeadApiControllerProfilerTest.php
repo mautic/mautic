@@ -67,7 +67,6 @@ final class LeadApiControllerProfilerTest extends MauticMysqlTestCase
     {
         // We have to reset the param counter to emulate 2 requests otherwise the counter will cause the queries to be different.
         $leadRepository = $this->getService(LeadRepository::class);
-        $this->assertInstanceOf(LeadRepository::class, $leadRepository);
         $reflection = new \ReflectionClass($leadRepository);
         $counter    = $reflection->getProperty('lastUsedParameterId');
         $counter->setValue($leadRepository, 0);
