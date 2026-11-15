@@ -150,24 +150,13 @@ abstract class AbstractMauticTestCase extends WebTestCase
      *     |'translator.default' $serviceId
      *
      * @return (
-     *     $serviceId is 'doctrine.debug_data_holder' ? BacktraceDebugDataHolder
-     *     : (
-     *         $serviceId is 'mailer.message_logger_listener' ? MessageLoggerListener
-     *         : (
-     *             $serviceId is 'monolog.logger.mautic' ? Logger
-     *             : (
-     *                 $serviceId is 'security.untracked_token_storage' ? TokenStorage
-     *                 : (
-     *                     $serviceId is 'session.factory' ? SessionFactory
-     *                     : (
-     *                         $serviceId is 'translator.default' ? MauticResourceTranslator
-     *                         : TService
-     *                     )
-     *                 )
-     *             )
-     *         )
-     *     )
-     * )
+     *     $serviceId is 'doctrine.debug_data_holder' ? BacktraceDebugDataHolder : (
+     *     $serviceId is 'mailer.message_logger_listener' ? MessageLoggerListener : (
+     *     $serviceId is 'monolog.logger.mautic' ? Logger : (
+     *     $serviceId is 'security.untracked_token_storage' ? TokenStorage : (
+     *     $serviceId is 'session.factory' ? SessionFactory : (
+     *     $serviceId is 'translator.default' ? MauticResourceTranslator : TService
+     *  ))))))
      */
     protected function getService(string $serviceId): object
     {
