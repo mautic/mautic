@@ -149,8 +149,8 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentSourceSearchManuallyRemoved(): void
     {
-        $leadOne = $this->createLead('one');
-        $leadTwo = $this->createLead('two');
+        $leadOne   = $this->createLead('one');
+        $leadTwo   = $this->createLead('two');
         $leadThree = $this->createLead('three');
 
         $list = $this->createLeadList('removed-list', [], $leadOne, $leadTwo);
@@ -172,6 +172,10 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->assertSearchResult('segment%3A'.$list->getAlias().'%20!segment_source%3Amanually_removed', [$leadOne, $leadTwo], [$leadThree]);
     }
 
+    /**
+     * @param string[] $expectedQueries
+     * @param string[] $previousQueries
+     */
     private function assertQueries(array $expectedQueries, array &$previousQueries): void
     {
         /** @var DoctrineDataCollector $dbCollector */
