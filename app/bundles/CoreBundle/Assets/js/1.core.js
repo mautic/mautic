@@ -903,11 +903,16 @@ var Mautic = {
      * @param container Selector or element wrapping the component
      * @param value     Current value
      * @param percent   Current percentage (0-100)
+     * @param max       Maximum value, used for the helper text
      */
-    updateProgressBar: function (container, value, percent) {
-        const track = mQuery(container).find('[role="progressbar"]');
+    updateProgressBar: function (container, value, percent, max) {
+        const component = mQuery(container);
+        const track = component.find('[role="progressbar"]');
         track.attr('aria-valuenow', value);
         track.find('.progress-bar').css('width', percent + '%');
+        component.find('.progress-component__helper-text').text(
+            Mautic.translate('mautic.core.progress_bar.count', {current: value, total: max})
+        );
     },
 
     /**
