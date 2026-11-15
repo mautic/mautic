@@ -69,7 +69,7 @@ final class IntegrationHelper
      *
      * @throws ORMException
      */
-    public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false): array
+    public function getIntegrationObjects($specificIntegrations = null, ?array $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false): array
     {
         // Build the service classes
         if ([] === $this->available) {

@@ -365,7 +365,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return null|mixed[]
      */
-    public function mergeApiKeys(array $mergeKeys, $withKeys = [], bool $return = false): ?array
+    public function mergeApiKeys(array $mergeKeys, array $withKeys = [], bool $return = false): ?array
     {
         if (empty($withKeys)) {
             $withKeys = $this->keys;
@@ -1556,7 +1556,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param Lead|array $entity
      */
-    public function populateCompanyData(object|array $entity, $config = []): array
+    public function populateCompanyData(object|array $entity, array $config = []): array
     {
         if (!isset($config['companyFields'])) {
             $config = $this->mergeConfigToFeatureSettings($config);
@@ -2147,7 +2147,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * @throws ApiErrorException
      * @throws Exception
      */
-    protected function cleanupFromSync(&$leadsToSync = [], $error = false)
+    protected function cleanupFromSync(array & $leadsToSync = [], $error = false)
     {
         $duplicates = 0;
         if ($this->mauticDuplicates) {
@@ -2365,7 +2365,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return int
      */
-    public function getLeadDoNotContactByDate($channel, $records, $object, $lead, $integrationData, $params = [])
+    public function getLeadDoNotContactByDate($channel, $records, $object, $lead, $integrationData, array $params = [])
     {
         return $records;
     }

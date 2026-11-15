@@ -83,7 +83,7 @@ final class CustomFieldValueHelper
      *
      * @return mixed|string
      */
-    public static function normalize($value, $type, $properties)
+    public static function normalize($value, $type, array $properties)
     {
         if ('' !== $value && $type && $properties) {
             if (!is_array($properties)) {

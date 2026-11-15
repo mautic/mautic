@@ -224,7 +224,7 @@ final class TrackableModel extends AbstractCommonModel
      *
      * @return array{0: string|string[],1: array<string, Redirect>|array<string, Trackable>}
      */
-    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, bool $usingClickthrough = true): array
+    public function parseContentForTrackables(array $content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, bool $usingClickthrough = true): array
     {
         // Set do not track list for validateUrlIsTrackable()
         $this->doNotTrack = $this->getDoNotTrackList($content);

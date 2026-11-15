@@ -96,7 +96,7 @@ final class HitRepository extends CommonRepository
     /**
      * Get an array of hits via an email clickthrough.
      */
-    public function getEmailClickthroughHitCount($emailIds, ?\DateTimeInterface $fromDate = null, int $code = 200, ?\DateTime $toDate = null): array
+    public function getEmailClickthroughHitCount(array $emailIds, ?\DateTimeInterface $fromDate = null, int $code = 200, ?\DateTime $toDate = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

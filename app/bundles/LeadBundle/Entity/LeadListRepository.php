@@ -98,7 +98,7 @@ final class LeadListRepository extends CommonRepository
      * @param int|Lead[] $lead Lead ID or array of Leads
      * @return ($singleArrayHydration is true ? array<int, array<string, mixed>> : array<int, LeadList>)
      */
-    public function getLeadLists($lead, bool $forList = false, bool $singleArrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false): array
+    public function getLeadLists(array $lead, bool $forList = false, bool $singleArrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false): array
     {
         if (is_array($lead)) {
             $q = $this->createQueryBuilder('l', 'l.id');

@@ -993,7 +993,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->internal;
     }
 
-    public function setSocialCache($cache): void
+    public function setSocialCache(array $cache): void
     {
         $this->socialCache = $cache;
     }
