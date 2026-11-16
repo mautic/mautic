@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Event\ReportFilterConditionEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\RelativeDateHelper;
 use Mautic\ReportBundle\ReportEvents;
@@ -622,6 +623,14 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 }
 
                 $filterDefinition = $filterDefinitions[$filter['column']] ?? [];
+
+                $conditionEvent = new ReportFilterConditionEvent($this->entity, $filter, $filterDefinition, $queryBuilder);
+                $this->dispatcher->dispatch($conditionEvent);
+                if (null !== $conditionEvent->getCondition()) {
+                    $andGroup[] = $conditionEvent->getCondition();
+                    continue;
+                }
+
                 $type             = $filterDefinition['type'] ?? null;
                 $isRelativeDate   = in_array($type, ['date', 'datetime', DateType::class, DateTimeType::class], true)
                     && !in_array($exprFunction, ['like', 'notLike', 'startsWith', 'endsWith', 'contains'], true)
