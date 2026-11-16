@@ -300,18 +300,6 @@ Mautic.leadlistOnLoad = function(container, response) {
         });
     }
 
-    mQuery('#campaign-share-tab').hover(function () {
-        if (Mautic.shareTableLoaded != true) {
-            Mautic.loadAjaxColumn('campaign-share-stat', 'lead:getCampaignShareStats', 'afterStatsLoad');
-            Mautic.shareTableLoaded = true;
-        }
-    })
-
-    Mautic.afterStatsLoad = function () {
-        Mautic.sortTableByColumn('#campaign-share-table', '.campaign-share-stat', true)
-    }
-
-
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.list');
     }
@@ -1733,6 +1721,8 @@ Mautic.listOnLoad = function(container, response) {
     Mautic.loadAndProcessPageContent('#contacts-container');
     Mautic.loadAndProcessPageContent('#segment-stats');
 
+    mQuery('a#campaign-share-tab').one('shown.bs.tab', Mautic.loadCampaignShare);
+
     const segmentDependenciesTab = mQuery('a#segment-dependencies');
     let segmentDependenciesLoaded = false;
     let jsPlumbData = null;
@@ -1771,6 +1761,62 @@ Mautic.listOnLoad = function(container, response) {
         mQuery(document).on('hide.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
             if (mQuery(e.target).attr('id') === 'segment-dependencies') {
                 Mautic.cleanSegmentDependencies();
+            }
+        });
+    }
+};
+
+Mautic.loadCampaignShare = function () {
+    const table = mQuery('#campaign-share-table');
+    const ids = table.find('tr[data-campaign-id]').filter(function () {
+        return mQuery(this).find('.gauge--loading').length > 0;
+    }).map(function () {
+        return mQuery(this).attr('data-campaign-id');
+    }).get();
+    const batchSize = 10;
+    let pendingBatches = Math.ceil(ids.length / batchSize);
+
+    const finish = function () {
+        const tbody = table.find('tbody');
+        const rows = tbody.find('tr[data-campaign-id]');
+
+        rows.each(function () {
+            const value = parseFloat(mQuery(this).find('[role="meter"]').attr('aria-valuenow'));
+
+            mQuery(this).data('share', isNaN(value) ? -1 : value);
+            if (0 === value) {
+                mQuery(this).remove();
+            }
+        });
+
+        tbody.find('tr[data-campaign-id]').sort(function (a, b) {
+            return mQuery(b).data('share') - mQuery(a).data('share');
+        }).appendTo(tbody);
+    };
+
+    if (!pendingBatches) {
+        finish();
+
+        return;
+    }
+
+    for (let i = 0; i < ids.length; i += batchSize) {
+        mQuery.ajax({
+            url: mauticAjaxUrl + '?action=lead:getCampaignShareStats',
+            type: 'GET',
+            data: {ids: ids.slice(i, i + batchSize), entityId: Mautic.getEntityId()},
+            success: function (response) {
+                (response.stats || []).forEach(function (stat) {
+                    Mautic.updateGauge(table.find('tr[data-campaign-id="' + stat.id + '"]'), stat.segmentCampaignShare);
+                });
+            },
+            error: function (request, textStatus, errorThrown) {
+                Mautic.processAjaxError(request, textStatus, errorThrown, true);
+            },
+            complete: function () {
+                if (0 === --pendingBatches) {
+                    finish();
+                }
             }
         });
     }

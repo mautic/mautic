@@ -1,0 +1,61 @@
+{% set type = 'full' == type|default('semi') ? 'full' : 'semi' %}
+{% set size = size|default('md') in ['xs', 'sm', 'md', 'lg', 'xl'] ? size|default('md') : 'md' %}
+{% set gaugeSize = {'xs': 16, 'sm': 32, 'md': 64, 'lg': 96, 'xl': 160}[size] %}
+{% set arcPixels = {'xs': 3, 'sm': 3, 'md': 5, 'lg': 7, 'xl': 12}[size] %}
+{% set arcWidth = arcPixels * 100 / gaugeSize %}
+{% set color = color|default('default') == 'color' ? 'color' : 'default' %}
+{% set status = status|default(null) in ['danger', 'warning', 'success'] ? status|default(null) : null %}
+{% set rawValue = value|default(null) %}
+{% set isLoading = null is same as rawValue %}
+{% set totalValue = total|default(null) %}
+{% set hasTotal = null is not same as totalValue and totalValue > 0 %}
+{% set currentValue = isLoading ? null : (hasTotal ? min(max(rawValue / totalValue * 100, 0), 100) : min(max(rawValue, 0), 100)) %}
+{% set currentValue = null is same as currentValue ? null : (currentValue|round(1)) %}
+{% set radius = 50 - arcWidth / 2 %}
+{% set showValue = showValue is defined ? showValue : true %}
+{% set baseId = id|default('gauge-' ~ random(1000000)) %}
+{% set deltaValue = delta|default(null) %}
+{% set unit = unit is defined ? unit : '%' %}
+{% set spokenValue = hasTotal ? 'mautic.core.gauge.of'|trans({'%value%': rawValue, '%total%': totalValue}) : (currentValue ~ unit) %}
+
+{% set classes = ['gauge', 'gauge--' ~ type, 'gauge--' ~ size, 'gauge--' ~ color] %}
+{% if 'plex' == font|default('') %}{% set classes = classes|merge(['gauge--plex']) %}{% endif %}
+{% if status %}{% set classes = classes|merge(['gauge--' ~ status]) %}{% endif %}
+{% if isLoading %}{% set classes = classes|merge(['gauge--loading']) %}{% endif %}
+{% if className|default('') %}{% set classes = classes|merge([className]) %}{% endif %}
+
+<div class="{{ classes|join(' ')|e }}" id="{{ baseId|escape('html_attr') }}" data-unit="{{ unit|e('html_attr') }}">
+    <div class="gauge__chart"
+        role="{{ isLoading ? 'progressbar' : 'meter' }}"
+        aria-label="{{ label|e('html_attr') }}"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        {% if not isLoading %}aria-valuenow="{{ currentValue }}" aria-valuetext="{{ spokenValue|e('html_attr') }}"{% else %}aria-busy="true"{% endif %}>
+        {% if 'full' == type %}
+            <svg class="gauge__svg" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                <circle class="gauge__track" cx="50" cy="50" r="{{ radius }}" stroke-width="{{ arcWidth }}" fill="none"/>
+                <circle class="gauge__arc" cx="50" cy="50" r="{{ radius }}" stroke-width="{{ arcWidth }}" fill="none" transform="rotate(-90 50 50)" pathLength="100" stroke-dasharray="{{ isLoading ? 0 : currentValue }} 100"/>
+            </svg>
+        {% else %}
+            {% set arc = 'M ' ~ (arcWidth / 2) ~ ' 50 A ' ~ radius ~ ' ' ~ radius ~ ' 0 0 1 ' ~ (100 - arcWidth / 2) ~ ' 50' %}
+            <svg class="gauge__svg" viewBox="0 0 100 50" aria-hidden="true" focusable="false">
+                <path class="gauge__track" d="{{ arc }}" stroke-width="{{ arcWidth }}" fill="none"/>
+                <path class="gauge__arc" d="{{ arc }}" stroke-width="{{ arcWidth }}" fill="none" pathLength="100" stroke-dasharray="{{ isLoading ? 0 : currentValue }} 100"/>
+            </svg>
+        {% endif %}
+    </div>
+    {% if showValue %}
+        <span class="gauge__value" aria-hidden="true">
+            {%- if isLoading -%}
+            {%- elseif hasTotal -%}<span class="gauge__number">{{ rawValue }}</span><span class="gauge__total">/{{ totalValue }}</span>
+            {%- else -%}<span class="gauge__number">{{ currentValue }}</span>{% if unit %}<span class="gauge__unit">{{ unit }}</span>{% endif %}
+            {%- endif -%}
+        </span>
+    {% endif %}
+    {% if null is not same as deltaValue %}
+        <div class="gauge__delta type-helper-text-01">
+            <i class="{{ deltaValue >= 0 ? 'ri-arrow-up-s-fill' : 'ri-arrow-down-s-fill' }}" aria-hidden="true"></i>
+            <span>{{ (deltaValue > 0 ? '+' : '') ~ deltaValue }}%</span>
+        </div>
+    {% endif %}
+</div>

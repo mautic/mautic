@@ -1,0 +1,197 @@
+//
+// Gauge
+// --------------------------------------------------
+@mixin gauge-type($token) {
+  font-size: var(--#{$token}-font-size);
+  line-height: var(--#{$token}-line-height);
+  font-weight: var(--#{$token}-font-weight);
+  letter-spacing: var(--#{$token}-letter-spacing);
+}
+
+.gauge {
+  --gauge-color: var(--layer-active);
+  --gauge-size: 64px;
+
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+  vertical-align: middle;
+  justify-content: center;
+  width: var(--gauge-size);
+
+  &--xs,
+  &--sm,
+  &--md {
+    width: auto;
+    flex-direction: row;
+  }
+
+  &--xs {
+    --gauge-size: 16px;
+
+    gap: 4px;
+  }
+
+  &--sm {
+    --gauge-size: 32px;
+
+    gap: 8px;
+  }
+
+  &--md {
+    --gauge-size: 64px;
+
+    gap: 12px;
+  }
+
+  &--lg {
+    --gauge-size: 96px;
+  }
+
+  &--xl {
+    --gauge-size: 160px;
+  }
+
+  &--color {
+    --gauge-color: var(--interactive);
+  }
+
+  &--plex &__value {
+    font-family: 'IBM Plex Sans', var(--bs-body-font-family);
+  }
+
+  &--danger {
+    --gauge-color: var(--support-error);
+  }
+
+  &--warning {
+    --gauge-color: var(--support-warning);
+  }
+
+  &--success {
+    --gauge-color: var(--support-success);
+  }
+
+  &__chart {
+    position: relative;
+    width: var(--gauge-size);
+    flex: 0 0 var(--gauge-size);
+  }
+
+  &__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  &__track {
+    stroke: var(--layer);
+  }
+
+  &__arc {
+    stroke: var(--gauge-color);
+    stroke-linecap: round;
+    transition: stroke-dasharray var(--duration-productive) var(--easing-standard-productive);
+  }
+
+  &__arc[stroke-dasharray^='0 '] {
+    display: none;
+  }
+
+  &__value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    color: var(--text-primary);
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &--xs &__value,
+  &--sm &__value,
+  &--md &__value {
+    position: static;
+    transform: none;
+  }
+
+  &--xs &__value {
+    @include gauge-type(label-01);
+  }
+
+  &--sm &__value {
+    @include gauge-type(body-compact-02);
+  }
+
+  &--lg &__value {
+    @include gauge-type(heading-04);
+  }
+
+  &--md &__value {
+    @include gauge-type(fluid-paragraph-01);
+  }
+
+  &--xl &__value {
+    @include gauge-type(heading-06);
+  }
+
+  &--md &__unit,
+  &--lg &__unit,
+  &--xl &__unit {
+    --gauge-unit-scale: 0.7;
+
+    position: relative;
+    margin-left: 2px;
+    font-size: calc(var(--gauge-unit-scale) * 1em);
+    line-height: 1;
+    vertical-align: baseline;
+    top: calc((1 - var(--gauge-unit-scale)) * -0.72em / var(--gauge-unit-scale));
+  }
+
+  &__total {
+    margin-left: 2px;
+    line-height: 1;
+    vertical-align: baseline;
+    color: var(--text-secondary);
+  }
+
+  &--md &__total,
+  &--lg &__total,
+  &--xl &__total {
+    font-size: 0.5em;
+  }
+
+  &--semi:not(&--xs):not(&--sm):not(&--md) &__value {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    transform: none;
+  }
+
+  &__delta {
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+    color: var(--text-secondary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__arc {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    &__track {
+      stroke: GrayText;
+    }
+
+    &__arc {
+      stroke: CanvasText;
+    }
+  }
+}
