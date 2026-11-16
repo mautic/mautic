@@ -1404,7 +1404,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\DynamicContentBundle\Entity\DynamicContent`: `setContent(?string $content)`, `setIsCampaignBased(bool $isCampaignBased)`, `setSlotName(?string $slotName)`
     - `Mautic\EmailBundle\Entity\Email`: `setName(?string $name)`, `setDescription(?string $description)`, `setReadCount(?int $readCount)`, `setSubject(?string $subject)`, `setTemplate(?string $template)`, `setSentCount(?int $sentCount)`, `setVariantSentCount(?int $variantSentCount)`, `setPlainText(?string $plainText)`, `setCustomHtml(?string $customHtml)`
     - `Mautic\EmailBundle\Entity\Stat`: `setIsRead(bool $isRead)`, `setTrackingHash(?string $trackingHash)`, `setRetryCount(?int $retryCount)`, `setIsFailed(bool $isFailed)`, `setEmailAddress(?string $emailAddress)`, `setViewedInBrowser(bool $viewedInBrowser)`, `setSource(?string $source)`, `setSourceId(?int $sourceId)`, `setOpenCount(?int $openCount)`, `addOpenDetails(array|string $details)`
-    - `Mautic\FormBundle\Entity\Action`: `setType(string $type)`, `setName(string $name)`
+    - `Mautic\FormBundle\Entity\Action`: `setType(string $type)`, `setName(?string $name)`
     - `Mautic\FormBundle\Entity\Field`: `setLabel(string $label)`, `setAlias(string $alias)`, `setType(string $type)`, `setIsRequired(bool $isRequired)`, `setOrder(int $order)`
     - `Mautic\FormBundle\Entity\Form`: `setName(?string $name)`, `setDescription(?string $description)`, `getDescription(bool $truncate = false, ?int $length = 45)`, `setPostActionProperty(?string $postActionProperty)`, `setAlias(string $alias)`, `setProgressiveProfilingLimit(?int $progressiveProfilingLimit)`
     - `Mautic\FormBundle\Entity\Submission`: `setReferer(string $referer)`
@@ -1418,7 +1418,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\LeadBundle\Entity\LeadCategory`: `setManuallyRemoved(bool $manuallyRemoved)`
     - `Mautic\LeadBundle\Entity\LeadDevice`: `setClientInfo(array|string|null $clientInfo)`, `setDeviceBrand(?string $brand)`, `setDeviceOsName(string $deviceOsName)`, `setTrackingId(string $trackingId)`
     - `Mautic\LeadBundle\Entity\LeadEventLog`: `setObject(string $object)`, `setAction(string $action)`, `addProperty(string $key)`, `setBundle(string $bundle)`
-    - `Mautic\LeadBundle\Entity\LeadField`: `setLabel(?string $label)`, `setName(string $label)`, `setType(string $type)`, `setDefaultValue(array|string|null $defaultValue)`, `setIsRequired(bool $isRequired)`, `setObject(?string $object)`, `setAlias(string $alias)`
+    - `Mautic\LeadBundle\Entity\LeadField`: `setLabel(?string $label)`, `setName(string $label)`, `setType(string $type)`, `setDefaultValue(array|string|null $defaultValue)`, `setIsRequired(bool $isRequired)`, `setObject(?string $object)`, `setAlias(?string $alias)`
     - `Mautic\LeadBundle\Entity\LeadList`: `setName(?string $name)`, `setDescription(?string $description)`, `setPublicName(?string $publicName)`, `setIsGlobal(bool|int|string|null $isGlobal)`, `setAlias(?string $alias)`, `setIsPreferenceCenter(bool|int|string|null $isPreferenceCenter)`
     - `Mautic\LeadBundle\Entity\LeadNote`: `setText(?string $text)`
     - `Mautic\LeadBundle\Entity\ListLead`: `setManuallyRemoved(bool $manuallyRemoved)`, `setManuallyAdded(bool $manuallyAdded)`

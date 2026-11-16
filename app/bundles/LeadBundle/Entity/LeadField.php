@@ -597,7 +597,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         return $this->setIsUniqueIdentifer($isUniqueIdentifier);
     }
 
-    public function setAlias(string $alias): static
+    public function setAlias(?string $alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
