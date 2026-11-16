@@ -20,7 +20,7 @@ final readonly class CsvExporter
     /**
      * @param resource $handle
      */
-    public function export(ReportDataResult $reportDataResult, $handle, int $page = 1): void
+    public function export(ReportDataResult $reportDataResult, $handle, ?int $page = 1): void
     {
         if (1 === $page) {
             $this->putHeader($reportDataResult, $handle);

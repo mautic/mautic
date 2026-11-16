@@ -215,7 +215,7 @@ final class Mailbox
      *
      * @throws MailboxException
      */
-    public function switchMailbox($bundle, string $mailbox = ''): void
+    public function switchMailbox($bundle, ?string $mailbox = ''): void
     {
         $key = $bundle.(!empty($mailbox) ? '_'.$mailbox : '');
 

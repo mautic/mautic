@@ -2586,7 +2586,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param int|int[] $leadId
      */
-    private function updateMauticDNC($leadId, bool $newDncValue): void
+    private function updateMauticDNC($leadId, ?bool $newDncValue): void
     {
         $leadIds = is_array($leadId) ? $leadId : [$leadId];
 

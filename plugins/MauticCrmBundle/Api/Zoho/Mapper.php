@@ -102,7 +102,7 @@ final class Mapper
      *
      * @throws MatchingKeyNotFoundException
      */
-    public function getContactIdByKey(int $key)
+    public function getContactIdByKey(int|string $key)
     {
         if (isset($this->contactMapper[$key])) {
             return $this->contactMapper[$key];
