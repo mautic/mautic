@@ -231,7 +231,7 @@
                         </thead>
                         <tbody>
                         {% for stat in campaignStats %}
-                            <tr data-campaign-id="{{ stat.id }}">
+                            <tr data-campaign-id="{{ stat.id }}"{% if stat.share is not null %} data-share="{{ stat.share|e('html_attr') }}"{% endif %}>
                                 <td>
                                     <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': stat.id}) }}" data-toggle="ajax">
                                         {{- stat.name -}}

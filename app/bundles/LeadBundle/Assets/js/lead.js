@@ -1778,34 +1778,36 @@ Mautic.loadCampaignShare = function () {
     const shares = {};
     let pendingBatches = Math.ceil(ids.length / batchSize);
 
-    if (table.data('loading') || !pendingBatches) {
-        return;
-    }
-
-    table.data('loading', true);
-
     const finish = function () {
-        const sorted = rows.filter(function () {
-            return shares.hasOwnProperty(mQuery(this).attr('data-campaign-id'));
-        }).filter(function () {
-            if (0 === shares[mQuery(this).attr('data-campaign-id')]) {
-                mQuery(this).remove();
+        rows.filter(function () {
+            const id = mQuery(this).attr('data-campaign-id');
 
-                return false;
-            }
+            return shares.hasOwnProperty(id) && 0 === shares[id];
+        }).remove();
 
-            return true;
-        }).get().sort(function (a, b) {
-            return shares[mQuery(b).attr('data-campaign-id')] - shares[mQuery(a).attr('data-campaign-id')];
+        const sorted = table.find('tr[data-campaign-id][data-share]').get().sort(function (a, b) {
+            return parseFloat(mQuery(b).attr('data-share')) - parseFloat(mQuery(a).attr('data-share'));
         });
 
         table.find('tbody').prepend(sorted);
         sorted.forEach(function (row) {
-            Mautic.updateGauge(row, shares[mQuery(row).attr('data-campaign-id')]);
+            Mautic.updateGauge(row, parseFloat(mQuery(row).attr('data-share')));
         });
 
         table.data('loading', false);
     };
+
+    if (table.data('loading')) {
+        return;
+    }
+
+    if (!pendingBatches) {
+        finish();
+
+        return;
+    }
+
+    table.data('loading', true);
 
     for (let i = 0; i < ids.length; i += batchSize) {
         mQuery.ajax({
@@ -1815,6 +1817,9 @@ Mautic.loadCampaignShare = function () {
             success: function (response) {
                 (response.stats || []).forEach(function (stat) {
                     shares[stat.id] = parseFloat(stat.segmentCampaignShare) || 0;
+                    rows.filter(function () {
+                        return mQuery(this).attr('data-campaign-id') === String(stat.id);
+                    }).attr('data-share', shares[stat.id]);
                 });
             },
             error: function (request, textStatus, errorThrown) {
