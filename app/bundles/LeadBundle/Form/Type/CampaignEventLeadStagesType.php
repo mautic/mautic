@@ -20,7 +20,7 @@ final class CampaignEventLeadStagesType extends AbstractType
             StageListType::class,
             [
                 'label'       => 'mautic.lead.lead.field.stage',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'multiple'    => true,
                 'required'    => false,
             ]

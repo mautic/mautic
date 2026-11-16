@@ -17,7 +17,7 @@ final class DatePickerType extends AbstractType
     {
         $resolver->setDefaults([
             'widget'     => 'single_text',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'       => 'form-control',
                 'data-toggle' => 'datetime',

@@ -8,14 +8,14 @@
   {{ form_start(form) }}
     {{ form_row(form.name) }}
     {{ form_row(form.text) }}
-    <div id="character-count" class="text-right small">
+    <div id="character-count" class="text-end small">
         {{ 'mautic.social.twitter.tweet.count'|trans }}
         <span></span>
     </div>
 
     <div class="row">
         <div class="col-md-4">
-            <label class="control-label">
+            <label class="form-label">
                 {{ 'mautic.social.twitter.tweet.handle'|trans }}
             </label>
             {{ form_row(form.handle) }}

@@ -193,7 +193,8 @@
 
             input[type="text"] {
               background-color: var(--field);
-              background-image: none;
+              // Override Chosen's high-DPI legacy search sprite; this component renders a Remix icon above.
+              background-image: none !important;
               border: none;
               border-bottom: var(--border-no-width);
               border-color: var(--border-strong);

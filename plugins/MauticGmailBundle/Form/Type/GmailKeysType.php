@@ -22,7 +22,7 @@ final class GmailKeysType extends AbstractType
             TextType::class,
             [
                 'label'       => 'mautic.integration.gmail.secret',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'required'    => true,
                 'constraints' => [new NotBlank()],

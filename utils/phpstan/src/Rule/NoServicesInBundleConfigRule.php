@@ -10,6 +10,7 @@ use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Return_;
 use PHPStan\Analyser\Scope;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 
@@ -51,7 +52,7 @@ final class NoServicesInBundleConfigRule implements Rule
     /**
      * @param Return_ $node
      *
-     * @return list<\PHPStan\Rules\IdentifierRuleError>
+     * @return list<IdentifierRuleError>
      */
     public function processNode(Node $node, Scope $scope): array
     {
@@ -86,7 +87,7 @@ final class NoServicesInBundleConfigRule implements Rule
     /**
      * Every service group is reported on its own, the "menus" one being the only one left alone.
      *
-     * @return list<\PHPStan\Rules\IdentifierRuleError>
+     * @return list<IdentifierRuleError>
      */
     private function createGroupRuleErrors(ArrayItem $servicesArrayItem): array
     {
@@ -112,7 +113,7 @@ final class NoServicesInBundleConfigRule implements Rule
         return $ruleErrors;
     }
 
-    private function createRuleError(string $groupName, int $line): \PHPStan\Rules\IdentifierRuleError
+    private function createRuleError(string $groupName, int $line): IdentifierRuleError
     {
         return RuleErrorBuilder::message(sprintf(
             'Config file must not define services. Register the "%s" group in the autowired Config/services.php instead.',

@@ -4,30 +4,28 @@
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'mautic.core.close' | trans }}">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'mautic.core.close' | trans }}"></button>
         <p class="modal-title" id="searchCommandsModalLabel">
           {{ "mautic.core.help.searchcommands.title" | trans }}
         </p>
       </div>
       <div class="modal-body modal-scroll-content">
         <div class="row">        
-          <h4 class="fw-sb mb-sm mt-md pi-md">{{ 'mautic.core.searchcommands.heading.operators'|trans }}</h4>
-          <div class="text-helper mb-md pi-md">
+          <h4 class="fw-sb mb-12 mt-16 pi-16">{{ 'mautic.core.searchcommands.heading.operators'|trans }}</h4>
+          <div class="text-helper mb-16 pi-16">
             {{'mautic.core.searchcommands.heading.operators.description'|trans}}</div>
           <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
             <!-- General operators -->
             <li class="panel">
-              <a role="button" id="headingSearchOperators" class="accordion-heading collapsed" data-toggle="collapse"
-                data-parent="#accordion" href="#collapseSearchOperators" aria-expanded="false"
+              <button type="button" id="headingSearchOperators" class="accordion-heading collapsed" data-bs-toggle="collapse"
+                data-bs-target="#collapseSearchOperators" aria-expanded="false"
                 aria-controls="collapseSearchOperators">
                 <i class="ri-arrow-down-s-line accordion-arrow"></i>
                 <span class="accordion-title">{{ 'mautic.core.searchcommands.operators'|trans }}</span>
-              </a>
+              </button>
 
               <div id="collapseSearchOperators" class="collapse accordion-wrapper" role="tabpanel"
-                aria-labelledby="headingSearchOperators">
+                data-bs-parent="#accordion" aria-labelledby="headingSearchOperators">
                 <div class="accordion-content">
                   <p><code>+term</code>: {{ 'mautic.core.searchcommands.operators.exact_term'|trans|raw }}</p>
                   <p><code>!term</code>: {{ 'mautic.core.searchcommands.operators.exclude_terms'|trans|raw }}</p>
@@ -41,8 +39,8 @@
             </li>
           </ul>
 
-          <h4 class="fw-sb mb-sm mt-32 pi-md">{{ 'mautic.core.searchcommands.heading.commands'|trans }}</h4>
-          <div class="text-helper mb-md pi-md">{{'mautic.core.searchcommands.heading.commands.description'|trans}}</div>
+          <h4 class="fw-sb mb-12 mt-32 pi-16">{{ 'mautic.core.searchcommands.heading.commands'|trans }}</h4>
+          <div class="text-helper mb-16 pi-16">{{'mautic.core.searchcommands.heading.commands.description'|trans}}</div>
 
           {% set searchCommands = searchCommandList() %}
 
@@ -70,13 +68,13 @@
           {% for section, commands in searchCommands %}
               {% set sectionId = section|replace({'.': '_'})|lower %}
               <li class="panel">
-                  <a role="button" id="heading{{ sectionId|capitalize }}" class="accordion-heading collapsed" data-toggle="collapse"
-                    data-parent="#specificCommandsAccordion" href="#collapse{{ sectionId|capitalize }}" aria-expanded="false" aria-controls="collapse{{ sectionId|capitalize }}">
+                  <button type="button" id="heading{{ sectionId|capitalize }}" class="accordion-heading collapsed" data-bs-toggle="collapse"
+                    data-bs-target="#collapse{{ sectionId|capitalize }}" aria-expanded="false" aria-controls="collapse{{ sectionId|capitalize }}">
                       <i class="ri-arrow-down-s-line accordion-arrow"></i>
                       <span class="accordion-title">{{ section|trans }}</span>
-                  </a>
+                  </button>
 
-                  <div id="collapse{{ sectionId|capitalize }}" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="heading{{ sectionId|capitalize }}">
+                  <div id="collapse{{ sectionId|capitalize }}" class="collapse accordion-wrapper" role="tabpanel" data-bs-parent="#specificCommandsAccordion" aria-labelledby="heading{{ sectionId|capitalize }}">
                       <div class="accordion-content">
                           {% for groupName, groupCommands in commandGroups %}
                               {% if groupName != 'filters' %}
@@ -86,7 +84,7 @@
                               {% endif %}
 
                               {% if groupedCommands|length > 0 %}
-                                  <p class="fw-b mb-sm mt-md">{{ ('searchcommand.group.' ~ groupName)|trans }}</p>
+                                  <p class="fw-b mb-12 mt-16">{{ ('searchcommand.group.' ~ groupName)|trans }}</p>
                                   {% for command in groupedCommands %}
                                       {% set commandCode = command|trans %}
                                       {% set descriptionKey = command ~ '.description' %}

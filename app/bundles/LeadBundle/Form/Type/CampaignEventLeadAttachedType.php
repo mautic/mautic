@@ -28,7 +28,7 @@ final class CampaignEventLeadAttachedType extends AbstractType
             ChoiceType::class,
             [
                 'label'             => 'mautic.lead.lead.events.campaigns.timestamp',
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'multiple'          => false,
                 'choices'           => ['Campaign Start Date' => 'campaign_start_date'],
                 'attr'              => ['class' => 'form-control'],
@@ -49,7 +49,7 @@ final class CampaignEventLeadAttachedType extends AbstractType
                     ],
                 ]),
                 'required'   => true,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                 ],
@@ -86,7 +86,7 @@ final class CampaignEventLeadAttachedType extends AbstractType
                     'mautic.campaign.event.intervalunit.choice.y' => 'y',
                 ],
                 'multiple'          => false,
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => [
                     'class' => 'form-control',
                 ],

@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Mailer;
 
@@ -56,6 +57,34 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
             $this->assertStringContainsString('Second Street'.$suffix, $messageBody);
         };
         $testEmail();
+    }
+
+    public function testSearchesForUnownedCompanies(): void
+    {
+        $unowned = $this->createCompany('Unowned company');
+        $owned   = $this->createCompany('Owned company');
+        $owner   = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $owner);
+        $owned->setOwner($owner);
+        $this->em->persist($owned);
+        $this->em->flush();
+        $this->em->refresh($owned);
+        $this->assertSame($owner, $owned->getOwner());
+
+        foreach (['', '&tmpl=list'] as $template) {
+            $this->client->request(Request::METHOD_GET, '/s/companies?search=is:unowned'.$template);
+
+            self::assertResponseIsSuccessful();
+            $content = (string) $this->client->getResponse()->getContent();
+            $this->assertStringContainsString($unowned->getName(), $content);
+            $this->assertStringNotContainsString($owned->getName(), $content);
+        }
+
+        $this->client->request(Request::METHOD_GET, '/s/companies?search=');
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($unowned->getName(), $content);
+        $this->assertStringContainsString($owned->getName(), $content);
     }
 
     private function createCompany(string $name, string $address1 = ''): Company

@@ -8,6 +8,8 @@ class ContactSegmentFilterCrate
 
     public const COMPANY_OBJECT   = 'company';
 
+    public const COMPANY_ALL_OBJECT = 'company_all';
+
     public const BEHAVIORS_OBJECT = 'behaviors';
 
     /**
@@ -87,7 +89,7 @@ class ContactSegmentFilterCrate
 
     public function isCompanyType(): bool
     {
-        return self::COMPANY_OBJECT === $this->object;
+        return in_array($this->object, [self::COMPANY_OBJECT, self::COMPANY_ALL_OBJECT], true);
     }
 
     public function isBehaviorsType(): bool
@@ -175,7 +177,7 @@ class ContactSegmentFilterCrate
         $operator = $filter['operator'] ?? null;
 
         if ('multiselect' === $this->type && in_array($operator, [OperatorOptions::INCLUDING_ANY, OperatorOptions::EXCLUDING_ANY, OperatorOptions::INCLUDING_ALL, OperatorOptions::EXCLUDING_ALL])) {
-            $neg            = !str_contains($operator, '!') ? '' : '!';
+            $neg            = !str_contains((string) $operator, '!') ? '' : '!';
             $this->operator = $neg.$this->type;
 
             return;

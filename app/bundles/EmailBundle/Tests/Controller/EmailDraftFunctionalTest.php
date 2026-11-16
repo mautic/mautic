@@ -66,8 +66,29 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
 
     public function testDiscardDraftForLegacy(): void
     {
-        $email = $this->createNewEmail();
+        $email       = $this->createNewEmail();
+        $publishUp   = new \DateTime('2031-01-02 03:04:00');
+        $publishDown = new \DateTime('2031-02-03 04:05:00');
+
+        $email->setPlainText('Plain text live');
+        $email->setPublishUp($publishUp);
+        $email->setPublishDown($publishDown);
+        $email->setContinueSending(true);
+        $this->em->flush();
+
         $this->discardDraft($email);
+        $this->em->refresh($email);
+
+        $this->assertSame('Plain text live', $email->getPlainText());
+        $this->assertSame(
+            $publishUp->format('Y-m-d H:i:s'),
+            $email->getPublishUp()?->format('Y-m-d H:i:s')
+        );
+        $this->assertSame(
+            $publishDown->format('Y-m-d H:i:s'),
+            $email->getPublishDown()?->format('Y-m-d H:i:s')
+        );
+        $this->assertTrue($email->getContinueSending());
     }
 
     public function testEmailDeleteCascade(): void

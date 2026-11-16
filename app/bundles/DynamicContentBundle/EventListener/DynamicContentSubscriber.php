@@ -192,13 +192,23 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
             $result[$token] = $dwc['content'];
         }
 
-        // DOMDocument URL-encodes { -> %7B and } -> %7D inside HTML attribute values (e.g. href).
-        // Replace those URL-encoded tokens first with HTML-stripped, attribute-escaped content to avoid injecting HTML markup
-        // into attribute values, then replace the plain tokens in the rest of the content normally.
-        foreach ($result as $token => $replacement) {
-            $encodedToken = str_replace(['{', '}'], ['%7B', '%7D'], $token);
-            $content      = str_replace($encodedToken, htmlspecialchars(strip_tags($replacement), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false), $content);
-        }
+        // Depending on the libxml version, DOMDocument may URL-encode { -> %7B and } -> %7D inside href, src and action values.
+        // Replace tokens (encoded or plain) inside those attributes with HTML-stripped, attribute-escaped content
+        // to avoid injecting HTML markup into attribute values, then replace the remaining tokens normally.
+        $content = preg_replace_callback(
+            '/(\b(?:href|src|action)\s*=\s*")([^"]*)(")/i',
+            static function (array $matches) use ($result): string {
+                $value = $matches[2];
+                foreach ($result as $token => $replacement) {
+                    $encodedToken = str_replace(['{', '}'], ['%7B', '%7D'], $token);
+                    $safe         = htmlspecialchars(strip_tags($replacement), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
+                    $value        = str_ireplace([$encodedToken, $token], $safe, $value);
+                }
+
+                return $matches[1].$value.$matches[3];
+            },
+            $content
+        ) ?? $content;
         $content = str_replace(array_keys($result), array_values($result), $content);
 
         $event->setContent($content);

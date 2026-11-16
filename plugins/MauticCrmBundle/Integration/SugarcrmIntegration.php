@@ -899,7 +899,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.sugarcrm.form.updateOwner',
-                    'label_attr'        => ['class' => 'control-label'],
+                    'label_attr'        => ['class' => 'form-label'],
                     'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
@@ -918,7 +918,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.sugarcrm.form.updateDnc',
-                    'label_attr'        => ['class' => 'control-label'],
+                    'label_attr'        => ['class' => 'form-label'],
                     'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
@@ -937,7 +937,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.blanks',
-                    'label_attr'        => ['class' => 'control-label'],
+                    'label_attr'        => ['class' => 'form-label'],
                     'placeholder'       => false,
                     'required'          => false,
                 ]
@@ -968,8 +968,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                     'choices'           => array_flip($this->leadModel->getEngagementTypes()), // Choice type expects labels as keys
                     'label'             => 'mautic.salesforce.form.activity_included_events',
                     'label_attr'        => [
-                        'class'       => 'control-label',
-                        'data-toggle' => 'tooltip',
+                        'class'       => 'form-label',
+                        'data-bs-toggle' => 'tooltip',
                         'title'       => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip'),
                     ],
                     'multiple'   => true,

@@ -138,7 +138,8 @@ ul.tag-cloud li {
     padding: 0 10px;
 }
 
-.lead-avatar-panel .img-responsive {
+.lead-avatar-panel .img-responsive,
+.lead-avatar-panel .img-fluid {
     min-width: 100%;
 }
 
@@ -319,7 +320,8 @@ ul.tag-cloud li {
     background-color: var(--layer);
 }
 
-.filter--panel .help-block {
+.filter--panel .help-block,
+.filter--panel .form-text {
     position: absolute;
     bottom: -10px;
     right: 18px;

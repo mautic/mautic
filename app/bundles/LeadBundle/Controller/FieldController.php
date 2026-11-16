@@ -106,10 +106,11 @@ final class FieldController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'items'           => $fields,
-                'searchValue'     => $search,
-                'searchScopes'    => $fieldSearchScopeProvider->getScopes(),
-                'permissions'     => $permissions,
+                'items'        => $fields,
+                'searchValue'  => $search,
+                'searchScopes' => $fieldSearchScopeProvider->getScopes(),
+                'filters'      => [],
+                'permissions'  => $permissions,
                 'tmpl'        => $tmpl,
                 'totalItems'  => $count,
                 'limit'       => $limit,
