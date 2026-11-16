@@ -1368,7 +1368,6 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\InstallBundle\Install\InstallService` | `saveConfiguration()` (`bool $clearCache`) |
     | `Mautic\IntegrationsBundle\Entity\ObjectMappingRepository` | `getIntegrationObject()` (`string $internalObjectName`) |
     | `Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO` | `addFieldMapping()` (`string $internalField`, `string $integrationField`, `string $direction`, `bool $isRequired`) |
-    | `Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO` | `remapObject()` (`int\|string\|null $newObjectId`) |
     | `Mautic\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO` | `__construct()` (`string $type`, `string $value`) |
     | `Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO` | `__construct()` (`string $type`) |
     | `Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException` | `__construct()` (`string $object`) |
