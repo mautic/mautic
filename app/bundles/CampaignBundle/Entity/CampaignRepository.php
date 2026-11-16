@@ -335,7 +335,7 @@ class CampaignRepository extends CommonRepository
             $expr = $q->expr()->not($expr);
         }
 
-        if (!empty($forceParameters)) {
+        if ([] !== $forceParameters) {
             $parameters = $forceParameters;
         }
 
