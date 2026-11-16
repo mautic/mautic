@@ -1,6 +1,6 @@
 <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
 {% set childContainer %}
-    <div class="mb-md">
+    <div class="mb-16">
         {% include '@MauticCore/Components/pictogram.html.twig' with {
             'pictogram': 'react-to-data',
             'size': '80'
@@ -15,7 +15,7 @@
     }) }}
 
     {% set triggersUseContainer %}
-    <div class="mb-md">
+    <div class="mb-16">
         {% include '@MauticCore/Components/pictogram.html.twig' with {
             'pictogram': 'construct',
             'size': '64'
@@ -32,7 +32,7 @@
             ]
         } %}
     </div>
-    <div class="mt-lg">
+    <div class="mt-24">
         {{ include('@MauticCore/Notification/inline_notification.html.twig', {
             'title': 'mautic.point.trigger.onboarding.notification.title',
             'content': 'mautic.point.trigger.onboarding.notification.content',

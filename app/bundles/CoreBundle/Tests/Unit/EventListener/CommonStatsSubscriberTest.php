@@ -238,4 +238,58 @@ final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->expectException(AccessDeniedException::class);
         $this->subscirber->onStatsFetch($this->statsEvent);
     }
+
+    public function testOnStatsFetchDeniesUnmappedTableForNonAdmin(): void
+    {
+        ReflectionHelper::setValue($this->subscirber, 'repositories', [$this->repository]);
+        ReflectionHelper::setValue($this->subscirber, 'permissions', []);
+
+        $this->repository->expects($this->once())
+            ->method('getTableName')
+            ->willReturn('audit_log');
+
+        $this->statsEvent->expects($this->once())
+            ->method('isLookingForTable')
+            ->with('audit_log', $this->repository)
+            ->willReturn(true);
+
+        $this->security->expects($this->once())
+            ->method('isAdmin')
+            ->willReturn(false);
+
+        $this->statsEvent->expects($this->never())
+            ->method('setSelect');
+
+        $this->expectException(AccessDeniedException::class);
+        $this->subscirber->onStatsFetch($this->statsEvent);
+    }
+
+    public function testOnStatsFetchAllowsUnmappedTableForAdmin(): void
+    {
+        ReflectionHelper::setValue($this->subscirber, 'repositories', [$this->repository]);
+        ReflectionHelper::setValue($this->subscirber, 'permissions', []);
+
+        $this->repository->expects($this->once())
+            ->method('getTableName')
+            ->willReturn('audit_log');
+
+        $this->statsEvent->expects($this->once())
+            ->method('isLookingForTable')
+            ->with('audit_log', $this->repository)
+            ->willReturn(true);
+
+        $this->security->expects($this->once())
+            ->method('isAdmin')
+            ->willReturn(true);
+
+        $this->statsEvent->expects($this->once())
+            ->method('setSelect')
+            ->willReturnSelf();
+
+        $this->statsEvent->expects($this->once())
+            ->method('setRepository')
+            ->with($this->repository, []);
+
+        $this->subscirber->onStatsFetch($this->statsEvent);
+    }
 }

@@ -201,7 +201,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $lead          = $event->getSubmission()->getLead();
         $matchedFields = [];
         $payload       = [
-            'mautic_contact' => $lead->getProfileFields(),
+            'mautic_contact' => $lead?->getProfileFields() ?? [],
             'mautic_form'    => [
                 'id'   => $post['formId'],
                 'name' => $post['formName'],
@@ -227,9 +227,12 @@ final readonly class FormSubscriber implements EventSubscriberInterface
 
         $event->setPostSubmitPayload($payload);
 
-        $headers = [
-            'X-Forwarded-For' => $event->getSubmission()->getIpAddress()->getIpAddress(),
-        ];
+        $headers = [];
+
+        // Kiosk mode submissions are stored without an IP address
+        if ($ipAddress = $event->getSubmission()->getIpAddress()) {
+            $headers['X-Forwarded-For'] = $ipAddress->getIpAddress();
+        }
 
         if (!empty($config['authorization_header'])) {
             if (str_contains($config['authorization_header'], ':')) {

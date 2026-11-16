@@ -191,6 +191,14 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             );
         }
 
+        if (in_array($command, [
+            $this->translator->trans('mautic.lead.company.searchcommand.isunowned'),
+            $this->translator->trans('mautic.lead.company.searchcommand.isunowned', [], null, 'en_US'),
+        ])) {
+            $expr = $q->expr()->isNull('comp.owner_id');
+            $returnParameter = false;
+        }
+
         if (in_array($command, $this->availableSearchFields)) {
             $expr = $q->expr()->like($this->getTableAlias().".{$command}", ":{$unique}");
         }
@@ -222,7 +230,10 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function getSearchCommands(): array
     {
-        $commands = array_merge(['mautic.project.searchcommand.name'], $this->getStandardSearchCommands());
+        $commands = array_merge([
+            'mautic.project.searchcommand.name',
+            'mautic.lead.company.searchcommand.isunowned',
+        ], $this->getStandardSearchCommands());
         if ([] !== $this->availableSearchFields) {
             $commands = array_merge($commands, $this->availableSearchFields);
         }
@@ -323,7 +334,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     public function identifyCompany($companyName, $city = null, $country = null, $state = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        if (empty($companyName)) {
+        // A company can be named "0"
+        if (!is_scalar($companyName) || '' === (string) $companyName) {
             return [];
         }
         $q->select('comp.id, comp.companyname, comp.companycity, comp.companycountry, comp.companystate')
@@ -331,7 +343,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         $q->where(
             $q->expr()->eq('comp.companyname', ':companyName')
-        )->setParameter('companyName', $companyName);
+        )->setParameter('companyName', (string) $companyName);
 
         if ($city) {
             $q->andWhere(

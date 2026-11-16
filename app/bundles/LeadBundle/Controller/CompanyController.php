@@ -29,6 +29,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class CompanyController extends FormController
 {
     use LeadDetailsTrait;
+    private const MAX_BATCH_REMOVE_CONTACTS = 1000;
 
     private CompanyRepository $companyRepository;
 
@@ -235,6 +236,106 @@ final class CompanyController extends FormController
                 ],
                 'contentTemplate' => '@MauticLead/Company/list_rows_contacts.html.twig',
             ]
+        );
+    }
+
+    /**
+     * Removes selected contacts from a company.
+     */
+    public function batchRemoveContactsAction(Request $request, string|int $objectId): Response
+    {
+        $companyId = $objectId;
+        $returnUrl = $this->generateUrl('mautic_company_action', [
+            'objectAction' => 'view',
+            'objectId'     => $companyId,
+        ]);
+        $flashes = [];
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => [
+                'objectAction' => 'view',
+                'objectId'     => $companyId,
+            ],
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::viewAction',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_company_index',
+                'mauticContent' => 'company',
+            ],
+        ];
+
+        $company = $this->companyModel->getEntity($companyId);
+        if (null === $company) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.company.error.notfound',
+                'msgVars' => ['%id%' => $companyId],
+            ];
+        } elseif (!$this->security->hasEntityAccess(
+            'lead:leads:viewown',
+            'lead:leads:viewother',
+            $company->getPermissionUser()
+        )) {
+            $this->throwAccessDenied();
+        } elseif (Request::METHOD_POST === $request->getMethod()) {
+            if (!$this->isCsrfTokenValid('mautic_ajax_post', $request->headers->get('X-CSRF-Token'))) {
+                $this->throwAccessDenied();
+            }
+
+            $ids = json_decode($request->query->get('ids', '[]'), true);
+
+            if (is_array($ids) && count($ids) <= self::MAX_BATCH_REMOVE_CONTACTS) {
+                $companyLeadRepository = $this->companyModel->getCompanyLeadRepository();
+                $removed = 0;
+                $ids = array_filter($ids, static fn (mixed $id): bool => is_int($id) || (is_string($id) && ctype_digit($id)));
+
+                foreach (array_unique(array_map(intval(...), $ids)) as $contactId) {
+                    $contactId = (int) $contactId;
+                    if (!$companyLeadRepository->getCompanyLeadEntity($contactId, (int) $companyId)) {
+                        continue;
+                    }
+
+                    $contact = $this->leadModel->getEntity($contactId);
+                    if (null === $contact) {
+                        continue;
+                    }
+
+                    if (!$this->security->hasEntityAccess(
+                        'lead:leads:editown',
+                        'lead:leads:editother',
+                        $contact->getPermissionUser()
+                    )) {
+                        $flashes[] = $this->getAccessDeniedFlash();
+
+                        continue;
+                    }
+
+                    if ($this->leadModel->isLocked($contact)) {
+                        $flashes[] = $this->isLocked($postActionVars, $contact, 'lead', true);
+
+                        continue;
+                    }
+
+                    $this->companyModel->removeLeadFromCompany($company, $contact);
+                    ++$removed;
+                }
+
+                $flashes[] = [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.company.contacts.notice.batch_removed',
+                    'msgVars' => ['%count%' => $removed],
+                ];
+            } elseif (is_array($ids)) {
+                $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.company.contacts.error.batch_limit',
+                    'msgVars' => ['%limit%' => self::MAX_BATCH_REMOVE_CONTACTS],
+                ];
+            }
+        }
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, ['flashes' => $flashes])
         );
     }
 

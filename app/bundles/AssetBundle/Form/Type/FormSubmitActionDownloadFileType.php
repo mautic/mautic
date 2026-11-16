@@ -22,7 +22,7 @@ final class FormSubmitActionDownloadFileType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => false,
                 'label'       => 'mautic.asset.form.submit.assets',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'placeholder' => 'mautic.asset.form.submit.latest.category',
                 'required'    => false,
                 'attr'        => [
@@ -37,7 +37,7 @@ final class FormSubmitActionDownloadFileType extends AbstractType
             CategoryListType::class,
             [
                 'label'         => 'mautic.asset.form.submit.latest.category',
-                'label_attr'    => ['class' => 'control-label'],
+                'label_attr'    => ['class' => 'form-label'],
                 'placeholder'   => false,
                 'required'      => false,
                 'bundle'        => 'asset',

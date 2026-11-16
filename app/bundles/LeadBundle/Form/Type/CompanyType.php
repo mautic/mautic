@@ -45,7 +45,7 @@ final class CompanyType extends AbstractType
                 UserListType::class,
                 [
                     'label'      => 'mautic.lead.company.field.owner',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class' => 'form-control',
                     ],
@@ -62,7 +62,7 @@ final class CompanyType extends AbstractType
             [
                 'label'      => 'mautic.company.score',
                 'attr'       => ['class' => 'form-control'],
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'scale'      => 0,
                 'required'   => false,
             ]

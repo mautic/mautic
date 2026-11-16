@@ -69,7 +69,7 @@ final class FocusPropertiesType extends AbstractType
                             'mautic.focus.form.bar.size.regular' => 'regular',
                         ],
                         'label'      => 'mautic.focus.form.bar.size',
-                        'label_attr' => ['class' => 'control-label'],
+                        'label_attr' => ['class' => 'form-label'],
                         'attr'       => [
                             'class'    => 'form-control',
                             'onchange' => 'Mautic.focusUpdatePreview()',
@@ -110,7 +110,7 @@ final class FocusPropertiesType extends AbstractType
                 [
                     'choices'           => $choices,
                     'label'             => 'mautic.focus.form.placement',
-                    'label_attr'        => ['class' => 'control-label'],
+                    'label_attr'        => ['class' => 'form-label'],
                     'attr'              => [
                         'class'    => 'form-control',
                         'onchange' => 'Mautic.focusUpdatePreview()',

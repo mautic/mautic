@@ -1,5 +1,5 @@
 <form action="{{ path('mautic_contactnote_index', {'page': page, 'leadId': lead.id, 'tmpl': 'list'}) }}" class="panel" id="note-filters" method="post">
-    <div class="form-control-icon pa-md">
+    <div class="form-control-icon pa-16">
         <input type="text"
                name="search"
                value="{{ search|e }}"
@@ -13,14 +13,13 @@
     </div>
     <input type="hidden" name="leadId" id="leadId" value="{{ lead.id|e }}" />
     <div class="panel-footer text-secondary">
+        {% set noteItems = [] %}
         {% for typeKey, typeName in noteTypes %}
-            <div class="checkbox-inline custom-primary">
-                <label class="mb-0">
-                    <input name="noteTypes[]" type="checkbox" value="{{ typeKey }}" {% if typeKey in noteType %}checked{% endif %} />
-                    <span class="mr-0"></span>
-                    {{ typeName|trans }}
-                </label>
-            </div>
+            {% set noteItems = noteItems|merge([{ name: 'noteTypes[]', value: typeKey, checked: typeKey in noteType, label: typeName }]) %}
         {% endfor %}
+        {% include '@MauticCore/Components/checkbox.html.twig' with {
+            inline: true,
+            items: noteItems
+        } only %}
     </div>
 </form>

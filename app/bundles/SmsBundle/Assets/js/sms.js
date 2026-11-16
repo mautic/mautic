@@ -142,8 +142,8 @@ globalThis.document.mediaManagerInsertImageCallback = function(url) {
 
 Mautic.addMediaList = function(url){
     const elemIdNumber = mQuery('#media_row input[type="checkbox"]:last').length > 0 ? Number.parseInt(mQuery('#media_row input[type="checkbox"]:last').attr('id').split('_')[2], 10) + 1 : 0;
-    const mediaHtml = '<li id="li_sms_media_'+elemIdNumber+'"><input type="checkbox" id="sms_media_'+elemIdNumber+'" name="sms[media][]" autocomplete="false" value="'+url+'" checked="checked">' +
-        '<label for="sms_media_'+elemIdNumber+'"><img src="'+url+'" alt="'+Mautic.translate('mautic.sms.type_media_url')+'"></label></li>';
+    const mediaHtml = '<li id="li_sms_media_'+elemIdNumber+'"><input type="checkbox" class="form-check-input" id="sms_media_'+elemIdNumber+'" name="sms[media][]" autocomplete="false" value="'+url+'" checked="checked">' +
+        '<label class="form-check-label" for="sms_media_'+elemIdNumber+'"><img src="'+url+'" alt="'+Mautic.translate('mautic.sms.type_media_url')+'"></label></li>';
     mQuery('#media_row').append(mediaHtml);
 };
 
