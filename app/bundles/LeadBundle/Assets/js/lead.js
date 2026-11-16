@@ -1721,7 +1721,7 @@ Mautic.listOnLoad = function(container, response) {
     Mautic.loadAndProcessPageContent('#contacts-container');
     Mautic.loadAndProcessPageContent('#segment-stats');
 
-    mQuery('a#campaign-share-tab').one('shown.bs.tab', Mautic.loadCampaignShare);
+    mQuery('a#campaign-share-tab').on('shown.bs.tab', Mautic.loadCampaignShare);
 
     const segmentDependenciesTab = mQuery('a#segment-dependencies');
     let segmentDependenciesLoaded = false;
@@ -1768,37 +1768,44 @@ Mautic.listOnLoad = function(container, response) {
 
 Mautic.loadCampaignShare = function () {
     const table = mQuery('#campaign-share-table');
-    const ids = table.find('tr[data-campaign-id]').filter(function () {
+    const rows = table.find('tr[data-campaign-id]').filter(function () {
         return mQuery(this).find('.gauge--loading').length > 0;
-    }).map(function () {
+    });
+    const ids = rows.map(function () {
         return mQuery(this).attr('data-campaign-id');
     }).get();
     const batchSize = 10;
+    const shares = {};
     let pendingBatches = Math.ceil(ids.length / batchSize);
 
-    const finish = function () {
-        const tbody = table.find('tbody');
-        const rows = tbody.find('tr[data-campaign-id]');
-
-        rows.each(function () {
-            const value = parseFloat(mQuery(this).find('[role="meter"]').attr('aria-valuenow'));
-
-            mQuery(this).data('share', isNaN(value) ? -1 : value);
-            if (0 === value) {
-                mQuery(this).remove();
-            }
-        });
-
-        tbody.find('tr[data-campaign-id]').sort(function (a, b) {
-            return mQuery(b).data('share') - mQuery(a).data('share');
-        }).appendTo(tbody);
-    };
-
-    if (!pendingBatches) {
-        finish();
-
+    if (table.data('loading') || !pendingBatches) {
         return;
     }
+
+    table.data('loading', true);
+
+    const finish = function () {
+        const sorted = rows.filter(function () {
+            return shares.hasOwnProperty(mQuery(this).attr('data-campaign-id'));
+        }).filter(function () {
+            if (0 === shares[mQuery(this).attr('data-campaign-id')]) {
+                mQuery(this).remove();
+
+                return false;
+            }
+
+            return true;
+        }).get().sort(function (a, b) {
+            return shares[mQuery(b).attr('data-campaign-id')] - shares[mQuery(a).attr('data-campaign-id')];
+        });
+
+        table.find('tbody').prepend(sorted);
+        sorted.forEach(function (row) {
+            Mautic.updateGauge(row, shares[mQuery(row).attr('data-campaign-id')]);
+        });
+
+        table.data('loading', false);
+    };
 
     for (let i = 0; i < ids.length; i += batchSize) {
         mQuery.ajax({
@@ -1807,7 +1814,7 @@ Mautic.loadCampaignShare = function () {
             data: {ids: ids.slice(i, i + batchSize), entityId: Mautic.getEntityId()},
             success: function (response) {
                 (response.stats || []).forEach(function (stat) {
-                    Mautic.updateGauge(table.find('tr[data-campaign-id="' + stat.id + '"]'), stat.segmentCampaignShare);
+                    shares[stat.id] = parseFloat(stat.segmentCampaignShare) || 0;
                 });
             },
             error: function (request, textStatus, errorThrown) {
