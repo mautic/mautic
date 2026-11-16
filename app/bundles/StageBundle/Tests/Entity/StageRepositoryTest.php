@@ -37,4 +37,41 @@ final class StageRepositoryTest extends MauticMysqlTestCase
         $this->assertSame(2, $counts['Stage A']);
         $this->assertSame(0, $counts['Stage B']);
     }
+
+    public function testGetPublishedWithContactCountsExcludesStagesOutsidePublicationWindow(): void
+    {
+        $now = new \DateTime();
+
+        $active = (new Stage())
+            ->setName('Active')
+            ->setIsPublished(true)
+            ->setWeight(1);
+        $scheduled = (new Stage())
+            ->setName('Scheduled')
+            ->setIsPublished(true)
+            ->setWeight(2)
+            ->setPublishUp((clone $now)->modify('+1 day'));
+        $expired = (new Stage())
+            ->setName('Expired')
+            ->setIsPublished(true)
+            ->setWeight(3)
+            ->setPublishDown((clone $now)->modify('-1 day'));
+
+        $this->em->persist($active);
+        $this->em->persist($scheduled);
+        $this->em->persist($expired);
+        $this->em->flush();
+
+        $repository = $this->em->getRepository(Stage::class);
+        $this->assertInstanceOf(StageRepository::class, $repository);
+
+        $names = array_map(
+            static fn (array $row): string => $row[0]->getName(),
+            $repository->getPublishedWithContactCounts()
+        );
+
+        $this->assertContains('Active', $names);
+        $this->assertNotContains('Scheduled', $names);
+        $this->assertNotContains('Expired', $names);
+    }
 }

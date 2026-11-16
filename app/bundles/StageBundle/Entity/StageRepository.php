@@ -50,13 +50,15 @@ class StageRepository extends CommonRepository
             ->from(Lead::class, 'l')
             ->where('l.stage = s');
 
-        return $this->createQueryBuilder('s')
+        $q = $this->createQueryBuilder('s')
             ->select('s', '('.$sq->getDql().') as contactCount')
-            ->where('s.isPublished = :published')
-            ->setParameter('published', true)
-            ->orderBy('s.weight', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('s.weight', 'ASC');
+
+        $expr = $this->getPublishedByDateOrmExpression($q);
+
+        $q->where($expr);
+
+        return $q->getQuery()->getResult();
     }
 
     /**
