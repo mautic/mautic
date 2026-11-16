@@ -105,11 +105,9 @@ final class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @param Field $f
-     *
      * @return string[]
      */
-    public function validateFieldValue($type, $value, $f = null): array
+    public function validateFieldValue($type, $value, ?Field $f = null): array
     {
         $errors = [];
         if (isset($this->types[$type]['constraints'])) {

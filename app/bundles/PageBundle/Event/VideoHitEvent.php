@@ -6,12 +6,13 @@ namespace Mautic\PageBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PageBundle\Entity\VideoHit;
+use Symfony\Component\HttpFoundation\Request;
 
 final class VideoHitEvent extends CommonEvent
 {
     public function __construct(
         VideoHit $hit,
-        private $request,
+        private readonly Request $request,
         private $code,
     ) {
         $this->entity  = $hit;
@@ -19,10 +20,8 @@ final class VideoHitEvent extends CommonEvent
 
     /**
      * Get page request.
-     *
-     * @return string
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
