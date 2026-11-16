@@ -120,6 +120,7 @@
                 </button>
             </li>
         {% endfor %}
+        {% block tabs_nav_extra %}{% endblock %}
     </ul>
 
     <div class="tab-content{% if variant == 'contained' %} tab-content--contained{% elseif variant == 'vertical' %} tab-content--contained tab-content--vertical{% endif %}">
@@ -129,5 +130,6 @@
             {%- set isActive = loop.index0 == selectedIndex -%}
             {{ _self.tabContent(tab, tabId, isActive, variant, layer) }}
         {% endfor %}
+        {% block tabs_pane_extra %}{% endblock %}
     </div>
 </div>
