@@ -221,11 +221,11 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $form->setAlias('source-form');
         $this->em->persist($form);
 
-        $segmentCampaign = $this->createCampaign('Segment source');
+        $segmentCampaign = $this->createCampaign();
         $segmentCampaign->addList($segment);
-        $formCampaign = $this->createCampaign('Form source');
+        $formCampaign = $this->createCampaign();
         $formCampaign->addForm($form);
-        $plainCampaign = $this->createCampaign('No source');
+        $plainCampaign = $this->createCampaign();
         $this->em->flush();
 
         $campaignIds = [$segmentCampaign->getId(), $formCampaign->getId(), $plainCampaign->getId()];
