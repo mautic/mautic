@@ -24,7 +24,7 @@ final class ColumnSchemaHelperFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->field        = $this->createCustomField();
-        $this->schemaHelper = $this->getContainer()->get(ColumnSchemaHelper::class);
+        $this->schemaHelper = $this->getService(ColumnSchemaHelper::class);
     }
 
     #[DataProvider('provideColumnLength')]
@@ -77,9 +77,7 @@ final class ColumnSchemaHelperFunctionalTest extends MauticMysqlTestCase
         $field->setAlias('custom_field_test');
         $field->setCharLengthLimit(64);
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
-        $this->assertInstanceOf(FieldModel::class, $fieldModel);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntity($field);
         $fieldModel->getRepository()->detachEntity($field);
 

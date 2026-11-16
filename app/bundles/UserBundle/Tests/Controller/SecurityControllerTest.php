@@ -28,7 +28,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $validationError = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.user.security.saml.clearsession', [], 'flashes');
+        $validationError = $this->getService(TranslatorInterface::class)->trans('mautic.user.security.saml.clearsession', [], 'flashes');
         $this->assertStringContainsString($validationError, (string) $clientResponse->getContent());
     }
 
@@ -39,10 +39,10 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $validationError = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.user.security.saml.clearsession', [], 'flashes');
+        $validationError = $this->getService(TranslatorInterface::class)->trans('mautic.user.security.saml.clearsession', [], 'flashes');
         $this->assertStringNotContainsString($validationError, (string) $clientResponse->getContent());
 
-        $loginText = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.user.auth.form.loginbtn', [], 'messages');
+        $loginText = $this->getService(TranslatorInterface::class)->trans('mautic.user.auth.form.loginbtn', [], 'messages');
         $this->assertStringContainsString($loginText, (string) $clientResponse->getContent());
     }
 

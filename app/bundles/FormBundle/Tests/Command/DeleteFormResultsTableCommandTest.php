@@ -22,11 +22,9 @@ final class DeleteFormResultsTableCommandTest extends MauticMysqlTestCase
         // In case any form results table exists whose form is deleted in previous test cases
         $this->deleteAllFormResultsTable();
 
-        /** @var SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->getContainer()->get(SubmissionRepository::class);
+        $submissionRepository = $this->getService(SubmissionRepository::class);
 
-        /** @var FormRepository $formRepository */
-        $formRepository = $this->getContainer()->get(FormRepository::class);
+        $formRepository = $this->getService(FormRepository::class);
 
         $deletedForms = 20;
 

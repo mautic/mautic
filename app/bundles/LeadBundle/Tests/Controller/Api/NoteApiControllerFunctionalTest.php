@@ -53,7 +53,7 @@ final class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
         $createPayload = json_decode($createResponse->getContent(), true);
         $this->assertSame('Created from API', $createPayload['note']['text']);
 
-        $createdNote = $this->getContainer()->get(LeadNoteRepository::class)->find($createPayload['note']['id']);
+        $createdNote = $this->getService(LeadNoteRepository::class)->find($createPayload['note']['id']);
         $this->assertInstanceOf(LeadNote::class, $createdNote);
         $this->assertSame($contact->getId(), $createdNote->getLead()->getId());
     }

@@ -24,9 +24,7 @@ final class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
     #[DataProvider('normalizeData')]
     public function testOnReportDisplay(string $value, string $type, array $properties, string $expected): void
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get(FieldModel::class);
-        $this->assertInstanceOf(FieldModel::class, $fieldModel);
+        $fieldModel = $this->getService(FieldModel::class);
         $field = new LeadField();
         $field->setType($type);
         $field->setObject('lead');
@@ -38,8 +36,7 @@ final class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
         $contact = new Lead();
         $contact->setEmail('contact@example.com');
         $contact->addUpdatedField('field1', $value);
-        $contactModel = self::getContainer()->get(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $contactModel);
+        $contactModel = $this->getService(LeadModel::class);
         $contactModel->saveEntity($contact);
 
         $report = new Report();

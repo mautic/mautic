@@ -44,8 +44,8 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
         ?string $expectedOwnerUsername = null,
         ?string $expectedStageName = null,
     ): void {
-        $salesUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'sales']);
-        $adminUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $salesUser = $this->getService(UserRepository::class)->findOneBy(['username' => 'sales']);
+        $adminUser = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
 
         $stage = new Stage();
         $stage->setName(self::STAGE_NAME);
@@ -62,13 +62,13 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
 
         $expectedOwnerId = null;
         if ($expectedOwnerUsername) {
-            $expectedOwner   = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => $expectedOwnerUsername]);
+            $expectedOwner   = $this->getService(UserRepository::class)->findOneBy(['username' => $expectedOwnerUsername]);
             $expectedOwnerId = $expectedOwner->getId();
         }
 
         $expectedStageId = null;
         if ($expectedStageName) {
-            $expectedStage   = $this->getContainer()->get(StageRepository::class)->findOneBy(['name' => $expectedStageName]);
+            $expectedStage   = $this->getService(StageRepository::class)->findOneBy(['name' => $expectedStageName]);
             $expectedStageId = $expectedStage->getId();
         }
 
@@ -97,7 +97,7 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form, $formValues);
 
-        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findBy(['form' => $formId]);
+        $submissions = $this->getService(SubmissionRepository::class)->findBy(['form' => $formId]);
         $this->assertCount(1, $submissions, "Submission was not created for test: {$testName}");
 
         /** @var Submission $submission */

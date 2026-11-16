@@ -31,8 +31,7 @@ final class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
 
         // Check segment cached contact count using the SegmentCountCacheHelper directly
-        /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
-        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
+        $segmentCountCacheHelper = $this->getService(SegmentCountCacheHelper::class);
         $count                   = $segmentCountCacheHelper->getSegmentContactCount($segmentId);
         $this->assertEquals(5, $count, "Expected segment {$segmentId} to have 5 contacts");
 
@@ -45,8 +44,7 @@ final class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
 
         // Check segment cached contact count using the SegmentCountCacheHelper directly
-        /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
-        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
+        $segmentCountCacheHelper = $this->getService(SegmentCountCacheHelper::class);
         $count                   = $segmentCountCacheHelper->getSegmentContactCount($segmentId);
         $this->assertEquals(4, $count, "Expected segment {$segmentId} to have 4 contacts");
     }
@@ -57,8 +55,7 @@ final class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
     private function saveContacts(): array
     {
         // Add 5 contacts
-        /** @var LeadRepository $contactRepo */
-        $contactRepo = $this->getContainer()->get(LeadRepository::class);
+        $contactRepo = $this->getService(LeadRepository::class);
         $contacts    = [];
 
         for ($i = 1; $i <= 5; ++$i) {
@@ -75,8 +72,7 @@ final class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
     private function saveSegment(): LeadList
     {
         // Add 1 segment
-        /** @var LeadListRepository $segmentRepo */
-        $segmentRepo = $this->getContainer()->get(LeadListRepository::class);
+        $segmentRepo = $this->getService(LeadListRepository::class);
         $segment     = new LeadList();
         $filters     = [
             [

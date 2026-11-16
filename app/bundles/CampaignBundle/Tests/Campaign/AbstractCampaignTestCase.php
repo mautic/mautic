@@ -22,10 +22,10 @@ abstract class AbstractCampaignTestCase extends MauticMysqlTestCase
     {
         $relativeDate = date('Y-m-d', strtotime('-1 month'));
 
-        $leadEventLogRepo = $this->getContainer()->get(LeadEventLogRepository::class);
-        $campaignRepo = $this->getContainer()->get(CampaignRepository::class);
-        $contactRepo = $this->getContainer()->get(LeadRepository::class);
-        $campaignLeadsRepo = $this->getContainer()->get(CampaignLeadsRepository::class);
+        $leadEventLogRepo = $this->getService(LeadEventLogRepository::class);
+        $campaignRepo = $this->getService(CampaignRepository::class);
+        $contactRepo = $this->getService(LeadRepository::class);
+        $campaignLeadsRepo = $this->getService(CampaignLeadsRepository::class);
 
         $contactA = new Lead();
         $contactB = new Lead();

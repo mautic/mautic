@@ -8,7 +8,6 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\TestBrowserToken;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 trait LoginUserWithSamlTrait
 {
@@ -16,13 +15,10 @@ trait LoginUserWithSamlTrait
     {
         $firewallContext = 'mautic';
         $token           = new TestBrowserToken($user->getRoles(), $user, $firewallContext);
-        $container       = $this->getContainer();
-        /** @var TokenStorageInterface $tokenStorage */
-        $tokenStorage = $container->get('security.untracked_token_storage');
+        $tokenStorage = $this->getService('security.untracked_token_storage');
         $tokenStorage->setToken($token);
 
-        /** @var SessionFactory $sessionFactoryService */
-        $sessionFactoryService = self::getContainer()->get('session.factory');
+        $sessionFactoryService = $this->getService('session.factory');
         /** @var SessionInterface $session */
         $session = $sessionFactoryService->createSession();
         $session->set('samlsso', true);

@@ -271,7 +271,6 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         // Set the override set by fetch command
         define('MAUTIC_DATE_MODIFIED_OVERRIDE', time());
 
-        /** @var \DateTime $lastSync */
         $lastSync = $lastSyncMethod->invokeArgs($sf, []);
 
         // should be teh same as MAUTIC_DATE_MODIFIED_OVERRIDE override

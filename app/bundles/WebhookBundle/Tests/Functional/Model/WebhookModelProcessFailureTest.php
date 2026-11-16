@@ -27,7 +27,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
         $this->configParams['disable_auto_unpublish'] = 'testDisableAutoUnpublishIsEnabled' === $this->name();
         parent::setUp();
 
-        $this->webhookModel                = self::$kernel->getContainer()->get(WebhookModel::class);
+        $this->webhookModel                = $this->getService(WebhookModel::class);
         $this->clientMockHandler           = new MockHandler();
     }
 
@@ -116,7 +116,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
 
     private function createWebhook(): Webhook
     {
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy([]);
+        $user = $this->getService(UserRepository::class)->findOneBy([]);
 
         $webhook = new Webhook();
         $webhook->setCreatedBy($user);
@@ -158,6 +158,6 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
 
     private function assertNumberOfLogs(int $expectedNumberOfLogs): void
     {
-        $this->assertSame($expectedNumberOfLogs, $this->getContainer()->get(LogRepository::class)->count([]));
+        $this->assertSame($expectedNumberOfLogs, $this->getService(LogRepository::class)->count([]));
     }
 }

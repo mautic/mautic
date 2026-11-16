@@ -11,8 +11,7 @@ final class LanguageHelperTest extends MauticMysqlTestCase
 {
     public function testGettingLanguageFiles(): void
     {
-        $languageHelper = self::getContainer()->get(LanguageHelper::class);
-        $this->assertInstanceOf(LanguageHelper::class, $languageHelper);
+        $languageHelper = $this->getService(LanguageHelper::class);
 
         $languageFiles = $languageHelper->getLanguageFiles();
 

@@ -37,9 +37,9 @@ final class PluginTrackingGifFunctionalTest extends MauticMysqlTestCase
         $this->requestTrackingGif($integrationName, $this->sign($this->encodeData()));
 
         $this->assertResponseIsSuccessful();
-        $this->assertInstanceOf(Lead::class, $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => self::EMAIL]));
+        $this->assertInstanceOf(Lead::class, $this->getService(LeadRepository::class)->findOneBy(['email' => self::EMAIL]));
 
-        $stat = $this->getContainer()->get(StatRepository::class)->findOneBy(['emailAddress' => self::EMAIL]);
+        $stat = $this->getService(StatRepository::class)->findOneBy(['emailAddress' => self::EMAIL]);
         $this->assertInstanceOf(Stat::class, $stat);
         $this->assertSame('email.client', $stat->getSource());
         $this->assertTrue($stat->isRead());
@@ -53,7 +53,7 @@ final class PluginTrackingGifFunctionalTest extends MauticMysqlTestCase
         $this->requestTrackingGif($integrationName, 'invalid');
 
         $this->assertResponseIsSuccessful();
-        $this->assertNotInstanceOf(Lead::class, $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => self::EMAIL]));
+        $this->assertNotInstanceOf(Lead::class, $this->getService(LeadRepository::class)->findOneBy(['email' => self::EMAIL]));
     }
 
     public function testUnknownIntegrationIsIgnored(): void
@@ -61,7 +61,7 @@ final class PluginTrackingGifFunctionalTest extends MauticMysqlTestCase
         $this->requestTrackingGif('Unknown', $this->sign($this->encodeData()));
 
         $this->assertResponseIsSuccessful();
-        $this->assertNotInstanceOf(Lead::class, $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => self::EMAIL]));
+        $this->assertNotInstanceOf(Lead::class, $this->getService(LeadRepository::class)->findOneBy(['email' => self::EMAIL]));
     }
 
     private function createIntegration(string $name, string $bundle): void
@@ -75,7 +75,7 @@ final class PluginTrackingGifFunctionalTest extends MauticMysqlTestCase
         $integration->setName($name);
         $integration->setIsPublished(true);
         $integration->setPlugin($plugin);
-        $integration->setApiKeys(['secret' => self::getContainer()->get(EncryptionHelper::class)->encrypt(self::SECRET)]);
+        $integration->setApiKeys(['secret' => $this->getService(EncryptionHelper::class)->encrypt(self::SECRET)]);
         $this->em->persist($integration);
 
         $this->em->flush();

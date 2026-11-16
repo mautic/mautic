@@ -13,7 +13,6 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
@@ -39,8 +38,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
                 'bundle' => 'global',
             ],
         ];
-        /** @var CategoryModel $model */
-        $model      = self::getContainer()->get(CategoryModel::class);
+        $model      = $this->getService(CategoryModel::class);
 
         foreach ($categoriesData as $categoryData) {
             $category = new Category();
@@ -50,7 +48,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             $model->saveEntity($category);
         }
 
-        $this->translator = self::getContainer()->get(TranslatorInterface::class);
+        $this->translator = $this->getService(TranslatorInterface::class);
     }
 
     /**
@@ -137,10 +135,8 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditLockCategory(): void
     {
-        /** @var CategoryModel $categoryModel */
-        $categoryModel      = self::getContainer()->get(CategoryModel::class);
-        /** @var UserModel $userModel */
-        $userModel      = self::getContainer()->get(UserModel::class);
+        $categoryModel      = $this->getService(CategoryModel::class);
+        $userModel      = $this->getService(UserModel::class);
         $user           = $userModel->getEntity(2);
 
         $category = new Category();
@@ -295,8 +291,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $category->setDescription($description);
         $category->setBundle($bundle);
         $category->setAlias($alias);
-        /** @var CategoryModel $categoryModel */
-        $categoryModel      = self::getContainer()->get(CategoryModel::class);
+        $categoryModel      = $this->getService(CategoryModel::class);
         $categoryModel->saveEntity($category);
 
         return $category;
@@ -319,8 +314,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $user->setPassword($hasher->hash('mautic'));
         $user->setRole($role);
 

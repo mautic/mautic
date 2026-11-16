@@ -173,8 +173,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $fieldAlias = 'test_multi';
 
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
-        $this->assertInstanceOf(FieldModel::class, $fieldModel);
+        $fieldModel = $this->getService(FieldModel::class);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
         $this->assertEmpty($fields, 'There are no Custom Fields.');
@@ -209,8 +208,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $contact->setEmail('email@acquia.cz');
 
         $contact->addUpdatedField($fieldAlias, ['bramborak', 'makovec']);
-        $contactModel = self::getContainer()->get(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $contactModel);
+        $contactModel = $this->getService(LeadModel::class);
         $contactModel->saveEntity($contact);
 
         $this->em->flush();
@@ -285,8 +283,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $fieldAlias = 'test_single';
 
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
-        $this->assertInstanceOf(FieldModel::class, $fieldModel);
+        $fieldModel = $this->getService(FieldModel::class);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
         $this->assertEmpty($fields, 'There are no Custom Fields.');
@@ -321,8 +318,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $contact->setEmail('email@acquia.cz');
 
         $contact->addUpdatedField($fieldAlias, ['makovec']);
-        $contactModel = self::getContainer()->get(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $contactModel);
+        $contactModel = $this->getService(LeadModel::class);
         $contactModel->saveEntity($contact);
 
         $this->em->flush();

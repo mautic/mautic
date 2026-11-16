@@ -24,8 +24,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        /** @var CacheProvider $cacheProvider */
-        $cacheProvider = self::getContainer()->get(CacheProvider::class);
+        $cacheProvider = $this->getService(CacheProvider::class);
         if ($fromCache) {
             $contactCountDetail = [
                 'contactCount'   => $expectedContacts,

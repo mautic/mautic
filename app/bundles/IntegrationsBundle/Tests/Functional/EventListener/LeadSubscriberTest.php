@@ -21,8 +21,8 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->dispatcher            = self::getContainer()->get(EventDispatcherInterface::class);
-        $this->fieldChangeRepository = self::getContainer()->get(FieldChangeRepository::class);
+        $this->dispatcher            = $this->getService(EventDispatcherInterface::class);
+        $this->fieldChangeRepository = $this->getService(FieldChangeRepository::class);
 
         self::getContainer()->set(
             SyncIntegrationsHelper::class,

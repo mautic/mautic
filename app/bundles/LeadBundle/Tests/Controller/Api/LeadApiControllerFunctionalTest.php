@@ -28,7 +28,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -169,8 +168,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($contact2);
         $this->em->flush();
 
-        /** @var ContactMerger $contactMerger */
-        $contactMerger = self::getContainer()->get(ContactMerger::class);
+        $contactMerger = $this->getService(ContactMerger::class);
 
         $contactMerger->merge($contact1, $contact2);
 
@@ -231,8 +229,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][3]);
         $contactId4Created = $response['contacts'][3]['id'];
 
-        /** @var ContactMerger $contactMerger */
-        $contactMerger = self::getContainer()->get(ContactMerger::class);
+        $contactMerger = $this->getService(ContactMerger::class);
 
         // Merge contact 102 into 101.
         $contactMerger->merge(
@@ -519,7 +516,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testGetEntitiesReturnsContactsForViewOwnUserBasedOnPermissionUser(): void
     {
         /** @var User $adminUser */
-        $adminUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $adminUser = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
 
         $role = new Role();
         $role->setName('View own contacts');
@@ -581,7 +578,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var User $apiUser */
-        $apiUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'api-owner']);
+        $apiUser = $this->getService(UserRepository::class)->findOneBy(['username' => 'api-owner']);
 
         $this->loginUser($apiUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $apiUser->getUserIdentifier());
@@ -1552,8 +1549,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setUsername($username);
         $user->setRole($role);
 
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $user->setPassword($hasher->hash($this->getUserPlainPassword()));
         $this->em->persist($user);
 

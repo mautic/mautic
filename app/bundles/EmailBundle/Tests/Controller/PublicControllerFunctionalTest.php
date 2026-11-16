@@ -74,7 +74,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testMailerCallbackWhenTransportDoesNotProccessIt(): void
     {
-        self::getContainer()->get(EventDispatcherInterface::class)->addListener(TransportWebhookEvent::class, fn (): null => null /* exists but does nothing */);
+        $this->getService(EventDispatcherInterface::class)->addListener(TransportWebhookEvent::class, fn (): null => null /* exists but does nothing */);
         $this->client->request(Request::METHOD_POST, '/mailer/callback');
 
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
@@ -83,7 +83,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testMailerCallbackWhenTransportProccessesIt(): void
     {
-        self::getContainer()->get(EventDispatcherInterface::class)->addListener(TransportWebhookEvent::class, fn (TransportWebhookEvent $event) => $event->setResponse(new Response('OK')));
+        $this->getService(EventDispatcherInterface::class)->addListener(TransportWebhookEvent::class, fn (TransportWebhookEvent $event) => $event->setResponse(new Response('OK')));
         $this->client->request(Request::METHOD_POST, '/mailer/callback');
 
         self::assertResponseIsSuccessful();
@@ -117,7 +117,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $entity = self::getContainer()->get(PageRepository::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
+        $entity = $this->getService(PageRepository::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
         $this->assertSame(1, $entity->getHits(), (string) $this->client->getResponse()->getContent());
     }
 
@@ -141,13 +141,12 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $this->assertCount(1, $crawler->filter('#success-message-text'), $this->client->getResponse()->getContent());
-        $expectedMessage = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.email.preferences_center_success_message.text');
+        $expectedMessage = $this->getService(TranslatorInterface::class)->trans('mautic.email.preferences_center_success_message.text');
         $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text(null, false)));
         $this->assertResponseIsSuccessful();
 
         // Assert that the contact has the DNC record now.
-        $dncRepository = $this->getContainer()->get(DoNotContactRepository::class);
-        $this->assertInstanceOf(DoNotContactRepository::class, $dncRepository);
+        $dncRepository = $this->getService(DoNotContactRepository::class);
         $dncRecords = $dncRepository->findBy(['lead' => $lead->getId()]);
         $this->assertCount(1, $dncRecords);
         $this->assertSame(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason());
@@ -327,7 +326,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
         $this->assertResponseIsSuccessful();
 
-        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
         $needle     = $translator->trans('mautic.page.form.saveprefs', [], null, $expectedLocale);
 
         $this->assertStringContainsString($needle, $crawler->html());
@@ -489,7 +488,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString($message, (string) $clientResponse->getContent());
-        $doNotContacts       = $this->getContainer()->get(DoNotContactRepository::class)->findBy(['lead' => $this->leadId]);
+        $doNotContacts       = $this->getService(DoNotContactRepository::class)->findBy(['lead' => $this->leadId]);
         $isAddedDoNotContact = (bool) count($doNotContacts);
         $addedDoNotContact   = $isAddedDoNotContact ? $doNotContacts[0] : null;
         $this->assertSame($addedRow, $isAddedDoNotContact);
@@ -516,8 +515,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $lead->setEmail($rightEmail);
         $this->em->persist($lead);
         // Email hash
-        /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper   = self::getContainer()->get(CoreParametersHelper::class);
+        $coreParametersHelper   = $this->getService(CoreParametersHelper::class);
         $configSecretEmailHash  = $coreParametersHelper->get('secret_key');
         $rightHashForWrongEmail = hash_hmac('sha256', $wrongEmail, $configSecretEmailHash);
         $rightHashForRightEmail = hash_hmac('sha256', $rightEmail, $configSecretEmailHash);
@@ -605,8 +603,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('We are sorry to see you go! john@doe.email will no longer receive emails from us. If this was by mistake, click here to re-subscribe.', strip_tags((string) $this->client->getResponse()->getContent()));
         self::assertResponseIsSuccessful();
 
-        /** @var DoNotContactRepository $dncRepository */
-        $dncRepository = $this->getContainer()->get(DoNotContactRepository::class);
+        $dncRepository = $this->getService(DoNotContactRepository::class);
 
         /** @var DoNotContact[] $dncRecords */
         $dncRecords = $dncRepository->findAll();
@@ -647,8 +644,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         // Assert that a DoNotContact record was created
-        /** @var DoNotContactRepository $dncRepository */
-        $dncRepository = $this->getContainer()->get(DoNotContactRepository::class);
+        $dncRepository = $this->getService(DoNotContactRepository::class);
 
         /** @var DoNotContact[] $dncRecords */
         $dncRecords = $dncRepository->findBy(['lead' => $lead]);

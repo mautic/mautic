@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Tests\Unit\Factory;
 
 use Mautic\CoreBundle\Factory\TransifexFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\Transifex\Connector\Resources;
 use Mautic\Transifex\Exception\MissingCredentialsException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -42,9 +41,8 @@ final class TransifexFactoryTest extends TestCase
             ->with('transifex_api_token')
             ->willReturn('the_api_key');
 
-        $transifex = $this->transifexFactory->getTransifex();
+        $this->transifexFactory->getTransifex();
 
         // Getting a connector validates the config, so this should throw an exception.
-        $this->assertInstanceOf(Resources::class, $transifex->getConnector(Resources::class));
     }
 }

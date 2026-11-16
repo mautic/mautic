@@ -33,7 +33,7 @@ final class MobileNotificationTranslationFunctionalTest extends MauticMysqlTestC
         $this->assertResponseIsSuccessful();
 
         // Assert
-        $childNotification = $this->getContainer()->get(NotificationRepository::class)->findOneBy(['name' => 'Child Notification']);
+        $childNotification = $this->getService(NotificationRepository::class)->findOneBy(['name' => 'Child Notification']);
         $this->assertInstanceOf(Notification::class, $childNotification);
         $this->assertInstanceOf(Notification::class, $childNotification->getTranslationParent());
         $this->assertSame($parentNotification->getId(), $childNotification->getTranslationParent()->getId());

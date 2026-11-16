@@ -53,8 +53,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
 
     private function createCompany(string $name, string $address1 = ''): Company
     {
-        /** @var CompanyModel $model */
-        $model   = self::getContainer()->get(CompanyModel::class);
+        $model   = $this->getService(CompanyModel::class);
         $company = new Company();
         $company->setIsPublished(true)->setName($name)->setAddress1($address1);
         $model->saveEntity($company);
@@ -78,7 +77,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         );
         $this->client->submit($form);
 
-        return $this->getContainer()->get(LeadRepository::class)->findOneBy(
+        return $this->getService(LeadRepository::class)->findOneBy(
             [
                 'firstname' => $firstName,
                 'email'     => $email,
@@ -151,8 +150,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
 
     private function setUpMailer(): void
     {
-        /** @var MailHelper $mailHelper */
-        $mailHelper = self::getContainer()->get(MailHelper::class);
+        $mailHelper = $this->getService(MailHelper::class);
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);
         ReflectionHelper::setValue($mailHelper, 'mailer', $mailer);

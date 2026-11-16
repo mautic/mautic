@@ -23,7 +23,6 @@ final class StatHelperPassTest extends TestCase
         $kernel->boot();
 
         $statHelperContainer = $kernel->getContainer()->get(StatHelperContainer::class);
-        $this->assertInstanceOf(StatHelperContainer::class, $statHelperContainer);
 
         $helpers = new \ReflectionProperty(StatHelperContainer::class, 'helpers')
             ->getValue($statHelperContainer);

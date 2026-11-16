@@ -69,7 +69,7 @@ final class EntityExportCommandTest extends MauticMysqlTestCase
 
     private function getTestCampaignId(): int
     {
-        $campaign = $this->getContainer()->get(CampaignRepository::class)->findOneBy(['name' => 'Test Campaign']);
+        $campaign = $this->getService(CampaignRepository::class)->findOneBy(['name' => 'Test Campaign']);
 
         return $campaign->getId();
     }

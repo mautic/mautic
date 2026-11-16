@@ -32,13 +32,12 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     public function testSavingPrimaryCompanyAfterPointsAreSetByListenerAreNotResetToDefaultOf0BecauseOfPointsFieldDefaultIs0(): void
     {
         /** @var EventDispatcher $eventDispatcher */
-        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        $eventDispatcher = $this->getService(EventDispatcherInterface::class);
         $eventDispatcher->addListener(LeadPostSaveEvent::class, $this->addPointsListener(...));
 
-        /** @var LeadModel $model */
-        $model = self::getContainer()->get(LeadModel::class);
+        $model = $this->getService(LeadModel::class);
         /** @var EntityManager $em */
-        $em   = self::getContainer()->get(EntityManagerInterface::class);
+        $em   = $this->getService(EntityManagerInterface::class);
 
         // Set company to trigger setPrimaryCompany()
         $lead = new Lead();
@@ -71,8 +70,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         $lead = $event->getLead();
         $lead->adjustPoints(10);
 
-        /** @var LeadModel $model */
-        $model = self::getContainer()->get(LeadModel::class);
+        $model = $this->getService(LeadModel::class);
         $model->saveEntity($lead);
     }
 
@@ -113,23 +111,19 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($contact);
         $this->em->flush();
 
-        /** @var LeadModel $leadModel */
-        $leadModel = $this->getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
         $leadModel->addToCompany($contact, $company);
         $leadModel->addToCompany($contact, $company2);
 
-        /** @var CompanyLeadRepository $companyLeadRepo */
-        $companyLeadRepo  = $this->getContainer()->get(CompanyLeadRepository::class);
+        $companyLeadRepo  = $this->getService(CompanyLeadRepository::class);
 
         return $companyLeadRepo->getCompaniesByLeadId($contact->getId());
     }
 
     public function testGetCustomLeadFieldLength(): void
     {
-        /** @var LeadModel $leadModel */
-        $leadModel  = $this->getContainer()->get(LeadModel::class);
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $leadModel  = $this->getService(LeadModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         // Create a lead field.
         $leadField = new LeadField();
@@ -179,8 +173,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     {
         $this->expectException(DBALException::class);
 
-        /** @var LeadModel $leadModel */
-        $leadModel  = $this->getContainer()->get(LeadModel::class);
+        $leadModel  = $this->getService(LeadModel::class);
         $leadModel->getCustomLeadFieldLength(['unknown_field']);
     }
 
@@ -190,8 +183,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('fieldValueProvider')]
     public function testSelectFieldSavesOnlyAllowedValuesInDB(string $selectFieldValue, ?string $expectedValue): void
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         // Create a lead field.
         $selectField = new LeadField();
@@ -207,8 +199,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($selectField);
         $this->em->clear();
 
-        /** @var LeadModel $leadModel */
-        $leadModel  = self::getContainer()->get(LeadModel::class);
+        $leadModel  = $this->getService(LeadModel::class);
 
         $fields = [
             'core' => [

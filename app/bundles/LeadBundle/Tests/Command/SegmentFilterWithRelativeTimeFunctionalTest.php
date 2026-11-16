@@ -23,7 +23,7 @@ final class SegmentFilterWithRelativeTimeFunctionalTest extends MauticMysqlTestC
         $segment = $this->saveSegment($hours);
 
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segment->getId()]);
-        $this->assertCount($hours, $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment->getId()]));
+        $this->assertCount($hours, $this->getService(ListLeadRepository::class)->findBy(['list' => $segment->getId()]));
     }
 
     /**
@@ -32,8 +32,7 @@ final class SegmentFilterWithRelativeTimeFunctionalTest extends MauticMysqlTestC
     private function saveContacts(): array
     {
         // Add 10 contacts
-        /** @var LeadRepository $contactRepo */
-        $contactRepo = $this->getContainer()->get(LeadRepository::class);
+        $contactRepo = $this->getService(LeadRepository::class);
         /** @var Lead[] $contacts */
         $contacts    = [];
 
@@ -52,8 +51,7 @@ final class SegmentFilterWithRelativeTimeFunctionalTest extends MauticMysqlTestC
 
     private function saveSegment(int $hours): LeadList
     {
-        /** @var LeadListRepository $segmentRepo */
-        $segmentRepo = $this->getContainer()->get(LeadListRepository::class);
+        $segmentRepo = $this->getService(LeadListRepository::class);
         $segment     = new LeadList();
         $filters     = [
             [
@@ -77,8 +75,7 @@ final class SegmentFilterWithRelativeTimeFunctionalTest extends MauticMysqlTestC
 
     public function testSegmentFilterWithRelativeTimeAndNonUtcTimezone(): void
     {
-        /** @var LeadRepository $contactRepo */
-        $contactRepo = $this->getContainer()->get(LeadRepository::class);
+        $contactRepo = $this->getService(LeadRepository::class);
         $contact     = new Lead();
         $contact->setFirstname('timezone');
         $contact->setLastname('test');
@@ -94,7 +91,7 @@ final class SegmentFilterWithRelativeTimeFunctionalTest extends MauticMysqlTestC
         try {
             $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segment->getId()]);
 
-            $this->assertCount(1, $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment->getId()]), 'Contact last active 30 min ago must be included in the "-1 hour" segment even when the system timezone is non-UTC.');
+            $this->assertCount(1, $this->getService(ListLeadRepository::class)->findBy(['list' => $segment->getId()]), 'Contact last active 30 min ago must be included in the "-1 hour" segment even when the system timezone is non-UTC.');
         } finally {
             ReflectionHelper::setStaticValue(DateTimeHelper::class, 'defaultLocalTimezone', $originalCachedTimezone);
         }

@@ -98,8 +98,7 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function getFirstAssetDownloadEvent(int $leadId): array
     {
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
         $payload   = $leadModel->getEngagements($leadModel->getEntity($leadId), []);
 
         // LeadTimelineEvent::getEvents() flattens events across all types into

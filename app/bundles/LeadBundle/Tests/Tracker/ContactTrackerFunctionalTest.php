@@ -22,13 +22,13 @@ final class ContactTrackerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->contactTracker = self::getContainer()->get(ContactTracker::class);
-        $this->requestStack   = self::getContainer()->get(RequestStack::class);
+        $this->contactTracker = $this->getService(ContactTracker::class);
+        $this->requestStack   = $this->getService(RequestStack::class);
     }
 
     public function testReset(): void
     {
-        self::getContainer()->get(TokenStorageInterface::class)->setToken(null);
+        $this->getService(TokenStorageInterface::class)->setToken(null);
         $this->contactTracker->setUseSystemContact(false);
 
         $contactOne = $this->createContact('test-one@domain.tld');

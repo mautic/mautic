@@ -18,8 +18,7 @@ final class ProjectEntityLookupLimitTest extends MauticMysqlTestCase
      */
     private function createTestEmails(): void
     {
-        /** @var EmailModel $emailModel */
-        $emailModel = self::getContainer()->get(EmailModel::class);
+        $emailModel = $this->getService(EmailModel::class);
 
         for ($i = 1; $i <= 2000; ++$i) {
             $email = new Email();

@@ -43,17 +43,13 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['update_segment_contact_count_in_background'] = 'testSegmentCountInBackground' === $this->name();
         $this->configParams['delete_segment_in_background']               = false;
         parent::setUp();
-        $this->listModel = self::getContainer()->get(ListModel::class);
-        $this->assertInstanceOf(ListModel::class, $this->listModel);
+        $this->listModel = $this->getService(ListModel::class);
         $this->listRepo = $this->listModel->getRepository();
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $leadModel);
-        $this->segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
+        $leadModel = $this->getService(LeadModel::class);
+        $this->segmentCountCacheHelper = $this->getService(SegmentCountCacheHelper::class);
         $this->leadRepo                = $leadModel->getRepository();
         $this->prefix                  = self::getContainer()->getParameter('mautic.db_table_prefix');
-        $this->translator              = self::getContainer()->get(TranslatorInterface::class);
-        $this->assertInstanceOf(TranslatorInterface::class, $this->translator);
+        $this->translator              = $this->getService(TranslatorInterface::class);
     }
 
     public function testBCSegmentWithPageHitInLeadObject(): void
@@ -100,8 +96,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $project = new Project();
         $project->setName('Test Project');
 
-        $projectModel = self::getContainer()->get(ProjectModel::class);
-        $this->assertInstanceOf(ProjectModel::class, $projectModel);
+        $projectModel = $this->getService(ProjectModel::class);
         $projectModel->saveEntity($project);
 
         $this->em->clear();
@@ -381,7 +376,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $segmentId = $segment->getId();
 
         // Number of segments before clone
-        $segmentsCountBefore = $this->getContainer()->get(LeadListRepository::class)->count([]);
+        $segmentsCountBefore = $this->getService(LeadListRepository::class)->count([]);
         // Go to clone segment action
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$segmentId);
         $this->assertResponseIsSuccessful();
@@ -394,7 +389,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         // Number of segments after clone
-        $segmentsCountAfter = $this->getContainer()->get(LeadListRepository::class)->count([]);
+        $segmentsCountAfter = $this->getService(LeadListRepository::class)->count([]);
         // Check that just one segment was created
         $this->assertSame($segmentsCountBefore + 1, $segmentsCountAfter);
     }
@@ -875,7 +870,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/view/'.$segment->getId());
         $this->assertResponseIsSuccessful();
 
-        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
 
         $this->assertStringContainsString($translator->trans('mautic.core.recent.activity'), (string) $this->client->getResponse()->getContent());
         $this->assertCount(2, $crawler->filterXPath('//ul[contains(@class, "media-list-feed")]/li'));

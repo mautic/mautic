@@ -18,7 +18,7 @@ final class PointInsightApiControllerTest extends MauticMysqlTestCase
     public function testPointInsightCRUDActions(): void
     {
         /** @var Translator $translator */
-        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
 
         $this->client->request(Request::METHOD_POST, '/api/points/insights/new', [
             'name'          => 'New Point Insight',

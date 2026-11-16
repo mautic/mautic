@@ -50,7 +50,7 @@ final class TransportChainTest extends MauticMysqlTestCase
 
         $this->transportChain = new TransportChain(
             'mautic.test.twilio.mock',
-            self::getContainer()->get(IntegrationHelper::class)
+            $this->getService(IntegrationHelper::class)
         );
 
         $this->twilioTransport = $this->createMock(TwilioTransport::class);
@@ -64,7 +64,7 @@ final class TransportChainTest extends MauticMysqlTestCase
     {
         $count = count($this->transportChain->getTransports());
 
-        $this->transportChain->addTransport('mautic.transport.test', self::getContainer()->get(TwilioTransport::class), 'mautic.transport.test', 'Twilio');
+        $this->transportChain->addTransport('mautic.transport.test', $this->getService(TwilioTransport::class), 'mautic.transport.test', 'Twilio');
 
         $this->assertCount($count + 1, $this->transportChain->getTransports());
     }
@@ -124,7 +124,7 @@ final class TransportChainTest extends MauticMysqlTestCase
 
     private function createDataAndAssertSendMessage(TransportInterface $transport): void
     {
-        $transportChain = new class('mautic.test.bulktwilio.mock', self::getContainer()->get(IntegrationHelper::class)) extends TransportChain {
+        $transportChain = new class('mautic.test.bulktwilio.mock', $this->getService(IntegrationHelper::class)) extends TransportChain {
             public function getEnabledTransports(): array
             {
                 $transports = $this->getTransports();

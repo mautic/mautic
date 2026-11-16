@@ -23,16 +23,14 @@ final class NotifierTest extends MauticMysqlTestCase
     {
         $this->installDatabaseFixtures([LoadLeadData::class]);
 
-        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+        $leadRepository = $this->getService(LeadRepository::class);
         /** @var Lead[] $leads */
         $leads = $leadRepository->findBy([], [], 2);
 
-        /** @var SyncIntegrationsHelper $syncIntegrationsHelper */
-        $syncIntegrationsHelper = self::getContainer()->get(SyncIntegrationsHelper::class);
+        $syncIntegrationsHelper = $this->getService(SyncIntegrationsHelper::class);
         $syncIntegrationsHelper->addIntegration(new ExampleIntegration(new ExampleSyncDataExchange()));
 
-        /** @var Notifier $notifier */
-        $notifier = self::getContainer()->get(Notifier::class);
+        $notifier = $this->getService(Notifier::class);
 
         $contactNotification = new NotificationDAO(
             new ObjectChangeDAO(

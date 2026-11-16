@@ -14,7 +14,7 @@ final class TranslatorTest extends AbstractMauticTestCase
     public function testMissingPluralOptions(): void
     {
         /** @var Translator $translator */
-        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
         $fallback   = 'en_US';
         $locale     = 'ru';
 

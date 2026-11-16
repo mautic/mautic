@@ -28,8 +28,7 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
 
     public function testConditionalFieldsPreserveOrderAfterDatabaseSave(): void
     {
-        /** @var FormModel $formModel */
-        $formModel = self::getContainer()->get(FormModel::class);
+        $formModel = $this->getService(FormModel::class);
 
         // Parent session key must contain 'new' so FormConditionalSubscriber resolves it to a persisted field ID.
         $sessionFields = ConditionalFieldOrderTestData::createSessionFields([
@@ -216,8 +215,7 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
     {
         $multiselectFieldId = $this->createMultiselectLeadField();
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel       = $this->getContainer()->get(FieldModel::class);
+        $fieldModel       = $this->getService(FieldModel::class);
         $multiselectField = $fieldModel->getEntity($multiselectFieldId);
         $this->assertInstanceOf(LeadField::class, $multiselectField);
         $fieldAlias       = $multiselectField->getAlias();
@@ -233,8 +231,7 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
 
         $this->logoutUser();
 
-        /** @var ContactTracker $contactTracker */
-        $contactTracker = $this->getContainer()->get(ContactTracker::class);
+        $contactTracker = $this->getService(ContactTracker::class);
         $contactTracker->setTrackedContact($lead);
 
         $this->client->request(Request::METHOD_GET, "/form/{$formId}");
@@ -291,16 +288,14 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        /** @var FormModel $formModel */
-        $formModel = $this->getContainer()->get(FormModel::class);
+        $formModel = $this->getService(FormModel::class);
 
         return $formModel->getEntity($response['form']['id']);
     }
 
     private function createMultiselectLeadField(): int
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $alias      = 'test_multiselect_'.uniqid();
 
         $field = new LeadField();

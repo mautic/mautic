@@ -39,7 +39,7 @@ final class ImportUrlValidationTest extends MauticMysqlTestCase
         $field->setAlias('website_url');
         $field->setName('website_url');
 
-        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntity($field);
 
         // Create Import entity manually (same as working test)
@@ -52,7 +52,7 @@ final class ImportUrlValidationTest extends MauticMysqlTestCase
 
         $this->assertStringContainsString('4 lines were processed, 2 items created, 0 items updated, 2 items ignored', $display);
 
-        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+        $leadRepository = $this->getService(LeadRepository::class);
 
         $this->assertInstanceOf(Lead::class, $leadRepository->findOneBy(['email' => 'ok1@a.com']));
         $this->assertInstanceOf(Lead::class, $leadRepository->findOneBy(['email' => 'ok2@a.com']));
@@ -131,10 +131,9 @@ final class ImportUrlValidationTest extends MauticMysqlTestCase
         ];
 
         $import->setProperties($properties);
-        self::getContainer()->get(UserTokenSetter::class)->setUser($import->getCreatedBy());
+        $this->getService(UserTokenSetter::class)->setUser($import->getCreatedBy());
 
-        /** @var ImportModel $importModel */
-        $importModel = self::getContainer()->get(ImportModel::class);
+        $importModel = $this->getService(ImportModel::class);
         $importModel->saveEntity($import);
 
         return $import;

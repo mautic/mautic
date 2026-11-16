@@ -54,7 +54,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('sendToDncStatus', $content);
         $this->assertSame($sendToDnc, $content['sendToDncStatus']);
         $this->assertSame(
-            self::getContainer()->get(TranslatorInterface::class)->trans($expectedTranslationKey),
+            $this->getService(TranslatorInterface::class)->trans($expectedTranslationKey),
             $content['sendToDncText']
         );
     }
@@ -80,8 +80,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSendTestEmailAction(): void
     {
-        /** @var CoreParametersHelper $parameters */
-        $parameters = self::getContainer()->get(CoreParametersHelper::class);
+        $parameters = $this->getService(CoreParametersHelper::class);
 
         $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendTestEmail');
         self::assertResponseIsSuccessful();
@@ -92,8 +91,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $email = KernelTestCase::getMailerMessage();
         $this->assertInstanceOf(EmailMime::class, $email);
 
-        /** @var UserHelper $userHelper */
-        $userHelper = self::getContainer()->get(UserHelper::class);
+        $userHelper = $this->getService(UserHelper::class);
         $user       = $userHelper->getUser();
 
         $this->assertSame('Mautic test email', $email->getSubject());
@@ -307,8 +305,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     {
         $dispatchedEvent = null;
 
-        self::getContainer()
-            ->get(EventDispatcherInterface::class)
+        $this->getService(EventDispatcherInterface::class)
             ->addListener(EntityTogglePublishEvent::class, function (EntityTogglePublishEvent $event) use (&$dispatchedEvent): void {
                 $dispatchedEvent = $event;
             });
@@ -326,7 +323,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->assertResponseIsSuccessful();
 
-        $email = $this->getContainer()->get(EmailRepository::class)->find($email->getId());
+        $email = $this->getService(EmailRepository::class)->find($email->getId());
         $this->assertInstanceOf(Email::class, $email);
         $this->assertFalse($email->isPublished(), 'The email should not be published.');
         $this->assertInstanceOf(EntityTogglePublishEvent::class, $dispatchedEvent, 'The event should have been dispatched.');

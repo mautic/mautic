@@ -26,7 +26,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $this->sMimeHelper = self::getContainer()->get(SMimeHelper::class);
+        $this->sMimeHelper = $this->getService(SMimeHelper::class);
     }
 
     protected function beforeTearDown(): void
@@ -88,9 +88,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
     public function testSMimeWithEncryptedPrivateKey(): void
     {
-        /** @var EncryptionHelper $encryptionHelper */
-        $encryptionHelper = self::getContainer()->get(EncryptionHelper::class);
-        $this->assertInstanceOf(EncryptionHelper::class, $encryptionHelper);
+        $encryptionHelper = $this->getService(EncryptionHelper::class);
 
         $certPath       = $this->sMimeHelper->getSMimeCertificatePath();
         $privateKeyPath = $certPath.'/admin@test-beta.mautibot.com.pem';

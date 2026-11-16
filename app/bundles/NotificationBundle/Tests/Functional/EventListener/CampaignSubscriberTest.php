@@ -409,7 +409,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
     public function testNotificationsSentInBatches(): void
     {
-        $subscriber = new class(self::getContainer()->get(OneSignalIntegrationHelper::class), self::getContainer()->get(NotificationModel::class), self::getContainer()->get(OneSignalApi::class), self::getContainer()->get(EventDispatcherInterface::class), self::getContainer()->get(DoNotContactModel::class), self::getContainer()->get(TranslatorInterface::class), self::getContainer()->get(NotificationRepository::class)) extends CampaignSubscriber {
+        $subscriber = new class($this->getService(OneSignalIntegrationHelper::class), $this->getService(NotificationModel::class), $this->getService(OneSignalApi::class), $this->getService(EventDispatcherInterface::class), $this->getService(DoNotContactModel::class), $this->getService(TranslatorInterface::class), $this->getService(NotificationRepository::class)) extends CampaignSubscriber {
             protected const int MAX_PLAYER_IDS_PER_REQUEST = 2;
         };
         self::getContainer()->set(CampaignSubscriber::class, $subscriber);
@@ -545,7 +545,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
     private function convertToTrackedUrl(Notification $notification, Lead $leadOne): string
     {
         /** @var AbstractNotificationApi $api */
-        $api          = self::getContainer()->get(OneSignalApi::class);
+        $api          = $this->getService(OneSignalApi::class);
         $clickThrough = [
             'notification' => $notification->getId(),
             'lead'         => $leadOne->getId(),
@@ -580,7 +580,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
     private function findEventLog(CampaignEvent $event, Lead $leadOne): LeadEventLog
     {
-        $log = $this->getContainer()->get(LeadEventLogRepository::class)->findOneBy([
+        $log = $this->getService(LeadEventLogRepository::class)->findOneBy([
             'event'    => $event->getId(),
             'lead'     => $leadOne,
             'rotation' => 1,

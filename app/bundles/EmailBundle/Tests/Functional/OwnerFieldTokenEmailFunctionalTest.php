@@ -52,8 +52,7 @@ final class OwnerFieldTokenEmailFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
 
-        /** @var EmailModel $emailModel */
-        $emailModel = self::getContainer()->get(EmailModel::class);
+        $emailModel = $this->getService(EmailModel::class);
         $emailModel->sendEmail(
             $email,
             [
@@ -67,8 +66,7 @@ final class OwnerFieldTokenEmailFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        /** @var StatRepository $emailStatRepository */
-        $emailStatRepository = $this->getContainer()->get(StatRepository::class);
+        $emailStatRepository = $this->getService(StatRepository::class);
 
         /** @var Stat|null $emailStat */
         $emailStat = $emailStatRepository->findOneBy(

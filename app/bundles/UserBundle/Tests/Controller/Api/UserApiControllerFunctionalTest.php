@@ -13,7 +13,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -181,8 +180,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $user->setPassword($hasher->hash($password));
         $user->setRole($role);
         $this->em->persist($user);
@@ -231,7 +229,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertArrayHasKey('username', $responseData);
 
             // Verify the user was actually created in the database
-            $userRepository = $this->getContainer()->get(UserRepository::class);
+            $userRepository = $this->getService(UserRepository::class);
             $user           = $userRepository->find($responseData['id']);
 
             $this->assertInstanceOf(User::class, $user);
@@ -241,8 +239,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertSame($userData['email'], $user->getEmail());
 
             // Verify the password was hashed correctly by checking if we can verify it
-            $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-            $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+            $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
             $this->assertTrue(
                 $hasher->verify($user->getPassword(), $userData['plainPassword']),
                 'Password should be properly hashed and verifiable'

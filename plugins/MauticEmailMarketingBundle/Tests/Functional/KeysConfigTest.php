@@ -100,7 +100,7 @@ final class KeysConfigTest extends MauticMysqlTestCase
     {
         // Loading the plugin list routes the config page to the IntegrationsBundle controller
         $this->client->request('GET', '/s/plugins');
-        $crawler = $this->client->request('GET', self::getContainer()->get(RouterInterface::class)->generate('mautic_plugin_config', ['name' => $integration]));
+        $crawler = $this->client->request('GET', $this->getService(RouterInterface::class)->generate('mautic_plugin_config', ['name' => $integration]));
         $this->assertResponseIsSuccessful();
 
         return $crawler;
@@ -134,7 +134,7 @@ final class KeysConfigTest extends MauticMysqlTestCase
         return [
             'isPublished'       => (bool) $row['is_published'],
             'supportedFeatures' => Serializer::decode((string) $row['supported_features']),
-            'apiKeys'           => is_array($apiKeys) ? self::getContainer()->get(EncryptionService::class)->decrypt($apiKeys) : [],
+            'apiKeys'           => is_array($apiKeys) ? $this->getService(EncryptionService::class)->decrypt($apiKeys) : [],
         ];
     }
 }

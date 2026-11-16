@@ -25,7 +25,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->campaignSubscriber = self::getContainer()->get(CampaignSubscriber::class);
+        $this->campaignSubscriber = $this->getService(CampaignSubscriber::class);
     }
 
     public function testCampaignTriggerConditionLeadIsInCampaign(): void
@@ -85,8 +85,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $field->setGroup('core');
         $field->setAlias($fieldDetails['alias']);
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 

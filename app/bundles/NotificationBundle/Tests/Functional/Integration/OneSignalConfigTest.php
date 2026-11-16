@@ -19,7 +19,7 @@ final class OneSignalConfigTest extends MauticMysqlTestCase
 {
     public function testHelperReturnsNullWithoutSettingsRow(): void
     {
-        $this->assertNull(self::getContainer()->get(OneSignalIntegrationHelper::class)->getIntegration());
+        $this->assertNull($this->getService(OneSignalIntegrationHelper::class)->getIntegration());
     }
 
     public function testConfigFormSavesKeysEncryptedAndFeatureSettingsUnderIntegrationKey(): void
@@ -46,7 +46,7 @@ final class OneSignalConfigTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->em->clear();
-        $settings = self::getContainer()->get(IntegrationRepository::class)->findOneBy(['name' => OneSignalIntegration::NAME]);
+        $settings = $this->getService(IntegrationRepository::class)->findOneBy(['name' => OneSignalIntegration::NAME]);
         $this->assertInstanceOf(Integration::class, $settings);
         $this->assertTrue($settings->getIsPublished());
         $this->assertSame(['mobile', 'landing_page_enabled'], $settings->getSupportedFeatures());
@@ -54,17 +54,17 @@ final class OneSignalConfigTest extends MauticMysqlTestCase
         $this->assertNotSame('rest-key', $settings->getApiKeys()['rest_api_key']);
         $this->assertSame(
             ['app_id' => 'app-id', 'safari_web_id' => 'safari-id', 'rest_api_key' => 'rest-key', 'gcm_sender_id' => 'gcm-id'],
-            self::getContainer()->get(EncryptionService::class)->decrypt($settings->getApiKeys())
+            $this->getService(EncryptionService::class)->decrypt($settings->getApiKeys())
         );
     }
 
     public function testHelperReturnsPublishedIntegrationWithDecryptedKeys(): void
     {
         $settings = new Integration();
-        $settings->setApiKeys(self::getContainer()->get(EncryptionService::class)->encrypt(['rest_api_key' => 'rest-key']));
+        $settings->setApiKeys($this->getService(EncryptionService::class)->encrypt(['rest_api_key' => 'rest-key']));
         $this->saveSettings($settings, true, ['integration' => ['platforms' => ['android']]]);
 
-        $integration = self::getContainer()->get(OneSignalIntegrationHelper::class)->getPublishedIntegration();
+        $integration = $this->getService(OneSignalIntegrationHelper::class)->getPublishedIntegration();
 
         $this->assertInstanceOf(OneSignalIntegration::class, $integration);
         $this->assertSame(['rest_api_key' => 'rest-key'], $integration->getIntegrationConfiguration()->getApiKeys());
@@ -75,7 +75,7 @@ final class OneSignalConfigTest extends MauticMysqlTestCase
     {
         $this->saveSettings(new Integration(), false, []);
 
-        $helper = self::getContainer()->get(OneSignalIntegrationHelper::class);
+        $helper = $this->getService(OneSignalIntegrationHelper::class);
 
         $this->assertInstanceOf(OneSignalIntegration::class, $helper->getIntegration());
         $this->assertNull($helper->getPublishedIntegration());
@@ -96,7 +96,7 @@ final class OneSignalConfigTest extends MauticMysqlTestCase
         $this->assertCount(4, $crawler->filter('.has-error #integration_config_apiKeys_app_id, .has-error #integration_config_apiKeys_safari_web_id, .has-error #integration_config_apiKeys_rest_api_key, .has-error #integration_config_apiKeys_gcm_sender_id'));
 
         $this->em->clear();
-        $settings = self::getContainer()->get(IntegrationRepository::class)->findOneBy(['name' => OneSignalIntegration::NAME]);
+        $settings = $this->getService(IntegrationRepository::class)->findOneBy(['name' => OneSignalIntegration::NAME]);
         $this->assertInstanceOf(Integration::class, $settings);
         $this->assertFalse($settings->getIsPublished());
     }
@@ -115,7 +115,7 @@ final class OneSignalConfigTest extends MauticMysqlTestCase
         $migration->up($schema);
 
         $this->em->clear();
-        $settings = self::getContainer()->get(IntegrationRepository::class)->find($settings->getId());
+        $settings = $this->getService(IntegrationRepository::class)->find($settings->getId());
         $this->assertInstanceOf(Integration::class, $settings);
         $this->assertSame(
             ['integration' => ['subdomain_name' => 'acme', 'platforms' => ['ios', 'android']]],

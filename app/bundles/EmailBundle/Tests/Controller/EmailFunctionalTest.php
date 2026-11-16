@@ -6,7 +6,6 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Exception\ORMException;
-use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
@@ -102,14 +101,12 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
         ], $email->getExcludedLists());
 
         // assert audit log
-        $auditLogs = $this->getContainer()->get(AuditLogRepository::class)->findBy([
+        $auditLogs = $this->getService(AuditLogRepository::class)->findBy([
             'bundle' => 'email',
             'object' => 'email',
         ]);
         $this->assertCount(1, $auditLogs);
-        /** @var AuditLog $auditLog */
         $auditLog = reset($auditLogs);
-        $this->assertInstanceOf(AuditLog::class, $auditLog);
         $details = $auditLog->getDetails();
         $this->assertIsArray($details);
         $this->assertArrayHasKey('lists', $details);
@@ -157,15 +154,13 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame($preferenceCenterTwo->getId(), $email->getPreferenceCenter()->getId());
 
-        $auditLogs = $this->getContainer()->get(AuditLogRepository::class)->findBy([
+        $auditLogs = $this->getService(AuditLogRepository::class)->findBy([
             'bundle' => 'email',
             'object' => 'email',
         ]);
         $this->assertCount(1, $auditLogs);
 
-        /** @var AuditLog $auditLog */
         $auditLog = reset($auditLogs);
-        $this->assertInstanceOf(AuditLog::class, $auditLog);
 
         $details = $auditLog->getDetails();
         $this->assertIsArray($details);

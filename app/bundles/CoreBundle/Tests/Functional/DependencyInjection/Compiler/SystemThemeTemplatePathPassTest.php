@@ -18,9 +18,7 @@ final class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
 
         // This test require cache to be cleared
         // as the template override must exist before the cache is generated.
-        /** @var PathsHelper $pathsHelper */
-        $pathsHelper = self::getContainer()->get(PathsHelper::class);
-        $this->assertInstanceOf(PathsHelper::class, $pathsHelper);
+        $pathsHelper = $this->getService(PathsHelper::class);
         $cacheDir    = $pathsHelper->getCachePath();
 
         $filesystem = new Filesystem();
@@ -58,8 +56,7 @@ final class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
 
     private function getOverridePath(): string
     {
-        /** @var PathsHelper $pathsHelper */
-        $pathsHelper = self::getContainer()->get(PathsHelper::class);
+        $pathsHelper = $this->getService(PathsHelper::class);
 
         return $pathsHelper->getThemesPath().'/system/UserBundle/Resources/views/Profile';
     }

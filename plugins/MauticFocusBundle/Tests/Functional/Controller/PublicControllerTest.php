@@ -54,7 +54,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/focus/%s.js', $focus->getId()));
         $content = $this->client->getResponse()->getContent();
 
-        $redirects = $this->getContainer()->get(RedirectRepository::class)->findAll();
+        $redirects = $this->getService(RedirectRepository::class)->findAll();
         $this->assertCount(1, $redirects);
 
         /** @var Redirect $redirect */
@@ -62,7 +62,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $this->assertSame($linkUrl, $redirect->getUrl());
 
         $url  = $this->router->generate('mautic_url_redirect', ['redirectId' => $redirect->getRedirectId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $twig = $this->getContainer()->get(Environment::class);
+        $twig = $this->getService(Environment::class);
         if (!$twig->hasExtension(EscaperExtension::class)) {
             $twig->addExtension(new EscaperExtension());
         }

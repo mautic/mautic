@@ -108,12 +108,10 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
         $field->setAlias('unknown');
         $field->setLabel('Unknown');
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntity($field);
 
-        /** @var ColumnSchemaHelper $columnSchemaHelper */
-        $columnSchemaHelper = $this->getContainer()->get(ColumnSchemaHelper::class);
+        $columnSchemaHelper = $this->getService(ColumnSchemaHelper::class);
         $columnSchemaHelper->setName('leads')->dropColumn($field->getAlias())->executeChanges();
 
         $output = $this->testSymfonyCommand('mautic:fields:analyse');
@@ -139,8 +137,7 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
             $field->setCharLengthLimit($fieldDetails['limit']);
         }
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 
@@ -160,8 +157,7 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
             $lead->addUpdatedField($alias, $fieldDetail['value']);
         }
 
-        /** @var LeadModel $leadModel */
-        $leadModel = $this->getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
         $leadModel->saveEntity($lead);
     }
 

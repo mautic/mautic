@@ -16,7 +16,7 @@ final class SegmentCountCacheHelperTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->segmentCountCacheHelper = $this->getContainer()->get(SegmentCountCacheHelper::class);
+        $this->segmentCountCacheHelper = $this->getService(SegmentCountCacheHelper::class);
 
         // Delete the cache before each test starts.
         $this->segmentCountCacheHelper->setSegmentContactCount(self::SEGMENT_ID, 20);

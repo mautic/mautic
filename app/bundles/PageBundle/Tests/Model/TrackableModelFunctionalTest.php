@@ -16,7 +16,7 @@ final class TrackableModelFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->trackableModel = self::getContainer()->get(TrackableModel::class);
+        $this->trackableModel = $this->getService(TrackableModel::class);
     }
 
     /**

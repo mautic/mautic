@@ -21,7 +21,7 @@ final class FocusModelFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->focusModel = self::getContainer()->get(FocusModel::class);
+        $this->focusModel = $this->getService(FocusModel::class);
         $this->lead       = $this->createLead();
     }
 

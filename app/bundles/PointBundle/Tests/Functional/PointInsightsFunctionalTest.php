@@ -21,11 +21,9 @@ final class PointInsightsFunctionalTest extends MauticMysqlTestCase
 
     public function testPointInsightExecutionWithSingleWinner(): void
     {
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
 
-        /** @var PointGroupModel $pointGroupModel */
-        $pointGroupModel = self::getContainer()->get(PointGroupModel::class);
+        $pointGroupModel = $this->getService(PointGroupModel::class);
 
         $groupA      = $this->createGroup('Group A');
         $groupB      = $this->createGroup('Group B');
@@ -53,11 +51,9 @@ final class PointInsightsFunctionalTest extends MauticMysqlTestCase
 
     public function testPointInsightExecutionWithTieBreaker(): void
     {
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
 
-        /** @var PointGroupModel $pointGroupModel */
-        $pointGroupModel = self::getContainer()->get(PointGroupModel::class);
+        $pointGroupModel = $this->getService(PointGroupModel::class);
 
         $groupA      = $this->createGroup('Group A');
         $groupB      = $this->createGroup('Group B');
@@ -97,11 +93,9 @@ final class PointInsightsFunctionalTest extends MauticMysqlTestCase
 
     public function testPointInsightExecutionForMultipleContacts(): void
     {
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
 
-        /** @var PointGroupModel $pointGroupModel */
-        $pointGroupModel = self::getContainer()->get(PointGroupModel::class);
+        $pointGroupModel = $this->getService(PointGroupModel::class);
 
         $groupA      = $this->createGroup('Multi Group A');
         $groupB      = $this->createGroup('Multi Group B');
@@ -183,8 +177,7 @@ final class PointInsightsFunctionalTest extends MauticMysqlTestCase
 
     private function createCustomField(string $alias): LeadField
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         $field = new LeadField();
         $field->setLabel(ucfirst(str_replace('_', ' ', $alias)));

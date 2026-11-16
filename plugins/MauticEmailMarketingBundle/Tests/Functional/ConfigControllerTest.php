@@ -76,7 +76,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
 
     public function testAccountConnectedThroughOauthCanBePublishedWithoutApiKeyAndKeepsItsToken(): void
     {
-        $this->integration->setApiKeys(self::getContainer()->get(EncryptionService::class)->encrypt([
+        $this->integration->setApiKeys($this->getService(EncryptionService::class)->encrypt([
             'client_id'     => 'client',
             'client_secret' => 'secret',
             'access_token'  => 'token',
@@ -98,7 +98,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
     {
         // Loading the plugin list routes the config page to the IntegrationsBundle controller
         $this->client->request('GET', '/s/plugins');
-        $crawler = $this->client->request('GET', self::getContainer()->get(RouterInterface::class)->generate('mautic_plugin_config', ['name' => 'Mailchimp']));
+        $crawler = $this->client->request('GET', $this->getService(RouterInterface::class)->generate('mautic_plugin_config', ['name' => 'Mailchimp']));
         $this->assertResponseIsSuccessful();
 
         return $crawler;
@@ -133,7 +133,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
         return [
             'isPublished'       => (bool) $row['is_published'],
             'supportedFeatures' => Serializer::decode((string) $row['supported_features']),
-            'apiKeys'           => self::getContainer()->get(EncryptionService::class)->decrypt($apiKeys),
+            'apiKeys'           => $this->getService(EncryptionService::class)->decrypt($apiKeys),
         ];
     }
 }

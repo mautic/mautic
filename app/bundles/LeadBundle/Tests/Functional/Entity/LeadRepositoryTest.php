@@ -37,7 +37,7 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
     #[DataProvider('joinIpAddressesProvider')]
     public function testSaveIpAddressToContacts(array $args): void
     {
-        $contactRepo = self::getContainer()->get(LeadRepository::class);
+        $contactRepo = $this->getService(LeadRepository::class);
 
         $ip      = new IpAddress('127.0.0.1');
         $contact = new Lead();

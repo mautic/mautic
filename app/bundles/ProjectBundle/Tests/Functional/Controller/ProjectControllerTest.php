@@ -15,7 +15,6 @@ use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ProjectControllerTest extends MauticMysqlTestCase
 {
@@ -34,8 +33,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
             'project4',
         ];
 
-        /** @var ProjectModel $projectModel */
-        $projectModel            = self::getContainer()->get(ProjectModel::class);
+        $projectModel            = $this->getService(ProjectModel::class);
         $this->projectRepository = $projectModel->getRepository();
 
         foreach ($projects as $projectName) {
@@ -227,8 +225,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     {
         // Create non-admin role
         $role = $this->createRole();
-        /** @var RoleModel $roleModel */
-        $roleModel = self::getContainer()->get(RoleModel::class);
+        $roleModel = $this->getService(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
         // Create non-admin user
         $user = $this->createUser($role);
@@ -261,8 +258,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername(self::USERNAME);
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $user->setPassword($hasher->hash('mautic'));
         $user->setRole($role);
 

@@ -23,8 +23,7 @@ final class RoleRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        /** @var RoleRepository $repo */
-        $repo = $this->getContainer()->get(RoleRepository::class);
+        $repo = $this->getService(RoleRepository::class);
 
         $expected = [
             $roleOne->getId() => '2',

@@ -171,7 +171,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertArrayHasKey('score', $responseData);
 
             // Verify the company was actually created in the database
-            $companyRepository = $this->getContainer()->get(CompanyRepository::class);
+            $companyRepository = $this->getService(CompanyRepository::class);
             $company           = $companyRepository->find($responseData['id']);
 
             $this->assertInstanceOf(Company::class, $company);
@@ -422,7 +422,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
      */
     protected function markCompanyEmailAsUnique(): void
     {
-        $fieldRepository   = $this->getContainer()->get(LeadFieldRepository::class);
+        $fieldRepository   = $this->getService(LeadFieldRepository::class);
         $companyEmailField = $fieldRepository->findOneBy(['alias' => 'companyemail']);
         $this->assertInstanceOf(LeadField::class, $companyEmailField);
         $companyEmailField->setIsUniqueIdentifer(true);
@@ -433,12 +433,12 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
     private function getCompanyRepository(): CompanyRepository
     {
         /** @var CompanyRepository */
-        return $this->getContainer()->get(CompanyRepository::class);
+        return $this->getService(CompanyRepository::class);
     }
 
     private function getContactRepository(): LeadRepository
     {
         /** @var LeadRepository */
-        return $this->getContainer()->get(LeadRepository::class);
+        return $this->getService(LeadRepository::class);
     }
 }

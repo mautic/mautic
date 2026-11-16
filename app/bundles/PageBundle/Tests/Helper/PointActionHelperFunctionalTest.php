@@ -18,7 +18,7 @@ final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->pointActionHelper = $this->getContainer()->get(PointActionHelper::class);
+        $this->pointActionHelper = $this->getService(PointActionHelper::class);
     }
 
     #[DataProvider('provideReturnsWithinAndAfterCases')]

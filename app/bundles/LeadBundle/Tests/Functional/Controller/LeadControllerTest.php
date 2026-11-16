@@ -19,7 +19,6 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class LeadControllerTest extends MauticMysqlTestCase
@@ -64,8 +63,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $contactExportScheduler     = $contactExportSchedulerRows[0];
         $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
-        /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper    = self::getContainer()->get(CoreParametersHelper::class);
+        $coreParametersHelper    = $this->getService(CoreParametersHelper::class);
         $zipFileName             = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
                 ->format('Y_m_d_H_i_s').'.zip';
         $this->filePaths[] = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
@@ -117,12 +115,11 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler = $this->checkContactExportScheduler(1)[0];
-        /** @var DateHelper $dateHelper */
-        $dateHelper             = self::getContainer()->get(DateHelper::class);
+        $dateHelper             = $this->getService(DateHelper::class);
         $requestedAt            = $dateHelper->toFull($this->getScheduledDateTimeForDisplay($contactExportScheduler));
-        $requestingAdmin        = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $requestingAdmin        = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
 
-        $requesterNotifications = $this->getContainer()->get(NotificationRepository::class)->findBy(
+        $requesterNotifications = $this->getService(NotificationRepository::class)->findBy(
             [
                 'user'   => $requestingAdmin,
                 'header' => 'mautic.lead.export.being.prepared.header',
@@ -130,7 +127,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         );
         $this->assertCount(1, $requesterNotifications);
 
-        $adminNotifications = $this->getContainer()->get(NotificationRepository::class)->findBy(
+        $adminNotifications = $this->getService(NotificationRepository::class)->findBy(
             [
                 'user'   => $secondaryAdmin,
                 'header' => 'mautic.lead.export.admin.notification.header',
@@ -144,7 +141,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString($requestedAt, (string) $adminNotifications[0]->getMessage());
         $this->assertStringNotContainsString('http', (string) $adminNotifications[0]->getMessage());
 
-        $requesterAdminNotifications = $this->getContainer()->get(NotificationRepository::class)->findBy(
+        $requesterAdminNotifications = $this->getService(NotificationRepository::class)->findBy(
             [
                 'user'   => $requestingAdmin,
                 'header' => 'mautic.lead.export.admin.notification.header',
@@ -152,7 +149,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         );
         $this->assertCount(0, $requesterAdminNotifications);
 
-        $nonAdminNotifications = $this->getContainer()->get(NotificationRepository::class)->findBy(
+        $nonAdminNotifications = $this->getService(NotificationRepository::class)->findBy(
             [
                 'user'   => $user,
                 'header' => 'mautic.lead.export.admin.notification.header',
@@ -190,16 +187,14 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler = $this->checkContactExportScheduler(1)[0];
-        $requestingAdmin        = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
-        /** @var DateHelper $dateHelper */
-        $dateHelper      = self::getContainer()->get(DateHelper::class);
+        $requestingAdmin        = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $dateHelper      = $this->getService(DateHelper::class);
         $requestedAt     = $dateHelper->toFull($this->getScheduledDateTimeForDisplay($contactExportScheduler));
 
         $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
 
-        /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
+        $coreParametersHelper = $this->getService(CoreParametersHelper::class);
         $zipFileName          = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()->format('Y_m_d_H_i_s').'.zip';
         $this->filePaths[]    = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
         $downloadLink         = $this->router->generate(
@@ -258,8 +253,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             $contacts[] = $contact;
         }
 
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
         $leadModel->saveEntities($contacts);
     }
 
@@ -268,7 +262,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
      */
     private function checkContactExportScheduler(int $count): array
     {
-        $repo    = $this->getContainer()->get(ContactExportSchedulerRepository::class);
+        $repo    = $this->getService(ContactExportSchedulerRepository::class);
         $allRows = $repo->findAll();
         $this->assertCount($count, $allRows);
 
@@ -292,7 +286,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
     private function setAdminUser(): void
     {
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', 'admin');
@@ -355,8 +349,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername($username);
         $user->setEmail($email);
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
         $user->setIsPublished(true);

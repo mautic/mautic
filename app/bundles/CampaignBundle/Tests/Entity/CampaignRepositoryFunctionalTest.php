@@ -22,7 +22,7 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->repository = self::getContainer()->get(CampaignRepository::class);
+        $this->repository = $this->getService(CampaignRepository::class);
     }
 
     public function testGetCountsForPendingContactsWithEmptyData(): void

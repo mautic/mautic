@@ -24,7 +24,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testWidgetWithReport(): void
     {
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy([]);
+        $user = $this->getService(UserRepository::class)->findOneBy([]);
 
         $report = new Report();
         $report->setName('Lead and points');
@@ -70,7 +70,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testWidgetWithBestHours(): void
     {
-        $user    = $this->getContainer()->get(UserRepository::class)->findOneBy([]);
+        $user    = $this->getService(UserRepository::class)->findOneBy([]);
         $segment = $this->createSegment('A', 'a');
         $widget  = new Widget();
         $widget->setName('Best email read hours');
@@ -107,7 +107,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testWidgetWithSegmentBuildTime(): void
     {
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy([]);
+        $user = $this->getService(UserRepository::class)->findOneBy([]);
         $this->assertInstanceOf(User::class, $user);
         $this->createSegment('A', 'a', 3, $user);
         $this->createSegment('B', 'b', 60, $user);
@@ -152,7 +152,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testAuditLogWidgetWithDeletedContact(): void
     {
-        $user   = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user   = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
         $widget = new Widget();
         $widget->setName('Recent activity');
         $widget->setType('recent.activity');
@@ -164,9 +164,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $contact = new Lead();
         $contact->setFirstName('John');
-        /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $contactModel);
+        $contactModel = $this->getService(LeadModel::class);
         $contactModel->saveEntity($contact);
         $contactModel->deleteEntity($contact);
         $this->em->clear();
@@ -217,7 +215,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testUpcomingEmailsWidget(): void
     {
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
 
         $widget = new Widget();
         $widget->setName('Upcoming Emails');

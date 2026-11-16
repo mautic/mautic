@@ -56,8 +56,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
 
         $this->getContainer()->set(TransportChain::class, $transportMock);
 
-        /** @var SmsModel $smsModel */
-        $smsModel = $this->getContainer()->get(SmsModel::class);
+        $smsModel = $this->getService(SmsModel::class);
         $this->assertInstanceOf(Sms::class, $sms);
 
         // 4. Send SMS
@@ -158,8 +157,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
 
         $this->getContainer()->set(TransportChain::class, $transportMock);
 
-        /** @var SmsModel $smsModel */
-        $smsModel = $this->getContainer()->get(SmsModel::class);
+        $smsModel = $this->getService(SmsModel::class);
         $this->assertInstanceOf(Sms::class, $sms);
 
         // 6. Send SMS
@@ -167,7 +165,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(3, $results, 'Total results count should be 3.');
 
         // 7. Validate SMS stats per contact
-        $statRepo = $this->getContainer()->get(StatRepository::class);
+        $statRepo = $this->getService(StatRepository::class);
         $this->assertInstanceOf(Lead::class, $contact1);
 
         $stat1 = $statRepo->getLeadStats($contact1->getId());

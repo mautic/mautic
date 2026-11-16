@@ -30,11 +30,9 @@ final class OwnershipScopedSecurityMetadataTest extends MauticMysqlTestCase
             IpAddress::class,
         ];
 
-        /** @var ResourceNameCollectionFactoryInterface $nameFactory */
-        $nameFactory = self::getContainer()->get(ResourceNameCollectionFactoryInterface::class);
+        $nameFactory = $this->getService(ResourceNameCollectionFactoryInterface::class);
 
-        /** @var ResourceMetadataCollectionFactoryInterface $metadataFactory */
-        $metadataFactory = self::getContainer()->get(ResourceMetadataCollectionFactoryInterface::class);
+        $metadataFactory = $this->getService(ResourceMetadataCollectionFactoryInterface::class);
 
         $violations = [];
 

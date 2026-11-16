@@ -24,8 +24,7 @@ final class SummarizeCommandTest extends AbstractCampaignTestCase
             ]
         );
 
-        /** @var SummaryRepository $summaryRepo */
-        $summaryRepo = $this->getContainer()->get(SummaryRepository::class);
+        $summaryRepo = $this->getService(SummaryRepository::class);
         $this->assertCount(0, $summaryRepo->findAll());
         $this->assertStringContainsString('There are no records in the campaign lead event log table. Nothing to summarize.', $commandResult->getDisplay());
     }
@@ -47,8 +46,7 @@ final class SummarizeCommandTest extends AbstractCampaignTestCase
             ]
         );
 
-        /** @var SummaryRepository $summaryRepo */
-        $summaryRepo = $this->getContainer()->get(SummaryRepository::class);
+        $summaryRepo = $this->getService(SummaryRepository::class);
 
         /** @var Summary[] $summaries */
         $summaries = $summaryRepo->findAll();

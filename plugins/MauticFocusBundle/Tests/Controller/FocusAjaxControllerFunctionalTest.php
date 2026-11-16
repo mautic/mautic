@@ -16,8 +16,7 @@ final class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testViewsCount(): void
     {
-        /** @var FocusModel $focusModel */
-        $focusModel = self::getContainer()->get(FocusModel::class);
+        $focusModel = $this->getService(FocusModel::class);
         $focus      = $this->createFocus('popup');
         $focusModel->saveEntity($focus);
 
@@ -42,8 +41,7 @@ final class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testClickThroughCount(): void
     {
-        /** @var FocusModel $focusModel */
-        $focusModel = self::getContainer()->get(FocusModel::class);
+        $focusModel = $this->getService(FocusModel::class);
         $focus      = $this->createFocus('popup');
         $focusModel->saveEntity($focus);
 

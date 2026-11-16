@@ -88,15 +88,13 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $campaign = $this->createCampaign();
         $contact  = $this->createContact('blabla@contact.email');
 
-        $userRepository = $this->getContainer()->get(UserRepository::class);
-        $this->assertInstanceOf(UserRepository::class, $userRepository);
+        $userRepository = $this->getService(UserRepository::class);
 
         $role = new Role();
         $role->setName('No-campaign-edit-access');
         $role->setIsAdmin(false);
 
-        $roleRepository = $this->getContainer()->get(RoleRepository::class);
-        $this->assertInstanceOf(RoleRepository::class, $roleRepository);
+        $roleRepository = $this->getService(RoleRepository::class);
         $roleRepository->saveEntity($role);
 
         $user = new User();
@@ -106,7 +104,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('no-campaign-edit-user');
         $user->setRole($role);
 
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
 
         $user->setPassword($hasher->hash('mautic'));
         $userRepository->saveEntity($user);
@@ -476,17 +474,15 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful($clientResponse->getContent());
 
         // Assert the tag is removed from the lead
-        $updatedLead = $this->getContainer()->get(LeadRepository::class)->find($lead->getId());
+        $updatedLead = $this->getService(LeadRepository::class)->find($lead->getId());
         $this->assertInstanceOf(Lead::class, $updatedLead);
         $this->assertNotContains($tag, $updatedLead->getTags()->toArray());
     }
 
     public function testContactListActionSuggestionsByAdminUser(): void
     {
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getContainer()->get(UserRepository::class);
+        $userRepository = $this->getService(UserRepository::class);
 
-        /** @var User $adminUser */
         $adminUser = $userRepository->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $adminUser);
 
@@ -509,8 +505,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             $leads[] = $lead;
         }
 
-        /** @var LeadRepository $leadRepository */
-        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+        $leadRepository = $this->getService(LeadRepository::class);
         $leadRepository->saveEntities($leads);
         $this->em->clear();
 
@@ -533,8 +528,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testContactListActionSuggestionsByNonAdminUser(): void
     {
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getContainer()->get(UserRepository::class);
+        $userRepository = $this->getService(UserRepository::class);
 
         $adminUser = $userRepository->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $adminUser);
@@ -549,8 +543,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             $leads[] = $lead;
         }
 
-        /** @var LeadRepository $leadRepository */
-        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+        $leadRepository = $this->getService(LeadRepository::class);
         $leadRepository->saveEntities($leads);
         $this->em->clear();
 
@@ -559,8 +552,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $role->setIsAdmin(false);
         $role->setRawPermissions(['lead:leads' => ['viewown']]);
 
-        /** @var RoleRepository $roleRepository */
-        $roleRepository = $this->getContainer()->get(RoleRepository::class);
+        $roleRepository = $this->getService(RoleRepository::class);
         $roleRepository->saveEntity($role);
 
         // Create a non admin user with view own contacts permission.
@@ -572,7 +564,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         /** @var PasswordHasherInterface $hasher */
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
 
         $passwordNonAdmin = 'Maut1cR0cks!';
         $user->setPassword($hasher->hash($passwordNonAdmin));

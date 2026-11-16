@@ -19,8 +19,7 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 
     protected function beforeTearDown(): void
     {
-        /** @var PathsHelper $pathsHelper */
-        $pathsHelper = self::getContainer()->get(PathsHelper::class);
+        $pathsHelper = $this->getService(PathsHelper::class);
         $folderPath  = "{$pathsHelper->getImagePath()}/{$this->folderName}";
 
         if (is_dir($folderPath)) {
@@ -55,7 +54,7 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
         self::getContainer()->set('fm_elfinder.loader', $elFinderLoader);
 
         $this->folderName = (string) time();
-        $user             = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user             = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $_SERVER['REQUEST_METHOD'] = Request::METHOD_POST;
@@ -64,8 +63,7 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
             "efconnect?cmd=mkdir&name={$this->folderName}&target=fls1_Lw"
         );
         self::assertResponseIsSuccessful();
-        /** @var PathsHelper $pathsHelper */
-        $pathsHelper = self::getContainer()->get(PathsHelper::class);
+        $pathsHelper = $this->getService(PathsHelper::class);
         $folderPath  = "{$pathsHelper->getImagePath()}/{$this->folderName}";
         $this->assertDirectoryExists($folderPath);
         $this->assertSame('777', substr(sprintf('%o', fileperms($folderPath)), -3));

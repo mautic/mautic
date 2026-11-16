@@ -49,11 +49,9 @@ final class ReportModelTest extends MauticMysqlTestCase
         $session = $this->createStub(Session::class);
         $request = new Request();
         $request->setSession($session);
-        /** @var RequestStack $requestStack */
-        $requestStack = self::getContainer()->get(RequestStack::class);
+        $requestStack = $this->getService(RequestStack::class);
         $requestStack->push($request);
-        /** @var ReportModel $reportModel */
-        $reportModel = self::getContainer()->get(ReportModel::class);
+        $reportModel = $this->getService(ReportModel::class);
 
         $aDayAgoBeginningOfTheDay = (clone $aDayAgo)->setTime(0, 0, 0);
 

@@ -40,7 +40,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
         $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
 
-        $res = $this->getContainer()->get(HitRepository::class)->getMostVisited($query);
+        $res = $this->getService(HitRepository::class)->getMostVisited($query);
 
         foreach ($res as $hit) {
             $this->assertNotNull($hit['id']);
@@ -114,7 +114,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
-        $report = $this->getContainer()->get(ReportRepository::class)->findOneBy(['name' => 'Report ABC']);
+        $report = $this->getService(ReportRepository::class)->findOneBy(['name' => 'Report ABC']);
         $this->assertInstanceOf(Report::class, $report);
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
@@ -126,7 +126,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
-        $reportClone = $this->getContainer()->get(ReportRepository::class)->findOneBy(['name' => 'Report ABC - cloned']);
+        $reportClone = $this->getService(ReportRepository::class)->findOneBy(['name' => 'Report ABC - cloned']);
         $this->assertInstanceOf(Report::class, $reportClone);
 
         $this->assertSame($report->getId() + 1, $reportClone->getId());
@@ -146,7 +146,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $report->setColumns($coulmns);
 
-        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         // Check sql injection in parameter orderby
         $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id\'');
@@ -176,7 +176,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $report->setColumns($coulmns);
 
-        self::getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
@@ -185,8 +185,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailReportWithAggregatedColumnsAndTotals(): void
     {
-        /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get(LeadModel::class);
+        $contactModel = $this->getService(LeadModel::class);
 
         // Create and save contacts
         $payload = [
@@ -268,7 +267,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
                 'function'  => 'AVG',
             ],
         ]);
-        self::getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         // Expected report table values [ID, Company name, MIN Points, Max Points, SUM Points, COUNT Points, AVG Points]
         $expected = [
@@ -291,8 +290,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testContactReportNotLikeExpression(): void
     {
-        /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get(LeadModel::class);
+        $contactModel = $this->getService(LeadModel::class);
 
         // Create and save contacts
         $payload = [
@@ -332,7 +330,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             ]]
         );
 
-        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
@@ -362,7 +360,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             ]]
         );
 
-        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
@@ -390,7 +388,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $report->setScheduleUnit($oldScheduleUnit);
         $report->setScheduleDay($oldScheduleDay);
         $report->setScheduleMonthFrequency($oldScheduleMonthFrequency);
-        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         $schedule = $report->getSchedule();
 
@@ -414,9 +412,9 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $report   = $this->getContainer()->get(ReportRepository::class)->find($report->getId());
+        $report   = $this->getService(ReportRepository::class)->find($report->getId());
         $schedule = $report->getSchedule();
-        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         $this->em->clear();
 
@@ -448,7 +446,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $report->setName('HTML Test');
         $report->setDescription('<b>This is allowed HTML</b>');
         $report->setSource('email');
-        self::getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request(Request::METHOD_GET, '/s/reports/'.$report->getId());
@@ -478,7 +476,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             'ph.user_agent',
         ];
         $report->setColumns($coulmns);
-        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
         $xssHeader     = '<script>alert(1)</script>';
         $this->client->request(Request::METHOD_GET, '/mtracking.gif?page_url='.$xssHeader);
         $this->assertResponseStatusCodeSame(200);
@@ -502,7 +500,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $report->setSource('leads');
         $report->setIsScheduled(true);
 
-        self::getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         $crawler = $this->client->request(Request::METHOD_GET, 's/reports/edit/'.$report->getId());
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -513,8 +511,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
 
-        $schedulerRepository = self::getContainer()->get(SchedulerRepository::class);
-        $this->assertInstanceOf(SchedulerRepository::class, $schedulerRepository);
+        $schedulerRepository = $this->getService(SchedulerRepository::class);
         $scheduler = $schedulerRepository->getSchedulerByReport($report);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -541,8 +538,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand('mautic:reports:scheduler');
 
-        $reportFileWriter = self::getContainer()->get(ReportFileWriter::class);
-        $this->assertInstanceOf(ReportFileWriter::class, $reportFileWriter);
+        $reportFileWriter = $this->getService(ReportFileWriter::class);
 
         $csvPath = $reportFileWriter->getFilePath($scheduler);
         $this->assertFileExists($csvPath);
@@ -664,7 +660,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
         self::assertResponseIsSuccessful();
@@ -693,7 +689,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
         self::assertResponseIsSuccessful();

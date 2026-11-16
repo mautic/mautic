@@ -20,7 +20,7 @@ final class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->frequencyRuleRepository = self::getContainer()->get(FrequencyRuleRepository::class);
+        $this->frequencyRuleRepository = $this->getService(FrequencyRuleRepository::class);
     }
 
     /**

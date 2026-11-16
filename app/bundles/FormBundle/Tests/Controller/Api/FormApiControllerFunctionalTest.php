@@ -378,7 +378,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         // Ensure the submission was created properly.
-        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findAll();
+        $submissions = $this->getService(SubmissionRepository::class)->findAll();
 
         $this->assertCount(1, $submissions);
 
@@ -404,7 +404,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(123, $contact->getPoints());
         $this->assertSame('Doe Corp', $contact->getCompany());
 
-        $companies = $this->getContainer()->get(CompanyRepository::class)->findAll();
+        $companies = $this->getService(CompanyRepository::class)->findAll();
 
         $this->assertCount(1, $companies);
 
@@ -415,7 +415,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('+420444555666', $company->getPhone());
 
         // The previous request changes user to anonymous.
-        $this->loginUser($this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']));
+        $this->loginUser($this->getService(UserRepository::class)->findOneBy(['username' => 'admin']));
 
         // Delete:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
