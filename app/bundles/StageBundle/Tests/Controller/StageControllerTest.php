@@ -76,6 +76,18 @@ final class StageControllerTest extends MauticMysqlTestCase
         $this->assertSame([1, 2], $chart['datasets'][0]['data']);
     }
 
+    public function testListFragmentRendersWithoutFunnel(): void
+    {
+        [$stageWithContacts] = $this->seedStagesWithLeads();
+
+        $this->client->xmlHttpRequest('GET', '/s/stages', ['tmpl' => 'list']);
+
+        $this->assertResponseIsSuccessful();
+        $responseData = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertStringContainsString('stage-contacts-count-'.$stageWithContacts->getId(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString('funnel-chart', (string) $responseData['newContent']);
+    }
+
     public function testIndexHidesFunnelWithoutViewOtherLeadPermission(): void
     {
         $this->seedStagesWithLeads();

@@ -54,10 +54,22 @@ final class StageRepositoryTest extends MauticMysqlTestCase
             ->setIsPublished(true)
             ->setWeight(3)
             ->setPublishDown(new \DateTime('2000-01-01 00:00:00'));
+        $current = (new Stage())
+            ->setName('Current')
+            ->setIsPublished(true)
+            ->setWeight(4)
+            ->setPublishUp(new \DateTime('2000-01-01 00:00:00'))
+            ->setPublishDown(new \DateTime('2100-01-01 00:00:00'));
+        $unpublished = (new Stage())
+            ->setName('Unpublished')
+            ->setIsPublished(false)
+            ->setWeight(5);
 
         $this->em->persist($active);
         $this->em->persist($scheduled);
         $this->em->persist($expired);
+        $this->em->persist($current);
+        $this->em->persist($unpublished);
         $this->em->flush();
 
         $repository = $this->em->getRepository(Stage::class);
@@ -69,7 +81,9 @@ final class StageRepositoryTest extends MauticMysqlTestCase
         );
 
         $this->assertContains('Active', $names);
+        $this->assertContains('Current', $names);
         $this->assertNotContains('Scheduled', $names);
         $this->assertNotContains('Expired', $names);
+        $this->assertNotContains('Unpublished', $names);
     }
 }
