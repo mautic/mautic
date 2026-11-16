@@ -1,0 +1,57 @@
+{#
+Variables
+  - items: list of {label (translated), value, href (optional)}
+  - variant: 'legend' (default) | 'linked' | 'labels'
+  Legend: decorative bar plus a link list. Linked: segments are the links. Labels: captions under each segment.
+#}
+{% set variant = variant|default('legend') %}
+{% set paletteSize = 6 %}
+{% set items = items|filter(item => item.value > 0) %}
+{% if items is not empty %}
+    <div class="partition-bar partition-bar--{{ variant }}">
+        {% if variant == 'labels' %}
+            <div class="partition-bar__track">
+                {% for item in items %}
+                    {% set tag = item.href is defined and item.href ? 'a' : 'div' %}
+                    <{{ tag }} class="partition-bar__cell" style="flex-grow: {{ item.value }}"{% if tag == 'a' %} href="{{ item.href }}"{% endif %}>
+                        <span class="partition-bar__segment partition-bar__segment--{{ (loop.index0 % paletteSize) + 1 }}" aria-hidden="true"></span>
+                        <span class="partition-bar__caption" title="{{ item.label }}">
+                            <span class="partition-bar__name type-helper-text-01">{{ item.label }}</span>
+                            <span class="partition-bar__value type-helper-text-01">{{ item.value }}</span>
+                        </span>
+                    </{{ tag }}>
+                {% endfor %}
+            </div>
+        {% elseif variant == 'linked' %}
+            {% set summary = items|map(item => item.label ~ ': ' ~ item.value)|join(', ') %}
+            <div class="partition-bar__track" role="group" aria-label="{{ summary }}">
+                {% for item in items %}
+                    {% set tag = item.href is defined and item.href ? 'a' : 'span' %}
+                    <{{ tag }} class="partition-bar__segment partition-bar__segment--{{ (loop.index0 % paletteSize) + 1 }}"
+                       style="flex-grow: {{ item.value }}"
+                       data-bs-toggle="tooltip"
+                       data-bs-title="{{ item.label }}: {{ item.value }}"
+                       {% if tag == 'a' %}href="{{ item.href }}" aria-label="{{ item.label }}: {{ item.value }}"{% else %}role="img" aria-label="{{ item.label }}: {{ item.value }}"{% endif %}></{{ tag }}>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="partition-bar__track" aria-hidden="true">
+                {% for item in items %}
+                    <span class="partition-bar__segment partition-bar__segment--{{ (loop.index0 % paletteSize) + 1 }}" style="flex-grow: {{ item.value }}"></span>
+                {% endfor %}
+            </div>
+                <ul class="partition-bar__legend list-unstyled mb-0">
+                    {% for item in items %}
+                        <li>
+                            {% set tag = item.href is defined and item.href ? 'a' : 'span' %}
+                            <{{ tag }} class="partition-bar__legend-item type-helper-text-01"{% if tag == 'a' %} href="{{ item.href }}"{% endif %}>
+                                <span class="partition-bar__dot partition-bar__segment--{{ (loop.index0 % paletteSize) + 1 }}" aria-hidden="true"></span>
+                                <span class="partition-bar__legend-label">{{ item.label }}</span>
+                                <span class="partition-bar__legend-value">{{ item.value }}</span>
+                            </{{ tag }}>
+                        </li>
+                    {% endfor %}
+                </ul>
+        {% endif %}
+    </div>
+{% endif %}

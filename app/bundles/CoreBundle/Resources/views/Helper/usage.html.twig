@@ -3,6 +3,7 @@ Variables
   - title
   - stats
   - noUsages
+  - variant (legend|linked|labels)
 #}
 
 {% if stats is defined and stats is not empty %}
@@ -11,18 +12,18 @@ Variables
             <div class="panel-title">{{- title -}}</div>
         </div>
         <div class="panel-body pt-5">
-            {% set hasDependences = false %}
-            {% for stat in stats %}
-                {% if stat.ids|length > 0 %}
-                    <a href="{{ path(stat.route, {'search': 'mautic.core.searchcommand.ids'|trans~':'~stat.ids|sort|join(',')}) }}"
-                       class="btn btn-ghost mt-4">
-                        {{ stat.label|trans }}
-                        <span class="mt-5 label label-primary">{{ stat.ids|length }}</span>
-                    </a>
-                    {% set hasDependences = true %}
-                {% endif %}
-            {% endfor %}
-            {% if not hasDependences %}
+            {% set used = stats|filter(stat => stat.ids|length > 0) %}
+            {% if used|length > 0 %}
+                {% set items = [] %}
+                {% for stat in used %}
+                    {% set items = items|merge([{
+                        'label': stat.label|trans,
+                        'value': stat.ids|length,
+                        'href': path(stat.route, {'search': 'mautic.core.searchcommand.ids'|trans~':'~stat.ids|sort|join(',')}),
+                    }]) %}
+                {% endfor %}
+                {{ include('@MauticCore/Components/partition-bar.html.twig', {'items': items, 'variant': variant|default('legend')}) }}
+            {% else %}
                 <p class="text-secondary mb-0">
                     {{ noUsages|default('mautic.core.usage.not_found'|trans) }}
                 </p>
