@@ -27,7 +27,7 @@ final class ObjectChangeDAO
 
     /**
      * @param string             $mappedObject   Name of the source object type
-     * @param int|string|null              $mappedId       ID of the source object
+     * @param int|string|null    $mappedId       ID of the source object
      * @param \DateTimeInterface $changeDateTime Date\Time the object was last changed
      */
     public function __construct(
