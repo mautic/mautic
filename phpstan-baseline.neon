@@ -3289,12 +3289,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/Lead.php
 
 		-
-			message: '#^Property Mautic\\LeadBundle\\Entity\\Lead\:\:\$primaryCompany has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Entity/Lead.php
-
-		-
 			message: '#^Property Mautic\\LeadBundle\\Entity\\Lead\:\:\$state has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -4649,12 +4643,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/EventListener/FormSubscriber.php
-
-		-
-			message: '#^Property Mautic\\PluginBundle\\Exception\\ApiErrorException\:\:\$contactId has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/PluginBundle/Exception/ApiErrorException.php
 
 		-
 			message: '#^Method Mautic\\PluginBundle\\Form\\Type\\CompanyFieldsType\:\:buildFormFields\(\) has parameter \$limit with no type specified\.$#'

@@ -1272,10 +1272,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         }
     }
 
-    /**
-     * @return mixed
-     */
-    public function getPrimaryCompany()
+    public function getPrimaryCompany(): ?array
     {
         return $this->primaryCompany;
     }

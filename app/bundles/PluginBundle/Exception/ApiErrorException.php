@@ -17,10 +17,7 @@ final class ApiErrorException extends \Exception
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getContactId()
+    public function getContactId(): int|string|null
     {
         return $this->contactId;
     }
