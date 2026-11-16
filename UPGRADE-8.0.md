@@ -1194,6 +1194,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
     `ContactIdentificationEvent::getIdentifier()` now returns `?string` and `ListPreProcessListEvent::getResult()` returns `?bool`.
 
+- The `$action` parameter of controller helpers now declares a native `string` type: `AbstractStandardFormController::afterEntitySave()`, `afterFormProcessed()`, `beforeEntitySave()`, `beforeFormProcessed()`, `checkActionPermission()`, `getFormEntity()`, `getFormView()`, `getPostActionRedirectArguments()`, `getPostActionControllerAction()` and `getViewArguments()`, `FetchCommonApiController::checkEntityAccess()` and `ListController::changeList()`, plus their overrides in core controllers. Callers that pass a non-string action now get a `TypeError`. Plugin controllers that override one of these methods may keep the parameter untyped or declare `string`.
 - Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
 
     | Class | Method | New parameter types |

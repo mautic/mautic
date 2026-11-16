@@ -81,7 +81,7 @@ final class DeviceApiController extends CommonApiController
     /**
      * @param LeadDevice|FormEntity $entity
      */
-    protected function checkEntityAccess(?object $entity, $action = 'view'): bool
+    protected function checkEntityAccess(?object $entity, string $action = 'view'): bool
     {
         return parent::checkEntityAccess($entity->getLead(), $action);
     }

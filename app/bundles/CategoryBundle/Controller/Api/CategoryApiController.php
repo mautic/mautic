@@ -51,7 +51,7 @@ final class CategoryApiController extends CommonApiController
      * @param Category $entity
      * @param string   $action view|create|edit|publish|delete
      */
-    protected function checkEntityAccess(?object $entity, $action = 'view'): bool
+    protected function checkEntityAccess(?object $entity, string $action = 'view'): bool
     {
         if (!$bundle = $entity->getBundle()) {
             $bundle = 'category';
@@ -64,7 +64,7 @@ final class CategoryApiController extends CommonApiController
             $permissionBase = $bundle.':categories';
         }
 
-        if ('create' != $action) {
+        if ('create' !== $action) {
             $ownPerm   = "{$permissionBase}:{$action}own";
             $otherPerm = "{$permissionBase}:{$action}other";
 
