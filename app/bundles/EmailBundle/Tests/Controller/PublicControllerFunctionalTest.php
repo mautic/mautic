@@ -1079,6 +1079,40 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    public function testUnsubscribedPageRendersRedIcon(): void
+    {
+        $stat       = $this->getStat();
+        $email      = $stat->getEmailAddress();
+        $secretHash = $this->getSecretHash($email);
+        $idHash     = $stat->getTrackingHash();
+        $this->em->flush();
+
+        $crawler = $this->client->request(
+            Request::METHOD_GET,
+            '/email/unsubscribe/'.$idHash.'/'.$email.'/'.$secretHash
+        );
+
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertCount(1, $crawler->filter('svg[fill="darkred"]'));
+    }
+
+    public function testResubscribedPageRendersGreenIcon(): void
+    {
+        $stat       = $this->getStat();
+        $email      = $stat->getEmailAddress();
+        $secretHash = $this->getSecretHash($email);
+        $idHash     = $stat->getTrackingHash();
+        $this->em->flush();
+
+        $crawler = $this->client->request(
+            Request::METHOD_GET,
+            '/email/resubscribe/'.$idHash.'/'.$email.'/'.$secretHash
+        );
+
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertCount(1, $crawler->filter('svg[fill="darkgreen"]'));
+    }
+
     public function testEmailValidationPageKeepsSharedStylesheet(): void
     {
         $secretHash = $this->getSecretHash('validation.styles@mautic.tld');

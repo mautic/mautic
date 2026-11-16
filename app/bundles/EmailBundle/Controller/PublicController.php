@@ -226,8 +226,8 @@ final class PublicController extends CommonFormController
         $email                  = null;
         $lead                   = null;
         $template               = null;
-        $formTemplate            = null;
-        $formContent             = null;
+        $formTemplate           = null;
+        $formContent            = null;
         $session                = $request->getSession();
         $isOneClickUnsubscribe  = $request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe');
         $isUnsubscribeAll       = $request->get('unsubscribe_all');
@@ -363,7 +363,7 @@ final class PublicController extends CommonFormController
                 );
 
                 if (empty($html)) {
-                    $html                    = $this->getHtml($formView, $lead, $viewParameters);
+                    $html = $this->getHtml($formView, $lead, $viewParameters);
                 }
                 $message = $html;
             }
