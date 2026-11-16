@@ -16,29 +16,29 @@
     {{ form_start(form) }}
     {% set hidePerms = form.isAdmin.vars.data %}
     {% set detailsContent %}
-        <div class="row">
-            <div class="pa-16">
-                <div class="col-md-6">
-                    {{ form_row(form.name) }}
-                </div>
-                <div class="col-md-6">
-                    {{ form_row(form.isAdmin) }}
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="pa-16">
-                    {{ form_row(form.description) }}
-                </div>
-            </div>
-        </div>
+				<div class="row">
+					<div class="pa-16">
+						<div class="col-md-6">
+                            {{ form_row(form.name) }}
+						</div>
+						<div class="col-md-6">
+                            {{ form_row(form.isAdmin) }}
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<div class="pa-16">
+                            {{ form_row(form.description) }}
+						</div>
+					</div>
+				</div>
     {% endset %}
     {% set permissionTabs = [] %}
     {% set currentBundle = null %}
     {% set currentContent = '' %}
     {% for child in form.permissions.children %}
-        {% if 'newbundle' == child.vars.value %}
+									{% if 'newbundle' == child.vars.value %}
             {% if currentBundle is not null %}
                 {% set permissionTabs = permissionTabs|merge([{
                     'id': currentBundle ~ 'PermissionTab',
@@ -46,14 +46,14 @@
                     'content': '<div class="pt-16 pe-16 ps-16 pb-16">' ~ currentContent ~ '</div>',
                     'className': 'bdr-w-0'
                 }]) %}
-            {% endif %}
+										{% endif %}
             {% set currentBundle = child.vars.name %}
             {% set currentContent = '' %}
-            {% do child.setRendered() %}
-        {% else %}
+										{% do child.setRendered() %}
+									{% else %}
             {% set currentContent = currentContent ~ form_row(child) %}
-        {% endif %}
-    {% endfor %}
+									{% endif %}
+								{% endfor %}
     {% if currentBundle is not null %}
         {% set permissionTabs = permissionTabs|merge([{
             'id': currentBundle ~ 'PermissionTab',
@@ -62,17 +62,17 @@
             'className': 'bdr-w-0'
         }]) %}
     {% endif %}
-    {% do form.permissions.setRendered() %}
+								{% do form.permissions.setRendered() %}
     {% set permissionsContent %}
         <div id="rolePermissions"{% if hidePerms %} class="hide"{% endif %}>
             {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': permissionTabs, 'variant': 'vertical'}) }}
-        </div>
-        <div id="isAdminMessage"{% if not hidePerms %} class="hide"{% endif %}>
-            <div class="alert alert-warning">
-                <h4>{% trans %}mautic.user.role.permission.isadmin.header{% endtrans %}</h4>
-                <p>{% trans %}mautic.user.role.permission.isadmin.message{% endtrans %}</p>
-            </div>
-        </div>
+				</div>
+				<div id="isAdminMessage"{% if not hidePerms %} class="hide"{% endif %}>
+					<div class="alert alert-warning">
+						<h4>{% trans %}mautic.user.role.permission.isadmin.header{% endtrans %}</h4>
+						<p>{% trans %}mautic.user.role.permission.isadmin.message{% endtrans %}</p>
+					</div>
+				</div>
     {% endset %}
     <div class="box-layout">
         <div class="col-xs-12 height-auto">
@@ -83,7 +83,7 @@
                 ],
                 'variant': 'contained'
             }) }}
-        </div>
-    </div>
+	</div>
+</div>
     {{ form_end(form) }}
 {% endblock %}

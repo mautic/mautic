@@ -172,11 +172,11 @@
 
             {% set tabsviewsdetails = [] %}
             {% set tabsviewsdetailsContent0 %}
-                            {{- include('@MauticPage/Trackable/click_counts.html.twig', {
-                                'trackables' : trackables,
-                                'entity'     : sms,
-                                'channel'    : 'sms'
-                            }) -}}
+                {{- include('@MauticPage/Trackable/click_counts.html.twig', {
+                    'trackables' : trackables,
+                    'entity'     : sms,
+                    'channel'    : 'sms'
+                }) -}}
 
             {% endset %}
             {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'clicks-container', 'label': 'mautic.trackable.click_counts', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
@@ -193,7 +193,7 @@
             {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'translation-container', 'label': 'mautic.core.translations', 'content': tabsviewsdetailsContent2, 'className': 'pa-16'}]) %}
             {% endif %}
             {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}
-        </div>
+            </div>
 
     </div>
     <!--/ left section -->
