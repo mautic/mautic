@@ -1768,6 +1768,7 @@ Mautic.listOnLoad = function(container, response) {
 
 Mautic.loadCampaignShare = function () {
     const table = mQuery('#campaign-share-table');
+    table.find('tr[data-campaign-id][data-share] .gauge').addClass('gauge--settled');
     const rows = table.find('tr[data-campaign-id]').filter(function () {
         return mQuery(this).find('.gauge--loading').length > 0;
     });
@@ -1779,21 +1780,11 @@ Mautic.loadCampaignShare = function () {
     let pendingBatches = Math.ceil(ids.length / batchSize);
 
     const finish = function () {
-        rows.filter(function () {
-            const id = mQuery(this).attr('data-campaign-id');
-
-            return shares.hasOwnProperty(id) && 0 === shares[id];
+        table.find('tr[data-campaign-id][data-share]').filter(function () {
+            return 0 === parseFloat(mQuery(this).attr('data-share'));
         }).remove();
 
         const resolvedRows = table.find('tr[data-campaign-id][data-share]');
-        resolvedRows.each(function () {
-            const id = mQuery(this).attr('data-campaign-id');
-
-            if (!shares.hasOwnProperty(id)) {
-                mQuery(this).find('.gauge').addClass('gauge--settled');
-            }
-        });
-
         const sorted = resolvedRows.get().sort(function (a, b) {
             return parseFloat(mQuery(b).attr('data-share')) - parseFloat(mQuery(a).attr('data-share'));
         });

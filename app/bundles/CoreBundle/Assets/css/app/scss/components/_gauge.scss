@@ -1,6 +1,3 @@
-//
-// Gauge
-// --------------------------------------------------
 @mixin gauge-type($token) {
   font-size: var(--#{$token}-font-size);
   line-height: var(--#{$token}-line-height);
