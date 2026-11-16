@@ -43,6 +43,7 @@
                 {% set permissionTabs = permissionTabs|merge([{
                     'id': currentBundle ~ 'PermissionTab',
                     'label': permissionsConfig['config'][currentBundle]['label'],
+                    'renderTag': {'label': permissionsConfig['config'][currentBundle]['ratio'][0] ~ ' / ' ~ permissionsConfig['config'][currentBundle]['ratio'][1], 'color': 'gray', 'attributes': {'id': currentBundle ~ '-permission-ratio', 'data-total': permissionsConfig['config'][currentBundle]['ratio'][1]}},
                     'content': '<div class="pt-16 pe-16 ps-16 pb-16">' ~ currentContent ~ '</div>',
                     'className': 'bdr-w-0'
                 }]) %}
@@ -58,6 +59,7 @@
         {% set permissionTabs = permissionTabs|merge([{
             'id': currentBundle ~ 'PermissionTab',
             'label': permissionsConfig['config'][currentBundle]['label'],
+            'renderTag': {'label': permissionsConfig['config'][currentBundle]['ratio'][0] ~ ' / ' ~ permissionsConfig['config'][currentBundle]['ratio'][1], 'color': 'gray', 'attributes': {'id': currentBundle ~ '-permission-ratio', 'data-total': permissionsConfig['config'][currentBundle]['ratio'][1]}},
             'content': '<div class="pt-16 pe-16 ps-16 pb-16">' ~ currentContent ~ '</div>',
             'className': 'bdr-w-0'
         }]) %}
