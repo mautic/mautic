@@ -21,10 +21,14 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
 ### Other removed code
 
+- `Mautic\CoreBundle\Entity\DateAddedTrait::addDateAddedField()` was removed (#17532). The trait now maps `$dateAdded` with a Doctrine column attribute. Remove calls to the helper from custom `loadMetadata()` methods and ensure the consuming entity has a class-level `#[ORM\Entity]` so the trait's attribute mapping is loaded. Verify that the `date_added` column remains mapped before applying schema changes.
+- `Mautic\PluginBundle\Model\IntegrationEntityModel::getRecordList()` was removed (#18066), with no replacement method. Callers that need its old result must build the mapping themselves from the integration's records: each record's `Id` was used as the array key and as the value of an inner `['id' => $record['Id']]` array.
+- `MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration` now extends `Mautic\IntegrationsBundle\Integration\BasicIntegration` instead of `Mautic\PluginBundle\Integration\AbstractIntegration` (#18135). Calls to `getAuthenticationType()`, `getRequiredKeyFields()`, `getFormNotes()` and inherited legacy `AbstractIntegration` methods are no longer available. Use the IntegrationsBundle interfaces and configuration support instead: `MauticPlugin\MauticOutlookBundle\Integration\Support\ConfigSupport` provides the configuration template and `OutlookKeysType` authentication form. Update code that requires Outlook to be an `AbstractIntegration`. The previous class was final, so this migration affects callers rather than existing subclasses.
+
 - Unused method `Mautic\ChannelBundle\Model\MessageModel::getMarketingMessagesEventLogs()` removed. It had no callers and failed when called, as it relied on a non-existing repository method. Use `Mautic\ChannelBundle\Model\MessageModel::getLeadStatsPost()` with an explicit date range to get chart data instead.
 - `Mautic\SmsBundle\Entity\Sms` no longer implements `Mautic\CoreBundle\Entity\VariantEntityInterface` nor uses `VariantEntityTrait`. SMS never stored variants (the `sms_messages` table has no variant columns), so the following methods were removed from `Sms` with no replacement: `Sms::addVariantChild()`, `Sms::removeVariantChild()`, `Sms::getVariantChildren()`, `Sms::setVariantParent()`, `Sms::getVariantParent()`, `Sms::removeVariantParent()`, `Sms::setVariantSettings()`, `Sms::getVariantSettings()`, `Sms::getVariantStartDate()`, `Sms::setVariantStartDate()`, `Sms::isVariant()`, `Sms::isParent()`, `Sms::hasVariants()`, `Sms::clearVariants()`, `Sms::getVariants()`, `Sms::getRelatedEntityIds()`, `Sms::clearVariantSettings()`, `Sms::isEnableAbTest()`, `Sms::getVariantsPendingCount()`, `Sms::getVariantEndDate()`.
 - `Mautic\CoreBundle\Entity\VariantEntityTrait` now maps `variantParent`, `variantChildren`, `variantSettings` and `variantStartDate` with Doctrine attributes. Entities mapped with `#[ORM\Entity]` that use the trait must stop calling `addVariantMetadata()` from `loadMetadata()`, otherwise the variant fields are mapped twice. Entities mapped only via `loadMetadata()` keep calling `addVariantMetadata()`.
-- Event class `Mautic\EmailBundle\Event\EmailOnTogglePublishEvent` and constant `Mautic\PageBundle\PageEvents::PAGE_ON_TOGGLE_PUBLISH` (`mautic.page_on_toggle_publish`) removed. `Mautic\CoreBundle\Model\FormModel::togglePublishStatus()` now dispatches the generic `Mautic\CoreBundle\Event\EntityTogglePublishEvent` for every entity, so the toggle is no longer limited to emails and pages. Subscribe to `EntityTogglePublishEvent::class` and check the type of `$event->getEntity()` instead.
+- Event class `Mautic\EmailBundle\Event\EmailOnTogglePublishEvent` and constant `Mautic\PageBundle\PageEvents::PAGE_ON_TOGGLE_PUBLISH` (`mautic.page_on_toggle_publish`) removed. `Mautic\CoreBundle\Model\FormModel::togglePublishStatus()` now dispatches the generic `Mautic\CoreBundle\Event\EntityTogglePublishEvent` for every entity, so the toggle is no longer limited to emails and pages. Subscribe to `EntityTogglePublishEvent::class` and check the type of `$event->getEntity()` instead. `togglePublishStatus()` dispatches this event directly and no longer calls `dispatchEvent('on_toggle_publish', ...)`. A plugin model override handling that action silently stops running; move that logic to an `EntityTogglePublishEvent` subscriber.
 - Unused service aliases `mautic.integration.gmail.config` and `mautic.integration.tagmanager.config` were removed. Inject the corresponding bundle’s `Integration\Support\ConfigSupport` class instead; the services and integrations remain available.
 - The ClearbitBundle was removed as the service was sunset.
 - The unused contact companies modal was removed: `Mautic\LeadBundle\Controller\LeadController::companyAction()` (`/s/contacts/company/{objectId}`), the `@MauticLead/Lead/company.html.twig` template, the `Mautic.toggleCompanyLead` JS function and the `lead:toggleCompanyLead` AJAX action (`Mautic\LeadBundle\Controller\AjaxController::toggleCompanyLeadAction()`). Nothing linked to the modal since the contact page button was removed, and the action failed with a 500 error. Add or remove a contact's companies through the contact edit form or the API (`/api/companies/{companyId}/contact/{contactId}/add` and `/remove`) instead.
@@ -1390,7 +1394,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
 ### Native parameter and return types for plugin extension points
 
-The following changes from #17842, #17895, #17894, #17891, #17890 and #17841 promote documented types to native PHP types. Update callers to pass the declared types: an `array` parameter rejects `null`, scalars and collection objects with a `TypeError`; use `[]` for an empty array, or convert a collection to an array where appropriate. An `iterable` parameter accepts arrays and `\Traversable` objects.
+The following changes promote documented types to native PHP types, including changes from #17842, #17895, #17894, #17891, #17890, #17841, #17969, #17968, #17856, #18031, #18032, #18033, #18030, #18029, #17496, #18087, #18149 and #18161. Update callers to pass the declared types: an `array` parameter rejects `null`, scalars and collection objects with a `TypeError`; use `[]` for an empty array, or convert a collection to an array where appropriate. An `iterable` parameter accepts arrays and `\Traversable` objects.
 
 For overridden methods and interface implementations, keep parameter types compatible with the parent: an untyped parameter remains valid, but narrowing `iterable` to `array` does not. Newly declared return types must also be present (or have a compatible narrower type) in overrides. Preserve the rest of each method's signature, including default values and references.
 
@@ -1460,3 +1464,89 @@ These parameters now have the native `array` type. Class names are relative to `
 - `Mautic\CoreBundle\Entity\CommonRepository::deleteEntities()` now takes `array $entities`, while `saveEntities()` takes `iterable $entities`. The latter also applies to `Mautic\LeadBundle\Entity\CustomFieldRepositoryTrait::saveEntities()` and `Mautic\LeadBundle\Entity\CompanyLeadRepository::saveEntities()`.
 - `Mautic\CoreBundle\Model\FormModel::saveEntities()` now takes `iterable $entities`, as do its overrides in `Mautic\EmailBundle\Model\EmailModel`, `Mautic\LeadBundle\Model\CompanyModel`, `Mautic\LeadBundle\Model\FieldModel`, `Mautic\NotificationBundle\Model\NotificationModel` and `Mautic\SmsBundle\Model\SmsModel`. Plugin overrides that declare `array $entities` must widen it to `iterable` (or leave it untyped).
 - `Mautic\ApiBundle\Controller\CommonApiController::processBatchForm()` now types `$method` as `string`; pass the HTTP method as a string. As with the other form hooks documented above, an untyped override remains compatible.
+
+#### Integration data and additional array parameters
+
+- `Mautic\PluginBundle\Entity\IntegrationEntity::getInternal()` now returns `?array`, and `setInternal()` accepts `?array $internal`: `null` remains valid. `Mautic\PluginBundle\Entity\Integration::getApiKeys()` returns `array`, and `setApiKeys()` requires `array $apiKeys`; pass `[]` rather than `null` for empty keys. Overrides of these getters must declare compatible return types.
+- `Mautic\PluginBundle\Integration\AbstractIntegration::populateMauticLeadData()` and its override in `MauticPlugin\MauticCrmBundle\Integration\ZohoIntegration` now take `?array $config = []`. Both arrays and `null` are accepted; an override restricted to `array $config` is incompatible with the nullable parent parameter.
+
+The following parameters require arrays, including when explicitly passing an empty value. Class names are relative to `Mautic\` unless prefixed with `MauticPlugin\`.
+
+| Class and method | Parameters |
+| --- | --- |
+| `ConfigBundle\Event\ConfigEvent::setNormData()` | `$normData` |
+| `IntegrationsBundle\Entity\ObjectMapping::setInternalStorage()` | `$internalStorage` |
+| `SmsBundle\Entity\Stat::setDetails()` | `$details` |
+| `StageBundle\Model\StageModel::getStageLineChartData()` | `$filter` |
+| `MauticPlugin\MauticFocusBundle\Entity\Focus::setProperties()` | `$properties` |
+| `MauticPlugin\MauticFocusBundle\Entity\Focus::setUtmTags()` | `$utmTags` |
+| `PluginBundle\Integration\AbstractIntegration::getRequestToken()` | `$settings` |
+| `PluginBundle\Integration\AbstractIntegration::populateLeadData()` | `$config` |
+| `PluginBundle\Integration\AbstractIntegration::appendToForm()` | `$data` |
+| `PluginBundle\Integration\AbstractIntegration::modifyForm()` | `$options` |
+| `MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration::pushLead()` | `$config` |
+| `CoreBundle\Helper\Chart\ChartQuery::applyFilters()`, `prepareTimeDataQuery()`, `getCountQuery()`, `count()` | `$filters` |
+| `CoreBundle\Helper\Chart\ChartQuery::count()` | `$options` |
+| `LeadBundle\Model\LeadModel::getTopOwners()`, `getTopCreators()` | `$filters` |
+| `AssetBundle\Model\AssetModel::getDownloadsLineChartData()` | `$filter` |
+| `AssetBundle\Model\AssetModel::getAssetList()` | `$filters` |
+| `DashboardBundle\Model\DashboardModel::populateWidgetsContent()`, `populateWidgetContent()` | `$filter` |
+| `WebhookBundle\Model\WebhookModel::serializeData()` | `$groups` |
+| `PluginBundle\Helper\IntegrationHelper::getUserProfiles()` | `$fields` |
+
+`AssetModel`, `DashboardModel`, `WebhookModel` and `IntegrationHelper` are final; their entries affect callers, not subclass overrides. In addition, `DashboardModel::populateWidgetsContent()` requires `array|Doctrine\ORM\Tools\Pagination\Paginator &$widgets`. Pass a variable containing an array or that paginator, preserving the by-reference argument.
+
+#### Object parameters and widened date types
+
+- `Mautic\CoreBundle\Security\Permissions\AbstractPermissions::addStandardFormFields()` and `addManageFormFields()`, and `Mautic\PluginBundle\Integration\AbstractIntegration::modifyForm()`, require `Symfony\Component\Form\FormBuilderInterface $builder`.
+- The following setters require `Doctrine\Common\Collections\Collection`, not a plain array. Pass a collection such as `new ArrayCollection($items)` (with the expected entity objects): `Mautic\PageBundle\Entity\Redirect::setTrackables()`, `Mautic\WebhookBundle\Entity\Event::setQueues()`, `Mautic\ChannelBundle\Entity\Message::setChannels()`, `Mautic\LeadBundle\Entity\Lead::setGroupScores()`, and `Mautic\WebhookBundle\Entity\Webhook::setEvents()` / `addLogs()`.
+- These association setters require non-null entity objects rather than IDs or `null`. Use the entity or an entity-manager reference. Class names are relative to `Mautic\`:
+
+    | Method | Parameter type |
+    | --- | --- |
+    | `LeadBundle\Entity\CompanyLead::setCompany()` | `LeadBundle\Entity\Company` |
+    | `LeadBundle\Entity\FrequencyRule::setLead()` | `LeadBundle\Entity\Lead` |
+    | `LeadBundle\Entity\LeadCategory::setCategory()` | `CategoryBundle\Entity\Category` |
+    | `LeadBundle\Entity\ListLead::setList()` | `LeadBundle\Entity\LeadList` |
+    | `DynamicContentBundle\Entity\DynamicContentLeadData::setLead()` | `LeadBundle\Entity\Lead` |
+    | `UserBundle\Entity\UserToken::setUser()` | `UserBundle\Entity\User` |
+
+- `Mautic\CoreBundle\Helper\Chart\ChartQuery::loadAndBuildTimeData()` / `fetchCountDateDiff()` and `Mautic\AssetBundle\Entity\DownloadRepository::getHttpStatuses()` require `Doctrine\DBAL\Query\QueryBuilder $query`; an ORM query builder is not compatible.
+- `Mautic\CampaignBundle\Entity\LeadRepository::checkLeadInCampaigns()` and `Mautic\LeadBundle\Entity\LeadDeviceRepository::getDevice()` require `Mautic\LeadBundle\Entity\Lead $lead`. Pass a contact entity rather than its ID. `LeadDeviceRepository` is final, so its change affects callers only.
+- `Mautic\AssetBundle\Entity\DownloadRepository::getDownloadCountsByPage()` and `getDownloadCountsByEmail()` widen `$fromDate` from `?\DateTime` to `?\DateTimeInterface`. Plugin overrides must accept `?\DateTimeInterface` (or a wider type); keeping `?\DateTime` rejects immutable dates accepted by the parent and causes an incompatible-signature error. The email method's `$toDate` remains `?\DateTime`.
+
+#### Nullable booleans and caller-only type changes
+
+These setters now take `?bool`: `Mautic\CampaignBundle\Entity\LeadEventLog::setNonActionPathTaken()`, `Mautic\EmailBundle\Entity\Email::setUseOwnerAsMailer()` / `setPublicPreview()`, `Mautic\FormBundle\Entity\Field::setShowLabel()` / `setShowWhenValueExists()` / `setAlwaysDisplay()`, and `Mautic\LeadBundle\Entity\CompanyLead::setPrimary()`. Pass `true`, `false` or `null`. Non-boolean scalars can be coerced by callers without strict types, but are rejected by callers using `declare(strict_types=1)`.
+
+The following classes are final; update callers rather than overrides:
+
+- `Mautic\UserBundle\Model\RoleModel::setRolePermissions()` requires `?array $rawPermissions`. Arrays and `null` remain valid; other values are rejected.
+- `Mautic\CampaignBundle\Entity\CampaignRepository::getContactSingleSegmentByCampaign()` requires `int|string|null $contactId`. Pass the contact ID or `null`, not a contact object.
+- `Mautic\CoreBundle\Helper\PRedisConnectionHelper::getRedisEndpoints()` requires `iterable|string $configuredUrls`. Pass a URL string or an iterable of URLs; `null` is not accepted.
+
+#### Native array and iterable property types
+
+Properties previously documented only with `@var array` or `@var iterable` now declare native types (#18087). A subclass redeclaring an inherited non-private property must retain its type; removing the type or changing `iterable` to `array` is incompatible. Assignments must also satisfy the declared type. Classes using these traits and redeclaring their properties must keep compatible types, visibility, staticness and defaults.
+
+Class and trait names below are relative to `Mautic\`. All listed properties are `array` except `LeadModel::$leadFields`, which is `iterable`.
+
+| Class or trait | Properties |
+| --- | --- |
+| `ApiBundle\Controller\CommonApiController` | `$dataInputMasks`, `$routeParams`, `$entityRequestParameters` |
+| `CoreBundle\Security\Permissions\AbstractPermissions` | `$permissions` |
+| `CoreBundle\Entity\CommonRepository` | `$advancedFilterCommands` |
+| `CoreBundle\Helper\Chart\AbstractChart` | `$datasets`, `$labels`, `$colors` |
+| `CoreBundle\Helper\Chart\ChartQuery` | `$sqlFormats`, `$mysqlTimeUnits` |
+| `CoreBundle\EventListener\CommonStatsSubscriber` | `$repositories`, `$permissions` |
+| `CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor` | `$systemProperties` |
+| `CampaignBundle\Event\CampaignExecutionEvent` | `$eventArray` |
+| `LeadBundle\Model\LeadModel` | `$leadFields` (`iterable`), `$availableLeadFields` |
+| `EmailBundle\Model\EmailModel` | `$emailSettings` |
+| `EmailBundle\Mailer\Message\MauticMessage` | `$metadata` |
+| `DashboardBundle\EventListener\DashboardSubscriber` | `$types`, `$permissions` |
+| `CoreBundle\Entity\DynamicContentEntityTrait` | static `$defaultDynamicContent` |
+| `LeadBundle\Entity\CustomFieldRepositoryTrait` | `$customFieldList` |
+| `LeadBundle\Entity\OperatorListTrait` | `$typeOperators` |
+
+For example, a plugin redeclaring `CommonApiController::$routeParams` must use `protected array $routeParams = [];`, and a `LeadModel` subclass redeclaring `$leadFields` must use `protected iterable $leadFields = [];`.
