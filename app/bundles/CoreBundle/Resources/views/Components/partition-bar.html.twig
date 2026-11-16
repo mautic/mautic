@@ -1,9 +1,3 @@
-{#
-Variables
-  - items: list of {label (translated), value, href (optional)}
-  - variant: 'legend' (default) | 'linked' | 'labels'
-  Legend: decorative bar plus a link list. Linked: segments are the links. Labels: captions under each segment.
-#}
 {% set variant = variant|default('legend') %}
 {% set paletteSize = 6 %}
 {% set items = items|filter(item => item.value > 0) %}
