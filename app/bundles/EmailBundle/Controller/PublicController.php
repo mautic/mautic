@@ -52,6 +52,10 @@ final class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
+    private const MESSAGE_TYPE_PREFERENCE_CENTER = 'preference_center';
+    private const MESSAGE_TYPE_RESUBSCRIBED      = 'resubscribed';
+    private const MESSAGE_TYPE_UNSUBSCRIBED      = 'unsubscribed';
+
     private LeadRepository $leadRepository;
 
     private EmailModel $emailModel;
@@ -411,10 +415,10 @@ final class PublicController extends CommonFormController
         }
 
         if ($showContactPreferences && !$isUnsubscribeAll && $hasLead) {
-            return 'preference_center';
+            return self::MESSAGE_TYPE_PREFERENCE_CENTER;
         }
 
-        return 'unsubscribed';
+        return self::MESSAGE_TYPE_UNSUBSCRIBED;
     }
 
     /**
@@ -592,7 +596,7 @@ final class PublicController extends CommonFormController
             [
                 'message'      => $message,
                 'type'         => 'notice',
-                'message_type' => $isCorrectHash ? 'resubscribed' : '',
+                'message_type' => $isCorrectHash ? self::MESSAGE_TYPE_RESUBSCRIBED : '',
                 'email'        => $email,
                 'lead'         => $lead,
                 'template'     => $template,
