@@ -55,6 +55,10 @@ final class FormActionFunctionalTest extends MauticMysqlTestCase
                     'mappedObject' => 'contact',
                     'mappedField'  => 'lastname',
                 ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
             ],
             'actions' => [
                 [
@@ -101,24 +105,11 @@ final class FormActionFunctionalTest extends MauticMysqlTestCase
         /** @var StatRepository $emailStatRepository */
         $emailStatRepository = $this->em->getRepository(Stat::class);
 
-        /** @var Stat|null $emailStat */
-        $emailStat = $emailStatRepository->findOneBy(
-            [
-                'email' => $emailToSendForm->getId(),
-                'lead'  => $lead->getId(),
-            ]
-        );
-        $this->assertInstanceOf(Stat::class, $emailStat);
-
-        // fetch email body
-        $crawler = $this->client->request(Request::METHOD_GET, "/email/view/{$emailStat->getTrackingHash()}");
-
-        $linkUrl     = $crawler->selectLink('page-with-dnc-form')->attr('href');
-        $linkCrawler = $this->client->request(Request::METHOD_GET, $linkUrl);
-
-        // submit form
-        $formCrawler = $linkCrawler->filter('form[id=mauticform_'.$formAlias.']');
-        $form        = $formCrawler->form();
+        // submit form directly
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_'.$formAlias.']');
+        $this->assertCount(1, $formCrawler, $this->client->getResponse()->getContent());
+        $form = $formCrawler->form();
         $form->setValues([
             'mauticform[email]'           => $lead->getEmail(),
             'mauticform[firstname]'       => $lead->getFirstname(),
@@ -135,8 +126,117 @@ final class FormActionFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        // as contact is unsubscribed so no email after form submit
-        $this->assertNotInstanceOf(Stat::class, $emailStat);
+        // unsubscribed contacts still receive transactional form emails (ignoreDNC => true)
+        $this->assertInstanceOf(Stat::class, $emailStat);
+    }
+
+    public function testBouncedContactDoesNotReceiveEmail(): void
+    {
+        // email to send after submit
+        $email = $this->createEmail('Send in response bounced', 'Send in response bounced');
+        $this->em->flush();
+
+        // payload to create form with field and action
+        $payload = [
+            'name'        => 'bouncedtest',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'description' => 'Functional API test for bounced contact',
+            'fields'      => [
+                [
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
+                ],
+                [
+                    'label'        => 'First Name',
+                    'type'         => 'text',
+                    'alias'        => 'firstname',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'firstname',
+                ],
+                [
+                    'label'        => 'Last Name',
+                    'type'         => 'text',
+                    'alias'        => 'lastname',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'lastname',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+            'actions' => [
+                [
+                    'name'        => 'Send email to contact',
+                    'description' => 'action description',
+                    'type'        => 'email.send.lead',
+                    'order'       => 1,
+                    'properties'  => [
+                        'email'    => $email->getId(),
+                    ],
+                ],
+            ],
+        ];
+
+        // Create a form
+        [$formId, $formAlias] = $this->createForm($payload);
+
+        // Create a landing Page having form
+        $page = $this->createLandingPage('Page with bounced form', 'page-with-bounced-form', sprintf('<p>{form=%s}</p>', $formId));
+
+        // create lead
+        $lead = $this->createLead('bounced@example.com');
+
+        // create email to send form
+        $emailToSendForm = $this->createEmail(
+            'Landing page email with bounced form',
+            sprintf('This is the link: <a title="Page Link" href="%s://%s/%s">page-with-bounced-form</a> ', $this->client->getRequest()->getScheme(), $this->client->getRequest()->getHost(), $page->getAlias())
+        );
+
+        $this->em->flush();
+
+        // email send to contact
+        $emailModel = self::getContainer()->get(EmailModel::class);
+        $this->assertInstanceOf(EmailModel::class, $emailModel);
+        $emailModel->sendEmail($emailToSendForm, [[
+            'id'           => $lead->getId(),
+            'email'        => $lead->getEmail(),
+            'firstname'    => $lead->getFirstname(),
+            'lastname'     => $lead->getLastname(), ]]
+        );
+
+        $this->leadAddToDNC($lead, DoNotContact::BOUNCED);
+
+        /** @var StatRepository $emailStatRepository */
+        $emailStatRepository = $this->em->getRepository(Stat::class);
+
+        // submit form directly
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->selectButton('Submit');
+        $this->assertCount(1, $formCrawler, $this->client->getResponse()->getContent());
+        $form = $formCrawler->form();
+        $form->setValues([
+            'mauticform[email]'           => $lead->getEmail(),
+            'mauticform[firstname]'       => $lead->getFirstname(),
+            'mauticform[lastname]'        => $lead->getLastname(),
+        ]);
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        /** @var Stat|null $emailStat */
+        $emailStat = $emailStatRepository->findOneBy(
+            [
+                'email' => $email->getId(),
+                'lead'  => $lead->getId(),
+            ]
+        );
+
+        // bounced contacts do NOT receive form emails (even with ignoreDNC => true)
+        $this->assertNull($emailStat);
     }
 
     private function createLandingPage(string $title, string $alias, string $html): Page
@@ -169,12 +269,12 @@ final class FormActionFunctionalTest extends MauticMysqlTestCase
     /**
      * @throws \Doctrine\ORM\Exception\ORMException
      */
-    public function createLead(): Lead
+    public function createLead(string $email = 'j@doe.com'): Lead
     {
         $lead = new Lead();
         $lead->setFirstname('John');
         $lead->setLastname('Doe');
-        $lead->setEmail('j@doe.com');
+        $lead->setEmail($email);
         $this->em->persist($lead);
 
         return $lead;
@@ -183,14 +283,15 @@ final class FormActionFunctionalTest extends MauticMysqlTestCase
     /**
      * @throws \Doctrine\ORM\Exception\ORMException
      */
-    public function leadAddToDNC(Lead $lead): void
+    public function leadAddToDNC(Lead $lead, int $reason = DoNotContact::UNSUBSCRIBED): void
     {
         $doNotContact = new DoNotContact();
         $doNotContact->setLead($lead);
         $doNotContact->setDateAdded(new \DateTime());
         $doNotContact->setChannel('email');
-        $doNotContact->setReason(DoNotContact::UNSUBSCRIBED);
+        $doNotContact->setReason($reason);
 
         $this->em->persist($doNotContact);
+        $this->em->flush();
     }
 }
