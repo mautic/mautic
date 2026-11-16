@@ -1,7 +1,7 @@
 {% set linkedInProfileContent %}
-    {{ include('@MauticSocial/Integration/LinkedIn/Profile/profile.html.twig', {
-        'profile': details.profile,
-    }) }}
+        {{ include('@MauticSocial/Integration/LinkedIn/Profile/profile.html.twig', {
+            'profile': details.profile,
+        }) }}
 {% endset %}
 {{ include('@MauticCore/Components/tabs.html.twig', {
     'tabs': [

@@ -1,34 +1,34 @@
 <div class="panel-toolbar p-0">
     {% set tabstwitterview = [] %}
     {% set tabstwitterviewContent0 %}
-            {{ include('@MauticSocial/Integration/Twitter/Profile/profile.html.twig', {
-                'lead': lead,
-                'profile': details.profile,
-            }) }}
+        {{ include('@MauticSocial/Integration/Twitter/Profile/profile.html.twig', {
+            'lead': lead,
+            'profile': details.profile,
+        }) }}
 
     {% endset %}
     {% set tabstwitterview = tabstwitterview|merge([{'id': 'TwitterProfile', 'label': 'mautic.lead.lead.social.profile', 'content': tabstwitterviewContent0, 'className': 'pa-16 pa-24'}]) %}
     {% set tabstwitterviewContent1 %}
-            {{ include('@MauticSocial/Integration/Twitter/Profile/tweets.html.twig', {
-                'lead': lead,
-                'activity': details.activity.tweets|default([]),
-            }) }}
+        {{ include('@MauticSocial/Integration/Twitter/Profile/tweets.html.twig', {
+            'lead': lead,
+            'activity': details.activity.tweets|default([]),
+        }) }}
 
     {% endset %}
     {% set tabstwitterview = tabstwitterview|merge([{'id': 'TwitterTweets', 'label': 'mautic.lead.lead.social.twitter.tweets', 'content': tabstwitterviewContent1, 'className': 'pa-16'}]) %}
     {% set tabstwitterviewContent2 %}
-            {{ include('@MauticSocial/Integration/Twitter/Profile/photos.html.twig', {
-                'lead': lead,
-                 'activity': details.activity.photos|default([]),
-            }) }}
+        {{ include('@MauticSocial/Integration/Twitter/Profile/photos.html.twig', {
+            'lead': lead,
+             'activity': details.activity.photos|default([]),
+        }) }}
 
     {% endset %}
     {% set tabstwitterview = tabstwitterview|merge([{'id': 'TwitterPhotos', 'label': 'mautic.lead.lead.social.photos', 'content': tabstwitterviewContent2, 'className': 'pa-16 pa-24'}]) %}
     {% set tabstwitterviewContent3 %}
-            {{ include('@MauticSocial/Integration/Twitter/Profile/tags.html.twig', {
-                'lead': lead,
-                'activity': details.activity.tags|default([]),
-            }) }}
+        {{ include('@MauticSocial/Integration/Twitter/Profile/tags.html.twig', {
+            'lead': lead,
+            'activity': details.activity.tags|default([]),
+        }) }}
 
     {% endset %}
     {% set tabstwitterview = tabstwitterview|merge([{'id': 'TwitterTags', 'label': 'mautic.lead.lead.social.tags', 'content': tabstwitterviewContent3, 'className': 'pa-16 pa-24'}]) %}

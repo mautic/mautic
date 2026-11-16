@@ -63,15 +63,15 @@
     <div role="tabpanel">
         {% set tabsviewsfield = [] %}
         {% set tabsviewsfieldContent0 %}
-                        <div class="row">
-                            {{ _self.row_if_exists(form, 'label') }}
-                            {{ _self.row_if_exists(form, 'showLabel') }}
-                            {{ _self.row_if_exists(form, 'saveResult') }}
-                            {{ _self.row_if_exists(form, 'defaultValue') }}
-                            {{ _self.row_if_exists(form, 'helpMessage') }}
-                            {{ _self.row_if_exists(form, 'fieldWidth') }}
-                            {{ placeholder|raw }}
-                        </div>
+                <div class="row">
+                    {{ _self.row_if_exists(form, 'label') }}
+                    {{ _self.row_if_exists(form, 'showLabel') }}
+                    {{ _self.row_if_exists(form, 'saveResult') }}
+                    {{ _self.row_if_exists(form, 'defaultValue') }}
+                    {{ _self.row_if_exists(form, 'helpMessage') }}
+                    {{ _self.row_if_exists(form, 'fieldWidth') }}
+                    {{ placeholder|raw }}
+                </div>
 
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'general', 'label': 'mautic.form.field.section.general', 'content': tabsviewsfieldContent0, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'presentation'}, 'hasError': generalTabError}]) %}
@@ -97,141 +97,141 @@
                                 <div class="col-md-4">
                                     {{ form_row(form.conditions.any) }}
                                 </div>
-                            </div>
+            </div>
 
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'conditions', 'label': 'mautic.form.field.form.condition', 'content': tabsviewsfieldContent1, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'presentation'}, 'hasError': conditionsTabError}]) %}
         {% endif %}
-        {% if form.mappedField is defined %}
+            {% if form.mappedField is defined %}
         {% set tabsviewsfieldContent2 %}
-                          <div class="row">
-                              {{ _self.row_if_exists(form, 'mappedObject') }}
-                              {{ _self.row_if_exists(form, 'mappedField') }}
-                          </div>
+                  <div class="row">
+                      {{ _self.row_if_exists(form, 'mappedObject') }}
+                      {{ _self.row_if_exists(form, 'mappedField') }}
+                  </div>
 
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'mappedfields', 'label': 'mautic.form.field.section.mappedfield', 'content': tabsviewsfieldContent2, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'presentation'}}]) %}
-        {% endif %}
-        {% if form.isRequired is defined %}
+            {% endif %}
+            {% if form.isRequired is defined %}
         {% set tabsviewsfieldContent3 %}
-                              <div class="row">
-                                  {%- if form.isRequired is defined %}<div class="col-md-4">{{ form_row(form.isRequired) }}</div>{% endif %}
-                                  {%- if form.validationMessage is defined %}<div class="col-md-8">{{ form_row(form.validationMessage) }}</div>{% endif %}
-                              </div>
-                              {% if validation %}
-                                <div class="row">
-                                  {% if validation.minimum is defined %}
-                                    <div class="col-md-4">{{ form_row(validation.minimum) }}</div>
+                      <div class="row">
+                          {%- if form.isRequired is defined %}<div class="col-md-4">{{ form_row(form.isRequired) }}</div>{% endif %}
+                          {%- if form.validationMessage is defined %}<div class="col-md-8">{{ form_row(form.validationMessage) }}</div>{% endif %}
+                      </div>
+                      {% if validation %}
+                        <div class="row">
+                          {% if validation.minimum is defined %}
+                            <div class="col-md-4">{{ form_row(validation.minimum) }}</div>
+                          {% endif %}
+                          {% if validation.min_message is defined %}
+                            <div class="col-md-8">{{ form_row(validation.min_message) }}</div>
+                          {% endif %}
+                        </div>
+                        <div class="row">
+                          {% if validation.maximum is defined %}
+                            <div class="col-md-4">{{ form_row(validation.maximum) }}</div>
+                          {% endif %}
+                          {% if validation.max_message is defined %}
+                            <div class="col-md-8">{{ form_row(validation.max_message) }}</div>
+                          {% endif %}
+                        </div>
+                        <div class="row">
+                            {% for name, property in validation %}
+                                {% if validation[name] is defined and not validation[name].isRendered and 'labelAttributes' != name %}
+                                  {% if 'hiddin' == validation[name].vars.block_prefixes[1] %}
+                                      {{ form_row(validation[name]) }}
+                                  {% else %}
+                                      {% set col = 8 %}
+                                      {% if 'chocie' == validation[name].vars.block_prefixes[1] %}
+                                          {% set col = 4 %}
+                                      {% endif %}
+                                      <div class="col-md-{{ col }}">
+                                          {{ form_row(validation[name]) }}
+                                      </div>
                                   {% endif %}
-                                  {% if validation.min_message is defined %}
-                                    <div class="col-md-8">{{ form_row(validation.min_message) }}</div>
-                                  {% endif %}
-                                </div>
-                                <div class="row">
-                                  {% if validation.maximum is defined %}
-                                    <div class="col-md-4">{{ form_row(validation.maximum) }}</div>
-                                  {% endif %}
-                                  {% if validation.max_message is defined %}
-                                    <div class="col-md-8">{{ form_row(validation.max_message) }}</div>
-                                  {% endif %}
-                                </div>
-                                <div class="row">
-                                    {% for name, property in validation %}
-                                        {% if validation[name] is defined and not validation[name].isRendered and 'labelAttributes' != name %}
-                                          {% if 'hiddin' == validation[name].vars.block_prefixes[1] %}
-                                              {{ form_row(validation[name]) }}
-                                          {% else %}
-                                              {% set col = 8 %}
-                                              {% if 'chocie' == validation[name].vars.block_prefixes[1] %}
-                                                  {% set col = 4 %}
-                                              {% endif %}
-                                              <div class="col-md-{{ col }}">
-                                                  {{ form_row(validation[name]) }}
-                                              </div>
-                                          {% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                              {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                      {% endif %}
 
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'required', 'label': 'mautic.form.field.section.validation', 'content': tabsviewsfieldContent3, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'presentation'}}]) %}
-        {% endif %}
-        {% if showProperties %}
+            {% endif %}
+            {% if showProperties %}
         {% set tabsviewsfieldContent4 %}
-                          {{ form_errors(form.properties) }}
-                          {% if form.properties.syncList is defined %}
-                              <div class="row">
-                                  <div class="col-md-12">
-                                      {{ form_row(form.properties.syncList) }}
-                                  </div>
-                              </div>
-                          {% endif %}
-                          {% if form.properties.list is defined %}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    {{ form_row(form.properties.list) }}
-                                </div>
-                            </div>
-                          {% endif %}
-                          {% if form.properties.optionlist is defined %}
-                              <div class="row">
-                                  <div class="col-md-12">
-                                      {{ form_row(form.properties.optionlist)|raw }}
-                                  </div>
-                              </div>
-                          {% endif %}
-                          <div class="row">
-                              {% set i = 0 %}
-                              {% for name, property in properties %}
-                                {% if not form.properties[name].isRendered and name not in ['labelAttributes', 'placeholder'] %}
-                                  {% if 'hidden' == form.properties[name].vars.block_prefixes[1] %}
-                                      {{ form_row(form.properties[name]) }}
-                                  {% else %}
-                                      {% set col = 'text' == name ? 12 : 6 %}
-                                      <div class="col-md-{{ col }}">
-                                          {{ form_row(form.properties[name]) }}
-                                      </div>
-                                      {% if 6 == col %}
-                                          {% set i = i + 1 %}
-                                          {% if i is divisible by(2) %}
-                                            <div class="clearfix"></div>
-                                          {% endif %}
-                                      {% endif %}
-                                  {% endif %}
-                                {% endif %}
-                              {% endfor %}
+                  {{ form_errors(form.properties) }}
+                  {% if form.properties.syncList is defined %}
+                      <div class="row">
+                          <div class="col-md-12">
+                              {{ form_row(form.properties.syncList) }}
                           </div>
+                      </div>
+                  {% endif %}
+                  {% if form.properties.list is defined %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ form_row(form.properties.list) }}
+                        </div>
+                    </div>
+                  {% endif %}
+                  {% if form.properties.optionlist is defined %}
+                      <div class="row">
+                          <div class="col-md-12">
+                              {{ form_row(form.properties.optionlist)|raw }}
+                          </div>
+                      </div>
+                  {% endif %}
+                  <div class="row">
+                      {% set i = 0 %}
+                      {% for name, property in properties %}
+                        {% if not form.properties[name].isRendered and name not in ['labelAttributes', 'placeholder'] %}
+                          {% if 'hidden' == form.properties[name].vars.block_prefixes[1] %}
+                              {{ form_row(form.properties[name]) }}
+                          {% else %}
+                              {% set col = 'text' == name ? 12 : 6 %}
+                              <div class="col-md-{{ col }}">
+                                  {{ form_row(form.properties[name]) }}
+                              </div>
+                              {% if 6 == col %}
+                                  {% set i = i + 1 %}
+                                  {% if i is divisible by(2) %}
+                                    <div class="clearfix"></div>
+                                  {% endif %}
+                              {% endif %}
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                  </div>
 
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'properties', 'label': 'mautic.form.field.section.properties', 'content': tabsviewsfieldContent4, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'presentation'}, 'hasError': propertiesTabError}]) %}
-        {% endif %}
-        {% if showAttributes %}
+            {% endif %}
+            {% if showAttributes %}
         {% set tabsviewsfieldContent5 %}
-                          <div class="row">
-                              {{ _self.row_if_exists(form, 'alias') }}
-                              {{ _self.row_if_exists(form, 'labelAttributes') }}
-                              {{ _self.row_if_exists(form, 'inputAttributes') }}
-                              {{ _self.row_if_exists(form, 'containerAttributes') }}
-                              {{ customAttributes|raw }}
-                          </div>
+                  <div class="row">
+                      {{ _self.row_if_exists(form, 'alias') }}
+                      {{ _self.row_if_exists(form, 'labelAttributes') }}
+                      {{ _self.row_if_exists(form, 'inputAttributes') }}
+                      {{ _self.row_if_exists(form, 'containerAttributes') }}
+                      {{ customAttributes|raw }}
+                  </div>
 
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'attributes', 'label': 'mautic.form.field.section.attributes', 'content': tabsviewsfieldContent5, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'presentation'}}]) %}
-        {% endif %}
-        {% if showBehavior %}
+            {% endif %}
+            {% if showBehavior %}
         {% set tabsviewsfieldContent6 %}
-                          <div class="row">
-                              {{ _self.row_if_exists(form, 'alwaysDisplay') }}
-                              {{ _self.row_if_exists(form, 'isAutoFill') }}
-                              {{ _self.row_if_exists(form, 'showWhenValueExists') }}
-                              {{ _self.row_if_exists(form, 'isReadOnly') }}
-                              {{ _self.row_if_exists(form, 'showAfterXSubmissions') }}
-                          </div>
+                  <div class="row">
+                      {{ _self.row_if_exists(form, 'alwaysDisplay') }}
+                      {{ _self.row_if_exists(form, 'isAutoFill') }}
+                      {{ _self.row_if_exists(form, 'showWhenValueExists') }}
+                      {{ _self.row_if_exists(form, 'isReadOnly') }}
+                      {{ _self.row_if_exists(form, 'showAfterXSubmissions') }}
+                  </div>
 
         {% endset %}
         {% set tabsviewsfield = tabsviewsfield|merge([{'id': 'progressive-profiling', 'label': 'mautic.form.field.section.progressive.profiling', 'content': tabsviewsfieldContent6, 'className': 'pa-16', 'paneAttributes': {'role': 'tabpanel'}, 'itemAttributes': {'role': 'progressive-profiling'}}]) %}
-        {% endif %}
+            {% endif %}
         {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsfield, 'variant': 'contained'}) }}
         {{ form_row(form.parent) }}
 

@@ -96,7 +96,7 @@
                 {{ customContent('details.stats.graph.below', _context) }}
 
                 {% set messageTabs = [] %}
-                {% for channel, contacts in messagedLeads %}
+                    {% for channel, contacts in messagedLeads %}
                     {% set messageTabContent %}
                         {% set message = ('all' is same as(channel)) ? 'mautic.channel.message.all_contacts' : 'mautic.channel.message.channel_contacts' %}
                         <div class="alert alert-info"><strong>{{ message|trans }}</strong></div>
@@ -105,7 +105,7 @@
                         </div>
                     {% endset %}
                     {% set messageTabs = messageTabs|merge([{'id': 'contacts-' ~ channel, 'label': ('all' is not same as(channel)) ? channels[channel]['label'] : 'mautic.lead.leads', 'content': messageTabContent, 'className': 'pa-16 page-list'}]) %}
-                {% endfor %}
+                    {% endfor %}
                 {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': messageTabs, 'variant': 'contained'}) }}
             </div>
 
