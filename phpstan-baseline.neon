@@ -373,12 +373,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Model/CampaignModel.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Model\\CampaignModel\:\:setLeadSources\(\) has parameter \$deletedSources with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Model/CampaignModel.php
-
-		-
 			message: '#^Property Mautic\\CategoryBundle\\Entity\\Category\:\:\$id \(int\) does not accept null\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -812,12 +806,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Entity\\CommonEntity\:\:addChange\(\) has parameter \$key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Entity/CommonEntity.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Entity\\CommonEntity\:\:addChange\(\) has parameter \$value with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Entity/CommonEntity.php
@@ -1635,12 +1623,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:getMockResultStatement\(\) has no return type specified\.$#'
 			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:setQueryResponse\(\) has parameter \$queryResponse with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
 
@@ -3301,12 +3283,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/Lead.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\Lead\:\:setSocialCache\(\) has parameter \$cache with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/Lead.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\Lead\:\:setTags\(\) has parameter \$tags with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -3955,12 +3931,6 @@ parameters:
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/DateOptionAbstract.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Query\\Expression\\ExpressionBuilder\:\:between\(\) has parameter \$arr with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Query/Expression/ExpressionBuilder.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Segment\\Query\\Expression\\ExpressionBuilder\:\:between\(\) has parameter \$x with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4201,12 +4171,6 @@ parameters:
 			path: app/bundles/PageBundle/Entity/Hit.php
 
 		-
-			message: '#^Method Mautic\\PageBundle\\Entity\\HitRepository\:\:getEmailClickthroughHitCount\(\) has parameter \$emailIds with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Entity/HitRepository.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\Entity\\HitRepository\:\:updateLead\(\) has parameter \$fromLeadId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4253,12 +4217,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/PageBundle/Entity/Page.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Entity\\PageRepository\:\:checkPageUniqueAlias\(\) has parameter \$ignoreIds with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Entity/PageRepository.php
 
 		-
 			message: '#^Method Mautic\\PageBundle\\Entity\\PageRepository\:\:upHitCount\(\) has parameter \$id with no type specified\.$#'
@@ -4457,12 +4415,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/bundles/PageBundle/Helper/TrackingHelper.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:getDeviceGranularityData\(\) has parameter \$filters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
 
 		-
 			message: '#^Parameter \#1 \$pageIds of method Mautic\\PageBundle\\Entity\\HitRepository\:\:getBounces\(\) expects array\|string, int given\.$#'
@@ -5018,12 +4970,6 @@ parameters:
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:getLeadDoNotContactByDate\(\) has parameter \$params with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:getLeadDoNotContactByDate\(\) has parameter \$records with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -5067,12 +5013,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:mergeApiKeys\(\) has parameter \$withKeys with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:populateCompanyData\(\) has parameter \$config with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
@@ -5768,12 +5708,6 @@ parameters:
 			path: app/bundles/WebhookBundle/Model/WebhookModel.php
 
 		-
-			message: '#^Method Mautic\\WebhookBundle\\Model\\WebhookModel\:\:queueWebhook\(\) has parameter \$payload with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/WebhookBundle/Model/WebhookModel.php
-
-		-
 			message: '#^Method Mautic\\WebhookBundle\\Model\\WebhookModel\:\:queueWebhooks\(\) has parameter \$payload with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -5781,12 +5715,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\WebhookBundle\\Model\\WebhookModel\:\:queueWebhooks\(\) has parameter \$webhookEvents with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/WebhookBundle/Model/WebhookModel.php
-
-		-
-			message: '#^Method Mautic\\WebhookBundle\\Model\\WebhookModel\:\:queueWebhooksByType\(\) has parameter \$payload with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/WebhookBundle/Model/WebhookModel.php

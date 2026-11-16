@@ -365,7 +365,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return null|mixed[]
      */
-    public function mergeApiKeys(array $mergeKeys, array $withKeys = [], bool $return = false): ?array
+    public function mergeApiKeys(array $mergeKeys, $withKeys = [], bool $return = false): ?array
     {
         if (empty($withKeys)) {
             $withKeys = $this->keys;
@@ -2147,7 +2147,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * @throws ApiErrorException
      * @throws Exception
      */
-    protected function cleanupFromSync(array & $leadsToSync = [], $error = false)
+    protected function cleanupFromSync(&$leadsToSync = [], $error = false)
     {
         $duplicates = 0;
         if ($this->mauticDuplicates) {

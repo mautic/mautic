@@ -19,7 +19,7 @@ final class IntegrationEntityRepository extends CommonRepository
         string $integration,
         ?string $integrationEntity,
         string $internalEntity,
-        ?array $internalEntityIds = null,
+        $internalEntityIds = null,
         ?string $startDate = null,
         ?string $endDate = null,
         bool $push = false,
@@ -160,7 +160,7 @@ final class IntegrationEntityRepository extends CommonRepository
         int|false $limit = 25,
         $fromDate = null,
         $toDate = null,
-        array $integrationEntity = ['Contact', 'Lead'],
+        $integrationEntity = ['Contact', 'Lead'],
         array $excludeIntegrationIds = [],
     ): array {
         if ('company' === $internalEntity) {

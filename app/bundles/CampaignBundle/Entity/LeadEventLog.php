@@ -323,7 +323,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @param mixed[]|string $metadata
      */
-    public function appendToMetadata(array $metadata): void
+    public function appendToMetadata($metadata): void
     {
         if (!is_array($metadata)) {
             // Assumed output for timeline BC for <2.14
@@ -336,7 +336,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @param mixed[]|string $metadata
      */
-    public function setMetadata(array $metadata): static
+    public function setMetadata($metadata): static
     {
         if (!is_array($metadata)) {
             // Assumed output for timeline

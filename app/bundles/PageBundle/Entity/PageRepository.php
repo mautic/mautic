@@ -49,7 +49,7 @@ final class PageRepository extends CommonRepository implements ResettableVariant
             ->where('e.alias = :alias');
         $q->setParameter('alias', $alias);
 
-        if (!empty($ignoreIds)) {
+        if ($ignoreIds !== []) {
             $q->andWhere(
                 $q->expr()->notIn('e.id', ':ignoreIds')
             )
