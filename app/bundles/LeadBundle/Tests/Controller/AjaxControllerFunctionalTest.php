@@ -483,8 +483,8 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     {
         $userRepository = $this->getService(UserRepository::class);
 
-        /** @var User $adminUser */
         $adminUser = $userRepository->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $adminUser);
 
         $salesUser = $userRepository->findOneBy(['username' => 'sales']);
         $this->assertInstanceOf(User::class, $salesUser);

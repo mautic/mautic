@@ -22,11 +22,11 @@ final class NoUselessAssertInstanceOfRuleTest extends RuleTestCase
     {
         $this->analyse([__DIR__.'/Fixture/NoUselessAssertInstanceOf/UselessAssertInstanceOf.php'], [
             [
-                'Value is already known to be "ArrayObject", remove the useless assertInstanceOf().',
+                'Value is already known to be "ArrayObject", remove the useless assertInstanceOf(), or if the type comes only from a @var docblock, remove the @var instead.',
                 14,
             ],
             [
-                'Value is already known to be "Countable", remove the useless assertInstanceOf().',
+                'Value is already known to be "Countable", remove the useless assertInstanceOf(), or if the type comes only from a @var docblock, remove the @var instead.',
                 16,
             ],
         ]);

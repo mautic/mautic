@@ -71,7 +71,7 @@ final class NoUselessAssertInstanceOfRule implements Rule
 
         return [
             RuleErrorBuilder::message(sprintf(
-                'Value is already known to be "%s", remove the useless assertInstanceOf().',
+                'Value is already known to be "%s", remove the useless assertInstanceOf(), or if the type comes only from a @var docblock, remove the @var instead.',
                 $className
             ))
                 ->identifier('mautic.noUselessAssertInstanceOf')

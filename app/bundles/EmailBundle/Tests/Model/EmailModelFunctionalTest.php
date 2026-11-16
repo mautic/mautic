@@ -707,9 +707,9 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        /** @var Email $winnerReloaded */
         $winnerReloaded = $this->getService(EmailRepository::class)->find($winner->getId());
 
+        $this->assertInstanceOf(Email::class, $winnerReloaded);
         $this->assertNotInstanceOf(VariantEntityInterface::class, $winnerReloaded->getVariantParent());
         $this->assertSame('2026-01-01 00:00:00', $winnerReloaded->getPublishUp()?->format('Y-m-d H:i:s'));
         $this->assertSame('2026-01-31 23:59:59', $winnerReloaded->getPublishDown()?->format('Y-m-d H:i:s'));

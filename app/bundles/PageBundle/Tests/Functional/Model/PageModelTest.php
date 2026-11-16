@@ -63,8 +63,8 @@ final class PageModelTest extends MauticMysqlTestCase
             'mautic_device_id' => 'some_device_id',
         ];
         $this->client->request(Request::METHOD_POST, '/mtc/event', $requestParameters);
-        /** @var Hit $pageHit */
         $pageHit = $this->pageHitRepository->findOneBy([]);
+        $this->assertInstanceOf(Hit::class, $pageHit);
         $this->assertStringStartsWith($pageHit->getUrlTitle(), $requestParameters['page_title']);
         $this->assertStringStartsWith($pageHit->getPageLanguage(), $requestParameters['page_language']);
         $this->assertStringStartsWith($pageHit->getUrl(), $requestParameters['page_url']);
@@ -146,10 +146,10 @@ final class PageModelTest extends MauticMysqlTestCase
             'REMOTE_ADDR'     => $ipAddress,
         ];
         $this->client->request(Request::METHOD_POST, '/mtc/event', $requestParameters, [], $server);
-        /** @var Hit $pageHit */
         $pageHit = $this->pageHitRepository->findOneBy([]);
 
         if ($isHit) {
+            $this->assertInstanceOf(Hit::class, $pageHit);
             $this->assertStringStartsWith($pageHit->getUrlTitle(), $requestParameters['page_title']);
             $this->assertStringStartsWith($pageHit->getPageLanguage(), $requestParameters['page_language']);
             $this->assertStringStartsWith($pageHit->getUrl(), $requestParameters['page_url']);
@@ -236,10 +236,10 @@ final class PageModelTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(Request::METHOD_GET, $redirectURL, [], [], $server);
-        /** @var Hit $pageHit */
         $pageHit = $this->pageHitRepository->findOneBy([]);
 
         if ($isHit) {
+            $this->assertInstanceOf(Hit::class, $pageHit);
             $this->assertStringStartsWith($pageHit->getUrl(), $page->getRedirectUrl());
         } else {
             $this->assertNull($pageHit);
