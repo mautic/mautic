@@ -20,8 +20,8 @@ use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Psr\Cache\InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Group;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 
 #[Group('non-parallel')]
