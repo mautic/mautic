@@ -96,6 +96,10 @@
     transition: stroke-dasharray var(--duration-productive) var(--easing-standard-productive);
   }
 
+  &--settled &__arc {
+    animation: none;
+  }
+
   &__arc[stroke-dasharray^='0 '] {
     display: none;
   }
