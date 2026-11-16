@@ -310,7 +310,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     private int $previousId = 0;
 
-    private $primaryCompany;
+    private ?array $primaryCompany = null;
 
     /**
      * Used to determine order of preferred channels.

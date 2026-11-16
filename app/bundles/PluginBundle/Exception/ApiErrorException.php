@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 final class ApiErrorException extends \Exception
 {
-    private $contactId;
+    private int|string|null $contactId = null;
 
     private ?Lead $contact = null;
 
