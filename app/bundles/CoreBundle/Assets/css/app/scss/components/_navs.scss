@@ -267,6 +267,10 @@
         color: var(--text-primary);
       }
 
+      &.text-danger {
+        color: $brand-danger;
+      }
+
       &::after {
         content: '';
         position: absolute;
