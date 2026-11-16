@@ -22,12 +22,12 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->model = self::getContainer()->get(StageModel::class);
+        $this->model = $this->getService(StageModel::class);
     }
 
     public function testUpdateLead(): void
     {
-        $this->assertEmpty($this->getContainer()->get(LeadStageLogRepository::class)->findAll());
+        $this->assertEmpty($this->getService(LeadStageLogRepository::class)->findAll());
         $ipAddress = new IpAddress();
         $ipAddress->setIpAddress('13.13.13.13');
         $this->em->persist($ipAddress);
@@ -46,16 +46,15 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
 
         $this->createLeadStageLog($leadTwo, $stageThree, $ipAddress);
 
-        $this->assertCount(5, $this->getContainer()->get(LeadStageLogRepository::class)->findAll());
+        $this->assertCount(5, $this->getService(LeadStageLogRepository::class)->findAll());
 
         $leadMergeEvent = new LeadPostMergeEvent($leadTwo, $leadOne);
 
-        /** @var LeadSubscriber $subscriber */
-        $subscriber = self::getContainer()->get(LeadSubscriber::class);
+        $subscriber = $this->getService(LeadSubscriber::class);
 
         $subscriber->onLeadMerge($leadMergeEvent);
 
-        $this->assertCount(3, $this->getContainer()->get(LeadStageLogRepository::class)->findAll());
+        $this->assertCount(3, $this->getService(LeadStageLogRepository::class)->findAll());
     }
 
     private function createLead(string $email): Lead

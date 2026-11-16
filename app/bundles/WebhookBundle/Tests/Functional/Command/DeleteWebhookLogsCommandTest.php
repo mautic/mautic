@@ -22,7 +22,7 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
         $this->configParams['webhook_log_max']                      = 5;
         parent::setUp();
 
-        $this->webhookModel = self::getContainer()->get(WebhookModel::class);
+        $this->webhookModel = $this->getService(WebhookModel::class);
     }
 
     public function testRemoveLogInstantly(): void
@@ -90,7 +90,7 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
      */
     private function assertLogs(Webhook $webhook, int $expectedCount, array $expectedIds): void
     {
-        $logs   = $this->getContainer()->get(LogRepository::class)->findBy(['webhook' => $webhook]);
+        $logs   = $this->getService(LogRepository::class)->findBy(['webhook' => $webhook]);
         $logIds = array_map(fn (Log $log) => $log->getId(), $logs);
 
         $this->assertCount($expectedCount, $logs);

@@ -21,7 +21,7 @@ final class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
         $this->createSegmentMember($segmentA, $lead);
         $this->createSegmentMember($segmentB, $lead, true);
 
-        $leadListRepository = self::getContainer()->get(LeadListRepository::class);
+        $leadListRepository = $this->getService(LeadListRepository::class);
 
         $result = $leadListRepository->checkLeadSegmentsByIds($lead, [$segmentA->getId()]);
         $this->assertTrue($result);

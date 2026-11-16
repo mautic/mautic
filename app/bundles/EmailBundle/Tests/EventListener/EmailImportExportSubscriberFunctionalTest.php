@@ -18,7 +18,7 @@ final class EmailImportExportSubscriberFunctionalTest extends MauticMysqlTestCas
     protected function setUp(): void
     {
         parent::setUp();
-        $this->dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        $this->dispatcher = $this->getService(EventDispatcherInterface::class);
     }
 
     public function testExportEmailWithNullParentReferences(): void
@@ -197,7 +197,7 @@ final class EmailImportExportSubscriberFunctionalTest extends MauticMysqlTestCas
 
         $this->em->clear();
 
-        $imported = $this->getContainer()->get(EmailRepository::class)->findOneBy(['uuid' => $exported['uuid']]);
+        $imported = $this->getService(EmailRepository::class)->findOneBy(['uuid' => $exported['uuid']]);
         $this->assertInstanceOf(Email::class, $imported);
 
         $this->assertSame($email->getCustomHtml(), $imported->getCustomHtml());

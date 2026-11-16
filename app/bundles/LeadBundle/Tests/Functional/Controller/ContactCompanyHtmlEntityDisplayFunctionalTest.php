@@ -24,13 +24,11 @@ final class ContactCompanyHtmlEntityDisplayFunctionalTest extends MauticMysqlTes
     {
         $companyName = 'R&D';
 
-        /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $companyModel = $this->getService(CompanyModel::class);
         $company      = new Company()->setName($companyName);
         $companyModel->saveEntity($company);
 
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
 
         $namedContact = new Lead()
             ->setFirstname('John')

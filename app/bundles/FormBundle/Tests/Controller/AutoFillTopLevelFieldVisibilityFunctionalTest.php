@@ -41,17 +41,14 @@ final class AutoFillTopLevelFieldVisibilityFunctionalTest extends MauticMysqlTes
         // Boot the browser kernel and set tracker state on the same container used for HTTP requests.
         $this->client->request(Request::METHOD_GET, '/');
 
-        /** @var ContactTracker $contactTracker */
-        $contactTracker = self::getContainer()->get(ContactTracker::class);
+        $contactTracker = $this->getService(ContactTracker::class);
         $contactTracker->setUseSystemContact(true);
         $contactTracker->setSystemContact($lead);
 
-        /** @var FormModel $formModel */
-        $formModel = self::getContainer()->get(FormModel::class);
+        $formModel = $this->getService(FormModel::class);
         $form      = $formModel->getEntity($formId);
 
-        /** @var RequestStack $requestStack */
-        $requestStack = self::getContainer()->get(RequestStack::class);
+        $requestStack = $this->getService(RequestStack::class);
         $requestStack->push(Request::create('/form/'.$formId, Request::METHOD_GET));
 
         try {

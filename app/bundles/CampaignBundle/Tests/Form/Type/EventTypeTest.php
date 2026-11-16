@@ -19,7 +19,6 @@ final class EventTypeTest extends TestCase
         $type   = new EventType();
         $method = new \ReflectionMethod(EventType::class, 'getTimeValue');
 
-        /** @var \DateTime $parsed */
         $parsed = $method->invoke($type, ['triggerHour' => $value], 'triggerHour');
 
         $this->assertInstanceOf(\DateTime::class, $parsed);

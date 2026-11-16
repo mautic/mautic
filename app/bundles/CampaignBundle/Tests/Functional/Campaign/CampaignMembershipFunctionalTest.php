@@ -82,8 +82,8 @@ final class CampaignMembershipFunctionalTest extends MauticMysqlTestCase
         );
         $this->em->clear();
 
-        $adder              = self::getContainer()->get(Adder::class);
-        $campaignLeadEntity = $this->getContainer()->get(LeadRepository::class)->findOneBy([
+        $adder              = $this->getService(Adder::class);
+        $campaignLeadEntity = $this->getService(LeadRepository::class)->findOneBy([
             'lead'     => $contactId,
             'campaign' => $campaignId,
         ]);

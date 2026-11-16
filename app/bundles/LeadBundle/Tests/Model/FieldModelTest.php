@@ -43,8 +43,7 @@ final class FieldModelTest extends MauticMysqlTestCase
     #[DataProvider('dataForGetFieldsProperties')]
     public function testGetFieldsProperties(array $filters, int $expectedCount): void
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         // Create an unpublished lead field.
         $field = new LeadField();
@@ -105,8 +104,7 @@ final class FieldModelTest extends MauticMysqlTestCase
 
     public function testSingleContactFieldIsCreatedAndDeleted(): void
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         $field = new LeadField();
         $field->setName('Test Field')
@@ -122,8 +120,7 @@ final class FieldModelTest extends MauticMysqlTestCase
 
     public function testSingleCompanyFieldIsCreatedAndDeleted(): void
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         $field = new LeadField();
         $field->setName('Test Field')
@@ -139,8 +136,7 @@ final class FieldModelTest extends MauticMysqlTestCase
 
     public function testMultipleFieldsAreCreatedAndDeleted(): void
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         $leadField = new LeadField();
         $leadField->setName('Test Field')
@@ -266,11 +262,9 @@ final class FieldModelTest extends MauticMysqlTestCase
     {
         // DBAL 4 dropped the SQL logger, so the queries are read off doctrine-bundle's
         // debug middleware instead
-        $debugDataHolder = $this->getContainer()->get('doctrine.debug_data_holder');
-        $this->assertInstanceOf(DebugDataHolder::class, $debugDataHolder);
+        $debugDataHolder = $this->getService('doctrine.debug_data_holder');
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         // Ensure the index exists
         $emailField = $fieldModel->getEntityByAlias('email');

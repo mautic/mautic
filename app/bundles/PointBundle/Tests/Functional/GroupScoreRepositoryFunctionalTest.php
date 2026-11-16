@@ -19,7 +19,7 @@ final class GroupScoreRepositoryFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repository = self::getContainer()->get(GroupContactScoreRepository::class);
+        $this->repository = $this->getService(GroupContactScoreRepository::class);
     }
 
     public function testCompareScore(): void

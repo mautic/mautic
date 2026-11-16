@@ -48,7 +48,7 @@ final class ConfigSubscriberTest extends MauticMysqlTestCase
     private function getConfigPath(): string
     {
         /** @var \AppKernel $kernel */
-        $kernel = self::getContainer()->get(KernelInterface::class);
+        $kernel = $this->getService(KernelInterface::class);
 
         return $kernel->getLocalConfigFile();
     }

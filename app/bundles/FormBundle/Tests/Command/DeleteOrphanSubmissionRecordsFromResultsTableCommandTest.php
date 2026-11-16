@@ -28,8 +28,7 @@ final class DeleteOrphanSubmissionRecordsFromResultsTableCommandTest extends Mau
             $this->submitForm($form);
         }
 
-        /** @var SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->getContainer()->get(SubmissionRepository::class);
+        $submissionRepository = $this->getService(SubmissionRepository::class);
 
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $form['id']]);

@@ -86,8 +86,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
      */
     private function setupCampaignData(int $bitwise, int $export): User
     {
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->getContainer()->get(UserRepository::class);
+        $userRepository = $this->getService(UserRepository::class);
         $adminUser      = $userRepository->findOneBy(['username' => 'admin']);
 
         // create users

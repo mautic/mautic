@@ -13,7 +13,7 @@ final class SegmentSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     public function testLeadListChangeEventHasListeners(): void
     {
-        $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
 
         $this->assertTrue($dispatcher->hasListeners(ListChangeEvent::class));
         $this->assertTrue($dispatcher->hasListeners(ListBatchChangeEvent::class));

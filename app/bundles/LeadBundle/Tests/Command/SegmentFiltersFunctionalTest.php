@@ -63,7 +63,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId]);
 
         // get the lead list leads stored in db after the segment update
-        $leadListLeads = $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment]);
+        $leadListLeads = $this->getService(ListLeadRepository::class)->findBy(['list' => $segment]);
         foreach ($leadListLeads as $listLead) {
             $leadListLeadsIds[] = (int) $listLead->getLead()->getId();
         }
@@ -89,8 +89,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
         $field->setAlias($fieldDetails['alias']);
         $field->setProperties($fieldDetails['properties']);
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 
@@ -101,8 +100,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
     {
         $numberOfContacts               = 8;
         $numberOfContactsWithBlankValue = 2;
-        /** @var LeadRepository $contactRepo */
-        $contactRepo = $this->getContainer()->get(LeadRepository::class);
+        $contactRepo = $this->getService(LeadRepository::class);
         $contacts    = [];
         $cars        = [
             'value1', 'value2', 'value3',
@@ -122,8 +120,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
                         ],
                     ],
                 ]);
-                /** @var LeadModel $leadModel */
-                $leadModel = self::getContainer()->get(LeadModel::class);
+                $leadModel = $this->getService(LeadModel::class);
                 $leadModel->setFieldValues($contact, [self::FIELD_NAME => [$cars[$i % 3]]]);
             }
             $contacts[] = $contact;
@@ -138,8 +135,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
      */
     private function saveSegment(array $segmentData = []): LeadList
     {
-        /** @var LeadListRepository $segmentRepo */
-        $segmentRepo = $this->getContainer()->get(LeadListRepository::class);
+        $segmentRepo = $this->getService(LeadListRepository::class);
         $segment     = new LeadList();
 
         $filterToSave = $segmentData['filterToSave'];

@@ -28,8 +28,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     {
         $dispatchedEvent = null;
 
-        self::getContainer()
-            ->get(EventDispatcherInterface::class)
+        $this->getService(EventDispatcherInterface::class)
             ->addListener(EntityTogglePublishEvent::class, function (EntityTogglePublishEvent $event) use (&$dispatchedEvent): void {
                 $dispatchedEvent = $event;
             });
@@ -49,7 +48,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->assertResponseIsSuccessful();
 
-        $page = $this->getContainer()->get(PageRepository::class)->find($page->getId());
+        $page = $this->getService(PageRepository::class)->find($page->getId());
         $this->assertInstanceOf(Page::class, $page);
         $this->assertFalse($page->isPublished(), 'The page should not be published.');
         $this->assertInstanceOf(EntityTogglePublishEvent::class, $dispatchedEvent, 'The event should have been dispatched.');

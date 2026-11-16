@@ -17,8 +17,7 @@ final class StatRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        /** @var StatRepository $repository */
-        $repository           = $this->getContainer()->get(StatRepository::class);
+        $repository           = $this->getService(StatRepository::class);
         $this->statRepository = $repository;
     }
 

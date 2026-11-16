@@ -516,6 +516,8 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - `Mautic\PluginBundle\Helper\IntegrationHelper::getUserIdentifierField()` now requires its first parameter `$integrationObject` to be a `Mautic\PluginBundle\Integration\AbstractIntegration` (previously untyped), and its return type is now `array`. Callers passing any other type now throw a `TypeError`.
 - `Mautic\CoreBundle\Helper\SearchStringHelper::mergeCommands()` now types its first parameter `$filters` as `\stdClass` (previously untyped). Passing any other object now throws a `TypeError`.
 - `Mautic\PageBundle\Event\VideoHitEvent::__construct()` now types its `$request` argument as `Symfony\Component\HttpFoundation\Request` (previously untyped), and `getRequest()` returns `Request`. Passing any other value now throws a `TypeError`.
+- `Mautic\LeadBundle\Entity\Lead::setUtmTags()` now types its `$utmTags` parameter as `Mautic\LeadBundle\Entity\UtmTag` (previously untyped). Passing any other value now throws a `TypeError`, and a subclass overriding the method must declare a compatible signature.
+- `Mautic\FormBundle\Helper\FormFieldHelper::validateFieldValue()` now types its `$f` parameter as `?Mautic\FormBundle\Entity\Field` (previously untyped). Passing any other value now throws a `TypeError`.
 - `Mautic\CoreBundle\Model\VariantModelTrait::preVariantSaveEntity()` now types `$entity` as `Mautic\CoreBundle\Entity\VariantEntityInterface&Mautic\CoreBundle\Entity\CommonEntity`. Passing a `VariantEntityInterface` implementation that does not extend `CommonEntity` now throws a `TypeError`.
 - Most core event subscribers no longer implement `Symfony\Component\EventDispatcher\EventSubscriberInterface`. Listener methods now carry a `#[AsEventListener]` attribute instead of being declared in `getSubscribedEvents()`, and are registered through service autoconfiguration. Two consequences for plugins:
     - A plugin service that extends an abstract base such as `Mautic\CoreBundle\EventListener\CommonStatsSubscriber` or `Mautic\NotificationBundle\EventListener\CampaignSubscriber` must be an autoconfigured service for its inherited `#[AsEventListener]` methods to register. Services defined with `autoconfigure: true` (the default in Mautic's `config/services.php` loader) get this automatically; a service registered without autoconfiguration no longer receives its events.
@@ -1156,6 +1158,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `LeadBundle\Entity\LeadFieldRepository` | `getFieldAliases()`, `getFieldsByType()` | `string` |
     | `LeadBundle\Entity\LeadFieldRepository` | `getPropertyByField()` | `string`, `Mautic\CoreBundle\Doctrine\Query\QueryBuilder` |
     | `LeadBundle\Entity\LeadFieldRepository` | `compareDateValue()` (second parameter) | `string` |
+    | `LeadBundle\Entity\LeadRepository` | `applySearchQueryRelationship()` (`$whereExpression`, `$having`) | `string\|Doctrine\DBAL\Query\Expression\CompositeExpression\|null` |
     | `LeadBundle\Entity\MergeRecordRepository` | `moveMergeRecord()` | `int`, `int` |
     | `LeadBundle\Entity\StagesChangeLogRepository` | `getCurrentLeadStage()` | `int` |
     | `LeadBundle\Event\ContactIdentificationEvent` | `setIdentifiedContact()` (second parameter) | `string` |
@@ -1170,6 +1173,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `LeadBundle\Segment\ContactSegmentService` | `getOrphanedLeadListLeads()` (third parameter) | `?int` |
     | `LeadBundle\Segment\Decorator\Date\TimezoneResolver` | `getDefaultDate()` | `bool` |
     | `LeadBundle\Segment\Query\Expression\ExpressionBuilder` | `notExists()` | `string` |
+    | `LeadBundle\Segment\Query\Expression\ExpressionBuilder` | `func()` (second parameter) | `string` |
     | `LeadBundle\Segment\Query\QueryBuilder` | `replaceJoinCondition()` | `string`, `string` |
     | `LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery` | `getDataFromLeadEventLog()` | `string` |
     | `LeadBundle\Tracker\ContactTracker` | `setUseSystemContact()` | `bool` (no longer nullable) |
@@ -1196,7 +1200,31 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
     `ContactIdentificationEvent::getIdentifier()` now returns `?string` and `ListPreProcessListEvent::getResult()` returns `?bool`.
 
+    When there is no where or having expression, pass `null` to `LeadRepository::applySearchQueryRelationship()`, not `false`. Pass the `ExpressionBuilder::func()` operand as a SQL expression string, e.g. `func('ABS', '-1')` instead of `func('ABS', -1)`.
+
 - The `$action` parameter of controller helpers now declares a native `string` type: `AbstractStandardFormController::afterEntitySave()`, `afterFormProcessed()`, `beforeEntitySave()`, `beforeFormProcessed()`, `checkActionPermission()`, `getFormEntity()`, `getFormView()`, `getPostActionRedirectArguments()`, `getPostActionControllerAction()` and `getViewArguments()`, `FetchCommonApiController::checkEntityAccess()` and `ListController::changeList()`, plus their overrides in core controllers. Callers that pass a non-string action now get a `TypeError`. Plugin controllers that override one of these methods may keep the parameter untyped or declare `string`.
+
+- Controller methods across bundles now declare native `bool` parameter types for their `$ignorePost`, `$forceTypeSelection`, `$isPost` and `$isClone` flags. Passing `null` now throws a `TypeError` in all callers. Callers in files with `declare(strict_types=1)` also get a `TypeError` for other non-bool values (e.g. `0`/`1`) - cast the argument to `bool`. `$isClone` in `getFormEntity()` is passed by reference, so convert the variable to `bool` before the call (`$isClone = (bool) $isClone;`) instead of casting inline. Plugin controllers that extend these classes and override one of these methods must keep the override compatible - drop the parameter type or use `bool`.
+
+    | Class | Method | New parameter types |
+    | --- | --- | --- |
+    | `Mautic\ApiBundle\Controller\ClientController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\AssetBundle\Controller\AssetController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\CampaignBundle\Controller\CampaignController` | `beforeFormProcessed()` (`$isPost`) | `bool` |
+    | `Mautic\CategoryBundle\Controller\CategoryController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\CoreBundle\Controller\AbstractStandardFormController` | `beforeFormProcessed()` (`$isPost`), `getFormEntity()` (`&$isClone`) | `bool` |
+    | `Mautic\DynamicContentBundle\Controller\DynamicContentController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\FormBundle\Controller\FormController` | `editAction()` (`$ignorePost`, `$forceTypeSelection`) | `bool` |
+    | `Mautic\NotificationBundle\Controller\MobileNotificationController` | `editAction()` (`$ignorePost`, `$forceTypeSelection`) | `bool` |
+    | `Mautic\NotificationBundle\Controller\NotificationController` | `editAction()` (`$ignorePost`, `$forceTypeSelection`) | `bool` |
+    | `Mautic\ReportBundle\Controller\ReportController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\SmsBundle\Controller\SmsController` | `editAction()` (`$ignorePost`, `$forceTypeSelection`) | `bool` |
+    | `Mautic\StageBundle\Controller\StageController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\UserBundle\Controller\RoleController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\UserBundle\Controller\UserController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `Mautic\WebhookBundle\Controller\WebhookController` | `editAction()` (`$ignorePost`) | `bool` |
+    | `MauticPlugin\MauticFocusBundle\Controller\FocusController` | `editAction()` (`$ignorePost`) | `bool` |
+
 - Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
 
     | Class | Method | New parameter types |

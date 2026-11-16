@@ -96,7 +96,7 @@ final class EventSchedulerExtendTriggerDateFunctionalTest extends MauticMysqlTes
         $this->assertStringNotContainsString('Exception', $output, 'Command should execute without errors');
 
         // Verify the event was processed
-        $updatedLog = $this->getContainer()->get(LeadEventLogRepository::class)->find($logId);
+        $updatedLog = $this->getService(LeadEventLogRepository::class)->find($logId);
 
         $this->assertInstanceOf(LeadEventLog::class, $updatedLog, 'Event log should exist');
         $this->assertInstanceOf(\DateTimeInterface::class, $updatedLog->getTriggerDate(), 'Trigger date should be set');
@@ -157,7 +157,7 @@ final class EventSchedulerExtendTriggerDateFunctionalTest extends MauticMysqlTes
         $this->assertStringNotContainsString('Exception', $output, 'Command should execute without errors');
 
         // The event should be rescheduled to approximately 7 days from now (10 day interval - 3 days elapsed)
-        $updatedLog = $this->getContainer()->get(LeadEventLogRepository::class)->find($logId);
+        $updatedLog = $this->getService(LeadEventLogRepository::class)->find($logId);
 
         $this->assertInstanceOf(LeadEventLog::class, $updatedLog, 'Event log should exist');
         $this->assertInstanceOf(\DateTimeInterface::class, $updatedLog->getTriggerDate(), 'Trigger date should be set');

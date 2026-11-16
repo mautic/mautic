@@ -28,7 +28,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $lead->setEmail('john@his-site.com');
         $this->em->persist($lead);
 
-        $fieldRepository = $this->getContainer()->get(LeadFieldRepository::class);
+        $fieldRepository = $this->getService(LeadFieldRepository::class);
 
         /** @var LeadField[] $fields */
         $fields = $fieldRepository->findBy(['object' => 'lead', 'group' => 'core'], [
@@ -132,8 +132,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
             ->setIsVisible(true);
         $htmlField->setGroup('core');
 
-        $fieldModel = self::getContainer()->get(FieldModel::class);
-        $this->assertInstanceOf(FieldModel::class, $fieldModel);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntity($htmlField);
 
         $payload = '<p>Safe Bio</p><script>alert("xss")</script><img src=x onerror=alert(1)><a href="javascript:alert(2)">bad</a><a href="https://example.com">good</a>';
@@ -142,8 +141,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $lead->setEmail('html-field-xss@example.com');
         $lead->addUpdatedField('html_bio', $payload);
 
-        $leadModel = self::getContainer()->get(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $leadModel);
+        $leadModel = $this->getService(LeadModel::class);
         $leadModel->saveEntity($lead);
 
         $this->em->clear();
@@ -175,7 +173,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $data    = $crawler->filterXPath('//div[@id="social"]//td');
         $this->assertCount(1, $data);
 
-        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
         $this->assertStringContainsString($translator->trans('mautic.lead.field.group.no_data'), $data->text());
     }
 

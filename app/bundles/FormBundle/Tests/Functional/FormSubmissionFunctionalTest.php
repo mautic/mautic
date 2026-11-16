@@ -37,8 +37,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit form on landing page
         $this->submitLandingPageFormWithoutCompanies($formAlias, $pageA->getAlias(), 'j@doe.com', 'John', 'Doe');
 
-        /** @var SubmissionRepository $submissionRepo */
-        $submissionRepo = $this->getContainer()->get(SubmissionRepository::class);
+        $submissionRepo = $this->getService(SubmissionRepository::class);
 
         // Set tracking_id on submission using direct SQL (simulates device tracking which doesn't work in functional tests)
         $submissions = $submissionRepo->findBy(['page' => $pageA]);
@@ -79,16 +78,14 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
 
-        /** @var EmailModel $emailModel */
-        $emailModel = self::getContainer()->get(EmailModel::class);
+        $emailModel = $this->getService(EmailModel::class);
         $emailModel->sendEmail($email, [[
             'id'        => $lead->getId(),
             'email'     => $lead->getEmail(),
             'firstname' => $lead->getFirstname(),
             'lastname'  => $lead->getLastname(), ]]);
 
-        /** @var StatRepository $emailStatRepository */
-        $emailStatRepository = $this->getContainer()->get(StatRepository::class);
+        $emailStatRepository = $this->getService(StatRepository::class);
 
         /** @var Stat|null $emailStat */
         $emailStat = $emailStatRepository->findOneBy(
@@ -115,8 +112,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
-        /** @var SubmissionRepository $submissionRepo */
-        $submissionRepo = $this->getContainer()->get(SubmissionRepository::class);
+        $submissionRepo = $this->getService(SubmissionRepository::class);
 
         // Verify submission is associated with the page
         $submissions = $submissionRepo->findBy(['page' => $pageA]);
@@ -139,8 +135,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
         // Create contact with the same email but different lastname.
         $this->submitLandingPageFormWithoutCompanies($formAlias, $page->getAlias(), 'j@doe.com', 'John', 'Doe');
 
-        /** @var SubmissionRepository $submissionRepo */
-        $submissionRepo = $this->getContainer()->get(SubmissionRepository::class);
+        $submissionRepo = $this->getService(SubmissionRepository::class);
 
         $this->assertEmpty($submissionRepo->validateSubmissions([9999999999999], $formId));
 

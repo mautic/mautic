@@ -14,7 +14,7 @@ final class LoadAssetDataTest extends MauticMysqlTestCase
     public function testLoadFixtures(): void
     {
         $this->loadFixtures([LoadAssetData::class]);
-        $asset = $this->getContainer()->get(AssetRepository::class)->findOneBy(
+        $asset = $this->getService(AssetRepository::class)->findOneBy(
             ['title' => '@TOCHANGE: Asset1 Title'],
             ['id' => 'DESC']
         );

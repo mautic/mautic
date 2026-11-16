@@ -123,13 +123,12 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(201);
         $this->assertGreaterThan(0, $segmentId);
 
-        return $this->getContainer()->get(LeadListRepository::class)->find($segmentId);
+        return $this->getService(LeadListRepository::class)->find($segmentId);
     }
 
     private function buildSegment(LeadList $segment, int $expectedCountInSegment): void
     {
-        /** @var ContactSegmentService $contactSegmentService */
-        $contactSegmentService = self::getContainer()->get(ContactSegmentService::class);
+        $contactSegmentService = $this->getService(ContactSegmentService::class);
 
         $this->testSymfonyCommand('mautic:segments:update', [
             '-i'    => $segment->getId(),
@@ -147,7 +146,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
     {
         $this->em->remove($segment);
         foreach ($this->leads as $lead) {
-            $deleteLead = $this->getContainer()->get(LeadRepository::class)->find($lead->getId());
+            $deleteLead = $this->getService(LeadRepository::class)->find($lead->getId());
             $this->assertInstanceOf(Lead::class, $deleteLead);
             $this->em->remove($deleteLead);
         }
@@ -202,7 +201,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $field->setName('Multiselect');
         $properties = Serializer::decode('a:1:{s:4:"list";a:3:{i:0;a:2:{s:5:"label";s:1:"f";s:5:"value";s:1:"f";}i:1;a:2:{s:5:"label";s:1:"s";s:5:"value";s:1:"s";}i:2;a:2:{s:5:"label";s:1:"t";s:5:"value";s:1:"t";}}}');
         $field->setProperties($properties);
-        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 }

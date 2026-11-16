@@ -45,8 +45,7 @@ final class EventModelFunctionalTest extends MauticMysqlTestCase
         }
 
         // delete them
-        /** @var EventModel $eventModel */
-        $eventModel = self::getContainer()->get(EventModel::class);
+        $eventModel = $this->getService(EventModel::class);
         $eventModel->deleteEvents($currentEvents, $deletedEvents);
 
         $this->em->clear();

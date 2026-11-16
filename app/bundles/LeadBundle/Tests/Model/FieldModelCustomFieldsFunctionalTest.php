@@ -14,8 +14,7 @@ final class FieldModelCustomFieldsFunctionalTest extends MauticMysqlTestCase
 
     public function testGetLeadFields(): void
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $fields     = $fieldModel->getLeadFields();
         $expected   = count(FieldModel::$coreFields);
         $this->assertGreaterThanOrEqual($expected, count($fields));
@@ -23,8 +22,7 @@ final class FieldModelCustomFieldsFunctionalTest extends MauticMysqlTestCase
 
     public function testLeadFieldCustomFields(): void
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
         $this->assertEmpty($fields, 'There are no Custom Fields.');
@@ -43,8 +41,7 @@ final class FieldModelCustomFieldsFunctionalTest extends MauticMysqlTestCase
 
     public function testGetLeadCustomFieldsSchemaDetails(): void
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
 
         // Add field.
         $leadField = new LeadField();

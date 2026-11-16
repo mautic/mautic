@@ -66,14 +66,12 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        /** @var CampaignModel $leadModel */
-        $leadModel = self::getContainer()->get(CampaignModel::class);
+        $leadModel = $this->getService(CampaignModel::class);
 
         $this->assertCount(2, $leadModel->getCampaignLeads($campaign));
 
         $leadMergeEvent = new LeadPostMergeEvent($victor, $loser);
-        /** @var LeadSubscriber $subscriber */
-        $subscriber = self::getContainer()->get(LeadSubscriber::class);
+        $subscriber = $this->getService(LeadSubscriber::class);
 
         $subscriber->onLeadMerge($leadMergeEvent);
 

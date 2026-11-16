@@ -1265,10 +1265,8 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
 
     /**
      * @param array<int, mixed> $tables          $tables[0] should be primary table
-     * @param mixed             $whereExpression
-     * @param mixed             $having
      */
-    public function applySearchQueryRelationship(TrackingQueryBuilder $q, array $tables, bool $innerJoinTables, $whereExpression = null, $having = null): void
+    public function applySearchQueryRelationship(TrackingQueryBuilder $q, array $tables, bool $innerJoinTables, string|CompositeExpression|null $whereExpression = null, string|CompositeExpression|null $having = null): void
     {
         $primaryTable = $tables[0];
         unset($tables[0]);

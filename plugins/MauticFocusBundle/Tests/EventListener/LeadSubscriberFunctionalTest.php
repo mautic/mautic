@@ -22,7 +22,7 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->focusModel = self::getContainer()->get(FocusModel::class);
+        $this->focusModel = $this->getService(FocusModel::class);
         $this->lead       = $this->createLead();
 
         $this->setTestsData($this->lead);
@@ -46,8 +46,8 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function searchPhrase(string $phrase, Lead $lead): array
     {
-        $searchViewStats  = $this->getContainer()->get(StatRepository::class)->getStatsViewByLead($lead->getId(), ['search'=>$phrase]);
-        $searchClickStats = $this->getContainer()->get(StatRepository::class)->getStatsClickByLead($lead->getId(), ['search'=>$phrase]);
+        $searchViewStats  = $this->getService(StatRepository::class)->getStatsViewByLead($lead->getId(), ['search'=>$phrase]);
+        $searchClickStats = $this->getService(StatRepository::class)->getStatsClickByLead($lead->getId(), ['search'=>$phrase]);
 
         return array_merge($searchViewStats, $searchClickStats);
     }

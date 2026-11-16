@@ -1232,7 +1232,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
 
     private function createStuckContactsTestData(): void
     {
-        $campaign = $this->getContainer()->get(CampaignRepository::class)->find(1);
+        $campaign = $this->getService(CampaignRepository::class)->find(1);
         if (!$campaign) {
             $campaign = $this->createCampaign('Test Campaign');
             $campaign->setIsPublished(true);
@@ -1297,7 +1297,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
             $criteria['event'] = $eventId;
         }
 
-        return $this->getContainer()->get(LeadEventLogRepository::class)->findBy($criteria);
+        return $this->getService(LeadEventLogRepository::class)->findBy($criteria);
     }
 
     /**

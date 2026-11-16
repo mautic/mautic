@@ -14,7 +14,6 @@ use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class NoteControllerTest extends MauticMysqlTestCase
 {
@@ -128,7 +127,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/notes/%d/delete/%d', $contact->getId(), $noteId));
         $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
-        $this->assertNotInstanceOf(LeadNote::class, $this->getContainer()->get(LeadNoteRepository::class)->find($noteId));
+        $this->assertNotInstanceOf(LeadNote::class, $this->getService(LeadNoteRepository::class)->find($noteId));
     }
 
     public function testDeleteActionIsDeniedWithoutNotesDeletePermission(): void
@@ -241,7 +240,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->em->persist($role);
         $this->em->flush();
 
-        $roleModel = self::getContainer()->get(RoleModel::class);
+        $roleModel = $this->getService(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
 
@@ -252,8 +251,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $user->setEmail('note.controller.'.uniqid().'@example.com');
         $user->setRole($role);
 
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $this->em->persist($user);
         $this->em->flush();
@@ -293,7 +291,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->em->persist($role);
         $this->em->flush();
 
-        $roleModel = self::getContainer()->get(RoleModel::class);
+        $roleModel = $this->getService(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
 
@@ -304,8 +302,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $user->setEmail('note.user.'.uniqid().'@example.com');
         $user->setRole($role);
 
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $this->em->persist($user);
         $this->em->flush();

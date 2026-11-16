@@ -19,16 +19,14 @@ final class CompanyObjectHelperTest extends MauticMysqlTestCase
 {
     public function testUpdateEmpty(): void
     {
-        /** @var CompanyObjectHelper $companyObjectHelper */
-        $companyObjectHelper  = self::getContainer()->get(CompanyObjectHelper::class);
+        $companyObjectHelper  = $this->getService(CompanyObjectHelper::class);
         $updatedMappedObjects = $companyObjectHelper->update([], []);
         $this->assertSame([], $updatedMappedObjects);
     }
 
     public function testUpdate(): void
     {
-        /** @var UserModel $userModel */
-        $userModel = self::getContainer()->get(UserModel::class);
+        $userModel = $this->getService(UserModel::class);
         $users     = $userModel->getRepository()->findAll();
         $user      = reset($users);
         $now       = new \DateTime();
@@ -41,16 +39,14 @@ final class CompanyObjectHelperTest extends MauticMysqlTestCase
         $company2->setDateAdded($now);
         $company2->setOwner($user);
 
-        /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $companyModel = $this->getService(CompanyModel::class);
         $companyModel->saveEntity($company1);
         $companyModel->saveEntity($company2);
 
         $phone = '123456789';
         $city  = 'Boston';
 
-        /** @var CompanyObjectHelper $companyObjectHelper */
-        $companyObjectHelper = self::getContainer()->get(CompanyObjectHelper::class);
+        $companyObjectHelper = $this->getService(CompanyObjectHelper::class);
         $companyObjectHelper->update([
             $company1->getId(),
             $company2->getId(),

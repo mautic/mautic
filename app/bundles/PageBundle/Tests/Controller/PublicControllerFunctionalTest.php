@@ -37,7 +37,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/xss-test?tags={$encodedPayload}");
         self::assertResponseIsSuccessful();
 
-        $tagRepository = $this->getContainer()->get(TagRepository::class);
+        $tagRepository = $this->getService(TagRepository::class);
         $tags          = $tagRepository->findAll();
 
         if ($expectedSanitized) {
@@ -119,7 +119,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->assertResponseIsSuccessful();
 
-        $this->loginUser($this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']));
+        $this->loginUser($this->getService(UserRepository::class)->findOneBy(['username' => 'admin']));
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
 

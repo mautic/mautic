@@ -58,7 +58,6 @@ final class UTCDateTimeImmutableTypeTest extends TestCase
 
         $phpValue = $this->type->convertToPHPValue($date, $this->platform);
 
-        $this->assertInstanceOf(\DateTimeImmutable::class, $phpValue);
         $this->assertSame($this->convertDateTimezone($date, 'UTC', $timezone), $phpValue->format(DateTimeHelper::FORMAT_DB), sprintf('PHP value should be converted to %s.', $timezone));
     }
 

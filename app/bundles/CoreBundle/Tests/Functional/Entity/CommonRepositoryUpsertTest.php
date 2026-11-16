@@ -23,8 +23,7 @@ final class CommonRepositoryUpsertTest extends MauticMysqlTestCase
     public function testUpsert(): void
     {
         // Insert twice, to get two insert IDs, and then insert the first one again to trigger update, and check insert ID
-        /** @var IpAddressRepository $ipAddressRepository */
-        $ipAddressRepository = $this->getContainer()->get(IpAddressRepository::class);
+        $ipAddressRepository = $this->getService(IpAddressRepository::class);
         $ipAddress1          = new IpAddress('10.10.10.10');
         $ipAddressRepository->upsert($ipAddress1);
         $this->assertNotEmpty($ipAddress1->getId());

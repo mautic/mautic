@@ -11,8 +11,7 @@ final class AssetExtensionTest extends AbstractMauticTestCase
 {
     public function testGetCountryFlag(): void
     {
-        $assetExtension = self::getContainer()->get(AssetExtension::class);
-        $this->assertInstanceOf(AssetExtension::class, $assetExtension);
+        $assetExtension = $this->getService(AssetExtension::class);
 
         $this->assertStringStartsWith('/./app/assets/images/flags/Belgium.png', $assetExtension->getCountryFlag('Belgium'));
     }

@@ -189,7 +189,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * @param 'edit'|'new' $action
      * Do anything necessary before the form is checked for POST and processed.
      */
-    protected function beforeFormProcessed(object $entity, Form $form, string $action, $isPost, $objectId = null, bool $isClone = false): void
+    protected function beforeFormProcessed(object $entity, Form $form, string $action, bool $isPost, $objectId = null, bool $isClone = false): void
     {
     }
 
@@ -530,9 +530,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * @param 'edit'|'new' $action
-     * @param bool $isClone
      */
-    protected function getFormEntity(string $action, &$objectId = null, &$isClone = false)
+    protected function getFormEntity(string $action, &$objectId = null, bool &$isClone = false)
     {
         $model = $this->getModel($this->getModelName());
 

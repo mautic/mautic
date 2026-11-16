@@ -62,14 +62,14 @@ final class EmailTypeTest extends MauticMysqlTestCase
         $commandTester = $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segment->getId()]);
         $this->assertSame(Command::SUCCESS, $commandTester->getStatusCode());
         $this->assertStringContainsString(($contactIdsCount = count($contactIds)).' total contact(s) to be added', $commandTester->getDisplay());
-        $segmentLeadCount = $this->getContainer()->get(ListLeadRepository::class)->count(['list' => $segment]);
+        $segmentLeadCount = $this->getService(ListLeadRepository::class)->count(['list' => $segment]);
         $this->assertSame($contactIdsCount, $segmentLeadCount);
 
         $campaign      = $this->createCampaign($segment, $emailId = (int) $email->getId());
         $commandTester = $this->testSymfonyCommand('mautic:campaigns:update', ['-i' => ($campaignId = $campaign->getId())]);
         $this->assertSame(Command::SUCCESS, $commandTester->getStatusCode());
         $this->assertStringContainsString($contactIdsCount.' total contact(s) to be added', $commandTester->getDisplay());
-        $campaignLeadCount = $this->getContainer()->get(LeadRepository::class)->count(['campaign' => $campaign]);
+        $campaignLeadCount = $this->getService(LeadRepository::class)->count(['campaign' => $campaign]);
         $this->assertSame($contactIdsCount, $campaignLeadCount);
 
         $this->em->clear();
@@ -78,7 +78,7 @@ final class EmailTypeTest extends MauticMysqlTestCase
         $this->assertSame(Command::SUCCESS, $commandTester->getStatusCode());
         $this->assertStringContainsString($contactIdsCount.' total events(s) to be processed', $commandTester->getDisplay());
 
-        $stats = $this->getContainer()->get(StatRepository::class)->count(['email' => $emailId]);
+        $stats = $this->getService(StatRepository::class)->count(['email' => $emailId]);
         $this->assertSame($expectedEmailCopiesCount, $stats);
     }
 
@@ -169,8 +169,7 @@ final class EmailTypeTest extends MauticMysqlTestCase
      */
     private function addContactToDnc(array $contactIds): void
     {
-        /** @var DoNotContactModel $dncModel */
-        $dncModel = self::getContainer()->get(DoNotContactModel::class);
+        $dncModel = $this->getService(DoNotContactModel::class);
 
         foreach ($contactIds as $contactId) {
             $dncModel->addDncForContact($contactId, 'email', DoNotContact::MANUAL, 'Some comment');

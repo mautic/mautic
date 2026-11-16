@@ -485,7 +485,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $userTimezone = 'Europe/Berlin';
         $wallClock    = '2026-12-15 19:00';
 
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $user->setTimezone($userTimezone);
         $this->em->persist($user);
@@ -514,7 +514,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $eventId       = $event->getId();
         $campaignId    = $campaign->getId();
         $roundTripped  = json_decode(json_encode($modifiedEvents, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
-        $campaignModel = self::getContainer()->get(CampaignModel::class);
+        $campaignModel = $this->getService(CampaignModel::class);
 
         $this->em->clear();
         $campaign = $this->em->find(Campaign::class, $campaignId);
@@ -534,7 +534,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         // Before the fix, DateHelper mutated triggerDate to system TZ and each save shifted the instant.
         $asArray = $reloaded->convertToArray();
         unset($asArray['campaign'], $asArray['children'], $asArray['parent'], $asArray['log']);
-        $dateHelper = self::getContainer()->get(DateHelper::class);
+        $dateHelper = $this->getService(DateHelper::class);
         $dateHelper->toFull($asArray['triggerDate']);
         $roundTripped2 = json_decode(json_encode([$eventId => $asArray], JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
 

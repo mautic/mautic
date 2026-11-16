@@ -117,8 +117,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(3, $hoursDatasets);  // Assuming there are 3 datasets: Email sent, Email read, Email clicked
 
         // Get the time format from CoreParametersHelper
-        /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
+        $coreParametersHelper = $this->getService(CoreParametersHelper::class);
         $timeFormat           = $coreParametersHelper->get('date_format_timeonly');
 
         // Generate expected hour labels based on the actual time format
@@ -250,7 +249,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         // emulate email read and link click
-        $emailStats = $this->getContainer()->get(StatRepository::class)->findBy(['email' => $email]);
+        $emailStats = $this->getService(StatRepository::class)->findBy(['email' => $email]);
         $email      = $emailStats[0]->getEmail();
         $this->assertCount(3, $emailStats);
         $this->emailFixturesHelper->emulateEmailRead($emailStats[0], $email);
@@ -280,7 +279,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         // increment rotation for one of the leads and run the campaign again
-        $campaignLead = $this->getContainer()->get(LeadRepository::class)->findOneBy([
+        $campaignLead = $this->getService(LeadRepository::class)->findOneBy([
             'campaign' => $campaign->getId(),
             'lead'     => $contacts[1]->getId(),
         ]);

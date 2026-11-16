@@ -25,7 +25,7 @@ final class SegmentStatsSubscriberTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->subscriber = new SegmentStatsSubscriber(
-            $this->getContainer()->get(LeadListRepository::class)
+            $this->getService(LeadListRepository::class)
         );
     }
 

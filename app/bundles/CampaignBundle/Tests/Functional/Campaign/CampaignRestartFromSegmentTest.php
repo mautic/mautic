@@ -59,7 +59,7 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
         // Assert: contact is in the campaign at rotation 1
         $this->em->clear();
 
-        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+        $leadRepository = $this->getService(LeadRepository::class);
         $campaignLead = $leadRepository->findOneBy([
             'lead'     => $contact->getId(),
             'campaign' => $campaign->getId(),
@@ -69,7 +69,7 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
         $this->assertFalse($campaignLead->wasManuallyRemoved(), 'Contact should not be removed after first rebuild.');
         $this->assertSame(1, $campaignLead->getRotation(), 'Rotation should be 1 after first run.');
 
-        $logsAfterFirstRun = $this->getContainer()->get(LeadEventLogRepository::class)->findBy([
+        $logsAfterFirstRun = $this->getService(LeadEventLogRepository::class)->findBy([
             'lead'     => $contact->getId(),
             'campaign' => $campaign->getId(),
         ]);
@@ -125,7 +125,7 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $allEventLogs = $this->getContainer()->get(LeadEventLogRepository::class)->findBy([
+        $allEventLogs = $this->getService(LeadEventLogRepository::class)->findBy([
             'lead'     => $contact->getId(),
             'campaign' => $campaign->getId(),
         ]);

@@ -21,8 +21,7 @@ abstract class AbstractSearchTestCase extends MauticMysqlTestCase
      */
     protected function createContact(array $data): void
     {
-        /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
 
         $contact = new Lead()
             ->setFirstname($data['firstname'])
@@ -49,7 +48,7 @@ abstract class AbstractSearchTestCase extends MauticMysqlTestCase
         $field->setIsIndex(true);
         $field->setType('text');
 
-        $fieldModel = static::getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 
@@ -58,8 +57,7 @@ abstract class AbstractSearchTestCase extends MauticMysqlTestCase
      */
     protected function createCompany(array $data): void
     {
-        /** @var CompanyModel $companyModel */
-        $companyModel = static::getContainer()->get(CompanyModel::class);
+        $companyModel = $this->getService(CompanyModel::class);
 
         $company = new Company()
             ->setName($data['name'] ?? null)

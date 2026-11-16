@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Model;
 
-use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
@@ -101,12 +100,11 @@ final class EmailModelFrequencyRuleFunctionalTest extends MauticMysqlTestCase
         ]));
 
         // Re-authenticate: setUpSymfony() destroys the previous client and its security token.
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
-        $emailModel = self::getContainer()->get(EmailModel::class);
-        $this->assertInstanceOf(EmailModel::class, $emailModel);
+        $emailModel = $this->getService(EmailModel::class);
         $this->emailModel = $emailModel;
     }
 
@@ -180,22 +178,19 @@ final class EmailModelFrequencyRuleFunctionalTest extends MauticMysqlTestCase
 
     private function assertEmailIsNotPostponed(): void
     {
-        $messageQueueRepository = $this->getContainer()->get(MessageQueueRepository::class);
-        $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
+        $messageQueueRepository = $this->getService(MessageQueueRepository::class);
 
         $this->assertSame(0, $messageQueueRepository->count([]), 'Email should not be postponed.');
     }
 
     private function assertEmailIsPostponed(Email $email, Lead $contact): void
     {
-        $messageQueueRepository = $this->getContainer()->get(MessageQueueRepository::class);
-        $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
+        $messageQueueRepository = $this->getService(MessageQueueRepository::class);
 
         $queuedMessages = $messageQueueRepository->findBy([]);
         $this->assertCount(1, $queuedMessages, 'Email should be postponed.');
 
         $queuedMessage = reset($queuedMessages);
-        $this->assertInstanceOf(MessageQueue::class, $queuedMessage);
         $this->assertSame('email', $queuedMessage->getChannel());
         $this->assertSame($email->getId(), $queuedMessage->getChannelId());
         $this->assertSame($contact, $queuedMessage->getLead());

@@ -20,8 +20,7 @@ final class DeleteContactSecondaryCompaniesCommandTest extends MauticMysqlTestCa
     public function testDeleteContactSecondaryCompanies(): void
     {
         $contact          = $this->getContactWithCompanies();
-        /** @var CompanyLeadRepository $companyLeadRepo */
-        $companyLeadRepo  = $this->getContainer()->get(CompanyLeadRepository::class);
+        $companyLeadRepo  = $this->getService(CompanyLeadRepository::class);
 
         $contactCompanies = $companyLeadRepo->getCompaniesByLeadId($contact->getId());
         $this->assertCount(2, $contactCompanies);
@@ -60,8 +59,7 @@ final class DeleteContactSecondaryCompaniesCommandTest extends MauticMysqlTestCa
         $this->em->persist($contact);
         $this->em->flush();
 
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
         $this->assertTrue($leadModel->addToCompany($contact, $company));
         $this->assertTrue($leadModel->addToCompany($contact, $company2));
 

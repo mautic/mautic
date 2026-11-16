@@ -35,8 +35,7 @@ final class PageControllerTest extends MauticMysqlTestCase
             'template' => 'blank',
         ];
 
-        /** @var PageModel $model */
-        $model = self::getContainer()->get(PageModel::class);
+        $model = $this->getService(PageModel::class);
         $page  = new Page();
         $page->setTitle($pageData['title'])
             ->setTemplate($pageData['template']);
@@ -166,7 +165,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $allUtmTags = self::getContainer()->get(UtmTagRepository::class)->getEntities();
+        $allUtmTags = $this->getService(UtmTagRepository::class)->getEntities();
         $this->assertNotCount(0, $allUtmTags);
 
         foreach ($allUtmTags as $utmTag) {
@@ -208,8 +207,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/pages/view/'.$this->id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        /** @var PageModel $model */
-        $model                  = self::getContainer()->get(PageModel::class);
+        $model                  = $this->getService(PageModel::class);
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertInstanceOf(Page::class, $page);
@@ -282,8 +280,7 @@ final class PageControllerTest extends MauticMysqlTestCase
 
     public function testSavePageAliasWithUnderscores(): void
     {
-        /** @var PageModel $pageModel */
-        $pageModel = self::getContainer()->get(PageModel::class);
+        $pageModel = $this->getService(PageModel::class);
 
         $parentPage = new Page();
         $parentPage->setTitle('This is My Page');

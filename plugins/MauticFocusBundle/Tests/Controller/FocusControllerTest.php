@@ -73,8 +73,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
             'stop_after_conversion' => 1,
         ]);
 
-        /** @var FocusModel $focusModel */
-        $focusModel = self::getContainer()->get(FocusModel::class);
+        $focusModel = $this->getService(FocusModel::class);
         $focusModel->saveEntity($focus);
 
         $this->em->clear();
@@ -88,7 +87,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/focus/view/'.$focus->getId());
         $this->assertResponseIsSuccessful();
 
-        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
 
         $this->assertStringContainsString($translator->trans('mautic.core.recent.activity'), (string) $this->client->getResponse()->getContent());
         $this->assertCount(2, $crawler->filterXPath('//ul[contains(@class, "media-list-feed")]/li'));

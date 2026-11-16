@@ -26,7 +26,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->campaignSubscriber = $this->getContainer()->get(CampaignSubscriber::class);
+        $this->campaignSubscriber = $this->getService(CampaignSubscriber::class);
     }
 
     public function testOnCampaignTriggerConditionReturnsCorrectResultForLeadDeviceContext(): void
@@ -192,8 +192,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
         $field->setGroup('core');
         $field->setAlias($fieldDetails['alias']);
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 

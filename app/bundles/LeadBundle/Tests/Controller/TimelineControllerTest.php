@@ -67,7 +67,7 @@ final class TimelineControllerTest extends MauticMysqlTestCase
         $this->em->persist($contact);
         $this->em->flush();
 
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => self::SALES_USER]);
+        $user = $this->getService(UserRepository::class)->findOneBy(['username' => self::SALES_USER]);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $this->client->request(Request::METHOD_GET, '/s/contacts/timeline/batchExport/'.$contact->getId());

@@ -30,9 +30,8 @@ final class GenerateProductionAssetsCommandTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->filesystem = self::getContainer()->get(Filesystem::class);
-        /** @var PathsHelper $pathHelper */
-        $pathHelper       = self::getContainer()->get(PathsHelper::class);
+        $this->filesystem = $this->getService(Filesystem::class);
+        $pathHelper       = $this->getService(PathsHelper::class);
 
         $this->ckeditorFilePath     = $pathHelper->getVendorRootPath().'/media/libraries/ckeditor/';
         $this->librariesCssFilePath = $pathHelper->getSystemPath('media', true).'/css/libraries.css';

@@ -18,8 +18,7 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
 
     public function testPointsTriggerWithTagAction(): void
     {
-        /** @var LeadModel $model */
-        $model = self::getContainer()->get(LeadModel::class);
+        $model = $this->getService(LeadModel::class);
 
         $trigger = $this->createTrigger('Trigger', 5);
         $this->createAddTagEvent('tag5', $trigger);
@@ -42,11 +41,9 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
 
     public function testGroupPointsTriggerWithTagAction(): void
     {
-        /** @var LeadModel $model */
-        $model = self::getContainer()->get(LeadModel::class);
+        $model = $this->getService(LeadModel::class);
 
-        /** @var PointGroupModel $pointGroupModel */
-        $pointGroupModel = self::getContainer()->get(PointGroupModel::class);
+        $pointGroupModel = $this->getService(PointGroupModel::class);
 
         $groupA = $this->createGroup('Group A');
         $groupB = $this->createGroup('Group B');
@@ -76,11 +73,9 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
 
     public function testTriggerForExistingContacts(): void
     {
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
 
-        /** @var TriggerModel $triggerModel */
-        $triggerModel = self::getContainer()->get(TriggerModel::class);
+        $triggerModel = $this->getService(TriggerModel::class);
 
         $lead = new Lead();
         $data = ['email' => 'pointtest@example.com', 'points' => 5];
@@ -108,14 +103,11 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
 
     public function testTriggerWithGroupForExistingContacts(): void
     {
-        /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get(LeadModel::class);
+        $leadModel = $this->getService(LeadModel::class);
 
-        /** @var TriggerModel $triggerModel */
-        $triggerModel = self::getContainer()->get(TriggerModel::class);
+        $triggerModel = $this->getService(TriggerModel::class);
 
-        /** @var PointGroupModel $pointGroupModel */
-        $pointGroupModel = self::getContainer()->get(PointGroupModel::class);
+        $pointGroupModel = $this->getService(PointGroupModel::class);
 
         $groupA = $this->createGroup('Group A');
         $groupB = $this->createGroup('Group B');

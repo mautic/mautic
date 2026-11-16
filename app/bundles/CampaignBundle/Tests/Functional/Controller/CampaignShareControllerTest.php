@@ -126,8 +126,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
      */
     public function testConcurrentShareBuildsDoNotClobberEachOther(): void
     {
-        $shareService = self::getContainer()->get(CampaignShareService::class);
-        $this->assertInstanceOf(CampaignShareService::class, $shareService);
+        $shareService = $this->getService(CampaignShareService::class);
 
         $campaignOne = new Campaign();
         $campaignOne->setName('Concurrent Campaign One');
@@ -208,8 +207,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
 
     public function testShareDownloadServesStoredZip(): void
     {
-        $shareService = self::getContainer()->get(CampaignShareService::class);
-        $this->assertInstanceOf(CampaignShareService::class, $shareService);
+        $shareService = $this->getService(CampaignShareService::class);
         $shareDir = $shareService->getShareDir();
 
         if (!is_dir($shareDir)) {
@@ -239,8 +237,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
 
     public function testShareDownloadReturnsGoneForExpiredFile(): void
     {
-        $shareService = self::getContainer()->get(CampaignShareService::class);
-        $this->assertInstanceOf(CampaignShareService::class, $shareService);
+        $shareService = $this->getService(CampaignShareService::class);
         $shareDir = $shareService->getShareDir();
 
         if (!is_dir($shareDir)) {
@@ -269,7 +266,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
 
         // A builder image on disk, referenced from the campaign's email the same way
         // the email builder stores it (absolute URL under media/images).
-        $pathsHelper = self::getContainer()->get(PathsHelper::class);
+        $pathsHelper = $this->getService(PathsHelper::class);
         $imageDir    = rtrim($pathsHelper->getImagePath(), '/');
         if (!is_dir($imageDir)) {
             mkdir($imageDir, 0775, true);

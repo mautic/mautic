@@ -25,7 +25,7 @@ final class ExportSchedulerCommandTest extends MauticMysqlTestCase
         $this->em->persist($scheduler);
         $this->em->flush();
 
-        $schedulersBeforeCommand = $this->getContainer()->get(SchedulerRepository::class)->findBy(['report' => $report]);
+        $schedulersBeforeCommand = $this->getService(SchedulerRepository::class)->findBy(['report' => $report]);
         $this->assertCount(1, $schedulersBeforeCommand, 'Scheduler should exist before command execution');
 
         // Execute command normally
@@ -42,7 +42,7 @@ final class ExportSchedulerCommandTest extends MauticMysqlTestCase
         $this->em->persist($scheduler);
         $this->em->flush();
 
-        $this->assertCount(1, $this->getContainer()->get(SchedulerRepository::class)->findBy(['report' => $report]), 'Scheduler should exist before command execution');
+        $this->assertCount(1, $this->getService(SchedulerRepository::class)->findBy(['report' => $report]), 'Scheduler should exist before command execution');
 
         $this->em->clear();
         $commandTester = $this->testSymfonyCommand('mautic:reports:scheduler', ['--report' => $reportId, '--cleanup-only' => true]);
@@ -51,7 +51,7 @@ final class ExportSchedulerCommandTest extends MauticMysqlTestCase
 
         $this->em->clear();
         $reportReference = $this->em->getReference(Report::class, $reportId);
-        $this->assertCount(1, $this->getContainer()->get(SchedulerRepository::class)->findBy(['report' => $reportReference]), 'Cleanup-only mode should keep due scheduler entries untouched');
+        $this->assertCount(1, $this->getService(SchedulerRepository::class)->findBy(['report' => $reportReference]), 'Cleanup-only mode should keep due scheduler entries untouched');
     }
 
     /**

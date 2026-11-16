@@ -29,15 +29,15 @@ final class GrapeJsDataTest extends MauticMysqlTestCase
             'author'      => 'Mautic Community',
             'bundle'      => 'GrapesJsBuilderBundle',
         ];
-        $plugin = $this->getContainer()->get(PluginRepository::class)->findOneBy($findOneByCriteria);
+        $plugin = $this->getService(PluginRepository::class)->findOneBy($findOneByCriteria);
         $this->assertNotInstanceOf(Plugin::class, $plugin);
 
         $this->loadFixtures([GrapesJsData::class]);
 
-        $plugin = $this->getContainer()->get(PluginRepository::class)->findOneBy($findOneByCriteria);
+        $plugin = $this->getService(PluginRepository::class)->findOneBy($findOneByCriteria);
         $this->assertInstanceOf(Plugin::class, $plugin);
 
-        $integration = $this->getContainer()->get(IntegrationRepository::class)->findOneBy(
+        $integration = $this->getService(IntegrationRepository::class)->findOneBy(
             [
                 'isPublished' => true,
                 'name'        => 'GrapesJsBuilder',

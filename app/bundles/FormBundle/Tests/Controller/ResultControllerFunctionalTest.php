@@ -18,10 +18,8 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testDownloadFileByFileNameAction(): void
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel   = self::getContainer()->get(FieldModel::class);
-        /** @var FormUploader $formUploader */
-        $formUploader = self::getContainer()->get(FormUploader::class);
+        $fieldModel   = $this->getService(FieldModel::class);
+        $formUploader = $this->getService(FormUploader::class);
         $fileName     = 'image.png';
 
         $this->createFile($fileName);

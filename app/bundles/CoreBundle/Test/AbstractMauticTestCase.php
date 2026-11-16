@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Test;
 
+use Doctrine\Bundle\DoctrineBundle\Middleware\BacktraceDebugDataHolder;
 use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
+use Mautic\CoreBundle\Translation\MauticResourceTranslator;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\UserBundle\Entity\User;
+use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -20,10 +23,13 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Mailer\EventListener\MessageLoggerListener;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 abstract class AbstractMauticTestCase extends WebTestCase
@@ -97,7 +103,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function setUp(): void
     {
         $this->setUpSymfony($this->configParams);
-        $this->databaseTool = static::getContainer()->get(DatabaseToolCollection::class)->get();
+        $this->databaseTool = $this->getService(DatabaseToolCollection::class)->get();
     }
 
     protected function tearDown(): void
@@ -123,13 +129,38 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
-        $this->em = static::getContainer()->get(ManagerRegistry::class)->getManager();
+        $this->em = $this->getService(ManagerRegistry::class)->getManager();
         $this->connection = $this->em->getConnection();
-        $this->router     = static::getContainer()->get(RouterInterface::class);
+        $this->router     = $this->getService(RouterInterface::class);
         $scheme           = $this->router->getContext()->getScheme();
         $secure           = 0 === strcasecmp($scheme, 'https');
 
         $this->client->setServerParameter('HTTPS', (string) $secure);
+    }
+
+    /**
+     * @template TService of object
+     *
+     * @param class-string<TService>
+     *     |'doctrine.debug_data_holder'
+     *     |'mailer.message_logger_listener'
+     *     |'monolog.logger.mautic'
+     *     |'security.untracked_token_storage'
+     *     |'session.factory'
+     *     |'translator.default' $serviceId
+     *
+     * @return (
+     *     $serviceId is 'doctrine.debug_data_holder' ? BacktraceDebugDataHolder : (
+     *     $serviceId is 'mailer.message_logger_listener' ? MessageLoggerListener : (
+     *     $serviceId is 'monolog.logger.mautic' ? Logger : (
+     *     $serviceId is 'security.untracked_token_storage' ? TokenStorage : (
+     *     $serviceId is 'session.factory' ? SessionFactory : (
+     *     $serviceId is 'translator.default' ? MauticResourceTranslator : TService
+     *  ))))))
+     */
+    protected function getService(string $serviceId): object
+    {
+        return static::getContainer()->get($serviceId);
     }
 
     public function loginUser(User $user): void
@@ -164,7 +195,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
         $output = new BufferedOutput();
 
-        $application = new Application(static::getContainer()->get(KernelInterface::class));
+        $application = new Application($this->getService(KernelInterface::class));
         $application->setAutoExit(false);
         $application->run($input, $output);
     }
@@ -184,7 +215,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function getCsrfToken(string $intention): string
     {
-        return $this->client->getContainer()->get(CsrfTokenManagerInterface::class)->refreshToken($intention)->getValue();
+        return $this->getService(CsrfTokenManagerInterface::class)->refreshToken($intention)->getValue();
     }
 
     /**
@@ -204,7 +235,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function testSymfonyCommand(string $name, array $params = [], ?Command $command = null): CommandTester
     {
-        $kernel      = static::getContainer()->get(KernelInterface::class);
+        $kernel      = $this->getService(KernelInterface::class);
         $application = new Application($kernel);
 
         if ($command) {

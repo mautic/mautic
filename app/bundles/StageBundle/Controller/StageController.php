@@ -255,9 +255,8 @@ final class StageController extends AbstractFormController
      * Generates edit form and processes post data.
      *
      * @param int  $objectId
-     * @param bool $ignorePost
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
     {
         $entity = $this->stageModel->getEntity($objectId);
 

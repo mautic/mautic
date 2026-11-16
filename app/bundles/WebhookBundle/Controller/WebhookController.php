@@ -101,9 +101,8 @@ final class WebhookController extends AbstractStandardFormController
      * Generates edit form and processes post data.
      *
      * @param int  $objectId
-     * @param bool $ignorePost
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
     {
         return parent::editStandard($request, $objectId, $ignorePost);
     }

@@ -28,8 +28,7 @@ final class CommonRepositorySimpleListTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $repository = self::getContainer()->get(CategoryRepository::class);
-        $this->assertInstanceOf(CategoryRepository::class, $repository);
+        $repository = $this->getService(CategoryRepository::class);
 
         $expressionBuilder = $this->connection->createExpressionBuilder();
         $expression        = $expressionBuilder->and(

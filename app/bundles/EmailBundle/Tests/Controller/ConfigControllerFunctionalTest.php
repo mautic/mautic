@@ -122,7 +122,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     {
         $parameters = [];
         /** @var \AppKernel $kernel */
-        $kernel = self::getContainer()->get(KernelInterface::class);
+        $kernel = $this->getService(KernelInterface::class);
         include $kernel->getLocalConfigFile();
 
         return $parameters;

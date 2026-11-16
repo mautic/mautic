@@ -14,7 +14,6 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ExportControllerTest extends MauticMysqlTestCase
 {
@@ -81,7 +80,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         ];
         $report->setColumns($coulmns);
 
-        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
+        $this->getService(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
@@ -144,8 +143,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
-        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
 

@@ -45,8 +45,7 @@ final class LeadDeviceRepositoryTest extends MauticMysqlTestCase
             'short_name' => 'WIN',
         ]);
 
-        /** @var LeadDeviceRepository $leadDeviceRepository */
-        $leadDeviceRepository = $this->getContainer()->get(LeadDeviceRepository::class);
+        $leadDeviceRepository = $this->getService(LeadDeviceRepository::class);
         $existingDevice       = $leadDeviceRepository->findExistingDevice($newDevice);
 
         // Using assertTrue instead of assertNull to reduce test output

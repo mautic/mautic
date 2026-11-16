@@ -47,7 +47,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->em->flush();
         $this->em->clear();
 
-        $restrictedUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'restricted.user']);
+        $restrictedUser = $this->getService(UserRepository::class)->findOneBy(['username' => 'restricted.user']);
         $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
@@ -108,7 +108,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->em->flush();
         $this->em->clear();
 
-        $restrictedUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'restricted.user']);
+        $restrictedUser = $this->getService(UserRepository::class)->findOneBy(['username' => 'restricted.user']);
         $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
@@ -169,7 +169,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->em->clear();
 
         // Test 1: newOwner (current owner) SHOULD see the company
-        $newOwner = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'new.owner']);
+        $newOwner = $this->getService(UserRepository::class)->findOneBy(['username' => 'new.owner']);
         $this->assertInstanceOf(User::class, $newOwner);
         $this->loginUser($newOwner);
         $this->client->setServerParameter('PHP_AUTH_USER', $newOwner->getUserIdentifier());
@@ -185,7 +185,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->assertSame($company->getId(), $data['member'][0]['id']);
 
         // Test 2: originalOwner (creator but no longer owner) should NOT see the company
-        $originalOwner = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'original.owner']);
+        $originalOwner = $this->getService(UserRepository::class)->findOneBy(['username' => 'original.owner']);
         $this->assertInstanceOf(User::class, $originalOwner);
         $this->loginUser($originalOwner);
         $this->client->setServerParameter('PHP_AUTH_USER', $originalOwner->getUserIdentifier());

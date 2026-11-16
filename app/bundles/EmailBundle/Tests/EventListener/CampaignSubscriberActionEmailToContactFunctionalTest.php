@@ -44,8 +44,7 @@ final class CampaignSubscriberActionEmailToContactFunctionalTest extends MauticM
         $this->testSymfonyCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
-        /** @var LeadEventLogRepository $logRepo */
-        $logRepo  = self::getContainer()->get(LeadEventLogRepository::class);
+        $logRepo  = $this->getService(LeadEventLogRepository::class);
         $metaData = [];
         foreach ($logRepo->getLeadLogs() as $leadLog) {
             if ($leadLog['metadata']) {
@@ -53,7 +52,7 @@ final class CampaignSubscriberActionEmailToContactFunctionalTest extends MauticM
             }
         }
 
-        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $translator = $this->getService(TranslatorInterface::class);
         $noEmailLog = $translator->trans(
             'mautic.email.contact_has_no_email',
             ['%contact%' => $leadB->getPrimaryIdentifier()]

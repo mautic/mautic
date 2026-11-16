@@ -24,8 +24,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        /** @var ProjectModel $projectModel */
-        $projectModel            = self::getContainer()->get(ProjectModel::class);
+        $projectModel            = $this->getService(ProjectModel::class);
 
         // Create test project
         $this->testProject = new Project();
@@ -34,8 +33,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $projectModel->saveEntity($this->testProject);
 
         // Create test email
-        /** @var EmailModel $emailModel */
-        $emailModel      = self::getContainer()->get(EmailModel::class);
+        $emailModel      = $this->getService(EmailModel::class);
         $this->testEmail = new Email();
         $this->testEmail->setName('Test Email for Project');
         $this->testEmail->setSubject('Test Email Subject');
@@ -177,7 +175,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $user->setLastName('User');
         $user->setUsername('testuser');
         $user->setEmail('test@example.com');
-        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $user->setPassword($hasher->hash('password'));
         $user->setRole($role);
         $this->em->persist($user);

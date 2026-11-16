@@ -23,11 +23,9 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
     {
         $this->configureTwilioWithArrayTransport();
 
-        /** @var TwilioIntegration $integration */
-        $integration = $this->getContainer()->get(TwilioIntegration::class);
-        $this->assertInstanceOf(TwilioIntegration::class, $integration);
+        $integration = $this->getService(TwilioIntegration::class);
 
-        $integrationRepository = $this->getContainer()->get(IntegrationRepository::class);
+        $integrationRepository = $this->getService(IntegrationRepository::class);
 
         // the saved entity keeps decrypted keys in memory; read the stored row
         $this->em->clear();

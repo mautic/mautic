@@ -27,12 +27,10 @@ final class CorePermissionsTest extends MauticMysqlTestCase
     #[DataProvider('dataVirtualPermission')]
     public function testVirtualPermission(bool $grant): void
     {
-        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'sales']);
+        $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'sales']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
-        /** @var CorePermissions $permissions */
-        $permissions = self::getContainer()->get(CorePermissions::class);
-        $this->assertInstanceOf(CorePermissions::class, $permissions);
+        $permissions = $this->getService(CorePermissions::class);
         $permissions->setPermissionObject($this->createVirtualPermission($grant));
 
         $this->assertSame($grant, $permissions->isGranted('test:group:action', 'MATCH_ALL', $user));

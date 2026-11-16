@@ -16,7 +16,7 @@ final class TagRepositoryTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->tagRepository = self::getContainer()->get(TagRepository::class);
+        $this->tagRepository = $this->getService(TagRepository::class);
 
         $tags = [
             'tag1',

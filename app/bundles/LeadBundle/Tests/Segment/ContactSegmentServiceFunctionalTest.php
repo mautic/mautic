@@ -54,7 +54,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             false
         )->getReferenceRepository();
 
-        $this->contactSegmentService = self::getContainer()->get(ContactSegmentService::class);
+        $this->contactSegmentService = $this->getService(ContactSegmentService::class);
     }
 
     protected function beforeBeginTransaction(): void
@@ -243,7 +243,6 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     public function testSegmentRebuildCommandFailsOnMissingTable(): void
     {
         $segment = $this->fixtures->getReference('table-name-missing-in-filter', LeadList::class);
-        $this->assertInstanceOf(LeadList::class, $segment);
 
         $this->expectException(TableNotFoundException::class);
         $this->contactSegmentService->getTotalLeadListLeadsCount($segment);
@@ -252,7 +251,6 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     public function testGetNewLeadListLeadsWithLeadIdsLimiter(): void
     {
         $segment = $this->fixtures->getReference('segment-having-company', LeadList::class);
-        $this->assertInstanceOf(LeadList::class, $segment);
 
         $this->connection->delete(MAUTIC_TABLE_PREFIX.'lead_lists_leads', ['leadlist_id' => $segment->getId()]);
 

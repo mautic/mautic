@@ -53,8 +53,7 @@ final class ModifyCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Skipping "Test text three", the suggested length must be between 1 and 191.', $output);
         $this->assertStringContainsString('1 Field(s) updated successfully.', $output);
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $field      = $fieldModel->getEntityByAlias('field_text_one');
         $this->assertEquals($field->getCharLengthLimit(), $csvRows['field_text_one']['newLen']);
     }
@@ -90,8 +89,7 @@ final class ModifyCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
             $fields[] = $field;
         }
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel = $this->getService(FieldModel::class);
         $fieldModel->saveEntities($fields);
         $fieldModel->getRepository()->detachEntities($fields);
     }

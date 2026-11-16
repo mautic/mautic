@@ -16,7 +16,7 @@ final class UserTokenRepositoryTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repository = $this->getContainer()->get(UserTokenRepository::class);
+        $this->repository = $this->getService(UserTokenRepository::class);
 
         // Guarantee a deterministic starting point regardless of fixtures.
         $table = $this->em->getClassMetadata(UserToken::class)->getTableName();

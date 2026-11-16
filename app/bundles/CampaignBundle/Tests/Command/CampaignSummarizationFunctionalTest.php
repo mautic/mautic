@@ -24,14 +24,14 @@ final class CampaignSummarizationFunctionalTest extends MauticMysqlTestCase
     public function testExecuteCampaignEventWithoutSummarization(): void
     {
         $this->createDataAndExecuteCommand();
-        $campaignSummary = $this->getContainer()->get(SummaryRepository::class)->findAll();
+        $campaignSummary = $this->getService(SummaryRepository::class)->findAll();
         $this->assertCount(0, $campaignSummary);
     }
 
     public function testExecuteCampaignEventWithSummarization(): void
     {
         $this->createDataAndExecuteCommand();
-        $campaignSummary = $this->getContainer()->get(SummaryRepository::class)->findAll();
+        $campaignSummary = $this->getService(SummaryRepository::class)->findAll();
         $this->assertCount(1, $campaignSummary);
     }
 
