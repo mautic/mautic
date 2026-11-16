@@ -4,6 +4,7 @@ namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Event\JobExtendTimeEvent;
 use Mautic\ReportBundle\Adapter\ReportDataAdapter;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Event\ReportScheduleSendEvent;
 use Mautic\ReportBundle\Exception\FileIOException;
@@ -42,6 +43,7 @@ final readonly class ReportExporter
         $report                  = $scheduler->getReport();
         $scheduledData           = $scheduler->getData();
         $scheduleNextDownloadJob = true;
+
         if ([] !== $scheduledData) {
             $scheduleNextDownloadJob = false;
             $this->reportExportOptions->setData($scheduledData);
@@ -70,31 +72,41 @@ final readonly class ReportExporter
 
             $this->reportExportOptions->setDateFrom($dateFrom);
             $this->reportExportOptions->setDateTo($dateTo->sub(new \DateInterval('PT1S')));
+        }
 
-            // just published reports, but schedule continue
-            if ($report->isPublished()) {
-                $this->reportExportOptions->beginExport();
-                while (true) {
-                    $data = $this->reportDataAdapter->getReportData($report, $this->reportExportOptions);
+        $this->exportAndSendReport($scheduler, $report);
+        $this->schedulerModel->reportWasScheduled($report, $scheduleNextDownloadJob);
+    }
 
-                    $this->reportFileWriter->writeReportData($scheduler, $data, $this->reportExportOptions);
+    /**
+     * @throws FileIOException
+     */
+    private function exportAndSendReport(Scheduler $scheduler, Report $report): void
+    {
+        if (!$report->isPublished()) {
+            return;
+        }
 
-                    $totalResults = $data->getTotalResults();
-                    unset($data);
+        $this->reportExportOptions->beginExport();
 
-                    if ($this->reportExportOptions->getNumberOfProcessedResults() >= $totalResults) {
-                        break;
-                    }
-                    $this->eventDispatcher->dispatch(new JobExtendTimeEvent());
-                    $this->reportExportOptions->nextBatch();
-                }
+        while (true) {
+            $data = $this->reportDataAdapter->getReportData($report, $this->reportExportOptions);
 
-                $file  = $this->reportFileWriter->getFilePath($scheduler);
-                $event = new ReportScheduleSendEvent($scheduler, $file);
-                $this->eventDispatcher->dispatch($event, ReportEvents::REPORT_SCHEDULE_SEND);
+            $this->reportFileWriter->writeReportData($scheduler, $data, $this->reportExportOptions);
+
+            $totalResults = $data->getTotalResults();
+            unset($data);
+
+            if ($this->reportExportOptions->getNumberOfProcessedResults() >= $totalResults) {
+                break;
             }
 
-            $this->schedulerModel->reportWasScheduled($report, $scheduleNextDownloadJob);
+            $this->eventDispatcher->dispatch(new JobExtendTimeEvent());
+            $this->reportExportOptions->nextBatch();
         }
+
+        $file  = $this->reportFileWriter->getFilePath($scheduler);
+        $event = new ReportScheduleSendEvent($scheduler, $file);
+        $this->eventDispatcher->dispatch($event, ReportEvents::REPORT_SCHEDULE_SEND);
     }
 }

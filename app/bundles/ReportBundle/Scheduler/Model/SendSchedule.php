@@ -57,7 +57,7 @@ class SendSchedule
         $this->mailer->setSubject($subject);
         $this->mailer->setBody($message);
         $this->mailer->parsePlainText($message);
-        $this->mailer->send(true);
+        $this->mailer->send(false);
 
         // Attachment file removal will be done in \Mautic\MessengerBundle\MessageHandler\RemoveReportAttachmentHandler
     }

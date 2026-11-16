@@ -152,4 +152,99 @@ final class ReportExporterTest extends \PHPUnit\Framework\TestCase
 
         $reportExporter->processExport($exportOption);
     }
+
+    public function testProcessExportWithScheduledData(): void
+    {
+        $batchSize = 2;
+
+        /** @var CoreParametersHelper|MockObject $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+        /** @var ScheduleModel|MockObject $schedulerModel */
+        $schedulerModel = $this->createMock(ScheduleModel::class);
+
+        /** @var ReportDataAdapter|MockObject $reportDataAdapter */
+        $reportDataAdapter = $this->createMock(ReportDataAdapter::class);
+
+        $coreParametersHelper->expects($this->once())
+            ->method('get')
+            ->with('report_export_batch_size')
+            ->willReturn($batchSize);
+
+        $reportExportOptions = new ReportExportOptions($coreParametersHelper);
+
+        /** @var ReportFileWriter|MockObject $reportFileWriter */
+        $reportFileWriter = $this->createMock(ReportFileWriter::class);
+
+        /** @var EventDispatcherInterface|MockObject $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $exportOption     = new ExportOption(null);
+        $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
+        $report           = new Report();
+        $scheduler        = new Scheduler($report, new \DateTime());
+
+        $scheduledData = [
+            'dateFrom'             => '2023-01-01',
+            'dateTo'               => '2023-01-31',
+            'dynamicFilters'       => [],
+            'email_to_send_report' => 'test@example.com',
+        ];
+        $scheduler->setData($scheduledData);
+
+        $schedulerModel->expects($this->once())
+            ->method('getScheduledReportsForExport')
+            ->with($exportOption)
+            ->willReturn([$scheduler]);
+
+        $schedulerModel->expects($this->never())
+            ->method('turnOffScheduler');
+
+        $invokedCount = $this->exactly(6);
+        $reportDataAdapter->expects($invokedCount)
+            ->method('getReportData')
+            ->willReturnCallback(function (Report $reportArg, ReportExportOptions $exportOptions) use ($report, $reportDataResult, $scheduledData): ReportDataResult {
+                $this->assertSame($report, $reportArg);
+                $this->assertEquals(new \DateTime($scheduledData['dateFrom']), $exportOptions->getDateFrom());
+                $this->assertEquals(new \DateTime($scheduledData['dateTo']), $exportOptions->getDateTo());
+                $this->assertEquals($scheduledData, $exportOptions->getData());
+
+                return $reportDataResult;
+            });
+
+        $reportFileWriter->expects($this->exactly(6))
+            ->method('writeReportData');
+
+        $reportFileWriter->expects($this->once())
+            ->method('getFilePath')
+            ->willReturn('my-path');
+
+        $eventDispatcher->expects($this->atLeast(1))
+            ->method('dispatch')
+            ->willReturnCallback(function (ReportScheduleSendEvent|JobExtendTimeEvent $event, ?string $eventName) use ($scheduler): JobExtendTimeEvent|ReportScheduleSendEvent {
+                if ($event instanceof JobExtendTimeEvent) {
+                    return $event;
+                }
+
+                $this->assertSame(ReportEvents::REPORT_SCHEDULE_SEND, $eventName);
+                $this->assertSame('my-path', $event->getFile());
+                $this->assertSame($scheduler, $event->getScheduler());
+
+                return $event;
+            });
+
+        $schedulerModel->expects($this->once())
+            ->method('reportWasScheduled')
+            ->with($report, false);
+
+        $reportExporter = new ReportExporter(
+            $schedulerModel,
+            $reportDataAdapter,
+            $reportExportOptions,
+            $reportFileWriter,
+            $eventDispatcher
+        );
+
+        $reportExporter->processExport($exportOption);
+    }
 }

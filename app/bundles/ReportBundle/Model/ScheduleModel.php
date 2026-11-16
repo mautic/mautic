@@ -5,17 +5,13 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 
-/**
- * @extends FormModel<Scheduler>
- */
-class ScheduleModel extends FormModel
+class ScheduleModel
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -24,9 +20,6 @@ class ScheduleModel extends FormModel
     ) {
     }
 
-    /**
-     * Avoid the default AbstractCommonModel::getRepository() as it caches it to a static property.
-     */
     public function getRepository(): SchedulerRepository
     {
         return $this->schedulerRepository;
@@ -35,9 +28,15 @@ class ScheduleModel extends FormModel
     /**
      * @return Scheduler[]
      */
-    public function getScheduledReportsForExport(ExportOption $exportOption)
+    public function getScheduledReportsForExport(ExportOption $exportOption): array
     {
         return $this->schedulerRepository->getScheduledReportsForExport($exportOption);
+    }
+
+    public function saveEntity(Scheduler $scheduler): void
+    {
+        $this->entityManager->persist($scheduler);
+        $this->entityManager->flush();
     }
 
     public function reportWasScheduled(Report $report, bool $scheduleNextDownloadJob = true): void
