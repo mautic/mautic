@@ -3673,12 +3673,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/UtmTag.php
 
 		-
-			message: '#^Property Mautic\\LeadBundle\\Event\\LeadBuildSearchEvent\:\:\$string \(string\) does not accept array\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/bundles/LeadBundle/Event/LeadBuildSearchEvent.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Event\\LeadChangeEvent\:\:__construct\(\) has parameter \$newTrackingId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
