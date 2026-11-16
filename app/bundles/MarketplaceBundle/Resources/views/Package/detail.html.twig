@@ -18,7 +18,7 @@
                 href: path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST')),
                 attributes: {
                     'data-toggle': 'ajax',
-                    'class': 'btn-back mb-lg'
+                    'class': 'btn-back mb-24'
                 }
             }
         ]
@@ -119,15 +119,15 @@
 
 {% block content %}
 <div class="col-md-9">
-    <div class="marketplace-header {{ packageDetail.packageBase.type|default('')|purify }} bg-picture col-xs-12 justify-content-center pt-lg pb-lg">
+    <div class="marketplace-header {{ packageDetail.packageBase.type|default('')|purify }} bg-picture col-xs-12 justify-content-center pt-24 pb-24">
 
         <h1 class="fw-b fs-46">{{ latestVersion.displayName|default(packageDetail.packageBase.getHumanPackageName()) }}</h1>
         {% if latestVersion.extra.mautic.headline|default('') %}<p class="lead">{{ latestVersion.extra.mautic.headline }}</p>{% endif %}
         {% if packageDetail.packageBase.description %}
-            <div class="text-muted mt-sm">{{ packageDetail.packageBase.description|purify }}</div>
+            <div class="text-muted mt-12">{{ packageDetail.packageBase.description|purify }}</div>
         {% endif %}
         <hr>
-        <div class="d-flex gap-3 mt-sm">
+        <div class="d-flex gap-3 mt-12">
             {% include '@MauticCore/Helper/_tag.html.twig' with {
                 tags: [
                     {
@@ -210,7 +210,7 @@
         {% for review in packageDetail.reviews %}
         <div class="row">
             <div class="col-md-2">
-                <ul class="list-inline pt-lg pl-lg pr-lg">
+                <ul class="list-inline pt-24 ps-24 pe-24">
                     {% for i in 1..5 %}
                         <li>
                             {% if i <= review.rating %}
@@ -234,7 +234,7 @@
     </div>
 </div>
 
-<div class="col-md-3 pb-lg">
+<div class="col-md-3 pb-24">
     <!-- Maintainers -->
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -253,7 +253,7 @@
             </div>
             <div class="col-xs-9 align-top">
                 <div class="panel-body">
-                    <h4 class="fw-sb mb-xs ellipsis">
+                    <h4 class="fw-sb mb-5 ellipsis">
                         {{ maintainer.name|title|escape }}
                     </h4>
                     <a href="https://packagist.org/packages/{{ maintainer.name|escape }}" target="_blank" rel="noopener noreferrer">

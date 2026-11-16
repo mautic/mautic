@@ -40,7 +40,7 @@
 
 {% block _content %}
 
-    <div class="pa-20 mautibot-error{% if isInline %} inline{% endif %}">
+    <div class="pa-24 mautibot-error{% if isInline %} inline{% endif %}">
 
         <div class="row">
             {% if isInline %}
@@ -69,10 +69,10 @@
         <div>
         {% endif %}
 
-            <div class="row mt-20">
+            <div class="row mt-24">
                 <div class="col-sm-12">
-                    <h5 class="ml-lg text-danger">{{ exception.class }}</h5>
-                    <div class="well well-sm ma-md">
+                    <h5 class="ms-24 text-danger">{{ exception.class }}</h5>
+                    <div class="well well-sm ma-16">
                         {{ include ('@MauticCore/Exception/traces.html.twig', {
                             'traces': exception.trace,
                         })}}
@@ -81,14 +81,14 @@
             </div>
 
             {% if previousExceptions and previousExceptions|length > 0 %}
-            <div class="row mt-20">
+            <div class="row mt-24">
                 <div class="col-sm-12">
-                    <h5 class="ml-lg">{{ 'mautic.core.error.previousexceptions' | trans }}</h5>
+                    <h5 class="ms-24">{{ 'mautic.core.error.previousexceptions' | trans }}</h5>
                     <div class="panel-group" id="previous" role="tablist" aria-multiselectable="true">
                     {% for key, e  in previousExceptions %}
                         <div class="panel panel-default">
                             <div class="panel-heading" role="tab" id="previous_heading_{{ key }}">
-                                <h4 class="panel-title pa-sm">
+                                <h4 class="panel-title pa-12">
                                     <a data-bs-toggle="collapse" href="#previous_body_{{ key }}" aria-expanded="true" aria-controls="collapseOne">
                                         {{ e.message }}
                                     </a>
@@ -96,7 +96,7 @@
                             </div>
                             <div id="previous_body_{{ key }}" data-bs-parent="#previous" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                                 <div class="panel-body">
-                                    <div class="pa-sm">
+                                    <div class="pa-12">
                                         {{ include ('@MauticCore/Exception/traces.html.twig', {
                                             'traces': e.trace,
                                         })}}
