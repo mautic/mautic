@@ -373,7 +373,9 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
     public function onSegmentFilterFormHandleNumber(FormAdjustmentEvent $event): void
     {
-        if (!$event->fieldTypeIsOneOf('number', 'int') || !OperatorOptions::isBetween($event->getOperator())) {
+        if (!$event->fieldTypeIsOneOf('number', 'int', 'integer')
+            || !$event->operatorIsOneOf(OperatorOptions::BETWEEN, OperatorOptions::NOT_BETWEEN)
+        ) {
             return;
         }
 

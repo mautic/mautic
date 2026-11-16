@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 final class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
@@ -18,14 +17,13 @@ final class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
         $leadsTableAlias      = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $pageHitsAlias        = $this->generateRandomParameterName();
         $exclusionAlias       = $this->generateRandomParameterName();
-        $expressionValueAlias = $this->generateRandomParameterName();
 
+        $filterParameters = $filter->getParameterValue();
+        $parameters       = $this->buildParameters($filterParameters);
         $expressionOperator = $filter->getOperator();
-        $expression         = $queryBuilder->expr()->{$expressionOperator}('count(id)',
-            OperatorOptions::isBetween($expressionOperator) ? array_values($filter->getParameterValue()) : $filter->getParameterHolder($expressionValueAlias)
-        );
+        $expression         = $queryBuilder->expr()->{$expressionOperator}('count(id)', $filter->getParameterHolder($parameters));
 
-        $queryBuilder->setParameter($expressionValueAlias, (int) $filter->getParameterValue());
+        $queryBuilder->setParametersPairs($parameters, $filterParameters);
 
         $exclusionQueryBuilder = $queryBuilder->createQueryBuilder();
         $exclusionQueryBuilder
@@ -62,5 +60,17 @@ final class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
         $queryBuilder->{$glue}($queryBuilder->expr()->exists($sessionQueryBuilder->getSQL()));
 
         return $queryBuilder;
+    }
+
+    /**
+     * @return string[]|string
+     */
+    private function buildParameters(mixed $filterParameters): array|string
+    {
+        if (!is_array($filterParameters)) {
+            return $this->generateRandomParameterName();
+        }
+
+        return array_map($this->generateRandomParameterName(...), $filterParameters);
     }
 }

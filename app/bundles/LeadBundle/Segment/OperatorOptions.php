@@ -206,10 +206,4 @@ final class OperatorOptions
     {
         return self::$operatorOptions;
     }
-
-    public static function isBetween(?string $operator): bool
-    {
-        return OperatorOptions::BETWEEN === $operator
-            || OperatorOptions::NOT_BETWEEN === $operator;
-    }
 }
