@@ -326,11 +326,18 @@ Mautic.renderFunnelChart = function(canvas) {
     const values = data.datasets[0].data;
     const labels = data.labels;
     const max = Math.max(...values);
-    const palette = ['#0f62fe', '#0043ce', '#002d9c', '#001d6c', '#001141'];
-    const color = (i) => palette[Math.min(i, palette.length - 1)];
     const themed = getComputedStyle(canvas[0]);
     const textPrimary = themed.getPropertyValue('--text-primary').trim();
     const textSecondary = themed.getPropertyValue('--text-secondary').trim();
+    const brightness = (hex) => {
+        const value = parseInt(hex.replace('#', ''), 16);
+        return ((value >> 16) * 299 + ((value >> 8) & 255) * 587 + (value & 255) * 114) / 1000;
+    };
+    const darkTheme = brightness(textPrimary) > 128;
+    const palette = darkTheme
+        ? ['#a6c8ff', '#78a9ff', '#4589ff', '#3a7bf0']
+        : ['#0f62fe', '#0043ce', '#002d9c', '#001d6c', '#001141'];
+    const color = (i) => palette[Math.min(i, palette.length - 1)];
     const gap = 4;
     const bounds = (bar) => {
         const props = bar.getProps(['x', 'y', 'base', 'width'], true);
