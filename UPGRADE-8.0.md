@@ -1141,6 +1141,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `LeadBundle\Entity\LeadFieldRepository` | `getFieldAliases()`, `getFieldsByType()` | `string` |
     | `LeadBundle\Entity\LeadFieldRepository` | `getPropertyByField()` | `string`, `Mautic\CoreBundle\Doctrine\Query\QueryBuilder` |
     | `LeadBundle\Entity\LeadFieldRepository` | `compareDateValue()` (second parameter) | `string` |
+    | `LeadBundle\Entity\LeadRepository` | `applySearchQueryRelationship()` (`$whereExpression`, `$having`) | `string\|Doctrine\DBAL\Query\Expression\CompositeExpression\|null` |
     | `LeadBundle\Entity\MergeRecordRepository` | `moveMergeRecord()` | `int`, `int` |
     | `LeadBundle\Entity\StagesChangeLogRepository` | `getCurrentLeadStage()` | `int` |
     | `LeadBundle\Event\ContactIdentificationEvent` | `setIdentifiedContact()` (second parameter) | `string` |
@@ -1155,6 +1156,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `LeadBundle\Segment\ContactSegmentService` | `getOrphanedLeadListLeads()` (third parameter) | `?int` |
     | `LeadBundle\Segment\Decorator\Date\TimezoneResolver` | `getDefaultDate()` | `bool` |
     | `LeadBundle\Segment\Query\Expression\ExpressionBuilder` | `notExists()` | `string` |
+    | `LeadBundle\Segment\Query\Expression\ExpressionBuilder` | `func()` (second parameter) | `string` |
     | `LeadBundle\Segment\Query\QueryBuilder` | `replaceJoinCondition()` | `string`, `string` |
     | `LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery` | `getDataFromLeadEventLog()` | `string` |
     | `LeadBundle\Tracker\ContactTracker` | `setUseSystemContact()` | `bool` (no longer nullable) |
@@ -1180,6 +1182,8 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `StageBundle\Entity\Stage` | `setCategory()` | `?Category` |
 
     `ContactIdentificationEvent::getIdentifier()` now returns `?string` and `ListPreProcessListEvent::getResult()` returns `?bool`.
+
+    When there is no where or having expression, pass `null` to `LeadRepository::applySearchQueryRelationship()`, not `false`. Pass the `ExpressionBuilder::func()` operand as a SQL expression string, e.g. `func('ABS', '-1')` instead of `func('ABS', -1)`.
 
 - The `$action` parameter of controller helpers now declares a native `string` type: `AbstractStandardFormController::afterEntitySave()`, `afterFormProcessed()`, `beforeEntitySave()`, `beforeFormProcessed()`, `checkActionPermission()`, `getFormEntity()`, `getFormView()`, `getPostActionRedirectArguments()`, `getPostActionControllerAction()` and `getViewArguments()`, `FetchCommonApiController::checkEntityAccess()` and `ListController::changeList()`, plus their overrides in core controllers. Callers that pass a non-string action now get a `TypeError`. Plugin controllers that override one of these methods may keep the parameter untyped or declare `string`.
 - Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
