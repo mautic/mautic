@@ -8,6 +8,8 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ContactLastActiveUpdatedEvent;
+use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -43,6 +45,19 @@ final class ContactLastActiveUpdatedEventFunctionalTest extends MauticMysqlTestC
         $this->assertSame($contact->getId(), $this->events[0]->getContactId());
         $this->assertSame('2026-02-01 12:00:00', $this->events[0]->getLastActive()->format('Y-m-d H:i:s'));
         $this->assertSame('2026-01-01 10:00:00', $this->events[0]->getPreviousLastActive()?->format('Y-m-d H:i:s'));
+    }
+
+    public function testRepositoryUpdateOfInactiveContactDispatchesEventWithoutPreviousDate(): void
+    {
+        $contact = $this->createContact(null);
+
+        self::getContainer()->get(LeadRepository::class)->updateLastActive(
+            $contact->getId(),
+            new \DateTime('2026-02-01 12:00:00', new \DateTimeZone('UTC'))
+        );
+
+        $this->assertCount(1, $this->events);
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $this->events[0]->getPreviousLastActive());
     }
 
     public function testRepositoryUpdateWithUnchangedDateDispatchesNoEvent(): void
@@ -144,6 +159,49 @@ final class ContactLastActiveUpdatedEventFunctionalTest extends MauticMysqlTestC
         $this->assertCount(1, $this->events);
         $this->assertSame('2026-03-01 08:00:00', $this->events[0]->getLastActive()->format('Y-m-d H:i:s'));
         $this->assertSame('2026-01-01 10:00:00', $this->events[0]->getPreviousLastActive()?->format('Y-m-d H:i:s'));
+    }
+
+    public function testListenerSavingContactDispatchesOneEvent(): void
+    {
+        $contact = $this->createContact(new \DateTime('2026-01-01 10:00:00', new \DateTimeZone('UTC')));
+        $model   = self::getContainer()->get(LeadModel::class);
+        $saves   = 0;
+
+        self::getContainer()->get(EventDispatcherInterface::class)->addListener(
+            ContactLastActiveUpdatedEvent::class,
+            function () use ($contact, $model, &$saves): void {
+                // Limit the nested saves, so a regression fails instead of recursing forever.
+                if (++$saves > 3) {
+                    return;
+                }
+                $contact->setFirstname('Synced '.$saves);
+                $model->saveEntity($contact);
+            }
+        );
+
+        $contact->setLastActive(new \DateTime('2026-03-01 08:00:00', new \DateTimeZone('UTC')));
+        $model->saveEntity($contact);
+
+        $this->assertCount(1, $this->events);
+    }
+
+    public function testPostSaveListenerStillSeesLastActiveChange(): void
+    {
+        $contact = $this->createContact(new \DateTime('2026-01-01 10:00:00', new \DateTimeZone('UTC')));
+        $changes = [];
+
+        self::getContainer()->get(EventDispatcherInterface::class)->addListener(
+            LeadEvents::LEAD_POST_SAVE,
+            function (LeadEvent $event) use (&$changes): void {
+                $changes = $event->getChanges();
+            }
+        );
+
+        $contact->setLastActive(new \DateTime('2026-03-01 08:00:00', new \DateTimeZone('UTC')));
+        self::getContainer()->get(LeadModel::class)->saveEntity($contact);
+
+        $this->assertCount(1, $this->events);
+        $this->assertArrayHasKey('dateLastActive', $changes);
     }
 
     public function testSavingContactWithoutLastActiveChangeDispatchesNoEvent(): void
