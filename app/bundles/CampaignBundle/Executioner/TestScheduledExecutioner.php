@@ -7,7 +7,7 @@ namespace Mautic\CampaignBundle\Executioner;
 /**
  * @internal Used in tests
  */
-class TestScheduledExecutioner extends ScheduledExecutioner
+final class TestScheduledExecutioner extends ScheduledExecutioner
 {
     /**
      * @internal Used in tests

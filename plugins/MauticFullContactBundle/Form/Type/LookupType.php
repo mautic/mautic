@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<string, mixed>>
  */
-class LookupType extends AbstractType
+final class LookupType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -33,7 +33,7 @@ class LookupType extends AbstractType
                 'save_text'      => 'mautic.core.form.submit',
                 'cancel_onclick' => 'javascript:void(0);',
                 'cancel_attr'    => [
-                    'data-dismiss' => 'modal',
+                    'data-bs-dismiss' => 'modal',
                 ],
             ]
         );
@@ -43,7 +43,7 @@ class LookupType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.plugin.fullcontact.notify',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],

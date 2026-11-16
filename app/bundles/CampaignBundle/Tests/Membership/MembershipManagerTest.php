@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Membership;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,25 +15,25 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 
-class MembershipManagerTest extends \PHPUnit\Framework\TestCase
+final class MembershipManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var Adder|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&Adder
      */
     private \PHPUnit\Framework\MockObject\MockObject $adder;
 
     /**
-     * @var Remover|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&Remover
      */
     private \PHPUnit\Framework\MockObject\MockObject $remover;
 
     /**
-     * @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&EventDispatcher
      */
     private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
     /**
-     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
@@ -108,12 +110,28 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testContactsAreAddedOrUpdated(): void
     {
-        $contact = $this->createMock(Lead::class);
-        $contact->method('getId')
-            ->willReturn(1);
-        $contact2 = $this->createMock(Lead::class);
-        $contact2->method('getId')
-            ->willReturn(2);
+        $contact = new class() extends Lead {
+            public function __construct(
+                private readonly int $id = 1,
+            ) {
+            }
+
+            public function getId(): int
+            {
+                return $this->id;
+            }
+        };
+        $contact2 = new class() extends Lead {
+            public function __construct(
+                private readonly int $id = 2,
+            ) {
+            }
+
+            public function getId(): int
+            {
+                return $this->id;
+            }
+        };
 
         $campaign       = new Campaign();
         $campaignMember = new CampaignMember();
@@ -137,17 +155,36 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
             ->method('dispatchBatchMembershipChange')
             ->with([$contact->getId() => $contact, $contact2->getId() => $contact2], $campaign, Adder::NAME);
 
-        $this->getManager()->addContacts(new ArrayCollection([1 => $contact, 2 => $contact2]), $campaign);
+        /** @var ArrayCollection<int, Lead> $contacts */
+        $contacts = new ArrayCollection([1 => $contact, 2 => $contact2]);
+
+        $this->getManager()->addContacts($contacts, $campaign);
     }
 
     public function testContactsAreRemoved(): void
     {
-        $contact = $this->createMock(Lead::class);
-        $contact->method('getId')
-            ->willReturn(1);
-        $contact2 = $this->createMock(Lead::class);
-        $contact2->method('getId')
-            ->willReturn(2);
+        $contact = new class() extends Lead {
+            public function __construct(
+                private readonly int $id = 1,
+            ) {
+            }
+
+            public function getId(): int
+            {
+                return $this->id;
+            }
+        };
+        $contact2 = new class() extends Lead {
+            public function __construct(
+                private readonly int $id = 2,
+            ) {
+            }
+
+            public function getId(): int
+            {
+                return $this->id;
+            }
+        };
 
         $campaign       = new Campaign();
         $campaignMember = new CampaignMember();
@@ -167,10 +204,13 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
             ->method('dispatchBatchMembershipChange')
             ->with([$contact2->getId() => $contact2], $campaign, Remover::NAME);
 
-        $this->getManager()->removeContacts(new ArrayCollection([1 => $contact, 2 => $contact2]), $campaign);
+        /** @var ArrayCollection<int, Lead> $contacts */
+        $contacts = new ArrayCollection([1 => $contact, 2 => $contact2]);
+
+        $this->getManager()->removeContacts($contacts, $campaign);
     }
 
-    private function getManager()
+    private function getManager(): MembershipManager
     {
         return new MembershipManager($this->adder, $this->remover, $this->eventDispatcher, $this->leadRepository, $this->logger);
     }

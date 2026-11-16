@@ -15,15 +15,13 @@ class FileUploadValidator
     }
 
     /**
-     * @param int    $fileSize          In bytes
+     * @param int    $fileSize      In bytes
      * @param string $fileExtension
-     * @param int    $maxUploadSize     In bytes
-     * @param string $extensionErrorMsg
-     * @param string $sizeErrorMsg
+     * @param int    $maxUploadSize In bytes
      *
      * @throws FileInvalidException
      */
-    public function validate($fileSize, $fileExtension, $maxUploadSize, array $allowedExtensions, $extensionErrorMsg, $sizeErrorMsg): void
+    public function validate($fileSize, $fileExtension, $maxUploadSize, array $allowedExtensions, string $extensionErrorMsg, string $sizeErrorMsg): void
     {
         $errors = [];
 
@@ -39,7 +37,7 @@ class FileUploadValidator
             $errors[] = $e->getMessage();
         }
 
-        if ($errors) {
+        if ([] !== $errors) {
             $message = implode('<br />', $errors);
             throw new FileInvalidException($message);
         }
@@ -47,14 +45,13 @@ class FileUploadValidator
 
     /**
      * @param string $extension
-     * @param string $extensionErrorMsg
      *
      * @throws FileInvalidException
      */
-    public function checkExtension($extension, array $allowedExtensions, $extensionErrorMsg = 'mautic.asset.asset.error.file.extension'): void
+    public function checkExtension($extension, array $allowedExtensions, string $extensionErrorMsg = 'mautic.asset.asset.error.file.extension'): void
     {
         $extension         = strtolower($extension);
-        $allowedExtensions = array_map('strtolower', $allowedExtensions);
+        $allowedExtensions = array_map(strtolower(...), $allowedExtensions);
 
         if (!in_array($extension, $allowedExtensions, true)) {
             $this->throwException($extensionErrorMsg, [
@@ -67,11 +64,10 @@ class FileUploadValidator
     /**
      * @param int    $fileSize
      * @param string $maxUploadSizeMB Max file size in MB
-     * @param string $sizeErrorMsg
      *
      * @throws FileInvalidException
      */
-    public function checkFileSize($fileSize, $maxUploadSizeMB, $sizeErrorMsg = 'mautic.asset.asset.error.file.size'): void
+    public function checkFileSize($fileSize, $maxUploadSizeMB, string $sizeErrorMsg = 'mautic.asset.asset.error.file.size'): void
     {
         if (!$maxUploadSizeMB) {
             return;
@@ -94,7 +90,7 @@ class FileUploadValidator
      */
     public function checkMimeType(string $mimeType, array $allowedExtensions, string $messageId = 'mautic.asset.asset.error.invalid.mimetype'): void
     {
-        $allowedExtensions = array_map('strtolower', $allowedExtensions);
+        $allowedExtensions = array_map(strtolower(...), $allowedExtensions);
         $extensions        = $this->getExtensionsByMimeType($mimeType);
 
         foreach ($extensions as $extension) {

@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -16,6 +17,10 @@ class SubmissionRepository extends CommonRepository
 {
     use TimelineTrait;
 
+    /**
+     * @param Submission $entity
+     * @param bool       $flush
+     */
     public function saveEntity($entity, $flush = true): void
     {
         parent::saveEntity($entity, $flush);
@@ -46,13 +51,10 @@ class SubmissionRepository extends CommonRepository
         $form = $args['form'];
 
         // DBAL
-        if (!isset($args['viewOnlyFields'])) {
-            $args['viewOnlyFields'] = ['button', 'freetext', 'freehtml', 'pagebreak', 'captcha'];
+        $viewOnlyFields = $args['viewOnlyFields'] ?? [];
+        if (empty($viewOnlyFields)) {
+            $viewOnlyFields = ['button', 'freetext', 'freehtml', 'pagebreak', 'captcha'];
         }
-        $viewOnlyFields = array_map(
-            fn ($value): string => '"'.$value.'"',
-            $args['viewOnlyFields']
-        );
 
         // Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
@@ -60,11 +62,13 @@ class SubmissionRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'form_fields', 'f')
             ->where('f.form_id = '.$form->getId())
             ->andWhere(
-                $fq->expr()->notIn('f.type', $viewOnlyFields),
+                $fq->expr()->notIn('f.type', ':types'),
                 $fq->expr()->eq('f.save_result', ':saveResult')
             )
             ->orderBy('f.field_order, f.id', 'ASC')
-            ->setParameter('saveResult', true);
+            ->setParameter('saveResult', true)
+            ->setParameter('types', $viewOnlyFields, ArrayParameterType::STRING);
+
         $results = $fq->executeQuery()->fetchAllAssociative();
 
         $fields = [];
@@ -95,9 +99,9 @@ class SubmissionRepository extends CommonRepository
 
         $databasePlatform = $this->_em->getConnection()->getDatabasePlatform();
         // Quote reserved keywords in field aliases
-        $fieldAliases = array_map(fn ($alias) => $databasePlatform->quoteIdentifier($alias), $fieldAliases);
+        $fieldAliases = array_map($databasePlatform->quoteIdentifier(...), $fieldAliases);
 
-        $fieldAliasSql = (!empty($fieldAliases)) ? ', r.'.implode(',r.', $fieldAliases) : '';
+        $fieldAliasSql = ([] !== $fieldAliases) ? ', r.'.implode(',r.', $fieldAliases) : '';
         $dq->select('r.submission_id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.referer, i.ip_address as ipAddress'.$fieldAliasSql);
         $results = $dq->executeQuery()->fetchAllAssociative();
 
@@ -253,8 +257,8 @@ class SubmissionRepository extends CommonRepository
             $date2      = $this->generateRandomParameterName();
             $parameters = [$date1 => $date.' 00:00:00', $date2 => $date.' 23:59:59'];
             $expr       = $q->expr()->and(
-                $q->expr()->gte('s.date_submitted', ":$date1"),
-                $q->expr()->lte('s.date_submitted', ":$date2")
+                $q->expr()->gte('s.date_submitted', ":{$date1}"),
+                $q->expr()->lte('s.date_submitted', ":{$date2}")
             );
 
             return [$expr, $parameters];
@@ -359,7 +363,8 @@ class SubmissionRepository extends CommonRepository
             ->join('s', MAUTIC_TABLE_PREFIX.'pages', 'p', 's.page_id = p.id');
 
         if (is_array($pageId)) {
-            $q->where($q->expr()->in('s.page_id', $pageId))
+            $q->where($q->expr()->in('s.page_id', ':pageIds'))
+                ->setParameter('pageIds', array_map(intval(...), $pageId), ArrayParameterType::INTEGER)
                 ->groupBy('s.page_id, p.title, p.variant_hits');
         } else {
             $q->where($q->expr()->eq('s.page_id', ':page'))
@@ -391,7 +396,8 @@ class SubmissionRepository extends CommonRepository
             ->join('h', MAUTIC_TABLE_PREFIX.'emails', 'e', 'h.email_id = e.id');
 
         if (is_array($emailId)) {
-            $q->where($q->expr()->in('e.id', $emailId))
+            $q->where($q->expr()->in('e.id', ':ids'))
+                ->setParameter('ids', array_map(intval(...), $emailId), ArrayParameterType::INTEGER)
                 ->groupBy('e.id, e.subject, e.variant_sent_count');
         } else {
             $q->where($q->expr()->eq('e.id', ':id'))
@@ -430,9 +436,10 @@ class SubmissionRepository extends CommonRepository
             ->where(
                 $q->expr()->and(
                     $q->expr()->eq('s.form_id', (int) $formId),
-                    $q->expr()->in('s.id', $ids)
+                    $q->expr()->in('s.id', ':ids')
                 )
-            );
+            )
+            ->setParameter('ids', $ids, ArrayParameterType::INTEGER);
 
         $validIds = [];
         $results  = $q->executeQuery()->fetchAllAssociative();
@@ -465,7 +472,7 @@ class SubmissionRepository extends CommonRepository
                 break;
             case 'startsWith':
                 $operatorExpr    = 'like';
-                $value           = $value.'%';
+                $value .= '%';
                 break;
             case 'endsWith':
                 $operatorExpr   = 'like';
@@ -492,8 +499,8 @@ class SubmissionRepository extends CommonRepository
             ->setParameter('form', (int) $form);
 
         match ($type) {
-            'boolean', 'number' => $q->andWhere($q->expr()->$operatorExpr('r.'.$field, $value)),
-            default => $q->andWhere($q->expr()->$operatorExpr('r.'.$field, ':value'))
+            'boolean', 'number' => $q->andWhere($q->expr()->{$operatorExpr}('r.'.$field, $value)),
+            default => $q->andWhere($q->expr()->{$operatorExpr}('r.'.$field, ':value'))
                 ->setParameter('value', $value),
         };
 
@@ -555,7 +562,7 @@ class SubmissionRepository extends CommonRepository
      */
     public function batchDeleteFormResultsTableRecord(array $submissionIds): void
     {
-        if (!empty($submissionIds)) {
+        if ([] !== $submissionIds) {
             $entity = $this->getEntity((int) $submissionIds[0]);
             $form   = $entity->getForm();
 

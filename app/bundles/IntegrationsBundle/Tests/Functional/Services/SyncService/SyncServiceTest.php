@@ -7,6 +7,7 @@ namespace Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
+use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncService\SyncService;
 use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration\ExampleIntegration;
@@ -14,9 +15,9 @@ use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\PluginBundle\Entity\Integration;
 
-class SyncServiceTest extends MauticMysqlTestCase
+final class SyncServiceTest extends MauticMysqlTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,10 +29,10 @@ class SyncServiceTest extends MauticMysqlTestCase
     {
         $this->markTestSkipped('disabled for now');
 
-        // Sleep one second to ensure that the modified date/time stamps of the contacts just created are in the past
+        // @phpstan-ignore-next-line deadCode.unreachable
         sleep(1);
 
-        $prefix             = $this->container->getParameter('mautic.db_table_prefix');
+        $prefix             = $this->getContainer()->getParameter('mautic.db_table_prefix');
         $dataExchange       = new ExampleSyncDataExchange();
         $exampleIntegration = new ExampleIntegration($dataExchange);
 
@@ -40,13 +41,14 @@ class SyncServiceTest extends MauticMysqlTestCase
         $settings->setIsPublished(true);
         $exampleIntegration->setIntegrationConfiguration($settings);
 
-        $syncIntegrationsHelper = $this->container->get('mautic.integrations.helper.sync_integrations');
+        /** @var SyncIntegrationsHelper $syncIntegrationsHelper */
+        $syncIntegrationsHelper = $this->getContainer()->get('mautic.integrations.helper.sync_integrations');
         $syncIntegrationsHelper->addIntegration($exampleIntegration);
 
         /** @var SyncService $syncService */
-        $syncService = $this->container->get('mautic.integrations.sync.service');
+        $syncService = $this->getContainer()->get(SyncService::class);
 
-        $syncService->processIntegrationSync(ExampleIntegration::NAME, true);
+        $syncService->processIntegrationSync(ExampleIntegration::NAME);
         $payload = $dataExchange->getOrderPayload();
 
         // Created the 48 known contacts already in Mautic

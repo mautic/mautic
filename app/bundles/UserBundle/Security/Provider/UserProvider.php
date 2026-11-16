@@ -31,10 +31,7 @@ class UserProvider implements UserProviderInterface
     ) {
     }
 
-    /**
-     * @param string $username
-     */
-    public function loadUserByUsername($username): User
+    public function loadUserByUsername(string $username): User
     {
         return $this->loadUserByIdentifier($username);
     }
@@ -101,7 +98,23 @@ class UserProvider implements UserProviderInterface
             }
         }
 
-        // Validation for User objects returned by a plugin
+        return $this->persistUser($user, $isNew);
+    }
+
+    /**
+     * Create a user without resolving an existing account by username or email.
+     */
+    public function createUser(User $user): User
+    {
+        if ($user->getId()) {
+            throw new \InvalidArgumentException('Only new users can be created.');
+        }
+
+        return $this->persistUser($user, true, true);
+    }
+
+    private function persistUser(User $user, bool $isNew, bool $createOnly = false): User
+    {
         if (!$user->getRole()) {
             throw new AuthenticationException('mautic.integration.sso.error.no_role');
         }
@@ -132,17 +145,15 @@ class UserProvider implements UserProviderInterface
             );
         }
 
-        $event = new UserEvent($user, $isNew);
+        $event = $this->dispatcher->dispatch(new UserEvent($user, $isNew), UserEvents::USER_PRE_SAVE);
 
-        if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_SAVE)) {
-            $event = $this->dispatcher->dispatch($event, UserEvents::USER_PRE_SAVE);
+        if ($createOnly) {
+            $this->userRepository->saveNewUser($user);
+        } else {
+            $this->userRepository->saveEntity($user);
         }
 
-        $this->userRepository->saveEntity($user);
-
-        if ($this->dispatcher->hasListeners(UserEvents::USER_POST_SAVE)) {
-            $this->dispatcher->dispatch($event, UserEvents::USER_POST_SAVE);
-        }
+        $this->dispatcher->dispatch($event, UserEvents::USER_POST_SAVE);
 
         return $user;
     }

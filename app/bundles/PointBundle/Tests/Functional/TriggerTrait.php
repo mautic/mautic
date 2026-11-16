@@ -18,7 +18,7 @@ trait TriggerTrait
         $trigger->setName($name);
         $trigger->setPoints($points);
 
-        if (isset($group)) {
+        if ($group instanceof Group) {
             $trigger->setGroup($group);
         }
         if ($triggerExistingLeads) {

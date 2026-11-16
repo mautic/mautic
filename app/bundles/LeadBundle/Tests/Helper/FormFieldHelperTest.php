@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class FormFieldHelperTest extends TestCase
@@ -28,8 +27,8 @@ final class FormFieldHelperTest extends TestCase
         $list  = FormFieldHelper::getCountryChoices();
         $first = array_shift($list);
         $last  = array_pop($list);
-        Assert::assertEquals('Afghanistan', $first);
-        Assert::assertEquals('Zimbabwe', $last);
+        $this->assertEquals('Afghanistan', $first);
+        $this->assertEquals('Zimbabwe', $last);
     }
 
     public function testCustomCountryList(): void
@@ -38,8 +37,8 @@ final class FormFieldHelperTest extends TestCase
         $list                      = FormFieldHelper::getCountryChoices();
         $first                     = array_shift($list);
         $last                      = array_pop($list);
-        Assert::assertEquals('Middle Earth', $first);
-        Assert::assertEquals('Fillory', $last);
+        $this->assertEquals('Middle Earth', $first);
+        $this->assertEquals('Fillory', $last);
     }
 
     public function testDefaultRegionList(): void
@@ -49,8 +48,8 @@ final class FormFieldHelperTest extends TestCase
         $firstCountryRegion = array_shift($firstCountry);
         $lastCountry        = array_pop($list);
         $lastCountryRegion  = array_pop($lastCountry);
-        Assert::assertEquals('Alabama', $firstCountryRegion);
-        Assert::assertEquals('St. Maarten', $lastCountryRegion);
+        $this->assertEquals('Alabama', $firstCountryRegion);
+        $this->assertEquals('St. Maarten', $lastCountryRegion);
     }
 
     public function testCustomRegionList(): void
@@ -61,7 +60,7 @@ final class FormFieldHelperTest extends TestCase
         $firstCountryRegion        = array_shift($firstCountry);
         $lastCountry               = array_pop($list);
         $lastCountryRegion         = array_pop($lastCountry);
-        Assert::assertEquals('The Westlands', $firstCountryRegion);
-        Assert::assertEquals('Darkling Woods', $lastCountryRegion);
+        $this->assertEquals('The Westlands', $firstCountryRegion);
+        $this->assertEquals('Darkling Woods', $lastCountryRegion);
     }
 }

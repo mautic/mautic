@@ -23,10 +23,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Point>
  */
-class PointType extends AbstractType
+final class PointType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $security,
+        private readonly CorePermissions $security,
     ) {
     }
 
@@ -40,7 +40,7 @@ class PointType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -50,7 +50,7 @@ class PointType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control editor'],
                 'required'   => false,
             ]
@@ -63,7 +63,7 @@ class PointType extends AbstractType
                 'choices'           => $options['pointActions']['choices'],
                 'placeholder'       => '',
                 'label'             => 'mautic.point.form.type',
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.getPointActionPropertiesForm(this.value);',
@@ -76,7 +76,7 @@ class PointType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.point.action.delta',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.point.action.delta.help',

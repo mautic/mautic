@@ -4,6 +4,16 @@
 }) %}
 
 <script type="text/javascript">
+    var mauticDomainToAdd = '{{ assetGetBaseUrl()|replace({'/index.php': ''}) }}';
+
+    if (!Array.isArray(window.MauticDomains)) {
+        window.MauticDomains = [];
+    }
+
+    if (window.MauticDomains.indexOf(mauticDomainToAdd) === -1) {
+        window.MauticDomains.push(mauticDomainToAdd);
+    }
+
     /** This section is only needed once per page if manually copying **/
     if (typeof MauticSDKLoaded == 'undefined') {
         var MauticSDKLoaded = true;

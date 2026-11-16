@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTestCase
 {
@@ -11,8 +14,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
     {
         // Check the message in the Campaign edit page
         $crawler  = $this->client->request('GET', '/s/campaigns/new');
-        $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $attributes = [
             'data-toggle',
@@ -36,12 +38,11 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
     public function testCampaignEditPageCheckUnpublishWorkflowAttributesPresent(): void
     {
         $campaign   = $this->saveSomeCampaignLeadEventLogs();
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         // Check the message in the Campaign edit page
         $crawler  = $this->client->request('GET', sprintf('/s/campaigns/edit/%d', $campaign->getId()));
-        $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $republishBehavior = $translator->trans('mautic.campaignconfig.campaign_republish_behavior.'.$campaign->getRepublishBehavior());
 
@@ -69,12 +70,11 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
     public function testCampaignListPageCheckUnpublishWorkflowAttributesPresent(): void
     {
         $campaign   = $this->saveSomeCampaignLeadEventLogs();
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         // Check the message in the Campaign listing page
-        $crawler  = $this->client->request('GET', sprintf('/s/campaigns'));
-        $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $crawler  = $this->client->request('GET', '/s/campaigns');
+        $this->assertResponseIsSuccessful();
 
         $republishBehavior = $translator->trans('mautic.campaignconfig.campaign_republish_behavior.'.$campaign->getRepublishBehavior());
 
@@ -98,12 +98,12 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
     public function testCampaignUnpublishToggle(): void
     {
         $campaign   = $this->saveSomeCampaignLeadEventLogs();
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'campaign', 'id' => $campaign->getId()]);
         $response = $this->client->getResponse();
 
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $attributes    = [
             'onclick'               => 'Mautic.confirmationCampaignPublishStatus(mQuery(this));',
@@ -118,8 +118,8 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
         $content = $response->getContent();
 
         foreach ($attributes as $key => $val) {
-            $this->assertStringContainsString($key, $content);
-            $this->assertStringContainsString($val, $content);
+            $this->assertStringContainsString($key, (string) $content);
+            $this->assertStringContainsString($val, (string) $content);
         }
     }
 }

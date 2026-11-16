@@ -9,22 +9,30 @@ use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class TriggerEventController extends CommonFormController
+final class TriggerEventController extends CommonFormController
 {
+    private TriggerModel $triggerModel;
+
+    #[Required]
+    public function autowireTriggerEventController(
+        TriggerModel $triggerModel,
+    ): void {
+        $this->triggerModel = $triggerModel;
+    }
+
     /**
      * Generates new form and processes post data.
-     *
-     * @return Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): JsonResponse|Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
         $method  = $request->getMethod();
         $session = $request->getSession();
 
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             $triggerEvent = $request->request->all()['pointtriggerevent'] ?? [];
             $eventType    = $triggerEvent['type'];
             $triggerId    = $triggerEvent['triggerId'];
@@ -48,12 +56,7 @@ class TriggerEventController extends CommonFormController
         ) {
             return $this->modalAccessDenied();
         }
-
-        // fire the builder event
-        /** @var TriggerModel $pointTriggerModel */
-        $pointTriggerModel = $this->getModel('point.trigger');
-        \assert($pointTriggerModel instanceof TriggerModel);
-        $events = $pointTriggerModel->getEvents();
+        $events = $this->triggerModel->getEvents();
         $form   = $this->formFactory->create(TriggerEventType::class, $triggerEvent, [
             'action'   => $this->generateUrl('mautic_pointtriggerevent_action', ['objectAction' => 'new']),
             'settings' => $events[$eventType],
@@ -62,7 +65,7 @@ class TriggerEventController extends CommonFormController
         $triggerEvent['settings'] = $events[$eventType];
 
         // Check for a submitted form and process it
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
@@ -140,10 +143,8 @@ class TriggerEventController extends CommonFormController
      * Generates edit form and processes post data.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function editAction(Request $request, $objectId)
+    public function editAction(Request $request, $objectId): JsonResponse|Response
     {
         $session      = $request->getSession();
         $method       = $request->getMethod();
@@ -152,13 +153,11 @@ class TriggerEventController extends CommonFormController
         $events       = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified', []);
         $success      = 0;
         $valid        = $cancelled = false;
-        $triggerEvent = array_key_exists($objectId, $events) ? $events[$objectId] : null;
+        $triggerEvent = $events[$objectId] ?? null;
 
         if (null !== $triggerEvent) {
             $eventType         = $triggerEvent['type'];
-            $pointTriggerModel = $this->getModel('point.trigger');
-            \assert($pointTriggerModel instanceof TriggerModel);
-            $events                   = $pointTriggerModel->getEvents();
+            $events                   = $this->triggerModel->getEvents();
             $triggerEvent['settings'] = $events[$eventType];
 
             // ajax only for form fields
@@ -178,7 +177,7 @@ class TriggerEventController extends CommonFormController
             ]);
             $form->get('triggerId')->setData($triggerId);
             // Check for a submitted form and process it
-            if ('POST' == $method) {
+            if ('POST' === $method) {
                 if (!$cancelled = $this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $success = 1;
@@ -263,10 +262,8 @@ class TriggerEventController extends CommonFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $session   = $request->getSession();
         $triggerId = $request->get('triggerId');
@@ -280,12 +277,12 @@ class TriggerEventController extends CommonFormController
                 'point:triggers:create',
             ], 'MATCH_ONE')
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
+        $triggerEvent = $events[$objectId] ?? null;
 
-        if ('POST' == $request->getMethod() && null !== $triggerEvent) {
+        if ('POST' === $request->getMethod() && null !== $triggerEvent) {
             // add the field to the delete list
             if (!in_array($objectId, $delete)) {
                 $delete[] = $objectId;
@@ -324,10 +321,8 @@ class TriggerEventController extends CommonFormController
      * Undeletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse
      */
-    public function undeleteAction(Request $request, $objectId)
+    public function undeleteAction(Request $request, $objectId): JsonResponse
     {
         $session   = $request->getSession();
         $triggerId = $request->get('triggerId');
@@ -341,10 +336,10 @@ class TriggerEventController extends CommonFormController
                 'point:triggers:create',
             ], 'MATCH_ONE')
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
+        $triggerEvent = $events[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $triggerEvent) {
             // add the field to the delete list

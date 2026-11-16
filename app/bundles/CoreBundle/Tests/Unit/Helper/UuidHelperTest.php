@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\UuidHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class UuidHelperTest extends TestCase
+final class UuidHelperTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideValidUuids')]
+    #[DataProvider('provideValidUuids')]
     public function testIsValidUuidWithValidUuids(string $uuid): void
     {
         $this->assertTrue(UuidHelper::isValidUuid($uuid));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideInvalidUuids')]
+    #[DataProvider('provideInvalidUuids')]
     public function testIsValidUuidWithInvalidUuids(string $uuid): void
     {
         $this->assertFalse(UuidHelper::isValidUuid($uuid));

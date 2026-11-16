@@ -18,7 +18,7 @@ final class GrapesJsControllerTest extends TestCase
 {
     public function testEditorStateActionThrowsForUnsupportedObjectType(): void
     {
-        $controller = $this->getControllerForEditorState($this->createMock(CorePermissions::class), null);
+        $controller = $this->getControllerForEditorState($this->createStub(CorePermissions::class), null);
 
         $this->expectException(ConflictHttpException::class);
         $this->expectExceptionMessage('Object not authorized to load custom builder');
@@ -28,11 +28,11 @@ final class GrapesJsControllerTest extends TestCase
 
     public function testEditorStateActionReturnsNullForNewEntity(): void
     {
-        $controller = $this->getControllerForEditorState($this->createMock(CorePermissions::class), null);
+        $controller = $this->getControllerForEditorState($this->createStub(CorePermissions::class), null);
         $response   = $controller->editorStateAction('email', 'new123');
 
-        self::assertInstanceOf(JsonResponse::class, $response);
-        self::assertSame('{"editorState":null}', $response->getContent());
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertSame('{"editorState":null}', $response->getContent());
     }
 
     public function testEditorStateActionReturnsEditorStateFromJsonContent(): void
@@ -51,7 +51,7 @@ final class GrapesJsControllerTest extends TestCase
         $controller = $this->getControllerForEditorState($security, $entity);
         $response   = $controller->editorStateAction('email', '15');
 
-        self::assertSame('{"editorState":{"components":[{"type":"text"}]}}', $response->getContent());
+        $this->assertSame('{"editorState":{"components":[{"type":"text"}]}}', $response->getContent());
     }
 
     public function testEditorStateActionReturnsEditorStateFromSerializedContent(): void
@@ -66,7 +66,7 @@ final class GrapesJsControllerTest extends TestCase
         $controller = $this->getControllerForEditorState($security, $entity);
         $response   = $controller->editorStateAction('email', '33');
 
-        self::assertSame('{"editorState":{"pages":[]}}', $response->getContent());
+        $this->assertSame('{"editorState":{"pages":[]}}', $response->getContent());
     }
 
     public function testEditorStateActionReturnsNullWhenEditorStateCannotBeDecoded(): void
@@ -85,15 +85,15 @@ final class GrapesJsControllerTest extends TestCase
         $controller = $this->getControllerForEditorState($security, $entity);
         $response   = $controller->editorStateAction('email', '20');
 
-        self::assertSame('{"editorState":null}', $response->getContent());
+        $this->assertSame('{"editorState":null}', $response->getContent());
     }
 
     private function getControllerForEditorState(CorePermissions $security, ?Email $entity): GrapesJsController
     {
         return new class($security, $entity) extends GrapesJsController {
             public function __construct(
-                private CorePermissions $testSecurity,
-                private ?Email $testEntity,
+                private readonly CorePermissions $testSecurity,
+                private readonly ?Email $testEntity,
             ) {
                 $this->security = $this->testSecurity;
                 $this->setContainer(new Container());
@@ -106,7 +106,7 @@ final class GrapesJsControllerTest extends TestCase
             {
                 return new class($this->testEntity) extends AbstractCommonModel {
                     public function __construct(
-                        private ?Email $entity,
+                        private readonly ?Email $entity,
                     ) {
                     }
 

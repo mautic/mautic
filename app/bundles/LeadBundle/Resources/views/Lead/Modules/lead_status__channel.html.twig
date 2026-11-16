@@ -31,9 +31,8 @@
           type: config.type,
           color: config.color,
           size: 'sm',
-          onClick: config.type == 'dismissible' ? "Mautic.removeBounceStatus(this, " ~ doNotContactFlag.id ~ ", '" ~ doNotContactFlag.channel ~ "');" : null,
-          dismissTooltip: config.type == 'dismissible' ? 'mautic.lead.remove_dnc_status' : null,
-          className: config.type == 'dismissible' ? 'ml-xs' : null
+          dismissible_onclick: config.type == 'dismissible' ? "Mautic.removeBounceStatus(this, " ~ doNotContactFlag.id ~ ", '" ~ doNotContactFlag.channel ~ "');" : null,
+          attributes: {class: 'ml-xs'}
         }]
       } %}
     </div>

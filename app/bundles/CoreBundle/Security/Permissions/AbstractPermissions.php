@@ -316,7 +316,7 @@ abstract class AbstractPermissions
      */
     protected function addCustomFormFields(string $bundle, string $level, FormBuilderInterface &$builder, string $label, array $choices, array $data): void
     {
-        $builder->add("$bundle:$level", PermissionListType::class, [
+        $builder->add("{$bundle}:{$level}", PermissionListType::class, [
             'choices' => $choices,
             'label'   => $label,
             'data'    => (!empty($data[$level]) ? $data[$level] : []),
@@ -375,9 +375,9 @@ abstract class AbstractPermissions
 
         $choices['mautic.core.permissions.full'] = 'full';
 
-        $label = ('categories' == $level) ? 'mautic.category.permissions.categories' : "mautic.$bundle.permissions.$level";
+        $label = ('categories' == $level) ? 'mautic.category.permissions.categories' : "mautic.{$bundle}.permissions.{$level}";
         $builder->add(
-            "$bundle:$level",
+            "{$bundle}:{$level}",
             PermissionListType::class,
             [
                 'choices'           => $choices,
@@ -433,11 +433,11 @@ abstract class AbstractPermissions
         ];
 
         $builder->add(
-            "$bundle:$level",
+            "{$bundle}:{$level}",
             PermissionListType::class,
             [
                 'choices'           => $choices,
-                'label'             => "mautic.$bundle.permissions.$level",
+                'label'             => "mautic.{$bundle}.permissions.{$level}",
                 'data'              => (!empty($data[$level]) ? $data[$level] : []),
                 'bundle'            => $bundle,
                 'level'             => $level,
@@ -505,7 +505,7 @@ abstract class AbstractPermissions
         }
 
         $builder->add(
-            "$bundle:$level",
+            "{$bundle}:{$level}",
             PermissionListType::class,
             [
                 'choices'           => $choices,

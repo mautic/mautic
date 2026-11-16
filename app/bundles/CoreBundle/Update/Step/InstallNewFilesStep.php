@@ -17,9 +17,9 @@ final class InstallNewFilesStep implements StepInterface
     private ?InputInterface $input = null;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private UpdateHelper $updateHelper,
-        private PathsHelper $pathsHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly UpdateHelper $updateHelper,
+        private readonly PathsHelper $pathsHelper,
     ) {
     }
 

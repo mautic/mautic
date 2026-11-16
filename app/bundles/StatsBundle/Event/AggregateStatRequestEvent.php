@@ -6,18 +6,18 @@ use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 use Mautic\StatsBundle\Event\Options\FetchOptions;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class AggregateStatRequestEvent extends Event
+final class AggregateStatRequestEvent extends Event
 {
-    private StatCollection $statCollection;
+    private readonly StatCollection $statCollection;
 
     /**
      * @param string $statName
      */
     public function __construct(
         private $statName,
-        private \DateTimeInterface $fromDateTime,
-        private \DateTimeInterface $toDateTime,
-        private FetchOptions $options,
+        private readonly \DateTimeInterface $fromDateTime,
+        private readonly \DateTimeInterface $toDateTime,
+        private readonly FetchOptions $options,
     ) {
         $this->statCollection = new StatCollection();
     }
@@ -38,34 +38,22 @@ class AggregateStatRequestEvent extends Event
         return $this->statName;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getFromDateTime()
+    public function getFromDateTime(): \DateTimeInterface
     {
         return $this->fromDateTime;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getToDateTime()
+    public function getToDateTime(): \DateTimeInterface
     {
         return $this->toDateTime;
     }
 
-    /**
-     * @return FetchOptions
-     */
-    public function getOptions()
+    public function getOptions(): FetchOptions
     {
         return $this->options;
     }
 
-    /**
-     * @return StatCollection
-     */
-    public function getStatCollection()
+    public function getStatCollection(): StatCollection
     {
         return $this->statCollection;
     }

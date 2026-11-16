@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ButtonSubscriber implements EventSubscriberInterface
+final readonly class ButtonSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private TranslatorInterface $translator,
@@ -30,14 +30,21 @@ final class ButtonSubscriber implements EventSubscriberInterface
 
     public function injectViewButtons(CustomButtonEvent $event): void
     {
-        if (!str_contains($event->getRoute(), 'mautic_campaign_index')) {
-            return;
-        }
-
         if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
             return;
         }
 
+        if (str_contains($event->getRoute(), 'mautic_campaign_index')) {
+            $this->addListPageButtons($event);
+        }
+
+        if (str_contains($event->getRoute(), 'mautic_campaign_action')) {
+            $this->addListRowExportButton($event);
+        }
+    }
+
+    private function addListPageButtons(CustomButtonEvent $event): void
+    {
         $exportRoute = $this->router->generate('mautic_campaign_action', ['objectAction' => 'batchExport']);
 
         $event->addButton(
@@ -70,6 +77,32 @@ final class ButtonSubscriber implements EventSubscriberInterface
                 'iconClass' => 'ri-file-zip-line',
             ],
             ButtonHelper::LOCATION_PAGE_ACTIONS
+        );
+    }
+
+    private function addListRowExportButton(CustomButtonEvent $event): void
+    {
+        $item = $event->getItem();
+        if (null === $item || !method_exists($item, 'getId')) {
+            return;
+        }
+
+        $shareRoute = $this->router->generate('mautic_campaign_action', [
+            'objectAction' => 'share',
+            'objectId'     => $item->getId(),
+        ]);
+
+        $event->addButton(
+            [
+                'attr'      => [
+                    'href'  => $shareRoute,
+                    'class' => 'btn btn-ghost btn-sm btn-nospin',
+                ],
+                'btnText'   => $this->translator->trans('mautic.core.export'),
+                'iconClass' => 'ri-export-line',
+                'priority'  => 150,
+            ],
+            ButtonHelper::LOCATION_LIST_ACTIONS
         );
     }
 }

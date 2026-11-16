@@ -9,7 +9,7 @@ use Symfony\Component\Validator\ConstraintValidator;
  * Throws an exception if the field alias is equal some segment filter keyword.
  * It would cause odd behavior with segment filters otherwise.
  */
-class FileEncodingValidator extends ConstraintValidator
+final class FileEncodingValidator extends ConstraintValidator
 {
     public function validate(mixed $field, Constraint $constraint): void
     {

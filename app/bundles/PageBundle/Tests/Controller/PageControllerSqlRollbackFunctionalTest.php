@@ -10,10 +10,9 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageControllerSqlRollbackFunctionalTest extends MauticMysqlTestCase
+final class PageControllerSqlRollbackFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -62,7 +61,7 @@ class PageControllerSqlRollbackFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/r/{$redirectHash}?ct={$encodedCt}");
         $response = $this->client->getResponse();
 
-        Assert::assertTrue($response->isRedirect($redirectUrl), (string) $response);
+        $this->assertTrue($response->isRedirect($redirectUrl), (string) $response);
 
         // Re-enable redirect following for subsequent tests.
         $this->client->followRedirects();
@@ -71,9 +70,9 @@ class PageControllerSqlRollbackFunctionalTest extends MauticMysqlTestCase
         /** @var Hit|null $hit */
         $hit = $hitRepository->findOneBy(['lead' => $lead]);
 
-        Assert::assertNotNull($hit, 'A Hit entity should have been created.');
-        Assert::assertSame('email', $hit->getSource(), 'The hit source should be email.');
-        Assert::assertSame($email->getId(), $hit->getSourceId(), 'The hit source ID should be the email ID.');
-        Assert::assertSame($redirect->getId(), $hit->getRedirect()->getId(), 'The hit should be associated with the correct redirect.');
+        $this->assertInstanceOf(Hit::class, $hit, 'A Hit entity should have been created.');
+        $this->assertSame('email', $hit->getSource(), 'The hit source should be email.');
+        $this->assertSame($email->getId(), $hit->getSourceId(), 'The hit source ID should be the email ID.');
+        $this->assertSame($redirect->getId(), $hit->getRedirect()->getId(), 'The hit should be associated with the correct redirect.');
     }
 }

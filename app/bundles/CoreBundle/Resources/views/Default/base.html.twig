@@ -5,7 +5,7 @@
             pageTitle: block('pageTitle') is defined ? block('pageTitle') : 'Mautic',
         })
     }}
-    <body class="header-fixed pr-0">
+    <body class="header-fixed pe-0">
         <section id="app-wrapper">
             {{ outputScripts('bodyOpen') }}
 
@@ -28,7 +28,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-xs-6 text-secondary">{% trans with {'%date%': 'now' | date('Y') } %}mautic.core.copyright{% endtrans %}</div>
-                        <div class="col-xs-6 text-secondary text-right small">v{{ mauticAppVersion() }}</div>
+                        <div class="col-xs-6 text-secondary text-end small">v{{ mauticAppVersion() }}</div>
                     </div>
                 </div>
             </footer>
@@ -42,19 +42,6 @@
 
             <script>
                 Mautic.onPageLoad('body');
-                {% if app.environment is same as 'dev' %}
-                mQuery( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
-                    if(XMLHttpRequest.responseJSON && typeof XMLHttpRequest.responseJSON.ignore_wdt == 'undefined' && XMLHttpRequest.getResponseHeader('x-debug-token')) {
-                        if (mQuery('[class*="sf-tool"]').length) {
-                            mQuery('[class*="sf-tool"]').remove();
-                        }
-
-                        mQuery.get(mauticBaseUrl + '_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
-                            mQuery('body').append('<div class="sf-toolbar-reload">'+data+'</div>');
-                        });
-                    }
-                });
-                {% endif %}
             </script>
             {{ outputScripts('bodyClose') }}
             {{ include('@MauticCore/Helper/modal.html.twig', {

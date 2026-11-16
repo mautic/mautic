@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Api\Zoho;
 
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
 
-class Mapper
+final class Mapper
 {
     private array $contact = [];
 
@@ -32,30 +34,21 @@ class Mapper
     ) {
     }
 
-    /**
-     * @return $this
-     */
-    public function setObject($object)
+    public function setObject($object): static
     {
         $this->object = $object;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function setContact(array $contact)
+    public function setContact(array $contact): static
     {
         $this->contact = $contact;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function setMappedFields(array $fields)
+    public function setMappedFields(array $fields): static
     {
         $this->mappedFields = $fields;
 
@@ -96,10 +89,7 @@ class Mapper
         return $mapped;
     }
 
-    /**
-     * @return array
-     */
-    public function getArray()
+    public function getArray(): array
     {
         return $this->objectMappedValues;
     }
@@ -123,7 +113,7 @@ class Mapper
     /**
      * @return mixed
      */
-    private function getField($fieldName)
+    private function getField(int|string $fieldName)
     {
         return $this->fields[$this->object][$fieldName] ?? null;
     }

@@ -30,8 +30,8 @@
 {% endset %}
 
 <div class="pa-md">
-    <div class="contact-status" data-toggle="popover" data-content="{{ leadStatusesPopoverContent|escape }}"
-        data-html="true" data-title="{{ 'mautic.lead.contact.status.popover.title'|trans }}" data-container="body" data-placement="left"
+    <div class="contact-status" data-bs-toggle="popover" data-bs-content="{{ leadStatusesPopoverContent|escape }}"
+        data-bs-html="true" data-bs-title="{{ 'mautic.lead.contact.status.popover.title'|trans }}" data-bs-container="body" data-bs-placement="left"
         tabindex="0">
         {% if not doNotContactSms %}
         {% if doNotContact %}

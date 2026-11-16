@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Helper\EventHelper;
 use PHPUnit\Framework\TestCase;
 
-class EventHelperTest extends TestCase
+final class EventHelperTest extends TestCase
 {
     public function testEngagePointAction(): void
     {

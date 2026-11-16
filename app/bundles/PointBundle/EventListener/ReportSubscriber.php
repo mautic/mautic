@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\EventListener;
 
 use Mautic\LeadBundle\Report\FieldsBuilder;
@@ -10,7 +12,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_GROUP_SCORE = 'group.score';
 
@@ -44,7 +46,7 @@ class ReportSubscriber implements EventSubscriberInterface
     ];
 
     public function __construct(
-        private FieldsBuilder $fieldsBuilder,
+        private readonly FieldsBuilder $fieldsBuilder,
     ) {
     }
 

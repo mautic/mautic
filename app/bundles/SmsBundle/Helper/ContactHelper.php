@@ -13,9 +13,9 @@ use Mautic\SmsBundle\Exception\NumberNotFoundException;
 class ContactHelper
 {
     public function __construct(
-        private LeadRepository $leadRepository,
-        private Connection $connection,
-        private PhoneNumberHelper $phoneNumberHelper,
+        private readonly LeadRepository $leadRepository,
+        private readonly Connection $connection,
+        private readonly PhoneNumberHelper $phoneNumberHelper,
     ) {
     }
 

@@ -15,10 +15,12 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
-class ApiUserSubscriber implements EventSubscriberInterface
+final readonly class ApiUserSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private UserProviderInterface $userProvider, private TokenPermissions $tokenPermissions)
-    {
+    public function __construct(
+        private UserProviderInterface $userProvider,
+        private TokenPermissions $tokenPermissions,
+    ) {
     }
 
     /**
@@ -91,7 +93,10 @@ class ApiUserSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $authenticatedToken->setUser($accessTokenBadge->getAccessToken()->getUser());
+        $user = $accessTokenBadge->getAccessToken()->getUser();
+        if (null !== $user) {
+            $authenticatedToken->setUser($user);
+        }
     }
 
     /**
@@ -100,7 +105,9 @@ class ApiUserSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CheckPassportEvent::class              => ['onCheckPassport', 2048],
+            // Priority must be higher than UserProviderListener (2048) which is registered
+            // per-firewall when a provider is configured. We need to set our userLoader first.
+            CheckPassportEvent::class              => ['onCheckPassport', 2560],
             AuthenticationTokenCreatedEvent::class => 'onTokenCreated',
         ];
     }

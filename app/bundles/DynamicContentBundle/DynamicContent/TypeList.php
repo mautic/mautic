@@ -7,6 +7,7 @@ namespace Mautic\DynamicContentBundle\DynamicContent;
 final class TypeList
 {
     public const HTML = 'html';
+
     public const TEXT = 'text';
 
     /**

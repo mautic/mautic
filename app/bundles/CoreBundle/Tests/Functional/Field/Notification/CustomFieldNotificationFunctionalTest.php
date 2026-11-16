@@ -12,19 +12,22 @@ use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
+final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
     private TranslatorInterface $translator;
+
     private CustomFieldNotification $notifier;
+
     private LeadField $leadField;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translator = $this->getContainer()->get('translator');
-        $this->notifier   = $this->getContainer()->get('mautic.lead.field.notification.custom_field');
+        $this->translator = $this->getContainer()->get(TranslatorInterface::class);
+        $this->notifier   = $this->getContainer()->get(CustomFieldNotification::class);
         $this->leadField  = $this->createCustomField();
     }
 
@@ -45,7 +48,7 @@ class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
         /** @var NotificationRepository $notificationRepo */
         $notificationRepo   = $this->em->getRepository(Notification::class);
         $notifications      = $notificationRepo->getNotifications(1);
-        $this->assertEquals(1, count($notifications));
+        $this->assertCount(1, $notifications);
 
         $notification = array_shift($notifications);
         $this->assertEquals($notification['header'], $this->translator->trans('mautic.lead.field.notification.cannot_be_updated_header'));
@@ -63,7 +66,7 @@ class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
         $field->setCharLengthLimit(64);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
         $fieldModel->getRepository()->detachEntity($field);
 

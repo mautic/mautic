@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 
-class TwilioIntegration extends AbstractIntegration
+final class TwilioIntegration extends AbstractIntegration
 {
     protected bool $coreIntegration = true;
 
@@ -57,7 +57,7 @@ class TwilioIntegration extends AbstractIntegration
                 TextType::class,
                 [
                     'label'      => 'mautic.sms.config.form.sms.messaging_service_sid',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'required'   => false,
                     'attr'       => [
                         'class'   => 'form-control',
@@ -69,7 +69,7 @@ class TwilioIntegration extends AbstractIntegration
                 [
                     'scale'      => 0,
                     'label'      => 'mautic.sms.list.frequency.number',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'required'   => false,
                     'attr'       => [
                         'class' => 'form-control frequency',
@@ -83,7 +83,7 @@ class TwilioIntegration extends AbstractIntegration
                         'month' => 'MONTH',
                     ],
                     'label'             => 'mautic.lead.list.frequency.times',
-                    'label_attr'        => ['class' => 'control-label'],
+                    'label_attr'        => ['class' => 'form-label'],
                     'required'          => false,
                     'multiple'          => false,
                     'attr'              => [

@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Event\LeadGetCurrentEvent;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -43,7 +42,7 @@ final class ContactTrackerFunctionalLastActiveTest extends MauticMysqlTestCase
 
         if ($skip) {
             $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-            $eventDispatcher->addListener(LeadGetCurrentEvent::class, function (LeadGetCurrentEvent $event) {
+            $eventDispatcher->addListener(LeadGetCurrentEvent::class, function (LeadGetCurrentEvent $event): void {
                 $event->skipContactLastActiveLogged();
             });
         }
@@ -69,7 +68,7 @@ final class ContactTrackerFunctionalLastActiveTest extends MauticMysqlTestCase
         $this->em->persist($page);
         $this->em->flush();
 
-        Assert::assertFalse($this->isLastActiveDateSet($lead->getId()));
+        $this->assertFalse($this->isLastActiveDateSet($lead->getId()));
 
         $request = new Request([
             'ct' => ClickthroughHelper::encodeArrayForUrl([
@@ -84,7 +83,7 @@ final class ContactTrackerFunctionalLastActiveTest extends MauticMysqlTestCase
         $query           = $pageModel->getHitQuery($request, $page);
         $trackerHelper->getContactFromQuery($query);
 
-        Assert::assertSame(!$skip, $this->isLastActiveDateSet($lead->getId()));
+        $this->assertSame(!$skip, $this->isLastActiveDateSet($lead->getId()));
     }
 
     private function isLastActiveDateSet(int $id): bool

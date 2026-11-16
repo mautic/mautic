@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory;
 
 use DeviceDetector\Cache\PSR6Bridge;
 use DeviceDetector\DeviceDetector;
 use Mautic\CacheBundle\Cache\CacheProvider;
 
-final class DeviceDetectorFactory implements DeviceDetectorFactoryInterface
+final readonly class DeviceDetectorFactory implements DeviceDetectorFactoryInterface
 {
     public function __construct(
         private CacheProvider $cacheProvider,

@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Twig\Extension;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ExceptionExtension extends AbstractExtension
+final class ExceptionExtension extends AbstractExtension
 {
     /**
      * @return TwigFunction[]
@@ -15,7 +15,7 @@ class ExceptionExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('getRootPath', [$this, 'getRoot'], ['is_safe' => ['all']]),
+            new TwigFunction('getRootPath', $this->getRoot(...), ['is_safe' => ['all']]),
         ];
     }
 

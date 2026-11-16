@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\LeadBundle\Segment\Query\Filter\Exception\UnsupportedFilterOperatorException;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
@@ -25,24 +26,13 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
         return 'mautic.lead.query.builder.complex_relation.value';
     }
 
-    /**
-     * @throws \Exception
-     */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator  = $filter->getOperator();
 
         $filterParameters = $filter->getParameterValue();
-
-        if (is_array($filterParameters)) {
-            $parameters = [];
-            foreach ($filterParameters as $filterParameter) {
-                $parameters[] = $this->generateRandomParameterName();
-            }
-        } else {
-            $parameters = $this->generateRandomParameterName();
-        }
+        $parameters       = $this->buildParameters($filterParameters);
 
         $filterParametersHolder = $filter->getParameterHolder($parameters);
 
@@ -78,7 +68,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'neq':
                 $expression = $queryBuilder->expr()->or(
                     $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
-                    $queryBuilder->expr()->$filterOperator(
+                    $queryBuilder->expr()->{$filterOperator}(
                         $tableAlias.'.'.$filter->getField(),
                         $filterParametersHolder
                     )
@@ -96,7 +86,9 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'between':   // Used only for date with week combination (EQUAL [this week, next week, last week])
             case 'regexp':
             case 'notRegexp': // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
-                $expression = $queryBuilder->expr()->$filterOperator(
+            case 'inLast':
+            case 'inNext':
+                $expression = $queryBuilder->expr()->{$filterOperator}(
                     $tableAlias.'.'.$filter->getField(),
                     $filterParametersHolder
                 );
@@ -105,7 +97,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'notBetween': // Used only for date with week combination (NOT EQUAL [this week, next week, last week])
             case 'notIn':
                 $expression = $queryBuilder->expr()->or(
-                    $queryBuilder->expr()->$filterOperator($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
+                    $queryBuilder->expr()->{$filterOperator}($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
                     $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                 );
                 break;
@@ -136,10 +128,10 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $expressions = [];
                 foreach ($filterParametersHolder as $parameter) {
-                    $expressions[] = $queryBuilder->expr()->$operator($tableAlias.'.'.$filter->getField(), $parameter);
+                    $expressions[] = $queryBuilder->expr()->{$operator}($tableAlias.'.'.$filter->getField(), $parameter);
                 }
 
-                if (empty($expressions)) {
+                if ([] === $expressions) {
                     $expression = $queryBuilder->expr()->and($applyIsNull ? '1 = 1' : '1 = 0');
                     break;
                 }
@@ -147,17 +139,17 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 if ($applyIsNull) {
                     if ($applyNot) {
                         $expression = $queryBuilder->expr()->or(
-                            'NOT('.$queryBuilder->expr()->$filterGlue(...$expressions).')',
+                            'NOT('.$queryBuilder->expr()->{$filterGlue}(...$expressions).')',
                             $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                         );
                     } else {
                         $expression = $queryBuilder->expr()->or(
-                            $queryBuilder->expr()->$filterGlue(...$expressions),
+                            $queryBuilder->expr()->{$filterGlue}(...$expressions),
                             $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                         );
                     }
                 } else {
-                    $expression = $queryBuilder->expr()->$filterGlue(...$expressions);
+                    $expression = $queryBuilder->expr()->{$filterGlue}(...$expressions);
                 }
                 break;
             case OperatorOptions::INCLUDING_ALL:
@@ -185,7 +177,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 );
                 break;
             default:
-                throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
+                throw UnsupportedFilterOperatorException::fromOperator($filterOperator);
         }
 
         $queryBuilder->addLogic($expression, $filter->getGlue());
@@ -193,5 +185,17 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
 
         return $queryBuilder;
+    }
+
+    /**
+     * @return array<string>|string
+     */
+    protected function buildParameters(mixed $filterParameters): array|string
+    {
+        if (!is_array($filterParameters)) {
+            return $this->generateRandomParameterName();
+        }
+
+        return array_map($this->generateRandomParameterName(...), $filterParameters);
     }
 }

@@ -209,9 +209,6 @@ class LeadListRepository extends CommonRepository
         return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
     }
 
-    /**
-     * Check Lead segments by ids.
-     */
     public function checkLeadSegmentsByIds(Lead $lead, $ids): bool
     {
         if (empty($ids)) {
@@ -256,18 +253,25 @@ class LeadListRepository extends CommonRepository
     /**
      * Return a list of global lists.
      *
-     * @return array
+     * @return array<int, array{
+     *     id: int,
+     *     name: string,
+     *     publicName: string,
+     *     alias: string
+     *  }>
      */
-    public function getPreferenceCenterList()
+    public function getPreferenceCenterList(): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(LeadList::class, 'l', 'l.id');
 
-        $q->select('partial l.{id, name, publicName, alias}')
-            ->where($q->expr()->eq('l.isPublished', 'true'))
-            ->setParameter('true', true, 'boolean')
-            ->andWhere($q->expr()->eq('l.isPreferenceCenter', ':true'))
-            ->orderBy('l.name');
+        $q->select('l.id, l.name, l.publicName, l.alias')
+            ->where($q->expr()->eq('l.isPublished', ':published'))
+            ->andWhere($q->expr()->eq('l.isPreferenceCenter', ':preferenceCenter'))
+            ->setParameter('published', true)
+            ->setParameter('preferenceCenter', true)
+            ->orderBy('l.publicName')
+            ->addOrderBy('l.id', 'ASC');
 
         return $q->getQuery()->getArrayResult();
     }
@@ -277,11 +281,9 @@ class LeadListRepository extends CommonRepository
      *
      * @param int|int[] $listIds
      *
-     * @return array|int
-     *
      * @throws \Exception
      */
-    public function getLeadCount($listIds)
+    public function getLeadCount($listIds): int|array
     {
         if (!is_array($listIds)) {
             $listIds = [$listIds];
@@ -297,7 +299,8 @@ class LeadListRepository extends CommonRepository
             $q          = $this->forceUseIndex($q, MAUTIC_TABLE_PREFIX.'manually_removed');
             $expression = $q->expr()->eq('l.leadlist_id', $listIds[0]);
         } else {
-            $expression = $q->expr()->in('l.leadlist_id', $listIds);
+            $expression = $q->expr()->in('l.leadlist_id', ':listIds');
+            $q->setParameter('listIds', $listIds, ArrayParameterType::INTEGER);
         }
 
         $q->where(
@@ -322,6 +325,39 @@ class LeadListRepository extends CommonRepository
         }
 
         return (1 === $countListIds) ? $return[$listIds[0]] : $return;
+    }
+
+    /**
+     * @return array{total: int, manuallyAdded: int, filterAdded: int|null}
+     */
+    public function getSegmentStatistics(int $listId, bool $includeFilterAdded): array
+    {
+        $queryBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $queryBuilder->select(
+            'COUNT(l.lead_id) AS total_count',
+            'COALESCE(SUM(CASE WHEN l.manually_added = :true THEN 1 ELSE 0 END), 0) AS manually_added_count'
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
+
+        if ($includeFilterAdded) {
+            $queryBuilder->addSelect('COALESCE(SUM(CASE WHEN l.manually_added = :false THEN 1 ELSE 0 END), 0) AS filter_added_count');
+        }
+
+        $stats = $queryBuilder->where(
+            $queryBuilder->expr()->eq('l.leadlist_id', ':listId'),
+            $queryBuilder->expr()->eq('l.manually_removed', ':false')
+        )
+            ->setParameter('listId', $listId)
+            ->setParameter('false', false, 'boolean')
+            ->setParameter('true', true, 'boolean')
+            ->executeQuery()
+            ->fetchAssociative() ?: [];
+
+        return [
+            'total'         => (int) ($stats['total_count'] ?? 0),
+            'manuallyAdded' => (int) ($stats['manually_added_count'] ?? 0),
+            'filterAdded'   => $includeFilterAdded ? (int) ($stats['filter_added_count'] ?? 0) : null,
+        ];
     }
 
     private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
@@ -369,7 +405,7 @@ class LeadListRepository extends CommonRepository
         $subExpr = [];
 
         foreach ($subQueryFilters as $subColumn => $subParameter) {
-            $subExpr[] = $subQb->expr()->eq($subColumn, ":$subParameter");
+            $subExpr[] = $subQb->expr()->eq($subColumn, ":{$subParameter}");
         }
 
         if ('leads' !== $table) {
@@ -387,13 +423,13 @@ class LeadListRepository extends CommonRepository
             $subFunc           = 'eq';
             if (is_array($value)) {
                 $subFunc                        = 'in';
-                $subExpr[]                      = $subQb->expr()->in(sprintf('%s.%s', $alias, $column), ":$subFilterParamter");
+                $subExpr[]                      = $subQb->expr()->in(sprintf('%s.%s', $alias, $column), ":{$subFilterParamter}");
                 $parameters[$subFilterParamter] = ['value' => $value, 'type' => ArrayParameterType::STRING];
             } else {
                 $parameters[$subFilterParamter] = $value;
             }
 
-            $subExpr = $subQb->expr()->$subFunc(sprintf('%s.%s', $alias, $column), ":$subFilterParamter");
+            $subExpr = $subQb->expr()->{$subFunc}(sprintf('%s.%s', $alias, $column), ":{$subFilterParamter}");
         }
 
         $subQb->expr()->and(...$subExpr);
@@ -437,7 +473,7 @@ class LeadListRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('l.isGlobal', ":$unique");
+                $expr            = $q->expr()->eq('l.isGlobal', ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
@@ -467,7 +503,7 @@ class LeadListRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [
@@ -583,7 +619,7 @@ class LeadListRepository extends CommonRepository
 
         $sql = <<<SQL
             SELECT leadlist_id 
-            FROM $tableName
+            FROM {$tableName}
             WHERE lead_id = ?
                 AND manually_removed = 0
             LIMIT 1
@@ -612,7 +648,7 @@ SQL;
     {
         $segmentIds = $this->fetchContactToSegmentIdsRelationships($contactId, $expectedSegmentIds);
 
-        return !empty($segmentIds);
+        return [] !== $segmentIds;
     }
 
     /**
@@ -622,7 +658,7 @@ SQL;
     {
         $segmentIds = $this->fetchContactToSegmentIdsRelationships($contactId, $expectedSegmentIds);
 
-        if (empty($segmentIds)) {
+        if ([] === $segmentIds) {
             return true; // Contact is not associated wit any segment
         }
 
@@ -666,7 +702,7 @@ SQL;
 
         $sql = <<<SQL
             SELECT leadlist_id 
-            FROM $tableName
+            FROM {$tableName}
             WHERE lead_id = ?
                 AND leadlist_id IN (?)
                 AND manually_removed = 0
@@ -776,7 +812,7 @@ SQL;
             $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
         }
 
-        return array_map(fn ($segment) => ['item_id' => (string) $segment], $segmentIds);
+        return array_map(fn ($segment): array => ['item_id' => (string) $segment], $segmentIds);
     }
 
     /**
@@ -796,7 +832,7 @@ SQL;
         foreach ($query->getResult() as $rowFilters) {
             $segmentMembershipFilters = array_filter(
                 \Mautic\CoreBundle\Helper\Serializer::decode($rowFilters['filters']),
-                fn (array $filter) => 'leadlist' === $filter['type']
+                fn (array $filter): bool => 'leadlist' === $filter['type']
             );
 
             foreach ($segmentMembershipFilters as $filter) {
@@ -878,7 +914,7 @@ SQL;
             $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
         }
 
-        return array_map(fn ($segment) => ['item_id' => (string) $segment], $segmentIds);
+        return array_map(fn ($segment): array => ['item_id' => (string) $segment], $segmentIds);
     }
 
     /**
@@ -922,6 +958,6 @@ SQL;
             ->executeQuery()
             ->fetchAllNumeric();
 
-        return array_map(fn ($row) => (int) $row[0], $result);
+        return array_map(fn (array $row): int => (int) $row[0], $result);
     }
 }

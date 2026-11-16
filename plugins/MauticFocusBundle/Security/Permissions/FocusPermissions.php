@@ -5,9 +5,12 @@ namespace MauticPlugin\MauticFocusBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class FocusPermissions extends AbstractPermissions
+final class FocusPermissions extends AbstractPermissions
 {
-    public function __construct($params)
+    /**
+     * @param mixed[] $params
+     */
+    public function __construct(array $params)
     {
         parent::__construct($params);
         $this->addStandardPermissions('categories');

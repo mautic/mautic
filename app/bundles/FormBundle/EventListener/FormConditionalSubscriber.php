@@ -10,7 +10,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class FormConditionalSubscriber implements EventSubscriberInterface
+final readonly class FormConditionalSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private FormModel $formModel,
@@ -54,7 +54,7 @@ final class FormConditionalSubscriber implements EventSubscriberInterface
             }
         }
 
-        if (!empty($deleteIds)) {
+        if ([] !== $deleteIds) {
             $this->formModel->deleteFields($form, $deleteIds);
         }
     }

@@ -15,7 +15,7 @@ final class RepublishBehaviorType extends AbstractType
     {
         $resolver->setDefaults([
             'label'                 => 'mautic.campaignconfig.campaign_republish_behavior',
-            'label_attr'            => ['class' => 'control-label'],
+            'label_attr'            => ['class' => 'form-label'],
             'required'              => false,
             'include_global_option' => false,
             'attr'                  => [
@@ -24,7 +24,7 @@ final class RepublishBehaviorType extends AbstractType
             ],
         ]);
 
-        $resolver->setNormalizer('choices', fn ($options) => $options['include_global_option']
+        $resolver->setNormalizer('choices', fn ($options): array => $options['include_global_option']
                 ? ['mautic.campaignconfig.campaign_republish_behavior.use_global' => null] + RepublishBehavior::getChoices()
                 : RepublishBehavior::getChoices()
         );

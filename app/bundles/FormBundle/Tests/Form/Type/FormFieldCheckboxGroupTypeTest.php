@@ -15,20 +15,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
 {
-    private TranslatorInterface $translator;
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->translator->method('trans')
-            ->willReturnCallback(function (string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string {
-                return match ($id) {
-                    'mautic.form.field.checkboxgrp.min_message.placeholder' => 'Enter minimum selection message',
-                    'mautic.form.field.checkboxgrp.max_message.placeholder' => 'Enter maximum selection message',
-                    'mautic.form.field.checkboxgrp.range.invalid'           => 'Maximum must be greater than or equal to minimum',
-                    default                                                 => $id,
-                };
+            ->willReturnCallback(fn (string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string => match ($id) {
+                'mautic.form.field.checkboxgrp.min_message.placeholder' => 'Enter minimum selection message',
+                'mautic.form.field.checkboxgrp.max_message.placeholder' => 'Enter maximum selection message',
+                'mautic.form.field.checkboxgrp.range.invalid'           => 'Maximum must be greater than or equal to minimum',
+                default                                                 => $id,
             });
 
         parent::setUp();
@@ -72,7 +73,7 @@ final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
 
         $this->assertFalse($minimumField->isRequired());
         $this->assertEquals('mautic.form.field.checkboxgrp.minimum', $minimumField->getConfig()->getOption('label'));
-        $this->assertEquals(['class' => 'control-label'], $minimumField->getConfig()->getOption('label_attr'));
+        $this->assertEquals(['class' => 'form-label'], $minimumField->getConfig()->getOption('label_attr'));
         $this->assertEquals(['class' => 'form-control', 'min' => 0], $minimumField->getConfig()->getOption('attr'));
     }
 
@@ -88,7 +89,7 @@ final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
 
         $this->assertFalse($minMessageField->isRequired());
         $this->assertEquals('mautic.form.field.checkboxgrp.min_message', $minMessageField->getConfig()->getOption('label'));
-        $this->assertEquals(['class' => 'control-label'], $minMessageField->getConfig()->getOption('label_attr'));
+        $this->assertEquals(['class' => 'form-label'], $minMessageField->getConfig()->getOption('label_attr'));
         $this->assertEquals('Custom min message', $minMessageField->getData());
 
         $attr = $minMessageField->getConfig()->getOption('attr');
@@ -107,7 +108,7 @@ final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
 
         $this->assertFalse($maximumField->isRequired());
         $this->assertEquals('mautic.form.field.checkboxgrp.maximum', $maximumField->getConfig()->getOption('label'));
-        $this->assertEquals(['class' => 'control-label'], $maximumField->getConfig()->getOption('label_attr'));
+        $this->assertEquals(['class' => 'form-label'], $maximumField->getConfig()->getOption('label_attr'));
         $this->assertEquals(['class' => 'form-control', 'min' => 0], $maximumField->getConfig()->getOption('attr'));
     }
 
@@ -123,7 +124,7 @@ final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
 
         $this->assertFalse($maxMessageField->isRequired());
         $this->assertEquals('mautic.form.field.checkboxgrp.max_message', $maxMessageField->getConfig()->getOption('label'));
-        $this->assertEquals(['class' => 'control-label'], $maxMessageField->getConfig()->getOption('label_attr'));
+        $this->assertEquals(['class' => 'form-label'], $maxMessageField->getConfig()->getOption('label_attr'));
         $this->assertEquals('Custom max message', $maxMessageField->getData());
 
         $attr = $maxMessageField->getConfig()->getOption('attr');
@@ -184,7 +185,7 @@ final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
 
         $errors = $form->getErrors(true);
         $this->assertInstanceOf(FormError::class, $errors[0]);
-        $this->assertEquals('Maximum must be greater than or equal to minimum', $errors[0]->getMessage());
+        $this->assertSame('Maximum must be greater than or equal to minimum', $errors[0]->getMessage());
     }
 
     public function testEmptyRangeSubmission(): void

@@ -45,7 +45,7 @@ class PointRepository extends CommonRepository
             ->setParameter('type', $type);
 
         // make sure the published up and down dates are good
-        $expr = $this->getPublishedByDateExpression($q);
+        $expr = $this->getPublishedByDateOrmExpression($q);
         $expr->add($q->expr()->eq('p.type', ':type'));
 
         $q->where($expr);

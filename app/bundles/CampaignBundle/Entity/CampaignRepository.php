@@ -2,10 +2,13 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -85,7 +88,7 @@ class CampaignRepository extends CommonRepository
         }
 
         $q->leftJoin('c.lists', 'll')
-            ->where($this->getPublishedByDateExpression($q));
+            ->where($this->getPublishedByDateOrmExpression($q));
 
         if (!$viewOther) {
             $q->andWhere($q->expr()->eq('c.createdBy', ':id'))
@@ -130,11 +133,13 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c');
 
         $q->join('c', MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'll', 'c.id = ll.campaign_id')
-            ->where($this->getPublishedByDateExpression($q));
+            ->where($this->getPublishedByDateDbalExpression($q));
 
         $q->andWhere(
-            $q->expr()->in('ll.leadlist_id', $leadLists)
+            $q->expr()->in('ll.leadlist_id', ':leadLists')
         );
+
+        $q->setParameter('leadLists', $leadLists, ArrayParameterType::INTEGER);
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
@@ -252,7 +257,7 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -263,7 +268,7 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -277,22 +282,22 @@ class CampaignRepository extends CommonRepository
         switch ($filter->command) {
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired', [], null, 'en_US'):
-                $expr = $q->expr()->and(
-                    $q->expr()->eq('c.isPublished', ":$unique"),
+                $conditions = [
+                    $q->expr()->eq('c.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('c.publishDown'),
-                    $q->expr()->neq('c.publishDown', $q->expr()->literal('')),
-                    $q->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()')
-                );
+                    $q->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()'),
+                ];
+                $expr = $q instanceof QueryBuilder ? $q->expr()->andX(...$conditions) : $q->expr()->and(...$conditions);
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending', [], null, 'en_US'):
-                $expr = $q->expr()->and(
-                    $q->expr()->eq('c.isPublished', ":$unique"),
+                $conditions = [
+                    $q->expr()->eq('c.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('c.publishUp'),
-                    $q->expr()->neq('c.publishUp', $q->expr()->literal('')),
-                    $q->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()')
-                );
+                    $q->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()'),
+                ];
+                $expr = $q instanceof QueryBuilder ? $q->expr()->andX(...$conditions) : $q->expr()->and(...$conditions);
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -346,7 +351,7 @@ class CampaignRepository extends CommonRepository
             ->groupBy('c.id, c.name')
             ->setMaxResults($limit);
 
-        $expr = $this->getPublishedByDateExpression($q, 'c');
+        $expr = $this->getPublishedByDateDbalExpression($q, 'c');
         $q->where($expr);
 
         return $q->executeQuery()->fetchAllAssociative();
@@ -369,21 +374,18 @@ class CampaignRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $q, $limiter, true);
 
         if (count($pendingEvents) > 0) {
-            $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-            $sq->select('null')
-                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
-                ->where(
-                    $sq->expr()->and(
-                        $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
-                        $sq->expr()->eq('e.rotation', 'cl.rotation'),
-                        $sq->expr()->in('e.event_id', $pendingEvents)
-                    )
-                );
-            $this->updateQueryFromContactLimiter('e', $sq, $limiter, true);
-
-            $q->andWhere(
-                sprintf('NOT EXISTS (%s)', $sq->getSQL())
-            );
+            $q->leftJoin(
+                'cl',
+                MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
+                'e',
+                $q->expr()->and(
+                    $q->expr()->eq('cl.lead_id', 'e.lead_id'),
+                    $q->expr()->eq('e.rotation', 'cl.rotation'),
+                    $q->expr()->in('e.event_id', ':pendingEvents')
+                )
+            )
+                ->andWhere($q->expr()->isNull('e.lead_id'))
+                ->setParameter('pendingEvents', $pendingEvents, ArrayParameterType::INTEGER);
         }
 
         $result = $q->executeQuery()->fetchAssociative();
@@ -606,10 +608,9 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * @param int   $segmentId
-     * @param array $campaignIds
+     * @param int[] $campaignIds
      */
-    public function getCampaignsSegmentShare($segmentId, $campaignIds = []): array
+    public function getCampaignsSegmentShare(int $segmentId, array $campaignIds = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('c.id, c.name, ROUND(IFNULL(COUNT(DISTINCT t.lead_id)/COUNT(DISTINCT cl.lead_id)*100, 0),1) segmentCampaignShare');
@@ -623,8 +624,9 @@ class CampaignRepository extends CommonRepository
             );
         $q->groupBy('c.id');
 
-        if (!empty($campaignIds)) {
-            $q->where($q->expr()->in('c.id', $campaignIds));
+        if ([] !== $campaignIds) {
+            $q->where($q->expr()->in('c.id', ':campaignIds'));
+            $q->setParameter('campaignIds', $campaignIds, ArrayParameterType::INTEGER);
         }
 
         return $q->executeQuery()->fetchAllAssociative();
@@ -663,7 +665,7 @@ class CampaignRepository extends CommonRepository
             ->setParameter('id', $id)
             ->andWhere('e.channelId IS NOT NULL')
             ->getQuery()
-            ->setHydrationMode(\Doctrine\ORM\Query::HYDRATE_ARRAY)
+            ->setHydrationMode(Query::HYDRATE_ARRAY)
             ->getResult();
 
         $return = [];
@@ -724,7 +726,7 @@ class CampaignRepository extends CommonRepository
                 'clr',
                 MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
                 'log',
-                'clr.lead_id = log.lead_id AND clr.campaign_id = :campaign_id  AND clr.manually_removed = 0
+                'clr.lead_id = log.lead_id AND clr.campaign_id = :campaign_id AND clr.manually_removed = 0
                  AND clr.rotation = log.rotation'
             )
             ->innerJoin(
@@ -747,15 +749,18 @@ class CampaignRepository extends CommonRepository
                 MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
                 'executed',
                 'executed.lead_id = log.lead_id AND executed.campaign_id = :campaign_id
-                AND (executed.event_id = ce.id OR executed.is_scheduled = 1)
-                AND executed.rotation = log.rotation'
+                AND ((executed.event_id = ce.id AND executed.version > 1) OR executed.is_scheduled = 1)
+                AND executed.rotation = log.rotation '
             )
             ->andWhere('executed.event_id IS NULL')
             ->andWhere(
                 $query->expr()->or(
                     $query->expr()->and(
-                        // For decision/condition events, check the decision path
+                        // For condition/decision parents, version > 1 means evaluation completed.
+                        // version = 1 means the job was killed after the DB INSERT but before evaluation —
+                        // children must NOT be picked up; the condition/decision itself must be re-executed.
                         $query->expr()->in('parent.event_type', ["'condition'", "'decision'"]),
+                        $query->expr()->gt('log.version', 1),
                         $query->expr()->or(
                             // "No" path taken
                             $query->expr()->and(
@@ -768,10 +773,7 @@ class CampaignRepository extends CommonRepository
                                     $query->expr()->eq('ce.decision_path', $query->expr()->literal('yes')),
                                     $query->expr()->isNull('ce.decision_path')
                                 ),
-                                $query->expr()->or(
-                                    $query->expr()->eq('log.non_action_path_taken', 0),
-                                    $query->expr()->isNull('log.non_action_path_taken')
-                                )
+                                $query->expr()->eq('log.non_action_path_taken', 0)
                             )
                         )
                     ),
@@ -784,12 +786,10 @@ class CampaignRepository extends CommonRepository
             $query->andWhere('clr.lead_id >= :minLeadId')
                 ->setParameter('minLeadId', $minLeadId);
         }
-
         if ($maxLeadId > 0) {
             $query->andWhere('clr.lead_id <= :maxLeadId')
                 ->setParameter('maxLeadId', $maxLeadId);
         }
-
         if ($recordsAfter) {
             $query->andWhere('clr.date_added >= :minDateForUnStuck')
                 ->setParameter('minDateForUnStuck', $recordsAfter);
@@ -849,7 +849,7 @@ class CampaignRepository extends CommonRepository
         )
             ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
             ->where('c.deleted IS NULL')
-            ->andWhere($this->getPublishedByDateExpression($query))
+            ->andWhere($this->getPublishedByDateDbalExpression($query))
             ->andWhere(
                 sprintf('EXISTS (%s)', $innerQuery->getSQL())
             )

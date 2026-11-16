@@ -56,29 +56,29 @@
 
 {% block content %}
   {% if true == phpVersion['isOutdated'] %}
-  <div class="pt-md pl-md col-md-12">
-      <div class="pt-md pl-md alert alert-warning">
+  <div class="pt-16 ps-16 col-md-12">
+      <div class="pt-16 ps-16 alert alert-warning">
           <h3>{{ 'mautic.dashboard.phpversionwarning.title'|trans }}</h3>
           <p>{{ 'mautic.dashboard.phpversionwarning.body'|trans({'%phpversion%': phpVersion['version']})|purify }}</p>
       </div>
   </div>
   {% endif %}
 
-  <div class="row pt-md ml-0">
+  <div class="row pt-16 ms-0">
       <div class="col-sm-12">
-        <div class="d-flex fd-row fw-nowrap gap-sm ai-center jc-space-between">
+        <div class="d-flex flex-row flex-nowrap gap-12 align-items-center justify-content-between">
             {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm}) }}
             <div class="dropdown">
-                <a href="#" class="btn btn-ghost btn-sm btn-nospin" data-toggle="dropdown" aria-expanded="false">
+                <a href="#" class="btn btn-ghost btn-sm btn-nospin" data-bs-toggle="dropdown" aria-expanded="false">
                   {{ 'mautic.core.quick_filters'|trans }}
                   <i class="ri-arrow-down-s-line"></i>
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a href="#" onclick="Mautic.setDateRange('today'); event.preventDefault();">{{ 'mautic.dashboard.date.today'|trans }}</a></li>
-                  <li><a href="#" onclick="Mautic.setDateRange('yesterday'); event.preventDefault();">{{ 'mautic.dashboard.date.yesterday'|trans }}</a></li>
-                  <li><a href="#" onclick="Mautic.setDateRange(7); event.preventDefault();">{{ 'mautic.dashboard.date.last_7_days'|trans }}</a></li>
-                  <li><a href="#" onclick="Mautic.setDateRange(30); event.preventDefault();">{{ 'mautic.dashboard.date.last_30_days'|trans }}</a></li>
-                  <li><a href="#" onclick="Mautic.setDateRange(90); event.preventDefault();">{{ 'mautic.dashboard.date.last_90_days'|trans }}</a></li>
+                  <li><a href="#" data-date-range-option="today">{{ 'mautic.dashboard.date.today'|trans }}</a></li>
+                  <li><a href="#" data-date-range-option="yesterday">{{ 'mautic.dashboard.date.yesterday'|trans }}</a></li>
+                  <li><a href="#" data-date-range-option="7">{{ 'mautic.dashboard.date.last_7_days'|trans }}</a></li>
+                  <li><a href="#" data-date-range-option="30">{{ 'mautic.dashboard.date.last_30_days'|trans }}</a></li>
+                  <li><a href="#" data-date-range-option="90">{{ 'mautic.dashboard.date.last_90_days'|trans }}</a></li>
                 </ul>
               </div>
         </div>
@@ -96,14 +96,14 @@
       </div>
       <div id="cloned-widgets" class="dashboard-widgets cards"></div>
   {% else %}
-      <div class="well well col-md-6 col-md-offset-3 mt-md">
+      <div class="well well col-md-6 col-md-offset-3 mt-16">
           <div class="row">
               <div class="mautibot-image col-xs-3 text-center">
-                  <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}" />
+                  <img class="img-fluid" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}" />
               </div>
               <div class="col-xs-9">
                   <h4><i class="ri-double-quotes-l"></i> {{ 'mautic.dashboard.nowidgets.tip.header'|trans }} <i class="ri-double-quotes-r"></i></h4>
-                  <p class="mt-md">{{ 'mautic.dashboard.nowidgets.tip'|trans }}</p>
+                  <p class="mt-16">{{ 'mautic.dashboard.nowidgets.tip'|trans }}</p>
                   {% include '@MauticCore/Helper/button.html.twig' with {
                     buttons: [
                         {

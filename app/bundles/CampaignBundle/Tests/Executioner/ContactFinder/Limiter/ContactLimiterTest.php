@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder\Limiter;
 
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 
-class ContactLimiterTest extends \PHPUnit\Framework\TestCase
+final class ContactLimiterTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetters(): void
     {
         $limiter = new ContactLimiter(1, 2, 3, 4, [1, 2, 3]);
 
-        $this->assertEquals(1, $limiter->getBatchLimit());
-        $this->assertEquals(2, $limiter->getContactId());
-        $this->assertEquals(3, $limiter->getMinContactId());
-        $this->assertEquals(4, $limiter->getMaxContactId());
-        $this->assertEquals([1, 2, 3], $limiter->getContactIdList());
+        $this->assertSame(1, $limiter->getBatchLimit());
+        $this->assertSame(2, $limiter->getContactId());
+        $this->assertSame(3, $limiter->getMinContactId());
+        $this->assertSame(4, $limiter->getMaxContactId());
+        $this->assertSame([1, 2, 3], $limiter->getContactIdList());
     }
 
     public function testBatchMinContactIsReturned(): void
@@ -23,7 +25,7 @@ class ContactLimiterTest extends \PHPUnit\Framework\TestCase
         $limiter = new ContactLimiter(1, 2, 3, 10, [1, 2, 3]);
 
         $limiter->setBatchMinContactId(5);
-        $this->assertEquals(5, $limiter->getMinContactId());
+        $this->assertSame(5, $limiter->getMinContactId());
     }
 
     public function testNoContactsFoundExceptionThrownIfIdIsLessThanMin(): void

@@ -16,12 +16,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class WidgetDetailEventFactory
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private CacheProviderTagAwareInterface $cacheProvider,
-        private CorePermissions $corePermissions,
-        private UserHelper $userHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private PathsHelper $pathsHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly CacheProviderTagAwareInterface $cacheProvider,
+        private readonly CorePermissions $corePermissions,
+        private readonly UserHelper $userHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly PathsHelper $pathsHelper,
     ) {
     }
 

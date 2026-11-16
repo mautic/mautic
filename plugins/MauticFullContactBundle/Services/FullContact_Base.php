@@ -55,7 +55,7 @@ class FullContact_Base
     /**
      * @param mixed[] $hdr
      */
-    private function _update_rate_limit($hdr): void
+    private function _update_rate_limit(array $hdr): void
     {
         $remaining            = (float) $hdr['X-Rate-Limit-Remaining'];
         $reset                = (float) $hdr['X-Rate-Limit-Reset'];
@@ -85,10 +85,8 @@ class FullContact_Base
      * @param string $url
      * @param string $id
      * @param bool   $json
-     *
-     * @return object
      */
-    public function setWebhookUrl($url, $id = null, $json = false)
+    public function setWebhookUrl($url, $id = null, $json = false): static
     {
         $this->_webhookUrl  = $url;
         $this->_webhookId   = $id;
@@ -104,7 +102,6 @@ class FullContact_Base
      * @author  Keith Casey <contrib@caseysoftware.com>
      * @author  David Boskovic <me@david.gs> @dboskovic
      *
-     * @param array $params
      * @param array $postData
      *
      * @return object
@@ -112,7 +109,7 @@ class FullContact_Base
      * @throws NoCreditException
      * @throws NotImplementedException
      */
-    protected function _execute($params = [], $postData = null)
+    protected function _execute(array $params = [], $postData = null)
     {
         if (null === $postData && !in_array($params['method'], $this->_supportedMethods, true)) {
             throw new NotImplementedException(self::class.' does not support the ['.$params['method'].'] method');

@@ -25,7 +25,7 @@ class LogRepository extends CommonRepository
             ->setParameter('logMaxLimit', $logMaxLimit);
 
         return array_map(
-            static fn ($row): int => (int) $row['webhook_id'],
+            static fn (array $row): int => (int) $row['webhook_id'],
             $qb->executeQuery()->fetchAllAssociative()
         );
     }
@@ -72,7 +72,7 @@ class LogRepository extends CommonRepository
      *
      * @return float|null
      */
-    public function getSuccessVsErrorStatusCodeRatio($webhookId, $limit)
+    public function getSuccessVsErrorStatusCodeRatio($webhookId, $limit): int|float|null
     {
         // Generate query to select last X = $limit rows
         $selectqb = $this->_em->getConnection()->createQueryBuilder();

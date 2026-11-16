@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription;
 
-class UnsubscribedEmail
+final class UnsubscribedEmail
 {
     /**
      * @param string $contactEmail

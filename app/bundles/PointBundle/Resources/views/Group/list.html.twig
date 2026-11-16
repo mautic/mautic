@@ -9,6 +9,8 @@
     <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
+            'searchScopes': searchScopes|default([]),
+            'searchScopeHint': searchScopeHint|default(null),
             'action': currentRoute,
             'page_actions': {
                 'templateButtons': {
@@ -117,7 +119,7 @@
                 {% else %}
                     <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
                         {% set childContainer %}
-                            <div class="mb-md">
+                            <div class="mb-16">
                                 {% include '@MauticCore/Components/pictogram.html.twig' with {
                                     'pictogram': 'filter-and-group-data',
                                     'size': '80'

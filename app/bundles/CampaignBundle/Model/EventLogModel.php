@@ -3,48 +3,45 @@
 namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends AbstractCommonModel<LeadEventLog>
  */
-class EventLogModel extends AbstractCommonModel
+final class EventLogModel extends AbstractCommonModel
 {
-    public function __construct(
-        protected EventModel $eventModel,
-        protected CampaignModel $campaignModel,
-        protected IpLookupHelper $ipLookupHelper,
-        protected EventScheduler $eventScheduler,
-        EntityManager $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    private EventModel $eventModel;
+
+    private IpLookupHelper $ipLookupHelper;
+
+    private EventScheduler $eventScheduler;
+
+    private LeadEventLogRepository $leadEventLogRepository;
+
+    #[Required]
+    public function autowireEventLogModel(
+        EventModel $eventModel,
+        IpLookupHelper $ipLookupHelper,
+        EventScheduler $eventScheduler,
+        LeadEventLogRepository $leadEventLogRepository,
+    ): void {
+        $this->eventModel             = $eventModel;
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->eventScheduler         = $eventScheduler;
+        $this->leadEventLogRepository = $leadEventLogRepository;
     }
 
     public function getRepository(): LeadEventLogRepository
     {
-        return $this->em->getRepository(LeadEventLog::class);
+        return $this->leadEventLogRepository;
     }
 
     public function getPermissionBase(): string

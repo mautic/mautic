@@ -10,7 +10,6 @@ use Mautic\CampaignBundle\Tests\Functional\Controller\CampaignControllerTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
-use PHPUnit\Framework\Assert;
 
 final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
 {
@@ -265,18 +264,16 @@ final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
         $form       = $crawler->selectButton('Save')->form();
         $newCrawler = $this->client->submit($form);
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         // Verify the validation error message is displayed
-        Assert::assertStringContainsString(
-            self::ORPHAN_EVENTS_ERROR_MESSAGE,
-            $newCrawler->text()
-        );
+        $this->assertStringContainsString(self::ORPHAN_EVENTS_ERROR_MESSAGE, $newCrawler->text());
 
         // Verify the campaign version was not incremented (save was prevented)
         $this->em->clear();
         $campaign = $this->em->find(Campaign::class, $campaign->getId());
-        Assert::assertSame($originalVersion, $campaign->getVersion());
+        $this->assertInstanceOf(Campaign::class, $campaign);
+        $this->assertSame($originalVersion, $campaign->getVersion());
     }
 
     private function addConnectedEventToCampaign(Campaign $campaign, string $sourceType = 'lists'): void

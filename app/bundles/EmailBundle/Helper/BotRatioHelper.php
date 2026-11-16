@@ -16,19 +16,19 @@ class BotRatioHelper
      * @param string[] $blockedIPAddresses
      */
     public function __construct(
-        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
+        private readonly DeviceDetectorFactoryInterface $deviceDetectorFactory,
 
         #[Autowire(env: 'float:MAUTIC_BOT_HELPER_BOT_RATIO_THRESHOLD')]
-        private float $botRatioThreshold = 0.6,
+        private readonly float $botRatioThreshold = 0.6,
 
         #[Autowire(env: 'int:MAUTIC_BOT_HELPER_TIME_EMAIL_THRESHOLD')]
-        private int $timeFromEmailThreshold = 2,
+        private readonly int $timeFromEmailThreshold = 2,
 
         #[Autowire(env: 'json:MAUTIC_BOT_HELPER_BLOCKED_USER_AGENTS')]
-        private array $blockedUserAgents = [],
+        private readonly array $blockedUserAgents = [],
 
         #[Autowire(env: 'json:MAUTIC_BOT_HELPER_BLOCKED_IP_ADDRESSES')]
-        private array $blockedIPAddresses = [],
+        private readonly array $blockedIPAddresses = [],
     ) {
     }
 

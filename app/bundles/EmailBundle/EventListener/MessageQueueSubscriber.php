@@ -9,7 +9,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class MessageQueueSubscriber implements EventSubscriberInterface
+final readonly class MessageQueueSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private EmailModel $emailModel,

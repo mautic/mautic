@@ -10,21 +10,23 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Entity\Report;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
+final class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
     /**
      * @param array<int, array<string, array<string, array<string, array<int,string>>|string>|string>> $properties
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('normalizeData')]
+    #[DataProvider('normalizeData')]
     public function testOnReportDisplay(string $value, string $type, array $properties, string $expected): void
     {
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
-        \assert($fieldModel instanceof FieldModel);
+        /** @var FieldModel $fieldModel */
+        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $field = new LeadField();
         $field->setType($type);
         $field->setObject('lead');
@@ -37,7 +39,7 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
         $contact->setEmail('contact@example.com');
         $contact->addUpdatedField('field1', $value);
         $contactModel = self::getContainer()->get(LeadModel::class);
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
 
         $report = new Report();
@@ -52,7 +54,7 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
 
         // convert html table to php array
@@ -77,61 +79,57 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, array<string, array<string, array<string, array<int,string>>|string>|string>> $properties
+     * @return \Iterator<int, array<string, (array<string, (array<string, array<int, string>>|string)>|string)>> $properties
      */
-    public static function normalizeData(): array
+    public static function normalizeData(): \Iterator
     {
-        return [
-            // Test for boolean custom field
-            [
-                'value'      => '1',
-                'type'       => 'boolean',
-                'properties' => [
-                    'yes' => 'True',
-                    'no'  => 'False',
-                ],
-                'expected'   => 'True',
+        // Test for boolean custom field
+        yield [
+            'value'      => '1',
+            'type'       => 'boolean',
+            'properties' => [
+                'yes' => 'True',
+                'no'  => 'False',
             ],
-            [
-                'value'      => '0',
-                'type'       => 'boolean',
-                'properties' => [
-                    'yes' => 'True',
-                    'no'  => 'False',
-                ],
-                'expected'   => 'False',
+            'expected'   => 'True',
+        ];
+        yield [
+            'value'      => '0',
+            'type'       => 'boolean',
+            'properties' => [
+                'yes' => 'True',
+                'no'  => 'False',
             ],
-
-            // Test for select custom field
-            [
-                'value'      => '2',
-                'type'       => 'select',
-                'properties' => [
+            'expected'   => 'False',
+        ];
+        // Test for select custom field
+        yield [
+            'value'      => '2',
+            'type'       => 'select',
+            'properties' => [
+                'list' => [
                     'list' => [
-                        'list' => [
-                            1 => 'Option 1',
-                            2 => 'Option 2',
-                        ],
+                        1 => 'Option 1',
+                        2 => 'Option 2',
                     ],
                 ],
-                'expected'   => 'Option 2',
             ],
-
-            // Test for multiselect custom field
-            [
-                'value'      => '1|3',
-                'type'       => 'multiselect',
-                'properties' => [
+            'expected'   => 'Option 2',
+        ];
+        // Test for multiselect custom field
+        yield [
+            'value'      => '1|3',
+            'type'       => 'multiselect',
+            'properties' => [
+                'list' => [
                     'list' => [
-                        'list' => [
-                            1 => 'Option 1',
-                            2 => 'Option 2',
-                            3 => 'Option 3',
-                        ],
+                        1 => 'Option 1',
+                        2 => 'Option 2',
+                        3 => 'Option 3',
                     ],
                 ],
-                'expected'   => 'Option 1|Option 3',
             ],
+            'expected'   => 'Option 1|Option 3',
         ];
     }
 
@@ -140,6 +138,6 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
      */
     private function domTableToArray(Crawler $crawler): array
     {
-        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
+        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td): string => trim($td->text())));
     }
 }

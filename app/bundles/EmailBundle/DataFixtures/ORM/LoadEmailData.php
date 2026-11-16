@@ -8,12 +8,12 @@ use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Entity\EmailRepository;
 
-class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private EmailModel $emailModel,
+        private readonly EmailRepository $emailRepository,
     ) {
     }
 
@@ -31,20 +31,17 @@ class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
                     if (in_array($col, ['content', 'variantSettings'])) {
                         $val = Serializer::decode(stripslashes($val));
                     }
-                    $email->$setter($val);
+                    $email->{$setter}($val);
                 }
             }
             $email->addList($this->getReference('lead-list'));
 
-            $this->emailModel->getRepository()->saveEntity($email);
+            $this->emailRepository->saveEntity($email);
             $this->setReference('email-'.$key, $email);
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 9;
     }

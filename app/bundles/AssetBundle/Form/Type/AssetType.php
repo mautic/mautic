@@ -26,11 +26,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Asset>
  */
-class AssetType extends AbstractType
+final class AssetType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private AssetModel $assetModel,
+        private readonly TranslatorInterface $translator,
+        private readonly AssetModel $assetModel,
     ) {
     }
 
@@ -56,7 +56,7 @@ class AssetType extends AbstractType
             HiddenType::class,
             [
                 'label'       => $this->translator->trans('mautic.asset.asset.form.file.upload', ['%max%' => $maxUploadSize]),
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'required'    => false,
             ]
         );
@@ -77,7 +77,7 @@ class AssetType extends AbstractType
                     'tooltip'      => 'mautic.asset.asset.form.disallow.crawlers.descr',
                     'data-show-on' => '{"asset_storageLocation_0":"checked"}',
                 ],
-                'data'=> empty($options['data']->getDisallow()) ? false : true,
+                'data'=> !empty($options['data']->getDisallow()),
             ]
         );
 
@@ -86,7 +86,7 @@ class AssetType extends AbstractType
             TextType::class,
             [
                 'label'       => 'mautic.asset.asset.form.remotePath',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'required'    => false,
             ]
@@ -97,7 +97,7 @@ class AssetType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.title',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -107,7 +107,7 @@ class AssetType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control editor'],
                 'required'   => false,
             ]
@@ -125,7 +125,7 @@ class AssetType extends AbstractType
 
         $builder->add('language', LocaleType::class, [
             'label'      => 'mautic.core.language',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.asset.asset.form.language.help',
@@ -133,9 +133,7 @@ class AssetType extends AbstractType
             'required'    => true,
             'constraints' => [
                 new NotBlank(
-                    [
-                        'message' => 'mautic.core.value.required',
-                    ]
+                    message: 'mautic.core.value.required'
                 ),
             ],
         ]);

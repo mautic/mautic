@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -12,7 +14,7 @@ use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Tests\Fixtures;
 
-class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
+final class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 {
     public function testWriteReportData(): void
     {
@@ -56,7 +58,7 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
     public function testClear(): void
     {
-        $csvExporter = $this->createMock(CsvExporter::class);
+        $csvExporter = $this->createStub(CsvExporter::class);
 
         $exportHandler = $this->createMock(ExportHandler::class);
 
@@ -75,7 +77,7 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilePath(): void
     {
-        $csvExporter = $this->createMock(CsvExporter::class);
+        $csvExporter = $this->createStub(CsvExporter::class);
 
         $exportHandler = $this->createMock(ExportHandler::class);
 

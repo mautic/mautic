@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormView;
 /**
  * @extends AbstractType<mixed>
  */
-class SortableValueLabelListType extends AbstractType
+final class SortableValueLabelListType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

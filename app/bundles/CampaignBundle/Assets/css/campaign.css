@@ -306,7 +306,21 @@
     height: auto;
     width: auto;
     bottom: 0;
+}
+
+.campaign-builder.live .builder-content {
     overflow: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    cursor: grab;
+}
+
+.campaign-builder.live .builder-content::-webkit-scrollbar {
+    display: none;
+}
+
+.campaign-builder.live .builder-content.campaign-canvas-panning {
+    cursor: grabbing;
 }
 
 #CampaignCanvas {

@@ -81,6 +81,10 @@ Mautic.emailOnLoad = function (container, response) {
         });
     }
 
+    if (mQuery('#content_preview_frame').length && Mautic.contentPreviewUrlGenerator) {
+        Mautic.contentPreviewUrlGenerator.init();
+    }
+
     var $loadDeliveredElements = mQuery('[data-email-stat-delivered-for]');
     if ($loadDeliveredElements.length) {
         $loadDeliveredElements.each(function(i, el) {
@@ -116,7 +120,7 @@ Mautic.insertEmailBuilderToken = function(editorId, token) {
 Mautic.getEmailAbTestWinnerForm = function(abKey) {
     if (abKey && mQuery(abKey).val() && mQuery(abKey).closest('.form-group').hasClass('has-error')) {
         mQuery(abKey).closest('.form-group').removeClass('has-error');
-        if (mQuery(abKey).next().hasClass('help-block')) {
+        if (mQuery(abKey).next().hasClass('form-text')) {
             mQuery(abKey).next().remove();
         }
     }
@@ -159,6 +163,12 @@ Mautic.submitSendForm = function () {
     mQuery('form[name=\'batch_send\']').submit();
 };
 
+Mautic.submitAbSendForm = function () {
+    Mautic.dismissConfirmation();
+    mQuery('.btn-send').prop('disabled', true);
+    mQuery('form[name=\'ab_test_send\']').submit();
+};
+
 Mautic.emailSendOnLoad = function (container, response) {
     if (mQuery('.email-send-progress').length) {
         if (!mQuery('#emailSendProgress').length) {
@@ -186,7 +196,7 @@ Mautic.sendEmailBatch = function () {
             if (response.progress[0] > 0) {
                 mQuery('.imported-count').html(response.progress[0]);
                 mQuery('.progress-bar-send').attr('aria-valuenow', response.progress[0]).css('width', response.percent + '%');
-                mQuery('.progress-bar-send span.sr-only').html(response.percent + '%');
+                mQuery('.progress-bar-send span.visually-hidden').html(response.percent + '%');
             }
 
             if (response.progress[0] >= response.progress[1]) {
@@ -241,7 +251,7 @@ Mautic.selectEmailType = function(emailType) {
     } else {
         mQuery('#segmentTranslationParent').addClass('hide');
         mQuery('#templateTranslationParent').removeClass('hide');
-        mQuery('#leadList').addClass('hide');
+        mQuery('#leadList,#ab-test').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newTemplateEmail);
     }
 
@@ -371,7 +381,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     var tabId                   = '#emailform_dynamicContent_' + dynamicContentIndex;
     var tokenName               = 'Dynamic Content ' + (dynamicContentIndex + 1);
     var newForm                 = dynamicContentPrototype.replace(/__name__/g, dynamicContentIndex);
-    var newTab                  = mQuery('<li><a role="tab" data-toggle="tab" href="' + tabId + '">' + tokenName + '</a></li>');
+    var newTab                  = mQuery('<li><a role="tab" data-bs-toggle="tab" href="' + tabId + '">' + tokenName + '</a></li>');
 
     tabHolder.append(newTab);
     filterHolder.append(newForm);
@@ -421,7 +431,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
         filterIndex++;
         filterContainerId = '#emailform_dynamicContent_' + dynamicContentIndex + '_filters_' + filterIndex ;
     }
-    var newTab            = mQuery('<li><a role="tab" data-toggle="tab" href="' + filterContainerId + '">Variation ' + (filterIndex + 1) + '</a></li>');
+    var newTab            = mQuery('<li><a role="tab" data-bs-toggle="tab" href="' + filterContainerId + '">Variation ' + (filterIndex + 1) + '</a></li>');
     var newForm           = filterPrototype.replace(/__name__/g, filterIndex)
         .replace(/dynamicContent_0_filters/g, 'dynamicContent_' + dynamicContentIndex + '_filters')
         .replace(/dynamicContent]\[0]\[filters/g, 'dynamicContent][' + dynamicContentIndex + '][filters');
@@ -514,7 +524,7 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
 Mautic.updateDynamicContentDropdown = function () {
     var options = [];
 
-    mQuery('#dynamicContentTabs').find('a[data-toggle="tab"]').each(function () {
+    mQuery('#dynamicContentTabs').find('a[data-bs-toggle="tab"]').each(function () {
         var prototype       = '<li><a class="fr-command" data-cmd="dynamicContent" data-param1="__tokenName__">__tokenName__</a></li>';
         var newOption       = prototype.replace(/__tokenName__/g, mQuery(this).text());
 
@@ -543,15 +553,32 @@ Mautic.toggleMailerIsOwnerWarningMessage = function(radioSelector) {
         let warning = mQuery('<div/>');
         warning.attr('id', warningMessageId);
         warning.html(checkedRadio.attr('data-warning'));
-        warning.addClass('alert alert-warning mt-md');
+        warning.addClass('alert alert-warning mt-16');
         checkedRadio.closest('.form-group').append(warning);
     }
 }
 
+Mautic.destroyCkEditorsInContainer = function (container) {
+    if (typeof ckEditors === 'undefined' || ckEditors.size === 0) {
+        return;
+    }
+
+    container.find('textarea.editor').each(function () {
+        var editor = ckEditors.get(this);
+
+        if (editor && typeof editor.destroy === 'function') {
+            editor.destroy();
+            ckEditors.delete(this);
+        }
+    });
+};
+
 Mautic.initRemoveEvents = function (elements, jQueryVariant) {
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     if (elements.hasClass('remove-selected')) {
-        elements.on('click', function() {
+        elements.off('click').on('click', function() {
+            Mautic.destroyCkEditorsInContainer(mQuery(this).closest('.panel'));
+
             mQuery(this).closest('.panel').animate(
                 {'opacity': 0},
                 'fast',
@@ -561,7 +588,7 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
             );
         });
     } else {
-        elements.on('click', function (e) {
+        elements.off('click').on('click', function (e) {
             e.preventDefault();
             var $this         = mQuery(this);
             var parentElement = $this.parents('.tab-pane.dynamic-content');
@@ -569,6 +596,8 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
             if ($this.hasClass('remove-filter')) {
                 parentElement = $this.parents('.tab-pane.dynamic-content-filter');
             }
+
+            Mautic.destroyCkEditorsInContainer(parentElement);
 
             var tabLink      = mQuery('a[href="#' + parentElement.attr('id') + '"]').parent();
             var tabContainer = tabLink.parent();

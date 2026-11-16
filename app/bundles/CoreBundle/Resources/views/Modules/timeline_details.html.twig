@@ -1,0 +1,3 @@
+{% if event.errors is defined and event.errors is not empty %}
+  <div class="text-danger">{{ event.errors|purify }}</div>
+{% endif %}

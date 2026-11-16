@@ -9,7 +9,7 @@ use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-class CampaignContactCountHelper
+final readonly class CampaignContactCountHelper
 {
     private const CACHE_TTL = 43200;
 
@@ -37,7 +37,7 @@ class CampaignContactCountHelper
             }
         }
 
-        if (empty($campaignIdsForCountFromDb)) {
+        if ([] === $campaignIdsForCountFromDb) {
             return $contactCounts;
         }
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper\Update\PreUpdateChecks;
 
-class PreUpdateCheckResult
+final class PreUpdateCheckResult
 {
     /**
      * @var PreUpdateCheckError[]

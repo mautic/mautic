@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,41 +23,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 #[AsCommand(
     name: CleanupMaintenanceCommand::NAME,
-    description: 'Updates the Mautic application'
-)]
-class CleanupMaintenanceCommand extends ModeratedCommand
-{
-    public const NAME = 'mautic:maintenance:cleanup';
-
-    public function __construct(
-        private TranslatorInterface $translator,
-        private EventDispatcherInterface $dispatcher,
-        PathsHelper $pathsHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper,
-    ) {
-        parent::__construct($pathsHelper, $coreParametersHelper);
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->setDefinition(
-                [
-                    new InputOption(
-                        'days-old',
-                        'd',
-                        InputOption::VALUE_OPTIONAL,
-                        'Purge records older than this number of days. Defaults to 365.',
-                        365
-                    ),
-                    new InputOption('dry-run', 'r', InputOption::VALUE_NONE, 'Performs a dry run. Shows no. of affected rows. Won\'t actually delete anything.'),
-                    new InputOption('gdpr', 'g', InputOption::VALUE_NONE, 'Deletes records of inactive users to fulfill GDPR requirements.'),
-                ]
-            )
-            ->setHelp(
-                <<<'EOT'
+    description: 'Updates the Mautic application',
+    help: <<<'TXT'
 <info>%command.name%</info> purges records of anonymous contacts (<comment>unless the <info>--gdpr</info> flag is set</comment>) that are older than 365 days.
 Adjust the threshold by using <info>--days-old</info>.
 
@@ -83,7 +51,38 @@ Deletes records of anonymous <options=bold>and inactive identified</> contacts o
 Shows you how many records of anonymous contacts <info>%command.name%</info> will purge.
 
 The <info>%command.name%</info> command dispatches the <info>CoreEvents::MAINTENANCE_CLEANUP_DATA</info> event in order to purge old data (data must be supported by event listeners, as not all data is applicable to be purged).
-EOT
+TXT
+)]
+final class CleanupMaintenanceCommand extends ModeratedCommand
+{
+    public const NAME = 'mautic:maintenance:cleanup';
+
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        private readonly EventDispatcherInterface $dispatcher,
+        PathsHelper $pathsHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+    ) {
+        parent::__construct($pathsHelper, $coreParametersHelper);
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->setDefinition(
+                [
+                    new InputOption(
+                        'days-old',
+                        'd',
+                        InputOption::VALUE_OPTIONAL,
+                        'Purge records older than this number of days. Defaults to 365.',
+                        365
+                    ),
+                    new InputOption('dry-run', 'r', InputOption::VALUE_NONE, 'Performs a dry run. Shows no. of affected rows. Won\'t actually delete anything.'),
+                    new InputOption('gdpr', 'g', InputOption::VALUE_NONE, 'Deletes records of inactive users to fulfill GDPR requirements.'),
+                ]
             );
         parent::configure();
     }
@@ -91,7 +90,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->checkRunStatus($input, $output)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
         $daysOld       = $input->getOption('days-old');
         $dryRun        = (bool) $input->getOption('dry-run');
@@ -100,7 +99,7 @@ EOT
 
         if (empty($daysOld) && empty($gdpr)) {
             // Safety catch; bail
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         if (!empty($gdpr)) {
@@ -118,7 +117,7 @@ EOT
             if (!$helper->ask($input, $output, $question)) {
                 $this->completeRun();
 
-                return \Symfony\Component\Console\Command\Command::SUCCESS;
+                return Command::SUCCESS;
             }
         }
 
@@ -142,7 +141,7 @@ EOT
             $debug = $event->getDebug();
 
             foreach ($debug as $key => $query) {
-                $output->writeln("<info>$key</info>");
+                $output->writeln("<info>{$key}</info>");
                 $output->writeln($query);
             }
         }
@@ -151,14 +150,14 @@ EOT
 
         $this->completeRun();
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     /**
      * @param array<int|string>                                   $stats
      * @param array<string|bool|int|float|array<int|string>|null> $options
      */
-    protected function storeToAuditLog(array $stats, bool $dryRun, array $options): void
+    private function storeToAuditLog(array $stats, bool $dryRun, array $options): void
     {
         $notEmptyStats = array_filter($stats);
         if (!$dryRun && count($notEmptyStats)) {

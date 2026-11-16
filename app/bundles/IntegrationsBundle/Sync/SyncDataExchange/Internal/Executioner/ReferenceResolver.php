@@ -14,7 +14,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\Excepti
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
-final class ReferenceResolver implements ReferenceResolverInterface
+final readonly class ReferenceResolver implements ReferenceResolverInterface
 {
     public function __construct(
         private Connection $connection,

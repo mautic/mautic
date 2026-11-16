@@ -10,25 +10,25 @@ use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SysinfoModel
+final class SysinfoModel
 {
     /**
      * @var string|null
      */
-    protected $phpInfo;
+    private $phpInfo;
 
     /**
      * @var array<string,bool>|null
      */
-    protected $folders;
+    private ?array $folders = null;
 
     public function __construct(
-        protected PathsHelper $pathsHelper,
-        protected CoreParametersHelper $coreParametersHelper,
-        private TranslatorInterface $translator,
-        protected Connection $connection,
-        private InstallService $installService,
-        private CheckStep $checkStep,
+        private readonly PathsHelper $pathsHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly Connection $connection,
+        private readonly InstallService $installService,
+        private readonly CheckStep $checkStep,
     ) {
     }
 
@@ -39,11 +39,11 @@ class SysinfoModel
      */
     public function getPhpInfo()
     {
-        if (!is_null($this->phpInfo)) {
+        if (null !== $this->phpInfo) {
             return $this->phpInfo;
         }
 
-        if (function_exists('phpinfo') && 'cli' !== php_sapi_name()) {
+        if (function_exists('phpinfo') && 'cli' !== PHP_SAPI) {
             ob_start();
             $currentTz = date_default_timezone_get();
             date_default_timezone_set('UTC');
@@ -62,7 +62,7 @@ class SysinfoModel
             // ensure TZ is set back to default
             date_default_timezone_set($currentTz);
         } elseif (function_exists('phpversion')) {
-            $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', ['%phpversion%' => phpversion()]);
+            $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', ['%phpversion%' => PHP_VERSION]);
         } else {
             $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.missing');
         }
@@ -88,12 +88,10 @@ class SysinfoModel
 
     /**
      * Method to get important folders with a writable flag.
-     *
-     * @return array
      */
-    public function getFolders()
+    public function getFolders(): array
     {
-        if (!is_null($this->folders)) {
+        if (null !== $this->folders) {
             return $this->folders;
         }
 

@@ -7,16 +7,25 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class PreviewFunctionalTest extends MauticMysqlTestCase
+final class PreviewFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
     private const PREHEADER_TEXT = 'Preheader text';
 
     protected $useCleanupRollback = false;
@@ -43,12 +52,22 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertPageContent($urlWithContact, $contentNoContactInfo, self::PREHEADER_TEXT);
     }
 
+    public function testPreviewPageWithTemplateAndNoSavedHtml(): void
+    {
+        $email = $this->createEmail();
+        $email->setCustomHtml('');
+        $email->setContent([]);
+        $this->em->flush();
+
+        $this->assertPageContent("/email/preview/{$email->getId()}", 'Hello World!');
+    }
+
     private function assertPageContent(string $url, string ...$expectedContents): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, $url);
         self::assertResponseIsSuccessful();
         foreach ($expectedContents as $expectedContent) {
-            self::assertStringContainsString($expectedContent, $crawler->text());
+            $this->assertStringContainsString($expectedContent, $crawler->text());
         }
     }
 
@@ -120,6 +139,82 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertPageContent($urlWithContact, $contentNoContactInfo, self::PREHEADER_TEXT);
     }
 
+    public function testPreviewEmailWithSegmentMembershipAndAdditionalCountryFilter(): void
+    {
+        // Create a segment
+        $segment = $this->createSegment('Test Segment');
+
+        // Create two contacts - one with country Austria, one with country Czech Republic
+        $leadWithAustria = $this->createLead('John', 'Austria', 'john.austria@test.com');
+        $leadWithAustria->setCountry('Austria');
+        $this->em->persist($leadWithAustria);
+
+        $leadWithCzech = $this->createLead('Jane', 'Czech', 'jane.czech@test.com');
+        $leadWithCzech->setCountry('Czech Republic');
+        $this->em->persist($leadWithCzech);
+
+        // Add both contacts to the segment
+        $this->addLeadToSegment($leadWithAustria, $segment);
+        $this->addLeadToSegment($leadWithCzech, $segment);
+
+        // Create email with dynamic content that filters by segment membership AND country
+        $email = $this->createEmail();
+        $email->setDynamicContent([
+            [
+                'tokenName' => 'Dynamic Content 1',
+                'content'   => '<p>Default content - not in segment or wrong country</p>',
+                'filters'   => [
+                    [
+                        'content' => '<p>You are in the segment AND from Czech Republic!</p>',
+                        'filters' => [
+                            [
+                                'glue'     => 'and',
+                                'field'    => 'leadlist',
+                                'object'   => 'lead',
+                                'type'     => 'leadlist',
+                                'filter'   => [$segment->getId()],
+                                'display'  => 'Segment Membership',
+                                'operator' => 'in',
+                            ],
+                            [
+                                'glue'     => 'and',
+                                'field'    => 'country',
+                                'object'   => 'lead',
+                                'type'     => 'country',
+                                'filter'   => 'Czech Republic',
+                                'display'  => null,
+                                'operator' => '=',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $email->setCustomHtml('<html><body>{dynamiccontent="Dynamic Content 1"}</body></html>');
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $url = "/email/preview/{$email->getId()}";
+
+        // Contact with Austria (in segment but wrong country) - should get DEFAULT content
+        $urlWithAustriaContact = "{$url}?contactId={$leadWithAustria->getId()}";
+        $this->assertPageContent($urlWithAustriaContact, 'Default content - not in segment or wrong country', self::PREHEADER_TEXT);
+        $this->assertStringNotContainsString('You are in the segment AND from Czech Republic!', (string) $this->client->getResponse()->getContent());
+
+        // Contact with Czech Republic (in segment AND correct country) - should get VARIANT content
+        $urlWithCzechContact = "{$url}?contactId={$leadWithCzech->getId()}";
+        $this->assertPageContent($urlWithCzechContact, 'You are in the segment AND from Czech Republic!', self::PREHEADER_TEXT);
+        $this->assertStringNotContainsString('Default content - not in segment or wrong country', (string) $this->client->getResponse()->getContent());
+
+        // Without contact (admin preview) - should get DEFAULT content
+        $this->assertPageContent($url, 'Default content - not in segment or wrong country', self::PREHEADER_TEXT);
+
+        $this->logoutUser();
+
+        // Anonymous visitor - should get DEFAULT content
+        $this->assertPageContent($url, 'Default content - not in segment or wrong country', self::PREHEADER_TEXT);
+    }
+
     public function testPreviewEmailForDynamicContentVariantsWithCustomField(): void
     {
         // Create custom field
@@ -136,7 +231,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
             ]
         );
         self::assertResponseStatusCodeSame(201);
-        self::assertJson($this->client->getResponse()->getContent());
+        $this->assertJson($this->client->getResponse()->getContent());
 
         // Create some contacts
         $this->client->request(
@@ -234,7 +329,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/email/preview/5009');
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-        self::assertStringContainsString('404 Not Found - Requested URL not found: /email/preview/5009', $crawler->text());
+        $this->assertStringContainsString('404 Not Found - Requested URL not found: /email/preview/5009', $crawler->text());
     }
 
     private function createSegment(string $name = 'Segment 1'): LeadList
@@ -282,6 +377,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $url                    = "/email/preview/{$email->getId()}";
@@ -298,5 +394,276 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         // Anonymous visitor
         $this->assertPageContent($url, $contentNoContactInfo);
         $this->assertPageContent($urlWithContact, $contentNoContactInfo);
+    }
+
+    public function testPreviewDownloadPage(): void
+    {
+        $email = $this->createEmail(false);
+        $this->em->flush();
+
+        $url = sprintf('/email/download/preview/%s', $email->getId());
+
+        // Admin user
+        $this->assertPageContent($url, 'Download HTML');
+
+        $this->logoutUser();
+
+        // Anonymous visitor
+        $response = $this->getUrlResponse($url);
+        $this->assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+    }
+
+    public function testPreviewDownloadForHtml(): void
+    {
+        $lead  = $this->createLead('O\'Neill');
+        $email = $this->createEmail();
+        $email->setName('Email name!');
+        $this->em->flush();
+
+        // Test HTML file download without any contact.
+        $response = $this->getUrlResponse(sprintf('/email/download/preview/%s/real/html', $email->getId()));
+        $this->assertStringContainsString('email-name.html', (string) $response->headers->get('content-disposition'));
+
+        // Test HTML file download with contact.
+        $response = $this->getUrlResponse(sprintf('/email/download/preview/%s/real/html?contactId=%s', $email->getId(), $lead->getId()));
+        $this->assertStringContainsString('o-neill-email-name.html', (string) $response->headers->get('content-disposition'));
+    }
+
+    public function testPreviewEmailForUnauthorizedContact(): void
+    {
+        $lead  = $this->createLead('Test');
+        // Create non-admin role
+        $permission = ['email:emails' => ['full'], 'lead:leads' => ['viewown', 'create']];
+        $role       = $this->createRole(false, $permission);
+        // Create permissions for the role
+        $this->createPermission('lead:leads', $role, 34);
+        $this->createPermission('email:emails', $role, 1024);
+        // Create non-admin user
+        $user = $this->createUser($role);
+        $this->em->flush();
+
+        // Login newly created non-admin user
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+
+        $email = $this->createEmail();
+        $this->em->flush();
+        $errorMsg = 'You do not have access to this contact.';
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/email/download/preview/{$email->getId()}?contactId={$lead->getId()}");
+        $content = $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($errorMsg, (string) $content);
+        $this->assertStringContainsString('Contact emails is [Email]', $this->getIframeContent($crawler));
+
+        $lead  = $this->createLead('Test');
+        $lead->setOwner($user);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/email/download/preview/{$email->getId()}?contactId={$lead->getId()}");
+        $content = $this->client->getResponse()->getContent();
+        $this->assertStringNotContainsString($errorMsg, (string) $content);
+        $this->assertStringContainsString(sprintf('Contact emails is %s', $lead->getEmail()), $this->getIframeContent($crawler));
+    }
+
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testPreviewEmailForCompanyHidesCompanyFromAnonymousVisitor(): void
+    {
+        $company = $this->createPreviewCompany('Secret Company');
+
+        $email = $this->createEmail();
+        $email->setName('Email name');
+        $email->setCustomHtml('<html><body>Company Name: {contactfield=companyname}</body></html>');
+        $this->em->flush();
+
+        $previewUrl  = "/email/preview/{$email->getId()}?companyId={$company->getId()}";
+        $downloadUrl = "/email/download/preview/{$email->getId()}/real/html?companyId={$company->getId()}";
+
+        // Admin user
+        $this->assertPageContent($previewUrl, 'Company Name: Secret Company');
+        $response = $this->getUrlResponse($downloadUrl);
+        $this->assertStringContainsString('secret-company-email-name.html', (string) $response->headers->get('content-disposition'));
+
+        $this->logoutUser();
+
+        // Anonymous visitor
+        $this->assertPageContent($previewUrl, 'Company Name: [Company Name]');
+        $response = $this->getUrlResponse($downloadUrl);
+        $this->assertStringContainsString('email-name.html', (string) $response->headers->get('content-disposition'));
+        $this->assertStringNotContainsString('secret', (string) $response->headers->get('content-disposition'));
+        $this->assertStringNotContainsString('Secret Company', (string) $response->getContent());
+    }
+
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testPreviewEmailForUnauthorizedCompany(): void
+    {
+        $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $admin);
+
+        $user           = $this->createNonAdminUser(['viewown', 'create'], 34);
+        $otherCompany   = $this->createPreviewCompany('Other Company', $admin);
+        $ownCompany     = $this->createPreviewCompany('Own Company', $user);
+        $createdCompany = $this->createPreviewCompany('Created Company', null, $user);
+
+        $contactCompany = $this->createCompany('Contact Company', 'hello@contact.tld');
+        $contactCompany->setOwner($admin);
+        $this->em->persist($contactCompany);
+        $contact = $this->createLead('Jack');
+        $contact->setOwner($user);
+        $this->createPrimaryCompanyForLead($contact, $contactCompany);
+
+        $email = $this->createEmail();
+        $email->setName('Email name');
+        $email->setCustomHtml('<html><body>Company Name: {contactfield=companyname}</body></html>');
+        $this->em->flush();
+
+        $this->loginNonAdminUser($user);
+        $errorMsg = 'You do not have access to this company.';
+
+        // Company owned by another user
+        $this->assertPageContent("/email/preview/{$email->getId()}?companyId={$otherCompany->getId()}", 'Company Name: [Company Name]');
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/email/download/preview/{$email->getId()}?companyId={$otherCompany->getId()}");
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($errorMsg, $content);
+        $this->assertStringNotContainsString('Other Company', $content);
+        $this->assertStringContainsString('Company Name: [Company Name]', $this->getIframeContent($crawler));
+
+        // A denied company falls back to the contact's companies, like a request without companyId
+        $this->assertPageContent("/email/preview/{$email->getId()}?contactId={$contact->getId()}&companyId={$otherCompany->getId()}", 'Company Name: Contact Company');
+
+        // Company owned by the user
+        $crawler = $this->client->request(Request::METHOD_GET, "/email/download/preview/{$email->getId()}?companyId={$ownCompany->getId()}");
+        $this->assertStringNotContainsString($errorMsg, (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Company Name: Own Company', $this->getIframeContent($crawler));
+
+        // Company without an owner, created by the user
+        $crawler = $this->client->request(Request::METHOD_GET, "/email/download/preview/{$email->getId()}?companyId={$createdCompany->getId()}");
+        $this->assertStringNotContainsString($errorMsg, (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Company Name: Created Company', $this->getIframeContent($crawler));
+
+        // HTML download of a company owned by another user. Last, because its flash message is shown on the next page.
+        $response = $this->getUrlResponse("/email/download/preview/{$email->getId()}/real/html?companyId={$otherCompany->getId()}");
+        $this->assertStringContainsString('email-name.html', (string) $response->headers->get('content-disposition'));
+        $this->assertStringNotContainsString('other', (string) $response->headers->get('content-disposition'));
+        $this->assertStringNotContainsString('Other Company', (string) $response->getContent());
+    }
+
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testPreviewEmailForCompanyOfOtherUserWithViewOtherPermission(): void
+    {
+        $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $admin);
+
+        $user    = $this->createNonAdminUser(['viewother'], 4);
+        $company = $this->createPreviewCompany('Other Company', $admin);
+
+        $email = $this->createEmail();
+        $email->setCustomHtml('<html><body>Company Name: {contactfield=companyname}</body></html>');
+        $this->em->flush();
+
+        $this->loginNonAdminUser($user);
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/email/download/preview/{$email->getId()}?companyId={$company->getId()}");
+        $this->assertStringNotContainsString('You do not have access to this company.', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Company Name: Other Company', $this->getIframeContent($crawler));
+    }
+
+    /**
+     * Company tokens are rendered only for a company that is primary for a contact.
+     */
+    private function createPreviewCompany(string $name, ?User $owner = null, ?User $createdBy = null): Company
+    {
+        $company = $this->createCompany($name, 'hello@company.tld');
+        $company->setOwner($owner);
+        if ($createdBy) {
+            $company->setCreatedBy($createdBy);
+        }
+        $this->em->persist($company);
+        $this->createPrimaryCompanyForLead($this->createLead('Jane'), $company);
+
+        return $company;
+    }
+
+    /**
+     * @param string[] $leadPermissions
+     */
+    private function createNonAdminUser(array $leadPermissions, int $leadBitwise): User
+    {
+        $role = $this->createRole(false, ['email:emails' => ['full'], 'lead:leads' => $leadPermissions]);
+        $this->createPermission('lead:leads', $role, $leadBitwise);
+        $this->createPermission('email:emails', $role, 1024);
+        $user = $this->createUser($role);
+        $this->em->flush();
+
+        return $user;
+    }
+
+    private function loginNonAdminUser(User $user): void
+    {
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+    }
+
+    private function getUrlResponse(string $url): Response
+    {
+        $this->client->request(Request::METHOD_GET, $url);
+
+        return $this->client->getResponse();
+    }
+
+    private function getIframeContent(Crawler $crawler): string
+    {
+        $iframe    = $crawler->filterXPath('//iframe')->eq(0);
+        $iframeSrc = $iframe->attr('src');
+        $this->client->request('GET', $iframeSrc);
+
+        return $this->client->getResponse()->getContent();
+    }
+
+    /**
+     * @param array<mixed> $permission
+     */
+    private function createRole(bool $isAdmin = false, array $permission = []): Role
+    {
+        $role = new Role();
+        $role->setName('Role');
+        $role->setIsAdmin($isAdmin);
+        $role->setRawPermissions($permission);
+        $this->em->persist($role);
+
+        return $role;
+    }
+
+    private function createPermission(string $rawPermission, Role $role, int $bitwise): void
+    {
+        $parts      = explode(':', $rawPermission);
+        $permission = new Permission();
+        $permission->setBundle($parts[0]);
+        $permission->setName($parts[1]);
+        $permission->setRole($role);
+        $permission->setBitwise($bitwise);
+        $this->em->persist($permission);
+    }
+
+    private function createUser(Role $role): User
+    {
+        $user = new User();
+        $user->setFirstName('John');
+        $user->setLastName('Doe');
+        $user->setUsername('john.doe');
+        $user->setEmail('john.doe@email.com');
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+        $user->setPassword($hasher->hash('Maut1cR0cks!'));
+
+        $user->setRole($role);
+        $this->em->persist($user);
+
+        return $user;
     }
 }

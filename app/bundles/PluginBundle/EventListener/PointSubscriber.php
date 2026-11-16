@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;
@@ -8,7 +10,7 @@ use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PointSubscriber implements EventSubscriberInterface
+final class PointSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

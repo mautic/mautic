@@ -18,16 +18,16 @@ trait ControllerTrait
         $crawler         = $this->client->request('GET', '/s/'.$urlAlias);
         $clientResponse  = $this->client->getResponse();
         $responseContent = $clientResponse->getContent();
-        PageControllerTest::assertTrue($clientResponse->isOk());
+        $this->assertResponseIsSuccessful();
 
         PageControllerTest::assertStringContainsString(
             'col-'.$routeAlias.'-dateAdded',
-            $responseContent,
+            (string) $responseContent,
             'The return must contain the created at date column'
         );
         PageControllerTest::assertStringContainsString(
             'col-'.$routeAlias.'-'.$column,
-            $responseContent,
+            (string) $responseContent,
             'The return must contain the modified date column'
         );
 

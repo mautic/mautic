@@ -5,9 +5,12 @@ namespace Mautic\NotificationBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class NotificationPermissions extends AbstractPermissions
+final class NotificationPermissions extends AbstractPermissions
 {
-    public function __construct($params)
+    /**
+     * @param mixed[] $params
+     */
+    public function __construct(array $params)
     {
         parent::__construct($params);
         $this->addStandardPermissions('categories');

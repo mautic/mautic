@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -17,17 +19,17 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
     public const TEMP_TEST_FILE = './DoNotSellTest.json';
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&LoggerInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $loggerMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|HttpClientInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&HttpClientInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $httpClientMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
 
@@ -76,7 +78,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
         $this->httpClientMock->expects($this->once())
             ->method('request')
             ->with('GET', 'https://api.maxmind.com/privacy/exclusions', ['auth_basic' => ['id', 'license']])
-            ->will($this->throwException(new TransportException('transportException')));
+            ->willThrowException(new TransportException('transportException'));
         $result = $maxMindDoNotSellDownloadHelper->downloadRemoteDataStore();
         $this->assertFalse($result);
     }
@@ -121,7 +123,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
             ->willReturn(200);
         $responseMock->expects($this->once())
             ->method('getContent')
-            ->will($this->throwException(new \Exception('noContent')));
+            ->willThrowException(new \Exception('noContent'));
         $result = $maxMindDoNotSellDownloadHelper->downloadRemoteDataStore();
         $this->assertFalse($result);
     }

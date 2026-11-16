@@ -11,7 +11,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use PHPUnit\Framework\TestCase;
 
-class InputOptionsDAOTest extends TestCase
+final class InputOptionsDAOTest extends TestCase
 {
     public function testWorkflowFromCliWithAllValuesSet(): void
     {
@@ -57,10 +57,10 @@ class InputOptionsDAOTest extends TestCase
         $this->assertTrue($inputOptionsDAO->pullIsEnabled());
         $this->assertTrue($inputOptionsDAO->pushIsEnabled());
         $this->assertTrue($inputOptionsDAO->activityPushIsEnabled());
-        $this->assertNull($inputOptionsDAO->getMauticObjectIds());
-        $this->assertNull($inputOptionsDAO->getIntegrationObjectIds());
-        $this->assertNull($inputOptionsDAO->getStartDateTime());
-        $this->assertNull($inputOptionsDAO->getEndDateTime());
+        $this->assertNotInstanceOf(ObjectIdsDAO::class, $inputOptionsDAO->getMauticObjectIds());
+        $this->assertNotInstanceOf(ObjectIdsDAO::class, $inputOptionsDAO->getIntegrationObjectIds());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $inputOptionsDAO->getStartDateTime());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $inputOptionsDAO->getEndDateTime());
         $this->assertEmpty($inputOptionsDAO->getOptions());
     }
 

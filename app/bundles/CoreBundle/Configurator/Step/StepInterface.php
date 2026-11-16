@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Configurator\Step;
 
 interface StepInterface
@@ -37,5 +39,5 @@ interface StepInterface
      *
      * @return array
      */
-    public function update(StepInterface $data);
+    public function update(self $data);
 }

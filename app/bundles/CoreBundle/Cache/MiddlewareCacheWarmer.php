@@ -6,17 +6,17 @@ namespace Mautic\CoreBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
-class MiddlewareCacheWarmer implements CacheWarmerInterface
+final class MiddlewareCacheWarmer implements CacheWarmerInterface
 {
     private ?string $cacheFile = null;
 
     /**
      * @var \SplPriorityQueue|\ReflectionClass[]
      */
-    private \SplPriorityQueue $specs;
+    private readonly \SplPriorityQueue $specs;
 
     public function __construct(
-        private string $env,
+        private readonly string $env,
     ) {
         $this->specs     = new \SplPriorityQueue();
     }
@@ -37,7 +37,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         return false;
     }
 
-    private function createCacheFile($cacheDirectory): void
+    private function createCacheFile(string $cacheDirectory): void
     {
         $middlewarsDir = __DIR__.'/../../../middlewares';
 

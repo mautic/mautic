@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormEvents;
 final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&FormBuilderInterface<FormBuilderInterface>
+     * @var MockObject&FormBuilderInterface
      */
     private MockObject $formBuilder;
 
@@ -33,7 +33,7 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
             ->method('addEventListener')
             ->with(
                 FormEvents::PRE_SUBMIT,
-                $this->callback(function ($formModifier) {
+                $this->callback(function ($formModifier): true {
                     $formEvent = $this->createMock(FormEvent::class);
 
                     $formEvent->expects($this->once())
@@ -46,7 +46,8 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
                     $formModifier($formEvent);
 
                     return true;
-                })
+                }),
+                512
             );
 
         $this->form->buildForm($this->formBuilder, []);
@@ -58,7 +59,7 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
             ->method('addEventListener')
             ->with(
                 FormEvents::PRE_SUBMIT,
-                $this->callback(function ($formModifier) {
+                $this->callback(function ($formModifier): true {
                     $formEvent = $this->createMock(FormEvent::class);
                     $data      = [['content' => 'dynamic slot content']];
 
@@ -73,9 +74,47 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
                     $formModifier($formEvent);
 
                     return true;
-                })
+                }),
+                512
             );
 
         $this->form->buildForm($this->formBuilder, []);
+    }
+
+    public function testPreSubmitRemovesStrayKeysAndReindexesEntries(): void
+    {
+        $listener = null;
+
+        $this->formBuilder->expects($this->once())
+            ->method('addEventListener')
+            ->with(
+                FormEvents::PRE_SUBMIT,
+                $this->callback(function ($formModifier) use (&$listener): true {
+                    $listener = $formModifier;
+
+                    return true;
+                }),
+                512
+            );
+
+        $this->form->buildForm($this->formBuilder, []);
+
+        $formEvent = $this->createMock(FormEvent::class);
+        $formEvent->expects($this->once())
+            ->method('getData')
+            ->willReturn([
+                'filter' => 'stray',
+                0        => ['content' => 'first'],
+                2        => ['content' => 'third'],
+            ]);
+        $formEvent->expects($this->once())
+            ->method('setData')
+            ->with([
+                ['content' => 'first'],
+                ['content' => 'third'],
+            ]);
+
+        $this->assertNotNull($listener);
+        $listener($formEvent);
     }
 }

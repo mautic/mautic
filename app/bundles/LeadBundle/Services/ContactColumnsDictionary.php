@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ContactColumnsDictionary
+final class ContactColumnsDictionary
 {
     /**
      * @var mixed[]
@@ -14,9 +14,9 @@ class ContactColumnsDictionary
     private array $fieldList = [];
 
     public function __construct(
-        protected FieldModel $fieldModel,
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly FieldModel $fieldModel,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -47,7 +47,7 @@ class ContactColumnsDictionary
             $this->fieldList['points']      = $this->translator->trans('mautic.lead.points');
             $this->fieldList['last_active'] = $this->translator->trans('mautic.lead.lastactive');
             $this->fieldList['id']          = $this->translator->trans('mautic.core.id');
-            $this->fieldList                = $this->fieldList + $this->fieldModel->getFieldList(false);
+            $this->fieldList += $this->fieldModel->getFieldList(false);
         }
 
         return $this->fieldList;

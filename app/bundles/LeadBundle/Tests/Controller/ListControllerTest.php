@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 
-class ListControllerTest extends MauticMysqlTestCase
+final class ListControllerTest extends MauticMysqlTestCase
 {
     use ControllerTrait;
 
@@ -51,10 +51,10 @@ class ListControllerTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/s/segments');
         $clientResponse = $this->client->getResponse();
-        $this->assertResponseIsSuccessful('Return code must be 200.');
-        $this->assertStringContainsString('February 7, 2020', $clientResponse->getContent());
-        $this->assertStringContainsString('March 21, 2020', $clientResponse->getContent());
-        $this->assertStringContainsString('Test User', $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('February 7, 2020', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('March 21, 2020', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('Test User', (string) $clientResponse->getContent());
     }
 
     /**
@@ -63,7 +63,6 @@ class ListControllerTest extends MauticMysqlTestCase
     public function testIndexActionWhenFiltering(): void
     {
         $this->client->request('GET', '/s/segments?search=has%3Aresults&tmpl=list');
-        $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200.');
     }
 
@@ -74,12 +73,12 @@ class ListControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', sprintf('/s/segments/view/%d', $segment->getId()));
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        self::assertStringContainsString('MySeg', $response->getContent());
+        $this->assertStringContainsString('MySeg', (string) $response->getContent());
         // Make sure that contact grid is not loaded synchronously
-        self::assertStringNotContainsString('Kane', $response->getContent());
-        self::assertStringNotContainsString('Jacques', $response->getContent());
+        $this->assertStringNotContainsString('Kane', (string) $response->getContent());
+        $this->assertStringNotContainsString('Jacques', (string) $response->getContent());
         // Make sure the data-target-url is not an absolute URL
-        self::assertStringContainsString(sprintf('data-target-url="/s/segment/view/%s/contact/1"', $segment->getId()), $response->getContent());
+        $this->assertStringContainsString(sprintf('data-target-url="/s/segment/view/%s/contact/1"', $segment->getId()), (string) $response->getContent());
     }
 
     public function testSegmentContactGrid(): void
@@ -90,16 +89,16 @@ class ListControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', sprintf('/s/segment/view/%d/contact/%d', $segment->getId(), $pageId));
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        self::assertStringContainsString('Kane', $response->getContent());
-        self::assertStringContainsString('Jacques', $response->getContent());
+        $this->assertStringContainsString('Kane', (string) $response->getContent());
+        $this->assertStringContainsString('Jacques', (string) $response->getContent());
     }
 
     private function createList(string $suffix = 'A'): LeadList
     {
         $list = new LeadList();
-        $list->setName("Segment $suffix");
-        $list->setPublicName("Segment $suffix");
-        $list->setAlias("segment-$suffix");
+        $list->setName("Segment {$suffix}");
+        $list->setPublicName("Segment {$suffix}");
+        $list->setAlias("segment-{$suffix}");
         $list->setDateAdded(new \DateTime('2020-02-07 20:29:02'));
         $list->setDateModified(new \DateTime('2020-03-21 20:29:02'));
         $list->setCreatedByUser('Test User');
@@ -190,7 +189,7 @@ class ListControllerTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200.');
-        self::assertStringContainsString('Segment clone', $clientResponse->getContent());
+        $this->assertStringContainsString('Segment clone', (string) $clientResponse->getContent());
     }
 
     public function testSegmentSearchFilters(): void
@@ -214,8 +213,8 @@ class ListControllerTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/api/segments?search=filters_field:custom_field_test');
         $clientResponse = $this->client->getResponse();
-        $this->assertEquals(200, $clientResponse->getStatusCode());
-        $this->assertStringContainsString('Segment filter', $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Segment filter', (string) $clientResponse->getContent());
     }
 
     private function createCustomField(): LeadField

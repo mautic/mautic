@@ -17,13 +17,13 @@ use Symfony\Component\Form\FormInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignConditionLeadPageHitType extends AbstractType
+final class CampaignConditionLeadPageHitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('page_url', TextType::class, [
             'label'      => 'mautic.page.point.action.form.page.url',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'       => 'form-control',
                 'tooltip'     => 'mautic.page.point.action.form.page.url.descr',
@@ -34,7 +34,7 @@ class CampaignConditionLeadPageHitType extends AbstractType
 
         $builder->add('page', PageListType::class, [
             'label'      => 'mautic.page.campaign.condition.form.page',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.page.campaign.condition.form.page.descr',
@@ -83,7 +83,7 @@ class CampaignConditionLeadPageHitType extends AbstractType
                 $builder->create('accumulative_time', TextType::class, [
                     'label'      => 'mautic.page.campaign.condition.form.timespent',
                     'required'   => false,
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                     ],

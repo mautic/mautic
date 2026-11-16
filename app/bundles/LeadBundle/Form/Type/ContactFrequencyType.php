@@ -11,10 +11,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class ContactFrequencyType extends AbstractType
+final class ContactFrequencyType extends AbstractType
 {
     public function __construct(
-        protected CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -42,7 +42,7 @@ class ContactFrequencyType extends AbstractType
                 LeadListType::class,
                 [
                     'label'      => 'mautic.lead.form.list',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'multiple'   => true,
                     'expanded'   => $options['public_view'],
                     'required'   => false,
@@ -55,7 +55,7 @@ class ContactFrequencyType extends AbstractType
                 [
                     'preference_center_only' => $options['preference_center_only'],
                     'label'                  => 'mautic.lead.form.list',
-                    'label_attr'             => ['class' => 'control-label'],
+                    'label_attr'             => ['class' => 'form-label'],
                     'multiple'               => true,
                     'expanded'               => true,
                     'required'               => false,
@@ -69,7 +69,7 @@ class ContactFrequencyType extends AbstractType
                 LeadCategoryType::class,
                 [
                     'label'      => 'mautic.lead.form.categories',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'multiple'   => true,
                     'expanded'   => $options['public_view'],
                     'required'   => false,
@@ -85,7 +85,7 @@ class ContactFrequencyType extends AbstractType
                 'save_text'      => 'mautic.core.form.save',
                 'cancel_onclick' => 'javascript:void(0);',
                 'cancel_attr'    => [
-                    'data-dismiss' => 'modal',
+                    'data-bs-dismiss' => 'modal',
                 ],
             ]
         );

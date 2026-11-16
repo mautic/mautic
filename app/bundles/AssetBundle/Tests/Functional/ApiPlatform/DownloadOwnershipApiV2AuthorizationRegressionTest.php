@@ -50,7 +50,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $foreignDownload->setAsset($foreignAsset);
         $foreignDownload->setDateDownload(new \DateTime());
         $foreignDownload->setCode(200);
-        $foreignDownload->setTrackingId(789012);
+        $foreignDownload->setTrackingId('789012');
         $this->em->persist($foreignDownload);
 
         $this->em->flush();
@@ -58,18 +58,16 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
 
         // Authenticate as restricted user
         $restrictedUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'restricted.user']);
-        \assert($restrictedUser instanceof User);
+        $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
         // Try to access the foreign download - should be forbidden
         $this->client->request('GET', '/api/v2/downloads/'.$foreignDownload->getId());
-        $response = $this->client->getResponse();
 
-        self::assertSame(
+        self::assertResponseStatusCodeSame(
             Response::HTTP_FORBIDDEN,
-            $response->getStatusCode(),
             'User with viewown permission should not be able to access downloads of assets they do not own. '.
             'This validates that ApiPermissionVoter correctly uses getPermissionUser() for Download entities.'
         );
@@ -109,7 +107,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $ownDownload->setAsset($ownAsset);
         $ownDownload->setDateDownload(new \DateTime());
         $ownDownload->setCode(200);
-        $ownDownload->setTrackingId(123456);
+        $ownDownload->setTrackingId('123456');
         $this->em->persist($ownDownload);
 
         // Create an asset owned by ownerUser
@@ -125,7 +123,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $foreignDownload->setAsset($foreignAsset);
         $foreignDownload->setDateDownload(new \DateTime());
         $foreignDownload->setCode(200);
-        $foreignDownload->setTrackingId(345678);
+        $foreignDownload->setTrackingId('345678');
         $this->em->persist($foreignDownload);
 
         $this->em->flush();
@@ -133,7 +131,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
 
         // Authenticate as restricted user
         $restrictedUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'restricted.collection.user']);
-        \assert($restrictedUser instanceof User);
+        $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
@@ -142,13 +140,13 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $this->client->request('GET', '/api/v2/downloads?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful($response->getContent());
 
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         $downloads = $data['member'];
-        self::assertCount(1, $downloads, 'Expected exactly 1 download (only the one for the owned asset)');
-        self::assertSame($ownDownload->getId(), $downloads[0]['id']);
+        $this->assertCount(1, $downloads, 'Expected exactly 1 download (only the one for the owned asset)');
+        $this->assertSame($ownDownload->getId(), $downloads[0]['id']);
     }
 
     public function testViewOwnCollectionReportsOwnedTotalAcrossPagesOnApiV2(): void
@@ -185,7 +183,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
             $download->setAsset($asset);
             $download->setDateDownload(new \DateTime());
             $download->setCode(200);
-            $download->setTrackingId(100000 + $i);
+            $download->setTrackingId((string) (100000 + $i));
             $this->em->persist($download);
         }
 
@@ -202,7 +200,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
             $download->setAsset($asset);
             $download->setDateDownload(new \DateTime());
             $download->setCode(200);
-            $download->setTrackingId(200000 + $i);
+            $download->setTrackingId((string) (200000 + $i));
             $this->em->persist($download);
         }
 
@@ -211,7 +209,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
 
         // Authenticate as restricted user
         $restrictedUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'restricted.pagination.user']);
-        \assert($restrictedUser instanceof User);
+        $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
@@ -220,13 +218,13 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $this->client->request('GET', '/api/v2/downloads?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful($response->getContent());
 
         $page1Data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
-        self::assertArrayHasKey('member', $page1Data);
-        self::assertArrayHasKey('totalItems', $page1Data);
-        self::assertSame(4, $page1Data['totalItems'], 'Should report totalItems 4 owned downloads');
-        self::assertCount(4, $page1Data['member'], 'Should return all 4 owned downloads on single page');
+        $this->assertArrayHasKey('member', $page1Data);
+        $this->assertArrayHasKey('totalItems', $page1Data);
+        $this->assertSame(4, $page1Data['totalItems'], 'Should report totalItems 4 owned downloads');
+        $this->assertCount(4, $page1Data['member'], 'Should return all 4 owned downloads on single page');
     }
 }

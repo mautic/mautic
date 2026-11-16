@@ -17,10 +17,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class DynamicFiltersType extends AbstractType
+final class DynamicFiltersType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -47,7 +47,7 @@ class DynamicFiltersType extends AbstractType
 
                 $args = [
                     'label'      => $label,
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'    => 'form-control',
                         'onchange' => "Mautic.filterTableData('report.".$options['report']->getId()."','".$column."',mQuery(this).val(),'list','.report-content');",
@@ -74,7 +74,7 @@ class DynamicFiltersType extends AbstractType
                         ];
 
                         if (isset($options['data'][$definition['alias']])) {
-                            $args['data'] = (1 == (int) $options['data'][$definition['alias']]);
+                            $args['data'] = (1 === (int) $options['data'][$definition['alias']]);
                         } elseif (isset($filter['value']) && '' !== $filter['value']) {
                             $args['data'] = (int) $filter['value'];
                         }

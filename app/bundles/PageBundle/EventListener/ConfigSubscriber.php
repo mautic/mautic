@@ -9,7 +9,7 @@ use Mautic\PageBundle\Form\Type\ConfigTrackingPageType;
 use Mautic\PageBundle\Form\Type\ConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber implements EventSubscriberInterface
+final class ConfigSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
@@ -59,6 +59,7 @@ class ConfigSubscriber implements EventSubscriberInterface
                 'google_analytics_anonymize_ip'         => false,
                 'do_not_track_404_anonymous'            => false,
                 'append_segment_id_tracking_url'        => false,
+                'aggregate_analytics'                   => true,
             ],
         ]);
     }

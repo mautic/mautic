@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Page\Acceptance;
 
-class CategoriesPage
+final class CategoriesPage
 {
     public static $URL                 = '/s/categories';
     public static $NEW_BUTTON          = '#new';

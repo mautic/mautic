@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Functional\Service;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Service\CampaignAuditService;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -16,7 +17,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class CampaignAuditServiceFunctionalTest extends MauticMysqlTestCase
 {
     private CampaignAuditService $campaignAuditService;
+
     private FlashBag&MockObject $flashBagMock;
+
     private UrlGeneratorInterface&MockObject $urlGeneratorMock;
 
     protected function setUp(): void
@@ -29,7 +32,7 @@ final class CampaignAuditServiceFunctionalTest extends MauticMysqlTestCase
         $this->campaignAuditService = new CampaignAuditService(
             $this->flashBagMock,
             $this->urlGeneratorMock,
-            static::getContainer()->get('mautic.campaign.repository.event')
+            self::getContainer()->get(EventRepository::class)
         );
     }
 
@@ -92,9 +95,9 @@ final class CampaignAuditServiceFunctionalTest extends MauticMysqlTestCase
             ->method('add')
             ->with(
                 'mautic.core.notice.campaign.unpublished.email',
-                $this->callback(function (array $messageVars) use ($unpublishedEmail) {
-                    $this->assertStringContainsString($unpublishedEmail->getName(), $messageVars['%name%']);
-                    $this->assertStringContainsString('mautic_email_index', $messageVars['%menu_link%']);
+                $this->callback(function (array $messageVars) use ($unpublishedEmail): true {
+                    $this->assertStringContainsString($unpublishedEmail->getName(), (string) $messageVars['%name%']);
+                    $this->assertStringContainsString('mautic_email_index', (string) $messageVars['%menu_link%']);
 
                     return true;
                 }),

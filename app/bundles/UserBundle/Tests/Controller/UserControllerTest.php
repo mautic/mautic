@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
 use Symfony\Component\HttpFoundation\Request;
 
-class UserControllerTest extends MauticMysqlTestCase
+final class UserControllerTest extends MauticMysqlTestCase
 {
     use CreateEntityTrait;
     use LoginUserWithSamlTrait;
@@ -33,8 +33,8 @@ class UserControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, 's/users/edit/'.$user1->getId());
 
         $clientResponse = $this->client->getResponse();
-        $this->assertEquals(200, $clientResponse->getStatusCode());
-        $this->assertStringNotContainsString('user[plainPassword][password]', $clientResponse->getContent());
-        $this->assertStringNotContainsString('user[plainPassword][confirm]', $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('user[plainPassword][password]', (string) $clientResponse->getContent());
+        $this->assertStringNotContainsString('user[plainPassword][confirm]', (string) $clientResponse->getContent());
     }
 }

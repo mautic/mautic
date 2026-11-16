@@ -94,6 +94,10 @@ Mautic.ajaxifyForm = function (formName) {
     // Handle Enter key for jumping to the next input
     mQuery(form + ' input, ' + form + ' select').off('keydown.ajaxform');
     mQuery(form + ' input, ' + form + ' select').on('keydown.ajaxform', function (e) {
+        if (mQuery(e.target).hasClass('chosen-search-input')) {
+            return;
+        }
+
         if (e.keyCode == 13 && mQuery(e.target).is(':input')) {
             var inputs = mQuery(this).parents('form').eq(0).find(':input');
             if (inputs[inputs.index(this) + 1] != null) {
@@ -443,8 +447,9 @@ Mautic.updateEntitySelect = function (response) {
     if (response.id) {
         // New entity added through a popup so update the chosen
         var newOption = mQuery('<option />').val(response.id);
-        newOption.html(response.name);
         var el = '#' + response.updateSelect;
+        var optionName = response.optionLabel || response.name;
+        newOption.html(optionName);
 
         var sortOptions = function (options) {
             return options.sort(function (a, b) {
@@ -484,7 +489,7 @@ Mautic.updateEntitySelect = function (response) {
                     var firstOptions = mQuery(this).children();
                     for (var i = 0; i < firstOptions.length; i++) {
                         if (firstOptions[i].value === response.id.toString()) {
-                            firstOptions[i].text = response.name;
+                            firstOptions[i].text = optionName;
                             isUpdateOption = true;
                             break;
                         }
@@ -527,8 +532,7 @@ Mautic.updateEntitySelect = function (response) {
         }
 
         newOption.prop('selected', true);
-        mQueryParent(el).trigger("chosen:updated");
-        mQueryParent(el).val(response.id).trigger("change");
+        mQueryParent(el).val(response.id).trigger("chosen:updated").trigger("change");
     }
 
     if (window.opener) {

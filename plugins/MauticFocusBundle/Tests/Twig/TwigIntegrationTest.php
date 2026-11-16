@@ -11,7 +11,7 @@ use Twig\Extension\ExtensionInterface;
 /**
  * @see https://twig.symfony.com/doc/3.x/advanced.html#functional-tests
  */
-class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
+final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
 {
     use TwigIntegrationTestTrait;
 

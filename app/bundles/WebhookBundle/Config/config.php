@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -35,19 +37,6 @@ return [
                     'route'     => 'mautic_webhook_index',
                     'parent'    => 'mautic.core.integrations',
                     'iconClass' => 'ri-webhook-fill',
-                ],
-            ],
-        ],
-    ],
-
-    'services' => [
-        'others' => [
-            'mautic.webhook.campaign.helper' => [
-                'class'     => Mautic\WebhookBundle\Helper\CampaignHelper::class,
-                'arguments' => [
-                    'mautic.http.client',
-                    'mautic.lead.model.company',
-                    'event_dispatcher',
                 ],
             ],
         ],

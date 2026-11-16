@@ -21,7 +21,7 @@ final class StatRepositoryTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->statRepository = $this->configureRepository(Stat::class);
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
     }
 
     public function testGetStatsSummaryForContacts(): void
@@ -78,7 +78,7 @@ final class StatRepositoryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetReadCount(): void
     {
-        $expectedQuery = 'SELECT count(s.id) as count FROM test_email_stats s WHERE (s.email_id IN (1)) AND (is_read = :true) AND (s.date_read BETWEEN :dateFrom AND :dateTo)';
+        $expectedQuery = 'SELECT count(s.id) as count FROM test_email_stats s WHERE (s.email_id IN (:emailIds)) AND (is_read = :true) AND (s.date_read BETWEEN :dateFrom AND :dateTo)';
         $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with(
@@ -87,6 +87,7 @@ final class StatRepositoryTest extends \PHPUnit\Framework\TestCase
                     'true'     => true,
                     'dateFrom' => '2023-01-01 00:00:00',
                     'dateTo'   => '2023-01-31 23:59:59',
+                    'emailIds' => [1],
                 ]
             )
             ->willReturn($this->result);
@@ -125,12 +126,12 @@ final class StatRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->connection->expects($this->once())
             ->method('executeQuery')
             ->willReturnCallback(function (string $sql, array $params = [], array $types = []) {
-                self::assertStringContainsString('SELECT s.id AS id, s.lead_id AS lead_id, s.email_address AS email_address, s.is_read AS is_read, s.email_id AS email_id, s.date_sent AS date_sent, s.date_read AS date_read, e.name AS email_name, c.id AS company_id, c.companyname AS company_name, campaign.id AS campaign_id, campaign.name AS campaign_name, ll.id AS segment_id, ll.name AS segment_name, COUNT(ph.id) AS link_hits', $sql);
-                self::assertStringContainsString('LEFT JOIN test_companies_leads cl ON s.lead_id = cl.lead_id AND cl.is_primary = 1', $sql);
-                self::assertStringContainsString('GROUP BY s.id, s.lead_id, s.email_address, s.is_read, s.email_id, s.date_sent, s.date_read, e.name, c.id, c.companyname, campaign.id, campaign.name, ll.id, ll.name', $sql);
-                self::assertStringNotContainsString('GROUP BY s.id AS', $sql);
-                self::assertSame('2026-03-01 00:00:00', $params['dateFrom']);
-                self::assertSame('2026-03-31 23:59:59', $params['dateTo']);
+                $this->assertStringContainsString('SELECT s.id AS id, s.lead_id AS lead_id, s.email_address AS email_address, s.is_read AS is_read, s.email_id AS email_id, s.date_sent AS date_sent, s.date_read AS date_read, e.name AS email_name, c.id AS company_id, c.companyname AS company_name, campaign.id AS campaign_id, campaign.name AS campaign_name, ll.id AS segment_id, ll.name AS segment_name, COUNT(ph.id) AS link_hits', $sql);
+                $this->assertStringContainsString('LEFT JOIN test_companies_leads cl ON s.lead_id = cl.lead_id AND cl.is_primary = 1', $sql);
+                $this->assertStringContainsString('GROUP BY s.id, s.lead_id, s.email_address, s.is_read, s.email_id, s.date_sent, s.date_read, e.name, c.id, c.companyname, campaign.id, campaign.name, ll.id, ll.name', $sql);
+                $this->assertStringNotContainsString('GROUP BY s.id AS', $sql);
+                $this->assertSame('2026-03-01 00:00:00', $params['dateFrom']);
+                $this->assertSame('2026-03-31 23:59:59', $params['dateTo']);
 
                 return $this->result;
             });

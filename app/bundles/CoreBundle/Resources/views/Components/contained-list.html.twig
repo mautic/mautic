@@ -16,9 +16,9 @@
 {% if variant == 'default' %}
     <li class="contained-list-item">
       <div class="contained-list-item__content">
-        <div class="d-flex ai-center">
+        <div class="d-flex align-items-center">
           <div>{{ item.label|trans }}</div>
-          <i class="{{ item.icon }} ml-sm" aria-hidden="true"></i>
+          <i class="{{ item.icon }} ms-12" aria-hidden="true"></i>
         </div>
       </div>
     </li>
@@ -27,9 +27,9 @@
 {% elseif variant == 'actions' %}
     <li class="contained-list-item contained-list-item--with-action">
       <div class="contained-list-item__content">
-        <div class="d-flex ai-center">
+        <div class="d-flex align-items-center">
           <div>{{ item.label|trans }}</div>
-          <i class="{{ item.icon }} ml-sm" aria-hidden="true"></i>
+          <i class="{{ item.icon }} ms-12" aria-hidden="true"></i>
         </div>
       </div>
       <div class="contained-list-item__action layout-constraint--size__min-sm layout-constraint--size__max-lg">
@@ -47,9 +47,9 @@
     <li class="contained-list-item contained-list-item--clickable">
       {% if item.link %}
       <a class="contained-list-item__content" href="{{ item.link }}">
-        <div class="d-flex jc-space-between ai-center">
+        <div class="d-flex justify-content-between align-items-center">
             <div>{{ item.label|trans }}</div>
-            <i class="{{ item.icon }} ri-lg text-interactive ml-md" aria-hidden="true"></i>
+            <i class="{{ item.icon }} ri-lg text-interactive ms-16" aria-hidden="true"></i>
         </div>
       </a>
       {% else %}
@@ -64,9 +64,9 @@
     <li class="contained-list-item contained-list-item--clickable contained-list-item--with-action">
       {% if item.link %}
       <a class="contained-list-item__content" href="{{ item.link }}">
-        <div class="d-flex ai-center">
+        <div class="d-flex align-items-center">
           <div>{{ item.label|trans }}</div>
-          <i class="{{ item.icon }} ml-sm" aria-hidden="true"></i>
+          <i class="{{ item.icon }} ms-12" aria-hidden="true"></i>
         </div>
       </a>
       {% endif %}

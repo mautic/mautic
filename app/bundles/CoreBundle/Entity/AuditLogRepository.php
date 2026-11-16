@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -111,7 +112,8 @@ class AuditLogRepository extends CommonRepository
             ->where('al.bundle = \'lead\'')
             ->andWhere('al.object = \'lead\'');
         $query
-            ->andWhere($query->expr()->in('al.objectId', $listOfContacts));
+            ->andWhere($query->expr()->in('al.objectId', ':listOfContacts'))
+            ->setParameter('listOfContacts', $listOfContacts, ArrayParameterType::INTEGER);
 
         if (is_array($filters) && !empty($filters['search'])) {
             $query->andWhere('al.details LIKE :search')
@@ -154,9 +156,9 @@ class AuditLogRepository extends CommonRepository
     /**
      * Get array of objects which belongs to the object.
      *
-     * @param string|null $object
-     * @param string|null $id
-     * @param int         $limit
+     * @param string|null     $object
+     * @param int|string|null $id
+     * @param int             $limit
      *
      * @return array
      */
@@ -226,6 +228,13 @@ class AuditLogRepository extends CommonRepository
                     $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dateTimeHelper->toUtcString($dateTimeFormat)))
                 )
             );
+        }
+
+        if (!empty($options['leadIds'])) {
+            // Just a check to ensure reused IDs (happens with innodb) doesn't infect data
+            $sqb->innerJoin('l', MAUTIC_TABLE_PREFIX.'leads', 'ld', 'ld.id = l.object_id AND l.date_added >= ld.date_added')
+                ->andWhere($sqb->expr()->in('l.object_id', ':leadIds'))
+                ->addGroupBy('l.object_id');
         }
 
         $qb

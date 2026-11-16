@@ -8,7 +8,7 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Symfony\Component\Routing\RouterInterface;
 
-class DashboardSubscriber extends MainDashboardSubscriber
+final class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
      * Define the name of the bundle/category of the widget(s).
@@ -20,7 +20,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     /**
      * Define the widget(s).
      *
-     * @var string
+     * @var array<string, array<string, string>>
      */
     protected $types = [
         'submissions.in.time'      => [],
@@ -40,9 +40,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        protected SubmissionModel $formSubmissionModel,
-        protected FormModel $formModel,
-        private RouterInterface $router,
+        private readonly SubmissionModel $formSubmissionModel,
+        private readonly FormModel $formModel,
+        private readonly RouterInterface $router,
     ) {
     }
 

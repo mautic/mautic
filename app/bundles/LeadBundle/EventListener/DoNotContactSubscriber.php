@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class DoNotContactSubscriber implements EventSubscriberInterface
+final readonly class DoNotContactSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private DoNotContact $doNotContact,

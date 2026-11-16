@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
@@ -173,6 +173,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         ],
                         'contentTemplate' => $template,
                         'icon'            => 'ri-vidicon-2-line',
+                        'contactId'       => $hit['lead_id'],
                     ]
                 );
             }

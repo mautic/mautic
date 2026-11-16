@@ -6,9 +6,8 @@ use Mautic\CoreBundle\Entity\Notification;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class NotificationArrayTransformer implements DataTransformerInterface
+final class NotificationArrayTransformer implements DataTransformerInterface
 {
-    /** {@inheritdoc} */
     public function transform(mixed $value): mixed
     {
         /** Notification $value */
@@ -34,7 +33,6 @@ class NotificationArrayTransformer implements DataTransformerInterface
         return $array;
     }
 
-    /** {@inheritdoc} */
     public function reverseTransform(mixed $value): mixed
     {
         if (!is_array($value)) {

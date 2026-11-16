@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -44,6 +44,7 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -54,6 +55,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -69,28 +71,28 @@ use Twig\Environment;
 /**
  * @extends CommonFormModel<Submission>
  */
-class SubmissionModel extends CommonFormModel
+final class SubmissionModel extends CommonFormModel
 {
     public function __construct(
-        protected IpLookupHelper $ipLookupHelper,
-        protected Environment $twig,
-        protected FormModel $formModel,
-        protected PageModel $pageModel,
-        protected LeadModel $leadModel,
-        protected CampaignModel $campaignModel,
-        protected MembershipManager $membershipManager,
-        protected LeadFieldModel $leadFieldModel,
-        protected CompanyModel $companyModel,
-        protected FormFieldHelper $fieldHelper,
-        private UploadFieldValidator $uploadFieldValidator,
-        private FormUploader $formUploader,
-        private DeviceTrackingServiceInterface $deviceTrackingService,
-        private FieldValueTransformer $fieldValueTransformer,
-        private DateHelper $dateHelper,
-        private ContactTracker $contactTracker,
-        private ContactMerger $contactMerger,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        EntityManager $em,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly Environment $twig,
+        private readonly FormModel $formModel,
+        private readonly PageModel $pageModel,
+        private readonly LeadModel $leadModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly MembershipManager $membershipManager,
+        private readonly LeadFieldModel $leadFieldModel,
+        private readonly CompanyModel $companyModel,
+        private readonly FormFieldHelper $fieldHelper,
+        private readonly UploadFieldValidator $uploadFieldValidator,
+        private readonly FormUploader $formUploader,
+        private readonly DeviceTrackingServiceInterface $deviceTrackingService,
+        private readonly FieldValueTransformer $fieldValueTransformer,
+        private readonly DateHelper $dateHelper,
+        private readonly ContactTracker $contactTracker,
+        private readonly ContactMerger $contactMerger,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -98,23 +100,25 @@ class SubmissionModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly StageRepository $stageRepository,
+        private readonly UserRepository $userRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): SubmissionRepository
     {
-        return $this->em->getRepository(Submission::class);
+        return $this->submissionRepository;
     }
 
     /**
      * @param bool $returnEvent
      *
-     * @return bool|array
-     *
      * @throws ORMException
      */
-    public function saveSubmission($post, $server, Form $form, Request $request, $returnEvent = false)
+    public function saveSubmission(array $post, array $server, Form $form, Request $request, $returnEvent = false): array|false
     {
         $leadFields = array_merge($this->leadFieldModel->getFieldListWithProperties(false), $this->leadFieldModel->getSpecialLeadFields());
 
@@ -131,8 +135,14 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-        $submission->setIpAddress($ipAddress);
+        // An untracked submitter's IP address is not stored either
+        $trackSubmitter = $this->shouldTrackSubmitter($form);
+        if ($trackSubmitter) {
+            $submission->setIpAddress($this->ipLookupHelper->getIpAddress());
+        } else {
+            // Keeps the IP out of the contact, company, point trigger and campaign logs this submission writes
+            $this->ipLookupHelper->markVisitorAsUntracked();
+        }
 
         if (!empty($post['return'])) {
             $referer = $post['return'];
@@ -143,7 +153,14 @@ class SubmissionModel extends CommonFormModel
         }
 
         // clean the referer by removing mauticError and mauticMessage
-        $referer = InputHelper::url($referer, null, null, ['mauticError', 'mauticMessage']);
+        $referer = InputHelper::url($referer, null, null, null, ['mauticError', 'mauticMessage']);
+
+        // An untracked submitter's referer keeps only the page address, because its query string can carry identifiers
+        if (!$trackSubmitter) {
+            [$referer] = explode('?', $referer, 2);
+            [$referer] = explode('#', $referer, 2);
+        }
+
         $submission->setReferer($referer);
 
         // Create an event to be dispatched through the processes
@@ -176,13 +193,14 @@ class SubmissionModel extends CommonFormModel
 
             if ($f->isCaptchaType()) {
                 $captcha = $this->fieldHelper->validateFieldValue($type, $value, $f);
-                if (!empty($captcha)) {
+                if ([] !== $captcha) {
                     $props = $f->getProperties();
                     // check for a custom message
                     $validationErrors[$alias] = (!empty($props['errorMessage'])) ? $props['errorMessage'] : implode('<br />', $captcha);
                 }
                 continue;
-            } elseif ($f->isFileType()) {
+            }
+            if ($f->isFileType()) {
                 try {
                     $file  = $this->uploadFieldValidator->processFileValidation($f, $request);
                     $value = $file->getClientOriginalName();
@@ -297,11 +315,12 @@ class SubmissionModel extends CommonFormModel
             ->setResults($results)
             ->setContactFieldMatches($leadFieldMatches);
 
-        $lead = $this->contactTracker->getContact();
+        // Looking up the tracked contact would identify an untracked submitter, so it is skipped for them
+        $lead = $trackSubmitter ? $this->contactTracker->getContact() : null;
 
-        // Remove validation errors if the field is not visible
-        if ($lead && $form->usesProgressiveProfiling()) {
-            $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
+        // Remove validation errors if the field is not visible, the same way the form was rendered, also for an untracked submitter
+        if ($form->usesProgressiveProfiling()) {
+            $leadSubmissions = $lead ? $this->formModel->getLeadSubmissions($form, $lead->getId()) : null;
 
             $displayManager = new DisplayManager($form, $this->formModel->getCustomComponents()['viewOnlyFields']);
             foreach ($fields as $field) {
@@ -314,26 +333,28 @@ class SubmissionModel extends CommonFormModel
         }
 
         // return errors if there any
-        if (!empty($validationErrors)) {
+        if ([] !== $validationErrors) {
             return ['errors' => $validationErrors];
         }
 
         // Create/update lead
-        if (!empty($leadFieldMatches)) {
+        if ([] !== $leadFieldMatches) {
             $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields, $company);
         }
 
-        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+        $lead = $this->getManagedLeadForSubmission($lead);
+
+        $trackedDevice = $trackSubmitter ? $this->deviceTrackingService->getTrackedDevice() : null;
         $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
         // set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
             ->setLead($lead);
 
-        /*
+        /**
          * Process File upload and save the result to the entity
          * Upload is here to minimize a need for deleting file if there is a validation error
-         * The action can still be invalidated below - deleteEntity takes care for File deletion
+         * The action can still be invalidated below - deleteEntity takes care for File deletion.
          *
          * @todo Refactor form validation to execute this code only if Submission is valid
          */
@@ -376,14 +397,14 @@ class SubmissionModel extends CommonFormModel
         $campaigns = $this->campaignModel->getCampaignsByForm($form);
         /** @var Campaign $campaign */
         foreach ($campaigns ?? [] as $campaign) {
-            if ($campaign->isPublished()) {
+            if ($lead instanceof Lead && $campaign->isPublished()) {
                 $this->membershipManager->addContact($lead, $campaign);
             }
         }
 
         if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
             // Reset action config from executeFormActions()
-            $submissionEvent->setAction(null);
+            $submissionEvent->setAction();
 
             // Dispatch to on submit listeners
             $this->dispatcher->dispatch($submissionEvent, FormEvents::FORM_ON_SUBMIT);
@@ -400,17 +421,47 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
+     * Kiosk mode never tracks the submitter. Other forms track only trackable requests (no DNT/GPC, bot or prefetch).
+     */
+    private function shouldTrackSubmitter(Form $form): bool
+    {
+        return !$form->isInKioskMode() && $this->ipLookupHelper->isRequestTrackable();
+    }
+
+    /**
+     * Ensure a lead assigned to a submission is managed by Doctrine.
+     */
+    private function getManagedLeadForSubmission(?Lead $lead): ?Lead
+    {
+        if (null === $lead) {
+            return null;
+        }
+
+        if ($this->em->contains($lead)) {
+            return $lead;
+        }
+
+        if (!$lead->getId()) {
+            $this->em->persist($lead);
+
+            return $lead;
+        }
+
+        $managedLead = $this->em->find(Lead::class, $lead->getId());
+
+        return $managedLead instanceof Lead ? $managedLead : null;
+    }
+
+    /**
      * @param Submission $submission
      */
     public function deleteEntity($submission): void
     {
         $this->formUploader->deleteUploadedFiles($submission);
 
-        $submissionRepository = $this->getRepository();
-
         // deleting form submission record in form results table
         try {
-            $submissionRepository->deleteFormResultsTableRecord($submission);
+            $this->submissionRepository->deleteFormResultsTableRecord($submission);
         } catch (\Exception $e) {
             $this->logger->error($e);
         }
@@ -426,11 +477,9 @@ class SubmissionModel extends CommonFormModel
     public function deleteEntities($ids): array
     {
         if (!empty($ids)) {
-            $submissionRepository = $this->getRepository();
-
             // deleting form submission record in form results table
             try {
-                $submissionRepository->batchDeleteFormResultsTableRecord($ids);
+                $this->submissionRepository->batchDeleteFormResultsTableRecord($ids);
             } catch (\Exception $e) {
                 $this->logger->error($e);
             }
@@ -446,7 +495,7 @@ class SubmissionModel extends CommonFormModel
      */
     public function getEntities(array $args = [])
     {
-        return $this->getRepository()->getEntities($args);
+        return $this->submissionRepository->getEntities($args);
     }
 
     /**
@@ -456,15 +505,15 @@ class SubmissionModel extends CommonFormModel
      */
     public function getEntitiesByPage(array $args = []): array
     {
-        return $this->getRepository()->getEntitiesByPage($args);
+        return $this->submissionRepository->getEntitiesByPage($args);
     }
 
     /**
-     * @return StreamedResponse|Response
+     * @param array<string, mixed> $queryArgs
      *
      * @throws \Exception
      */
-    public function exportResults($format, $form, $queryArgs)
+    public function exportResults($format, $form, array $queryArgs): StreamedResponse|Response
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
@@ -571,11 +620,9 @@ class SubmissionModel extends CommonFormModel
      * @param object               $page
      * @param array<string, mixed> $queryArgs
      *
-     * @return StreamedResponse|Response
-     *
      * @throws \Exception
      */
-    public function exportResultsForPage($format, $page, $queryArgs)
+    public function exportResultsForPage($format, $page, array $queryArgs): StreamedResponse|Response
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];
@@ -907,13 +954,13 @@ class SubmissionModel extends CommonFormModel
     protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields, ?Company $companyEntity = null): Lead
     {
         // set the mapped data
-        $inKioskMode   = $form->isInKioskMode();
-        $leadId        = null;
-        $lead          = new Lead();
-        $currentFields = $leadFieldMatches;
-        $companyFields = $this->leadFieldModel->getFieldListWithProperties('company');
+        $trackSubmitter = $this->shouldTrackSubmitter($form);
+        $leadId         = null;
+        $lead           = new Lead();
+        $currentFields  = $leadFieldMatches;
+        $companyFields  = $this->leadFieldModel->getFieldListWithProperties('company');
 
-        if (!$inKioskMode) {
+        if ($trackSubmitter) {
             // Default to currently tracked lead
             if ($currentLead = $this->contactTracker->getContact()) {
                 $lead          = $currentLead;
@@ -923,16 +970,16 @@ class SubmissionModel extends CommonFormModel
 
             $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #'.$leadId);
         } else {
-            // Default to a new lead in kiosk mode
+            // Default to a new lead in kiosk mode or when the request is not trackable
             $lead->setNewlyCreated(true);
 
-            $this->logger->debug('FORM: In kiosk mode so assuming a new contact');
+            $this->logger->debug('FORM: In kiosk mode or not trackable so assuming a new contact');
         }
 
         $uniqueLeadFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
 
         // Closure to get data and unique fields
-        $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields): array {
+        $getData = function (array $currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields): array {
             $uniqueFieldsWithData = $data = [];
             foreach ($leadFields as $alias => $properties) {
                 if (isset($currentFields[$alias])) {
@@ -950,7 +997,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to get data and unique fields
-        $getCompanyData = function ($currentFields) use ($companyFields): array {
+        $getCompanyData = function (array $currentFields) use ($companyFields): array {
             $companyData = [];
             // force add company contact field to company fields check
             $companyFields = array_merge($companyFields, ['company' => 'company']);
@@ -965,7 +1012,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to help search for a conflict
-        $checkForIdentifierConflict = function ($fieldSet1, $fieldSet2): array {
+        $checkForIdentifierConflict = function (array $fieldSet1, array $fieldSet2): array {
             // Find fields in both sets
             $potentialConflicts = array_keys(
                 array_intersect_key($fieldSet1, $fieldSet2)
@@ -993,7 +1040,7 @@ class SubmissionModel extends CommonFormModel
 
         // Check for duplicate lead
         /** @var Lead[] $leads */
-        $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository(Lead::class)->getLeadsByUniqueFields(
+        $leads = (!empty($uniqueFieldsWithData)) ? $this->leadRepository->getLeadsByUniqueFields(
             $uniqueFieldsWithData,
             $leadId
         ) : [];
@@ -1014,21 +1061,23 @@ class SubmissionModel extends CommonFormModel
             $uniqueFieldsFound         = $getData($foundLeadFields, true);
             [$hasConflict, $conflicts] = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
-            if ($inKioskMode || $hasConflict || !$lead->getId()) {
-                // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
+            if (!$trackSubmitter || $hasConflict || !$lead->getId()) {
+                // Use the found lead without merging because there is some sort of conflict with unique identifiers or the submitter is not tracked and thus should not merge
                 $lead = $foundLead;
 
                 if ($hasConflict) {
                     $this->logger->debug('FORM: Conflicts found in '.implode(', ', $conflicts).' so not merging');
                 } else {
-                    $this->logger->debug('FORM: In kiosk mode so not merging');
+                    $this->logger->debug('FORM: In kiosk mode or not trackable so not merging');
                 }
             } else {
                 $this->logger->debug('FORM: Merging contacts '.$lead->getId().' and '.$foundLead->getId());
 
-                // Merge the found lead with currently tracked lead
+                // Merge the found lead with currently tracked lead.
+                // $foundLead (the existing identified contact) is the winner so its ID is preserved;
+                // $lead (the anonymous session contact) is the loser and gets deleted.
                 try {
-                    $lead = $this->contactMerger->merge($lead, $foundLead);
+                    $lead = $this->contactMerger->merge($foundLead, $lead);
                 } catch (SameContactException) {
                 }
             }
@@ -1038,7 +1087,7 @@ class SubmissionModel extends CommonFormModel
             $uniqueFieldsCurrent = $getData($currentFields, true);
         }
 
-        if (!$inKioskMode) {
+        if ($trackSubmitter) {
             // Check for conflicts with the submitted data and the currently tracked lead
             [$hasConflict, $conflicts] = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
 
@@ -1059,20 +1108,15 @@ class SubmissionModel extends CommonFormModel
                     .' between current tracked contact and submitted data so assuming a new contact'
                 );
             }
-        }
 
-        // check for existing IP address
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
+            // The lookup itself saves new IP addresses, so an untracked submitter never reaches it
+            $ipAddress = $this->ipLookupHelper->getIpAddress();
 
-        // no lead was found by a mapped email field so create a new one
-        if ($lead->isNewlyCreated()) {
-            if (!$inKioskMode) {
+            // no lead was found by a mapped email field so create a new one
+            if ($lead->isNewlyCreated()) {
                 $lead->addIpAddress($ipAddress);
                 $this->logger->debug('FORM: Associating '.$ipAddress->getIpAddress().' to contact');
-            }
-        } elseif (!$inKioskMode) {
-            $leadIpAddresses = $lead->getIpAddresses();
-            if (!$leadIpAddresses->contains($ipAddress)) {
+            } elseif (!$lead->getIpAddresses()->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
 
                 $this->logger->debug('FORM: Associating '.$ipAddress->getIpAddress().' to contact');
@@ -1087,7 +1131,7 @@ class SubmissionModel extends CommonFormModel
 
         // Set stage.
         if (!empty($data['stagebyname'])) {
-            $stage = $this->em->getRepository(Stage::class)->findOneBy(['name' => $data['stagebyname']]);
+            $stage = $this->stageRepository->findOneBy(['name' => $data['stagebyname']]);
 
             if ($stage instanceof Stage) {
                 $lead->setStage($stage);
@@ -1098,7 +1142,7 @@ class SubmissionModel extends CommonFormModel
                     sprintf('%d:%s', $stage->getId(), $stage->getName()),
                     $this->translator->trans(
                         'mautic.stage.import.action.name',
-                        ['%name%' => $this->userHelper->getUser()->getUsername()]
+                        ['%name%' => $this->userHelper->getUser()->getUserIdentifier()]
                     )
                 );
             } else {
@@ -1112,15 +1156,11 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
-        // Set owner
-        $userRepo = $this->em->getRepository(User::class);
-        \assert($userRepo instanceof UserRepository);
-
         $user = null;
         if (!empty($data['ownerbyemail'])) {
-            $user = $userRepo->findOneBy(['email' => $data['ownerbyemail']]);
+            $user = $this->userRepository->findOneBy(['email' => $data['ownerbyemail']]);
         } elseif (!empty($data['ownerbyid'])) {
-            $user = $userRepo->find($data['ownerbyid']);
+            $user = $this->userRepository->find($data['ownerbyid']);
         }
 
         if ($user instanceof User) {
@@ -1136,7 +1176,7 @@ class SubmissionModel extends CommonFormModel
         ));
         $this->leadModel->saveEntity($lead, false);
 
-        if (!$inKioskMode) {
+        if ($trackSubmitter) {
             // Set the current lead which will generate tracking cookies
             $this->contactTracker->setTrackedContact($lead);
         } else {
@@ -1151,7 +1191,7 @@ class SubmissionModel extends CommonFormModel
         }
 
         $companyFieldMatches = $getCompanyData($leadFieldMatches);
-        if (!empty($companyFieldMatches)) {
+        if ([] !== $companyFieldMatches) {
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
             $companyChangeLog                      = null;
             if ($leadAdded) {
@@ -1163,7 +1203,7 @@ class SubmissionModel extends CommonFormModel
                 $this->companyModel->saveEntity($companyEntity);
             }
 
-            if (!empty($company) and $companyEntity instanceof Company) {
+            if (!empty($company) && $companyEntity instanceof Company) {
                 // Save after the lead in for new leads created through the API and maybe other places
                 $this->companyModel->addLeadToCompany($companyEntity, $lead);
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
@@ -1177,14 +1217,12 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Validates a field value.
-     *
      * @return bool|string True if valid; otherwise string with invalid reason
      */
     protected function validateFieldValue(Field $field, $value)
     {
         $standardValidation = $this->fieldHelper->validateFieldValue($field->getType(), $value, $field);
-        if (!empty($standardValidation)) {
+        if ([] !== $standardValidation) {
             return $standardValidation;
         }
 
@@ -1209,7 +1247,7 @@ class SubmissionModel extends CommonFormModel
         return true;
     }
 
-    private function normalizeValue($value, Field $f): string
+    private function normalizeValue(mixed $value, Field $f): string
     {
         $value = !is_array($value) ? [$value] : $value;
 

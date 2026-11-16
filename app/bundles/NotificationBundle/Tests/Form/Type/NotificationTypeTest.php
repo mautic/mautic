@@ -9,7 +9,6 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Form\Type\NotificationType;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormExtensionInterface;
@@ -19,7 +18,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class NotificationTypeTest extends TypeTestCase
+final class NotificationTypeTest extends TypeTestCase
 {
     /**
      * @return array<FormExtensionInterface>
@@ -33,10 +32,10 @@ class NotificationTypeTest extends TypeTestCase
             new ValidatorExtension($validatorBuilder->getValidator()),
             new PreloadedExtension([
                 new CategoryListType(
-                    $this->createMock(EntityManager::class),
-                    $this->createMock(TranslatorInterface::class),
-                    $this->createMock(CategoryModel::class),
-                    $this->createMock(RouterInterface::class),
+                    $this->createStub(EntityManager::class),
+                    $this->createStub(TranslatorInterface::class),
+                    $this->createStub(CategoryModel::class),
+                    $this->createStub(RouterInterface::class),
                 ),
             ], []),
         ];
@@ -60,34 +59,34 @@ class NotificationTypeTest extends TypeTestCase
             'language' => 'en',
         ]);
 
-        Assert::assertTrue($form->isSynchronized());
+        $this->assertTrue($form->isSynchronized());
 
         $formData = $form->getData();
-        \assert($formData instanceof Notification);
+        $this->assertInstanceOf(Notification::class, $formData);
 
         $expected->setChanges($formData->getChanges());
-        Assert::assertEquals($expected, $formData);
+        $this->assertEquals($expected, $formData);
 
-        Assert::assertFalse($form->isValid());
+        $this->assertFalse($form->isValid());
 
         $view          = $form->createView();
         $invalidFields = ['name', 'heading', 'message'];
         $errorCount    = 0;
         foreach ($view->children as $fieldName => $child) {
             $errors = $view->children[$fieldName]->vars['errors'];
-            \assert($errors instanceof FormErrorIterator);
+            $this->assertInstanceOf(FormErrorIterator::class, $errors);
 
             if (in_array($fieldName, $invalidFields, true)) {
                 ++$errorCount;
-                self::assertCount(1, $errors);
+                $this->assertCount(1, $errors);
                 continue;
             }
 
-            self::assertCount(0, $errors);
+            $this->assertCount(0, $errors);
         }
 
-        self::assertCount($errorCount, $invalidFields);
-        self::assertCount(0, $view->vars['errors']);
+        $this->assertCount($errorCount, $invalidFields);
+        $this->assertCount(0, $view->vars['errors']);
     }
 
     public function testSubmitValidData(): void
@@ -114,23 +113,23 @@ class NotificationTypeTest extends TypeTestCase
             'language' => 'en',
         ]);
 
-        Assert::assertTrue($form->isSynchronized());
+        $this->assertTrue($form->isSynchronized());
 
         $formData = $form->getData();
-        \assert($formData instanceof Notification);
+        $this->assertInstanceOf(Notification::class, $formData);
 
         $expected->setChanges($formData->getChanges());
-        Assert::assertEquals($expected, $formData);
+        $this->assertEquals($expected, $formData);
 
-        Assert::assertTrue($form->isValid());
+        $this->assertTrue($form->isValid());
 
         $view = $form->createView();
         foreach ($view->children as $fieldName => $child) {
             $errors = $view->children[$fieldName]->vars['errors'];
-            \assert($errors instanceof FormErrorIterator);
-            self::assertCount(0, $errors);
+            $this->assertInstanceOf(FormErrorIterator::class, $errors);
+            $this->assertCount(0, $errors);
         }
 
-        self::assertCount(0, $view->vars['errors']);
+        $this->assertCount(0, $view->vars['errors']);
     }
 }

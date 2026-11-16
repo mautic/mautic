@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
@@ -17,7 +19,7 @@ class StatsCollectionHelper
     public const GENERAL_STAT_PREFIX = 'email';
 
     public function __construct(
-        private StatHelperContainer $helperContainer,
+        private readonly StatHelperContainer $helperContainer,
     ) {
     }
 

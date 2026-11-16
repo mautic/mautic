@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -12,10 +14,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class SmsSendType extends AbstractType
+final class SmsSendType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -30,7 +32,7 @@ class SmsSendType extends AbstractType
             SmsListType::class,
             [
                 'label'      => 'mautic.sms.send.selectsmss',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.sms.choose.smss',
@@ -40,7 +42,7 @@ class SmsSendType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.sms.choosesms.notblank']
+                        message: 'mautic.sms.choosesms.notblank'
                     ),
                 ],
             ]

@@ -3,8 +3,7 @@
     "features": {
         "ghcr.io/devcontainers/features/docker-in-docker:2": {
             "version": "latest"
-        },
-        "ghcr.io/ddev/ddev/install-ddev:latest": {}
+        }
     },
     "portsAttributes": {
         "80": {
@@ -23,5 +22,21 @@
             "label": "Mautic (HTTPS)"
         }
     },
-    "postCreateCommand": "chmod +x .devcontainer/setup-project.sh && .devcontainer/setup-project.sh"
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "workbench.editorAssociations": {
+                    "*.md": "vscode.markdown.preview.editor"
+                }
+            }
+        },
+        "codespaces": {
+            "openFiles": [
+                ".devcontainer/CODESPACES.md"
+            ]
+        }
+    },
+    "postCreateCommand": ".devcontainer/setup-project.sh",
+    "postAttachCommand": ".devcontainer/post-attach.sh",
+    "updateContentCommand": ".devcontainer/prebuild-project.sh"
 }

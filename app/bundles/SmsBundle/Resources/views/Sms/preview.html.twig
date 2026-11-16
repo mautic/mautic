@@ -1,5 +1,5 @@
 {# sms @var \Mautic\SmsBundle\Entity\Sms #}
-<div class="d-flex jc-center pa-md">
+<div class="d-flex justify-content-center pa-16">
     <div class="phone-preview animation--slide-in-right">
         <div class="phone-preview__silence-switch phone-preview__button--outer"></div>
         <div class="phone-preview__volume-rocker--top phone-preview__button--outer"></div>
@@ -31,6 +31,11 @@
             <div class="phone-preview__message phone-preview__message--from">
                 <span class="phone-preview__message-content">{{ sms.getMessage() }}</span>
             </div>
+            {% for image in sms.getMedia() %}
+                <div class="phone-preview__message phone-preview__message--from phone-preview__message--media">
+                    <span class="phone-preview__message-content"><img src="{{ image }}" alt="{{ 'mautic.sms.preview.input.placeholder'|trans }}"></span>
+                </div>
+            {% endfor %}
             <div class="phone-preview__message phone-preview__message--to">{{ 'mautic.sms.preview.demo.message'|trans }}</div>
         </div>
 

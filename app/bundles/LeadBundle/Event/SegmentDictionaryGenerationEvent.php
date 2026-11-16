@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
  *
  * This is not related to language translations at all
  */
-class SegmentDictionaryGenerationEvent extends CommonEvent
+final class SegmentDictionaryGenerationEvent extends CommonEvent
 {
     /**
      * @param array<string,mixed[]> $translations
@@ -24,10 +24,8 @@ class SegmentDictionaryGenerationEvent extends CommonEvent
 
     /**
      * @param mixed[] $attributes
-     *
-     * @return SegmentDictionaryGenerationEvent
      */
-    public function addTranslation(string $key, $attributes)
+    public function addTranslation(string $key, $attributes): static
     {
         $this->translations[$key] = $attributes;
 
@@ -37,7 +35,7 @@ class SegmentDictionaryGenerationEvent extends CommonEvent
     /**
      * @return array<string,mixed[]>
      */
-    public function getTranslations()
+    public function getTranslations(): array
     {
         return $this->translations;
     }

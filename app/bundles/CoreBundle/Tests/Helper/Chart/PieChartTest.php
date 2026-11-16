@@ -7,12 +7,9 @@ namespace Mautic\CoreBundle\Tests\Helper\Chart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use PHPUnit\Framework\TestCase;
 
-class PieChartTest extends TestCase
+final class PieChartTest extends TestCase
 {
-    /**
-     * @var PieChart
-     */
-    private $pieChart;
+    private PieChart $pieChart;
 
     protected function setUp(): void
     {

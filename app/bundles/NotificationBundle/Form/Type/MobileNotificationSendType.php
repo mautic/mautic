@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\NotificationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -12,10 +14,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class MobileNotificationSendType extends AbstractType
+final class MobileNotificationSendType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -26,7 +28,7 @@ class MobileNotificationSendType extends AbstractType
             MobileNotificationListType::class,
             [
                 'label'      => 'mautic.notification.send.selectnotifications',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.notification.choose.notifications',
@@ -35,7 +37,7 @@ class MobileNotificationSendType extends AbstractType
                 'multiple'    => false,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.notification.choosenotification.notblank']
+                        message: 'mautic.notification.choosenotification.notblank'
                     ),
                 ],
             ]

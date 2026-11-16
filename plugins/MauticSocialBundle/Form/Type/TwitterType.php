@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -11,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class TwitterType extends AbstractType
+final class TwitterType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -24,12 +26,12 @@ class TwitterType extends AbstractType
             'label'             => 'mautic.integration.Twitter.share.layout',
             'required'          => false,
             'placeholder'       => false,
-            'label_attr'        => ['class' => 'control-label'],
+            'label_attr'        => ['class' => 'form-label'],
             'attr'              => ['class' => 'form-control'],
         ]);
 
         $builder->add('text', TextType::class, [
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'label'      => 'mautic.integration.Twitter.share.text',
             'required'   => false,
             'attr'       => [
@@ -39,7 +41,7 @@ class TwitterType extends AbstractType
         ]);
 
         $builder->add('via', TextType::class, [
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'label'      => 'mautic.integration.Twitter.share.via',
             'required'   => false,
             'attr'       => [
@@ -50,7 +52,7 @@ class TwitterType extends AbstractType
         ]);
 
         $builder->add('related', TextType::class, [
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'label'      => 'mautic.integration.Twitter.share.related',
             'required'   => false,
             'attr'       => [
@@ -61,7 +63,7 @@ class TwitterType extends AbstractType
         ]);
 
         $builder->add('hashtags', TextType::class, [
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'label'      => 'mautic.integration.Twitter.share.hashtag',
             'required'   => false,
             'attr'       => [

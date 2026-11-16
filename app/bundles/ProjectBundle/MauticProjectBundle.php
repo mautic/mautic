@@ -6,6 +6,6 @@ namespace Mautic\ProjectBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class MauticProjectBundle extends Bundle
+final class MauticProjectBundle extends Bundle
 {
 }

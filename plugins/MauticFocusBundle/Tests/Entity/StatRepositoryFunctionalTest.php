@@ -11,7 +11,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 
-class StatRepositoryFunctionalTest extends MauticMysqlTestCase
+final class StatRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private FocusModel $focusModel;
 
@@ -19,8 +19,8 @@ class StatRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->focusModel = static::$kernel->getContainer()->get('mautic.focus.model.focus');
-        $this->setTestsData($this->createLead(), $this->focusModel);
+        $this->focusModel = self::$kernel->getContainer()->get(FocusModel::class);
+        $this->setTestsData($this->createLead());
     }
 
     public function testGetStatsViewByLead(): void
@@ -44,7 +44,7 @@ class StatRepositoryFunctionalTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    private function setTestsData(Lead $lead, FocusModel $focusModel): void
+    private function setTestsData(Lead $lead): void
     {
         $focusPopupA = $this->createFocus('popup focus A');
         $focusPopupB = $this->createFocus('popup focus B');

@@ -1,15 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Aggregate\Collection\DAO;
 
-class StatDAO
+final class StatDAO
 {
     private array $stats = [];
 
-    /**
-     * @return $this
-     */
-    public function addStat($key, $value)
+    public function addStat($key, $value): static
     {
         if (!isset($this->stats[$key])) {
             $this->stats[$key] = 0;
@@ -32,10 +31,7 @@ class StatDAO
         return $this->stats[$key];
     }
 
-    /**
-     * @return array
-     */
-    public function getStats()
+    public function getStats(): array
     {
         return $this->stats;
     }

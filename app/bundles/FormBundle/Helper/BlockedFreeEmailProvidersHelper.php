@@ -17,7 +17,7 @@ final class BlockedFreeEmailProvidersHelper
     {
         $providers = self::loadRaw();
 
-        return is_array($providers) ? array_map('strtolower', $providers) : [];
+        return is_array($providers) ? array_map(strtolower(...), $providers) : [];
     }
 
     /**

@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Model;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -14,6 +19,8 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -23,9 +30,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CampaignModelTransactionalTest extends TestCase
+final class CampaignModelTransactionalTest extends TestCase
 {
     private MockObject&CampaignRepository $campaignRepositoryMock;
+
     private MockObject&CampaignModel $campaignModel;
 
     protected function setUp(): void
@@ -36,30 +44,32 @@ class CampaignModelTransactionalTest extends TestCase
 
         $entityManagerMock = $this->createMock(EntityManager::class);
         $entityManagerMock->method('getConnection')
-            ->willReturn($this->createMock(Connection::class));
-
-        $entityManagerMock->method('getRepository')
-            ->with(Campaign::class)
-            ->willReturn($this->campaignRepositoryMock);
+            ->willReturn($this->createStub(Connection::class));
 
         $userHelperMock = $this->createMock(UserHelper::class);
 
         $this->campaignModel = $this->getMockBuilder(CampaignModel::class)
             ->setConstructorArgs([
-                $this->createMock(ListModel::class),
-                $this->createMock(FormModel::class),
-                $this->createMock(EventCollector::class),
-                $this->createMock(MembershipBuilder::class),
-                $this->createMock(ContactTracker::class),
-                $this->createMock(GeneratedColumnsProviderInterface::class),
+                $this->createStub(ListModel::class),
+                $this->createStub(FormModel::class),
+                $this->createStub(EventCollector::class),
+                $this->createStub(MembershipBuilder::class),
+                $this->createStub(ContactTracker::class),
+                $this->createStub(GeneratedColumnsProviderInterface::class),
                 $entityManagerMock,
-                $this->createMock(CorePermissions::class),
-                $this->createMock(EventDispatcherInterface::class),
-                $this->createMock(UrlGeneratorInterface::class),
-                $this->createMock(Translator::class),
+                $this->createStub(CorePermissions::class),
+                $this->createStub(EventDispatcherInterface::class),
+                $this->createStub(UrlGeneratorInterface::class),
+                $this->createStub(Translator::class),
                 $userHelperMock,
-                $this->createMock(LoggerInterface::class),
-                $this->createMock(CoreParametersHelper::class),
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(CoreParametersHelper::class),
+                $this->campaignRepositoryMock,
+                $this->createStub(EventRepository::class),
+                $this->createStub(LeadRepository::class),
+                $this->createStub(LeadEventLogRepository::class),
+                $this->createStub(StatRepository::class),
+                $this->createStub(FormRepository::class),
             ])
             ->onlyMethods(['saveEntity'])
             ->getMock();

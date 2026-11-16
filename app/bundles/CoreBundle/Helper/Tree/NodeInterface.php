@@ -14,11 +14,11 @@ interface NodeInterface extends \RecursiveIterator
      */
     public function getValue();
 
-    public function setParent(NodeInterface $parent): void;
+    public function setParent(self $parent): void;
 
-    public function getParent(): ?NodeInterface;
+    public function getParent(): ?self;
 
-    public function addChild(NodeInterface $child): void;
+    public function addChild(self $child): void;
 
     /**
      * @return NodeInterface[]

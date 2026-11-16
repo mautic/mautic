@@ -99,17 +99,14 @@ class IpAddress
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * @return $this
-     */
-    public function setIpAddress($ipAddress)
+    public function setIpAddress($ipAddress): static
     {
         $this->ipAddress = $ipAddress;
 
@@ -117,7 +114,7 @@ class IpAddress
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIpAddress()
     {
@@ -126,10 +123,8 @@ class IpAddress
 
     /**
      * @param array<string,string> $ipDetails
-     *
-     * @return IpAddress
      */
-    public function setIpDetails($ipDetails)
+    public function setIpDetails($ipDetails): static
     {
         $this->ipDetails = $ipDetails;
 
@@ -154,10 +149,8 @@ class IpAddress
 
     /**
      * Get list of IPs to not track.
-     *
-     * @return array
      */
-    public function getDoNotTrackList()
+    public function getDoNotTrackList(): array
     {
         return $this->doNotTrack;
     }
@@ -177,7 +170,7 @@ class IpAddress
                 $wildcard_decimal      = 2 ** (32 - $netmask) - 1;
                 $netmask_decimal       = ~$wildcard_decimal;
 
-                if (($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal)) {
+                if (($ip_decimal & $netmask_decimal) === ($range_decimal & $netmask_decimal)) {
                     return false;
                 }
 

@@ -11,10 +11,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class LeadGetCurrentEvent extends Event
 {
     private ?Lead $contact                    = null;
+
     private bool $skipContactLastActiveLogged = false;
 
-    public function __construct(private ?Request $request = null)
-    {
+    public function __construct(
+        private readonly ?Request $request = null,
+    ) {
     }
 
     public function getRequest(): ?Request

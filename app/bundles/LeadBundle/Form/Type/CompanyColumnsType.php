@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class CompanyColumnsType extends AbstractType
 {
     public function __construct(
-        private CompanyColumnsDictionary $columnsDictionary,
+        private readonly CompanyColumnsDictionary $columnsDictionary,
     ) {
     }
 
@@ -25,7 +25,7 @@ final class CompanyColumnsType extends AbstractType
             [
                 'choices'    => array_flip($this->columnsDictionary->getFields()),
                 'label'      => false,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'multiple'   => true,
                 'expanded'   => false,

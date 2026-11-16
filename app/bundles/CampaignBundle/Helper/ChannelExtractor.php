@@ -6,7 +6,7 @@ use Mautic\CampaignBundle\Entity\ChannelInterface;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
-class ChannelExtractor
+final class ChannelExtractor
 {
     public static function setChannel(ChannelInterface $entity, Event $event, AbstractEventAccessor $eventConfig): void
     {

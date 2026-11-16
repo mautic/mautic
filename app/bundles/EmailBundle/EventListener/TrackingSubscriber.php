@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class TrackingSubscriber implements EventSubscriberInterface
+final readonly class TrackingSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private StatRepository $statRepository,

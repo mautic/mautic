@@ -14,15 +14,15 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber implements EventSubscriberInterface
 {
     private string $assetToken = '{assetlink=(.*?)}';
 
     public function __construct(
-        private CorePermissions $security,
-        private TokenHelper $tokenHelper,
-        private ContactTracker $contactTracker,
-        private BuilderTokenHelperFactory $builderTokenHelperFactory,
+        private readonly CorePermissions $security,
+        private readonly TokenHelper $tokenHelper,
+        private readonly ContactTracker $contactTracker,
+        private readonly BuilderTokenHelperFactory $builderTokenHelperFactory,
     ) {
     }
 
@@ -48,7 +48,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
                 'title'
             );
-            if ($tokens) {
+            if ([] !== $tokens) {
                 $event->addTokens($tokens);
             }
         }
@@ -81,13 +81,12 @@ class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param PageDisplayEvent|EmailSendEvent $event
-     * @param array                           $source
-     * @param int|null                        $emailId
+     * @param array    $source
+     * @param int|null $emailId
      *
      * @return mixed[]
      */
-    private function generateTokensFromContent($event, ?int $leadId, $source = [], $emailId = null): array
+    private function generateTokensFromContent(EmailSendEvent|PageDisplayEvent $event, ?int $leadId, $source = [], $emailId = null): array
     {
         if ($event instanceof PageDisplayEvent || ($event instanceof EmailSendEvent && $event->shouldAppendClickthrough())) {
             $clickthrough = [

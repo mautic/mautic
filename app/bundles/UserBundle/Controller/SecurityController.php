@@ -4,22 +4,19 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Exception\WeakPasswordException;
+use Mautic\UserBundle\Security\OIDC\ClientCredentials;
+use Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface;
+use Mautic\UserBundle\Security\OIDC\Settings;
 use Mautic\UserBundle\Security\SAML\Helper as SAMLHelper;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -27,23 +24,18 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SecurityController extends CommonController implements EventSubscriberInterface
+final class SecurityController extends CommonController implements EventSubscriberInterface
 {
-    public function __construct(
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        ?RequestStack $requestStack,
-        ?CorePermissions $security,
-        private AuthorizationCheckerInterface $authorizationChecker,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private AuthorizationCheckerInterface $authorizationChecker;
+
+    #[Required]
+    public function autowireSecurityController(
+        AuthorizationCheckerInterface $authorizationChecker,
+    ): void {
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     public function onRequest(RequestEvent $event): void
@@ -52,6 +44,14 @@ class SecurityController extends CommonController implements EventSubscriberInte
         \assert(is_string($controller));
 
         if (!str_contains($controller, self::class)) {
+            return;
+        }
+
+        // Don't redirect from OIDC actions - oidcRequiredAction needs user to link account,
+        // oidcCheckAction needs to return 404 for direct access
+        if (str_contains($controller, 'oidcRequiredAction')
+            || str_contains($controller, 'oidcCheckAction')
+            || str_contains($controller, 'oidcLoginAction')) {
             return;
         }
 
@@ -76,7 +76,8 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 $this->addFlash(FlashBag::LEVEL_ERROR, $translator->trans('mautic.user.auth.error.weakpassword', [], 'flashes'));
 
                 return $this->forward('Mautic\UserBundle\Controller\PublicController::passwordResetAction');
-            } elseif ($error instanceof Exception\BadCredentialsException) {
+            }
+            if ($error instanceof Exception\BadCredentialsException) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
@@ -106,13 +107,6 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 'sessionExpired' => true,
             ],
         ]);
-    }
-
-    /**
-     * Do nothing.
-     */
-    public function loginCheckAction(): void
-    {
     }
 
     /**
@@ -153,6 +147,70 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 'mauticContent'  => 'user',
                 'sessionExpired' => true,
             ],
+        ]);
+    }
+
+    public function oidcLoginAction(
+        Settings $oidcSettings,
+        ClientFactoryInterface $clientFactory,
+        ClientCredentials $clientCredentials,
+        LoggerInterface $logger,
+        SessionInterface $session,
+    ): RedirectResponse {
+        if (!$oidcSettings->isEnabled()) {
+            return $this->redirectToRoute('login');
+        }
+
+        // Clear any previous OIDC session state to ensure a clean authentication flow
+        // This is important when user is already authenticated with non-OIDC method
+        $oidcSessionKeys = ['openid_connect_state', 'openid_connect_nonce', 'openid_connect_code_verifier'];
+        foreach ($oidcSessionKeys as $key) {
+            $session->remove($key);
+        }
+
+        try {
+            $oidcClient = $clientFactory->create($clientCredentials);
+            $authenticatedRedirect = $oidcClient->authenticate();
+            if ($authenticatedRedirect) {
+                return $authenticatedRedirect;
+            }
+        } catch (\Mautic\UserBundle\Exception\OidcAuthorizationException $e) {
+            $logger->error('OpenID Connect: Login action failed', ['exception' => $e, 'message' => $e->getMessage()]);
+        }
+
+        $this->addFlashMessage('mautic.open_id.login.exception.user_info', [], FlashBag::LEVEL_ERROR);
+
+        return $this->redirectToRoute('login');
+    }
+
+    /**
+     * OIDC login check action (handled by authenticator).
+     * This endpoint should only be reached when the authenticator processes the OIDC callback.
+     * Direct GET requests should return 404.
+     */
+    public function oidcCheckAction(): Response
+    {
+        // This method should be intercepted by the authenticator
+        // If we reach here, it means the request was not handled by the authenticator
+        throw $this->createNotFoundException('This endpoint is handled by the OIDC authenticator.');
+    }
+
+    /**
+     * OIDC required action - prompts user to link their OIDC account.
+     */
+    public function oidcRequiredAction(
+        Settings $oidcSettings,
+        OidcSubjectIdRepository $repository,
+    ): Response {
+        if (!$oidcSettings->isEnabled() || !($user = $this->getUser())) {
+            return $this->redirectToRoute('login');
+        }
+
+        // Show the OIDC required page - it will prompt them to click OIDC login button
+        // Whether they already have OIDC linked or not, they need to authenticate via OIDC
+        return $this->render('@MauticUser/Security/oidc_required.html.twig', [
+            'parameters' => $oidcSettings,
+            'hasOidcLinked' => (bool) $repository->findOneBy(['user' => $user]),
         ]);
     }
 

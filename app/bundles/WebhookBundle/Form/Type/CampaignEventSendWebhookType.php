@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\SortableListType;
@@ -14,10 +16,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class CampaignEventSendWebhookType extends AbstractType
+final class CampaignEventSendWebhookType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -28,14 +30,12 @@ class CampaignEventSendWebhookType extends AbstractType
             UrlType::class,
             [
                 'label'       => 'mautic.webhook.event.sendwebhook.url',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -53,7 +53,7 @@ class CampaignEventSendWebhookType extends AbstractType
                     'DELETE' => 'delete',
                 ],
                 'multiple'   => false,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'label'      => 'mautic.webhook.event.sendwebhook.method',
                 'attr'       => [
                     'class' => 'form-control',
@@ -90,7 +90,7 @@ class CampaignEventSendWebhookType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.webhook.event.sendwebhook.timeout',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'          => 'form-control',
                     'postaddon_text' => $this->translator->trans('mautic.core.time.seconds'),

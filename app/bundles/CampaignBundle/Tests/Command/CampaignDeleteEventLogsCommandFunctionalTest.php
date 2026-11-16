@@ -10,35 +10,34 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
-class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
+final class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
 {
     public function testWithEventIds(): void
     {
         $exitCode = $this->createDataAndRunCommand(false);
-        Assert::assertSame(0, $exitCode);
+        $this->assertSame(0, $exitCode);
 
         $campaign = $this->em->getRepository(Campaign::class)->findAll();
-        Assert::assertCount(1, $campaign);
+        $this->assertCount(1, $campaign);
 
         $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
-        Assert::assertCount(2, $eventLogs); // Logs are preserved when events are deleted
+        $this->assertCount(2, $eventLogs); // Logs are preserved when events are deleted
     }
 
     public function testWithCampaignId(): void
     {
         $exitCode = $this->createDataAndRunCommand(true);
 
-        Assert::assertSame(0, $exitCode);
+        $this->assertSame(0, $exitCode);
 
         $campaign = $this->em->getRepository(Campaign::class)->findAll();
-        Assert::assertCount(0, $campaign);
+        $this->assertCount(0, $campaign);
 
         $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
-        Assert::assertCount(0, $eventLogs);
+        $this->assertCount(0, $eventLogs);
     }
 
     private function createApplicationTester(): ApplicationTester
@@ -66,9 +65,7 @@ class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
             $commandData['campaign_event_ids'] = [$event1->getId(), $event2->getId()];
         }
 
-        $exitCode = $applicationTester->run($commandData);
-
-        return $exitCode;
+        return $applicationTester->run($commandData);
     }
 
     private function createLead(): Lead

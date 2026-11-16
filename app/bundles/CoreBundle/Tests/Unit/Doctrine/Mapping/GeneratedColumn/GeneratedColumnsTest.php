@@ -6,11 +6,10 @@ namespace Mautic\CoreBundle\Tests\Unit\Doctrine\GeneratedColumn;
 
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class GeneratedColumnsTest extends TestCase
+final class GeneratedColumnsTest extends TestCase
 {
     private GeneratedColumns $generatedColumns;
 
@@ -30,10 +29,10 @@ class GeneratedColumnsTest extends TestCase
             $this->generatedColumns->add($column);
         }
 
-        Assert::assertCount(count($columns), $this->generatedColumns);
+        $this->assertCount(count($columns), $this->generatedColumns);
 
         foreach ($this->generatedColumns as $index => $column) {
-            Assert::assertSame($columns[$index], $column);
+            $this->assertSame($columns[$index], $column);
         }
     }
 

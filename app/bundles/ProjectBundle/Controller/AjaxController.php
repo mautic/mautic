@@ -52,7 +52,7 @@ final class AjaxController extends CommonAjaxController
     public function addProjectsAction(Request $request, ProjectModel $projectModel, ProjectRepository $projectRepository, CorePermissions $corePermissions): JsonResponse
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_ASSOCIATE)) {
-            $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $existingProjectIds = json_decode($request->request->get('existingProjectIds'), true);

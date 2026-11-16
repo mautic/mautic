@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Crate;
 
-final class ObjectCrate
+final readonly class ObjectCrate
 {
     public function __construct(
         private string $key,

@@ -13,7 +13,7 @@ use Mautic\FormBundle\Entity\Submission;
 
 #[AsDoctrineListener(Events::postPersist)]
 #[AsDoctrineListener(Events::postRemove)]
-final class SubmissionSubscriber
+final readonly class SubmissionSubscriber
 {
     public function __construct(
         private FormRepository $formRepository,

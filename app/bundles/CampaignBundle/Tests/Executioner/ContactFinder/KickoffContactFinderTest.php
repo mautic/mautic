@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,15 +13,15 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\NullLogger;
 
-class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
+final class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CampaignRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject&CampaignRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $campaignRepository;
 
@@ -77,10 +79,7 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($foundContacts, $this->getContactFinder()->getContacts(1, $limiter));
     }
 
-    /**
-     * @return KickoffContactFinder
-     */
-    private function getContactFinder()
+    private function getContactFinder(): KickoffContactFinder
     {
         return new KickoffContactFinder(
             $this->leadRepository,

@@ -16,12 +16,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     /**
-     * @var MockObject|FilterOperatorProviderInterface
+     * @var MockObject&FilterOperatorProviderInterface
      */
     private MockObject $filterOperatorPovider;
 
@@ -41,39 +41,39 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperatorsIncluding(): void
     {
-        $this->filterOperatorPovider->expects($this->any())
+        $this->filterOperatorPovider
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
-                    'label'        => 'equals',
+                    'label'        => 'is equal to',
                     'expr'         => 'eq',
                     'negagte_expr' => 'neq',
                 ],
                 OperatorOptions::NOT_EQUAL_TO => [
-                    'label'        => 'not equal',
+                    'label'        => 'is not equal to',
                     'expr'         => 'neq',
                     'negagte_expr' => 'eq',
                 ],
             ]);
 
         $this->assertSame(
-            ['equals' => OperatorOptions::EQUAL_TO],
+            ['is equal to' => OperatorOptions::EQUAL_TO],
             $this->provider->getOperatorsIncluding([OperatorOptions::EQUAL_TO])
         );
     }
 
     public function testGetOperatorsExcluding(): void
     {
-        $this->filterOperatorPovider->expects($this->any())
+        $this->filterOperatorPovider
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
-                    'label'        => 'equals',
+                    'label'        => 'is equal to',
                     'expr'         => 'eq',
                     'negagte_expr' => 'neq',
                 ],
                 OperatorOptions::NOT_EQUAL_TO => [
-                    'label'        => 'not equal',
+                    'label'        => 'is not equal to',
                     'expr'         => 'neq',
                     'negagte_expr' => 'eq',
                 ],
@@ -87,16 +87,16 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperatorsForFieldType(): void
     {
-        $this->filterOperatorPovider->expects($this->any())
+        $this->filterOperatorPovider
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
-                    'label'        => 'equals',
+                    'label'        => 'is equal to',
                     'expr'         => 'eq',
                     'negagte_expr' => 'neq',
                 ],
                 OperatorOptions::NOT_EQUAL_TO => [
-                    'label'        => 'not equal',
+                    'label'        => 'is not equal to',
                     'expr'         => 'neq',
                     'negagte_expr' => 'eq',
                 ],
@@ -110,7 +110,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (TypeOperatorsEvent $event) {
+                $this->callback(function (TypeOperatorsEvent $event): true {
                     // Emulate a subscriber.
                     $event->setOperatorsForFieldType('text', [
                         'include' => [
@@ -126,8 +126,8 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             [
-                'equals'    => OperatorOptions::EQUAL_TO,
-                'not equal' => OperatorOptions::NOT_EQUAL_TO,
+                'is equal to'     => OperatorOptions::EQUAL_TO,
+                'is not equal to' => OperatorOptions::NOT_EQUAL_TO,
             ],
             $this->provider->getOperatorsForFieldType('text')
         );
@@ -135,16 +135,16 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperatorsForSpecificField(): void
     {
-        $this->filterOperatorPovider->expects($this->any())
+        $this->filterOperatorPovider
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
-                    'label'        => 'equals',
+                    'label'        => 'is equal to',
                     'expr'         => 'eq',
                     'negagte_expr' => 'neq',
                 ],
                 OperatorOptions::NOT_EQUAL_TO => [
-                    'label'        => 'not equal',
+                    'label'        => 'is not equal to',
                     'expr'         => 'neq',
                     'negagte_expr' => 'eq',
                 ],
@@ -157,9 +157,9 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $callback = function (TypeOperatorsEvent $event) {
+                    $callback = function (TypeOperatorsEvent $event): void {
                         // Emulate a subscriber.
                         $event->setOperatorsForFieldType('text', [
                             'include' => [
@@ -172,7 +172,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
                     $this->assertSame(LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $callback = function (FieldOperatorsEvent $event) {
+                    $callback = function (FieldOperatorsEvent $event): void {
                         // Emulate a subscriber.
                         $this->assertSame('text', $event->getType());
                         $this->assertSame('email', $event->getField());
@@ -189,9 +189,9 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             [
-                'equals'      => OperatorOptions::EQUAL_TO,
-                'not equal'   => OperatorOptions::NOT_EQUAL_TO,
-                'starts with' => OperatorOptions::STARTS_WITH,
+                'is equal to'      => OperatorOptions::EQUAL_TO,
+                'is not equal to'  => OperatorOptions::NOT_EQUAL_TO,
+                'starts with'      => OperatorOptions::STARTS_WITH,
             ],
             $this->provider->getOperatorsForField('text', 'email')
         );

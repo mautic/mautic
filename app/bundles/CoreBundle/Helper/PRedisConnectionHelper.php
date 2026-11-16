@@ -16,7 +16,7 @@ use Predis\Connection\Replication\SentinelReplication;
 /**
  * Helper functions for simpler operations with arrays.
  */
-class PRedisConnectionHelper
+final class PRedisConnectionHelper
 {
     /**
      * Transform the redis url config key into an array if needed
@@ -43,7 +43,7 @@ class PRedisConnectionHelper
         }
 
         // this will return an array of associative arrays which is supported by Predis
-        return array_map(function ($i) use ($parsed) {
+        return array_map(function ($i) use ($parsed): array {
             $parsed['host'] = $i;
 
             return $parsed;

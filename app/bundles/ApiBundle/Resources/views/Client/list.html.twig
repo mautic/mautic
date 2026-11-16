@@ -21,7 +21,9 @@
         <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
-                'searchHelp'  : 'mautic.api.client.help.searchcommands',
+                'searchScopes': searchScopes|default([]),
+                'searchScopeHint': searchScopeHint|default(null),
+                'action': currentRoute,
                 'filters'     : filters,
             }) -}}
             <div class="page-list">
@@ -123,7 +125,7 @@
     {% else %}
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
-                <div class="mt-32 mb-md">
+                <div class="mt-32 mb-16">
                     {% include '@MauticCore/Components/pictogram.html.twig' with {
                         'pictogram': 'api',
                         'size': '80'

@@ -17,7 +17,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
 
-class EmailMapStatsControllerTest extends MauticMysqlTestCase
+final class EmailMapStatsControllerTest extends MauticMysqlTestCase
 {
     /**
      * @throws \Exception
@@ -71,8 +71,8 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
             $this->emulateEmailStat($lead, $email, $l['read']);
 
             if ($l['read'] && $l['click']) {
-                $hits       = rand(1, 5);
-                $uniqueHits = rand(1, $hits);
+                $hits       = random_int(1, 5);
+                $uniqueHits = random_int(1, $hits);
                 $this->emulateClick($lead, $email, $hits, $uniqueHits);
             }
         }

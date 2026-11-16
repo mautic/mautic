@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\EventListener;
 
 use Mautic\ReportBundle\Entity\Report;
@@ -8,7 +10,7 @@ use Mautic\ReportBundle\Event\ReportScheduleSendEvent;
 use Mautic\ReportBundle\EventListener\SchedulerSubscriber;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 
-class SchedulerSubscriberTest extends \PHPUnit\Framework\TestCase
+final class SchedulerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoEmailsProvided(): void
     {

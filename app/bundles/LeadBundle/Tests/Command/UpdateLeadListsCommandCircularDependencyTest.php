@@ -7,8 +7,9 @@ namespace Mautic\LeadBundle\Tests\Command;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 
-class UpdateLeadListsCommandCircularDependencyTest extends MauticMysqlTestCase
+final class UpdateLeadListsCommandCircularDependencyTest extends MauticMysqlTestCase
 {
     /**
      * @var LeadList[]
@@ -25,7 +26,7 @@ class UpdateLeadListsCommandCircularDependencyTest extends MauticMysqlTestCase
     {
         $segmentA = $this->segments['Segment A'];
 
-        $this->expectException(\Mautic\LeadBundle\Segment\Exception\SegmentQueryException::class);
+        $this->expectException(SegmentQueryException::class);
         $this->expectExceptionMessage('Circular reference detected.');
 
         $this->testSymfonyCommand(

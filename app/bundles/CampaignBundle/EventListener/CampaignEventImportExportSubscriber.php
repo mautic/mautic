@@ -7,8 +7,11 @@ namespace Mautic\CampaignBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CampaignBundle\Helper\EventEntityReferences;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
@@ -16,23 +19,27 @@ use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UuidHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\EmailBundle\Entity\Email;
-use Mautic\FormBundle\Entity\Form;
-use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\PageBundle\Entity\Page;
-use Mautic\PointBundle\Entity\Group;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class CampaignEventImportExportSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventImportExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CampaignModel $campaignModel,
         private EntityManagerInterface $entityManager,
+        private EventRepository $eventRepository,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
         private EventDispatcherInterface $dispatcher,
         private EventModel $eventModel,
+        private EventEntityReferences $eventEntityReferences,
+        private LeadFieldRepository $leadFieldRepository,
+        private CompanyModel $companyModel,
     ) {
     }
 
@@ -52,7 +59,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             return;
         }
 
-        $campaignId = (int) $event->getEntityId();
+        $campaignId = $event->getEntityId();
         $campaign   = $this->campaignModel->getEntity($campaignId);
 
         if (!$campaign instanceof Campaign) {
@@ -68,6 +75,14 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             }
 
             $eventData  = $this->createEventData($campaign, $campaignEvent);
+
+            if ($linkedUuids = $this->getLinkedUuids($campaignEvent)) {
+                $eventData['linked_uuids'] = $linkedUuids;
+            }
+
+            if ($linkedNames = $this->getLinkedNames($campaignEvent)) {
+                $eventData['linked_names'] = $linkedNames;
+            }
 
             $this->handleChannelExport($campaignEvent, $data, $event);
 
@@ -116,7 +131,9 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         ];
     }
 
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     private function handleChannelExport(Event $campaignEvent, array &$data, EntityExportEvent $event): void
     {
         $channel      = $campaignEvent->getChannel();
@@ -126,73 +143,103 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             Event::ENTITY_NAME    => (int) $campaignEvent->getId(),
         ];
 
-        if ($channel && $channelId) {
+        if ($this->eventEntityReferences->hasReferences($campaignEvent->getType())) {
+            // Takes along every selected entity, also when more than one is selected and the event has no channel ID
+            foreach ($this->eventEntityReferences->getExportedIds($campaignEvent->getType(), $campaignEvent->getProperties()) as $entityName => $entityIds) {
+                foreach ($entityIds as $entityId) {
+                    $dependencies[$entityName][] = $entityId;
+                    $this->exportEntity($entityName, $entityId, $data, $event);
+                }
+            }
+
+            foreach ($this->getCustomFieldIds($campaignEvent) as $fieldId) {
+                $dependencies[LeadField::ENTITY_NAME][] = $fieldId;
+                $this->exportEntity(LeadField::ENTITY_NAME, $fieldId, $data, $event);
+            }
+        } elseif ($channel && $channelId) {
             $dependencies[$channel] = (int) $channelId;
             $subEvent               = new EntityExportEvent($channel, (int) $channelId);
             $this->dispatcher->dispatch($subEvent);
             $event->addDependencies($subEvent->getDependencies());
             $this->mergeExportData($data, $subEvent);
-        } else {
-            $eventType  = $campaignEvent->getType();
-            $properties = $campaignEvent->getProperties();
-
-            switch ($eventType) {
-                case 'lead.pageHit':
-                    if (!empty($properties['page'])) {
-                        $dependencies[Page::ENTITY_NAME] = (int) $properties['page'];
-                        $this->exportEntity(Page::ENTITY_NAME, (int) $properties['page'], $data, $event);
-                    }
-                    break;
-                case 'lead.changelist':
-                    if (!empty($properties['addToLists']) && is_array($properties['addToLists'])) {
-                        foreach ($properties['addToLists'] as $segmentId) {
-                            $dependencies[LeadList::ENTITY_NAME][] = (int) $segmentId;
-                            $this->exportEntity(LeadList::ENTITY_NAME, (int) $segmentId, $data, $event);
-                        }
-                    }
-                    if (!empty($properties['removeFromLists']) && is_array($properties['removeFromLists'])) {
-                        foreach ($properties['removeFromLists'] as $segmentId) {
-                            $dependencies[LeadList::ENTITY_NAME][] = (int) $segmentId;
-                            $this->exportEntity(LeadList::ENTITY_NAME, (int) $segmentId, $data, $event);
-                        }
-                    }
-                    break;
-                case 'lead.segments':
-                    if (!empty($properties['segments']) && is_array($properties['segments'])) {
-                        foreach ($properties['segments'] as $segmentId) {
-                            $dependencies[LeadList::ENTITY_NAME][] = (int) $segmentId;
-                            $this->exportEntity(LeadList::ENTITY_NAME, (int) $segmentId, $data, $event);
-                        }
-                    }
-                    break;
-                case 'form.submit':
-                    if (!empty($properties['forms']) && is_array($properties['forms'])) {
-                        foreach ($properties['forms'] as $formId) {
-                            $dependencies[Form::ENTITY_NAME][] = (int) $formId;
-                            $this->exportEntity(Form::ENTITY_NAME, (int) $formId, $data, $event);
-                        }
-                    }
-                    break;
-                case 'lead.changepoints':
-                case 'lead.points':
-                    if (!empty($properties['group'])) {
-                        $dependencies[Group::ENTITY_NAME] = (int) $properties['group'];
-                        $this->exportEntity(Group::ENTITY_NAME, (int) $properties['group'], $data, $event);
-                    }
-                    break;
-                case 'email.send.to.user':
-                    if (!empty($properties['useremail'])) {
-                        $dependencies[Email::ENTITY_NAME] = (int) $properties['useremail']['email'];
-                        $this->exportEntity(Email::ENTITY_NAME, (int) $properties['useremail']['email'], $data, $event);
-                    }
-                    break;
-            }
         }
 
         $event->addDependencyEntity(Event::ENTITY_NAME, $dependencies);
     }
 
-    /** @phpstan-ignore-next-line */
+    /**
+     * The custom fields the event uses, so the import can create them like for segment filters.
+     *
+     * @return list<int>
+     */
+    private function getCustomFieldIds(Event $campaignEvent): array
+    {
+        // The default fields exist on every instance
+        $aliases = array_diff(
+            $this->eventEntityReferences->getFieldAliases($campaignEvent->getType(), $campaignEvent->getProperties()),
+            array_keys(FieldModel::$coreFields),
+            array_keys(FieldModel::$coreCompanyFields)
+        );
+
+        if ([] === $aliases) {
+            return [];
+        }
+
+        $fields = $this->leadFieldRepository->findBy(['alias' => array_values($aliases), 'isFixed' => false]);
+
+        return array_values(array_map(static fn (LeadField $field): int => (int) $field->getId(), $fields));
+    }
+
+    /**
+     * The UUIDs of the entities the event refers to that are not exported, so the import can find them on the target instance.
+     *
+     * @return array<string, array<int, string>>
+     */
+    private function getLinkedUuids(Event $campaignEvent): array
+    {
+        $uuids = [];
+
+        foreach ($this->eventEntityReferences->getLinkedIds($campaignEvent->getType(), $campaignEvent->getProperties()) as $kind => $ids) {
+            foreach ($ids as $id) {
+                $entity = $this->entityManager->find(EventEntityReferences::LINKED[$kind], $id);
+
+                if ($entity instanceof UuidInterface && $entity->getUuid()) {
+                    $uuids[$kind][$id] = $entity->getUuid();
+                }
+            }
+        }
+
+        return $uuids;
+    }
+
+    /**
+     * The names of the entities the event refers to that have no UUID, like companies, so the import can find or create them.
+     *
+     * @return array<string, array<int, string>>
+     */
+    private function getLinkedNames(Event $campaignEvent): array
+    {
+        $names = [];
+
+        foreach ($this->eventEntityReferences->getNamedIds($campaignEvent->getType(), $campaignEvent->getProperties()) as $kind => $ids) {
+            foreach ($ids as $id) {
+                // The model loads the company name, which is a company field
+                $company = EventEntityReferences::COMPANY === $kind ? $this->companyModel->getEntity($id) : null;
+                $name    = $company instanceof Company ? $company->getName() : null;
+
+                // A company can be named "0"
+                if (is_string($name) && '' !== $name) {
+                    $names[$kind][$id] = $name;
+                }
+            }
+        }
+
+        return $names;
+    }
+
+    /**
+     * @phpstan-ignore-next-line
+     */
     private function mergeExportData(array &$data, EntityExportEvent $subEvent): void
     {
         foreach ($subEvent->getEntities() as $key => $values) {
@@ -200,12 +247,14 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                 $data[$key] = $values;
             } else {
                 $existingIds = array_column($data[$key], 'id');
-                $data[$key]  = array_merge($data[$key], array_filter($values, fn ($value) => !in_array($value['id'], $existingIds)));
+                $data[$key]  = array_merge($data[$key], array_filter($values, fn (array $value): bool => !in_array($value['id'], $existingIds)));
             }
         }
     }
 
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     private function exportEntity(string $entityName, ?int $entityId, array &$data, EntityExportEvent $event): void
     {
         if ($entityId) {
@@ -232,7 +281,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                 continue;
             }
 
-            $campaignEvent = $this->entityManager->getRepository(Event::class)->findOneBy(['uuid' => $element['uuid'] ?? null]);
+            $campaignEvent = $this->eventRepository->findOneBy(['uuid' => $element['uuid'] ?? null]);
             $isNew         = !$campaignEvent;
 
             $campaignEvent ??= new Event();
@@ -301,7 +350,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                 break;
             }
 
-            $existing = $this->entityManager->getRepository(Event::class)->findOneBy(['uuid' => $element['uuid'] ?? null]);
+            $existing = $this->eventRepository->findOneBy(['uuid' => $element['uuid'] ?? null]);
 
             if ($existing) {
                 $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
@@ -336,8 +385,8 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
 
                 if ($newParentId) {
                     $campaignEventId = $idMap[(int) $element['id']];
-                    $campaignEvent   = $this->entityManager->getRepository(Event::class)->find($campaignEventId);
-                    $parentEvent     = $this->entityManager->getRepository(Event::class)->find($newParentId);
+                    $campaignEvent   = $this->eventRepository->find($campaignEventId);
+                    $parentEvent     = $this->eventRepository->find($newParentId);
 
                     if ($campaignEvent && $parentEvent) {
                         $campaignEvent->setParent($parentEvent);
@@ -351,7 +400,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
 
                 if ($newJumpToEventId) {
                     $campaignEventId = $idMap[(int) $element['id']];
-                    $campaignEvent   = $this->entityManager->getRepository(Event::class)->find($campaignEventId);
+                    $campaignEvent   = $this->eventRepository->find($campaignEventId);
 
                     $element['properties']['jumpToEvent'] = $newJumpToEventId;
                     if ($campaignEvent) {
@@ -377,14 +426,14 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             return;
         }
         foreach ($summary['ids'] as $id) {
-            $entity = $this->entityManager->getRepository(Event::class)->find($id);
+            $entity = $this->eventRepository->find($id);
 
             if ($entity) {
-                $dependentEvents = $this->entityManager->getRepository(Event::class)->findBy(['parent' => $id]);
+                $dependentEvents = $this->eventRepository->findBy(['parent' => $id]);
 
                 foreach ($dependentEvents as $dependentEvent) {
                     // Set parent_id to null
-                    $dependentEvent->setParent(null);
+                    $dependentEvent->setParent();
                     $this->entityManager->persist($dependentEvent);
                 }
 

@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Release\Metadata;
 class ReleaseParser
 {
     public function __construct(
-        private Client $client,
+        private readonly Client $client,
     ) {
     }
 

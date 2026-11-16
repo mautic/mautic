@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -11,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldSelectType extends AbstractType
+final class FormFieldSelectType extends AbstractType
 {
     use SortableListTrait;
 
@@ -26,14 +28,14 @@ class FormFieldSelectType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.emptyvalue',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]
         );
 
         if (!empty($options['parentData'])) {
-            $default = (empty($options['parentData']['properties']['multiple'])) ? false : true;
+            $default = !empty($options['parentData']['properties']['multiple']);
         } else {
             $default = false;
         }

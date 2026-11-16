@@ -4,23 +4,26 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Twig\Extension;
 
+use Mautic\CoreBundle\Helper\ThemeFavoritesHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ThemeExtension extends AbstractExtension
+final class ThemeExtension extends AbstractExtension
 {
     public function __construct(
-        private ThemeHelper $themeHelper,
-        private TranslatorInterface $translator,
+        private readonly ThemeHelper $themeHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly ThemeFavoritesHelper $themeFavoritesHelper,
     ) {
     }
 
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('getThemeName', [$this, 'getThemeName']),
+            new TwigFunction('getThemeName', $this->getThemeName(...)),
+            new TwigFunction('getFavoriteThemes', $this->getFavoriteThemes(...)),
         ];
     }
 
@@ -37,5 +40,15 @@ class ThemeExtension extends AbstractExtension
         $themeConfig = $this->themeHelper->getTheme($theme)->getConfig();
 
         return $themeConfig['name'] ?? $theme;
+    }
+
+    /**
+     * Get the keys of the themes that the logged-in user marked as favorites for the theme type.
+     *
+     * @return string[]
+     */
+    public function getFavoriteThemes(string $type): array
+    {
+        return $this->themeFavoritesHelper->getFavorites($type);
     }
 }
