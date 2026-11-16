@@ -90,7 +90,7 @@ Variables:
                             class="background-media--container background-media--mobile-position background-media--mobile-position--bottom background-media--image">
                             <div part="item" class="background-media--item" style="opacity:1">
                                 <picture part="picture">
-                                    <img part="image" class="image__img" src="{{ asset(media.src) }}" {% if media.alt is defined %}alt="{{ media.alt }}"{% endif %}>
+                                    <img part="image" class="image__img" src="{{ asset(media.src) }}" alt="{{ media.alt|default('')|e('html_attr') }}">
                                 </picture>
                             </div>
                         </div>
