@@ -346,7 +346,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->id;
     }
 
-    public function setTitle(string $title): static
+    public function setTitle(?string $title): static
     {
         $this->isChanged('title', $title);
         $this->title = $title;

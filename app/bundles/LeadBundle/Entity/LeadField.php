@@ -301,7 +301,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         return $this->isCloned;
     }
 
-    public function setLabel(string $label): static
+    public function setLabel(?string $label): static
     {
         $this->isChanged('label', $label);
         $this->label = $label;

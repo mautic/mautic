@@ -87,10 +87,7 @@ class Client extends BaseClient
      */
     protected $changes;
 
-    /**
-     * @param 'name'|'redirectUris' $prop
-     */
-    protected function isChanged(?string $prop, $val): void
+    protected function isChanged(string $prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();
@@ -112,7 +109,7 @@ class Client extends BaseClient
         return $this->id;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
 
