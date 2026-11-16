@@ -22,7 +22,7 @@
   
   {% set config = dncConfig[doNotContactFlag.reason] %}
   {% if config is defined %}
-    <div class="contact-status__label mb-xs">
+    <div class="contact-status__label mb-xs" id="bounceLabel{{ doNotContactFlag.id }}">
       <i class="contact-status__icon {{ config.icon }}"></i>
       <span class="contact-status__text fw-sb">{{ channelLabel|trans }}</span>
       {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': 

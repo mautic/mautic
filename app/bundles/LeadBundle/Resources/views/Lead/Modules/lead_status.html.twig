@@ -54,9 +54,15 @@
         } %}
 
         {% set config = statusConfig[doNotContact.reason] %}
-        <div class="contact-status__heading {{ config.class }}">
+        <div class="contact-status__heading {{ config.class }}" id="bounceLabel{{ doNotContact.id }}">
             <i class="contact-status__icon {{ config.icon }}"></i>
             <span class="contact-status__text fw-sb">{{ config.label }}</span>
+            {% if doNotContact.reason != constant('\\Mautic\\LeadBundle\\Entity\\DoNotContact::UNSUBSCRIBED') %}
+            <button type="button" class="btn btn-ghost btn-xs btn-nospin" title="{{ 'mautic.lead.remove_dnc_status'|trans }}" aria-label="{{ 'mautic.lead.remove_dnc_status'|trans }}"
+                onclick="event.stopPropagation(); Mautic.removeBounceStatus(this.querySelector('i'), {{ doNotContact.id }}, '{{ doNotContact.channel }}');">
+                <i class="ri-close-line" aria-hidden="true"></i>
+            </button>
+            {% endif %}
         </div>
         {% else %}
         <div class="contact-status__heading text-success">
