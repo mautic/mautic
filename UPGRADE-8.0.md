@@ -1306,6 +1306,20 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\EmailBundle\Entity\Email::setEmailType()`
     - `Mautic\FormBundle\Entity\Field::setLeadField()`
     - `Mautic\FormBundle\Entity\Form::setTemplate()`
+    - `Mautic\LeadBundle\Entity\Lead::setTitle()`
+    - `Mautic\LeadBundle\Entity\Lead::setFirstname()`
+    - `Mautic\LeadBundle\Entity\Lead::setLastname()`
+    - `Mautic\LeadBundle\Entity\Lead::setPosition()`
+    - `Mautic\LeadBundle\Entity\Lead::setPhone()`
+    - `Mautic\LeadBundle\Entity\Lead::setMobile()`
+    - `Mautic\LeadBundle\Entity\Lead::setAddress1()`
+    - `Mautic\LeadBundle\Entity\Lead::setAddress2()`
+    - `Mautic\LeadBundle\Entity\Lead::setCity()`
+    - `Mautic\LeadBundle\Entity\Lead::setState()`
+    - `Mautic\LeadBundle\Entity\Lead::setZipcode()`
+    - `Mautic\LeadBundle\Entity\Lead::setCountry()`
+    - `Mautic\LeadBundle\Entity\Lead::setCompany()` - it stores the company name, so pass `$company->getName()` instead of a `Company` entity
+    - `Mautic\LeadBundle\Entity\Lead::setEmail()`
     - `Mautic\LeadBundle\Entity\LeadDevice::setDevice()`
     - `Mautic\LeadBundle\Entity\LeadDevice::setDeviceModel()`
     - `Mautic\LeadBundle\Entity\LeadField::setGroup()`

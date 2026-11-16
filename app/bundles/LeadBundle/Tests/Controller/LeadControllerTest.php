@@ -957,13 +957,11 @@ EMAIL;
         $newCompany = new Company()
             ->setName('New Co.');
         $companyModel->saveEntities([$company, $newCompany]);
-        $companyId    = $company->getId();
-        $newCompanyId = $newCompany->getId();
 
         // Create contact with first 'Co.' company
         $contact = new Lead()
             ->setFirstname('C1')
-            ->setCompany($company);
+            ->setCompany($company->getName());
         $contactModel->saveEntity($contact);
 
         // Check contact detail view audit log
@@ -973,17 +971,17 @@ EMAIL;
         unset($createAuditLogDetails['dateIdentified']);
         $this->assertSame([
             'firstname' => [null, 'C1'],
-            'company'   => [null, $companyId],
+            'company'   => [null, 'Co.'],
         ], $createAuditLogDetails);
 
         // Edit contact with second 'New Co.' company
-        $contact->setCompany($newCompany);
+        $contact->setCompany($newCompany->getName());
         $contactModel->saveEntity($contact);
 
         // Check contact detail view audit log for old value
         $updateAuditLog = $this->getContactAuditLogForSpecificAction($contact, 'update');
         $this->assertSame([
-            'company' => [$companyId, $newCompanyId],
+            'company' => ['Co.', 'New Co.'],
         ], $updateAuditLog->getDetails());
     }
 
@@ -1107,7 +1105,7 @@ EMAIL;
         $contact->setFirstname('John');
         $contact->setLastname('Doe');
         $contact->setEmail('john.doe@example.com');
-        $contact->setCompany($lastCompany);
+        $contact->setCompany($lastCompany->getName());
         $this->em->persist($contact);
         $this->em->flush();
 
