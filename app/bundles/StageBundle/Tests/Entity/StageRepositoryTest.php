@@ -13,6 +13,9 @@ final class StageRepositoryTest extends MauticMysqlTestCase
 {
     use StageTestSeederTrait;
 
+    private const FUTURE_OFFSET = '+1 year';
+    private const PAST_OFFSET = '-1 year';
+
     public function testGetEntitiesReturnsContactCount(): void
     {
         $this->seedStagesWithLeads();
@@ -48,18 +51,18 @@ final class StageRepositoryTest extends MauticMysqlTestCase
             ->setName('Scheduled')
             ->setIsPublished(true)
             ->setWeight(2)
-            ->setPublishUp(new \DateTime('+1 year'));
+            ->setPublishUp(new \DateTime(self::FUTURE_OFFSET));
         $expired = (new Stage())
             ->setName('Expired')
             ->setIsPublished(true)
             ->setWeight(3)
-            ->setPublishDown(new \DateTime('-1 year'));
+            ->setPublishDown(new \DateTime(self::PAST_OFFSET));
         $current = (new Stage())
             ->setName('Current')
             ->setIsPublished(true)
             ->setWeight(4)
-            ->setPublishUp(new \DateTime('-1 year'))
-            ->setPublishDown(new \DateTime('+1 year'));
+            ->setPublishUp(new \DateTime(self::PAST_OFFSET))
+            ->setPublishDown(new \DateTime(self::FUTURE_OFFSET));
         $unpublished = (new Stage())
             ->setName('Unpublished')
             ->setIsPublished(false)
