@@ -394,11 +394,24 @@ Mautic.initTabsScroll = function() {
             return; // Already initialized
         }
 
+        const isTabsComponent = $navTabs.closest('.tabs-container').length > 0;
+        const hasNoHorizontalOverflow = $navTabs[0].clientWidth > 0 && $navTabs[0].scrollWidth <= $navTabs[0].clientWidth;
+        if (!isTabsComponent && hasNoHorizontalOverflow) {
+            return;
+        }
+
         // Create wrapper
         var $navTabsWrapper = mQuery('<div class="nav-tabs-wrapper"></div>');
+        if ($navTabs.hasClass('nav-tabs-contained')) {
+            $navTabsWrapper.addClass('nav-tabs-wrapper--contained');
+        }
 
+        const activeElement = $navTabs[0].contains(document.activeElement) ? document.activeElement : null;
         // Wrap the nav-tabs with the wrapper
         $navTabs.wrap($navTabsWrapper);
+        if (activeElement) {
+            activeElement.focus();
+        }
 
         // After wrapping, update the reference
         $navTabsWrapper = $navTabs.parent('.nav-tabs-wrapper');
@@ -461,6 +474,8 @@ function debounce(func, wait) {
         timeout = setTimeout(func, wait);
     };
 }
+
+mQuery(window).on('resize', debounce(Mautic.initTabsScroll, 100));
 
 // Initialize on document ready
 mQuery(document).ready(function() {
