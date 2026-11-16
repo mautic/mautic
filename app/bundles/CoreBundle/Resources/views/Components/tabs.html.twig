@@ -43,7 +43,12 @@
 
 {% set variant = variant|default(style|default('line')) %}
 {% set layer = layer|default('two') %}
-{% set selectedIndex = selectedIndex|default(0) %}
+{% set selectedIndex = selectedIndex is defined ? selectedIndex : null %}
+{% if selectedIndex is null %}
+    {% for tab in tabs %}
+        {% if selectedIndex is null and not (tab.disabled|default(false)) %}{% set selectedIndex = loop.index0 %}{% endif %}
+    {% endfor %}
+{% endif %}
 {% set iconOnlyLarge = iconSize is defined and iconSize == 'lg' %}
 {% set isDismissable = isDismissable|default(false) %}
 
@@ -53,7 +58,7 @@
         {% for tab in tabs %}
             {%- set tabLabel = tab.label|default(tab.title|default('')) -%}
             {%- set tabId = tab.id|default(_self.generateTabId(tabLabel)) -%}
-            {%- set isActive = loop.index0 == selectedIndex -%}
+            {%- set isActive = selectedIndex is not null and loop.index0 == selectedIndex -%}
             {%- set isDisabled = tab.disabled is defined and tab.disabled -%}
             {%- set hasError = tab.hasError|default(false) -%}
             {%- if hasError -%}{%- set tab = tab|merge({'renderIcon': 'ri-alert-line'}) -%}{%- endif -%}
@@ -127,7 +132,7 @@
         {% for tab in tabs %}
             {%- set tabLabel = tab.label|default(tab.title|default('')) -%}
             {%- set tabId = tab.id|default(_self.generateTabId(tabLabel)) -%}
-            {%- set isActive = loop.index0 == selectedIndex -%}
+            {%- set isActive = selectedIndex is not null and loop.index0 == selectedIndex -%}
             {{ _self.tabContent(tab, tabId, isActive, variant, layer) }}
         {% endfor %}
         {% block tabs_pane_extra %}{% endblock %}
