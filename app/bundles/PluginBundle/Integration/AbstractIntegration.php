@@ -1800,10 +1800,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Convert and assign the data to assignable fields.
-     *
-     * @param mixed $data
      */
-    protected function matchUpData($data): array
+    protected function matchUpData(array|object $data): array
     {
         $info      = [];
         $available = $this->getAvailableLeadFields();
@@ -2124,11 +2122,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Cleans the identifier for api calls.
      *
-     * @param mixed $identifier
-     *
      * @return string
      */
-    protected function cleanIdentifier($identifier)
+    protected function cleanIdentifier(string|array $identifier)
     {
         if (is_array($identifier)) {
             foreach ($identifier as &$i) {
