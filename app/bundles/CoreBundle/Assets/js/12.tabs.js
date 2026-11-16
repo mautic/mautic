@@ -402,7 +402,7 @@ Mautic.initTabsScroll = function() {
 
         // Create wrapper
         var $navTabsWrapper = mQuery('<div class="nav-tabs-wrapper"></div>');
-        if ($navTabs.hasClass('nav-tabs-contained')) {
+        if ($navTabs.hasClass('nav-tabs-contained') || $navTabs.hasClass('nav-tabs--contained')) {
             $navTabsWrapper.addClass('nav-tabs-wrapper--contained');
         }
 
