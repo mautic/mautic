@@ -108,11 +108,10 @@ final class InputHelper
      * function to be used for the specific field.
      *
      * @param mixed $value
-     * @param mixed $mask
      *
      * @return mixed
      */
-    public static function _($value, $mask = 'clean', bool $urldecode = false)
+    public static function _($value, array|string $mask = 'clean', bool $urldecode = false)
     {
         if (is_array($value)) {
             foreach ($value as $k => &$v) {

@@ -1321,6 +1321,20 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\EmailBundle\Entity\Email::setEmailType()`
     - `Mautic\FormBundle\Entity\Field::setLeadField()`
     - `Mautic\FormBundle\Entity\Form::setTemplate()`
+    - `Mautic\LeadBundle\Entity\Lead::setTitle()`
+    - `Mautic\LeadBundle\Entity\Lead::setFirstname()`
+    - `Mautic\LeadBundle\Entity\Lead::setLastname()`
+    - `Mautic\LeadBundle\Entity\Lead::setPosition()`
+    - `Mautic\LeadBundle\Entity\Lead::setPhone()`
+    - `Mautic\LeadBundle\Entity\Lead::setMobile()`
+    - `Mautic\LeadBundle\Entity\Lead::setAddress1()`
+    - `Mautic\LeadBundle\Entity\Lead::setAddress2()`
+    - `Mautic\LeadBundle\Entity\Lead::setCity()`
+    - `Mautic\LeadBundle\Entity\Lead::setState()`
+    - `Mautic\LeadBundle\Entity\Lead::setZipcode()`
+    - `Mautic\LeadBundle\Entity\Lead::setCountry()`
+    - `Mautic\LeadBundle\Entity\Lead::setCompany()` - it stores the company name, so pass `$company->getName()` instead of a `Company` entity
+    - `Mautic\LeadBundle\Entity\Lead::setEmail()`
     - `Mautic\LeadBundle\Entity\LeadDevice::setDevice()`
     - `Mautic\LeadBundle\Entity\LeadDevice::setDeviceModel()`
     - `Mautic\LeadBundle\Entity\LeadField::setGroup()`
@@ -1401,3 +1415,8 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\ChannelBundle\Model\MessageQueueModel::processFrequencyRules()` types `$messageQueue` as `?array`. This also applies to the `resend_message_queue` option passed through `Mautic\EmailBundle\Model\EmailModel::sendEmail()`. Passing `false` for "no queue" now throws; pass `null` instead.
     - `Mautic\CoreBundle\Controller\FormThemeTrait::setFormTheme()` types `$themes` as `array|string|null`. An object holding template paths (e.g. a custom form field's `formTheme` forwarded by `Mautic\FormBundle\Controller\FieldController`) is no longer cast to an array; pass an array or a string.
     - `Mautic\CoreBundle\ErrorHandler\ErrorHandler::setDisplayErrors()` types `$displayErrors` as `bool`. Passing `null`, or an integer from a `strict_types` file, now throws; pass an explicit boolean.
+    - `Mautic\IntegrationsBundle\Entity\ObjectMappingRepository::updateIntegrationObject()` types `$oldObjectId` and `$newObjectId` as `int|string|null`. The sync DAOs type object ids the same way: `Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO::remapObject()` and `Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO::remapObject()` take `int|string $oldObjectId` and `int|string|null $newObjectId`, `Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO::setObjectId()` takes `int|string|null`, `Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO::getMappedInternalObjectId()` takes `int|string`, and the constructors `Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO::__construct()` (`$objectId`), `Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO::__construct()` (`$objectId`, `$mappedId`) and `Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO::__construct()` (`$integrationObjectId`) take `int|string|null`. Any other value (e.g. a `float` or an object) now throws; pass the object id as `int` or `string`, and `null` only where the signature allows it.
+    - `Mautic\PluginBundle\Integration\AbstractIntegration::matchUpData()` types `$data` as `array|object`. Passing `null` or a scalar now throws; pass the API response as an array or object. An override that leaves `$data` untyped stays compatible.
+    - `Mautic\PluginBundle\Integration\AbstractIntegration::cleanIdentifier()` types `$identifier` as `string|array`. Passing `null` now throws; pass a string or an array identifier.
+    - `Mautic\CoreBundle\Helper\InputHelper::_()` types `$mask` as `array|string`. Passing `null` now throws; omit the argument to use the default `'clean'` mask.
+    - `MauticPlugin\MauticCrmBundle\Api\SalesforceApi::getLeads()` types `$query` as `string|array`. Passing `null` now throws; pass a SOQL query string or an array to build the query.
