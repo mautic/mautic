@@ -4578,6 +4578,16 @@
             "objectId": "[a-zA-Z0-9_-]+"
         }
     },
+    "mautic_dashboard_import": {
+        "path": "/s/dashboard/import",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\DashboardBundle\\Controller\\DashboardController::executeAction",
+            "objectAction": "import",
+            "objectId": 0
+        },
+        "requirements": []
+    },
     "mautic_dashboard_index": {
         "path": "/s/dashboard",
         "methods": [],

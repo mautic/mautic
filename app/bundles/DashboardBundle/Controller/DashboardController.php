@@ -44,6 +44,12 @@ final class DashboardController extends AbstractFormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
     )]
+    // Fully static, so the specificity sort ranks it above mautic_import_index (/s/{object}/import/{page})
+    #[Route(
+        path: '/s/dashboard/import',
+        name: 'mautic_dashboard_import',
+        defaults: ['objectAction' => 'import', 'objectId' => 0],
+    )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
