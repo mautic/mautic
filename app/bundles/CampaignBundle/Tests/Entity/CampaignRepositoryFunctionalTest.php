@@ -173,10 +173,10 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    private function createCampaign(string $name = 'Test campaign'): Campaign
+    private function createCampaign(): Campaign
     {
         $campaign = new Campaign();
-        $campaign->setName($name);
+        $campaign->setName('Test campaign');
         $campaign->setIsPublished(true);
         $this->em->persist($campaign);
 
@@ -244,7 +244,7 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
     private function getMatchingCampaignIds(string $search, array $campaignIds): array
     {
         $campaigns = $this->repository->getEntities([
-            'filter'           => ['string' => $search, 'force' => []],
+            'filter'           => ['string' => $search],
             'ignore_paginator' => true,
         ]);
 
