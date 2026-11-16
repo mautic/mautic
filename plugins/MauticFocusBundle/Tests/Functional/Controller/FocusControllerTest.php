@@ -47,6 +47,9 @@ final class FocusControllerTest extends MauticMysqlTestCase
         $quickFilters = $this->getQuickFiltersCrawler();
         $this->assertCount(4, $quickFilters->filter('[data-conflict-group="mautic.focus.quick_filters.style"]'));
         $this->assertCount(1, $quickFilters->filter('[data-filter="style:bar"]'));
+        $this->assertCount(1, $quickFilters->filter('[data-filter="style:modal"]'));
+        $this->assertCount(1, $quickFilters->filter('[data-filter="style:notification"]'));
+        $this->assertCount(1, $quickFilters->filter('[data-filter="style:fullpage"]'));
     }
 
     private function getQuickFiltersCrawler(): Crawler
