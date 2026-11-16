@@ -1175,7 +1175,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $lastActive = $dt->toUtcString();
 
         $dispatchEvent      = $this->dispatcher?->hasListeners(ContactLastActiveUpdatedEvent::class) ?? false;
-        $previousLastActive = $dispatchEvent ? $this->getLastActive((int) $leadId) : null;
+        $previousLastActive = $dispatchEvent ? $this->getLastActive($leadId) : null;
 
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')
@@ -1217,7 +1217,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
     }
 
-    private function getLastActive(int $leadId): ?\DateTimeImmutable
+    private function getLastActive(string|int $leadId): ?\DateTimeImmutable
     {
         $lastActive = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.last_active')
