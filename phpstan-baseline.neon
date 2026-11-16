@@ -1453,12 +1453,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/PhoneNumberHelper.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:mergeCommands\(\) has parameter \$filters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:parseString\(\) has parameter \$input with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -3619,12 +3613,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/Lead.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\Lead\:\:setUtmTags\(\) has parameter \$utmTags with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/Lead.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\Lead\:\:stageChangeLogEntry\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4820,12 +4808,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\PageBundle\\Event\\VideoHitEvent\:\:__construct\(\) has parameter \$code with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Event/VideoHitEvent.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Event\\VideoHitEvent\:\:__construct\(\) has parameter \$request with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PageBundle/Event/VideoHitEvent.php

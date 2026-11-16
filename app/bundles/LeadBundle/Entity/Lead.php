@@ -1168,7 +1168,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->utmtags;
     }
 
-    public function setUtmTags($utmTags): static
+    public function setUtmTags(UtmTag $utmTags): static
     {
         $this->isChanged('utmtags', $utmTags);
         $this->utmtags[] = $utmTags;
