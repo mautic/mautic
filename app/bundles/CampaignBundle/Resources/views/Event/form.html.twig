@@ -9,7 +9,7 @@
   {% form_theme form formTheme %}
 {% endif %}
 <div class="bundle-form">
-    <div class="bundle-form-header mb-10">
+    <div class="bundle-form-header mb-12">
         <h3>{{ eventHeader }}</h3>
         {% if eventDescription is defined %}
           <h6 class="text-secondary">{{ eventDescription|purify }}</h6>
@@ -24,7 +24,7 @@
     {{ form_row(form.name) }}
 
     {% if form.triggerMode is defined %}
-    <div class="mb-lg{% if hideTriggerMode %} hide{% endif %}">
+    <div class="mb-24{% if hideTriggerMode %} hide{% endif %}">
         {{ form_row(form.triggerMode) }}
 
         <div{% if ('date' != form.triggerMode.vars['data']) %} class="hide"{% endif %} id="triggerDate">
@@ -44,7 +44,7 @@
                 <hr />
                 <div class="row">
                     <div class="col-sm-12">
-                        <div class="d-flex flex-row flex-nowrap align-items-center gap-sm">
+                        <div class="d-flex flex-row flex-nowrap align-items-center gap-12">
                             <div>{{ 'mautic.campaign.form.type.interval_schedule_at'|trans }} </div>
                             <div>{{ form_widget(form.triggerHour) }}</div>
                             <div> {{ 'mautic.campaign.form.type.interval_schedule_between_hours'|trans }} </div>
@@ -87,7 +87,7 @@
         <div{% if ('optimized' != form.triggerMode.vars['data']) %} class="hide"{% endif %} id="triggerOptimized">
             <div class="row">
                 <div class="col-xs-7">
-                    <div class="mb-15">
+                    <div class="mb-16">
                         {% for child in form.triggerWindow %}
                             <div>
                                 {{ form_widget(child) }}

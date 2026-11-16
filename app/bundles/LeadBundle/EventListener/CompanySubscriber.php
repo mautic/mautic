@@ -47,7 +47,8 @@ final readonly class CompanySubscriber implements EventSubscriberInterface
                 'objectId'  => $company->getId(),
                 'action'    => ($event->isNew()) ? 'create' : 'update',
                 'details'   => $details,
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+                // No IP for a form submitter Mautic doesn't track
+                'ipAddress' => $this->ipLookupHelper->isVisitorUntracked() ? '' : $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
             $this->auditLogModel->writeToLog($log);
         }

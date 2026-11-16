@@ -82,7 +82,7 @@ Mautic.integrationOnLoad = function(container, response) {
     } else {
         Mautic.filterIntegrations();
     }
-    mQuery('[data-toggle="tooltip"], [data-bs-toggle="tooltip"]').tooltip();
+    mQuery('[data-bs-toggle="tooltip"]').tooltip();
 };
 
 Mautic.integrationConfigOnLoad = function(container) {
@@ -330,7 +330,7 @@ Mautic.initPluginEvents = function () {
             const $modalLabel = mQuery('#IntegrationEditModal-label');
             if ($modalLabel.find('.plugin-version-badge').length === 0) {
                 const $badge = mQuery('<span>')
-                    .addClass('plugin-version-badge label label-default ml-xs')
+                    .addClass('plugin-version-badge label label-default ms-5')
                     .text('v' + String(response.pluginVersion));
 
                 $modalLabel.append(' ').append($badge);

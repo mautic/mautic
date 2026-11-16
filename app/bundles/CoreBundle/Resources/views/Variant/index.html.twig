@@ -13,7 +13,7 @@
 {%- set abStatsHeader = 'mautic.core.ab_test.stats'|trans -%}
 {%- if variants.properties is defined and variants.properties is not empty -%}
   {% if variants.parent.variantStartDate is not empty %}
-    <div class="box-layout mb-lg">
+    <div class="box-layout mb-24">
         <div class="col-xs-10 align-middle">
             <h4>
                     {{ 'mautic.core.variant_start_date'|trans({

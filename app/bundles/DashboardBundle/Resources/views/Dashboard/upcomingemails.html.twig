@@ -4,7 +4,7 @@
             <li class="media bdr-b wrapper-sm">
                 <div class="box-layout">
                     <div class="col-md-9 align-middle">
-                        <h5 class="fw-sb text-primary mt-0 mb-sm">
+                        <h5 class="fw-sb text-primary mt-0 mb-12">
                             <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': email.campaign_id}) }}" data-toggle="ajax">
                                 {{ email.campaign_name }}
                             </a>
@@ -21,7 +21,7 @@
                                         href: path('mautic_contact_action', {'objectAction': 'view', 'objectId': email.lead_id}),
                                         attributes: {
                                             'data-toggle': 'ajax',
-                                            'class': 'pr-sm pl-sm fs-12 ml-3'
+                                            'class': 'pe-12 ps-12 fs-12 ms-3'
                                         }
                                     }
                                 ]

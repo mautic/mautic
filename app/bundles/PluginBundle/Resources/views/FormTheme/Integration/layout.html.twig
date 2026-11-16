@@ -19,7 +19,7 @@
   <div class="row">
       <div class="col-sm-12">
           {% if showLabel %}
-              <h4 class="mb-sm">{{ form.vars['label']|trans }}</h4>
+              <h4 class="mb-12">{{ form.vars['label']|trans }}</h4>
           {% endif %}
           {% if formNotes.supported_features is defined and formNotes.supported_features is not empty %}
               <div class="alert alert-{{ formNotes['supported_features']['type'] }}">
@@ -43,7 +43,7 @@
 {% block _integration_details_featureSettings_row %}
 <div class="row">
     <div class="col-sm-12">
-        <h4 class="mb-sm mt-lg">
+        <h4 class="mb-12 mt-24">
             {{ form.vars['label']|trans }}
         </h4>
         {% if formNotes.features is defined and formNotes.features is not empty %}
@@ -88,17 +88,17 @@
 
     <div class="{{ object }}-field form-group col-xs-12">
       <div class="row">
-        <div class="mb-xs col-sm-{{ (5 == numberOfFields) ? 5 : 6 }} text-center"><h4>{{ 'mautic.plugins.integration.fields'|trans }}</h4></div>
+        <div class="mb-5 col-sm-{{ (5 == numberOfFields) ? 5 : 6 }} text-center"><h4>{{ 'mautic.plugins.integration.fields'|trans }}</h4></div>
         {% if 5 == numberOfFields -%}
           <div class="col-sm-2"></div>
         {%- endif %}
-        <div class="mb-xs col-sm-{{ (5 == numberOfFields) ? 5 : 6 }} text-center"><h4>{{ 'mautic.plugins.mautic.fields'|trans }}</h4></div>
+        <div class="mb-5 col-sm-{{ (5 == numberOfFields) ? 5 : 6 }} text-center"><h4>{{ 'mautic.plugins.mautic.fields'|trans }}</h4></div>
       </div>
       {% for child in form.children %}
           {% set selected = false %}
           {% set isRequired = child.vars.attr['data-required'] is defined and child.vars.attr['data-required'] is not same as 0 %}
           {% if rowCount is divisible by(numberOfFields) %}
-            <div id="{{ object }}-{{ rowCount }}" class="field-container row {% if 5 != numberOfFields %}pb-md{% endif %}">
+            <div id="{{ object }}-{{ rowCount }}" class="field-container row {% if 5 != numberOfFields %}pb-16{% endif %}">
           {% endif %}
           {% set rowCount = rowCount + 1 %}
           {% if 'hidden' == child.vars.block_prefixes[1] %}
@@ -117,7 +117,7 @@
               {% set name = child.vars.full_name %}
               <input type="hidden" value="{{ child.vars['attr']['data-label'] }}" name="{{ name }}" />
             {% endif %}
-            <div class="pl-xs pr-xs {{ class }} {% if isRequired %}has-error{% endif %}">
+            <div class="ps-5 pe-5 {{ class }} {% if isRequired %}has-error{% endif %}">
               <div class="placeholder" data-placeholder="{{ child.vars.attr.placeholder }}">
                 <input type="text"
                        id="{{ child.vars.id }}"
@@ -129,7 +129,7 @@
           {% endif %}
 
           {%- if 'update_mautic' in child.vars.name -%}
-            <div class="pr-xs {{ class }}" style="padding-left: 8px;" data-bs-toggle="tooltip" title="{{ 'mautic.plugin.direction.data.update'|trans }}">
+            <div class="pe-5 {{ class }}" style="padding-left: 8px;" data-bs-toggle="tooltip" title="{{ 'mautic.plugin.direction.data.update'|trans }}">
               <div class="row">
                 <div class="form-group col-xs-12 ">
                   <div class="choice-wrapper">
@@ -167,7 +167,7 @@
           {%- endif -%}
 
           {% if ('m_' ~ indexCount) == child.vars.name %}
-            <div class="pl-xs pr-xs {{ class }}">
+            <div class="ps-5 pe-5 {{ class }}">
               {% if isRequired %}<div class="has-errors">{% endif %}
               <select id="{{ child.vars.id }}"
                       name="{{ child.vars.full_name }}"

@@ -92,7 +92,7 @@
                         {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats">
-                        <span class="mt-xs label label-green"
+                        <span class="mt-5 label label-green"
                               data-bs-toggle="tooltip"
                               title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
                             <a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.web_sent'|trans ~ ':' ~ item.id}) }}">

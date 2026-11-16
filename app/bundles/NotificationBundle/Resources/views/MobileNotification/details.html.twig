@@ -76,8 +76,8 @@
       <div class="col-lg-8 col-md-7 height-auto">
           <div>
               <!-- notification detail collapseable -->
-              <div class="collapse pr-md pl-md" id="notification-details">
-                <div class="pr-md pl-md pb-md">
+              <div class="collapse pe-16 ps-16" id="notification-details">
+                <div class="pe-16 ps-16 pb-16">
                   <div class="panel shd-none mb-0">
                     <table class="table table-hover mb-0">
                       <tbody>
@@ -98,7 +98,7 @@
               <!--/ notification detail collapseable toggler -->
 
               <!-- some stats -->
-              <div class="pa-md">
+              <div class="pa-16">
                   <div class="row">
                       <div class="col-sm-12">
                         {% if security.isGranted('lead:leads:viewown') %}
@@ -116,7 +116,7 @@
                           <div class="panel">
                               <div class="panel-body box-layout">
                                   <div class="col-md-3 align-middle">
-                                      <h5 class="text-white dark-md fw-sb mb-xs">
+                                      <h5 class="text-white dark-md fw-sb mb-5">
                                           <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.core.stats'|trans }}
                                       </h5>
@@ -125,7 +125,7 @@
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'float-end'}) }}
                                   </div>
                               </div>
-                              <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                              <div class="d-flex flex-column pt-0 ps-16 pb-16 pe-16 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
@@ -159,7 +159,7 @@
           </div>
 
           <!-- start: tab-content -->
-          <div class="tab-content pa-md">
+          <div class="tab-content pa-16">
               <div class="tab-pane active bdr-w-0" id="clicks-container">
                   {{ include('@MauticPage/Trackable/click_counts.html.twig', {
                       'trackables': trackables,
@@ -185,7 +185,7 @@
 
       <!-- right section -->
       <div class="col-lg-4 col-md-5 height-auto">
-        <div class="pa-md mb-32 animation--slide-in-down">
+        <div class="pa-16 mb-32 animation--slide-in-down">
             {{ include('@MauticNotification/MobileNotification/preview.html.twig') }}
         </div>
           <!-- activity feed -->

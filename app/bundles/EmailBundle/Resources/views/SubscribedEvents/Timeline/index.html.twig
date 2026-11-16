@@ -40,7 +40,7 @@
     </p>
     <div class="small">
       {% if item.openDetails is not empty %}
-        <h6 class="mt-lg mb-sm"><strong>{{ 'mautic.email.timeline.open_details'|trans }}</strong></h6>
+        <h6 class="mt-24 mb-12"><strong>{{ 'mautic.email.timeline.open_details'|trans }}</strong></h6>
         {% for key, detail in item.openDetails %}
             {% if 'bounces' != key %}
               {% if showMore is not defined and loop.index > 5 %}
@@ -53,12 +53,12 @@
         {% endfor %}
         {% if showMore is defined %}
             </div>
-            <a href="javascript:void(0);" class="text-center small center-block mt-xs" onclick="Mautic.toggleTimelineMoreVisiblity(mQuery(this).prev());">{{ 'mautic.core.more.show'|trans }}</a>
+            <a href="javascript:void(0);" class="text-center small center-block mt-5" onclick="Mautic.toggleTimelineMoreVisiblity(mQuery(this).prev());">{{ 'mautic.core.more.show'|trans }}</a>
         {% endif %}
       {% endif %}
     </div>
     {% if item.email_id is defined and item.email_id %}
-    <div class="mt-sm">
+    <div class="mt-12">
         <a href="{{ path('mautic_email_action', {'objectAction': 'view', 'objectId': item.email_id}) }}" data-toggle="ajax">
             <i class="ri-information-line"></i> {{ 'mautic.core.details'|trans }}
         </a>

@@ -114,7 +114,7 @@ Mautic.activateTabDeleteButtons = function(container) {
  * @param tab
  */
 Mautic.activateTabDeleteButton = function(tab) {
-    var btn = mQuery('<span class="btn btn-danger btn-xs btn-delete pull-right hide"><i class="ri-close-line"></i></span>')
+    var btn = mQuery('<span class="btn btn-danger btn-xs btn-delete float-end hide"><i class="ri-close-line"></i></span>')
         .on('click',
             function() {
                 return Mautic.deleteTab(btn)
@@ -361,11 +361,11 @@ Mautic.deleteTab = function(deleteBtn) {
                 }
             } else {
                 // Or store the default, so the script will not end up with NULL value.
-                const href = $navTabs.find('.active a[data-toggle="tab"], .active a[data-bs-toggle="tab"]').attr('href');
+                const href = $navTabs.find('.active a[data-bs-toggle="tab"]').attr('href');
                 tabStorage.setItem(storageKeys[index], href);
             }
 
-            $navTabs.find('a[data-toggle="tab"], a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+            $navTabs.find('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
                 tabStorage.setItem(storageKeys[index], mQuery(e.target).attr('href'));
             });
         });

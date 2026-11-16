@@ -28,7 +28,7 @@ final class ContactPage
     public static $saveButton         = '.btn-save.btn-copy';
 
     // Edit Contact Form
-    public static $editForm     = '#core > div.pa-md.bdr-b > h4';
+    public static $editForm     = '#core > div.pa-16.bdr-b > h4';
 
     // Delete Contact alert
     public static $ConfirmDelete = 'button.btn.btn-danger';
@@ -49,6 +49,8 @@ final class ContactPage
     public static $chooseFileButton       = '#lead_import_file';
 
     public static $uploadButton           = '#lead_import_start';
+
+    public static string $importForm = 'form[name="lead_import"]';
 
     public static $firstName              = '#lead_field_import_firstname_chosen';
 

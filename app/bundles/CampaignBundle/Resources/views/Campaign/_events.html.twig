@@ -14,7 +14,7 @@
             <div class="progress-bar progress-bar-danger" style="width:{{ event['noPercent'] }}%; left: {{ event['yesPercent'] }}%"></div>
             <div class="box-layout">
                 <div class="visible-sm visible-md visible-lg col-stats">
-                    <span class="mt-xs label label-{{ typeClass }}" data-bs-toggle="tooltip" title="{{ percentLabel|trans }}">
+                    <span class="mt-5 label label-{{ typeClass }}" data-bs-toggle="tooltip" title="{{ percentLabel|trans }}">
                       {{ event[percentProp] }}%
                     </span>
                     {% if event.eventType is defined and 'action' != event.eventType %}
@@ -22,15 +22,15 @@
                           {{ event.noPercent }}%
                         </span>
                     {% endif %}
-                <span class="mt-xs label label-warning" data-bs-toggle="tooltip" title="{{ 'mautic.report.campaign.completed.actions'|trans }}">
+                <span class="mt-5 label label-warning" data-bs-toggle="tooltip" title="{{ 'mautic.report.campaign.completed.actions'|trans }}">
                     {{ event.logCountProcessed }}
                 </span>
-                <span size="sm" class="mt-xs label label-gray"  data-bs-toggle="tooltip" title="{{ 'mautic.report.campaign.pending.actions'|trans }}">
+                <span size="sm" class="mt-5 label label-gray"  data-bs-toggle="tooltip" title="{{ 'mautic.report.campaign.pending.actions'|trans }}">
                     {{ event.logCountForPending }}
                 </span>
                 </div>
                     <div class="col-md-5 align-middle">
-                    <h5 class="fw-sb text-interactive mb-xs">
+                    <h5 class="fw-sb text-interactive mb-5">
                         {{ event.name }}
                         {% if event.eventType is defined and 'action' != event.eventType %}
                           <small class="text-secondary">{{ event.percent }}%</small>
