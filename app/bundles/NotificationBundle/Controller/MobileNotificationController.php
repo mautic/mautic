@@ -400,11 +400,7 @@ final class MobileNotificationController extends AbstractFormController
         );
     }
 
-    /**
-     * @param bool $ignorePost
-     * @param bool $forceTypeSelection
-     */
-    public function editAction(Request $request, OneSignalIntegrationHelper $oneSignalIntegrationHelper, $objectId, $ignorePost = false, $forceTypeSelection = false): Response
+    public function editAction(Request $request, OneSignalIntegrationHelper $oneSignalIntegrationHelper, $objectId, bool $ignorePost = false, bool $forceTypeSelection = false): Response
     {
         $method  = $request->getMethod();
         $entity  = $this->notificationModel->getEntity($objectId);

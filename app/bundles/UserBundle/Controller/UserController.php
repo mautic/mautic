@@ -332,9 +332,8 @@ final class UserController extends AbstractFormController
      * Generates edit form and processes post data.
      *
      * @param int  $objectId
-     * @param bool $ignorePost
      */
-    public function editAction(Request $request, LanguageHelper $languageHelper, SAMLHelper $samlHelper, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, LanguageHelper $languageHelper, SAMLHelper $samlHelper, $objectId, bool $ignorePost = false): Response
     {
         if (!$this->security->isGranted('user:users:edit')) {
             $this->throwAccessDenied();

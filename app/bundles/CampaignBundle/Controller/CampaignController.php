@@ -872,7 +872,7 @@ final class CampaignController extends AbstractStandardFormController
      *
      * @param Campaign $entity
      */
-    protected function beforeFormProcessed(object $entity, FormInterface $form, string $action, $isPost, $objectId = null, bool $isClone = false): void
+    protected function beforeFormProcessed(object $entity, FormInterface $form, string $action, bool $isPost, $objectId = null, bool $isClone = false): void
     {
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
 
