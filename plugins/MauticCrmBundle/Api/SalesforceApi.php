@@ -312,8 +312,8 @@ final class SalesforceApi extends CrmApi
     /**
      * Get Salesforce leads.
      *
-     * @param string|array  $query  String for a SOQL query or array to build query
-     * @param string $object
+     * @param string|array $query  String for a SOQL query or array to build query
+     * @param string       $object
      *
      * @return array{totalSize: int, records: array<mixed>}|mixed|string
      *
