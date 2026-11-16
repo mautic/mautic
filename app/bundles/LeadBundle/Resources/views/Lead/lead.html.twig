@@ -330,6 +330,7 @@
                     'id': 'place-container',
                     'className': 'pa-16',
                     'label': 'mautic.lead.lead.tab.places',
+                    'attributes': {'id': 'load-lead-map'},
                     'renderTag': {'label': places|length, 'attributes': {'id': 'PlaceCount'}},
                     'content': (not places and not configGetParameter('ip_lookup_auth') ? include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.places'}) : '') ~ include('@MauticLead/Lead/_map.html.twig', {'places': places})
                 },

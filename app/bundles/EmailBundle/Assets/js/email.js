@@ -603,7 +603,7 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
 
             parentElement.remove();
             tabLink.remove();
-            tabContainer.find('[data-bs-toggle="tab"]').first().tab('show');
+            tabContainer.find('[data-bs-toggle="tab"]').eq(tabContainer.hasClass('tabs-left') || $this.hasClass('remove-filter') ? 1 : 0).tab('show');
 
             Mautic.updateDynamicContentDropdown();
         });
