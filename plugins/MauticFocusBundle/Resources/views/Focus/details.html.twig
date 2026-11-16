@@ -215,11 +215,11 @@
               {% if trackables is defined and trackables is not empty %}
                   {% set tabsviewsdetails = [] %}
                   {% set tabsviewsdetailsContent0 %}
-                                            {{ include('@MauticPage/Trackable/click_counts.html.twig', {
-                                                    'trackables': trackables,
-                                                    'entity': item,
-                                                    'channel': 'focus',
-                                            }) }}
+                          {{ include('@MauticPage/Trackable/click_counts.html.twig', {
+                                  'trackables': trackables,
+                                  'entity': item,
+                                  'channel': 'focus',
+                          }) }}
 
                   {% endset %}
                   {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'clicks-container', 'label': 'mautic.trackable.click_counts', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}

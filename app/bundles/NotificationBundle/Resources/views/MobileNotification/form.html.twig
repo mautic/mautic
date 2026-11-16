@@ -27,19 +27,19 @@
               <div class="col-xs-12">
 
                   {% set detailsContent %}
-                      <div class="row">
-                          <div class="col-md-6">
-                              {{- form_row(form.name) -}}
-                              {{- form_row(form.heading) -}}
-                              {{- form_row(form.url) -}}
+                          <div class="row">
+                              <div class="col-md-6">
+                                  {{- form_row(form.name) -}}
+                                  {{- form_row(form.heading) -}}
+                                  {{- form_row(form.url) -}}
+                              </div>
+                              <div class="col-md-6">{{ form_row(form.message) }}</div>
                           </div>
-                          <div class="col-md-6">{{ form_row(form.message) }}</div>
-                      </div>
                   {% endset %}
                   {% set dataContent %}
-                      <div class="row">
-                          <div class="col-md-6">{{ form_row(form.mobileSettings.additional_data) }}</div>
-                      </div>
+                          <div class="row">
+                              <div class="col-md-6">{{ form_row(form.mobileSettings.additional_data) }}</div>
+                          </div>
                   {% endset %}
                   {% set notificationTabs = [
                       {'id': 'notification-container', 'label': 'mautic.core.details', 'content': detailsContent, 'className': 'pa-16'},
@@ -48,7 +48,7 @@
                   {% if form.mobileSettings.ios_sound is defined %}
                       {% set iosContent %}{{ include('@MauticNotification/MobileNotification/_ios_settings.html.twig', {'form': form.mobileSettings}) }}{% endset %}
                       {% set notificationTabs = notificationTabs|merge([{'id': 'ios-notification-container', 'label': 'mautic.notification.tab.ios', 'content': iosContent, 'className': 'pa-16'}]) %}
-                  {% endif %}
+                      {% endif %}
                   {% if form.mobileSettings.android_sound is defined %}
                       {% set androidContent %}{{ include('@MauticNotification/MobileNotification/_android_settings.html.twig', {'form': form.mobileSettings}) }}{% endset %}
                       {% set notificationTabs = notificationTabs|merge([{'id': 'android-notification-container', 'label': 'mautic.notification.tab.android', 'content': androidContent, 'className': 'pa-16'}]) %}

@@ -46,47 +46,47 @@
 
 {{- form_start(form) -}}
 {% set detailsContent %}
-    {{- form_row(form.isPublished) -}}
-    {%- if form.virtual is defined %}{{ form_row(form.virtual) }}{% endif %}
-    {%- if form.apiKeys is defined -%}
-        {{- form_row(form.apiKeys) -}}
-        {%- if formNotes.authorization is defined -%}
-            <div class="alert alert-{{ formNotes.authorization.type }}">
-                {{- formNotes.authorization.note|purify -}}
-            </div>
-        {%- endif -%}
-
-        <div class="row">
-            {%- if form.apiKeys|length > 0 and callbackUrl is not empty -%}
-                <div class="well well-sm">
-                    {{- 'mautic.integration.callbackuri'|trans }}<br/>
-                    {{ include('@MauticCore/Components/code-snippet.html.twig', {
-                        variant: 'single',
-                        innerText: callbackUrl,
-                        className: 'layer-two mt-12'
-                    }) }}
+        {{- form_row(form.isPublished) -}}
+        {%- if form.virtual is defined %}{{ form_row(form.virtual) }}{% endif %}
+        {%- if form.apiKeys is defined -%}
+            {{- form_row(form.apiKeys) -}}
+            {%- if formNotes.authorization is defined -%}
+                <div class="alert alert-{{ formNotes.authorization.type }}">
+                    {{- formNotes.authorization.note|purify -}}
                 </div>
             {%- endif -%}
-        </div>
 
-        {%- if form.authButton is defined -%}
             <div class="row">
-                <div class="col-xs-12 text-center">
-                    {{- form_widget(form.authButton, {'attr': {'class': 'btn btn-success btn-lg'}}) -}}
-                </div>
+                {%- if form.apiKeys|length > 0 and callbackUrl is not empty -%}
+                    <div class="well well-sm">
+                        {{- 'mautic.integration.callbackuri'|trans }}<br/>
+                        {{ include('@MauticCore/Components/code-snippet.html.twig', {
+                            variant: 'single',
+                            innerText: callbackUrl,
+                            className: 'layer-two mt-12'
+                        }) }}
+                    </div>
+                {%- endif -%}
             </div>
-        {%- endif -%}
-    {%- endif -%}
 
-    {%- if formNotes.custom is defined -%}
-        {%- if formNotes.custom is string -%}
-            {{ formNotes.custom|purify }}
-        {%- elseif formNotes.custom.custom is defined and formNotes.custom.template is string -%}
-            <!-- start: "{{ formNotes.custom.template }}" -->
-            {{ include(formNotes.custom.template, formNotes.custom.parameters|default([]), ignore_missing=true) }}
-            <!-- end: "{{ formNotes.custom.template }}" -->
+            {%- if form.authButton is defined -%}
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        {{- form_widget(form.authButton, {'attr': {'class': 'btn btn-success btn-lg'}}) -}}
+                    </div>
+                </div>
+            {%- endif -%}
         {%- endif -%}
-    {%- endif -%}
+
+        {%- if formNotes.custom is defined -%}
+            {%- if formNotes.custom is string -%}
+                {{ formNotes.custom|purify }}
+            {%- elseif formNotes.custom.custom is defined and formNotes.custom.template is string -%}
+                <!-- start: "{{ formNotes.custom.template }}" -->
+                {{ include(formNotes.custom.template, formNotes.custom.parameters|default([]), ignore_missing=true) }}
+                <!-- end: "{{ formNotes.custom.template }}" -->
+            {%- endif -%}
+        {%- endif -%}
 {% endset %}
 {% set integrationTabs = [{
     'id': 'details-container',
@@ -97,21 +97,21 @@
     'itemAttributes': {'id': 'details-tab'}
 }] %}
 
-{%- if hasSupportedFeatures or hasFeatureSettings -%}
+    {%- if hasSupportedFeatures or hasFeatureSettings -%}
     {% set featuresContent %}
-    {%- if hasSupportedFeatures -%}
-        {{- form_row(form.supportedFeatures, {
-              'formSettings': formSettings,
-              'formNotes': formNotes,
-        }) -}}
-    {%- endif -%}
+            {%- if hasSupportedFeatures -%}
+                {{- form_row(form.supportedFeatures, {
+                      'formSettings': formSettings,
+                      'formNotes': formNotes,
+                }) -}}
+            {%- endif -%}
 
-    {%- if hasFeatureSettings -%}
-        {{ form_row(form.featureSettings, {
-                'formSettings': formSettings,
-                'formNotes': formNotes,
-        }) -}}
-    {%- endif -%}
+            {%- if hasFeatureSettings -%}
+                {{ form_row(form.featureSettings, {
+                        'formSettings': formSettings,
+                        'formNotes': formNotes,
+                }) -}}
+            {%- endif -%}
     {% endset %}
     {% set integrationTabs = integrationTabs|merge([{
         'id': 'features-container',
@@ -122,12 +122,12 @@
         'hasError': (hasSupportedFeatures and formContainsErrors(form.supportedFeatures)) or (hasFeatureSettings and formContainsErrors(form.featureSettings, ['leadFields'])),
         'itemAttributes': {'id': 'features-tab'}
     }]) %}
-{%- endif -%}
+    {%- endif -%}
 
-{%- if hasFields -%}
+    {%- if hasFields -%}
     {% set leadFieldsContent %}
-        <h4 class="mb-12">{{ fieldLabel|trans }}</h4>
-        {{- fieldHtml|raw -}}
+            <h4 class="mb-12">{{ fieldLabel|trans }}</h4>
+            {{- fieldHtml|raw -}}
     {% endset %}
     {% set integrationTabs = integrationTabs|merge([{
         'id': 'fields-container',
@@ -139,12 +139,12 @@
         'itemClass': fieldTabClass,
         'itemAttributes': {'id': 'fields-tab'}
     }]) %}
-{%- endif -%}
+    {%- endif -%}
 
-{%- if hasCompanyFields -%}
+    {%- if hasCompanyFields -%}
     {% set companyFieldsContent %}
-        <h4 class="mb-12">{{ 'mautic.integration.companyfield_matches'|trans }}</h4>
-        {{- companyFieldHtml|raw -}}
+            <h4 class="mb-12">{{ 'mautic.integration.companyfield_matches'|trans }}</h4>
+            {{- companyFieldHtml|raw -}}
     {% endset %}
     {% set integrationTabs = integrationTabs|merge([{
         'id': 'company-fields-container',
@@ -155,7 +155,7 @@
         'hasError': hasCompanyFieldErrors,
         'itemAttributes': {'id': 'company-fields-tab'}
     }]) %}
-{%- endif -%}
+    {%- endif -%}
 
 {% set activeIndexes = integrationTabs|filter(tab => tab.key == activeTab)|keys %}
 {{ include('@MauticCore/Components/tabs.html.twig', {
