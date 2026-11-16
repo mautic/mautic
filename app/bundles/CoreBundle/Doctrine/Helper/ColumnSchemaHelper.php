@@ -20,10 +20,7 @@ final class ColumnSchemaHelper
      */
     private readonly AbstractSchemaManager $sm;
 
-    /**
-     * @var string
-     */
-    private $tableName;
+    private ?string $tableName = null;
 
     private ?Table $fromTable = null;
 

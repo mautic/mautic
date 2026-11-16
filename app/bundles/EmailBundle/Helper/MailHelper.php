@@ -1045,7 +1045,7 @@ final class MailHelper
      *
      * @param string|array $fromEmail
      */
-    public function setFrom(string $fromEmail, ?string $fromName = null): void
+    public function setFrom($fromEmail, ?string $fromName = null): void
     {
         if (is_array($fromEmail)) {
             $this->from = AddressDTO::fromAddressArray($fromEmail);

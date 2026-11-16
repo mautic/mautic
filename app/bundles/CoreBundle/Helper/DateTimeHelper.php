@@ -262,7 +262,6 @@ final class DateTimeHelper
      * Returns interval based on $interval number and $unit.
      *
      * @throws \Exception
-     * @param 'I'|'M'|'S'|'Y'|'j' $unit
      */
     public function buildInterval(int $interval, string $unit): \DateInterval
     {

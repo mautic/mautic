@@ -41,7 +41,7 @@ final class CookieHelper
     /**
      * @param int|string|float|bool|object|null $value
      */
-    public function setCookie(string $name, string $value, ?int $expire = 1800, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null, ?string $sameSite = Cookie::SAMESITE_LAX): void
+    public function setCookie(string $name, $value, ?int $expire = 1800, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null, ?string $sameSite = Cookie::SAMESITE_LAX): void
     {
         if (null !== $value) {
             $value = (string) $value;

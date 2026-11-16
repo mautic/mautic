@@ -62,7 +62,6 @@ final class IntegrationHelper
      * @param array|string      $specificIntegrations
      * @param string[]|string|null $withFeatures
      * @param int|null     $pluginFilter
-     * @param bool|false   $publishedOnly
      *
      * @return array<AbstractIntegration>
      *

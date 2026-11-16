@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Helper\Chart;
 
 final class BarChart extends AbstractChart implements ChartInterface

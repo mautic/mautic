@@ -156,7 +156,7 @@ final class AssetsHelper
         $addScripts = function ($s) use ($location, &$assets, $async, $name): void {
             $name = $name ?: 'script_'.hash('sha1', uniqid((string) mt_rand()));
 
-            if ('head' == $location) {
+            if ('head' === $location) {
                 // special place for these so that declarations and scripts can be mingled
                 $assets['headDeclarations'][$name] = ['script' => [$s, $async]];
             } else {
@@ -184,7 +184,7 @@ final class AssetsHelper
      */
     public function addScriptDeclaration(string $script, string $location = 'head'): self
     {
-        if ('head' == $location) {
+        if ('head' === $location) {
             // special place for these so that declarations and scripts can be mingled
             $this->assets[$this->context]['headDeclarations'][] = ['declaration' => $script];
         } else {
@@ -203,7 +203,7 @@ final class AssetsHelper
      *
      * @param string|array<string, string> $stylesheet
      */
-    public function addStylesheet(string $stylesheet): self
+    public function addStylesheet($stylesheet): self
     {
         $addSheet = function ($s): void {
             $this->assets[$this->context]['stylesheets'] ??= [];
@@ -245,7 +245,7 @@ final class AssetsHelper
      */
     public function addCustomDeclaration(string $declaration, string $location = 'head'): self
     {
-        if ('head' == $location) {
+        if ('head' === $location) {
             $this->assets[$this->context]['headDeclarations'][] = ['custom' => $declaration];
         } else {
             $this->assets[$this->context]['customDeclarations'][$location] ??= [];

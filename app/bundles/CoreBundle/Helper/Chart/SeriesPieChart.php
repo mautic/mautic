@@ -66,10 +66,8 @@ final class SeriesPieChart extends AbstractChart implements ChartInterface
 
     /**
      * Adds to the label also the value and the percentage.
-     *
-     * @return string
      */
-    public function buildFullLabel(string $label, int $value)
+    public function buildFullLabel(string $label, int $value): string
     {
         if (!$this->totalCount) {
             return $label;
