@@ -1,17 +1,3 @@
-{#
-  Carbon-style progress bar built on Bootstrap's .progress.
-
-  label       Required. The action being performed, e.g. "Sending emails".
-  value       Current value. Omit for the indeterminate state.
-  max         Maximum value. Default 100.
-  size        'big' (default, 8px) or 'small' (4px).
-  type        'default', 'inline' or 'indented'.
-  status      'active' (default), 'finished' or 'error'.
-  helperText  Textual representation of the progress, e.g. "12 of 40".
-  hideLabel   Visually hides the label, keeping it for assistive technology.
-  className   Extra classes for the wrapper.
-  id          Base id used to link label and helper text.
-#}
 {% set size = size|default('big') %}
 {% set type = type|default('default') %}
 {% set status = status|default('active') %}

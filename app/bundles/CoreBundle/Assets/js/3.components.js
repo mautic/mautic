@@ -1,7 +1,5 @@
 /**
- * Progress bar (Components/progress-bar.html.twig)
- *
- * Updates a progress bar rendered by the component.
+ * Update the value, width and helper text of a progress bar
  *
  * @param container Selector or element wrapping the component
  * @param value     Current value
