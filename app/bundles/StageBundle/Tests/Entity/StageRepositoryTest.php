@@ -48,18 +48,18 @@ final class StageRepositoryTest extends MauticMysqlTestCase
             ->setName('Scheduled')
             ->setIsPublished(true)
             ->setWeight(2)
-            ->setPublishUp(new \DateTime('2100-01-01 00:00:00'));
+            ->setPublishUp(new \DateTime('+1 year'));
         $expired = (new Stage())
             ->setName('Expired')
             ->setIsPublished(true)
             ->setWeight(3)
-            ->setPublishDown(new \DateTime('2000-01-01 00:00:00'));
+            ->setPublishDown(new \DateTime('-1 year'));
         $current = (new Stage())
             ->setName('Current')
             ->setIsPublished(true)
             ->setWeight(4)
-            ->setPublishUp(new \DateTime('2000-01-01 00:00:00'))
-            ->setPublishDown(new \DateTime('2100-01-01 00:00:00'));
+            ->setPublishUp(new \DateTime('-1 year'))
+            ->setPublishDown(new \DateTime('+1 year'));
         $unpublished = (new Stage())
             ->setName('Unpublished')
             ->setIsPublished(false)
