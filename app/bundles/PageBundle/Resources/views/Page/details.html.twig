@@ -199,14 +199,14 @@
               {% set tabsviewsdetails = [] %}
                   {% if showVariants %}
               {% set tabsviewsdetailsContent0 %}
-                                {{ variantContent|raw }}
+                  {{ variantContent|raw }}
 
               {% endset %}
               {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'variants-container', 'label': 'mautic.core.variants', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
                   {% endif %}
                   {% if showTranslations %}
               {% set tabsviewsdetailsContent1 %}
-                                {{ translationContent|raw }}
+                  {{ translationContent|raw }}
 
               {% endset %}
               {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'translation-container', 'label': 'mautic.core.translations', 'content': tabsviewsdetailsContent1, 'className': 'pa-16' ~ " " ~ (not showVariants ? 'active' : ''), 'itemClass': (not showVariants ? 'active' : '')}]) %}
