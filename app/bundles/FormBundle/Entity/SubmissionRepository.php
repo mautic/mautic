@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -598,5 +599,95 @@ class SubmissionRepository extends CommonRepository
         $qb->delete($tableName)
             ->where($qb->expr()->in('submission_id', $inValidSubmissionIds))
             ->executeStatement();
+    }
+
+    /**
+     * Returns the IDs of the forms that have submissions of deleted contacts.
+     * When a contact is deleted, the foreign key sets form_submissions.lead_id to NULL.
+     *
+     * @return int[]
+     */
+    public function getFormIdsWithSubmissionsOfDeletedContacts(): array
+    {
+        $formIds = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('DISTINCT fs.form_id')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
+            ->where('fs.lead_id IS NULL')
+            ->orderBy('fs.form_id', 'ASC')
+            ->executeQuery()
+            ->fetchFirstColumn();
+
+        return array_map(intval(...), $formIds);
+    }
+
+    public function countSubmissionsOfDeletedContacts(int $formId): int
+    {
+        return (int) $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('COUNT(fs.id)')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
+            ->where('fs.form_id = :formId')
+            ->andWhere('fs.lead_id IS NULL')
+            ->setParameter('formId', $formId)
+            ->executeQuery()
+            ->fetchOne();
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getSubmissionIdsOfDeletedContacts(int $formId, int $limit, int $afterSubmissionId = 0): array
+    {
+        $submissionIds = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('fs.id')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
+            ->where('fs.form_id = :formId')
+            ->andWhere('fs.lead_id IS NULL')
+            ->andWhere('fs.id > :afterSubmissionId')
+            ->setParameter('formId', $formId)
+            ->setParameter('afterSubmissionId', $afterSubmissionId)
+            ->orderBy('fs.id', 'ASC')
+            ->setMaxResults($limit)
+            ->executeQuery()
+            ->fetchFirstColumn();
+
+        return array_map(intval(...), $submissionIds);
+    }
+
+    /**
+     * Deletes submissions of deleted contacts and their records in the form results table in one transaction.
+     * Submissions that have a contact are never deleted.
+     *
+     * @param int[] $submissionIds
+     *
+     * @return int The number of deleted submissions
+     */
+    public function deleteSubmissionsOfDeletedContacts(Form $form, array $submissionIds): int
+    {
+        if ([] === $submissionIds) {
+            return 0;
+        }
+
+        $connection         = $this->getEntityManager()->getConnection();
+        $resultsTableName   = $this->getResultsTableName($form->getId(), $form->getAlias());
+        $resultsTableExists = $connection->createSchemaManager()->tablesExist([$resultsTableName]);
+
+        return (int) $connection->transactional(
+            static function (Connection $connection) use ($resultsTableName, $resultsTableExists, $submissionIds): int {
+                if ($resultsTableExists) {
+                    $connection->createQueryBuilder()
+                        ->delete($resultsTableName)
+                        ->where('submission_id IN (:submissionIds)')
+                        ->setParameter('submissionIds', $submissionIds, ArrayParameterType::INTEGER)
+                        ->executeStatement();
+                }
+
+                return (int) $connection->createQueryBuilder()
+                    ->delete(MAUTIC_TABLE_PREFIX.'form_submissions')
+                    ->where('id IN (:submissionIds)')
+                    ->andWhere('lead_id IS NULL')
+                    ->setParameter('submissionIds', $submissionIds, ArrayParameterType::INTEGER)
+                    ->executeStatement();
+            }
+        );
     }
 }
