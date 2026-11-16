@@ -146,7 +146,8 @@
     cursor: pointer;
 }
 
-.nav-tabs-contained + .tab-content {
+.nav-tabs-contained + .tab-content,
+.nav-tabs-wrapper--contained + .tab-content {
     .tile {
         background-color: var(--layer-02);
 
