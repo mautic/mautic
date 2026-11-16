@@ -40,8 +40,6 @@ final class StageRepositoryTest extends MauticMysqlTestCase
 
     public function testGetPublishedWithContactCountsExcludesStagesOutsidePublicationWindow(): void
     {
-        $now = new \DateTime();
-
         $active = (new Stage())
             ->setName('Active')
             ->setIsPublished(true)
@@ -50,12 +48,12 @@ final class StageRepositoryTest extends MauticMysqlTestCase
             ->setName('Scheduled')
             ->setIsPublished(true)
             ->setWeight(2)
-            ->setPublishUp((clone $now)->modify('+1 day'));
+            ->setPublishUp(new \DateTime('2100-01-01 00:00:00'));
         $expired = (new Stage())
             ->setName('Expired')
             ->setIsPublished(true)
             ->setWeight(3)
-            ->setPublishDown((clone $now)->modify('-1 day'));
+            ->setPublishDown(new \DateTime('2000-01-01 00:00:00'));
 
         $this->em->persist($active);
         $this->em->persist($scheduled);
