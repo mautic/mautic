@@ -179,7 +179,6 @@
               {% set tabsviewsdetailsContent0 %}
                   {{ include('@MauticPage/Trackable/click_counts.html.twig', {'trackables': trackables, 'entity': entity, 'channel': 'dynamicContent'}) }}
 
-
               {% endset %}
               {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'clicks-container', 'label': 'mautic.trackable.click_counts', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
               {% if showTranslations %}
