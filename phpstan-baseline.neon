@@ -6692,12 +6692,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Services/TransportInterface.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Helper\\LookupHelper\:\:getCache\(\) has parameter \$notify with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticFullContactBundle/Helper/LookupHelper.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Helper\\LookupHelper\:\:validateRequest\(\) has parameter \$oid with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
