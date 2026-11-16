@@ -133,7 +133,7 @@ final class ExpressionBuilder extends BaseExpressionBuilder
      * Creates a functional expression.
      *
      * @param string       $func any function to be applied on $x
-     * @param string        $x    the left expression
+     * @param string       $x    the left expression
      * @param string|array $y    the placeholder or the array of values to be used by IN() comparison
      */
     public function func($func, string $x, $y = null): string
