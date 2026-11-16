@@ -34,7 +34,7 @@ final class EventType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]
@@ -81,7 +81,7 @@ final class EventType extends AbstractType
                     'choices'           => array_flip($choices),
                     'expanded'          => true,
                     'multiple'          => false,
-                    'label_attr'        => ['class' => 'control-label'],
+                    'label_attr'        => ['class' => 'form-label'],
                     'label'             => $label,
                     'placeholder'       => false,
                     'required'          => false,
@@ -137,7 +137,7 @@ final class EventType extends AbstractType
                         'mautic.campaign.event.intervalunit.choice.y' => 'y',
                     ],
                     'multiple'          => false,
-                    'label_attr'        => ['class' => 'control-label'],
+                    'label_attr'        => ['class' => 'form-label'],
                     'label'             => false,
                     'attr'              => [
                         'class' => 'form-control',

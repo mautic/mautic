@@ -59,7 +59,7 @@ final class AssetType extends AbstractType
             HiddenType::class,
             [
                 'label'       => $this->translator->trans('mautic.asset.asset.form.file.upload', ['%max%' => $maxUploadSize]),
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'required'    => false,
             ]
         );
@@ -89,7 +89,7 @@ final class AssetType extends AbstractType
             TextType::class,
             [
                 'label'       => 'mautic.asset.asset.form.remotePath',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'required'    => false,
             ]
@@ -100,7 +100,7 @@ final class AssetType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.title',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -110,7 +110,7 @@ final class AssetType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control editor'],
                 'required'   => false,
             ]
@@ -128,7 +128,7 @@ final class AssetType extends AbstractType
 
         $builder->add('language', LocaleType::class, [
             'label'      => 'mautic.core.language',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.asset.asset.form.language.help',

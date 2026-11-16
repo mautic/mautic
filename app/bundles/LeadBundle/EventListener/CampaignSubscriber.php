@@ -299,7 +299,8 @@ final class CampaignSubscriber
                 $pointsChangeLog->setType('campaign');
                 $pointsChangeLog->setEventName($pointsLogEventName);
                 $pointsChangeLog->setActionName($pointsLogActionName);
-                $pointsChangeLog->setIpAddress($this->ipLookupHelper->getIpAddress());
+                // No IP for a form submitter Mautic doesn't track
+                $pointsChangeLog->setIpAddress($this->ipLookupHelper->isVisitorUntracked() ? null : $this->ipLookupHelper->getIpAddress());
                 $pointsChangeLog->setDateAdded(new DateTime());
                 if ($pointGroup instanceof Group) {
                     $pointsChangeLog->setGroup($pointGroup);
@@ -605,10 +606,10 @@ final class CampaignSubscriber
                 if (isset($fields[$field])) {
                     $fieldType  = $fields[$field]['type'];
                     // Keep regex values unchanged so they are evaluated as patterns
-                    // Otherwise CustomFieldHelper::fieldValueTransfomer would attempt to parse
+                    // Otherwise CustomFieldHelper::fieldValueTransformer would attempt to parse
                     // the regex as a DateTime string, which would throw an error
                     if (!in_array($operator, [OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP])) {
-                        $fieldValue = CustomFieldHelper::fieldValueTransfomer($fields[$field], $value);
+                        $fieldValue = CustomFieldHelper::fieldValueTransformer($fields[$field], $value);
                     }
                 }
 

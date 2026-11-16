@@ -170,6 +170,7 @@ final class LeadSubscriber
                         ],
                         'contentTemplate' => $template,
                         'icon'            => 'ri-vidicon-2-line',
+                        'contactId'       => $hit['lead_id'],
                     ]
                 );
             }

@@ -53,7 +53,7 @@ abstract class AbstractFormStandardType extends AbstractType
                 TextType::class,
                 [
                     'label'      => 'mautic.core.name',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => ['class' => 'form-control'],
                 ]
             );
@@ -65,7 +65,7 @@ abstract class AbstractFormStandardType extends AbstractType
                 TextareaType::class,
                 [
                     'label'      => 'mautic.core.description',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => ['class' => 'form-control editor'],
                     'required'   => false,
                 ]
@@ -138,7 +138,7 @@ abstract class AbstractFormStandardType extends AbstractType
                 LocaleType::class,
                 [
                     'label'      => 'mautic.core.language',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class' => 'form-control',
                     ],

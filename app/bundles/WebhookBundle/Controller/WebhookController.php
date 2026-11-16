@@ -3,6 +3,7 @@
 namespace Mautic\WebhookBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\WebhookBundle\Helper\WebhookSearchScopeProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,6 +11,13 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class WebhookController extends AbstractStandardFormController
 {
+    use CategoryListFiltersTrait;
+
+    /**
+     * @var array<string, mixed>
+     */
+    private array $listFilters = [];
+
     /**
      * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
      */
@@ -75,12 +83,35 @@ final class WebhookController extends AbstractStandardFormController
     }
 
     /**
+     * @param mixed   $start
+     * @param mixed   $limit
+     * @param mixed   $filter
+     * @param mixed   $orderBy
+     * @param mixed   $orderByDir
+     * @param mixed[] $args
+     *
+     * @return array{0: int, 1: array<int, mixed>}
+     */
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
+    {
+        $request           = $this->getCurrentRequest();
+        $categoryFilters   = $this->applyCategoryListFilter($request, 'mautic.'.$this->getSessionBase().'.list_filters', 'Webhook', 'cat.id', $filter);
+        $this->listFilters = $categoryFilters['filters'];
+
+        return parent::getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, $args);
+    }
+
+    /**
      * @param array<string, mixed> $args
      *
      * @return array<string, mixed>
      */
     protected function getViewArguments(array $args, string $action): array
     {
+        if ('index' === $action) {
+            $args['viewParameters']['filters'] = $this->listFilters;
+        }
+
         if ('index' === $action && null !== $this->indexSearchScopes) {
             $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
             $this->indexSearchScopes                = null;

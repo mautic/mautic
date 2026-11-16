@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\AnyCompanyRelationValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
@@ -28,6 +29,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyRelationValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
@@ -100,6 +102,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.lead.query.builder.special.integration', IntegrationCampaignFilterQueryBuilder::class);
     $services->set('mautic.lead.query.builder.special.sessions', SessionsFilterQueryBuilder::class);
     $services->set('mautic.lead.query.builder.complex_relation.value', ComplexRelationValueFilterQueryBuilder::class);
+    $services->set(PrimaryCompanyRelationValueFilterQueryBuilder::class);
+    $services->set(AnyCompanyRelationValueFilterQueryBuilder::class);
     $services->set('mautic.lead.query.builder.channel_click.value', ChannelClickQueryBuilder::class);
     $services->get(CompanyRepository::class)
         ->call('setUniqueIdentifiersOperator', ['%mautic.company_unique_identifiers_operator%']);

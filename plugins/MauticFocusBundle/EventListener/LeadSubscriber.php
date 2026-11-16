@@ -64,7 +64,7 @@ final readonly class LeadSubscriber
                             'eventType'       => (Stat::TYPE_NOTIFICATION == $statsView['type']) ? $eventViewTypeName : $eventClickTypeName,
                             'timestamp'       => $statsView['date_added'],
                             'icon'            => $icon,
-                            'contactId'       => $leadId,
+                            'contactId'       => $statsView['lead_id'],
                         ]
                     );
                 }

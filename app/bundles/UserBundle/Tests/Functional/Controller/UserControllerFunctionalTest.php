@@ -9,11 +9,15 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
 final class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateEntityTrait;
+
     protected function setUp(): void
     {
         $this->configParams += [
@@ -116,12 +120,84 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('The email entered is invalid.', (string) $this->client->getResponse()->getContent());
     }
 
+    public function testIndexUsesLocalAvatars(): void
+    {
+        $crawler = $this->client->request('GET', '/s/users');
+
+        $this->assertResponseIsSuccessful();
+        $images = $crawler->filter('#userTable tbody img');
+        $this->assertGreaterThan(0, $images->count());
+
+        foreach ($images as $image) {
+            $this->assertInstanceOf(\DOMElement::class, $image);
+            $this->assertLocalAvatarUrl($image->getAttribute('src'));
+            $this->assertSame('', $image->getAttribute('alt'));
+        }
+    }
+
+    public function testAccountPageUsesLocalAvatar(): void
+    {
+        $crawler = $this->client->request('GET', '/s/account');
+
+        $this->assertResponseIsSuccessful();
+        $image = $crawler->filter('img.media-object');
+        $this->assertGreaterThan(0, $image->count());
+        $this->assertLocalAvatarUrl((string) $image->attr('src'));
+    }
+
+    private function assertLocalAvatarUrl(string $avatarUrl): void
+    {
+        $this->assertStringStartsWith('data:image/svg+xml;', $avatarUrl);
+    }
+
     public function testIndexIncludesInviteForm(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/users');
 
         $this->assertResponseIsSuccessful();
         $this->assertGreaterThan(0, $crawler->filter('#invite-user-form')->count());
+    }
+
+    #[DataProvider('neverLoggedInSearchProvider')]
+    public function testNeverLoggedInQuickFilterShowsUsersWithoutLastLogin(string $query): void
+    {
+        $admin = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $admin);
+        $adminRole = $admin->getRole();
+        $this->assertInstanceOf(Role::class, $adminRole);
+        $loggedInUser = $this->createUser($adminRole, 'alreadyloggedin@example.com');
+        $loggedInUser->setLastLogin(new \DateTime('2024-02-22 10:30:00'));
+        $neverLoggedInUser = $this->createUser($adminRole, 'neverloggedinfilter@example.com');
+        $this->em->flush();
+        $this->em->refresh($loggedInUser);
+        $this->assertInstanceOf(\DateTimeInterface::class, $loggedInUser->getLastLogin());
+
+        $crawler = $this->client->request('GET', '/s/users?'.$query);
+
+        $this->assertResponseIsSuccessful();
+        $usernames = $crawler->filter('#userTable tbody tr td:nth-child(4)')->each(
+            static fn (Crawler $cell): string => $cell->text()
+        );
+
+        $this->assertContains($neverLoggedInUser->getUsername(), $usernames);
+        $this->assertNotContains($loggedInUser->getUsername(), $usernames);
+
+        $crawler = $this->client->request('GET', '/s/users?search=');
+        $this->assertResponseIsSuccessful();
+        $usernames = $crawler->filter('#userTable tbody tr td:nth-child(4)')->each(
+            static fn (Crawler $cell): string => $cell->text()
+        );
+        $this->assertContains($neverLoggedInUser->getUsername(), $usernames);
+        $this->assertContains($loggedInUser->getUsername(), $usernames);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function neverLoggedInSearchProvider(): iterable
+    {
+        yield 'full page' => ['search=is%3Anever_logged_in'];
+        yield 'list fragment' => ['search=is%3Anever_logged_in&tmpl=list'];
     }
 
     public function testInviteActionShowsForm(): void

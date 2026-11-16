@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
@@ -356,41 +357,7 @@ final class LeadController extends AbstractFormController
         // Get the quick add form
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new', 'qf' => 1]);
 
-        $fields = $this->leadFieldModel->getEntities(
-            [
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'f.isPublished',
-                            'expr'   => 'eq',
-                            'value'  => true,
-                        ],
-                        [
-                            'column' => 'f.isShortVisible',
-                            'expr'   => 'eq',
-                            'value'  => true,
-                        ],
-                        [
-                            'column' => 'f.object',
-                            'expr'   => 'like',
-                            'value'  => 'lead',
-                        ],
-                    ],
-                    'order' => [
-                        [
-                            'col' => 'f.isFixed',
-                            'dir' => 'DESC',
-                        ],
-                        [
-                            'col' => 'f.order',
-                            'dir' => 'ASC',
-                        ],
-                    ],
-                ],
-                'hydration_mode' => 'HYDRATE_ARRAY',
-                'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
-            ]
-        );
+        $fields = $this->getQuickAddFields();
 
         $quickForm = $this->leadModel->createForm($this->leadModel->getEntity(), $action, ['fields' => $fields, 'isShortForm' => true]);
 
@@ -576,10 +543,11 @@ final class LeadController extends AbstractFormController
         }
 
         // set the page we came from
-        $page           = $request->getSession()->get('mautic.lead.page', 1);
-        $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
-        $fields = $this->leadFieldModel->getPublishedFieldArrays('lead');
-        $form   = $this->leadModel->createForm($lead, $action, ['fields' => $fields]);
+        $page        = $request->getSession()->get('mautic.lead.page', 1);
+        $inQuickForm = (bool) ($request->attributes->all()['qf'] ?? $request->query->all()['qf'] ?? $request->request->all()['qf'] ?? false);
+        $action      = $this->generateUrl('mautic_contact_action', array_filter(['objectAction' => 'new', 'qf' => $inQuickForm ? 1 : null]));
+        $fields      = $inQuickForm ? $this->getQuickAddFields() : $this->leadFieldModel->getPublishedFieldArrays('lead');
+        $form        = $this->leadModel->createForm($lead, $action, ['fields' => $fields, 'isShortForm' => $inQuickForm]);
 
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {
@@ -626,12 +594,14 @@ final class LeadController extends AbstractFormController
                     // Save here through the model to trigger all subscribers.
                     $this->leadModel->saveEntity($lead);
 
-                    // Upload avatar if applicable
-                    $image = $form['preferred_profile_image']->getData();
-                    if ('custom' === $image) {
-                        // Check for a file
-                        if ($form['custom_avatar']->getData()) {
-                            $this->uploadAvatar($request, $avatarHelper, $lead);
+                    if (!$inQuickForm) {
+                        // Upload avatar if applicable
+                        $image = $form['preferred_profile_image']->getData();
+                        if ('custom' === $image) {
+                            // Check for a file
+                            if ($form['custom_avatar']->getData()) {
+                                $this->uploadAvatar($request, $avatarHelper, $lead);
+                            }
                         }
                     }
 
@@ -652,9 +622,11 @@ final class LeadController extends AbstractFormController
                         ]
                     );
 
-                    $inQuickForm = $request->attributes->all()['qf'] ?? $request->query->all()['qf'] ?? $request->request->all()['qf'] ?? false;
-
                     if ($inQuickForm) {
+                        if ($this->getFormButton($form, ['buttons', 'save_and_new'])->isClicked()) {
+                            return $this->redirectToRoute('mautic_contact_action', ['objectAction' => 'quickAdd']);
+                        }
+
                         $viewParameters = ['page' => $page];
                         $returnUrl      = $this->generateUrl('mautic_contact_index', $viewParameters);
                         $template       = 'Mautic\LeadBundle\Controller\LeadController::indexAction';
@@ -726,6 +698,51 @@ final class LeadController extends AbstractFormController
                 ],
             ]
         );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function getQuickAddFields(): array
+    {
+        $fields = $this->leadFieldModel->getEntities(
+            [
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'f.isPublished',
+                            'expr'   => 'eq',
+                            'value'  => true,
+                        ],
+                        [
+                            'column' => 'f.isShortVisible',
+                            'expr'   => 'eq',
+                            'value'  => true,
+                        ],
+                        [
+                            'column' => 'f.object',
+                            'expr'   => 'like',
+                            'value'  => 'lead',
+                        ],
+                    ],
+                    'order' => [
+                        [
+                            'col' => 'f.isFixed',
+                            'dir' => 'DESC',
+                        ],
+                        [
+                            'col' => 'f.order',
+                            'dir' => 'ASC',
+                        ],
+                    ],
+                ],
+                'hydration_mode' => 'HYDRATE_ARRAY',
+                'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
+            ]
+        );
+        \assert($fields instanceof Paginator);
+
+        return iterator_to_array($fields->getIterator());
     }
 
     /**
@@ -1911,7 +1928,9 @@ final class LeadController extends AbstractFormController
                 if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                     ++$count;
 
-                    if (!empty($data['addowner'])) {
+                    if (OwnerType::NO_OWNER_VALUE === ($data['addowner'] ?? null)) {
+                        $lead->setOwner();
+                    } elseif (!empty($data['addowner'])) {
                         $user      = $this->userModel->getEntity((int) $data['addowner']);
                         $lead->setOwner($user);
                     }
@@ -1954,6 +1973,7 @@ final class LeadController extends AbstractFormController
                         [],
                         [
                             'items'  => $items,
+                            'remove_label' => 'mautic.lead.batch.owner.remove',
                             'action' => $route,
                         ]
                     )->createView(),

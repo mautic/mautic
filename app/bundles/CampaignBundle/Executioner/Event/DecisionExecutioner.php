@@ -72,6 +72,7 @@ final readonly class DecisionExecutioner implements EventInterface
             try {
                 /** @var DecisionAccessor $config */
                 $this->dispatchEvent($config, $log);
+                $log->setNonActionPathTaken(false);
                 $evaluatedContacts->pass($log->getLead());
 
                 // Update the date triggered timestamp

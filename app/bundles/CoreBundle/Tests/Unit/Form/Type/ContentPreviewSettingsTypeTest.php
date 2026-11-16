@@ -59,6 +59,25 @@ final class ContentPreviewSettingsTypeTest extends TestCase
         ],
     ];
 
+    /**
+     * @var mixed[]
+     */
+    private array $companyFieldDefinition = [
+        'company',
+        LookupType::class,
+        [
+            'attr' => [
+                'class'                   => 'form-control',
+                'data-callback'           => 'activatePreviewCompanyLookupField',
+                'data-toggle'             => 'field-lookup',
+                'data-lookup-callback'    => 'updatePreviewCompanyLookupListFilter',
+                'data-chosen-lookup'      => 'lead:companyList',
+                'placeholder'             => 'startTyping',
+                'data-no-record-message'  => 'nomatches',
+            ],
+        ],
+    ];
+
     protected function setUp(): void
     {
         $this->translator     = $this->createMock(TranslatorInterface::class);
@@ -115,16 +134,16 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                 'children' => [],
             ],
         ];
-        $matcher = $this->exactly(2);
+        $matcher = $this->exactly(4);
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
-                if (1 === $matcher->numberOfInvocations()) {
+                if (in_array($matcher->numberOfInvocations(), [1, 3], true)) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
                     return 'startTyping';
                 }
-                if (2 === $matcher->numberOfInvocations()) {
+                if (in_array($matcher->numberOfInvocations(), [2, 4], true)) {
                     $this->assertSame('mautic.core.form.nomatches', $parameters[0]);
 
                     return 'nomatches';
@@ -134,13 +153,17 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
-        $matcher = $this->once();
+        $matcher = $this->exactly(2);
         $builder->expects($matcher)
             ->method('add')
             ->willReturnCallback(
                 function (...$parameters) use ($matcher, $builder): MockObject {
                     if (1 === $matcher->numberOfInvocations()) {
                         $this->assertEquals($this->contactFieldDefinition, $parameters);
+                    }
+
+                    if (2 === $matcher->numberOfInvocations()) {
+                        $this->assertEquals($this->companyFieldDefinition, $parameters);
                     }
 
                     return $builder;
@@ -210,16 +233,16 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->willReturn(true);
         $this->security->expects($this->never())
             ->method('hasEntityAccess');
-        $matcher = $this->exactly(2);
+        $matcher = $this->exactly(4);
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
-                if (1 === $matcher->numberOfInvocations()) {
+                if (in_array($matcher->numberOfInvocations(), [1, 3], true)) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
                     return 'startTyping';
                 }
-                if (2 === $matcher->numberOfInvocations()) {
+                if (in_array($matcher->numberOfInvocations(), [2, 4], true)) {
                     $this->assertSame('mautic.core.form.nomatches', $parameters[0]);
 
                     return 'nomatches';
@@ -229,13 +252,17 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
-        $matcher = $this->once();
+        $matcher = $this->exactly(2);
         $builder->expects($matcher)
             ->method('add')
             ->willReturnCallback(
                 function (...$parameters) use ($matcher, $builder): MockObject {
                     if (1 === $matcher->numberOfInvocations()) {
                         $this->assertEquals($this->contactFieldDefinition, $parameters);
+                    }
+
+                    if (2 === $matcher->numberOfInvocations()) {
+                        $this->assertEquals($this->companyFieldDefinition, $parameters);
                     }
 
                     return $builder;
@@ -274,16 +301,16 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->method('hasEntityAccess')
             ->with('lead:leads:viewown', 'lead:leads:viewother', $userId)
             ->willReturn(true);
-        $matcher = $this->exactly(2);
+        $matcher = $this->exactly(4);
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
-                if (1 === $matcher->numberOfInvocations()) {
+                if (in_array($matcher->numberOfInvocations(), [1, 3], true)) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
                     return 'startTyping';
                 }
-                if (2 === $matcher->numberOfInvocations()) {
+                if (in_array($matcher->numberOfInvocations(), [2, 4], true)) {
                     $this->assertSame('mautic.core.form.nomatches', $parameters[0]);
 
                     return 'nomatches';
@@ -293,13 +320,17 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
-        $matcher = $this->once();
+        $matcher = $this->exactly(2);
         $builder->expects($matcher)
             ->method('add')
             ->willReturnCallback(
                 function (...$parameters) use ($matcher, $builder): MockObject {
                     if (1 === $matcher->numberOfInvocations()) {
                         $this->assertEquals($this->contactFieldDefinition, $parameters);
+                    }
+
+                    if (2 === $matcher->numberOfInvocations()) {
+                        $this->assertEquals($this->companyFieldDefinition, $parameters);
                     }
 
                     return $builder;
@@ -370,7 +401,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->willReturn(true);
         $this->security->expects($this->never())
             ->method('hasEntityAccess');
-        $matcher = $this->exactly(4);
+        $matcher = $this->exactly(6);
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
@@ -394,12 +425,22 @@ final class ContentPreviewSettingsTypeTest extends TestCase
 
                     return 'nomatches';
                 }
+                if (in_array($matcher->numberOfInvocations(), [3, 5], true)) {
+                    $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
+
+                    return 'startTyping';
+                }
+                if (in_array($matcher->numberOfInvocations(), [4, 6], true)) {
+                    $this->assertSame('mautic.core.form.nomatches', $parameters[0]);
+
+                    return 'nomatches';
+                }
 
                 throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $formBuilder = $this->createMock(FormBuilderInterface::class);
-        $matcher     = $this->exactly(3);
+        $matcher     = $this->exactly(4);
         $formBuilder->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $expectedTranslationChoices, $parentEmailId, $expectedVariantChoices, $formBuilder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
@@ -428,6 +469,9 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                 }
                 if (3 === $matcher->numberOfInvocations()) {
                     $this->assertEquals($this->contactFieldDefinition, $parameters);
+                }
+                if (4 === $matcher->numberOfInvocations()) {
+                    $this->assertEquals($this->companyFieldDefinition, $parameters);
                 }
 
                 return $formBuilder;

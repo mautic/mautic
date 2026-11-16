@@ -43,7 +43,7 @@ Mautic.initStageWeightConflictCheck = function(weights, weightFieldId, entityId)
     mQuery(document).ready(function() {
         const weightField = mQuery('#' + weightFieldId);
         const group = weightField.closest('.form-group');
-        const message = mQuery('<span class="help-block text-danger"></span>').insertAfter(weightField);
+        const message = mQuery('<span class="form-text text-danger"></span>').insertAfter(weightField);
 
         function check() {
             const val = parseInt(weightField.val(), 10);

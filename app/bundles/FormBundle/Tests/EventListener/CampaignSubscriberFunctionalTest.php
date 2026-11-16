@@ -123,6 +123,46 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($result, $event->wasConditionSatisfied());
     }
 
+    public function testConditionOnAFieldThatIsNotOnTheFormIsNotMet(): void
+    {
+        $this->client->request('POST', '/api/forms/new', [
+            'name'     => 'Test Form',
+            'formType' => 'campaign',
+            'fields'   => [['label' => 'Email', 'alias' => 'email', 'type' => 'email', 'leadField' => 'email']],
+        ]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $formId = json_decode($this->client->getResponse()->getContent(), true)['form']['id'];
+
+        $contact = new Lead();
+        $contact->setEmail('testing@field.gone');
+        $this->em->persist($contact);
+
+        $campaignEvent = new Event();
+        $campaignEvent->setName('Test Event');
+        $campaignEvent->setType('form.field_value');
+        $campaignEvent->setEventType('condition');
+        $campaignEvent->setProperties(['form' => $formId, 'field' => 'gone', 'value' => 'a', 'operator' => '=']);
+
+        $campaign = new Campaign();
+        $campaign->setName('Test Campaign');
+        $campaign->addEvent(1, $campaignEvent);
+        $campaignEvent->setCampaign($campaign);
+
+        $this->em->persist($campaignEvent);
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $log = new LeadEventLog();
+        $log->setLead($contact);
+        $log->setEvent($campaignEvent);
+
+        $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
+
+        $this->getService(EventDispatcherInterface::class)->dispatch($event, FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
+
+        $this->assertFalse($event->wasConditionSatisfied());
+    }
+
     public static function valueProvider(): \Generator
     {
         yield [

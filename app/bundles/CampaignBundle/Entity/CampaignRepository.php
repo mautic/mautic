@@ -269,22 +269,22 @@ final class CampaignRepository extends CommonRepository
         switch ($filter->command) {
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired', [], null, 'en_US'):
-                $expr = $queryBuilder->expr()->and(
+                $conditions = [
                     $queryBuilder->expr()->eq('c.isPublished', ":{$unique}"),
                     $queryBuilder->expr()->isNotNull('c.publishDown'),
-                    $queryBuilder->expr()->neq('c.publishDown', $queryBuilder->expr()->literal('')),
-                    $queryBuilder->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()')
-                );
+                    $queryBuilder->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()'),
+                ];
+                $expr = $queryBuilder instanceof QueryBuilder ? $queryBuilder->expr()->andX(...$conditions) : $queryBuilder->expr()->and(...$conditions);
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending', [], null, 'en_US'):
-                $expr = $queryBuilder->expr()->and(
+                $conditions = [
                     $queryBuilder->expr()->eq('c.isPublished', ":{$unique}"),
                     $queryBuilder->expr()->isNotNull('c.publishUp'),
-                    $queryBuilder->expr()->neq('c.publishUp', $queryBuilder->expr()->literal('')),
-                    $queryBuilder->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()')
-                );
+                    $queryBuilder->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()'),
+                ];
+                $expr = $queryBuilder instanceof QueryBuilder ? $queryBuilder->expr()->andX(...$conditions) : $queryBuilder->expr()->and(...$conditions);
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -609,10 +609,7 @@ final class CampaignRepository extends CommonRepository
                                     $query->expr()->eq('ce.decision_path', $query->expr()->literal('yes')),
                                     $query->expr()->isNull('ce.decision_path')
                                 ),
-                                $query->expr()->or(
-                                    $query->expr()->eq('log.non_action_path_taken', '0'),
-                                    $query->expr()->isNull('log.non_action_path_taken')
-                                )
+                                $query->expr()->eq('log.non_action_path_taken', '0')
                             )
                         )
                     ),

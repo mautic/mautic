@@ -27,7 +27,7 @@ final class SubmitActionRepostType extends AbstractType
             UrlType::class,
             [
                 'label'      => 'mautic.form.action.repost.post_url',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'preaddon' => 'ri-earth-line',
@@ -50,7 +50,7 @@ final class SubmitActionRepostType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.action.repost.authorization_header',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.form.action.repost.authorization_header.tooltip',
@@ -65,7 +65,7 @@ final class SubmitActionRepostType extends AbstractType
             EmailType::class,
             [
                 'label'      => 'mautic.form.action.repost.failure_email',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.form.action.repost.failure_email.tooltip',
@@ -86,7 +86,7 @@ final class SubmitActionRepostType extends AbstractType
                 TextType::class,
                 [
                     'label'      => $label." ({$alias})",
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class' => 'form-control',
                     ],

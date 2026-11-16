@@ -1,16 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\EventListener;
 
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Event\ConfigPostSaveEvent;
 use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
+use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Form\Type\ConfigType;
+use Mautic\UserBundle\Security\OIDC\ClientCredentials;
+use Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigSubscriber
 {
+    private const array PRESERVED_OIDC_FIELDS = [
+        'open_id_registered_user_role',
+        'open_id_client_url',
+        'open_id_client_id',
+        'open_id_mapping_field',
+    ];
+
     /**
      * @var string[]
      */
@@ -19,6 +34,14 @@ final class ConfigSubscriber
         'saml_idp_own_certificate',
         'saml_idp_own_private_key',
     ];
+
+    public function __construct(
+        private readonly ClientFactoryInterface $clientFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly LoggerInterface $logger,
+        private readonly OidcSubjectIdRepository $subjectIdRepository,
+    ) {
+    }
 
     #[AsEventListener(
         event: ConfigBuilderEvent::class,
@@ -41,6 +64,48 @@ final class ConfigSubscriber
         event: ConfigPreSaveEvent::class,
     )]
     public function onConfigSave(ConfigEvent $event): void
+    {
+        $this->validateOidcConnection($event);
+
+        // Browsers do not submit these fields while OIDC is disabled. Keep the stored values,
+        // otherwise re-enabling the same provider looks like a provider change and unlinks all users.
+        $event->unsetIfEmpty(self::PRESERVED_OIDC_FIELDS);
+
+        $this->processSamlConfig($event);
+    }
+
+    #[AsEventListener(
+        event: ConfigPostSaveEvent::class,
+    )]
+    public function onConfigPostSave(ConfigEvent $event): void
+    {
+        $this->deleteOidcLinksIfProviderChanged($event);
+    }
+
+    private function validateOidcConnection(ConfigEvent $event): void
+    {
+        $config = $event->getConfig();
+
+        if (!isset($config['userconfig']['open_id_is_enabled']) || 1 !== $config['userconfig']['open_id_is_enabled']) {
+            return;
+        }
+
+        $credentials = new ClientCredentials(
+            $config['userconfig']['open_id_client_url'],
+            $config['userconfig']['open_id_client_id'],
+            $config['userconfig']['open_id_client_secret'],
+            $config['userconfig']['open_id_mapping_field']
+        );
+        $client = $this->clientFactory->create($credentials);
+
+        if ($error = $client->testConnection()) {
+            $message = $this->translator->trans('mautic.open_id.config.exception.test_connection_failed');
+            $this->logger->debug($message, ['error' => $error]);
+            $event->setError($message, [], 'userconfig', 'open_id_is_enabled');
+        }
+    }
+
+    private function processSamlConfig(ConfigEvent $event): void
     {
         // Preserve existing value
         $event->unsetIfEmpty('saml_idp_own_password');
@@ -88,6 +153,38 @@ final class ConfigSubscriber
         }
 
         $event->setConfig($data, 'userconfig');
+    }
+
+    private function deleteOidcLinksIfProviderChanged(ConfigEvent $event): void
+    {
+        $originalData = $event->getOriginalNormData()['userconfig']['parameters'] ?? [];
+        $newData      = $event->getConfig('userconfig');
+
+        $newMappingField = $newData['open_id_mapping_field'] ?? null;
+        $newClientUrl    = $this->normalizeUrl($newData['open_id_client_url'] ?? null);
+
+        // Subject IDs are only unique per provider and mapping field, so existing links
+        // must not be reused when either changes. Empty new values mean OIDC is not configured.
+        $mappingFieldChanged = !empty($newMappingField) && $newMappingField !== ($originalData['open_id_mapping_field'] ?? null);
+        $clientUrlChanged    = '' !== $newClientUrl && $newClientUrl !== $this->normalizeUrl($originalData['open_id_client_url'] ?? null);
+
+        if ($mappingFieldChanged || $clientUrlChanged) {
+            $this->subjectIdRepository->createQueryBuilder('s')
+                ->delete()
+                ->getQuery()
+                ->execute();
+        }
+    }
+
+    /**
+     * Ignores differences that do not change the provider: surrounding whitespace,
+     * trailing slashes and the case of the scheme and host.
+     */
+    private function normalizeUrl(mixed $url): string
+    {
+        $url = rtrim(trim((string) $url), '/');
+
+        return (string) preg_replace_callback('~^[a-z][a-z0-9+.-]*://[^/?#]*~i', static fn (array $matches): string => strtolower($matches[0]), $url);
     }
 
     private function validateXml(string $content): bool

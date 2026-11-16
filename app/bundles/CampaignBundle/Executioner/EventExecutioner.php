@@ -20,6 +20,7 @@ use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
 use Mautic\CampaignBundle\Model\SummaryModel;
+use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
@@ -39,6 +40,7 @@ class EventExecutioner
         private readonly EventScheduler $scheduler,
         private readonly RemovedContactTracker $removedContactTracker,
         private readonly SummaryModel $summaryModel,
+        private readonly OptimisticLockServiceInterface $optimisticLockService,
     ) {
         // Be sure that all events are compared using the exact same \DateTime
         $this->executionDate = new \DateTime();
@@ -129,7 +131,21 @@ class EventExecutioner
 
         switch ($event->getEventType()) {
             case Event::TYPE_ACTION:
-                $evaluatedContacts = $this->actionExecutioner->execute($config, $logs);
+                try {
+                    $evaluatedContacts = $this->actionExecutioner->execute($config, $logs);
+                } catch (\Exception $e) {
+                    $this->logger->error('CAMPAIGN: Error executing action ID '.$event->getId().' - '.$e->getMessage());
+
+                    // reset version for failed jobs and reschedule it in raceCondition
+                    foreach ($logs as $log) {
+                        if (!$log->isExecuted()) {
+                            $this->optimisticLockService->resetVersion($log);
+                        }
+                    }
+
+                    throw $e;
+                }
+
                 $this->persistLogs($logs);
                 $this->executeConditionEventsForContacts($event, $evaluatedContacts->getPassed(), $counter);
                 $this->executeActionEventsForContacts($event, $evaluatedContacts->getPassed(), $counter);

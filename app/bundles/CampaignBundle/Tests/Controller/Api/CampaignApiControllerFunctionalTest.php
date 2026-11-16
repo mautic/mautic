@@ -13,6 +13,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -439,6 +440,25 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $responseData = json_decode($clientResponse->getContent(), true);
         $this->assertIsArray($responseData);
         $this->assertContains('Import successful: Imported campaigns are switched off by default.', $responseData);
+    }
+
+    public function testImportCampaignActionRejectsACraftedFieldAlias(): void
+    {
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
+        $this->loginUser($user);
+
+        $payload = FixtureHelper::getPayload();
+        $payload[0][Field::ENTITY_NAME][0]['alias'] = 'review_field LONGTEXT, ADD review_extra';
+        $campaigns                                  = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\CampaignRepository::class)->count([]);
+        $forms                                      = $this->getContainer()->get(\Mautic\FormBundle\Entity\FormRepository::class)->count([]);
+
+        $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], [], [], json_encode($payload));
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $this->assertStringContainsString('review_field LONGTEXT, ADD review_extra', (string) json_decode($this->client->getResponse()->getContent(), true)['error']);
+        $this->assertSame($campaigns, $this->getContainer()->get(\Mautic\CampaignBundle\Entity\CampaignRepository::class)->count([]));
+        $this->assertSame($forms, $this->getContainer()->get(\Mautic\FormBundle\Entity\FormRepository::class)->count([]));
     }
 
     public function testImportCampaignActionZip(): void

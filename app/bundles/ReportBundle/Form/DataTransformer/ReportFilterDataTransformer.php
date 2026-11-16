@@ -3,6 +3,7 @@
 namespace Mautic\ReportBundle\Form\DataTransformer;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\ReportBundle\Helper\RelativeDateHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -37,6 +38,9 @@ final readonly class ReportFilterDataTransformer implements DataTransformerInter
             if (in_array($type, ['datetime', 'time', DateTimeType::class, DateType::class, TimeType::class])) {
                 // Skip datetime parsing for string-like conditions
                 if (isset($f['condition']) && in_array($f['condition'], ['like', 'notLike', 'startsWith', 'endsWith', 'contains'])) {
+                    continue;
+                }
+                if (in_array($type, ['datetime', 'date', DateTimeType::class, DateType::class], true) && RelativeDateHelper::isRelative($f['value'])) {
                     continue;
                 }
                 $dt         = new DateTimeHelper($f['value'], null, 'utc');
@@ -76,6 +80,9 @@ final readonly class ReportFilterDataTransformer implements DataTransformerInter
             if (in_array($type, ['datetime', 'time'])) {
                 // Skip datetime parsing for string-like conditions
                 if (isset($f['condition']) && in_array($f['condition'], ['like', 'notLike', 'startsWith', 'endsWith', 'contains'])) {
+                    continue;
+                }
+                if (RelativeDateHelper::isRelative($f['value'])) {
                     continue;
                 }
                 $dt         = new DateTimeHelper($f['value'], null, 'local');

@@ -1405,3 +1405,4 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\PluginBundle\Integration\AbstractIntegration::cleanIdentifier()` types `$identifier` as `string|array`. Passing `null` now throws; pass a string or an array identifier.
     - `Mautic\CoreBundle\Helper\InputHelper::_()` types `$mask` as `array|string`. Passing `null` now throws; omit the argument to use the default `'clean'` mask.
     - `MauticPlugin\MauticCrmBundle\Api\SalesforceApi::getLeads()` types `$query` as `string|array`. Passing `null` now throws; pass a SOQL query string or an array to build the query.
+    - `Mautic\EmailBundle\Helper\MailHelper::setLead()` types `$lead` as `array` and `Mautic\EmailBundle\Helper\MailHelper::getLead()` returns `?array`. Passing a `Mautic\LeadBundle\Entity\Lead` entity now throws; pass the contact's field array instead (e.g. `$lead->getProfileFields()`).

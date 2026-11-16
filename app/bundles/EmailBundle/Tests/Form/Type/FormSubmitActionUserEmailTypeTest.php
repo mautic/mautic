@@ -51,7 +51,7 @@ final class FormSubmitActionUserEmailTypeTest extends TestCase
                     $this->assertSame(UserListType::class, $parameters[1]);
                     $this->assertEquals([
                         'label'      => 'mautic.email.form.users',
-                        'label_attr' => ['class' => 'control-label'],
+                        'label_attr' => ['class' => 'form-label'],
                         'attr'       => [
                             'class'   => 'form-control',
                             'tooltip' => 'mautic.core.help.autocomplete',
