@@ -1766,7 +1766,9 @@ Mautic.listOnLoad = function(container, response) {
 
 Mautic.loadCampaignShare = function () {
     const table = mQuery('#campaign-share-table');
-    table.find('tr[data-campaign-id][data-share] .gauge').addClass('gauge--settled');
+    table.off('animationend.gaugeSettle').on('animationend.gaugeSettle', '.gauge__arc', function () {
+        mQuery(this).closest('.gauge').addClass('gauge--settled');
+    });
     const rows = table.find('tr[data-campaign-id]').filter(function () {
         return mQuery(this).find('.gauge--loading').length > 0;
     });
@@ -1778,8 +1780,10 @@ Mautic.loadCampaignShare = function () {
     let pendingBatches = Math.ceil(ids.length / batchSize);
 
     const finish = function () {
-        table.find('tr[data-campaign-id][data-share]').filter(function () {
-            return 0 === parseFloat(mQuery(this).attr('data-share'));
+        table.find('tr[data-campaign-id]').filter(function () {
+            const share = mQuery(this).attr('data-share');
+
+            return undefined === share || 0 === parseFloat(share);
         }).remove();
 
         const resolvedRows = table.find('tr[data-campaign-id][data-share]');
