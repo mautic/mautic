@@ -18,7 +18,8 @@ label {
 
 // control label
 // -------------------------
-.control-label {
+.control-label,
+.form-label {
   color: var(--text-secondary);
 
   &.text-left {

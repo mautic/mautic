@@ -12,10 +12,10 @@ Mautic.downloadIpLookupDataStore = function() {
 
         if (response.message) {
             mQuery('#iplookup_fetch_button_container').parent().removeClass('has-error').addClass('has-success');
-            mQuery('#iplookup_fetch_button_container').next('.help-block').html(response.message);
+            mQuery('#iplookup_fetch_button_container').next('.form-text').html(response.message);
         } else if (response.error) {
             mQuery('#iplookup_fetch_button_container').parent().removeClass('has-success').addClass('has-error');
-            mQuery('#iplookup_fetch_button_container').next('.help-block').html(response.error);
+            mQuery('#iplookup_fetch_button_container').next('.form-text').html(response.error);
         }
     }, false, false, 'POST');
 };

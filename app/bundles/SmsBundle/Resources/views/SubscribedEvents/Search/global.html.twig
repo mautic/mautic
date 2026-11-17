@@ -6,15 +6,15 @@
 {% else %}
     <a href="{{ url('mautic_sms_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
         <span class="fw-sb">{{ item.name }}</span>
-        <span class="ml-4 mr-sm">#{{ item.id }}</span>
+        <span class="ms-4 me-12">#{{ item.id }}</span>
         {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
             'entity': item,
             'status': 'active',
             'simplified': 'true'
         }) -}}
     </a>
-    <span class="pull-right" data-toggle="tooltip" title="{{ 'mautic.sms.stat.sentcount.label'|trans }}"
-          data-placement="left">
+    <span class="float-end" data-bs-toggle="tooltip" title="{{ 'mautic.sms.stat.sentcount.label'|trans }}"
+          data-bs-placement="left">
         <i class="ri-send-plane-line"></i>
         {{ item.sentCount }}
     </span>
