@@ -202,7 +202,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $lead          = $event->getSubmission()->getLead();
         $matchedFields = [];
         $payload       = [
-            'mautic_contact' => $lead->getProfileFields(),
+            'mautic_contact' => $lead?->getProfileFields() ?? [],
             'mautic_form'    => [
                 'id'   => $post['formId'],
                 'name' => $post['formName'],
