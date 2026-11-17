@@ -122,7 +122,7 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
 
         $validation = $field->getValidation() ?? [];
 
-        if (!$this->failsCountryValidation($event, $validation)) {
+        if (!$this->rejectInvalidCountryPhone($event, $validation)) {
             $this->validateInternationalPhone($event, $validation);
         }
     }
@@ -130,7 +130,7 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
     /**
      * @param array<string, mixed> $validation
      */
-    private function failsCountryValidation(Events\ValidationEvent $event, array $validation): bool
+    private function rejectInvalidCountryPhone(Events\ValidationEvent $event, array $validation): bool
     {
         $countryCode = (string) ($validation['country'] ?? '');
 
@@ -141,10 +141,13 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
             return false;
         }
 
-        $message = isset($validation['country_validationmsg']) && '' !== $validation['country_validationmsg']
-            ? $validation['country_validationmsg']
-            : $this->translator->trans('mautic.form.submission.phone.invalid_country', ['%country%' => Countries::getName($countryCode)], 'validators');
-        $event->failedValidation($message);
+        if (isset($validation['country_validationmsg']) && '' !== $validation['country_validationmsg']) {
+            $event->failedValidation($validation['country_validationmsg']);
+
+            return true;
+        }
+
+        $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid_country', ['%country%' => Countries::getName($countryCode)], 'validators'));
 
         return true;
     }
@@ -158,10 +161,8 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
             return;
         }
 
-        $phoneUtil = PhoneNumberUtil::getInstance();
-
         try {
-            $phoneUtil->parse((string) $event->getValue(), PhoneNumberUtil::UNKNOWN_REGION);
+            PhoneNumberUtil::getInstance()->parse((string) $event->getValue(), PhoneNumberUtil::UNKNOWN_REGION);
         } catch (NumberParseException) {
             if (isset($validation['international_validationmsg']) && '' !== $validation['international_validationmsg']) {
                 $event->failedValidation($validation['international_validationmsg']);

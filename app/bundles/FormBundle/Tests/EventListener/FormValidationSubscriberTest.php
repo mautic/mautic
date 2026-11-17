@@ -331,13 +331,15 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testNationalPhoneValidationFallsThroughToInternational(): void
     {
-        $this->translator->method('trans')->willReturn('Invalid international phone number.');
+        $this->translator->method('trans')
+            ->with('mautic.form.submission.phone.invalid', [], 'validators')
+            ->willReturn('Invalid international phone number.');
 
         $field = new Field();
         $field->setType('tel');
         $field->setValidation(['country' => 'US', 'international' => 1]);
 
-        $event = new ValidationEvent($field, '2025550123');
+        $event = new ValidationEvent($field, '2015550123');
         $this->subscriber->onFormValidate($event);
 
         $this->assertFalse($event->isValid());

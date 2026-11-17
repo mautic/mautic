@@ -54,8 +54,7 @@ final class PhoneCountryValidationHelper
      */
     public static function getCountries(): array
     {
-        $phoneUtil    = PhoneNumberUtil::getInstance();
-        $regions      = $phoneUtil->getSupportedRegions();
+        $regions      = PhoneNumberUtil::getInstance()->getSupportedRegions();
         $allCountries = Countries::getNames();
         $result       = [];
 
