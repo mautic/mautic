@@ -60,6 +60,10 @@ Mautic.initQuantitySteppers = function () {
         };
     }
 
+    function stepOf(input) {
+        return Math.max(1, Math.round(Number(input.step)) || 1);
+    }
+
     function clamp(input, number) {
         const {min, max} = bounds(input);
 
@@ -79,7 +83,7 @@ Mautic.initQuantitySteppers = function () {
 
     function snap(input, number, direction) {
         const {max} = bounds(input);
-        const step = Number(input.step) || 1;
+        const step = stepOf(input);
         const base = stepBase(input);
         const current = Number(input.value) || 0;
         const ratio = (clamp(input, number) - base) / step;
@@ -89,7 +93,7 @@ Mautic.initQuantitySteppers = function () {
     }
 
     function fromGrid(input, number, delta) {
-        const step = Number(input.step) || 1;
+        const step = stepOf(input);
         const base = stepBase(input);
         const ratio = (number - base) / step;
         const anchor = base + (delta < 0 ? Math.ceil(ratio) : Math.floor(ratio)) * step;
@@ -218,7 +222,7 @@ Mautic.initQuantitySteppers = function () {
 
     function start(root, direction) {
         const data = info(root);
-        const step = Number(parts(root).input.step) || 1;
+        const step = stepOf(parts(root).input);
         let count = 0;
         const tick = () => {
             data.repeating = true;
@@ -255,7 +259,7 @@ Mautic.initQuantitySteppers = function () {
         const button = event.target.closest('[data-quantity-step]');
         const root = button && rootOf(button);
         if (root && event.detail === 0 && !button.disabled) {
-            change(root, Number(button.dataset.quantityStep) * (Number(parts(root).input.step) || 1));
+            change(root, Number(button.dataset.quantityStep) * (stepOf(parts(root).input)));
         }
     });
 
@@ -294,7 +298,7 @@ Mautic.initQuantitySteppers = function () {
         if (button) {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
-                change(root, Number(button.dataset.quantityStep) * (Number(parts(root).input.step) || 1));
+                change(root, Number(button.dataset.quantityStep) * (stepOf(parts(root).input)));
             }
 
             return;
@@ -305,7 +309,7 @@ Mautic.initQuantitySteppers = function () {
             return;
         }
 
-        const step = Number(input.step) || 1;
+        const step = stepOf(input);
         const {min, max} = bounds(input);
         const deltas = {ArrowUp: step, ArrowDown: -step, PageUp: step * 10, PageDown: -step * 10};
 
