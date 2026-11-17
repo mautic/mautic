@@ -2,8 +2,8 @@
 
 namespace Mautic\LeadBundle\Form\DataTransformer;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
@@ -33,7 +33,7 @@ final class TagEntityModelTransformer implements DataTransformerInterface
             return $entity->getTag();
         }
 
-        if (!is_array($entity) && !$entity instanceof PersistentCollection) {
+        if (!is_array($entity) && !$entity instanceof Collection) {
             return [];
         }
 
