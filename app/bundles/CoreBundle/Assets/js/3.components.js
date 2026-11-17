@@ -81,10 +81,11 @@ Mautic.initQuantitySteppers = function () {
         const {max} = bounds(input);
         const step = Number(input.step) || 1;
         const base = stepBase(input);
+        const current = Number(input.value) || 0;
         const ratio = (clamp(input, number) - base) / step;
         const next = base + (direction < 0 ? Math.floor(ratio) : Math.ceil(ratio)) * step;
 
-        return next > max ? next - step : next;
+        return next > max ? Math.min(max, Math.max(next - step, current)) : next;
     }
 
     function fromGrid(input, number, delta) {
@@ -221,7 +222,7 @@ Mautic.initQuantitySteppers = function () {
         let count = 0;
         const tick = () => {
             data.repeating = true;
-            if (!change(root, direction * step)) {
+            if (!root.isConnected || !change(root, direction * step)) {
                 stop(root);
 
                 return;
