@@ -72,6 +72,19 @@ final class FormFieldTelTypeTest extends TypeTestCase
         $this->assertSame('mautic.core.none', $countryField->getConfig()->getOption('placeholder'));
         $this->assertSame(self::COUNTRY_UNITED_STATES, $countryField->getData());
         $this->assertContains(self::COUNTRY_UNITED_STATES, $countryField->getConfig()->getOption('choices'));
+        $this->assertSame('mautic.form.field.type.tel.country_validation.tooltip', $countryField->getConfig()->getOption('attr')['tooltip']);
+    }
+
+    public function testInternationalFieldConfiguration(): void
+    {
+        $form = $this->factory->create(FormFieldTelType::class, [], [
+            'data' => [],
+        ]);
+
+        $internationalField = $form->get('international');
+
+        $this->assertSame('mautic.form.field.type.tel.international', $internationalField->getConfig()->getOption('label'));
+        $this->assertSame('mautic.form.field.type.tel.international.tooltip', $internationalField->getConfig()->getOption('attr')['tooltip']);
     }
 
     public function testCountryValidationMessageFieldConfiguration(): void

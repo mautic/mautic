@@ -33,6 +33,9 @@ final class FormFieldTelType extends AbstractType
                 'placeholder' => 'mautic.core.none',
                 'required'    => false,
                 'data'        => $options['data']['country'] ?? null,
+                'attr'        => [
+                    'tooltip' => 'mautic.form.field.type.tel.country_validation.tooltip',
+                ],
             ]
         );
 
@@ -42,6 +45,9 @@ final class FormFieldTelType extends AbstractType
             [
                 'label' => 'mautic.form.field.type.tel.international',
                 'data'  => $options['data']['international'] ?? false,
+                'attr'  => [
+                    'tooltip' => 'mautic.form.field.type.tel.international.tooltip',
+                ],
             ]
         );
 
