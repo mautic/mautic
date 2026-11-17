@@ -85,7 +85,7 @@ final class FormRepositoryTest extends TestCase
 
         [$expr] = $method->invoke($this->repository, $qb, $filter);
 
-        $this->assertStringContainsString('Mautic\\FormBundle\\Entity\\Action a WHERE a.form = f', (string) $expr);
+        $this->assertMatchesRegularExpression('/EXISTS\(SELECT (a\w+)\.id FROM Mautic\\\\FormBundle\\\\Entity\\\\Action \1 WHERE \1\.form = f\)/', (string) $expr);
     }
 
     public function testGetSearchCommandsContainsHasActions(): void

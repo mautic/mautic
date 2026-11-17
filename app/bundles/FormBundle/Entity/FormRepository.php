@@ -155,13 +155,14 @@ class FormRepository extends CommonRepository
             case $this->translator->trans('mautic.form.form.searchcommand.hasactions'):
             case $this->translator->trans('mautic.form.form.searchcommand.hasactions', [], null, 'en_US'):
                 $sq       = $this->getEntityManager()->createQueryBuilder();
-                $subquery = $sq->select('count(a.id)')
-                    ->from(Action::class, 'a')
+                $alias    = 'a'.$unique;
+                $subquery = $sq->select($alias.'.id')
+                    ->from(Action::class, $alias)
                     ->where(
-                        $q->expr()->eq('a.form', 'f')
+                        $q->expr()->eq($alias.'.form', 'f')
                     )
                     ->getDql();
-                $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 0);
+                $expr = $q->expr()->exists($subquery);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):

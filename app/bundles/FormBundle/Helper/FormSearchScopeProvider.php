@@ -30,6 +30,7 @@ final class FormSearchScopeProvider extends AbstractSearchScopeProvider
             SearchScopePresets::isUncategorized(),
             SearchScopePresets::isMine(),
             SearchScopePresets::command('mautic.form.form.searchcommand.hasresults'),
+            SearchScopePresets::command('mautic.form.form.searchcommand.hasactions'),
             SearchScopePresets::project(),
         ];
     }
