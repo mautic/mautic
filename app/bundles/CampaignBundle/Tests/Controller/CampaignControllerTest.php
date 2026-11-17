@@ -35,9 +35,13 @@ final class CampaignControllerTest extends MauticMysqlTestCase
      */
     public function testNewActionCampaign(): void
     {
-        $this->client->request('GET', '/s/campaigns/new/');
+        $crawler = $this->client->request('GET', '/s/campaigns/new/');
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertSame(
+            'true',
+            $crawler->filter('#campaign_isPublished_1')->attr('data-enable-schedule-when-inactive')
+        );
     }
 
     /**
