@@ -404,14 +404,14 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @throws \Exception
      */
-    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, $query = [], ?\DateTime $dateTime = null): bool
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, $query = [], ?\DateTime $dateTime = null, bool $isExplicitAction = false): bool
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous() || $request->cookies->get('Blocked-Tracking')) {
             return false;
         }
 
-        if (!$this->ipLookupHelper->isRequestTrackable()) {
+        if (!$this->ipLookupHelper->isRequestTrackable($isExplicitAction)) {
             return false;
         }
 
