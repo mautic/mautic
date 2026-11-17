@@ -60,6 +60,7 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
             "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listOne->getId()})))) AND (l.date_identified IS NOT NULL)",
             "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listOne->getId()})))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
+
         $this->assertSearchResult('!segment%3A'.$listOne->getAlias(), [$leadFour, $leadFive, $leadSix, $leadSeven], [$leadOne, $leadTwo, $leadThree]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listOne->getAlias()}'",
@@ -92,6 +93,30 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
             "SELECT COUNT(l.id) as count FROM {$prefix}leads l WHERE (l.date_identified IS NOT NULL) AND (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0)))",
             "SELECT l.* FROM {$prefix}leads l WHERE (l.date_identified IS NOT NULL) AND (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0))) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
+    }
+
+    public function testUnsegmentedIgnoresManuallyRemovedMemberships(): void
+    {
+        $activeLead     = $this->createLead('kilo');
+        $removedLead    = $this->createLead('lima');
+        $unassignedLead = $this->createLead('mike');
+
+        $list = $this->createLeadList('removed-list', [], $activeLead);
+
+        $manuallyRemovedListLead = new ListLead();
+        $manuallyRemovedListLead->setLead($removedLead);
+        $manuallyRemovedListLead->setList($list);
+        $manuallyRemovedListLead->setDateAdded(new \DateTime());
+        $manuallyRemovedListLead->setManuallyAdded(false);
+        $manuallyRemovedListLead->setManuallyRemoved(true);
+        $this->em->persist($manuallyRemovedListLead);
+
+        $this->em->flush();
+        $this->em->clear();
+        $this->client->enableProfiler();
+
+        $this->assertSearchResult('is%3Aunsegmented', [$removedLead, $unassignedLead], [$activeLead]);
+        $this->assertSearchResult('!is%3Aunsegmented', [$activeLead], [$removedLead, $unassignedLead]);
     }
 
     public function testSegmentSourceSearch(): void
