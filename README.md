@@ -108,7 +108,7 @@ There are lots of good conversations and resources in our Forums. If you're stru
 
 - [GitHub Issues](https://github.com/mautic/mautic/issues)
 - [Forum](https://forum.mautic.org/)
-- [General troubleshooting][troubleshooting] page
+- [Troubleshooting failed updates][troubleshooting] page
 - [User documentation](https://docs.mautic.org), including how to use Mautic
 - [Developer documentation](https://devdocs.mautic.org), including API reference docs
 
