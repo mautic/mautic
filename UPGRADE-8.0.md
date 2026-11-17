@@ -1517,6 +1517,11 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\CoreBundle\Helper\InputHelper::_()` types `$mask` as `array|string`. Passing `null` now throws; omit the argument to use the default `'clean'` mask.
     - `MauticPlugin\MauticCrmBundle\Api\SalesforceApi::getLeads()` types `$query` as `string|array`. Passing `null` now throws; pass a SOQL query string or an array to build the query.
     - `Mautic\EmailBundle\Helper\MailHelper::setLead()` types `$lead` as `array` and `Mautic\EmailBundle\Helper\MailHelper::getLead()` returns `?array`. Passing a `Mautic\LeadBundle\Entity\Lead` entity now throws; pass the contact's field array instead (e.g. `$lead->getProfileFields()`).
+    - `Mautic\CoreBundle\Helper\InputHelper::url()` types `$defaultProtocol` as `?string`. Passing `false` now throws; pass `null` to fall back to `http`, or a protocol string.
+    - `Mautic\CoreBundle\Twig\Extension\ContentExtension::getCustomContent()` (Twig function `customContent()`) types `$context` as `?string`. Pass a string context or `null`.
+    - `Mautic\CoreBundle\Twig\Helper\FormatterHelper::simpleCsvToArray()` types `$csv` as `?string`. Pass a comma-separated string or `null`.
+    - `Mautic\PluginBundle\Entity\IntegrationEntityRepository::getIntegrationsEntityId()` types `$startDate` and `$endDate` as `?string`. Passing a `\DateTimeInterface` now throws; pass a date string or `null`.
+    - `MauticPlugin\MauticFocusBundle\Model\FocusModel::addStat()` types `$type` as `string`. Passing `null` now throws; pass a stat type such as `Stat::TYPE_FORM`.
 
 ### Native parameter and return types for plugin extension points
 
