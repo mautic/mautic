@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -16,10 +17,12 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use Mautic\UserBundle\Model\RoleModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
@@ -860,6 +863,212 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             ->where("cl.campaign_id = {$campaignId}")
             ->executeQuery()
             ->fetchAllAssociative();
+    }
+
+    /**
+     * @param 'lead:toggleLeadList'|'lead:toggleCompanyLead'|'lead:setAsPrimaryCompany'|'lead:removeTagFromLead'|'lead:togglePreferredLeadChannel'|'lead:removeBounceStatus' $action
+     */
+    #[DataProvider('contactChangingActionProvider')]
+    public function testContactChangingActionIsDeniedWithoutContactEditPermission(string $action): void
+    {
+        $fixtures = $this->createContactChangeFixtures(null);
+        $this->loginUser($this->createUserWithContactPermissions('no-contact-access', []));
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $this->getContactChangePayload($action, $fixtures));
+
+        $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        $this->assertFalse($this->isContactChanged($action, $fixtures));
+    }
+
+    /**
+     * @param 'lead:toggleLeadList'|'lead:toggleCompanyLead'|'lead:setAsPrimaryCompany'|'lead:removeTagFromLead'|'lead:togglePreferredLeadChannel'|'lead:removeBounceStatus' $action
+     */
+    #[DataProvider('contactChangingActionProvider')]
+    public function testContactChangingActionIsAllowedOnOwnContactWithEditOwnPermission(string $action): void
+    {
+        $user     = $this->createUserWithContactPermissions('own-contact-access', ['viewown', 'editown']);
+        $fixtures = $this->createContactChangeFixtures($user);
+        $this->loginUser($user);
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $this->getContactChangePayload($action, $fixtures));
+
+        $this->assertResponseIsSuccessful();
+        $this->assertTrue($this->isContactChanged($action, $fixtures));
+    }
+
+    /**
+     * @param 'lead:toggleLeadList'|'lead:toggleCompanyLead'|'lead:setAsPrimaryCompany'|'lead:removeTagFromLead'|'lead:togglePreferredLeadChannel'|'lead:removeBounceStatus' $action
+     */
+    #[DataProvider('contactChangingActionProvider')]
+    public function testContactChangingActionIsDeniedOnOtherContactWithEditOwnPermission(string $action): void
+    {
+        $owner    = $this->createUserWithContactPermissions('contact-owner', []);
+        $user     = $this->createUserWithContactPermissions('own-contact-access', ['viewown', 'viewother', 'editown']);
+        $fixtures = $this->createContactChangeFixtures($owner);
+        $this->loginUser($user);
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $this->getContactChangePayload($action, $fixtures));
+
+        $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        $this->assertFalse($this->isContactChanged($action, $fixtures));
+    }
+
+    /**
+     * @param 'lead:toggleLeadList'|'lead:toggleCompanyLead'|'lead:setAsPrimaryCompany'|'lead:removeTagFromLead'|'lead:togglePreferredLeadChannel'|'lead:removeBounceStatus' $action
+     */
+    #[DataProvider('contactChangingActionProvider')]
+    public function testContactChangingActionIsAllowedOnOtherContactWithEditOtherPermission(string $action): void
+    {
+        $owner    = $this->createUserWithContactPermissions('contact-owner', []);
+        $user     = $this->createUserWithContactPermissions('other-contact-access', ['viewother', 'editother']);
+        $fixtures = $this->createContactChangeFixtures($owner);
+        $this->loginUser($user);
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $this->getContactChangePayload($action, $fixtures));
+
+        $this->assertResponseIsSuccessful();
+        $this->assertTrue($this->isContactChanged($action, $fixtures));
+    }
+
+    /**
+     * @return \Generator<string, array{'lead:toggleLeadList'|'lead:toggleCompanyLead'|'lead:setAsPrimaryCompany'|'lead:removeTagFromLead'|'lead:togglePreferredLeadChannel'|'lead:removeBounceStatus'}>
+     */
+    public static function contactChangingActionProvider(): \Generator
+    {
+        yield 'toggle segment' => ['lead:toggleLeadList'];
+        yield 'toggle company' => ['lead:toggleCompanyLead'];
+        yield 'set primary company' => ['lead:setAsPrimaryCompany'];
+        yield 'remove tag' => ['lead:removeTagFromLead'];
+        yield 'toggle preferred channel' => ['lead:togglePreferredLeadChannel'];
+        yield 'remove bounce status' => ['lead:removeBounceStatus'];
+    }
+
+    /**
+     * @param string[] $permissions
+     */
+    private function createUserWithContactPermissions(string $username, array $permissions): User
+    {
+        $role = new Role();
+        $role->setName($username);
+        $role->setIsAdmin(false);
+        if ([] !== $permissions) {
+            self::getContainer()->get(RoleModel::class)->setRolePermissions($role, ['lead:leads' => $permissions]);
+        }
+        $this->em->persist($role);
+
+        $user = new User();
+        $user->setFirstName('Test');
+        $user->setLastName('User');
+        $user->setEmail($username.'@test.com');
+        $user->setUsername($username);
+        $user->setRole($role);
+        $user->setPassword(self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user)->hash('mautic'));
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $user;
+    }
+
+    /**
+     * @return array{lead: int, segment: int, company: int, secondaryCompany: int, tag: int, dnc: int}
+     */
+    private function createContactChangeFixtures(?User $owner): array
+    {
+        $tag = new Tag();
+        $tag->setTag('Tag to remove');
+        $this->em->persist($tag);
+
+        $lead = new Lead();
+        $lead->setEmail('contact-change@example.com');
+        $lead->setOwner($owner);
+        $lead->addTag($tag);
+        $this->em->persist($lead);
+
+        $segment = new LeadList();
+        $segment->setName('Segment');
+        $segment->setPublicName('Segment');
+        $segment->setAlias('contact-change-segment');
+        $this->em->persist($segment);
+
+        $companies = [];
+        foreach (['Company to add', 'Primary company', 'Secondary company'] as $name) {
+            $company = new Company();
+            $company->setName($name);
+            $this->em->persist($company);
+            $companies[] = $company;
+        }
+
+        foreach ([[$companies[1], true], [$companies[2], false]] as [$company, $isPrimary]) {
+            $companyLead = new CompanyLead();
+            $companyLead->setCompany($company);
+            $companyLead->setLead($lead);
+            $companyLead->setPrimary($isPrimary);
+            $companyLead->setDateAdded(new \DateTime());
+            $this->em->persist($companyLead);
+        }
+
+        $dnc = new DoNotContact();
+        $dnc->setLead($lead);
+        $dnc->setChannel('email');
+        $dnc->setReason(DoNotContact::BOUNCED);
+        $dnc->setDateAdded(new \DateTime());
+        $lead->addDoNotContactEntry($dnc);
+        $this->em->persist($dnc);
+
+        $this->em->flush();
+
+        return [
+            'lead'             => $lead->getId(),
+            'segment'          => (int) $segment->getId(),
+            'company'          => (int) $companies[0]->getId(),
+            'secondaryCompany' => (int) $companies[2]->getId(),
+            'tag'              => (int) $tag->getId(),
+            'dnc'              => (int) $dnc->getId(),
+        ];
+    }
+
+    /**
+     * @param 'lead:toggleLeadList'|'lead:toggleCompanyLead'|'lead:setAsPrimaryCompany'|'lead:removeTagFromLead'|'lead:togglePreferredLeadChannel'|'lead:removeBounceStatus' $action
+     * @param array{lead: int, segment: int, company: int, secondaryCompany: int, tag: int, dnc: int}                                                                        $fixtures
+     *
+     * @return array<string, int|string>
+     */
+    private function getContactChangePayload(string $action, array $fixtures): array
+    {
+        return ['action' => $action] + match ($action) {
+            'lead:toggleLeadList'             => ['leadId' => $fixtures['lead'], 'listId' => $fixtures['segment'], 'listAction' => 'add'],
+            'lead:toggleCompanyLead'          => ['leadId' => $fixtures['lead'], 'companyId' => $fixtures['company'], 'companyAction' => 'add'],
+            'lead:setAsPrimaryCompany'        => ['leadId' => $fixtures['lead'], 'companyId' => $fixtures['secondaryCompany']],
+            'lead:removeTagFromLead'          => ['leadId' => $fixtures['lead'], 'tagId' => $fixtures['tag']],
+            'lead:togglePreferredLeadChannel' => ['leadId' => $fixtures['lead'], 'channel' => 'sms', 'channelAction' => 'remove'],
+            'lead:removeBounceStatus'         => ['id' => $fixtures['dnc'], 'channel' => 'email'],
+        };
+    }
+
+    /**
+     * @param 'lead:toggleLeadList'|'lead:toggleCompanyLead'|'lead:setAsPrimaryCompany'|'lead:removeTagFromLead'|'lead:togglePreferredLeadChannel'|'lead:removeBounceStatus' $action
+     * @param array{lead: int, segment: int, company: int, secondaryCompany: int, tag: int, dnc: int}                                                                        $fixtures
+     */
+    private function isContactChanged(string $action, array $fixtures): bool
+    {
+        $connection = $this->em->getConnection();
+        $count      = fn (string $table, array $criteria): int => (int) $connection->fetchOne(
+            'SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.$table.' WHERE '.implode(' AND ', array_map(fn (string $column): string => $column.' = ?', array_keys($criteria))),
+            array_values($criteria)
+        );
+
+        return match ($action) {
+            'lead:toggleLeadList'             => 1 === $count('lead_lists_leads', ['lead_id' => $fixtures['lead'], 'leadlist_id' => $fixtures['segment']]),
+            'lead:toggleCompanyLead'          => 1 === $count('companies_leads', ['lead_id' => $fixtures['lead'], 'company_id' => $fixtures['company']]),
+            'lead:setAsPrimaryCompany'        => 1 === $count('companies_leads', ['lead_id' => $fixtures['lead'], 'company_id' => $fixtures['secondaryCompany'], 'is_primary' => 1]),
+            'lead:removeTagFromLead'          => 0 === $count('lead_tags_xref', ['lead_id' => $fixtures['lead'], 'tag_id' => $fixtures['tag']]),
+            'lead:togglePreferredLeadChannel' => 1 === $count('lead_donotcontact', ['lead_id' => $fixtures['lead'], 'channel' => 'sms']),
+            'lead:removeBounceStatus'         => 0 === $count('lead_donotcontact', ['lead_id' => $fixtures['lead'], 'channel' => 'email']),
+        };
     }
 
     private function createContact(string $email): Lead

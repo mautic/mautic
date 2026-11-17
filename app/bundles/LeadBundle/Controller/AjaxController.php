@@ -305,6 +305,10 @@ final class AjaxController extends CommonAjaxController
             $list = $listModel->getEntity($listId);
 
             if (null !== $lead && null !== $list) {
+                if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+                    $this->throwAccessDenied();
+                }
+
                 $class = 'add' == $action ? 'addToLists' : 'removeFromLists';
                 $leadModel->{$class}($lead, $list);
                 $dataArray['success'] = 1;
@@ -325,6 +329,10 @@ final class AjaxController extends CommonAjaxController
             $lead = $leadModel->getEntity($leadId);
 
             if (null !== $lead) {
+                if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+                    $this->throwAccessDenied();
+                }
+
                 if ('remove' === $action) {
                     $doNotContact->addDncForContact($leadId, $channel, DoNotContact::MANUAL, 'user');
                 } elseif ('add' === $action) {
@@ -386,6 +394,10 @@ final class AjaxController extends CommonAjaxController
             $company = $companyModel->getEntity($companyId);
 
             if (null !== $lead && null !== $company) {
+                if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+                    $this->throwAccessDenied();
+                }
+
                 $class = 'add' == $action ? 'addLeadToCompany' : 'removeLeadFromCompany';
                 $companyModel->{$class}($company, $lead);
                 $dataArray['success'] = 1;
@@ -424,6 +436,10 @@ final class AjaxController extends CommonAjaxController
 
             $lead = $dnc->getLead();
             if ($lead) {
+                if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+                    $this->throwAccessDenied();
+                }
+
                 // Use lead model to trigger listeners
                 $doNotContact->removeDncForContact($lead->getId(), $channel);
                 $this->addFlashMessage('mautic.lead.event.donotcontact_channel_contactable', ['%channel%' => $channel], FlashBag::LEVEL_SUCCESS);
@@ -772,6 +788,13 @@ final class AjaxController extends CommonAjaxController
         $companyId            = InputHelper::clean($request->request->get('companyId'));
         $leadId               = InputHelper::clean($request->request->get('leadId'));
 
+        $lead = $leadModel->getEntity((int) $leadId);
+        if (null !== $lead) {
+            if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+                $this->throwAccessDenied();
+            }
+        }
+
         $primaryCompany = $leadModel->setPrimaryCompany($companyId, $leadId);
 
         $dataArray = array_merge($dataArray, $primaryCompany);
@@ -853,6 +876,15 @@ final class AjaxController extends CommonAjaxController
         $tagId     = (int) $request->request->get('tagId');
 
         if (!empty($leadId) && !empty($tagId)) {
+            $lead = $leadModel->getEntity($leadId);
+            if (null === $lead) {
+                return $this->sendJsonResponse([]);
+            }
+
+            if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+                $this->throwAccessDenied();
+            }
+
             $leadModel->removeTagFromLead($leadId, $tagId);
         }
 
