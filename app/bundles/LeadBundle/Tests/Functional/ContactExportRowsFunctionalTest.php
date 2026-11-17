@@ -116,7 +116,7 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=csv&ids='.urlencode(json_encode($ids)));
         $this->assertResponseIsSuccessful();
         $content     = $this->client->getInternalResponse()->getContent();
-        $interactive = array_map(str_getcsv(...), explode("\n", trim(preg_replace('/^\xEF\xBB\xBF/', '', $content))));
+        $interactive = array_map(fn (string $line): array => str_getcsv($line, escape: ''), explode("\n", trim(preg_replace('/^\xEF\xBB\xBF/', '', $content))));
 
         $scheduled = $this->readScheduledExport(['limit' => 200, 'fileType' => 'csv'] + $this->argsFor($ids));
 
@@ -163,7 +163,7 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
         $zip->close();
         unlink($zipPath);
 
-        return array_map(str_getcsv(...), explode("\n", trim($csv)));
+        return array_map(fn (string $line): array => str_getcsv($line, escape: ''), explode("\n", trim($csv)));
     }
 
     /**
