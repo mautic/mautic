@@ -273,7 +273,7 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
             'country_validationmsg' => '',
         ]);
 
-        $event = new ValidationEvent($field, '+551****9999');
+        $event = new ValidationEvent($field, '+5511987654321');
         $this->subscriber->onFormValidate($event);
 
         $this->assertFalse($event->isValid());
