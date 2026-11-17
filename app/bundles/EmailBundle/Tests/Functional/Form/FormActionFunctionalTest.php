@@ -236,7 +236,7 @@ final class FormActionFunctionalTest extends MauticMysqlTestCase
         );
 
         // bounced contacts do NOT receive form emails (even with ignoreDNC => true)
-        $this->assertNull($emailStat);
+        $this->assertNotInstanceOf(Stat::class, $emailStat);
     }
 
     private function createLandingPage(string $title, string $alias, string $html): Page

@@ -176,8 +176,11 @@ final class FormSubscriberTest extends TestCase
             ->with(
                 $email,
                 $feedback['lead.create']['lead'],
-                $this->callback(function ($options) {
-                    return isset($options['ignoreDNC']) && true === $options['ignoreDNC'];
+                $this->callback(function (array|\ArrayAccess $options): bool {
+                    $this->assertArrayHasKey('ignoreDNC', $options);
+                    $this->assertTrue($options['ignoreDNC']);
+
+                    return true;
                 })
             );
 
