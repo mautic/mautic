@@ -271,13 +271,10 @@ final class CampaignSubscriberTest extends TestCase
         $lead->setId(99);
         $log = $this->createStub(LeadEventLog::class);
         $log->method('getLead')->willReturn($lead);
-        $log->method('getEvent')->willReturn([
-            'type'       => 'lead.dnc',
-            'properties' => [
-                'reason'   => $reason,
-                'channels' => $channels,
-            ],
-        ]);
+        $log->method('getEvent')->willReturn($this->createCampaignEvent('lead.dnc', [
+            'reason'   => $reason,
+            'channels' => $channels,
+        ]));
 
         $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
         $this->subscriber->onCampaignTriggerCondition($event);
@@ -313,10 +310,7 @@ final class CampaignSubscriberTest extends TestCase
 
         $log = $this->createStub(LeadEventLog::class);
         $log->method('getLead')->willReturn($lead);
-        $log->method('getEvent')->willReturn([
-            'type'       => 'lead.pageHit',
-            'properties' => $this->configPageHit,
-        ]);
+        $log->method('getEvent')->willReturn($this->createCampaignEvent('lead.pageHit', $this->configPageHit));
 
         $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
         $this->subscriber->onCampaignTriggerCondition($event);
@@ -353,10 +347,7 @@ final class CampaignSubscriberTest extends TestCase
 
         $log = $this->createStub(LeadEventLog::class);
         $log->method('getLead')->willReturn($lead);
-        $log->method('getEvent')->willReturn([
-            'type'       => 'lead.pageHit',
-            'properties' => $this->configUrlPageHit,
-        ]);
+        $log->method('getEvent')->willReturn($this->createCampaignEvent('lead.pageHit', $this->configUrlPageHit));
 
         $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
         $this->subscriber->onCampaignTriggerCondition($event);
@@ -393,10 +384,7 @@ final class CampaignSubscriberTest extends TestCase
 
         $log = $this->createStub(LeadEventLog::class);
         $log->method('getLead')->willReturn($lead);
-        $log->method('getEvent')->willReturn([
-            'type'       => 'lead.pageHit',
-            'properties' => $this->configUrlPageHitWithoutSpentTime,
-        ]);
+        $log->method('getEvent')->willReturn($this->createCampaignEvent('lead.pageHit', $this->configUrlPageHitWithoutSpentTime));
 
         $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
         $this->subscriber->onCampaignTriggerCondition($event);
@@ -424,16 +412,13 @@ final class CampaignSubscriberTest extends TestCase
 
         $log = $this->createStub(LeadEventLog::class);
         $log->method('getLead')->willReturn($lead);
-        $log->method('getEvent')->willReturn([
-            'type'       => 'lead.pageHit',
-            'properties' => [
-                'startDate'         => '',
-                'endDate'           => '',
-                'page'              => '',
-                'page_url'          => $pageUrlFilter,
-                'accumulative_time' => '',
-            ],
-        ]);
+        $log->method('getEvent')->willReturn($this->createCampaignEvent('lead.pageHit', [
+            'startDate'         => '',
+            'endDate'           => '',
+            'page'              => '',
+            'page_url'          => $pageUrlFilter,
+            'accumulative_time' => '',
+        ]));
 
         $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
         $this->subscriber->onCampaignTriggerCondition($event);
@@ -500,5 +485,17 @@ final class CampaignSubscriberTest extends TestCase
         $this->assertCount(1, $pendingEvent->getSuccessful());
         $this->assertCount(0, $pendingEvent->getFailures());
         $this->assertFalse($leadEventLog->getIsScheduled());
+    }
+
+    /**
+     * @param array<string, mixed> $properties
+     */
+    private function createCampaignEvent(string $type, array $properties): Event
+    {
+        $event = new Event();
+        $event->setType($type);
+        $event->setProperties($properties);
+
+        return $event;
     }
 }
