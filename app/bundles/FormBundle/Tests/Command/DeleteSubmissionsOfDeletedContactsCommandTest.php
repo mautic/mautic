@@ -39,16 +39,49 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $this->assertSame(3, $this->countSubmissionsWithoutContact());
         $this->assertSame(['Kept', 'Deleted A1', 'Deleted A2'], $this->getResultsNames($formA));
         $this->assertSame(['Deleted B'], $this->getResultsNames($formB));
+        $this->assertSame(3, $this->getSubmissionCount($formA));
+        $this->assertSame(1, $this->getSubmissionCount($formB));
 
         $this->em->clear();
         $commandTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME);
 
         $this->assertSame(0, $commandTester->getStatusCode());
         $this->assertStringContainsString('Deleted 3 form submissions of deleted contacts, including their form results records.', $commandTester->getDisplay());
+        $this->assertSame(1, $this->getSubmissionCount($formA));
+        $this->assertSame(0, $this->getSubmissionCount($formB));
         $this->assertSame(0, $this->countSubmissionsWithoutContact());
         $this->assertSame(['Kept'], $this->getResultsNames($formA));
         $this->assertSame([], $this->getResultsNames($formB));
         $this->assertInstanceOf(Submission::class, self::getContainer()->get(SubmissionRepository::class)->find($keptSubmissionId));
+    }
+
+    public function testDeletedSubmissionsNoLongerCountTowardTheSubmissionLimit(): void
+    {
+        $form           = $this->createFormViaApi($this->getPayLoad());
+        $deletedContact = $this->createContact('deleted@example.com');
+
+        $formEntity = $this->em->find(Form::class, $form['id']);
+        $this->assertInstanceOf(Form::class, $formEntity);
+        $formEntity->setSubmissionLimit(1);
+        $this->em->persist($formEntity);
+        $this->em->flush();
+
+        $this->createTrackedSubmission($form, $deletedContact, 'Deleted');
+        $this->deleteContactViaApi($deletedContact);
+
+        $this->em->clear();
+        $formEntity = $this->em->find(Form::class, $form['id']);
+        $this->assertInstanceOf(Form::class, $formEntity);
+        $this->assertTrue($formEntity->isSubmissionLimitReached());
+
+        $this->em->clear();
+        $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME);
+
+        $this->em->clear();
+        $formEntity = $this->em->find(Form::class, $form['id']);
+        $this->assertInstanceOf(Form::class, $formEntity);
+        $this->assertSame(0, $formEntity->getSubmissionCount());
+        $this->assertFalse($formEntity->isSubmissionLimitReached());
     }
 
     public function testDryRunCountsSubmissionsForEachFormAndDeletesNothing(): void
@@ -236,6 +269,14 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
     {
         $this->client->request(Request::METHOD_DELETE, "/api/contacts/{$contact->getId()}/delete");
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), (string) $this->client->getResponse()->getContent());
+    }
+
+    /**
+     * @param array<string, mixed> $form
+     */
+    private function getSubmissionCount(array $form): int
+    {
+        return (int) $this->connection->fetchOne('SELECT submission_count FROM '.MAUTIC_TABLE_PREFIX.'forms WHERE id = ?', [$form['id']]);
     }
 
     private function countSubmissionsWithoutContact(): int
