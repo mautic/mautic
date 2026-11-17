@@ -144,8 +144,8 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @param OrmQueryBuilder|DbalQueryBuilder $q
-     * @param object                           $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param object                                                       $filter
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -203,9 +203,7 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * Add company left join.
-     *
-     * @param OrmQueryBuilder|DbalQueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
     private function addCompanyLeftJoin($q): void
     {
@@ -216,8 +214,8 @@ class LeadFieldRepository extends CommonRepository
     /**
      * Return property by field alias and join tables.
      *
-     * @param string                           $field
-     * @param OrmQueryBuilder|DbalQueryBuilder $q
+     * @param string                                                       $field
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
     public function getPropertyByField($field, $q): string
     {
@@ -518,8 +516,8 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @param OrmQueryBuilder|DbalQueryBuilder $q
-     * @param \StdClass                        $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param \StdClass                                                    $filter
      *
      * @return mixed[]
      */
@@ -616,7 +614,10 @@ class LeadFieldRepository extends CommonRepository
      */
     private function getSystemDefaultAliases(): array
     {
-        return FieldModel::getCoreAliases();
+        return array_values(array_unique(array_merge(
+            array_keys(FieldModel::$coreFields),
+            array_keys(FieldModel::$coreCompanyFields),
+        )));
     }
 
     /**
