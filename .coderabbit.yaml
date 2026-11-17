@@ -257,6 +257,31 @@ reviews:
       mode: "off"
     issue_assessment:
       mode: "off"
+    custom_checks:
+      - name: "PR template"
+        mode: "warning"
+        instructions: |
+          Check that the PR description uses the repository PR template
+          (.github/PULL_REQUEST_TEMPLATE.md). HTML comments (<!-- ... -->) do
+          not count as content.
+
+          Pass when all of these are true:
+          1. The description contains the template table with the rows
+             "Bug fix?", "New feature/enhancement?", "Deprecations?",
+             "BC breaks?" and "Automated tests included?".
+          2. Each of those five rows is answered with exactly one of ✔️ or ❌,
+             not left as the template's placeholder "✔️❌" and not empty.
+          3. The description has a "Description" heading followed by text
+             that explains the change.
+          4. The description has a "Steps to test this PR" heading followed
+             by at least one step beyond the template's first step about
+             GitHub Codespaces, and the second step is not left empty.
+
+          Otherwise fail, and name which of the points above are missing.
+
+          Always pass, without checking, for merge-up PRs that merge one
+          release branch or tag into a higher branch (title like "Merge 7.x
+          into 8.x" or "Merge 7.2.2 into 8.x").
 knowledge_base:
   # Uses guideline files in the repo (such as AGENTS.md) as review context.
   code_guidelines:
