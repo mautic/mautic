@@ -107,8 +107,8 @@ final readonly class CampaignSubscriber
     )]
     public function onCampaignTriggerDecisionDeviceHit(DecisionEvent $event): void
     {
-        $eventDetails = $event->getEventDetails();
-        $config       = $event->getConfig();
+        $eventDetails = $event->getPassthrough();
+        $config       = $event->getEvent()->getProperties();
         $lead         = $event->getLead();
 
         if (!$event->checkContext('page.devicehit')) {
@@ -157,8 +157,8 @@ final readonly class CampaignSubscriber
     )]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
-        $eventDetails = $event->getEventDetails();
-        $config       = $event->getConfig();
+        $eventDetails = $event->getPassthrough();
+        $config       = $event->getEvent()->getProperties();
 
         if (!$event->checkContext('page.pagehit')) {
             return;

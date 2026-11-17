@@ -32,6 +32,51 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Unused service aliases `mautic.integration.gmail.config` and `mautic.integration.tagmanager.config` were removed. Inject the corresponding bundle’s `Integration\Support\ConfigSupport` class instead; the services and integrations remain available.
 - The ClearbitBundle was removed as the service was sunset.
 - The unused contact companies modal was removed: `Mautic\LeadBundle\Controller\LeadController::companyAction()` (`/s/contacts/company/{objectId}`), the `@MauticLead/Lead/company.html.twig` template, the `Mautic.toggleCompanyLead` JS function and the `lead:toggleCompanyLead` AJAX action (`Mautic\LeadBundle\Controller\AjaxController::toggleCompanyLeadAction()`). Nothing linked to the modal since the contact page button was removed, and the action failed with a 500 error. Add or remove a contact's companies through the contact edit form or the API (`/api/companies/{companyId}/contact/{contactId}/add` and `/remove`) instead.
+- Deprecated class `Mautic\CampaignBundle\Event\CampaignExecutionEvent` removed. It was deprecated since 2.13.0 and only served as the backward-compatible parent of `Mautic\CampaignBundle\Event\DecisionEvent` and `Mautic\CampaignBundle\Event\ConditionEvent`. Campaign decision/condition listeners must type their event argument as `DecisionEvent` / `ConditionEvent` and use the typed API. `getEvent()` now returns the `Mautic\CampaignBundle\Entity\Event` entity instead of an array:
+
+    ```diff
+    -public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
+    +public function onCampaignTriggerCondition(ConditionEvent $event): void
+     {
+    -    $config     = $event->getConfig();
+    +    $config     = $event->getEvent()->getProperties();
+    -    $eventArray = $event->getEvent();
+    +    $campaignId = $event->getEvent()->getCampaign()->getId();
+    -    $settings   = $event->getEventSettings();
+    +    $accessor   = $event->getEventConfig();
+    -    $fields     = $event->getLeadFields();
+    +    $lead       = $event->getLead();
+    +    $fields     = $lead?->getProfileFields() ?? [];
+    +    $fields['owner_id'] = $lead?->getOwner()?->getId() ?? 0;
+    -    $system     = $event->getSystemTriggered();
+    +    $system     = $event->getLog()->getSystemTriggered();
+    -    $log        = $event->getLogEntry();
+    +    $log        = $event->getLog();
+    -    $details    = $event->getEventDetails();
+    +    $details    = $event->getPassthrough(); // DecisionEvent only
+
+    -    $event->setChannel('email', $emailId);
+    +    $event->getLog()->setChannel('email');
+    +    $event->getLog()->setChannelId($emailId);
+
+    -    $event->setResult(true);
+    +    $event->pass(); // ConditionEvent; DecisionEvent uses setAsApplicable()
+    -    $event->setFailed('reason');
+    +    $event->fail();
+     }
+    ```
+
+  `getChannel()` / `getChannelId()` map to `getLog()->getChannel()` / `getLog()->getChannelId()`. `setLogEntry()` and `wasLogUpdatedByListener()` were removed with no replacement; modify the log returned by `getLog()` directly.
+- Deprecated method `Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor::getConfig()` removed. It was deprecated since 2.13.0. Use the typed getters on the accessor instead, and `getExtraProperties()` for custom config keys:
+
+    ```diff
+    -$label  = $accessor->getConfig()['label'];
+    +$label  = $accessor->getLabel();
+    -$custom = $accessor->getConfig()['myCustomKey'];
+    +$custom = $accessor->getExtraProperties()['myCustomKey'];
+    ```
+
+  `Mautic\CampaignBundle\Event\ScheduledEvent::getEventSettings()`, which only exposed the same raw config array, was removed as well. Use `ScheduledEvent::getEventConfig()` instead, which returns an `AbstractEventAccessor` object, not an array.
 - Constant `ON_AFTER_EVENTS_DELETE` removed from `Mautic\CampaignBundle\CampaignEvents`. The after-events-delete event is now dispatched by its own event class `Mautic\CampaignBundle\Event\AfterEventsDeleteEvent`, dispatched by the event object alone (Symfony 4.3+), so its name is the event class. Subscribe to `AfterEventsDeleteEvent::class` instead of the constant. The pre-existing `Mautic\CampaignBundle\Event\DeleteEvent` (dispatched when event logs are deleted) is unchanged.
 - Constants `EMAIL_PARSE` and `EMAIL_PRE_FETCH` removed from `Mautic\EmailBundle\EmailEvents`. These two events used to share one `Mautic\EmailBundle\Event\ParseEmailEvent` object dispatched under both names; the pre-fetch phase (setting search criteria) is now a dedicated `Mautic\EmailBundle\Event\PreFetchEmailEvent` and the parse phase keeps `ParseEmailEvent` (messages only). Both are dispatched by the event object alone (Symfony 4.3+), so their names are the event classes. The criteria methods (`setCriteriaRequest`, `getCriteriaRequests`, `getMarkAsSeenInstructions`) moved from `ParseEmailEvent` to `PreFetchEmailEvent`. Subscribe to the event class instead of the constant.
 
@@ -182,9 +227,9 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     `language` is the PHP property name; replace `custom_language` with the plugin's existing database column name.
 - Method `loadFixedFieldMetadata()` removed from `Mautic\LeadBundle\Entity\CustomFieldEntityTrait`. `Lead` and `Company` now map their fixed core field columns with native `#[ORM\Column]` attributes (columns unchanged) and no longer declare `loadMetadata()`. Any custom entity using `CustomFieldEntityTrait` and calling `self::loadFixedFieldMetadata(...)` in `loadMetadata()` must declare those columns with Doctrine attributes instead.
 - Deprecated entity `Mautic\CoreBundle\Entity\Cache` removed with no replacement. It mapped the `cache_items` table but was never read or written anywhere in the codebase.
-- Deprecated methods `getResult()` and `setResult()` removed from `Mautic\CampaignBundle\Event\ConditionEvent` and `Mautic\CampaignBundle\Event\DecisionEvent`. Campaign condition/decision listeners must type their event argument as `ConditionEvent` / `DecisionEvent` (not the deprecated parent `CampaignExecutionEvent`) and use the real API: conditions call `pass()` / `fail()` (read back with `wasConditionSatisfied()`), decisions call `setAsApplicable()` (read back with `wasDecisionApplicable()`). The broken `setChannel()` overrides on both events were also removed; they now inherit the working `CampaignExecutionEvent::setChannel()`. The executioners already read the applicability via `wasConditionSatisfied()` / `wasDecisionApplicable()`, so behaviour is unchanged.
+- Deprecated methods `getResult()` and `setResult()` removed from `Mautic\CampaignBundle\Event\ConditionEvent` and `Mautic\CampaignBundle\Event\DecisionEvent`. Campaign condition/decision listeners must type their event argument as `ConditionEvent` / `DecisionEvent` and use the real API: conditions call `pass()` / `fail()` (read back with `wasConditionSatisfied()`), decisions call `setAsApplicable()` (read back with `wasDecisionApplicable()`). The broken `setChannel()` overrides on both events were also removed. The executioners already read the applicability via `wasConditionSatisfied()` / `wasDecisionApplicable()`, so behaviour is unchanged.
 - Deprecated class `Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher` removed. It dispatched the per-contact, deprecated `CampaignExecutionEvent` for campaign actions registered with the legacy `'eventName'`/`'callback'` config keys. `Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher` no longer takes it as a constructor argument and only dispatches the batch `Mautic\CampaignBundle\Event\PendingEvent` for actions declaring `'batchEventName'`. Campaign actions must register `'batchEventName'` and listen on a `PendingEvent` — the `'eventName'`/`'callback'` action path no longer runs.
-- Deprecated trait `Mautic\CampaignBundle\Event\EventArrayTrait` removed. Its `getEventArray()` logic is now a private method inside `Mautic\CampaignBundle\Event\CampaignExecutionEvent`, the only remaining consumer.
+- Deprecated trait `Mautic\CampaignBundle\Event\EventArrayTrait` removed with no replacement. Read the data from the `Mautic\CampaignBundle\Entity\Event` entity getters instead.
 - Deprecated constant `Mautic\DynamicContentBundle\DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.dwc.on_campaign_trigger_action`) removed, replaced by `ON_CAMPAIGN_BATCH_ACTION` (`mautic.dwc.on_campaign_batch_action`). The `dwc.push_content` action now runs on `Mautic\CampaignBundle\Event\PendingEvent`. Switch any registration or listener to `'batchEventName' => DynamicContentEvents::ON_CAMPAIGN_BATCH_ACTION` and iterate `getPending()`, calling `pass()`/`fail()` per log.
 - Deprecated constant `Mautic\PageBundle\PageEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.page.on_campaign_trigger_action`) removed, replaced by `ON_CAMPAIGN_BATCH_ACTION` (`mautic.page.on_campaign_batch_action`). The `tracking.pixel.send` action now runs on `PendingEvent`. Switch to `'batchEventName' => PageEvents::ON_CAMPAIGN_BATCH_ACTION` and a `PendingEvent` listener.
 - Deprecated constant `Mautic\PluginBundle\PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.plugin.on_campaign_trigger_action`) removed, replaced by `ON_CAMPAIGN_BATCH_ACTION` (`mautic.plugin.on_campaign_batch_action`). The `plugin.leadpush` action now runs on `PendingEvent`. Switch to `'batchEventName' => PluginEvents::ON_CAMPAIGN_BATCH_ACTION` and a `PendingEvent` listener.
@@ -1310,6 +1355,20 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\EmailBundle\Entity\Email::setEmailType()`
     - `Mautic\FormBundle\Entity\Field::setLeadField()`
     - `Mautic\FormBundle\Entity\Form::setTemplate()`
+    - `Mautic\LeadBundle\Entity\Lead::setTitle()`
+    - `Mautic\LeadBundle\Entity\Lead::setFirstname()`
+    - `Mautic\LeadBundle\Entity\Lead::setLastname()`
+    - `Mautic\LeadBundle\Entity\Lead::setPosition()`
+    - `Mautic\LeadBundle\Entity\Lead::setPhone()`
+    - `Mautic\LeadBundle\Entity\Lead::setMobile()`
+    - `Mautic\LeadBundle\Entity\Lead::setAddress1()`
+    - `Mautic\LeadBundle\Entity\Lead::setAddress2()`
+    - `Mautic\LeadBundle\Entity\Lead::setCity()`
+    - `Mautic\LeadBundle\Entity\Lead::setState()`
+    - `Mautic\LeadBundle\Entity\Lead::setZipcode()`
+    - `Mautic\LeadBundle\Entity\Lead::setCountry()`
+    - `Mautic\LeadBundle\Entity\Lead::setCompany()` - it stores the company name, so pass `$company->getName()` instead of a `Company` entity
+    - `Mautic\LeadBundle\Entity\Lead::setEmail()`
     - `Mautic\LeadBundle\Entity\LeadDevice::setDevice()`
     - `Mautic\LeadBundle\Entity\LeadDevice::setDeviceModel()`
     - `Mautic\LeadBundle\Entity\LeadField::setGroup()`
@@ -1391,6 +1450,10 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\CoreBundle\Controller\FormThemeTrait::setFormTheme()` types `$themes` as `array|string|null`. An object holding template paths (e.g. a custom form field's `formTheme` forwarded by `Mautic\FormBundle\Controller\FieldController`) is no longer cast to an array; pass an array or a string.
     - `Mautic\CoreBundle\ErrorHandler\ErrorHandler::setDisplayErrors()` types `$displayErrors` as `bool`. Passing `null`, or an integer from a `strict_types` file, now throws; pass an explicit boolean.
     - `Mautic\IntegrationsBundle\Entity\ObjectMappingRepository::updateIntegrationObject()` types `$oldObjectId` and `$newObjectId` as `int|string|null`. The sync DAOs type object ids the same way: `Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO::remapObject()` and `Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO::remapObject()` take `int|string $oldObjectId` and `int|string|null $newObjectId`, `Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO::setObjectId()` takes `int|string|null`, `Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO::getMappedInternalObjectId()` takes `int|string`, and the constructors `Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO::__construct()` (`$objectId`), `Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO::__construct()` (`$objectId`, `$mappedId`) and `Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO::__construct()` (`$integrationObjectId`) take `int|string|null`. Any other value (e.g. a `float` or an object) now throws; pass the object id as `int` or `string`, and `null` only where the signature allows it.
+    - `Mautic\PluginBundle\Integration\AbstractIntegration::matchUpData()` types `$data` as `array|object`. Passing `null` or a scalar now throws; pass the API response as an array or object. An override that leaves `$data` untyped stays compatible.
+    - `Mautic\PluginBundle\Integration\AbstractIntegration::cleanIdentifier()` types `$identifier` as `string|array`. Passing `null` now throws; pass a string or an array identifier.
+    - `Mautic\CoreBundle\Helper\InputHelper::_()` types `$mask` as `array|string`. Passing `null` now throws; omit the argument to use the default `'clean'` mask.
+    - `MauticPlugin\MauticCrmBundle\Api\SalesforceApi::getLeads()` types `$query` as `string|array`. Passing `null` now throws; pass a SOQL query string or an array to build the query.
 
 ### Native parameter and return types for plugin extension points
 

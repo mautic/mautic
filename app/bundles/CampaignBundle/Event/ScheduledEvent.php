@@ -12,8 +12,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class ScheduledEvent extends Event
 {
-    use ContextTrait;
-
     /**
      * @var array<int|string, array<string, mixed>>
      */
@@ -27,20 +25,26 @@ final class ScheduledEvent extends Event
 
     private readonly ?\DateTimeInterface $dateScheduled;
 
-    /**
-     * @var array
-     */
-    private $eventSettings;
-
     public function __construct(
         private readonly AbstractEventAccessor $eventConfig,
         private readonly LeadEventLog $eventLog,
         private readonly bool $isReschedule = false,
     ) {
-        $this->eventSettings   = $eventConfig->getConfig();
         $this->event           = $eventLog->getEvent();
         $this->lead            = $eventLog->getLead();
         $this->dateScheduled   = $eventLog->getTriggerDate();
+    }
+
+    /**
+     * Check if an event is applicable.
+     */
+    public function checkContext($eventType): bool
+    {
+        if (!$this->event instanceof CampaignEvent) {
+            return false;
+        }
+
+        return strtolower((string) $eventType) === strtolower((string) $this->event->getType());
     }
 
     public function getEventConfig(): AbstractEventAccessor
@@ -86,14 +90,6 @@ final class ScheduledEvent extends Event
     public function getDateScheduled(): ?\DateTimeInterface
     {
         return $this->dateScheduled;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getEventSettings()
-    {
-        return $this->eventSettings;
     }
 
     /**

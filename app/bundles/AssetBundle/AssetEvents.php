@@ -10,7 +10,7 @@ final class AssetEvents
      * The mautic.asset.on_campaign_trigger_decision event is fired when the campaign action triggers.
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * Mautic\CampaignBundle\Event\DecisionEvent
      */
     public const string ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.asset.on_campaign_trigger_decision';
 

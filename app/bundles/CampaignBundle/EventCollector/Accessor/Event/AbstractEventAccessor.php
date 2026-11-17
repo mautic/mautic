@@ -96,14 +96,6 @@ abstract class AbstractEventAccessor
     }
 
     /**
-     * @deprecated pre 2.13.0 support; to be removed in 3.0
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    /**
      * @param string $property
      * @param mixed  $default
      *
