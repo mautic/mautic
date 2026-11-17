@@ -2595,7 +2595,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
             if ($newDncValue) {
                 $this->doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, 'Set by Salesforce', true, true, true);
-            } elseif (false === $newDncValue) {
+            } else {
                 $this->doNotContact->removeDncForContact($lead->getId(), 'email', true);
             }
         }

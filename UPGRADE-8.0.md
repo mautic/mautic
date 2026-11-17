@@ -1339,7 +1339,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\CoreBundle\Command\ModeratedCommand` | `checkRunStatus()` (`string $moderationKey`) |
     | `Mautic\CoreBundle\Configurator\Configurator` | `addStep()` (`int $priority`); `getStep()` (`int $index`) |
     | `Mautic\CoreBundle\Doctrine\AbstractMauticMigration` | `generatePropertyName()` (`string $type`) |
-    | `Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder` | `addBigIntIdField()` (`string $fieldName`, `string $columnName`); `addIdColumns()` (`string $nameColumn`, `string $descriptionColumn`); `addNullableField()` (`string $name`, `?string $columnName`) |
+    | `Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder` | `addBigIntIdField()` (`string $fieldName`, `string $columnName`); `addIdColumns()` (`string $nameColumn`, `string $descriptionColumn` - pass `''` instead of `null` to skip a column); `addNullableField()` (`string $name`, `?string $columnName`) |
     | `Mautic\CoreBundle\ErrorHandler\ErrorHandler` | `handleError()` (`string $file`, `int $line`); `register()` (`string $environment`) |
     | `Mautic\CoreBundle\Menu\MenuHelper` | `createMenuStructure()` (`int $depth`, `int $defaultPriority`, `string $type`); `placeOrphans()` (`int $depth`, `string $type`); `resetOrphans()` (`string $type`); `sortByPriority()` (`int $defaultPriority`) |
     | `Mautic\CoreBundle\Model\FormModel` | `setTimestamps()` (`bool $isNew`) |
@@ -1380,7 +1380,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\LeadBundle\Entity\LeadFieldRepository` | `compareValue()` (`string $field`); `getAliases()` (`?string $object`) |
     | `Mautic\LeadBundle\Entity\LeadRepository` | `getLeadsByFieldValue()` (`string $field`); `updateContactPoints()` (`int $tries`); `updateLastActive()` (`?int $leadId`) |
     | `Mautic\LeadBundle\Event\ChannelSubscriptionChange` | `__construct()` (`string $channel`) |
-    | `Mautic\LeadBundle\Event\LeadBuildSearchEvent` | `__construct()` (`string $string`, `string $command`) |
+    | `Mautic\LeadBundle\Event\LeadBuildSearchEvent` | `__construct()` (`string $string`, `string $command`); `setString()` (`string $string`); `getString()` and `getCommand()` now return `string` and the `protected` properties are typed, so subclasses must declare matching types |
     | `Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent` | `addChoice()` (`string $object`, `string $choiceKey`) |
     | `Mautic\LeadBundle\Event\LeadTimelineEvent` | `addEventType()` (`string $eventTypeKey`); `addToCounter()` (`string $eventType`, `array\|int $count`); `isApplicable()` (`string $eventType`); `subtractFromCounter()` (`int $count`) |
     | `Mautic\LeadBundle\Event\PointsChangeEvent` | `__construct()` (`int $old`, `int $new`) |

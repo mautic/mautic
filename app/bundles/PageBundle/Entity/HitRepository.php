@@ -122,7 +122,7 @@ final class HitRepository extends CommonRepository
                 ->setParameter('dateTo', $dateHelper->toUtcString());
         }
 
-        $q->andWhere($q->expr()->eq('h.code', (string) ($code)));
+        $q->andWhere($q->expr()->eq('h.code', (string) $code));
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
