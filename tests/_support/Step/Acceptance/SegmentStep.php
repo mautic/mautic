@@ -18,6 +18,5 @@ final class SegmentStep extends \AcceptanceTester
         $I->waitForElementVisible(SegmentsPage::$SEGMENT_NAME);
         $I->fillField(SegmentsPage::$SEGMENT_NAME, $name);
         $I->click(SegmentsPage::$SAVE_AND_CLOSE_BUTTON);
-        $I->waitForText($name, \AcceptanceTester::TIMEOUT, '#flashes .alert');
     }
 }

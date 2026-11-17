@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Page\Acceptance\EmailsPage;
 use Step\Acceptance\EmailStep;
+use Step\Acceptance\SegmentStep;
 
 final class EmailManagementCest
 {
@@ -18,11 +19,13 @@ final class EmailManagementCest
 
     public function tryToBatchChangeEmailCategory(
         AcceptanceTester $I,
+        SegmentStep $segment,
         EmailStep $email,
     ): void {
         $now = date(self::DATE_FORMAT);
 
         // Arrange
+        $segment->createAContactSegment('Segment '.$now);
         $I->createACategory('Category '.$now);
         $email->createSegmentEmail('Email '.$now);
 
