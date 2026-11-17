@@ -91,6 +91,23 @@ final class QuantityStepperFormTest extends TestCase
         $this->assertEquals(-125, $form->getData()['score']);
     }
 
+    public function testCompanyScoreRoundTripsIntegersInNonAsciiLocale(): void
+    {
+        \Locale::setDefault('fa_IR');
+        $factory = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory();
+        $form = $factory->createNamed('action', CompanyChangeScoreActionType::class, ['score' => 1234]);
+        $html = $this->twig->createTemplate('{{ form_row(form.score) }}')->render(['form' => $form->createView()]);
+        $input = (new Crawler($html))->filter('input[name="action[score]"]');
+
+        $this->assertSame('1234', $input->attr('value'));
+        $this->assertSame('1', $input->attr('step'));
+        $form->submit(['score' => '-125']);
+        $this->assertTrue($form->isSynchronized());
+        $this->assertEquals(-125, $form->getData()['score']);
+    }
+
     public function testRatingRetainsItsRangeAndSubmittedValue(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
