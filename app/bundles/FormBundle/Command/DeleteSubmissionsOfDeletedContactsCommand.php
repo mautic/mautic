@@ -101,13 +101,16 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
             default               => $this->formRepository->findBy(['id' => array_keys($counts)], ['id' => 'ASC']),
         };
 
+        $existingResultsTables = $dryRun || [] === $forms
+            ? []
+            : array_flip($this->submissionRepository->getExistingResultsTableNames());
         $total = 0;
 
         foreach ($forms as $form) {
             try {
                 $count = $dryRun
                     ? ($counts[(int) $form->getId()] ?? 0)
-                    : $this->deleteSubmissionsOfForm($form, $batchLimit);
+                    : $this->deleteSubmissionsOfForm($form, $batchLimit, $existingResultsTables);
             } catch (\Exception $e) {
                 $this->logger->error('An exception occurred while deleting the submissions of deleted contacts.', ['formId' => $form->getId(), 'exception' => $e]);
                 $output->writeln('<error>'.$e->getMessage().'</error>');
@@ -134,10 +137,13 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
         return ExitCode::SUCCESS;
     }
 
-    private function deleteSubmissionsOfForm(Form $form, int $batchLimit): int
+    /**
+     * @param array<string, int> $existingResultsTables
+     */
+    private function deleteSubmissionsOfForm(Form $form, int $batchLimit, array $existingResultsTables): int
     {
         $formId             = (int) $form->getId();
-        $resultsTableExists = $this->submissionRepository->resultsTableExists($form);
+        $resultsTableExists = isset($existingResultsTables[$this->submissionRepository->getResultsTableName($formId, $form->getAlias())]);
         $deleted            = 0;
         $lastId             = 0;
 

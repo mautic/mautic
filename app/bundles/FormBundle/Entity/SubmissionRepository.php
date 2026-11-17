@@ -612,7 +612,7 @@ class SubmissionRepository extends CommonRepository
             ->groupBy('fs.form_id')
             ->orderBy('fs.form_id', 'ASC');
 
-        $this->whereSubmissionOfDeletedContact($qb, 'fs.');
+        $this->whereSubmissionOfDeletedContact($qb, 'fs');
 
         if (null !== $formId) {
             $qb->andWhere('fs.form_id = :formId')
@@ -643,16 +643,22 @@ class SubmissionRepository extends CommonRepository
             ->orderBy('fs.id', 'ASC')
             ->setMaxResults($limit);
 
-        $this->whereSubmissionOfDeletedContact($qb, 'fs.');
+        $this->whereSubmissionOfDeletedContact($qb, 'fs');
 
         return array_map(intval(...), $qb->executeQuery()->fetchFirstColumn());
     }
 
-    public function resultsTableExists(Form $form): bool
+    /**
+     * @return string[]
+     */
+    public function getExistingResultsTableNames(): array
     {
-        return $this->getEntityManager()->getConnection()->createSchemaManager()->tablesExist([
-            $this->getResultsTableName($form->getId(), $form->getAlias()),
-        ]);
+        $tableNamePrefix = MAUTIC_TABLE_PREFIX.'form_results_';
+
+        return array_values(array_filter(
+            $this->getEntityManager()->getConnection()->createSchemaManager()->listTableNames(),
+            static fn (string $tableName): bool => str_starts_with($tableName, $tableNamePrefix)
+        ));
     }
 
     /**
@@ -681,7 +687,7 @@ class SubmissionRepository extends CommonRepository
                     ->where('id IN (:submissionIds)')
                     ->setParameter('submissionIds', $submissionIds, ArrayParameterType::INTEGER);
 
-                $this->whereSubmissionOfDeletedContact($qb);
+                $this->whereSubmissionOfDeletedContact($qb, MAUTIC_TABLE_PREFIX.'form_submissions');
 
                 return (int) $qb->executeStatement();
             }
@@ -689,13 +695,20 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * A deleted contact leaves its submissions with lead_id = NULL. Submissions of untracked submitters
-     * (kiosk mode, Do Not Track, Global Privacy Control, bots) can also have lead_id = NULL, but they never
-     * have a tracking ID. The tracking ID condition makes sure that such submissions are never deleted.
+     * A deleted contact leaves its submissions with lead_id = NULL, and the database deletes its devices.
+     * Other submissions can also have lead_id = NULL: untracked submitters (kiosk mode, Do Not Track,
+     * Global Privacy Control, bots) have no tracking ID, and a visitor with the Blocked-Tracking cookie has
+     * the tracking ID of a device that still exists. So only a submission with the tracking ID of a deleted
+     * device belongs to a deleted contact.
      */
-    private function whereSubmissionOfDeletedContact(DbalQueryBuilder $qb, string $columnPrefix = ''): void
+    private function whereSubmissionOfDeletedContact(DbalQueryBuilder $qb, string $submissionTable): void
     {
-        $qb->andWhere($columnPrefix.'lead_id IS NULL')
-            ->andWhere($columnPrefix.'tracking_id IS NOT NULL');
+        $qb->andWhere($submissionTable.'.lead_id IS NULL')
+            ->andWhere($submissionTable.'.tracking_id IS NOT NULL')
+            ->andWhere(sprintf(
+                'NOT EXISTS (SELECT 1 FROM %slead_devices ld WHERE ld.tracking_id = %s.tracking_id)',
+                MAUTIC_TABLE_PREFIX,
+                $submissionTable
+            ));
     }
 }

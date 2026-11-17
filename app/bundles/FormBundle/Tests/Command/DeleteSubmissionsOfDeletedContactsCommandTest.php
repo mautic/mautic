@@ -11,6 +11,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Tests\FormTestHelperTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,10 +29,10 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $keptContact    = $this->createContact('kept@example.com');
         $deletedContact = $this->createContact('deleted@example.com');
 
-        $keptSubmissionId = $this->createSubmission($formA, $keptContact, 'Kept');
-        $this->createSubmission($formA, $deletedContact, 'Deleted A1');
-        $this->createSubmission($formA, $deletedContact, 'Deleted A2');
-        $this->createSubmission($formB, $deletedContact, 'Deleted B');
+        $keptSubmissionId = $this->createTrackedSubmission($formA, $keptContact, 'Kept');
+        $this->createTrackedSubmission($formA, $deletedContact, 'Deleted A1');
+        $this->createTrackedSubmission($formA, $deletedContact, 'Deleted A2');
+        $this->createTrackedSubmission($formB, $deletedContact, 'Deleted B');
         $this->deleteContactViaApi($deletedContact);
 
         // Mautic keeps the submissions without a contact and keeps the submitted values.
@@ -57,10 +58,10 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $formWithoutAny = $this->createFormViaApi($this->getPayLoad());
         $deletedContact = $this->createContact('deleted@example.com');
 
-        $this->createSubmission($formA, $deletedContact, 'Deleted A1');
-        $this->createSubmission($formA, $deletedContact, 'Deleted A2');
-        $this->createSubmission($formB, $deletedContact, 'Deleted B');
-        $this->createSubmission($formWithoutAny, $this->createContact('kept@example.com'), 'Kept');
+        $this->createTrackedSubmission($formA, $deletedContact, 'Deleted A1');
+        $this->createTrackedSubmission($formA, $deletedContact, 'Deleted A2');
+        $this->createTrackedSubmission($formB, $deletedContact, 'Deleted B');
+        $this->createTrackedSubmission($formWithoutAny, $this->createContact('kept@example.com'), 'Kept');
         $this->deleteContactViaApi($deletedContact);
 
         $this->em->clear();
@@ -82,8 +83,8 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $formB          = $this->createFormViaApi($this->getPayLoad());
         $deletedContact = $this->createContact('deleted@example.com');
 
-        $this->createSubmission($formA, $deletedContact, 'Deleted A');
-        $this->createSubmission($formB, $deletedContact, 'Deleted B');
+        $this->createTrackedSubmission($formA, $deletedContact, 'Deleted A');
+        $this->createTrackedSubmission($formB, $deletedContact, 'Deleted B');
         $this->deleteContactViaApi($deletedContact);
 
         $this->em->clear();
@@ -101,8 +102,8 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $deletedContact = $this->createContact('deleted@example.com');
 
         // Kiosk mode, Do Not Track or Global Privacy Control: the submission never had a contact.
-        $this->createSubmission($form, null, 'Untracked', false);
-        $this->createSubmission($form, $deletedContact, 'Deleted');
+        $this->createSubmission($form, null, 'Untracked');
+        $this->createTrackedSubmission($form, $deletedContact, 'Deleted');
         $this->deleteContactViaApi($deletedContact);
 
         $this->assertSame(2, $this->countSubmissionsWithoutContact());
@@ -118,13 +119,33 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $this->assertSame(['Untracked'], $this->getResultsNames($form));
     }
 
+    public function testSubmissionWithTrackingIdOfExistingDeviceIsNotDeleted(): void
+    {
+        $form           = $this->createFormViaApi($this->getPayLoad());
+        $visitor        = $this->createContact('visitor@example.com');
+        $deletedContact = $this->createContact('deleted@example.com');
+
+        // With the Blocked-Tracking cookie, the submission gets no contact, but the tracking ID of the visitor's device.
+        $this->createSubmission($form, null, 'Blocked tracking', $this->createDevice($visitor)->getTrackingId());
+        $this->createTrackedSubmission($form, $deletedContact, 'Deleted');
+        $this->deleteContactViaApi($deletedContact);
+
+        $this->assertSame(2, $this->countSubmissionsWithoutContact());
+
+        $this->em->clear();
+        $commandTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME);
+
+        $this->assertStringContainsString('Deleted 1 form submissions of deleted contacts', $commandTester->getDisplay());
+        $this->assertSame(['Blocked tracking'], $this->getResultsNames($form));
+    }
+
     public function testAllBatchesAreDeleted(): void
     {
         $form           = $this->createFormViaApi($this->getPayLoad());
         $deletedContact = $this->createContact('deleted@example.com');
 
         for ($i = 1; $i <= 5; ++$i) {
-            $this->createSubmission($form, $deletedContact, 'Deleted '.$i);
+            $this->createTrackedSubmission($form, $deletedContact, 'Deleted '.$i);
         }
         $this->deleteContactViaApi($deletedContact);
 
@@ -171,23 +192,44 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
     }
 
     /**
-     * Creates a submission and its record in the form results table.
-     * A tracked submission has a tracking ID. An untracked submission (for example in kiosk mode) has none.
+     * Creates a submission with the tracking ID of a new device of the contact, as for a tracked submitter.
      *
      * @param array<string, mixed> $form
      */
-    private function createSubmission(array $form, ?Lead $contact, string $name, bool $tracked = true): int
+    private function createTrackedSubmission(array $form, Lead $contact, string $name): int
+    {
+        return $this->createSubmission($form, $contact, $name, $this->createDevice($contact)->getTrackingId());
+    }
+
+    /**
+     * Creates a submission and its record in the form results table.
+     *
+     * @param array<string, mixed> $form
+     */
+    private function createSubmission(array $form, ?Lead $contact, string $name, ?string $trackingId = null): int
     {
         $submission = new Submission();
         $submission->setForm($this->em->getReference(Form::class, $form['id']));
         $submission->setLead($contact);
-        $submission->setTrackingId($tracked ? bin2hex(random_bytes(12)) : null);
+        $submission->setTrackingId($trackingId);
         $submission->setDateSubmitted(new \DateTime());
         $submission->setReferer('https://example.com/form');
         $submission->setResults(['name' => $name]);
         self::getContainer()->get(SubmissionRepository::class)->saveEntity($submission);
 
         return $submission->getId();
+    }
+
+    private function createDevice(Lead $contact): LeadDevice
+    {
+        $device = new LeadDevice();
+        $device->setLead($contact);
+        $device->setTrackingId(bin2hex(random_bytes(12)));
+        $device->setDateAdded(new \DateTime());
+        $this->em->persist($device);
+        $this->em->flush();
+
+        return $device;
     }
 
     private function deleteContactViaApi(Lead $contact): void
