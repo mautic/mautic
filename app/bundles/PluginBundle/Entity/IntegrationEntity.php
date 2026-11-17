@@ -88,10 +88,7 @@ class IntegrationEntity extends CommonEntity
         return $this->integration;
     }
 
-    /**
-     * @param string $integration
-     */
-    public function setIntegration($integration): static
+    public function setIntegration(string $integration): static
     {
         $this->integration = $integration;
 
@@ -106,10 +103,7 @@ class IntegrationEntity extends CommonEntity
         return $this->integrationEntity;
     }
 
-    /**
-     * @param string $integrationEntity
-     */
-    public function setIntegrationEntity($integrationEntity): static
+    public function setIntegrationEntity(?string $integrationEntity): static
     {
         $this->integrationEntity = $integrationEntity;
 
@@ -178,10 +172,7 @@ class IntegrationEntity extends CommonEntity
         return $this->internalEntity;
     }
 
-    /**
-     * @param string $internalEntity
-     */
-    public function setInternalEntity($internalEntity): static
+    public function setInternalEntity(?string $internalEntity): static
     {
         $this->internalEntity = $internalEntity;
 

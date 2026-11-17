@@ -198,10 +198,7 @@ class LeadList extends FormEntity implements UuidInterface
         $this->id = $id;
     }
 
-    /**
-     * @param string|null $name
-     */
-    public function setName($name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -217,10 +214,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->name;
     }
 
-    /**
-     * @param string|null $description
-     */
-    public function setDescription($description): static
+    public function setDescription(?string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -257,10 +251,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->publicName;
     }
 
-    /**
-     * @param string|null $publicName
-     */
-    public function setPublicName($publicName): static
+    public function setPublicName(?string $publicName): static
     {
         $this->isChanged('publicName', $publicName);
         $this->publicName = $publicName;
@@ -305,10 +296,7 @@ class LeadList extends FormEntity implements UuidInterface
         return array_any($this->getFilters(), fn ($filter): bool => $filter['type'] === $type);
     }
 
-    /**
-     * @param bool $isGlobal
-     */
-    public function setIsGlobal($isGlobal): static
+    public function setIsGlobal(bool|int|string|null $isGlobal): static
     {
         $this->isChanged('isGlobal', (bool) $isGlobal);
         $this->isGlobal = (bool) $isGlobal;
@@ -334,10 +322,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->isGlobal;
     }
 
-    /**
-     * @param string|null $alias
-     */
-    public function setAlias($alias): static
+    public function setAlias(?string $alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -383,10 +368,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->isPreferenceCenter;
     }
 
-    /**
-     * @param bool $isPreferenceCenter
-     */
-    public function setIsPreferenceCenter($isPreferenceCenter): void
+    public function setIsPreferenceCenter(bool|int|string|null $isPreferenceCenter): void
     {
         $this->isChanged('isPreferenceCenter', (bool) $isPreferenceCenter);
         $this->isPreferenceCenter = (bool) $isPreferenceCenter;

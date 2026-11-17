@@ -241,10 +241,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     private ?LeadManipulator $manipulator = null;
 
-    /**
-     * @var bool
-     */
-    private $newlyCreated = false;
+    private bool $newlyCreated = false;
 
     /**
      * @var \DateTimeInterface
@@ -487,10 +484,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return get_object_vars($this);
     }
 
-    /**
-     * @param int $id
-     */
-    public function setId($id): static
+    public function setId(int $id): static
     {
         $this->id = (string) $id;
 
@@ -655,13 +649,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Point changes are tracked and will be persisted as a direct DB query to avoid PHP memory overwrites with concurrent requests
      * The risk in this is that the $changes['points'] may not be accurate but at least no points are lost.
-     *
-     * @param int    $points
-     * @param string $operator
      */
-    public function adjustPoints($points, $operator = self::POINTS_ADD): static
+    public function adjustPoints(int $points, string $operator = self::POINTS_ADD): static
     {
-        if (!$points = (int) $points) {
+        if (0 === $points) {
             return $this;
         }
 
@@ -708,10 +699,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->pointChanges;
     }
 
-    /**
-     * @param int $points
-     */
-    public function setPoints($points): static
+    public function setPoints(?int $points): static
     {
         $this->isChanged('points', $points);
         $this->points = (int) $points;
@@ -783,7 +771,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Creates a points change entry.
      */
-    public function stageChangeLogEntry(Stage $stage, $name, $action): void
+    public function stageChangeLogEntry(Stage $stage, ?string $name, $action): void
     {
         // create a new points change event
         $event = new StagesChangeLog();
@@ -826,7 +814,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->pointsChangeLog;
     }
 
-    public function addCompanyChangeLogEntry($type, $name, $action, $company = null): ?CompanyChangeLog
+    public function addCompanyChangeLogEntry(?string $type, ?string $name, $action, $company = null): ?CompanyChangeLog
     {
         if (!$company) {
             // No need to record a null delta
@@ -1058,10 +1046,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->manipulator;
     }
 
-    /**
-     * @return bool
-     */
-    public function isNewlyCreated()
+    public function isNewlyCreated(): bool
     {
         return $this->newlyCreated;
     }
@@ -1069,7 +1054,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @param bool $newlyCreated Created
      */
-    public function setNewlyCreated($newlyCreated): void
+    public function setNewlyCreated(bool $newlyCreated): void
     {
         $this->newlyCreated = $newlyCreated;
     }
@@ -1082,10 +1067,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->notes;
     }
 
-    /**
-     * @param string $source
-     */
-    public function setPreferredProfileImage($source): void
+    public function setPreferredProfileImage(?string $source): void
     {
         $this->preferredProfileImage = $source;
     }
@@ -1484,10 +1466,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->timezone;
     }
 
-    /**
-     * @param string $timezone
-     */
-    public function setTimezone($timezone): static
+    public function setTimezone(?string $timezone): static
     {
         $this->isChanged('timezone', $timezone);
         $this->timezone = $timezone;

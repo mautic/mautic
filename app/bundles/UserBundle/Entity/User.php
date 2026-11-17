@@ -74,21 +74,17 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     /**
      * Used for when updating the password.
-     *
-     * @var ?string
      */
     #[Groups(['user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.password.notblank', groups: ['CheckPasswordNotBlank'])]
     #[Assert\Length(min: 6, minMessage: 'mautic.user.user.password.minlength', groups: ['CheckPassword'])]
     #[NotWeak(message: 'mautic.user.user.password.weak', groups: ['CheckPassword'])]
-    private $plainPassword;
+    private ?string $plainPassword = null;
 
     /**
      * Used for updating account.
-     *
-     * @var ?string
      */
-    private $currentPassword;
+    private ?string $currentPassword = null;
 
     /**
      * @var string
@@ -277,20 +273,15 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->password;
     }
 
-    /**
-     * @return ?string
-     */
-    public function getPlainPassword()
+    public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
 
     /**
      * Get current password (that a user has typed into a form).
-     *
-     * @return ?string
      */
-    public function getCurrentPassword()
+    public function getCurrentPassword(): ?string
     {
         return $this->currentPassword;
     }
@@ -361,34 +352,28 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this;
     }
 
-    /**
-     * @param string $password
-     */
-    public function setPassword($password): static
+    public function setPassword(string $password): static
     {
         $this->password = $password;
 
         return $this;
     }
 
-    public function setPlainPassword($plainPassword): static
+    public function setPlainPassword(?string $plainPassword): static
     {
         $this->plainPassword = $plainPassword;
 
         return $this;
     }
 
-    public function setCurrentPassword($currentPassword): static
+    public function setCurrentPassword(?string $currentPassword): static
     {
         $this->currentPassword = $currentPassword;
 
         return $this;
     }
 
-    /**
-     * @param string $firstName
-     */
-    public function setFirstName($firstName): static
+    public function setFirstName(?string $firstName): static
     {
         $this->isChanged('firstName', $firstName);
         $this->firstName = $firstName;
@@ -404,10 +389,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->firstName;
     }
 
-    /**
-     * @param string $lastName
-     */
-    public function setLastName($lastName): static
+    public function setLastName(?string $lastName): static
     {
         $this->isChanged('lastName', $lastName);
         $this->lastName = $lastName;
@@ -431,10 +413,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return ($lastFirst) ? $this->lastName.', '.$this->firstName : $this->firstName.' '.$this->lastName;
     }
 
-    /**
-     * @param string $email
-     */
-    public function setEmail($email): static
+    public function setEmail(?string $email): static
     {
         $this->isChanged('email', $email);
         $this->email = $email;
@@ -478,10 +457,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->activePermissions;
     }
 
-    /**
-     * @param string $position
-     */
-    public function setPosition($position): static
+    public function setPosition(?string $position): static
     {
         $this->isChanged('position', $position);
         $this->position = $position;
@@ -497,10 +473,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->position;
     }
 
-    /**
-     * @param string $timezone
-     */
-    public function setTimezone($timezone): static
+    public function setTimezone(?string $timezone): static
     {
         $this->isChanged('timezone', $timezone);
         $this->timezone = $timezone;
@@ -588,10 +561,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $this->preferences = $preferences;
     }
 
-    /**
-     * @param string $signature
-     */
-    public function setSignature($signature): static
+    public function setSignature(?string $signature): static
     {
         $this->isChanged('signature', $signature);
         $this->signature = $signature;

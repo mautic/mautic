@@ -129,10 +129,7 @@ class Submission
         return $this->dateSubmitted;
     }
 
-    /**
-     * @param string $referer
-     */
-    public function setReferer($referer): static
+    public function setReferer(string $referer): static
     {
         $this->referer = $referer;
 

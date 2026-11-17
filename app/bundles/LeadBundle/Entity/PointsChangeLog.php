@@ -74,10 +74,7 @@ class PointsChangeLog
         return (int) $this->id;
     }
 
-    /**
-     * @param string $type
-     */
-    public function setType($type): static
+    public function setType(string $type): static
     {
         $this->type = $type;
 
@@ -110,10 +107,7 @@ class PointsChangeLog
         return $this->eventName;
     }
 
-    /**
-     * @param string $actionName
-     */
-    public function setActionName($actionName): static
+    public function setActionName(?string $actionName): static
     {
         $this->actionName = $actionName;
 
