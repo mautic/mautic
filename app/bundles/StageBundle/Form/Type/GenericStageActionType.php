@@ -25,6 +25,7 @@ final class GenericStageActionType extends AbstractType
                 'tooltip' => 'mautic.stage.action.weight.help',
                 'digits'  => 5,
                 'size'    => 'sm',
+                'step'    => 1,
             ],
             'scale' => 0,
             'data'  => $default,

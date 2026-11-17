@@ -83,6 +83,7 @@ final class PointType extends AbstractType
                     'tooltip' => 'mautic.point.action.delta.help',
                     'digits'  => 7,
                     'size'    => 'sm',
+                    'step'    => 1,
                 ],
                 'scale' => 0,
             ]

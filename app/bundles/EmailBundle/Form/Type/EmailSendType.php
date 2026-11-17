@@ -170,6 +170,7 @@ final class EmailSendType extends AbstractType
                             'min'     => 0,
                             'digits'  => 2,
                             'size'    => 'sm',
+                            'step'    => 1,
                         ],
                         'data'       => $data,
                         'empty_data' => 0,

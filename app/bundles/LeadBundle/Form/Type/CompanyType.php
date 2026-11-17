@@ -67,6 +67,7 @@ final class CompanyType extends AbstractType
                     'min'    => 0,
                     'digits' => 5,
                     'size'   => 'sm',
+                    'step'   => 1,
                 ],
                 'label_attr' => ['class' => 'form-label'],
                 'scale'      => 0,

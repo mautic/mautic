@@ -52,7 +52,8 @@ final class CampaignEventPointType extends AbstractType
                 'html5'        => true,
                 'attr'       => [
                     'digits' => 5,
-                    'size' => 'sm',
+                    'size'   => 'sm',
+                    'step'   => 1,
                 ],
                 'label_attr' => ['class' => 'form-label'],
                 'scale'      => 0,

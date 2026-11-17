@@ -78,6 +78,7 @@ final class TriggerType extends AbstractType
                     'tooltip' => 'mautic.point.trigger.form.points_descr',
                     'digits'  => 7,
                     'size'    => 'sm',
+                    'step'    => 1,
                 ],
                 'required' => false,
             ]

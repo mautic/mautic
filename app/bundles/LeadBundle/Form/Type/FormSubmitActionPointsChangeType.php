@@ -44,6 +44,7 @@ final class FormSubmitActionPointsChangeType extends AbstractType
                 'attr'         => [
                     'digits' => 5,
                     'size'   => 'sm',
+                    'step'   => 1,
                 ],
                 'label_attr' => ['class' => 'form-label'],
                 'scale'      => 0,

@@ -85,6 +85,7 @@ final class QuantityStepperFormTest extends TestCase
         $this->assertCount(0, $crawler->filter('input[tabindex="-1"], input[type="hidden"]'));
         $this->assertCount(1, $crawler->filter('.quantity-stepper--sm input[type="number"][name="action[score]"]'));
         $this->assertCount(0, $crawler->filter('input[min], input[max]'));
+        $this->assertSame('1', $crawler->filter('input[name="action[score]"]')->attr('step'));
         $form->submit(['score' => '-125']);
         $this->assertTrue($form->isValid());
         $this->assertEquals(-125, $form->getData()['score']);

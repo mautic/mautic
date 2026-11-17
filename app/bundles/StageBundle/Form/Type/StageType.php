@@ -56,6 +56,7 @@ final class StageType extends AbstractType
                 'tooltip' => 'mautic.stage.action.weight.help',
                 'digits'  => 5,
                 'size'    => 'sm',
+                'step'    => 1,
             ],
             'scale'    => 0,
             'required' => false,
