@@ -9,6 +9,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Symfony\Component\Console\Input\ArgvInput;
 
 final class Version20260715144000 extends PreUpAssertionMigration
 {
@@ -29,6 +30,13 @@ final class Version20260715144000 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
+        // The backfill writes directly, so Doctrine's dry-run protection does not apply.
+        if ((new ArgvInput())->hasParameterOption('--dry-run')) {
+            $this->write('<comment>Dry run: skipping non_action_path_taken backfill</comment>');
+
+            return;
+        }
+
         $logIds = $this->fetchPendingLogIds();
 
         while ([] !== $logIds) {

@@ -27,14 +27,19 @@
                 'delete': permissions['project:project:delete'],
             },
         },
-        'quickFilters': [
-            {
-                'search': 'mautic.core.searchcommand.ismine',
-                'label': 'mautic.core.searchcommand.ismine.label',
-                'tooltip': 'mautic.core.searchcommand.ismine.description',
-                'icon': 'ri-user-line'
+        'quickFilters': {
+            'mautic.core.quick_filters.ownership': {
+                'conflictGroup': true,
+                'filters': [
+                    {
+                        'search': 'mautic.core.searchcommand.ismine',
+                        'label': 'mautic.core.searchcommand.ismine.label',
+                        'tooltip': 'mautic.core.searchcommand.ismine.description',
+                        'icon': 'ri-user-line'
+                    }
+                ]
             }
-        ]
+        }
     }) }}
     <div class="page-list">
 {% endif %}
@@ -166,7 +171,7 @@
         {% else %}
             <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
                 {% set childContainer %}
-                    <div class="mt-32 mb-md">
+                    <div class="mt-32 mb-16">
                         {% include '@MauticCore/Components/pictogram.html.twig' with {
                             'pictogram': 'asset-management',
                             'size': '80'

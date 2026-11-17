@@ -5,22 +5,22 @@
 #}
 {% set route = route|default('mautic_campaignevent_action') %}
 {% set decisionTileContent %}
-<h3 class="type-heading-02 mb-lg">{{ 'mautic.campaign.event.decision.header'|trans }}</h3>
+<h3 class="type-heading-02 mb-24">{{ 'mautic.campaign.event.decision.header'|trans }}</h3>
 <div class="type-helper-text-01 mb-32">{{ 'mautic.campaign.event.decision.descr'|trans }}</div>
 {% endset %}
 
 {% set actionTileContent %}
-<h3 class="type-heading-02 mb-lg">{{ 'mautic.campaign.event.action.header'|trans }}</h3>
+<h3 class="type-heading-02 mb-24">{{ 'mautic.campaign.event.action.header'|trans }}</h3>
 <div class="type-helper-text-01 mb-32">{{ 'mautic.campaign.event.action.descr'|trans }}</div>
 {% endset %}
 
 {% set conditionTileContent %}
-<h3 class="type-heading-02 mb-lg">{{ 'mautic.campaign.event.condition.header'|trans }}</h3>
+<h3 class="type-heading-02 mb-24">{{ 'mautic.campaign.event.condition.header'|trans }}</h3>
 <div class="type-helper-text-01 mb-32">{{ 'mautic.campaign.event.condition.descr'|trans }}</div>
 {% endset %}
 
 {% set cloneTileContent %}
-<h3 class="type-heading-02 mb-lg">{{ 'mautic.campaign.event.clone.header'|trans }}</h3>
+<h3 class="type-heading-02 mb-24">{{ 'mautic.campaign.event.clone.header'|trans }}</h3>
 <div class="type-helper-text-01 campaign-paste-detail">
     <span>{{ 'mautic.campaign.event.clone.name'|trans }}: </span><span data-campaign-event-clone="sourceEventName"></span>
 </div>
@@ -32,7 +32,7 @@
 <div class="hide" id="CampaignEventPanel">
     <div id="CampaignEventPanelGroups">
         <div class="row">
-            <div class="me-0 ms-0 pl-xs pr-xs campaign-group-container col-md-4" id="DecisionGroupSelector">
+            <div class="me-0 ms-0 ps-5 pe-5 campaign-group-container col-md-4" id="DecisionGroupSelector">
                 {% include '@MauticCore/Components/tile.html.twig' with {
                     'type': 'clickable',
                     'content': decisionTileContent,
@@ -42,7 +42,7 @@
                     }
                 } %}
             </div>
-            <div class="me-0 ms-0 pl-xs pr-xs campaign-group-container col-md-4" id="ActionGroupSelector">
+            <div class="me-0 ms-0 ps-5 pe-5 campaign-group-container col-md-4" id="ActionGroupSelector">
                 {% include '@MauticCore/Components/tile.html.twig' with {
                     'type': 'clickable',
                     'content': actionTileContent,
@@ -52,7 +52,7 @@
                     }
                 } %}
             </div>
-            <div class="me-0 ms-0 pl-xs pr-xs campaign-group-container col-md-4" id="ConditionGroupSelector">
+            <div class="me-0 ms-0 ps-5 pe-5 campaign-group-container col-md-4" id="ConditionGroupSelector">
                 {% include '@MauticCore/Components/tile.html.twig' with {
                     'type': 'clickable',
                     'content': conditionTileContent,
@@ -64,7 +64,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="me-0 ms-0 pl-xs pr-xs mt-sm campaign-group-container col-md-12">
+            <div class="me-0 ms-0 ps-5 pe-5 mt-12 campaign-group-container col-md-12">
                 <div id="CampaignPasteContainer">
                     {% include '@MauticCore/Components/tile.html.twig' with {
                         'type': 'clickable',

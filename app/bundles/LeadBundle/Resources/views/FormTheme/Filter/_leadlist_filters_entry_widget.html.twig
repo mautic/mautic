@@ -20,16 +20,16 @@
 
   {% if isPrototype or fields[object][filterType].label is defined %}
 
-      <div class="filter--row segment-filter d-flex flex-nowrap align-items-center gap-sm {% if inGroup %}in-group{% endif %}" id="{{ id }}">
+      <div class="filter--row segment-filter d-flex flex-nowrap align-items-center gap-12 {% if inGroup %}in-group{% endif %}" id="{{ id }}">
             <span class="filter--condition-when fw-sb{% if '0' != form.vars.name %} hide{% endif %}">{{ 'mautic.lead.list.form.glue.when'|trans }}</span>
-            <div class="filter--condition panel-glue d-flex align-items-center gap-xs ps-0{% if '0' == form.vars.name %} hide{% endif %}">
+            <div class="filter--condition panel-glue d-flex align-items-center gap-5 ps-0{% if '0' == form.vars.name %} hide{% endif %}">
                 <i class="ri-draggable ri-1x text-primary"></i>
                 {{ form_widget(form.glue) }}
             </div>
 
             <div class="filter--panel panel">
                 <div class="d-flex flex-nowrap">
-                    <div class="filter--field-name d-flex align-items-center pr-lg pl-lg" size="lg">
+                    <div class="filter--field-name d-flex align-items-center pe-24 ps-24" size="lg">
                         {% set objectLabel = translatorHasId('mautic.lead_list.filter.' ~ object) ? ('mautic.lead_list.filter.' ~ object)|trans : object|trans  %}
                         <i class="object-icon {{ filterTypeIconClass }}" aria-hidden="true"></i>
                         <span> {% if isPrototype %}__label__{% else %}{{ 'mautic.lead_list.filter.field.label'|trans({'%object%': objectLabel, '%field%': fields[object][filterType]['label'] })|raw}}{% endif %}</span>

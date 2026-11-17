@@ -71,10 +71,12 @@ final class CampaignEventFormFieldValueType extends AbstractType
                 $form->remove('field');
             }
 
-            if (empty($data['form'])) {
+            // The form can be gone, e.g. after importing a campaign without it
+            $formEntity = empty($data['form']) ? null : $this->model->getEntity($data['form']);
+
+            if (!$formEntity) {
                 $fields['Select form first'] = 0;
             } else {
-                $formEntity = $this->model->getEntity($data['form']);
                 $formFields = $formEntity->getFields();
 
                 foreach ($formFields as $field) {

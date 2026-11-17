@@ -2,7 +2,7 @@
 some stats: need more input on what type of form data to show.
 delete if it is not require
 -->
-<div class="pa-md">
+<div class="pa-16">
     <div class="row">
         <div class="col-sm-12">
             {% if showVariants %}
@@ -27,7 +27,7 @@ delete if it is not require
             <div class="panel">
                 <div class="panel-body box-layout">
                     <div class="col-xs-4 align-middle">
-                        <h5 class="text-white dark-md fw-sb mb-xs">
+                        <h5 class="text-white dark-md fw-sb mb-5">
                             <span class="ri-mail-line"></span>
                             {% trans %}mautic.email.stats{% endtrans %}
                         </h5>
@@ -40,7 +40,7 @@ delete if it is not require
                         -}}
                     </div>
                 </div>
-                <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                <div class="d-flex flex-column pt-0 ps-16 pb-16 pe-16 min-h-256">
                     {{- include('@MauticCore/Helper/chart.html.twig', {
                         'chartData'     : stats,
                         'chartType'     : 'line',
