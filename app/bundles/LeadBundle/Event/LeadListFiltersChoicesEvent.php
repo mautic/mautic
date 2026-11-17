@@ -102,6 +102,6 @@ final class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
         $request = $this->getRequest();
 
         // something else such as dynamic content
-        return 'loadSegmentFilterForm' === $request->attributes->get('action');
+        return null !== $request && 'loadSegmentFilterForm' === $request->attributes->get('action');
     }
 }

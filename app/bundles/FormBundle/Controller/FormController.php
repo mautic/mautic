@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController as CommonFormController;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -38,6 +39,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class FormController extends CommonFormController
 {
+    use CategoryListFiltersTrait;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -114,6 +117,13 @@ class FormController extends CommonFormController
         if (!$permissions['form:forms:viewother']) {
             $filter['force'][] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
+        $categoryFilters = $this->applyCategoryListFilter(
+            $request,
+            'mautic.form.list_filters',
+            'form',
+            'c.id',
+            $filter
+        );
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
         $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
@@ -153,9 +163,10 @@ class FormController extends CommonFormController
         return $this->delegateView(
             [
                 'viewParameters'  => [
-                    'searchValue'     => $search,
-                    'searchScopes'    => $formSearchScopeProvider->getScopes(),
-                    'items'           => $forms,
+                    'searchValue'  => $search,
+                    'searchScopes' => $formSearchScopeProvider->getScopes(),
+                    'filters'      => $categoryFilters['filters'],
+                    'items'        => $forms,
                     'totalItems'  => $count,
                     'page'        => $page,
                     'limit'       => $limit,

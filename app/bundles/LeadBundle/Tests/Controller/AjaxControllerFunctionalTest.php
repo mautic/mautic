@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -524,6 +525,135 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         foreach ($foundNames as $key => $name) {
             $this->assertSame('User '.($key + 1), $name);
         }
+    }
+
+    public function testCompanyListActionSuggestionsByAdminUser(): void
+    {
+        $userRepository = $this->getService(UserRepository::class);
+
+        $adminUser = $userRepository->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $adminUser);
+
+        $salesUser = $userRepository->findOneBy(['username' => 'sales']);
+        $this->assertInstanceOf(User::class, $salesUser);
+
+        $companies = [];
+
+        // Create 4 companies with two owned by admin and sales users respectively.
+        for ($i = 1; $i <= 4; ++$i) {
+            $owner = $adminUser;
+
+            if ($i > 2) {
+                $owner = $salesUser;
+            }
+
+            $company = new Company();
+            $company->setName("Company {$i}");
+            $company->setOwner($owner);
+            $companies[] = $company;
+        }
+
+        /** @var CompanyRepository $companyRepository */
+        $companyRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyRepository::class);
+        $companyRepository->saveEntities($companies);
+        $this->em->clear();
+
+        // Check suggestions for admin user.
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:companyList&field=undefined&filter=company');
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+
+        $data       = json_decode($response->getContent(), true);
+        $foundNames = array_column($data, 'value');
+
+        $this->assertCount(4, $foundNames);
+
+        foreach ($foundNames as $key => $name) {
+            $this->assertSame('Company '.($key + 1), $name);
+        }
+    }
+
+    public function testCompanyListActionSuggestionsByNonAdminUser(): void
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class);
+
+        $adminUser = $userRepository->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $adminUser);
+
+        $companies = [];
+
+        // Create 4 companies with two owned by admin and sales users respectively.
+        for ($i = 1; $i <= 2; ++$i) {
+            $company = new Company();
+            $company->setName("Company {$i}");
+            $company->setOwner($adminUser);
+            $companies[] = $company;
+        }
+
+        /** @var CompanyRepository $companyRepository */
+        $companyRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyRepository::class);
+        $companyRepository->saveEntities($companies);
+        $this->em->clear();
+
+        $role = new Role();
+        $role->setName('Role');
+        $role->setIsAdmin(false);
+        $role->setRawPermissions(['lead:leads' => ['viewown']]);
+
+        /** @var RoleRepository $roleRepository */
+        $roleRepository = $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class);
+        $roleRepository->saveEntity($role);
+
+        // Create a non admin user with view own contacts permission.
+        $user = new User();
+        $user->setFirstName('Non');
+        $user->setLastName('Admin');
+        $user->setEmail('non-admin-user@test.com');
+        $user->setUsername('non-admin-user');
+        $user->setRole($role);
+
+        $hasher = $this->getService(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+
+        $passwordNonAdmin = 'Maut1cR0cks!';
+        $user->setPassword($hasher->hash($passwordNonAdmin));
+
+        $userRepository->saveEntity($user);
+
+        /** @var User $nonAdminUser */
+        $nonAdminUser = $userRepository->findOneBy(['email' => 'non-admin-user@test.com']);
+
+        $nonAdminCompanies = [];
+
+        // Create 2 companies with owned by non-admin user.
+        for ($i = 3; $i <= 4; ++$i) {
+            $company = new Company();
+            $company->setName("Company {$i}");
+            $company->setOwner($nonAdminUser);
+            $nonAdminCompanies[] = $company;
+        }
+
+        $companyRepository->saveEntities($nonAdminCompanies);
+        $this->em->clear();
+
+        $this->logoutUser();
+
+        // Check suggestions for a non admin user.
+        $this->client->loginUser($nonAdminUser, 'mautic');
+        $this->client->setServerParameter('PHP_AUTH_USER', 'non-admin-user');
+        // Set the new password, because new authenticator system checks for it.
+        $this->client->setServerParameter('PHP_AUTH_PW', $passwordNonAdmin);
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:companyList&field=undefined&filter=company');
+        $response = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+
+        $data       = json_decode($response->getContent(), true);
+        $foundNames = array_column($data, 'value');
+
+        $this->assertCount(2, $foundNames);
+
+        $this->assertSame('Company 3', $foundNames[0]);
+        $this->assertSame('Company 4', $foundNames[1]);
     }
 
     public function testContactListActionSuggestionsByNonAdminUser(): void

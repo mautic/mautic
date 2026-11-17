@@ -78,8 +78,7 @@ final class LeadSubscriberTest extends TestCase
             FocusEventTypes::FOCUS_ON_VIEW,
             self::EVENT_TYPE_VIEW_NAME,
             self::FOCUS_NAME,
-            $date,
-            $lead
+            $date
         );
 
         $leadEvent  = new LeadTimelineEvent($lead);
@@ -138,8 +137,7 @@ final class LeadSubscriberTest extends TestCase
             FocusEventTypes::FOCUS_ON_CLICK,
             self::EVENT_TYPE_CLICK_NAME,
             self::FOCUS_NAME,
-            $date,
-            $lead
+            $date
         );
 
         $leadEvent  = new LeadTimelineEvent($lead);
@@ -189,6 +187,7 @@ final class LeadSubscriberTest extends TestCase
             'results'=> [
                 [
                     'id'         => 1,
+                    'lead_id'    => 1,
                     'type'       => $statType,
                     'date_added' => $date,
                     'focus_id'   => 1,
@@ -212,7 +211,7 @@ final class LeadSubscriberTest extends TestCase
     /**
      * @return array<string, mixed>
      */
-    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, \DateTime $date, ?Lead $lead=null): array
+    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, \DateTime $date): array
     {
         $leadEventLogId = 1;
 
@@ -226,7 +225,7 @@ final class LeadSubscriberTest extends TestCase
             'eventType'       => $eventTypeName,
             'timestamp'       => $date,
             'icon'            => 'ri-search-line',
-            'contactId'       => $lead?->getId(),
+            'contactId'       => 1,
         ];
     }
 }

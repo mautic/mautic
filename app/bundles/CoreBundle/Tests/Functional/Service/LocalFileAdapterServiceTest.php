@@ -10,6 +10,8 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -27,6 +29,8 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
         }
     }
 
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testElfinderCreateFolderPermissions(): void
     {
         $elFinderLoader = new class(self::getContainer()) extends ElFinderLoader {

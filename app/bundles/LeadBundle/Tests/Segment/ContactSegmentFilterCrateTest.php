@@ -121,6 +121,20 @@ final class ContactSegmentFilterCrateTest extends TestCase
 
         $this->assertFalse($contactSegmentFilterCrate->isContactType());
         $this->assertTrue($contactSegmentFilterCrate->isCompanyType());
+        $this->assertSame(ContactSegmentFilterCrate::COMPANY_OBJECT, $contactSegmentFilterCrate->getObject());
+    }
+
+    public function testCompanyAllTypeFilter(): void
+    {
+        $filter = [
+            'object' => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+        ];
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $this->assertFalse($contactSegmentFilterCrate->isContactType());
+        $this->assertTrue($contactSegmentFilterCrate->isCompanyType());
+        $this->assertSame(ContactSegmentFilterCrate::COMPANY_ALL_OBJECT, $contactSegmentFilterCrate->getObject());
     }
 
     public function testMultiselectFilter(): void

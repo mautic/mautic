@@ -67,8 +67,8 @@ final class HtmlExtension
     }
 
     #[AsTwigFunction(name: 'htmlEntityDecode')]
-    public function htmlEntityDecode(string $content): string
+    public function htmlEntityDecode(?string $content): string
     {
-        return html_entity_decode($content);
+        return html_entity_decode($content ?? '');
     }
 }

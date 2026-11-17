@@ -40,6 +40,7 @@ return function (ContainerConfigurator $configurator): void {
         'Stat/Reference.php',
         'Helper/DTO',
         'Model/AbTest/EmailStatus.php',
+        'Validator/EmailAddressMatchesLink.php',
     ];
 
     $services->load('Mautic\\EmailBundle\\', '../')

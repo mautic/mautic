@@ -76,7 +76,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     private $systemTriggered = false;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     #[ORM\Column(type: 'array', nullable: true)]
     private $metadata = [];
@@ -114,6 +114,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     #[ORM\Column(name: 'date_queued', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $dateQueued = null;
+
+    private bool $isExecuted = false;
 
     /**
      * Prepares the metadata for API usage.
@@ -435,5 +437,15 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         $this->dateQueued = $dateQueued;
 
         return $this;
+    }
+
+    public function isExecuted(): bool
+    {
+        return $this->isExecuted;
+    }
+
+    public function setIsExecuted(bool $isExecuted): void
+    {
+        $this->isExecuted = $isExecuted;
     }
 }

@@ -95,9 +95,9 @@ final class MailHelper
     private array $errors = [];
 
     /**
-     * @var array|Lead
+     * @var array<string, mixed>|null
      */
-    private $lead;
+    private ?array $lead = null;
 
     private bool $internalSend = false;
 
@@ -1095,17 +1095,17 @@ final class MailHelper
     }
 
     /**
-     * @return array|Lead
+     * @return array<string, mixed>|null
      */
-    public function getLead()
+    public function getLead(): ?array
     {
         return $this->lead;
     }
 
     /**
-     * @param array|Lead $lead
+     * @param array<string, mixed> $lead
      */
-    public function setLead($lead, bool $interalSend = false): void
+    public function setLead(array $lead, bool $interalSend = false): void
     {
         $this->lead         = $lead;
         $this->internalSend = $interalSend;
@@ -1277,8 +1277,6 @@ final class MailHelper
             $toEmail = null;
             if (is_array($lead) && array_key_exists('email', $lead) && is_string($lead['email'])) {
                 $toEmail = $lead['email'];
-            } elseif ($lead instanceof Lead && is_string($lead->getEmail())) {
-                $toEmail = $lead->getEmail();
             }
 
             if ($toEmail) {
@@ -1813,7 +1811,7 @@ final class MailHelper
     {
         return [
             'name'        => $name,
-            'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
+            'leadId'      => $this->lead['id'] ?? null,
             'emailId'     => ($this->email instanceof Email) ? $this->email->getId() : null,
             'emailName'   => ($this->email instanceof Email) ? $this->email->getName() : null,
             'hashId'      => $this->idHash,
@@ -1894,7 +1892,7 @@ final class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set.
-        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+        if ($emailToSend && null !== $emailToSend->getFromAddress()) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
             return;
@@ -1921,7 +1919,7 @@ final class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set and global reply-to is not configured.
-        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+        if ($emailToSend && null !== $emailToSend->getFromAddress()) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
             return;

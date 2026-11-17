@@ -29,7 +29,9 @@ final readonly class ApiUserSubscriber
      */
     #[AsEventListener(
         event: CheckPassportEvent::class,
-        priority: 2048
+        // Priority must be higher than UserProviderListener (2048) which is registered
+        // per-firewall when a provider is configured. We need to set our userLoader first.
+        priority: 2560
     )]
     public function onCheckPassport(CheckPassportEvent $event): void
     {
@@ -96,6 +98,9 @@ final readonly class ApiUserSubscriber
             return;
         }
 
-        $authenticatedToken->setUser($accessTokenBadge->getAccessToken()->getUser());
+        $user = $accessTokenBadge->getAccessToken()->getUser();
+        if (null !== $user) {
+            $authenticatedToken->setUser($user);
+        }
     }
 }

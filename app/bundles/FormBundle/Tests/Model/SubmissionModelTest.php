@@ -46,6 +46,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -237,11 +238,30 @@ final class SubmissionModelTest extends TestCase
         $this->submissionModelReflection = new \ReflectionClass($this->submissionModel);
     }
 
-    public function testSaveSubmission(): void
+    /**
+     * @return iterable<string, array{bool}>
+     */
+    public static function trackableRequestProvider(): iterable
     {
+        yield 'trackable request' => [true];
+        yield 'request with a privacy signal' => [false];
+    }
+
+    #[DataProvider('trackableRequestProvider')]
+    public function testSaveSubmission(bool $isRequestTrackable): void
+    {
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn($isRequestTrackable);
+
+        // Only a trackable submitter becomes the tracked contact, which writes the tracking cookies
+        $this->contactTracker->expects($isRequestTrackable ? $this->once() : $this->never())->method('setTrackedContact');
+        $this->contactTracker->expects($isRequestTrackable ? $this->never() : $this->once())->method('setSystemContact');
+
+        // An untracked submitter is never looked up, so neither a tracked contact nor an IP address is resolved for them
         $this->contactTracker
+            ->expects($isRequestTrackable ? $this->atLeastOnce() : $this->never())
             ->method('getContact')
             ->willReturn(new Lead());
+        $this->ipLookupHelper->expects($isRequestTrackable ? $this->atLeastOnce() : $this->never())->method('getIpAddress');
 
         $this->userHelper
             ->method('getUser')
@@ -320,6 +340,7 @@ final class SubmissionModelTest extends TestCase
         $this->assertEquals($formData['email'], $tokens['{formfield=email}']);
         $this->assertEquals($formData['file'], $tokens['{formfield=file}']);
         $this->assertSame(['email' => 'test@email.com'], $submissionEvent->getContactFieldMatches());
+        $this->assertSame($isRequestTrackable, null !== $submissionEvent->getSubmission()->getIpAddress());
     }
 
     public function testNormalizeValues(): void

@@ -82,5 +82,15 @@ return [
         'saml_idp_firstname_attribute' => '',
         'saml_idp_lastname_attribute'  => '',
         'saml_idp_default_role'        => '',
+
+        // OIDC Parameters
+        'open_id_is_enabled'                   => 0,
+        'open_id_is_required'                  => 0,
+        'open_id_is_user_registration_allowed' => 0,
+        'open_id_registered_user_role'         => 2,
+        'open_id_client_id'                    => '',
+        'open_id_client_secret'                => '',
+        'open_id_client_url'                   => '',
+        'open_id_mapping_field'                => 'sub',
     ],
 ];

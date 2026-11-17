@@ -54,6 +54,7 @@ final class ConfigSubscriber
                 'google_analytics_anonymize_ip'         => false,
                 'do_not_track_404_anonymous'            => false,
                 'append_segment_id_tracking_url'        => false,
+                'aggregate_analytics'                   => true,
             ],
         ]);
     }

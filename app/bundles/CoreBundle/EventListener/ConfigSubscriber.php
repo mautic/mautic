@@ -24,6 +24,7 @@ final readonly class ConfigSubscriber
         $coreParams = $event->getParametersFromConfig('MauticCoreBundle');
         unset($coreParams['theme']);
         unset($coreParams['theme_import_allowed_extensions']);
+        unset($coreParams['gravatar_enabled']);
         $event->addForm([
             'bundle'     => 'CoreBundle',
             'formType'   => ConfigType::class,
@@ -42,6 +43,11 @@ final readonly class ConfigSubscriber
 
         // Preserve existing value
         $event->unsetIfEmpty('transifex_password');
+
+        // The coreconfig tab is not submitted when another configuration page is saved
+        if (!isset($values['coreconfig']['locale'])) {
+            return;
+        }
 
         // Check if the selected locale has been downloaded already, fetch it if not
         if (!array_key_exists($values['coreconfig']['locale'], $this->languageHelper->getSupportedLanguages())) {

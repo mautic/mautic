@@ -269,6 +269,19 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function addLeadToCompany($companies, $lead): bool
     {
+        return [] !== $this->addLeadToCompanyReturningAddedIds($companies, $lead);
+    }
+
+    /**
+     * @param array|Company $companies
+     * @param array|Lead    $lead
+     *
+     * @return list<int> IDs of companies the lead was newly added to
+     *
+     * @throws ORMException
+     */
+    public function addLeadToCompanyReturningAddedIds($companies, $lead): array
+    {
         // Primary company name to be persisted to the lead's contact company field
         $companyName        = '';
         $companyLeadAdd     = [];
@@ -319,7 +332,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         $persistCompany = [];
         $dispatchEvents = [];
-        $contactAdded   = false;
         foreach ($companies as $companyId) {
             if (!isset($companyLeadAdd[$companyId])) {
                 // List no longer exists in the DB so continue to the next
@@ -343,7 +355,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $companyLead->setCompany($companyLeadAdd[$companyId]);
             $companyLead->setLead($lead);
             $companyLead->setDateAdded($dateManipulated);
-            $contactAdded     = true;
             $persistCompany[] = $companyLead;
             $dispatchEvents[] = $companyId;
 
@@ -382,7 +393,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         // Clear CompanyLead entities from Doctrine memory
         $this->companyLeadRepository->detachEntities($persistCompany);
 
-        return $contactAdded;
+        return $dispatchEvents;
     }
 
     /**
@@ -572,12 +583,16 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                     }
                 }
 
+                if (!preg_match('/^[a-zA-Z0-9_-]+$/', $column)) {
+                    return [];
+                }
+
                 $expr      = new ExpressionBuilder($this->em->getConnection());
                 $composite = $expr->and($expr->like("comp.{$column}", ':filterVar'));
 
                 // Validate owner permissions
                 if (!$this->security->isGranted('lead:leads:viewother')) {
-                    $composite->with(
+                    $composite = $composite->with(
                         $expr->or(
                             $expr->and(
                                 $expr->isNull('comp.owner_id'),

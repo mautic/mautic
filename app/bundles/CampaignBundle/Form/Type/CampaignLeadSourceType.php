@@ -32,7 +32,7 @@ final class CampaignLeadSourceType extends AbstractType
                         'choices'           => array_flip($sourceChoices),
                         'multiple'          => true,
                         'label'             => 'mautic.campaign.leadsource.lists',
-                        'label_attr'        => ['class' => 'control-label'],
+                        'label_attr'        => ['class' => 'form-label'],
                         'attr'              => [
                             'class' => 'form-control',
                         ],
@@ -52,7 +52,7 @@ final class CampaignLeadSourceType extends AbstractType
                         'choices'           => array_flip($sourceChoices),
                         'multiple'          => true,
                         'label'             => 'mautic.campaign.leadsource.forms',
-                        'label_attr'        => ['class' => 'control-label'],
+                        'label_attr'        => ['class' => 'form-label'],
                         'attr'              => [
                             'class' => 'form-control',
                         ],

@@ -63,6 +63,10 @@ final readonly class CampaignSubscriber
     )]
     public function onFormSubmit(SubmissionEvent $event): void
     {
+        if (null === $event->getLead()) {
+            return;
+        }
+
         $form = $event->getSubmission()->getForm();
         $this->realTimeExecutioner->execute('form.submit', $form, 'form', $form->getId());
     }
@@ -118,6 +122,13 @@ final readonly class CampaignSubscriber
 
         $field = $this->formModel->findFormFieldByAlias($form, $event->getEvent()->getProperties()['field']);
 
+        // The field can be gone from the form, e.g. after it was edited
+        if (!$field) {
+            $event->fail();
+
+            return;
+        }
+
         $filter = $this->formFieldHelper->getFieldFilter($field->getType());
         $value  = InputHelper::_($event->getEvent()->getProperties()['value'], $filter);
 
@@ -128,7 +139,7 @@ final readonly class CampaignSubscriber
             $event->getEvent()->getProperties()['field'],
             $value,
             $operators[$event->getEvent()->getProperties()['operator']]['expr'],
-            $field ? $field->getType() : null
+            $field->getType()
         );
 
         $event->getLog()->setChannel('form');

@@ -31,10 +31,15 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         prepareDbalFieldsForSave as defaultPrepareDbalFieldsForSave;
     }
     use ExpressionHelperTrait;
+    use TimelineTrait;
 
     private const string EXISTS_EXPRESSION     = 'EXISTS';
 
     private const string NOT_EXISTS_EXPRESSION = 'NOT EXISTS';
+
+    private const string LIST_SEARCH_COMMAND   = 'mautic.lead.lead.searchcommand.list';
+
+    private const string SOURCE_SEARCH_COMMAND = 'mautic.lead.lead.searchcommand.source';
 
     private CompanyRepository $companyRepository;
 
@@ -77,6 +82,20 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
     private ?TriggerModel $triggerModel = null;
 
     private ?ListLeadRepository $listLeadRepository = null;
+
+    /**
+     * @var list<int> Segment IDs resolved from the current search query's list/segment command
+     */
+    private array $activeSearchSegmentIds = [];
+
+    /**
+     * @var array<string, list<int>>
+     */
+    private array $searchSegmentIdsByAlias = [];
+
+    private bool $searchSegmentContextInitialized = false;
+
+    private bool $combineSegmentAndSourceFilters = false;
 
     /**
      * Used by search functions to search social profiles.
@@ -453,6 +472,11 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
      */
     public function getEntities(array $args = []): iterable
     {
+        $this->activeSearchSegmentIds = [];
+        $this->searchSegmentIdsByAlias = [];
+        $this->searchSegmentContextInitialized = false;
+        $this->combineSegmentAndSourceFilters = false;
+
         $contacts = $this->getEntitiesWithCustomFields(
             'lead',
             $args,
@@ -683,6 +707,18 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, $columns);
     }
 
+    protected function addAdvancedSearchWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $qb, \stdClass $filters): array
+    {
+        if (!$this->searchSegmentContextInitialized) {
+            $this->searchSegmentIdsByAlias = $this->getSearchSegmentIdsByAlias($filters);
+            $this->activeSearchSegmentIds = array_values(array_unique(array_merge([], ...array_values($this->searchSegmentIdsByAlias))));
+            $this->combineSegmentAndSourceFilters = $this->canCombineSegmentAndSourceFilters($filters);
+            $this->searchSegmentContextInitialized = true;
+        }
+
+        return parent::addAdvancedSearchWhereClause($qb, $filters);
+    }
+
     /**
      * Adds the command where clause to the QueryBuilder.
      */
@@ -757,8 +793,15 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
                 $expr            = $queryBuilder->expr()->{$likeExpr}('l.email', ":{$unique}");
                 $returnParameter = true;
                 break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.list', [], null, 'en_US'):
+            case $this->translator->trans(self::LIST_SEARCH_COMMAND):
+            case $this->translator->trans(self::LIST_SEARCH_COMMAND, [], null, 'en_US'):
+                if ($this->combineSegmentAndSourceFilters) {
+                    break;
+                }
+
+                $listIds = $this->searchSegmentIdsByAlias[$string] ?? $this->getListIdsByAlias($string);
+                $listIds = $listIds ?: [0];
+
                 $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 $sq->select('1')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lla')
@@ -775,7 +818,49 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
 
                 $filter->strict  = true;
                 $queryBuilder->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
-                $queryBuilder->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], ArrayParameterType::INTEGER);
+                $queryBuilder->setParameter($unique, $listIds, ArrayParameterType::INTEGER);
+                break;
+            case $this->translator->trans(self::SOURCE_SEARCH_COMMAND):
+            case $this->translator->trans(self::SOURCE_SEARCH_COMMAND, [], null, 'en_US'):
+                $manuallyAddedValue   = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added');
+                $manuallyAddedValueEn = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added', [], null, 'en_US');
+                $filterAddedValue     = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added');
+                $filterAddedValueEn   = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added', [], null, 'en_US');
+
+                if (in_array($string, [$manuallyAddedValue, $manuallyAddedValueEn], true)) {
+                    $manuallyAddedParam = 1;
+                } elseif (in_array($string, [$filterAddedValue, $filterAddedValueEn], true)) {
+                    $manuallyAddedParam = 0;
+                } else {
+                    // Unknown source value, so match nothing.
+                    $expr = $queryBuilder->expr()->eq(1, 0);
+                    break;
+                }
+
+                // This command is designed to be used together with segment:alias.
+                // Without a segment context it returns no results to prevent unintended broad matches.
+                $activeSegmentIds = $this->activeSearchSegmentIds;
+                if ([] === $activeSegmentIds) {
+                    $expr = $queryBuilder->expr()->eq(1, 0);
+                    break;
+                }
+
+                $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                $sq->select('1')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lls')
+                    ->where(
+                        $queryBuilder->expr()->and(
+                            $queryBuilder->expr()->eq('l.id', 'lls.lead_id'),
+                            $queryBuilder->expr()->eq('lls.manually_removed', 0),
+                            $queryBuilder->expr()->eq('lls.manually_added', ":{$unique}"),
+                            $queryBuilder->expr()->in('lls.leadlist_id', ":lls_seg_{$unique}")
+                        )
+                    );
+
+                $filter->strict = true;
+                $queryBuilder->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
+                $queryBuilder->setParameter($unique, $manuallyAddedParam, 'integer');
+                $queryBuilder->setParameter("lls_seg_{$unique}", $activeSegmentIds, ArrayParameterType::INTEGER);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id', [], null, 'en_US'):
@@ -913,6 +998,12 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
                 );
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.stage_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.stage_id', [], null, 'en_US'):
+                $expr            = $this->generateFilterExpression($queryBuilder, 'l.stage_id', $eqExpr, $unique, null);
+                $filter->strict  = true;
+                $returnParameter = true;
+                break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.dnc'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.dnc', [], null, 'en_US'):
                 $anyKeyword   = $this->translator->trans('mautic.lead.lead.searchcommand.dnc.any');
@@ -987,7 +1078,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
             'mautic.lead.lead.searchcommand.isanonymous',
             'mautic.core.searchcommand.ismine',
             'mautic.lead.lead.searchcommand.isunowned',
-            'mautic.lead.lead.searchcommand.list',
+            self::LIST_SEARCH_COMMAND,
             'mautic.lead.lead.searchcommand.campaign_membership',
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
@@ -997,6 +1088,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
             'mautic.core.searchcommand.ip',
             'mautic.lead.lead.searchcommand.tag',
             'mautic.lead.lead.searchcommand.stage',
+            'mautic.lead.lead.searchcommand.stage_id',
             'mautic.lead.lead.searchcommand.duplicate',
             'mautic.lead.lead.searchcommand.email_sent',
             'mautic.lead.lead.searchcommand.email_read',
@@ -1011,6 +1103,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
             'mautic.lead.lead.searchcommand.web_sent',
             'mautic.lead.lead.searchcommand.mobile_sent',
             'mautic.lead.lead.searchcommand.dnc',
+            self::SOURCE_SEARCH_COMMAND,
             'mautic.lead.lead.searchcommand.form',
         ];
 
@@ -1197,6 +1290,23 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
     public function getTableAlias(): string
     {
         return 'l';
+    }
+
+    /**
+     * Timeline entries for the contacts in $options['leadIds'] based on a date column of the contact (date_added, date_identified).
+     *
+     * @param array<string, mixed> $options
+     *
+     * @return array<mixed>
+     */
+    public function getTimelineDates(string $dateColumn, array $options): array
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('l.id AS lead_id, l.'.$dateColumn)
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where($qb->expr()->isNotNull('l.'.$dateColumn));
+
+        return $this->getTimelineResults($qb, $options, 'l.'.$dateColumn, 'l.'.$dateColumn, [], [$dateColumn], null, 'l.id', 'l.id');
     }
 
     /**
@@ -1435,19 +1545,153 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
     }
 
     /**
-     * @return string[]
+     * @return array<string, list<int>>
+     */
+    private function getSearchSegmentIdsByAlias(mixed $filters): array
+    {
+        $segmentIdsByAlias = [];
+        $this->collectSearchSegmentIdsByAlias($filters, $segmentIdsByAlias);
+
+        return $segmentIdsByAlias;
+    }
+
+    /**
+     * @param array<string, list<int>> $segmentIdsByAlias
+     */
+    private function collectSearchSegmentIdsByAlias(mixed $filters, array &$segmentIdsByAlias): void
+    {
+        $listCommands = [
+            $this->translator->trans(self::LIST_SEARCH_COMMAND),
+            $this->translator->trans(self::LIST_SEARCH_COMMAND, [], null, 'en_US'),
+        ];
+
+        if ($filters instanceof \stdClass) {
+            if (isset($filters->command, $filters->string) && in_array($filters->command, $listCommands, true)) {
+                if ($filters->not ?? false) {
+                    return;
+                }
+
+                $alias = (string) $filters->string;
+                if (!array_key_exists($alias, $segmentIdsByAlias)) {
+                    $segmentIdsByAlias[$alias] = $this->getListIdsByAlias($alias) ?: [0];
+                }
+
+                return;
+            }
+
+            $filters = get_object_vars($filters);
+        }
+
+        if (!is_array($filters)) {
+            return;
+        }
+
+        foreach ($filters as $filter) {
+            $this->collectSearchSegmentIdsByAlias($filter, $segmentIdsByAlias);
+        }
+    }
+
+    private function canCombineSegmentAndSourceFilters(mixed $filters): bool
+    {
+        $filters = $this->getConjunctiveSearchFilters($filters);
+        if (null === $filters) {
+            return false;
+        }
+
+        $listCommands = [
+            $this->translator->trans(self::LIST_SEARCH_COMMAND),
+            $this->translator->trans(self::LIST_SEARCH_COMMAND, [], null, 'en_US'),
+        ];
+        $sourceCommands = [
+            $this->translator->trans(self::SOURCE_SEARCH_COMMAND),
+            $this->translator->trans(self::SOURCE_SEARCH_COMMAND, [], null, 'en_US'),
+        ];
+        $listCount   = 0;
+        $sourceCount = 0;
+
+        foreach ($filters as $filter) {
+            if (in_array($filter->command, $listCommands, true)) {
+                if (!empty($filter->not)) {
+                    return false;
+                }
+
+                ++$listCount;
+            } elseif (in_array($filter->command, $sourceCommands, true)) {
+                if (!empty($filter->not)) {
+                    return false;
+                }
+
+                ++$sourceCount;
+            }
+        }
+
+        return 1 === $listCount && 1 === $sourceCount;
+    }
+
+    /**
+     * @return array<int, \stdClass>|null
+     */
+    private function getConjunctiveSearchFilters(mixed $filters): ?array
+    {
+        if ($filters instanceof \stdClass) {
+            if (isset($filters->root)) {
+                return $this->getConjunctiveSearchFilters($filters->root);
+            }
+
+            if (isset($filters->children)) {
+                if (!empty($filters->not) || (isset($filters->type) && 'and' !== $filters->type)) {
+                    return null;
+                }
+
+                return $this->getConjunctiveSearchFilters($filters->children);
+            }
+
+            return isset($filters->command) ? [$filters] : [];
+        }
+
+        if (!is_array($filters)) {
+            return [];
+        }
+
+        $conjunctiveFilters = [];
+        foreach ($filters as $filter) {
+            if (!$filter instanceof \stdClass || 'and' !== ($filter->type ?? null)) {
+                return null;
+            }
+
+            if (isset($filter->children)) {
+                $nestedFilters = $this->getConjunctiveSearchFilters($filter->children);
+                if (null === $nestedFilters) {
+                    return null;
+                }
+
+                $conjunctiveFilters = array_merge($conjunctiveFilters, $nestedFilters);
+                continue;
+            }
+
+            $conjunctiveFilters[] = $filter;
+        }
+
+        return $conjunctiveFilters;
+    }
+
+    /**
+     * @return list<int>
      */
     private function getListIdsByAlias(string $alias): array
     {
-        return $this->getEntityManager()
-            ->getConnection()
-            ->createQueryBuilder()
-            ->select('list.id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'list')
-            ->where('list.alias = :alias')
-            ->setParameter('alias', $alias)
-            ->executeQuery()
-            ->fetchFirstColumn();
+        return array_map(
+            intval(...),
+            $this->getEntityManager()
+                ->getConnection()
+                ->createQueryBuilder()
+                ->select('list.id')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'list')
+                ->where('list.alias = :alias')
+                ->setParameter('alias', $alias)
+                ->executeQuery()
+                ->fetchFirstColumn()
+        );
     }
 
     private function getExistsExpression(bool $isNegated): string

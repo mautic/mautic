@@ -48,7 +48,14 @@ final class ConfigController extends AbstractFormController
     /**
      * Controller action for editing the application configuration.
      */
-    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper): JsonResponse|RedirectResponse|Response
+    #[Route(
+        path: '/s/config/edit/{activeTabId}',
+        name: 'mautic_config_edit',
+        defaults: ['activeTabId' => null],
+        // Must win over mautic_config_action so configuration pages are not matched as a generic action
+        priority: 1,
+    )]
+    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, ?string $activeTabId = null): JsonResponse|RedirectResponse|Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
@@ -64,8 +71,27 @@ final class ConfigController extends AbstractFormController
 
         $this->mergeParamsWithLocal($formConfigs, $pathsHelper);
 
+        // Each configuration tab is rendered as its own page so only one tab's fields are loaded at a time
+        $tabs = array_keys(array_filter($formConfigs, fn (array $config): bool => !empty($config['parameters'])));
+
+        if (null === $activeTabId) {
+            // Keep the legacy ?tab= links working, otherwise open the general settings
+            $legacyTab  = $request->query->get('tab');
+            $defaultTab = in_array('coreconfig', $tabs, true) ? 'coreconfig' : ($tabs[0] ?? 'coreconfig');
+
+            return $this->delegateRedirect($this->generateUrl('mautic_config_edit', [
+                'activeTabId' => in_array($legacyTab, $tabs, true) ? $legacyTab : $defaultTab,
+            ]));
+        }
+
+        if (!in_array($activeTabId, $tabs, true)) {
+            return $this->notFound();
+        }
+
+        $formConfigs = [$activeTabId => $formConfigs[$activeTabId]];
+
         // Create the form
-        $action = $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']);
+        $action = $this->generateUrl('mautic_config_edit', ['activeTabId' => $activeTabId]);
         $form   = $this->formFactory->create(
             ConfigType::class,
             $formConfigs,
@@ -78,7 +104,6 @@ final class ConfigController extends AbstractFormController
         $originalNormData = $form->getNormData();
 
         $isWritable = $configurator->isFileWritable();
-        $openTab    = null;
 
         // Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
@@ -152,10 +177,6 @@ final class ConfigController extends AbstractFormController
                             $this->addFlashMessage('mautic.config.config.notice.updated');
 
                             $cacheHelper->refreshConfig();
-
-                            if (!empty($formData['coreconfig']['last_shown_tab'])) {
-                                $openTab = $formData['coreconfig']['last_shown_tab'];
-                            }
                         } catch (\RuntimeException $exception) {
                             $this->addFlashMessage('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                         }
@@ -174,12 +195,7 @@ final class ConfigController extends AbstractFormController
             // If the form is saved or cancelled, redirect back to the dashboard
             if ($cancelled || $isValid) {
                 if (!$cancelled && $this->isFormApplied($form)) {
-                    $redirectParameters = ['objectAction' => 'edit'];
-                    if ($openTab) {
-                        $redirectParameters['tab'] = $openTab;
-                    }
-
-                    return $this->delegateRedirect($this->generateUrl('mautic_config_action', $redirectParameters));
+                    return $this->delegateRedirect($this->generateUrl('mautic_config_edit', ['activeTabId' => $activeTabId]));
                 }
 
                 return $this->delegateRedirect($this->generateUrl('mautic_dashboard_index'));
@@ -197,12 +213,14 @@ final class ConfigController extends AbstractFormController
                     'formThemes'  => $formThemes,
                     'formConfigs' => $formConfigs,
                     'isWritable'  => $isWritable,
+                    'tabs'        => $tabs,
+                    'activeTab'   => $activeTabId,
                 ],
                 'contentTemplate' => '@MauticConfig/Config/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_config_index',
                     'mauticContent' => 'config',
-                    'route'         => $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']),
+                    'route'         => $action,
                 ],
             ]
         );

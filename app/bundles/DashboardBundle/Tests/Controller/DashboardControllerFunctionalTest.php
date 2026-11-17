@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\DashboardBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\DashboardBundle\Entity\Widget;
@@ -14,13 +15,64 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function dataUploadedDashboardIsPreviewed(): iterable
+    {
+        yield 'plain file name' => ['Automation test dashboard preview'];
+        yield 'file name with an earlier .json occurrence' => ['Automation.json test dashboard preview'];
+    }
+
+    #[DataProvider('dataUploadedDashboardIsPreviewed')]
+    public function testUploadedDashboardIsPreviewed(string $dashboardNamePrefix): void
+    {
+        $dashboardName       = $dashboardNamePrefix.' '.bin2hex(random_bytes(6));
+        $dashboardFileName   = $dashboardName.'.json';
+        $temporaryDirectory  = sys_get_temp_dir().'/mautic-dashboard-'.bin2hex(random_bytes(6));
+        $this->assertTrue(mkdir($temporaryDirectory));
+        $filePath = $temporaryDirectory.'/'.$dashboardFileName;
+        file_put_contents($filePath, json_encode([
+            'name'    => $dashboardName,
+            'widgets' => [],
+        ], JSON_THROW_ON_ERROR));
+
+        try {
+            $crawler = $this->client->request(Request::METHOD_GET, '/s/dashboard/import');
+            $this->assertResponseIsSuccessful();
+            $this->assertSelectorExists('form[name="dashboard_upload"]');
+            $form = $crawler->selectButton('Upload')->form();
+            $fileField = $form['dashboard_upload[file]'];
+            $this->assertInstanceOf(FileFormField::class, $fileField);
+            $fileField->upload($filePath);
+            $this->client->submit($form);
+
+            $this->assertResponseIsSuccessful();
+            $this->assertSelectorExists('.list-group-item.active');
+            $this->assertSelectorTextContains('.list-group-item.active', $dashboardName);
+        } finally {
+            $uploadedDashboard = $this->getService(PathsHelper::class)->getSystemPath('dashboard.user').'/'.$dashboardFileName;
+            if (file_exists($uploadedDashboard)) {
+                unlink($uploadedDashboard);
+            }
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            if (is_dir($temporaryDirectory)) {
+                rmdir($temporaryDirectory);
+            }
+        }
+    }
 
     public function testWidgetWithReport(): void
     {

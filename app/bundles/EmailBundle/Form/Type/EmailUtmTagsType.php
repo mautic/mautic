@@ -22,7 +22,7 @@ final class EmailUtmTagsType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.campaign_source',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -35,7 +35,7 @@ final class EmailUtmTagsType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.campaign_medium',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -48,7 +48,7 @@ final class EmailUtmTagsType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.campaign_name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -61,7 +61,7 @@ final class EmailUtmTagsType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.campaign_content',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],

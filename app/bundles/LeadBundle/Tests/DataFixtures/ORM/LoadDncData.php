@@ -12,13 +12,15 @@ use Mautic\LeadBundle\Entity\Lead;
 
 final class LoadDncData extends Fixture implements OrderedFixtureInterface
 {
+    use ManagedLeadTrait;
+
     public function load(ObjectManager $manager): void
     {
         $dnc = new DoNotContact();
         $dnc->setChannel('sms');
         $dnc->setReason(DoNotContact::MANUAL);
         $dnc->setDateAdded(new \DateTime());
-        $dnc->setLead($this->getReference('lead-1', Lead::class));
+        $dnc->setLead($this->getManagedLead($this->getReference('lead-1', Lead::class), $manager));
 
         $manager->persist($dnc);
         $manager->flush();

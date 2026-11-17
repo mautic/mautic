@@ -16,6 +16,8 @@ use Mautic\SmsBundle\Entity\Sms;
 
 final class LoadClickData extends Fixture implements OrderedFixtureInterface
 {
+    use ManagedLeadTrait;
+
     public function load(ObjectManager $manager): void
     {
         // Create an email for clicks
@@ -113,7 +115,7 @@ final class LoadClickData extends Fixture implements OrderedFixtureInterface
         $hit->setUrl('https://mautic.org');
         $hit->setReferer('https://google.com');
         $hit->setUrlTitle('Test Title');
-        $hit->setLead($this->getReference('lead-'.$hitConfig['lead_id'], Lead::class));
+        $hit->setLead($this->getManagedLead($this->getReference('lead-'.$hitConfig['lead_id'], Lead::class), $manager));
         $hit->setDateHit($hitConfig['date_hit']);
         $hit->setCode(200);
         $hit->setTrackingId('abc');

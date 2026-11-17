@@ -19,8 +19,8 @@ final class EmailModelBuildUrlTest extends MauticMysqlTestCase
     {
         $emailModel = $this->getService(EmailModel::class);
         $idHash     = uniqid();
-        $url        = $emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
+        $url        = $emailModel->buildUrl('mautic_email_validate_email_form', ['action' => 'unsubscribe', 'secretHash' => 'somehash', 'idHash' => $idHash]);
 
-        $this->assertSame('https://foo.bar.com/email/unsubscribe/'.$idHash, $url);
+        $this->assertSame('https://foo.bar.com/email/validate/unsubscribe/somehash/'.$idHash, $url);
     }
 }

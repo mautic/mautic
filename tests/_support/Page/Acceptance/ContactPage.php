@@ -28,7 +28,7 @@ final class ContactPage
     public static $saveButton         = '.btn-save.btn-copy';
 
     // Edit Contact Form
-    public static $editForm     = '#core > div.pa-md.bdr-b > h4';
+    public static $editForm     = '#core > div.pa-16.bdr-b > h4';
 
     // Delete Contact alert
     public static $ConfirmDelete = 'button.btn.btn-danger';
@@ -50,7 +50,7 @@ final class ContactPage
 
     public static $uploadButton           = '#lead_import_start';
 
-    public static $importModal            = '#app-content > div > div.row.animation--slide-in-up > div > div > div.row > div > div';
+    public static string $importForm = 'form[name="lead_import"]';
 
     public static $firstName              = '#lead_field_import_firstname_chosen';
 
@@ -80,7 +80,7 @@ final class ContactPage
     // Change Owner From
     public static $addToTheFollowing          = '#lead_batch_owner_addowner_chosen';
 
-    public static $adminUser                  = '#lead_batch_owner_addowner_chosen > div > ul > li:nth-child(1)';
+    public static $adminUser                  = '//div[@id="lead_batch_owner_addowner_chosen"]//li[contains(normalize-space(.), "Admin User")]';
 
     public static $changeOwnerModalSaveButton = '//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[1]';
 
@@ -104,9 +104,9 @@ final class ContactPage
     public static $clearAllContactsSelection = '#form-cancel';
 
     // Do Not Contact
-    public static $firstContactDoNotContact  = '#leadTable > tbody > tr:nth-child(1) > td:nth-child(2) > a > div.pull-right > span';
+    public static $firstContactDoNotContact  = '#leadTable > tbody > tr:nth-child(1) > td:nth-child(2) > a > div.float-end > span';
 
-    public static $secondContactDoNotContact = '#leadTable > tbody > tr:nth-child(2) > td:nth-child(2) > a > div.pull-right > span';
+    public static $secondContactDoNotContact = '#leadTable > tbody > tr:nth-child(2) > td:nth-child(2) > a > div.float-end > span';
 
     public static $doNotContactSaveButton    = '//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[1]';
 
@@ -115,9 +115,9 @@ final class ContactPage
      * You can append any additional parameter to URL
      * and use it in tests like: Page\Edit::route('/123-post');.
      */
-    public static function route($param)
+    public static function route($param): string
     {
-        return static::$URL.$param;
+        return self::$URL.$param;
     }
 
     /**

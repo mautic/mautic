@@ -578,9 +578,7 @@ final class FromEmailHelperTest extends TestCase
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
 
-        $owner = $this->getHelper()->getContactOwner(1);
-
-        $this->assertEquals(null, $owner);
+        $this->getHelper()->getContactOwner(1);
     }
 
     public function testExceptionIsThrownWhenOwnerNotFound(): void
@@ -597,9 +595,7 @@ final class FromEmailHelperTest extends TestCase
             ->with(1)
             ->willReturn(null);
 
-        $owner = $this->getHelper()->getContactOwner(1);
-
-        $this->assertEquals(null, $owner);
+        $this->getHelper()->getContactOwner(1);
     }
 
     public function testSignatureOfLastFetchedOwnerReturned(): void

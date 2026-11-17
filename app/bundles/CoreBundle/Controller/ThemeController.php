@@ -99,7 +99,7 @@ final class ThemeController extends AbstractFormController
                             );
                         }
                     }
-                } else {
+                } elseif ($form->isSubmitted()) {
                     $form->addError(new FormError($form->getErrors(true)));
                 }
             }

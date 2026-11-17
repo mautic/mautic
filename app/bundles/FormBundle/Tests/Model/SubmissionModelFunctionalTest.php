@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -54,6 +57,45 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(0, $contactsOld);
         $contactsNew = $contactRepository->findBy(['lastname' => 'Sykora']);
         $this->assertCount(1, $contactsNew);
+    }
+
+    public function testExistingContactWinsMergeWhenTrackedAnonymousContactSubmitsMatchingForm(): void
+    {
+        [$formId, $formAlias] = $this->createFormWithoutCompanies();
+
+        $existingContact = new Lead();
+        $existingContact->setEmail('existing.winner@example.com')
+            ->setFirstname('Existing')
+            ->setLastname('Contact');
+        $this->em->persist($existingContact);
+
+        $anonymousContact = new Lead();
+        $anonymousContact->setFirstname('Anonymous');
+        $this->em->persist($anonymousContact);
+        $this->em->flush();
+
+        $existingContactId  = $existingContact->getId();
+        $anonymousContactId = $anonymousContact->getId();
+
+        $this->logoutUser();
+
+        /** @var ContactTracker $contactTracker */
+        $contactTracker = $this->getService(ContactTracker::class);
+        $contactTracker->setTrackedContact($anonymousContact);
+
+        $this->submitFormWithoutCompanies($formId, $formAlias, 'existing.winner@example.com', 'Updated', 'Winner');
+
+        $this->em->clear();
+
+        $this->assertSame($existingContactId, $this->getSubmissionLeadId($formId));
+        $this->assertSame(1, $this->countLeadRowsById($existingContactId));
+        $this->assertSame(0, $this->countLeadRowsById($anonymousContactId));
+
+        $contact = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->find($existingContactId);
+        $this->assertInstanceOf(Lead::class, $contact);
+        $this->assertSame('existing.winner@example.com', $contact->getEmail());
+        $this->assertSame('Updated', $contact->getFirstname());
+        $this->assertSame('Winner', $contact->getLastname());
     }
 
     /**
@@ -201,5 +243,21 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         $form->setValues($values);
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
+    }
+
+    private function getSubmissionLeadId(int $formId): int
+    {
+        return (int) $this->connection->fetchOne(
+            'SELECT lead_id FROM '.MAUTIC_TABLE_PREFIX.'form_submissions WHERE form_id = ?',
+            [$formId]
+        );
+    }
+
+    private function countLeadRowsById(int $leadId): int
+    {
+        return (int) $this->connection->fetchOne(
+            'SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'leads WHERE id = ?',
+            [$leadId]
+        );
     }
 }

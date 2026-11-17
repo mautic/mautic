@@ -50,6 +50,16 @@ final class TagRepository extends BaseTagRepository
         return $q->executeQuery()->rowCount();
     }
 
+    public function getTagByName(string $tag): ?Tag
+    {
+        $qb = $this->createQueryBuilder($this->getTableAlias());
+        $qb->where($qb->expr()->eq($this->getTableAlias().'.tag', ':tag'))
+            ->setParameter('tag', $tag)
+            ->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
     /**
      * Get a count of leads that belong to the tag.
      *
