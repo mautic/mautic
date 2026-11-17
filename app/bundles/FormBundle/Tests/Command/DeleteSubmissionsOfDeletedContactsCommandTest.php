@@ -95,6 +95,29 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $this->assertSame(['Deleted B'], $this->getResultsNames($formB));
     }
 
+    public function testUntrackedSubmissionsWithoutContactAreNotDeleted(): void
+    {
+        $form           = $this->createFormViaApi($this->getPayLoad());
+        $deletedContact = $this->createContact('deleted@example.com');
+
+        // Kiosk mode, Do Not Track or Global Privacy Control: the submission never had a contact.
+        $this->createSubmission($form, null, 'Untracked', false);
+        $this->createSubmission($form, $deletedContact, 'Deleted');
+        $this->deleteContactViaApi($deletedContact);
+
+        $this->assertSame(2, $this->countSubmissionsWithoutContact());
+
+        $this->em->clear();
+        $dryRunTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME, ['--dry-run' => true]);
+        $this->assertStringContainsString('Found 1 form submissions of deleted contacts.', $dryRunTester->getDisplay());
+
+        $commandTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME);
+
+        $this->assertStringContainsString('Deleted 1 form submissions of deleted contacts', $commandTester->getDisplay());
+        $this->assertSame(1, $this->countSubmissionsWithoutContact());
+        $this->assertSame(['Untracked'], $this->getResultsNames($form));
+    }
+
     public function testAllBatchesAreDeleted(): void
     {
         $form           = $this->createFormViaApi($this->getPayLoad());
@@ -149,14 +172,16 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
 
     /**
      * Creates a submission and its record in the form results table.
+     * A tracked submission has a tracking ID. An untracked submission (for example in kiosk mode) has none.
      *
      * @param array<string, mixed> $form
      */
-    private function createSubmission(array $form, Lead $contact, string $name): int
+    private function createSubmission(array $form, ?Lead $contact, string $name, bool $tracked = true): int
     {
         $submission = new Submission();
         $submission->setForm($this->em->getReference(Form::class, $form['id']));
         $submission->setLead($contact);
+        $submission->setTrackingId($tracked ? bin2hex(random_bytes(12)) : null);
         $submission->setDateSubmitted(new \DateTime());
         $submission->setReferer('https://example.com/form');
         $submission->setResults(['name' => $name]);

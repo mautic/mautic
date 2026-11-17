@@ -86,30 +86,30 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
 
         $dryRun = (bool) $input->getOption('dry-run');
 
-        if (null !== $formId) {
-            $form = $this->formRepository->find($formId);
+        $form = null === $formId ? null : $this->formRepository->find($formId);
 
-            if (!$form instanceof Form) {
-                $output->writeln('<error>'.$this->translator->trans('mautic.forms.command.deleted_contact_submissions.form_not_found', ['%form_id%' => $formId]).'</error>');
+        if (null !== $formId && !$form instanceof Form) {
+            $output->writeln('<error>'.$this->translator->trans('mautic.forms.command.deleted_contact_submissions.form_not_found', ['%form_id%' => $formId]).'</error>');
 
-                return ExitCode::FAILURE;
-            }
-
-            $forms = [$form];
-        } else {
-            $forms = $this->formRepository->findBy(['id' => $this->submissionRepository->getFormIdsWithSubmissionsOfDeletedContacts()], ['id' => 'ASC']);
+            return ExitCode::FAILURE;
         }
+
+        $counts = $this->submissionRepository->countSubmissionsOfDeletedContactsByForm($formId);
+        $forms  = match (true) {
+            $form instanceof Form => [$form],
+            [] === $counts        => [],
+            default               => $this->formRepository->findBy(['id' => array_keys($counts)], ['id' => 'ASC']),
+        };
 
         $total = 0;
 
         foreach ($forms as $form) {
             try {
                 $count = $dryRun
-                    ? $this->submissionRepository->countSubmissionsOfDeletedContacts((int) $form->getId())
+                    ? ($counts[(int) $form->getId()] ?? 0)
                     : $this->deleteSubmissionsOfForm($form, $batchLimit);
             } catch (\Exception $e) {
-                $this->logger->error('An exception occurred while deleting the submissions of deleted contacts of form '.$form->getId());
-                $this->logger->error($e->getMessage());
+                $this->logger->error('An exception occurred while deleting the submissions of deleted contacts.', ['formId' => $form->getId(), 'exception' => $e]);
                 $output->writeln('<error>'.$e->getMessage().'</error>');
 
                 return ExitCode::FAILURE;
@@ -136,9 +136,10 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
 
     private function deleteSubmissionsOfForm(Form $form, int $batchLimit): int
     {
-        $formId  = (int) $form->getId();
-        $deleted = 0;
-        $lastId  = 0;
+        $formId             = (int) $form->getId();
+        $resultsTableExists = $this->submissionRepository->resultsTableExists($form);
+        $deleted            = 0;
+        $lastId             = 0;
 
         do {
             $submissionIds = $this->submissionRepository->getSubmissionIdsOfDeletedContacts($formId, $batchLimit, $lastId);
@@ -147,7 +148,7 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
                 break;
             }
 
-            $deleted += $this->submissionRepository->deleteSubmissionsOfDeletedContacts($form, $submissionIds);
+            $deleted += $this->submissionRepository->deleteSubmissionsOfDeletedContacts($form, $submissionIds, $resultsTableExists);
             $lastId = max($submissionIds);
         } while (count($submissionIds) === $batchLimit);
 

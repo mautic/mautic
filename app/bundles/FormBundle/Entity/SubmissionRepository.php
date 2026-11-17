@@ -602,34 +602,30 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * Returns the IDs of the forms that have submissions of deleted contacts.
-     * When a contact is deleted, the foreign key sets form_submissions.lead_id to NULL.
-     *
-     * @return int[]
+     * @return array<int, int> Form ID => number of submissions
      */
-    public function getFormIdsWithSubmissionsOfDeletedContacts(): array
+    public function countSubmissionsOfDeletedContactsByForm(?int $formId = null): array
     {
-        $formIds = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('DISTINCT fs.form_id')
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('fs.form_id', 'COUNT(fs.id) AS submission_count')
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
-            ->where('fs.lead_id IS NULL')
-            ->orderBy('fs.form_id', 'ASC')
-            ->executeQuery()
-            ->fetchFirstColumn();
+            ->groupBy('fs.form_id')
+            ->orderBy('fs.form_id', 'ASC');
 
-        return array_map(intval(...), $formIds);
-    }
+        $this->whereSubmissionOfDeletedContact($qb, 'fs.');
 
-    public function countSubmissionsOfDeletedContacts(int $formId): int
-    {
-        return (int) $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('COUNT(fs.id)')
-            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
-            ->where('fs.form_id = :formId')
-            ->andWhere('fs.lead_id IS NULL')
-            ->setParameter('formId', $formId)
-            ->executeQuery()
-            ->fetchOne();
+        if (null !== $formId) {
+            $qb->andWhere('fs.form_id = :formId')
+                ->setParameter('formId', $formId);
+        }
+
+        $counts = [];
+
+        foreach ($qb->executeQuery()->fetchAllAssociative() as $row) {
+            $counts[(int) $row['form_id']] = (int) $row['submission_count'];
+        }
+
+        return $counts;
     }
 
     /**
@@ -637,42 +633,41 @@ class SubmissionRepository extends CommonRepository
      */
     public function getSubmissionIdsOfDeletedContacts(int $formId, int $limit, int $afterSubmissionId = 0): array
     {
-        $submissionIds = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('fs.id')
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
             ->where('fs.form_id = :formId')
-            ->andWhere('fs.lead_id IS NULL')
             ->andWhere('fs.id > :afterSubmissionId')
             ->setParameter('formId', $formId)
             ->setParameter('afterSubmissionId', $afterSubmissionId)
             ->orderBy('fs.id', 'ASC')
-            ->setMaxResults($limit)
-            ->executeQuery()
-            ->fetchFirstColumn();
+            ->setMaxResults($limit);
 
-        return array_map(intval(...), $submissionIds);
+        $this->whereSubmissionOfDeletedContact($qb, 'fs.');
+
+        return array_map(intval(...), $qb->executeQuery()->fetchFirstColumn());
+    }
+
+    public function resultsTableExists(Form $form): bool
+    {
+        return $this->getEntityManager()->getConnection()->createSchemaManager()->tablesExist([
+            $this->getResultsTableName($form->getId(), $form->getAlias()),
+        ]);
     }
 
     /**
-     * Deletes submissions of deleted contacts and their records in the form results table in one transaction.
-     * Submissions that have a contact are never deleted.
-     *
      * @param int[] $submissionIds
-     *
-     * @return int The number of deleted submissions
      */
-    public function deleteSubmissionsOfDeletedContacts(Form $form, array $submissionIds): int
+    public function deleteSubmissionsOfDeletedContacts(Form $form, array $submissionIds, bool $resultsTableExists): int
     {
         if ([] === $submissionIds) {
             return 0;
         }
 
-        $connection         = $this->getEntityManager()->getConnection();
-        $resultsTableName   = $this->getResultsTableName($form->getId(), $form->getAlias());
-        $resultsTableExists = $connection->createSchemaManager()->tablesExist([$resultsTableName]);
+        $resultsTableName = $this->getResultsTableName($form->getId(), $form->getAlias());
 
-        return (int) $connection->transactional(
-            static function (Connection $connection) use ($resultsTableName, $resultsTableExists, $submissionIds): int {
+        return (int) $this->getEntityManager()->getConnection()->transactional(
+            function (Connection $connection) use ($resultsTableName, $resultsTableExists, $submissionIds): int {
                 if ($resultsTableExists) {
                     $connection->createQueryBuilder()
                         ->delete($resultsTableName)
@@ -681,13 +676,26 @@ class SubmissionRepository extends CommonRepository
                         ->executeStatement();
                 }
 
-                return (int) $connection->createQueryBuilder()
+                $qb = $connection->createQueryBuilder()
                     ->delete(MAUTIC_TABLE_PREFIX.'form_submissions')
                     ->where('id IN (:submissionIds)')
-                    ->andWhere('lead_id IS NULL')
-                    ->setParameter('submissionIds', $submissionIds, ArrayParameterType::INTEGER)
-                    ->executeStatement();
+                    ->setParameter('submissionIds', $submissionIds, ArrayParameterType::INTEGER);
+
+                $this->whereSubmissionOfDeletedContact($qb);
+
+                return (int) $qb->executeStatement();
             }
         );
+    }
+
+    /**
+     * A deleted contact leaves its submissions with lead_id = NULL. Submissions of untracked submitters
+     * (kiosk mode, Do Not Track, Global Privacy Control, bots) can also have lead_id = NULL, but they never
+     * have a tracking ID. The tracking ID condition makes sure that such submissions are never deleted.
+     */
+    private function whereSubmissionOfDeletedContact(DbalQueryBuilder $qb, string $columnPrefix = ''): void
+    {
+        $qb->andWhere($columnPrefix.'lead_id IS NULL')
+            ->andWhere($columnPrefix.'tracking_id IS NOT NULL');
     }
 }
