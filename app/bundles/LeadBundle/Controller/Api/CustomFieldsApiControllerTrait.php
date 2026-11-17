@@ -193,11 +193,12 @@ trait CustomFieldsApiControllerTrait
             // When merging a contact because of a unique identifier match in POST /api/contacts//new or PATCH /api/contacts//edit all 0 values must be unset because
             // we have to assume 0 was not meant to overwrite an existing value. Other empty values will be caught by LeadModel::setFieldValues
             // A 0 the request itself sent is a value though, so it is kept aside and written below.
+            // Not for company: LeadModel::saveEntity reads an empty company as "remove the primary company".
             $parameters = array_filter(
                 $parameters,
                 function ($value, $alias) use ($requested, &$zeros): bool {
                     if (is_numeric($value) && 0.0 === (float) $value) {
-                        if (array_key_exists($alias, $requested)) {
+                        if ('company' !== $alias && array_key_exists($alias, $requested)) {
                             $zeros[$alias] = $value;
                         }
 
@@ -218,9 +219,10 @@ trait CustomFieldsApiControllerTrait
 
         $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
 
-        // LeadModel::setFieldValues treats 0 as empty, so write the requested zeros with overwriteWithBlank
+        // LeadModel::setFieldValues treats 0 as empty, so write the requested zeros with overwriteWithBlank.
+        // The first call already fetched social profiles from the full payload.
         if ([] !== $zeros) {
-            $this->model->setFieldValues($entity, $zeros, true);
+            $this->model->setFieldValues($entity, $zeros, true, false);
         }
     }
 

@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
@@ -36,9 +37,13 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use ApiTestUserTrait;
     use CreateTestEntitiesTrait;
+    use LeadFieldTestTrait;
 
     protected function setUp(): void
     {
+        // Creating a custom field alters the leads table, which a rollback cannot undo.
+        $this->useCleanupRollback = 'testRequestedZeroIsSavedAndOmittedNumberIsKept' !== $this->name();
+
         // Disable API just for specific test.
         $this->configParams['api_enabled'] = 'testDisabledApi' !== $this->name();
 
@@ -917,6 +922,48 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['preferred_locale'], $response['contact']['fields']['all']['preferred_locale']);
         $this->assertEquals($payload['timezone'], $response['contact']['fields']['all']['timezone']);
         $this->assertEquals($updatedValues['owner'], $response['contact']['owner']['id']);
+    }
+
+    public function testRequestedZeroIsSavedAndOmittedNumberIsKept(): void
+    {
+        $this->createField(['alias' => 'zero_test_score', 'type' => 'number']);
+        $this->createField(['alias' => 'zero_test_other', 'type' => 'number']);
+
+        $fieldValues = fn (int $contactId): array => $this->em->getConnection()->fetchAssociative(
+            'SELECT zero_test_score, zero_test_other FROM '.MAUTIC_TABLE_PREFIX.'leads WHERE id = ?',
+            [$contactId]
+        );
+
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', [
+            'email'           => 'zero@example.com',
+            'zero_test_score' => 17,
+            'zero_test_other' => 23,
+        ]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $this->client->getResponse()->getContent());
+        $contactId = json_decode($this->client->getResponse()->getContent(), true)['contact']['id'];
+
+        // POST merging on the email sends 0 for one field and leaves the other out
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', [
+            'email'           => 'zero@example.com',
+            'zero_test_score' => 0,
+        ]);
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
+        $this->assertSame($contactId, json_decode($this->client->getResponse()->getContent(), true)['contact']['id']);
+
+        $values = $fieldValues($contactId);
+        $this->assertNotNull($values['zero_test_score']);
+        $this->assertEquals(0, $values['zero_test_score']);
+        $this->assertEquals(23, $values['zero_test_other']);
+
+        // PATCH sends 0 for the other field
+        $this->client->request(Request::METHOD_PATCH, '/api/contacts/'.$contactId.'/edit', ['zero_test_other' => '0']);
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
+
+        $values = $fieldValues($contactId);
+        $this->assertNotNull($values['zero_test_other']);
+        $this->assertEquals(0, $values['zero_test_other']);
+        $this->assertNotNull($values['zero_test_score']);
+        $this->assertEquals(0, $values['zero_test_score']);
     }
 
     /**

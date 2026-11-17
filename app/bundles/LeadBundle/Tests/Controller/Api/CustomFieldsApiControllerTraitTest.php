@@ -65,25 +65,25 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
     }
 
     /**
-     * @param array<string, mixed>                          $parameters
-     * @param array<string, mixed>                          $formData
-     * @param array<int, array{array<string, mixed>, bool}> $expectedCalls
+     * @param array<string, mixed>                                $parameters
+     * @param array<string, mixed>                                $formData
+     * @param array<int, array{array<string, mixed>, bool, bool}> $expectedCalls
      */
     #[DataProvider('numericValueProvider')]
     public function testSetCustomFieldValuesKeepsOnlyRequestedNumericZero(array $parameters, array $formData, array $expectedCalls): void
     {
         $model = new class() {
             /**
-             * @var array<int, array{array<string, mixed>, bool}>
+             * @var array<int, array{array<string, mixed>, bool, bool}>
              */
             public array $calls = [];
 
             /**
              * @param array<string, mixed> $parameters
              */
-            public function setFieldValues(Lead $lead, array $parameters, bool $overwriteWithBlank): void
+            public function setFieldValues(Lead $lead, array $parameters, bool $overwriteWithBlank, bool $fetchSocialProfiles = true): void
             {
-                $this->calls[] = [$parameters, $overwriteWithBlank];
+                $this->calls[] = [$parameters, $overwriteWithBlank, $fetchSocialProfiles];
             }
         };
 
@@ -127,7 +127,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
     }
 
     /**
-     * @return \Generator<string, array{array<string, mixed>, array<string, mixed>, array<int, array{array<string, mixed>, bool}>}>
+     * @return \Generator<string, array{array<string, mixed>, array<string, mixed>, array<int, array{array<string, mixed>, bool, bool}>}>
      */
     public static function numericValueProvider(): \Generator
     {
@@ -138,7 +138,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             'integer'                  => 5,
             'integer string'           => '5',
         ] as $name => $value) {
-            yield $name => [['number_field' => $value], [], [[['number_field' => $value], false]]];
+            yield $name => [['number_field' => $value], [], [[['number_field' => $value], false, true]]];
         }
 
         // A zero the request sent is written with overwriteWithBlank, as LeadModel::setFieldValues treats 0 as empty
@@ -148,14 +148,17 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             'zero string'         => '0',
             'decimal zero string' => '0.00',
         ] as $name => $value) {
-            yield $name => [['number_field' => $value], [], [[[], false], [['number_field' => $value], true]]];
+            yield $name => [['number_field' => $value], [], [[[], false, true], [['number_field' => $value], true, false]]];
         }
 
         // A zero the form filled in for a field the request did not send is still dropped
         yield 'zero the form filled in' => [
             ['sent_field' => '0'],
             ['sent_field' => 0.0, 'filled_field' => 0.0],
-            [[[], false], [['sent_field' => 0.0], true]],
+            [[[], false, true], [['sent_field' => 0.0], true, false]],
         ];
+
+        // An empty company removes the contact's primary company in LeadModel::saveEntity, so a 0 company is still dropped
+        yield 'zero company' => [['company' => '0'], [], [[[], false, true]]];
     }
 }
