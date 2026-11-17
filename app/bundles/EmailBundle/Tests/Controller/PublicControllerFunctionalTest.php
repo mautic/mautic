@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,6 +48,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['show_contact_pause_dates']        = 0;
         $this->configParams['show_contact_categories']         = 0;
         $this->configParams['show_contact_preferred_channels'] = 0;
+        $this->configParams['theme']                          = 'blank';
 
         $this->configParams['show_contact_preferences'] = 1;
         if (in_array($this->name(), self::UNSUBSCRIBE_TESTS)) {
@@ -65,7 +67,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['show_contact_segments'] = 1;
         }
 
-        switch ($this->getName()) {
+        switch ($this->name()) {
             case 'testResubscribeSuccessMessageContainsDirectUnsubscribeLinkWhenValidationDisabled':
             case 'testUnsubscribeSuccessMessageContainsDirectResubscribeLinkWhenValidationDisabled':
                 $this->configParams['validate_unsubscribe_emails'] = false;
@@ -122,7 +124,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
 
         $this->em->clear();
 
@@ -136,7 +138,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = $this->getStat(null, $lead);
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
 
         self::assertResponseIsSuccessful();
         $form = $crawler->filter('form')->form();
@@ -234,7 +236,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $lead = $this->createLead();
         $stat = $this->getStat(null, $lead);
         $this->em->flush();
-        $this->client->request('HEAD', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->client->request('HEAD', $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
         $dncCollection = $stat->getLead()->getDoNotContact();
         $this->assertCount(0, $dncCollection);
@@ -247,7 +249,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $preferencesCenter = $this->createCustomPreferencesPage('{segmentlist}{saveprefsbutton}');
         $stat              = $this->getStat(null, $lead, $preferencesCenter);
         $this->em->flush();
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
         $tokenInput = $crawler->filter('input[name="lead_contact_frequency_rules[_token]"]');
         $this->assertCount(1, $tokenInput, $this->client->getResponse()->getContent());
@@ -274,7 +276,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = $this->getStat(null, $lead, $page);
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Save preferences', $crawler->html());
     }
@@ -342,7 +344,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = $this->getStat(null, $lead, $page);
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
 
         $translator = self::getContainer()->get(TranslatorInterface::class);
@@ -905,7 +907,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Get the unsubscribe page
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
 
         self::assertResponseIsSuccessful();
 
@@ -949,7 +951,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->logoutUser();
 
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
 
         $this->assertResponseIsSuccessful();
         $form = $crawler->filter('form')->form();
@@ -983,7 +985,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
 
         $this->assertResponseIsSuccessful();
 
@@ -1101,7 +1103,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getSecretHash(string $email): string
     {
-        $mailHashHelper = self::$container->get('mautic.helper.mailer_hash');
+        $mailHashHelper = self::getContainer()->get(MailHashHelper::class);
         \assert($mailHashHelper instanceof MailHashHelper);
 
         return $mailHashHelper->getEmailHash($email);

@@ -79,7 +79,8 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         preg_match($unsubscribeUrlPattern, $messages[0]->getHtmlBody(), $unsubscribeMatches1);
         preg_match($resubscribeUrlPattern, $messages[0]->getHtmlBody(), $resubscribeMatches1);
 
-        $this->assertSame(20, strlen($unsubscribeMatches1[1]), $messages[0]->getHtmlBody());
+        $this->assertSame(64, strlen($unsubscribeMatches1[1]), $messages[0]->getHtmlBody());
+        $this->assertSame(20, strlen($unsubscribeMatches1[2]), $messages[0]->getHtmlBody());
         $this->assertSame($unsubscribeMatches1[1], $resubscribeMatches1[1], $messages[0]->getHtmlBody());
         $this->assertNotEmpty($unsubscribeMatches1[1], $messages[0]->getHtmlBody());
         $this->assertNotEmpty($unsubscribeMatches1[2], $messages[0]->getHtmlBody());
@@ -99,7 +100,8 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         // The email stat hashes cannot be the same in different emails:
         $this->assertNotEquals($unsubscribeMatches1[2], $unsubscribeMatches2[2], $messages[0]->getHtmlBody());
 
-        $this->assertSame(20, strlen($unsubscribeMatches2[1]), $messages[1]->getHtmlBody());
+        $this->assertSame(64, strlen($unsubscribeMatches2[1]), $messages[1]->getHtmlBody());
+        $this->assertSame(20, strlen($unsubscribeMatches2[2]), $messages[1]->getHtmlBody());
         $this->assertSame($unsubscribeMatches2[1], $resubscribeMatches2[1], $messages[1]->getHtmlBody());
 
         // The email stat hashes cannot be the same in different emails:

@@ -94,7 +94,7 @@ return [
             ],
             'mautic_email_validate_email_form' => [
                 'path'       => '/email/validate/{action}/{secretHash}/{idHash}',
-                'controller' => 'MauticEmailBundle:Public:validateEmail',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::validateEmailAction',
                 'defaults'   => ['idHash' => null],
             ],
             'mautic_mailer_transport_callback' => [

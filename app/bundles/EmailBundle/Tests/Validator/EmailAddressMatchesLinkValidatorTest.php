@@ -100,7 +100,7 @@ final class EmailAddressMatchesLinkValidatorTest extends TestCase
         $validator->validate(
             'john@doe.com',
             new EmailAddressMatchesLink([
-                'secretHash'       => 'expected-hash',
+                'secretHash'       => $secretHash,
                 'statEmailAddress' => 'john@doe.com',
             ])
         );
