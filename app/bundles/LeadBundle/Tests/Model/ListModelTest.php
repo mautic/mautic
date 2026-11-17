@@ -376,7 +376,7 @@ final class ListModelTest extends TestCase
 
         $this->doNotContactRepositoryMock->expects($this->once())
             ->method('getCount')
-            ->with(null, null, null, $segmentId)
+            ->with('email', null, null, $segmentId)
             ->willReturn($dnc);
 
         $active = $this->model->getActiveSegmentContactCount($segmentId);

@@ -1,11 +1,11 @@
 {% set system_user = 'mautic.core.system'|trans %}
 
 {% if logs is defined and logs is iterable %}
-    <div class="pt-md pr-md pb-md pl-md">
+    <div class="pt-16 pe-16 pb-16 ps-16">
         <ul class="media-list media-list-feed">
             {% for log in logs %}
                 <li class="media">
-                    <div class="media-object pull-left">
+                    <div class="media-object float-start">
                         <span class="figure featured {% if 'create' == log.action %}bg-success{% endif %}">
                             <span class="fa {{ icons[log.bundle]|default('') }}"></span>
                         </span>

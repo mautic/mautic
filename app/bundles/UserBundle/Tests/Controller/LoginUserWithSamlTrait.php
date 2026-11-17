@@ -6,7 +6,7 @@ namespace Mautic\UserBundle\Tests\Controller;
 
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\TestBrowserToken;
-use Symfony\Component\HttpFoundation\Session\SessionFactory;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 trait LoginUserWithSamlTrait
@@ -25,11 +25,6 @@ trait LoginUserWithSamlTrait
         $session->set('_security_'.$firewallContext, serialize($token));
         $session->save();
 
-        $sessionFactory = $this->createMock(SessionFactory::class);
-        $sessionFactory
-            ->method('createSession')
-            ->willReturn($session);
-
-        self::getContainer()->set('session.factory', $sessionFactory);
+        $this->client->getCookieJar()->set(new Cookie($session->getName(), $session->getId()));
     }
 }

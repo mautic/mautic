@@ -1903,12 +1903,6 @@ parameters:
 			path: app/bundles/EmailBundle/Entity/Email.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setVariantReadCount\(\) has parameter \$variantReadCount with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -2121,12 +2115,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:setTo\(\) has parameter \$name with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\Helper\\MailHelper\:\:\$lead \(array\|Mautic\\LeadBundle\\Entity\\Lead\) does not accept null\.$#'
-			identifier: assign.propertyType
 			count: 1
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
@@ -2765,12 +2753,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/FormBundle/Event/SubmissionEvent.php
-
-		-
-			message: '#^Parameter \#1 \$response of method Mautic\\FormBundle\\EventListener\\FormSubscriber\:\:parseResponse\(\) expects GuzzleHttp\\Psr7\\Response, Psr\\Http\\Message\\ResponseInterface given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/FormBundle/EventListener/FormSubscriber.php
 
 		-
 			message: '#^Method Mautic\\FormBundle\\Exception\\ValidationException\:\:__construct\(\) has parameter \$message with no type specified\.$#'

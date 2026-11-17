@@ -33,7 +33,7 @@ final class EmailSendType extends AbstractType
             EmailListType::class,
             [
                 'label'      => 'mautic.email.send.selectemails',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'                => 'form-control',
                     'tooltip'              => 'mautic.email.choose.emails_descr',
@@ -60,7 +60,7 @@ final class EmailSendType extends AbstractType
                         'mautic.core.form.yes' => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
                     ],
                     'label'      => 'mautic.email.send.emailtype',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control email-type',
                         'tooltip' => 'mautic.email.send.emailtype.tooltip',
@@ -85,7 +85,7 @@ final class EmailSendType extends AbstractType
                 ButtonType::class,
                 [
                     'attr' => [
-                        'class'   => 'btn btn-tertiary btn-sm btn-nospin mr-xs',
+                        'class'   => 'btn btn-tertiary btn-sm btn-nospin me-5',
                         'onclick' => 'Mautic.loadNewWindow({
                             "windowUrl": "'.$windowUrl.'"
                         })',
@@ -111,7 +111,7 @@ final class EmailSendType extends AbstractType
                 ButtonType::class,
                 [
                     'attr' => [
-                        'class'    => 'btn btn-tertiary btn-sm btn-nospin mr-xs',
+                        'class'    => 'btn btn-tertiary btn-sm btn-nospin me-5',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlEdit.'","origin":"#'.$options['update_select'].'"}))',
                         'disabled' => !isset($options['data']['email']) && !isset($options['attr']['email']),
                         'icon'     => 'ri-edit-line',
@@ -128,7 +128,7 @@ final class EmailSendType extends AbstractType
                 ButtonType::class,
                 [
                     'attr' => [
-                        'class'    => 'btn btn-tertiary btn-sm btn-nospin mr-xs',
+                        'class'    => 'btn btn-tertiary btn-sm btn-nospin me-5',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlPreview.'","origin":"#'.$options['update_select'].'"}))',
                         'disabled' => !isset($options['data']['email']) && !isset($options['attr']['email']),
                         'icon'     => 'ri-external-link-line',

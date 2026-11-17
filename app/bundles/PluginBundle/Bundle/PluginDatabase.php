@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\PluginBundle\Bundle;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Name\OptionallyQualifiedName;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\IntegrationsBundle\Migration\Engine;
 use Mautic\PluginBundle\Entity\Plugin;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -39,8 +41,22 @@ final readonly class PluginDatabase
             return;
         }
 
-        $schemaTool     = new SchemaTool($this->em);
-        $installQueries = $schemaTool->getCreateSchemaSql(array_values($metadata));
+        $schemaTool = new SchemaTool($this->em);
+        $schema     = $schemaTool->getSchemaFromMetadata(array_values($metadata));
+
+        // Schema listeners (e.g. Symfony Messenger) add their own tables, which may already exist
+        $existingTables = array_map(
+            static fn (OptionallyQualifiedName $name): string => strtolower(AssetName::fromName($name)),
+            $this->connection->createSchemaManager()->introspectTableNames()
+        );
+        foreach ($schema->getTables() as $table) {
+            $tableName = AssetName::of($table);
+            if (in_array(strtolower($tableName), $existingTables, true)) {
+                $schema->dropTable($tableName);
+            }
+        }
+
+        $installQueries = $schema->toSql($this->connection->getDatabasePlatform());
 
         foreach ($installQueries as $q) {
             // Check if the query is a DDL statement

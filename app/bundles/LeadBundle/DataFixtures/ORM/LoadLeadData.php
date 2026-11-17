@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\DataFixtures\ORM;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CsvHelper;
@@ -50,12 +51,16 @@ final class LoadLeadData extends Fixture implements OrderedFixtureInterface
             $this->setReference('lead-'.$count, $lead);
 
             // Assign to companies in a predictable way
-            $lastCharacter = (int) substr($count, -1, 1);
+            $lastCharacter = (int) substr((string) $count, -1, 1);
             if ($lastCharacter <= 3) {
                 if ($this->hasReference('company-'.$lastCharacter, Company::class)) {
                     $companyLead = new CompanyLead();
+                    $company     = $this->getReference('company-'.$lastCharacter, Company::class);
+                    \assert($manager instanceof EntityManagerInterface);
+                    $managedCompany = $manager->getReference(Company::class, $company->getId());
+                    \assert($managedCompany instanceof Company);
                     $companyLead->setLead($lead);
-                    $companyLead->setCompany($this->getReference('company-'.$lastCharacter, Company::class));
+                    $companyLead->setCompany($managedCompany);
                     $companyLead->setDateAdded($today);
                     $companyLead->setPrimary(true);
                     $this->companyLeadRepository->saveEntity($companyLead);

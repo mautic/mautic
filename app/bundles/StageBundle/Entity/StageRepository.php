@@ -4,6 +4,7 @@ namespace Mautic\StageBundle\Entity;
 
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
@@ -18,6 +19,17 @@ class StageRepository extends CommonRepository
         $q = $this
             ->createQueryBuilder($this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'c');
+
+        if (!empty($args['withContactCount'])) {
+            // Use a subquery so the main stage list query stays safe for pagination and sorting.
+            $sq = $this->getEntityManager()->createQueryBuilder()
+                ->select('count(l.id)')
+                ->from(Lead::class, 'l')
+                ->where('l.stage = s');
+
+            $q->addSelect('('.$sq->getDql().') as contactCount');
+            unset($args['withContactCount']);
+        }
 
         $args['qb'] = $q;
 

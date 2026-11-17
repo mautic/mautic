@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CampaignBundle\Helper\EventEntityReferences;
+use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
@@ -16,26 +18,35 @@ use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final readonly class SegmentImportExportSubscriber
+final class SegmentImportExportSubscriber
 {
     use ImportExportTrait;
 
+    /**
+     * The segments being exported, as segment filters can refer to each other.
+     *
+     * @var array<int, true>
+     */
+    private array $exporting = [];
+
     public function __construct(
-        private ListModel $leadListModel,
-        private EntityManagerInterface $entityManager,
-        private LeadListRepository $leadListRepository,
-        private AuditLogModel $auditLogModel,
-        private PluginModel $pluginModel,
-        private EventDispatcherInterface $dispatcher,
-        private FieldModel $fieldModel,
-        private IpLookupHelper $ipLookupHelper,
-        private ImportEntityDenormalizer $serializer,
+        private readonly ListModel $leadListModel,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly LeadListRepository $leadListRepository,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly PluginModel $pluginModel,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly FieldModel $fieldModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly ImportEntityDenormalizer $serializer,
+        private readonly EventEntityReferences $eventEntityReferences,
     ) {
     }
 
@@ -50,9 +61,22 @@ final readonly class SegmentImportExportSubscriber
 
         $leadListId = $event->getEntityId();
         $leadList   = $this->leadListModel->getEntity($leadListId);
-        if (!$leadList instanceof LeadList) {
+        if (!$leadList instanceof LeadList || isset($this->exporting[$leadListId])) {
             return;
         }
+
+        $this->exporting[$leadListId] = true;
+
+        try {
+            $this->exportSegment($event, $leadList);
+        } finally {
+            unset($this->exporting[$leadListId]);
+        }
+    }
+
+    private function exportSegment(EntityExportEvent $event, LeadList $leadList): void
+    {
+        $leadListId  = (int) $leadList->getId();
         $segmentData = [
             'id'                   => $leadListId,
             'name'                 => $leadList->getName(),
@@ -68,6 +92,29 @@ final readonly class SegmentImportExportSubscriber
         $customFields   = $this->fieldModel->getLeadFieldCustomFields();
         $filters        = $leadList->getFilters();
         $data           = [];
+
+        if ($linkedUuids = $this->getLinkedUuids($filters)) {
+            $segmentData['linked_uuids'] = $linkedUuids;
+        }
+
+        if ($tagNames = $this->getTagNames($filters)) {
+            $segmentData['linked_names'][EventEntityReferences::TAG_ID] = $tagNames;
+        }
+
+        // Takes along the segments, emails and assets the filters refer to, so the import can point the filters to them
+        foreach ($this->eventEntityReferences->getSegmentFilterExportedIds($filters) as $entityName => $entityIds) {
+            foreach ($entityIds as $entityId) {
+                $subEvent = new EntityExportEvent($entityName, $entityId);
+                $this->dispatcher->dispatch($subEvent);
+                $this->mergeExportData($data, $subEvent);
+                $event->addDependencies($subEvent->getDependencies());
+
+                $event->addDependencyEntity(LeadList::ENTITY_NAME, [
+                    LeadList::ENTITY_NAME => $leadListId,
+                    $entityName           => $entityId,
+                ]);
+            }
+        }
 
         foreach ($filters as $filter) {
             if (isset($filter['object']) && in_array($filter['object'], ['lead', 'company'], true)) {
@@ -92,6 +139,55 @@ final readonly class SegmentImportExportSubscriber
         $this->logAction('export', $leadListId, $segmentData);
     }
 
+    /**
+     * The UUIDs of the campaigns and stages the filters refer to, so the import can find them on the target instance.
+     *
+     * @param array<int, array<string, mixed>> $filters
+     *
+     * @return array<string, array<int, string>>
+     */
+    private function getLinkedUuids(array $filters): array
+    {
+        $uuids = [];
+
+        foreach ($this->eventEntityReferences->getSegmentFilterLinkedIds($filters) as $kind => $ids) {
+            foreach ($ids as $id) {
+                $entity = $this->entityManager->find(EventEntityReferences::LINKED[$kind], $id);
+
+                if ($entity instanceof UuidInterface && $entity->getUuid()) {
+                    $uuids[$kind][$id] = $entity->getUuid();
+                }
+            }
+        }
+
+        return $uuids;
+    }
+
+    /**
+     * Filters refer to tags by ID, so the import finds or creates them by name.
+     *
+     * @param array<int, array<string, mixed>> $filters
+     *
+     * @return array<int, string>
+     */
+    private function getTagNames(array $filters): array
+    {
+        $names = [];
+
+        foreach ($this->eventEntityReferences->getSegmentFilterTagIds($filters) as $id) {
+            $tag = $this->entityManager->find(Tag::class, $id);
+
+            $name = $tag instanceof Tag ? $tag->getTag() : null;
+
+            // A tag can be named "0"
+            if (is_string($name) && '' !== $name) {
+                $names[$id] = $name;
+            }
+        }
+
+        return $names;
+    }
+
     #[AsEventListener(
         event: EntityImportEvent::class,
     )]
@@ -111,6 +207,9 @@ final readonly class SegmentImportExportSubscriber
             $isNew   = !$segment;
 
             $segment ??= new LeadList();
+
+            // The campaign import points the filters to the entities on this instance once they are all imported
+            unset($element['linked_uuids'], $element['linked_names']);
 
             $this->serializer->denormalize(
                 $element,

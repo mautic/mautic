@@ -50,7 +50,7 @@ final class SamlTest extends MauticMysqlTestCase
         $metadataUrl = 'http://'.$host.':'.$port.'/simplesaml/saml2/idp/metadata.php';
         $this->assertTrue(copy($metadataUrl, $temporaryFile), 'Error copying '.$metadataUrl.' to '.$temporaryFile);
 
-        $configUrl        = '/s/config/edit?tab=userconfig';
+        $configUrl        = '/s/config/edit/userconfig';
         $crawler          = $this->client->request(Request::METHOD_GET, $configUrl);
         $configSaveButton = $crawler->selectButton('config[buttons][apply]');
         $configForm       = $configSaveButton->form();
@@ -75,11 +75,9 @@ final class SamlTest extends MauticMysqlTestCase
 
         // Fill in email in the fields Email, First Name and Last name (we are testing, so no problem that the actual values are not correct)
         $configForm->setValues([
-            'config[leadconfig][contact_columns]'               => ['name', 'email', 'id'],
-            'config[companyconfig][company_columns]'            => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
-            'config[userconfig][saml_idp_email_attribute]'      => $attributeName,
-            'config[userconfig][saml_idp_firstname_attribute]'  => $attributeName,
-            'config[userconfig][saml_idp_lastname_attribute]'   => $attributeName,
+            'config[userconfig][saml_idp_email_attribute]'     => $attributeName,
+            'config[userconfig][saml_idp_firstname_attribute]' => $attributeName,
+            'config[userconfig][saml_idp_lastname_attribute]'  => $attributeName,
         ]);
         $this->client->submit($configForm);
         $clientResponse = $this->client->getResponse();

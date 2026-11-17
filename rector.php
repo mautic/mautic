@@ -6,6 +6,7 @@ use Rector\Config\RectorConfig;
 use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
+    ->withParallel(timeoutSeconds: 300)
     ->withPaths([
         __DIR__.'/app/bundles',
         __DIR__.'/plugins',

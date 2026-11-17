@@ -110,7 +110,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%d', $lead->getId()));
 
-        $anchorTag  = $crawler->filter('#toolbar ul.dropdown-menu-right li')->first()->filter('a');
+        $anchorTag  = $crawler->filter('#toolbar ul.dropdown-menu-end li')->first()->filter('a');
         $mouseOver  = $anchorTag->attr('onmouseover');
         $dataHeader = $anchorTag->attr('data-header');
 

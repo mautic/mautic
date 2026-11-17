@@ -22,7 +22,7 @@ final class FormFieldGroupType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.group.labelattr',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'     => 'form-control',
                     'tooltip'   => 'mautic.form.field.help.group.labelattr',

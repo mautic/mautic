@@ -17,7 +17,7 @@
 				'attr': {
 					'class': 'btn btn-ghost btn--icon-only btn-nospin',
 					'href': '#InviteUserModal',
-					'data-toggle': 'modal',
+					'data-bs-toggle': 'modal',
 				},
 				'iconClass': 'ri-team-line',
 				'tooltip': 'mautic.user.profile.invite',
@@ -44,26 +44,41 @@
 					'delete': permissions['delete']
 				}
 			},
-			'quickFilters': [
-				{
-					'search': 'mautic.user.user.searchcommand.isadmin',
-					'label': 'mautic.user.role.form.isadmin',
-					'tooltip': 'mautic.core.search.quickfilter.is_admin',
-					'icon': 'ri-admin-line'
+			'quickFilters': {
+				'mautic.core.quick_filters.status': {
+					'conflictGroup': true,
+					'filters': [
+						{
+							'search': 'mautic.core.searchcommand.ispublished',
+							'label': 'mautic.core.form.active',
+							'tooltip': 'mautic.core.search.quickfilter.is_published',
+							'icon': 'ri-check-line'
+						},
+						{
+							'search': 'mautic.core.searchcommand.isunpublished',
+							'label': 'mautic.core.form.inactive',
+							'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
+							'icon': 'ri-close-line'
+						}
+					]
 				},
-				{
-					'search': 'mautic.core.searchcommand.ispublished',
-					'label': 'mautic.core.form.active',
-					'tooltip': 'mautic.core.search.quickfilter.is_published',
-					'icon': 'ri-check-line'
-				},
-				{
-					'search': 'mautic.core.searchcommand.isunpublished',
-					'label': 'mautic.core.form.inactive',
-					'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
-					'icon': 'ri-close-line'
+				'mautic.core.quick_filters.others': {
+					'filters': [
+						{
+							'search': 'mautic.user.user.searchcommand.isadmin',
+							'label': 'mautic.user.role.form.isadmin',
+							'tooltip': 'mautic.core.search.quickfilter.is_admin',
+							'icon': 'ri-admin-line'
+						},
+						{
+							'search': 'mautic.user.user.searchcommand.neverloggedin',
+							'label': 'mautic.user.user.searchcommand.neverloggedin.label',
+							'tooltip': 'mautic.user.user.searchcommand.neverloggedin.description',
+							'icon': 'ri-login-box-line'
+						}
+					]
 				}
-			]
+			},
 		}) -}}
 		<div class="page-list">
 			{{ block('listResults') }}
@@ -90,7 +105,7 @@
 					'label': 'mautic.core.form.cancel'|trans,
 					'variant': 'secondary',
 					'attributes': {
-						'data-dismiss': 'modal'
+						'data-bs-dismiss': 'modal'
 					}
 				},
 				{
@@ -173,7 +188,7 @@
                    }) -}}
 						</td>
 						<td class="visible-md visible-lg">
-							<img class="img img-responsive img-thumbnail w-44" src="{{ gravatarGetImage(item.getEmail(), '50') }}"/>
+							<img class="img img-fluid img-thumbnail w-44" src="{{ userAvatar(item.getId()) }}" alt=""/>
 						</td>
 						<td>
 							<div>

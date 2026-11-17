@@ -29,6 +29,13 @@ final class TrackableModel extends AbstractCommonModel
     private array $doNotTrack = [];
 
     /**
+     * Literal URLs collected from disable-tracking attributes.
+     *
+     * @var array<string, string>
+     */
+    private array $literalDoNotTrackUrls = [];
+
+    /**
      * Tokens with values that could be used as URLs.
      */
     private array $contentTokens = [];
@@ -221,6 +228,7 @@ final class TrackableModel extends AbstractCommonModel
     {
         // Set do not track list for validateUrlIsTrackable()
         $this->doNotTrack = $this->getDoNotTrackList($content);
+        $this->literalDoNotTrackUrls = [];
 
         // Set content tokens used by validateUrlIsTrackable()
         $this->contentTokens = $contentTokens;
@@ -279,6 +287,12 @@ final class TrackableModel extends AbstractCommonModel
         // Simple search and replace to remove attributes, schema for tokens, and updating URL parameter order
         $firstPassSearch  = array_keys($this->contentReplacements['first_pass']);
         $firstPassReplace = $this->contentReplacements['first_pass'];
+
+        foreach ($this->literalDoNotTrackUrls as $url) {
+            $expandedUrl       = trim(str_ireplace($firstPassSearch, $firstPassReplace, $url));
+            $this->doNotTrack[] = '^'.preg_quote($expandedUrl, '~').'$';
+        }
+
         $content          = str_ireplace($firstPassSearch, $firstPassReplace, $content);
 
         // Sort longer to shorter strings to ensure that URLs that share the same base are appropriately replaced
@@ -289,12 +303,21 @@ final class TrackableModel extends AbstractCommonModel
             // by the \DomDocument::save will encode those on all doc, but here we need to replace only `href`.
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
                 // Make the search regular expression match both "&" and "&amp;".
-                $search  = preg_quote($search, '/');
-                $search  = str_replace('&amp;', '&', $search);
-                $search  = str_replace('&', '(?:&|&amp;)', $search);
-                $content = preg_replace(
-                    '/<(.*?) href=(["\'])(?:\R|)(?:\s*)'.$search.'(.*?)(?:\s*)(?:\R|)\\2(.*?)>/i',
-                    '<$1 href=$2'.$replace.'$3$2$4>',
+                $searchPattern = preg_quote($search, '/');
+                $searchPattern = str_replace('&amp;', '&', $searchPattern);
+                $searchPattern = str_replace('&', '(?:&|&amp;)', $searchPattern);
+                $content       = preg_replace_callback(
+                    '/<(.*?) href=(["\'])(?:\R|)(?:\s*)('.$searchPattern.')(.*?)(?:\s*)(?:\R|)\\2(.*?)>/i',
+                    function (array $m) use ($replace): string {
+                        // Decode HTML entities so raw href suffixes (&amp;) match normalized URLs
+                        // in the do-not-track list (which are stored with plain &).
+                        $fullHref = trim(html_entity_decode($m[3].$m[4], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                        if ($this->isInDoNotTrack($fullHref)) {
+                            return $m[0];
+                        }
+
+                        return '<'.$m[1].' href='.$m[2].$replace.$m[4].$m[2].$m[5].'>';
+                    },
                     $content
                 );
             }
@@ -620,7 +643,7 @@ final class TrackableModel extends AbstractCommonModel
 
             // Check for a do not track in proper HTML format
             if ($link->hasAttribute('data-mautic-disable-tracking') && 'true' === $link->getAttribute('data-mautic-disable-tracking')) {
-                $this->doNotTrack[$url] = $url;
+                $this->addDoNotTrackUrl($url);
                 continue;
             }
 
@@ -631,6 +654,13 @@ final class TrackableModel extends AbstractCommonModel
         }
 
         return $trackableUrls;
+    }
+
+    private function addDoNotTrackUrl(string $url): void
+    {
+        $normalizedUrl                             = trim($url);
+        $this->literalDoNotTrackUrls[$normalizedUrl] = $normalizedUrl;
+        $this->doNotTrack[]                          = '^'.preg_quote($normalizedUrl, '~').'$';
     }
 
     /**

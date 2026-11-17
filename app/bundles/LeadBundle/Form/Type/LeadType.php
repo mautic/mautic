@@ -63,7 +63,7 @@ final class LeadType extends AbstractType
                 [
                     'choices'           => $imageChoices,
                     'label'             => 'mautic.lead.lead.field.preferred_profile',
-                    'label_attr'        => ['class' => 'control-label'],
+                    'label_attr'        => ['class' => 'form-label'],
                     'attr'              => ['class' => 'form-control'],
                     'required'          => true,
                     'multiple'          => false,
@@ -75,7 +75,7 @@ final class LeadType extends AbstractType
                 FileType::class,
                 [
                     'label'      => false,
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'required'   => false,
                     'attr'       => [
                         'class' => 'form-control',
@@ -125,7 +125,7 @@ final class LeadType extends AbstractType
             CompanyListType::class,
             [
                 'label'      => 'mautic.company.selectcompany',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'multiple'   => $allowMultipleCompanies,
                 'required'   => false,
                 'mapped'     => false,
@@ -141,7 +141,7 @@ final class LeadType extends AbstractType
                 UserListType::class,
                 [
                     'label'      => 'mautic.lead.lead.field.owner',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class' => 'form-control',
                     ],
@@ -160,7 +160,7 @@ final class LeadType extends AbstractType
                 StageListType::class,
                 [
                     'label'      => 'mautic.lead.lead.field.stage',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class' => 'form-control',
                     ],
@@ -180,6 +180,17 @@ final class LeadType extends AbstractType
                 [
                     'apply_text' => false,
                     'save_text'  => 'mautic.core.form.save',
+                    'post_extra_buttons' => [
+                        [
+                            'name'  => 'save_and_new',
+                            'label' => 'mautic.lead.lead.save_and_new',
+                            'type'  => true,
+                            'attr'  => [
+                                'class' => 'btn btn-secondary btn-save-and-new',
+                                'icon'  => 'ri-add-line',
+                            ],
+                        ],
+                    ],
                 ]
             );
         }

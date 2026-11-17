@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadNoteRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
@@ -38,6 +39,7 @@ use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadSubscriber
@@ -50,6 +52,8 @@ final class LeadSubscriber
     private array $preventLoop = [];
 
     private ?int $lastContactId = null;
+
+    private LeadRepository $leadRepository;
 
     /**
      * @param ModelFactory<object> $modelFactory
@@ -78,6 +82,14 @@ final class LeadSubscriber
         private readonly bool $isTest = false,
     ) {
         $this->setModelFactory($modelFactory);
+    }
+
+    #[Required]
+    public function setLeadRepository(
+        LeadRepository $leadRepository
+    ): void
+    {
+        $this->leadRepository = $leadRepository;
     }
 
     /**
@@ -126,7 +138,7 @@ final class LeadSubscriber
             'objectId'  => $lead->getId(),
             'action'    => ($event->isNew()) ? 'create' : 'update',
             'details'   => $details,
-            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            'ipAddress' => $this->getVisitorIpAddress(),
         ];
         $this->auditLogModel->writeToLog($log);
 
@@ -139,7 +151,7 @@ final class LeadSubscriber
                 'objectId'  => $lead->getId(),
                 'action'    => 'identified',
                 'details'   => [],
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+                'ipAddress' => $this->getVisitorIpAddress(),
             ];
             $this->auditLogModel->writeToLog($log);
         }
@@ -152,7 +164,7 @@ final class LeadSubscriber
                 'objectId'  => $lead->getId(),
                 'action'    => 'ipadded',
                 'details'   => $details['ipAddresses'],
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+                'ipAddress' => $this->getVisitorIpAddress(),
             ];
             $this->auditLogModel->writeToLog($log);
         }
@@ -345,8 +357,8 @@ final class LeadSubscriber
         ];
 
         // Following events takes the event from the lead itself, so not applicable for API
-        // where we are getting events for all leads.
-        if ($event->isForTimeline()) {
+        // where we are getting events for all leads, unless the leads are restricted by leadIds.
+        if ($event->isForTimeline() || [] !== $event->getLeadIds()) {
             $eventTypes['lead.create']     = 'mautic.lead.event.create';
             $eventTypes['lead.identified'] = 'mautic.lead.event.identified';
             $eventTypes['lead.ipadded']    = 'mautic.lead.event.ipadded';
@@ -428,7 +440,7 @@ final class LeadSubscriber
                         'eventPriority' => -1, // Usually an IP is added after another event
                         'timestamp'     => $row['date_added'],
                         'extra'         => [
-                            'ipDetails' => $ipAddresses[$row['ip_address']],
+                            'ipDetails' => $ipAddresses[$row['ip_address']] ?? null,
                         ],
                         'contentTemplate' => '@MauticLead/SubscribedEvents/Timeline/ipadded.html.twig',
                         'contactId'       => $row['lead_id'],
@@ -441,6 +453,12 @@ final class LeadSubscriber
 
     private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
+        if ([] !== $event->getLeadIds()) {
+            $this->addTimelineLeadDateEntries($event, $eventTypeKey, $eventTypeName, 'date_added', 'ri-spy-line', -5);
+
+            return;
+        }
+
         // Do nothing if the lead is not set
         if (!$event->getLead() instanceof Lead) {
             return;
@@ -485,6 +503,12 @@ final class LeadSubscriber
 
     private function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
+        if ([] !== $event->getLeadIds()) {
+            $this->addTimelineLeadDateEntries($event, $eventTypeKey, $eventTypeName, 'date_identified', 'ri-user-6-fill', -4, true);
+
+            return;
+        }
+
         // Do nothing if the lead is not set
         if (!$event->getLead() instanceof Lead) {
             return;
@@ -510,6 +534,38 @@ final class LeadSubscriber
                 }
             }
             // Purposively not including this in engagements graph as it's info only
+        }
+    }
+
+    private function addTimelineLeadDateEntries(
+        Events\LeadTimelineEvent $event,
+        string $eventTypeKey,
+        string $eventTypeName,
+        string $dateColumn,
+        string $icon,
+        int $priority,
+        bool $featured = false,
+    ): void {
+        if ($event->isEngagementCount()) {
+            return;
+        }
+
+        $rows = $this->leadRepository->getTimelineDates($dateColumn, $event->getQueryOptions());
+        $event->addToCounter($eventTypeKey, $rows);
+
+        foreach ($rows['results'] as $row) {
+            $event->addEvent(
+                [
+                    'event'         => $eventTypeKey,
+                    'eventId'       => $eventTypeKey.$row['lead_id'],
+                    'icon'          => $icon,
+                    'eventType'     => $eventTypeName,
+                    'eventPriority' => $priority,
+                    'timestamp'     => $row[$dateColumn],
+                    'featured'      => $featured,
+                    'contactId'     => $row['lead_id'],
+                ]
+            );
         }
     }
 
@@ -729,5 +785,13 @@ final class LeadSubscriber
             }
         }
         // Purposively not including this
+    }
+
+    /**
+     * No IP for a form submitter Mautic doesn't track.
+     */
+    private function getVisitorIpAddress(): string
+    {
+        return $this->ipLookupHelper->isVisitorUntracked() ? '' : $this->ipLookupHelper->getIpAddressFromRequest();
     }
 }

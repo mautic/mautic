@@ -22,6 +22,8 @@ abstract class AuthenticationEvent extends Event
 
     private bool $isAuthenticated = false;
 
+    private bool $isSupportUser = false;
+
     private bool $forceFailedAuthentication = false;
 
     private readonly UserProviderInterface $userProvider;
@@ -139,6 +141,22 @@ abstract class AuthenticationEvent extends Event
     public function isAuthenticated(): bool
     {
         return $this->isAuthenticated;
+    }
+
+    /**
+     * Check if the user is a support user.
+     */
+    public function isSupportUser(): bool
+    {
+        return $this->isSupportUser;
+    }
+
+    /**
+     * Set if this user is a support user.
+     */
+    public function setIsSupportUser(bool $isSupportUser): void
+    {
+        $this->isSupportUser = $isSupportUser;
     }
 
     /**

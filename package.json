@@ -50,7 +50,7 @@
     "@ckeditor/ckeditor5-word-count": "^48.0.1",
     "@claviska/jquery-minicolors": "^2.3.6",
     "at.js": "^1.5.4",
-    "chart.js": "^2.9.4",
+    "chart.js": "^4.6.1",
     "chosen-js": "^1.8.7",
     "dropzone": "^4.3.0",
     "jquery": "^3.7.0",

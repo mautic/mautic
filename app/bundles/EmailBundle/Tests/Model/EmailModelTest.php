@@ -7,6 +7,11 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Persisters\Entity\EntityPersister;
+use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -49,6 +54,9 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\TrackingPreference;
+use Mautic\LeadBundle\Entity\TrackingPreferenceRepository;
+use Mautic\LeadBundle\Helper\ContactTrackingPreferenceHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -279,6 +287,7 @@ final class EmailModelTest extends TestCase
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->companyRepository, // $companyRepository
             $this->statRepository, // $statRepository
+            $this->createTrackingPreferenceHelper(),
         );
     }
 
@@ -308,34 +317,44 @@ final class EmailModelTest extends TestCase
 
         // Setup an email variant email
         $variantDate = new \DateTime();
-        $this->emailEntity->setId(1);
-        $this->emailEntity->setTemplate('');
-        $this->emailEntity->setVariantStartDate($variantDate);
+        $parentEmail = new class() extends Email {
+            public function getId(): int
+            {
+                return 1;
+            }
+        };
+
+        $variantA = new class() extends Email {
+            public function getId(): int
+            {
+                return 2;
+            }
+        };
+        $variantA->setVariantParent($parentEmail);
+        $variantA->setVariantStartDate($variantDate);
+        $variantA->setVariantSettings(['weight' => '25']);
+
+        $variantB = new class() extends Email {
+            public function getId(): int
+            {
+                return 3;
+            }
+        };
+        $variantB->setVariantParent($parentEmail);
+        $variantB->setVariantStartDate($variantDate);
+        $variantB->setVariantSettings(['weight' => '25']);
+
+        $parentEmail->addVariantChild($variantA);
+        $parentEmail->addVariantChild($variantB);
+        $parentEmail->setVariantStartDate($variantDate);
 
         $this->mailHelper->method('createEmailStat')
-            ->willReturnCallback(function (): Stat {
+            ->willReturnCallback(function () use ($parentEmail): Stat {
                 $stat = new Stat();
-                $stat->setEmail($this->emailEntity);
+                $stat->setEmail($parentEmail);
 
                 return $stat;
             });
-
-        $variantA = new Email();
-        $variantA->setId(2);
-        $variantA->setTemplate('');
-        $variantA->setVariantStartDate($variantDate);
-        $variantA->setVariantSettings(['weight' => '25']);
-        $variantA->setVariantParent($this->emailEntity);
-
-        $variantB = new Email();
-        $variantB->setId(3);
-        $variantB->setTemplate('');
-        $variantB->setVariantStartDate($variantDate);
-        $variantB->setVariantSettings(['weight' => '25']);
-        $variantB->setVariantParent($this->emailEntity);
-
-        $this->emailEntity->addVariantChild($variantA);
-        $this->emailEntity->addVariantChild($variantB);
 
         $this->emailRepository->method('getDoNotEmailList')
             ->willReturn([]);
@@ -361,9 +380,16 @@ final class EmailModelTest extends TestCase
             --$count;
         }
 
-        $this->emailModel->sendEmail($this->emailEntity, $contacts);
+        $this->emailModel->sendEmail($parentEmail, $contacts);
 
-        $emailSettings = $this->emailModel->getEmailSettings($this->emailEntity);
+        $this->assertSame(6, $parentEmail->getVariantSentCount());
+        $this->assertSame(3, $variantA->getVariantSentCount());
+        $this->assertSame(3, $variantB->getVariantSentCount());
+        $this->assertSame(6, $parentEmail->getSentCount());
+        $this->assertSame(3, $variantA->getSentCount());
+        $this->assertSame(3, $variantB->getSentCount());
+
+        $emailSettings = $this->emailModel->getEmailSettings($parentEmail);
 
         // Sent counts should be as follows
         // ID 1 => 6 50%
@@ -407,34 +433,44 @@ final class EmailModelTest extends TestCase
 
         // Setup an email variant email
         $variantDate = new \DateTime();
-        $this->emailEntity->setId(1);
-        $this->emailEntity->setTemplate('');
-        $this->emailEntity->setVariantStartDate($variantDate);
+        $parentEmail = new class() extends Email {
+            public function getId(): int
+            {
+                return 1;
+            }
+        };
+
+        $variantA = new class() extends Email {
+            public function getId(): int
+            {
+                return 2;
+            }
+        };
+        $variantA->setVariantParent($parentEmail);
+        $variantA->setVariantStartDate($variantDate);
+        $variantA->setVariantSettings(['weight' => '25']);
+
+        $variantB = new class() extends Email {
+            public function getId(): int
+            {
+                return 3;
+            }
+        };
+        $variantB->setVariantParent($parentEmail);
+        $variantB->setVariantStartDate($variantDate);
+        $variantB->setVariantSettings(['weight' => '25']);
+
+        $parentEmail->addVariantChild($variantA);
+        $parentEmail->addVariantChild($variantB);
+        $parentEmail->setVariantStartDate($variantDate);
 
         $this->mailHelper->method('createEmailStat')
-            ->willReturnCallback(function (): Stat {
+            ->willReturnCallback(function () use ($parentEmail): Stat {
                 $stat = new Stat();
-                $stat->setEmail($this->emailEntity);
+                $stat->setEmail($parentEmail);
 
                 return $stat;
             });
-
-        $variantA = new Email();
-        $variantA->setId(2);
-        $variantA->setTemplate('');
-        $variantA->setVariantStartDate($variantDate);
-        $variantA->setVariantSettings(['weight' => '25']);
-        $variantA->setVariantParent($this->emailEntity);
-
-        $variantB = new Email();
-        $variantB->setId(3);
-        $variantB->setTemplate('');
-        $variantB->setVariantStartDate($variantDate);
-        $variantB->setVariantSettings(['weight' => '25']);
-        $variantB->setVariantParent($this->emailEntity);
-
-        $this->emailEntity->addVariantChild($variantA);
-        $this->emailEntity->addVariantChild($variantB);
 
         $this->emailRepository->method('getDoNotEmailList')
             ->willReturn([]);
@@ -459,10 +495,10 @@ final class EmailModelTest extends TestCase
             ];
             --$count;
 
-            $results[] = $this->emailModel->sendEmail($this->emailEntity, [$contact]);
+            $results[] = $this->emailModel->sendEmail($parentEmail, [$contact]);
         }
 
-        $emailSettings = $this->emailModel->getEmailSettings($this->emailEntity);
+        $emailSettings = $this->emailModel->getEmailSettings($parentEmail);
 
         // Sent counts should be as follows
         // ID 1 => 6 50%
@@ -496,9 +532,14 @@ final class EmailModelTest extends TestCase
         $this->companyRepository->expects($this->exactly(0))
             ->method('getCompaniesForContacts');
 
-        $this->emailEntity->setId(1);
+        $email = new class() extends Email {
+            public function getId(): int
+            {
+                return 1;
+            }
+        };
 
-        $this->assertCount(0, $this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']]));
+        $this->assertCount(0, $this->emailModel->sendEmail($email, [1 => ['id' => 1, 'email' => 'someone@domain.com']]));
     }
 
     #[DataProvider('dataStatRecordExistance')]
@@ -544,6 +585,7 @@ final class EmailModelTest extends TestCase
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->companyRepository, // $companyRepository
             $this->statRepository, // $statRepository
+            $this->createTrackingPreferenceHelper(),
         );
 
         $contacts = [
@@ -689,12 +731,18 @@ final class EmailModelTest extends TestCase
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->companyRepository, // $companyRepository
             $this->statRepository, // $statRepository
+            $this->createTrackingPreferenceHelper(),
         );
 
-        $this->emailEntity->setId(1);
+        $email = new class() extends Email {
+            public function getId(): int
+            {
+                return 1;
+            }
+        };
 
         $result = $emailModel->sendEmail(
-            $this->emailEntity,
+            $email,
             [
                 1 => [
                     'id'        => 1,
@@ -897,6 +945,21 @@ final class EmailModelTest extends TestCase
         $this->assertCount(3, $result['datasets']);
         $this->assertEquals(self::SEGMENT_A, $result['datasets'][1]['label']);
         $this->assertEquals(self::SEGMENT_B, $result['datasets'][2]['label']);
+    }
+
+    private function createTrackingPreferenceHelper(): ContactTrackingPreferenceHelper
+    {
+        $unitOfWork = $this->createStub(UnitOfWork::class);
+        $unitOfWork->method('getEntityPersister')->willReturn($this->createStub(EntityPersister::class));
+
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $entityManager->method('getClassMetadata')->willReturn(new ClassMetadata(TrackingPreference::class));
+        $entityManager->method('getUnitOfWork')->willReturn($unitOfWork);
+
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturn($entityManager);
+
+        return new ContactTrackingPreferenceHelper(new TrackingPreferenceRepository($managerRegistry), $this->createStub(EntityManagerInterface::class));
     }
 
     /**

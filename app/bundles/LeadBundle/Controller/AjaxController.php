@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -116,6 +117,18 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($results);
     }
 
+    public function companyListAction(Request $request, CompanyModel $model): JsonResponse
+    {
+        $filter = ['companyname', InputHelper::clean($request->query->get('filter'))];
+
+        $results = $model->getLookupResults('companyfield', $filter);
+        $results = array_map(fn (array $entry): array => ['value'=> $entry['label'], 'id' => $entry['value']], $results);
+
+        $results['success'] = 1;
+
+        return $this->sendJsonResponse($results);
+    }
+
     public function getLeadIdsByFieldValueAction(Request $request): JsonResponse
     {
         $field     = InputHelper::clean($request->query->get('field'));
@@ -179,13 +192,17 @@ final class AjaxController extends CommonAjaxController
         $form = $this->formFactory->createNamed('RENAME', FilterPropertiesType::class);
 
         if ($fieldAlias && $operator) {
-            $formAdjustmentsProvider->adjustForm(
-                $form,
-                $fieldAlias,
-                $fieldObject,
-                $operator,
-                $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias]
-            );
+            $fieldConfig = $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias] ?? null;
+
+            if (null !== $fieldConfig) {
+                $formAdjustmentsProvider->adjustForm(
+                    $form,
+                    $fieldAlias,
+                    $fieldObject,
+                    $operator,
+                    $fieldConfig
+                );
+            }
         }
 
         $formHtml = $this->renderView(

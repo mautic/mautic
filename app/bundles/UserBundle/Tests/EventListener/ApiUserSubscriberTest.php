@@ -13,6 +13,7 @@ use Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions
 use Mautic\UserBundle\Security\Provider\UserProvider;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
@@ -24,6 +25,16 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 #[AllowMockObjectsWithoutExpectations]
 final class ApiUserSubscriberTest extends TestCase
 {
+    public function testCheckPassportListenerRunsBeforeUserProviderListener(): void
+    {
+        $attributes = new \ReflectionMethod(ApiUserSubscriber::class, 'onCheckPassport')->getAttributes(AsEventListener::class);
+        $this->assertCount(1, $attributes);
+
+        $listener = $attributes[0]->newInstance();
+        $this->assertSame(CheckPassportEvent::class, $listener->event);
+        $this->assertSame(2560, $listener->priority);
+    }
+
     public function testIfAuthenticationHasNoUserInvolved(): void
     {
         $passport = $this->createMock(Passport::class);

@@ -39,7 +39,7 @@ final class NoteType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.lead.note.form.text',
-                'label_attr' => ['class' => 'control-label sr-only'],
+                'label_attr' => ['class' => 'form-label visually-hidden'],
                 'attr'       => ['class' => 'mousetrap form-control editor', 'rows' => 10, 'autofocus' => 'autofocus'],
             ]
         );
@@ -55,7 +55,7 @@ final class NoteType extends AbstractType
                     'mautic.lead.note.type.call'    => 'call',
                     'mautic.lead.note.type.meeting' => 'meeting',
                 ],
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -68,7 +68,7 @@ final class NoteType extends AbstractType
             DateTimeType::class,
             [
                 'label'      => 'mautic.core.date.added',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'widget'     => 'single_text',
                 'attr'       => [
                     'class'       => 'form-control',

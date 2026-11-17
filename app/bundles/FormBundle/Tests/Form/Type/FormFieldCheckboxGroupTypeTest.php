@@ -75,7 +75,7 @@ final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
 
         $this->assertFalse($minimumField->isRequired());
         $this->assertEquals('mautic.form.field.checkboxgrp.minimum', $minimumField->getConfig()->getOption('label'));
-        $this->assertEquals(['class' => 'control-label'], $minimumField->getConfig()->getOption('label_attr'));
+        $this->assertEquals(['class' => 'form-label'], $minimumField->getConfig()->getOption('label_attr'));
         $this->assertEquals(['class' => 'form-control', 'min' => 0], $minimumField->getConfig()->getOption('attr'));
     }
 
@@ -91,7 +91,7 @@ final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
 
         $this->assertFalse($minMessageField->isRequired());
         $this->assertEquals('mautic.form.field.checkboxgrp.min_message', $minMessageField->getConfig()->getOption('label'));
-        $this->assertEquals(['class' => 'control-label'], $minMessageField->getConfig()->getOption('label_attr'));
+        $this->assertEquals(['class' => 'form-label'], $minMessageField->getConfig()->getOption('label_attr'));
         $this->assertEquals('Custom min message', $minMessageField->getData());
 
         $attr = $minMessageField->getConfig()->getOption('attr');
@@ -110,7 +110,7 @@ final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
 
         $this->assertFalse($maximumField->isRequired());
         $this->assertEquals('mautic.form.field.checkboxgrp.maximum', $maximumField->getConfig()->getOption('label'));
-        $this->assertEquals(['class' => 'control-label'], $maximumField->getConfig()->getOption('label_attr'));
+        $this->assertEquals(['class' => 'form-label'], $maximumField->getConfig()->getOption('label_attr'));
         $this->assertEquals(['class' => 'form-control', 'min' => 0], $maximumField->getConfig()->getOption('attr'));
     }
 
@@ -126,7 +126,7 @@ final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
 
         $this->assertFalse($maxMessageField->isRequired());
         $this->assertEquals('mautic.form.field.checkboxgrp.max_message', $maxMessageField->getConfig()->getOption('label'));
-        $this->assertEquals(['class' => 'control-label'], $maxMessageField->getConfig()->getOption('label_attr'));
+        $this->assertEquals(['class' => 'form-label'], $maxMessageField->getConfig()->getOption('label_attr'));
         $this->assertEquals('Custom max message', $maxMessageField->getData());
 
         $attr = $maxMessageField->getConfig()->getOption('attr');

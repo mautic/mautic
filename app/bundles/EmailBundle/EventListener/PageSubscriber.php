@@ -28,6 +28,7 @@ final readonly class PageSubscriber
     {
         $hit      = $event->getHit();
         $redirect = $hit->getRedirect();
+        $stat     = null;
 
         if ($redirect && $email = $hit->getEmail()) {
             // click trigger condition

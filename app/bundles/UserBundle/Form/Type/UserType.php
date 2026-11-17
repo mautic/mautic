@@ -10,20 +10,30 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\UserBundle\Entity\OidcSubjectId;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Exception\OidcIdTakenException;
 use Mautic\UserBundle\Model\UserModel;
+use Mautic\UserBundle\Security\OIDC\Settings;
+use Mautic\UserBundle\Security\OIDC\SubjectToUserTransformer;
+use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -35,6 +45,9 @@ final class UserType extends AbstractType
         private readonly TranslatorInterface $translator,
         private readonly UserModel $model,
         private readonly LanguageHelper $languageHelper,
+        private readonly Settings $oidcSettings,
+        private readonly SubjectToUserTransformer $subjectToUserTransformer,
+        private readonly LinkerInterface $linker,
     ) {
     }
 
@@ -51,7 +64,7 @@ final class UserType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.username',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'preaddon'     => 'ri-user-6-fill',
@@ -65,7 +78,7 @@ final class UserType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.firstname',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -75,7 +88,7 @@ final class UserType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.lastname',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -86,7 +99,7 @@ final class UserType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.position',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'data-options' => json_encode($positions),
@@ -100,7 +113,7 @@ final class UserType extends AbstractType
             EmailType::class,
             [
                 'label'      => 'mautic.core.type.email',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'preaddon' => 'ri-mail-line',
@@ -119,7 +132,7 @@ final class UserType extends AbstractType
                 'first_name'    => 'password',
                 'first_options' => [
                     'label'      => 'mautic.core.password',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'        => 'form-control',
                         'placeholder'  => $placeholder,
@@ -133,7 +146,7 @@ final class UserType extends AbstractType
                 'second_name'    => 'confirm',
                 'second_options' => [
                     'label'      => 'mautic.user.user.form.passwordconfirm',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'        => 'form-control',
                         'placeholder'  => $placeholder,
@@ -156,7 +169,7 @@ final class UserType extends AbstractType
             TimezoneType::class,
             [
                 'label'      => 'mautic.core.timezone',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -171,7 +184,7 @@ final class UserType extends AbstractType
             [
                 'choices'           => $this->getSupportedLanguageChoices(),
                 'label'             => 'mautic.core.language',
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => [
                     'class' => 'form-control',
                 ],
@@ -200,7 +213,7 @@ final class UserType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.email.token.signature',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class' => 'form-control',
@@ -217,7 +230,7 @@ final class UserType extends AbstractType
                     EntityType::class,
                     [
                         'label'      => 'mautic.user.role',
-                        'label_attr' => ['class' => 'control-label'],
+                        'label_attr' => ['class' => 'form-label'],
                         'attr'       => [
                             'class' => 'form-control',
                         ],
@@ -231,6 +244,63 @@ final class UserType extends AbstractType
             );
 
             $builder->add('isPublished', YesNoButtonGroupType::class);
+
+            if ($this->oidcSettings->isEnabled()) {
+                // Create the OIDC subject ID field with model transformer
+                // The field structure mimics the original OidcSubjectIdType but is now inline
+                $subjectIdBuilder = $builder->create('subjectID', FormType::class, [
+                    'mapped'      => false,
+                    'data_class'  => OidcSubjectId::class,  // This form represents an OidcSubjectId
+                    'data'        => $options['data'],      // But we pass a User...
+                    'validation_groups' => [OidcSubjectId::class, 'subjectID'],
+                ])
+                ->addModelTransformer($this->subjectToUserTransformer); // ...which this transformer converts
+
+                // Add the actual text input field as a child
+                $subjectIdBuilder->add('subjectID', TextType::class, [
+                    'label'       => 'mautic.open_id.form.subject_id',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.open_id.form.subject_id.tooltip',
+                    ],
+                    'required'    => false,
+                    'constraints' => [
+                        new Assert\Type(type: 'string', groups: ['subjectID']),
+                        new Assert\Length(max: 255, groups: ['subjectID']),
+                    ],
+                ]);
+
+                $builder->add($subjectIdBuilder);
+
+                // Add POST_SUBMIT listener at priority -10 to run after validation (priority 0)
+                $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
+                    $form = $event->getForm();
+
+                    // Check if the root form is valid
+                    if (!$form->getRoot()->isValid()) {
+                        return;
+                    }
+
+                    // Check if the subjectID field exists and get its data
+                    if (!$form->has('subjectID')) {
+                        return;
+                    }
+
+                    // Use getNormData() to get the OidcSubjectId before reverse transform converts it to User
+                    $subjectId = $form->get('subjectID')->getNormData();
+                    if (!$subjectId instanceof OidcSubjectId) {
+                        return;
+                    }
+
+                    try {
+                        $this->linker->editLinkToUser($subjectId, $subjectId->getUser());
+                    } catch (OidcIdTakenException $e) {
+                        $error = new FormError($this->translator->trans($e->getMessage()));
+                        $form->get('subjectID')->addError($error);
+                    }
+                }, -10);
+            }
 
             $builder->add('buttons', FormButtonsType::class);
         } else {

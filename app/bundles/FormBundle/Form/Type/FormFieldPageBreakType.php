@@ -27,7 +27,7 @@ final class FormFieldPageBreakType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_pagebreak_nextpage_label',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -46,7 +46,7 @@ final class FormFieldPageBreakType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_pagebreak_prevpage_label',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'       => 'form-control',
                     'placeholder' => 'mautic.form.field.form.property_pagebreak_prevpage_placeholder',
