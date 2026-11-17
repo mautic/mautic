@@ -22,7 +22,7 @@ final class TwilioFeatureSettingsType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.sms.config.form.sms.messaging_service_sid',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class'   => 'form-control',
@@ -37,7 +37,7 @@ final class TwilioFeatureSettingsType extends AbstractType
             [
                 'scale'      => 0,
                 'label'      => 'mautic.sms.list.frequency.number',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class' => 'form-control frequency',
@@ -55,7 +55,7 @@ final class TwilioFeatureSettingsType extends AbstractType
                     'month' => 'MONTH',
                 ],
                 'label'      => 'mautic.lead.list.frequency.times',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'multiple'   => false,
                 'attr'       => [

@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -26,6 +27,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class PageController extends AbstractStandardFormController
 {
+    use CategoryListFiltersTrait;
     use FormErrorMessagesTrait;
 
     private PageModel $pageModel;
@@ -127,6 +129,13 @@ final class PageController extends AbstractStandardFormController
         if (!str_contains($search, "{$langSearchCommand}:")) {
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
+        $categoryFilters = $this->applyCategoryListFilter(
+            $request,
+            'mautic.page.list_filters',
+            'page',
+            'c.id',
+            $filter
+        );
 
         $orderBy    = $request->getSession()->get('mautic.page.orderby', 'p.dateModified');
         $orderByDir = $request->getSession()->get('mautic.page.orderbydir', $this->getDefaultOrderDirection());
@@ -162,10 +171,11 @@ final class PageController extends AbstractStandardFormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue'     => $search,
-                'searchScopes'    => $pageSearchScopeProvider->getScopes(),
-                'items'           => $pages,
-                'categories'  => $model->getLookupResults('category', '', 0),
+                'searchValue'  => $search,
+                'searchScopes' => $pageSearchScopeProvider->getScopes(),
+                'filters'      => $categoryFilters['filters'],
+                'items'        => $pages,
+                'categories'   => $categoryFilters['categories'],
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,

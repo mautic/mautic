@@ -105,22 +105,22 @@ final class FormRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired', [], null, 'en_US'):
-                $expr = $queryBuilder->expr()->and(
+                $conditions = [
                     $queryBuilder->expr()->eq('f.isPublished', ":{$unique}"),
                     $queryBuilder->expr()->isNotNull('f.publishDown'),
-                    $queryBuilder->expr()->neq('f.publishDown', $queryBuilder->expr()->literal('')),
-                    $queryBuilder->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()')
-                );
+                    $queryBuilder->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()'),
+                ];
+                $expr = $queryBuilder instanceof QueryBuilder ? $queryBuilder->expr()->andX(...$conditions) : $queryBuilder->expr()->and(...$conditions);
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.ispending'):
             case $this->translator->trans('mautic.form.form.searchcommand.ispending', [], null, 'en_US'):
-                $expr = $queryBuilder->expr()->and(
+                $conditions = [
                     $queryBuilder->expr()->eq('f.isPublished', ":{$unique}"),
                     $queryBuilder->expr()->isNotNull('f.publishUp'),
-                    $queryBuilder->expr()->neq('f.publishUp', $queryBuilder->expr()->literal('')),
-                    $queryBuilder->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()')
-                );
+                    $queryBuilder->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()'),
+                ];
+                $expr = $queryBuilder instanceof QueryBuilder ? $queryBuilder->expr()->andX(...$conditions) : $queryBuilder->expr()->and(...$conditions);
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.hasresults'):

@@ -29,7 +29,7 @@ final class CampaignEventLeadCampaignsType extends AbstractType
             CampaignListType::class,
             [
                 'label'      => 'mautic.lead.lead.events.campaigns.membership',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -59,7 +59,7 @@ final class CampaignEventLeadCampaignsType extends AbstractType
                     ],
                 ]),
                 'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'data-show-on' => '{"campaignevent_properties_dataAddedLimit_1":"checked"}',
@@ -72,7 +72,7 @@ final class CampaignEventLeadCampaignsType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.lead.lead.events.campaigns.date',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'data-toggle'  => 'datetime',

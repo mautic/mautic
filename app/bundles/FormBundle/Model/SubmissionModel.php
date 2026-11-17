@@ -140,8 +140,14 @@ final class SubmissionModel extends CommonFormModel
             }
         }
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-        $submission->setIpAddress($ipAddress);
+        // An untracked submitter's IP address is not stored either
+        $trackSubmitter = $this->shouldTrackSubmitter($form);
+        if ($trackSubmitter) {
+            $submission->setIpAddress($this->ipLookupHelper->getIpAddress());
+        } else {
+            // Keeps the IP out of the contact, company, point trigger and campaign logs this submission writes
+            $this->ipLookupHelper->markVisitorAsUntracked();
+        }
 
         if (!empty($post['return'])) {
             $referer = $post['return'];
@@ -153,6 +159,13 @@ final class SubmissionModel extends CommonFormModel
 
         // clean the referer by removing mauticError and mauticMessage
         $referer = InputHelper::url($referer, null, null, null, ['mauticError', 'mauticMessage']);
+
+        // An untracked submitter's referer keeps only the page address, because its query string can carry identifiers
+        if (!$trackSubmitter) {
+            [$referer] = explode('?', $referer, 2);
+            [$referer] = explode('#', $referer, 2);
+        }
+
         $submission->setReferer($referer);
 
         // Create an event to be dispatched through the processes
@@ -307,11 +320,12 @@ final class SubmissionModel extends CommonFormModel
             ->setResults($results)
             ->setContactFieldMatches($leadFieldMatches);
 
-        $lead = $this->contactTracker->getContact();
+        // Looking up the tracked contact would identify an untracked submitter, so it is skipped for them
+        $lead = $trackSubmitter ? $this->contactTracker->getContact() : null;
 
-        // Remove validation errors if the field is not visible
-        if ($lead && $form->usesProgressiveProfiling()) {
-            $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
+        // Remove validation errors if the field is not visible, the same way the form was rendered, also for an untracked submitter
+        if ($form->usesProgressiveProfiling()) {
+            $leadSubmissions = $lead ? $this->formModel->getLeadSubmissions($form, $lead->getId()) : null;
 
             $displayManager = new DisplayManager($form, $this->formModel->getCustomComponents()['viewOnlyFields']);
             foreach ($fields as $field) {
@@ -335,8 +349,8 @@ final class SubmissionModel extends CommonFormModel
 
         $lead = $this->getManagedLeadForSubmission($lead);
 
-        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
-        $trackingId    = ($trackedDevice?->getTrackingId());
+        $trackedDevice = $trackSubmitter ? $this->deviceTrackingService->getTrackedDevice() : null;
+        $trackingId    = $trackedDevice?->getTrackingId();
 
         // set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
@@ -388,7 +402,7 @@ final class SubmissionModel extends CommonFormModel
         $campaigns = $this->campaignModel->getCampaignsByForm($form);
         /** @var Campaign $campaign */
         foreach ($campaigns as $campaign) {
-            if ($campaign->isPublished()) {
+            if ($lead instanceof Lead && $campaign->isPublished()) {
                 $this->membershipManager->addContact($lead, $campaign);
             }
         }
@@ -409,6 +423,14 @@ final class SubmissionModel extends CommonFormModel
         // made it to the end so return the submission event to give the calling method access to tokens, results, etc
         // otherwise return false that no errors were encountered (to keep BC really)
         return ($returnEvent) ? ['submission' => $submissionEvent] : false;
+    }
+
+    /**
+     * Kiosk mode never tracks the submitter. Other forms track only trackable requests (no DNT/GPC, bot or prefetch).
+     */
+    private function shouldTrackSubmitter(Form $form): bool
+    {
+        return !$form->isInKioskMode() && $this->ipLookupHelper->isRequestTrackable();
     }
 
     /**
@@ -929,13 +951,13 @@ final class SubmissionModel extends CommonFormModel
     private function createLeadFromSubmit(Form $form, array $leadFieldMatches, array $leadFields, ?Company $companyEntity = null): Lead
     {
         // set the mapped data
-        $inKioskMode   = $form->isInKioskMode();
-        $leadId        = null;
-        $lead          = new Lead();
-        $currentFields = $leadFieldMatches;
-        $companyFields = $this->leadFieldModel->getFieldListWithProperties('company');
+        $trackSubmitter = $this->shouldTrackSubmitter($form);
+        $leadId         = null;
+        $lead           = new Lead();
+        $currentFields  = $leadFieldMatches;
+        $companyFields  = $this->leadFieldModel->getFieldListWithProperties('company');
 
-        if (!$inKioskMode) {
+        if ($trackSubmitter) {
             // Default to currently tracked lead
             if ($currentLead = $this->contactTracker->getContact()) {
                 $lead          = $currentLead;
@@ -945,10 +967,10 @@ final class SubmissionModel extends CommonFormModel
 
             $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #'.$leadId);
         } else {
-            // Default to a new lead in kiosk mode
+            // Default to a new lead in kiosk mode or when the request is not trackable
             $lead->setNewlyCreated(true);
 
-            $this->logger->debug('FORM: In kiosk mode so assuming a new contact');
+            $this->logger->debug('FORM: In kiosk mode or not trackable so assuming a new contact');
         }
 
         $uniqueLeadFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
@@ -1036,21 +1058,23 @@ final class SubmissionModel extends CommonFormModel
             $uniqueFieldsFound         = $getData($foundLeadFields, true);
             [$hasConflict, $conflicts] = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
-            if ($inKioskMode || $hasConflict || !$lead->getId()) {
-                // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
+            if (!$trackSubmitter || $hasConflict || !$lead->getId()) {
+                // Use the found lead without merging because there is some sort of conflict with unique identifiers or the submitter is not tracked and thus should not merge
                 $lead = $foundLead;
 
                 if ($hasConflict) {
                     $this->logger->debug('FORM: Conflicts found in '.implode(', ', $conflicts).' so not merging');
                 } else {
-                    $this->logger->debug('FORM: In kiosk mode so not merging');
+                    $this->logger->debug('FORM: In kiosk mode or not trackable so not merging');
                 }
             } else {
                 $this->logger->debug('FORM: Merging contacts '.$lead->getId().' and '.$foundLead->getId());
 
-                // Merge the found lead with currently tracked lead
+                // Merge the found lead with currently tracked lead.
+                // $foundLead (the existing identified contact) is the winner so its ID is preserved;
+                // $lead (the anonymous session contact) is the loser and gets deleted.
                 try {
-                    $lead = $this->contactMerger->merge($lead, $foundLead);
+                    $lead = $this->contactMerger->merge($foundLead, $lead);
                 } catch (SameContactException) {
                 }
             }
@@ -1060,7 +1084,7 @@ final class SubmissionModel extends CommonFormModel
             $uniqueFieldsCurrent = $getData($currentFields, true);
         }
 
-        if (!$inKioskMode) {
+        if ($trackSubmitter) {
             // Check for conflicts with the submitted data and the currently tracked lead
             [$hasConflict, $conflicts] = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
 
@@ -1081,20 +1105,15 @@ final class SubmissionModel extends CommonFormModel
                     .' between current tracked contact and submitted data so assuming a new contact'
                 );
             }
-        }
 
-        // check for existing IP address
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
+            // The lookup itself saves new IP addresses, so an untracked submitter never reaches it
+            $ipAddress = $this->ipLookupHelper->getIpAddress();
 
-        // no lead was found by a mapped email field so create a new one
-        if ($lead->isNewlyCreated()) {
-            if (!$inKioskMode) {
+            // no lead was found by a mapped email field so create a new one
+            if ($lead->isNewlyCreated()) {
                 $lead->addIpAddress($ipAddress);
                 $this->logger->debug('FORM: Associating '.$ipAddress->getIpAddress().' to contact');
-            }
-        } elseif (!$inKioskMode) {
-            $leadIpAddresses = $lead->getIpAddresses();
-            if (!$leadIpAddresses->contains($ipAddress)) {
+            } elseif (!$lead->getIpAddresses()->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
 
                 $this->logger->debug('FORM: Associating '.$ipAddress->getIpAddress().' to contact');
@@ -1154,7 +1173,7 @@ final class SubmissionModel extends CommonFormModel
         ));
         $this->leadModel->saveEntity($lead, false);
 
-        if (!$inKioskMode) {
+        if ($trackSubmitter) {
             // Set the current lead which will generate tracking cookies
             $this->contactTracker->setTrackedContact($lead);
         } else {

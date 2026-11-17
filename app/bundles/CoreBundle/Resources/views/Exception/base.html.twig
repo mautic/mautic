@@ -40,7 +40,7 @@
 
 {% block _content %}
 
-    <div class="pa-20 mautibot-error{% if isInline %} inline{% endif %}">
+    <div class="pa-24 mautibot-error{% if isInline %} inline{% endif %}">
 
         <div class="row">
             {% if isInline %}
@@ -49,14 +49,14 @@
             </div>
             {% else %}
             <div class="mautibot-image col-xs-4 col-md-3">
-                <img class="img-responsive mautibot" src="{{ src }}" />
+                <img class="img-fluid mautibot" src="{{ src }}" />
             </div>
             <div class="mautibot-content col-xs-8 col-md-9">
-                <blockquote class="np break-word">
+                <blockquote class="p-0 break-word">
                     <h2><i class="ri-double-quotes-l"></i> <strong>{{ status_code }}</strong> {{ status_text }}{{ exceptionMessage }} <i class="ri-double-quotes-r"></i></h2>
-                    <footer class="text-right">Mautibot</footer>
+                    <footer class="text-end">Mautibot</footer>
                 </blockquote>
-                <div class="pull-right">
+                <div class="float-end">
                     <a class="text-secondary" href="http://mau.tc/report-issue" target="_new">{{ 'mautic.core.report_issue' | trans }}</a>
                 </div>
             </div>
@@ -69,10 +69,10 @@
         <div>
         {% endif %}
 
-            <div class="row mt-20">
+            <div class="row mt-24">
                 <div class="col-sm-12">
-                    <h5 class="ml-lg text-danger">{{ exception.class }}</h5>
-                    <div class="well well-sm ma-md">
+                    <h5 class="ms-24 text-danger">{{ exception.class }}</h5>
+                    <div class="well well-sm ma-16">
                         {{ include ('@MauticCore/Exception/traces.html.twig', {
                             'traces': exception.trace,
                         })}}
@@ -81,22 +81,22 @@
             </div>
 
             {% if previousExceptions and previousExceptions|length > 0 %}
-            <div class="row mt-20">
+            <div class="row mt-24">
                 <div class="col-sm-12">
-                    <h5 class="ml-lg">{{ 'mautic.core.error.previousexceptions' | trans }}</h5>
+                    <h5 class="ms-24">{{ 'mautic.core.error.previousexceptions' | trans }}</h5>
                     <div class="panel-group" id="previous" role="tablist" aria-multiselectable="true">
                     {% for key, e  in previousExceptions %}
                         <div class="panel panel-default">
                             <div class="panel-heading" role="tab" id="previous_heading_{{ key }}">
-                                <h4 class="panel-title pa-sm">
-                                    <a data-toggle="collapse" data-parent="#previous" href="#previous_body_{{ key }}" aria-expanded="true" aria-controls="collapseOne">
+                                <h4 class="panel-title pa-12">
+                                    <a data-bs-toggle="collapse" href="#previous_body_{{ key }}" aria-expanded="true" aria-controls="collapseOne">
                                         {{ e.message }}
                                     </a>
                                 </h4>
                             </div>
-                            <div id="previous_body_{{ key }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                            <div id="previous_body_{{ key }}" data-bs-parent="#previous" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                                 <div class="panel-body">
-                                    <div class="pa-sm">
+                                    <div class="pa-12">
                                         {{ include ('@MauticCore/Exception/traces.html.twig', {
                                             'traces': e.trace,
                                         })}}

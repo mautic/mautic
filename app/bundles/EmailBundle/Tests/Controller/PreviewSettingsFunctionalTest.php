@@ -39,8 +39,11 @@ final class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
         // Variant choice is not visible
         $this->assertCount(0, $crawler->filterXPath('//*[@id="content_preview_settings_variant"]'));
 
-        // Contact lookup is not visible
+        // Contact lookup is visible
         $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_contact"]'));
+
+        // Company lookup is visible
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_company"]'));
 
         $emailTranslated = new Email();
         $emailTranslated->setIsPublished(true);
@@ -87,5 +90,8 @@ final class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
 
         // Contact lookup is visible
         $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_contact"]'));
+
+        // Company lookup is visible
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_company"]'));
     }
 }

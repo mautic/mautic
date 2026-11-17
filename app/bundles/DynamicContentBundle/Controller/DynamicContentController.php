@@ -3,12 +3,12 @@
 namespace Mautic\DynamicContentBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Helper\DynamicContentSearchScopeProvider;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,9 +17,9 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class DynamicContentController extends AbstractFormController
 {
-    private TrackableModel $trackableModel;
+    use CategoryListFiltersTrait;
 
-    private PageModel $pageModel;
+    private TrackableModel $trackableModel;
 
     private AuditLogModel $auditLogModel;
 
@@ -29,12 +29,10 @@ final class DynamicContentController extends AbstractFormController
     public function autowireDynamicContentController(
         AuditLogModel $auditLogModel,
         DynamicContentModel $dynamicContentModel,
-        PageModel $pageModel,
         TrackableModel $trackableModel,
     ): void {
         $this->auditLogModel = $auditLogModel;
         $this->dynamicContentModel = $dynamicContentModel;
-        $this->pageModel = $pageModel;
         $this->trackableModel = $trackableModel;
     }
 
@@ -101,6 +99,8 @@ final class DynamicContentController extends AbstractFormController
             ],
         ];
 
+        $categoryFilters = $this->applyCategoryListFilter($request, 'mautic.dynamicContent.list_filters', 'dynamicContent', 'c.id', $filter);
+
         $orderBy    = $request->getSession()->get('mautic.dynamicContent.orderby', 'e.name');
         $orderByDir = $request->getSession()->get('mautic.dynamicContent.orderbydir', 'DESC');
 
@@ -118,7 +118,6 @@ final class DynamicContentController extends AbstractFormController
         $request->getSession()->set('mautic.dynamicContent.page', $page);
 
         $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
-        $categories = $this->pageModel->getLookupResults('category', '', 0);
 
         return $this->delegateView(
             [
@@ -129,10 +128,11 @@ final class DynamicContentController extends AbstractFormController
                     'route'         => $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]),
                 ],
                 'viewParameters' => [
-                    'searchValue'     => $search,
-                    'searchScopes'    => $dynamicContentSearchScopeProvider->getScopes(),
-                    'items'           => $entities,
-                    'categories'  => $categories,
+                    'searchValue'  => $search,
+                    'searchScopes' => $dynamicContentSearchScopeProvider->getScopes(),
+                    'filters'      => $categoryFilters['filters'],
+                    'items'        => $entities,
+                    'categories'   => $categoryFilters['categories'],
                     'page'        => $page,
                     'limit'       => $limit,
                     'permissions' => $permissions,

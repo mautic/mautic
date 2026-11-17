@@ -28,7 +28,7 @@ final class NotificationSendType extends AbstractType
             NotificationListType::class,
             [
                 'label'      => 'mautic.notification.send.selectnotifications',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.notification.choose.notifications',

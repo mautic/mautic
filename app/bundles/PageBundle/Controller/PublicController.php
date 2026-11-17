@@ -392,6 +392,7 @@ final class PublicController extends AbstractFormController
         TrackingHelper $trackingHelper,
         ContactTracker $contactTracker,
         PageModel $model,
+        IpLookupHelper $ipLookupHelper,
     ): JsonResponse {
         $notSuccessResponse = new JsonResponse(
             [
@@ -409,7 +410,23 @@ final class PublicController extends AbstractFormController
             return $notSuccessResponse;
         }
 
-        $lead          = $contactTracker->getContact();
+        // A visitor Mautic doesn't track isn't looked up, and gets nothing back that would let the script recognise them again
+        if (!$ipLookupHelper->isRequestTrackable()) {
+            return new JsonResponse(
+                [
+                    'id'        => null,
+                    'sid'       => null,
+                    'device_id' => null,
+                    'events'    => [],
+                ]
+            );
+        }
+
+        $lead = $contactTracker->getContact();
+        if (null === $lead) {
+            return $notSuccessResponse;
+        }
+
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
         $trackingId    = ($trackedDevice?->getTrackingId());
 
@@ -421,7 +438,7 @@ final class PublicController extends AbstractFormController
         return new JsonResponse(
             [
                 'success'   => 1,
-                'id'        => ($lead) ? $lead->getId() : null,
+                'id'        => $lead->getId(),
                 'sid'       => $trackingId,
                 'device_id' => $trackingId,
                 'events'    => $event->getResponse()->all(),
@@ -564,10 +581,17 @@ final class PublicController extends AbstractFormController
         path: '/mtc',
         name: 'mautic_page_tracker_getcontact',
     )]
-    public function getContactIdAction(DeviceTrackingServiceInterface $trackedDeviceService, ContactTracker $contactTracker): JsonResponse
+    public function getContactIdAction(DeviceTrackingServiceInterface $trackedDeviceService, ContactTracker $contactTracker, IpLookupHelper $ipLookupHelper): JsonResponse
     {
         $data = [];
-        if ($this->security->isAnonymous()) {
+        if ($this->security->isAnonymous() && !$ipLookupHelper->isRequestTrackable()) {
+            // A visitor Mautic doesn't track isn't looked up, and gets nothing back that would let the script recognise them again
+            $data = [
+                'id'        => null,
+                'sid'       => null,
+                'device_id' => null,
+            ];
+        } elseif ($this->security->isAnonymous()) {
             $lead          = $contactTracker->getContact();
             $trackedDevice = $trackedDeviceService->getTrackedDevice();
             $trackingId    = ($trackedDevice?->getTrackingId());

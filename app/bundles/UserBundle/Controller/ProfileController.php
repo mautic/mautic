@@ -80,7 +80,7 @@ final class ProfileController extends AbstractFormController
                             TextType::class,
                             [
                                 'label'      => 'mautic.core.firstname',
-                                'label_attr' => ['class' => 'control-label'],
+                                'label_attr' => ['class' => 'form-label'],
                                 'attr'       => ['class' => 'form-control'],
                                 'mapped'     => false,
                                 'disabled'   => true,
@@ -95,7 +95,7 @@ final class ProfileController extends AbstractFormController
                             TextType::class,
                             [
                                 'label'      => 'mautic.core.lastname',
-                                'label_attr' => ['class' => 'control-label'],
+                                'label_attr' => ['class' => 'form-label'],
                                 'attr'       => ['class' => 'form-control'],
                                 'mapped'     => false,
                                 'disabled'   => true,
@@ -113,7 +113,7 @@ final class ProfileController extends AbstractFormController
                             TextType::class,
                             [
                                 'label'      => 'mautic.core.username',
-                                'label_attr' => ['class' => 'control-label'],
+                                'label_attr' => ['class' => 'form-label'],
                                 'attr'       => ['class' => 'form-control'],
                                 'mapped'     => false,
                                 'disabled'   => true,
@@ -130,7 +130,7 @@ final class ProfileController extends AbstractFormController
                             TextType::class,
                             [
                                 'label'      => 'mautic.core.position',
-                                'label_attr' => ['class' => 'control-label'],
+                                'label_attr' => ['class' => 'form-label'],
                                 'attr'       => ['class' => 'form-control'],
                                 'mapped'     => false,
                                 'disabled'   => true,
@@ -147,7 +147,7 @@ final class ProfileController extends AbstractFormController
                             TextType::class,
                             [
                                 'label'      => 'mautic.core.type.email',
-                                'label_attr' => ['class' => 'control-label'],
+                                'label_attr' => ['class' => 'form-label'],
                                 'attr'       => ['class' => 'form-control'],
                                 'mapped'     => false,
                                 'disabled'   => true,

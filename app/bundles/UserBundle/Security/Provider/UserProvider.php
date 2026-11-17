@@ -96,7 +96,23 @@ final readonly class UserProvider implements UserProviderInterface
             }
         }
 
-        // Validation for User objects returned by a plugin
+        return $this->persistUser($user, $isNew);
+    }
+
+    /**
+     * Create a user without resolving an existing account by username or email.
+     */
+    public function createUser(User $user): User
+    {
+        if ($user->getId()) {
+            throw new \InvalidArgumentException('Only new users can be created.');
+        }
+
+        return $this->persistUser($user, true, true);
+    }
+
+    private function persistUser(User $user, bool $isNew, bool $createOnly = false): User
+    {
         if (!$user->getRole()) {
             throw new AuthenticationException('mautic.integration.sso.error.no_role');
         }
@@ -131,7 +147,11 @@ final readonly class UserProvider implements UserProviderInterface
             $this->dispatcher->dispatch(new PreSaveUserEvent($user, $isNew));
         }
 
-        $this->userRepository->saveEntity($user);
+        if ($createOnly) {
+            $this->userRepository->saveNewUser($user);
+        } else {
+            $this->userRepository->saveEntity($user);
+        }
 
         if ($this->dispatcher->hasListeners(PostSaveUserEvent::class)) {
             $this->dispatcher->dispatch(new PostSaveUserEvent($user, $isNew));

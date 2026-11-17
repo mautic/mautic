@@ -50,7 +50,7 @@ $container->loadFromExtension('framework', [
     'asset_mapper' => [
         'paths' => [
             '%mautic.application_dir%/app/bundles/CoreBundle/Assets'             => '',
-            '%kernel.project_dir%/vendor/twbs/bootstrap-sass/assets/javascripts' => 'vendor/bootstrap',
+            '%kernel.project_dir%/vendor/twbs/bootstrap/dist/js' => 'vendor/bootstrap',
         ],
         'public_prefix'       => '/assets/build/',
         'missing_import_mode' => 'strict',
@@ -137,7 +137,7 @@ $container->loadFromExtension('symfonycasts_sass', [
     ],
     'sass_options' => [
         'load_path'  => [
-            '%kernel.project_dir%/vendor/twbs/bootstrap-sass/assets/stylesheets',
+            '%kernel.project_dir%/vendor/twbs/bootstrap/scss',
         ],
         'source_map' => false,
     ],
@@ -185,7 +185,7 @@ if (!empty($localConfigParameterBag->get('db_host_ro'))) {
 }
 
 // Use the new Pdo\Mysql namespace for PHP 8.4+, fallback to legacy constant for older versions
-$unbufferedQueryConstant = class_exists('Pdo\Mysql') ? Pdo\Mysql::ATTR_USE_BUFFERED_QUERY : PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
+$unbufferedQueryConstant = class_exists(\Pdo\Mysql::class) ? Pdo\Mysql::ATTR_USE_BUFFERED_QUERY : PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
 
 $container->loadFromExtension('doctrine', [
     'dbal' => [
@@ -316,7 +316,7 @@ $container->setParameter(
 );
 
 // Monolog formatter
-$container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\LineFormatter')
+$container->register('mautic.monolog.fulltrace.formatter', \Monolog\Formatter\LineFormatter::class)
     ->addMethodCall('includeStacktraces', [true])
     ->addMethodCall('ignoreEmptyContextAndExtra', [true]);
 
@@ -461,10 +461,10 @@ $container->loadFromExtension('api_platform', [
         ],
     ],
     'exception_to_status' => [
-        'Symfony\Component\Serializer\Exception\ExceptionInterface'       => 400,
+        \Symfony\Component\Serializer\Exception\ExceptionInterface::class       => 400,
         'ApiPlatform\Exception\InvalidArgumentException'                  => Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST,
-        'ApiPlatform\Validator\Exception\ValidationException'             => 400,
-        'Doctrine\ORM\OptimisticLockException'                            => 409,
-        'Symfony\Component\Security\Core\Exception\AccessDeniedException' => 403,
+        \ApiPlatform\Validator\Exception\ValidationException::class             => 400,
+        \Doctrine\ORM\OptimisticLockException::class                            => 409,
+        \Symfony\Component\Security\Core\Exception\AccessDeniedException::class => 403,
     ],
 ]);

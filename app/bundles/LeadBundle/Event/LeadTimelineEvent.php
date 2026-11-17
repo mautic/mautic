@@ -53,6 +53,11 @@ final class LeadTimelineEvent extends Event
 
     private bool $fetchTypesOnly = false;
 
+    /**
+     * @var int[]
+     */
+    private array $leadIds = [];
+
     private array $serializerGroups = [
         'ipAddressList',
     ];
@@ -87,6 +92,11 @@ final class LeadTimelineEvent extends Event
         if (!empty($filters['dateTo'])) {
             $this->dateTo = ($filters['dateTo'] instanceof \DateTime) ? $filters['dateTo'] : new \DateTime($filters['dateTo']);
         }
+
+        if (null === $lead && array_key_exists('leadIds', $filters)) {
+            // An empty list must match no contact instead of all contacts
+            $this->leadIds = array_values(array_unique(array_map(intval(...), (array) $filters['leadIds']))) ?: [0];
+        }
     }
 
     /**
@@ -101,6 +111,11 @@ final class LeadTimelineEvent extends Event
      */
     public function addEvent(array $data): void
     {
+        // Drop events of other contacts from subscribers that ignore the leadIds filter
+        if ([] !== $this->leadIds && (empty($data['contactId']) || !in_array((int) $data['contactId'], $this->leadIds, true))) {
+            return;
+        }
+
         if ($this->countOnly) {
             // BC support for old format
             if ($this->groupUnit && $this->chartQuery) {
@@ -303,7 +318,8 @@ final class LeadTimelineEvent extends Event
                 'toDate'     => $this->dateTo,
                 'chartQuery' => $this->chartQuery,
             ],
-            $this->getEventLimit()
+            $this->getEventLimit(),
+            [] !== $this->leadIds ? ['leadIds' => $this->leadIds] : []
         );
     }
 
@@ -313,6 +329,16 @@ final class LeadTimelineEvent extends Event
     public function getLead(): ?Lead
     {
         return $this->lead;
+    }
+
+    /**
+     * Lead IDs to restrict the timeline to when no single lead is given.
+     *
+     * @return int[]
+     */
+    public function getLeadIds(): array
+    {
+        return $this->leadIds;
     }
 
     /**

@@ -4,7 +4,9 @@ namespace Mautic\LeadBundle\Segment\Decorator;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\Query\Filter\AnyCompanyRelationValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyRelationValueFilterQueryBuilder;
 
 final readonly class DateCompanyDecorator implements FilterDecoratorInterface
 {
@@ -57,7 +59,11 @@ final readonly class DateCompanyDecorator implements FilterDecoratorInterface
 
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
-        return ComplexRelationValueFilterQueryBuilder::getServiceId();
+        return match ($contactSegmentFilterCrate->getObject()) {
+            ContactSegmentFilterCrate::COMPANY_ALL_OBJECT => AnyCompanyRelationValueFilterQueryBuilder::getServiceId(),
+            ContactSegmentFilterCrate::COMPANY_OBJECT     => PrimaryCompanyRelationValueFilterQueryBuilder::getServiceId(),
+            default                                       => ComplexRelationValueFilterQueryBuilder::getServiceId(),
+        };
     }
 
     public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): string|bool

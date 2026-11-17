@@ -64,6 +64,10 @@
 ### Javascript
 - Removed `Mautic.insertTextInEditor` function. Use `Mautic.insertHtmlInEditor` instead.
 
+## Deprecated search help event
+
+- `Mautic\CoreBundle\Event\SearchHelpEvent` is deprecated and will be removed in Mautic 8.0. List toolbars no longer display search help or dispatch this event, so plugin listeners are no longer called. Plugins can supply legacy quick-filter arrays or grouped filters through the `quickFilters` toolbar option instead.
+
 # Notes
 
 - Migration file `app/migrations/Version20230522141144.php` has been removed. If you do not use the Mautic Citrix plugin or a fork of it, you can manually drop the `plugin_citrix_events` table from the database, as it is no longer used.

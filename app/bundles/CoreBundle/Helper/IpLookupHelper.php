@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class IpLookupHelper
 {
+    private const string UNTRACKED_VISITOR = 'mautic_untracked_visitor';
+
     /**
      * @var array
      */
@@ -130,41 +132,7 @@ final class IpLookupHelper
                 $ipAddress->setIpAddress($ip);
             }
 
-            // Ensure the do not track list is inserted
-            if (!is_array($this->doNotTrackIps)) {
-                $this->doNotTrackIps = [];
-            }
-
-            if (!is_array($this->doNotTrackBots)) {
-                $this->doNotTrackBots = [];
-            }
-
-            if (!is_array($this->doNotTrackInternalIps)) {
-                $this->doNotTrackInternalIps = [];
-            }
-
-            $doNotTrack = array_merge($this->doNotTrackIps, $this->doNotTrackInternalIps);
-
-            $ipAddress->setDoNotTrackList($doNotTrack);
-
-            if ($ipAddress->isTrackable() && $request = $this->getRequest()) {
-                $userAgent = $request->headers->get('User-Agent', '');
-                foreach ($this->doNotTrackBots as $bot) {
-                    if (str_contains($userAgent, $bot)) {
-                        $doNotTrack[] = $ip;
-                        $ipAddress->setDoNotTrackList($doNotTrack);
-                        break;
-                    }
-                }
-
-                // second check for bots  https://github.com/matomo-org/device-detector
-                $deviceDetector = $this->deviceDetectorFactory->create($userAgent);
-                $deviceDetector->parse();
-                if ($deviceDetector->isBot()) {
-                    $doNotTrack[] = $ip;
-                    $ipAddress->setDoNotTrackList($doNotTrack);
-                }
-            }
+            $this->setDoNotTrackList($ipAddress, $ip);
 
             $details = $ipAddress->getIpDetails();
             if ($ipAddress->isTrackable() && !$isIpAnonymizationEnabled && empty($details['city'])) {
@@ -189,6 +157,19 @@ final class IpLookupHelper
         }
 
         return self::$ipAddresses[$ip];
+    }
+
+    /**
+     * Marks the visitor of the current request as not tracked, so the contact events it causes keep no IP address.
+     */
+    public function markVisitorAsUntracked(): void
+    {
+        $this->getRequest()?->attributes->set(self::UNTRACKED_VISITOR, true);
+    }
+
+    public function isVisitorUntracked(): bool
+    {
+        return true === $this->getRequest()?->attributes->get(self::UNTRACKED_VISITOR);
     }
 
     /**
@@ -274,7 +255,7 @@ final class IpLookupHelper
         $request = $this->requestStack->getCurrentRequest();
 
         if (null === $request) {
-            return $this->getIpAddress()->isTrackable();
+            return $this->isCurrentIpTrackable();
         }
 
         // Skip HEAD requests - often used by bots/monitoring tools
@@ -301,11 +282,68 @@ final class IpLookupHelper
         }
 
         // Use existing IP/User-Agent based bot filtering
-        return $this->getIpAddress()->isTrackable();
+        return $this->isCurrentIpTrackable();
     }
 
     private function getRequest(): ?Request
     {
         return $this->requestStack->getCurrentRequest();
+    }
+
+    /**
+     * Same check as getIpAddress()->isTrackable(), but a new address is not saved,
+     * so bots and IPs on the do-not-track lists don't end up in the database.
+     */
+    private function isCurrentIpTrackable(): bool
+    {
+        $ip = $this->coreParametersHelper->get('anonymize_ip') ? '*.*.*.*' : $this->getIpAddressFromRequest();
+
+        if (isset(self::$ipAddresses[$ip])) {
+            return self::$ipAddresses[$ip]->isTrackable();
+        }
+
+        $ipAddress = new IpAddress($ip);
+        $this->setDoNotTrackList($ipAddress, $ip);
+
+        return $ipAddress->isTrackable();
+    }
+
+    private function setDoNotTrackList(IpAddress $ipAddress, string $ip): void
+    {
+        // Ensure the do not track list is inserted
+        if (!is_array($this->doNotTrackIps)) {
+            $this->doNotTrackIps = [];
+        }
+
+        if (!is_array($this->doNotTrackBots)) {
+            $this->doNotTrackBots = [];
+        }
+
+        if (!is_array($this->doNotTrackInternalIps)) {
+            $this->doNotTrackInternalIps = [];
+        }
+
+        $doNotTrack = array_merge($this->doNotTrackIps, $this->doNotTrackInternalIps);
+
+        $ipAddress->setDoNotTrackList($doNotTrack);
+
+        if ($ipAddress->isTrackable() && $request = $this->getRequest()) {
+            $userAgent = $request->headers->get('User-Agent', '');
+            foreach ($this->doNotTrackBots as $bot) {
+                if (str_contains($userAgent, $bot)) {
+                    $doNotTrack[] = $ip;
+                    $ipAddress->setDoNotTrackList($doNotTrack);
+                    break;
+                }
+            }
+
+            // second check for bots  https://github.com/matomo-org/device-detector
+            $deviceDetector = $this->deviceDetectorFactory->create($userAgent);
+            $deviceDetector->parse();
+            if ($deviceDetector->isBot()) {
+                $doNotTrack[] = $ip;
+                $ipAddress->setDoNotTrackList($doNotTrack);
+            }
+        }
     }
 }

@@ -283,18 +283,22 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $stats;
 
     /**
-     * @var int
+     * Get's incremented every time an email is sent the same as the sentCount.
+     * But unlike sentCount it will be incremented only when the email is a variant.
+     * And unlike sentCount it will be cleared when a variant is updated.
      */
     #[Groups(['email:read', 'download:read'])]
     #[ORM\Column(name: 'variant_sent_count', type: Types::INTEGER)]
-    private $variantSentCount = 0;
+    private int $variantSentCount = 0;
 
     /**
-     * @var int
+     * Get's incremented every time an email is read the same as the readCount.
+     * But unlike readCount it will be incremented only when the email is a variant.
+     * And unlike readCount it will be cleared when a variant is updated.
      */
     #[Groups(['email:read', 'download:read'])]
     #[ORM\Column(name: 'variant_read_count', type: Types::INTEGER)]
-    private $variantReadCount = 0;
+    private int $variantReadCount = 0;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[ORM\ManyToOne(targetEntity: Form::class)]
@@ -501,6 +505,16 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();
 
+        if ('variantSettings' == $prop) {
+            $tmpValue = [];
+            foreach ($this->getSettingsKeys() as $key) {
+                if (array_key_exists($key, $val)) {
+                    $tmpValue[$key] = $val[$key];
+                }
+            }
+            $val = $tmpValue;
+        }
+
         if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop || 'list' == $prop) {
             /** @var VariantEntityInterface|TranslationEntityInterface|Category|null $current */
             /** @var VariantEntityInterface|TranslationEntityInterface|Category|null $val */
@@ -618,6 +632,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function getIsClone(): bool
     {
         return $this->isCloned;
+    }
+
+    public function setIsClone(bool $isCloned): self
+    {
+        $this->isCloned = $isCloned;
+
+        return $this;
     }
 
     /**
@@ -829,6 +850,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
+    public function increaseSentCount(): void
+    {
+        ++$this->sentCount;
+    }
+
     /**
      * @return int
      */
@@ -837,7 +863,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantSentCount') : $this->variantSentCount;
     }
 
-    public function setVariantSentCount(?int $variantSentCount): static
+    public function increaseVariantSentCount(): void
+    {
+        ++$this->variantSentCount;
+    }
+
+    public function setVariantSentCount(int $variantSentCount): static
     {
         $this->variantSentCount = $variantSentCount;
 
@@ -931,15 +962,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getVariantReadCount()
+    public function getVariantReadCount(): int
     {
         return $this->variantReadCount;
     }
 
-    public function setVariantReadCount($variantReadCount): static
+    public function setVariantReadCount(int $variantReadCount): static
     {
         $this->variantReadCount = $variantReadCount;
 
@@ -1159,13 +1187,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private function listsChangedAdd(string $property, ?int $id): void
     {
         $this->initListChanges($property);
-        $this->changes[$property][1] = array_unique(array_merge($this->changes[$property][1], [$id]));
+        $this->recordListChanges($property, array_unique(array_merge($this->changes[$property][1], [$id])));
     }
 
     private function listsChangedRemove(string $property, ?int $id): void
     {
         $this->initListChanges($property);
-        $this->changes[$property][1] = array_diff($this->changes[$property][1], [$id]);
+        $this->recordListChanges($property, array_diff($this->changes[$property][1], [$id]));
     }
 
     public function getDraft(): ?EmailDraft
@@ -1194,7 +1222,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private function listsChangedSet(string $property, array $ids): void
     {
         $this->initListChanges($property);
-        $this->changes[$property][1] = $ids;
+        $this->recordListChanges($property, $ids);
     }
 
     private function initListChanges(string $property): void
@@ -1261,6 +1289,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     }
 
                     if ($this->pendingCount) {
+                        if (null === $this->getPublishUp()) {
+                            return 'ready_to_send';
+                        }
+
                         return 'sending';
                     }
                 }
@@ -1342,5 +1374,23 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private function translateSettingsKey(string $name): string
     {
         return str_replace(self::SETTINGS_PREFIX, '', $name);
+    }
+
+    /**
+     * @param array<int> $ids
+     */
+    private function recordListChanges(string $property, array $ids): void
+    {
+        $oldList = array_unique($this->changes[$property][0]);
+        sort($oldList);
+
+        $currentList = array_unique($ids);
+        sort($currentList);
+
+        if ($oldList !== $currentList) {
+            $this->changes[$property][1] = $ids;
+        } else {
+            unset($this->changes[$property]);
+        }
     }
 }

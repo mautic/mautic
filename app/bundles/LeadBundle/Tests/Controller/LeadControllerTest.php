@@ -96,13 +96,10 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $responseContent = json_decode($clientResponse->getContent(), true);
-        $contentDom      = new \DOMDocument();
-        $contentDom->loadHTML($responseContent['newContent']);
-
-        $xpath = new \DOMXPath($contentDom);
+        $crawler         = new Crawler($responseContent['newContent']);
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals(1, $xpath->query("//option[@value='segment']")->count());
+        $this->assertCount(1, $crawler->filter('option[value="segment"]'));
     }
 
     public function testAddCategorizedLeadList(): void
@@ -552,9 +549,27 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
     public function testQuickAddAction(): void
     {
-        $this->client->request(Request::METHOD_GET, '/s/contacts/quickAdd');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/quickAdd');
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertCount(1, $crawler->filter('button[name="lead[buttons][save_and_new]"]'));
+
+        $email = 'quick-add-save-and-new@example.com';
+        $form  = $crawler->selectButton('Save & New')->form([
+            'lead' => [
+                'firstname' => 'Quick Add',
+                'email'     => $email,
+            ],
+        ]);
+
+        $this->client->submit($form, [], $this->createAjaxHeaders());
+
+        self::assertResponseIsSuccessful();
+        $response = json_decode((string) $this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertArrayHasKey('newContent', $response, json_encode($response, JSON_THROW_ON_ERROR));
+        $this->assertStringContainsString('lead[buttons][save_and_new]', (string) $response['newContent']);
+        $this->assertArrayNotHasKey('closeModal', $response);
+        $this->assertInstanceOf(Lead::class, $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findOneBy(['email' => $email]));
     }
 
     public function testAddContactsErrorMessage(): void
@@ -830,7 +845,7 @@ EMAIL;
         $crawler = $this->client->submit($form);
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $errorContainer = $crawler->filter('form[name="lead"] .has-error .help-block');
+        $errorContainer = $crawler->filter('form[name="lead"] .has-error .form-text');
         $this->assertCount(1, $errorContainer);
         $this->assertSame('This field must be unique.', $errorContainer->text(null, true));
     }

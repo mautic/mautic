@@ -1814,6 +1814,114 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "kah-ja",
+      "name": "Jan Kahmen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/36455663?v=4",
+      "profile": "https://turingpoint.de/en/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "brynnclaw",
+      "name": "Brynn Bendixen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/261708852?v=4",
+      "profile": "https://github.com/brynnclaw",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "fabiooliveir",
+      "name": "Fábio Oliveira",
+      "avatar_url": "https://avatars.githubusercontent.com/u/152011896?v=4",
+      "profile": "https://dadosquebatem.com.br/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "peculiaruc",
+      "name": "Peculiar C. Umeh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35475543?v=4",
+      "profile": "https://github.com/peculiaruc",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "dylanpulver",
+      "name": "Dylan Pulver",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35541198?v=4",
+      "profile": "https://dylanpulver.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "redbullpeter",
+      "name": "Peter",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7094955?v=4",
+      "profile": "https://github.com/redbullpeter",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "DeepanshuPal",
+      "name": "Deepanshu Pal",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40927968?v=4",
+      "profile": "https://github.com/DeepanshuPal",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "gcomneno",
+      "name": "Giancarlo Cicellyn Comneno",
+      "avatar_url": "https://avatars.githubusercontent.com/u/126195429?v=4",
+      "profile": "https://giadaware.vercel.app",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "techsurrusr",
+      "name": "TechSurrection",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24973245?v=4",
+      "profile": "https://techsurrection.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "AlexanderZlobinM1",
+      "name": "Alexander Zlobin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/186687229?v=4",
+      "profile": "https://tendence.ru/zlobin",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "mahmoud-alawad",
+      "name": "Mahmoud Alawad",
+      "avatar_url": "https://avatars.githubusercontent.com/u/76591349?v=4",
+      "profile": "https://mahmoudalawad.netlify.app",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "VictorMoni",
+      "name": "Victor Moni",
+      "avatar_url": "https://avatars.githubusercontent.com/u/123900844?v=4",
+      "profile": "http://victormoni.vercel.app",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
