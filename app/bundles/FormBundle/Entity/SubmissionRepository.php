@@ -602,9 +602,11 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
+     * @param int[] $excludedFormIds
+     *
      * @return array<int, int> Form ID => number of submissions
      */
-    public function countSubmissionsOfDeletedContactsByForm(?int $formId = null): array
+    public function countSubmissionsOfDeletedContactsByForm(?int $formId = null, array $excludedFormIds = []): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('fs.form_id', 'COUNT(fs.id) AS submission_count')
@@ -617,6 +619,11 @@ class SubmissionRepository extends CommonRepository
         if (null !== $formId) {
             $qb->andWhere('fs.form_id = :formId')
                 ->setParameter('formId', $formId);
+        }
+
+        if ([] !== $excludedFormIds) {
+            $qb->andWhere('fs.form_id NOT IN (:excludedFormIds)')
+                ->setParameter('excludedFormIds', $excludedFormIds, ArrayParameterType::INTEGER);
         }
 
         $counts = [];

@@ -26,7 +26,8 @@ This command deletes these submissions and their form results records for all fo
 
 <comment>This includes anonymous contacts that mautic:maintenance:cleanup deletes.</comment>
 For example, the command deletes the answers of anonymous visitors to a survey form without fields mapped to contact fields,
-after the cleanup deleted these visitors. Use --dry-run to check which forms are affected before you delete.
+after the cleanup deleted these visitors. Use --dry-run to check which forms are affected before you delete,
+and --exclude to keep the submissions of these forms.
 
 <info>php %command.full_name%</info>
 
@@ -35,6 +36,9 @@ Count the submissions of deleted contacts for each form. Nothing is deleted:
 
 Only delete the submissions of one form:
 <info>php %command.full_name% --form-id=12</info>
+
+Delete the submissions of all forms except the forms 3 and 7, for example survey forms:
+<info>php %command.full_name% --exclude=3 --exclude=7</info>
 TXT
 )]
 final class DeleteSubmissionsOfDeletedContactsCommand extends Command
@@ -62,6 +66,13 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
                 'Delete the submissions of a specific form. Otherwise, the submissions of all forms will be deleted.'
             )
             ->addOption(
+                '--exclude',
+                '-d',
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Exclude a specific form from the deletion. Otherwise, the submissions of all forms will be deleted.',
+                []
+            )
+            ->addOption(
                 '--batch-limit',
                 '-l',
                 InputOption::VALUE_OPTIONAL,
@@ -83,6 +94,17 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
             return $this->writeInvalidOption($output, 'form-id');
         }
 
+        $excludedFormIds = $this->getExcludedFormIds($input);
+        if (false === $excludedFormIds) {
+            return $this->writeInvalidOption($output, 'exclude');
+        }
+
+        if (null !== $formId && [] !== $excludedFormIds) {
+            $output->writeln('<error>'.$this->translator->trans('mautic.forms.command.deleted_contact_submissions.options_conflict').'</error>');
+
+            return ExitCode::FAILURE;
+        }
+
         $batchLimit = $this->getPositiveIntegerOption($input, 'batch-limit') ?? self::DEFAULT_BATCH_LIMIT;
         if (false === $batchLimit) {
             return $this->writeInvalidOption($output, 'batch-limit');
@@ -98,7 +120,7 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
             return ExitCode::FAILURE;
         }
 
-        $counts = $this->submissionRepository->countSubmissionsOfDeletedContactsByForm($formId);
+        $counts = $this->submissionRepository->countSubmissionsOfDeletedContactsByForm($formId, $excludedFormIds);
         $forms  = match (true) {
             $form instanceof Form => [$form],
             [] === $counts        => [],
@@ -185,16 +207,33 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
     {
         $value = $input->getOption($name);
 
-        if (null === $value) {
-            return null;
+        return null === $value ? null : $this->toPositiveInteger($value);
+    }
+
+    /**
+     * @return int[]|false The form IDs, or false if a value is not a positive integer
+     */
+    private function getExcludedFormIds(InputInterface $input): array|false
+    {
+        $formIds = [];
+
+        foreach ((array) $input->getOption('exclude') as $value) {
+            $formId = $this->toPositiveInteger($value);
+
+            if (false === $formId) {
+                return false;
+            }
+
+            $formIds[] = $formId;
         }
 
+        return array_values(array_unique($formIds));
+    }
+
+    private function toPositiveInteger(mixed $value): int|false
+    {
         $value = trim((string) $value);
 
-        if (!ctype_digit($value) || 0 === (int) $value) {
-            return false;
-        }
-
-        return (int) $value;
+        return ctype_digit($value) && 0 !== (int) $value ? (int) $value : false;
     }
 }

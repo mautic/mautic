@@ -129,6 +129,38 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $this->assertSame(['Deleted B'], $this->getResultsNames($formB));
     }
 
+    public function testExcludedFormsKeepTheirSubmissions(): void
+    {
+        $formA          = $this->createFormViaApi($this->getPayLoad());
+        $formB          = $this->createFormViaApi($this->getPayLoad());
+        $formC          = $this->createFormViaApi($this->getPayLoad());
+        $deletedContact = $this->createContact('deleted@example.com');
+
+        $this->createTrackedSubmission($formA, $deletedContact, 'Deleted A');
+        $this->createTrackedSubmission($formB, $deletedContact, 'Deleted B');
+        $this->createTrackedSubmission($formC, $deletedContact, 'Deleted C');
+        $this->deleteContactViaApi($deletedContact);
+
+        $options = ['--exclude' => [(string) $formA['id'], (string) $formC['id']]];
+
+        $this->em->clear();
+        $dryRunTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME, $options + ['--dry-run' => true]);
+
+        $dryRunDisplay = $dryRunTester->getDisplay();
+        $this->assertStringNotContainsString("Form {$formA['id']} ", $dryRunDisplay);
+        $this->assertStringContainsString("Form {$formB['id']} (Submission test form): 1 form submissions of deleted contacts", $dryRunDisplay);
+        $this->assertStringNotContainsString("Form {$formC['id']} ", $dryRunDisplay);
+        $this->assertStringContainsString('Found 1 form submissions of deleted contacts.', $dryRunDisplay);
+
+        $commandTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME, $options);
+
+        $this->assertSame(0, $commandTester->getStatusCode());
+        $this->assertStringContainsString('Deleted 1 form submissions of deleted contacts', $commandTester->getDisplay());
+        $this->assertSame(['Deleted A'], $this->getResultsNames($formA));
+        $this->assertSame([], $this->getResultsNames($formB));
+        $this->assertSame(['Deleted C'], $this->getResultsNames($formC));
+    }
+
     public function testUntrackedSubmissionsWithoutContactAreNotDeleted(): void
     {
         $form           = $this->createFormViaApi($this->getPayLoad());
@@ -191,7 +223,7 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
     }
 
     /**
-     * @param array<string, string> $options
+     * @param array<string, string|string[]> $options
      */
     #[DataProvider('invalidOptionsProvider')]
     public function testInvalidOptionsFail(array $options, string $expectedMessage): void
@@ -204,7 +236,7 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
     }
 
     /**
-     * @return iterable<string, array{array<string, string>, string}>
+     * @return iterable<string, array{array<string, string|string[]>, string}>
      */
     public static function invalidOptionsProvider(): iterable
     {
@@ -212,6 +244,9 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         yield 'form ID is zero' => [['--form-id' => '0'], 'The option --form-id must be a positive integer.'];
         yield 'form ID is not a number' => [['--form-id' => 'abc'], 'The option --form-id must be a positive integer.'];
         yield 'batch limit is zero' => [['--batch-limit' => '0'], 'The option --batch-limit must be a positive integer.'];
+        yield 'excluded form ID is not a number' => [['--exclude' => ['3', 'abc']], 'The option --exclude must be a positive integer.'];
+        yield 'excluded form ID is zero' => [['--exclude' => ['0']], 'The option --exclude must be a positive integer.'];
+        yield 'form ID and excluded form ID together' => [['--form-id' => '3', '--exclude' => ['7']], 'The options --form-id and --exclude cannot be used together.'];
     }
 
     private function createContact(string $email): Lead
