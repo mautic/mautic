@@ -1326,7 +1326,6 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `MauticPlugin\MauticFullContactBundle\Services\FullContact_Name` | `deducer()` (`string $type`, `string $casing`); `normalizer()` (`string $casing`); `parser()` (`string $casing`); `similarity()` (`string $casing`); `stats()` (`string $type`, `string $casing`) |
     | `MauticPlugin\MauticTagManagerBundle\Entity\TagRepository` | `countOccurrences()` (`string $tag`) |
     | `Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver` | `addProperties()` (`bool $addToListGroup`, `bool $useGetter`); `addProperty()` (`bool $useGetter`); `setRoot()` (`string $root`) |
-    | `Mautic\CampaignBundle\Entity\Lead` | `setManuallyAdded()` (`bool $manuallyAdded`); `setManuallyRemoved()` (`bool $manuallyRemoved`); `setRotation()` (`int $rotation`) |
     | `Mautic\CampaignBundle\Entity\LeadEventLogRepository` | `hasBeenInCampaignRotation()` (`int $rotation`) |
     | `Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor` | `getAction()` (`string $key`); `getCondition()` (`string $key`); `getDecision()` (`string $key`) |
     | `Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor` | `getProperty()` (`string $property`) |
@@ -1401,7 +1400,6 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\PageBundle\Entity\TrackableRepository` | `getCount()` (`string $channel`, `string $countColumn`); `upHitCount()` (`int $increaseBy`) |
     | `Mautic\PageBundle\Model\TrackableModel` | `getTrackableByUrl()` (`string $channel`); `getTrackableList()` (`string $channel`) |
     | `Mautic\PageBundle\Model\VideoModel` | `hitVideo()` (`string $code`) |
-    | `Mautic\PluginBundle\Entity\Integration` | `setName()` (`string $name`) |
     | `Mautic\PluginBundle\Entity\IntegrationEntityRepository` | `findLeadsToCreate()` (`int\|false $limit`, `string $internalEntity`); `findLeadsToDelete()` (`string $internalEntity`); `findLeadsToUpdate()` (`string $integration`, `string $internalEntity`, `string $leadFields`, `int\|false $limit`); `getIntegrationEntityByLead()` (`?string $integration`); `getIntegrationsEntityId()` (`string $integration`, `?string $integrationEntity`, `string $internalEntity`, `int $start`, `int $limit`); `markAsDeleted()` (`string $integration`, `string $internalEntityType`); `updateErrorLeads()` (`string $internalEntity`) |
     | `Mautic\PluginBundle\Exception\ApiErrorException` | `__construct()` (`string $message`, `int $code`) |
     | `Mautic\PluginBundle\Integration\AbstractIntegration` | `cleanPushData()` (`string $fieldType`); `createIntegrationEntity()` (`string $integrationEntity`, `bool $persist`); `getLastSyncDate()` (`bool $ignoreEntityChanges`); `getLeadDoNotContact()` (`string $channel`); `getRequiredFields()` (`string $fieldType`); `makeRequest()` (`string $method`); `matchFieldName()` (`string $subfield`); `mergeApiKeys()` (`bool $return`); `parseCallbackResponse()` (`bool $postAuthorization`) |
