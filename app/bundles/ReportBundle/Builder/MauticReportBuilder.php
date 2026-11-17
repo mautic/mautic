@@ -610,6 +610,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
                 }
 
+                $filterDefinition = $filterDefinitions[$filter['column']] ?? [];
+
+                $conditionEvent = new ReportFilterConditionEvent($this->entity, $filter, $filterDefinition, $queryBuilder);
+                $this->dispatcher->dispatch($conditionEvent);
+                if (null !== $conditionEvent->getCondition()) {
+                    $andGroup[] = $conditionEvent->getCondition();
+                    continue;
+                }
+
                 $tagCondition = $this->getTagCondition($filter);
                 if ($tagCondition) {
                     $andGroup[] = $tagCondition;
@@ -622,16 +631,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     continue;
                 }
 
-                $filterDefinition = $filterDefinitions[$filter['column']] ?? [];
-
-                $conditionEvent = new ReportFilterConditionEvent($this->entity, $filter, $filterDefinition, $queryBuilder);
-                $this->dispatcher->dispatch($conditionEvent);
-                if (null !== $conditionEvent->getCondition()) {
-                    $andGroup[] = $conditionEvent->getCondition();
-                    continue;
-                }
-
-                $type             = $filterDefinition['type'] ?? null;
+                $type            = $filterDefinition['type'] ?? null;
                 $isRelativeDate   = in_array($type, ['date', 'datetime', DateType::class, DateTimeType::class], true)
                     && !in_array($exprFunction, ['like', 'notLike', 'startsWith', 'endsWith', 'contains'], true)
                     && RelativeDateHelper::isRelative($filter['value']);
