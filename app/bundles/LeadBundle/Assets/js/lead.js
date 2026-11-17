@@ -1780,10 +1780,8 @@ Mautic.loadCampaignShare = function () {
     let pendingBatches = Math.ceil(ids.length / batchSize);
 
     const finish = function () {
-        table.find('tr[data-campaign-id]').filter(function () {
-            const share = mQuery(this).attr('data-share');
-
-            return undefined === share || 0 === parseFloat(share);
+        table.find('tr[data-campaign-id][data-share]').filter(function () {
+            return 0 === parseFloat(mQuery(this).attr('data-share'));
         }).remove();
 
         const resolvedRows = table.find('tr[data-campaign-id][data-share]');
