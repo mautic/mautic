@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignMapStatsController extends AbstractController
 {
@@ -30,10 +31,11 @@ final class CampaignMapStatsController extends AbstractController
         ],
     ];
 
-    public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
+    public const LEGEND_TEXT = 'mautic.core.map.legend';
 
     public function __construct(
         private readonly CampaignModel $model,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -91,7 +93,7 @@ final class CampaignMapStatsController extends AbstractController
         }
 
         $statsCountries = $this->getData($entity, new \DateTimeImmutable($dateFrom), new \DateTimeImmutable($dateTo));
-        $mapData        = MapHelper::buildMapData($statsCountries, $this->getMapOptions($entity), self::LEGEND_TEXT);
+        $mapData        = MapHelper::buildMapData($statsCountries, $this->getMapOptions($entity), $this->translator->trans(self::LEGEND_TEXT));
 
         return $this->render(
             '@MauticCore/Helper/map.html.twig',

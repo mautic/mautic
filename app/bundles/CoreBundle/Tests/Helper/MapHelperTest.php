@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Helper;
 use Mautic\CampaignBundle\Controller\CampaignMapStatsController;
 use Mautic\CoreBundle\Helper\MapHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class MapHelperTest extends MauticMysqlTestCase
 {
@@ -61,6 +62,11 @@ final class MapHelperTest extends MauticMysqlTestCase
         ];
     }
 
+    private function getLegendText(): string
+    {
+        return static::getContainer()->get(TranslatorInterface::class)->trans(CampaignMapStatsController::LEGEND_TEXT);
+    }
+
     public function testGetOptionLegendText(): void
     {
         $legendValues = [
@@ -70,7 +76,7 @@ final class MapHelperTest extends MauticMysqlTestCase
 
         $this->assertSame(
             'Total: 4 (2 with country)',
-            MapHelper::getOptionLegendText(CampaignMapStatsController::LEGEND_TEXT, $legendValues)
+            MapHelper::getOptionLegendText($this->getLegendText(), $legendValues)
         );
     }
 
@@ -79,7 +85,7 @@ final class MapHelperTest extends MauticMysqlTestCase
         $results = MapHelper::buildMapData(
             $this->getStats(),
             CampaignMapStatsController::MAP_OPTIONS,
-            CampaignMapStatsController::LEGEND_TEXT
+            $this->getLegendText()
         );
 
         $this->assertCount(3, $results);
