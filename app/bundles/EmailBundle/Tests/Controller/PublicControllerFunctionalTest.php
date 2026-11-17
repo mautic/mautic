@@ -739,6 +739,16 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode(), (string) $this->client->getResponse()->getContent());
     }
 
+    public function testUnsubscribeLinkWithoutEmailAndSecretHashReturnsNotFound(): void
+    {
+        $stat = $this->getStat(null, $this->createLead());
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode(), (string) $this->client->getResponse()->getContent());
+    }
+
     public function testValidateEmailFormWithMissingStatDoesNotThrowError(): void
     {
         $email      = 'validate.without.stat@mautic.tld';

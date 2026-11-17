@@ -4747,9 +4747,7 @@
         "path": "/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}",
         "methods": [],
         "defaults": {
-            "_controller": "Mautic\\EmailBundle\\Controller\\PublicController::unsubscribeAction",
-            "secretHash": null,
-            "urlEmail": null
+            "_controller": "Mautic\\EmailBundle\\Controller\\PublicController::unsubscribeAction"
         },
         "requirements": []
     },
