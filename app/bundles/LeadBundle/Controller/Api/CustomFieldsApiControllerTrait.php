@@ -174,6 +174,10 @@ trait CustomFieldsApiControllerTrait
      */
     protected function setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch = false)
     {
+        // The fields the request itself sent, before the form fills in all the others
+        $requested = $parameters;
+        $zeros     = [];
+
         // set the custom field values
         // pull the data from the form in order to apply the form's formatting
         foreach ($form as $f) {
@@ -188,15 +192,21 @@ trait CustomFieldsApiControllerTrait
 
             // When merging a contact because of a unique identifier match in POST /api/contacts//new or PATCH /api/contacts//edit all 0 values must be unset because
             // we have to assume 0 was not meant to overwrite an existing value. Other empty values will be caught by LeadModel::setFieldValues
+            // A 0 the request itself sent is a value though, so it is kept aside and written below.
             $parameters = array_filter(
                 $parameters,
-                function ($value): bool {
-                    if (is_numeric($value)) {
-                        return 0.0 !== (float) $value;
+                function ($value, $alias) use ($requested, &$zeros): bool {
+                    if (is_numeric($value) && 0.0 === (float) $value) {
+                        if (array_key_exists($alias, $requested)) {
+                            $zeros[$alias] = $value;
+                        }
+
+                        return false;
                     }
 
                     return true;
-                }
+                },
+                ARRAY_FILTER_USE_BOTH
             );
         }
 
@@ -207,6 +217,11 @@ trait CustomFieldsApiControllerTrait
         }
 
         $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
+
+        // LeadModel::setFieldValues treats 0 as empty, so write the requested zeros with overwriteWithBlank
+        if ([] !== $zeros) {
+            $this->model->setFieldValues($entity, $zeros, true);
+        }
     }
 
     #[Required]

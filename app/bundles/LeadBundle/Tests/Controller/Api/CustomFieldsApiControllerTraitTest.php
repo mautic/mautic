@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 
 final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
 {
@@ -64,23 +65,25 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
     }
 
     /**
-     * @param array<string, mixed> $expectedParameters
+     * @param array<string, mixed>                          $parameters
+     * @param array<string, mixed>                          $formData
+     * @param array<int, array{array<string, mixed>, bool}> $expectedCalls
      */
     #[DataProvider('numericValueProvider')]
-    public function testSetCustomFieldValuesFiltersOnlyNumericZero(mixed $value, array $expectedParameters): void
+    public function testSetCustomFieldValuesKeepsOnlyRequestedNumericZero(array $parameters, array $formData, array $expectedCalls): void
     {
         $model = new class() {
             /**
-             * @var array<string, mixed>
+             * @var array<int, array{array<string, mixed>, bool}>
              */
-            public array $parameters = [];
+            public array $calls = [];
 
             /**
              * @param array<string, mixed> $parameters
              */
             public function setFieldValues(Lead $lead, array $parameters, bool $overwriteWithBlank): void
             {
-                $this->parameters = $parameters;
+                $this->calls[] = [$parameters, $overwriteWithBlank];
             }
         };
 
@@ -108,24 +111,51 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             }
         };
 
-        $controller->setCustomFieldValuesPublic(new Lead(), $this->createStub(Form::class), ['number_field' => $value]);
+        $children = [];
+        foreach ($formData as $name => $data) {
+            $child = $this->createStub(FormInterface::class);
+            $child->method('getName')->willReturn($name);
+            $child->method('getData')->willReturn($data);
+            $children[$name] = $child;
+        }
+        $form = $this->createStub(Form::class);
+        $form->method('getIterator')->willReturn(new \ArrayIterator($children));
 
-        $this->assertSame($expectedParameters, $model->parameters);
+        $controller->setCustomFieldValuesPublic(new Lead(), $form, $parameters);
+
+        $this->assertSame($expectedCalls, $model->calls);
     }
 
     /**
-     * @return \Generator<string, array{mixed, array<string, mixed>}>
+     * @return \Generator<string, array{array<string, mixed>, array<string, mixed>, array<int, array{array<string, mixed>, bool}>}>
      */
     public static function numericValueProvider(): \Generator
     {
-        yield 'positive fraction' => [0.5, ['number_field' => 0.5]];
-        yield 'positive fraction string' => ['0.5', ['number_field' => '0.5']];
-        yield 'negative fraction' => [-0.5, ['number_field' => -0.5]];
-        yield 'integer' => [5, ['number_field' => 5]];
-        yield 'integer string' => ['5', ['number_field' => '5']];
-        yield 'integer zero' => [0, []];
-        yield 'float zero' => [0.0, []];
-        yield 'zero string' => ['0', []];
-        yield 'decimal zero string' => ['0.00', []];
+        foreach ([
+            'positive fraction'        => 0.5,
+            'positive fraction string' => '0.5',
+            'negative fraction'        => -0.5,
+            'integer'                  => 5,
+            'integer string'           => '5',
+        ] as $name => $value) {
+            yield $name => [['number_field' => $value], [], [[['number_field' => $value], false]]];
+        }
+
+        // A zero the request sent is written with overwriteWithBlank, as LeadModel::setFieldValues treats 0 as empty
+        foreach ([
+            'integer zero'        => 0,
+            'float zero'          => 0.0,
+            'zero string'         => '0',
+            'decimal zero string' => '0.00',
+        ] as $name => $value) {
+            yield $name => [['number_field' => $value], [], [[[], false], [['number_field' => $value], true]]];
+        }
+
+        // A zero the form filled in for a field the request did not send is still dropped
+        yield 'zero the form filled in' => [
+            ['sent_field' => '0'],
+            ['sent_field' => 0.0, 'filled_field' => 0.0],
+            [[[], false], [['sent_field' => 0.0], true]],
+        ];
     }
 }
