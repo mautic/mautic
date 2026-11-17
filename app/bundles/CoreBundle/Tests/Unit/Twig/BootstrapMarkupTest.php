@@ -111,9 +111,9 @@ final class BootstrapMarkupTest extends TestCase
 
         $this->assertSame('1234', $input->attr('value'));
         $this->assertSame('1', $input->attr('step'));
-        $form->submit('-125');
+        $form->submit($input->attr('value'));
         $this->assertTrue($form->isSynchronized());
-        $this->assertEquals(-125, $form->getData());
+        $this->assertSame(1234, $form->getData());
     }
 
     public function testCompanyScoreRendersAndSubmitsNegativePoints(): void
