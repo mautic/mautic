@@ -24,6 +24,10 @@ When Mautic deletes a contact, the form submissions of the contact stay in the d
 The submitted values also stay in the form results tables (form_results_<form ID>_<form alias>).
 This command deletes these submissions and their form results records for all forms.
 
+<comment>This includes anonymous contacts that mautic:maintenance:cleanup deletes.</comment>
+For example, the command deletes the answers of anonymous visitors to a survey form without fields mapped to contact fields,
+after the cleanup deleted these visitors. Use --dry-run to check which forms are affected before you delete.
+
 <info>php %command.full_name%</info>
 
 Count the submissions of deleted contacts for each form. Nothing is deleted:
