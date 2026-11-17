@@ -7,23 +7,17 @@ namespace Mautic\ReportBundle\Scheduler\Entity;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 
-final class SchedulerEntity implements SchedulerInterface
+final readonly class SchedulerEntity implements SchedulerInterface
 {
-    /**
-     * @param bool $isScheduled
-     */
     public function __construct(
-        private $isScheduled,
-        private readonly ?string $scheduleUnit,
-        private readonly ?string $scheduleDay,
-        private readonly ?string $scheduleMonthFrequency,
+        private bool $isScheduled,
+        private ?string $scheduleUnit,
+        private ?string $scheduleDay,
+        private ?string $scheduleMonthFrequency,
     ) {
     }
 
-    /**
-     * @return bool
-     */
-    public function isScheduled()
+    public function isScheduled(): bool
     {
         return $this->isScheduled;
     }

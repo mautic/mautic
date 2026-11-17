@@ -366,10 +366,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->heading;
     }
 
-    /**
-     * @param string $heading
-     */
-    public function setHeading($heading): void
+    public function setHeading(?string $heading): void
     {
         $this->isChanged('heading', $heading);
         $this->heading = $heading;

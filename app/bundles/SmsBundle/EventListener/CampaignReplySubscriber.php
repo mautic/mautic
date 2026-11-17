@@ -68,7 +68,7 @@ final readonly class CampaignReplySubscriber
             return;
         }
 
-        $decisionEvent->setChannel('sms');
+        $decisionEvent->getLog()->setChannel('sms');
         $decisionEvent->setAsApplicable();
     }
 

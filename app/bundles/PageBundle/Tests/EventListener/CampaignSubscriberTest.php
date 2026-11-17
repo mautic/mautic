@@ -105,7 +105,6 @@ final class CampaignSubscriberTest extends TestCase
         $log->setEvent($campaignEvent);
 
         $config = $this->createStub(DecisionAccessor::class);
-        $config->method('getConfig')->willReturn([]);
 
         return new DecisionEvent($config, $log, $hit);
     }

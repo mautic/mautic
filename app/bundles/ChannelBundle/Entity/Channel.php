@@ -141,10 +141,7 @@ class Channel extends CommonEntity implements UuidInterface
         return $this->channel;
     }
 
-    /**
-     * @param string $channel
-     */
-    public function setChannel($channel): static
+    public function setChannel(string $channel): static
     {
         $this->channel = $channel;
 
@@ -159,10 +156,7 @@ class Channel extends CommonEntity implements UuidInterface
         return $this->channelId;
     }
 
-    /**
-     * @param int $channelId
-     */
-    public function setChannelId($channelId): static
+    public function setChannelId(int|string|null $channelId): static
     {
         if (empty($channelId)) {
             $channelId = null;
@@ -226,10 +220,7 @@ class Channel extends CommonEntity implements UuidInterface
         return $this->isEnabled;
     }
 
-    /**
-     * @param bool $isEnabled
-     */
-    public function setIsEnabled($isEnabled): static
+    public function setIsEnabled(bool $isEnabled): static
     {
         $this->isEnabled = $isEnabled;
 

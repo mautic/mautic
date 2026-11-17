@@ -90,7 +90,7 @@ final class PointApiController extends CommonApiController
     #[Route(
         path: '/api/contacts/{leadId}/points/{operator}/{delta}',
         name: 'mautic_api_adjustcontactpoints',
-        requirements: ['leadId' => '\d+'],
+        requirements: ['leadId' => '\d+', 'delta' => '-?\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
