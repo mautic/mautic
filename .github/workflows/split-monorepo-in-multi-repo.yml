@@ -40,7 +40,6 @@ jobs:
                 config:
                     - core-lib
                     - plugin-cloudstorage
-                    - plugin-crm
                     - plugin-emailmarketing
                     - plugin-focus
                     - plugin-fullcontact

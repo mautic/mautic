@@ -40,7 +40,7 @@ final class RemovedSocialBundleTest extends MauticMysqlTestCase
 
         $integrations = $this->getService(IntegrationHelper::class)->getIntegrationObjects();
         $this->assertArrayNotHasKey('Twitter', $integrations);
-        $this->assertArrayHasKey('Salesforce', $integrations);
+        $this->assertArrayHasKey('Twilio', $integrations);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/plugins');
         self::assertResponseIsSuccessful();

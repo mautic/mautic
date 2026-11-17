@@ -63,9 +63,9 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
 {
     /**
-     * There are 300 local event subscribers in the container, keep a small reserve for removed ones.
+     * There are 296 local event subscribers in the container, keep a small reserve for removed ones.
      */
-    private const int MINIMAL_EVENT_SUBSCRIBER_COUNT = 297;
+    private const int MINIMAL_EVENT_SUBSCRIBER_COUNT = 293;
 
     /**
      * Local event subscribers per hand-picked event, to catch a subscriber that silently stops listening.

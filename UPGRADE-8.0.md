@@ -8,7 +8,7 @@
 
 ### Social media integrations
 
-`MauticSocialBundle` and the bundled `mautic/plugin-social` package have been removed. This removes the Facebook, Twitter/X, Instagram and Foursquare integrations, Social Monitoring, tweets, the `twitter.tweet` campaign action and the `plugin.loginSocial` form field. CRM integrations in `MauticCrmBundle` are unaffected, as are contact social-profile fields and social links in emails.
+`MauticSocialBundle` and the bundled `mautic/plugin-social` package have been removed. This removes the Facebook, Twitter/X, Instagram and Foursquare integrations, Social Monitoring, tweets, the `twitter.tweet` campaign action and the `plugin.loginSocial` form field. Contact social-profile fields and social links in emails are unaffected.
 
 Before upgrading:
 
@@ -19,8 +19,22 @@ Before upgrading:
 
 After upgrading, clear the application cache and run `bin/console mautic:plugins:reload` to mark the removed plugin as missing. Existing integration settings and social tables are retained; this removal does not delete historical data or automatically rewrite campaigns and forms.
 
+### CRM integrations
+
+`MauticCrmBundle` and the bundled `mautic/plugin-crm` package have been removed from core. This removes the Salesforce, HubSpot, Microsoft Dynamics CRM, SugarCRM, Zoho CRM, vTiger and ConnectWise integrations, the "Integration Campaign Members" segment filter choices and the public `mautic_integration_contacts` route (`/plugin/{integration}/contact_data`) that CRMs posted contact updates to. The integrations live on outside core in `mautic/plugin-crm`.
+
+Before upgrading:
+
+- Install a Mautic 8 compatible version of `mautic/plugin-crm` if you keep using these CRMs, or remove them from "Push contact to integration" (`plugin.leadpush`) campaign actions, form actions and point triggers, and from segments that filter on "Integration Campaign Members". Segments with that filter no longer pull members from the CRM while the plugin is not installed.
+- Remove webhooks and workflows in the CRM that post to `/plugin/{integration}/contact_data`, and scheduled `mautic:integration:fetchleads` / `mautic:integration:pushactivity` commands for these integrations.
+- Remove custom code that depends on this bundle's classes (`MauticPlugin\MauticCrmBundle\...`), services (e.g. `mautic.integration.salesforce`, `mautic.integration.hubspot`) or routes.
+- For Composer-managed installations, remove any explicit `mautic/plugin-crm` requirement from the project's `composer.json` as part of the upgrade, unless you install the separate package.
+
+After upgrading, clear the application cache and run `bin/console mautic:plugins:reload` to mark the removed plugin as missing. Existing integration settings and synced records (`integration_entity`) are retained; this removal does not delete historical data or automatically rewrite campaigns, forms and segments.
+
 ### Other removed code
 
+- `Mautic\CoreBundle\Entity\Transformer\NotificationArrayTransformer` was removed with no replacement. Its only user was `SalesforceIntegration` in the removed `MauticCrmBundle`. Code that needs it must keep its own copy.
 - `Mautic\CoreBundle\Entity\DateAddedTrait::addDateAddedField()` was removed (#17532). The trait now maps `$dateAdded` with a Doctrine column attribute. Remove calls to the helper from custom `loadMetadata()` methods and ensure the consuming entity has a class-level `#[ORM\Entity]` so the trait's attribute mapping is loaded. Verify that the `date_added` column remains mapped before applying schema changes.
 - `Mautic\PluginBundle\Model\IntegrationEntityModel::getRecordList()` was removed (#18066), with no replacement method. Callers that need its old result must build the mapping themselves from the integration's records: each record's `Id` was used as the array key and as the value of an inner `['id' => $record['Id']]` array.
 - `MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration` now extends `Mautic\IntegrationsBundle\Integration\BasicIntegration` instead of `Mautic\PluginBundle\Integration\AbstractIntegration` (#18135). Calls to `getAuthenticationType()`, `getRequiredKeyFields()`, `getFormNotes()` and inherited legacy `AbstractIntegration` methods are no longer available. Use the IntegrationsBundle interfaces and configuration support instead: `MauticPlugin\MauticOutlookBundle\Integration\Support\ConfigSupport` provides the configuration template and `OutlookKeysType` authentication form. Update code that requires Outlook to be an `AbstractIntegration`. The previous class was final, so this migration affects callers rather than existing subclasses.

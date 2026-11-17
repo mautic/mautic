@@ -56,7 +56,6 @@
   "replace": {
     "mautic/grapes-js-builder-bundle": "self.version",
     "mautic/plugin-cloudstorage": "self.version",
-    "mautic/plugin-crm": "self.version",
     "mautic/plugin-emailmarketing": "self.version",
     "mautic/plugin-focus": "self.version",
     "mautic/plugin-fullcontact": "self.version",
