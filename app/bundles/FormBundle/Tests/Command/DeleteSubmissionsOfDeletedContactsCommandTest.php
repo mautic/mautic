@@ -220,6 +220,7 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $this->assertStringContainsString('Deleted 5 form submissions of deleted contacts', $commandTester->getDisplay());
         $this->assertSame(0, $this->countSubmissionsWithoutContact());
         $this->assertSame([], $this->getResultsNames($form));
+        $this->assertSame(0, $this->getSubmissionCount($form));
     }
 
     /**

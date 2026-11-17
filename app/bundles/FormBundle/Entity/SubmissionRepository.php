@@ -698,13 +698,16 @@ class SubmissionRepository extends CommonRepository
 
                 $deleted = (int) $qb->executeStatement();
 
-                // The SQL deletion skips SubmissionSubscriber::postRemove(), so the count for the submission limit is updated in the same transaction
-                $connection->createQueryBuilder()
-                    ->update(MAUTIC_TABLE_PREFIX.'forms')
-                    ->set('submission_count', '(SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'form_submissions s WHERE s.form_id = :formId)')
-                    ->where('id = :formId')
-                    ->setParameter('formId', $form->getId())
-                    ->executeStatement();
+                if ($deleted > 0) {
+                    // The SQL deletion skips SubmissionSubscriber::postRemove(), so the count for the submission limit is decreased in the same transaction
+                    $connection->createQueryBuilder()
+                        ->update(MAUTIC_TABLE_PREFIX.'forms')
+                        ->set('submission_count', 'CASE WHEN submission_count > :deleted THEN submission_count - :deleted ELSE 0 END')
+                        ->where('id = :formId')
+                        ->setParameter('deleted', $deleted)
+                        ->setParameter('formId', $form->getId())
+                        ->executeStatement();
+                }
 
                 return $deleted;
             }
