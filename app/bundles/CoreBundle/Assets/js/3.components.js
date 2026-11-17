@@ -195,12 +195,13 @@ Mautic.initQuantitySteppers = function () {
         }
 
         const current = Number(input.value) || 0;
-        const next = snap(input, fromGrid(input, current, delta), delta);
+        const {min, max} = bounds(input);
+        const atLimit = (delta < 0 && current <= min) || (delta > 0 && current >= max);
+        const next = atLimit ? current : snap(input, fromGrid(input, current, delta), delta);
 
         if (next === current) {
             flashLimit(root);
             if (announceLimit) {
-                const {min, max} = bounds(input);
                 announce(root, format(delta < 0 ? root.dataset.minMessage : root.dataset.maxMessage, delta < 0 ? min : max));
             }
 
