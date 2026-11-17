@@ -61,14 +61,14 @@ final class LeadListRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertContains('mautic.lead.list.searchcommand.static', $commands);
 
         $dynamicResults = $leadListRepository->getEntities([
-            'filter'           => ['string' => sprintf('ids:%d is:dynamic', $dynamicSegment->getId())],
+            'filter'           => ['string' => sprintf('ids:%d,%d is:dynamic', $dynamicSegment->getId(), $staticSegment->getId())],
             'ignore_paginator' => true,
         ]);
         $dynamicIds = array_map(intval(...), array_keys($dynamicResults));
         $this->assertSame([$dynamicSegment->getId()], $dynamicIds);
 
         $staticResults = $leadListRepository->getEntities([
-            'filter'           => ['string' => sprintf('ids:%d is:static', $staticSegment->getId())],
+            'filter'           => ['string' => sprintf('ids:%d,%d is:static', $dynamicSegment->getId(), $staticSegment->getId())],
             'ignore_paginator' => true,
         ]);
         $staticIds = array_map(intval(...), array_keys($staticResults));

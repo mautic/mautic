@@ -697,13 +697,13 @@ class EmailRepository extends CommonRepository
                 $expr            = '('.$q->expr()->eq('e.language', ":{$unique}").' OR '.$q->expr()->like('e.language', ":{$langUnique}").')';
                 $returnParameter = true;
                 break;
-            case $this->translator->trans('mautic.email.searchcommand.triggered'):
-            case $this->translator->trans('mautic.email.searchcommand.triggered', [], null, 'en_US'):
+            case $this->translator->trans('mautic.email.email.searchcommand.triggered'):
+            case $this->translator->trans('mautic.email.email.searchcommand.triggered', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('e.emailType', ":$unique");
                 $forceParameters = [$unique => 'template'];
                 break;
-            case $this->translator->trans('mautic.email.searchcommand.segment'):
-            case $this->translator->trans('mautic.email.searchcommand.segment', [], null, 'en_US'):
+            case $this->translator->trans('mautic.email.email.searchcommand.segment'):
+            case $this->translator->trans('mautic.email.email.searchcommand.segment', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('e.emailType', ":$unique");
                 $forceParameters = [$unique => 'list'];
                 break;
@@ -759,8 +759,8 @@ class EmailRepository extends CommonRepository
             'mautic.email.email.searchcommand.ispending',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
-            'mautic.email.searchcommand.triggered',
-            'mautic.email.searchcommand.segment',
+            'mautic.email.email.searchcommand.triggered',
+            'mautic.email.email.searchcommand.segment',
             'mautic.project.searchcommand.name',
         ];
 

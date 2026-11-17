@@ -28,6 +28,8 @@ final class SegmentSearchScopeProvider extends AbstractSearchScopeProvider
             SearchScopePresets::isUnpublished(),
             SearchScopePresets::isMine(),
             SearchScopePresets::command('mautic.lead.list.searchcommand.isglobal'),
+            SearchScopePresets::command('mautic.lead.list.searchcommand.dynamic'),
+            SearchScopePresets::command('mautic.lead.list.searchcommand.static'),
             SearchScopePresets::command('mautic.lead.list.searchcommand.filters_field'),
             SearchScopePresets::project(),
             SearchScopePresets::ids(),
