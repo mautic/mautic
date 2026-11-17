@@ -23,6 +23,8 @@ return function (ContainerConfigurator $configurator): void {
 
     $excludes = [
         'Api',
+        'Hubspot/Exception',
+        'Hubspot/Sync/DTO',
         'Integration/Salesforce',
     ];
 
