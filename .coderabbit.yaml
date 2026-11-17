@@ -310,13 +310,13 @@ issue_enrichment:
         instructions: "Apply when the issue asks to improve an existing feature and does not report incorrect behavior. Do not apply together with bug or feature."
       - label: "feature"
         instructions: "Apply when the issue asks for new functionality that does not exist yet. Do not apply together with bug or enhancement."
-      # Difficulty: apply exactly one of T1, T2 or T3
+      # Difficulty
       - label: "T1"
-        instructions: "Apply when the fix is likely small and local: one file or a few lines, with a clear cause and no database or BC impact."
+        instructions: "Difficulty level. Apply exactly one of T1, T2 or T3; when the criteria of more than one fit, apply only the highest. Apply T1 when the fix is likely small and local: one file or a few lines, with a clear cause and no database or BC impact. Do not apply together with T2 or T3."
       - label: "T2"
-        instructions: "Apply when the fix likely touches several files or one bundle, or needs a new test, but the cause is understood."
+        instructions: "Difficulty level. Apply exactly one of T1, T2 or T3; when the criteria of more than one fit, apply only the highest. Apply T2 when the fix likely touches several files within one bundle, the cause is understood, and none of the T3 criteria fit. Do not apply together with T1 or T3."
       - label: "T3"
-        instructions: "Apply when the fix likely spans several bundles, needs a database migration, affects backward compatibility or performance on large databases, or the cause is unclear."
+        instructions: "Difficulty level. Apply exactly one of T1, T2 or T3; when the criteria of more than one fit, apply only the highest. Apply T3 when the fix likely spans several bundles, needs a database migration, affects backward compatibility or performance on large databases, or the cause is unclear. Do not apply together with T1 or T2."
       - label: "good first issue"
         instructions: "Apply only together with T1, when the problem is clearly described, easy to reproduce and the likely fix is obvious to a new contributor."
       # Triage state
