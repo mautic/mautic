@@ -59,20 +59,11 @@ class Widget extends FormEntity
     #[ORM\Column(type: ArrayType::ARRAY, nullable: true)]
     private $params = [];
 
-    /**
-     * @var string
-     */
-    private $template;
+    private ?string $template = null;
 
-    /**
-     * @var string
-     */
-    private $errorMessage;
+    private ?string $errorMessage = null;
 
-    /**
-     * @var bool
-     */
-    private $cached = false;
+    private bool $cached = false;
 
     /**
      * @var int
@@ -134,12 +125,9 @@ class Widget extends FormEntity
         return $this->type;
     }
 
-    /**
-     * @param int $width
-     */
-    public function setWidth($width): static
+    public function setWidth(int $width): static
     {
-        $this->width = (int) $width;
+        $this->width = $width;
         $this->isChanged('width', $this->width);
 
         return $this;
@@ -153,12 +141,9 @@ class Widget extends FormEntity
         return $this->width;
     }
 
-    /**
-     * @param int $height
-     */
-    public function setHeight($height): static
+    public function setHeight(int $height): static
     {
-        $this->height = (int) $height;
+        $this->height = $height;
         $this->isChanged('height', $this->height);
 
         return $this;
@@ -191,10 +176,7 @@ class Widget extends FormEntity
         return $this->height;
     }
 
-    /**
-     * @param int $ordering
-     */
-    public function setOrdering($ordering): static
+    public function setOrdering(?int $ordering): static
     {
         $this->ordering = (int) $ordering;
         $this->isChanged('ordering', $this->ordering);
@@ -223,10 +205,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @param string $template
-     */
-    public function setTemplate($template): static
+    public function setTemplate(?string $template): static
     {
         $this->isChanged('template', $template);
         $this->template = $template;
@@ -234,10 +213,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTemplate()
+    public function getTemplate(): ?string
     {
         return $this->template;
     }
@@ -255,30 +231,22 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @param string $errorMessage
-     */
-    public function setErrorMessage($errorMessage): static
+    public function setErrorMessage(string $errorMessage): static
     {
         $this->errorMessage = $errorMessage;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getErrorMessage()
+    public function getErrorMessage(): ?string
     {
         return $this->errorMessage;
     }
 
     /**
      * Set cached flag.
-     *
-     * @param bool $cached
      */
-    public function setCached($cached): static
+    public function setCached(bool $cached): static
     {
         $this->cached = $cached;
 
@@ -287,10 +255,8 @@ class Widget extends FormEntity
 
     /**
      * Get cached.
-     *
-     * @return bool
      */
-    public function isCached()
+    public function isCached(): bool
     {
         return $this->cached;
     }

@@ -536,10 +536,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->name;
     }
 
-    /**
-     * @param ?string $name
-     */
-    public function setName($name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -555,10 +552,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->description;
     }
 
-    /**
-     * @param ?string $description
-     */
-    public function setDescription($description): static
+    public function setDescription(?string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -628,7 +622,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getReadCount') : $this->readCount;
     }
 
-    public function setReadCount($readCount): static
+    public function setReadCount(?int $readCount): static
     {
         $this->readCount = $readCount;
 
@@ -685,7 +679,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->subject;
     }
 
-    public function setSubject($subject): static
+    public function setSubject(?string $subject): static
     {
         $this->isChanged('subject', $subject);
         $this->subject = $subject;
@@ -803,7 +797,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->template;
     }
 
-    public function setTemplate($template): static
+    public function setTemplate(?string $template): static
     {
         $this->isChanged('template', $template);
         $this->template = $template;
@@ -849,7 +843,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getSentCount') : $this->sentCount;
     }
 
-    public function setSentCount($sentCount): static
+    public function setSentCount(?int $sentCount): static
     {
         $this->sentCount = $sentCount;
 
@@ -943,7 +937,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->plainText;
     }
 
-    public function setPlainText($plainText): static
+    public function setPlainText(?string $plainText): static
     {
         $this->plainText = $plainText;
 
@@ -996,7 +990,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->customHtml;
     }
 
-    public function setCustomHtml($customHtml): static
+    public function setCustomHtml(?string $customHtml): static
     {
         $this->customHtml = $customHtml;
 

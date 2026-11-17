@@ -231,10 +231,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         $this->id = $id;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -269,10 +266,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         return $this->system;
     }
 
-    /**
-     * @param string $source
-     */
-    public function setSource($source): static
+    public function setSource(string $source): static
     {
         $this->isChanged('source', $source);
         $this->source = $source;
@@ -485,10 +479,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         return $this->isScheduled;
     }
 
-    /**
-     * @param bool $isScheduled
-     */
-    public function setIsScheduled($isScheduled): void
+    public function setIsScheduled(bool $isScheduled): void
     {
         $this->isChanged('isScheduled', $isScheduled);
 
@@ -503,10 +494,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         return $this->toAddress;
     }
 
-    /**
-     * @param string|null $toAddress
-     */
-    public function setToAddress($toAddress): void
+    public function setToAddress(?string $toAddress): void
     {
         $this->isChanged('toAddress', $toAddress);
 
@@ -521,10 +509,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         return $this->scheduleUnit;
     }
 
-    /**
-     * @param string|null $scheduleUnit
-     */
-    public function setScheduleUnit($scheduleUnit): void
+    public function setScheduleUnit(?string $scheduleUnit): void
     {
         $this->isChanged('scheduleUnit', $scheduleUnit);
 
@@ -539,10 +524,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         return $this->scheduleDay;
     }
 
-    /**
-     * @param string|null $scheduleDay
-     */
-    public function setScheduleDay($scheduleDay): void
+    public function setScheduleDay(?string $scheduleDay): void
     {
         $this->isChanged('scheduleDay', $scheduleDay);
 
@@ -557,10 +539,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         return $this->scheduleMonthFrequency;
     }
 
-    /**
-     * @param string|null $scheduleMonthFrequency
-     */
-    public function setScheduleMonthFrequency($scheduleMonthFrequency): void
+    public function setScheduleMonthFrequency(?string $scheduleMonthFrequency): void
     {
         $this->scheduleMonthFrequency = $scheduleMonthFrequency;
     }

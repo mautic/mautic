@@ -53,6 +53,7 @@
             "_format": "json"
         },
         "requirements": {
+            "delta": "-?\\d+",
             "leadId": "\\d+"
         }
     },

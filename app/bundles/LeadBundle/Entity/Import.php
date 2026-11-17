@@ -223,10 +223,7 @@ class Import extends FormEntity
         return self::MANUAL !== $this->status;
     }
 
-    /**
-     * @param string $dir
-     */
-    public function setDir($dir): static
+    public function setDir(string $dir): static
     {
         $this->isChanged('dir', $dir);
         $this->dir = $dir;
@@ -437,10 +434,7 @@ class Import extends FormEntity
         return $this->priority;
     }
 
-    /**
-     * @param int $status
-     */
-    public function setStatus($status): static
+    public function setStatus(int $status): static
     {
         $this->isChanged('status', $status);
         $this->status = $status;
@@ -720,10 +714,7 @@ class Import extends FormEntity
         return empty($this->properties['status_info']) ? 'unknown' : $this->properties['status_info'];
     }
 
-    /**
-     * @param string $info
-     */
-    public function setStatusInfo($info): static
+    public function setStatusInfo(string $info): static
     {
         $properties                = $this->properties;
         $properties['status_info'] = $info;

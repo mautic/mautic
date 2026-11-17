@@ -188,10 +188,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->id;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -226,10 +223,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->description;
     }
 
-    /**
-     * @param string $webhookUrl
-     */
-    public function setWebhookUrl($webhookUrl): static
+    public function setWebhookUrl(?string $webhookUrl): static
     {
         $this->isChanged('webhookUrl', $webhookUrl);
         $this->webhookUrl = $webhookUrl;
@@ -245,10 +239,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->webhookUrl;
     }
 
-    /**
-     * @param ?string $secret
-     */
-    public function setSecret($secret): static
+    public function setSecret(?string $secret): static
     {
         $this->isChanged('secret', $secret);
         $this->secret = $secret;
