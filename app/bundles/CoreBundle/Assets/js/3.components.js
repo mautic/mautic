@@ -34,6 +34,7 @@ Mautic.initQuantitySteppers = function () {
     const SHAKE = [0, -4, 4, -2, 2, 0];
     const SHAKE_DURATION = 300;
     const state = new WeakMap();
+    const activeRepeats = new Set();
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     function parts(root) {
@@ -211,6 +212,7 @@ Mautic.initQuantitySteppers = function () {
         clearTimeout(data.timer);
         data.timer = null;
         data.repeating = false;
+        activeRepeats.delete(root);
     }
 
     function start(root, direction) {
@@ -231,6 +233,7 @@ Mautic.initQuantitySteppers = function () {
         stop(root);
         change(root, direction * step);
         data.timer = setTimeout(tick, HOLD_DELAY);
+        activeRepeats.add(root);
     }
 
     function rootOf(target) {
@@ -255,13 +258,29 @@ Mautic.initQuantitySteppers = function () {
         }
     });
 
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach((type) => {
+    ['pointerup', 'pointercancel'].forEach((type) => {
         document.addEventListener(type, (event) => {
             const root = rootOf(event.target);
             if (root) {
                 stop(root);
             }
         }, true);
+    });
+
+    document.addEventListener('pointerleave', (event) => {
+        const button = event.target.closest && event.target.closest('[data-quantity-step]');
+        if (button && !button.contains(event.relatedTarget)) {
+            stop(rootOf(button));
+        }
+    }, true);
+
+    const stopActiveRepeats = () => activeRepeats.forEach((root) => stop(root));
+
+    window.addEventListener('blur', stopActiveRepeats);
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopActiveRepeats();
+        }
     });
 
     document.addEventListener('keydown', (event) => {

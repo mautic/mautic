@@ -52,6 +52,7 @@ final class BootstrapMarkupTest extends TestCase
     protected function tearDown(): void
     {
         \Locale::setDefault($this->defaultLocale);
+        parent::tearDown();
     }
 
     public function testTabsRenderNativeSelectionAndFadeState(): void
