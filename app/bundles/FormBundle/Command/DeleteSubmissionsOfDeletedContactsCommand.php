@@ -185,8 +185,6 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
         } while (count($submissionIds) === $batchLimit);
 
         if ($deleted > 0) {
-            // The SQL deletion skips SubmissionSubscriber::postRemove(), which keeps the count for the submission limit up to date
-            $this->formRepository->recalculateSubmissionCount($formId);
             $this->logger->info(sprintf('Deleted %d submissions of deleted contacts of form %d.', $deleted, $formId));
         }
 

@@ -300,19 +300,6 @@ class FormRepository extends CommonRepository
     }
 
     /**
-     * Recalculate the submission count for a form, for example after its submissions were deleted with SQL.
-     */
-    public function recalculateSubmissionCount(int $formId): void
-    {
-        $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->update(MAUTIC_TABLE_PREFIX.'forms')
-            ->set('submission_count', '(SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'form_submissions s WHERE s.form_id = :formId)')
-            ->where('id = :formId')
-            ->setParameter('formId', $formId)
-            ->executeStatement();
-    }
-
-    /**
      * Atomically decrement the submission count for a form.
      */
     public function decrementSubmissionCount(int $formId): void

@@ -680,7 +680,7 @@ class SubmissionRepository extends CommonRepository
         $resultsTableName = $this->getResultsTableName($form->getId(), $form->getAlias());
 
         return (int) $this->getEntityManager()->getConnection()->transactional(
-            function (Connection $connection) use ($resultsTableName, $resultsTableExists, $submissionIds): int {
+            function (Connection $connection) use ($form, $resultsTableName, $resultsTableExists, $submissionIds): int {
                 if ($resultsTableExists) {
                     $connection->createQueryBuilder()
                         ->delete($resultsTableName)
@@ -696,7 +696,17 @@ class SubmissionRepository extends CommonRepository
 
                 $this->whereSubmissionOfDeletedContact($qb, MAUTIC_TABLE_PREFIX.'form_submissions');
 
-                return (int) $qb->executeStatement();
+                $deleted = (int) $qb->executeStatement();
+
+                // The SQL deletion skips SubmissionSubscriber::postRemove(), so the count for the submission limit is updated in the same transaction
+                $connection->createQueryBuilder()
+                    ->update(MAUTIC_TABLE_PREFIX.'forms')
+                    ->set('submission_count', '(SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'form_submissions s WHERE s.form_id = :formId)')
+                    ->where('id = :formId')
+                    ->setParameter('formId', $form->getId())
+                    ->executeStatement();
+
+                return $deleted;
             }
         );
     }
