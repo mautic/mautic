@@ -6,8 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
-use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -589,22 +587,16 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @param OrmQueryBuilder|DbalQueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      *
      * @return array{0:mixed,1:array<string,mixed>}
      */
     private function getSystemAliasExpression($q, string $column): array
     {
-        $aliases = $this->getSystemDefaultAliases();
-
-        if (!$aliases) {
-            return [false, []];
-        }
-
         $parameter = $this->generateRandomParameterName();
-        $expr      = $q->expr()->in($column, ":$parameter");
+        $expr      = $q->expr()->in($column, ":{$parameter}");
 
-        $q->setParameter($parameter, $aliases, ArrayParameterType::STRING);
+        $q->setParameter($parameter, $this->getSystemDefaultAliases(), ArrayParameterType::STRING);
 
         return [$expr, []];
     }
@@ -621,12 +613,12 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @param OrmQueryBuilder|DbalQueryBuilder $q
-     * @param mixed                            $expr
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param mixed                                                        $expr
      */
     private function negateExpression($q, $expr): object|string
     {
-        if ($q instanceof OrmQueryBuilder) {
+        if ($q instanceof \Doctrine\ORM\QueryBuilder) {
             return $q->expr()->not($expr);
         }
 

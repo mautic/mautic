@@ -413,6 +413,30 @@ final class LeadFieldRepositoryTest extends TestCase
         $this->assertEqualsCanonicalizing($expectedAliases, array_values($customQueryBuilder->getParameters())[0]);
     }
 
+    public function testSearchCommandsNegateSystemDefaultExpressionForOrm(): void
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(static fn (string $id): string => $id);
+        $this->repository->autowireCommonRepository($translator);
+
+        $method = new \ReflectionMethod(LeadFieldRepository::class, 'addSearchCommandWhereClause');
+
+        $filter = (object) [
+            'command' => 'mautic.lead.field.searchcommand.issystemdefault',
+            'string'  => '',
+            'strict'  => true,
+            'not'     => true,
+        ];
+
+        $this->entityManager->method('getExpressionBuilder')->willReturn(new Query\Expr());
+        $ormQueryBuilder     = new OrmQueryBuilder($this->entityManager);
+        [$expr, $parameters] = $method->invoke($this->repository, $ormQueryBuilder, $filter);
+
+        $this->assertSame([], $parameters);
+        $this->assertStringStartsWith('NOT(', (string) $expr);
+        $this->assertCount(1, $ormQueryBuilder->getParameters());
+    }
+
     private function createQueryMock(): MockObject
     {
         // This is terrible, but the Query class is final and AbstractQuery doesn't have some methods used.
