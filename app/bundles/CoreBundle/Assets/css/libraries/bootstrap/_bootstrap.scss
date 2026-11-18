@@ -78,4 +78,16 @@ $gutters: (
 
 @import 'bootstrap-3-compatibility';
 
+$utilities: map-merge($utilities, (
+  "background-color": map-merge(map-get($utilities, "background-color"), (
+    "values": map-merge(map-get(map-get($utilities, "background-color"), "values"), (
+      "primary": var(--background-brand),
+      "success": var(--support-success),
+      "info": var(--support-info),
+      "warning": var(--support-warning),
+      "danger": var(--support-error)
+    ))
+  ))
+));
+
 @import "utilities/api";
