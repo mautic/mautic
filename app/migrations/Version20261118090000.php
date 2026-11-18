@@ -26,10 +26,7 @@ final class Version20261118090000 extends PreUpAssertionMigration
         // Existing installations may contain NULL values although the entity
         // property is typed as an array. Normalize them before tightening the
         // schema so Doctrine can hydrate every user safely.
-        $this->connection->executeStatement(
-            sprintf('UPDATE %s SET preferences = :emptyPreferences WHERE preferences IS NULL', $table->getName()),
-            ['emptyPreferences' => serialize([])]
-        );
+        $this->addSql(sprintf("UPDATE %s SET preferences = 'a:0:{}' WHERE preferences IS NULL", $table->getName()));
 
         $table->getColumn('preferences')->setNotnull(true);
     }
