@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\SmsRepository;
 use Mautic\SmsBundle\Model\SmsModel;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class BroadcastExecutioner
@@ -22,6 +23,7 @@ final class BroadcastExecutioner
         private readonly TranslatorInterface $translator,
         private readonly LeadRepository $leadRepository,
         private readonly SmsRepository $smsRepository,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -34,7 +36,12 @@ final class BroadcastExecutioner
             $this->result         = new BroadcastResult();
             try {
                 $this->send($sms);
-            } catch (\Exception) {
+            } catch (\Exception $exception) {
+                // Do not let one failing broadcast stop the others, but make the failure traceable.
+                $this->logger->error(
+                    sprintf('Sending SMS broadcast ID %d failed: %s', $sms->getId(), $exception->getMessage()),
+                    ['exception' => $exception]
+                );
             }
             $event->setResults(
                 sprintf('%s: %s', $this->translator->trans('mautic.sms.sms'), $sms->getName()),
