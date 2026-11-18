@@ -40,16 +40,11 @@
   }
 }
 
-
 // Animations
-// Slide in
-
 .animation--slide-in-up { animation: animationSlideInUp var(--duration-expressive) forwards; }
 .animation--slide-in-down { animation: animationSlideInDown var(--duration-expressive) forwards; }
 .animation--slide-in-right { animation: animationSlideInRight var(--duration-expressive) forwards; }
-
-// Scale animations
-.animation--grow { 
+.animation--grow {
   transition: transform var(--duration-expressive);
   &:hover { transform: scale(1.02); }
 }
