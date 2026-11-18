@@ -8,7 +8,6 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
-use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
 trait CustomFieldRepositoryTrait
@@ -84,9 +83,6 @@ trait CustomFieldRepositoryTrait
             $this->buildSelectClause($dq, $args);
 
             $results = $dq->executeQuery()->fetchAllAssociative();
-            if (isset($args['route']) && ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) {
-                unset($args['select']); // Our purpose of getting list of ids has already accomplished. We no longer need this.
-            }
 
             // loop over results to put fields in something that can be assigned to the entities
             $fieldValues = [];
