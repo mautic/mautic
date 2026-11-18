@@ -98,7 +98,7 @@ trait MatchFilterForLeadTrait
                             break;
                         case 'datetime':
                         case 'time':
-                            if (!is_null($leadVal) && !is_null($filterVal)) {
+                            if (null !== $leadVal && null !== $filterVal) {
                                 $leadValCount   = substr_count($leadVal, ':');
                                 $filterValCount = substr_count($filterVal, ':');
 
@@ -149,9 +149,9 @@ trait MatchFilterForLeadTrait
                     switch ($data['operator']) {
                         case '=':
                             if ('number' === $data['type'] && null === $leadVal) {
-                        // SQL equality never matches NULL, but PHP's null == 0.0 does.
-                        $groups[$groupNum] = false;
-                    } elseif ('boolean' === $data['type']) {
+                                // SQL equality never matches NULL, but PHP's null == 0.0 does.
+                                $groups[$groupNum] = false;
+                            } elseif ('boolean' === $data['type']) {
                                 $groups[$groupNum] = $leadVal === $filterVal;
                             } else {
                                 $groups[$groupNum] = $leadVal == $filterVal;
@@ -159,16 +159,16 @@ trait MatchFilterForLeadTrait
                             break;
                         case '!=':
                             if ('number' === $data['type'] && null === $leadVal) {
-                        // The segment neq handler ORs in IS NULL, so NULL always matches.
-                        $groups[$groupNum] = true;
-                    } elseif ('boolean' === $data['type']) {
+                                // The segment neq handler ORs in IS NULL, so NULL always matches.
+                                $groups[$groupNum] = true;
+                            } elseif ('boolean' === $data['type']) {
                                 $groups[$groupNum] = $leadVal !== $filterVal;
                             } else {
                                 $groups[$groupNum] = $leadVal != $filterVal;
                             }
                             break;
                         case 'gt':
-                    // SQL comparisons against NULL never match.
+                            // SQL comparisons against NULL never match.
                             $groups[$groupNum] = null !== $leadVal && $leadVal > $filterVal;
                             break;
                         case 'gte':
