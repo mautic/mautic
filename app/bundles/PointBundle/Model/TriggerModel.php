@@ -388,10 +388,8 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     {
         $points = $lead->getPoints();
 
-        // find all published triggers that is applicable to this points
-        $events       = $this->triggerEventRepository->getPublishedByPointTotal($points);
-        $groupEvents  = $this->triggerEventRepository->getPublishedByGroupScore($lead->getGroupScores());
-        $events       = array_merge($events, $groupEvents);
+        // Find all published point and group-score triggers in one query.
+        $events = $this->triggerEventRepository->getPublishedByPointTotalAndGroupScore($points, $lead->getId());
 
         if ([] !== $events) {
             // get a list of actions that has already been applied to this lead
