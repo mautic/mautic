@@ -31,7 +31,7 @@
 
         // This should work with all navs, not just the navbar, so you should be able to pass a parent in
         var parent     = $(this).closest(options.parent);
-        var isVertical = $(this).hasClass('tabs-left') || $(this).hasClass('tabs-right');
+        var isVertical = $(this).hasClass('flex-column');
 
         if (!options.offset) {
             options.offset = {};
