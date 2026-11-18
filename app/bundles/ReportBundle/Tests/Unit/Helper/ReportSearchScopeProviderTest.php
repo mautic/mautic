@@ -40,7 +40,7 @@ final class ReportSearchScopeProviderTest extends SearchScopeProviderTestCase
         return ['is:mine'];
     }
 
-    public function testSourceCommandIsRecognizedByQuickFiltersButNotOfferedAsScope(): void
+    public function testSourceCommandIsNotOfferedAsScope(): void
     {
         $reportModel = $this->createMock(ReportModel::class);
         $translator  = $this->createMock(TranslatorInterface::class);
