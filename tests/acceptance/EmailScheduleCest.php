@@ -10,11 +10,12 @@ final class EmailScheduleCest
 {
     public function _before(AcceptanceTester $I): void
     {
-        $I->login(reuseSessionSnapshot: false);
+        $I->login();
     }
 
     public function triggeredEmailShowsScheduleOptionsOnCreate(AcceptanceTester $I): void
     {
+        $I->login(reuseSessionSnapshot: false);
         $I->amOnPage(EmailsPage::URL);
 
         // Create a new email
