@@ -39,23 +39,7 @@
     }
   }
 }
-.shd-sm {
-  -webkit-box-shadow: 0 4px 8px -4px rgba(0, 0, 0, 0.05);
-  box-shadow: 0 4px 8px -4px rgba(0, 0, 0, 0.05);
-}
-.mi-16, .mi-md { margin-inline: var(--spacing-05) !important; }
-.pi-neg-local { padding-inline: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
-.mi-neg-local { margin-inline: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
-.ma-neg-local { margin: calc(-1 * var(--layout-density-padding-inline-local)) !important; }
 
-//fixed widths
-.w-44 {width: 44px;}
-.h-32 { height: 32px; }
-.h-48 { height: 48px; }
-.h-384 { height: 384px; }
-.min-h-256 { min-height: 256px; }
-.fb-0 { flex-basis: 0; }
-.ar-2-1 { aspect-ratio: 2 / 1; }
 
 // Animations
 // Slide in
@@ -85,10 +69,6 @@
   to   { transform: translateX(0); opacity: 1; }
 }
 
-/// Aspect ratio
-.as-1-1 { aspect-ratio: 1 / 1; }
-.as-4-3 { aspect-ratio: 4 / 3; }
-.as-16-9 { aspect-ratio: 16 / 9; }
 
 // Grids
 .grid {
