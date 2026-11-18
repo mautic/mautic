@@ -239,6 +239,7 @@ final class ConfigController extends AbstractFormController
             'name'          => $this->integrationConfiguration->getName(),
             'mauticContent' => 'integrationsConfig',
             'flashes'       => $this->getFlashContent(),
+            'sidebar'       => $this->renderView('@MauticCore/LeftPanel/index.html.twig'),
         ];
 
         if ($this->integrationObject instanceof ConfigFormAuthorizeButtonInterface) {

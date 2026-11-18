@@ -44,7 +44,8 @@ final class PluginControllerTest extends MauticMysqlTestCase
         ]);
 
         $crawler     = $this->client->submit($form);
-        $this->assertStringContainsString('A value is required.', $crawler->filter('#integration_config_apiKeys')->ancestors()->first()->html());
+        $this->assertStringContainsString('A value is required.', $crawler->filter('#integration_config_apiKeys_username')->ancestors()->first()->html());
+        $this->assertStringNotContainsString('A value is required.', $crawler->filter('#integration_config_apiKeys_password')->ancestors()->first()->html());
     }
 
     public function testReturnPluginVersion(): void

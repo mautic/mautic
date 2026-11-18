@@ -38,6 +38,17 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    public function testSavingRefreshesTheLeftPanel(): void
+    {
+        $this->configureTwilioWithArrayTransport();
+
+        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $this->assertIsArray($response);
+        $this->assertSame(1, $response['closeModal'] ?? null);
+        $this->assertIsString($response['sidebar'] ?? null);
+        $this->assertStringContainsString('/s/sms', $response['sidebar']);
+    }
+
     public function testBlankAuthTokenKeepsTheSavedOne(): void
     {
         $this->configureTwilioWithArrayTransport();
