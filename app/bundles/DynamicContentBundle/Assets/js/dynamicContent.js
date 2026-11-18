@@ -253,20 +253,6 @@ Mautic.dynamicFiltersOnLoad = function(container, response) {
         });
 
     }
-
-    // segment contact filters
-    var segmentContactForm = mQuery('#segment-contact-filters');
-
-    if (segmentContactForm.length) {
-        segmentContactForm.on('change', function() {
-            segmentContactForm.submit();
-        }).on('keyup', function() {
-            segmentContactForm.delay(200).submit();
-        }).on('submit', function(e) {
-            e.preventDefault();
-            Mautic.refreshSegmentContacts(segmentContactForm);
-        });
-    }
 };
 
 Mautic.addDwcFilter = function (elId, elObj) {
