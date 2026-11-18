@@ -284,6 +284,7 @@ class MailHelperTest extends TestCase
         $this->assertEquals(3, count($fromAddresses));
         $this->assertEquals(3, count($metadatas));
         $this->assertEquals(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
+        $this->assertEquals(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $transport->getReplyToAddresses());
 
         foreach ($metadatas as $key => $metadata) {
             $this->assertTrue(isset($metadata[$this->contacts[$key]['email']]));
@@ -312,6 +313,43 @@ class MailHelperTest extends TestCase
 
         // Validate that the message object only has the contacts for the last "from" group to ensure we aren't sending duplicates
         $this->assertEquals('contact3@somewhere.com', $mailer->message->getTo()[0]->getAddress());
+    }
+
+    public function testQueuedOwnerAsMailerHonorsEmailReplyToOverride(): void
+    {
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($this->defaultParams));
+
+        $this->contactRepository->method('getLeadOwner')
+            ->willReturnOnConsecutiveCalls(
+                ['email' => 'owner1@owner.com', 'first_name' => 'owner 1', 'last_name' => null, 'signature' => 'owner 1'],
+                ['email' => 'owner2@owner.com', 'first_name' => 'owner 2', 'last_name' => null, 'signature' => 'owner 2'],
+            );
+        $transport     = new BatchTransport();
+        $symfonyMailer = new Mailer($transport);
+
+        $mailer = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+
+        $email = new Email();
+        $email->setUseOwnerAsMailer(true);
+        $email->setReplyToAddress('replytooverride@nowhere.com');
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+
+        $mailer->setEmail($email);
+        $mailer->enableQueue();
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $mailer->flushQueue([]);
+
+        $this->assertEquals(
+            ['replytooverride@nowhere.com', 'replytooverride@nowhere.com', 'replytooverride@nowhere.com'],
+            $transport->getReplyToAddresses()
+        );
     }
 
     public function testMailAsOwnerWithEncodedCharactersInName(): void
