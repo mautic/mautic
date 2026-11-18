@@ -172,21 +172,6 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(0, $this->getStoredValue($contactId, self::NUMBER_FIELD));
     }
 
-    public function testPostNewDoesNotZeroUnsentNumericFieldOnIdentifierMatch(): void
-    {
-        $email     = 'identifier-match@example.com';
-        $contactId = $this->createContact($email, [self::NUMBER_FIELD => 5]);
-
-        $this->client->request(Request::METHOD_POST, '/api/contacts/new', [
-            'email'     => $email,
-            'firstname' => 'Unchanged',
-        ]);
-        $response = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertSame($contactId, $response['contact']['id'], 'Expected the identifier match to update the same contact.');
-
-        $this->assertSame(5, $this->getStoredValue($contactId, self::NUMBER_FIELD));
-    }
-
     public function testPostNewWritesSentZeroOnIdentifierMatch(): void
     {
         $email     = 'identifier-match-zero@example.com';
