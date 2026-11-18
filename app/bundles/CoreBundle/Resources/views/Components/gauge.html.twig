@@ -24,23 +24,23 @@
 {% if isLoading %}{% set classes = classes|merge(['gauge--loading']) %}{% endif %}
 {% if className|default('') %}{% set classes = classes|merge([className]) %}{% endif %}
 
-<div class="{{ classes|join(' ')|e }}" id="{{ baseId|escape('html_attr') }}" data-unit="{{ unit|e('html_attr') }}">
+<div class="{{ classes|join(' ')|e('html_attr') }}" id="{{ baseId|escape('html_attr') }}" data-unit="{{ unit|e('html_attr') }}">
     <div class="gauge__chart"
-        role="{{ isLoading ? 'progressbar' : 'meter' }}"
+        role="{{ (isLoading ? 'progressbar' : 'meter')|e('html_attr') }}"
         aria-label="{{ label|e('html_attr') }}"
         aria-valuemin="0"
         aria-valuemax="100"
-        {% if not isLoading %}aria-valuenow="{{ currentValue }}" aria-valuetext="{{ spokenValue|e('html_attr') }}"{% else %}aria-busy="true"{% endif %}>
+        {% if not isLoading %}aria-valuenow="{{ currentValue|e('html_attr') }}" aria-valuetext="{{ spokenValue|e('html_attr') }}"{% else %}aria-busy="true"{% endif %}>
         {% if 'full' == type %}
             <svg class="gauge__svg" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-                <circle class="gauge__track" cx="50" cy="50" r="{{ radius }}" stroke-width="{{ arcWidth }}" fill="none"/>
-                <circle class="gauge__arc" cx="50" cy="50" r="{{ radius }}" stroke-width="{{ arcWidth }}" fill="none" transform="rotate(-90 50 50)" pathLength="100" stroke-dasharray="{{ isLoading ? 0 : currentValue }} 100"/>
+                <circle class="gauge__track" cx="50" cy="50" r="{{ radius|e('html_attr') }}" stroke-width="{{ arcWidth|e('html_attr') }}" fill="none"/>
+                <circle class="gauge__arc" cx="50" cy="50" r="{{ radius|e('html_attr') }}" stroke-width="{{ arcWidth|e('html_attr') }}" fill="none" transform="rotate(-90 50 50)" pathLength="100" stroke-dasharray="{{ ((isLoading ? 0 : currentValue) ~ ' 100')|e('html_attr') }}"/>
             </svg>
         {% else %}
             {% set arc = 'M ' ~ (arcWidth / 2) ~ ' 50 A ' ~ radius ~ ' ' ~ radius ~ ' 0 0 1 ' ~ (100 - arcWidth / 2) ~ ' 50' %}
             <svg class="gauge__svg" viewBox="0 0 100 50" aria-hidden="true" focusable="false">
-                <path class="gauge__track" d="{{ arc }}" stroke-width="{{ arcWidth }}" fill="none"/>
-                <path class="gauge__arc" d="{{ arc }}" stroke-width="{{ arcWidth }}" fill="none" pathLength="100" stroke-dasharray="{{ isLoading ? 0 : currentValue }} 100"/>
+                <path class="gauge__track" d="{{ arc|e('html_attr') }}" stroke-width="{{ arcWidth|e('html_attr') }}" fill="none"/>
+                <path class="gauge__arc" d="{{ arc|e('html_attr') }}" stroke-width="{{ arcWidth|e('html_attr') }}" fill="none" pathLength="100" stroke-dasharray="{{ ((isLoading ? 0 : currentValue) ~ ' 100')|e('html_attr') }}"/>
             </svg>
         {% endif %}
     </div>
@@ -54,7 +54,7 @@
     {% endif %}
     {% if null is not same as deltaValue %}
         <div class="gauge__delta type-helper-text-01">
-            <i class="{{ deltaValue >= 0 ? 'ri-arrow-up-s-fill' : 'ri-arrow-down-s-fill' }}" aria-hidden="true"></i>
+            <i class="{{ (deltaValue >= 0 ? 'ri-arrow-up-s-fill' : 'ri-arrow-down-s-fill')|e('html_attr') }}" aria-hidden="true"></i>
             <span>{{ (deltaValue > 0 ? '+' : '') ~ deltaValue }}%</span>
         </div>
     {% endif %}
