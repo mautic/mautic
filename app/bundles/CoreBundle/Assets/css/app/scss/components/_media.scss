@@ -95,6 +95,16 @@ a.media {
           &:before { top: 0; }
         }
       }
+      &:last-child {
+        > .media-object {
+          &:before { bottom: auto; height: calc(200% + 7px); }
+        }
+      }
+      &:first-child:last-child {
+        > .media-object {
+          &:before { display: none; }
+        }
+      }
     }
   }
 }
