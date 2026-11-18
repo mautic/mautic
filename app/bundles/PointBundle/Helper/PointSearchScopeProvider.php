@@ -6,6 +6,7 @@ namespace Mautic\PointBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Helper\SearchScopePresets;
+use Mautic\PointBundle\Entity\PointRepository;
 use Mautic\PointBundle\Model\PointModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -28,6 +29,9 @@ final class PointSearchScopeProvider extends AbstractSearchScopeProvider
             SearchScopePresets::isUnpublished(),
             SearchScopePresets::isUncategorized(),
             SearchScopePresets::isMine(),
+            SearchScopePresets::command(PointRepository::SEARCH_COMMAND_TYPE_GAIN),
+            SearchScopePresets::command(PointRepository::SEARCH_COMMAND_TYPE_LOSS),
+            SearchScopePresets::command(PointRepository::SEARCH_COMMAND_REPEATABLE),
             SearchScopePresets::project(),
         ];
     }
