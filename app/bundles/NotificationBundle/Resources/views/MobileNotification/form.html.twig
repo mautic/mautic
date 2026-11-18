@@ -6,8 +6,6 @@
     - forceTypeSelection (optional, bool, default = false)
         Only defined when editing notification
 #}
-{% form_theme form '@MauticNotification/FormTheme/MobileNotification/_mobile_notification_mobileSettings_widget.html.twig' %}
-
 {% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent %}mobile_notification{% endblock %}
@@ -28,41 +26,34 @@
           <div class="row">
               <div class="col-xs-12">
 
-                  <!-- tabs controls -->
-                  <ul class="nav nav-tabs nav-tabs-contained">
-                      <li class="active"><a href="#notification-container" role="tab" data-bs-toggle="tab" class="active nav-link">{{ 'mautic.core.details'|trans }}</a></li>
-                      <li><a href="#data-notification-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.notification.tab.data'|trans }}</a></li>
-                      {% if integrationSettings.platforms is defined and 'ios' in integrationSettings.platforms %}
-                          <li><a href="#ios-notification-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.notification.tab.ios'|trans }}</a></li>
-                      {% endif %}
-                      {% if integrationSettings.platforms is defined and 'android' in integrationSettings.platforms %}
-                          <li><a href="#android-notification-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.notification.tab.android'|trans }}</a></li>
-                      {% endif %}
-                  </ul>
-                  <!--/ tabs controls -->
-
-                  <!-- tabs content -->
-                  <div class="tab-content pa-16">
-                      <div class="tab-pane fade show active bdr-w-0" id="notification-container">
-                          <div class="row">
-                              <div class="col-md-6">
-                                  {{- form_row(form.name) -}}
-                                  {{- form_row(form.heading) -}}
-                                  {{- form_row(form.url) -}}
-                              </div>
-                              <div class="col-md-6">{{ form_row(form.message) }}</div>
+                  {% set detailsContent %}
+                      <div class="row">
+                          <div class="col-md-6">
+                              {{- form_row(form.name) -}}
+                              {{- form_row(form.heading) -}}
+                              {{- form_row(form.url) -}}
                           </div>
+                          <div class="col-md-6">{{ form_row(form.message) }}</div>
                       </div>
-                      <div class="tab-pane fade in bdr-w-0" id="data-notification-container">
-                          <div class="row">
-                              <div class="col-md-6">{{ form_row(form.mobileSettings.additional_data) }}</div>
-                          </div>
+                  {% endset %}
+                  {% set dataContent %}
+                      <div class="row">
+                          <div class="col-md-6">{{ form_row(form.mobileSettings.additional_data) }}</div>
                       </div>
-                      {% if form.mobileSettings.ios_sound is defined or form.mobileSettings.android_sound is defined  %}
-                        {{ form_widget(form.mobileSettings, {'integrationSettings': integrationSettings}) }}
-                      {% endif %}
-                  </div>
-                  <!--/ tabs content -->
+                  {% endset %}
+                  {% set notificationTabs = [
+                      {'id': 'notification-container', 'label': 'mautic.core.details', 'content': detailsContent, 'className': 'pa-16'},
+                      {'id': 'data-notification-container', 'label': 'mautic.notification.tab.data', 'content': dataContent, 'className': 'pa-16'}
+                  ] %}
+                  {% if form.mobileSettings.ios_sound is defined %}
+                      {% set iosContent %}{{ include('@MauticNotification/MobileNotification/_ios_settings.html.twig', {'form': form.mobileSettings}) }}{% endset %}
+                      {% set notificationTabs = notificationTabs|merge([{'id': 'ios-notification-container', 'label': 'mautic.notification.tab.ios', 'content': iosContent, 'className': 'pa-16'}]) %}
+                  {% endif %}
+                  {% if form.mobileSettings.android_sound is defined %}
+                      {% set androidContent %}{{ include('@MauticNotification/MobileNotification/_android_settings.html.twig', {'form': form.mobileSettings}) }}{% endset %}
+                      {% set notificationTabs = notificationTabs|merge([{'id': 'android-notification-container', 'label': 'mautic.notification.tab.android', 'content': androidContent, 'className': 'pa-16'}]) %}
+                  {% endif %}
+                  {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': notificationTabs, 'variant': 'contained'}) }}
 
               </div>
           </div>

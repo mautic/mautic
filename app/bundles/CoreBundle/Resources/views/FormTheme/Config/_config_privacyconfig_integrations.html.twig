@@ -1,0 +1,4 @@
+<h4 class="fw-sb mt-16 mb-16">{{ 'mautic.core.config.header.privacyconfig.third_party'|trans }}</h4>
+{% for child in form.children %}
+    {{ form_row(child) }}
+{% endfor %}

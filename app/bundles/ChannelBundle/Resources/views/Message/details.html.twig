@@ -95,35 +95,20 @@
                 <!--/ stats -->
                 {{ customContent('details.stats.graph.below', _context) }}
 
-                <!-- tabs controls -->
-                <ul class="nav nav-tabs nav-tabs-contained">
-                    {% set active = 'active' %}
-                    {% for channel, contacts in messagedLeads %}
-                    <li class="{{ active }}">
-                        <a href="#contacts-{{ channel }}" role="tab" data-bs-toggle="tab" class="nav-link{{ active is not empty ? ' active' : '' }}" aria-selected="{{ active is not empty ? 'true' : 'false' }}">
-                            {{ ('all' is not same as(channel)) ? channels[channel]['label'] : 'mautic.lead.leads'|trans() }}
-                        </a>
-                    </li>
-                    {% set active = '' %}
-                    {% endfor %}
-                </ul>
-                <!--/ tabs controls -->
+                {% set messageTabs = [] %}
+                {% for channel, contacts in messagedLeads %}
+                    {% set messageTabContent %}
+                        {% set message = ('all' is same as(channel)) ? 'mautic.channel.message.all_contacts' : 'mautic.channel.message.channel_contacts' %}
+                        <div class="alert alert-info"><strong>{{ message|trans }}</strong></div>
+                        <div class="message-{{ channel|e('html_attr') }}">
+                            {{ contacts|raw }}
+                        </div>
+                    {% endset %}
+                    {% set messageTabs = messageTabs|merge([{'id': 'contacts-' ~ channel, 'label': ('all' is not same as(channel)) ? channels[channel]['label'] : 'mautic.lead.leads', 'content': messageTabContent, 'className': 'pa-16 page-list'}]) %}
+                {% endfor %}
+                {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': messageTabs, 'variant': 'contained'}) }}
             </div>
 
-            <!-- start: tab-content -->
-            <div class="tab-content pa-16">
-            {% set active = ' active in' %}
-                {% for channel, contacts in messagedLeads %}
-                <div class="tab-pane bdr-w-0 page-list{{ active }}" id="contacts-{{ channel }}">
-                    {% set message = ('all' is same as(channel)) ? 'mautic.channel.message.all_contacts' : 'mautic.channel.message.channel_contacts' %}
-                    <div class="alert alert-info"><strong>{{ message|trans }}</strong></div>
-                    <div class="message-{{ channel }}">
-                        {{ contacts|raw }}
-                    </div>
-                </div>
-                {% set active = '' %}
-                {% endfor %}
-            </div>
         </div>
         <!-- right section -->
         <div class="col-md-3 bdr-l height-auto">

@@ -1,4 +1,6 @@
-{# nav_tabs.html.twig #}
+{# === DEPRECATED SINCE 7.3 === #}
+{# Use @MauticCore/Components/tabs.html.twig instead. #}
+
 {% macro generateTabId(translationKey) -%}
     {%- set parts = translationKey|split('.') -%}
     {%- set lastParts = parts|slice(-2) -%}

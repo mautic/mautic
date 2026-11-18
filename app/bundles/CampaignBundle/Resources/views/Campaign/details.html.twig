@@ -157,78 +157,64 @@
             {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
             <!-- some stats -->
             <div class="stats-menu ps-16 mt-24">
-                <!-- tabs controls -->
-                <ul class="nav nav-tabs nav-tabs-contained">
-                    <li class="active">
-                        <a href="#stats-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">
-                            {{ 'mautic.campaign.stats'|trans }}
-                        </a>
-                    </li>
-                    {%  if showEmailStats|default(false) %}
-                        <li>
-                            <a href="#campaign-email-stats" role="tab" data-bs-toggle="tab" data-load="campaign-email-stats" class="nav-link">
-                                {{ 'mautic.campaign.email_stats'|trans }}
-                            </a>
-                        </li>
-                    {% endif %}
-                    <li>
-                        <a href="#reads-map-container" role="tab" data-bs-toggle="tab" data-load="map" class="nav-link">
-                            {{ 'mautic.email.thead.maps'|trans }}
-                        </a>
-                    </li>
-                </ul>
-                <!--/ tabs controls -->
-                <div class="date-range">
+                <div class="date-range ms-auto">
                     {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
                         'dateRangeForm': dateRangeForm,
                     }) }}
                 </div>
             </div>
-            <div class="stats-menu__content tab-content pa-16 mb-24 shd-sm">
-                <div class="tab-pane active bdr-w-0" id="stats-container">
-                    <div id="campaign-graph-div" data-target-url="{{ path('mautic_campaign_graph', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
-                        <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
-                        <div class="clearfix"></div>
-                    </div>
-                </div>
-                <div class="tab-pane bdr-w-0" id="reads-map-container"
-                     data-map-url="{{ path('mautic_campaign_map_stats', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
-                    <div class="spinner">
-                        <i class="ri-loader-3-line ri-spin"></i>
-                    </div>
-                </div>
+            <div class="ps-16 mb-24">
+                {% set tabsviewsdetails = [] %}
+                {% set tabsviewsdetailsContent0 %}
+                                    <div id="campaign-graph-div" data-target-url="{{ path('mautic_campaign_graph', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')})|e('html_attr') }}">
+                                        <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                                        <div class="clearfix"></div>
+                                    </div>
+
+                {% endset %}
+                {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'stats-container', 'label': 'mautic.campaign.stats', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
                 {% if showEmailStats|default(false) %}
-                <div class="tab-pane bdr-w-0" id="campaign-email-stats">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h4 class="text-muted ms-24 mb-16">{{ 'mautic.campaign.email_stats.weekday' | trans }}</h4>
-                            <div data-campaign-email-stats-weekdays="{{ path('mautic_campaign_metrics_email_weekdays', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
-                                <div class="d-flex justify-content-center align-items-center">
-                                    <div class="spinner fs-42">
-                                        <i class="ri-loader-3-line ri-spin"></i>
+                {% set tabsviewsdetailsContent1 %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h4 class="text-muted ms-24 mb-16">{{ 'mautic.campaign.email_stats.weekday' | trans }}</h4>
+                                            <div data-campaign-email-stats-weekdays="{{ path('mautic_campaign_metrics_email_weekdays', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')})|e('html_attr') }}">
+                                                <div class="d-flex justify-content-center align-items-center">
+                                                    <div class="spinner fs-42">
+                                                        <i class="ri-loader-3-line ri-spin"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h4 class="text-muted ms-24 mb-16">{{ 'mautic.campaign.email_stats.hour' | trans }}</h4>
+                                            <div data-campaign-email-stats-hours="{{ path('mautic_campaign_metrics_email_hours', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')})|e('html_attr') }}">
+                                                <div class="d-flex justify-content-center align-items-center">
+                                                    <div class="spinner fs-42">
+                                                        <i class="ri-loader-3-line ri-spin"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <h4 class="text-muted ms-24 mb-16">{{ 'mautic.campaign.email_stats.hour' | trans }}</h4>
-                            <div data-campaign-email-stats-hours="{{ path('mautic_campaign_metrics_email_hours', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
-                                <div class="d-flex justify-content-center align-items-center">
-                                    <div class="spinner fs-42">
-                                        <i class="ri-loader-3-line ri-spin"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+                {% endset %}
+                {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'campaign-email-stats', 'label': 'mautic.campaign.email_stats', 'content': tabsviewsdetailsContent1, 'className': 'pa-16', 'attributes': {'data-load': 'campaign-email-stats'}}]) %}
                 {% endif %}
+                {% set tabsviewsdetailsContent2 %}
+                                    <div class="spinner">
+                                        <i class="ri-loader-3-line ri-spin"></i>
+                                    </div>
+
+                {% endset %}
+                {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'reads-map-container', 'label': 'mautic.email.thead.maps', 'content': tabsviewsdetailsContent2, 'className': 'pa-16', 'attributes': {'data-load': 'map'}, 'paneAttributes': {'data-map-url': path('mautic_campaign_map_stats', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')})}}]) %}
+                {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}
             </div>
+
             <!--/ stats -->
 
             {{ customContent('details.stats.graph.below', _context) }}
 
-            <!-- tabs controls -->
             <ul class="nav nav-tabs nav-tabs-contained" id="campaign_nav_header_ul">
                 <li class="active" id="preview_li">
                     <a href="#preview-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">
@@ -257,10 +243,8 @@
                 </li>
                 {{ customContent('tabs', _context) }}
             </ul>
-            <!--/ tabs controls -->
         </div>
 
-        <!-- start: tab-content -->
         <div class="tab-content pa-16" id="campaign-tab-content"
              data-event-target-url="{{ path('mautic_campaign_event_stats', {'objectId' : campaign.id, 'dateFromValue' : dateFrom|date('Y-m-d'), 'dateToValue' : dateTo|date('Y-m-d')}) }}">
             <!-- #events-container -->
@@ -289,7 +273,6 @@
             </div>
             {{ customContent('tabs.content', _context) }}
         </div>
-        <!--/ end: tab-content -->
 
         {{ customContent('left.section.bottom', _context) }}
     </div>

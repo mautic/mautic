@@ -27,9 +27,9 @@
             ? [{ color: 'blue', label: 'mautic.core.icon_tooltip.translation', icon_only: true, icon: 'ri-translate' }]
             : [])
         |merge(entity.isTranslation(true)
-            ? [{ 
-                color: 'warm-gray', 
-                label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), 
+            ? [{
+                color: 'warm-gray',
+                label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}),
                 icon: 'ri-translate',
                 attributes: {
                     'href': path('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': translations.parent.id}),
@@ -175,38 +175,23 @@
 
               {{ customContent('details.stats.graph.below', _context) }}
 
-              <!-- tabs controls -->
-              <ul class="nav nav-tabs nav-tabs-contained">
-                  <li class="active">
-                      <a href="#clicks-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">
-                          {{ 'mautic.trackable.click_counts'|trans }}
-                      </a>
-                  </li>
-                  {% if showTranslations %}
-                  <li class>
-                      <a href="#translation-container" role="tab" data-bs-toggle="tab" class="nav-link">
-                          {{ 'mautic.core.translations'|trans }}
-                      </a>
-                  </li>
-                  {% endif %}
-              </ul>
-              <!--/ tabs controls -->
-          </div>
-          <!-- start: tab-content -->
-          <div class="tab-content pa-16">
-              <div class="tab-pane active active bdr-w-0" id="clicks-container">
-                  {{ include('@MauticPage/Trackable/click_counts.html.twig', {'trackables': trackables, 'entity': entity, 'channel': 'dynamicContent'}) }}
+              {% set tabsviewsdetails = [] %}
+              {% set tabsviewsdetailsContent0 %}
+                                {{ include('@MauticPage/Trackable/click_counts.html.twig', {'trackables': trackables, 'entity': entity, 'channel': 'dynamicContent'}) }}
 
-              </div>
-              <!-- #translation-container -->
+
+              {% endset %}
+              {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'clicks-container', 'label': 'mautic.trackable.click_counts', 'content': tabsviewsdetailsContent0, 'className': 'pa-16'}]) %}
               {% if showTranslations %}
-                  <div class="tab-pane bdr-w-0" id="translation-container">
-                      {{ translationContent|raw }}
-                  </div>
+              {% set tabsviewsdetailsContent1 %}
+                                    {{ translationContent|raw }}
+
+              {% endset %}
+              {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'translation-container', 'label': 'mautic.core.translations', 'content': tabsviewsdetailsContent1, 'className': 'pa-16'}]) %}
               {% endif %}
-              <!--/ #translation-container -->
+              {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}
           </div>
-          <!-- end: tab-content -->
+
       </div>
       <!--/ left section -->
 

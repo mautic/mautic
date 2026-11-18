@@ -1,17 +1,15 @@
 {% block _config_privacyconfig_widget %}
-<h4 class="fw-sb mt-48 mb-5">{{ 'mautic.core.config.header.privacyconfig.third_party'|trans }}</h4>
-<div class="text-muted small pb-16">{{ 'mautic.core.config.header.privacyconfig.third_party.description'|trans }}</div>
-<div class="row">
-    <div class="panel panel-default mb-16">
-        <div class="panel-body">
-            <div class="row">
-                {% for child in form.children %}
-                <div class="col-xs-12">
-                    {{ form_row(child) }}
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
+{% set integrationsContent %}{% include '@MauticCore/FormTheme/Config/_config_privacyconfig_integrations.html.twig' with {'form': form} %}{% endset %}
+<div class="mt-48">
+    {% include '@MauticCore/Components/tabs.html.twig' with {
+        'variant': 'line',
+        'tabs': [
+            {
+                'label': 'mautic.core.config.tab.privacyconfig.integrations',
+                'content': integrationsContent,
+                'className': 'pt-16'
+            }
+        ]
+    } %}
 </div>
 {% endblock %}
