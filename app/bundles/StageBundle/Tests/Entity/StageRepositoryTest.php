@@ -13,8 +13,9 @@ final class StageRepositoryTest extends MauticMysqlTestCase
 {
     use StageTestSeederTrait;
 
-    private const FUTURE_OFFSET = '+1 year';
-    private const PAST_OFFSET = '-1 year';
+    private const NOW = '2026-06-15 12:00:00';
+    private const FUTURE = '2026-07-15 12:00:00';
+    private const PAST = '2026-05-15 12:00:00';
 
     public function testGetEntitiesReturnsContactCount(): void
     {
@@ -43,6 +44,8 @@ final class StageRepositoryTest extends MauticMysqlTestCase
 
     public function testGetPublishedWithContactCountsExcludesStagesOutsidePublicationWindow(): void
     {
+        $now = new \DateTime(self::NOW);
+
         $active = (new Stage())
             ->setName('Active')
             ->setIsPublished(true)
@@ -51,18 +54,18 @@ final class StageRepositoryTest extends MauticMysqlTestCase
             ->setName('Scheduled')
             ->setIsPublished(true)
             ->setWeight(2)
-            ->setPublishUp(new \DateTime(self::FUTURE_OFFSET));
+            ->setPublishUp(new \DateTime(self::FUTURE));
         $expired = (new Stage())
             ->setName('Expired')
             ->setIsPublished(true)
             ->setWeight(3)
-            ->setPublishDown(new \DateTime(self::PAST_OFFSET));
+            ->setPublishDown(new \DateTime(self::PAST));
         $current = (new Stage())
             ->setName('Current')
             ->setIsPublished(true)
             ->setWeight(4)
-            ->setPublishUp(new \DateTime(self::PAST_OFFSET))
-            ->setPublishDown(new \DateTime(self::FUTURE_OFFSET));
+            ->setPublishUp(new \DateTime(self::PAST))
+            ->setPublishDown(new \DateTime(self::FUTURE));
         $unpublished = (new Stage())
             ->setName('Unpublished')
             ->setIsPublished(false)
@@ -80,7 +83,7 @@ final class StageRepositoryTest extends MauticMysqlTestCase
 
         $names = array_map(
             static fn (array $row): string => $row[0]->getName(),
-            $repository->getPublishedWithContactCounts()
+            $repository->getPublishedWithContactCounts($now)
         );
 
         $this->assertContains('Active', $names);

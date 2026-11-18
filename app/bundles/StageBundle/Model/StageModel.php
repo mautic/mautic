@@ -246,7 +246,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         $entities      = [];
         $contactCounts = [];
 
-        foreach ($this->getRepository()->getPublishedWithContactCounts() as $row) {
+        foreach ($this->getRepository()->getPublishedWithContactCounts(new \DateTime()) as $row) {
             /** @var Stage $stage */
             $stage                          = $row[0];
             $entities[]                     = $stage;
