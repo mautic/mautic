@@ -516,7 +516,24 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Deprecated method `Mautic\CoreBundle\Entity\CommonRepository::getPublishedByDateExpression()` removed. Use `getPublishedByDateOrmExpression()` for a `Doctrine\ORM\QueryBuilder` or `getPublishedByDateDbalExpression()` for a `Doctrine\DBAL\Query\QueryBuilder`; both take the same arguments.
 - Deprecated property `leadField` removed from `Mautic\FormBundle\Entity\Field` together with `getLeadField()` and `setLeadField()`. Use `mappedObject` and `mappedField` (`getMappedObject()`/`getMappedField()`) instead. The `lead_field` column is dropped from the `form_fields` table by a migration, which first copies any value not yet present in `mapped_field` (and the matching `mapped_object`). API impact: form fields in `/api/forms` responses no longer include `leadField`, and a `leadField` sent in a request is ignored - send `mappedObject` (`contact` or `company`) and `mappedField` instead. Custom form field templates must read `field.mappedField` instead of `field.leadField`.
 
-- Pull-right/right-align utilities are replaced by Bootstrap 5 float and text-alignment utilities; `.pull-right-xs`, `.pull-left-xs`, `.pull-right-sm`, `.pull-left-sm`, `.pull-right-md`, `.pull-left-md`, `.pull-right-lg`, `.pull-left-lg`, `.text-right-sm`, `.text-left-sm`, `.text-right-md`, `.text-left-md`, `.text-right-lg` and `.text-left-lg` have no direct equivalent in this table and must be updated in templates and custom themes.
+- Responsive float and text-alignment classes now use Bootstrap 5's mobile-first breakpoint names: `md` starts at 768px, `lg` at 992px and `xl` at 1200px. The old `xs` float classes apply only below 768px, so pair the base float class with `float-md-none`.
+    | Removed class | Bootstrap 5 replacement |
+    |---|---|
+    | `.pull-right-xs` | `.float-end .float-md-none` |
+    | `.pull-left-xs` | `.float-start .float-md-none` |
+    | `.pull-right-sm` | `.float-md-end` |
+    | `.pull-left-sm` | `.float-md-start` |
+    | `.pull-right-md` | `.float-lg-end` |
+    | `.pull-left-md` | `.float-lg-start` |
+    | `.pull-right-lg` | `.float-xl-end` |
+    | `.pull-left-lg` | `.float-xl-start` |
+    | `.text-right-sm` | `.text-md-end` |
+    | `.text-left-sm` | `.text-md-start` |
+    | `.text-right-md` | `.text-lg-end` |
+    | `.text-left-md` | `.text-lg-start` |
+    | `.text-right-lg` | `.text-xl-end` |
+    | `.text-left-lg` | `.text-xl-start` |
+
     | Removed class | Bootstrap class |
     |---|---|
     | `.bdr-a` | `.border` |
