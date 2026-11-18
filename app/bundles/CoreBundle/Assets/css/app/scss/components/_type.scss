@@ -67,16 +67,6 @@ $type-tokens: (
   }
 }
 
-// Contextual colors
-// -------------------------
-.text-white { @include text-emphasis-variants(#fff); }
-.text-success { @include text-emphasis-variants($brand-success); }
-.text-warning { @include text-emphasis-variants($brand-warning); }
-.text-danger { @include text-emphasis-variants($brand-danger); }
-.text-twitter { @include text-emphasis-variants($brand-twitter); }
-.text-facebook { @include text-emphasis-variants($brand-facebook); }
-.text-google { @include text-emphasis-variants($brand-google); }
-
 .help-block,
 .form-text {
   display: block;

@@ -16,15 +16,6 @@
   color: $color !important;
 }
 
-// Text emphasis
-// ------------------------
-@mixin text-emphasis-variants($color) {
-  color: $color;
-  a#{&}:hover {
-    color: darken($color, 10%);
-  }
-}
-
 // Switch size
 // ------------------------
 @mixin switch-size($height) {
