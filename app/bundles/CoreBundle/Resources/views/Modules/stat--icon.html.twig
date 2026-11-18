@@ -1,4 +1,4 @@
-<div class="grid grid-cols-4 gap-1 mb-12">
+<div class="grid grid-cols-{{ max(stats|length, 4) }} gap-1 mb-12">
     {% for stat in stats %}
     <div>
         {% set tileContent %}
