@@ -515,8 +515,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Deprecated method `Mautic\CoreBundle\Entity\CommonRepository::getPublishedByDateExpression()` removed. Use `getPublishedByDateOrmExpression()` for a `Doctrine\ORM\QueryBuilder` or `getPublishedByDateDbalExpression()` for a `Doctrine\DBAL\Query\QueryBuilder`; both take the same arguments.
 - Deprecated property `leadField` removed from `Mautic\FormBundle\Entity\Field` together with `getLeadField()` and `setLeadField()`. Use `mappedObject` and `mappedField` (`getMappedObject()`/`getMappedField()`) instead. The `lead_field` column is dropped from the `form_fields` table by a migration, which first copies any value not yet present in `mapped_field` (and the matching `mapped_object`). API impact: form fields in `/api/forms` responses no longer include `leadField`, and a `leadField` sent in a request is ignored - send `mappedObject` (`contact` or `company`) and `mappedField` instead. Custom form field templates must read `field.mappedField` instead of `field.leadField`.
 
-- Custom CSS utility classes removed in favour of Bootstrap 5 utilities. Replace them in your templates and custom themes:
-
+- Pull-right/right-align utilities are replaced by Bootstrap 5 float and text-alignment utilities; `.pull-right-xs`, `.pull-left-xs`, `.pull-right-sm`, `.pull-left-sm`, `.pull-right-md`, `.pull-left-md`, `.pull-right-lg`, `.pull-left-lg`, `.text-right-sm`, `.text-left-sm`, `.text-right-md`, `.text-left-md`, `.text-right-lg` and `.text-left-lg` have no direct equivalent in this table and must be updated in templates and custom themes.
     | Removed class | Bootstrap class |
     |---|---|
     | `.bdr-a` | `.border` |
@@ -538,7 +537,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `.va-b` | `.align-bottom` |
     | `.fs-1` | `.flex-shrink-1` |
 
-    Mautic sets the Bootstrap border colour to `--border-subtle`, so the Bootstrap border classes keep Mautic's colour. A theme that replaces that colour must set `--bs-border-color` itself.
+    Mautic maps Bootstrap border colours to `--border-subtle` in supported themes. If a custom theme replaces that colour, it must also set `--bs-border-color` to preserve the same border appearance.
 
     `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
 
