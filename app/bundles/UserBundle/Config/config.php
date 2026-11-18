@@ -23,6 +23,29 @@ return [
                 'iconClass' => 'ri-shield-user-line',
             ],
         ],
+        'profile' => [
+            'items' => [
+                'mautic.user.account.settings' => [
+                    'route'     => 'mautic_user_account',
+                    'iconClass' => 'ri-user-smile-line',
+                    'priority'  => 400,
+                ],
+                'mautic.user.profile.invite' => [
+                    'id'              => 'mautic_user_invite',
+                    'route'           => 'mautic_user_index',
+                    'routeParameters' => ['open' => 'invite'],
+                    'access'          => 'user:users:create',
+                    'iconClass'       => 'ri-team-line',
+                    'priority'        => 300,
+                ],
+                'mautic.user.auth.logout' => [
+                    'route'          => 'mautic_user_logout',
+                    'iconClass'      => 'ri-logout-circle-r-line',
+                    'priority'       => 200,
+                    'linkAttributes' => ['target' => '_self'],
+                ],
+            ],
+        ],
     ],
 
     'routes' => [
