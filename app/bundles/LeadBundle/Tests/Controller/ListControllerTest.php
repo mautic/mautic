@@ -74,23 +74,9 @@ final class ListControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString('MySeg', (string) $response->getContent());
-        // Make sure that contact grid is not loaded synchronously
         $this->assertStringNotContainsString('Kane', (string) $response->getContent());
         $this->assertStringNotContainsString('Jacques', (string) $response->getContent());
-        // Make sure the data-target-url is not an absolute URL
-        $this->assertStringContainsString(sprintf('data-target-url="/s/segment/view/%s/contact/1"', $segment->getId()), (string) $response->getContent());
-    }
-
-    public function testSegmentContactGrid(): void
-    {
-        $pageId   = 1;
-        $contacts = $this->createContacts();
-        $segment  = $this->addContactsToSegment($contacts, 'MySeg');
-        $this->client->request('GET', sprintf('/s/segment/view/%d/contact/%d', $segment->getId(), $pageId));
-        $response = $this->client->getResponse();
-        self::assertResponseIsSuccessful();
-        $this->assertStringContainsString('Kane', (string) $response->getContent());
-        $this->assertStringContainsString('Jacques', (string) $response->getContent());
+        $this->assertStringNotContainsString('contacts-container', (string) $response->getContent());
     }
 
     private function createList(string $suffix = 'A'): LeadList
