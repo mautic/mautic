@@ -136,6 +136,67 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('{"message":"Segment 9999 could not be found."}', $response->getContent());
     }
 
+    public function testInaccessibleChildrenAreOmittedAndInaccessibleRootsAreDenied(): void
+    {
+        $admin        = $this->getUserByUsername('admin');
+        $user         = $this->createUserWithPermissions(['lead:lists' => ['viewown']]);
+        $root         = $this->createOwnedSegment('Issue 17912 root '.uniqid(), $user);
+        $accessible    = $this->createOwnedSegment('Issue 17912 accessible '.uniqid(), $user);
+        $inaccessible = $this->createOwnedSegment('Issue 17912 inaccessible '.uniqid(), $admin);
+        $grandchild   = $this->createOwnedSegment('Issue 17912 grandchild '.uniqid(), $user);
+        $this->em->flush();
+
+        $root->setFilters([[
+            'type'       => 'leadlist',
+            'properties' => ['filter' => [$accessible->getId(), $inaccessible->getId()]],
+        ]]);
+        $accessible->setFilters([[
+            'type'       => 'leadlist',
+            'properties' => ['filter' => [$grandchild->getId()]],
+        ]]);
+        $this->em->flush();
+
+        $this->loginUser($user);
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getSegmentDependencyTree&id='.$root->getId());
+        self::assertResponseIsSuccessful();
+
+        $response = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $nodes    = array_merge(...array_map(static fn (array $level): array => $level['nodes'], $response['levels']));
+        $names    = array_column($nodes, 'name');
+
+        $this->assertContains($accessible->getName(), $names);
+        $this->assertContains($grandchild->getName(), $names);
+        $this->assertNotContains($inaccessible->getName(), $names);
+        $this->assertCount(3, $nodes);
+    }
+
+    public function testUnauthorizedRootIsRejected(): void
+    {
+        $admin = $this->getUserByUsername('admin');
+        $user  = $this->createUserWithPermissions(['lead:lists' => ['viewown']]);
+        $root  = $this->createOwnedSegment('Issue 17912 unauthorized root '.uniqid(), $admin);
+        $this->em->flush();
+
+        $this->loginUser($user);
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getSegmentDependencyTree&id='.$root->getId());
+        self::assertResponseStatusCodeSame(403);
+    }
+
+    public function testNonOwnerWithOtherListPermissionCanViewRoot(): void
+    {
+        $admin = $this->getUserByUsername('admin');
+        $user  = $this->createUserWithPermissions(['lead:lists' => ['viewother']]);
+        $root  = $this->createOwnedSegment('Issue 17912 other-owner root '.uniqid(), $admin);
+        $this->em->flush();
+
+        $this->loginUser($user);
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getSegmentDependencyTree&id='.$root->getId());
+        self::assertResponseIsSuccessful();
+
+        $response = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame($root->getName(), $response['levels'][0]['nodes'][0]['name']);
+    }
+
     public function testCompanyLookupWithNoCompanySelected(): void
     {
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=unicorn');
@@ -850,6 +911,53 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertArrayHasKey('viewParameters', $response);
         $this->assertStringContainsString('data-model="category.category"', (string) $response['viewParameters']['form']);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    /**
+     * @param array<string, array<int, string>> $permissions
+     */
+    private function createUserWithPermissions(array $permissions): User
+    {
+        $role = new Role();
+        $role->setName('Issue 17912 role '.uniqid());
+        $role->setIsAdmin(false);
+        self::getContainer()->get(RoleModel::class)->setRolePermissions($role, $permissions);
+        $this->em->persist($role);
+
+        $user = new User();
+        $user->setFirstName('Issue');
+        $user->setLastName('17912');
+        $user->setUsername('issue17912_'.uniqid());
+        $user->setEmail($user->getUsername().'@example.invalid');
+        $user->setRole($role);
+        $user->setPassword(self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user)->hash('mautic'));
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $user;
+    }
+
+    private function createOwnedSegment(string $name, User $owner): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName($name);
+        $segment->setPublicName($name);
+        $segment->setAlias(strtolower(str_replace(' ', '-', $name)));
+        $segment->setCreatedBy($owner);
+        $this->em->persist($segment);
+
+        return $segment;
+    }
+
+    private function getUserByUsername(string $username): User
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => $username]);
+        $this->assertInstanceOf(User::class, $user);
+
+        return $user;
     }
 
     /**
