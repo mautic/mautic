@@ -10,12 +10,6 @@
   background-color: var(--layer-translucent);
 }
 
-@mixin bg-color($bg-color, $color) {
-  background-color: $bg-color !important;
-  border-color: $bg-color !important;
-  color: $color !important;
-}
-
 // Text emphasis
 // ------------------------
 @mixin text-emphasis-variants($color) {

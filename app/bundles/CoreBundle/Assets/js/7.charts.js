@@ -485,8 +485,8 @@ Mautic.getChartData = function(element, action, query, callback) {
     var element = mQuery(element);
     var wrapper = element.closest('ul');
     var button  = mQuery('#time-scopes .button-label');
-    wrapper.find('a').removeClass('bg-primary');
-    element.addClass('bg-primary');
+    wrapper.find('a').removeClass('bg-primary text-on-color');
+    element.addClass('bg-primary text-on-color');
     button.text(element.text());
 
     // Append action
