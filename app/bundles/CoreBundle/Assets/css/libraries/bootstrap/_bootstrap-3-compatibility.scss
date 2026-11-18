@@ -1625,11 +1625,6 @@ dfn {
   font-style: italic;
 }
 
-h1 {
-  font-size: 2em;
-  margin: 0.67em 0;
-}
-
 mark {
   background: #ff0;
   color: #000;
@@ -1992,9 +1987,6 @@ h1, h2, h3, h4, h5, h6,
 h1, .h1,
 h2, .h2,
 h3, .h3 {
-  margin-top: $line-height-computed;
-  margin-bottom: ($line-height-computed * 0.5);
-
   small,
   .small {
     font-size: 65%;
@@ -2003,9 +1995,6 @@ h3, .h3 {
 h4, .h4,
 h5, .h5,
 h6, .h6 {
-  margin-top: ($line-height-computed * 0.5);
-  margin-bottom: ($line-height-computed * 0.5);
-
   small,
   .small {
     font-size: 75%;
