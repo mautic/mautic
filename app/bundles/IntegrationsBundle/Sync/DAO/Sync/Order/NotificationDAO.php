@@ -32,10 +32,7 @@ final readonly class NotificationDAO
         return $this->objectChangeDAO->getObject();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getIntegrationObjectId()
+    public function getIntegrationObjectId(): int|string|null
     {
         return $this->objectChangeDAO->getObjectId();
     }

@@ -17,12 +17,12 @@ final readonly class ContentExtension
     /**
      * Dispatch an event to collect custom content.
      *
-     * @param ?mixed              $context  Context of the content requested for the viewName
+     * @param ?string              $context  Context of the content requested for the viewName
      * @param array<string,mixed> $vars     twig vars
      * @param ?string             $viewName The main identifier for the content requested. Will be etracted from $vars if get_defined
      */
     #[AsTwigFunction(name: 'customContent', isSafe: ['all'])]
-    public function getCustomContent($context = null, array $vars = [], ?string $viewName = null): string
+    public function getCustomContent(?string $context = null, array $vars = [], ?string $viewName = null): string
     {
         return $this->contentHelper->getCustomContent($context, $vars, $viewName);
     }
