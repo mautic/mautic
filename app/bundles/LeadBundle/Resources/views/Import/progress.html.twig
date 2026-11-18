@@ -21,7 +21,6 @@ Variables
 {% block content %}
 {% set object = app.request.get('object', 'contacts') %}
 {% set objectName = objectName|trans %}
-{% set percent = progress.toPercent %}
 {% set id = complete ? 'leadImportProgressComplete' : 'leadImportProgress' %}
 {% set header = complete ? 'mautic.lead.import.success' : 'mautic.lead.import.donotleave' %}
 
@@ -69,13 +68,18 @@ Variables
         <div class="row">
             <div class="panel">
             <div class="panel-heading mt-12">
-                <div class="progress mt-24" style="height:4px;">
-                    <div class="progress-bar-import progress-bar {% if not complete %}active{% endif %} bg-{% if complete %}success{% endif %}"
-                        role="progressbar" aria-valuenow="{{ progress.done }}" aria-valuemin="0"
-                        aria-valuemax="{{ progress.total }}" style="width: {{ percent }}%; height: 4px;"><span
-                            class="visually-hidden">{{ percent }}%</span>
-                    </div>
-                </div>
+                {% include '@MauticCore/Components/progress-bar.html.twig' with {
+                    label: 'mautic.lead.import.leads'|trans({'%object%': objectName}),
+                    helperText: complete
+                        ? 'mautic.core.progress_bar.done'
+                        : (progress.done > 0 ? 'mautic.core.progress_bar.count'|trans({'%current%': progress.done, '%total%': progress.total}) : 'mautic.core.progress_bar.preparing'),
+                    size: 'small',
+                    value: progress.done > 0 ? progress.done : null,
+                    max: progress.total,
+                    status: complete ? 'finished' : 'active',
+                    id: 'contact-import-progress-bar',
+                    className: 'mt-24'
+                } %}
 
             </div>
             <div class="panel-body">
