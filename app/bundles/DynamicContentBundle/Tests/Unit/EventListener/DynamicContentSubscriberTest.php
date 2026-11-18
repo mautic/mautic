@@ -448,6 +448,96 @@ HTML;
         $this->subscriber->decodeTokens($event);
     }
 
+    public function testDecodeTokensDoesNotExpandNestedTokensInsideHrefAttributes(): void
+    {
+        $content = '<html><body><a href="{dwc=outer}">{dwc=inner}</a></body></html>';
+        $contact = new Lead();
+        $event   = $this->createMock(PageDisplayEvent::class);
+
+        $event->method('getLead')->willReturn($contact);
+        $event->method('getContent')->willReturn($content);
+
+        $this->dynamicContentHelper->expects($this->once())
+            ->method('findDwcTokens')
+            ->with($content, $contact)
+            ->willReturn([
+                '{dwc=outer}' => [
+                    'content' => '<p>{dwc=inner}</p>',
+                    'filters'  => [],
+                ],
+                '{dwc=inner}' => [
+                    'content' => '<img src=x onerror=alert(1)>',
+                    'filters'  => [],
+                ],
+            ]);
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->willReturnCallback(function (string $output): void {
+                $dom = new \DOMDocument();
+                $dom->loadHTML($output, LIBXML_NOERROR | LIBXML_NOWARNING);
+                $link = $dom->getElementsByTagName('a')->item(0);
+
+                $this->assertInstanceOf(\DOMElement::class, $link);
+                $this->assertFalse($link->hasAttribute('onerror'));
+                $this->assertSame('{dwc=inner}', trim($link->getAttribute('href')));
+            });
+
+        $this->subscriber->decodeTokens($event);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('opaqueReplacementProvider')]
+    public function testDecodeTokensPreservesOpaqueReplacements(array $tokens, array $expected, string $content): void
+    {
+        $contact = new Lead();
+        $event   = $this->createMock(PageDisplayEvent::class);
+
+        $event->method('getLead')->willReturn($contact);
+        $event->method('getContent')->willReturn($content);
+        $this->dynamicContentHelper->method('findDwcTokens')->willReturn($tokens);
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->willReturnCallback(function (string $output) use ($expected): void {
+                foreach ($expected as $value) {
+                    $this->assertStringContainsString($value, $output);
+                }
+            });
+
+        $this->subscriber->decodeTokens($event);
+    }
+
+    /**
+     * @return iterable<string, array{array<string, array{content: string, filters: array<mixed>}>, list<string>, string}>
+     */
+    public static function opaqueReplacementProvider(): iterable
+    {
+        yield 'UTF-8 text' => [
+            [
+                '{dwc=first}'  => ['content' => '<p>Привет, José</p>', 'filters' => []],
+                '{dwc=second}' => ['content' => '<p>second</p>', 'filters' => []],
+            ],
+            ['Привет, José'],
+            '<html><body>{dwc=first} {dwc=second}</body></html>',
+        ];
+        yield 'script body' => [
+            [
+                '{dwc=first}'  => ['content' => '<script>document.write("<div>visible</div>");</script>', 'filters' => []],
+                '{dwc=second}' => ['content' => '<p>second</p>', 'filters' => []],
+            ],
+            ['document.write("<div>visible</div>");', '<p>second</p>'],
+            '<html><body>{dwc=first} {dwc=second}</body></html>',
+        ];
+        yield 'placeholder-looking text is preserved' => [
+            [
+                '{dwc=first}'  => ['content' => '<p>__MAUTIC_DWC_REPLACEMENT_0__</p>', 'filters' => []],
+                '{dwc=second}' => ['content' => '<p>second</p>', 'filters' => []],
+            ],
+            ['__MAUTIC_DWC_REPLACEMENT_0__'],
+            '<html><body>{dwc=first} {dwc=second}</body></html>',
+        ];
+    }
+
     public function testOnTokenReplacement(): void
     {
         $content = <<< HTML
