@@ -88,9 +88,12 @@ final class Bootstrap5ComponentsCest
     public function initializesDynamicallyInsertedLegacyTooltipAttributes(\AcceptanceTester $tester): void
     {
         $tester->executeJS((string) file_get_contents(dirname(__DIR__, 2).'/app/bundles/CoreBundle/Assets/js/1.bootstrap-compatibility.js'));
-        $tester->executeJS('document.body.insertAdjacentHTML("beforeend", '.json_encode('<div id="dynamicLegacyEvent"><i id="legacyTooltipTrigger" data-toggle="tooltip" data-title="Plugin event help" data-placement="left"></i></div>').'); const container = document.querySelector("#dynamicLegacyEvent"); window.MauticBootstrapCompatibility.mirrorLegacyMarkup(container); container.querySelectorAll("[data-toggle=\'tooltip\']").forEach(element => bootstrap.Tooltip.getOrCreateInstance(element, {html: true, animation: false})); bootstrap.Tooltip.getInstance(document.querySelector("#legacyTooltipTrigger")).show();');
+        $tester->executeJS('document.body.insertAdjacentHTML("beforeend", '.json_encode('<div id="dynamicLegacyEvent"><i id="legacyTooltipTrigger" data-toggle="tooltip" data-title="Plugin event help" data-placement="left"></i><i id="autoLegacyTooltipTrigger" data-toggle="tooltip" data-title="Auto help" data-placement="auto left"></i></div>').'); const container = document.querySelector("#dynamicLegacyEvent"); window.MauticBootstrapCompatibility.mirrorLegacyMarkup(container); container.querySelectorAll("[data-toggle=\'tooltip\']").forEach(element => bootstrap.Tooltip.getOrCreateInstance(element, {html: true, animation: false})); bootstrap.Tooltip.getInstance(document.querySelector("#legacyTooltipTrigger")).show();');
         $tester->waitForJS('return document.querySelector(".tooltip-inner")?.textContent === "Plugin event help"', 5);
-        $tester->executeJS('bootstrap.Tooltip.getInstance(document.querySelector("#legacyTooltipTrigger")).dispose(); document.querySelector("#dynamicLegacyEvent").remove();');
+        $tester->executeJS('bootstrap.Tooltip.getInstance(document.querySelector("#legacyTooltipTrigger")).hide(); bootstrap.Tooltip.getOrCreateInstance(document.querySelector("#autoLegacyTooltipTrigger"), {animation: false}).show();');
+        $tester->waitForJS('return document.querySelector(".tooltip-inner")?.textContent === "Auto help"', 5);
+        $tester->assertSame('left', $tester->executeJS('return document.querySelector("#autoLegacyTooltipTrigger").getAttribute("data-bs-placement");'));
+        $tester->executeJS('bootstrap.Tooltip.getInstance(document.querySelector("#legacyTooltipTrigger")).dispose(); bootstrap.Tooltip.getInstance(document.querySelector("#autoLegacyTooltipTrigger")).dispose(); document.querySelector("#dynamicLegacyEvent").remove();');
     }
 
     public function usesNativeCollapseAndDropdownDataApis(\AcceptanceTester $tester): void
