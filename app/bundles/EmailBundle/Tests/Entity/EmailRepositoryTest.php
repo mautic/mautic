@@ -344,6 +344,31 @@ final class EmailRepositoryTest extends TestCase
         $this->assertContains('mautic.email.email.searchcommand.subject', $commands);
     }
 
+    public function testAddSearchCommandWhereClauseHandlesEmailTypeFilters(): void
+    {
+        $method = new \ReflectionMethod(EmailRepository::class, 'addSearchCommandWhereClause');
+
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'mautic.email.email.searchcommand.triggered', 'string' => '', 'not' => false, 'strict' => false];
+
+        [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
+
+        $this->assertStringStartsWith('e.emailType = :', (string) $expr);
+        $this->assertSame('template', array_values($params)[0]);
+
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'mautic.email.email.searchcommand.segment', 'string' => '', 'not' => false, 'strict' => false];
+
+        [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
+
+        $this->assertStringStartsWith('e.emailType = :', (string) $expr);
+        $this->assertSame('list', array_values($params)[0]);
+
+        $commands = $this->repo->getSearchCommands();
+        $this->assertContains('mautic.email.email.searchcommand.triggered', $commands);
+        $this->assertContains('mautic.email.email.searchcommand.segment', $commands);
+    }
+
     public function testAddSearchCommandWhereClauseHandlesNameFilter(): void
     {
         $qb     = $this->connection->createQueryBuilder();
