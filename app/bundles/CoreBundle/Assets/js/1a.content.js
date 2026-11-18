@@ -1709,6 +1709,8 @@ Mautic.getLiveSearchFilterValue = function (elId) {
  */
 Mautic.submitSearchScopeChange = function (scopeSelect, searchInput, searchId) {
     const command = scopeSelect.val() || '';
+    const clear = searchInput.closest('.form-field-with-action').find('.form-field-clear');
+    clear.prop('hidden', searchInput.val() === '' && !command);
     const inputValue = Mautic.normalizeSearchScopeInputValue(scopeSelect, searchInput.val());
     const scopedValue = Mautic.composeScopedSearchValue(command, inputValue);
 
