@@ -1,7 +1,7 @@
 // loading bar
 // -------------------------
 
-@include lh-keyframes(after-anim) {
+@keyframes after-anim {
   0% { width: 0%; left: 0%; }
   10% { width: 30%; left: 100%; }
   19.99% { width: 30%; left: 100%; }
@@ -19,7 +19,7 @@
   100% { width: 20%; left: 100%; }
 }
 
-@include lh-keyframes(before-anim) {
+@keyframes before-anim {
   0% { width: 60%; left: 0%; }
   19.99% { width: 40%; left: 100%; }
   20% { width: 0%; left: 0%; }
@@ -47,7 +47,7 @@
   height: 2px;
   background-color: lighten($brand-primary, 30%);
   overflow: hidden;
-  @include lh-transition(opacity 0.3s ease);
+  transition: opacity 0.3s ease;
 
   // the bar itself
   &:after,
@@ -60,17 +60,17 @@
   // active state
   &.active {
     opacity: 1;
-    @include lh-transition(opacity 0.3s ease);
+    transition: opacity 0.3s ease;
 
     &:after {
       left: 50%;
       width: 10%;
-      @include lh-animation(after-anim 2.5s infinite linear);
+      animation: after-anim 2.5s infinite linear;
     }
     &:before {
       left: 0%;
       width: 0%;
-      @include lh-animation(before-anim 2.5s infinite linear);
+      animation: before-anim 2.5s infinite linear;
     }
   }
 }

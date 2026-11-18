@@ -64,7 +64,7 @@ a.media {
           bottom: -200%;
           width: 1px;
           left: 50%;
-          @include lh-background-image(linear-gradient(top,  rgba(255,255,255,0) 0%, var(--layer) 5%, var(--layer) 90%, rgba(229,229,229,0) 100%));
+          background-image: linear-gradient(to bottom, rgba(255,255,255,0) 0%, var(--layer) 5%, var(--layer) 90%, rgba(229,229,229,0) 100%);
         }
 
         > .figure {
