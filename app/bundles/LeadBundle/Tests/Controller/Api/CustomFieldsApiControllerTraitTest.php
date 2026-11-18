@@ -65,10 +65,12 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
     }
 
     /**
+     * @param array<string, mixed> $sentParameters
+     * @param array<string, mixed> $formChildren
      * @param array<string, mixed> $expectedParameters
      */
-    #[DataProvider('sentValueProvider')]
-    public function testSetCustomFieldValuesFiltersValuesSentByTheClient(mixed $value, array $expectedParameters, string $alias = 'number_field'): void
+    #[DataProvider('parameterProvider')]
+    public function testSetCustomFieldValuesFiltersZeros(array $sentParameters, array $formChildren, array $expectedParameters): void
     {
         $model = new class() {
             /**
@@ -109,57 +111,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             }
         };
 
-        $controller->setCustomFieldValuesPublic(new Lead(), $this->createFormStub([]), [$alias => $value]);
-
-        $this->assertSame($expectedParameters, $model->parameters);
-    }
-
-    /**
-     * @param array<string, mixed> $expectedParameters
-     */
-    #[DataProvider('injectedValueProvider')]
-    public function testSetCustomFieldValuesDropsZeroInjectedByTheForm(mixed $value, array $expectedParameters): void
-    {
-        $model = new class() {
-            /**
-             * @var array<string, mixed>
-             */
-            public array $parameters = [];
-
-            /**
-             * @param array<string, mixed> $parameters
-             */
-            public function setFieldValues(Lead $lead, array $parameters, bool $overwriteWithBlank): void
-            {
-                $this->parameters = $parameters;
-            }
-        };
-
-        $controller = new class($model) {
-            use CustomFieldsApiControllerTrait;
-
-            private string $entityNameOne = 'lead';
-
-            public function __construct(
-                private object $model,
-            ) {
-            }
-
-            public function getModel(?string $name): object
-            {
-                return $this->model;
-            }
-
-            /**
-             * @param array<string, mixed> $parameters
-             */
-            public function setCustomFieldValuesPublic(Lead $lead, Form $form, array $parameters): void
-            {
-                $this->setCustomFieldValues($lead, $form, $parameters, true);
-            }
-        };
-
-        $controller->setCustomFieldValuesPublic(new Lead(), $this->createFormStub(['number_field' => $value]), []);
+        $controller->setCustomFieldValuesPublic(new Lead(), $this->createFormStub($formChildren), $sentParameters);
 
         $this->assertSame($expectedParameters, $model->parameters);
     }
@@ -185,39 +137,33 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
     }
 
     /**
-     * @return \Generator<string, array{0: mixed, 1: array<string, mixed>, 2?: string}>
+     * @return \Generator<string, array{array<string, mixed>, array<string, mixed>, array<string, mixed>}>
      */
-    public static function sentValueProvider(): \Generator
+    public static function parameterProvider(): \Generator
     {
-        yield 'positive fraction' => [0.5, ['number_field' => 0.5]];
-        yield 'positive fraction string' => ['0.5', ['number_field' => '0.5']];
-        yield 'negative fraction' => [-0.5, ['number_field' => -0.5]];
-        yield 'integer' => [5, ['number_field' => 5]];
-        yield 'integer string' => ['5', ['number_field' => '5']];
-        yield 'integer zero' => [0, ['number_field' => 0]];
-        yield 'float zero' => [0.0, ['number_field' => 0.0]];
-        yield 'zero string' => ['0', ['number_field' => '0']];
-        yield 'decimal zero string' => ['0.00', ['number_field' => '0.00']];
-        yield 'company integer zero' => [0, [], 'company'];
-        yield 'company float zero' => [0.0, [], 'company'];
-        yield 'company zero string' => ['0', [], 'company'];
-        yield 'company decimal zero string' => ['0.00', [], 'company'];
-        yield 'company name' => ['Acme', ['company' => 'Acme'], 'company'];
-    }
-
-    /**
-     * @return \Generator<string, array{mixed, array<string, mixed>}>
-     */
-    public static function injectedValueProvider(): \Generator
-    {
-        yield 'positive fraction' => [0.5, ['number_field' => 0.5]];
-        yield 'positive fraction string' => ['0.5', ['number_field' => '0.5']];
-        yield 'negative fraction' => [-0.5, ['number_field' => -0.5]];
-        yield 'integer' => [5, ['number_field' => 5]];
-        yield 'integer string' => ['5', ['number_field' => '5']];
-        yield 'integer zero' => [0, []];
-        yield 'float zero' => [0.0, []];
-        yield 'zero string' => ['0', []];
-        yield 'decimal zero string' => ['0.00', []];
+        yield 'sent positive fraction' => [['number_field' => 0.5], [], ['number_field' => 0.5]];
+        yield 'sent positive fraction string' => [['number_field' => '0.5'], [], ['number_field' => '0.5']];
+        yield 'sent negative fraction' => [['number_field' => -0.5], [], ['number_field' => -0.5]];
+        yield 'sent integer' => [['number_field' => 5], [], ['number_field' => 5]];
+        yield 'sent integer string' => [['number_field' => '5'], [], ['number_field' => '5']];
+        yield 'sent integer zero' => [['number_field' => 0], [], ['number_field' => 0]];
+        yield 'sent float zero' => [['number_field' => 0.0], [], ['number_field' => 0.0]];
+        yield 'sent zero string' => [['number_field' => '0'], [], ['number_field' => '0']];
+        yield 'sent decimal zero string' => [['number_field' => '0.00'], [], ['number_field' => '0.00']];
+        yield 'sent company integer zero' => [['company' => 0], [], []];
+        yield 'sent company float zero' => [['company' => 0.0], [], []];
+        yield 'sent company zero string' => [['company' => '0'], [], []];
+        yield 'sent company decimal zero string' => [['company' => '0.00'], [], []];
+        yield 'sent company name' => [['company' => 'Acme'], [], ['company' => 'Acme']];
+        yield 'sent numeric company name' => [['company' => '1'], [], ['company' => '1']];
+        yield 'injected positive fraction' => [[], ['number_field' => 0.5], ['number_field' => 0.5]];
+        yield 'injected positive fraction string' => [[], ['number_field' => '0.5'], ['number_field' => '0.5']];
+        yield 'injected negative fraction' => [[], ['number_field' => -0.5], ['number_field' => -0.5]];
+        yield 'injected integer' => [[], ['number_field' => 5], ['number_field' => 5]];
+        yield 'injected integer string' => [[], ['number_field' => '5'], ['number_field' => '5']];
+        yield 'injected integer zero' => [[], ['number_field' => 0], []];
+        yield 'injected float zero' => [[], ['number_field' => 0.0], []];
+        yield 'injected zero string' => [[], ['number_field' => '0'], []];
+        yield 'injected decimal zero string' => [[], ['number_field' => '0.00'], []];
     }
 }
