@@ -42,8 +42,8 @@ a.media {
   &.media-list-feed {
     position: relative;
     .media {
-      position: relative;
       overflow: visible;
+
       &:first-of-type > .media-object > .figure {
         background-color: var(--background-inverse);
         color: var(--text-inverse);
@@ -52,6 +52,7 @@ a.media {
         &:hover { background-color: var(--background-inverse-hover);}
       }
       > .media-object {
+        position: relative;
         width: 28px;
         text-align: center;
         margin-right: 20px;
@@ -59,11 +60,10 @@ a.media {
         &:before {
           content: '';
           position: absolute;
-          top: 0;
-          bottom: -15px;
+          top: -200%;
+          bottom: -200%;
           width: 1px;
-          left: 14px;
-          background-color: var(--border-subtle);
+          left: 50%;
         }
 
         > .figure {
@@ -91,13 +91,37 @@ a.media {
       }
       &:first-child {
         > .media-object {
-          &:before { top: 10px; }
+          &:before { top: 0; }
         }
       }
-      &:last-child {
-        > .media-object {
-          &:before { display: none; }
-        }
+    }
+  }
+}
+
+.dashboard-widgets .media-list.media-list-feed {
+  .media {
+    position: relative;
+
+    > .media-object {
+      position: static;
+
+      &:before {
+        top: 0;
+        bottom: -15px;
+        left: 14px;
+        background: var(--border-strong);
+      }
+    }
+
+    &:first-child {
+      > .media-object {
+        &:before { top: 10px; }
+      }
+    }
+
+    &:last-child {
+      > .media-object {
+        &:before { display: none; }
       }
     }
   }
