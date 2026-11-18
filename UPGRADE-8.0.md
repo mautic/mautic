@@ -109,7 +109,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD` | `InternalCompanyFullReportBuildEvent` |
     | `INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC` | `IntegrationToMauticSyncCompletedEvent` |
     | `INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION` | `MauticToIntegrationSyncCompletedEvent` |
-- Constants `WEBHOOK_PRE_SAVE`, `WEBHOOK_POST_SAVE`, `WEBHOOK_PRE_DELETE`, `WEBHOOK_POST_DELETE` and `WEBHOOK_KILL` removed from `Mautic\WebhookBundle\WebhookEvents`. These events are now dispatched by their own event class (all under `Mautic\WebhookBundle\Event`). They used to share one `WebhookEvent` object; `WebhookEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant. The save and delete events now use the generic `Mautic\CoreBundle\Event` lifecycle events, so subscribe e.g. `EntityPostSave::class => 'onWebhookSave'` and guard the entity type at the start of `onWebhookSave()`:
+- Constants `WEBHOOK_PRE_SAVE`, `WEBHOOK_POST_SAVE`, `WEBHOOK_PRE_DELETE`, `WEBHOOK_POST_DELETE` and `WEBHOOK_KILL` removed from `Mautic\WebhookBundle\WebhookEvents`. They used to share one `WebhookEvent` object; `WebhookEvent` is now `abstract`. The kill event is dispatched by its own subclass `Mautic\WebhookBundle\Event\WebhookKillEvent`, so subscribe to that class instead of the constant. The save and delete events now use the generic `Mautic\CoreBundle\Event` lifecycle events, so subscribe e.g. `EntityPostSave::class => 'onWebhookSave'` and guard the entity type at the start of `onWebhookSave()`:
 
     ```php
     $webhook = $event->getEntity();
