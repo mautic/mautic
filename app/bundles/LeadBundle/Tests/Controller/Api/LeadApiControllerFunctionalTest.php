@@ -19,6 +19,7 @@ use Mautic\EmailBundle\Entity\Stat as StatEmail;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadEventLog as ContactEventLog;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
@@ -1160,6 +1161,11 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertSame(3, $response['contacts'][0]['doNotContact'][0]['reason']);
+        $this->assertSame(1, $this->em->getRepository(ContactEventLog::class)->count([
+            'object' => 'dnc',
+            'lead'   => $contactId,
+            'action' => 'unsubscribed',
+        ]));
 
         // Batch update contact and remove DNC record
         $payload = [
@@ -1182,6 +1188,11 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertEmpty($response['contacts'][0]['doNotContact']);
+        $this->assertSame(1, $this->em->getRepository(ContactEventLog::class)->count([
+            'object' => 'dnc',
+            'lead'   => $contactId,
+            'action' => 'subscribed',
+        ]));
 
         // Remove contact
         $this->client->request(Request::METHOD_DELETE, "/api/contacts/{$contactId}/delete");
@@ -1261,6 +1272,11 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         // MANUAL (3) is the default value according to the dev docs: https://developer.mautic.org/#add-do-not-contact
         $this->assertSame(DoNotContact::MANUAL, $dncResponse['contact']['doNotContact'][0]['reason']);
         $this->assertSame($dncChannel, $dncResponse['contact']['doNotContact'][0]['channel']);
+        $this->assertSame(1, $this->em->getRepository(ContactEventLog::class)->count([
+            'object' => 'dnc',
+            'lead'   => $contactId,
+            'action' => 'unsubscribed',
+        ]));
 
         // Check DNC is recorded in the contact activity.
         $this->client->request('GET', "/api/contacts/{$contactId}/activity");
@@ -1281,6 +1297,11 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertArrayHasKey('contact', $dncRemoveResponse, $clientResponse->getContent());
         $this->assertSame([], $dncRemoveResponse['contact']['doNotContact']);
+        $this->assertSame(1, $this->em->getRepository(ContactEventLog::class)->count([
+            'object' => 'dnc',
+            'lead'   => $contactId,
+            'action' => 'subscribed',
+        ]));
 
         // Remove the contact.
         $this->client->request(Request::METHOD_DELETE, "/api/contacts/{$contactId}/delete");
