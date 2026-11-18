@@ -134,7 +134,10 @@
   z-index: 1;
 }
 
-.asset-preview:hover .asset-preview__label,
+.asset-preview:hover .asset-preview__label {
+  opacity: 0.5;
+}
+
 .asset-preview .asset-preview__label:has(a:focus) {
   opacity: 0.5;
 }
