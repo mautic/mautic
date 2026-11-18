@@ -66,7 +66,7 @@
                   {% else %}
                       {% set pluginTitle = item.name ~ ' - ' ~ item.display %}
                   {% endif %}
-                  <div class="shuffle shuffle-item m-12 float-start text-center integration plugin{{ item.plugin }} integration-{{ item.name }} {% if not item.enabled %}integration-disabled{% endif %}">
+                  <div class="shuffle shuffle-item grid m-12 float-start text-center integration plugin{{ item.plugin }} integration-{{ item.name }} {% if not item.enabled %}integration-disabled{% endif %}">
                       <div class="panel overflow-hidden p-12">
                           <a href="{{ path((item.isBundle ? 'mautic_plugin_info' : 'mautic_plugin_config'), {'name': item.name}) }}"
                              {% if item.isBundle %}data-footer="false"{% endif %}
