@@ -515,6 +515,33 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Deprecated method `Mautic\CoreBundle\Entity\CommonRepository::getPublishedByDateExpression()` removed. Use `getPublishedByDateOrmExpression()` for a `Doctrine\ORM\QueryBuilder` or `getPublishedByDateDbalExpression()` for a `Doctrine\DBAL\Query\QueryBuilder`; both take the same arguments.
 - Deprecated property `leadField` removed from `Mautic\FormBundle\Entity\Field` together with `getLeadField()` and `setLeadField()`. Use `mappedObject` and `mappedField` (`getMappedObject()`/`getMappedField()`) instead. The `lead_field` column is dropped from the `form_fields` table by a migration, which first copies any value not yet present in `mapped_field` (and the matching `mapped_object`). API impact: form fields in `/api/forms` responses no longer include `leadField`, and a `leadField` sent in a request is ignored - send `mappedObject` (`contact` or `company`) and `mappedField` instead. Custom form field templates must read `field.mappedField` instead of `field.leadField`.
 
+- Custom CSS utility classes removed in favour of Bootstrap 5 utilities. Replace them in your templates and custom themes:
+
+    | Removed class | Bootstrap class |
+    |---|---|
+    | `.bdr-a` | `.border` |
+    | `.bdr-w-0` | `.border-0` |
+    | `.bdr-l` | `.border-start` |
+    | `.bdr-r` | `.border-end` |
+    | `.bdr-t` | `.border-top` |
+    | `.bdr-b` | `.border-bottom` |
+    | `.bdr-l-wdh-0` | `.border-start-0` |
+    | `.bdr-r-wdh-0` | `.border-end-0` |
+    | `.bdr-t-wdh-0` | `.border-top-0` |
+    | `.bdr-b-wdh-0` | `.border-bottom-0` |
+    | `.bdr-rds-0` | `.rounded-0` |
+    | `.bdr-rds`, `.bdr-rds-sm`, `.bdr-rds-lg` | No direct equivalent. The radius comes from Mautic's theme, and in the default brand `.rounded-1` or `.rounded-3` would give a different radius. No callers in the repository. |
+    | `.bdr-rds-circle` | `.rounded-circle` |
+    | `.ovf-h` | `.overflow-hidden` |
+    | `.va-t` | `.align-top` |
+    | `.va-m` | `.align-middle` |
+    | `.va-b` | `.align-bottom` |
+    | `.fs-1` | `.flex-shrink-1` |
+
+    Mautic sets the Bootstrap border colour to `--border-subtle`, so the Bootstrap border classes keep Mautic's colour. A theme that replaces that colour must set `--bs-border-color` itself.
+
+    `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
+
 ## Changed code
 
 - `Mautic\NotificationBundle\Integration\OneSignalIntegration` now extends `Mautic\IntegrationsBundle\Integration\BasicIntegration` instead of the deprecated `Mautic\PluginBundle\Integration\AbstractIntegration`, so it is no longer an `AbstractIntegration`. Methods that only `AbstractIntegration` provides no longer exist on it, for example `getKeys()`, `getDecryptedApiKeys()`, `getFormSettings()` and `isCoreIntegration()`; it still has `getName()`, `getDisplayName()`, `getIcon()`, `getIntegrationSettings()` and `getSupportedFeatures()`. Load the integration with its API keys decrypted through the new `Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper` (`getIntegration()` / `getPublishedIntegration()`) instead of `Mautic\PluginBundle\Helper\IntegrationHelper::getIntegrationObject('OneSignal')` and `getKeys()` / `getDecryptedApiKeys()`.

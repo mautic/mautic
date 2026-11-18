@@ -175,7 +175,7 @@
                 <!-- start: tab-content -->
                 <div class="tab-content pa-16">
                     {% for group in groups %}
-                        <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ group }}">
+                        <div class="tab-pane fade {% if loop.first %}in active{% endif %} border-0" id="{{ group }}">
                             <div class="pe-16 ps-16 pb-16">
                                 <div class="panel shd-none mb-0">
                                     <table class="table table-hover mb-0">
@@ -225,14 +225,14 @@
                             </div>
                         </div>
                     {% endfor %}
-                        <div class="tab-pane fade bdr-w-0" id="devices">
+                        <div class="tab-pane fade border-0" id="devices">
                             {% if devices %}
                                 {{ include('@MauticLead/Lead/_devices.html.twig', {'devices': devices}) }}
                             {% else %}
                                 {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.devices'}) }}
                             {% endif %}
                         </div>
-                    <div class="tab-pane fade bdr-w-0" id="lead-stats" data-target-url="{{ path('mautic_contact_stats', {'objectId': lead.id}) }}">
+                    <div class="tab-pane fade border-0" id="lead-stats" data-target-url="{{ path('mautic_contact_stats', {'objectId': lead.id}) }}">
                         <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
                     </div>
                 </div>
@@ -335,20 +335,20 @@
             <!-- start: tab-content -->
             <div class="tab-content pa-16">
                 <!-- #history-container -->
-                <div class="tab-pane fade show active bdr-w-0" id="timeline-container">
+                <div class="tab-pane fade show active border-0" id="timeline-container">
                     {{ include('@MauticLead/Timeline/list.html.twig', {'events': events, 'lead': lead}) }}
                 </div>
                 <!--/ #history-container -->
 
                 <!-- #notes-container -->
-                <div class="tab-pane fade bdr-w-0" id="notes-container">
+                <div class="tab-pane fade border-0" id="notes-container">
                     {{ render(controller('Mautic\\LeadBundle\\Controller\\NoteController::indexAction', {'leadId': lead.id, 'ignoreAjax': 1})) }}
                 </div>
                 <!--/ #notes-container -->
 
                 <!-- #social-container -->
                 {% if not isAnonymous %}
-                    <div class="tab-pane fade bdr-w-0" id="social-container">
+                    <div class="tab-pane fade border-0" id="social-container">
                         {{ include('@MauticLead/Social/index.html.twig', {
                             'lead': lead,
                             'socialProfiles': socialProfiles,
@@ -359,7 +359,7 @@
                 <!--/ #social-container -->
 
                 <!-- #integration-container -->
-                <div class="tab-pane fade bdr-w-0" id="integration-container">
+                <div class="tab-pane fade border-0" id="integration-container">
                     {{ include('@MauticLead/Integration/index.html.twig', {
                         'lead': lead,
                         'integrations': integrations,
@@ -368,7 +368,7 @@
                 <!--/ #integration-container -->
 
                 <!-- #auditlog-container -->
-                <div class="tab-pane fade bdr-w-0" id="auditlog-container">
+                <div class="tab-pane fade border-0" id="auditlog-container">
                     {{ include('@MauticLead/Auditlog/_list.html.twig', {
                         'lead': lead,
                         'events': auditlog,
@@ -381,7 +381,7 @@
                 <!-- end: custom content -->
 
                 <!-- #place-container -->
-                    <div class="tab-pane fade bdr-w-0" id="place-container">
+                    <div class="tab-pane fade border-0" id="place-container">
                         {% if not places and not configGetParameter('ip_lookup_auth') %}
                             {{ include('@MauticCore/Helper/no_information.html.twig', {
                                 'tip': 'mautic.contact.noinformation.places'
@@ -398,9 +398,9 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bdr-l height-auto">
+    <div class="col-md-3 border-start height-auto">
         <!-- form HTML -->
-        <div class="panel shd-none rounded-0 bdr-w-0 mb-0">
+        <div class="panel shd-none rounded-0 border-0 mb-0">
             {% if not lead.isAnonymous %}
                 <div class="lead-avatar-panel">
                     <div class="avatar-collapser hr-expand nm">
@@ -493,7 +493,7 @@
 
         <hr class="hr-w-2" style="width:50%">
 
-        <div class="panel shd-none rounded-0 bdr-w-0">
+        <div class="panel shd-none rounded-0 border-0">
                 <div class="panel-heading">
                     <div class="panel-title">{{ 'mautic.lead.lead.upcoming.events'|trans }}</div>
                 </div>
