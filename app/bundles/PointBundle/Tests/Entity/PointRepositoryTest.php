@@ -22,9 +22,11 @@ final class PointRepositoryTest extends TestCase
         $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
-            'mautic.project.searchcommand.name'              => 'project',
-            'mautic.point.searchcommand.isrepeatable'        => 'is:repeatable',
+        $translator->method('trans')->willReturnCallback(fn (string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string => match ($id) {
+            'mautic.project.searchcommand.name'              => 'en_US' === $locale ? 'project' : 'projekt',
+            'mautic.point.searchcommand.isrepeatable'        => 'en_US' === $locale ? 'is:repeatable' : 'ist:wiederholbar',
+            'mautic.point.searchcommand.type_gain.filter'    => 'en_US' === $locale ? 'type:gain' : 'typ:gewinn',
+            'mautic.point.searchcommand.type_loss.filter'    => 'en_US' === $locale ? 'type:loss' : 'typ:verlust',
             default                                          => $id,
         });
         $repository->autowireCommonRepository($translator);
@@ -71,6 +73,49 @@ final class PointRepositoryTest extends TestCase
     public static function repeatableFilters(): iterable
     {
         yield 'repeatable' => ['is:repeatable', '', false, true, false];
+        yield 'localized repeatable' => ['ist:wiederholbar', '', false, true, false];
         yield 'negated repeatable' => ['is:repeatable', '', true, true, true];
+    }
+
+    #[DataProvider('deltaTypeFilters')]
+    public function testAddSearchCommandWhereClauseHandlesDeltaType(string $command, bool $not, string $expectedExpression): void
+    {
+        $repository = $this->getRepository();
+        $qb         = $this->connection->createQueryBuilder();
+        $filter     = (object) [
+            'command' => $command,
+            'string'  => '',
+            'not'     => $not,
+            'strict'  => false,
+        ];
+
+        $method = new \ReflectionMethod(PointRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($repository, $qb, $filter);
+
+        $this->assertSame($expectedExpression, (string) $expr);
+        $this->assertSame([], $params);
+    }
+
+    /**
+     * @return iterable<array{string,bool,string}>
+     */
+    public static function deltaTypeFilters(): iterable
+    {
+        yield 'gain' => ['type:gain', false, 'p.delta > 0'];
+        yield 'localized gain' => ['typ:gewinn', false, 'p.delta > 0'];
+        yield 'loss' => ['type:loss', false, 'p.delta < 0'];
+        yield 'localized loss' => ['typ:verlust', false, 'p.delta < 0'];
+        yield 'negated gain' => ['type:gain', true, 'p.delta <= 0'];
+        yield 'negated loss' => ['type:loss', true, 'p.delta >= 0'];
+    }
+
+    public function testCommandListIncludesTypeAndRepeatableOptions(): void
+    {
+        $commands = $this->getRepository()->getSearchCommands();
+
+        $this->assertContains('mautic.point.searchcommand.type_gain.filter', $commands);
+        $this->assertContains('mautic.point.searchcommand.type_loss.filter', $commands);
+        $this->assertContains('mautic.point.searchcommand.isrepeatable', $commands);
     }
 }
