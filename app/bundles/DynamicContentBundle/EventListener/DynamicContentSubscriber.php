@@ -276,23 +276,24 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
     private function replaceDwcTokensInContent(string $content, array $dwcTokens): string
     {
         foreach ($dwcTokens as $token => $data) {
-            $dwcContent = $data['content'];
+            $dwcContent   = $data['content'];
+            $encodedToken = str_replace(['{', '}'], ['%7B', '%7D'], $token);
 
             // For href/src: strip HTML tags and decode entities, then escape for attribute context
-            $plainContent = strip_tags($dwcContent);
-            $plainContent = html_entity_decode($plainContent, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $plainContent   = strip_tags($dwcContent);
+            $plainContent   = html_entity_decode($plainContent, ENT_QUOTES | ENT_HTML5, 'UTF-8');
             $escapedContent = htmlspecialchars($plainContent, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-            // Replace tokens ANYWHERE inside href/src attribute values with escaped plain text
-            // Pattern matches href="...{token}..." or src='...{token}...'
-            $content = preg_replace_callback(
-                '/((?:href|src|action)\s*=\s*)(["\'])([^"\']*'.preg_quote($token, '/').'[^"\']*)\2/i',
-                fn (array $matches): string => $matches[1].$matches[2].str_replace($token, $escapedContent, $matches[3]).$matches[2],
+            // Replace tokens (plain or URL-encoded) inside href/src/action attribute values with escaped plain text
+            $tokenPattern = '(?:'.preg_quote($token, '/').'|'.preg_quote($encodedToken, '/').')';
+            $content      = preg_replace_callback(
+                '/((?:href|src|action)\s*=\s*)(["\'])([^"\']*'.$tokenPattern.'[^"\']*)\2/i',
+                fn (array $matches): string => $matches[1].$matches[2].str_ireplace([$encodedToken, $token], $escapedContent, $matches[3]).$matches[2],
                 $content
             );
 
             // Replace remaining occurrences with full HTML content
-            $content = str_replace($token, $dwcContent, $content);
+            $content = str_ireplace([$encodedToken, $token], $dwcContent, $content);
         }
 
         return $content;
