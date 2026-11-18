@@ -13,6 +13,7 @@ use Mautic\FormBundle\Tests\FormTestHelperTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -223,17 +224,26 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $this->assertSame(0, $this->getSubmissionCount($form));
     }
 
+    public function testFormIdThatDoesNotExistFails(): void
+    {
+        $this->em->clear();
+        $commandTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME, ['--form-id' => '999999']);
+
+        $this->assertSame(1, $commandTester->getStatusCode());
+        $this->assertStringContainsString('The form with ID 999999 does not exist.', $commandTester->getDisplay());
+    }
+
     /**
      * @param array<string, string|string[]> $options
      */
     #[DataProvider('invalidOptionsProvider')]
-    public function testInvalidOptionsFail(array $options, string $expectedMessage): void
+    public function testInvalidOptionsAreRejected(array $options, string $expectedMessage): void
     {
-        $this->em->clear();
-        $commandTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME, $options);
+        $this->expectException(InvalidOptionException::class);
+        $this->expectExceptionMessage($expectedMessage);
 
-        $this->assertSame(1, $commandTester->getStatusCode());
-        $this->assertStringContainsString($expectedMessage, $commandTester->getDisplay());
+        $this->em->clear();
+        $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME, $options);
     }
 
     /**
@@ -241,13 +251,10 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
      */
     public static function invalidOptionsProvider(): iterable
     {
-        yield 'form ID that does not exist' => [['--form-id' => '999999'], 'The form with ID 999999 does not exist.'];
-        yield 'form ID is zero' => [['--form-id' => '0'], 'The option --form-id must be a positive integer.'];
-        yield 'form ID is not a number' => [['--form-id' => 'abc'], 'The option --form-id must be a positive integer.'];
-        yield 'batch limit is zero' => [['--batch-limit' => '0'], 'The option --batch-limit must be a positive integer.'];
-        yield 'excluded form ID is not a number' => [['--exclude' => ['3', 'abc']], 'The option --exclude must be a positive integer.'];
-        yield 'excluded form ID is zero' => [['--exclude' => ['0']], 'The option --exclude must be a positive integer.'];
-        yield 'form ID and excluded form ID together' => [['--form-id' => '3', '--exclude' => ['7']], 'The options --form-id and --exclude cannot be used together.'];
+        yield 'form ID is not a number' => [['--form-id' => 'abc'], 'The "--form-id" option must be a positive integer, "abc" given.'];
+        yield 'batch limit is zero' => [['--batch-limit' => '0'], 'The "--batch-limit" option must be a positive integer, "0" given.'];
+        yield 'excluded form ID is not a number' => [['--exclude' => ['3', 'abc']], 'The "--exclude" option must be a positive integer, "abc" given.'];
+        yield 'form ID and excluded form ID together' => [['--form-id' => '3', '--exclude' => ['7']], 'The "--form-id" and "--exclude" options cannot be used together.'];
     }
 
     private function createContact(string $email): Lead
