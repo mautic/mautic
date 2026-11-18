@@ -352,6 +352,35 @@ class MailHelperTest extends TestCase
         );
     }
 
+    public function testQueuedTokenizedFromDoesNotBreakReplyTo(): void
+    {
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($this->defaultParams));
+
+        $transport     = new BatchTransport();
+        $symfonyMailer = new Mailer($transport);
+
+        $mailer = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+
+        $email = new Email();
+        $email->setFromAddress('{contactfield=email}');
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+
+        $mailer->setEmail($email);
+        $mailer->enableQueue();
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $this->assertTrue($mailer->flushQueue([]));
+        $this->assertNotEmpty($transport->getMetadatas());
+        $this->assertNotContains('{contactfield=email}', $transport->getReplyToAddresses());
+        $this->assertSame(['nobody@nowhere.com'], array_unique($transport->getReplyToAddresses()));
+    }
+
     public function testMailAsOwnerWithEncodedCharactersInName(): void
     {
         $this->coreParametersHelper->method('get')
