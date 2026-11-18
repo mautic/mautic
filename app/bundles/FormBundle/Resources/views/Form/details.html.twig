@@ -133,7 +133,7 @@
             <!-- form detail collapseable -->
             <div class="collapse pe-16 ps-16" id="form-details">
                 <div class="pe-16 ps-16 pb-16">
-                    <div class="panel shd-none mb-0">
+                    <div class="panel shadow-none mb-0">
                         <table class="table table-hover mb-0">
                             <tbody>
                             {{ include('@MauticCore/Helper/details.html.twig', {'entity': activeForm}) }}
@@ -157,7 +157,7 @@
             <!--/ form detail collapseable toggler -->
 
             <!-- stats -->
-            <div class="pa-16">
+            <div class="p-16">
                 <div class="row">
                     <div class="col-sm-12">
                         {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
@@ -213,7 +213,7 @@
         </div>
 
         <!-- start: tab-content -->
-        <div class="tab-content pa-16">
+        <div class="tab-content p-16">
             {% if showActions %}
                 <!-- #actions-container -->
                 <div class="tab-pane active fade in border-0" id="actions-container">
@@ -282,7 +282,7 @@
     <!-- right section -->
     <div class="col-md-3 border-start height-auto">
         <!-- form HTML -->
-        <div class="pa-16">
+        <div class="p-16">
             {% set aboveFoldContent %}
                 <h4 class="fw-b mb-24">{{ 'mautic.form.form.header.copy'|trans }}</h4>
                 {% include '@MauticCore/Components/pictogram.html.twig' with {
@@ -332,7 +332,7 @@
         <!--/ form HTML -->
 
         <!-- preview URL -->
-        <div class="panel shd-none rounded-0 border-0 mt-12 mb-0">
+        <div class="panel shadow-none rounded-0 border-0 mt-12 mb-0">
             <div class="panel-heading">
                 <div class="panel-title">{{ 'mautic.form.form.preview'|trans }}</div>
             </div>
@@ -372,7 +372,7 @@
         <hr class="hr-w-2" style="width:50%">
 
         {# we can leverage data from audit_log table and build activity feed from it #}
-        <div class="panel shd-none rounded-0 border-0 mb-0">
+        <div class="panel shadow-none rounded-0 border-0 mb-0">
             <!-- recent activity -->
             {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
         </div>

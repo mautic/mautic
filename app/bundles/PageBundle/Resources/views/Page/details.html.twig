@@ -146,7 +146,7 @@
               <!-- page detail collapseable -->
               <div class="collapse pe-16 ps-16" id="page-details">
                   <div class="pe-16 ps-16 pb-16">
-                      <div class="panel shd-none mb-0">
+                      <div class="panel shadow-none mb-0">
                           <table class="table table-hover mb-0">
                               <tbody>
                                 {{ include('@MauticCore/Helper/details.html.twig', {'entity': activePage}, with_context=false) }}
@@ -170,7 +170,7 @@
               <!--/ page detail collapseable toggler -->
 
               <!-- some stats -->
-              <div class="pa-16">
+              <div class="p-16">
                   <div class="row">
                       <div class="col-sm-12">
                           <div class="panel">
@@ -218,7 +218,7 @@
 
           {% if showVariants or showTranslations %}
           <!-- start: tab-content -->
-          <div class="tab-content pa-16">
+          <div class="tab-content p-16">
               {% if showVariants %}
               <!-- #variants-container -->
               <div class="tab-pane active border-0" id="variants-container">
@@ -263,7 +263,7 @@
       <div class="col-md-3 border-start height-auto">
           <!-- preview URL -->
           {% if not activePage.isPreferenceCenter %}
-          <div class="panel shd-none rounded-0 border-0 mt-12 mb-0">
+          <div class="panel shadow-none rounded-0 border-0 mt-12 mb-0">
               <div class="panel-body pt-5">
                   {% include '@MauticCore/Components/card.html.twig' with {
                       type: 'link',
@@ -277,7 +277,7 @@
               </div>
           </div>
           {% endif %}
-          <div class="panel shd-none rounded-0 border-0 mt-12 mb-0">
+          <div class="panel shadow-none rounded-0 border-0 mt-12 mb-0">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.page.preview.url'|trans }}</div>
               </div>
@@ -348,7 +348,7 @@
               </div>
           </div>
           {% if draftPreviewUrl is not empty %}
-              <div class="panel bg-transparent shd-none rounded-0 border-0 mt-12 mb-0">
+              <div class="panel bg-transparent shadow-none rounded-0 border-0 mt-12 mb-0">
                   <div class="panel-heading">
                       <div class="panel-title">{{ 'mautic.email.draft.preview.url'|trans }}</div>
                   </div>

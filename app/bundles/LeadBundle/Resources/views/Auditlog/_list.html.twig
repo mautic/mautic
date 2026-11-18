@@ -5,7 +5,7 @@
 #}
 <!-- filter form -->
 <form method="post" action="{{ path('mautic_contact_auditlog_action', {'leadId': lead.id}) }}" class="panel" id="auditlog-filters">
-    <div class="form-control-icon pa-16">
+    <div class="form-control-icon p-16">
         <input type="text" class="form-control border-0" name="search" id="search" placeholder="{{ 'mautic.core.search.placeholder'|trans }}" value="{{ events['filters']['search']|e }}">
         <span class="the-icon ri-search-line text-secondary"></span>
     </div>

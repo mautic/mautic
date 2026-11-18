@@ -275,12 +275,12 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     <input type="hidden" name="_method" value="{{ method|escape }}" />
 {% endif %}
 {% if form.vars.errors|length > 0 %}
-<div class="has-error pa-12">
+<div class="has-error p-12">
     {{ form_errors(form) }}
 </div>
 {% endif %}
 {% if form.vars.help|length > 0 %}
-<div class="pa-12">
+<div class="p-12">
     {{ form_help(form) }}
 </div>
 {% endif %}

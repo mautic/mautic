@@ -37,23 +37,23 @@
                   </ul>
                   <!--/ tabs controls -->
 
-                  <div class="tab-content pa-16">
+                  <div class="tab-content p-16">
                       <div class="tab-pane fade show active border-0" id="details-container">
                           <div class="row">
                               <div class="col-md-6">
-                                  <div class="pa-16">
+                                  <div class="p-16">
                                       {{ form_row(form.name) }}
                                   </div>
                               </div>
                               <div class="col-md-6">
-                                  <div class="pa-16">
+                                  <div class="p-16">
                                       {{ form_row(form.source) }}
                                   </div>
                               </div>
                           </div>
                           <div class="row">
                               <div class="col-md-12">
-                                  <div class="pa-16">
+                                  <div class="p-16">
                                       {{ form_row(form.description) }}
                                   </div>
                               </div>
@@ -63,7 +63,7 @@
                       <div class="tab-pane fade border-0" id="data-container">
                           <div class="row">
                               <div class="col-md-6">
-                                  <div class="pa-16">
+                                  <div class="p-16">
                                       <h4><strong>{{ 'mautic.report.report.form.columnselector'|trans }}</strong></h4>
                                       {{ form_row(form.columns) }}
                                   </div>
@@ -77,7 +77,7 @@
                           </div>
                           <div class="row">
                               <div class="col-md-12">
-                                  <div class="pa-16">
+                                  <div class="p-16">
                                       <h4><strong>{{ 'mautic.core.filters'|trans }}</strong></h4>
                                       {{ form_row(form.filters) }}
                                   </div>
@@ -90,13 +90,13 @@
                           </div>
                           <div class="row">
                               <div class="col-md-6">
-                                  <div class="pa-16">
+                                  <div class="p-16">
                                       <h4><strong>{{ 'mautic.report.form.groupby'|trans }}</strong></h4>
                                       {{ form_row(form.groupBy) }}
                                   </div>
                               </div>
                               <div class="col-md-6">
-                                  <div class="pa-16">
+                                  <div class="p-16">
                                       <h4><strong>{{ 'mautic.core.calculated.fields'|trans }}</strong></h4>
                                       {{ form_row(form.aggregators) }}
                                   </div>
@@ -106,7 +106,7 @@
                       <div class="tab-pane fade border-0 {% if not showGraphTab %}hide{% endif %}" id="graphs-container">
                           <div class="row">
                               <div class="col-md-6">
-                                  <div class="pa-16">
+                                  <div class="p-16">
                                       {{ form_row(form.vars.form.children.settings.showGraphsAboveTable) }}
                                       {{ form_row(form.graphs) }}
                                   </div>

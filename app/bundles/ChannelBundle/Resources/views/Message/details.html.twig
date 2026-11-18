@@ -49,7 +49,7 @@
                 <!-- form detail collapseable -->
                 <div class="collapse pe-16 ps-16" id="focus-details">
                     <div class="pe-16 ps-16 pb-16">
-                        <div class="panel shd-none mb-0">
+                        <div class="panel shadow-none mb-0">
                             <table class="table table-hover mb-0">
                                 <tbody>
                                 {{- include('@MauticCore/Helper/details.html.twig', {'entity' : item}) -}}
@@ -70,7 +70,7 @@
                         </span>
                 </div>
                 <!-- stats -->
-                <div class="pa-16">
+                <div class="p-16">
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="panel">
@@ -111,7 +111,7 @@
             </div>
 
             <!-- start: tab-content -->
-            <div class="tab-content pa-16">
+            <div class="tab-content p-16">
             {% set active = ' active in' %}
                 {% for channel, contacts in messagedLeads %}
                 <div class="tab-pane border-0 page-list{{ active }}" id="contacts-{{ channel }}">

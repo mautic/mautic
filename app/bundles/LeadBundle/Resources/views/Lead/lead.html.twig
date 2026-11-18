@@ -173,11 +173,11 @@
                 </ul>
 
                 <!-- start: tab-content -->
-                <div class="tab-content pa-16">
+                <div class="tab-content p-16">
                     {% for group in groups %}
                         <div class="tab-pane fade {% if loop.first %}in active{% endif %} border-0" id="{{ group }}">
                             <div class="pe-16 ps-16 pb-16">
-                                <div class="panel shd-none mb-0">
+                                <div class="panel shadow-none mb-0">
                                     <table class="table table-hover mb-0">
                                         <tbody>
                                         {% if 'core' == group %}
@@ -253,7 +253,7 @@
             <!--/ lead detail collapseable toggler -->
 
             {% if not isAnonymous %}
-                <div class="pa-16">
+                <div class="p-16">
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="panel">
@@ -265,7 +265,7 @@
                                         <h3 class="text-white dark-sm"><span class="ri-eye-line"></span></h3>
                                     </div>
                                 </div>
-                                <div class="d-flex flex-column pt-0 ps-15 pb-15 pe-15 min-h-256">
+                                <div class="d-flex flex-column pt-0 ps-15 pb-16 pe-15 min-h-256">
                                     {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': engagementData, 'chartType': 'line', 'chartHeight': 250}) }}
                                 </div>
                             </div>
@@ -275,9 +275,9 @@
             {% endif %}
         </div>
 
-        <div class="pa-16">
+        <div class="p-16">
             <!-- tabs controls -->
-            <ul class="nav nav-tabs nav-tabs-contained mt-10">
+            <ul class="nav nav-tabs nav-tabs-contained mt-8">
                 <li class="active">
                     <a href="#timeline-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">
                         <span size="sm" class="label label-primary me-12" id="TimelineCount">
@@ -333,7 +333,7 @@
             <!--/ tabs controls -->
 
             <!-- start: tab-content -->
-            <div class="tab-content pa-16">
+            <div class="tab-content p-16">
                 <!-- #history-container -->
                 <div class="tab-pane fade show active border-0" id="timeline-container">
                     {{ include('@MauticLead/Timeline/list.html.twig', {'events': events, 'lead': lead}) }}
@@ -400,7 +400,7 @@
     <!-- right section -->
     <div class="col-md-3 border-start height-auto">
         <!-- form HTML -->
-        <div class="panel shd-none rounded-0 border-0 mb-0">
+        <div class="panel shadow-none rounded-0 border-0 mb-0">
             {% if not lead.isAnonymous %}
                 <div class="lead-avatar-panel">
                     <div class="avatar-collapser hr-expand nm">
@@ -493,7 +493,7 @@
 
         <hr class="hr-w-2" style="width:50%">
 
-        <div class="panel shd-none rounded-0 border-0">
+        <div class="panel shadow-none rounded-0 border-0">
                 <div class="panel-heading">
                     <div class="panel-title">{{ 'mautic.lead.lead.upcoming.events'|trans }}</div>
                 </div>
@@ -536,7 +536,7 @@
                 {% endif %}
             </div>
 
-        <div class="pa-12">
+        <div class="p-12">
             
             {% set maxVisibleTagsCount = 8 %}
             {% set tagCount = lead.tags|length %}
@@ -554,7 +554,7 @@
                 {% set tagContent %}
                     {{ tagHeader }}
                     
-                    <div class="d-flex flex-wrap gap-xs mt-5">
+                    <div class="d-flex flex-wrap gap-5 mt-5">
                         {% if tagCount > 0 %}
                             {% for tag in lead.tags %}
                                 {{ _self.render_tag(tag, lead.id) }}
@@ -580,7 +580,7 @@
                 {% set aboveContent %}
                     {{ tagHeader }}
                     
-                    <div class="d-flex flex-wrap gap-xs">
+                    <div class="d-flex flex-wrap gap-5">
                         {% for tag in firstEightTags %}
                             {{ _self.render_tag(tag, lead.id) }}
                         {% endfor %}
@@ -588,7 +588,7 @@
                 {% endset %}
                 
                 {% set belowContent %}
-                    <div class="d-flex flex-wrap gap-xs mt-5">
+                    <div class="d-flex flex-wrap gap-5 mt-5">
                         {% for tag in remainingTags %}
                             {{ _self.render_tag(tag, lead.id) }}
                         {% endfor %}
@@ -604,7 +604,7 @@
             {% endif %}
         </div>
 
-        <div class="pa-12 panel-companies">
+        <div class="p-12 panel-companies">
             {% set maxVisibleCompaniesCount = 8 %}
             {% set companyCount = companies is defined ? companies|length : 0 %}
             {% set companyClasses = ['gray', 'red', 'magenta', 'purple', 'blue', 'cyan', 'teal', 'green'] %}
@@ -620,7 +620,7 @@
                 {% if companyCount <= maxVisibleCompaniesCount %}
                     {% set content %}
                         {{ companyHeader }}
-                        <div class="d-flex flex-wrap gap-xs">
+                        <div class="d-flex flex-wrap gap-5">
                             {% for company in companies %}
                                 {{ _self.render_company(company, lead.id, cycle(companyClasses, loop.index0)) }}
                             {% endfor %}
@@ -631,7 +631,7 @@
                 {% else %}
                     {% set aboveContent %}
                         {{ companyHeader }}
-                        <div class="d-flex flex-wrap gap-xs">
+                        <div class="d-flex flex-wrap gap-5">
                             {% for company in companies|slice(0, maxVisibleCompaniesCount) %}
                                 {{ _self.render_company(company, lead.id, cycle(companyClasses, loop.index0)) }}
                             {% endfor %}
@@ -639,7 +639,7 @@
                     {% endset %}
 
                     {% set belowContent %}
-                        <div class="d-flex flex-wrap gap-xs mt-5">
+                        <div class="d-flex flex-wrap gap-5 mt-5">
                             {% for company in companies|slice(maxVisibleCompaniesCount) %}
                                 {{ _self.render_company(company, lead.id, cycle(companyClasses, loop.index0 + maxVisibleCompaniesCount)) }}
                             {% endfor %}
@@ -662,7 +662,7 @@
                 {% include '@MauticCore/Components/tile.html.twig' with {'type': 'base', 'content': content} %}
             {% endif %}
         </div>
-        <div class="pa-12">
+        <div class="p-12">
             {% if lists[lead.id] is defined and lists[lead.id]|length > 0 %}
                 {% set segments = lists[lead.id] %}
                 {% set classes = ['gray', 'red', 'magenta', 'purple', 'blue', 'cyan', 'teal', 'green'] %}
@@ -673,7 +673,7 @@
                             <span class="fw-b ellipsis mb-16">{{ 'mautic.lead.lead.lists'|trans }}</span>
                             <i class="ri-pie-chart-line" aria-hidden="true"></i>
                         </div>
-                        <div class="d-flex flex-wrap gap-xs">
+                        <div class="d-flex flex-wrap gap-5">
                             {% for key, list in segments %}
                                 {% set tag = {
                                     'label': list.name|purify,
@@ -695,7 +695,7 @@
                             <span class="fw-b ellipsis mb-16">{{ 'mautic.lead.lead.lists'|trans }}</span>
                             <i class="ri-pie-chart-line" aria-hidden="true"></i>
                         </div>
-                        <div class="d-flex flex-wrap gap-xs">
+                        <div class="d-flex flex-wrap gap-5">
                             {% for key, list in segments|slice(0, 8) %}
                                 {% set tag = {
                                     'label': list.name|purify,
@@ -711,7 +711,7 @@
                     {% endset %}
                     
                     {% set belowContent %}
-                        <div class="d-flex flex-wrap gap-xs mt-5">
+                        <div class="d-flex flex-wrap gap-5 mt-5">
                         {% for key, list in segments|slice(8) %}
                             {% set tag = {
                                 'label': list.name|purify,
@@ -756,7 +756,7 @@
 
 {% macro render_company(company, leadId, color) %}
     {% set companyName = htmlEntityDecode(company.companyname) %}
-    <div data-company-id="{{ company.id }}" class="d-flex align-items-center gap-xs">
+    <div data-company-id="{{ company.id }}" class="d-flex align-items-center gap-5">
         <a id="company-{{ company.id }}" class="label label-{{ color }}" href="{{ path('mautic_company_action', {'objectAction': 'view', 'objectId': company.id}) }}" data-toggle="ajax">
             {% if company.is_primary == 1 %}
                 <i class="ri-user-star-fill company-primary-icon primary" aria-hidden="true" focusable="false"></i>

@@ -102,7 +102,7 @@
             <!-- sms detail collapseable toggler -->
             <div class="collapse pe-16 ps-16" id="sms-details">
                 <div class="pe-16 ps-16 pb-16">
-                    <div class="panel shd-none mb-0">
+                    <div class="panel shadow-none mb-0">
                         <table class="table table-hover mb-0">
                             <tbody>
                                 {{- include('@MauticCore/Helper/details.html.twig', {'entity' : sms}) -}}
@@ -132,7 +132,7 @@
                 </span>
             </div>
             <!-- some stats -->
-            <div class="pa-16">
+            <div class="p-16">
                 <div class="row">
                     <div class="col-sm-12">
                         {% if security.isGranted('lead:leads:viewown') %}
@@ -195,7 +195,7 @@
         </div>
 
         <!-- start: tab-content -->
-        <div class="tab-content pa-16">
+        <div class="tab-content p-16">
             <div class="tab-pane active border-0" id="clicks-container">
                 {{- include('@MauticPage/Trackable/click_counts.html.twig', {
                     'trackables' : trackables,

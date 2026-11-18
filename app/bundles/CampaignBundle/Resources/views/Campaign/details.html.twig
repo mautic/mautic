@@ -81,7 +81,7 @@
             <!-- campaign detail collapseable -->
             <div class="collapse pe-16 ps-16" id="campaign-details">
                 <div class="pe-16 ps-16 pb-16">
-                    <div class="panel shd-none mb-0">
+                    <div class="panel shadow-none mb-0">
                         <table class="table table-hover mb-0">
                             <tbody>
                             <tr>
@@ -137,7 +137,7 @@
 
             {{ customContent('left.section.top', _context) }}
             {% if securityIsGranted('lead:leads:viewown') %}
-                <div class="pa-16">
+                <div class="p-16">
                     <div class="row">
                         <div class="col-sm-12">
                             {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
@@ -184,7 +184,7 @@
                     }) }}
                 </div>
             </div>
-            <div class="stats-menu__content tab-content pa-16 mb-24 shd-sm">
+            <div class="stats-menu__content tab-content p-16 mb-24 shd-sm">
                 <div class="tab-pane active border-0" id="stats-container">
                     <div id="campaign-graph-div" data-target-url="{{ path('mautic_campaign_graph', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
                         <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
@@ -261,7 +261,7 @@
         </div>
 
         <!-- start: tab-content -->
-        <div class="tab-content pa-16" id="campaign-tab-content"
+        <div class="tab-content p-16" id="campaign-tab-content"
              data-event-target-url="{{ path('mautic_campaign_event_stats', {'objectId' : campaign.id, 'dateFromValue' : dateFrom|date('Y-m-d'), 'dateToValue' : dateTo|date('Y-m-d')}) }}">
             <!-- #events-container -->
                 <div class="active tab-pane fade in border-0" id="preview-container">
