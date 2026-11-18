@@ -20,7 +20,7 @@
     ) %}
     {% set id = hasErrors ? 'campaignImportError' : 'campaignImportSuccess' %}
 
-    <div class="row ma-lg" id="{{ id }}">
+    <div class="row ma-24" id="{{ id }}">
         <div class="col-sm-offset-3 col-sm-6 text-center">
             <div class="panel panel-{% if hasErrors %}danger{% elseif isComplete %}success{% else %}info{% endif %}">
                 <div class="panel-heading text-center">
@@ -86,7 +86,7 @@
                                 {% endif %}
                             {% endfor %}
 
-                            <div class="justify-content-center gap-3 mt-md">
+                            <div class="justify-content-center gap-3 mt-16">
                                 {{ include('@MauticCore/Helper/confirm.html.twig', {
                                     'btnClass': 'btn btn-danger btn-nospin',
                                     'message': 'mautic.campaign.campaign.import.cancelmessage'|trans,
@@ -109,7 +109,7 @@
                         {% for group in importSummary %}
                             {% if group.update is defined and 'email' in group.update|keys %}
                                 {% set emailName = group.update['email'].names[0] %}
-                                <h4 class="text-info pa-sm">
+                                <h4 class="text-info pa-12">
                                     {{ 'mautic.campaign.campaign.import.email_notice'|trans({'%emailName%': emailName}) }}
                                 </h4>
                             {% endif %}

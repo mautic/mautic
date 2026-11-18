@@ -1,0 +1,102 @@
+{% set name = name|default('input') %}
+{% set type = type|default('text') %}
+{% set id = id|default(name|replace({'[': '-', ']': '', ' ': '-', '.': '-'})) %}
+{% set label = label|default(null) %}
+{% set labelPosition = labelPosition|default('top') %}
+{% set value = value is defined ? value : null %}
+{% set placeholder = placeholder|default(null) %}
+{% set helpText = helpText|default(null) %}
+{% set help_id = help_id|default(helpText ? id ~ '-help' : null) %}
+{% set feedback_id = feedback_id|default(id ~ '-feedback') %}
+{% set render_feedback = render_feedback is defined ? render_feedback : true %}
+{% set rows = rows|default(3) %}
+{% set size = size|default(null) %}
+{% set plaintext = plaintext|default(false) %}
+{% set disabled = disabled|default(false) %}
+{% set readonly = readonly|default(false) %}
+{% set required = required|default(false) %}
+{% set input_class = plaintext ? 'form-control-plaintext' : 'form-control' %}
+{% set describedby = describedby|default([]) %}
+{% set attributes = attributes|default({}) %}
+{% set common_label_html %}
+    {% if label %}
+    <label for="{{ id }}" class="form-label type-label-01">
+        {% if icon is defined and icon is not empty %}
+        <i class="{{ icon }} me-4" aria-hidden="true"></i>
+        {% endif %}
+        {{ required ? 'mautic.core.forms.field.required'|trans({'%fieldLabel%': label|trans}) : label|trans }}
+    </label>
+    {% endif %}
+{% endset %}
+
+{% if size in ['sm', 'lg'] %}
+    {% set input_class = input_class ~ ' ' ~ (plaintext ? '' : 'form-control-' ~ size) %}
+{% endif %}
+
+{% if attributes.class is defined %}
+    {% set input_class = input_class ~ ' ' ~ attributes.class %}
+{% endif %}
+
+{% if help_id %}
+    {% set describedby = describedby|merge([help_id]) %}
+{% endif %}
+
+{% if wrapperClass is defined and wrapperClass is not empty %}
+<div class="{{ wrapperClass }}">
+{% endif %}
+
+    {% if labelPosition == 'top' %}
+        {{ common_label_html }}
+    {% endif %}
+
+    {% if type == 'textarea' %}
+        <textarea
+            class="{{ input_class|trim }}"
+            id="{{ id }}"
+            name="{{ name }}"
+            {% if placeholder is defined and placeholder is not empty %}placeholder="{{ placeholder|trans }}"{% endif %}
+            {% if describedby is not empty %}aria-describedby="{{ describedby|join(' ') }}"{% endif %}
+            {% if not plaintext %}rows="{{ rows }}"{% endif %}
+            {% if disabled %}disabled{% endif %}
+            {% if readonly %}readonly{% endif %}
+            {% if required %}required{% endif %}
+            {% for attribute, attribute_value in attributes %}
+                {% if attribute != 'class' %}
+                    {{ attribute }}="{{ attribute_value }}"
+                {% endif %}
+            {% endfor %}
+        >{{ value }}</textarea>
+    {% else %}
+        <input
+            type="{{ type }}"
+            class="{{ input_class|trim }}"
+            id="{{ id }}"
+            name="{{ name }}"
+            {% if value is not same as(null) %}value="{{ value|e('html_attr') }}"{% endif %}
+            {% if placeholder is defined and placeholder is not empty %}placeholder="{{ placeholder|trans }}"{% endif %}
+            {% if describedby is not empty %}aria-describedby="{{ describedby|join(' ') }}"{% endif %}
+            {% if disabled %}disabled{% endif %}
+            {% if readonly %}readonly{% endif %}
+            {% if required %}required{% endif %}
+            {% for attribute, attribute_value in attributes %}
+                {% if attribute != 'class' %}
+                    {{ attribute }}="{{ attribute_value }}"
+                {% endif %}
+            {% endfor %}
+        >
+    {% endif %}
+
+    {% if labelPosition == 'bottom' %}
+        {{ common_label_html }}
+    {% endif %}
+
+    {% if helpText %}
+        <div id="{{ help_id }}" class="form-text">{{ helpText|trans }}</div>
+    {% endif %}
+
+    {% if render_feedback %}
+        <div id="{{ feedback_id }}" class="invalid-feedback" hidden aria-live="polite"></div>
+    {% endif %}
+{% if wrapperClass is defined and wrapperClass is not empty %}
+</div>
+{% endif %}

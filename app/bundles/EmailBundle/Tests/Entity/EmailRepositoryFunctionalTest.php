@@ -202,6 +202,45 @@ final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectedLeadIds, $actualLeadIds);
     }
 
+    public function testGetBatchMaxContactId(): void
+    {
+        // create some leads
+        $leadOne   = $this->createLead('one');
+        $leadTwo   = $this->createLead('two');
+        $leadThree = $this->createLead('three');
+        $leadFour  = $this->createLead('four');
+        $leadFive  = $this->createLead('five');
+        $leadSix   = $this->createLead('six');
+
+        // add some leads in lists for inclusion
+        $sourceListOne  = $this->createLeadList('Source One', $leadOne, $leadTwo, $leadThree);
+        $sourceListTwo  = $this->createLeadList('Source Two', $leadOne, $leadTwo, $leadFour, $leadFive, $leadSix);
+
+        // create an email with included/excluded lists
+        $email = new Email();
+        $email->setName('Email');
+        $email->setSubject('Subject');
+        $email->setEmailType('list');
+        $email->addList($sourceListOne);
+        $email->addList($sourceListTwo);
+        $this->em->persist($email);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $minId      = 0;
+        $batchSize  = 3;
+        $iterations = 0;
+
+        while ($minId !== ($maxId = $this->emailRepository->getBatchMaxContactId($email, $minId, $batchSize))) {
+            $minId = $maxId;
+            ++$iterations;
+        }
+
+        $this->assertSame(3, $iterations, 'No more than 3 iterations should be run.');
+        $this->assertSame((string) $leadSix->getId(), (string) $maxId, 'The ID of the last inserted lead should be returned.');
+    }
+
     /**
      * @throws ORMException
      */

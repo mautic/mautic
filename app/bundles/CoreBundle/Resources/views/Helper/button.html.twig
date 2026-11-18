@@ -55,7 +55,7 @@
 
     {% if button.icon_only is defined and button.icon_only %}
         {% set tooltip_placement = button.tooltip_placement is defined ? button.tooltip_placement : 'top' %}
-        {% set icon_attributes = ' data-toggle="tooltip" title="' ~ button.label|trans ~ '" data-placement="' ~ tooltip_placement ~ '"' %}
+        {% set icon_attributes = ' data-bs-toggle="tooltip" title="' ~ button.label|trans ~ '" data-bs-placement="' ~ tooltip_placement ~ '"' %}
     {% else %}
         {% set icon_attributes = '' %}
     {% endif %}

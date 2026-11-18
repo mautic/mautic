@@ -36,6 +36,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\MailboxListHeader;
@@ -1636,11 +1637,11 @@ final class MailHelperTest extends TestCase
         $this->assertTrue($mailer->send());
 
         $returnPath = $transport->sentMessage->getReturnPath();
-        $this->assertInstanceOf(\Symfony\Component\Mime\Address::class, $returnPath, 'Return-Path should be set to the VERP bounce address.');
+        $this->assertInstanceOf(Address::class, $returnPath, 'Return-Path should be set to the VERP bounce address.');
         $this->assertSame('bounces+bounce_abc123@example.com', $returnPath->getAddress());
 
         $this->assertNotInstanceOf(
-            \Symfony\Component\Mime\Address::class,
+            Address::class,
             $transport->sentMessage->getSender(),
             'Sender header must be removed when a VERP Return-Path is configured; otherwise Symfony Mailer routes the SMTP envelope to From instead of Return-Path.'
         );
@@ -1665,9 +1666,9 @@ final class MailHelperTest extends TestCase
         $this->assertTrue($mailer->send());
 
         $returnPath = $transport->sentMessage->getReturnPath();
-        $this->assertInstanceOf(\Symfony\Component\Mime\Address::class, $returnPath);
+        $this->assertInstanceOf(Address::class, $returnPath);
         $this->assertSame('bounce@example.org', $returnPath->getAddress());
-        $this->assertNotInstanceOf(\Symfony\Component\Mime\Address::class, $transport->sentMessage->getSender());
+        $this->assertNotInstanceOf(Address::class, $transport->sentMessage->getSender());
     }
 
     public function testSenderHeaderAlignsWithFromWhenNoReturnPathIsConfigured(): void
@@ -1684,9 +1685,9 @@ final class MailHelperTest extends TestCase
 
         $this->assertTrue($mailer->send());
 
-        $this->assertNotInstanceOf(\Symfony\Component\Mime\Address::class, $transport->sentMessage->getReturnPath());
+        $this->assertNotInstanceOf(Address::class, $transport->sentMessage->getReturnPath());
         $sender = $transport->sentMessage->getSender();
-        $this->assertInstanceOf(\Symfony\Component\Mime\Address::class, $sender, 'Sender must align with From when no Return-Path is set so strict SMTP servers do not reject the envelope (see #14047).');
+        $this->assertInstanceOf(Address::class, $sender, 'Sender must align with From when no Return-Path is set so strict SMTP servers do not reject the envelope (see #14047).');
         $this->assertSame('from@example.com', $sender->getAddress());
     }
 

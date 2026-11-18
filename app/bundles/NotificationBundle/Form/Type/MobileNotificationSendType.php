@@ -28,7 +28,7 @@ final class MobileNotificationSendType extends AbstractType
             MobileNotificationListType::class,
             [
                 'label'      => 'mautic.notification.send.selectnotifications',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.notification.choose.notifications',

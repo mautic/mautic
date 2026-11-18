@@ -88,6 +88,31 @@ New line',
         ], 'Form data should be decode before posting to next form');
     }
 
+    public function testOnFormSubmitActionRepostForKioskSubmissionWithoutIpAddressOrContact(): void
+    {
+        $postData = [
+            'first_name' => 'Kiosk',
+            'formId'     => '1',
+            'return'     => '',
+            'formName'   => 'form190122',
+        ];
+
+        $request    = new Request();
+        $submission = new Submission();
+        $submission->setForm($this->getForm());
+
+        $submissionEvent = new SubmissionEvent($submission, $postData, $request->server, $request);
+        $submissionEvent->setResults(['first_name' => 'Kiosk'])
+            ->setFields($this->getFormFields())
+            ->setAction($this->getFormRepostAction());
+
+        $this->subscriber->onFormSubmitActionRepost($submissionEvent);
+
+        $payload = $submissionEvent->getPostSubmitPayload();
+        $this->assertSame('Kiosk', $payload['first_name']);
+        $this->assertSame([], $payload['mautic_contact']);
+    }
+
     public function testParseResponseThrowsRuntimeExceptionForServerError(): void
     {
         $method = new \ReflectionMethod(FormSubscriber::class, 'parseResponse');

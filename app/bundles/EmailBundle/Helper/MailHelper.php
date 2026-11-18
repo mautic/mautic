@@ -388,9 +388,16 @@ class MailHelper
             /** @var Asset $asset */
             foreach ($this->assets as $asset) {
                 if (!in_array($asset->getId(), $this->attachedAssets)) {
+                    $filePath = $asset->getFilePath();
+
+                    // Null when a local asset resolves outside the upload dir.
+                    if (null === $filePath) {
+                        continue;
+                    }
+
                     $this->attachedAssets[] = $asset->getId();
                     $this->attachFile(
-                        $asset->getFilePath(),
+                        $filePath,
                         $asset->getOriginalFileName(),
                         $asset->getMime()
                     );

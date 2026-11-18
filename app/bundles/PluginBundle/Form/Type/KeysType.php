@@ -48,7 +48,7 @@ final class KeysType extends AbstractType
                 $type,
                 [
                     'label'      => $label,
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'        => 'form-control',
                         'placeholder'  => (PasswordType::class === $type) ? '**************' : '',
