@@ -4,10 +4,12 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -507,6 +509,8 @@ class LeadFieldRepository extends CommonRepository
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.ismine',
+            'mautic.lead.field.searchcommand.issystemdefault',
+            'mautic.lead.field.searchcommand.isusercreated',
             'mautic.lead.field.searchcommand.isindexed',
             'mautic.lead.field.searchcommand.isunique',
             'mautic.lead.field.searchcommand.type',
@@ -547,6 +551,7 @@ class LeadFieldRepository extends CommonRepository
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
         $prefix          = $this->getTableAlias();
+        $forceParameters = [];
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.field.searchcommand.isindexed'):
@@ -573,10 +578,23 @@ class LeadFieldRepository extends CommonRepository
                 $expr            = $q->expr()->like($prefix.'.group', ":{$unique}");
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.lead.field.searchcommand.issystemdefault'):
+            case $this->translator->trans('mautic.lead.field.searchcommand.issystemdefault', [], null, 'en_US'):
+                [$expr, $forceParameters] = $this->getSystemAliasExpression($q, $prefix.'.alias');
+                $parameters               = [];
+                break;
+            case $this->translator->trans('mautic.lead.field.searchcommand.isusercreated'):
+            case $this->translator->trans('mautic.lead.field.searchcommand.isusercreated', [], null, 'en_US'):
+                [$expr, $forceParameters] = $this->getSystemAliasExpression($q, $prefix.'.alias');
+                $parameters               = [];
+                if ($expr) {
+                    $expr = $this->negateExpression($q, $expr);
+                }
+                break;
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $this->negateExpression($q, $expr);
         }
 
         if (!empty($forceParameters)) {
@@ -597,5 +615,44 @@ class LeadFieldRepository extends CommonRepository
         }
 
         return null;
+    }
+
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     *
+     * @return array{0:mixed,1:array<string,mixed>}
+     */
+    private function getSystemAliasExpression($q, string $column): array
+    {
+        $parameter = $this->generateRandomParameterName();
+        $expr      = $q->expr()->in($column, ":{$parameter}");
+
+        $q->setParameter($parameter, $this->getSystemDefaultAliases(), ArrayParameterType::STRING);
+
+        return [$expr, []];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getSystemDefaultAliases(): array
+    {
+        return array_values(array_unique(array_merge(
+            array_keys(FieldModel::$coreFields),
+            array_keys(FieldModel::$coreCompanyFields),
+        )));
+    }
+
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param mixed                                                        $expr
+     */
+    private function negateExpression($q, $expr): object|string
+    {
+        if ($q instanceof \Doctrine\ORM\QueryBuilder) {
+            return $q->expr()->not($expr);
+        }
+
+        return sprintf('NOT(%s)', (string) $expr);
     }
 }
