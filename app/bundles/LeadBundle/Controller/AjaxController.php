@@ -827,12 +827,6 @@ final class AjaxController extends CommonAjaxController
             return new JsonResponse(['message' => "Segment {$id} could not be found."], Response::HTTP_NOT_FOUND);
         }
 
-        if (!$this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN)
-            && !$this->security->isGranted(LeadPermissions::LISTS_VIEW_OTHER)
-        ) {
-            $this->throwAccessDenied();
-        }
-
         if (!$this->security->hasEntityAccess(
             LeadPermissions::LISTS_VIEW_OWN,
             LeadPermissions::LISTS_VIEW_OTHER,
