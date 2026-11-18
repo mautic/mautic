@@ -127,7 +127,7 @@
         ] %}
         {% set tilesHtml %}
         <div class="mb-32">
-            <div class="grid grid-cols-4 gap-12">
+            <div class="grid gap-12">
             {% for type in itemTypes %}
                 {% for item in type.items %}
                     {% set tileContent %}
@@ -155,7 +155,9 @@
                         } %}
                         </div>
                     {% endset %}
-                    {% include '@MauticCore/Components/tile.html.twig' with {type: 'base', content: tileContent} only %}
+                    <div class="g-col-12 g-col-lg-6 g-col-xl-3">
+                        {% include '@MauticCore/Components/tile.html.twig' with {type: 'base', content: tileContent, className: 'h-100'} only %}
+                    </div>
                 {% endfor %}
             {% endfor %}
                 </div>

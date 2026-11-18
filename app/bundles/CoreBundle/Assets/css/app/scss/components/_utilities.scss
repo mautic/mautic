@@ -68,26 +68,3 @@
   from { transform: translateX(20px); opacity: 0; }
   to   { transform: translateX(0); opacity: 1; }
 }
-
-
-// Grids
-.grid {
-    --grid--columns: 1;
-    display: grid;
-    grid-template-columns: 1fr;
-}
-.grid-cols-4 { --grid--columns: 4; }
-
-@media (min-width: $screen-md-min) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-}
-
-@media (min-width: $screen-lg-min) {
-    .grid {
-        grid-template-columns: repeat(var(--grid--columns), 1fr);
-    }
-
-}
