@@ -735,16 +735,6 @@ $utilities: map-merge($utilities, (
   white-space: normal;
 }
 
-@mixin text-emphasis-variant($parent, $color) {
-  #{$parent} {
-    color: $color;
-  }
-  a#{$parent}:hover,
-  a#{$parent}:focus {
-    color: darken($color, 10%);
-  }
-}
-
 @mixin text-overflow() {
   overflow: hidden;
   text-overflow: ellipsis;
