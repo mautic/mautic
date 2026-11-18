@@ -115,9 +115,9 @@ final class ProjectRepositoryTest extends TestCase
         $subQueryDql     = $subQuery->getDQL();
 
         $this->assertStringContainsString('NOT(EXISTS', (string) $expr);
-        $this->assertStringContainsString('FROM Mautic\\EmailBundle\\Entity\\Email associated', $subQueryDql);
-        $this->assertStringContainsString('INNER JOIN associated.projects associatedProject', $subQueryDql);
-        $this->assertStringContainsString('associatedProject.id = p.id', $subQueryDql);
+        $this->assertStringContainsString('FROM Mautic\\EmailBundle\\Entity\\Email ', $subQueryDql);
+        $this->assertStringContainsString('INNER JOIN ', $subQueryDql);
+        $this->assertStringContainsString('Project.id = p.id', $subQueryDql);
         $this->assertSame([], $params);
     }
 }

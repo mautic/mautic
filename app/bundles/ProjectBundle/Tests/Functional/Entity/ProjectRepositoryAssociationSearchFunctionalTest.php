@@ -80,6 +80,47 @@ final class ProjectRepositoryAssociationSearchFunctionalTest extends MauticMysql
         $this->assertNotContains($projectWithDeletedCampaign, $withCampaigns);
     }
 
+    public function testAssociationSearchCommandsCanBeCombined(): void
+    {
+        $projectWithEmailAndCampaign = $this->createProject('Project with email and campaign');
+        $projectWithEmailOnly        = $this->createProject('Project with email only');
+
+        $this->createEmail('Email with campaign project', $projectWithEmailAndCampaign);
+        $this->createEmail('Email only project', $projectWithEmailOnly);
+        $this->createCampaign('Campaign with email project', $projectWithEmailAndCampaign);
+
+        $projectRepository = $this->em->getRepository(Project::class);
+        $withBoth          = $projectRepository->getEntities([
+            'filter'           => ['string' => 'has:emails has:campaigns'],
+            'ignore_paginator' => true,
+        ]);
+        $emailsWithoutCampaigns = $projectRepository->getEntities([
+            'filter'           => ['string' => 'has:emails !has:campaigns'],
+            'ignore_paginator' => true,
+        ]);
+
+        $this->assertContains($projectWithEmailAndCampaign, $withBoth);
+        $this->assertNotContains($projectWithEmailOnly, $withBoth);
+        $this->assertContains($projectWithEmailOnly, $emailsWithoutCampaigns);
+        $this->assertNotContains($projectWithEmailAndCampaign, $emailsWithoutCampaigns);
+    }
+
+    private function createEmail(string $name, Project $project): Email
+    {
+        $email = new Email();
+        $email->setName($name.' '.bin2hex(random_bytes(6)));
+        $email->setSubject($name);
+        $email->setEmailType('template');
+        $email->setTemplate('blank');
+        $email->addProject($project);
+
+        $emailModel = self::getContainer()->get(EmailModel::class);
+        $this->assertInstanceOf(EmailModel::class, $emailModel);
+        $emailModel->saveEntity($email);
+
+        return $email;
+    }
+
     private function createCampaign(string $name, Project $project): Campaign
     {
         $campaign = new Campaign();

@@ -58,14 +58,15 @@ final class ProjectRepository extends CommonRepository
         $field = sprintf('%s.id', $this->getTableAlias());
 
         if ($q instanceof QueryBuilder) {
+            $alias    = $this->generateRandomParameterName();
             $subQuery = $this->_em->createQueryBuilder()
-                ->select('associated.id')
-                ->from($association['entityClass'], 'associated')
-                ->innerJoin('associated.projects', 'associatedProject')
-                ->where('associatedProject.id = '.$field);
+                ->select($alias.'.id')
+                ->from($association['entityClass'], $alias)
+                ->innerJoin($alias.'.projects', $alias.'Project')
+                ->where($alias.'Project.id = '.$field);
 
             if (isset($association['entityTable'])) {
-                $subQuery->andWhere('associated.deleted IS NULL');
+                $subQuery->andWhere($alias.'.deleted IS NULL');
             }
 
             $expr = $q->expr()->exists($subQuery->getDQL());
