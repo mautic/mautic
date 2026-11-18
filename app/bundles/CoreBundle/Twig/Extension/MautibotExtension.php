@@ -31,9 +31,6 @@ final class MautibotExtension extends AbstractExtension
         return $this->mautibotHelper->getImage($image);
     }
 
-    /**
-     * @retrun bot name
-     */
     public function getName(): string
     {
         return $this->mautibotHelper->getName();
