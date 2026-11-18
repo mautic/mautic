@@ -645,9 +645,6 @@ $danger: $brand-danger;
 $utilities: map-merge($utilities, (
   "color": map-merge(map-get($utilities, "color"), (
     "values": map-remove(map-get(map-get($utilities, "color"), "values"), "primary", "success", "info", "warning", "danger", "muted", "white")
-  )),
-  "background-color": map-merge(map-get($utilities, "background-color"), (
-    "values": map-remove(map-get(map-get($utilities, "background-color"), "values"), "primary", "success", "info", "warning", "danger")
   ))
 ));
 
@@ -1209,16 +1206,6 @@ $utilities: map-merge($utilities, (
     &.#{$state}:hover > th {
       background-color: darken($background, 5%);
     }
-  }
-}
-
-@mixin bg-variant($parent, $color) {
-  #{$parent} {
-    background-color: $color;
-  }
-  a#{$parent}:hover,
-  a#{$parent}:focus {
-    background-color: darken($color, 10%);
   }
 }
 
@@ -2093,20 +2080,6 @@ mark,
 @include text-emphasis-variant('.text-warning', $state-warning-text);
 
 @include text-emphasis-variant('.text-danger', $state-danger-text);
-
-.bg-primary {
-
-  color: #fff;
-}
-@include bg-variant('.bg-primary', $brand-primary);
-
-@include bg-variant('.bg-success', $state-success-bg);
-
-@include bg-variant('.bg-info', $state-info-bg);
-
-@include bg-variant('.bg-warning', $state-warning-bg);
-
-@include bg-variant('.bg-danger', $state-danger-bg);
 
 .page-header {
   padding-bottom: (($line-height-computed * 0.5) - 1);

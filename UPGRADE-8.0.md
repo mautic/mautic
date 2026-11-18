@@ -285,6 +285,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Deprecated class `Mautic\CoreBundle\Helper\EmojiMap\UnicodeToShortEmojiMap` removed with no replacement.
 - Class `Mautic\CoreBundle\Helper\EmojiHelper` removed with no replacement. All emoji conversion calls were dropped; emoji are stored and rendered as UTF-8 (`utf8mb4`) directly.
 - Emoji sprite stylesheet `app/bundles/CoreBundle/Assets/css/libraries/emoji/` (`_emoji.scss` + `emoji.png`) removed together with its `@import` in `_libraries.scss`. It styled the `span.emoji-sizer`/`.emoji-outer`/`.emoji-inner` markup that `EmojiHelper::toHtml()` used to emit, which is no longer produced. Custom themes relying on those classes must ship their own CSS.
+- Bootstrap Glyphicons font files `app/bundles/CoreBundle/Assets/css/libraries/bootstrap/glyphicons-halflings-regular.*` and the `$icon-font-path`, `$icon-font-name` and `$icon-font-svg-id` SCSS variables removed with no replacement. Nothing in core used them. Custom themes referencing them must remove those references. Themes that render Glyphicons icons must ship their own icon font.
 - Deprecated constant `Mautic\CampaignBundle\CampaignEvents::ON_EVENT_EXECUTION` (`mautic.campaign_on_event_execution`) removed. Listen to the `Mautic\CampaignBundle\Event\ExecutedEvent` and `FailedEvent` event classes instead.
 - Deprecated constant `Mautic\CampaignBundle\CampaignEvents::ON_EVENT_DECISION_TRIGGER` (`mautic.campaign_on_event_decision_trigger`) removed. Listen to `CampaignEvents::ON_EVENT_DECISION_EVALUATION` instead.
 - Deprecated class `Mautic\CampaignBundle\Event\CampaignDecisionEvent` removed. It was only dispatched with the removed `ON_EVENT_DECISION_TRIGGER` event. Use `Mautic\CampaignBundle\Event\DecisionEvent` instead.
@@ -1543,6 +1544,11 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\CoreBundle\Helper\InputHelper::_()` types `$mask` as `array|string`. Passing `null` now throws; omit the argument to use the default `'clean'` mask.
     - `MauticPlugin\MauticCrmBundle\Api\SalesforceApi::getLeads()` types `$query` as `string|array`. Passing `null` now throws; pass a SOQL query string or an array to build the query.
     - `Mautic\EmailBundle\Helper\MailHelper::setLead()` types `$lead` as `array` and `Mautic\EmailBundle\Helper\MailHelper::getLead()` returns `?array`. Passing a `Mautic\LeadBundle\Entity\Lead` entity now throws; pass the contact's field array instead (e.g. `$lead->getProfileFields()`).
+    - `Mautic\CoreBundle\Helper\InputHelper::url()` types `$defaultProtocol` as `?string`. Passing `false` from a file with `declare(strict_types=1)` now throws a `TypeError`; without strict types it is coerced to `''` and still falls back to `http`. Pass `null` to fall back to `http`, or a protocol string.
+    - `Mautic\CoreBundle\Twig\Extension\ContentExtension::getCustomContent()` (Twig function `customContent()`) types `$context` as `?string`. Pass a string context or `null`.
+    - `Mautic\CoreBundle\Twig\Helper\FormatterHelper::simpleCsvToArray()` types `$csv` as `?string`. Pass a comma-separated string or `null`.
+    - `Mautic\PluginBundle\Entity\IntegrationEntityRepository::getIntegrationsEntityId()` types `$startDate` and `$endDate` as `?string`. Passing a `\DateTimeInterface` now throws; pass a date string or `null`.
+    - `MauticPlugin\MauticFocusBundle\Model\FocusModel::addStat()` types `$type` as `string`. Passing `null` now throws; pass a stat type such as `Stat::TYPE_FORM`.
 
 ### Native parameter and return types for plugin extension points
 
