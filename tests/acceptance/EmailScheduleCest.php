@@ -15,6 +15,7 @@ final class EmailScheduleCest
 
     public function triggeredEmailShowsScheduleOptionsOnCreate(AcceptanceTester $I): void
     {
+        $I->login(reuseSessionSnapshot: false);
         $I->amOnPage(EmailsPage::URL);
 
         // Create a new email
