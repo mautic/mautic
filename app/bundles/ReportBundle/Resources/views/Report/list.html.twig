@@ -7,6 +7,12 @@
 {% block headerTitle 'mautic.report.reports'|trans %}
 
 {% block content %}
+  {% set focusStatsFilters = focusStatsAvailable|default(false) ? [{
+    'search': ('mautic.report.report.searchcommand.source'|trans) ~ ':focus_stats',
+    'label': 'mautic.report.quickfilter.source.focus_stats.label',
+    'tooltip': 'mautic.report.quickfilter.source.focus_stats.tooltip',
+    'icon': 'ri-focus-3-line'
+  }] : [] %}
   {% if isIndex %}
   <div id="page-list-wrapper" class="panel panel-default">
     {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
@@ -117,14 +123,8 @@
                         'label': 'mautic.report.quickfilter.source.pages.label',
                         'tooltip': 'mautic.report.quickfilter.source.pages.tooltip',
                         'icon': 'ri-window-line'
-                    },
-                    {
-                        'search': ('mautic.report.report.searchcommand.source'|trans) ~ ':focus_stats',
-                        'label': 'mautic.report.quickfilter.source.focus_stats.label',
-                        'tooltip': 'mautic.report.quickfilter.source.focus_stats.tooltip',
-                        'icon': 'ri-focus-3-line'
                     }
-                ]
+                ]|merge(focusStatsFilters)
             }
       },
   }) }}
