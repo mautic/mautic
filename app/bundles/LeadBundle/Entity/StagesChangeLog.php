@@ -65,7 +65,7 @@ class StagesChangeLog
             ->addJoinColumn('stage_id', 'id', true, false, 'CASCADE')
             ->build();
 
-        $builder->addDateAdded();
+        $builder->addDateAdded(false, 3);
     }
 
     /**
