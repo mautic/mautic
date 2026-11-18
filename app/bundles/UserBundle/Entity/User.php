@@ -219,7 +219,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             ->build();
 
         $builder->createField('preferences', 'array')
-            ->nullable()
             ->build();
 
         $builder->createField('signature', 'text')
