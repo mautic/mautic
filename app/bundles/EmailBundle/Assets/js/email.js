@@ -604,7 +604,7 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
 
             parentElement.remove();
             tabLink.remove();
-            // if tabContainer is for variants, show the first one, if it is the DEC vertical list, show the second one
+            // if tabContainer is for variants, show the first one, if it is the DEC list, show the second one
             if ($this.hasClass('remove-filter') || tabContainer.attr('id') === 'dynamicContentTabs') {
                 tabContainer.find('li').first().next().find('a').tab('show');
             } else {
