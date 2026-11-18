@@ -95,7 +95,6 @@ $utilities: map-merge($utilities, (
     ))
   ))
 ));
-
 $utilities: map-merge($utilities, (
   "color": map-merge(map-get($utilities, "color"), (
     "values": map-merge(map-get(map-get($utilities, "color"), "values"), (
@@ -105,7 +104,7 @@ $utilities: map-merge($utilities, (
       "info": var(--support-info),
       "success": $brand-success,
       "warning": $brand-warning,
-      "danger": $brand-danger,
+      "danger": var(--text-error),
       "interactive": var(--interactive),
       "placeholder": var(--text-placeholder),
       "disabled": var(--text-disabled),
