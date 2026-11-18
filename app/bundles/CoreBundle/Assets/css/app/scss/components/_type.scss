@@ -298,28 +298,6 @@ h1, h2, h3, h4, h5, h6,
     border-radius: 0;
   }
 }
-// page header inside container reset
-.container {
-  .page-header {
-    margin: -15px -15px 15px -15px;
-  }
-  &.container-xs {
-    .page-header { margin: -5px -5px 5px -5px; }
-  }
-  &.container-sm {
-    .page-header { margin: -10px -10px 10px -10px; }
-  }
-  &.container-md {
-    .page-header { margin: -15px -15px 15px -15px; }
-  }
-  &.container-lg {
-    .page-header { margin: -20px -20px 20px -20px; }
-  }
-}
-
-.tt-u { text-transform: uppercase; }
-
-.lh-1 { line-height: 1; }
 
 // Contextual colors
 // -------------------------
@@ -330,49 +308,6 @@ h1, h2, h3, h4, h5, h6,
 .text-twitter { @include text-emphasis-variants($brand-twitter); }
 .text-facebook { @include text-emphasis-variants($brand-facebook); }
 .text-google { @include text-emphasis-variants($brand-google); }
-
-.text-help {
-  color: var(--text-helper);
-  font-size: var(--typography-utility-productive);
-}
-
-// Blockquote
-// -------------------------
-blockquote {
-  padding-left: 40px;
-  border-width: 0px;
-
-  > p {
-    position: relative;
-    font-style: italic;
-    font-size: 18px !important;
-  }
-
-  > p:before {
-    position: absolute;
-    top: -1px;
-    margin-left: -25px;
-    font-family: "remixicon", sans-serif;
-    font-size: 18px;
-    content: "\EC51";
-    color: $gray-lighter;
-  }
-
-  > p:after {
-    position: absolute;
-    bottom: -1px;
-    margin-left: 5px;
-    font-family: "remixicon", sans-serif;
-    font-size: 18px;
-    content: "\EC52";
-    color: $gray-lighter;
-  }
-}
-.blockquote-reverse {
-  padding-left: 20px;
-  padding-right: 40px;
-  border-width: 0px;
-}
 
 .help-block,
 .form-text {

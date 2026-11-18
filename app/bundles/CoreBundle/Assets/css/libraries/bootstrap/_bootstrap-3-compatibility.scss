@@ -76,8 +76,6 @@ $headings-line-height:    1.1;
 $headings-color:          inherit;
 
 
-
-
 $padding-base-vertical:     6px !default;
 $padding-base-horizontal:   12px !default;
 
@@ -620,14 +618,6 @@ $abbr-border-color:           $gray-light !default;
 
 $headings-small-color:        $gray-light !default;
 
-$blockquote-small-color:      $gray-light !default;
-
-$blockquote-font-size:        ($font-size-base * 1.25);
-
-$blockquote-border-color:     $gray-lighter !default;
-
-$page-header-border-color:    $gray-lighter !default;
-
 $dl-horizontal-offset:        $component-offset-horizontal !default;
 
 $dl-horizontal-breakpoint:    $grid-float-breakpoint !default;
@@ -650,18 +640,6 @@ $utilities: map-merge($utilities, (
     "values": map-remove(map-get(map-get($utilities, "background-color"), "values"), "primary", "success", "info", "warning", "danger")
   ))
 ));
-
-@mixin hide-text() {
-  font: 0/0 a;
-  color: transparent;
-  text-shadow: none;
-  background-color: transparent;
-  border: 0;
-}
-
-@mixin text-hide() {
-  @include hide-text;
-}
 
 @mixin opacity($opacity) {
   $opacity-ie: ($opacity * 100);
@@ -2072,19 +2050,7 @@ mark,
 
 .text-left           { text-align: left; }
 .text-right          { text-align: right; }
-.text-center         { text-align: center; }
-.text-justify        { text-align: justify; }
-.text-nowrap         { white-space: nowrap; }
 
-.text-lowercase      { text-transform: lowercase; }
-.text-uppercase      { text-transform: uppercase; }
-.text-capitalize     { text-transform: capitalize; }
-
-@include text-emphasis-variant('.text-success', $state-success-text);
-
-@include text-emphasis-variant('.text-warning', $state-warning-text);
-
-@include text-emphasis-variant('.text-danger', $state-danger-text);
 
 .bg-primary {
 
@@ -2099,12 +2065,6 @@ mark,
 @include bg-variant('.bg-warning', $state-warning-bg);
 
 @include bg-variant('.bg-danger', $state-danger-bg);
-
-.page-header {
-  padding-bottom: (($line-height-computed * 0.5) - 1);
-  margin: ($line-height-computed * 2) 0 $line-height-computed;
-  border-bottom: 1px solid $page-header-border-color;
-}
 
 ul,
 ol {
@@ -2178,52 +2138,6 @@ abbr[data-original-title] {
 .initialism {
   font-size: 90%;
   @extend .text-uppercase;
-}
-
-blockquote {
-  padding: ($line-height-computed * 0.5) $line-height-computed;
-  margin: 0 0 $line-height-computed;
-  font-size: $blockquote-font-size;
-  border-left: 5px solid $blockquote-border-color;
-
-  p,
-  ul,
-  ol {
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  footer,
-  small,
-  .small {
-    display: block;
-    font-size: 80%;
-    line-height: $line-height-base;
-    color: $blockquote-small-color;
-
-    &:before {
-      content: "\2014 \00A0";
-    }
-  }
-}
-
-.blockquote-reverse,
-blockquote.pull-right {
-  padding-right: 15px;
-  padding-left: 0;
-  text-align: right;
-  border-right: 5px solid $blockquote-border-color;
-  border-left: 0;
-
-  footer,
-  small,
-  .small {
-    &:before { content: ""; }
-    &:after {
-      content: "\00A0 \2014";
-    }
-  }
 }
 
 address {
@@ -5936,10 +5850,6 @@ button.btn-close {
 .invisible {
   visibility: hidden;
 }
-.text-hide {
-  @include text-hide;
-}
-
 .hidden {
   display: none !important;
 }
