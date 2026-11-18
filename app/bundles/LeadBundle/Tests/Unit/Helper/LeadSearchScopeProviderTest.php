@@ -25,6 +25,7 @@ final class LeadSearchScopeProviderTest extends SearchScopeProviderTestCase
                 'mautic.lead.field.firstname' => 'First Name',
                 'mautic.lead.lead.searchcommand.list' => 'segment',
                 'mautic.core.searchcommand.ismine' => 'is:mine',
+                'mautic.lead.lead.searchcommand.isunsegmented' => 'is:unsegmented',
                 default => $key,
             });
 
@@ -55,6 +56,13 @@ final class LeadSearchScopeProviderTest extends SearchScopeProviderTestCase
         $commands = array_column($this->getScopes(), 'command');
 
         $this->assertCount(1, array_filter($commands, static fn (string $command): bool => 'segment' === $command));
+    }
+
+    public function testUnsegmentedCommandIsPinned(): void
+    {
+        $commands = array_column($this->getScopes(), 'command');
+
+        $this->assertContains('is:unsegmented', $commands);
     }
 
     public function testCustomFieldIsIndentedAndSortedAfterKnownFields(): void
