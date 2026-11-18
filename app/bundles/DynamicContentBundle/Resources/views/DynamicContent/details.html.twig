@@ -116,12 +116,12 @@
                               <tbody>
                               {{ include('@MauticCore/Helper/details.html.twig', {'entity': entity}) }}
                               <tr>
-                                  <td width="20%"><span class="fw-b textTitle">{{ 'mautic.dynamicContent.slot.campaign'|trans }}</span></td>
+                                  <td width="20%"><span class="fw-bold textTitle">{{ 'mautic.dynamicContent.slot.campaign'|trans }}</span></td>
                                   <td>{{ entity.isCampaignBased ? 'Yes' : 'No' }}</td>
                               </tr>
                               {% if not entity.isCampaignBased %}
                                 <tr>
-                                    <td width="20%"><span class="fw-b textTitle">{{ 'mautic.dynamicContent.label.slot_name'|trans }}</span></td>
+                                    <td width="20%"><span class="fw-bold textTitle">{{ 'mautic.dynamicContent.label.slot_name'|trans }}</span></td>
                                     <td>{{ entity.slotName }}</td>
                                 </tr>
                               {% endif %}
@@ -151,7 +151,7 @@
                           <div class="panel">
                               <div class="panel-body box-layout">
                                   <div class="col-md-3 align-middle">
-                                      <h5 class="text-white dark-md fw-sb mb-5">
+                                      <h5 class="text-white dark-md fw-semibold mb-5">
                                           <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.dynamicContent.views'|trans }}
                                       </h5>

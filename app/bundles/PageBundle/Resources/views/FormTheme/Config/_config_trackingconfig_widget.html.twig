@@ -1,5 +1,5 @@
 {% block _config_trackingconfig_widget %}
-<h4 class="fw-sb mt-48 mb-5">{{ 'mautic.config.tab.pagetracking'|trans }}</h4>
+<h4 class="fw-semibold mt-48 mb-5">{{ 'mautic.config.tab.pagetracking'|trans }}</h4>
 <div class="text-muted small pb-16">{{ 'mautic.core.config.header.pagetracking.description'|trans }}</div>
 <div class="row">
     <div class="panel panel-default mb-16">
@@ -24,7 +24,7 @@
                         <div class="alert alert-info" role="alert">
                             {{ 'mautic.page.config.tracking.script.consent.focus_notice'|trans }}
                         </div>
-                        <h5 class="fw-sb mb-5">{{ 'mautic.page.config.tracking.script.essential.label'|trans }}</h5>
+                        <h5 class="fw-semibold mb-5">{{ 'mautic.page.config.tracking.script.essential.label'|trans }}</h5>
                         <p class="text-muted small">{{ 'mautic.page.config.tracking.script.essential.description'|trans }}</p>
                         {% include '@MauticCore/Components/code-snippet.html.twig' with {
                             variant: 'multi',
@@ -42,7 +42,7 @@
     })(window,document,\'script\',\'' ~ url('mautic_essential_js') ~ '\');
 &lt;/script&gt;',
                         } %}
-                        <h5 class="fw-sb mt-24 mb-5">{{ 'mautic.page.config.tracking.script.tracking.label'|trans }}</h5>
+                        <h5 class="fw-semibold mt-24 mb-5">{{ 'mautic.page.config.tracking.script.tracking.label'|trans }}</h5>
                         <p class="text-muted small">{{ 'mautic.page.config.tracking.script.tracking.description'|trans }}</p>
                         {% include '@MauticCore/Components/code-snippet.html.twig' with {
                             variant: 'multi',
@@ -104,7 +104,7 @@
     </div>
 </div>
 
-<h4 class="fw-sb mt-48 mb-5">{{ 'mautic.config.tab.tracking.facebook.pixel'|trans }}</h4>
+<h4 class="fw-semibold mt-48 mb-5">{{ 'mautic.config.tab.tracking.facebook.pixel'|trans }}</h4>
 <div class="text-muted small pb-16">{{ 'mautic.core.config.header.tracking.facebook.pixel.description'|trans }}</div>
 <div class="row">
     <div class="panel panel-default mb-16">
@@ -126,7 +126,7 @@
     </div>
 </div>
 
-<h4 class="fw-sb mt-48 mb-5">{{ 'mautic.config.tab.tracking.google.analytics'|trans }}</h4>
+<h4 class="fw-semibold mt-48 mb-5">{{ 'mautic.config.tab.tracking.google.analytics'|trans }}</h4>
 <div class="text-muted small pb-16">{{ 'mautic.core.config.header.tracking.google.analytics.description'|trans }}</div>
 <div class="row">
     <div class="panel panel-default mb-16">

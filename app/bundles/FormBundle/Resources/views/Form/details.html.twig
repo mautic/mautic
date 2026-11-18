@@ -178,7 +178,7 @@
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-6 align-middle">
-                                    <h5 class="text-white dark-md fw-sb mb-5">
+                                    <h5 class="text-white dark-md fw-semibold mb-5">
                                         <span class="ri-download-line"></span>
                                         {{ 'mautic.form.graph.line.submissions'|trans }}
                                     </h5>
@@ -218,7 +218,7 @@
                 <!-- #actions-container -->
                 <div class="tab-pane active fade in bdr-w-0" id="actions-container">
                     {% for group, groupActions in activeFormActions %}
-                        <h5 class="fw-sb mb-5">{{ group|title }}</h5>
+                        <h5 class="fw-semibold mb-5">{{ group|title }}</h5>
                         <ul class="list-group">
                             {# @var \Mautic\FormBundle\Entity\Action $action #}
                             {% for action in groupActions %}
@@ -236,7 +236,7 @@
                                             </div>
                                         {% endif %}
                                         <div class="col-md-7 align-middle">
-                                            <h5 class="fw-sb text-interactive mb-5">{{ action.name }}</h5>
+                                            <h5 class="fw-semibold text-interactive mb-5">{{ action.name }}</h5>
                                             <h6 class="text-white dark-sm">{{ action.description|purify }}</h6>
                                         </div>
                                         <div class="col-md-4 align-middle text-end">
@@ -253,7 +253,7 @@
 
             <!-- #fields-container -->
             <div class="tab-pane fade {% if not showActions %}active in{% endif %} bdr-w-0" id="fields-container">
-                <h5 class="fw-sb mb-5">{{ 'mautic.form.field'|trans }}</h5>
+                <h5 class="fw-semibold mb-5">{{ 'mautic.form.field'|trans }}</h5>
                 <ul class="list-group mb-5">
                     {# @var \Mautic\FormBundle\Entity\Field $field #}
                     {% for field in activeFormFields %}
@@ -284,7 +284,7 @@
         <!-- form HTML -->
         <div class="pa-16">
             {% set aboveFoldContent %}
-                <h4 class="fw-b mb-24">{{ 'mautic.form.form.header.copy'|trans }}</h4>
+                <h4 class="fw-bold mb-24">{{ 'mautic.form.form.header.copy'|trans }}</h4>
                 {% include '@MauticCore/Components/pictogram.html.twig' with {
                     pictogram: 'embed',
                     size: 64,
@@ -293,9 +293,9 @@
             {% endset %}
 
             {% set belowFoldContent %}
-                <h5 class="mt-24 fw-b">{{ 'mautic.form.form.header.landingpages'|trans }}</h5>
+                <h5 class="mt-24 fw-bold">{{ 'mautic.form.form.header.landingpages'|trans }}</h5>
                 <p class="mt-5 mb-24">{{ 'mautic.form.form.help.landingpages'|trans }}</p>
-                <h5 class="mt-24 mb-12 fw-b">{{ 'mautic.form.form.header.external_cms'|trans }}</h5>
+                <h5 class="mt-24 mb-12 fw-bold">{{ 'mautic.form.form.header.external_cms'|trans }}</h5>
                 {% include '@MauticCore/Helper/button.html.twig' with {
                     buttons: [
                         {

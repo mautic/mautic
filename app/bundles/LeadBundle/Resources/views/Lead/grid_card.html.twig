@@ -21,7 +21,7 @@
                     {% if contact.id in noContactList|keys %}
                         <div class="float-end label label-danger"><i class="ri-prohibited-line"></i></div>
                     {% endif %}
-                    <h4 class="fw-sb mb-5 ellipsis">
+                    <h4 class="fw-semibold mb-5 ellipsis">
                         <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': contact.id}) }}" data-toggle="ajax">
                             <span>{% if contact.isAnonymous %}{{ contact.primaryIdentifier|trans }}{% else %}{{ htmlEntityDecode(contact.primaryIdentifier)|purify }}{% endif %}</span>
                         </a>

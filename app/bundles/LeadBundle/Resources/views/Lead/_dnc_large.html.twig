@@ -4,7 +4,7 @@
 #}
 <div id="bounceLabel{{ doNotContact.id }}">
     <div class="panel-heading text-center">
-        <h4 class="fw-sb">
+        <h4 class="fw-semibold">
             {% if constant('\\Mautic\\LeadBundle\\Entity\\DoNotContact::UNSUBSCRIBED') == doNotContact.reason %}
               <span class="label label-danger" data-bs-toggle="tooltip" title="{{ dncReasonToText(doNotContact.reason) }}">
                 {{ 'mautic.lead.do.not.contact_channel'|trans({'%channel%': doNotContact.channel|upper}) }}

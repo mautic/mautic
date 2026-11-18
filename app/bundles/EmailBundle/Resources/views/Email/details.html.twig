@@ -246,14 +246,14 @@
                               {{- include('@MauticCore/Helper/details.html.twig', {'entity': email}) -}}
                               <tr>
                                   <td width="20%">
-                                      <span class="fw-b">{{ 'mautic.core.form.theme'|trans }}</span>
+                                      <span class="fw-bold">{{ 'mautic.core.form.theme'|trans }}</span>
                                   </td>
                                   <td>{{ email.template }}</td>
                               </tr>
                               {% if email.fromName %}
                                   <tr>
                                       <td width="20%">
-                                          <span class="fw-b">{{ 'mautic.email.from_name'|trans }}</span>
+                                          <span class="fw-bold">{{ 'mautic.email.from_name'|trans }}</span>
                                       </td>
                                       <td>{{ email.fromName }}</td>
                                   </tr>
@@ -261,7 +261,7 @@
                               {% if email.fromAddress %}
                                   <tr>
                                       <td width="20%">
-                                          <span class="fw-b">{{ 'mautic.email.from_email'|trans }}</span>
+                                          <span class="fw-bold">{{ 'mautic.email.from_email'|trans }}</span>
                                       </td>
                                       <td>{{ email.fromAddress }}</td>
                                   </tr>
@@ -269,7 +269,7 @@
                               {% if email.replyToAddress %}
                                   <tr>
                                       <td width="20%">
-                                          <span class="fw-b">{{ 'mautic.email.reply_to_email'|trans }}</span>
+                                          <span class="fw-bold">{{ 'mautic.email.reply_to_email'|trans }}</span>
                                       </td>
                                       <td>{{ email.replyToAddress }}</td>
                                   </tr>
@@ -277,7 +277,7 @@
                               {% if email.bccAddress %}
                                   <tr>
                                       <td width="20%">
-                                          <span class="fw-b">{{ 'mautic.email.bcc'|trans }}</span>
+                                          <span class="fw-bold">{{ 'mautic.email.bcc'|trans }}</span>
                                       </td>
                                       <td>{{ email.bccAddress }}</td>
                                   </tr>
@@ -285,7 +285,7 @@
                               {% if email.getPreheaderText() %}
                                 <tr>
                                     <td width="20%">
-                                        <span class="fw-b">{{ 'mautic.email.preheader_text'|trans }}</span>
+                                        <span class="fw-bold">{{ 'mautic.email.preheader_text'|trans }}</span>
                                     </td>
                                     <td>{{ email.getPreheaderText() }}</td>
                                 </tr>
@@ -293,26 +293,26 @@
                               {% if email.headers %}
                                   <tr>
                                       <td width="20%">
-                                          <span class="fw-b">{{ 'mautic.email.custom_headers'|trans }}</span>
+                                          <span class="fw-bold">{{ 'mautic.email.custom_headers'|trans }}</span>
                                       </td>
                                       <td>{{ email.headers|formatter_simple_array_to_html }}</td>
                                   </tr>
                               {% endif %}
                               <tr>
                                   <td width="20%">
-                                      <span class="fw-b" data-bs-toggle="tooltip" data-bs-placement="right" title="{{ 'mautic.email.stat.sent.details'|trans }}">{{ 'mautic.email.stat.sent'|trans }} <i class="ri-question-line"></i></span>
+                                      <span class="fw-bold" data-bs-toggle="tooltip" data-bs-placement="right" title="{{ 'mautic.email.stat.sent.details'|trans }}">{{ 'mautic.email.stat.sent'|trans }} <i class="ri-question-line"></i></span>
                                   </td>
                                   <td>{{ email.sentCount }}</td>
                               </tr>
                               <tr>
                                   <td width="20%">
-                                      <span class="fw-b">{{ 'mautic.email.stat.delivered'|trans }}</span>
+                                      <span class="fw-bold">{{ 'mautic.email.stat.delivered'|trans }}</span>
                                   </td>
                                   <td data-email-stat-delivered-for="{{ email.id }}"><div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div></td>
                               </tr>
                               <tr>
                                   <td width="20%">
-                                      <span class="fw-b">{{ 'mautic.email.stat.read'|trans }}</span>
+                                      <span class="fw-bold">{{ 'mautic.email.stat.read'|trans }}</span>
                                   </td>
                                   <td>{{ email.readCount }}</td>
                               </tr>

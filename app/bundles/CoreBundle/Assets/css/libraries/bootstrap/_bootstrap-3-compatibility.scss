@@ -2080,15 +2080,7 @@ mark,
 .text-uppercase      { text-transform: uppercase; }
 .text-capitalize     { text-transform: capitalize; }
 
-.text-muted {
-  color: $text-muted;
-}
-
-@include text-emphasis-variant('.text-primary', $brand-primary);
-
 @include text-emphasis-variant('.text-success', $state-success-text);
-
-@include text-emphasis-variant('.text-info', $state-info-text);
 
 @include text-emphasis-variant('.text-warning', $state-warning-text);
 

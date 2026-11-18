@@ -317,33 +317,19 @@ h1, h2, h3, h4, h5, h6,
   }
 }
 
-// Font weight
-// -------------------------
-.fw-b { font-weight: 700; }
-.fw-sb { font-weight: 600; }
-.fw-n { font-weight: 400; }
-.fw-t { font-weight: 300; }
-
 .tt-u { text-transform: uppercase; }
 
 .lh-1 { line-height: 1; }
 
 // Contextual colors
 // -------------------------
-.text-muted, .text-secondary { color: var(--text-secondary); }
-.text-placeholder { color: var(--text-placeholder); }
 .text-white { @include text-emphasis-variants(#fff); }
-.text-primary { color: var(--text-primary) }
-.text-interactive { color: var(--interactive) }
 .text-success { @include text-emphasis-variants($brand-success); }
 .text-warning { @include text-emphasis-variants($brand-warning); }
 .text-danger { @include text-emphasis-variants($brand-danger); }
-.text-info { color: var(--support-info); }
 .text-twitter { @include text-emphasis-variants($brand-twitter); }
 .text-facebook { @include text-emphasis-variants($brand-facebook); }
 .text-google { @include text-emphasis-variants($brand-google); }
-.text-disabled { color: var(--text-disabled); }
-.text-helper { color: var(--text-helper);}
 
 .text-help {
   color: var(--text-helper);

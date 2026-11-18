@@ -26,7 +26,7 @@ data-event-no-percent="{{ event['noPercent'] }}">
 <div class="campaign-event-type">
     {% if event['eventType'] == 'decision' %}
     <div class="campaign-event-content flex-nowrap gap-5 align-items-center flex-row d-flex flex-grow-1 pa-12">
-        <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.when'|trans }}</span>
+        <span class="h5 fw-bold event-type-color">{{ 'mautic.campaign.when'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
         {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
         <span class="campaign-event-name label label-info ms-5 me-5 ellipsis">{{ idString ~ event['name'] }}</span>
@@ -59,7 +59,7 @@ data-event-no-percent="{{ event['noPercent'] }}">
 
     {% elseif event['eventType'] == 'condition' %}
     <div class="campaign-event-content flex-nowrap gap-5 align-items-center flex-row d-flex flex-grow-1 pa-12">
-        <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.if'|trans }}</span>
+        <span class="h5 fw-bold event-type-color">{{ 'mautic.campaign.if'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
             {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
             <span class="campaign-event-name label label-warning ms-5 me-5 ellipsis">{{ idString ~ event['name'] }}</span>

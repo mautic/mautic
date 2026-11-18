@@ -4,7 +4,7 @@
   </a>
 {% else %}
     <a href="{{ url('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
-      <span class="fw-sb">{{ item.tag }}</span>
+      <span class="fw-semibold">{{ item.tag }}</span>
       <span class="ms-4 me-12">#{{ item.id }}</span>
     </a>
   <div class="clearfix"></div>

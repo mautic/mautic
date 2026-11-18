@@ -14,9 +14,9 @@
             <span class="notification-preview__timestamp">{{ 'mautic.core.now'|trans }}</span>
           </header>
           <div class="notification-preview__content">
-            <span class="notification-preview__title fw-sb">{{ notification.heading }}</span>
+            <span class="notification-preview__title fw-semibold">{{ notification.heading }}</span>
             {% if notification.mobileSettings.ios_subtitle is defined %}
-            <span class="notification-preview__subtitle fw-sb">{{ notification.mobileSettings.ios_subtitle }}</span>
+            <span class="notification-preview__subtitle fw-semibold">{{ notification.mobileSettings.ios_subtitle }}</span>
             {% endif %}
             <span class="notification-preview__message">{{ notification.message }}</span>
             <span class="notification-preview__more">{{ 'mautic.notification.preview.more_notifications'|trans }}</span>

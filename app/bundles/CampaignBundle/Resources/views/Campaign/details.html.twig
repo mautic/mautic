@@ -85,7 +85,7 @@
                         <table class="table table-hover mb-0">
                             <tbody>
                             <tr>
-                                <td width="20%"><span class="fw-b textTitle">
+                                <td width="20%"><span class="fw-bold textTitle">
                                     {{ 'mautic.campaignconfig.campaign_republish_behavior'|trans }}
                                 </td>
                                 <td>
@@ -93,7 +93,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td width="20%"><span class="fw-b textTitle">
+                                <td width="20%"><span class="fw-bold textTitle">
                                     {{ 'mautic.campaign.last.publish.date'|trans }}
                                     <span data-bs-toggle="tooltip"  title="{{ 'mautic.campaign.last.publish.date.tooltip'|trans }}">
                                         <i class="ri-question-line"></i>
@@ -107,7 +107,7 @@
                             {% for sourceType, typeNames in sources %}
                               {% if typeNames is not empty %}
                                 <tr>
-                                    <td width="20%"><span class="fw-b textTitle">
+                                    <td width="20%"><span class="fw-bold textTitle">
                                       {{ ('mautic.campaign.leadsource.'~sourceType)|trans }}
                                     </td>
                                     <td>

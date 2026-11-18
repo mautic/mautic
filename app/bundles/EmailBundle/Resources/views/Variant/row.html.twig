@@ -26,7 +26,7 @@
             <a href="{{ path(actionRoute, {'objectAction': 'view', 'objectId': variant.id}) }}"
                data-toggle="ajax"
                title="{{ variant.subject }}"
-               class="variant-name {% if isCurrent %}fw-b{% endif %}"
+               class="variant-name {% if isCurrent %}fw-bold{% endif %}"
                style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 {{ attribute(variant, nameGetter) }}
             </a>

@@ -18,7 +18,7 @@
                         alt="" width="65px">
                 </div>
                 <div class="media-body">
-                    <h3 class="fw-sb">{{ me.getName() }}</h3>
+                    <h3 class="fw-semibold">{{ me.getName() }}</h3>
                     <span class="text-secondary">{{ me.getPosition() }}</span>
                 </div>
             </div>
@@ -60,7 +60,7 @@
                 <div class="tab-pane fade show active rounded-0 bdr-w-0" id="profile">
                     {{ form_start(userForm) }}
                     <div class="row pa-16 bdr-b">
-                        <h4 class="fw-sb">{{ 'mautic.user.account.header.details'|trans }}</h4>
+                        <h4 class="fw-semibold">{{ 'mautic.user.account.header.details'|trans }}</h4>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -108,7 +108,7 @@
                 {% if permissions.apiAccess is defined and permissions.apiAccess %}
                 <div class="tab-pane fade rounded-0 bdr-w-0" id="clients">
                     <div class="row pa-16 bdr-b">
-                        <h4 class="fw-sb">{{ 'mautic.user.account.header.authorizedclients'|trans }}</h4>
+                        <h4 class="fw-semibold">{{ 'mautic.user.account.header.authorizedclients'|trans }}</h4>
                     </div>
                     <div class="row">
                         {{ authorizedClients|raw }}
@@ -118,7 +118,7 @@
 
                 <div class="tab-pane fade rounded-0 bdr-w-0" id="appearance">
                     <div class="row pa-16 bdr-b">
-                        <h4 class="fw-sb">{{ 'mautic.user.account.appearance'|trans }}</h4>
+                        <h4 class="fw-semibold">{{ 'mautic.user.account.appearance'|trans }}</h4>
                     </div>
                     <div class="row">
                         <div class="col-xs-12 mb-24">
@@ -174,7 +174,7 @@
 
                 <div class="tab-pane fade rounded-0 bdr-w-0" id="accessibility">
                     <div class="row pa-16 bdr-b">
-                        <h4 class="fw-sb">{{ 'mautic.user.account.accessibility'|trans }}</h4>
+                        <h4 class="fw-semibold">{{ 'mautic.user.account.accessibility'|trans }}</h4>
                     </div>
                     <div class="row">
                         <div class="col-xs-12 mb-24">
