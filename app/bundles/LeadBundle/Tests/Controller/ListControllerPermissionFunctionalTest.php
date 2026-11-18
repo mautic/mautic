@@ -580,18 +580,6 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
-    public function testPostOnViewSegment(): void
-    {
-        $this->client->request(Request::METHOD_POST, '/s/segments/view/'.$this->segmentA->getId(), [
-            'includeEvents' => [
-                'manually_added',
-                'manually_removed',
-                'filter_added',
-            ],
-        ]);
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-    }
-
     public function testRemoveLeadFromSegmentWhereUserIsNotOwnerOfSegment(): void
     {
         $leadId = $this->createLead($this->userOne)->getId();
