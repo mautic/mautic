@@ -2,7 +2,6 @@ $enable-rfs: false;
 $enable-smooth-scroll: false;
 $enable-negative-margins: true;
 $link-decoration: none;
-$headings-margin-bottom: 0;
 $spacers: (
   0: 0px,
   1: 1px,
@@ -78,6 +77,24 @@ $gutters: (
 @import "helpers";
 
 @import 'bootstrap-3-compatibility';
+
+$utilities: map-merge($utilities, (
+  "color": map-merge(map-get($utilities, "color"), (
+    "values": map-merge(map-get(map-get($utilities, "color"), "values"), (
+      "on-color": var(--text-on-color),
+      "inverse": var(--text-inverse)
+    ))
+  )),
+  "background-color": map-merge(map-get($utilities, "background-color"), (
+    "values": map-merge(map-get(map-get($utilities, "background-color"), "values"), (
+      "primary": var(--background-brand),
+      "success": var(--support-success),
+      "info": var(--support-info),
+      "warning": var(--support-warning),
+      "danger": var(--support-error)
+    ))
+  ))
+));
 
 $utilities: map-merge($utilities, (
   "color": map-merge(map-get($utilities, "color"), (

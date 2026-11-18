@@ -76,6 +76,8 @@ $headings-line-height:    1.1;
 $headings-color:          inherit;
 
 
+
+
 $padding-base-vertical:     6px !default;
 $padding-base-horizontal:   12px !default;
 
@@ -618,6 +620,14 @@ $abbr-border-color:           $gray-light !default;
 
 $headings-small-color:        $gray-light !default;
 
+$blockquote-small-color:      $gray-light !default;
+
+$blockquote-font-size:        ($font-size-base * 1.25);
+
+$blockquote-border-color:     $gray-lighter !default;
+
+$page-header-border-color:    $gray-lighter !default;
+
 $dl-horizontal-offset:        $component-offset-horizontal !default;
 
 $dl-horizontal-breakpoint:    $grid-float-breakpoint !default;
@@ -632,11 +642,18 @@ $info: $brand-info;
 $warning: $brand-warning;
 $danger: $brand-danger;
 
-$utilities: map-merge($utilities, (
-  "background-color": map-merge(map-get($utilities, "background-color"), (
-    "values": map-remove(map-get(map-get($utilities, "background-color"), "values"), "primary", "success", "info", "warning", "danger")
-  ))
-));
+
+@mixin hide-text() {
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+
+@mixin text-hide() {
+  @include hide-text;
+}
 
 @mixin opacity($opacity) {
   $opacity-ie: ($opacity * 100);
@@ -733,6 +750,16 @@ $utilities: map-merge($utilities, (
   word-spacing: normal;
   word-wrap: normal;
   white-space: normal;
+}
+
+@mixin text-emphasis-variant($parent, $color) {
+  #{$parent} {
+    color: $color;
+  }
+  a#{$parent}:hover,
+  a#{$parent}:focus {
+    color: darken($color, 10%);
+  }
 }
 
 @mixin text-overflow() {
@@ -1177,16 +1204,6 @@ $utilities: map-merge($utilities, (
   }
 }
 
-@mixin bg-variant($parent, $color) {
-  #{$parent} {
-    background-color: $color;
-  }
-  a#{$parent}:hover,
-  a#{$parent}:focus {
-    background-color: darken($color, 10%);
-  }
-}
-
 @mixin border-top-radius($radius) {
   border-top-left-radius: $radius;
   border-top-right-radius: $radius;
@@ -1615,6 +1632,11 @@ dfn {
   font-style: italic;
 }
 
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
 mark {
   background: #ff0;
   color: #000;
@@ -1977,6 +1999,9 @@ h1, h2, h3, h4, h5, h6,
 h1, .h1,
 h2, .h2,
 h3, .h3 {
+  margin-top: $line-height-computed;
+  margin-bottom: ($line-height-computed * 0.5);
+
   small,
   .small {
     font-size: 65%;
@@ -1985,6 +2010,9 @@ h3, .h3 {
 h4, .h4,
 h5, .h5,
 h6, .h6 {
+  margin-top: ($line-height-computed * 0.5);
+  margin-bottom: ($line-height-computed * 0.5);
+
   small,
   .small {
     font-size: 75%;
@@ -2024,21 +2052,35 @@ mark,
   background-color: $state-warning-bg;
 }
 
+.text-left           { text-align: left; }
+.text-right          { text-align: right; }
+.text-center         { text-align: center; }
+.text-justify        { text-align: justify; }
+.text-nowrap         { white-space: nowrap; }
 
+.text-lowercase      { text-transform: lowercase; }
+.text-uppercase      { text-transform: uppercase; }
+.text-capitalize     { text-transform: capitalize; }
 
-.bg-primary {
-
-  color: #fff;
+.text-muted {
+  color: $text-muted;
 }
-@include bg-variant('.bg-primary', $brand-primary);
 
-@include bg-variant('.bg-success', $state-success-bg);
+@include text-emphasis-variant('.text-primary', $brand-primary);
 
-@include bg-variant('.bg-info', $state-info-bg);
+@include text-emphasis-variant('.text-success', $state-success-text);
 
-@include bg-variant('.bg-warning', $state-warning-bg);
+@include text-emphasis-variant('.text-info', $state-info-text);
 
-@include bg-variant('.bg-danger', $state-danger-bg);
+@include text-emphasis-variant('.text-warning', $state-warning-text);
+
+@include text-emphasis-variant('.text-danger', $state-danger-text);
+
+.page-header {
+  padding-bottom: (($line-height-computed * 0.5) - 1);
+  margin: ($line-height-computed * 2) 0 $line-height-computed;
+  border-bottom: 1px solid $page-header-border-color;
+}
 
 ul,
 ol {
@@ -2112,6 +2154,52 @@ abbr[data-original-title] {
 .initialism {
   font-size: 90%;
   @extend .text-uppercase;
+}
+
+blockquote {
+  padding: ($line-height-computed * 0.5) $line-height-computed;
+  margin: 0 0 $line-height-computed;
+  font-size: $blockquote-font-size;
+  border-left: 5px solid $blockquote-border-color;
+
+  p,
+  ul,
+  ol {
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  footer,
+  small,
+  .small {
+    display: block;
+    font-size: 80%;
+    line-height: $line-height-base;
+    color: $blockquote-small-color;
+
+    &:before {
+      content: "\2014 \00A0";
+    }
+  }
+}
+
+.blockquote-reverse,
+blockquote.pull-right {
+  padding-right: 15px;
+  padding-left: 0;
+  text-align: right;
+  border-right: 5px solid $blockquote-border-color;
+  border-left: 0;
+
+  footer,
+  small,
+  .small {
+    &:before { content: ""; }
+    &:after {
+      content: "\00A0 \2014";
+    }
+  }
 }
 
 address {
@@ -4790,6 +4878,14 @@ a.thumbnail.active {
   vertical-align: top;
 }
 
+.media-middle {
+  vertical-align: middle;
+}
+
+.media-bottom {
+  vertical-align: bottom;
+}
+
 .media-heading {
   margin-top: 0;
   margin-bottom: 5px;
@@ -5816,6 +5912,10 @@ button.btn-close {
 .invisible {
   visibility: hidden;
 }
+.text-hide {
+  @include text-hide;
+}
+
 .hidden {
   display: none !important;
 }

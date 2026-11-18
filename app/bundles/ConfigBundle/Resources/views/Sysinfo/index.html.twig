@@ -82,7 +82,7 @@
                             </tr>
                         </thead>
                         {% for folder, isWritable in folders %}
-                            <tr class="{% if isWritable %}bg-success{% else %}bg-danger{% endif %}">
+                            <tr class="{% if isWritable %}bg-success{% else %}bg-danger{% endif %} text-inverse">
                                 <td>{{ folder }}</td>
                                 <td>
                                     {% if isWritable %}

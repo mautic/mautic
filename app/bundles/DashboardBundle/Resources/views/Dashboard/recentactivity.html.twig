@@ -6,7 +6,7 @@
             {% for log in logs %}
                 <li class="media">
                     <div class="media-object float-start">
-                        <span class="figure featured {% if 'create' == log.action %}bg-success{% endif %}">
+                        <span class="figure featured {% if 'create' == log.action %}bg-success text-inverse{% endif %}">
                             <span class="fa {{ icons[log.bundle]|default('') }}"></span>
                         </span>
                     </div>
