@@ -178,7 +178,7 @@
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-6 align-middle">
-                                    <h5 class="text-white dark-md fw-semibold mb-5">
+                                    <h5 class="text-secondary fw-semibold mb-5">
                                         <span class="ri-download-line"></span>
                                         {{ 'mautic.form.graph.line.submissions'|trans }}
                                     </h5>
@@ -232,15 +232,15 @@
                                         {% endif %}
                                         {% if icon is not empty %}
                                             <div class="col-md-1 align-middle">
-                                                <h3><span class="fa {{ icon }} text-white dark-xs"></span></h3>
+                                                <h3><span class="fa {{ icon }} text-secondary"></span></h3>
                                             </div>
                                         {% endif %}
                                         <div class="col-md-7 align-middle">
                                             <h5 class="fw-semibold text-interactive mb-5">{{ action.name }}</h5>
-                                            <h6 class="text-white dark-sm">{{ action.description|purify }}</h6>
+                                            <h6 class="text-secondary">{{ action.description|purify }}</h6>
                                         </div>
                                         <div class="col-md-4 align-middle text-end">
-                                            <em class="text-white dark-sm">{% if availableActions[action.type] is defined %}{{ availableActions[action.type]['label']|trans }}{% else %}{{ action.type }}{% endif %}</em>
+                                            <em class="text-secondary">{% if availableActions[action.type] is defined %}{{ availableActions[action.type]['label']|trans }}{% else %}{{ action.type }}{% endif %}</em>
                                         </div>
                                     </div>
                                 </li>
