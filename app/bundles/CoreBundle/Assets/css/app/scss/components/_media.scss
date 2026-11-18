@@ -42,8 +42,8 @@ a.media {
   &.media-list-feed {
     position: relative;
     .media {
+      position: relative;
       overflow: visible;
-
       &:first-of-type > .media-object > .figure {
         background-color: var(--background-inverse);
         color: var(--text-inverse);
@@ -52,7 +52,6 @@ a.media {
         &:hover { background-color: var(--background-inverse-hover);}
       }
       > .media-object {
-        position: relative;
         width: 28px;
         text-align: center;
         margin-right: 20px;
@@ -60,11 +59,11 @@ a.media {
         &:before {
           content: '';
           position: absolute;
-          top: -200%;
-          bottom: -200%;
+          top: 0;
+          bottom: -15px;
           width: 1px;
-          left: 50%;
-          background-image: linear-gradient(to bottom, rgba(255,255,255,0) 0%, var(--layer) 5%, var(--layer) 90%, rgba(229,229,229,0) 100%);
+          left: 14px;
+          background-color: var(--border-subtle);
         }
 
         > .figure {
@@ -92,15 +91,10 @@ a.media {
       }
       &:first-child {
         > .media-object {
-          &:before { top: 0; }
+          &:before { top: 10px; }
         }
       }
       &:last-child {
-        > .media-object {
-          &:before { bottom: auto; height: calc(200% + 7px); }
-        }
-      }
-      &:first-child:last-child {
         > .media-object {
           &:before { display: none; }
         }
