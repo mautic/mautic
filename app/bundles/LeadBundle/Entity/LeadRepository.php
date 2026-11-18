@@ -870,7 +870,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 if (in_array($string, [$manuallyAddedValue, $manuallyAddedValueEn], true)) {
                     $manuallyAddedParam = 1;
                 } elseif (in_array($string, [$manuallyRemovedValue, $manuallyRemovedValueEn], true)) {
-                    $manuallyRemoved = true;
+                    $manuallyAddedParam = null;
+                    $manuallyRemoved    = true;
                 } elseif (in_array($string, [$filterAddedValue, $filterAddedValueEn], true)) {
                     $manuallyAddedParam = 0;
                 } else {
