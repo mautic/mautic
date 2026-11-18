@@ -593,7 +593,7 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
             var $this         = mQuery(this);
             var parentElement = $this.parents('.tab-pane.dynamic-content');
 
-            if ($this.hasClass('remove-filter') || tabContainer.attr('id') === 'dynamicContentTabs') {
+            if ($this.hasClass('remove-filter')) {
                 parentElement = $this.parents('.tab-pane.dynamic-content-filter');
             }
 
