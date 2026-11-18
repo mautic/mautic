@@ -31,20 +31,17 @@
 
         // This should work with all navs, not just the navbar, so you should be able to pass a parent in
         var parent     = $(this).closest(options.parent);
-        var isVertical = $(this).hasClass('flex-column');
 
         if (!options.offset) {
             options.offset = {};
         }
 
-        if (!isVertical) {
-            $(ul).css(
-                {
-                    'height': '42px',
-                    'overflow-y': 'hidden'
-                }
-            );
-        }
+        $(ul).css(
+            {
+                'height': '42px',
+                'overflow-y': 'hidden'
+            }
+        );
 
         // Check if it is a navbar and twitter bootstrap collapse is in use
         var collapse = $('div.nav-collapse').length; // Boostrap < 2
@@ -67,7 +64,7 @@
         if(collapsed === false) {
 
             // Get dimension of the navbar parent so we know how much room we have to work with
-            var parent_dimension = (isVertical) ? $(parent).height() - (options.offset.height ? parseInt(options.offset.height) : 0) : $(parent).width() - (options.offset.width ? parseInt(options.offset.width) : 0);
+            var parent_dimension = $(parent).width() - (options.offset.width ? parseInt(options.offset.width) : 0);
 
             // Find an already existing .overflow-nav dropdown
             var dropdown = $('li.overflow-nav', ul);
@@ -75,17 +72,15 @@
             // Create one if none exists
             if (! dropdown.length) {
                 dropdown = $('<li class="overflow-nav dropdown"></li>');
-                if (!isVertical) {
-                    dropdown.addClass('float-end');
-                }
+                dropdown.addClass('float-end');
                 dropdown.append($('<a class="dropdown-toggle" data-bs-toggle="dropdown" href="#"><span class="overflow-count"></span><b class="caret"></b></a>'));
                 dropdown.append($('<ul class="dropdown-menu"></ul>'));
             }
 
             // Get the dimension of the navbar, need to add together <li>s as the ul wraps in bootstrap
-            var dimension = (isVertical) ? 42 : 100;
+            var dimension = 100;
             ul.children('li').not('li.dropdown').each(function() {
-                dimension += (isVertical) ? $(this).outerHeight(true) : $(this).outerWidth(true);
+                dimension += $(this).outerWidth(true);
             });
 
             // Window is shrinking
@@ -93,15 +88,15 @@
                 // Loop through each non-dropdown li in the ul menu from right to left (using .get().reverse())
                 $($('li', ul).not('.dropdown').get().reverse()).each(function() {
                     // Get the dimension of the navbar
-                    var dimension = (isVertical) ? 42 : 100; // Allow for padding
+                    var dimension = 100; // Allow for padding
                     ul.children('li').each(function() {
                         var $this = $(this);
-                        dimension += (isVertical) ? $this.outerHeight(true) : $this.outerWidth(true);
+                        dimension += $this.outerWidth(true);
                     });
                     // Count tabs in the drop down as well
                     if (dimension >= parent_dimension) {
                         // Remember the original dimension so that we can restore as the window grows
-                        $(this).attr('data-original-dimension', (isVertical) ? $(this).outerHeight(true) : $(this).outerWidth(true));
+                        $(this).attr('data-original-dimension', $(this).outerWidth(true));
                         // Move the rightmost item to top of dropdown menu if we are running out of space
                         dropdown.children('ul.dropdown-menu').prepend(this);
                     }
@@ -152,18 +147,12 @@
         // Update overflow tab count
         dropdown.find('.dropdown-toggle .overflow-count').text(dropdown.find('ul.dropdown-menu li').length+" "+options.more);
 
-        if (isVertical) {
-            dropdown.find('ul.dropdown-menu').css('width', '100%');
-        }
-
-        if (!isVertical) {
-            $(ul).css(
-                {
-                    'height': 'auto',
-                    'overflow-y': 'inherit'
-                }
-            );
-        }
+        $(ul).css(
+            {
+                'height': 'auto',
+                'overflow-y': 'inherit'
+            }
+        );
     };
 
 }(window.jQuery);

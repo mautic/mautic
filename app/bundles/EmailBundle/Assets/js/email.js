@@ -593,7 +593,7 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
             var $this         = mQuery(this);
             var parentElement = $this.parents('.tab-pane.dynamic-content');
 
-            if ($this.hasClass('remove-filter')) {
+            if ($this.hasClass('remove-filter') || tabContainer.attr('id') === 'dynamicContentTabs') {
                 parentElement = $this.parents('.tab-pane.dynamic-content-filter');
             }
 
@@ -605,7 +605,7 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
             parentElement.remove();
             tabLink.remove();
             // if tabContainer is for variants, show the first one, if it is the DEC vertical list, show the second one
-            if (tabContainer.hasClass('flex-column') || $this.hasClass('remove-filter')) {
+            if ($this.hasClass('remove-filter') || tabContainer.attr('id') === 'dynamicContentTabs') {
                 tabContainer.find('li').first().next().find('a').tab('show');
             } else {
                 tabContainer.find('li').first().find('a').tab('show');
