@@ -6,7 +6,7 @@
     - deleted (bool, optional)
 #}
 {% set deleted = deleted|default(false) %}
-<div class="trigger-event-row {% if deleted %}bg-danger{% endif %}" id="triggerEvent_{{ id }}">
+<div class="trigger-event-row {% if deleted %}bg-danger text-inverse{% endif %}" id="triggerEvent_{{ id }}">
     {{ include('@MauticPoint/Event/actions.html.twig', {
         'deleted': deleted,
         'id': id,
