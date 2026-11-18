@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\Intl\Countries;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -21,11 +22,13 @@ final class FormFieldTelTypeTest extends TypeTestCase
 
     private MockObject&TranslatorInterface $translator;
 
+    private string $locale = 'en';
+
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->method('trans')->willReturnArgument(0);
-        $this->translator->method('getLocale')->willReturn('en');
+        $this->translator->method('getLocale')->willReturnCallback(fn (): string => $this->locale);
 
         parent::setUp();
     }
@@ -74,6 +77,18 @@ final class FormFieldTelTypeTest extends TypeTestCase
         $this->assertSame(self::COUNTRY_UNITED_STATES, $countryField->getData());
         $this->assertContains(self::COUNTRY_UNITED_STATES, $countryField->getConfig()->getOption('choices'));
         $this->assertSame('mautic.form.field.type.tel.country_validation.tooltip', $countryField->getConfig()->getOption('attr')['tooltip']);
+    }
+
+    public function testCountryChoicesUseTranslatorLocale(): void
+    {
+        $this->locale = 'fr';
+        $form = $this->factory->create(FormFieldTelType::class, [], [
+            'data' => [],
+        ]);
+
+        $choices = $form->get('country')->getConfig()->getOption('choices');
+
+        $this->assertSame(self::COUNTRY_UNITED_STATES, $choices[Countries::getName(self::COUNTRY_UNITED_STATES, 'fr')]);
     }
 
     public function testInternationalFieldConfiguration(): void

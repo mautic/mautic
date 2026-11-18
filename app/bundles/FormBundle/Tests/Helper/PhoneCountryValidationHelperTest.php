@@ -6,6 +6,7 @@ namespace Mautic\FormBundle\Tests\Helper;
 
 use Mautic\FormBundle\Helper\PhoneCountryValidationHelper;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Intl\Countries;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(PhoneCountryValidationHelper::class)]
 final class PhoneCountryValidationHelperTest extends TestCase
@@ -15,12 +16,26 @@ final class PhoneCountryValidationHelperTest extends TestCase
         $countries = PhoneCountryValidationHelper::getCountries();
 
         $this->assertGreaterThan(50, count($countries));
-        $names = array_keys($countries);
-        $sorted = $names;
-        sort($sorted);
+        $names    = array_keys($countries);
+        $sorted   = $names;
+        $collator = new \Collator('en');
+        $collator->sort($sorted);
+
         $this->assertSame($sorted, $names);
         $this->assertArrayHasKey('United States', $countries);
         $this->assertSame('US', $countries['United States']);
+    }
+
+    public function testGetsCountriesInRequestedLocaleOrder(): void
+    {
+        $countries = PhoneCountryValidationHelper::getCountries('fr');
+        $names     = array_keys($countries);
+        $sorted    = $names;
+        $collator  = new \Collator('fr');
+        $collator->sort($sorted);
+
+        $this->assertSame($sorted, $names);
+        $this->assertSame('US', $countries[Countries::getName('US', 'fr')]);
     }
 
     public function testValidatesPhoneNumberForCountry(): void

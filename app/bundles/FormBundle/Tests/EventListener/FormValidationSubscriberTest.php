@@ -10,6 +10,7 @@ use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\EventListener\FormValidationSubscriber;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Intl\Countries;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[CoversClass(FormValidationSubscriber::class)]
@@ -18,6 +19,8 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
     private const MINIMUM_TWO_OPTIONS_MESSAGE = 'You must select at least 2 options.';
 
     private MockObject&TranslatorInterface $translator;
+
+    private string $locale = 'en';
 
     private MockObject&CoreParametersHelper $coreParametersHelper;
 
@@ -28,7 +31,7 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->translator->method('getLocale')->willReturn('en');
+        $this->translator->method('getLocale')->willReturnCallback(fn (): string => $this->locale);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $this->subscriber = new FormValidationSubscriber(
@@ -239,6 +242,29 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $field->setValidation(['country' => 'US']);
 
         $event = new ValidationEvent($field, '+5511999999999');
+        $this->subscriber->onFormValidate($event);
+
+        $this->assertFalse($event->isValid());
+    }
+
+    public function testCountryPhoneValidationUsesTranslatorLocale(): void
+    {
+        $this->locale = 'fr';
+        $this->translator
+            ->expects($this->once())
+            ->method('trans')
+            ->with(
+                'mautic.form.submission.phone.invalid_country',
+                ['%country%' => Countries::getName('US', 'fr')],
+                'validators'
+            )
+            ->willReturn('Invalid phone number.');
+
+        $field = new Field();
+        $field->setType('tel');
+        $field->setValidation(['country' => 'US']);
+
+        $event = new ValidationEvent($field, '+551****9999');
         $this->subscriber->onFormValidate($event);
 
         $this->assertFalse($event->isValid());
@@ -467,7 +493,7 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
             'international_validationmsg' => '0',
         ]);
 
-        $event = new ValidationEvent($field, 'not a phone');
+        $event = new ValidationEvent($field, '0');
         $this->subscriber->onFormValidate($event);
 
         $this->assertFalse($event->isValid());

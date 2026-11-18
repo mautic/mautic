@@ -54,16 +54,15 @@ final class PhoneCountryValidationHelper
      */
     public static function getCountries(string $locale = 'en'): array
     {
-        $allCountries = Countries::getNames($locale);
-        $result       = [];
+        $allCountries     = Countries::getNames($locale);
+        $supportedRegions = array_fill_keys(PhoneNumberUtil::getInstance()->getSupportedRegions(), true);
+        $result           = [];
 
-        foreach (PhoneNumberUtil::getInstance()->getSupportedRegions() as $regionCode) {
-            if (isset($allCountries[$regionCode])) {
-                $result[$allCountries[$regionCode]] = $regionCode;
+        foreach ($allCountries as $regionCode => $name) {
+            if (isset($supportedRegions[$regionCode])) {
+                $result[$name] = $regionCode;
             }
         }
-
-        ksort($result);
 
         return $result;
     }
