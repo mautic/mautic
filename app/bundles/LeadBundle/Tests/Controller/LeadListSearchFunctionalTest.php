@@ -103,14 +103,14 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSearchResult('is%3Aunsegmented', [$leadSeven], [$leadOne, $leadTwo, $leadThree, $leadFour, $leadFive, $leadSix]);
         $this->assertQueries([
-            "SELECT COUNT(l.id) as count FROM {$prefix}leads l WHERE (l.date_identified IS NOT NULL) AND (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0)))",
-            "SELECT l.* FROM {$prefix}leads l WHERE (l.date_identified IS NOT NULL) AND (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0))) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$this->prefix}leads l WHERE (l.date_identified IS NOT NULL) AND (NOT EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0)))",
+            "SELECT l.* FROM {$this->prefix}leads l WHERE (l.date_identified IS NOT NULL) AND (NOT EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0))) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
 
         $this->assertSearchResult('!is%3Aunsegmented', [$leadOne, $leadTwo, $leadThree, $leadFour, $leadFive, $leadSix], [$leadSeven]);
         $this->assertQueries([
-            "SELECT COUNT(l.id) as count FROM {$prefix}leads l WHERE (l.date_identified IS NOT NULL) AND (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0)))",
-            "SELECT l.* FROM {$prefix}leads l WHERE (l.date_identified IS NOT NULL) AND (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0))) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$this->prefix}leads l WHERE (l.date_identified IS NOT NULL) AND (EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0)))",
+            "SELECT l.* FROM {$this->prefix}leads l WHERE (l.date_identified IS NOT NULL) AND (EXISTS(SELECT 1 FROM {$this->prefix}lead_lists_leads llu WHERE (l.id = llu.lead_id) AND (llu.manually_removed = 0))) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
     }
 
