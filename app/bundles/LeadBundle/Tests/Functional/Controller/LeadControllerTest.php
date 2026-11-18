@@ -61,7 +61,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $contactExportSchedulerRows = $this->checkContactExportScheduler(1);
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler     = $contactExportSchedulerRows[0];
-        $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
+        $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => (string) $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
         $coreParametersHelper    = $this->getService(CoreParametersHelper::class);
         $zipFileName             = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
@@ -191,7 +191,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $dateHelper      = $this->getService(DateHelper::class);
         $requestedAt     = $dateHelper->toFull($this->getScheduledDateTimeForDisplay($contactExportScheduler));
 
-        $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
+        $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => (string) $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
 
         $coreParametersHelper = $this->getService(CoreParametersHelper::class);

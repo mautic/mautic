@@ -97,7 +97,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         );
         $this->assertInstanceOf(AuditLog::class, $createAuditLog);
 
-        $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
+        $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => (string) $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
 
         /** @var AuditLog|null $sendEmailAuditLog */

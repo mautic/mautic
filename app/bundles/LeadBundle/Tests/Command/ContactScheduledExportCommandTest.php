@@ -61,7 +61,7 @@ final class ContactScheduledExportCommandTest extends TestCase
 
         $inputInterfaceMock->expects($this->once())->method('getOption')
             ->with('ids')
-            ->willReturn(1);
+            ->willReturn('1');
 
         $this->assertSame(ExitCode::TERMINATED, $command->getExecute($inputInterfaceMock, $outputInterfaceMock));
     }
