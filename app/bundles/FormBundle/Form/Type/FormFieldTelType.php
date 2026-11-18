@@ -30,7 +30,7 @@ final class FormFieldTelType extends AbstractType
             [
                 'label'       => 'mautic.form.field.type.tel.country_validation',
                 'label_attr'  => ['class' => 'form-label'],
-                'choices'     => PhoneCountryValidationHelper::getCountries(),
+                'choices'     => PhoneCountryValidationHelper::getCountries($this->translator->getLocale()),
                 'placeholder' => 'mautic.core.none',
                 'required'    => false,
                 'data'        => $options['data']['country'] ?? null,

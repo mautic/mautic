@@ -52,9 +52,9 @@ final class PhoneCountryValidationHelper
      *
      * @return array<string, string> [localized country name => ISO region code]
      */
-    public static function getCountries(): array
+    public static function getCountries(string $locale = 'en'): array
     {
-        $allCountries = Countries::getNames();
+        $allCountries = Countries::getNames($locale);
         $result       = [];
 
         foreach (PhoneNumberUtil::getInstance()->getSupportedRegions() as $regionCode) {

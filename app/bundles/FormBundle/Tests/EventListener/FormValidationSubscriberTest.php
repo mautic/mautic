@@ -28,6 +28,7 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->translator->method('getLocale')->willReturn('en');
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $this->subscriber = new FormValidationSubscriber(

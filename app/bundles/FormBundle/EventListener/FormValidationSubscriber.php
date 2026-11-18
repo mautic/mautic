@@ -146,7 +146,13 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
             return true;
         }
 
-        $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid_country', ['%country%' => Countries::getName($countryCode)], 'validators'));
+        $event->failedValidation(
+            $this->translator->trans(
+                'mautic.form.submission.phone.invalid_country',
+                ['%country%' => Countries::getName($countryCode, $this->translator->getLocale())],
+                'validators'
+            )
+        );
 
         return true;
     }

@@ -25,6 +25,7 @@ final class FormFieldTelTypeTest extends TypeTestCase
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->method('trans')->willReturnArgument(0);
+        $this->translator->method('getLocale')->willReturn('en');
 
         parent::setUp();
     }
