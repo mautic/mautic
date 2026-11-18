@@ -186,7 +186,7 @@ jobs:
           - php-versions: '8.6'
             postgres-versions: '18'
           - php-versions: '8.7'
-            postgres-versions: '19rc1-alpine'
+            postgres-versions: '19rc2-alpine'
             experimental: true            
 
     name: PHPUnit ${{ matrix.php-versions }} postgres:${{ matrix.postgres-versions }}
