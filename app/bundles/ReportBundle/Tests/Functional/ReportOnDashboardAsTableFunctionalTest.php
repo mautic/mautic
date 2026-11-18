@@ -73,7 +73,7 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
 
         $this->assertEquals($expected, $columns);
 
-        $link = $crawler->filter('.pull-right a')->attr('href');
+        $link = $crawler->filter('.float-end a')->attr('href');
         $this->assertSame('/s/reports/view/'.$report->getId(), $link);
     }
 

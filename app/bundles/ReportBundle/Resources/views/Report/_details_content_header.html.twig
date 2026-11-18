@@ -6,8 +6,8 @@
 <!--/ report detail header -->
 <!-- report detail collapseable -->
 <div id="report-shelves" class="mb-5" aria-multiselectable="true">
-    <div class="collapse pr-md pl-md" id="report-details">
-        <div class="pr-md pl-md pb-md">
+    <div class="collapse pe-16 ps-16" id="report-details">
+        <div class="pe-16 ps-16 pb-16">
             <div class="panel shd-none mb-0">
                 <table class="table table-hover mb-0">
                     <tbody>
@@ -19,8 +19,8 @@
     </div>
     {% if dynamicFilterFields is not empty %}
     <div class="collapse {% if showDynamicFilters %}in{% endif %}" id="report-filters">
-        <div class="pr-md pl-md pb-md">
-            <div class="panel shd-none mb-0 pa-lg">
+        <div class="pe-16 ps-16 pb-16">
+            <div class="panel shd-none mb-0 pa-24">
                 <div class="row">
                     {{ form_start(dynamicFilterForm) }}
                     {% for child in dynamicFilterFields %}
@@ -39,11 +39,11 @@
     <div>
         <!-- report detail collapseable toggler -->
         <div class="hr-expand nm">
-            <a href="#report-details" class="arrow text-secondary collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="report-details">
+            <a href="#report-details" class="arrow text-secondary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="report-details">
                 <span class="caret"></span> {{ 'mautic.core.details'|trans }}
             </a>
             {% if dynamicFilterFields is not empty %}
-            <a href="#report-filters" class="arrow text-secondary {% if not showDynamicFilters %}collapsed{% endif %}" data-toggle="collapse" aria-expanded="false" aria-controls="report-filters">
+            <a href="#report-filters" class="arrow text-secondary {% if not showDynamicFilters %}collapsed{% endif %}" data-bs-toggle="collapse" aria-expanded="false" aria-controls="report-filters">
                 <span class="caret"></span> {{ 'mautic.core.filters'|trans }}
             </a>
             {% endif %}

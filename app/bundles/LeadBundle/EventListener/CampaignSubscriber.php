@@ -299,7 +299,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
             $log->setType('campaign');
             $log->setEventName($pointsLogEventName);
             $log->setActionName($pointsLogActionName);
-            $log->setIpAddress($this->ipLookupHelper->getIpAddress());
+            // No IP for a form submitter Mautic doesn't track
+            $log->setIpAddress($this->ipLookupHelper->isVisitorUntracked() ? null : $this->ipLookupHelper->getIpAddress());
             $log->setDateAdded(new \DateTime());
             if ($pointGroup) {
                 $log->setGroup($pointGroup);

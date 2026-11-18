@@ -697,6 +697,16 @@ class EmailRepository extends CommonRepository
                 $expr            = '('.$q->expr()->eq('e.language', ":{$unique}").' OR '.$q->expr()->like('e.language', ":{$langUnique}").')';
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.email.email.searchcommand.triggered'):
+            case $this->translator->trans('mautic.email.email.searchcommand.triggered', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('e.emailType', ":$unique");
+                $forceParameters = [$unique => 'template'];
+                break;
+            case $this->translator->trans('mautic.email.email.searchcommand.segment'):
+            case $this->translator->trans('mautic.email.email.searchcommand.segment', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('e.emailType', ":$unique");
+                $forceParameters = [$unique => 'list'];
+                break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
                 return $this->handleProjectFilter(
@@ -749,6 +759,8 @@ class EmailRepository extends CommonRepository
             'mautic.email.email.searchcommand.ispending',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
+            'mautic.email.email.searchcommand.triggered',
+            'mautic.email.email.searchcommand.segment',
             'mautic.project.searchcommand.name',
         ];
 
@@ -921,6 +933,12 @@ class EmailRepository extends CommonRepository
 
         $expr->add(
             $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
+        );
+
+        // Translation children must not be broadcast independently. They are sent
+        // by the parent's broadcast to the contacts with a matching preferred locale.
+        $expr->add(
+            $qb->expr()->isNull($this->getTableAlias().'.translationParent')
         );
 
         if (null !== $id && 0 !== $id) {

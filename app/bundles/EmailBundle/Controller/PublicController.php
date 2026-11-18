@@ -22,6 +22,8 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
@@ -35,6 +37,7 @@ use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\HeaderUtils;
@@ -48,6 +51,10 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
 final class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
+
+    private const MESSAGE_TYPE_PREFERENCE_CENTER = 'preference_center';
+    private const MESSAGE_TYPE_RESUBSCRIBED      = 'resubscribed';
+    private const MESSAGE_TYPE_UNSUBSCRIBED      = 'unsubscribed';
 
     private LeadRepository $leadRepository;
 
@@ -134,6 +141,10 @@ final class PublicController extends CommonFormController
         LoggerInterface $logger,
         string $idHash,
     ): Response {
+        if (!$this->emailModel->allowsOpenTracking($idHash)) {
+            return TrackingPixelHelper::getResponse($request);
+        }
+
         try {
             $messageBus->dispatch(new EmailHitNotification($idHash, $request));
         } catch (\Exception $exception) {
@@ -219,6 +230,8 @@ final class PublicController extends CommonFormController
         $email                  = null;
         $lead                   = null;
         $template               = null;
+        $formTemplate           = null;
+        $formContent            = null;
         $session                = $request->getSession();
         $isOneClickUnsubscribe  = $request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe');
         $isUnsubscribeAll       = $request->get('unsubscribe_all');
@@ -364,20 +377,71 @@ final class PublicController extends CommonFormController
 
         $config = $theme->getConfig();
 
+        $messageType = $this->getUnsubscribeMessageType(
+            $isCorrectHash,
+            $hasStat || $lead instanceof Lead,
+            $lead instanceof Lead,
+            (bool) $showContactPreferences,
+            (bool) $isUnsubscribeAll,
+        );
+
         $viewParams = [
-            'email'    => $email,
-            'lead'     => $lead,
-            'template' => $template,
-            'message'  => $message,
+            'email'                    => $email,
+            'lead'                     => $lead,
+            'template'                 => $template,
+            'message'                  => $message,
+            'message_type'             => $messageType,
         ];
 
-        if (!empty($formContent)) {
+        return $this->renderUnsubscribeResponse(
+            $contentTemplate,
+            $viewParams,
+            $message,
+            $formContent,
+            $template,
+            $config
+        );
+    }
+
+    private function getUnsubscribeMessageType(
+        bool $isCorrectHash,
+        bool $hasContact,
+        bool $hasLead,
+        bool $showContactPreferences,
+        bool $isUnsubscribeAll,
+    ): string {
+        if (!$isCorrectHash || !$hasContact) {
+            return '';
+        }
+
+        if ($showContactPreferences && !$isUnsubscribeAll && $hasLead) {
+            return self::MESSAGE_TYPE_PREFERENCE_CENTER;
+        }
+
+        return self::MESSAGE_TYPE_UNSUBSCRIBED;
+    }
+
+    /**
+     * @param array<string, mixed> $viewParams
+     * @param array<string, mixed> $config
+     */
+    private function renderUnsubscribeResponse(
+        string $contentTemplate,
+        array $viewParams,
+        string $message,
+        ?string $formContent,
+        string $template,
+        array $config,
+    ): Response {
+        if (null !== $formContent && '' !== $formContent) {
             $viewParams['content'] = $formContent;
-            if (in_array('form', $config['features'])) {
+            if (in_array('form', $config['features'], true)) {
                 $contentTemplate = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
             } else {
-                $viewParams['content'] = '';
-                $viewParams['message'] = $message.$formContent;
+                $viewParams['content']       = '';
+                $viewParams['message']       = $message.$formContent;
+                $viewParams['statusMessage'] = $message;
+                $viewParams['formContent']   = $formContent;
             }
         }
 
@@ -530,11 +594,12 @@ final class PublicController extends CommonFormController
         return new Response($this->themeHelper->renderThemeTemplate(
             $logicalName,
             [
-                'message'  => $message,
-                'type'     => 'notice',
-                'email'    => $email,
-                'lead'     => $lead,
-                'template' => $template,
+                'message'      => $message,
+                'type'         => 'notice',
+                'message_type' => $isCorrectHash ? self::MESSAGE_TYPE_RESUBSCRIBED : '',
+                'email'        => $email,
+                'lead'         => $lead,
+                'template'     => $template,
             ]
         ));
     }
@@ -597,8 +662,13 @@ final class PublicController extends CommonFormController
             }
         }
 
-        $content = $this->generateContent($emailEntity, $assetsHelper, $draftEnabled, $objectType);
         $company = $previewHelper->getCompanyEntity($companyId);
+        if ([] !== $company && !$this->canViewCompany($company)) {
+            // disallow displaying company information
+            $company = [];
+        }
+
+        $content = $this->generateContent($emailEntity, $assetsHelper, $draftEnabled, $objectType);
         $content = $previewHelper->generatePreviewContent($emailEntity, $contact, $company, $content);
 
         if ($this->security->isAnonymous()) {
@@ -658,6 +728,12 @@ final class PublicController extends CommonFormController
         }
 
         $company = $previewHelper->getCompanyEntity($companyId);
+        if ([] !== $company && !$this->canViewCompany($company)) {
+            // disallow displaying company information
+            $companyId = 0;
+            $company   = [];
+            $this->addFlash(FlashBag::LEVEL_ERROR, $this->translator->trans('mautic.email.preview.company.access.denied', [], 'flashes'));
+        }
 
         $previewPageUrl = $this->generateUrl('mautic_email_preview', [
             'objectId'   => $objectId,
@@ -713,9 +789,24 @@ final class PublicController extends CommonFormController
     }
 
     /**
+     * @param array<mixed> $company
+     */
+    private function canViewCompany(array $company): bool
+    {
+        if ($this->security->isAdmin()) {
+            return true;
+        }
+
+        $ownerId = $company[0]['owner_id'] ?? $company[0]['created_by'] ?? 0;
+
+        return !$this->security->isAnonymous()
+            && $this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', (int) $ownerId);
+    }
+
+    /**
      * @throws \Exception
      */
-    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, $integration): void
+    private function doTracking(Request $request, IntegrationsHelper $integrationsHelper, IntegrationHelper $integrationHelper, MailHelper $mailer, $integration): void
     {
         // if additional data were sent with the tracking pixel
         $query_string = $request->server->get('QUERY_STRING');
@@ -739,14 +830,13 @@ final class PublicController extends CommonFormController
         }
 
         // get secret from plugin settings
-        $myIntegration = $integrationHelper->getIntegrationObject($integration);
+        $keys = $this->getIntegrationApiKeys($integrationsHelper, $integrationHelper, (string) $integration);
 
-        if (!$myIntegration) {
+        if (null === $keys) {
             $this->mauticLogger->log('error', $integration.': integration not found');
 
             return;
         }
-        $keys = $myIntegration->getDecryptedApiKeys();
 
         // generate signature
         $salt = $keys['secret'];
@@ -810,9 +900,29 @@ final class PublicController extends CommonFormController
         }
     }
 
-    public function pluginTrackingGifAction(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, $integration): Response
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function getIntegrationApiKeys(IntegrationsHelper $integrationsHelper, IntegrationHelper $integrationHelper, string $integration): ?array
     {
-        $this->doTracking($request, $integrationHelper, $mailer, $integration);
+        // Integrations migrated to the IntegrationsBundle get their keys decrypted by the IntegrationsHelper
+        try {
+            return $integrationsHelper->getIntegration($integration)->getIntegrationConfiguration()->getApiKeys();
+        } catch (IntegrationNotFoundException) {
+        }
+
+        $myIntegration = $integrationHelper->getIntegrationObject($integration);
+
+        if (!$myIntegration instanceof AbstractIntegration) {
+            return null;
+        }
+
+        return $myIntegration->getDecryptedApiKeys();
+    }
+
+    public function pluginTrackingGifAction(Request $request, IntegrationsHelper $integrationsHelper, IntegrationHelper $integrationHelper, MailHelper $mailer, $integration): Response
+    {
+        $this->doTracking($request, $integrationsHelper, $integrationHelper, $mailer, $integration);
 
         return TrackingPixelHelper::getResponse($request); // send gif
     }

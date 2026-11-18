@@ -26,7 +26,7 @@
 {% block content %}
     <div class="row">
         <div class="col-sm-offset-3 col-sm-6">
-            <div class="ml-lg mr-lg mt-md pa-lg">               
+            <div class="ms-24 me-24 mt-16 pa-24">
                 <div class="panel panel-info">
                     <div class="panel-heading">
                         <div class="panel-title">{{ 'mautic.campaign.campaign.import.instructions'|trans({'%size%': 100}) }}</div>
@@ -34,7 +34,7 @@
 
                     <div class="panel-body">
                         {{ form_start(form) }}
-                        <div class="input-group well mt-lg">
+                        <div class="input-group well mt-24">
                             {{ form_widget(form.campaignFile) }}
                             <span class="input-group-btn">
                                 {{ form_widget(form.start) }}

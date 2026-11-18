@@ -262,6 +262,31 @@ JS);
         $I->assertSame([], $state['cookieAccess']);
     }
 
+    public function essentialScriptSubmitsEmbeddedFormWithoutTrackingIdentifiers(\AcceptanceTester $I): void
+    {
+        // A real form embedded next to mautic-essential.js must not read or write
+        // tracking identifiers, neither when it loads nor after it is submitted.
+        $mauticUrl = $this->getMauticUrl($I);
+        $this->loadScripts($I, [$mauticUrl.'/mautic-essential.js', $mauticUrl.'/form/generate.js?id=1']);
+        $I->waitForJS("return typeof MauticSDK !== 'undefined' && document.getElementById('mauticform_kaleidoscoperegistration') !== null", 10);
+
+        $this->assertNoTrackingIdentifiers($I, $this->grabBrowserState($I));
+
+        // Reading the state goes through the instrumented cookie and storage getters, so start the submission with a clean record
+        $I->executeJS('window.mauticStorageAccess = []; window.mauticCookieAccess = [];');
+
+        $I->executeJS(<<<'JS'
+var form = document.getElementById('mauticform_kaleidoscoperegistration');
+form.querySelector('[name="mauticform[name]"]').value = 'Embed visitor';
+form.querySelector('[name="mauticform[email]"]').value = 'embed-visitor@example.test';
+form.querySelector('[name="mauticform[numberofattendees]"]').value = '1';
+form.requestSubmit();
+JS);
+        $I->waitForJS("return document.getElementById('mauticform_kaleidoscoperegistration_message').textContent.indexOf('Thank you for registering!') !== -1", 10);
+
+        $this->assertNoTrackingIdentifiers($I, $this->grabBrowserState($I));
+    }
+
     public function essentialScriptLoadsFormSdkOnceForRepeatedInitialization(\AcceptanceTester $I): void
     {
         $scriptUrl = $this->getMauticUrl($I).'/mautic-essential.js';
@@ -402,6 +427,23 @@ JS);
     private function assertOnlyScriptRequested(\AcceptanceTester $I, array $networkRequests, string $scriptUrl): void
     {
         $I->assertSame([$scriptUrl], array_column($networkRequests, 'url'));
+    }
+
+    /**
+     * @param array<string, mixed> $state
+     */
+    private function assertNoTrackingIdentifiers(\AcceptanceTester $I, array $state): void
+    {
+        $I->assertFalse($state['trackingEnabled']);
+        $I->assertSame([], $state['errors']);
+        $I->assertSame([], $state['trackingRequests']);
+        $I->assertSame([], $this->filterTrackingIdentifierAccess($state['storageAccess']));
+        $I->assertTrue($state['cookieInstrumentationSupported']);
+        $I->assertSame([], $state['cookieAccess']);
+        $I->assertNull($state['mtcId']);
+        $I->assertNull($state['deviceId']);
+        $I->assertStringNotContainsString('mtc_id=', $state['cookies']);
+        $I->assertStringNotContainsString('mautic_device_id=', $state['cookies']);
     }
 
     /**

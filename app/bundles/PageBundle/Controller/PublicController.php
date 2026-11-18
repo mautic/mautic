@@ -435,7 +435,11 @@ final class PublicController extends AbstractFormController
             );
         }
 
-        $lead          = $contactTracker->getContact();
+        $lead = $contactTracker->getContact();
+        if (null === $lead) {
+            return $notSuccessResponse;
+        }
+
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
         $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
@@ -447,7 +451,7 @@ final class PublicController extends AbstractFormController
         return new JsonResponse(
             [
                 'success'   => 1,
-                'id'        => ($lead) ? $lead->getId() : null,
+                'id'        => $lead->getId(),
                 'sid'       => $trackingId,
                 'device_id' => $trackingId,
                 'events'    => $event->getResponse()->all(),

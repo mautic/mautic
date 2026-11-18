@@ -1904,6 +1904,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "mahmoud-alawad",
+      "name": "Mahmoud Alawad",
+      "avatar_url": "https://avatars.githubusercontent.com/u/76591349?v=4",
+      "profile": "https://mahmoudalawad.netlify.app",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "VictorMoni",
+      "name": "Victor Moni",
+      "avatar_url": "https://avatars.githubusercontent.com/u/123900844?v=4",
+      "profile": "http://victormoni.vercel.app",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

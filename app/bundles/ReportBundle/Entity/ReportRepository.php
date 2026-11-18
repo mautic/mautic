@@ -10,6 +10,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class ReportRepository extends CommonRepository
 {
+    public const SEARCH_COMMAND_SOURCE = 'mautic.report.report.searchcommand.source';
+
     /**
      * Get a list of entities.
      *
@@ -65,6 +67,11 @@ class ReportRepository extends CommonRepository
                 $expr            = $q->expr()->eq('r.isScheduled', ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
+            case $this->translator->trans(self::SEARCH_COMMAND_SOURCE):
+            case $this->translator->trans(self::SEARCH_COMMAND_SOURCE, [], null, 'en_US'):
+                $expr            = $q->expr()->eq('r.source', ":$unique");
+                $forceParameters = [$unique => $filter->string];
+                break;
         }
 
         if ($expr && $filter->not) {
@@ -88,6 +95,7 @@ class ReportRepository extends CommonRepository
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.ismine',
             'mautic.report.report.searchcommand.isscheduled',
+            self::SEARCH_COMMAND_SOURCE,
         ];
 
         return array_merge($commands, parent::getSearchCommands());

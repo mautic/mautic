@@ -1,11 +1,11 @@
 {% if form is defined %}
     {% if showContactSegments is defined and showContactSegments and form.lead_lists is defined and form.lead_lists|length > 0 %}
         <div class="contact-segments">
-            <div class="text-left">
-                <label class="control-label">{{ segmentlist['label-text']|default(label_text|default('mautic.lead.form.list'|trans)) }}</label>
+            <div class="text-start">
+                <label class="form-label">{{ segmentlist['label-text']|default(label_text|default('mautic.lead.form.list'|trans)) }}</label>
             </div>
             {% for key, leadList in form.lead_lists %}
-                <div id="segment-{{ key }}" class="text-left">
+                <div id="segment-{{ key }}" class="text-start">
                     {{ form_widget(leadList) }}
                     {{ form_label(leadList) }}
                 </div>
@@ -14,10 +14,10 @@
     {% endif %}
 {% else %}
     <div class="contact-segments">
-        <div class="text-left">
-            <label class="control-label">{{ segmentlist['label-text']|default('mautic.lead.form.list'|trans) }}</label>
+        <div class="text-start">
+            <label class="form-label">{{ segmentlist['label-text']|default('mautic.lead.form.list'|trans) }}</label>
         </div>
-        <div id="segment-1" class="text-left">
+        <div id="segment-1" class="text-start">
             {% include '@MauticCore/Components/checkbox.html.twig' with {
                 items: [{ id: 'lead_contact_frequency_rules_lead_lists_1', name: 'lead_contact_frequency_rules[lead_lists][]', value: '2', checked: true, label: 'mautic.lead.lead.field.list' }]
             } only %}
