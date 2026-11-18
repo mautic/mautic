@@ -134,7 +134,6 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
     {
         $countryCode = (string) ($validation['country'] ?? '');
 
-        // Not a supported phone region: skip rather than block every submission.
         if (!PhoneCountryValidationHelper::isSupportedCountry($countryCode)
             || PhoneCountryValidationHelper::isValidForCountry((string) $event->getValue(), $countryCode)
         ) {

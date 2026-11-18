@@ -29,11 +29,13 @@ final class FormFieldTelType extends AbstractType
             ChoiceType::class,
             [
                 'label'       => 'mautic.form.field.type.tel.country_validation',
+                'label_attr'  => ['class' => 'form-label'],
                 'choices'     => PhoneCountryValidationHelper::getCountries(),
                 'placeholder' => 'mautic.core.none',
                 'required'    => false,
                 'data'        => $options['data']['country'] ?? null,
                 'attr'        => [
+                    'class'   => 'form-control',
                     'tooltip' => 'mautic.form.field.type.tel.country_validation.tooltip',
                 ],
             ]
