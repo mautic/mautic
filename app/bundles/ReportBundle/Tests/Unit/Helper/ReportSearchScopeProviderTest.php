@@ -39,4 +39,27 @@ final class ReportSearchScopeProviderTest extends SearchScopeProviderTestCase
     {
         return ['is:mine'];
     }
+
+    public function testSourceCommandIsNotOfferedAsScope(): void
+    {
+        $reportModel = $this->createMock(ReportModel::class);
+        $translator  = $this->createMock(TranslatorInterface::class);
+
+        $translator->method('trans')
+            ->willReturnCallback(static fn (string $key): string => match ($key) {
+                'mautic.report.report.searchcommand.source' => 'source',
+                default => $key,
+            });
+
+        $reportModel->method('getCommandList')
+            ->willReturn([
+                'mautic.report.report.searchcommand.source',
+                'mautic.core.searchcommand.ismine',
+            ]);
+
+        $provider = new ReportSearchScopeProvider($reportModel, $translator);
+        $commands = array_column($provider->getScopes(), 'command');
+
+        $this->assertNotContains('source', $commands);
+    }
 }
