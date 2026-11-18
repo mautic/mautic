@@ -10,7 +10,7 @@
 
         <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
         {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
-        <span class="campaign-event-name label label-primary ellipsis">{{ idString ~ event['name'] }}</span>
+        <span class="campaign-event-name label label-primary text-truncate d-block">{{ idString ~ event['name'] }}</span>
         <a class="label label-primary has-click-event highlight-jump-target ms-12" href="javascript:void(0)" onClick="Mautic.highlightJumpTarget(event, this)" data-jump-target="{{ event['properties']['jumpToEvent'] }}">
             {{ 'mautic.campaign.locate'|trans }}
             <i class="ri-map-pin-2-line"></i>

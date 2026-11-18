@@ -38,11 +38,11 @@
 
 <dl class="dl-horizontal">
     <dt>{{ 'mautic.page.time.on.video'|trans }}:</dt>
-    <dd class="ellipsis">{{ 'mautic.page.time.on.video.value'|trans({'%time_watched%': viewTime, '%duration%': duration, '%percentage%': percentage}) }}</dd>
+    <dd class="text-truncate d-block">{{ 'mautic.page.time.on.video.value'|trans({'%time_watched%': viewTime, '%duration%': duration, '%percentage%': percentage}) }}</dd>
     <dt>{{ 'mautic.page.referrer'|trans }}:</dt>
-    <dd class="ellipsis">{% if event.extra.hit.referer is defined and event.extra.hit.referer is not empty %}{{ assetMakeLinks(event['extra']['hit']['referer']) }}{% else %}{{ 'mautic.core.unknown'|trans }}{% endif %}</dd>
+    <dd class="text-truncate d-block">{% if event.extra.hit.referer is defined and event.extra.hit.referer is not empty %}{{ assetMakeLinks(event['extra']['hit']['referer']) }}{% else %}{{ 'mautic.core.unknown'|trans }}{% endif %}</dd>
     <dt>{{ 'mautic.video.url'|trans }}:</dt>
-    <dd class="ellipsis">{% if event.hit.url is defined and event.hit.url is not empty %}{{ assetMakeLinks(event['extra']['hit']['url']) }}{% else %}{{ 'mautic.core.unknown'|trans }}{% endif %}</dd>
+    <dd class="text-truncate d-block">{% if event.hit.url is defined and event.hit.url is not empty %}{{ assetMakeLinks(event['extra']['hit']['url']) }}{% else %}{{ 'mautic.core.unknown'|trans }}{% endif %}</dd>
 </dl>
 <div class="small">
     {{ inputClean(event.extra.hit.user_agent) }}
