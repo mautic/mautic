@@ -458,18 +458,22 @@ class MailHelper
             foreach ($this->queuedRecipients as $email => $name) {
                 $from        = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $this->email);
                 $fromAddress = $from->getEmail();
+                $ownerEmail  = $this->fromEmailHelper->getLastOwnerEmail();
+                // Owned and ownerless contacts can share a "from" address but need different reply-to headers.
+                $batchKey    = $fromAddress."\0".$ownerEmail;
 
                 $tokens                = $this->getTokens();
                 $tokens['{signature}'] = $this->fromEmailHelper->getSignature();
 
-                if (!isset($this->metadata[$fromAddress])) {
-                    $this->metadata[$fromAddress] = [
-                        'from'     => $from,
-                        'contacts' => [],
+                if (!isset($this->metadata[$batchKey])) {
+                    $this->metadata[$batchKey] = [
+                        'from'       => $from,
+                        'ownerEmail' => $ownerEmail,
+                        'contacts'   => [],
                     ];
                 }
 
-                $this->metadata[$fromAddress]['contacts'][$email] = $this->buildMetadata($name, $tokens);
+                $this->metadata[$batchKey]['contacts'][$email] = $this->buildMetadata($name, $tokens);
             }
 
             // Reset recipients
@@ -550,7 +554,7 @@ class MailHelper
                 }
                 $this->setReplyToForQueueMessage(
                     $email,
-                    ($email && $email->getUseOwnerAsMailer()) ? $metadatum['from']->getEmail() : null
+                    ($email && $email->getUseOwnerAsMailer()) ? $metadatum['ownerEmail'] : null
                 );
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
