@@ -11,7 +11,6 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
-use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -79,8 +78,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     private ?TriggerModel $triggerModel = null;
 
-    private ?ListLeadRepository $listLeadRepository = null;
-
     /** @var list<int> Segment IDs resolved from the current search query's list/segment command */
     private array $activeSearchSegmentIds = [];
 
@@ -115,11 +112,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
-    }
-
-    public function setListLeadRepository(ListLeadRepository $listLeadRepository): void
-    {
-        $this->listLeadRepository = $listLeadRepository;
     }
 
     public static function getLeadFieldRepository(): LeadFieldRepository
@@ -697,7 +689,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $args['qb']    = $qb;
-        $args['count'] = (ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) ? $this->listLeadRepository->getContactsCountBySegment($entityId, $filters) : null;
 
         if ($dateFrom && $dateTo) {
             $qb->andWhere('entity.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
