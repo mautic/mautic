@@ -109,14 +109,21 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD` | `InternalCompanyFullReportBuildEvent` |
     | `INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC` | `IntegrationToMauticSyncCompletedEvent` |
     | `INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION` | `MauticToIntegrationSyncCompletedEvent` |
-- Constants `WEBHOOK_PRE_SAVE`, `WEBHOOK_POST_SAVE`, `WEBHOOK_PRE_DELETE`, `WEBHOOK_POST_DELETE` and `WEBHOOK_KILL` removed from `Mautic\WebhookBundle\WebhookEvents`. These events are now dispatched by their own event class (all under `Mautic\WebhookBundle\Event`). They used to share one `WebhookEvent` object; `WebhookEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `WebhookPostSaveEvent::class => 'onWebhookSave'`.
+- Constants `WEBHOOK_PRE_SAVE`, `WEBHOOK_POST_SAVE`, `WEBHOOK_PRE_DELETE`, `WEBHOOK_POST_DELETE` and `WEBHOOK_KILL` removed from `Mautic\WebhookBundle\WebhookEvents`. These events are now dispatched by their own event class (all under `Mautic\WebhookBundle\Event`). They used to share one `WebhookEvent` object; `WebhookEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant. The save and delete events now use the generic `Mautic\CoreBundle\Event` lifecycle events, so subscribe e.g. `EntityPostSave::class => 'onWebhookSave'` and guard the entity type at the start of `onWebhookSave()`:
+
+    ```php
+    $webhook = $event->getEntity();
+    if (!$webhook instanceof Webhook) {
+        return;
+    }
+    ```
 
     | Removed `WebhookEvents` constant | New event class |
     |---|---|
-    | `WEBHOOK_PRE_SAVE` | `WebhookPreSaveEvent` |
-    | `WEBHOOK_POST_SAVE` | `WebhookPostSaveEvent` |
-    | `WEBHOOK_PRE_DELETE` | `WebhookPreDeleteEvent` |
-    | `WEBHOOK_POST_DELETE` | `WebhookPostDeleteEvent` |
+    | `WEBHOOK_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof Webhook`) |
+    | `WEBHOOK_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof Webhook`) |
+    | `WEBHOOK_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof Webhook`) |
+    | `WEBHOOK_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof Webhook`) |
     | `WEBHOOK_KILL` | `WebhookKillEvent` |
 - Class `Mautic\UserBundle\UserEvents` removed entirely. Its events are now dispatched by their own event class (Symfony 4.3+) instead of the string constant, so subscribe to the event class instead of the constant. `AuthenticationEvent` used to be dispatched under both `USER_PRE_AUTHENTICATION` and `USER_FORM_AUTHENTICATION`; it is now `abstract` and each case has a dedicated subclass (both under `Mautic\UserBundle\Event`), so listener type hints keep working. The `USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION` constant was unused (never dispatched) and has been removed with no replacement.
 
@@ -171,14 +178,14 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `IMPORT_PRE_DELETE` | `ImportPreDeleteEvent` |
     | `IMPORT_POST_DELETE` | `ImportPostDeleteEvent` |
     | `IMPORT_BATCH_PROCESSED` | `ImportBatchProcessedEvent` |
-    | `DEVICE_PRE_SAVE` | `DevicePreSaveEvent` |
-    | `DEVICE_POST_SAVE` | `DevicePostSaveEvent` |
-    | `DEVICE_PRE_DELETE` | `DevicePreDeleteEvent` |
-    | `DEVICE_POST_DELETE` | `DevicePostDeleteEvent` |
-    | `TAG_PRE_SAVE` | `TagPreSaveEvent` |
-    | `TAG_POST_SAVE` | `TagPostSaveEvent` |
-    | `TAG_PRE_DELETE` | `TagPreDeleteEvent` |
-    | `TAG_POST_DELETE` | `TagPostDeleteEvent` |
+    | `DEVICE_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof LeadDevice`) |
+    | `DEVICE_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof LeadDevice`) |
+    | `DEVICE_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof LeadDevice`) |
+    | `DEVICE_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof LeadDevice`) |
+    | `TAG_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof Tag`) |
+    | `TAG_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof Tag`) |
+    | `TAG_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof Tag`) |
+    | `TAG_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof Tag`) |
     | `TAG_PRE_MERGE` | `TagPreMergeEvent` |
     | `TAG_POST_MERGE` | `TagPostMergeEvent` |
     | `COMPANY_PRE_SAVE` | `CompanyPreSaveEvent` |
@@ -251,10 +258,10 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
   | `EMAIL_ON_DISPLAY` | `EmailDisplayEvent` |
   | `EMAIL_ON_BUILD` | `EmailOnBuildEvent` |
   | `EMAIL_ON_TOGGLE_PUBLISH` | `Mautic\CoreBundle\Event\EntityTogglePublishEvent` (dispatched for every entity, see above) |
-  | `EMAIL_PRE_SAVE` | `EmailPreSaveEvent` |
-  | `EMAIL_POST_SAVE` | `EmailPostSaveEvent` |
-  | `EMAIL_PRE_DELETE` | `EmailPreDeleteEvent` |
-  | `EMAIL_POST_DELETE` | `EmailPostDeleteEvent` |
+  | `EMAIL_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof Email`) |
+  | `EMAIL_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof Email`) |
+  | `EMAIL_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof Email`) |
+  | `EMAIL_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof Email`) |
   | `ON_EMAIL_STAT_PRE_SAVE` | `EmailStatEvent` |
   | `ON_EMAIL_STAT_POST_SAVE` | `EmailStatPostSaveEvent` |
   | `ON_EMAIL_EDIT_SUBMIT` | `EmailEditSubmitEvent` |
