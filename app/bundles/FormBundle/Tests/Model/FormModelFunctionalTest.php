@@ -323,4 +323,38 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
 
         return $field->getId();
     }
+
+    public function testGeneratedFormAliasesAreUniqueForCollidingNames(): void
+    {
+        /** @var FormModel $formModel */
+        $formModel = static::getContainer()->get('mautic.form.model.form');
+
+        $aliases = [];
+        foreach (['One', 'Two', 'Three'] as $suffix) {
+            $form = new Form();
+            $form->setName('Unique alias test '.$suffix);
+            $form->setIsPublished(false);
+            $formModel->saveEntity($form);
+            $aliases[] = $form->getAlias();
+        }
+
+        $this->assertSame(['unique_ali', 'unique_ali1', 'unique_ali2'], $aliases);
+    }
+
+    public function testRenamingFormDoesNotChangeAlias(): void
+    {
+        /** @var FormModel $formModel */
+        $formModel = static::getContainer()->get('mautic.form.model.form');
+
+        $form = new Form();
+        $form->setName('Alias stability test');
+        $form->setIsPublished(false);
+        $formModel->saveEntity($form);
+        $this->assertSame('alias_stab', $form->getAlias());
+
+        $form->setName('A completely different name');
+        $formModel->saveEntity($form);
+
+        $this->assertSame('alias_stab', $form->getAlias());
+    }
 }
