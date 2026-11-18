@@ -94,8 +94,8 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(5, $this->getStoredValue($contactId, self::NUMBER_FIELD));
     }
 
-    #[DataProvider('nonNumericTextProvider')]
-    public function testSetFieldValuesDoesNotOverwriteStoredNumberWithNonNumericText(string $value, string $slug): void
+    #[DataProvider('nonNumericValueProvider')]
+    public function testSetFieldValuesDoesNotOverwriteStoredNumberWithNonNumericValue(mixed $value, string $slug): void
     {
         $contactId = $this->createContact('non-numeric-'.$slug.'@example.com', [self::NUMBER_FIELD => 5]);
         $this->em->clear();
@@ -111,11 +111,62 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(5, $this->getStoredValue($contactId, self::NUMBER_FIELD));
     }
 
-    public static function nonNumericTextProvider(): \Generator
+    public static function nonNumericValueProvider(): \Generator
     {
         yield 'whitespace' => [' ', 'whitespace'];
         yield 'text' => ['abc', 'text'];
         yield 'placeholder' => ['n/a', 'placeholder'];
+        yield 'false' => [false, 'false'];
+        yield 'empty array' => [[], 'empty-array'];
+    }
+
+    #[DataProvider('zeroCompanyNumberProvider')]
+    public function testSetFieldValuesWithNumericZeroCompanyKeepsPrimaryCompany(int|float $value, string $slug): void
+    {
+        $contactId = $this->createContact('zero-company-model-'.$slug.'@example.com', ['company' => 'Zero Company Probe Ltd']);
+        $this->em->clear();
+
+        $leadModel = self::getContainer()->get(LeadModel::class);
+        $this->assertInstanceOf(LeadModel::class, $leadModel);
+        $contact = $leadModel->getEntity($contactId);
+        $this->assertInstanceOf(Lead::class, $contact);
+
+        $leadModel->setFieldValues($contact, ['company' => $value], false, false);
+        $leadModel->saveEntity($contact);
+
+        $this->assertSame('Zero Company Probe Ltd', $this->getPrimaryCompanyName($contactId));
+    }
+
+    public static function zeroCompanyNumberProvider(): \Generator
+    {
+        yield 'integer zero' => [0, 'int'];
+        yield 'float zero' => [0.0, 'float'];
+    }
+
+    public function testPostNewWithJsonZeroCompanyLeavesCompanyEmpty(): void
+    {
+        // A JSON body keeps the integer, which reaches setFieldValues() before the form casts it.
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode(['email' => 'zero-company-json@example.com', 'company' => 0]));
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $this->client->getResponse()->getContent());
+        $contactId = json_decode($this->client->getResponse()->getContent(), true)['contact']['id'];
+
+        $this->assertNull($this->getStoredValue($contactId, 'company'));
+    }
+
+    public function testSetFieldValuesDoesNotOverwriteStoredTextWithNumericZero(): void
+    {
+        $contactId = $this->createContact('zero-text-model@example.com', [self::TEXT_FIELD => 'abc']);
+        $this->em->clear();
+
+        $leadModel = self::getContainer()->get(LeadModel::class);
+        $this->assertInstanceOf(LeadModel::class, $leadModel);
+        $contact = $leadModel->getEntity($contactId);
+        $this->assertInstanceOf(Lead::class, $contact);
+
+        $leadModel->setFieldValues($contact, [self::TEXT_FIELD => 0], false, false);
+        $leadModel->saveEntity($contact);
+
+        $this->assertSame('abc', $this->getStoredValue($contactId, self::TEXT_FIELD));
     }
 
     public function testPatchPersistsZeroNumberField(): void
@@ -203,15 +254,22 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
         );
     }
 
-    public function testPatchKeepsThePrimaryCompanyWhenCompanyIsSentAsZero(): void
+    #[DataProvider('zeroCompanyProvider')]
+    public function testPatchKeepsThePrimaryCompanyWhenCompanyIsSentAsZero(int|string $value, string $slug): void
     {
-        $contactId = $this->createContact('zero-company-patch@example.com', ['company' => 'Zero Company Patch']);
+        $contactId = $this->createContact('zero-company-patch-'.$slug.'@example.com', ['company' => 'Zero Company Patch']);
         $this->assertSame('Zero Company Patch', $this->getPrimaryCompanyName($contactId));
 
-        $this->client->request(Request::METHOD_PATCH, '/api/contacts/'.$contactId.'/edit', ['company' => 0]);
+        $this->client->request(Request::METHOD_PATCH, '/api/contacts/'.$contactId.'/edit', ['company' => $value]);
         $this->assertResponseStatusCodeSame(Response::HTTP_OK, $this->client->getResponse()->getContent());
 
         $this->assertSame('Zero Company Patch', $this->getPrimaryCompanyName($contactId));
+    }
+
+    public static function zeroCompanyProvider(): \Generator
+    {
+        yield 'zero' => [0, 'zero'];
+        yield 'decimal zero string' => ['0.00', 'decimal'];
     }
 
     public function testPostNewKeepsThePrimaryCompanyWhenCompanyIsSentAsZeroOnIdentifierMatch(): void

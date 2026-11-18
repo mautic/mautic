@@ -165,6 +165,68 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
     }
 
     /**
+     * @param array<string, mixed> $expectedParameters
+     */
+    #[DataProvider('companyValueProvider')]
+    public function testSetCustomFieldValuesDropsZeroCompanySentByTheClient(mixed $value, array $expectedParameters): void
+    {
+        $model = new class() {
+            /**
+             * @var array<string, mixed>
+             */
+            public array $parameters = [];
+
+            /**
+             * @param array<string, mixed> $parameters
+             */
+            public function setFieldValues(Lead $lead, array $parameters, bool $overwriteWithBlank): void
+            {
+                $this->parameters = $parameters;
+            }
+        };
+
+        $controller = new class($model) {
+            use CustomFieldsApiControllerTrait;
+
+            private string $entityNameOne = 'lead';
+
+            public function __construct(
+                private object $model,
+            ) {
+            }
+
+            public function getModel(?string $name): object
+            {
+                return $this->model;
+            }
+
+            /**
+             * @param array<string, mixed> $parameters
+             */
+            public function setCustomFieldValuesPublic(Lead $lead, Form $form, array $parameters): void
+            {
+                $this->setCustomFieldValues($lead, $form, $parameters, true);
+            }
+        };
+
+        $controller->setCustomFieldValuesPublic(new Lead(), $this->createFormStub([]), ['company' => $value]);
+
+        $this->assertSame($expectedParameters, $model->parameters);
+    }
+
+    /**
+     * @return \Generator<string, array{mixed, array<string, mixed>}>
+     */
+    public static function companyValueProvider(): \Generator
+    {
+        yield 'integer zero' => [0, []];
+        yield 'float zero' => [0.0, []];
+        yield 'zero string' => ['0', []];
+        yield 'decimal zero string' => ['0.00', []];
+        yield 'company name' => ['Acme', ['company' => 'Acme']];
+    }
+
+    /**
      * @param array<string, mixed> $children
      */
     private function createFormStub(array $children): Form

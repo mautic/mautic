@@ -663,10 +663,10 @@ class LeadModel extends FormModel
 
                 // Only update fields that are part of the passed $data array
                 if (array_key_exists($alias, $data)) {
-                    // Judge the raw value: cleanFields() casts a Number string to float, so '' and 'n/a' both become 0.0.
+                    // Judge the raw value: cleanFields() casts a Number value to float, so '', 'n/a', false and [] all become 0.0.
                     $rawValue     = $data[$alias];
                     $noValueGiven = '' === $rawValue
-                        || ('number' === $field['type'] && is_string($rawValue) && !is_numeric($rawValue) && 0.0 === (float) $rawValue);
+                        || ('number' === $field['type'] && !is_numeric($rawValue) && 0.0 === (float) $rawValue);
                     if (!$bindWithForm) {
                         $this->cleanFields($data, $field);
                     }
@@ -678,7 +678,9 @@ class LeadModel extends FormModel
                     }
 
                     // false stays empty; a boolean "No" is written by CampaignSubscriber::updateLead().
-                    $isEmpty = ($noValueGiven || '' === $newValue || false === $newValue);
+                    // A cleaned int or float zero is empty except on Number fields; a zero company would remove or replace the primary company.
+                    $isEmpty = ($noValueGiven || '' === $newValue || false === $newValue
+                        || ('number' !== $field['type'] && (0 === $newValue || 0.0 === $newValue)));
                     if ($curValue !== $newValue && (!$isEmpty || $overwriteWithBlank)) {
                         $field['value'] = $newValue;
                         $lead->addUpdatedField($alias, $newValue, $curValue);
