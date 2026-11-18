@@ -44,8 +44,6 @@ export default class ButtonApplyCommand {
         ButtonCloseCommands.returnContentToTextarea(editor, html);
       }
 
-      ButtonApplyCommand.postForm(editor, sender);
-      return true;
     } finally {
       // Tokens are captured in the textarea; always restore human-readable
       // content on the canvas, including failed MJML conversion.
@@ -55,6 +53,7 @@ export default class ButtonApplyCommand {
     ButtonApplyCommand.postForm(editor, sender);
 
     return true;
+
   }
 
   /**

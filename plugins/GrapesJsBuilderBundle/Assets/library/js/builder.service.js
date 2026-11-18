@@ -762,10 +762,10 @@ export default class BuilderService {
           this.cacheOptimisticLockVersion();
         });
     }
-    this.editor.on('run:mautic-editor-page-html-close', triggerBuilderHide);
-    this.editor.on('run:mautic-editor-email-html-close', triggerBuilderHide);
-    this.editor.on('run:mautic-editor-email-mjml-close', triggerBuilderHide);
-    this.editor.on('run:preset-mautic:apply-form', (event) => {
+    this.editor.on('command:run:mautic-editor-page-html-close', triggerBuilderHide);
+    this.editor.on('command:run:mautic-editor-email-html-close', triggerBuilderHide);
+    this.editor.on('command:run:mautic-editor-email-mjml-close', triggerBuilderHide);
+    this.editor.on('command:run:preset-mautic:apply-form', (event) => {
       if (false !== event?.result) {
         this.persistEditorState();
       }
