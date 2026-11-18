@@ -43,6 +43,7 @@ final class LeadSearchScopeProvider extends AbstractSearchScopeProvider
             SearchScopePresets::command('mautic.core.searchcommand.ip'),
             SearchScopePresets::isMine(),
             SearchScopePresets::command('mautic.lead.lead.searchcommand.isunowned'),
+            SearchScopePresets::command('mautic.lead.lead.searchcommand.isunsegmented'),
             SearchScopePresets::command('mautic.lead.lead.searchcommand.dnc'),
         ];
     }
