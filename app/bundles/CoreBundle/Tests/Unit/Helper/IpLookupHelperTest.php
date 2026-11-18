@@ -183,7 +183,53 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    private function getIpHelper(?Request $request = null, ?CoreParametersHelper $mockCoreParametersHelper = null): IpLookupHelper
+    #[TestDox('Check that a bot request is not trackable and its IP address is not saved')]
+    public function testIsRequestTrackableDoesNotSaveBotIpAddress(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+
+        $this->deviceDetector
+            ->method('isBot')
+            ->willReturn(true);
+
+        $repository = $this->createMock(IpAddressRepository::class);
+        $repository->expects($this->never())->method('saveEntity');
+
+        $this->assertFalse($this->getIpHelper($request, null, $repository)->isRequestTrackable());
+    }
+
+    #[TestDox('Check that a request from an IP on the do-not-track list is not trackable and the IP address is not saved')]
+    public function testIsRequestTrackableDoesNotSaveDoNotTrackIpAddress(): void
+    {
+        $request                  = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $mockCoreParametersHelper
+            ->method('get')
+            ->willReturnCallback(
+                fn ($param): ?array => 'do_not_track_ips' === $param ? ['73.77.245.52'] : null
+            );
+
+        $repository = $this->createMock(IpAddressRepository::class);
+        $repository->expects($this->never())->method('saveEntity');
+
+        $this->assertFalse($this->getIpHelper($request, $mockCoreParametersHelper, $repository)->isRequestTrackable());
+    }
+
+    public function testVisitorIsUntrackedOnlyOnceMarked(): void
+    {
+        $helper = $this->getIpHelper(new Request());
+        $this->assertFalse($helper->isVisitorUntracked());
+
+        $helper->markVisitorAsUntracked();
+        $this->assertTrue($helper->isVisitorUntracked());
+
+        // Without a request there is no visitor to mark
+        $helper = $this->getIpHelper();
+        $helper->markVisitorAsUntracked();
+        $this->assertFalse($helper->isVisitorUntracked());
+    }
+
+    private function getIpHelper(?Request $request = null, ?CoreParametersHelper $mockCoreParametersHelper = null, ?IpAddressRepository $mockRepository = null): IpLookupHelper
     {
         $requestStack = new RequestStack();
 
@@ -191,11 +237,13 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
             $requestStack->push($request);
         }
 
-        $mockRepository = $this->createMock(IpAddressRepository::class);
-        $mockRepository
-            ->method('__call')
-            ->with('findOneByIpAddress')
-            ->willReturn(null);
+        if (null === $mockRepository) {
+            $mockRepository = $this->createMock(IpAddressRepository::class);
+            $mockRepository
+                ->method('__call')
+                ->with('findOneByIpAddress')
+                ->willReturn(null);
+        }
 
         if (null === $mockCoreParametersHelper) {
             $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);

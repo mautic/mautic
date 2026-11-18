@@ -53,50 +53,64 @@
               },
           ],
         },
-        'quickFilters': [
-            {
-                'search': 'mautic.core.searchcommand.ispublished',
-                'label': 'mautic.core.form.available',
-                'tooltip': 'mautic.core.searchcommand.ispublished.description',
-                'icon': 'ri-check-line'
+        'quickFilters': {
+            'mautic.core.quick_filters.status': {
+                'conflictGroup': true,
+                'filters': [
+                    {
+                        'search': 'mautic.core.searchcommand.ispublished',
+                        'label': 'mautic.core.form.available',
+                        'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                        'icon': 'ri-check-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.isunpublished',
+                        'label': 'mautic.core.form.unavailable',
+                        'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                        'icon': 'ri-close-line'
+                    },
+                    {
+                        'search': 'mautic.form.form.searchcommand.isexpired',
+                        'label': 'mautic.core.form.no_longer_available',
+                        'tooltip': 'mautic.form.form.searchcommand.isexpired.description',
+                        'icon': 'ri-time-line'
+                    },
+                    {
+                        'search': 'mautic.form.form.searchcommand.ispending',
+                        'label': 'mautic.core.form.not_yet_available',
+                        'tooltip': 'mautic.form.form.searchcommand.ispending.description',
+                        'icon': 'ri-timer-line'
+                    }
+                ]
             },
-            {
-                'search': 'mautic.core.searchcommand.isunpublished',
-                'label': 'mautic.core.form.unavailable',
-                'tooltip': 'mautic.core.searchcommand.isunpublished.description',
-                'icon': 'ri-close-line'
+            'mautic.core.quick_filters.ownership': {
+                'conflictGroup': true,
+                'filters': [
+                    {
+                        'search': 'mautic.core.searchcommand.ismine',
+                        'label': 'mautic.core.searchcommand.ismine.label',
+                        'tooltip': 'mautic.core.searchcommand.ismine.description',
+                        'icon': 'ri-user-line'
+                    }
+                ]
             },
-            {
-                'search': 'mautic.core.searchcommand.isuncategorized',
-                'label': 'mautic.core.form.uncategorized',
-                'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
-                'icon': 'ri-folder-unknow-line'
+            'mautic.core.quick_filters.others': {
+                'filters': [
+                    {
+                        'search': 'mautic.core.searchcommand.isuncategorized',
+                        'label': 'mautic.core.form.uncategorized',
+                        'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                        'icon': 'ri-folder-unknow-line'
+                    },
+                    {
+                        'search': 'has:results',
+                        'label': 'mautic.core.search.quickfilter.form_results',
+                        'tooltip': 'mautic.core.search.quickfilter.form_results.tooltip',
+                        'icon': 'ri-file-list-2-line'
+                    }
+                ]
             },
-            {
-                'search': 'mautic.core.searchcommand.ismine',
-                'label': 'mautic.core.searchcommand.ismine.label',
-                'tooltip': 'mautic.core.searchcommand.ismine.description',
-                'icon': 'ri-user-line'
-            },
-            {
-                'search': 'mautic.form.form.searchcommand.isexpired',
-                'label': 'mautic.core.form.no_longer_available',
-                'tooltip': 'mautic.form.form.searchcommand.isexpired.description',
-                'icon': 'ri-time-line'
-            },
-            {
-                'search': 'mautic.form.form.searchcommand.ispending',
-                'label': 'mautic.core.form.not_yet_available',
-                'tooltip': 'mautic.form.form.searchcommand.ispending.description',
-                'icon': 'ri-timer-line'
-            },
-            {
-                'search': 'has:results',
-                'label': 'mautic.core.search.quickfilter.form_results',
-                'tooltip': 'mautic.core.search.quickfilter.form_results.tooltip',
-                'icon': 'ri-file-list-2-line'
-            }
-        ],
+        },
         'searchScopes': searchScopes|default([]),
         'searchScopeHint': searchScopeHint|default(''),
     }) -}}

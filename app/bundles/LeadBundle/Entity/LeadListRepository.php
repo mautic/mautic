@@ -327,6 +327,39 @@ class LeadListRepository extends CommonRepository
         return (1 === $countListIds) ? $return[$listIds[0]] : $return;
     }
 
+    /**
+     * @return array{total: int, manuallyAdded: int, filterAdded: int|null}
+     */
+    public function getSegmentStatistics(int $listId, bool $includeFilterAdded): array
+    {
+        $queryBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $queryBuilder->select(
+            'COUNT(l.lead_id) AS total_count',
+            'COALESCE(SUM(CASE WHEN l.manually_added = :true THEN 1 ELSE 0 END), 0) AS manually_added_count'
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
+
+        if ($includeFilterAdded) {
+            $queryBuilder->addSelect('COALESCE(SUM(CASE WHEN l.manually_added = :false THEN 1 ELSE 0 END), 0) AS filter_added_count');
+        }
+
+        $stats = $queryBuilder->where(
+            $queryBuilder->expr()->eq('l.leadlist_id', ':listId'),
+            $queryBuilder->expr()->eq('l.manually_removed', ':false')
+        )
+            ->setParameter('listId', $listId)
+            ->setParameter('false', false, 'boolean')
+            ->setParameter('true', true, 'boolean')
+            ->executeQuery()
+            ->fetchAssociative() ?: [];
+
+        return [
+            'total'         => (int) ($stats['total_count'] ?? 0),
+            'manuallyAdded' => (int) ($stats['manually_added_count'] ?? 0),
+            'filterAdded'   => $includeFilterAdded ? (int) ($stats['filter_added_count'] ?? 0) : null,
+        ];
+    }
+
     private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
     {
         $fromPart             = $qb->getQueryPart('from');
@@ -443,6 +476,12 @@ class LeadListRepository extends CommonRepository
                 $expr            = $q->expr()->eq('l.isGlobal', ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
+            case $this->translator->trans('mautic.lead.list.searchcommand.ispreference'):
+            case $this->translator->trans('mautic.lead.list.searchcommand.ispreference', [], null, 'en_US'):
+                $column          = $q instanceof \Doctrine\ORM\QueryBuilder ? 'l.isPreferenceCenter' : 'l.is_preference_center';
+                $expr            = $q->expr()->eq($column, ":$unique");
+                $forceParameters = [$unique => !$filter->not];
+                break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
                 $expr            = $q->expr()->like('l.name', ':'.$unique);
@@ -486,6 +525,7 @@ class LeadListRepository extends CommonRepository
     {
         $commands = [
             'mautic.lead.list.searchcommand.isglobal',
+            'mautic.lead.list.searchcommand.ispreference',
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.name',

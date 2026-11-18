@@ -2,7 +2,7 @@ Mautic.getNetworkFormAction = function(networkType) {
     // removes errors when network type properties has changed
     if (networkType && mQuery(networkType).val() && mQuery(networkType).closest('.form-group').hasClass('has-error')) {
         mQuery(networkType).closest('.form-group').removeClass('has-error');
-        if (mQuery(networkType).next().hasClass('help-block')) {
+        if (mQuery(networkType).next().hasClass('form-text')) {
             mQuery(networkType).next().remove();
         }
     }

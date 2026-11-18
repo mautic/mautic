@@ -2,9 +2,9 @@
 {% set type = item.getSmsType() %}
 <td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
     {% if 'list' == type %}
-        <span size="sm" class="mt-xs label label-gray clickable-stat{{ item.getPendingCount() > 0 and 'list' == item.getSmsType() ? '' : ' hide' }}"
+        <span size="sm" class="mt-5 label label-gray clickable-stat{{ item.getPendingCount() > 0 and 'list' == item.getSmsType() ? '' : ' hide' }}"
               id="pending-{{ item.getId() }}"
-              data-toggle="tooltip"
+              data-bs-toggle="tooltip"
               title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
             <a href="{{ path('mautic_contact_index', { 'search' : 'mautic.lead.lead.searchcommand.sms_pending'|trans ~ ':' ~ item.getId() }) }}">
                 {{ 'mautic.sms.stat.leadcount'|trans({'%count%' : item.getPendingCount()}) }}
@@ -12,9 +12,9 @@
         </span>
     {% endif %}
 
-    <span class="mt-xs label label-green"
+    <span class="mt-5 label label-green"
           id="sent-count-{{ item.getId() }}"
-          data-toggle="tooltip"
+          data-bs-toggle="tooltip"
           title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
         <a href="{{ path('mautic_contact_index',{'search' : 'mautic.lead.lead.searchcommand.sms_sent'|trans ~ ':' ~ item.getId()}) }}">
             {{ 'mautic.sms.stat.sentcount'|trans({'%count%' : item.getSentCount(true)}) }}
