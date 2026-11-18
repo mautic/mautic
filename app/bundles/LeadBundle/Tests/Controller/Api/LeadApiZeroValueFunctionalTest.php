@@ -203,6 +203,28 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    public function testPatchKeepsThePrimaryCompanyWhenCompanyIsSentAsZero(): void
+    {
+        $contactId = $this->createContact('zero-company-patch@example.com', ['company' => 'Zero Company Patch']);
+        $this->assertSame('Zero Company Patch', $this->getPrimaryCompanyName($contactId));
+
+        $this->client->request(Request::METHOD_PATCH, '/api/contacts/'.$contactId.'/edit', ['company' => 0]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK, $this->client->getResponse()->getContent());
+
+        $this->assertSame('Zero Company Patch', $this->getPrimaryCompanyName($contactId));
+    }
+
+    public function testPostNewKeepsThePrimaryCompanyWhenCompanyIsSentAsZeroOnIdentifierMatch(): void
+    {
+        $contactId = $this->createContact('zero-company-post@example.com', ['company' => 'Zero Company Post']);
+
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', ['email' => 'zero-company-post@example.com', 'company' => 0]);
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
+        $this->assertSame($contactId, json_decode($this->client->getResponse()->getContent(), true)['contact']['id']);
+
+        $this->assertSame('Zero Company Post', $this->getPrimaryCompanyName($contactId));
+    }
+
     /**
      * @param array<string, mixed> $fields
      */
@@ -222,6 +244,22 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_OK, $this->client->getResponse()->getContent());
 
         return json_decode($this->client->getResponse()->getContent(), true)['contact']['fields']['all'][$alias];
+    }
+
+    private function getPrimaryCompanyName(int $contactId): ?string
+    {
+        $this->em->clear();
+
+        $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contactId.'/companies');
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK, $this->client->getResponse()->getContent());
+
+        foreach (json_decode($this->client->getResponse()->getContent(), true)['companies'] as $company) {
+            if ($company['is_primary']) {
+                return $company['companyname'];
+            }
+        }
+
+        return null;
     }
 
     /**

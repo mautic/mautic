@@ -194,7 +194,8 @@ trait CustomFieldsApiControllerTrait
             $parameters = array_filter(
                 $parameters,
                 function ($value, $key) use ($parameterKeysBeforeForm): bool {
-                    if (in_array($key, $parameterKeysBeforeForm, true)) {
+                    // Except company: an empty company would remove the contact's primary company.
+                    if (in_array($key, $parameterKeysBeforeForm, true) && 'company' !== $key) {
                         return true;
                     }
 
