@@ -80,16 +80,8 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
     public function testSetFieldValuesDoesNotOverwriteStoredNumberWithBlank(): void
     {
         $contactId = $this->createContact('blank-stored@example.com', [self::NUMBER_FIELD => 5]);
-        $this->em->clear();
-
-        $leadModel = self::getContainer()->get(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $leadModel);
-        $contact = $leadModel->getEntity($contactId);
-        $this->assertInstanceOf(Lead::class, $contact);
-
         // Integrations and the campaign Update contact action pass raw values straight to setFieldValues().
-        $leadModel->setFieldValues($contact, [self::NUMBER_FIELD => ''], false, false);
-        $leadModel->saveEntity($contact);
+        $this->setFieldValuesThroughModel($contactId, [self::NUMBER_FIELD => '']);
 
         $this->assertSame(5, $this->getStoredValue($contactId, self::NUMBER_FIELD));
     }
@@ -98,15 +90,7 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
     public function testSetFieldValuesDoesNotOverwriteStoredNumberWithNonNumericValue(mixed $value, string $slug): void
     {
         $contactId = $this->createContact('non-numeric-'.$slug.'@example.com', [self::NUMBER_FIELD => 5]);
-        $this->em->clear();
-
-        $leadModel = self::getContainer()->get(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $leadModel);
-        $contact = $leadModel->getEntity($contactId);
-        $this->assertInstanceOf(Lead::class, $contact);
-
-        $leadModel->setFieldValues($contact, [self::NUMBER_FIELD => $value], false, false);
-        $leadModel->saveEntity($contact);
+        $this->setFieldValuesThroughModel($contactId, [self::NUMBER_FIELD => $value]);
 
         $this->assertSame(5, $this->getStoredValue($contactId, self::NUMBER_FIELD));
     }
@@ -124,15 +108,7 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
     public function testSetFieldValuesWithNumericZeroCompanyKeepsPrimaryCompany(int|float $value, string $slug): void
     {
         $contactId = $this->createContact('zero-company-model-'.$slug.'@example.com', ['company' => 'Zero Company Probe Ltd']);
-        $this->em->clear();
-
-        $leadModel = self::getContainer()->get(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $leadModel);
-        $contact = $leadModel->getEntity($contactId);
-        $this->assertInstanceOf(Lead::class, $contact);
-
-        $leadModel->setFieldValues($contact, ['company' => $value], false, false);
-        $leadModel->saveEntity($contact);
+        $this->setFieldValuesThroughModel($contactId, ['company' => $value]);
 
         $this->assertSame('Zero Company Probe Ltd', $this->getPrimaryCompanyName($contactId));
     }
@@ -156,15 +132,7 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
     public function testSetFieldValuesDoesNotOverwriteStoredTextWithNumericZero(): void
     {
         $contactId = $this->createContact('zero-text-model@example.com', [self::TEXT_FIELD => 'abc']);
-        $this->em->clear();
-
-        $leadModel = self::getContainer()->get(LeadModel::class);
-        $this->assertInstanceOf(LeadModel::class, $leadModel);
-        $contact = $leadModel->getEntity($contactId);
-        $this->assertInstanceOf(Lead::class, $contact);
-
-        $leadModel->setFieldValues($contact, [self::TEXT_FIELD => 0], false, false);
-        $leadModel->saveEntity($contact);
+        $this->setFieldValuesThroughModel($contactId, [self::TEXT_FIELD => 0]);
 
         $this->assertSame('abc', $this->getStoredValue($contactId, self::TEXT_FIELD));
     }
@@ -292,6 +260,22 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $this->client->getResponse()->getContent());
 
         return json_decode($this->client->getResponse()->getContent(), true)['contact']['id'];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function setFieldValuesThroughModel(int $contactId, array $data): void
+    {
+        $this->em->clear();
+
+        $leadModel = self::getContainer()->get(LeadModel::class);
+        $this->assertInstanceOf(LeadModel::class, $leadModel);
+        $contact = $leadModel->getEntity($contactId);
+        $this->assertInstanceOf(Lead::class, $contact);
+
+        $leadModel->setFieldValues($contact, $data, false, false);
+        $leadModel->saveEntity($contact);
     }
 
     private function getStoredValue(int $contactId, string $alias): mixed

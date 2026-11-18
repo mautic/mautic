@@ -67,8 +67,8 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
     /**
      * @param array<string, mixed> $expectedParameters
      */
-    #[DataProvider('numericValueProvider')]
-    public function testSetCustomFieldValuesKeepsValuesSentByTheClient(mixed $value, array $expectedParameters): void
+    #[DataProvider('sentValueProvider')]
+    public function testSetCustomFieldValuesFiltersValuesSentByTheClient(mixed $value, array $expectedParameters, string $alias = 'number_field'): void
     {
         $model = new class() {
             /**
@@ -109,7 +109,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             }
         };
 
-        $controller->setCustomFieldValuesPublic(new Lead(), $this->createFormStub([]), ['number_field' => $value]);
+        $controller->setCustomFieldValuesPublic(new Lead(), $this->createFormStub([]), [$alias => $value]);
 
         $this->assertSame($expectedParameters, $model->parameters);
     }
@@ -165,68 +165,6 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
     }
 
     /**
-     * @param array<string, mixed> $expectedParameters
-     */
-    #[DataProvider('companyValueProvider')]
-    public function testSetCustomFieldValuesDropsZeroCompanySentByTheClient(mixed $value, array $expectedParameters): void
-    {
-        $model = new class() {
-            /**
-             * @var array<string, mixed>
-             */
-            public array $parameters = [];
-
-            /**
-             * @param array<string, mixed> $parameters
-             */
-            public function setFieldValues(Lead $lead, array $parameters, bool $overwriteWithBlank): void
-            {
-                $this->parameters = $parameters;
-            }
-        };
-
-        $controller = new class($model) {
-            use CustomFieldsApiControllerTrait;
-
-            private string $entityNameOne = 'lead';
-
-            public function __construct(
-                private object $model,
-            ) {
-            }
-
-            public function getModel(?string $name): object
-            {
-                return $this->model;
-            }
-
-            /**
-             * @param array<string, mixed> $parameters
-             */
-            public function setCustomFieldValuesPublic(Lead $lead, Form $form, array $parameters): void
-            {
-                $this->setCustomFieldValues($lead, $form, $parameters, true);
-            }
-        };
-
-        $controller->setCustomFieldValuesPublic(new Lead(), $this->createFormStub([]), ['company' => $value]);
-
-        $this->assertSame($expectedParameters, $model->parameters);
-    }
-
-    /**
-     * @return \Generator<string, array{mixed, array<string, mixed>}>
-     */
-    public static function companyValueProvider(): \Generator
-    {
-        yield 'integer zero' => [0, []];
-        yield 'float zero' => [0.0, []];
-        yield 'zero string' => ['0', []];
-        yield 'decimal zero string' => ['0.00', []];
-        yield 'company name' => ['Acme', ['company' => 'Acme']];
-    }
-
-    /**
      * @param array<string, mixed> $children
      */
     private function createFormStub(array $children): Form
@@ -247,9 +185,9 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
     }
 
     /**
-     * @return \Generator<string, array{mixed, array<string, mixed>}>
+     * @return \Generator<string, array{0: mixed, 1: array<string, mixed>, 2?: string}>
      */
-    public static function numericValueProvider(): \Generator
+    public static function sentValueProvider(): \Generator
     {
         yield 'positive fraction' => [0.5, ['number_field' => 0.5]];
         yield 'positive fraction string' => ['0.5', ['number_field' => '0.5']];
@@ -260,6 +198,11 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
         yield 'float zero' => [0.0, ['number_field' => 0.0]];
         yield 'zero string' => ['0', ['number_field' => '0']];
         yield 'decimal zero string' => ['0.00', ['number_field' => '0.00']];
+        yield 'company integer zero' => [0, [], 'company'];
+        yield 'company float zero' => [0.0, [], 'company'];
+        yield 'company zero string' => ['0', [], 'company'];
+        yield 'company decimal zero string' => ['0.00', [], 'company'];
+        yield 'company name' => ['Acme', ['company' => 'Acme'], 'company'];
     }
 
     /**
