@@ -9,6 +9,11 @@
   border-collapse: separate;
 }
 
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
 // background picture
 // ---------------------------------------------
 .bg-picture {
