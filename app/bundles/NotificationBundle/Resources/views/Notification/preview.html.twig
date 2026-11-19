@@ -5,21 +5,21 @@
 
 {% set notificationWrapper %}
 <div id="notification-preview" class="notification-preview">
-  <div class="notification-preview__body {{ notification.url ? 'animation--grow' }}">
+  <div class="notification-preview__body position-relative {{ notification.url ? 'animation--grow' }}">
     <div class="notification-preview__container">
-      <div class="notification-preview__notification notification-preview__notification--web">
-        <span class="notification-preview__before"></span>
+      <div class="notification-preview__notification notification-preview__notification--web overflow-hidden position-relative">
+        <span class="notification-preview__before pe-none position-absolute"></span>
         <div class="d-flex gap-16 align-items-center">
-            <div class="notification-preview__icon">
+            <div class="notification-preview__icon align-items-center d-flex flex-shrink-0 justify-content-center">
               <i class="ri-safari-fill"></i>
             </div>
-            <div class="notification-preview__content">
+            <div class="notification-preview__content d-grid">
               <h3 class="notification-preview__title type-heading-02" data-notification-preview="heading" data-notification-preview-default="{{ 'mautic.notification.preview.notification'|trans|e('html_attr') }}">{{ notification.heading|default('mautic.notification.preview.notification'|trans) }}</h3>
-              <p class="notification-preview__message type-body-01 mb-5" data-notification-preview="message" data-notification-preview-default="{{ 'mautic.notification.preview.message'|trans|e('html_attr') }}">{{ notification.message|default('mautic.notification.preview.message'|trans) }}</p>
+              <p class="notification-preview__message type-body-01 mb-5 text-truncate" data-notification-preview="message" data-notification-preview-default="{{ 'mautic.notification.preview.message'|trans|e('html_attr') }}">{{ notification.message|default('mautic.notification.preview.message'|trans) }}</p>
               <span class="notification-preview__more type-label-01">{{ 'mautic.notification.preview.source.web_browser'|trans }} • {{ 'mautic.notification.preview.source.example_com'|trans }}</span>
             </div>
         </div>
-        <div class="notification-preview__button{% if not notification.button %} hide{% endif %}" data-notification-preview="button">{{ notification.button }}</div>
+        <div class="notification-preview__button text-center{% if not notification.button %} hide{% endif %}" data-notification-preview="button">{{ notification.button }}</div>
 
       </div>
     </div>
