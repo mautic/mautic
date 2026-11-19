@@ -1,0 +1,149 @@
+.segmented-control {
+    --segmented-control-padding: 3px;
+    --segmented-control-height: 36px;
+    --segmented-control-radius: 25px;
+    --segmented-control-surface: var(--layer-02);
+    --segmented-control-duration: 350ms;
+    --segmented-control-x: 0px;
+    --segmented-control-width: 0px;
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: stretch;
+    inline-size: fit-content;
+    block-size: var(--segmented-control-height);
+    padding: var(--segmented-control-padding);
+    border-radius: var(--segmented-control-radius);
+    background-color: var(--layer-01);
+    font-size: 14px;
+    box-shadow: none;
+    user-select: none;
+
+    > .btn {
+        display: flex;
+        align-self: stretch;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        block-size: auto;
+        min-block-size: 0;
+        margin: 0;
+        padding: 0 14px;
+        border: 0;
+        border-radius: calc(var(--segmented-control-radius) - var(--segmented-control-padding)) !important;
+        background: transparent;
+        box-shadow: none;
+        color: var(--text-secondary);
+        font-size: inherit;
+        font-weight: 500;
+        line-height: 1;
+        white-space: nowrap;
+        transition: color var(--duration-productive) var(--easing-standard-productive);
+
+        &:hover {
+            color: var(--text-primary);
+        }
+    }
+
+    > .btn-check:checked + .btn {
+        color: var(--text-primary);
+    }
+
+    > .btn-check:disabled + .btn {
+        opacity: 0.4;
+        cursor: default;
+    }
+
+    > .btn-check:focus-visible + .btn {
+        outline: 2px solid var(--focus);
+        outline-offset: -2px;
+    }
+
+    &:not(.is-initialized) > .btn-check:checked + .btn {
+        background-color: var(--segmented-control-surface);
+    }
+
+    &--sm {
+        --segmented-control-padding: 2px;
+        --segmented-control-height: 32px;
+        font-size: 13px;
+
+        > .btn {
+            padding: 0 12px;
+        }
+    }
+
+    &--lg {
+        --segmented-control-padding: 4px;
+        --segmented-control-height: 44px;
+        font-size: 15px;
+
+        > .btn {
+            gap: 8px;
+            padding: 0 16px;
+        }
+    }
+
+    &--equal {
+        display: inline-grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+
+        > .btn {
+            inline-size: 100%;
+        }
+    }
+
+    &--draggable {
+        touch-action: pan-y;
+    }
+
+    &[data-segmented-control-dragging] {
+        cursor: grabbing;
+
+        > .btn {
+            color: var(--text-secondary);
+        }
+
+        > [data-segmented-control-preview] {
+            color: var(--text-primary);
+        }
+    }
+}
+
+.segmented-control__indicator {
+    position: absolute;
+    z-index: -1;
+    inset-block: var(--segmented-control-padding);
+    inset-inline-start: 0;
+    inline-size: var(--segmented-control-width);
+    border-radius: calc(var(--segmented-control-radius) - var(--segmented-control-padding));
+    background-color: var(--segmented-control-surface);
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    translate: var(--segmented-control-x);
+    transition:
+        translate var(--segmented-control-duration) cubic-bezier(0.22, 1, 0.36, 1),
+        inline-size var(--segmented-control-duration) cubic-bezier(0.22, 1, 0.36, 1),
+        scale var(--duration-productive) var(--easing-standard-productive);
+
+    [data-segmented-control-dragging] > & {
+        translate: var(--segmented-control-drag-x, var(--segmented-control-x));
+        inline-size: var(--segmented-control-drag-width, var(--segmented-control-width));
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .segmented-control:active > &,
+        [data-segmented-control-dragging] > & {
+            scale: 0.95;
+        }
+    }
+
+    .is-initialized > & {
+        opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
+}
