@@ -95,11 +95,11 @@
                 </ul>
 
                 <!-- start: tab-content -->
-                <div class="tab-content pa-16">
+                <div class="tab-content p-16">
                     {% for group in fields|keys %}
-                        <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ group }}">
+                        <div class="tab-pane fade {% if loop.first %}in active{% endif %} border-0" id="{{ group }}">
                             <div class="pe-16 ps-16 pb-16">
-                                <div class="panel shd-none mb-0">
+                                <div class="panel shadow-none mb-0">
                                     <table class="table table-hover mb-0">
                                         <tbody>
                                         {% for field in fields[group] %}
@@ -148,7 +148,7 @@
         </div>
 
         {{ customContent('company.engagement.before', _context) }}
-        <div class="pa-16 enage">
+        <div class="p-16 enage">
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel">
@@ -184,11 +184,11 @@
         {% endset %}
         {% set customTabs %}{{ customContent('company.tabs', _context) }}{% endset %}
         {% if customTabs is empty %}
-            <div class="pa-16 enage">
+            <div class="p-16 enage">
                 {{ contactsTable }}
             </div>
         {% else %}
-            <div class="pa-16">
+            <div class="p-16">
                 <ul class="nav nav-tabs nav-tabs-contained">
                     <li class="active">
                         <a href="#company-contacts-container" class="nav-link active" role="tab" data-bs-toggle="tab">
@@ -197,8 +197,8 @@
                     </li>
                     {{ customTabs }}
                 </ul>
-                <div class="tab-content pa-16">
-                    <div class="tab-pane fade show active bdr-w-0" id="company-contacts-container">
+                <div class="tab-content p-16">
+                    <div class="tab-pane fade show active border-0" id="company-contacts-container">
                         {{ contactsTable }}
                     </div>
                     {{ customContent('company.tabs.content', _context) }}
@@ -214,10 +214,10 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bdr-l height-auto">
+    <div class="col-md-3 border-start height-auto">
         {{ customContent('company.sidebar.top', _context) }}
         <!-- form HTML -->
-        <div class="panel shd-none rounded-0 bdr-w-0 mb-0">
+        <div class="panel shadow-none rounded-0 border-0 mb-0">
             <div class="mt-12 points-panel text-center">
                 <h1>{{ 'mautic.company.score.count'|trans({'%count%': company.score}) }}</h1>
                 <hr/>

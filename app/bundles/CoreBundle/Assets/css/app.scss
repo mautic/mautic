@@ -4,7 +4,6 @@
 @import 'libraries/libraries';
 @import 'app/scss/variables';
 @import 'app/scss/mixins';
-@import 'app/scss/lesshat';
 @import 'libraries/bootstrap/bootstrap-mautic-custom';
 @import 'app/scss/spinning';
 @import 'app/scss/layouts/base';
@@ -50,6 +49,7 @@
 @import 'app/scss/components/modals';
 @import 'app/scss/components/accordions';
 @import 'app/scss/components/tiles';
+@import 'app/scss/components/code-snippet';
 @import 'app/scss/custom';
 @import 'app/scss/components/toggle';
 @import 'app/scss/components/globalsearch';

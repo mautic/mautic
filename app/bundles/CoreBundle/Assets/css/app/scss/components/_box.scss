@@ -18,14 +18,14 @@
       overflow: hidden;
     }
 
-    &.bdr-l {
+    &.border-start {
       &.height-auto {
         &:before {
           margin-left: -1px;
         }
       }
     }
-    &.bdr-r {
+    &.border-end {
       &.height-auto {
         &:before {
           margin-right: -1px;

@@ -64,7 +64,6 @@ a.media {
           bottom: -200%;
           width: 1px;
           left: 50%;
-          @include lh-background-image(linear-gradient(top,  rgba(255,255,255,0) 0%, var(--layer) 5%, var(--layer) 90%, rgba(229,229,229,0) 100%));
         }
 
         > .figure {
@@ -94,6 +93,35 @@ a.media {
         > .media-object {
           &:before { top: 0; }
         }
+      }
+    }
+  }
+}
+
+.dashboard-widgets .media-list.media-list-feed {
+  .media {
+    position: relative;
+
+    > .media-object {
+      position: static;
+
+      &:before {
+        top: 0;
+        bottom: -15px;
+        left: 14px;
+        background: var(--border-strong);
+      }
+    }
+
+    &:first-child {
+      > .media-object {
+        &:before { top: 10px; }
+      }
+    }
+
+    &:last-child {
+      > .media-object {
+        &:before { display: none; }
       }
     }
   }

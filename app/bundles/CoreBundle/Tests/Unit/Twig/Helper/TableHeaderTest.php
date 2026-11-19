@@ -92,7 +92,7 @@ final class TableHeaderTest extends TestCase
             'tooltip'    => 'StaticColumn',
         ]);
 
-        $this->assertStringContainsString('class="pa-16" data-bs-toggle="tooltip"', $html);
+        $this->assertStringContainsString('class="p-16" data-bs-toggle="tooltip"', $html);
         $this->assertStringContainsString('data-bs-title="StaticColumn"', $html);
     }
 

@@ -63,7 +63,7 @@
     {% if filters is defined and filters is not empty %}
     <div class="{{ quickFilters is defined and quickFilters is not empty ? 'col-xs-6' : 'col-xs-12' }} p-0">
         <div class="dropdown-header mt-0">{{ filtersLabel|default('mautic.core.quick_filters.more')|trans }}</div>
-        <div class="pi-16">
+        <div class="px-16">
             {{- include('@MauticCore/Helper/list_filters.html.twig', {
                 filters: filters,
                 target: target|default(null),

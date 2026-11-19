@@ -130,4 +130,48 @@ $utilities: map-merge($utilities, (
   ))
 ));
 
+$utilities: map-merge($utilities, (
+  "width": map-merge(map-get($utilities, "width"), (
+    "values": map-merge(map-get(map-get($utilities, "width"), "values"), (44: 44px))
+  )),
+  "height": map-merge(map-get($utilities, "height"), (
+    "values": map-merge(map-get(map-get($utilities, "height"), "values"), (32: 32px, 48: 48px, 384: 384px))
+  )),
+  "min-height": (
+    property: min-height,
+    class: min-h,
+    values: (256: 256px)
+  ),
+  "flex-basis": (
+    property: flex-basis,
+    class: fb,
+    values: (0: 0)
+  ),
+  "aspect-ratio": (
+    property: aspect-ratio,
+    class: as,
+    values: ("1-1": 1 / 1, "2-1": 2 / 1, "4-3": 4 / 3, "16-9": 16 / 9)
+  ),
+  "box-shadow-custom": (
+    property: box-shadow,
+    class: shd,
+    values: (sm: 0 4px 8px -4px rgba(0, 0, 0, 0.05))
+  ),
+  "margin-inline-local": (
+    property: margin-inline,
+    class: mi,
+    values: (neg-local: calc(-1 * var(--layout-density-padding-inline-local)))
+  ),
+  "padding-inline-local": (
+    property: padding-inline,
+    class: pi,
+    values: (neg-local: calc(-1 * var(--layout-density-padding-inline-local)))
+  ),
+  "margin-local": (
+    property: margin,
+    class: ma,
+    values: (neg-local: calc(-1 * var(--layout-density-padding-inline-local)))
+  )
+));
+
 @import "utilities/api";

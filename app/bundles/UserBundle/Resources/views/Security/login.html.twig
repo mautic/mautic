@@ -24,7 +24,7 @@
 		{% if oidcSettings is defined and oidcSettings.isEnabled and oidcSettings.isRequired %}
 			{% include '@MauticUser/Security/oidc_login_top.html.twig' with {parameters: oidcSettings} %}
 		{% endif %}
-		<form class="login-form bdr-t" name="login" data-toggle="ajax" role="form" action="{{ path('mautic_user_logincheck') }}" method="post">
+		<form class="login-form border-top" name="login" data-toggle="ajax" role="form" action="{{ path('mautic_user_logincheck') }}" method="post">
 		{% include '@MauticCore/Components/text-input.html.twig' with {
 			variant: 'fluid',
 			id: 'username',
