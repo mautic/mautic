@@ -276,7 +276,7 @@ abstract class WidgetDetailEvent extends CommonEvent
      *
      * @throws CouldNotFormatDateTimeException
      */
-    private function castDateTimeToString($value): string
+    private function castDateTimeToString(mixed $value): string
     {
         if ($value instanceof \DateTimeInterface) {
             // We use RFC 2822 format because it includes timezone

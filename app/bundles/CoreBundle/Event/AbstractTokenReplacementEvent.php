@@ -24,14 +24,11 @@ abstract class AbstractTokenReplacementEvent extends CommonEvent
 
     private ?Stat $stat = null;
 
-    /**
-     * @param mixed $passthrough
-     */
     public function __construct(
         array|string|null|Lead $content,
         protected Lead|array|null $lead = null,
         protected array $clickthrough = [],
-        protected $passthrough = null,
+        protected mixed $passthrough = null,
         private readonly bool $internalSend = false,
     ) {
         if ($content instanceof CommonEntity) {

@@ -33,9 +33,8 @@ class FetchOptions
 
     /**
      * @param string $key
-     * @param mixed  $value
      */
-    public function setOption($key, $value): static
+    public function setOption($key, mixed $value): static
     {
         $this->options[$key] = $value;
 

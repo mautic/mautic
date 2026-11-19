@@ -46,12 +46,12 @@ final class IntNode implements NodeInterface
         $this->children[] = $child;
     }
 
-    public function addParam(string $key, $value): void
+    public function addParam(string $key, mixed $value): void
     {
         $this->params[$key] = $value;
     }
 
-    public function getParam(string $key, $default = null)
+    public function getParam(string $key, mixed $default = null)
     {
         return $this->params[$key] ?? $default;
     }
