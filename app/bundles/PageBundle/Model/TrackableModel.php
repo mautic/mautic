@@ -106,7 +106,7 @@ final class TrackableModel extends AbstractCommonModel
     /**
      * Return a channel Trackable entity by URL.
      */
-    public function getTrackableByUrl($url, $channel, $channelId): ?Trackable
+    public function getTrackableByUrl($url, string $channel, $channelId): ?Trackable
     {
         if (empty($url)) {
             return null;
@@ -193,7 +193,7 @@ final class TrackableModel extends AbstractCommonModel
      *
      * @return mixed[]
      */
-    public function getTrackableList($channel, $channelId): array
+    public function getTrackableList(string $channel, $channelId): array
     {
         return $this->trackableRepository->findByChannel($channel, $channelId);
     }

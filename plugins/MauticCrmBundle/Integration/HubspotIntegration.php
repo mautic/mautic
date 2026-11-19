@@ -219,7 +219,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
      *
      * @param array $leadData All the lead fields mapped
      */
-    public function formatLeadDataForCreateOrUpdate(array $leadData, $lead, $updateLink = false): array
+    public function formatLeadDataForCreateOrUpdate(array $leadData, $lead, bool $updateLink = false): array
     {
         $formattedLeadData = [];
 
@@ -380,10 +380,9 @@ final class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param bool                 $id
      * @param array<string, mixed> $params
      */
-    public function getCompanies(array $params = [], $id = false, &$executed = null)
+    public function getCompanies(array $params = [], int|string|false $id = false, &$executed = null)
     {
         $results = [];
         try {

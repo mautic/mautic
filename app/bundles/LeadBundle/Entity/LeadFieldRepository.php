@@ -34,9 +34,9 @@ final class LeadFieldRepository extends CommonRepository
      * Retrieves array of aliases used to ensure unique alias for new fields.
      *
      * @param int    $exludingId
-     * @param string $object     name of object using the custom fields
+     * @param string|null $object name of object using the custom fields
      */
-    public function getAliases($exludingId, bool $publishedOnly = false, bool $includeEntityFields = true, $object = 'lead'): array
+    public function getAliases($exludingId, bool $publishedOnly = false, bool $includeEntityFields = true, ?string $object = 'lead'): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.alias')
@@ -232,7 +232,7 @@ final class LeadFieldRepository extends CommonRepository
      * @param mixed  $value        to compare with
      * @param string $operatorExpr for WHERE clause
      */
-    public function compareValue($lead, $field, $value, $operatorExpr, ?string $fieldType = null): bool
+    public function compareValue($lead, string $field, $value, $operatorExpr, ?string $fieldType = null): bool
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id')

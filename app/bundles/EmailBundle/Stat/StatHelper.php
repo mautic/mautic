@@ -29,7 +29,7 @@ final class StatHelper
     ) {
     }
 
-    public function storeStat(Stat $stat, $emailAddress): void
+    public function storeStat(Stat $stat, string $emailAddress): void
     {
         $this->emailStatModel->saveEntity($stat);
 
@@ -55,7 +55,7 @@ final class StatHelper
     /**
      * @throws StatNotFoundException
      */
-    public function getStat($emailAddress): Reference
+    public function getStat(string $emailAddress): Reference
     {
         if (!isset($this->stats[$emailAddress])) {
             throw new StatNotFoundException();
