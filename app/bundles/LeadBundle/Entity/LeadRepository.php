@@ -11,7 +11,6 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
-use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -79,8 +78,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     private ?TriggerModel $triggerModel = null;
 
-    private ?ListLeadRepository $listLeadRepository = null;
-
     /** @var list<int> Segment IDs resolved from the current search query's list/segment command */
     private array $activeSearchSegmentIds = [];
 
@@ -115,11 +112,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
-    }
-
-    public function setListLeadRepository(ListLeadRepository $listLeadRepository): void
-    {
-        $this->listLeadRepository = $listLeadRepository;
     }
 
     public static function getLeadFieldRepository(): LeadFieldRepository
@@ -697,7 +689,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $args['qb']    = $qb;
-        $args['count'] = (ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) ? $this->listLeadRepository->getContactsCountBySegment($entityId, $filters) : null;
 
         if ($dateFrom && $dateTo) {
             $qb->andWhere('entity.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
@@ -801,6 +792,20 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $q->expr()->{$eqExpr}('l.owner_id', 0),
                     $q->expr()->{$nullExpr}('l.owner_id')
                 );
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.isunsegmented'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.isunsegmented', [], null, 'en_US'):
+                $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                $sq->select('1')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'llu')
+                    ->where(
+                        $q->expr()->and(
+                            $q->expr()->eq('l.id', 'llu.lead_id'),
+                            $q->expr()->eq('llu.manually_removed', 0)
+                        )
+                    );
+
+                $expr           = $this->getExistsExpression(!$filter->not).'('.$sq->getSQL().')';
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner', [], null, 'en_US'):
@@ -1111,6 +1116,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.isanonymous',
             'mautic.core.searchcommand.ismine',
             'mautic.lead.lead.searchcommand.isunowned',
+            'mautic.lead.lead.searchcommand.isunsegmented',
             self::LIST_SEARCH_COMMAND,
             'mautic.lead.lead.searchcommand.campaign_membership',
             'mautic.core.searchcommand.name',
