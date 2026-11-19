@@ -21,6 +21,7 @@ final class SegmentSearchScopeProviderTest extends SearchScopeProviderTestCase
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.core.searchcommand.name' => 'name',
                 'mautic.lead.list.searchcommand.isglobal' => 'is:global',
+                'mautic.lead.list.searchcommand.ispreference' => 'is:preference',
                 'mautic.core.searchcommand.ismine' => 'is:mine',
                 default => $key,
             });
@@ -29,6 +30,7 @@ final class SegmentSearchScopeProviderTest extends SearchScopeProviderTestCase
             ->willReturn([
                 'mautic.core.searchcommand.name',
                 'mautic.lead.list.searchcommand.isglobal',
+                'mautic.lead.list.searchcommand.ispreference',
                 'mautic.core.searchcommand.ismine',
             ]);
 
@@ -37,6 +39,6 @@ final class SegmentSearchScopeProviderTest extends SearchScopeProviderTestCase
 
     protected function expectedDynamicCommands(): array
     {
-        return ['is:global'];
+        return ['is:global', 'is:preference'];
     }
 }
