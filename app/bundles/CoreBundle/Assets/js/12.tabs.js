@@ -389,6 +389,10 @@ Mautic.initTabsScroll = function() {
     mQuery('.nav-tabs').each(function() {
         var $navTabs = mQuery(this);
 
+        if ($navTabs.closest('.tabs-container--vertical').length) {
+            $navTabs.attr('aria-orientation', window.matchMedia('(min-width: 1200px)').matches ? 'vertical' : 'horizontal');
+        }
+
         // Avoid initializing the same nav-tabs multiple times
         if ($navTabs.parent().hasClass('nav-tabs-wrapper')) {
             return; // Already initialized
