@@ -18,7 +18,7 @@
   "require": {
     "php": "~8.2",
     "ext-iconv": "*",
-    "ext-imap": "*",
+    "horde/imap_client": "^3.3",
     "ext-pdo": "*",
     "ext-zip": "*",
     "ext-zlib": "*",

@@ -204,7 +204,8 @@
       "symfony/flex": true,
       "phpstan/extension-installer": true,
       "php-http/discovery": true,
-      "cweagans/composer-patches": true
+      "cweagans/composer-patches": true,
+      "horde/horde-installer-plugin": false
     }
   },
   "extra": {
