@@ -782,6 +782,46 @@ final class MauticReportBuilderTest extends TestCase
         $this->assertSame('SELECT `a`.`someField` WHERE a.name LIKE :i0caname', $query->getSql());
     }
 
+    /**
+     * @param string[] $value
+     */
+    #[DataProvider('builtInFilterColumnProvider')]
+    public function testFilterConditionFromListenerOverridesBuiltInFilter(string $column, array $value): void
+    {
+        $report = $this->buildReportWithFilters([
+            [
+                'column'    => $column,
+                'glue'      => 'and',
+                'value'     => $value,
+                'condition' => 'in',
+            ],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(
+            ReportFilterConditionEvent::class,
+            function (ReportFilterConditionEvent $event): void {
+                $event->setCondition('l.id IN (SELECT custom_id FROM custom_xref)');
+            }
+        );
+
+        $query = (new MauticReportBuilder($dispatcher, $this->connection, $report, $this->channelListHelper))->getQuery([
+            'columns' => ['a.someField' => []],
+            'filters' => [$column => $this->buildFilterDefinition('Built-in', 'multiselect', $column)],
+        ]);
+
+        $this->assertSame('SELECT `a`.`someField` WHERE l.id IN (SELECT custom_id FROM custom_xref)', $query->getSql());
+    }
+
+    /**
+     * @return iterable<string, array{string, string[]}>
+     */
+    public static function builtInFilterColumnProvider(): iterable
+    {
+        yield 'tag' => ['tag', ['1']];
+        yield 'dnc_preferences' => ['dnc_preferences', ['email:1']];
+    }
+
     private function buildBuilder(Report $report): MauticReportBuilder
     {
         return new MauticReportBuilder(
