@@ -705,15 +705,32 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentListShowsCategoryAfterName(): void
     {
-        $categoryTitle = 'Newsletters';
-        $category      = new Category();
-        $category->setTitle($categoryTitle);
-        $category->setAlias('newsletters');
-        $category->setBundle('segment');
-        $this->em->persist($category);
+        $categories = [
+            [
+                'title'         => 'Zebra',
+                'alias'         => 'zebra',
+                'segment_name'  => 'Zebra Segment',
+                'segment_alias' => 'zebra-segment',
+            ],
+            [
+                'title'         => 'Alpha',
+                'alias'         => 'alpha',
+                'segment_name'  => 'Alpha Segment',
+                'segment_alias' => 'alpha-segment',
+            ],
+        ];
 
-        $categorised = (new LeadList())->setCategory($category);
-        $this->saveSegment('Categorised', 'categorised', [], $categorised);
+        foreach ($categories as $categoryData) {
+            $category = new Category();
+            $category->setTitle($categoryData['title']);
+            $category->setAlias($categoryData['alias']);
+            $category->setBundle('segment');
+            $this->em->persist($category);
+
+            $categorised = (new LeadList())->setCategory($category);
+            $this->saveSegment($categoryData['segment_name'], $categoryData['segment_alias'], [], $categorised);
+        }
+
         $this->saveSegment('Uncategorised', 'uncategorised', []);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
@@ -726,10 +743,14 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
             $texts[trim($rowCrawler->filterXPath('.//td[2]//a')->text())] = $rowCrawler->filterXPath('.//td[3]')->text();
         }
 
-        $this->assertStringContainsString($categoryTitle, $texts['Categorised (categorised)']);
+        $this->assertStringContainsString('Zebra', $texts['Zebra Segment (zebra-segment)']);
+        $this->assertStringContainsString('Alpha', $texts['Alpha Segment (alpha-segment)']);
         $this->assertSame($this->translator->trans('mautic.core.form.uncategorized'), trim($texts['Uncategorised (uncategorised)']));
 
-        foreach (['ASC' => ['Uncategorised', 'Categorised'], 'DESC' => ['Categorised', 'Uncategorised']] as $direction => $expected) {
+        foreach ([
+            'ASC'  => ['Uncategorised', 'Alpha Segment', 'Zebra Segment'],
+            'DESC' => ['Zebra Segment', 'Alpha Segment', 'Uncategorised'],
+        ] as $direction => $expected) {
             $crawler = $this->client->request(Request::METHOD_GET, '/s/segments?orderby=cat.title&orderbydir='.$direction);
             $names   = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr/td[2]//a")->each(static fn (Crawler $a): string => trim(explode(' (', $a->text())[0]));
             $this->assertSame($expected, $names, $direction);
