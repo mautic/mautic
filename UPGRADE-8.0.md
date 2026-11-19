@@ -559,6 +559,8 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
     `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
 
+- Bootstrap Vertical Tabs stylesheet `app/bundles/CoreBundle/Assets/css/libraries/bootstrap/_bootstrap-vertical-tabs.scss` removed together with its `@import` in `_libraries.scss` and the `.modal-body.p-0 .tabs-left`/`.tabs-right` border-radius override in `app/bundles/CoreBundle/Assets/css/app/scss/_custom.scss`. The `.tabs-left`, `.tabs-right` and `.vertical-text` classes no longer have styles, and the `overflowNavs` plugin and tab sorting no longer have a vertical mode: overflow handling and sorting are always horizontal. The Dynamic Content tabs in the email editor no longer carry `.tabs-left`. Use Bootstrap's vertical navigation (`.nav` with `.flex-column`) instead.
+
 ## Changed code
 
 - `Mautic\NotificationBundle\Integration\OneSignalIntegration` now extends `Mautic\IntegrationsBundle\Integration\BasicIntegration` instead of the deprecated `Mautic\PluginBundle\Integration\AbstractIntegration`, so it is no longer an `AbstractIntegration`. Methods that only `AbstractIntegration` provides no longer exist on it, for example `getKeys()`, `getDecryptedApiKeys()`, `getFormSettings()` and `isCoreIntegration()`; it still has `getName()`, `getDisplayName()`, `getIcon()`, `getIntegrationSettings()` and `getSupportedFeatures()`. Load the integration with its API keys decrypted through the new `Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper` (`getIntegration()` / `getPublishedIntegration()`) instead of `Mautic\PluginBundle\Helper\IntegrationHelper::getIntegrationObject('OneSignal')` and `getKeys()` / `getDecryptedApiKeys()`.
