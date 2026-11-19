@@ -75,8 +75,9 @@ final class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
 
         $response = $this->app->handle($request, $type, $catch);
 
-        // Add standard CORS headers to any XHR
-        if ($request->isXmlHttpRequest()) {
+        // Page tracking uses a simple CORS request so that browsers can send it with fetch keepalive without a preflight.
+        $isPageTrackingRequest = 'mautic_page_tracker_cors' === $request->attributes->get('_route');
+        if ($request->isXmlHttpRequest() || ($isPageTrackingRequest && $this->requestOriginIsValid)) {
             foreach ($this->corsHeaders as $header => $value) {
                 $response->headers->set($header, $value);
             }
