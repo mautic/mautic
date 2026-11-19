@@ -43,7 +43,9 @@ final readonly class DoctrineGeneratedColumnsListener
                     ]
                 );
 
-                $table->addIndex($generatedColumn->getIndexColumns(), $generatedColumn->getIndexName());
+                if (!$generatedColumn->hasIndexColumnLengths()) {
+                    $table->addIndex($generatedColumn->getIndexColumns(), $generatedColumn->getIndexName());
+                }
             } catch (\Exception $e) {
                 // table doesn't exist or something bad happened so oh well
                 $this->logger->error('SCHEMA ERROR: '.$e->getMessage());

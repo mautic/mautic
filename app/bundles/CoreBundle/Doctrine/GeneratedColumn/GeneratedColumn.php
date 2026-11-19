@@ -18,6 +18,13 @@ final class GeneratedColumn implements GeneratedColumnInterface
 
     private array $indexColumns = [];
 
+    /**
+     * Column specifications for index (e.g., 'column_name(100)').
+     *
+     * @var array<string>
+     */
+    private array $indexColumnSpecs = [];
+
     private ?string $filterDateColumn = null;
 
     public function __construct(
@@ -49,6 +56,18 @@ final class GeneratedColumn implements GeneratedColumnInterface
     public function addIndexColumn(string $indexColumn): void
     {
         $this->indexColumns[] = $indexColumn;
+    }
+
+    /**
+     * @param array<string> $indexColumns
+     */
+    public function setIndexColumns(array $indexColumns): void
+    {
+        $this->indexColumnSpecs = $indexColumns;
+        $this->indexColumns     = array_map(
+            fn (string $spec): ?string => preg_replace('/\(\d+\)$/', '', $spec),
+            $indexColumns
+        );
     }
 
     public function prependIndexColumn(string $indexColumn): void
@@ -85,7 +104,9 @@ final class GeneratedColumn implements GeneratedColumnInterface
 
     public function getAddIndexSql(): string
     {
-        return "ADD INDEX `{$this->getIndexName()}`({$this->indexColumnsToString()})";
+        $columns = implode(', ', $this->hasIndexColumnLengths() ? $this->indexColumnSpecs : $this->indexColumns);
+
+        return "ADD INDEX `{$this->getIndexName()}`({$columns})";
     }
 
     public function getColumnDefinition(): string
@@ -100,9 +121,21 @@ final class GeneratedColumn implements GeneratedColumnInterface
         return $this->indexColumns;
     }
 
+    /**
+     * Check if this generated column's index uses column lengths.
+     *
+     * Returns true if any index column specification includes a column length
+     * (e.g., 'column_name(100)'), which indicates the index cannot be created
+     * using Doctrine's addIndex() and must use raw SQL instead.
+     */
+    public function hasIndexColumnLengths(): bool
+    {
+        return [] !== $this->indexColumnSpecs;
+    }
+
     public function getIndexName(): string
     {
-        return $this->tablePrefix.$this->indexColumnsToString('_');
+        return $this->tablePrefix.implode('_', $this->indexColumns);
     }
 
     public function getFilterDateColumn(): ?string
@@ -113,10 +146,5 @@ final class GeneratedColumn implements GeneratedColumnInterface
     public function setFilterDateColumn(?string $filterDateColumn): void
     {
         $this->filterDateColumn = $filterDateColumn;
-    }
-
-    private function indexColumnsToString(string $separator = ', '): string
-    {
-        return implode($separator, $this->indexColumns);
     }
 }

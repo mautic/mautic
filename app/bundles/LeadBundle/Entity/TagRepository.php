@@ -233,6 +233,21 @@ class TagRepository extends CommonRepository
     }
 
     /**
+     * @return string[]
+     */
+    public function getTagIdsByLeadId(string $leadId): array
+    {
+        return $this->_em->getConnection()
+            ->createQueryBuilder()
+            ->select('tag_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x')
+            ->where('x.lead_id = :leadId')
+            ->setParameter('leadId', $leadId)
+            ->executeQuery()
+            ->fetchFirstColumn();
+    }
+
+    /**
      * @return array<mixed>
      */
     protected function addCatchAllWhereClause($qb, $filter): array

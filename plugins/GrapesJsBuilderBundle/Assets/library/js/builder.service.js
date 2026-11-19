@@ -924,7 +924,7 @@ export default class BuilderService {
 
     blockToolbar.push('|', 'TokenPlugin', 'heading');
 
-    const blockConfig = Mautic.GetCkEditorConfigOptions(blockToolbar, tokenCallback) || {};
+    const blockConfig = Mautic.GetCkEditorConfigOptions(blockToolbar, tokenCallback, true) || {};
 
     blockConfig.licenseKey = 'GPL';
     blockConfig.mauticContentPolicy = contentPolicy;
