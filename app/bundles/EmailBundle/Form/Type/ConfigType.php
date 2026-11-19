@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -487,7 +488,7 @@ final class ConfigType extends AbstractType
                     'min'     => 0,
                 ],
                 'required'    => true,
-                'constraints' => [new GreaterThanOrEqual(0)],
+                'constraints' => [new NotNull(), new GreaterThanOrEqual(0)],
             ]
         );
 
