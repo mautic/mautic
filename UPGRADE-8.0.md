@@ -1752,7 +1752,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail::setType()` types `$bounceType` as `?string`, and `getType()` now declares a `?string` return type.
     - `Mautic\EmailBundle\MonitoredEmail\Search\Result::setEmail()` types `$email` as `string`. Passing `null` now throws; pass the email address. `getEmail()` now declares a `?string` return type.
     - `Mautic\LeadBundle\Entity\Lead::setColor()` types `$color` as `string`. Passing `null` now throws; pass a color string. `getColor()` now declares a `?string` return type, so a subclass overriding it must declare `?string` (or `string`).
-    - `Mautic\NotificationBundle\Event\NotificationSendEvent::setHeading()` types `$heading` as `?string`.
+    - `Mautic\NotificationBundle\Event\NotificationSendEvent::__construct()` and `setHeading()` type `$heading` as `?string`, and `getHeading()` now declares a `?string` return type.
     - `Mautic\PluginBundle\Entity\Integration::setName()` types `$name` as `string`. Passing `null` now throws; pass the integration name.
 
 ### Native parameter and return types for plugin extension points

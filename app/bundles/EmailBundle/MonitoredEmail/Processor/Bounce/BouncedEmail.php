@@ -84,9 +84,6 @@ final class BouncedEmail
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): ?string
     {
         return $this->bounceType;
