@@ -83,7 +83,7 @@ trait FormTestHelperTrait
     {
         $conn = $this->em->getConnection();
 
-        $sql  = "SELECT Table_name  from information_schema.tables where Table_name like '%form_results%' and table_schema in (SELECT DATABASE())";
+        $sql  = "SELECT TABLE_NAME AS table_name FROM information_schema.tables WHERE TABLE_NAME LIKE '%form_results%' AND TABLE_SCHEMA IN (SELECT DATABASE())";
         $stmt = $conn->prepare($sql);
 
         $tables = $stmt->executeQuery()->fetchAllAssociative();
@@ -91,7 +91,7 @@ trait FormTestHelperTrait
         $sm = $conn->createSchemaManager();
 
         foreach ($tables as $table) {
-            $sm->dropTable($table['Table_name']);
+            $sm->dropTable($table['table_name']);
         }
     }
 }
