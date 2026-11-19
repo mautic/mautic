@@ -863,7 +863,6 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `WebhookEvents::WEBHOOK_QUEUE_ON_ADD` | `WebhookQueueEvent` |
     | `WebhookEvents::WEBHOOK_ON_REQUEST` | `WebhookRequestEvent` |
 
-    The CRUD constants (`WEBHOOK_PRE_SAVE` / `WEBHOOK_POST_SAVE` / `WEBHOOK_PRE_DELETE` / `WEBHOOK_POST_DELETE`) and `WEBHOOK_KILL` all share the `WebhookEvent` class, so they keep their string names and are unchanged.
     -        PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
     +        PageDisplayEvent::class => ['onPageDisplay', 0],
          ];
