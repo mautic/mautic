@@ -79,15 +79,20 @@ final readonly class ForwardedEmailSender
             return;
         }
 
-        $mailer = $this->mailHelper->getMailer();
-        $mailer->setLead(null, true);
-        $mailer->setForwardedCopy(true);
-        $mailer->setEmail($email, false, [], true);
+        try {
+            $mailer = $this->mailHelper->getMailer();
+            $mailer->setLead(null, true);
+            $mailer->setForwardedCopy(true);
+            $mailer->setEmail($email, false, [], true);
 
-        if (!$mailer->setTo($toAddress)) {
+            if (!$mailer->setTo($toAddress)) {
+                throw new InvalidEmailException($toAddress, implode('; ', $mailer->getErrors()));
+            }
+        } catch (\Throwable $exception) {
+            // Nothing was sent yet, so the copy doesn't count
             $this->emailForwardRepository->deleteEntity($forward);
 
-            throw new InvalidEmailException($toAddress, implode('; ', $mailer->getErrors()));
+            throw $exception;
         }
 
         if (!$mailer->send(true)) {

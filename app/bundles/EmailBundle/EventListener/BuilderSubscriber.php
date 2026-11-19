@@ -256,7 +256,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
 
         $forwardText = $this->coreParametersHelper->get('forward_text');
-        if (!$forwardText) {
+        if (null === $forwardText || '' === $forwardText) {
             $forwardText = $this->translator->trans('mautic.email.forward.text', ['%link%' => '|URL|']);
         }
 

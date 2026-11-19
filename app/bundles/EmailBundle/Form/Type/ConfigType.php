@@ -18,6 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -103,7 +104,7 @@ final class ConfigType extends AbstractType
                     'tooltip' => 'mautic.email.config.forward_text.tooltip',
                 ],
                 'required'   => false,
-                'data'       => (array_key_exists('forward_text', $options['data']) && !empty($options['data']['forward_text']))
+                'data'       => (isset($options['data']['forward_text']) && '' !== $options['data']['forward_text'])
                     ? $options['data']['forward_text']
                     : $this->translator->trans(
                         'mautic.email.forward.text',
@@ -483,8 +484,10 @@ final class ConfigType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.forward.limit.tooltip',
+                    'min'     => 0,
                 ],
-                'required'   => true,
+                'required'    => true,
+                'constraints' => [new GreaterThanOrEqual(0)],
             ]
         );
 

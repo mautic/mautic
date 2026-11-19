@@ -257,16 +257,38 @@ final class EmailForwardFunctionalTest extends MauticMysqlTestCase
     {
         $stat = $this->createSentEmail();
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/email/forward/'.self::TRACKING_HASH);
-        $form    = $crawler->filter('form')->form();
-        $form['forward_email[emailAddress]'] = self::FRIEND_EMAIL;
-        $form['forward_email[_token]']       = 'not-the-token';
-        $this->client->submit($form);
+        // Posted without loading the page first, as a request made on somebody's behalf would be
+        $crawler = $this->client->request(Request::METHOD_POST, '/email/forward/'.self::TRACKING_HASH, [
+            'forward_email' => ['emailAddress' => self::FRIEND_EMAIL, '_token' => 'not-the-token'],
+        ]);
 
         self::assertResponseIsSuccessful();
-        $this->assertCount(1, $this->client->getCrawler()->filter('.validate-alert'), 'The page says why nothing was sent.');
+        $this->assertCount(1, $crawler->filter('.validate-alert'), 'The page says why nothing was sent.');
         $this->assertCount(0, self::getMailerMessages());
         $this->assertSame(0, $this->em->getRepository(EmailForward::class)->count(['stat' => $stat]));
+    }
+
+    public function testForwardThatCouldNotBeSentIsNotCountedAndSaysSo(): void
+    {
+        $stat = $this->createSentEmail();
+
+        $mailer = $this->createMock(MailHelper::class);
+        $mailer->method('getMailer')->willReturnSelf();
+        $mailer->method('setTo')->willReturn(true);
+        $mailer->method('send')->willReturn(false);
+        $mailer->method('getErrors')->willReturn(['The mail server refused the message']);
+        self::getContainer()->set(MailHelper::class, $mailer);
+
+        $crawler = $this->submitForward(self::FRIEND_EMAIL);
+
+        self::assertResponseIsSuccessful();
+        $this->assertCount(0, $crawler->filter('input[name="forward_email[emailAddress]"]'));
+        $this->assertStringContainsString(
+            self::getContainer()->get(TranslatorInterface::class)->trans('mautic.email.forward.failed'),
+            $crawler->text()
+        );
+        $this->assertStringNotContainsString(self::FRIEND_EMAIL, $crawler->text());
+        $this->assertSame(0, $this->em->getRepository(EmailForward::class)->count(['stat' => $stat]), 'A copy that was not sent does not count.');
     }
 
     public function testForwardRejectsAnInvalidAddress(): void
