@@ -1033,16 +1033,30 @@ final class EmailModelTest extends TestCase
         $email = new Email();
         $email->setEmailType('list');
         $email->addTranslationChild($child = new Email());
-        $listener   = function (AbstractEntityEvent $event) use ($child): void {
+        $calls    = [];
+        $listener = function (AbstractEntityEvent $event) use ($child, &$calls): void {
             $isChild = $event->getEntity() === $child;
             $this->assertSame($isChild, $this->emailModel->isUpdatingTranslationChildren());
+            $calls[] = [$event::class, $isChild];
         };
-        $this->eventDispatcher->addListener(EntityPreSave::class, $listener);
-        $this->eventDispatcher->addListener(EntityPostSave::class, $listener);
+        // mock dispatcher, so run the listener on dispatch
+        $this->eventDispatcher->method('hasListeners')->willReturn(true);
+        $this->eventDispatcher->method('dispatch')->willReturnCallback(function (object $event) use ($listener): object {
+            if ($event instanceof EntityPreSave || $event instanceof EntityPostSave) {
+                $listener($event);
+            }
+
+            return $event;
+        });
         $emailRepository = $this->createStub(EmailRepository::class);
         $this->entityManager->method('getRepository')->willReturn($emailRepository);
         $this->emailModel->saveEntity($email);
         $this->assertFalse($this->emailModel->isUpdatingTranslationChildren());
+
+        $this->assertContains([EntityPreSave::class, false], $calls);
+        $this->assertContains([EntityPostSave::class, false], $calls);
+        $this->assertContains([EntityPreSave::class, true], $calls);
+        $this->assertContains([EntityPostSave::class, true], $calls);
     }
 
     /**
