@@ -4159,12 +4159,6 @@ parameters:
 			path: app/bundles/NotificationBundle/Entity/StatRepository.php
 
 		-
-			message: '#^Method Mautic\\NotificationBundle\\Event\\NotificationSendEvent\:\:__construct\(\) has parameter \$heading with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/NotificationBundle/Event/NotificationSendEvent.php
-
-		-
 			message: '#^Unable to resolve the template type T in call to function array_values$#'
 			identifier: argument.templateType
 			count: 1

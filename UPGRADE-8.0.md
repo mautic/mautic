@@ -1748,6 +1748,12 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\CoreBundle\Twig\Extension\ButtonExtension::addButtonsFromTemplate()` (Twig function `buttonsAddFromTemplate()`) types `$item` as `?object`. Passing an array or scalar now throws; pass the entity. The `edit`, `clone`, `abtest` and `delete` buttons call methods on `$item`, so `null` is only valid when none of these are enabled.
     - `Mautic\PointBundle\Model\PointModel::triggerAction()` types `$eventDetails` as `?object`. Passing an array or scalar now throws; pass an object or `null`. The value is passed through to the point action callback, so callbacks that typed it as `array` must accept `?object` instead.
     - `MauticPlugin\MauticFocusBundle\Model\FocusModel::addStat()` types `$data` as `?object`. Passing an array or scalar now throws. `Stat::TYPE_CLICK` requires the page hit and `Stat::TYPE_FORM` the form submission; pass `null` only for `Stat::TYPE_NOTIFICATION`, which does not use `$data`.
+    - `Mautic\CoreBundle\Twig\Helper\ButtonHelper::setLocation()` types `$location` as `?string`.
+    - `Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail::setType()` types `$bounceType` as `?string`, and `getType()` now declares a `?string` return type.
+    - `Mautic\EmailBundle\MonitoredEmail\Search\Result::setEmail()` types `$email` as `string`. Passing `null` now throws; pass the email address. `getEmail()` now declares a `?string` return type.
+    - `Mautic\LeadBundle\Entity\Lead::setColor()` types `$color` as `string`. Passing `null` now throws; pass a color string. `getColor()` now declares a `?string` return type, so a subclass overriding it must declare `?string` (or `string`).
+    - `Mautic\NotificationBundle\Event\NotificationSendEvent::__construct()` and `setHeading()` type `$heading` as `?string`, and `getHeading()` now declares a `?string` return type.
+    - `Mautic\PluginBundle\Entity\Integration::setName()` types `$name` as `string`. Passing `null` now throws; pass the integration name.
 
 ### Native parameter and return types for plugin extension points
 

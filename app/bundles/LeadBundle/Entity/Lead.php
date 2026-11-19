@@ -234,10 +234,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Used to populate trigger color.
-     *
-     * @var string
      */
-    private $color;
+    private ?string $color = null;
 
     private ?LeadManipulator $manipulator = null;
 
@@ -1006,18 +1004,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->socialCache;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getColor()
+    public function getColor(): ?string
     {
         return $this->color;
     }
 
-    /**
-     * @param mixed $color
-     */
-    public function setColor($color): void
+    public function setColor(string $color): void
     {
         $this->color = $color;
     }

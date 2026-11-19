@@ -21,10 +21,7 @@ final class BouncedEmail
      */
     private $ruleNumber;
 
-    /**
-     * @var string|null
-     */
-    private $bounceType;
+    private ?string $bounceType = null;
 
     private bool $final = false;
 
@@ -87,18 +84,12 @@ final class BouncedEmail
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->bounceType;
     }
 
-    /**
-     * @param mixed $bounceType
-     */
-    public function setType($bounceType): static
+    public function setType(?string $bounceType): static
     {
         $this->bounceType = $bounceType;
 
