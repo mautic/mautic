@@ -934,6 +934,141 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         yield [OperatorOptions::IN_NEXT, 2];
     }
 
+    public function testBetweenDatesFilterWithInvalidFields(): void
+    {
+        $filters = [[
+            'glue'        => 'and',
+            'field'       => 'last_active',
+            'object'      => 'lead',
+            'type'        => 'datetime',
+            'operator'    => 'between',
+            'properties'  => [
+                'filter' => [
+                    'date_from' => '',        // cannot be empty
+                    'date_to'   => 'unicorn', // should be a date with valid format
+                ],
+            ],
+        ]];
+
+        $this->client->request('POST', '/api/segments/new', ['name' => 'Between Dates', 'filters' => $filters]);
+        $expectedErrorMessage = "date_from: This value should not be blank., date_to: The date must be in the format 'M j, Y' (e.g. 'Jan 1, 2021'). Use the date picker to select a date.";
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
+        $this->assertSame($expectedErrorMessage, $response['errors'][0]['message']);
+    }
+
+    public function testBetweenDatesFilter(): void
+    {
+        $filters = [[
+            'glue'        => 'and',
+            'field'       => 'last_active',
+            'object'      => 'lead',
+            'type'        => 'datetime',
+            'operator'    => 'between',
+            'properties'  => [
+                'filter' => [
+                    'date_from' => 'Jan 3, 2024',
+                    'date_to'   => 'Feb 3, 2024',
+                ],
+            ],
+        ]];
+
+        $this->client->request('POST', '/api/segments/new', ['name' => 'Between Dates', 'filters' => $filters]);
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode());
+        $segmentId = json_decode($clientResponse->getContent(), true)['list']['id'];
+
+        $contactA = new Lead();
+        $contactA->setLastActive(new \DateTime('2024-01-02 23:59:59', new \DateTimeZone('UTC'))); // 1 second before the date_from - won't get to the segment
+
+        $contactB = new Lead();
+        $contactB->setLastActive(new \DateTime('2024-01-03 00:00:00', new \DateTimeZone('UTC'))); // 1 second after the date_from - will get to the segment
+
+        $contactC = new Lead();
+        $contactC->setLastActive(new \DateTime('2024-02-03 23:59:59', new \DateTimeZone('UTC'))); // 1 second before the date_to - will get to the segment
+
+        $contactD = new Lead();
+        $contactD->setLastActive(new \DateTime('2024-02-04 00:00:00', new \DateTimeZone('UTC'))); // 1 second after the date_to - won't get to the segment
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactB);
+        $this->em->persist($contactC);
+        $this->em->persist($contactD);
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segmentId]);
+
+        $this->assertSame(0, $commandTester->getStatusCode());
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentId]);
+
+        $this->assertCount(2, $members);
+
+        $expectedMembers = [$contactB->getId(), $contactC->getId()];
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        $this->assertSame($expectedMembers, $actualMembers);
+    }
+
+    public function testNotBetweenDatesFilter(): void
+    {
+        $filters = [[
+            'glue'        => 'and',
+            'field'       => 'last_active',
+            'object'      => 'lead',
+            'type'        => 'datetime',
+            'operator'    => '!between',
+            'properties'  => [
+                'filter' => [
+                    'date_from' => 'Jan 3, 2024',
+                    'date_to'   => 'Feb 3, 2024',
+                ],
+            ],
+        ]];
+
+        $this->client->request('POST', '/api/segments/new', ['name' => 'Between Dates', 'filters' => $filters]);
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode());
+        $segmentId = json_decode($clientResponse->getContent(), true)['list']['id'];
+
+        $contactA = new Lead();
+        $contactA->setLastActive(new \DateTime('2024-01-02 23:59:59', new \DateTimeZone('UTC'))); // 1 second before the date_from - will get to the segment
+
+        $contactB = new Lead();
+        $contactB->setLastActive(new \DateTime('2024-01-03 00:00:00', new \DateTimeZone('UTC'))); // 1 second after the date_from - won't get to the segment
+
+        $contactC = new Lead();
+        $contactC->setLastActive(new \DateTime('2024-02-03 23:59:59', new \DateTimeZone('UTC'))); // 1 second before the date_to - won't get to the segment
+
+        $contactD = new Lead();
+        $contactD->setLastActive(new \DateTime('2024-02-04 00:00:00', new \DateTimeZone('UTC'))); // 1 second after the date_to - will get to the segment
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactB);
+        $this->em->persist($contactC);
+        $this->em->persist($contactD);
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segmentId]);
+
+        $this->assertSame(0, $commandTester->getStatusCode());
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentId]);
+
+        $this->assertCount(2, $members);
+
+        $expectedMembers = [$contactA->getId(), $contactD->getId()];
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        $this->assertSame($expectedMembers, $actualMembers);
+    }
+
     /**
      * @param array<int, array<string, mixed>> $filters
      */
