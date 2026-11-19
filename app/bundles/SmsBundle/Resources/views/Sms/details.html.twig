@@ -20,7 +20,7 @@
         'targetLabel': 'mautic.sms.smses'|trans
     }
 ) -}}
-{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': sms.category}) }}
+{{ include('@MauticCore/Components/category.html.twig', {'type': 'inline', 'category': sms.category}) }}
 {{ include('@MauticProject/Modules/projects.html.twig', {'item': sms}) }}
 {% endblock %}
 

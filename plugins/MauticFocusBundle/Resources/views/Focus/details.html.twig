@@ -115,7 +115,7 @@
         'targetLabel': 'mautic.focus.focus_items'|trans
     }
 ) -}}
-{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': item.category}) }}
+{{ include('@MauticCore/Components/category.html.twig', {'type': 'inline', 'category': item.category}) }}
 {{ include('@MauticProject/Modules/projects.html.twig') }}
 {% endblock %}
 

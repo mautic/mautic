@@ -186,7 +186,7 @@
                         }) }}
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
+                        {{ include('@MauticCore/Components/category.html.twig', {'type': 'expanded', 'category': item.category}) }}
                     </td>
                     {% if permissions['lead:leads:viewother'] %}
                     <td class="visible-md visible-lg">

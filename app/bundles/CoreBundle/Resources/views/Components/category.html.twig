@@ -1,0 +1,19 @@
+{% set type = type|default('expanded') %}
+{% set hasCategory = category is not empty and category.title is not empty %}
+{% set title = hasCategory ? category.title : 'mautic.core.form.uncategorized'|trans %}
+{% set color = category.color is defined and category.color ? '#' ~ category.color : 'var(--label-background-gray)' %}
+
+{% if type == 'inline' %}
+    <div class="d-flex align-items-center mt-12 float-end">
+        <div class="category--inline d-inline-flex align-items-center h-32 pe-5" data-bs-toggle="tooltip" data-bs-placement="right" title="{{ title|striptags|e('html_attr') }}">
+            <span class="category--inline-color d-inline-flex align-items-center justify-content-center" style="--category-color: {{ color|e('html_attr') }};">
+                <i class="ri-folder-6-fill fs-10"></i>
+            </span>
+        </div>
+    </div>
+{% else %}
+    <div class="d-flex align-items-center gap-5{{ hasCategory ? '' : ' text-secondary' }}">
+        <span class="label label-gray label-category" style="background: {{ color|e('html_attr') }};"> </span>
+        {{ title }}
+    </div>
+{% endif %}
