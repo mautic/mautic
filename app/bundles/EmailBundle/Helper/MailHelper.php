@@ -859,8 +859,18 @@ class MailHelper
                     $path = $this->pathsHelper->getRootPath().rawurldecode($path);
                 }
 
+                // A null byte (e.g. from %00) makes file_get_contents() throw instead of returning false.
+                if (str_contains($path, "\0")) {
+                    continue;
+                }
+
                 // Ingore the get_contents errors and use the path in the image src instead if it cannot be fetched.
                 if ($imageContent = @file_get_contents($path)) {
+                    // Keep the URL if it isn't an image, e.g. a dynamic URL that pointed to a script once the query was dropped.
+                    if (!str_starts_with((string) (new \finfo(FILEINFO_MIME_TYPE))->buffer($imageContent), 'image/')) {
+                        continue;
+                    }
+
                     $this->message->embed($imageContent, md5($match));
                     $this->embedImagesReplaces[$match] = 'cid:'.md5($match);
                 }

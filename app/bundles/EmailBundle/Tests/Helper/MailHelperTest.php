@@ -1198,7 +1198,7 @@ final class MailHelperTest extends TestCase
 
     public function testLocalImagesWithQueryStringOrEncodedCharactersAreEmbedded(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->atLeast(5))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_from_email', null, 'nobody@nowhere.com'],
@@ -1244,6 +1244,51 @@ final class MailHelperTest extends TestCase
         $this->assertCount(2, $message->getAttachments());
         $this->assertStringContainsString('src="cid:'.md5($encodedUrl).'"', $body);
         $this->assertStringContainsString('src="cid:'.md5($cacheBusted).'"', $body);
+    }
+
+    public function testLocalUrlsWithNullByteOrNonImageContentAreNotEmbedded(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(5))->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_convert_embed_images', null, true],
+                    ['mailer_from_name', null, 'Test'],
+                    ['secret_key', null, 'secret'],
+                    ['site_url', null, 'https://mautic.url'],
+                ]
+            );
+
+        $rootPath = sys_get_temp_dir().'/mautic-embed-'.bin2hex(random_bytes(4));
+        mkdir($rootPath);
+        file_put_contents($rootPath.'/thumbnail.php', '<?php echo "not an image";');
+        $this->pathsHelper->method('getRootPath')->willReturn($rootPath);
+
+        $this->router->method('generate')->willReturn('http://tracking.url');
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+
+        $nullByteUrl = 'https://mautic.url/media/images/a%00.png';
+        $scriptUrl   = 'https://mautic.url/thumbnail.php?id=42';
+        $email       = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<img src="'.$nullByteUrl.'"> <img src="'.$scriptUrl.'">');
+
+        try {
+            $mailer->setEmail($email);
+            $mailer->addTo($this->contacts[0]['email']);
+            $mailer->setLead($this->contacts[0]);
+            $mailer->send();
+        } finally {
+            unlink($rootPath.'/thumbnail.php');
+            rmdir($rootPath);
+        }
+
+        $message = $transport->getMessage();
+        $body    = (string) $message->getHtmlBody();
+        $this->assertCount(0, $message->getAttachments());
+        $this->assertStringContainsString('src="'.$nullByteUrl.'"', $body);
+        $this->assertStringContainsString('src="'.$scriptUrl.'"', $body);
     }
 
     public function testThatWeDontEmbedAlreadyEmbeddedImages(): void
