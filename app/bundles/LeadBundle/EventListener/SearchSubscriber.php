@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\GlobalSearch;
+use Mautic\EmailBundle\DTO\Repository\EmailPendingQueryOptions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -221,7 +222,11 @@ final class SearchSubscriber implements EventSubscriberInterface
         $email = $this->emailRepository->getEntity($emailId);
         if (null !== $email) {
             $variantIds = $email->getRelatedEntityIds();
-            $nq         = $this->emailRepository->getEmailPendingQuery($emailId, $variantIds);
+            $nq         = $this->emailRepository->getEmailPendingQuery(
+                (new EmailPendingQueryOptions($emailId))
+                    ->setVariantIds($variantIds)
+                    ->setSentToDnc($email->getSendToDnc())
+            );
             if (!$nq instanceof QueryBuilder) {
                 return;
             }
