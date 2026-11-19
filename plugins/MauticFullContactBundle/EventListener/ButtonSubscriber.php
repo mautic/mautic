@@ -5,8 +5,8 @@ namespace MauticPlugin\MauticFullContactBundle\EventListener;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final readonly class ButtonSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private IntegrationHelper $helper,
+        private IntegrationsHelper $integrationsHelper,
         private TranslatorInterface $translator,
         private RouterInterface $router,
     ) {
@@ -29,11 +29,13 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
 
     public function injectViewButtons(CustomButtonEvent $event): void
     {
-        // get api_key from plugin settings
-        /** @var FullContactIntegration $myIntegration */
-        $myIntegration = $this->helper->getIntegrationObject('FullContact');
+        try {
+            $integration = $this->integrationsHelper->getIntegration('FullContact');
+        } catch (IntegrationNotFoundException) {
+            return;
+        }
 
-        if (false === $myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()) {
+        if (!$integration->getIntegrationConfiguration()->getIsPublished()) {
             return;
         }
 
