@@ -769,7 +769,7 @@ class FieldModel extends FormModel
      *
      * @param int $start Number to start the order by (used for paginated reordering)
      */
-    public function reorderFieldsByList(array $list, $start = 1): void
+    public function reorderFieldsByList(array $list, int $start = 1): void
     {
         $fields = $this->leadFieldRepository->findBy([], ['order' => 'ASC']);
         foreach ($fields as $field) {
@@ -784,10 +784,8 @@ class FieldModel extends FormModel
 
     /**
      * Get list of custom field values for autopopulate fields.
-     *
-     * @param int    $limit
      */
-    public function getLookupResults(string $type, string $filter = '', $limit = 10): array
+    public function getLookupResults(string $type, string $filter = '', int $limit = 10): array
     {
         return $this->leadRepository->getValueList($type, $filter, $limit);
     }

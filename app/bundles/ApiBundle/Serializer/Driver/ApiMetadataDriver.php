@@ -52,7 +52,7 @@ final class ApiMetadataDriver implements DriverInterface
     /**
      * Set the root (base key).
      */
-    public function setRoot($root): static
+    public function setRoot(string $root): static
     {
         $this->metadata->xmlRootName = $root;
 
@@ -93,10 +93,8 @@ final class ApiMetadataDriver implements DriverInterface
 
     /**
      * Add property and set default version and Details group.
-     *
-     * @param bool $useGetter
      */
-    public function addProperty($name, $serializedName = null, $useGetter = false): static
+    public function addProperty($name, $serializedName = null, bool $useGetter = false): static
     {
         if (empty($name)) {
             return $this;
@@ -122,11 +120,8 @@ final class ApiMetadataDriver implements DriverInterface
 
     /**
      * Create properties.
-     *
-     * @param bool|false $addToListGroup
-     * @param bool|false $useGetter
      */
-    public function addProperties(array $properties, $addToListGroup = false, $useGetter = false): static
+    public function addProperties(array $properties, bool $addToListGroup = false, bool $useGetter = false): static
     {
         foreach ($properties as $prop) {
             if (!empty($prop)) {

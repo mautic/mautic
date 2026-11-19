@@ -14,7 +14,7 @@
     <div class="campaign-event-type">
 
     {% if event['eventType'] == 'decision' %}
-    <div class="campaign-event-content flex-nowrap gap-5 align-items-center flex-row d-flex flex-grow-1 pa-16">
+    <div class="campaign-event-content flex-nowrap gap-5 align-items-center flex-row d-flex flex-grow-1 p-16">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.when'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
         {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
@@ -24,7 +24,7 @@
 
     {% elseif event['eventType'] == 'action' %}
         <div class="campaign-event-content d-flex flex-nowrap align-items-center gap-12">
-            <div class="campaign-event-icon pa-12 me-5"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
+            <div class="campaign-event-icon p-12 me-5"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
             <div class="d-flex flex-column align-items-start">
                 <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
                 {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
@@ -33,7 +33,7 @@
         </div>
 
     {% elseif event['eventType'] == 'condition' %}
-    <div class="campaign-event-content flex-nowrap gap-5 align-items-center flex-row d-flex flex-grow-1 pa-16">
+    <div class="campaign-event-content flex-nowrap gap-5 align-items-center flex-row d-flex flex-grow-1 p-16">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.if'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
             {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}

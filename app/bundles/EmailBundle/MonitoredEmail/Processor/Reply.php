@@ -77,9 +77,8 @@ final readonly class Reply implements ProcessorInterface
 
     /**
      * @param string $trackingHash
-     * @param string $messageId
      */
-    public function createReplyByHash($trackingHash, $messageId): void
+    public function createReplyByHash($trackingHash, string $messageId): void
     {
         /** @var Stat|null $stat */
         $stat = $this->statRepository->findOneBy(['trackingHash' => $trackingHash]);

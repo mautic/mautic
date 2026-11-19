@@ -6,7 +6,7 @@
 <div class="campaign-event-type">
 
 <div class="campaign-event-content d-flex flex-nowrap align-items-center gap-12">
-    <div class="campaign-event-icon pa-12 me-5"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
+    <div class="campaign-event-icon p-12 me-5"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
 
         <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
         {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}

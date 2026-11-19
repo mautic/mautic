@@ -275,12 +275,12 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     <input type="hidden" name="_method" value="{{ method|escape }}" />
 {% endif %}
 {% if form.vars.errors|length > 0 %}
-<div class="has-error pa-12">
+<div class="has-error p-12">
     {{ form_errors(form) }}
 </div>
 {% endif %}
 {% if form.vars.help|length > 0 %}
-<div class="pa-12">
+<div class="p-12">
     {{ form_help(form) }}
 </div>
 {% endif %}
@@ -381,7 +381,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     {% endif %}
     <div>
         <div class="row">
-            <div class="col-xs-6 me-0 pe-0 bdr-r-wdh-0">
+            <div class="col-xs-6 me-0 pe-0 border-end-0">
             {{ form_widget(form.label, {'attr': {'class': 'form-control sortable-label', 'placeholder': form.label.vars.label}}) }}
             </div>
             <div class="col-xs-6 ms-0 ps-0">

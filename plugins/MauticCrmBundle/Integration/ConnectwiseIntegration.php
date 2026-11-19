@@ -421,7 +421,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
         return $this->getRecords($params, 'company');
     }
 
-    public function getRecords($params, $object): int
+    public function getRecords($params, string $object): int
     {
         if (!$this->isAuthorized()) {
             return 0;
@@ -431,15 +431,15 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
         $executed            = 0;
         $integrationEntities = [];
         try {
-            while ($records = ('Contact' == $object)
+            while ($records = ('Contact' === $object)
                 ? $this->getApiHelper()->getContacts($params, $page)
                 : $this->getApiHelper()->getCompanies($params, $page)) {
-                $mauticReferenceObject = ('Contact' == $object) ? 'lead' : 'company';
+                $mauticReferenceObject = ('Contact' === $object) ? 'lead' : 'company';
                 foreach ($records as $record) {
                     if (is_array($record)) {
                         $id            = $record['id'];
                         $formattedData = $this->amendLeadDataBeforeMauticPopulate($record, $object);
-                        $entity        = ('Contact' == $object)
+                        $entity        = ('Contact' === $object)
                             ? $this->getMauticLead($formattedData)
                             : $this->getMauticCompany(
                                 $formattedData,
@@ -528,7 +528,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * @param Lead|Company $entity
      */
-    public function saveSyncedData(object $entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
+    public function saveSyncedData(object $entity, $object, string $mauticObjectReference, $integrationEntityId): IntegrationEntity
     {
         $integrationEntities = $this->integrationEntityRepository->getIntegrationEntities(
             $this->getName(),
@@ -904,7 +904,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
         }
     }
 
-    public function getRecordList($records, $index = null): array
+    public function getRecordList($records, ?string $index = null): array
     {
         $recordList = [];
 

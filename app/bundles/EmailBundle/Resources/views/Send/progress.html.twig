@@ -8,7 +8,7 @@
 {% set id = ('inprogress' != status) ? 'emailSendProgressComplete' : 'emailSendProgress' %}
 
 {% block content %}
-    <div class="row ma-24 email-send-progress" id="{{ id }}">
+    <div class="row m-24 email-send-progress" id="{{ id }}">
         <div class="col-sm-offset-3 col-sm-6">
             <div class="panel panel-{{ ('inprogress' != status) ? 'success' : 'danger' }}">
                 <div class="panel-heading">

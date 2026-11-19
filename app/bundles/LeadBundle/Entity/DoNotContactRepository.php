@@ -24,12 +24,10 @@ final class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param string|null                         $channel
      * @param array<int,int|string>|int|null      $ids
-     * @param int|null                            $reason
      * @param array<int,int|string>|int|true|null $listId
      */
-    public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
+    public function getCount(?string $channel = null, $ids = null, ?int $reason = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -134,12 +132,11 @@ final class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param string|null    $channel
      * @param string[]|int[]|null $contacts Array of contact IDs to filter by
      *
      * @return mixed[]
      */
-    public function getChannelList($channel, ?array $contacts = null): array
+    public function getChannelList(?string $channel, ?array $contacts = null): array
     {
         // If no contacts are sent then stop querying for all of the DNC records as it leads to the out of memory error.
         if ([] === $contacts) {

@@ -27,10 +27,7 @@ final class EmailStatOptions extends FetchOptions
 
     private bool $canViewOthers = false;
 
-    /**
-     * @var string
-     */
-    private $unit;
+    private ?string $unit = null;
 
     public function setEmailIds(array $ids): static
     {
@@ -125,15 +122,12 @@ final class EmailStatOptions extends FetchOptions
     /**
      * @return string
      */
-    public function getUnit()
+    public function getUnit(): ?string
     {
         return $this->unit;
     }
 
-    /**
-     * @param string $unit
-     */
-    public function setUnit($unit): static
+    public function setUnit(string $unit): static
     {
         $this->unit = $unit;
 

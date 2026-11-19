@@ -23,10 +23,10 @@
 		</ul>
 		<!--/ tabs controls -->
 
-		<div class="tab-content pa-16">
-			<div class="tab-pane fade show active bdr-w-0 height-auto" id="details-container">
+		<div class="tab-content p-16">
+			<div class="tab-pane fade show active border-0 height-auto" id="details-container">
 				<div class="row">
-					<div class="pa-16">
+					<div class="p-16">
 						<div class="col-md-6">
                             {{ form_row(form.name) }}
 						</div>
@@ -37,7 +37,7 @@
 				</div>
 				<div class="row">
 					<div class="col-md-6">
-						<div class="pa-16">
+						<div class="p-16">
                             {{ form_row(form.description) }}
 						</div>
 					</div>
@@ -45,7 +45,7 @@
 			</div>
 
             {% set hidePerms = form.isAdmin.vars.data %}
-			<div class="tab-pane fade bdr-w-0" id="permissions-container">
+			<div class="tab-pane fade border-0" id="permissions-container">
 				<div id="rolePermissions"{% if hidePerms %}class="hide"{% endif %}>
 					<!-- start: box layout -->
 					<div class="box-layout">
@@ -68,7 +68,7 @@
 						</div>
 
 						<!-- container -->
-						<div class="col-md-7 height-auto bdr-l">
+						<div class="col-md-7 height-auto border-start">
 							<div class="tab-content">
 								{% set permissions = form.permissions.children %}
 								{% for child in permissions %}
@@ -77,7 +77,7 @@
 											{# // Close tab panel #}
 											</div>{{ "\n" }}</div>{{ "\n" }}
 										{% endif %}
-										<div role="tabpanel" class="tab-pane fade{{ 0 is same as(loop.index0) ? ' show active' : '' }} bdr-w-0" id="{{ child.vars.name }}PermissionTab">{{ "\n" }}
+										<div role="tabpanel" class="tab-pane fade{{ 0 is same as(loop.index0) ? ' show active' : '' }} border-0" id="{{ child.vars.name }}PermissionTab">{{ "\n" }}
 										<div class="pt-16 pe-16 ps-16 pb-16"> {{ "\n" }}
 										{% do child.setRendered() %}
 									{% else %}
