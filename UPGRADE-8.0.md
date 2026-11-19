@@ -559,7 +559,14 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
     `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
 
-- The `@MauticCore/Modules/category--inline.html.twig` and `@MauticCore/Modules/category--expanded.html.twig` templates were removed. Include `@MauticCore/Components/category.html.twig` with `type: 'inline'` or `type: 'expanded'` (default) instead. Uncategorized items in the expanded type now render their text with `text-secondary`.
+- The category templates were replaced as follows:
+
+    | Removed template | Replacement |
+    |---|---|
+    | `@MauticCore/Modules/category--inline.html.twig` | Include `@MauticCore/Components/category.html.twig` with `type: 'inline'`. |
+    | `@MauticCore/Modules/category--expanded.html.twig` | Include `@MauticCore/Components/category.html.twig` with `type: 'expanded'` (the default). |
+
+    Uncategorized items in the expanded type now render their text with `text-secondary`.
 
 - Custom background colour classes removed. Bootstrap's `.bg-*` utilities now apply, with the Carbon colours for `.bg-primary`, `.bg-success`, `.bg-info`, `.bg-warning` and `.bg-danger`. The removed classes also forced the text colour, so add a text utility where the text must stay readable. The `bg-color` SCSS mixin and `app/bundles/CoreBundle/Assets/css/app/scss/components/_colors.scss` (with its `@import` in `app/bundles/CoreBundle/Assets/css/app.scss`) were removed.
     | Removed class | Bootstrap 5 replacement |

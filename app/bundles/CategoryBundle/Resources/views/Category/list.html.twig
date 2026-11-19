@@ -152,8 +152,10 @@
                             }) -}}
 							</td>
 							<td>
-								{% set color = item.getColor() %}
-								<span class="label label-gray label-category" style="background: {{ '#' not in color ? '#' : ''}}{{ color }};"> </span>
+								{% set categoryColor = item.getColor()|default('') %}
+								{% set colorIsHex = categoryColor matches '/^#?(?:[a-f0-9]{3}|[a-f0-9]{6})$/i' %}
+								{% set color = colorIsHex ? (categoryColor|slice(0, 1) == '#' ? categoryColor : '#' ~ categoryColor) : 'var(--label-background-gray)' %}
+								<span class="label label-gray label-category" style="background: {{ color|e('html_attr') }};"> </span>
 							</td>
 							<td>
                                 <div>

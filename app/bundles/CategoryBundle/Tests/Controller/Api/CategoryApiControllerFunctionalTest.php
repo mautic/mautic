@@ -65,6 +65,59 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($foundCategory, 'Test category should be found in the API response');
     }
 
+    public function testApiAcceptsThreeDigitHexCategoryColor(): void
+    {
+        $this->loginUser($this->createUser());
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/v2/categories',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/ld+json',
+                'HTTP_ACCEPT'  => 'application/ld+json',
+            ],
+            json_encode([
+                'title'  => 'Hex color category',
+                'alias'  => 'hex-color-category',
+                'bundle' => 'global',
+                'color'  => '#abc',
+            ], JSON_THROW_ON_ERROR)
+        );
+
+        $this->assertResponseStatusCodeSame(201);
+        $responseData = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame('#abc', $responseData['color']);
+    }
+
+    public function testApiRejectsNonHexCategoryColor(): void
+    {
+        $this->loginUser($this->createUser());
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/v2/categories',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/ld+json',
+                'HTTP_ACCEPT'  => 'application/ld+json',
+            ],
+            json_encode([
+                'title'  => 'Invalid color category',
+                'alias'  => 'invalid-color-category',
+                'bundle' => 'global',
+                'color'  => 'rgb(255, 0, 0)',
+            ], JSON_THROW_ON_ERROR)
+        );
+
+        $this->assertResponseStatusCodeSame(422);
+        $responseData = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame('Enter a valid 3- or 6-digit hex color.', $responseData['violations'][0]['message']);
+        $this->assertNull($this->em->getRepository(Category::class)->findOneBy(['alias' => 'invalid-color-category']));
+    }
+
     public function testContactsCategoriesEndpointWorks(): void
     {
         // The endpoint requires authentication - create and login a user

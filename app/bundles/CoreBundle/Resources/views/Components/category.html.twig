@@ -1,7 +1,9 @@
 {% set type = type|default('expanded') %}
 {% set hasCategory = category is defined and category is not empty and category.title is not empty %}
 {% set title = hasCategory ? category.title : 'mautic.core.form.uncategorized'|trans %}
-{% set color = category.color is defined and category.color ? '#' ~ category.color : 'var(--label-background-gray)' %}
+{% set categoryColor = category.color is defined ? category.color|default('') : '' %}
+{% set colorIsHex = categoryColor matches '/^#?(?:[a-f0-9]{3}|[a-f0-9]{6})$/i' %}
+{% set color = colorIsHex ? (categoryColor|slice(0, 1) == '#' ? categoryColor : '#' ~ categoryColor) : 'var(--label-background-gray)' %}
 
 {% if type == 'inline' %}
     <div class="d-flex align-items-center mt-12 float-end">
