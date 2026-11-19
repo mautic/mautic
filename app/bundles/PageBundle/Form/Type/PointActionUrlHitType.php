@@ -30,12 +30,15 @@ final class PointActionUrlHitType extends AbstractType
         ]);
 
         $builder->add('page_hits', IntegerType::class, [
-            'label'      => 'mautic.page.hits',
-            'label_attr' => ['class' => 'form-label'],
-            'required'   => false,
-            'attr'       => [
-                'class'   => 'form-control',
+            'label'        => 'mautic.page.hits',
+            'label_attr'   => ['class' => 'form-label'],
+            'required'     => false,
+            'block_prefix' => 'quantity_stepper',
+            'attr'         => [
                 'tooltip' => 'mautic.page.point.action.form.page.hits.descr',
+                'min'     => 0,
+                'digits'  => 4,
+                'size'    => 'sm',
             ],
         ]);
 

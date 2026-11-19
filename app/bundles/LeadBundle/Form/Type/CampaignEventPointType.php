@@ -48,7 +48,13 @@ final class CampaignEventPointType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.lead.campaign.event.point_score',
-                'attr'       => ['class' => 'form-control'],
+                'block_prefix' => 'quantity_stepper',
+                'html5'        => true,
+                'attr'       => [
+                    'digits' => 5,
+                    'size'   => 'sm',
+                    'step'   => 1,
+                ],
                 'label_attr' => ['class' => 'form-label'],
                 'scale'      => 0,
                 'required'   => true,

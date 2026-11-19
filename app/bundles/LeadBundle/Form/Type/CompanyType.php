@@ -60,8 +60,15 @@ final class CompanyType extends AbstractType
             'score',
             NumberType::class,
             [
-                'label'      => 'mautic.company.score',
-                'attr'       => ['class' => 'form-control'],
+                'label'        => 'mautic.company.score',
+                'block_prefix' => 'quantity_stepper',
+                'html5'        => true,
+                'attr'         => [
+                    'min'    => 0,
+                    'digits' => 5,
+                    'size'   => 'sm',
+                    'step'   => 1,
+                ],
                 'label_attr' => ['class' => 'form-label'],
                 'scale'      => 0,
                 'required'   => false,
