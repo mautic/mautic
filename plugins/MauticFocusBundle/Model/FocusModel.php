@@ -263,10 +263,9 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
     /**
      * Add a stat entry.
      *
-     * @param mixed                                                    $data
      * @param array<int|string|array<int|string>>|Lead|Submission|null $lead
      */
-    public function addStat(Focus $focus, string $type, $data = null, $lead = null): ?Stat
+    public function addStat(Focus $focus, string $type, ?object $data = null, $lead = null): ?Stat
     {
         if (empty($lead)) {
             return null;
