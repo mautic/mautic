@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Page\Acceptance;
 
 final class ContactPage
@@ -118,15 +120,5 @@ final class ContactPage
     public static function route($param): string
     {
         return self::$URL.$param;
-    }
-
-    /**
-     * @var \AcceptanceTester;
-     */
-    private $acceptanceTester;
-
-    public function __construct(\AcceptanceTester $I)
-    {
-        $this->acceptanceTester = $I;
     }
 }
