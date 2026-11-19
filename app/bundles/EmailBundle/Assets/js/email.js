@@ -396,7 +396,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     }
 
     tabHolder.find('i').first().removeClass('ri-loader-3-line ri-spin').addClass('ri-add-line text-success');
-    newTab.find('a').tab('show');
+    newTab.find('a').each((index, element) => bootstrap.Tab.getOrCreateInstance(element).show());
 
     firstInput.focus();
 
@@ -463,7 +463,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
 
     Mautic.initRemoveEvents(removeButton, mQuery);
 
-    newTab.find('a').tab('show');
+    newTab.find('a').each((index, element) => bootstrap.Tab.getOrCreateInstance(element).show());
 
     return filterContainerId;
 };
@@ -603,11 +603,14 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
 
             parentElement.remove();
             tabLink.remove();
-            var nextTab = tabContainer.find('[data-bs-toggle="tab"]').eq(tabContainer.hasClass('tabs-left') || $this.hasClass('remove-filter') ? 1 : 0);
+            var nextTabIndex = tabContainer.hasClass('tabs-left') || $this.hasClass('remove-filter') ? 1 : 0;
+            var nextTab = tabContainer.find('[data-bs-toggle="tab"]').eq(nextTabIndex);
             if (!nextTab.length) {
                 nextTab = tabContainer.find('[data-bs-toggle="tab"]').first();
             }
-            nextTab.tab('show');
+            if (nextTab.length) {
+                bootstrap.Tab.getOrCreateInstance(nextTab[0]).show();
+            }
 
             Mautic.updateDynamicContentDropdown();
         });

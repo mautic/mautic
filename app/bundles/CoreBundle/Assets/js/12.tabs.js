@@ -369,7 +369,7 @@ Mautic.deleteTab = function(deleteBtn) {
                 // With the current tab key get an active tab.
                 const $tab = $navTabs.find('[href="' + activeTab + '"], [data-bs-target="' + activeTab + '"]').first();
                 if ($tab.length) {
-                    $tab.tab('show');
+                    $tab.each((index, element) => bootstrap.Tab.getOrCreateInstance(element).show());
                 }
             } else {
                 // Or store the default, so the script will not end up with NULL value.
