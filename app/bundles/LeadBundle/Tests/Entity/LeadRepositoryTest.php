@@ -8,11 +8,13 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\UnitOfWork;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -201,8 +203,40 @@ final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->expects($this->once())
             ->method('getConnection')
             ->willReturn($this->connection);
+        $this->connection->method('createQueryBuilder')
+            ->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
+        $this->connection->expects($this->once())
+            ->method('executeStatement')
+            ->with($this->stringContains('last_active IS NULL OR last_active <> :lastActive'))
+            ->willReturn(1);
+
+        $unitOfWork = $this->createMock(UnitOfWork::class);
+        $unitOfWork->method('tryGetById')->willReturn(false);
+        $this->entityManager->method('getUnitOfWork')->willReturn($unitOfWork);
 
         $this->repository->updateLastActive(1);
+    }
+
+    public function testUpdateLastActiveDispatchesNoEventWhenValueChangedConcurrently(): void
+    {
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->method('hasListeners')->willReturn(true);
+        $dispatcher->expects($this->never())->method('dispatch');
+        $this->repository->setDispatcher($dispatcher);
+
+        $this->connection->method('createQueryBuilder')
+            ->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
+        $this->result->method('fetchOne')->willReturn('2026-01-01 10:00:00');
+
+        // Another request wrote a new value after the SELECT, so only an update without a check of the read value succeeds.
+        $this->connection->method('executeStatement')
+            ->willReturnCallback(fn (string $sql): int => str_contains($sql, 'last_active <=> :previous') ? 0 : 1);
+
+        $unitOfWork = $this->createMock(UnitOfWork::class);
+        $unitOfWork->method('tryGetById')->willReturn(false);
+        $this->entityManager->method('getUnitOfWork')->willReturn($unitOfWork);
+
+        $this->repository->updateLastActive(1, new \DateTime('2026-02-01 12:00:00', new \DateTimeZone('UTC')));
     }
 
     public function testUpdateLastActiveWithNoId(): void

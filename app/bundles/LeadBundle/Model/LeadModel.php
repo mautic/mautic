@@ -59,6 +59,7 @@ use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
+use Mautic\LeadBundle\Event\ContactLastActiveUpdatedEvent;
 use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
@@ -369,6 +370,13 @@ class LeadModel extends FormModel
                 break;
             case 'post_save':
                 $name = LeadEvents::LEAD_POST_SAVE;
+                if ($this->dispatcher->hasListeners(ContactLastActiveUpdatedEvent::class)) {
+                    if (!$event instanceof LeadEvent) {
+                        $event = new LeadEvent($entity, $isNew);
+                        $event->setEntityManager($this->em);
+                    }
+                    $this->dispatchLastActiveUpdatedEvent($event);
+                }
                 break;
             case 'pre_delete':
                 $name = LeadEvents::LEAD_PRE_DELETE;
@@ -391,6 +399,33 @@ class LeadModel extends FormModel
         }
 
         return null;
+    }
+
+    private function dispatchLastActiveUpdatedEvent(LeadEvent $event): void
+    {
+        // Consumes the entity changes before the listeners run, LEAD_POST_SAVE reuses this event.
+        $changes = $event->getChanges();
+        if (!isset($changes['dateLastActive'])) {
+            return;
+        }
+
+        [$previous, $current] = $changes['dateLastActive'];
+        if (empty($current)) {
+            return;
+        }
+
+        $lastActive         = new DateTimeHelper($current);
+        $previousLastActive = empty($previous) ? null : new DateTimeHelper($previous);
+
+        if ($previousLastActive?->toUtcString() === $lastActive->toUtcString()) {
+            return;
+        }
+
+        $this->dispatcher->dispatch(new ContactLastActiveUpdatedEvent(
+            $event->getLead()->getId(),
+            $lastActive->getUtcDateTime(),
+            $previousLastActive?->getUtcDateTime()
+        ));
     }
 
     protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
