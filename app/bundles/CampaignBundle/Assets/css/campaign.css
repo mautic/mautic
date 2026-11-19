@@ -1,6 +1,4 @@
-.col-campaign-id {
-    width: 75px;
-}
+.col-campaign-id { width: 75px; }
 
 .campaign-builder #builder-errors {
     top: 52px;
@@ -8,9 +6,7 @@
     z-index: 1040;
 }
 
-#CampaignEvent_newsource_hide {
-    display: none;
-}
+#CampaignEvent_newsource_hide { display: none; }
 
 #CampaignEventPanel {
     height: auto;
@@ -20,13 +16,9 @@
     z-index:1035;
 }
 
-#CampaignEventPanelLists .disabled-result {
-    display: none;
-}
+#CampaignEventPanelLists .disabled-result { display: none; }
 
-.jtk-endpoint {
-    z-index: 1005;
-}
+.jtk-endpoint { z-index: 1005; }
 
 .jtk-label {
     background-color: white;
@@ -51,22 +43,16 @@
     color: var(--text-inverse);
 }
 
-.jtk-connector {
-    z-index: 1000;
-}
+.jtk-connector { z-index: 1000; }
 
 .jtk-clickable_anchor {
     cursor: pointer;
     z-index: 1050;
 }
 
-.jtk-endpoint svg text {
-    display: none;
-}
+.jtk-endpoint svg text { display: none; }
 
-.jtk-clickable_anchor svg text {
-    display: block;
-}
+.jtk-clickable_anchor svg text { display: block; }
 
 .jtk-surface {
     overflow: hidden !important;
@@ -94,7 +80,6 @@
     cursor: -webkit-grabbing !important;
 }
 
-
 .list-campaign-event,
 .list-campaign-source {
     min-width: 260px;
@@ -117,9 +102,7 @@
     line-height: 1em;
 }
 
-.list-campaign-leadsource .campaign-event-icon {
-    font-size: 16px;
-}
+.list-campaign-leadsource .campaign-event-icon { font-size: 16px; }
 
 .campaign-source-title {
     top: -32px;
@@ -138,22 +121,16 @@
     right: -10px;
 }
 
-.campaign-event-buttons .btn:hover {
-    transform: scale(1.2);
-}
+.campaign-event-buttons .btn:hover { transform: scale(1.2); }
 
 .campaign-event-icon {
     color: var(--icon-inverse);
     font-size: 20px;
 }
 
-.campaign-event-content {
-    cursor: pointer;
-}
+.campaign-event-content { cursor: pointer; }
 
-.preview .list-campaign-source .campaign-event-content {
-    cursor: default;
-}
+.preview .list-campaign-source .campaign-event-content { cursor: default; }
 
 .list-campaign-event .highlight-jump-target {
     opacity: 0;
@@ -164,9 +141,7 @@
     line-height: 16px;
 }
 
-.list-campaign-event:hover .highlight-jump-target {
-    opacity: 1;
-}
+.list-campaign-event:hover .highlight-jump-target { opacity: 1; }
 
 .list-campaign-decision {
     background-color: var(--background);
@@ -192,9 +167,7 @@
     background-color: var(--background);
 }
 
-.list-campaign-action {
-    border-radius: clamp(4px, var(--border-radius-md), 8px);
-}
+.list-campaign-action { border-radius: clamp(4px, var(--border-radius-md), 8px); }
 
 .list-campaign-action .campaign-event-content {
     background-color: var(--background-brand);
@@ -217,13 +190,9 @@
     aspect-ratio: 1/1;
 }
 
-.list-campaign-condition .campaign-event-icon {
-    color: var(--support-warning);
-}
+.list-campaign-condition .campaign-event-icon { color: var(--support-warning); }
 
-.list-campaign-decision .campaign-event-icon {
-    color: var(--support-info);
-}
+.list-campaign-decision .campaign-event-icon { color: var(--support-info); }
 
 #CampaignEventSelector_chosen .list-campaign-action,
 #CampaignEventSelector_chosen .list-campaign-condition,
@@ -235,9 +204,7 @@
     padding: 10px 5px;
 }
 
-#CampaignEventSelector_chosen .disabled-result {
-    display: none;
-}
+#CampaignEventSelector_chosen .disabled-result { display: none; }
 
 .campaign-builder .list-group-item.ui-draggable-dragging {
     width: 206px;
@@ -246,9 +213,7 @@
     margin-bottom: 10px;
 }
 
-.campaign-builder .builder-active {
-    height: 10000px !important;
-}
+.campaign-builder .builder-active { height: 10000px !important; }
 
 .campaign-builder.live .builder-content {
     -ms-overflow-style: none;
@@ -256,13 +221,9 @@
     cursor: grab;
 }
 
-.campaign-builder.live .builder-content::-webkit-scrollbar {
-    display: none;
-}
+.campaign-builder.live .builder-content::-webkit-scrollbar { display: none; }
 
-.campaign-builder.live .builder-content.campaign-canvas-panning {
-    cursor: grabbing;
-}
+.campaign-builder.live .builder-content.campaign-canvas-panning { cursor: grabbing; }
 
 #CampaignCanvas {
     height: 10000px;
@@ -287,13 +248,9 @@
     display: block;
 }
 
-.campaign-event-list .progress-bar {
-    height: 3px;
-}
+.campaign-event-list .progress-bar { height: 3px; }
 
-.preview {
-    transform: scale(.8);
-}
+.preview { transform: scale(.8); }
 
 .preview .builder-active {
     width: 100%;
@@ -306,13 +263,9 @@
     cursor: default;
 }
 
-.preview .jtk-endpoint svg {
-    display: none;
-}
+.preview .jtk-endpoint svg { display: none; }
 
-#preview-container {
-    height: 500px;
-}
+#preview-container { height: 500px; }
 
 #EventJumpOverlay {
     display: none;
@@ -335,9 +288,7 @@
     --medium-col-width: 280px;
 }
 
-.campaign-changelog {
-    padding: 0 25px;
-}
+.campaign-changelog { padding: 0 25px; }
 
 .campaign-changelog th:first-child {
     width: var(--small-col-width);
@@ -355,11 +306,8 @@
     max-height: 150px;
 }
 
-
 /* Text overflow handling for campaign source widget */
-.list-campaign-source .campaign-event-name {
-    max-width: 300px;
-}
+.list-campaign-source .campaign-event-name { max-width: 300px; }
 
 #campaignEventDeleteRedirect.error {
     border-color: #a94442;
@@ -371,9 +319,7 @@
     cursor: pointer;
 }
 
-.list-campaign-event .campaign-event-details {
-    display: none;
-}
+.list-campaign-event .campaign-event-details { display: none; }
 
 .list-campaign-event.event-details-visible .campaign-event-details {
     display: block;
