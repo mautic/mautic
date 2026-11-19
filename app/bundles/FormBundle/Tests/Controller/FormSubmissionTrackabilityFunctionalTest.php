@@ -14,6 +14,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Point;
@@ -29,6 +30,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
 {
+    private const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5) Version/17.5 Safari/605.1.15';
+
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -70,16 +73,20 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
                 'mappedObject' => 'company',
                 'mappedField'  => 'companyname',
             ],
-        ]);
+        ], actions: [[
+            'name'       => 'Record UTM tags',
+            'type'       => 'lead.addutmtags',
+            'properties' => [],
+        ]]);
         $this->createFormSubmitPointAction($formId);
         $this->createPointTrigger();
 
         // The visitor is sent back to the referer after submitting, so it points at the form page itself
         $page    = "http://localhost/form/{$formId}";
-        $referer = $page.'?email=visitor%40example.com&utm_source=newsletter#form';
+        $referer = $page.'?email=visitor%40example.com&utm_source=newsletter&utm_recipient_id=12345&recipient_id=12345#form';
 
         $this->logoutUser();
-        $this->submitForm($formId, ['mauticform[email]' => 'visitor@example.com', 'mauticform[company]' => 'Acme'], $server + ['REMOTE_ADDR' => '203.0.113.9', 'HTTP_REFERER' => $referer]);
+        $this->submitForm($formId, ['mauticform[email]' => 'visitor@example.com', 'mauticform[company]' => 'Acme'], $server + ['REMOTE_ADDR' => '203.0.113.9', 'HTTP_REFERER' => $referer, 'HTTP_USER_AGENT' => self::USER_AGENT]);
 
         $cookieJar = $this->client->getCookieJar();
         $this->assertSame($expectTracking, $cookieJar->get('mautic_device_id') instanceof Cookie);
@@ -93,12 +100,22 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectTracking, null !== $submission->getIpAddress());
         $this->assertSame($expectTracking, null !== $submission->getTrackingId());
 
-        // An untracked submitter's referer keeps the UTM tags for campaign attribution, and drops the email and the fragment
+        // An untracked submitter's referer keeps the campaign UTM tags, and drops the email, the recipient IDs and the fragment
         $this->assertSame($expectTracking ? $referer : $page.'?utm_source=newsletter', $submission->getReferer());
 
         // The submitted data is still saved to the contact
         $contact = $submission->getLead();
         $this->assertSame('visitor@example.com', $contact?->getEmail());
+
+        // The "Record UTM tags" action keeps the campaign source, and follows the same rules for an untracked submitter
+        $utmTag = $this->em->getRepository(UtmTag::class)->findOneBy(['lead' => $contact]);
+        $this->assertInstanceOf(UtmTag::class, $utmTag);
+        $this->assertSame('newsletter', $utmTag->getUtmSource());
+        $this->assertSame($expectTracking ? $referer : $page.'?utm_source=newsletter', $utmTag->getReferer());
+        $this->assertSame($expectTracking ? self::USER_AGENT : null, $utmTag->getUserAgent());
+        // The form submit URL's query string (the form ID) is kept only for a tracked submitter
+        $this->assertSame($expectTracking, str_contains((string) $utmTag->getUrl(), '?'));
+        $this->assertSame($expectTracking, [] !== $utmTag->getQuery());
         $this->assertSame($expectTracking, !$contact->getIpAddresses()->isEmpty());
         $this->assertSame($expectTracking, [] !== $this->em->getRepository(LeadDevice::class)->findBy(['lead' => $contact]));
 
@@ -398,8 +415,9 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @param list<array<string, string>> $fields
+     * @param list<array<string, mixed>>  $actions
      */
-    private function createForm(array $fields, bool $inKioskMode = false): int
+    private function createForm(array $fields, bool $inKioskMode = false, array $actions = []): int
     {
         $this->client->request(Request::METHOD_POST, '/api/forms/new', [
             'name'        => 'Trackability form',
@@ -407,6 +425,7 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
             'isPublished' => true,
             'inKioskMode' => $inKioskMode,
             'fields'      => $fields,
+            'actions'     => $actions,
         ]);
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, (string) $this->client->getResponse()->getContent());
 

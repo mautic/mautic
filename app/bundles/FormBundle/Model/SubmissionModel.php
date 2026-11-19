@@ -45,6 +45,7 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -155,7 +156,7 @@ final class SubmissionModel extends CommonFormModel
         // clean the referer by removing mauticError and mauticMessage
         $referer = InputHelper::url($referer, null, null, null, ['mauticError', 'mauticMessage']);
 
-        // An untracked submitter's referer keeps only the page address and the UTM tags, as the rest of the query string can carry identifiers
+        // An untracked submitter's referer keeps only the page address and the campaign UTM tags, as the rest of the query string can carry identifiers
         if (!$trackSubmitter) {
             $referer = $this->stripIdentifiersFromReferer($referer);
         }
@@ -1264,7 +1265,7 @@ final class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Keeps the page address and the UTM tags, which carry campaign attribution, and drops the other query parameters and the fragment.
+     * Keeps the page address and the campaign UTM tags Mautic recognises, and drops the other query parameters and the fragment.
      */
     private function stripIdentifiersFromReferer(string $referer): string
     {
@@ -1272,7 +1273,7 @@ final class SubmissionModel extends CommonFormModel
         [$address, $query] = array_pad(explode('?', $referer, 2), 2, '');
 
         parse_str($query, $parameters);
-        $utmTags = array_filter($parameters, static fn ($name): bool => str_starts_with((string) $name, 'utm_'), ARRAY_FILTER_USE_KEY);
+        $utmTags = UtmTag::filterCampaignParameters($parameters);
 
         return [] === $utmTags ? $address : $address.'?'.http_build_query($utmTags);
     }
