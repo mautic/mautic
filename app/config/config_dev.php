@@ -40,7 +40,10 @@ $container->loadFromExtension('framework', [
 ]);
 
 $container->loadFromExtension('web_profiler', [
-    'toolbar'             => true,
+    'toolbar' => [
+        'enabled'      => true,
+        'ajax_replace' => true,
+    ],
     'intercept_redirects' => false,
 ]);
 
@@ -86,6 +89,11 @@ $container->loadFromExtension('monolog', [
 
 $container->loadFromExtension('maker', [
     'root_namespace' => 'Mautic',
+]);
+
+// API Platform Configuration
+$container->loadFromExtension('api_platform', [
+    'enable_profiler'   => true,
 ]);
 
 // Allow overriding config without a requiring a full bundle or hacks

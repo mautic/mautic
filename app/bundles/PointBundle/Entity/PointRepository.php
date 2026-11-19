@@ -3,12 +3,19 @@
 namespace Mautic\PointBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Point>
  */
 class PointRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
+    public const SEARCH_COMMAND_TYPE_GAIN  = 'mautic.point.searchcommand.type_gain.filter';
+    public const SEARCH_COMMAND_TYPE_LOSS  = 'mautic.point.searchcommand.type_loss.filter';
+    public const SEARCH_COMMAND_REPEATABLE = 'mautic.point.searchcommand.isrepeatable';
+
     public function getEntities(array $args = [])
     {
         $q = $this->_em
@@ -42,7 +49,7 @@ class PointRepository extends CommonRepository
             ->setParameter('type', $type);
 
         // make sure the published up and down dates are good
-        $expr = $this->getPublishedByDateExpression($q);
+        $expr = $this->getPublishedByDateOrmExpression($q);
         $expr->add($q->expr()->eq('p.type', ':type'));
 
         $q->where($expr);
@@ -119,6 +126,40 @@ class PointRepository extends CommonRepository
 
     protected function addSearchCommandWhereClause($q, $filter): array
     {
+        $command             = $filter->command;
+        $projectCommand      = $this->translator->trans('mautic.project.searchcommand.name');
+        $projectCommandEn    = $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US');
+        $typeGainCommand     = $this->translator->trans(self::SEARCH_COMMAND_TYPE_GAIN);
+        $typeGainCommandEn   = $this->translator->trans(self::SEARCH_COMMAND_TYPE_GAIN, [], null, 'en_US');
+        $typeLossCommand     = $this->translator->trans(self::SEARCH_COMMAND_TYPE_LOSS);
+        $typeLossCommandEn   = $this->translator->trans(self::SEARCH_COMMAND_TYPE_LOSS, [], null, 'en_US');
+
+        if ($command === $projectCommand || $command === $projectCommandEn) {
+            return $this->handleProjectFilter(
+                $this->_em->getConnection()->createQueryBuilder(),
+                'point_id',
+                'point_projects_xref',
+                $this->getTableAlias(),
+                $filter->string,
+                $filter->not
+            );
+        }
+
+        $repeatableCommand   = $this->translator->trans(self::SEARCH_COMMAND_REPEATABLE);
+        $repeatableCommandEn = $this->translator->trans(self::SEARCH_COMMAND_REPEATABLE, [], null, 'en_US');
+
+        if ($command === $repeatableCommand || $command === $repeatableCommandEn) {
+            return $this->addRepeatableWhereClause($q, $filter);
+        }
+
+        if ($command === $typeGainCommand || $command === $typeGainCommandEn) {
+            return [$this->buildDeltaTypeExpression($q, true, $filter->not), []];
+        }
+
+        if ($command === $typeLossCommand || $command === $typeLossCommandEn) {
+            return [$this->buildDeltaTypeExpression($q, false, $filter->not), []];
+        }
+
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
 
@@ -127,6 +168,49 @@ class PointRepository extends CommonRepository
      */
     public function getSearchCommands(): array
     {
-        return $this->getStandardSearchCommands();
+        return array_merge(
+            [
+                self::SEARCH_COMMAND_TYPE_GAIN,
+                self::SEARCH_COMMAND_TYPE_LOSS,
+                'mautic.project.searchcommand.name',
+                self::SEARCH_COMMAND_REPEATABLE,
+            ],
+            $this->getStandardSearchCommands()
+        );
+    }
+
+    /**
+     * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
+     * @param object                                                       $filter
+     *
+     * @return array{0:mixed,1:array<string,bool>}
+     */
+    private function addRepeatableWhereClause($q, $filter): array
+    {
+        $column    = $this->getTableAlias().'.repeatable';
+        $parameter = $this->generateRandomParameterName();
+
+        $expr = $filter->not
+            ? $q->expr()->neq($column, ":$parameter")
+            : $q->expr()->eq($column, ":$parameter");
+
+        return [
+            $expr,
+            [$parameter => true],
+        ];
+    }
+
+    /**
+     * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
+     */
+    private function buildDeltaTypeExpression($q, bool $isGain, bool $not): mixed
+    {
+        $field = $this->getTableAlias().'.delta';
+
+        if ($isGain) {
+            return $not ? $q->expr()->lte($field, '0') : $q->expr()->gt($field, '0');
+        }
+
+        return $not ? $q->expr()->gte($field, '0') : $q->expr()->lt($field, '0');
     }
 }

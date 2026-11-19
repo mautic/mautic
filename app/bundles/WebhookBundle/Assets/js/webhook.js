@@ -30,12 +30,17 @@ Mautic.sendHookTest = function() {
         type: 'POST',
         dataType: "json",
         success: function(response) {
-            if (response.success) {
+            if (response.html) {
                 mQuery('#tester').html(response.html);
             }
         },
-        error: function (request, textStatus, errorThrown) {
-            Mautic.processAjaxError(request, textStatus, errorThrown);
+        error: function (response, textStatus, errorThrown) {
+            console.log(response.responseJSON);
+            if (response.responseJSON.html) {
+                mQuery('#tester').html(response.responseJSON.html);
+            } else {
+                Mautic.processAjaxError(response, textStatus, errorThrown);
+            }
         },
         complete: function(response) {
             spinner.addClass('hide');

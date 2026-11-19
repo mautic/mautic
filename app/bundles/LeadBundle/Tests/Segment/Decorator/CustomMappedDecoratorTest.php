@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(CustomMappedDecorator::class)]
-class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(CustomMappedDecorator::class)]
+final class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetField(): void
     {
@@ -55,15 +58,10 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('lead_id', $customMappedDecorator->getForeignContactColumn($contactSegmentFilterCrate));
     }
 
-    /**
-     * @return CustomMappedDecorator
-     */
-    private function getDecorator()
+    private function getDecorator(): CustomMappedDecorator
     {
-        $contactSegmentFilterOperator   = $this->createMock(ContactSegmentFilterOperator::class);
-        $dispatcherMock                 = $this->createMock(EventDispatcherInterface::class);
-        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($dispatcherMock);
+        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($this->createStub(EventDispatcherInterface::class));
 
-        return new CustomMappedDecorator($contactSegmentFilterOperator, $contactSegmentFilterDictionary);
+        return new CustomMappedDecorator($this->createStub(ContactSegmentFilterOperator::class), $contactSegmentFilterDictionary);
     }
 }

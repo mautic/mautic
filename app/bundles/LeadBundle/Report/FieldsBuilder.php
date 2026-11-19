@@ -11,10 +11,11 @@ use Mautic\UserBundle\Model\UserModel;
 class FieldsBuilder
 {
     public function __construct(
-        private FieldModel $fieldModel,
-        private ListModel $listModel,
-        private UserModel $userModel,
-        private LeadModel $leadModel,
+        private readonly FieldModel $fieldModel,
+        private readonly ListModel $listModel,
+        private readonly UserModel $userModel,
+        private readonly LeadModel $leadModel,
+        private readonly DncReportService $dncReportService,
     ) {
     }
 
@@ -77,6 +78,9 @@ class FieldsBuilder
                 'notEmpty' => 'mautic.core.operator.isnotempty',
             ],
         ];
+
+        // Add DNC Status filter
+        $filters = array_merge($filters, $this->dncReportService->getDncFilters());
 
         $ownerPrefix           = $prefix.'owner_id';
         $ownersList            = [];
@@ -141,6 +145,10 @@ class FieldsBuilder
             ],
             'u.last_name' => [
                 'label' => 'mautic.lead.report.owner_lastname',
+                'type'  => 'string',
+            ],
+            'l.generated_email_domain' => [
+                'label' => 'mautic.lead.report.generated_email_domain',
                 'type'  => 'string',
             ],
         ];

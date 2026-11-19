@@ -49,14 +49,9 @@ mQuery.ajaxSetup({
 mQuery(document).on('click', function (e) {
     var target = mQuery(e.target);
     // Check if the click is outside the popover and its trigger
-    if (!target.closest('.popover').length && !target.closest('[data-toggle="popover"]').length) {
-        mQuery('[data-toggle="popover"]').each(function () {
-            var $this = mQuery(this);
-            var popover = $this.data('bs.popover');
-            if (popover && popover.tip().hasClass('in')) {
-                $this.popover('hide');
-                popover.inState.click = false; // Reset the internal click state
-            }
+    if (!target.closest('.popover').length && !target.closest('[data-bs-toggle="popover"]').length) {
+        mQuery('[data-bs-toggle="popover"]').each(function () {
+            bootstrap.Popover.getInstance(this)?.hide();
         });
     }
 });
@@ -69,26 +64,11 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
     Mautic.attachDismissHandlers();
 
     // Initialize popovers with custom configuration
-    mQuery('[data-toggle="popover"]').popover({
-        sanitize: false,
-        content: function() {
-            return mQuery(this).data('content');
-        }
-    });
+    mQuery('[data-bs-toggle="popover"]:not([data-quick-filter])').each((index, element) => bootstrap.Popover.getOrCreateInstance(element, {
+        sanitize: false
+    }));
+    mQuery('[data-quick-filter]').popover(Mautic.getQuickFilterPopoverOptions());
 
-    // Handle popover shown event
-    mQuery('[data-toggle="popover"]').on('shown.bs.popover', function () {
-        // Initialize code blocks after popover is fully shown
-        Mautic.initializeCodeBlocks();
-
-        // Initialize other elements inside popover
-        mQuery('.popover-content select').chosen({
-            allow_single_deselect: true,
-            disable_search_threshold: 10
-        });
-
-        mQuery('.popover-content [data-toggle="tooltip"]').tooltip();
-    });
 });
 
 // Force stop the page loading bar when no more requests are being in progress
@@ -96,7 +76,6 @@ mQuery( document ).ajaxStop(function(event) {
     // Seems to be stuck
     MauticVars.activeRequests = 0;
     Mautic.stopPageLoadingBar();
-    Mautic.initializeCodeBlocks();
 });
 
 mQuery( document ).ready(function() {
@@ -125,15 +104,6 @@ mQuery( document ).ready(function() {
         }
     }, mauticSessionLifetime * 1000 / 2);
 
-    // Copy code blocks when clicked
-    mQuery(document).on('click', 'code', function(e) {
-        e.preventDefault();
-        navigator.clipboard.writeText(mQuery(this).clone().children('.copy-icon').remove().end().text().trim()).then(() => {
-            mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line');
-            setTimeout(() => mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line'), 2000);
-        });
-    });
-    Mautic.initializeCodeBlocks();
     Mautic.attachDismissHandlers();
 });
 
@@ -367,29 +337,16 @@ var Mautic = {
 
         Mousetrap.bind('?', function (e) {
             var modalWindow = mQuery('#keyboardShortcutsModal');
-            modalWindow.modal();
+            modalWindow.each((index, element) => bootstrap.Modal.getOrCreateInstance(element).show());
         });
 
-    },
-
-    /**
-     * Copy code blocks when clicked
-     *
-     */
-    initializeCodeBlocks: function () {
-        mQuery('code').each(function() {
-            var $codeBlock = mQuery(this);
-            if (!$codeBlock.find('.copy-icon').length) {
-                $codeBlock.append('<i class="ri-clipboard-fill copy-icon"></i>');
-            }
-        });
     },
 
     /**
      * Initializes list group toggle functionality.
      */
     initListGroupToggle: function(container) {
-        mQuery(container).on('click', '.list-group[data-toggle="list-group"] .list-group-item', function(e) {
+        mQuery(container).on('click', '.list-group[data-bs-toggle="list-group"] .list-group-item', function(e) {
             e.preventDefault(); // Prevent default action if necessary
 
             var $item = mQuery(this);
@@ -760,8 +717,8 @@ var Mautic = {
         //dismiss modal if activated
         Mautic.dismissConfirmation();
 
-        if (action.indexOf('batchExport') >= 0) {
-            delete Mautic.activeActions[action]
+        if (action.includes('batchExport')) {
+            delete Mautic.activeActions[action];
             Mautic.initiateFileDownload(action);
             return;
         }
@@ -844,17 +801,17 @@ var Mautic = {
                     //update URL in address bar
                     history.pushState(null, "Mautic", response.route);
                 }
-            } else if (response.newContent && mQuery('.modal.in').length) {
+            } else if (response.newContent && mQuery('.modal.show').length) {
                 //assume a modal was the recipient of the information
-                mQuery('.modal.in .modal-body-content').html(response.newContent);
-                mQuery('.modal.in .modal-body-content').removeClass('hide');
-                if (mQuery('.modal.in  .loading-placeholder').length) {
-                    mQuery('.modal.in  .loading-placeholder').addClass('hide');
+                mQuery('.modal.show .modal-body-content').html(response.newContent);
+                mQuery('.modal.show .modal-body-content').removeClass('hide');
+                if (mQuery('.modal.show  .loading-placeholder').length) {
+                    mQuery('.modal.show  .loading-placeholder').addClass('hide');
                 }
             } else if (response.closeModal) {
                 if (typeof target !== "undefined") {
                     mQuery('body').removeClass('noscroll');
-                    mQuery(target).modal('hide');
+                    mQuery(target).each((index, element) => Mautic.hideModal(element));
                 }
             } else if (inDevMode) {
                 console.log(response);
@@ -1028,7 +985,7 @@ var Mautic = {
     clearNotification: function (id) {
         if (id) {
             mQuery("#notification" + id).fadeTo("fast", 0.01).slideUp("fast", function () {
-                mQuery(this).find("*[data-toggle='tooltip']").tooltip('destroy');
+                mQuery(this).find("*[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
                 mQuery(this).remove();
 
                 if (!mQuery('#notifications .notification').length) {

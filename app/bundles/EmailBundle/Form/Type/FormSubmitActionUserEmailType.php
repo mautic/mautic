@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\UserBundle\Form\Type\UserListType;
@@ -11,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class FormSubmitActionUserEmailType extends AbstractType
+final class FormSubmitActionUserEmailType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -32,16 +34,14 @@ class FormSubmitActionUserEmailType extends AbstractType
             UserListType::class,
             [
                 'label'      => 'mautic.email.form.users',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.help.autocomplete',
                 ],
                 'required'    => true,
                 'constraints' => new NotBlank(
-                    [
-                        'message' => 'mautic.core.value.required',
-                    ]
+                    message: 'mautic.core.value.required'
                 ),
             ]
         );

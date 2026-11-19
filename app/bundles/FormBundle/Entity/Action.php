@@ -2,71 +2,86 @@
 
 namespace Mautic\FormBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "action:read"
- *        },
- *       "swagger_definition_name"="Read"
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "action:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('form:forms:viewown')"),
+        new Post(security: "is_granted('form:forms:create')"),
+        new Get(security: "is_granted('form:forms:viewown', object)"),
+        new Put(security: "is_granted('form:forms:editown', object)"),
+        new Patch(security: "is_granted('form:forms:editother', object)"),
+        new Delete(security: "is_granted('form:forms:deleteown', object)"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['action:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['action:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Action implements UuidInterface
 {
     use UuidTrait;
 
+    public const ENTITY_NAME = 'form_action';
+
     /**
      * @var int
      */
+    #[Groups(['action:read', 'form:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $description;
 
     /**
      * @var string
      */
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $type;
 
     /**
      * @var int
      */
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $order = 0;
 
     /**
      * @var array
      */
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $properties = [];
 
     /**
      * @var Form|null
      */
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $form;
 
     /**
@@ -74,9 +89,6 @@ class Action implements UuidInterface
      */
     private $changes;
 
-    /**
-     * Reset properties on clone.
-     */
     public function __clone()
     {
         $this->id   = null;
@@ -106,6 +118,7 @@ class Action implements UuidInterface
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('actions')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         static::addUuidField($builder);
@@ -132,16 +145,13 @@ class Action implements UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-            'groups'  => ['action'],
-        ]));
+        $metadata->addPropertyConstraint('type', new Assert\NotBlank(message: 'mautic.core.name.required', groups: ['action']));
     }
 
-    private function isChanged($prop, $val): void
+    private function isChanged(string $prop, mixed $val): void
     {
-        if ($this->$prop != $val) {
-            $this->changes[$prop] = [$this->$prop, $val];
+        if ($this->{$prop} != $val) {
+            $this->changes[$prop] = [$this->{$prop}, $val];
         }
     }
 
@@ -154,9 +164,7 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -164,13 +172,9 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set order.
-     *
      * @param int $order
-     *
-     * @return Action
      */
-    public function setOrder($order)
+    public function setOrder($order): static
     {
         $this->isChanged('order', $order);
 
@@ -180,8 +184,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get order.
-     *
      * @return int
      */
     public function getOrder()
@@ -190,13 +192,9 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set properties.
-     *
      * @param array $properties
-     *
-     * @return Action
      */
-    public function setProperties($properties)
+    public function setProperties($properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -206,8 +204,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get properties.
-     *
      * @return array
      */
     public function getProperties()
@@ -215,12 +211,7 @@ class Action implements UuidInterface
         return $this->properties;
     }
 
-    /**
-     * Set form.
-     *
-     * @return Action
-     */
-    public function setForm(Form $form)
+    public function setForm(Form $form): static
     {
         $this->form = $form;
 
@@ -228,8 +219,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get form.
-     *
      * @return Form|null
      */
     public function getForm()
@@ -238,13 +227,9 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
-     *
-     * @return Action
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -253,9 +238,7 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get type.
-     *
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -268,13 +251,9 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
-     *
-     * @return Action
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -283,9 +262,7 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get description.
-     *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -293,13 +270,9 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
-     *
-     * @return Action
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -308,12 +281,15 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get name.
-     *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->form?->getCreatedBy();
     }
 }

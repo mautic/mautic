@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Executioner\Logger;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,46 +20,28 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class EventLoggerTest extends TestCase
+final class EventLoggerTest extends TestCase
 {
     /**
-     * @var IpLookupHelper&MockObject
+     * @var MockObject&IpLookupHelper
      */
     private MockObject $ipLookupHelper;
 
     /**
-     * @var ContactTracker|MockObject
-     */
-    private MockObject $contactTracker;
-
-    /**
-     * @var LeadEventLogRepository|MockObject
+     * @var MockObject&LeadEventLogRepository
      */
     private MockObject $leadEventLogRepository;
 
     /**
-     * @var LeadRepository|MockObject
+     * @var MockObject&LeadRepository
      */
     private MockObject $leadRepository;
-
-    /**
-     * @var SummaryModel|MockObject
-     */
-    private MockObject $summaryModel;
-
-    /**
-     * @var CoreParametersHelper&MockObject
-     */
-    private MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {
         $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
-        $this->contactTracker         = $this->createMock(ContactTracker::class);
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
         $this->leadRepository         = $this->createMock(LeadRepository::class);
-        $this->summaryModel           = $this->createMock(SummaryModel::class);
-        $this->coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
     }
 
     public function testAllLogsAreReturnedWithFinalPersist(): void
@@ -71,8 +55,9 @@ class EventLoggerTest extends TestCase
             $logCollection->add($log);
         }
 
-        $this->leadEventLogRepository->expects($this->exactly(3))
-            ->method('saveEntities');
+        // upsert is called once per log (60 times total)
+        $this->leadEventLogRepository->expects($this->exactly(60))
+            ->method('upsert');
 
         $logger = $this->getLogger();
         foreach ($logCollection as $log) {
@@ -81,7 +66,7 @@ class EventLoggerTest extends TestCase
 
         $persistedLogs = $logger->persistQueuedLogs();
 
-        $this->assertEquals($persistedLogs->count(), $logCollection->count());
+        $this->assertCount($persistedLogs->count(), $logCollection);
         $this->assertEquals($logCollection->getValues(), $persistedLogs->getValues());
     }
 
@@ -97,12 +82,14 @@ class EventLoggerTest extends TestCase
                 [1 => ['rotation' => 1, 'manually_removed' => 0]],
             );
 
+        /** @var MockObject&Campaign $campaign */
         $campaign = $this->createMock(Campaign::class);
-        $campaign->method('getId')->willReturnOnConsecutiveCalls(1, 1, 2);
+        $campaign->method('getId')->willReturnOnConsecutiveCalls(1, 1, 1, 1, 2, 2);
 
-        $event = $this->createMock(Event::class);
-        $event->method('getCampaign')->willReturn($campaign);
+        $event = new Event();
+        $event->setCampaign($campaign);
 
+        /** @var MockObject&Lead $contact */
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')->willReturn(1);
 
@@ -119,15 +106,62 @@ class EventLoggerTest extends TestCase
         $this->assertEquals(1, $log->getRotation());
     }
 
+    public function testBuildLogEntryLeavesInactiveConditionPathUnset(): void
+    {
+        $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress());
+        $this->leadRepository->method('getContactRotations')->willReturn([]);
+
+        /** @var MockObject&Campaign $campaign */
+        $campaign = $this->createMock(Campaign::class);
+        $campaign->method('getId')->willReturn(1);
+
+        $condition = new Event();
+        $condition->setCampaign($campaign);
+        $condition->setEventType(Event::TYPE_CONDITION);
+
+        $action = new Event();
+        $action->setCampaign($campaign);
+        $action->setEventType(Event::TYPE_ACTION);
+
+        /** @var MockObject&Lead $contact */
+        $contact = $this->createMock(Lead::class);
+        $contact->method('getId')->willReturn(1);
+
+        $this->assertNull($this->getLogger()->buildLogEntry($condition, $contact, true)->getNonActionPathTaken());
+        $this->assertTrue($this->getLogger()->buildLogEntry($action, $contact, true)->getNonActionPathTaken());
+    }
+
+    public function testBuildLogEntryHasNoIpAddressForAnUntrackedVisitor(): void
+    {
+        $this->ipLookupHelper->method('isVisitorUntracked')->willReturn(true);
+        $this->ipLookupHelper->expects($this->never())->method('getIpAddress');
+        $this->leadRepository->method('getContactRotations')->willReturn([1 => ['rotation' => 1, 'manually_removed' => 0]]);
+
+        /** @var MockObject&Campaign $campaign */
+        $campaign = $this->createMock(Campaign::class);
+        $campaign->method('getId')->willReturn(1);
+
+        $event = new Event();
+        $event->setCampaign($campaign);
+
+        /** @var MockObject&Lead $contact */
+        $contact = $this->createMock(Lead::class);
+        $contact->method('getId')->willReturn(1);
+
+        $log = $this->getLogger()->buildLogEntry($event, $contact, false);
+
+        $this->assertNotInstanceOf(IpAddress::class, $log->getIpAddress());
+    }
+
     private function getLogger(): EventLogger
     {
         return new EventLogger(
             $this->ipLookupHelper,
-            $this->contactTracker,
+            $this->createStub(ContactTracker::class),
             $this->leadEventLogRepository,
             $this->leadRepository,
-            $this->summaryModel,
-            $this->coreParametersHelper
+            $this->createStub(SummaryModel::class),
+            $this->createStub(CoreParametersHelper::class)
         );
     }
 }

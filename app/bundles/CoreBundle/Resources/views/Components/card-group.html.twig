@@ -1,0 +1,22 @@
+{% if type == 'card-in-card' %}
+    {% set firstCard = cards|first %}
+    {% include '@MauticCore/Components/card-in-card.html.twig' with firstCard %}
+    <div class="card-group" grid-mode="condensed" style="--card-group--cards-in-row: {{ cardsPerRow|default(3) }};">
+        {% for card in cards|slice(1) %}
+            <div class="card-group__item">
+                {% include '@MauticCore/Components/card.html.twig' with card|merge({type: 'default'}) %}
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card-group" grid-mode="{{ gridMode|default('default') }}" style="--card-group--cards-in-row: {{ cardsPerRow|default(3) }};">
+        {% if cardSectionOffset is defined and cardSectionOffset %}
+            <div class="card-group__item"></div>
+        {% endif %}
+        {% for card in cards %}
+            <div class="card-group__item">
+                {% include '@MauticCore/Components/card.html.twig' with card|merge({type: type}) %}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

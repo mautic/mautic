@@ -1,11 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Controller;
 
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\ProjectBundle\Entity\Project;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignControllerTest extends MauticMysqlTestCase
+final class CampaignControllerTest extends MauticMysqlTestCase
 {
     /**
      * Index should return status code 200.
@@ -48,5 +55,110 @@ class CampaignControllerTest extends MauticMysqlTestCase
         $form = $crawler->filter('form[name="campaign"]')->selectButton('campaign_buttons_cancel')->form();
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
+    }
+
+    public function testCampaignWithProject(): void
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test Campaign');
+        $this->em->persist($campaign);
+
+        $project = new Project();
+        $project->setName('Test Project');
+        $this->em->persist($project);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', '/s/campaigns/edit/'.$campaign->getId());
+        $form    = $crawler->selectButton('Save')->form();
+        $form['campaign[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedCampaign = $this->em->find(Campaign::class, $campaign->getId());
+        $this->assertInstanceOf(Campaign::class, $savedCampaign);
+        $this->assertSame($project->getId(), $savedCampaign->getProjects()->first()->getId());
+    }
+
+    /**
+     * Test that campaign events include isRedirectTarget property when editing campaign.
+     */
+    public function testCampaignEditIncludesIsRedirectTargetProperty(): void
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test Campaign for Redirect Target');
+        $this->em->persist($campaign);
+
+        // Create a target event (the one being redirected to)
+        $targetEvent = new Event();
+        $targetEvent->setName('Target Event');
+        $targetEvent->setType('email.send');
+        $targetEvent->setEventType('action');
+        $targetEvent->setCampaign($campaign);
+        $this->em->persist($targetEvent);
+
+        // Create a source event that redirects to the target
+        $sourceEvent = new Event();
+        $sourceEvent->setName('Source Event');
+        $sourceEvent->setType('campaign.jump_to_event');
+        $sourceEvent->setEventType('action');
+        $sourceEvent->setCampaign($campaign);
+        $sourceEvent->setDeleted();
+        $sourceEvent->setRedirectEvent($targetEvent);
+        $this->em->persist($sourceEvent);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        // Request the edit page for the campaign
+        $this->client->request('GET', '/s/campaigns/edit/'.$campaign->getId());
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertResponseIsSuccessful();
+
+        // Check that the campaign elements data includes isRedirectTarget
+        $content = $clientResponse->getContent();
+        $this->assertStringContainsString('isRedirectTarget', (string) $content);
+
+        // Verify that the target event is marked as a redirect target
+        $this->assertStringContainsString('"isRedirectTarget": true', (string) $content);
+    }
+
+    public function testIndexActionWithTypeFilters(): void
+    {
+        $category = new Category();
+        $category->setTitle('Campaign category');
+        $category->setAlias('test-category');
+        $category->setBundle('campaign');
+        $this->em->persist($category);
+
+        $campaign = new Campaign();
+        $campaign->setName('Test Campaign for Filters');
+        $campaign->setCategory($category);
+        $this->em->persist($campaign);
+
+        $uncategorizedCampaign = new Campaign();
+        $uncategorizedCampaign->setName('Uncategorized Campaign for Filters');
+        $this->em->persist($uncategorizedCampaign);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->client->request('GET', '/s/campaigns');
+        $this->assertResponseIsSuccessful();
+
+        $this->client->request('GET', '/s/campaigns?filters=["list:1"]');
+        $this->assertResponseIsSuccessful();
+
+        $this->client->request('GET', '/s/campaigns?filters=["form:1"]');
+        $this->assertResponseIsSuccessful();
+
+        $categoryFilterPrefix = $this->getContainer()->get(TranslatorInterface::class)->trans('mautic.core.searchcommand.category');
+        $this->client->request('GET', '/s/campaigns?filters=["'.$categoryFilterPrefix.':test-category"]');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('#campaignTable', $campaign->getName());
+        $this->assertSelectorTextNotContains('#campaignTable', $uncategorizedCampaign->getName());
     }
 }

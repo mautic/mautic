@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -18,6 +19,7 @@ trait TimelineTrait
      * @param array<mixed> $dateTimeColumns       Array of columns to be converted to \DateTime
      * @param mixed|null   $resultsParserCallback Callback to custom parse results
      * @param string|null  $secondaryOrdering     Name of column for secondary sort
+     * @param string|null  $leadIdColumn          Lead ID column for the leadIds filter, defaults to lead_id of the timestamp column's table
      *
      * @return array<mixed>
      */
@@ -29,8 +31,15 @@ trait TimelineTrait
         $serializedColumns = [],
         $dateTimeColumns = [],
         $resultsParserCallback = null,
-        string $secondaryOrdering = null,
+        ?string $secondaryOrdering = null,
+        ?string $leadIdColumn = null,
     ) {
+        if (!empty($options['leadIds'])) {
+            $leadIdColumn ??= str_contains($timestampColumn, '.') ? strstr($timestampColumn, '.', true).'.lead_id' : 'lead_id';
+            $query->andWhere($query->expr()->in($leadIdColumn, ':leadIds'))
+                ->setParameter('leadIds', $options['leadIds'], ArrayParameterType::INTEGER);
+        }
+
         if (!empty($options['unitCounts'])) {
             [$tablePrefix, $column] = explode('.', $timestampColumn);
 
@@ -56,21 +65,14 @@ trait TimelineTrait
                 ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s'));
         }
 
-        if (isset($options['leadIds'])) {
-            $leadColumn = $this->getTableAlias().'.lead_id';
-            $query->addSelect($leadColumn);
-            $query->andWhere(
-                $query->expr()->in($leadColumn, $options['leadIds'])
-            );
-        }
-
         if (isset($options['order'])) {
             [$orderBy, $orderByDir] = $options['order'];
 
-            $orderBy = match ($orderBy) {
+            $orderBy    = match ($orderBy) {
                 'eventLabel' => $eventNameColumn,
                 default      => $timestampColumn,
             };
+            $orderByDir = 'ASC' === strtoupper((string) $orderByDir) ? 'ASC' : 'DESC';
 
             $query->orderBy($orderBy, $orderByDir);
 

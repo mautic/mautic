@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,27 +21,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriberTest extends TestCase
 {
-    private OperatorOptions $operatorOptions;
+    private LeadFieldRepository&MockObject $leadFieldRepository;
 
-    /**
-     * @var MockObject|LeadFieldRepository
-     */
-    private MockObject $leadFieldRepository;
+    private TypeOperatorProviderInterface&MockObject $typeOperatorProvider;
 
-    /**
-     * @var MockObject|TypeOperatorProviderInterface
-     */
-    private MockObject $typeOperatorProvider;
+    private FieldChoicesProviderInterface&MockObject $fieldChoicesProvider;
 
-    /**
-     * @var MockObject|FieldChoicesProviderInterface
-     */
-    private MockObject $fieldChoicesProvider;
-
-    /**
-     * @var MockObject|TranslatorInterface
-     */
-    private MockObject $translator;
+    private TranslatorInterface&MockObject $translator;
 
     private FilterOperatorSubscriber $subscriber;
 
@@ -50,14 +35,14 @@ final class FilterOperatorSubscriberTest extends TestCase
     {
         parent::setUp();
 
-        $this->operatorOptions      = new OperatorOptions();
+        $operatorOptions            = new OperatorOptions();
         $this->leadFieldRepository  = $this->createMock(LeadFieldRepository::class);
         $this->typeOperatorProvider = $this->createMock(TypeOperatorProviderInterface::class);
         $this->fieldChoicesProvider = $this->createMock(FieldChoicesProviderInterface::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
 
         $this->subscriber = new FilterOperatorSubscriber(
-            $this->operatorOptions,
+            $operatorOptions,
             $this->leadFieldRepository,
             $this->typeOperatorProvider,
             $this->fieldChoicesProvider,
@@ -67,7 +52,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
     public function testOnListOperatorsGenerate(): void
     {
-        $event = new LeadListFiltersOperatorsEvent([], $this->translator);
+        $event = new LeadListFiltersOperatorsEvent([]);
 
         $this->subscriber->onListOperatorsGenerate($event);
 
@@ -151,6 +136,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                             'equals'    => '=',
                             'not equal' => '!=',
                         ],
+                        'iconClass' => 'ri-shapes-line',
                     ],
                 ],
             ],
@@ -206,6 +192,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                             'equals'    => '=',
                             'not equal' => '!=',
                         ],
+                        'iconClass' => 'ri-shapes-line',
                     ],
                 ],
             ],
@@ -265,6 +252,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                             'equals'    => '=',
                             'not equal' => '!=',
                         ],
+                        'iconClass' => 'ri-shapes-line',
                     ],
                 ],
             ],
@@ -316,6 +304,21 @@ final class FilterOperatorSubscriberTest extends TestCase
                             'equals'    => '=',
                             'not equal' => '!=',
                         ],
+                        'iconClass' => 'ri-shapes-line',
+                    ],
+                ],
+                'company_all' => [
+                    'test_text' => [
+                        'label'      => 'Test Text',
+                        'properties' => [
+                            'type' => 'text',
+                        ],
+                        'object'    => 'company_all',
+                        'operators' => [
+                            'equals'    => '=',
+                            'not equal' => '!=',
+                        ],
+                        'iconClass' => 'ri-shapes-line',
                     ],
                 ],
             ],
@@ -331,7 +334,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -340,7 +343,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -349,7 +352,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -358,7 +361,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -371,13 +374,14 @@ final class FilterOperatorSubscriberTest extends TestCase
             [
                 'label'      => 'mautic.lead.list.filter.date_identified',
                 'properties' => [
-                    'type' => 'date',
+                    'type' => 'datetime',
                 ],
                 'operators' => [
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-calendar-todo-line',
             ],
             $choices['lead']['date_identified']
         );
@@ -392,7 +396,8 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-device-line',
             ],
             $choices['lead']['device_model']
         );
@@ -411,7 +416,8 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-mail-forbid-line',
             ],
             $choices['lead']['dnc_manual_email']
         );
@@ -425,7 +431,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -434,7 +440,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -443,7 +449,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -452,7 +458,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -476,6 +482,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
+                'iconClass' => 'ri-mail-open-line',
             ],
             $choices['behaviors']['lead_email_received']
         );
@@ -486,17 +493,18 @@ final class FilterOperatorSubscriberTest extends TestCase
                 'properties' => [
                     'type' => 'number',
                 ],
+                'object'    => 'lead',
                 'operators' => [
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']
         );
     }
 
-    public function testOnlyCustomFieldsAreLoadedForNonSegmentRoutes(): void
+    public function testFieldsAreLoadedForNonSegmentRoutes(): void
     {
         $request = new Request();
         $request->attributes->set('_route', 'mautic_dynamicContent_action');
@@ -518,7 +526,7 @@ final class FilterOperatorSubscriberTest extends TestCase
             ->method('getListablePublishedFields')
             ->willReturn(new ArrayCollection([$field]));
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -527,7 +535,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -536,7 +544,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -545,7 +553,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -556,14 +564,14 @@ final class FilterOperatorSubscriberTest extends TestCase
         $choices = $event->getChoices();
 
         // Only custom fields should be shown
-        Assert::assertArrayHasKey('lead', $choices);
-        Assert::assertArrayHasKey('test_select', $choices['lead']);
+        $this->assertArrayHasKey('lead', $choices);
+        $this->assertArrayHasKey('test_select', $choices['lead']);
 
         // Static fields should not be included
-        Assert::assertArrayNotHasKey('utm_source', $choices['lead']);
+        $this->assertArrayNotHasKey('utm_source', $choices['lead']);
 
         // Behaviors should not be included
-        Assert::assertArrayNotHasKey('behaviors', $choices);
+        $this->assertArrayNotHasKey('behaviors', $choices);
     }
 
     public function testOnGenerateSegmentFiltersAddCustomFieldsForTextTypesForValueAjaxRequest(): void
@@ -614,6 +622,21 @@ final class FilterOperatorSubscriberTest extends TestCase
                             'equals'    => '=',
                             'not equal' => '!=',
                         ],
+                        'iconClass' => 'ri-shapes-line',
+                    ],
+                ],
+                'company_all' => [
+                    'test_text' => [
+                        'label'      => 'Test Text',
+                        'properties' => [
+                            'type' => 'text',
+                        ],
+                        'object'    => 'company_all',
+                        'operators' => [
+                            'equals'    => '=',
+                            'not equal' => '!=',
+                        ],
+                        'iconClass' => 'ri-shapes-line',
                     ],
                 ],
             ],
@@ -629,7 +652,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -638,7 +661,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -647,7 +670,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -656,7 +679,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -669,13 +692,14 @@ final class FilterOperatorSubscriberTest extends TestCase
             [
                 'label'      => 'mautic.lead.list.filter.date_identified',
                 'properties' => [
-                    'type' => 'date',
+                    'type' => 'datetime',
                 ],
                 'operators' => [
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-calendar-todo-line',
             ],
             $choices['lead']['date_identified']
         );
@@ -690,7 +714,8 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-device-line',
             ],
             $choices['lead']['device_model']
         );
@@ -709,7 +734,8 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'object'    => 'lead',
+                'iconClass' => 'ri-mail-forbid-line',
             ],
             $choices['lead']['dnc_manual_email']
         );
@@ -723,7 +749,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -732,7 +758,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -741,7 +767,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -750,7 +776,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -774,6 +800,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
+                'iconClass' => 'ri-mail-open-line',
             ],
             $choices['behaviors']['lead_email_received']
         );
@@ -784,11 +811,12 @@ final class FilterOperatorSubscriberTest extends TestCase
                 'properties' => [
                     'type' => 'number',
                 ],
+                'object'    => 'lead',
                 'operators' => [
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object' => 'lead',
+                'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']
         );

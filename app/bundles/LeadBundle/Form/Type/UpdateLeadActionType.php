@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
@@ -11,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class UpdateLeadActionType extends AbstractType
+final class UpdateLeadActionType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
@@ -39,6 +41,7 @@ class UpdateLeadActionType extends AbstractType
         $options['fields']                      = $leadFields;
         $options['ignore_required_constraints'] = true;
         $options['ignore_date_type']            = true;
+        $options['use_nullable_yes_no_type']    = true;
 
         $this->getFormFields($builder, $options);
     }

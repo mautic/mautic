@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\DataTransformer;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -10,30 +10,30 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 /**
  * @implements DataTransformerInterface<array<mixed>|int|null, array<mixed>|object|null>
  */
-class TagEntityModelTransformer implements DataTransformerInterface
+final class TagEntityModelTransformer implements DataTransformerInterface
 {
     /**
      * @param string $repository
      * @param bool   $isArray
      */
     public function __construct(
-        private EntityManager $em,
+        private readonly EntityManagerInterface $em,
         private $repository = '',
         private $isArray = false,
     ) {
     }
 
-    public function reverseTransform($entity)
+    public function reverseTransform(mixed $entity): mixed
     {
         if (!$this->isArray) {
-            if (is_null($entity) || !is_object($entity)) {
+            if (null === $entity || !is_object($entity)) {
                 return null;
             }
 
             return $entity->getTag();
         }
 
-        if (is_null($entity) && !is_array($entity) && !$entity instanceof PersistentCollection) {
+        if (!is_array($entity) && !$entity instanceof PersistentCollection) {
             return [];
         }
 
@@ -48,7 +48,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
     /**
      * @throws TransformationFailedException if object is not found
      */
-    public function transform($id)
+    public function transform(mixed $id): mixed
     {
         if (!$this->isArray) {
             if (!$id) {

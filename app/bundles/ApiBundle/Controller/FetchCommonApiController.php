@@ -9,6 +9,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Event\ApiInitializeEvent;
 use Mautic\ApiBundle\Event\ApiSerializationContextEvent;
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -16,6 +17,7 @@ use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\MauticController;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -30,7 +32,6 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -123,11 +124,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected $serializerGroups = [];
 
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
     protected ContainerBagInterface $parametersContainer;
 
     /**
@@ -135,7 +131,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     public function __construct(
         protected CorePermissions $security,
-        Translator $translator,
+        protected Translator $translator,
         protected EntityResultHelper $entityResultHelper,
         private AppVersion $appVersion,
         private RequestStack $requestStack,
@@ -144,11 +140,19 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         protected EventDispatcherInterface $dispatcher,
         protected CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->translator           = $translator;
-
         if (null !== $this->model && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
             $this->permissionBase = $this->model->getPermissionBase();
         }
+
+        $event = new ApiInitializeEvent(
+            (string) $this->entityClass,
+            $this->serializerGroups,
+            $this->exclusionStrategies,
+        );
+        $this->dispatcher->dispatch($event);
+
+        $this->serializerGroups    = $event->getSerializerGroups();
+        $this->exclusionStrategies = $event->getExclusionStrategies();
     }
 
     /**
@@ -162,7 +166,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $tableAlias    = $repo->getTableAlias();
         $publishedOnly = $request->get('published', 0);
         $minimal       = $request->get('minimal', 0);
-
         try {
             if (!$this->security->isGranted($this->permissionBase.':view')) {
                 return $this->accessDenied();
@@ -175,11 +178,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             && !$this->security->isGranted($this->permissionBase.':viewother')
             && null !== $user = $userHelper->getUser()
         ) {
-            $this->listFilters[] = [
-                'column' => $tableAlias.'.createdBy',
-                'expr'   => 'eq',
-                'value'  => $user->getId(),
-            ];
+            $this->listFilters = array_merge($this->listFilters, $this->getOwnEntityListFilters($tableAlias, $user));
         }
 
         if ($publishedOnly) {
@@ -196,10 +195,12 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             }
         }
 
+        /** @var int $defaultPagelimit */
+        $defaultPagelimit = $this->coreParametersHelper->get('default_pagelimit');
         $args = array_merge(
             [
                 'start'  => $request->query->get('start', 0),
-                'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
+                'limit'  => $request->query->get('limit', $defaultPagelimit),
                 'filter' => [
                     'string' => $request->query->get('search', ''),
                     'force'  => $this->listFilters,
@@ -271,7 +272,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Adds the repository alias to the column name if it doesn't exist.
      *
-     * @return string $column name with alias prefix
+     * @return string column name with alias prefix
      */
     protected function addAliasIfNotPresent(string $columns, string $alias): string
     {
@@ -311,7 +312,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $this->customSelectRequested = true;
         }
 
-        if (!empty($args)) {
+        if ([] !== $args) {
             $args['id'] = $id;
             $entity     = $this->model->getEntity($args);
         } else {
@@ -400,17 +401,21 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Checks if user has permission to access retrieved entity.
      *
-     * @param mixed  $entity
-     * @param string $action view|create|edit|publish|delete
+     * @param FormEntity $entity
+     * @param string     $action view|create|edit|publish|delete
      *
      * @return bool|Response
      */
     protected function checkEntityAccess($entity, $action = 'view')
     {
-        if ('create' !== $action && is_object($entity) && method_exists($entity, 'getCreatedBy')) {
-            $ownPerm   = "{$this->permissionBase}:{$action}own";
-            $otherPerm = "{$this->permissionBase}:{$action}other";
+        $ownPerm   = "{$this->permissionBase}:{$action}own";
+        $otherPerm = "{$this->permissionBase}:{$action}other";
 
+        if ('publish' === $action) {
+            return $this->security->hasPublishAccessForEntity($entity, $ownPerm, $otherPerm);
+        }
+
+        if ('create' !== $action && is_object($entity) && method_exists($entity, 'getCreatedBy')) {
             $owner = (method_exists($entity, 'getPermissionUser')) ? $entity->getPermissionUser() : $entity->getCreatedBy();
 
             return $this->security->hasEntityAccess($ownPerm, $otherPerm, $owner);
@@ -461,10 +466,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $idHelper->setIsAssociative(true);
 
         [$entities, $total] = $prepareForSerialization
-                ?
-                $this->prepareEntitiesForView($entities)
-                :
-                $this->prepareEntityResultsToArray($entities);
+            ?
+            $this->prepareEntitiesForView($entities)
+            :
+            $this->prepareEntityResultsToArray($entities);
 
         // Set errors
         if ($idHelper->hasErrors()) {
@@ -494,7 +499,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Get the default properties of an entity and parents.
      *
-     * @phpstan-param E $entity
+     * @param E $entity
      *
      * @return array<mixed>
      */
@@ -536,8 +541,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * Get a model instance from the service container.
-     *
-     * @return AbstractCommonModel<E>
      */
     protected function getModel(string $modelNameKey): AbstractCommonModel
     {
@@ -557,7 +560,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
      *
-     * @phpstan-param E $entity
+     * @param E $entity
      */
     protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
@@ -574,7 +577,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         return $this->prepareEntityResultsToArray(
             $results,
-            function ($entity): void {
+            function (object $entity): void {
                 $this->preSerializeEntity($entity);
             }
         );
@@ -601,8 +604,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     }
 
     /**
-     * Returns an error.
-     *
      * @param array<mixed> $details
      *
      * @return Response|array<string, array<mixed>|int|string|null>
@@ -647,17 +648,15 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             if (isset($statement['internal'])) {
                 unset($where[$key]);
             } elseif (in_array($statement['expr'], ['andX', 'orX'])) {
-                $this->sanitizeWhereClauseArrayFromRequest($statement['val']);
+                $this->sanitizeWhereClauseArrayFromRequest($where[$key]['val']);
             }
         }
     }
 
     /**
      * @param array<int, array<string|int>> $errors
-     * @param array<int, object|null>       $entities
-     *
-     * @phpstan-param E|null $entity
-     * @phpstan-param array<int, E|null> $entities
+     * @param E|null                        $entity
+     * @param array<int, E|null>            $entities
      */
     protected function setBatchError(int $key, string $msg, int $code, array &$errors, array &$entities = [], ?object $entity = null): void
     {
@@ -686,7 +685,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $context = $apiSerializationContextEvent->getContext();
         }
 
-        if (!empty($this->serializerGroups)) {
+        if ([] !== $this->serializerGroups) {
             $context->setGroups($this->serializerGroups);
         }
 
@@ -730,7 +729,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         $batchLimit = (int) $this->coreParametersHelper->get('api_batch_max_limit', 200);
         if (count($parameters) > $batchLimit) {
-            return $this->returnError($this->translator->trans('mautic.api.call.batch_exception', ['%limit%' => $batchLimit]));
+            return $this->returnError($this->translator->trans('mautic.api.call.batch_exception', ['%limit%' => $batchLimit]), Response::HTTP_BAD_REQUEST);
         }
 
         return true;
@@ -755,5 +754,30 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     protected function getTotalCountTtl(): ?int
     {
         return null;
+    }
+
+    /**
+     * Returns filters for users who may only view their own entities.
+     *
+     * Child controllers can override this when "own" is not equivalent to "created by".
+     *
+     * @return array<int, array{
+     *     column?: string,
+     *     expr?: string,
+     *     value?: int|null,
+     *     group?: array<int, array<int, array{
+     *         column: string,
+     *         expr: string,
+     *         value?: int|null,
+     *     }>>,
+     * }>
+     */
+    protected function getOwnEntityListFilters(string $tableAlias, User $user): array
+    {
+        return [[
+            'column' => $tableAlias.'.createdBy',
+            'expr'   => 'eq',
+            'value'  => $user->getId(),
+        ]];
     }
 }

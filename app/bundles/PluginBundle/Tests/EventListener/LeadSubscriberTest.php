@@ -14,19 +14,19 @@ use Mautic\PluginBundle\Model\PluginModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class LeadSubscriberTest extends TestCase
+final class LeadSubscriberTest extends TestCase
 {
     private LeadSubscriber $subscriber;
 
     /**
-     * @var IntegrationEntityRepository|MockObject
+     * @var MockObject&IntegrationEntityRepository
      */
-    private $integrationEntityRepository;
+    private MockObject $integrationEntityRepository;
 
     /**
-     * @var IntegrationRepository|MockObject
+     * @var MockObject&IntegrationRepository
      */
-    private $integrationRepository;
+    private MockObject $integrationRepository;
 
     protected function setUp(): void
     {

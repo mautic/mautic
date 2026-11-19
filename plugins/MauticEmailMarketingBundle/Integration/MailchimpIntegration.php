@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType;
 
-class MailchimpIntegration extends EmailAbstractIntegration
+final class MailchimpIntegration extends EmailAbstractIntegration
 {
     public function getName(): string
     {
@@ -51,7 +51,6 @@ class MailchimpIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @param array $settings
      * @param array $parameters
      *
      * @return bool|string
@@ -65,17 +64,15 @@ class MailchimpIntegration extends EmailAbstractIntegration
             $data = $this->makeRequest('https://login.mailchimp.com/oauth2/metadata');
 
             return $this->extractAuthKeys($data, 'dc');
-        } else {
-            return $error;
         }
+
+        return $error;
     }
 
     /**
-     * @param array $settings
-     *
      * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         if (isset($settings['list'])) {
             // Ajax update
@@ -130,9 +127,11 @@ class MailchimpIntegration extends EmailAbstractIntegration
 
         if (empty($mappedData)) {
             return false;
-        } elseif (empty($mappedData['EMAIL'])) {
+        }
+        if (empty($mappedData['EMAIL'])) {
             return false;
-        } elseif (!isset($config['list_settings'])) {
+        }
+        if (!isset($config['list_settings'])) {
             return false;
         }
 

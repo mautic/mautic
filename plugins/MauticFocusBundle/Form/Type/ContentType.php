@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -13,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<string, mixed>>
  */
-class ContentType extends AbstractType
+final class ContentType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -22,7 +24,7 @@ class ContentType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.focus.form.headline',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'onblur'       => 'Mautic.focusUpdatePreview()',
@@ -37,7 +39,7 @@ class ContentType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.focus.form.tagline',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'placeholder'  => 'mautic.core.optional',
@@ -53,7 +55,7 @@ class ContentType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.focus.form.link_text',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'onblur'       => 'Mautic.focusUpdatePreview()',
@@ -67,7 +69,7 @@ class ContentType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.focus.form.link_url',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'onblur'       => 'Mautic.focusUpdatePreview()',
@@ -111,7 +113,7 @@ class ContentType extends AbstractType
                     'Verdana'                  => 'Verdana, Geneva, sans-serif',
                 ],
                 'label'            => 'mautic.focus.form.font',
-                'label_attr'       => ['class' => 'control-label'],
+                'label_attr'       => ['class' => 'form-label'],
                 'attr'             => [
                     'class'        => 'form-control',
                     'onchange'     => 'Mautic.focusUpdatePreview()',
@@ -127,7 +129,7 @@ class ContentType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.focus.form.custom.css',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'rows'         => 6,

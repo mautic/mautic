@@ -8,7 +8,7 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class RedisTagAwareAdapter extends TagAwareAdapter
+final class RedisTagAwareAdapter extends TagAwareAdapter
 {
     use RedisAdapterTrait;
 
@@ -26,8 +26,8 @@ class RedisTagAwareAdapter extends TagAwareAdapter
         int $lifetime,
 
         #[Autowire(env: 'bool:MAUTIC_REDIS_PRIMARY_ONLY')]
-        bool $primaryOnly)
-    {
+        bool $primaryOnly,
+    ) {
         $client = $this->createClient($servers, $primaryOnly);
 
         parent::__construct(

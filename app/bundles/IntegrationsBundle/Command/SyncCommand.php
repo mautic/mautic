@@ -7,30 +7,34 @@ namespace Mautic\IntegrationsBundle\Command;
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class SyncCommand extends Command
+#[AsCommand(
+    name: SyncCommand::NAME,
+    description: 'Fetch objects from integration.'
+)]
+final class SyncCommand extends Command
 {
     public const NAME = 'mautic:integrations:sync';
 
     public function __construct(
-        private SyncServiceInterface $syncService,
+        private readonly SyncServiceInterface $syncService,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this->setName(self::NAME)
+        $this
             ->addArgument(
                 'integration',
                 InputOption::VALUE_REQUIRED,
-                'Fetch objects from integration.',
-                null
+                'Fetch objects from integration.'
             )
             ->addOption(
                 '--start-datetime',
@@ -103,10 +107,10 @@ class SyncCommand extends Command
         }
 
         try {
-            defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS') or define('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS', $inputOptions->getIntegration());
+            defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS') || define('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS', $inputOptions->getIntegration());
 
             // Tell audit log to use integration name rather than "System"
-            defined('MAUTIC_AUDITLOG_USER') or define('MAUTIC_AUDITLOG_USER', $inputOptions->getIntegration());
+            defined('MAUTIC_AUDITLOG_USER') || define('MAUTIC_AUDITLOG_USER', $inputOptions->getIntegration());
 
             $this->syncService->processIntegrationSync($inputOptions);
         } catch (\Throwable $e) {
@@ -123,6 +127,4 @@ class SyncCommand extends Command
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Fetch objects from integration.';
 }

@@ -10,7 +10,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use Mautic\IntegrationsBundle\Sync\SyncJudge\Modes\FuzzyEvidence;
 use PHPUnit\Framework\TestCase;
 
-class FuzzyEvidenceTest extends TestCase
+final class FuzzyEvidenceTest extends TestCase
 {
     public function testLeftWinnerWithCertainChangeDateTime(): void
     {

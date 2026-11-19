@@ -11,26 +11,20 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 
-class CampaignEventHelper
+final class CampaignEventHelper
 {
-    /**
-     * @var array
-     */
-    protected $clickthrough = [];
+    private array $clickthrough = [];
 
     public function __construct(
-        protected IntegrationHelper $integrationHelper,
-        protected TrackableModel $trackableModel,
-        protected PageTokenHelper $pageTokenHelper,
-        protected AssetTokenHelper $assetTokenHelper,
-        protected TweetModel $tweetModel,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly TrackableModel $trackableModel,
+        private readonly PageTokenHelper $pageTokenHelper,
+        private readonly AssetTokenHelper $assetTokenHelper,
+        private readonly TweetModel $tweetModel,
     ) {
     }
 
-    /**
-     * @return array|false
-     */
-    public function sendTweetAction(Lead $lead, array $event)
+    public function sendTweetAction(Lead $lead, array $event): array|false
     {
         $tweetSent   = false;
         $tweetEntity = $this->tweetModel->getEntity($event['channelId']);
@@ -83,16 +77,14 @@ class CampaignEventHelper
      * PreParse the twitter message and replace placeholders with values.
      *
      * @param string $text
-     * @param array  $lead
-     * @param int    $channelId
      *
      * @return string|string[]
      */
-    protected function parseTweetText($text, $lead, $channelId = -1): array|string
+    private function parseTweetText($text, array $lead, ?int $channelId = -1): array|string
     {
         $tweetHandle = $lead['twitter'];
         $tokens      = [
-            '{twitter_handle}' => (str_contains($tweetHandle, '@')) ? $tweetHandle : "@$tweetHandle",
+            '{twitter_handle}' => (str_contains($tweetHandle, '@')) ? $tweetHandle : "@{$tweetHandle}",
         ];
 
         $tokens = array_merge(
@@ -114,7 +106,7 @@ class CampaignEventHelper
          * @var Trackable $trackable
          */
         foreach ($trackables as $token => $trackable) {
-            $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $this->clickthrough);
+            $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, array_merge($this->clickthrough, ['lead' => $lead['id']]));
         }
 
         return str_replace(array_keys($tokens), array_values($tokens), $text);

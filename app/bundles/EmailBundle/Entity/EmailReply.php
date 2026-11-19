@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -9,9 +11,9 @@ use Ramsey\Uuid\Uuid;
 
 class EmailReply
 {
-    private string $id;
+    private readonly string $id;
 
-    private \DateTimeInterface $dateReplied;
+    private readonly \DateTimeInterface $dateReplied;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -58,9 +60,9 @@ class EmailReply
      * @param string $messageId
      */
     public function __construct(
-        private Stat $stat,
+        private readonly Stat $stat,
         private $messageId,
-        \DateTime $dateReplied = null,
+        ?\DateTime $dateReplied = null,
     ) {
         $this->id          = Uuid::uuid4()->toString();
         $this->dateReplied = $dateReplied ?? new \DateTime();
@@ -71,18 +73,12 @@ class EmailReply
         return $this->id;
     }
 
-    /**
-     * @return Stat
-     */
-    public function getStat()
+    public function getStat(): Stat
     {
         return $this->stat;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateReplied()
+    public function getDateReplied(): \DateTimeInterface
     {
         return $this->dateReplied;
     }

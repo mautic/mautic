@@ -6,31 +6,38 @@ use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UpdateLeadListsCommand extends ModeratedCommand
+#[AsCommand(
+    name: UpdateLeadListsCommand::NAME,
+    description: 'Update contacts in smart segments based on new contact data.',
+    aliases: ['mautic:segments:rebuild']
+)]
+final class UpdateLeadListsCommand extends ModeratedCommand
 {
     public const NAME = 'mautic:segments:update';
 
     public function __construct(
-        private ListModel $listModel,
-        private TranslatorInterface $translator,
+        private readonly ListModel $listModel,
+        private readonly TranslatorInterface $translator,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
+        private readonly LeadListRepository $leadListRepository,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setName('mautic:segments:update')
-            ->setAliases(['mautic:segments:rebuild'])
             ->addOption(
                 '--batch-limit',
                 '-b',
@@ -74,17 +81,13 @@ class UpdateLeadListsCommand extends ModeratedCommand
     {
         $id                    = $input->getOption('list-id');
         $batch                 = $input->getOption('batch-limit');
-        $max                   = $input->getOption('max-contacts');
+        $max                   = $input->getOption('max-contacts') ? (int) $input->getOption('max-contacts') : null;
         $enableTimeMeasurement = (bool) $input->getOption('timing');
         $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
         $excludeSegments       = $input->getOption('exclude');
 
-        if (is_numeric($max)) {
-            $max = (int) $max;
-        }
-
         if (!$this->checkRunStatus($input, $output, $id)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         if ($enableTimeMeasurement) {
@@ -97,10 +100,21 @@ class UpdateLeadListsCommand extends ModeratedCommand
             if (!$list) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.lead.list.rebuild.not_found', ['%id%' => $id]).'</error>');
 
-                return \Symfony\Component\Console\Command\Command::FAILURE;
+                return Command::FAILURE;
             }
 
-            $this->rebuildSegment($list, $batch, $max, $output);
+            // Track already rebuilt lists to avoid rebuilding them multiple times
+            $rebuiltLists = [];
+
+            // First check if this segment has dependencies and rebuild them
+            if ($list->hasFilterTypeOf('leadlist')) {
+                $this->rebuildDependentSegments($list, $rebuiltLists, $batch, $max, $output, $enableTimeMeasurement, [], $excludeSegments);
+            }
+
+            // Add the current list ID to the rebuilt lists to avoid rebuilding it again
+            $rebuiltLists[] = (int) $list->getId();
+
+            $this->rebuildSegment($list, $batch, $max, $output, $enableTimeMeasurement);
         } else {
             $filter = [
                 'iterable_mode' => true,
@@ -111,24 +125,36 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     'force' => [
                         [
                             'expr'   => 'notIn',
-                            'column' => $this->listModel->getRepository()->getTableAlias().'.id',
+                            'column' => $this->leadListRepository->getTableAlias().'.id',
                             'value'  => $excludeSegments,
                         ],
                     ],
                 ];
             }
-            $leadLists = $this->listModel->getEntities($filter);
 
+            $rebuiltLists = [];
+            $leadLists    = $this->listModel->getEntities($filter);
+
+            /** @var LeadList $leadList */
             foreach ($leadLists as $leadList) {
-                $startTimeForSingleSegment = time();
-                $this->rebuildSegment($leadList, $batch, $max, $output);
-                if ($enableTimeMeasurement) {
-                    $totalTime = round(microtime(true) - $startTimeForSingleSegment, 2);
-                    $output->writeln('<fg=cyan>'.$this->translator->trans('mautic.lead.list.rebuild.contacts.time', ['%time%' => $totalTime]).'</>'."\n");
+                $listId = $leadList->getId();
+
+                // Skip if already rebuilt
+                if (in_array($listId, $rebuiltLists)) {
+                    continue;
                 }
-                unset($leadList);
+
+                // Process any dependent segments first (segments that are used as filters in this segment)
+                if ($leadList->hasFilterTypeOf('leadlist')) {
+                    $this->rebuildDependentSegments($leadList, $rebuiltLists, $batch, $max, $output, $enableTimeMeasurement, [], $excludeSegments);
+                }
+
+                // Add the current list ID to the rebuilt lists to avoid rebuilding it again
+                $rebuiltLists[] = $listId;
+
+                // Rebuild the current segment
+                $this->rebuildSegment($leadList, $batch, $max, $output, $enableTimeMeasurement);
             }
-            unset($leadLists);
         }
 
         $this->completeRun();
@@ -138,28 +164,140 @@ class UpdateLeadListsCommand extends ModeratedCommand
             $output->writeln('<fg=magenta>'.$this->translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime]).'</>'."\n");
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
-    private function rebuildSegment(LeadList $segment, int $batch, int $max, OutputInterface $output): void
-    {
-        if ($segment->isPublished()) {
-            $output->writeln('<info>'.$this->translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $segment->getId()]).'</info>');
-            $startTime   = microtime(true);
-            $processed   = $this->listModel->rebuildListLeads($segment, $batch, $max, $output);
-            $rebuildTime = round(microtime(true) - $startTime, 2);
-            if (0 >= (int) $max) {
-                // Only full segment rebuilds count
-                $segment->setLastBuiltDateToCurrentDatetime();
-                $segment->setLastBuiltTime($rebuildTime);
-                $this->listModel->saveEntity($segment);
-            }
+    /**
+     * @param array<int>        $rebuiltLists    List of segment IDs that have already been rebuilt
+     * @param array<int>        $dependencyChain Chain of segment IDs to detect circular dependencies
+     * @param array<int|string> $excludeSegments List of segment IDs to exclude from rebuilding
+     *
+     * @param-out array<int> $rebuiltLists Updated list of segment IDs that have been rebuilt
+     */
+    private function rebuildDependentSegments(
+        LeadList $leadList,
+        array &$rebuiltLists,
+        int $batch,
+        ?int $max,
+        OutputInterface $output,
+        bool $enableTimeMeasurement,
+        array $dependencyChain = [],
+        array $excludeSegments = [],
+    ): void {
+        // Track the current segment in our dependency chain
+        $currentId         = $leadList->getId();
+        $dependencyChain[] = $currentId;
 
-            $output->writeln(
-                '<comment>'.$this->translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
-            );
+        foreach ($leadList->getFilters() as $filter) {
+            if ('leadlist' === $filter['type']) {
+                foreach ($filter['filter'] ?? [] as $dependentListId) {
+                    $dependentListId = (int) $dependentListId;
+
+                    // Skip if already rebuilt or in exclude list
+                    if (in_array($dependentListId, $rebuiltLists) || in_array($dependentListId, $excludeSegments)) {
+                        continue;
+                    }
+
+                    // Check for circular dependency
+                    if (in_array($dependentListId, $dependencyChain)) {
+                        $output->writeln(
+                            '<error>'.$this->translator->trans(
+                                'Circular dependency detected in segment chain: %chain%',
+                                ['%chain%' => implode(' → ', array_merge($dependencyChain, [$dependentListId]))]
+                            ).'</error>'
+                        );
+                        continue; // Skip this dependency to prevent infinite recursion
+                    }
+
+                    $dependentLeadList = $this->listModel->getEntity($dependentListId);
+                    if (!$dependentLeadList) {
+                        continue; // Skip if the dependent segment doesn't exist - it may have been deleted
+                    }
+
+                    // Check if this dependent segment has its own dependencies
+                    if ($dependentLeadList->hasFilterTypeOf('leadlist')) {
+                        // Recursively process this segment's dependencies first, passing the current chain
+                        $this->rebuildDependentSegments(
+                            $dependentLeadList,
+                            $rebuiltLists,
+                            $batch,
+                            $max,
+                            $output,
+                            $enableTimeMeasurement,
+                            $dependencyChain,
+                            $excludeSegments
+                        );
+                    }
+
+                    // Now rebuild this dependent segment
+                    $this->rebuildSegment($dependentLeadList, $batch, $max, $output, $enableTimeMeasurement);
+                    $rebuiltLists[] = $dependentListId;
+                }
+            }
         }
     }
 
-    protected static $defaultDescription = 'Update contacts in smart segments based on new contact data.';
+    private function rebuildSegment(LeadList $segment, int $batch, ?int $max, OutputInterface $output, bool $enableTimeMeasurement = false): void
+    {
+        if (!$segment->isPublished()) {
+            return;
+        }
+
+        $output->writeln('<info>'.$this->translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $segment->getId()]).'</info>');
+        $lastBuiltDateBefore = $segment->getLastBuiltDate();
+        $startTime           = microtime(true);
+        $processed           = $this->listModel->rebuildListLeads($segment, $batch, $max, $output);
+        $rebuildTime         = round(microtime(true) - $startTime, 2);
+
+        // ListModel sets lastBuiltDate only when membership work is fully finished
+        // (including runs capped by --max-contacts that still drain the queue).
+        if ($segment->getLastBuiltDate() !== $lastBuiltDateBefore) {
+            if (!$this->areSegmentFilterDependenciesComplete($segment)) {
+                $segment->setLastBuiltDate(null);
+            } else {
+                $segment->setLastBuiltTime($rebuildTime);
+            }
+
+            $this->listModel->saveEntity($segment);
+        }
+
+        $output->writeln(
+            '<comment>'.$this->translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
+        );
+
+        if ($enableTimeMeasurement) {
+            $output->writeln('<fg=cyan>'.$this->translator->trans(
+                'mautic.lead.list.rebuild.contacts.time',
+                ['%time%' => $rebuildTime]
+            ).'</>'."\n");
+        }
+    }
+
+    /**
+     * A segment that filters on other segments must not be marked complete while
+     * any of those dependencies still need rebuilding (e.g. after a capped run).
+     */
+    private function areSegmentFilterDependenciesComplete(LeadList $segment): bool
+    {
+        foreach ($segment->getFilters() as $filter) {
+            if ('leadlist' !== $filter['type']) {
+                continue;
+            }
+
+            foreach ($filter['filter'] ?? [] as $dependentListId) {
+                $dependentListId = (int) $dependentListId;
+                $dependentList   = $this->listModel->getEntity($dependentListId);
+
+                if (!$dependentList instanceof LeadList) {
+                    continue;
+                }
+
+                if ($dependentList->needsRebuild()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }

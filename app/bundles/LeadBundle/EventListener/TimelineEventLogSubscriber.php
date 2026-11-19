@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -8,7 +10,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class TimelineEventLogSubscriber implements EventSubscriberInterface
+final class TimelineEventLogSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 

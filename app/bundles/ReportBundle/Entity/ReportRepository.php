@@ -10,6 +10,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class ReportRepository extends CommonRepository
 {
+    public const SEARCH_COMMAND_SOURCE = 'mautic.report.report.searchcommand.source';
+
     /**
      * Get a list of entities.
      *
@@ -41,25 +43,34 @@ class ReportRepository extends CommonRepository
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
         [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
             case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('r.isPublished', ":$unique");
+                $expr            = $q->expr()->eq('r.isPublished', ":{$unique}");
                 $forceParameters = [$unique => true];
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
             case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('r.isPublished', ":$unique");
+                $expr            = $q->expr()->eq('r.isPublished', ":{$unique}");
                 $forceParameters = [$unique => false];
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
             case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
                 $expr = $q->expr()->eq('IDENTITY(r.createdBy)', $this->currentUser->getId());
+                break;
+            case $this->translator->trans('mautic.report.report.searchcommand.isscheduled'):
+            case $this->translator->trans('mautic.report.report.searchcommand.isscheduled', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('r.isScheduled', ":{$unique}");
+                $forceParameters = [$unique => true];
+                break;
+            case $this->translator->trans(self::SEARCH_COMMAND_SOURCE):
+            case $this->translator->trans(self::SEARCH_COMMAND_SOURCE, [], null, 'en_US'):
+                $expr            = $q->expr()->eq('r.source', ":$unique");
+                $forceParameters = [$unique => $filter->string];
                 break;
         }
 
@@ -69,9 +80,6 @@ class ReportRepository extends CommonRepository
 
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
-        } elseif ($returnParameter) {
-            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
         }
 
         return [$expr, $parameters];
@@ -86,6 +94,8 @@ class ReportRepository extends CommonRepository
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.ismine',
+            'mautic.report.report.searchcommand.isscheduled',
+            self::SEARCH_COMMAND_SOURCE,
         ];
 
         return array_merge($commands, parent::getSearchCommands());

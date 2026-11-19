@@ -13,9 +13,11 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -24,11 +26,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Form>
  */
-class FormType extends AbstractType
+final class FormType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $security,
-        private LanguageHelper $langHelper,
+        private readonly CorePermissions $security,
+        private readonly LanguageHelper $langHelper,
     ) {
     }
 
@@ -40,7 +42,7 @@ class FormType extends AbstractType
         // details
         $builder->add('name', TextType::class, [
             'label'      => 'mautic.core.name',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
 
@@ -61,7 +63,7 @@ class FormType extends AbstractType
 
         $builder->add('formAttributes', TextType::class, [
             'label'      => 'mautic.form.field.form.form_attr',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.form.field.form.form_attr.tooltip',
@@ -71,7 +73,7 @@ class FormType extends AbstractType
 
         $builder->add('description', TextareaType::class, [
             'label'      => 'mautic.core.description',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => ['class' => 'form-control editor'],
             'required'   => false,
         ]);
@@ -84,6 +86,8 @@ class FormType extends AbstractType
                 'bundle' => 'form',
             ]
         );
+
+        $builder->add('projects', ProjectType::class);
 
         $builder->add('template', ThemeListType::class, [
             'include_code_mode' => false,
@@ -133,7 +137,7 @@ class FormType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.form.no_index',
-                'data'  => $options['data']->getNoIndex() ?: false,
+                'data'  => $options['data']->getNoIndex(),
             ]
         );
 
@@ -143,8 +147,7 @@ class FormType extends AbstractType
             [
                 'label' => 'mautic.form.form.progressive_profiling_limit.max_fields',
                 'attr'  => [
-                    'style'       => 'width:100px;',
-                    'class'       => 'form-control',
+                    'class'       => 'form-control form-control-narrow',
                     'tooltip'     => 'mautic.form.form.progressive_profiling_limit.max_fields.tooltip',
                     'placeholder' => 'mautic.form.form.progressive_profiling_limit_unlimited',
                 ],
@@ -168,14 +171,32 @@ class FormType extends AbstractType
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
 
+        $builder->add('submissionLimit', IntegerType::class, [
+            'label'      => 'mautic.form.submission.limit',
+            'attr'       => [
+                'class' => 'form-control form-control-narrow',
+            ],
+            'required'   => false,
+        ]);
+
+        $builder->add('submissionLimitMessage', TextareaType::class, [
+            'label'      => 'mautic.form.submission.limit_message',
+            'attr'       => [
+                'class' => 'form-control',
+                'rows'  => 3,
+            ],
+            'required'   => false,
+        ]);
+
         $builder->add('postAction', ChoiceType::class, [
             'choices' => [
                 'mautic.form.form.postaction.message'  => 'message',
                 'mautic.form.form.postaction.redirect' => 'redirect',
                 'mautic.form.form.postaction.return'   => 'return',
+                'mautic.form.form.postaction.hideform' => 'hideform',
             ],
             'label'             => 'mautic.form.form.postaction',
-            'label_attr'        => ['class' => 'control-label'],
+            'label_attr'        => ['class' => 'form-label'],
             'attr'              => [
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.onPostSubmitActionChange(this.value);',
@@ -185,10 +206,10 @@ class FormType extends AbstractType
         ]);
 
         $postAction = (isset($options['data'])) ? $options['data']->getPostAction() : '';
-        $required   = (in_array($postAction, ['redirect', 'message'])) ? true : false;
+        $required   = in_array($postAction, ['redirect', 'message', 'hideform']);
         $builder->add('postActionProperty', TextType::class, [
             'label'      => 'mautic.form.form.postactionproperty',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'         => 'form-control',
                 'tooltip'       => 'mautic.form.form.postactionproperty.tooltip',
@@ -202,7 +223,6 @@ class FormType extends AbstractType
         ]);
 
         $builder->add('buttons', FormButtonsType::class);
-        $builder->add('formType', HiddenType::class, ['empty_data' => 'standalone']);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

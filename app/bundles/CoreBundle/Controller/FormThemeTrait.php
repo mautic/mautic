@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Twig\Environment;
 
 trait FormThemeTrait
@@ -14,7 +15,7 @@ trait FormThemeTrait
      * @param FormInterface<mixed> $form
      * @param mixed                $themes
      *
-     * @return \Symfony\Component\Form\FormView
+     * @return FormView
      */
     protected function setFormTheme(FormInterface $form, Environment $twig, $themes = null)
     {
@@ -22,7 +23,8 @@ trait FormThemeTrait
 
         // Extract form theme from options if applicable
         $fieldThemes = [];
-        $findThemes  = function ($form, $formView) use ($twig, &$findThemes, &$fieldThemes): void {
+
+        $findThemes  = function (FormInterface $form, FormView $formView) use ($twig, &$findThemes, &$fieldThemes): void {
             /** @var Form $field */
             foreach ($form as $name => $field) {
                 $fieldView = $formView[$name];

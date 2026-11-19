@@ -12,22 +12,17 @@ use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Stage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExportHelperTest extends TestCase
+final class ExportHelperTest extends TestCase
 {
-    /**
-     * @var MockObject|TranslatorInterface
-     */
-    private MockObject $translatorInterfaceMock;
+    private MockObject&TranslatorInterface $translatorInterfaceMock;
 
-    /**
-     * @var MockObject|CoreParametersHelper
-     */
-    private MockObject $coreParametersHelperMock;
+    private MockObject&CoreParametersHelper $coreParametersHelperMock;
 
     private ExportHelper $exportHelper;
 
@@ -54,27 +49,20 @@ class ExportHelperTest extends TestCase
      */
     private array $filePaths = [];
 
-    /**
-     * @var FilePathResolver|MockObject
-     */
-    private MockObject $filePathResolver;
-
-    /**
-     * @var ProcessSignalService|MockObject
-     */
-    private $processSignalService;
+    private MockObject&FilePathResolver $filePathResolver;
 
     protected function setUp(): void
     {
         $this->translatorInterfaceMock  = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->filePathResolver         = $this->createMock(FilePathResolver::class);
-        $this->processSignalService     = $this->createMock(ProcessSignalService::class);
+
         $this->exportHelper             = new ExportHelper(
             $this->translatorInterfaceMock,
             $this->coreParametersHelperMock,
             $this->filePathResolver,
-            $this->processSignalService
+            $this->createStub(ProcessSignalService::class),
+            $this->createStub(EventDispatcherInterface::class),
         );
     }
 
@@ -86,6 +74,100 @@ class ExportHelperTest extends TestCase
             }
         }
         parent::tearDown();
+    }
+
+    public function testDownloadAsZip(): void
+    {
+        $tempDir     = sys_get_temp_dir();
+        $zipFilePath = $tempDir.'/test-download.zip';
+        $zip         = new \ZipArchive();
+        $zip->open($zipFilePath, \ZipArchive::CREATE);
+        $zip->addFromString('test.txt', 'This is test content');
+        $zip->close();
+
+        $this->filePaths[] = $zipFilePath;
+
+        $response = $this->exportHelper->downloadAsZip($zipFilePath, 'exported.zip');
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('application/zip', $response->headers->get('Content-Type'));
+        $this->assertSame('attachment; filename="exported.zip"', $response->headers->get('Content-Disposition'));
+    }
+
+    public function testWriteToZipFileIncludesAssets(): void
+    {
+        $tempDir = sys_get_temp_dir();
+
+        // Create temporary asset files
+        $assetFilePath1 = tempnam($tempDir, 'asset_test1');
+        file_put_contents($assetFilePath1, 'Asset content 1');
+
+        $assetFilePath2 = tempnam($tempDir, 'asset_test2');
+        file_put_contents($assetFilePath2, 'Asset content 2');
+
+        $assetList  = [$assetFilePath1, $assetFilePath2];
+        $jsonOutput = json_encode(['key' => 'value']);
+
+        // Call the method
+        $zipFilePath = $this->exportHelper->writeToZipFile($jsonOutput, $assetList, '');
+
+        // Open the ZIP file and verify contents
+        $zip = new \ZipArchive();
+        $zip->open($zipFilePath);
+
+        $this->assertNotFalse($zip->locateName('entity_data.json'));
+        $this->assertNotFalse($zip->locateName('assets/'.basename($assetFilePath1)));
+        $this->assertNotFalse($zip->locateName('assets/'.basename($assetFilePath2)));
+
+        $zip->close();
+
+        // Clean up
+        unlink($assetFilePath1);
+        unlink($assetFilePath2);
+        unlink($zipFilePath);
+    }
+
+    public function testWriteToZipFileIncludesAssetsWithCustomPath(): void
+    {
+        $filesystem = new Filesystem();
+        $tempDir    = sys_get_temp_dir();
+        $customDir  = $tempDir.'/export_test_'.uniqid();
+        $filesystem->mkdir($customDir);
+
+        // Create temporary asset files
+        $assetFilePath1 = tempnam($tempDir, 'asset_test1');
+        file_put_contents($assetFilePath1, 'Asset content 1');
+
+        $assetFilePath2 = tempnam($tempDir, 'asset_test2');
+        file_put_contents($assetFilePath2, 'Asset content 2');
+
+        $assetList  = [$assetFilePath1, $assetFilePath2];
+        $jsonOutput = json_encode(['key' => 'value']);
+
+        // Pre-create entity_data.json to trigger unlink in method
+        $jsonFilePath = sprintf('%s/entity_data.json', $customDir);
+        file_put_contents($jsonFilePath, 'Old content');
+        $this->assertFileExists($jsonFilePath);
+
+        // Call the method with custom path
+        $zipFilePath = $this->exportHelper->writeToZipFile($jsonOutput, $assetList, $customDir);
+
+        $this->assertFileExists($zipFilePath);
+        $this->assertStringStartsWith($customDir, $zipFilePath);
+
+        // Open the ZIP file and verify contents
+        $zip = new \ZipArchive();
+        $zip->open($zipFilePath);
+
+        $this->assertNotFalse($zip->locateName('entity_data.json'));
+        $this->assertNotFalse($zip->locateName('assets/'.basename($assetFilePath1)));
+        $this->assertNotFalse($zip->locateName('assets/'.basename($assetFilePath2)));
+
+        $zip->close();
+        $this->assertFileDoesNotExist($jsonFilePath);
+
+        // Clean up using Symfony Filesystem
+        $filesystem->remove([$assetFilePath1, $assetFilePath2, $zipFilePath, $customDir]);
     }
 
     /**
@@ -154,7 +236,7 @@ class ExportHelperTest extends TestCase
 
         $result   = $this->exportHelper->parseLeadToExport($lead);
         $expected = $leadFieldsData + ['stage' => 'Stage 3'];
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     public function testSupportedExportTypes(): void
@@ -163,7 +245,7 @@ class ExportHelperTest extends TestCase
             ExportHelper::EXPORT_TYPE_CSV,
             ExportHelper::EXPORT_TYPE_EXCEL,
         ];
-        Assert::assertSame($fileTypes, $this->exportHelper->getSupportedExportTypes());
+        $this->assertSame($fileTypes, $this->exportHelper->getSupportedExportTypes());
     }
 
     public function testExportDataAsInvalidData(): void
@@ -192,8 +274,8 @@ class ExportHelperTest extends TestCase
     public function testExportDataAsExcel(): void
     {
         $stream = $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_EXCEL, 'demo.xlsx');
-        Assert::assertSame(200, $stream->getStatusCode());
-        Assert::assertFalse($stream->isEmpty());
+        $this->assertSame(200, $stream->getStatusCode());
+        $this->assertFalse($stream->isEmpty());
 
         ob_start();
         $stream->sendContent();
@@ -253,7 +335,7 @@ class ExportHelperTest extends TestCase
             ExportHelper::EXPORT_TYPE_CSV,
             'demo.csv'
         );
-        Assert::assertFileExists($filePath);
+        $this->assertFileExists($filePath);
         $spreadsheet = IOFactory::load('/tmp/demo.csv');
         $this->assertSame(1, $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
         $this->assertSame('Mautibot', $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
@@ -266,8 +348,8 @@ class ExportHelperTest extends TestCase
             ExportHelper::EXPORT_TYPE_CSV,
             'demo.csv' // give same file name
         );
-        Assert::assertSame('/tmp/demo_1.csv', $filePath2);
-        Assert::assertFileExists($filePath2);
+        $this->assertSame('/tmp/demo_1.csv', $filePath2);
+        $this->assertFileExists($filePath2);
         $spreadsheet = IOFactory::load('/tmp/demo_1.csv');
         $this->assertSame(1, $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
         $this->assertSame('Mautibot', $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
@@ -275,7 +357,7 @@ class ExportHelperTest extends TestCase
         $this->assertSame('Demo', $spreadsheet->getActiveSheet()->getCell('B3')->getValue());
 
         $this->filePaths[] = $zipFilePath = $this->exportHelper->zipFile($filePath, 'contacts_export.csv');
-        Assert::assertFileExists($zipFilePath);
+        $this->assertFileExists($zipFilePath);
     }
 
     /**
@@ -283,7 +365,7 @@ class ExportHelperTest extends TestCase
      */
     private function removeBomUtf8(string $s): string
     {
-        if (substr($s, 0, 3) == chr(hexdec('EF')).chr(hexdec('BB')).chr(hexdec('BF'))) {
+        if (substr($s, 0, 3) === chr(hexdec('EF')).chr(hexdec('BB')).chr(hexdec('BF'))) {
             return substr($s, 3);
         }
 
@@ -309,12 +391,12 @@ class ExportHelperTest extends TestCase
 
         $iteratorExportDataModelMock->method('current')
             ->willReturnCallback(
-                fn () => $iteratorData->array[$iteratorData->position]
+                fn (): mixed => $iteratorData->array[$iteratorData->position]
             );
 
         $iteratorExportDataModelMock->method('key')
             ->willReturnCallback(
-                fn () => $iteratorData->position
+                fn (): int => $iteratorData->position
             );
 
         $iteratorExportDataModelMock->method('next')
@@ -326,7 +408,7 @@ class ExportHelperTest extends TestCase
 
         $iteratorExportDataModelMock->method('valid')
             ->willReturnCallback(
-                fn () => isset($iteratorData->array[$iteratorData->position])
+                fn (): bool => isset($iteratorData->array[$iteratorData->position])
             );
 
         return $iteratorExportDataModelMock;

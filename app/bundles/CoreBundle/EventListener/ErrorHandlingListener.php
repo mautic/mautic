@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
@@ -8,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ErrorHandlingListener implements EventSubscriberInterface
+final readonly class ErrorHandlingListener implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
@@ -17,7 +19,7 @@ class ErrorHandlingListener implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(LoggerInterface $logger, LoggerInterface $mainLogger, LoggerInterface $debugLogger = null)
+    public function __construct(LoggerInterface $logger, LoggerInterface $mainLogger, ?LoggerInterface $debugLogger = null)
     {
         ErrorHandler::getHandler()
             ->setLogger($logger)

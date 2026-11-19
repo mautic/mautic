@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 /**
  * @extends CommonRepository<VideoHit>
  */
-class VideoHitRepository extends CommonRepository
+final class VideoHitRepository extends CommonRepository
 {
     use TimelineTrait;
 
@@ -24,7 +24,7 @@ class VideoHitRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $query->select('h.id, h.url, h.date_hit, h.time_watched, h.duration, h.referer, h.user_agent')
+        $query->select('h.id, h.lead_id, h.url, h.date_hit, h.time_watched, h.duration, h.referer, h.user_agent')
             ->from(MAUTIC_TABLE_PREFIX.'video_hits', 'h');
 
         if ($leadId) {
@@ -33,8 +33,8 @@ class VideoHitRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('h.url', $query->expr()->literal('%'.$options['search'].'%'))
-            );
+                $query->expr()->like('h.url', ':search')
+            )->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'h.url', 'h.date_hit', [], ['date_hit'], null, 'h.id');

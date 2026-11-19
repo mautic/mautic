@@ -7,17 +7,21 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<array<string>|null, string|null>
  */
-class ArrayLinebreakTransformer implements DataTransformerInterface
+final class ArrayLinebreakTransformer implements DataTransformerInterface
 {
     /**
      * @param array<string>|null $array
      *
      * @return string
      */
-    public function transform($array)
+    public function transform(mixed $array): mixed
     {
-        if (null === $array) {
+        if (null === $array || '' === $array) {
             return '';
+        }
+
+        if (is_string($array)) {
+            return $array;
         }
 
         return implode("\n", $array);
@@ -28,12 +32,12 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
      *
      * @return array<string>
      */
-    public function reverseTransform($string)
+    public function reverseTransform(mixed $string): mixed
     {
         if (!$string) {
             return [];
         }
 
-        return array_map('trim', explode("\n", $string));
+        return array_map(trim(...), explode("\n", $string));
     }
 }

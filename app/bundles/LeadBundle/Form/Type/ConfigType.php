@@ -11,12 +11,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -56,13 +57,27 @@ class ConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.lead.background.import.if.more.rows.than',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.background.import.if.more.rows.than.tooltip',
                 ],
             ]
         );
+
+        $builder->add('contact_export_limit', NumberType::class, [
+            'label'      => 'mautic.lead.export.limit.rows',
+            'label_attr' => ['class' => 'form-label'],
+            'attr'       => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.lead.export.limit.rows.tooltip',
+            ],
+            'required'    => false,
+            'data'        => $options['data']['contact_export_limit'] ?? 0,
+            'constraints' => [
+                new GreaterThanOrEqual(value: 0),
+            ],
+        ]);
 
         $formModifier = static function (FormInterface $form, $currentColumns): void {
             $order        = [];
@@ -76,7 +91,7 @@ class ConfigType extends AbstractType
                 ContactColumnsType::class,
                 [
                     'label'       => 'mautic.config.tab.columns',
-                    'label_attr'  => ['class' => 'control-label'],
+                    'label_attr'  => ['class' => 'form-label'],
                     'attr'        => [
                         'class'         => 'form-control multiselect',
                         'data-sortable' => 'true',
@@ -87,7 +102,7 @@ class ConfigType extends AbstractType
                     'expanded'    => false,
                     'constraints' => [
                         new NotBlank(
-                            ['message' => 'mautic.core.value.required']
+                            message: 'mautic.core.value.required'
                         ),
                     ],
                     'data'=> array_flip($orderColumns),
@@ -122,6 +137,18 @@ class ConfigType extends AbstractType
                 'data'  => $options['data']['contact_export_in_background'] ?? false,
                 'attr'  => [
                     'tooltip' => 'mautic.lead.background.export.csv.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'contact_export_notify_admins',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.lead.export.notify.admins',
+                'data'  => $options['data']['contact_export_notify_admins'] ?? true,
+                'attr'  => [
+                    'tooltip' => 'mautic.lead.export.notify.admins.tooltip',
                 ],
             ]
         );

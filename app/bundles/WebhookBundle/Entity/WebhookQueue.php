@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\DBAL\Platforms\MySQLPlatform;
@@ -9,47 +11,36 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class WebhookQueue
 {
-    /**
-     * @var int|null
-     */
-    private $id;
+    public const TABLE_NAME = 'webhook_queue';
 
-    /**
-     * @var Webhook
-     */
-    private $webhook;
+    private ?string $id = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $dateAdded;
+    private ?Webhook $webhook = null;
 
-    /**
-     * @var string|null
-     */
-    private $payload; // @phpstan-ignore-line (BC: plain payload is fetched by ORM)
+    private ?\DateTime $dateAdded = null;
+
+    private ?\DateTimeImmutable $dateModified = null;
 
     /**
      * @var string|resource|null
      */
     private $payloadCompressed;
 
-    /**
-     * @var Event
-     **/
-    private $event;
+    private ?Event $event = null;
+
+    private int $retries = 0;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('webhook_queue')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(WebhookQueueRepository::class);
-        $builder->addId();
+        $builder->addBigIntIdField();
         $builder->createManyToOne('webhook', 'Webhook')
             ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
         $builder->addNullableField('dateAdded', Types::DATETIME_MUTABLE, 'date_added');
-        $builder->addNullableField('payload', Types::TEXT);
+        $builder->addNullableField('dateModified', Types::DATETIME_IMMUTABLE, 'date_modified');
         $builder->createField('payloadCompressed', Types::BLOB)
             ->columnName('payload_compressed')
             ->nullable()
@@ -59,50 +50,36 @@ class WebhookQueue
             ->inversedBy('queues')
             ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
             ->build();
+        $builder->createField('retries', Types::SMALLINT)
+            ->columnName('retries')
+            ->option('unsigned', true)
+            ->option('default', 0)
+            ->build();
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    /**
-     * @return Webhook|null
-     */
-    public function getWebhook()
+    public function getWebhook(): ?Webhook
     {
         return $this->webhook;
     }
 
-    /**
-     * @param Webhook|null $webhook
-     *
-     * @return WebhookQueue
-     */
-    public function setWebhook($webhook)
+    public function setWebhook(?Webhook $webhook): static
     {
         $this->webhook = $webhook;
 
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTime
     {
         return $this->dateAdded;
     }
 
-    /**
-     * @param \DateTime|null $dateAdded
-     *
-     * @return WebhookQueue
-     */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded(?\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -112,13 +89,8 @@ class WebhookQueue
     /**
      * @return string|null
      */
-    public function getPayload()
+    public function getPayload(): string|false|null
     {
-        if (null !== $this->payload) {
-            // BC: plain payload is fetched by ORM
-            return $this->payload;
-        }
-
         if (null === $this->payloadCompressed) {
             // no payload is set
             return null;
@@ -136,32 +108,46 @@ class WebhookQueue
 
     /**
      * @param string $payload
-     *
-     * @return WebhookQueue
      */
-    public function setPayload($payload)
+    public function setPayload($payload): static
     {
         $this->payloadCompressed = gzcompress($payload, 9);
 
         return $this;
     }
 
-    /**
-     * @return Event|null
-     */
-    public function getEvent()
+    public function getEvent(): ?Event
     {
         return $this->event;
     }
 
-    /**
-     * @param Event|null $event
-     *
-     * @return WebhookQueue
-     */
-    public function setEvent($event)
+    public function setEvent(?Event $event): static
     {
         $this->event = $event;
+
+        return $this;
+    }
+
+    public function getRetries(): int
+    {
+        return $this->retries;
+    }
+
+    public function setRetries(int $retries): self
+    {
+        $this->retries = $retries;
+
+        return $this;
+    }
+
+    public function getDateModified(): ?\DateTimeImmutable
+    {
+        return $this->dateModified;
+    }
+
+    public function setDateModified(?\DateTimeImmutable $dateModified): self
+    {
+        $this->dateModified = $dateModified;
 
         return $this;
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\ListModel;
@@ -11,10 +13,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class LeadListType extends AbstractType
+final class LeadListType extends AbstractType
 {
     public function __construct(
-        private ListModel $segmentModel,
+        private readonly ListModel $segmentModel,
     ) {
     }
 
@@ -28,9 +30,9 @@ class LeadListType extends AbstractType
                 $choices = [];
                 foreach ($lists as $l) {
                     if (empty($options['preference_center_only'])) {
-                        $choices[$l['name']] = $l['id'];
+                        $choices[$l['name'].' ('.$l['id'].')'] = $l['id'];
                     } else {
-                        $choices[empty($l['publicName']) ? $l['name'] : $l['publicName']] = $l['id'];
+                        $choices[empty($l['publicName']) ? $l['name'].' ('.$l['id'].')' : $l['publicName'].' ('.$l['id'].')'] = $l['id'];
                     }
                 }
 
@@ -42,7 +44,7 @@ class LeadListType extends AbstractType
         ]);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

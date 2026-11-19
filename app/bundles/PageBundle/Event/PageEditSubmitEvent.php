@@ -10,13 +10,13 @@ use Mautic\PageBundle\Entity\Page;
 final class PageEditSubmitEvent extends CommonEvent
 {
     public function __construct(
-        private Page $previousPage,
-        private Page $currentPage,
-        private bool $saveAndClose,
-        private bool $apply,
-        private bool $saveAsDraft,
-        private bool $applyDraft,
-        private bool $discardDraft,
+        private readonly Page $previousPage,
+        private readonly Page $currentPage,
+        private readonly bool $saveAndClose,
+        private readonly bool $apply,
+        private readonly bool $saveAsDraft,
+        private readonly bool $applyDraft,
+        private readonly bool $discardDraft,
     ) {
     }
 

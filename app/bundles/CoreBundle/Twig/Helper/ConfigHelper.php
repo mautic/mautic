@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -11,7 +13,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
  *
  * <?php echo $view['config']->get('default_timezone', 'UTC'); ?>
  */
-final class ConfigHelper
+final readonly class ConfigHelper
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,

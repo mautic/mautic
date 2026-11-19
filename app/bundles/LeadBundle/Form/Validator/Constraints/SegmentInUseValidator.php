@@ -11,10 +11,10 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class SegmentInUseValidator extends ConstraintValidator
+final class SegmentInUseValidator extends ConstraintValidator
 {
     public function __construct(
-        private ListModel $listModel,
+        private readonly ListModel $listModel,
     ) {
     }
 
@@ -37,6 +37,8 @@ class SegmentInUseValidator extends ConstraintValidator
             $this->context->buildViolation($constraint->message)
                 ->setCode((string) Response::HTTP_UNPROCESSABLE_ENTITY)
                 ->setParameter('%segments%', implode(',', $lists))
+                ->setParameter('%segmentNames%', $leadList->getName())
+                ->atPath('isPublished')
                 ->addViolation();
         }
     }

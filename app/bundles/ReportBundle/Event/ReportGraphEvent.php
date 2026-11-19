@@ -21,10 +21,8 @@ class ReportGraphEvent extends AbstractReportEvent
 
     /**
      * Fetch the graphs.
-     *
-     * @return array
      */
-    public function getGraphs()
+    public function getGraphs(): array
     {
         return $this->requestedGraphs;
     }
@@ -87,10 +85,7 @@ class ReportGraphEvent extends AbstractReportEvent
         return array_keys($this->requestedGraphs);
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): QueryBuilder
     {
         return $this->queryBuilder;
     }

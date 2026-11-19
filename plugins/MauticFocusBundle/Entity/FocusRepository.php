@@ -3,12 +3,15 @@
 namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Focus>
  */
 class FocusRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
     /**
      * @return array
      */
@@ -30,7 +33,7 @@ class FocusRepository extends CommonRepository
             ->select($alias)
             ->from(Focus::class, $alias, $alias.'.id');
 
-        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
+        if (empty($args['iterable_mode'])) {
             $q->leftJoin($alias.'.category', 'c');
         }
 
@@ -52,7 +55,18 @@ class FocusRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        return $this->addStandardSearchCommandWhereClause($q, $filter);
+        return match ($filter->command) {
+            $this->translator->trans('mautic.project.searchcommand.name'),
+            $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
+                $this->_em->getConnection()->createQueryBuilder(),
+                'focus_id',
+                'focus_projects_xref',
+                $this->getTableAlias(),
+                $filter->string,
+                $filter->not
+            ),
+            default => $this->addStandardSearchCommandWhereClause($q, $filter),
+        };
     }
 
     /**
@@ -60,7 +74,9 @@ class FocusRepository extends CommonRepository
      */
     public function getSearchCommands(): array
     {
-        return $this->getStandardSearchCommands();
+        return array_merge([
+            'mautic.project.searchcommand.name',
+        ], $this->getStandardSearchCommands());
     }
 
     /**

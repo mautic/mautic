@@ -1,16 +1,15 @@
-<h4 class="mt-lg fw-sb pa-md">{{'mautic.form.forms'|trans}}</h4>
-<p class="pi-md text-helper">{{'mautic.placeholder_tokens.form.redirect_url'|trans}}</p>
+{% set childContainer %}
+<p class="pi-16 text-helper">{{'mautic.placeholder_tokens.form.redirect_url'|trans}}</p>
 
 <ul id="formTokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
     <!-- Form specific tokens -->
     <li class="panel">
-        <a role="button" id="headingFormTokens" class="accordion-heading collapsed" data-toggle="collapse"
-            data-parent="#formTokensAccordion" href="#collapseFormTokens" aria-expanded="false"
+        <button type="button" id="headingFormTokens" class="accordion-heading collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFormTokens" aria-expanded="false"
             aria-controls="collapseFormTokens">
             <i class="ri-arrow-down-s-line accordion-arrow"></i>
             <span class="accordion-title">{{ 'mautic.placeholder_tokens.form_tokens'|trans }}</span>
-        </a>
-        <div id="collapseFormTokens" class="collapse accordion-wrapper" role="tabpanel"
+        </button>
+        <div id="collapseFormTokens" data-bs-parent="#formTokensAccordion" class="collapse accordion-wrapper" role="tabpanel"
             aria-labelledby="headingFormTokens">
 
             <table class="table table-hover">
@@ -34,3 +33,6 @@
         </div>
     </li>
 </ul>
+{% endset %}
+
+{% include '@MauticCore/Components/content-section.html.twig' with {'heading': 'mautic.form.forms', 'childContainer': childContainer} %}

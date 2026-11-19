@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -12,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<string, mixed>>
  */
-class PropertiesType extends AbstractType
+final class PropertiesType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -104,7 +106,7 @@ class PropertiesType extends AbstractType
                     'mautic.focus.form.when.leave'         => 'leave',
                 ],
                 'label'       => 'mautic.focus.form.when',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'expanded'    => false,
                 'multiple'    => false,
@@ -118,7 +120,7 @@ class PropertiesType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.focus.form.timeout',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'          => 'form-control',
                     'postaddon_text' => 'sec',
@@ -140,7 +142,7 @@ class PropertiesType extends AbstractType
                     'mautic.focus.form.frequency.daily'     => 'daily',
                 ],
                 'label'       => 'mautic.focus.form.frequency',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control', 'tooltip' => 'mautic.focus.form.frequency.help'],
                 'expanded'    => false,
                 'multiple'    => false,
@@ -166,7 +168,7 @@ class PropertiesType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.stop_after_close',
-                'data'  => (isset($options['data']['stop_after_close'])) ? $options['data']['stop_after_close'] : false,
+                'data'  => $options['data']['stop_after_close'] ?? false,
                 'attr'  => [
                     'tooltip' => 'mautic.focus.form.stop_after_close.tooltip',
                 ],

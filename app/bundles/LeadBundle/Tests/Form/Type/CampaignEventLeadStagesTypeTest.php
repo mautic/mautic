@@ -15,9 +15,9 @@ final class CampaignEventLeadStagesTypeTest extends AbstractMauticTestCase
     private CampaignEventLeadStagesType $campaignEventLeadStagesType;
 
     /**
-     * @var FormBuilderInterface&MockObject
+     * @var MockObject&FormBuilderInterface
      */
-    private FormBuilderInterface $formBuilderInterface;
+    private MockObject $formBuilderInterface;
 
     protected function setUp(): void
     {
@@ -31,7 +31,7 @@ final class CampaignEventLeadStagesTypeTest extends AbstractMauticTestCase
     {
         $parameters = [
             'label'       => 'mautic.lead.lead.field.stage',
-            'label_attr'  => ['class' => 'control-label'],
+            'label_attr'  => ['class' => 'form-label'],
             'multiple'    => true,
             'required'    => false,
         ];

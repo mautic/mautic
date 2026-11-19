@@ -7,6 +7,7 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
@@ -31,7 +32,7 @@ final class ObjectMappingRepositoryTest extends TestCase
 
         $this->repository = $this->configureRepository(ObjectMapping::class);
 
-        $this->entityManager->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->entityManager));
+        $this->entityManager->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->entityManager));
 
         // This is terrible, but the Query class is final and AbstractQuery doesn't have some methods used.
         $this->query = $this->getMockBuilder(Query::class)
@@ -57,7 +58,7 @@ final class ObjectMappingRepositoryTest extends TestCase
 
         $this->query->expects($this->once())
             ->method('setParameters')
-            ->with($this->callback(function (ArrayCollection $collection) {
+            ->with($this->callback(function (ArrayCollection $collection): true {
                 /** @var Parameter $parameter */
                 $parameter = $collection[0];
                 $this->assertSame('internalObject', $parameter->getName());

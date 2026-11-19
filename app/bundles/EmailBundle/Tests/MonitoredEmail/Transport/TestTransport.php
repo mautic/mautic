@@ -13,7 +13,7 @@ use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\RawMessage;
 
-class TestTransport implements TransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
+final readonly class TestTransport implements TransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
 {
     private NullTransport $nullTransport;
 
@@ -22,7 +22,7 @@ class TestTransport implements TransportInterface, BounceProcessorInterface, Uns
         $this->nullTransport = new NullTransport();
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         return $this->nullTransport->send($message, $envelope);
     }

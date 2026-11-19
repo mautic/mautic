@@ -23,7 +23,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Message>
  */
-class MessageApiController extends CommonApiController
+final class MessageApiController extends CommonApiController
 {
     /**
      * @var MessageModel|null
@@ -37,14 +37,13 @@ class MessageApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        MessageModel $messageModel,
     ) {
-        $messageModel = $modelFactory->getModel('channel.message');
-        \assert($messageModel instanceof MessageModel);
         $this->model            = $messageModel;
         $this->entityClass      = Message::class;
         $this->entityNameOne    = 'message';
@@ -54,13 +53,14 @@ class MessageApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    protected function prepareParametersFromRequest(FormInterface $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, ?object $entity = null, array $masks = [], array $fields = []): void
     {
         parent::prepareParametersFromRequest($form, $params, $entity, $masks);
 
         if ('PATCH' === $this->requestStack->getCurrentRequest()->getMethod() && !isset($params['channels'])) {
             return;
-        } elseif (!isset($params['channels'])) {
+        }
+        if (!isset($params['channels'])) {
             $params['channels'] = [];
         }
 

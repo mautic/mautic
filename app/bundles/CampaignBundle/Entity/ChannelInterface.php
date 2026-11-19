@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Entity;
 
 interface ChannelInterface
@@ -12,7 +14,7 @@ interface ChannelInterface
     public function setChannel($channel): void;
 
     /**
-     * @return int
+     * @return int|string
      */
     public function getChannelId();
 

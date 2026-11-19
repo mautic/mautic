@@ -10,10 +10,11 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class SlotNameTypeValidator extends ConstraintValidator
+final class SlotNameTypeValidator extends ConstraintValidator
 {
-    public function __construct(private DynamicContentModel $dynamicContentModel)
-    {
+    public function __construct(
+        private readonly DynamicContentModel $dynamicContentModel,
+    ) {
     }
 
     public function validate(mixed $value, Constraint $constraint): void
@@ -32,7 +33,7 @@ class SlotNameTypeValidator extends ConstraintValidator
         }
 
         $existingContents = $this->dynamicContentModel->
-            checkEntityBySlotName($slotName, $value->getType(), '!=');
+            checkEntityBySlotName($slotName, $value->getType(), '!=', $value->getId());
         if ($existingContents) {
             $this->context->buildViolation($constraint->message)
                 ->atPath('type')

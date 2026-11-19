@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper\DateTime;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class DateTimeToken
+final readonly class DateTimeToken
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
@@ -15,7 +15,7 @@ class DateTimeToken
     /**
      * @return array<string>
      */
-    public function getTokens(string $content, string $contactTimezone = null): array
+    public function getTokens(string $content, ?string $contactTimezone = null): array
     {
         $tokens = [];
         preg_match_all('/{today(.*?)}/', $content, $matches);

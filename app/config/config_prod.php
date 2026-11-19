@@ -19,7 +19,6 @@ $container->loadFromExtension("framework", array(
         "cache" => "apc"
     )
 ));
-
 $container->loadFromExtension("doctrine", array(
     "orm" => array(
         "metadata_cache_driver" => "apc",
@@ -27,7 +26,7 @@ $container->loadFromExtension("doctrine", array(
         "query_cache_driver"    => "apc"
     )
 ));
-*/
+ */
 
 $container->loadFromExtension('monolog', [
     'channels' => [

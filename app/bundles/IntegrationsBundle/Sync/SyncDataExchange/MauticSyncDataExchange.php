@@ -32,13 +32,13 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     public const OBJECT_COMPANY = 'company';
 
     public function __construct(
-        private FieldChangeRepository $fieldChangeRepository,
-        private FieldHelper $fieldHelper,
-        private MappingHelper $mappingHelper,
-        private FullObjectReportBuilder $fullObjectReportBuilder,
-        private PartialObjectReportBuilder $partialObjectReportBuilder,
-        private OrderExecutioner $orderExecutioner,
-        private SyncDateHelper $syncDateHelper,
+        private readonly FieldChangeRepository $fieldChangeRepository,
+        private readonly FieldHelper $fieldHelper,
+        private readonly MappingHelper $mappingHelper,
+        private readonly FullObjectReportBuilder $fullObjectReportBuilder,
+        private readonly PartialObjectReportBuilder $partialObjectReportBuilder,
+        private readonly OrderExecutioner $orderExecutioner,
+        private readonly SyncDateHelper $syncDateHelper,
     ) {
     }
 

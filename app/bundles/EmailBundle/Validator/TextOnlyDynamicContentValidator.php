@@ -12,12 +12,18 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 final class TextOnlyDynamicContentValidator extends ConstraintValidator
 {
-    public function __construct(private DynamicContentModel $dynamicContentModel)
-    {
+    public function __construct(
+        private readonly DynamicContentModel $dynamicContentModel,
+    ) {
     }
 
     public function validate(mixed $value, Constraint $constraint): void
     {
+        // Skip validation for null or empty values
+        if (null === $value || '' === $value) {
+            return;
+        }
+
         if (!is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');
         }

@@ -6,10 +6,10 @@ namespace Mautic\CoreBundle\Tests\Unit\ProcessSignal;
 
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class ProcessSignalServiceTest extends TestCase
+final class ProcessSignalServiceTest extends TestCase
 {
     private ProcessSignalService $processSignalService;
 
@@ -48,53 +48,53 @@ class ProcessSignalServiceTest extends TestCase
     /**
      * @param int[] $signals
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataSignals')]
+    #[DataProvider('dataSignals')]
     public function testRegisterSignalHandler(int $signal, array $signals): void
     {
         $beforeCallbackCalled = false;
 
-        $this->processSignalService->registerSignalHandler(function () use (&$beforeCallbackCalled) {
+        $this->processSignalService->registerSignalHandler(function () use (&$beforeCallbackCalled): void {
             $beforeCallbackCalled = true;
         }, $signals);
 
         posix_kill(posix_getpid(), $signal);
 
-        Assert::assertTrue($this->processSignalService->isSignalCaught());
-        Assert::assertTrue($beforeCallbackCalled);
+        $this->assertTrue($this->processSignalService->isSignalCaught());
+        $this->assertTrue($beforeCallbackCalled);
     }
 
     /**
      * @param int[] $signals
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataSignals')]
+    #[DataProvider('dataSignals')]
     public function testRestoreSignalHandler(int $signal, array $signals): void
     {
         $this->processSignalService->registerSignalHandler(null, $signals);
-        Assert::assertIsCallable(pcntl_signal_get_handler($signal));
+        $this->assertIsCallable(pcntl_signal_get_handler($signal));
 
         $this->processSignalService->restoreSignalHandler($signals);
-        Assert::assertSame(SIG_DFL, pcntl_signal_get_handler($signal));
+        $this->assertSame(SIG_DFL, pcntl_signal_get_handler($signal));
     }
 
     /**
      * @param int[] $signals
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataSignals')]
+    #[DataProvider('dataSignals')]
     public function testIsSignalCaught(int $signal, array $signals): void
     {
-        Assert::assertFalse($this->processSignalService->isSignalCaught());
+        $this->assertFalse($this->processSignalService->isSignalCaught());
 
         $this->processSignalService->registerSignalHandler(null, $signals);
 
         posix_kill(posix_getpid(), $signal);
 
-        Assert::assertTrue($this->processSignalService->isSignalCaught());
+        $this->assertTrue($this->processSignalService->isSignalCaught());
     }
 
     /**
      * @param int[] $signals
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataSignals')]
+    #[DataProvider('dataSignals')]
     public function testThrowExceptionIfSignalIsCaught(int $signal, array $signals): void
     {
         $this->processSignalService->registerSignalHandler(null, $signals);

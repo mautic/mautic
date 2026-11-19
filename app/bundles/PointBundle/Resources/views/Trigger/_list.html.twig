@@ -72,14 +72,12 @@
                             {% endif %}
                             {{ customContent('trigger.name', _context) }}
                         </div>
-                        {% if item.description is not empty %}
-                            <div class="text-secondary mt-4">
-                                <small>{{ item.description|purify }}</small>
-                            </div>
-                        {% endif %}
+                        {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                            'description': item.description
+                        }) }}
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">
                         {{ item.group.name|default('mautic.point.group.form.nogroup'|trans) }}
@@ -107,8 +105,8 @@
     {% else %}
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
-            <div class="mb-md">
-                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+            <div class="mb-16">
+                {% include '@MauticCore/Components/pictogram.html.twig' with {
                     'pictogram': 'react-to-data',
                     'size': '80'
                 } %}
@@ -122,8 +120,8 @@
             }) }}
 
             {% set triggersUseContainer %}
-            <div class="mb-md">
-                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+            <div class="mb-16">
+                {% include '@MauticCore/Components/pictogram.html.twig' with {
                     'pictogram': 'construct',
                     'size': '64'
                 } %}
@@ -139,7 +137,7 @@
                     ]
                 } %}
             </div>
-            <div class="mt-lg">
+            <div class="mt-24">
                 {{ include('@MauticCore/Notification/inline_notification.html.twig', {
                     'title': 'mautic.point.trigger.onboarding.notification.title',
                     'content': 'mautic.point.trigger.onboarding.notification.content',

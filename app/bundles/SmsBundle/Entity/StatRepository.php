@@ -2,6 +2,7 @@
 
 namespace Mautic\SmsBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -79,8 +80,9 @@ class StatRepository extends CommonRepository
                 $smsIds = [(int) $smsIds];
             }
             $q->where(
-                $q->expr()->in('s.sms_id', $smsIds)
-            );
+                $q->expr()->in('s.sms_id', ':smsIds')
+            )
+                ->setParameter('smsIds', $smsIds, ArrayParameterType::INTEGER);
         }
 
         if ($listId) {
@@ -113,8 +115,8 @@ class StatRepository extends CommonRepository
 
         if ($leadId) {
             $query->andWhere(
-                $query->expr()->eq('s.lead_id', (int) $leadId)
-            );
+                $query->expr()->eq('s.lead_id', ':leadId')
+            )->setParameter('leadId', $leadId);
         }
 
         if (!empty($options['basic_select'])) {
@@ -173,9 +175,6 @@ class StatRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * Delete a stat.
-     */
     public function deleteStat($id): void
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'sms_message_stats', ['id' => (int) $id]);

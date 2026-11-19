@@ -7,13 +7,13 @@ namespace Mautic\IntegrationsBundle\Event;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class InternalObjectRouteEvent extends Event
+final class InternalObjectRouteEvent extends Event
 {
     private ?string $route = null;
 
     public function __construct(
-        private ObjectInterface $object,
-        private int $id,
+        private readonly ObjectInterface $object,
+        private readonly int $id,
     ) {
     }
 

@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\LazyResponseException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
@@ -32,8 +33,16 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 final class PluginAuthenticator extends AbstractAuthenticator
 {
-    public function __construct(private TokenPermissions $tokenPermissions, private EventDispatcherInterface $dispatcher, private IntegrationHelper $integrationHelper, private UserProviderInterface $userProvider, private AuthenticationHandler $authenticationHandler, private OAuth2 $oAuth2, private LoggerInterface $logger, private string $firewallName)
-    {
+    public function __construct(
+        private readonly TokenPermissions $tokenPermissions,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly UserProviderInterface $userProvider,
+        private readonly AuthenticationHandler $authenticationHandler,
+        private readonly OAuth2 $oAuth2,
+        private readonly LoggerInterface $logger,
+        private readonly string $firewallName,
+    ) {
     }
 
     public function supports(Request $request): ?bool
@@ -42,15 +51,16 @@ final class PluginAuthenticator extends AbstractAuthenticator
         return null === $this->oAuth2->getBearerToken($request) ? null : false;
     }
 
-    public function authenticate(Request $request): Passport
+    public function authenticate(Request $request): SelfValidatingPassport
     {
         $authenticatingService = $request->get('integration');
         \assert(null === $authenticatingService || is_string($authenticatingService));
         $token = new PluginToken($this->firewallName, $authenticatingService);
 
-        $user          = null;
-        $response      = null;
-        $authenticated = false;
+        $user               = null;
+        $response           = null;
+        $authenticated      = false;
+        $authenticatedToken = null;
 
         // Try authenticating with a plugin
         if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_AUTHENTICATION)) {
@@ -67,22 +77,28 @@ final class PluginAuthenticator extends AbstractAuthenticator
                 $integrations
             );
             $authEvent = $this->dispatcher->dispatch($authEvent, UserEvents::USER_PRE_AUTHENTICATION);
-            \assert($authEvent instanceof AuthenticationEvent);
 
             if ($authenticated = $authEvent->isAuthenticated()) {
                 $eventToken            = $authEvent->getToken();
                 $authenticatingService = $authEvent->getAuthenticatingService();
 
+                // Return passport with the token set in the event, if the event set a different token.
                 if ($eventToken !== $token) {
                     return new SelfValidatingPassport(
-                        new UserBadge($eventToken->getUserIdentifier(), function () use ($eventToken): UserInterface {
-                            return $eventToken->getUser();
-                        }),
+                        new UserBadge($eventToken->getUserIdentifier(), fn (): UserInterface => $eventToken->getUser()),
                         [new PluginBadge($eventToken, null, $authenticatingService)]
                     );
                 }
 
+                // Set the user in the token.
                 $user = $authEvent->getUser();
+
+                if (null === $user) {
+                    throw new \RuntimeException('User must be set in the authenticated token.');
+                }
+
+                $authenticatedToken = $eventToken;
+                $authenticatedToken->setUser($user);
             }
 
             $response = $authEvent->getResponse();
@@ -93,8 +109,14 @@ final class PluginAuthenticator extends AbstractAuthenticator
             }
         }
 
+        // The check is intended to catch: Plugin authenticator must be authenticated and have $user. oAuth should have a response.
         if (!$user instanceof User && !$authenticated && null === $response) {
             throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
+        }
+
+        // Otherwise if the plugin authenticator has a response, then pass it to the Symfony.
+        if (null === $user && !$authenticated && null !== $response) {
+            throw new LazyResponseException($response);
         }
 
         return new SelfValidatingPassport(
@@ -108,7 +130,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
                     return $this->userProvider->loadUserByIdentifier($userIdentifier);
                 }
             ),
-            [new PluginBadge(null, $response, $authenticatingService)]
+            [new PluginBadge($authenticatedToken, $response, $authenticatingService)]
         );
     }
 
@@ -119,7 +141,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
         $userBadge = $passport->getBadge(UserBadge::class);
         \assert($userBadge instanceof UserBadge);
 
-        // A custom token has been set by the plugin so just return it
+        // A custom token has not been set by the plugin, so create a new one. Mainly used for oAuth.
         if (null === $token = $pluginBadge->getPreAuthenticatedToken()) {
             $user  = $userBadge->getUser();
             $token = new PluginToken(
@@ -169,7 +191,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
         $this->logger->info(sprintf('Authentication request failed: %s', $exception->getMessage()));
 
         // Gets app/bundles/UserBundle/Security/Firewall/AuthenticationListener.php:74 and till the end of the method referenced.
-        if ('api' === $this->firewallName) {
+        if (in_array($this->firewallName, ['api', 'v2api'])) {
             // Continue with another authentication.
             return null;
         }

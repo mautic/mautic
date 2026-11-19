@@ -12,13 +12,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SendSchedule
 {
-    private MailHelper $mailer;
+    private readonly MailHelper $mailer;
 
     public function __construct(
         MailHelper $mailer,
-        private MessageSchedule $messageSchedule,
-        private FileHandler $fileHandler,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly MessageSchedule $messageSchedule,
+        private readonly FileHandler $fileHandler,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
         $this->mailer = $mailer->getMailer();
     }
@@ -58,10 +58,6 @@ class SendSchedule
         $this->mailer->parsePlainText($message);
         $this->mailer->send(true);
 
-        $this->fileHandler->delete($csvFilePath);
-
-        if (!empty($zipFilePath)) {
-            $this->fileHandler->delete($zipFilePath);
-        }
+        // Attachment file removal will be done in \Mautic\MessengerBundle\MessageHandler\RemoveReportAttachmentHandler
     }
 }

@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Mautic\FormBundle\Form\Type\FormListType;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -25,16 +26,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Focus>
  */
-class FocusType extends AbstractType
+final class FocusType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $security,
+        private readonly CorePermissions $security,
     ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url', 'html' => 'html', 'editor' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url', 'html' => 'html', 'editor' => 'html', 'description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('focus', $options));
 
         $builder->add(
@@ -42,7 +43,7 @@ class FocusType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -52,7 +53,7 @@ class FocusType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control editor'],
                 'required'   => false,
             ]
@@ -63,7 +64,7 @@ class FocusType extends AbstractType
             EmailUtmTagsType::class,
             [
                 'label'      => 'mautic.email.utm_tags',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.utm_tags.tooltip',
@@ -77,7 +78,7 @@ class FocusType extends AbstractType
             ButtonGroupType::class,
             [
                 'label'      => 'mautic.focus.form.html_mode',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'data'       => !empty($options['data']->getHtmlMode()) ? $options['data']->getHtmlMode() : 'basic',
                 'attr'       => [
                     'class'    => 'form-control',
@@ -97,7 +98,7 @@ class FocusType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.focus.form.editor',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control editor editor-basic',
                     'data-show-on' => '{"focus_html_mode_1":"checked"}',
@@ -111,7 +112,7 @@ class FocusType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.focus.form.html',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'rows'         => 12,
@@ -127,7 +128,7 @@ class FocusType extends AbstractType
             UrlType::class,
             [
                 'label'      => 'mautic.focus.form.website',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.focus.form.website.tooltip',
@@ -144,6 +145,8 @@ class FocusType extends AbstractType
                 'bundle' => 'plugin:focus',
             ]
         );
+
+        $builder->add('projects', ProjectType::class);
 
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->isGranted('focus:items:publish');
@@ -197,7 +200,7 @@ class FocusType extends AbstractType
                 'name'  => 'builder',
                 'label' => 'mautic.core.builder',
                 'attr'  => [
-                    'class'   => 'btn btn-ghost btn-dnd btn-nospin',
+                    'class'   => 'btn btn-tertiary btn-dnd btn-nospin',
                     'icon'    => 'ri-layout-line',
                     'onclick' => 'Mautic.launchFocusBuilder();',
                 ],

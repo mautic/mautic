@@ -17,7 +17,7 @@ trait SmsTestHelperTrait
         $this->testSymfonyCommand('mautic:plugins:install');
         $messagingServiceSid = 'messaging_sid';
 
-        $integration = $this->getContainer()->get('mautic.integration.twilio');
+        $integration = $this->getContainer()->get(TwilioIntegration::class);
         \assert($integration instanceof TwilioIntegration);
 
         $crawler  = $this->client->request(Request::METHOD_GET, 's/plugins/config/'.$integration->getName());
@@ -38,7 +38,7 @@ trait SmsTestHelperTrait
         $response = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
 
-        $transportChain = $this->getContainer()->get('mautic.sms.transport_chain');
+        $transportChain = $this->getContainer()->get(TransportChain::class);
         \assert($transportChain instanceof TransportChain);
 
         // Replaces Twilio transport with ArrayTransport

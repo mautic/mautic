@@ -2,6 +2,41 @@ Mautic.modalContentXhr = {};
 Mautic.activeModal = '';
 Mautic.backgroundedModal = '';
 
+const showingModals = new WeakSet();
+mQuery(document).on('show.bs.modal.mauticLifecycle', event => {
+    showingModals.add(event.target);
+    queueMicrotask(() => {
+        if (event.isDefaultPrevented()) {
+            showingModals.delete(event.target);
+            mQuery(event.target).off('shown.bs.modal.mauticHide');
+        }
+    });
+}).on('shown.bs.modal.mauticLifecycle hidden.bs.modal.mauticLifecycle', event => {
+    showingModals.delete(event.target);
+});
+
+Mautic.hideModal = function (element) {
+    const modal = bootstrap.Modal.getInstance(element);
+    if (!modal) {
+        return;
+    }
+    if (showingModals.has(element)) {
+        mQuery(element).off('shown.bs.modal.mauticHide').one('shown.bs.modal.mauticHide', () => modal.hide());
+        return;
+    }
+    modal.hide();
+};
+
+Mautic.configureModal = function (element, options) {
+    if (!element) {
+        return null;
+    }
+    const modal = bootstrap.Modal.getOrCreateInstance(element, options);
+    modal._config.keyboard = options.keyboard;
+    modal._config.backdrop = options.backdrop;
+    return modal;
+};
+
 /**
  * Load a modal with ajax content
  *
@@ -32,6 +67,7 @@ Mautic.ajaxifyModal = function (el, event) {
     let modalOpenCallback = element.attr('data-modal-open-callback') ? element.attr('data-modal-open-callback') : null;
     let modalCloseCallback = element.attr('data-modal-close-callback') ? element.attr('data-modal-close-callback') : null;
     let preventDismissal = element.attr('data-prevent-dismiss');
+    let formData = element.data('form-data') ? element.data('form-data') : {};
 
     if (preventDismissal) {
         // Reset
@@ -57,7 +93,7 @@ Mautic.ajaxifyModal = function (el, event) {
         };
     }
 
-    Mautic.loadAjaxModal(target, route, method, header, footer, preventDismissal, modalOpenCallbackReal, modalCloseCallbackReal);
+    Mautic.loadAjaxModal(target, route, method, header, footer, preventDismissal, modalOpenCallbackReal, modalCloseCallbackReal, formData);
 };
 
 /**
@@ -70,8 +106,9 @@ Mautic.ajaxifyModal = function (el, event) {
  * @param preventDismissal
  * @param modalOpenCallback
  * @param modalCloseCallback
+ * @param formData
  */
-Mautic.loadAjaxModal = function (target, route, method, header, footer, preventDismissal, modalOpenCallback, modalCloseCallback) {
+Mautic.loadAjaxModal = function (target, route, method, header, footer, preventDismissal, modalOpenCallback, modalCloseCallback, formData = {}) {
     let element = mQuery(target);
 
     if (element.find('.loading-placeholder').length) {
@@ -128,28 +165,10 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
         Mautic.resetModal(target);
     });
 
-    // Check if dismissal is allowed
-    if (typeof element.data('bs.modal') !== 'undefined' && typeof element.data('bs.modal').options !== 'undefined') {
-        if (preventDismissal) {
-            element.data('bs.modal').options.keyboard = false;
-            element.data('bs.modal').options.backdrop = 'static';
-        } else {
-            element.data('bs.modal').options.keyboard = true;
-            element.data('bs.modal').options.backdrop = true;
-        }
-    } else {
-        if (preventDismissal) {
-            element.modal({
-                backdrop: 'static',
-                keyboard: false
-            });
-        } else {
-            element.modal({
-                backdrop: true,
-                keyboard: true
-            });
-        }
-    }
+    Mautic.configureModal(element[0], {
+        keyboard: !preventDismissal,
+        backdrop: preventDismissal ? 'static' : true
+    });
 
     Mautic.showModal(target);
 
@@ -163,6 +182,7 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
         url: route,
         type: method,
         dataType: "json",
+        data: formData,
         success: function (response) {
             if (response) {
                 Mautic.processModalContent(response, target);
@@ -185,7 +205,7 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
  * @param target
  */
 Mautic.resetModal = function (target) {
-    if (mQuery(target).hasClass('in')) {
+    if (mQuery(target).hasClass('show')) {
         return;
     }
 
@@ -227,7 +247,7 @@ Mautic.processModalContent = function (response, target) {
     }
 
     if (response.sessionExpired || (response.closeModal && response.newContent && !response.updateModalContent)) {
-        mQuery(target).modal('hide');
+        mQuery(target).each((index, element) => Mautic.hideModal(element));
         mQuery('body').removeClass('modal-open');
         mQuery('.modal-backdrop').remove();
         //assume the content is to refresh main app
@@ -264,7 +284,7 @@ Mautic.processModalContent = function (response, target) {
         Mautic.modalMauticContent = false;
         if (response.closeModal) {
             mQuery('body').removeClass('noscroll');
-            mQuery(target).modal('hide');
+            mQuery(target).each((index, element) => Mautic.hideModal(element));
 
             if (!response.updateModalContent) {
                 Mautic.onPageUnload(target, response);
@@ -279,7 +299,7 @@ Mautic.processModalContent = function (response, target) {
 /**
  * Display confirmation modal
  */
-Mautic.showConfirmation = function (el) {
+Mautic.showConfirmation = function (el, customMessage) {
     var precheck = mQuery(el).data('precheck');
 
     if (precheck) {
@@ -294,7 +314,7 @@ Mautic.showConfirmation = function (el) {
         }
     }
 
-    var message = mQuery(el).data('message');
+    var message = customMessage ?? mQuery(el).data('message');
     var confirmText = mQuery(el).data('confirm-text');
     var confirmAction = mQuery(el).attr('href');
     var confirmCallback = mQuery(el).data('confirm-callback');
@@ -320,18 +340,18 @@ Mautic.showConfirmation = function (el) {
             }
         })
         .html(confirmText);
-    if (cancelText) {
-        var cancelButton = mQuery('<button type="button" />')
-            .addClass("btn btn-primary")
-            .click(function () {
-                if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
-                    window["Mautic"][cancelCallback].apply('window', [el]);
-                } else {
-                    Mautic.dismissConfirmation();
-                }
-            })
-            .html(cancelText);
-    }
+	    if (cancelText) {
+	        var cancelButton = mQuery('<button type="button" />')
+	            .addClass("btn btn-primary")
+	            .click(function () {
+	                if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
+	                    window["Mautic"][cancelCallback].apply('window', [el]);
+	                } else {
+	                    Mautic.dismissConfirmation();
+	                }
+	            })
+	            .text(cancelText);
+	    }
 
     if (typeof cancelButton != 'undefined') {
         confirmFooterDiv.append(cancelButton);
@@ -348,10 +368,11 @@ Mautic.showConfirmation = function (el) {
     mQuery('body').append(confirmContainer);
 
     mQuery('.confirmation-modal').on('hidden.bs.modal', function () {
+        bootstrap.Modal.getInstance(this)?.dispose();
         mQuery(this).remove();
     });
 
-    mQuery('.confirmation-modal').modal('show');
+    mQuery('.confirmation-modal').each((index, element) => bootstrap.Modal.getOrCreateInstance(element).show());
 };
 
 /**
@@ -359,7 +380,7 @@ Mautic.showConfirmation = function (el) {
  */
 Mautic.dismissConfirmation = function () {
     if (mQuery('.confirmation-modal').length) {
-        mQuery('.confirmation-modal').modal('hide');
+        mQuery('.confirmation-modal').each((index, element) => Mautic.hideModal(element));
     }
 };
 
@@ -405,7 +426,7 @@ Mautic.loadAjaxModalBySelectValue = function (el, value, route, header) {
  * @param target
  */
 Mautic.showModal = function(target) {
-    if (mQuery('.modal.in').length) {
+    if (mQuery('.modal.show').length) {
         // another modal is activated so let's stack
 
         // is this modal within another modal?
@@ -419,13 +440,13 @@ Mautic.showModal = function(target) {
             mQuery(target).appendTo('body');
         }
 
-        var activeModal = mQuery('.modal.in .modal-dialog:not(:has(.aside))').parents('.modal').last(),
+        var activeModal = mQuery('.modal.show .modal-dialog:not(:has(.aside))').parents('.modal').last(),
             targetModal  = mQuery(target);
 
         if (activeModal.length && activeModal.attr('id') !== targetModal.attr('id')) {
             targetModal.attr('data-previous-modal', '#'+activeModal.attr('id'));
             activeModal.find('.modal-dialog').addClass('aside');
-            var stackedDialogCount = mQuery('.modal.in .modal-dialog.aside').length;
+            var stackedDialogCount = mQuery('.modal.show .modal-dialog.aside').length;
             if (stackedDialogCount <= 5) {
                 activeModal.find('.modal-dialog').addClass('aside-' + stackedDialogCount);
             }
@@ -447,7 +468,6 @@ Mautic.showModal = function(target) {
         }
     }
 
-    mQuery(target).modal('show');
+    mQuery(target).each((index, element) => bootstrap.Modal.getOrCreateInstance(element).show());
 };
-
 

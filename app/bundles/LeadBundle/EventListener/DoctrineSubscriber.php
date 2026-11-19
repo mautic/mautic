@@ -2,25 +2,21 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Monolog\Logger;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class DoctrineSubscriber implements EventSubscriber
+#[AsDoctrineListener(ToolEvents::postGenerateSchema)]
+final readonly class DoctrineSubscriber
 {
     public function __construct(
+        #[Autowire(service: 'monolog.logger.mautic')]
         private Logger $logger,
     ) {
-    }
-
-    public function getSubscribedEvents(): array
-    {
-        return [
-            ToolEvents::postGenerateSchema,
-        ];
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $args): void
@@ -44,7 +40,7 @@ class DoctrineSubscriber implements EventSubscriber
                 $fields = $args->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select('f.alias, f.is_unique_identifer as is_unique, f.is_index, f.type, f.object')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
-                    ->where("f.object = '$object'")
+                    ->where("f.object = '{$object}'")
                     ->orderBy('f.field_order', 'ASC')
                     ->executeQuery()
                     ->fetchAllAssociative();

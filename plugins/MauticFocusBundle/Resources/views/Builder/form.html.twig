@@ -20,7 +20,6 @@
 {{ include('@MauticForm/Builder/_script.html.twig', {'form': form, 'formName': formName}, with_context=false) }}
 <script>
     var MauticFocusHandler = function (messageType, message) {
-        // Store the HTML
         var wrapper = document.getElementById('mauticform_wrapper{{ formName }}');
         var innerForm = wrapper.getElementsByClassName('mauticform-innerform');
         innerForm[0].style.display = "none";
@@ -62,7 +61,7 @@
                 document.getElementById('mauticform{{ formName }}_' + messageType).innerHTML = '';
             }, 1500);
         }
-    }
+    };
     if (typeof MauticFormCallback == 'undefined') {
         var MauticFormCallback = {};
     }
@@ -81,10 +80,8 @@
         },
         onResponse: function (data) {
             if (data.download) {
-                // Hit the download in the iframe
                 document.getElementById('mauticiframe{{ formName }}').src = data.download;
 
-                // Register a callback for a redirect
                 if (data.redirect) {
                     setTimeout(function () {
                         window.top.location = data.redirect;

@@ -2,14 +2,17 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
+use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class IpLookupHelper
 {
+    private const UNTRACKED_VISITOR = 'mautic_untracked_visitor';
+
     /**
      * @var array
      */
@@ -35,12 +38,18 @@ class IpLookupHelper
      */
     private $realIp;
 
-    private CoreParametersHelper $coreParametersHelper;
+    private readonly CoreParametersHelper $coreParametersHelper;
+
+    /**
+     * @var array<string, IpAddress>
+     */
+    private static array $ipAddresses = [];
 
     public function __construct(
         protected RequestStack $requestStack,
-        protected EntityManager $em,
+        protected IpAddressRepository $ipAddressRepository,
         CoreParametersHelper $coreParametersHelper,
+        private readonly DeviceDetectorFactoryInterface $deviceDetectorFactory,
         protected ?AbstractLookup $ipLookup = null,
     ) {
         $this->doNotTrackIps         = $coreParametersHelper->get('do_not_track_ips');
@@ -57,7 +66,7 @@ class IpLookupHelper
      */
     public function getIpAddressFromRequest()
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->getRequest();
 
         if (null !== $request) {
             $ipHolders = [
@@ -99,8 +108,6 @@ class IpLookupHelper
      */
     public function getIpAddress($ip = null)
     {
-        static $ipAddresses       = [];
-        $request                  = $this->requestStack->getCurrentRequest();
         $isIpAnonymizationEnabled = (bool) $this->coreParametersHelper->get('anonymize_ip');
 
         if (null === $ip) {
@@ -118,13 +125,8 @@ class IpLookupHelper
             $ip = '*.*.*.*';
         }
 
-        if (empty($ipAddresses[$ip])) {
-            $ipAddress = null;
-            $saveIp    = false;
-
-            /** @var IpAddressRepository $repo */
-            $repo      = $this->em->getRepository(IpAddress::class);
-            $ipAddress = $repo->findOneByIpAddress($ip);
+        if (!isset(self::$ipAddresses[$ip])) {
+            $ipAddress = $this->ipAddressRepository->findOneByIpAddress($ip);
             $saveIp    = (null === $ipAddress);
 
             if (null === $ipAddress) {
@@ -132,33 +134,7 @@ class IpLookupHelper
                 $ipAddress->setIpAddress($ip);
             }
 
-            // Ensure the do not track list is inserted
-            if (!is_array($this->doNotTrackIps)) {
-                $this->doNotTrackIps = [];
-            }
-
-            if (!is_array($this->doNotTrackBots)) {
-                $this->doNotTrackBots = [];
-            }
-
-            if (!is_array($this->doNotTrackInternalIps)) {
-                $this->doNotTrackInternalIps = [];
-            }
-
-            $doNotTrack = array_merge($this->doNotTrackIps, $this->doNotTrackInternalIps);
-
-            $ipAddress->setDoNotTrackList($doNotTrack);
-
-            if ($ipAddress->isTrackable() && $request) {
-                $userAgent = $request->headers->get('User-Agent', '');
-                foreach ($this->doNotTrackBots as $bot) {
-                    if (str_contains($userAgent, $bot)) {
-                        $doNotTrack[] = $ip;
-                        $ipAddress->setDoNotTrackList($doNotTrack);
-                        continue;
-                    }
-                }
-            }
+            $this->setDoNotTrackList($ipAddress, $ip);
 
             $details = $ipAddress->getIpDetails();
             if ($ipAddress->isTrackable() && !$isIpAnonymizationEnabled && empty($details['city'])) {
@@ -176,13 +152,26 @@ class IpLookupHelper
             }
 
             if ($saveIp) {
-                $repo->saveEntity($ipAddress);
+                $this->ipAddressRepository->saveEntity($ipAddress);
             }
 
-            $ipAddresses[$ip] = $ipAddress;
+            self::$ipAddresses[$ip] = $ipAddress;
         }
 
-        return $ipAddresses[$ip];
+        return self::$ipAddresses[$ip];
+    }
+
+    /**
+     * Marks the visitor of the current request as not tracked, so the contact events it causes keep no IP address.
+     */
+    public function markVisitorAsUntracked(): void
+    {
+        $this->getRequest()?->attributes->set(self::UNTRACKED_VISITOR, true);
+    }
+
+    public function isVisitorUntracked(): bool
+    {
+        return true === $this->getRequest()?->attributes->get(self::UNTRACKED_VISITOR);
     }
 
     /**
@@ -211,6 +200,14 @@ class IpLookupHelper
             FILTER_VALIDATE_IP,
             FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | $filterFlagNoPrivRange | FILTER_FLAG_NO_RES_RANGE
         );
+    }
+
+    /**
+     * Resets cache.
+     */
+    public function reset(): void
+    {
+        self::$ipAddresses = [];
     }
 
     protected function getClientIpFromProxyList($ip)
@@ -245,5 +242,112 @@ class IpLookupHelper
     public function getRealIp()
     {
         return $this->realIp;
+    }
+
+    /**
+     * Determine if the current request should be tracked.
+     *
+     * Checks for privacy signals and bot indicators:
+     * - HEAD requests (bots/monitoring tools)
+     * - Prefetch/prerender requests (browser speculation)
+     * - Sec-GPC: 1 (Global Privacy Control - legally required by CCPA)
+     * - DNT: 1 (Do Not Track - user preference)
+     * - Known bots (existing IP/User-Agent filtering)
+     */
+    public function isRequestTrackable(): bool
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (null === $request) {
+            return $this->isCurrentIpTrackable();
+        }
+
+        // Skip HEAD requests - often used by bots/monitoring tools
+        if ($request->isMethod('HEAD')) {
+            return false;
+        }
+
+        // Skip prefetch requests (browser prefetching links)
+        $purpose = $request->headers->get('Purpose') ?? $request->headers->get('Sec-Purpose');
+        if ($purpose && in_array(strtolower($purpose), ['prefetch', 'prerender'], true)) {
+            return false;
+        }
+
+        // Respect privacy signals - Global Privacy Control (legally required in California/CCPA)
+        $secGpc = trim((string) ($request->headers->get('Sec-GPC') ?? $request->server->get('HTTP_SEC_GPC')));
+        if ('1' === $secGpc) {
+            return false;
+        }
+
+        // Respect Do Not Track header
+        $dnt = trim((string) ($request->headers->get('DNT') ?? $request->server->get('HTTP_DNT')));
+        if ('1' === $dnt) {
+            return false;
+        }
+
+        // Use existing IP/User-Agent based bot filtering
+        return $this->isCurrentIpTrackable();
+    }
+
+    private function getRequest(): ?Request
+    {
+        return $this->requestStack->getCurrentRequest();
+    }
+
+    /**
+     * Same check as getIpAddress()->isTrackable(), but a new address is not saved,
+     * so bots and IPs on the do-not-track lists don't end up in the database.
+     */
+    private function isCurrentIpTrackable(): bool
+    {
+        $ip = $this->coreParametersHelper->get('anonymize_ip') ? '*.*.*.*' : $this->getIpAddressFromRequest();
+
+        if (isset(self::$ipAddresses[$ip])) {
+            return self::$ipAddresses[$ip]->isTrackable();
+        }
+
+        $ipAddress = new IpAddress($ip);
+        $this->setDoNotTrackList($ipAddress, $ip);
+
+        return $ipAddress->isTrackable();
+    }
+
+    private function setDoNotTrackList(IpAddress $ipAddress, string $ip): void
+    {
+        // Ensure the do not track list is inserted
+        if (!is_array($this->doNotTrackIps)) {
+            $this->doNotTrackIps = [];
+        }
+
+        if (!is_array($this->doNotTrackBots)) {
+            $this->doNotTrackBots = [];
+        }
+
+        if (!is_array($this->doNotTrackInternalIps)) {
+            $this->doNotTrackInternalIps = [];
+        }
+
+        $doNotTrack = array_merge($this->doNotTrackIps, $this->doNotTrackInternalIps);
+
+        $ipAddress->setDoNotTrackList($doNotTrack);
+
+        if ($ipAddress->isTrackable() && $request = $this->getRequest()) {
+            $userAgent = $request->headers->get('User-Agent', '');
+            foreach ($this->doNotTrackBots as $bot) {
+                if (str_contains($userAgent, $bot)) {
+                    $doNotTrack[] = $ip;
+                    $ipAddress->setDoNotTrackList($doNotTrack);
+                    break;
+                }
+            }
+
+            // second check for bots  https://github.com/matomo-org/device-detector
+            $deviceDetector = $this->deviceDetectorFactory->create($userAgent);
+            $deviceDetector->parse();
+            if ($deviceDetector->isBot()) {
+                $doNotTrack[] = $ip;
+                $ipAddress->setDoNotTrackList($doNotTrack);
+            }
+        }
     }
 }

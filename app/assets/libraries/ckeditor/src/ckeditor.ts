@@ -4,6 +4,7 @@
  */
 
 // The editor creator to use.
+import 'ckeditor5/ckeditor5.css';
 import { ClassicEditor as ClassicEditorBase } from '@ckeditor/ckeditor5-editor-classic';
 import { Essentials } from '@ckeditor/ckeditor5-essentials';
 import { CKFinderUploadAdapter } from '@ckeditor/ckeditor5-adapter-ckfinder';
@@ -32,6 +33,34 @@ import { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
 import { GeneralHtmlSupport } from "@ckeditor/ckeditor5-html-support";
 import { Mention } from "@ckeditor/ckeditor5-mention";
 import TokenPlugin from './TokenPlugin';
+import translations, { availableTranslationLanguages } from './translations';
+
+type WindowWithMauticLocale = Window & {
+    mauticLocale?: string;
+};
+
+function getEditorLanguage(): string {
+    const w = window as WindowWithMauticLocale;
+    const mauticLocale = w.mauticLocale ?? (w.parent as WindowWithMauticLocale)?.mauticLocale;
+
+    if (!mauticLocale) {
+        return 'en';
+    }
+
+    const normalizedLocale = mauticLocale.toLowerCase().replace('_', '-');
+
+    if (availableTranslationLanguages.has(normalizedLocale)) {
+        return normalizedLocale;
+    }
+
+    const baseLanguage = normalizedLocale.split('-')[0];
+
+    if (availableTranslationLanguages.has(baseLanguage)) {
+        return baseLanguage;
+    }
+
+    return 'en';
+}
 
 export default class ClassicEditor extends ClassicEditorBase {
     public static override builtinPlugins = [
@@ -88,4 +117,10 @@ export default class ClassicEditor extends ClassicEditorBase {
         TableToolbar,
         TextTransformation
     ];
+
+    public static override defaultConfig = {
+        licenseKey: 'GPL',
+        language: getEditorLanguage(),
+        translations
+    };
 }

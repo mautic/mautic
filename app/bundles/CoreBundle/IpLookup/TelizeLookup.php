@@ -2,14 +2,20 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class TelizeLookup extends AbstractRemoteDataLookup
+final class TelizeLookup extends AbstractRemoteDataLookup
 {
     public string $offset         = '';
+
     public string $area_code      = '';
+
     public string $dma_code       = '';
+
     public string $country_code3  = '';
+
     public string $continent_code = '';
+
     public string $country_code   = '';
+
     public string $region_code    = '';
 
     public function getAttribution(): string
@@ -35,7 +41,7 @@ class TelizeLookup extends AbstractRemoteDataLookup
      *
      * @param mixed $response Response from the service
      */
-    protected function parseResponse($response)
+    protected function parseResponse($response): void
     {
         $data = json_decode($response);
 
@@ -45,7 +51,7 @@ class TelizeLookup extends AbstractRemoteDataLookup
                     $key = 'zipcode';
                 }
 
-                $this->$key = $value;
+                $this->{$key} = $value;
             }
         }
     }

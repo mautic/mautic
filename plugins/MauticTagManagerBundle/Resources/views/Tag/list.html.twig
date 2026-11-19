@@ -16,6 +16,8 @@
     <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
+            'searchScopes': searchScopes|default([]),
+            'searchScopeHint': searchScopeHint|default(null),
             'action': currentRoute,
             'page_actions': {
                 'templateButtons': {
@@ -109,20 +111,28 @@
                                         {% else %}
                                             {{ item.getTag() }}
                                         {% endif %}
+                                        {{ customContent('tag.name', _context) }}
                                     </div>
                                     {% set description = item.getDescription() %}
                                     {% if description %}
-                                        <div class="text-secondary mt-4">
-                                            <small>{{ description|purify }}</small>
-                                        </div>
+                                        {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                                            'description': description
+                                        }) }}
                                     {% endif %}
                                 </td>
                                 <td class="visible-md visible-lg">
-                                    <a size="sm" class="label label-gray" href="{{-  path('mautic_contact_index', {
-                                        'search' : "#{'mautic.tagmanager.lead.searchcommand.list'|trans}:\"#{item.getTag()}\"",
-                                    }) -}}" data-toggle="ajax" {{- 0 == tagsCount[item.getId()] ? 'disabled=disabled' : '' -}}>
-                                    {{- 'mautic.lead.list.viewleads_count'|trans({'%count%': tagsCount[item.getId()]}) -}}
-                                    </a>
+                                    {% include '@MauticCore/Helper/_tag.html.twig' with {
+                                        tags: [{
+                                            label: 'mautic.lead.list.viewleads_count'|trans({'%count%': tagsCount[item.getId()]}),
+                                            color: 'gray',
+                                            size: 'sm',
+                                            attributes: {
+                                                id: 'tag-contacts-count-' ~ item.getId(),
+                                                href: path('mautic_contact_index', {'search': 'mautic.tagmanager.lead.searchcommand.list'|trans ~ ':"' ~ item.getTag() ~ '"'}),
+                                                'data-toggle': 'ajax'
+                                            }|filter((v, k) => 0 != (tagsCount[item.getId()]) or (k != 'href' and k != 'data-toggle'))
+                                        }]
+                                    } %}
                                 </td>
                                 <td class="visible-md visible-lg">{{ item.getId() }}</td>
                             </tr>
@@ -145,8 +155,8 @@
                 {% else %}
                     <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
                         {% set childContainer %}
-                            <div class="mt-32 mb-md">
-                                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                            <div class="mt-32 mb-16">
+                                {% include '@MauticCore/Components/pictogram.html.twig' with {
                                     'pictogram': 'tags',
                                     'size': '80'
                                 } %}
@@ -164,7 +174,7 @@
             {% endif %}
         </div>
     </div>
-    {{ include('@MauticCore/Helper/protip.html.twig', {
+    {{ include('@MauticCore/Modules/protip.html.twig', {
         tip: random(['mautic.protip.tags.segmentation', 'mautic.protip.tags.multivalue', 'mautic.protip.tags.creation'])
     }) }}
 {% endblock %}

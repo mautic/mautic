@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
+use Knp\Menu\MenuItem;
+use Mautic\CoreBundle\Menu\MenuRenderer;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -62,7 +64,7 @@ final class ServicePass implements CompilerPassInterface
 
                     foreach ($services as $name => $details) {
                         if (isset($serviceNames[$name])) {
-                            throw new \InvalidArgumentException("$name is already registered");
+                            throw new \InvalidArgumentException("{$name} is already registered");
                         }
                         $serviceNames[$name] = true;
 
@@ -76,7 +78,7 @@ final class ServicePass implements CompilerPassInterface
                         if ('menus' == $type) {
                             $details = array_merge(
                                 [
-                                    'class'   => \Knp\Menu\MenuItem::class,
+                                    'class'   => MenuItem::class,
                                     'factory' => ['@mautic.menu.builder', $details['alias'].'Menu'],
                                 ],
                                 $details
@@ -118,7 +120,7 @@ final class ServicePass implements CompilerPassInterface
                         if ($container->hasDefinition($details['class'])) {
                             $definition = $container->getDefinition($details['class']);
 
-                            if ($definitionArguments) {
+                            if ([] !== $definitionArguments) {
                                 $definition->setArguments($definitionArguments);
                             }
                         } else {
@@ -251,7 +253,7 @@ final class ServicePass implements CompilerPassInterface
 
         foreach ($menus as $alias => $options) {
             $container->setDefinition('mautic.menu_renderer.'.$alias, new Definition(
-                \Mautic\CoreBundle\Menu\MenuRenderer::class,
+                MenuRenderer::class,
                 [
                     new Reference('knp_menu.matcher'),
                     new Reference('twig'),
@@ -272,7 +274,7 @@ final class ServicePass implements CompilerPassInterface
      * @param mixed   $argument
      * @param mixed[] $definitionArguments
      */
-    private function processArgument($argument, ContainerBuilder $container, &$definitionArguments): void
+    private function processArgument($argument, ContainerBuilder $container, array &$definitionArguments): void
     {
         if ('' === $argument) {
             // To be added during compilation

@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -38,16 +39,16 @@ trait EntityContactsTrait
         $entityJoinTable,
         $dncChannel = null,
         $entityIdColumnName = 'id',
-        array $contactFilter = null,
-        array $additionalJoins = null,
+        ?array $contactFilter = null,
+        ?array $additionalJoins = null,
         $contactColumnName = null,
         ?array $routeParameters = [],
         $paginationTarget = null,
         $orderBy = null,
         $orderByDir = null,
         $count = null,
-        \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null,
+        ?\DateTimeInterface $dateFrom = null,
+        ?\DateTimeInterface $dateTo = null,
     ) {
         if ($permission && !$this->security->isGranted($permission)) {
             return $this->delegateView(
@@ -79,7 +80,7 @@ trait EntityContactsTrait
         }
 
         // Apply filters
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $this->setListFilters($sessionVar.'.contact');
         }
 
@@ -113,7 +114,6 @@ trait EntityContactsTrait
                 'orderBy'        => $orderBy,
                 'orderByDir'     => $orderByDir,
                 'select'         => ListController::SEGMENT_CONTACT_FIELDS,
-                'route'          => $route,
             ],
             $entityJoinTable,
             $entityId,
@@ -159,7 +159,7 @@ trait EntityContactsTrait
         // Get DNC for the contact
         $dnc = [];
         if ($dncChannel && $count > 0) {
-            $dnc = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getChannelList(
+            $dnc = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getChannelList(
                 $dncChannel,
                 array_keys($contacts['results'])
             );

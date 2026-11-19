@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticEmailMarketingBundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 
-class MauticEmailMarketingBundle extends PluginBundleBase
+final class MauticEmailMarketingBundle extends PluginBundleBase
 {
 }

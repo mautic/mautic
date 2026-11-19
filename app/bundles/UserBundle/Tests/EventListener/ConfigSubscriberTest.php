@@ -1,195 +1,182 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\EventListener;
 
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\EventListener\ConfigSubscriber;
+use Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ConfigSubscriberTest extends TestCase
+final class ConfigSubscriberTest extends TestCase
 {
     /**
-     * @var ConfigEvent|MockObject
+     * @var MockObject&ConfigEvent
      */
     private MockObject $configEvent;
+
+    private ConfigSubscriber $subscriber;
 
     protected function setUp(): void
     {
         $this->configEvent = $this->createMock(ConfigEvent::class);
+        $clientFactory = $this->createStub(ClientFactoryInterface::class);
+        $translator = $this->createStub(TranslatorInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
+        $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
+        $this->subscriber = new ConfigSubscriber($clientFactory, $translator, $logger, $subjectIdRepository);
     }
 
-    public function testOwnPasswordIsNotWipedOutOnConfigSaveIfEmpty(): void
+    /**
+     * Setup config mock to disable OIDC validation and return the provided userconfig data.
+     *
+     * @param array<string, mixed> $userConfigData
+     */
+    private function setupConfigMockWithOidcDisabled(array $userConfigData): void
     {
-        $subscriber = new ConfigSubscriber();
-        $this->configEvent->expects($this->once())
-            ->method('unsetIfEmpty')
-            ->with('saml_idp_own_password');
-
-        $this->configEvent->expects($this->once())
+        $this->configEvent->expects($this->exactly(2))
             ->method('getConfig')
-            ->with('userconfig')
-            ->willReturn([]);
+            ->willReturnCallback(function ($bundle = null) use ($userConfigData): array {
+                if (null === $bundle) {
+                    return ['userconfig' => array_merge(['open_id_is_enabled' => 0], $userConfigData)];
+                }
 
-        $subscriber->onConfigSave($this->configEvent);
+                return $userConfigData;
+            });
+    }
+
+    public function testEmptyPasswordAndOidcProviderFieldsArePreservedOnConfigSave(): void
+    {
+        $event = new ConfigEvent(['userconfig' => ['open_id_is_enabled' => 0]], new ParameterBag());
+
+        $this->subscriber->onConfigSave($event);
+
+        $this->assertEqualsCanonicalizing(
+            [
+                'open_id_registered_user_role',
+                'open_id_client_url',
+                'open_id_client_id',
+                'open_id_mapping_field',
+                'saml_idp_own_password',
+            ],
+            $event->getPreservedFields()
+        );
     }
 
     public function testMetadataFileIsDetectedAsXml(): void
     {
-        $subscriber = new ConfigSubscriber();
-        $this->configEvent->expects($this->once())
-            ->method('unsetIfEmpty')
-            ->with('saml_idp_own_password');
-
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
             ->willReturn('<xml></xml>');
 
-        $this->configEvent->expects($this->once())
+        $this->configEvent->expects($this->exactly(2))
             ->method('getConfig')
-            ->with('userconfig')
-            ->willReturn(
-                [
-                    'saml_idp_metadata' => $file,
-                ]
-            );
+            ->willReturnCallback(function ($bundle = null) use ($file): array {
+                if (null === $bundle) {
+                    return ['userconfig' => ['open_id_is_enabled' => 0, 'saml_idp_metadata' => $file]];
+                }
+
+                return ['saml_idp_metadata' => $file];
+            });
 
         $this->configEvent->expects($this->never())
             ->method('setError');
 
-        $subscriber->onConfigSave($this->configEvent);
+        $this->subscriber->onConfigSave($this->configEvent);
     }
 
     public function testMetadataFileFailsValidationIfNotXml(): void
     {
-        $subscriber = new ConfigSubscriber();
-
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
             ->willReturn('foobar');
 
-        $this->configEvent->expects($this->once())
-            ->method('getConfig')
-            ->with('userconfig')
-            ->willReturn(
-                [
-                    'saml_idp_metadata' => $file,
-                ]
-            );
+        $this->setupConfigMockWithOidcDisabled(['saml_idp_metadata' => $file]);
 
         $this->configEvent->expects($this->once())
             ->method('setError')
             ->with('mautic.user.saml.metadata.invalid', [], 'userconfig', 'saml_idp_metadata');
 
-        $subscriber->onConfigSave($this->configEvent);
+        $this->subscriber->onConfigSave($this->configEvent);
     }
 
     public function testCertificatePassesValidationIfValid(): void
     {
-        $subscriber = new ConfigSubscriber();
-
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
             ->willReturn('-----BEGIN CERTIFICATE-----');
 
-        $this->configEvent->expects($this->once())
-            ->method('getConfig')
-            ->with('userconfig')
-            ->willReturn(
-                [
-                    'saml_idp_own_certificate' => $file,
-                ]
-            );
+        $this->setupConfigMockWithOidcDisabled(['saml_idp_own_certificate' => $file]);
 
         $this->configEvent->expects($this->never())
             ->method('setError');
 
-        $subscriber->onConfigSave($this->configEvent);
+        $this->subscriber->onConfigSave($this->configEvent);
     }
 
     public function testCertificateFailsValidationIfNotValid(): void
     {
-        $subscriber = new ConfigSubscriber();
-
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
             ->willReturn('foobar');
 
-        $this->configEvent->expects($this->once())
-            ->method('getConfig')
-            ->with('userconfig')
-            ->willReturn(
-                [
-                    'saml_idp_own_certificate' => $file,
-                ]
-            );
+        $this->setupConfigMockWithOidcDisabled(['saml_idp_own_certificate' => $file]);
 
         $this->configEvent->expects($this->once())
             ->method('setError')
             ->with('mautic.user.saml.certificate.invalid', [], 'userconfig', 'saml_idp_own_certificate');
 
-        $subscriber->onConfigSave($this->configEvent);
+        $this->subscriber->onConfigSave($this->configEvent);
     }
 
     public function testPrivateKeyPassesValidationIfValid(): void
     {
-        $subscriber = new ConfigSubscriber();
-
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
             ->willReturn('-----BEGIN RSA PRIVATE KEY-----');
 
-        $this->configEvent->expects($this->once())
-            ->method('getConfig')
-            ->with('userconfig')
-            ->willReturn(
-                [
-                    'saml_idp_own_private_key' => $file,
-                ]
-            );
+        $this->setupConfigMockWithOidcDisabled(['saml_idp_own_private_key' => $file]);
 
         $this->configEvent->expects($this->never())
             ->method('setError');
 
-        $subscriber->onConfigSave($this->configEvent);
+        $this->subscriber->onConfigSave($this->configEvent);
     }
 
     public function testPrivateKeyFailsValidationIfNotValid(): void
     {
-        $subscriber = new ConfigSubscriber();
-
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
             ->willReturn('foobar');
 
-        $this->configEvent->expects($this->once())
-            ->method('getConfig')
-            ->with('userconfig')
-            ->willReturn(
-                [
-                    'saml_idp_own_private_key' => $file,
-                ]
-            );
+        $this->setupConfigMockWithOidcDisabled(['saml_idp_own_private_key' => $file]);
 
         $this->configEvent->expects($this->once())
             ->method('setError')
             ->with('mautic.user.saml.private_key.invalid', [], 'userconfig', 'saml_idp_own_private_key');
 
-        $subscriber->onConfigSave($this->configEvent);
+        $this->subscriber->onConfigSave($this->configEvent);
     }
 
     public function testEncryptedPrivateKeyPassesValidationIfValid(): void
     {
-        $subscriber = new ConfigSubscriber();
-
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $key  = <<<KEY_WRAP
 -----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI+tgT3QFhjEgCAggA
@@ -214,27 +201,20 @@ KEY_WRAP;
             ->method('getFileContent')
             ->willReturn($key);
 
-        $this->configEvent->expects($this->once())
-            ->method('getConfig')
-            ->with('userconfig')
-            ->willReturn(
-                [
-                    'saml_idp_own_private_key' => $file,
-                    'saml_idp_own_password'    => 'abc123',
-                ]
-            );
+        $this->setupConfigMockWithOidcDisabled([
+            'saml_idp_own_private_key' => $file,
+            'saml_idp_own_password'    => 'abc123',
+        ]);
 
         $this->configEvent->expects($this->never())
             ->method('setError');
 
-        $subscriber->onConfigSave($this->configEvent);
+        $this->subscriber->onConfigSave($this->configEvent);
     }
 
     public function testPrivateKeyFailsValidationIfPasswordNotValid(): void
     {
-        $subscriber = new ConfigSubscriber();
-
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $key  = <<<KEY_WRAP
 -----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI+tgT3QFhjEgCAggA
@@ -259,28 +239,21 @@ KEY_WRAP;
             ->method('getFileContent')
             ->willReturn($key);
 
-        $this->configEvent->expects($this->once())
-            ->method('getConfig')
-            ->with('userconfig')
-            ->willReturn(
-                [
-                    'saml_idp_own_private_key' => $file,
-                    'saml_idp_own_password'    => '123abc',
-                ]
-            );
+        $this->setupConfigMockWithOidcDisabled([
+            'saml_idp_own_private_key' => $file,
+            'saml_idp_own_password'    => '123abc',
+        ]);
 
         $this->configEvent->expects($this->once())
             ->method('setError')
             ->with('mautic.user.saml.private_key.password_invalid', [], 'userconfig', 'saml_idp_own_password');
 
-        $subscriber->onConfigSave($this->configEvent);
+        $this->subscriber->onConfigSave($this->configEvent);
     }
 
     public function testPrivateKeyFailsValidationIfPasswordMissing(): void
     {
-        $subscriber = new ConfigSubscriber();
-
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $key  = <<<KEY_WRAP
 -----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI+tgT3QFhjEgCAggA
@@ -305,20 +278,64 @@ KEY_WRAP;
             ->method('getFileContent')
             ->willReturn($key);
 
-        $this->configEvent->expects($this->once())
-            ->method('getConfig')
-            ->with('userconfig')
-            ->willReturn(
-                [
-                    'saml_idp_own_private_key' => $file,
-                    'saml_idp_own_password'    => '',
-                ]
-            );
+        $this->setupConfigMockWithOidcDisabled([
+            'saml_idp_own_private_key' => $file,
+            'saml_idp_own_password'    => '',
+        ]);
 
         $this->configEvent->expects($this->once())
             ->method('setError')
             ->with('mautic.user.saml.private_key.password_needed', [], 'userconfig', 'saml_idp_own_password');
 
-        $subscriber->onConfigSave($this->configEvent);
+        $this->subscriber->onConfigSave($this->configEvent);
+    }
+
+    /**
+     * @param array<string, mixed> $originalConfig
+     * @param array<string, mixed> $newConfig
+     */
+    #[DataProvider('oidcLinkResetProvider')]
+    public function testOidcLinksAreResetOnlyWhenProviderOrMappingFieldChanges(array $originalConfig, array $newConfig, bool $expectReset): void
+    {
+        $query = $this->createMock(Query::class);
+        $query->expects($expectReset ? $this->once() : $this->never())->method('execute');
+
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $queryBuilder->method('delete')->willReturnSelf();
+        $queryBuilder->method('getQuery')->willReturn($query);
+
+        $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
+        $subjectIdRepository->method('createQueryBuilder')->willReturn($queryBuilder);
+
+        $subscriber = new ConfigSubscriber(
+            $this->createStub(ClientFactoryInterface::class),
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(LoggerInterface::class),
+            $subjectIdRepository,
+        );
+
+        $event = new ConfigEvent(['userconfig' => $newConfig], new ParameterBag());
+        $event->setOriginalNormData(['userconfig' => ['parameters' => $originalConfig]]);
+
+        $subscriber->onConfigPostSave($event);
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, array<string, mixed>, bool}>
+     */
+    public static function oidcLinkResetProvider(): iterable
+    {
+        $current = ['open_id_client_url' => 'https://idp-a.example.com/realms/main', 'open_id_mapping_field' => 'sub'];
+
+        yield 'nothing changed' => [$current, $current, false];
+        yield 'provider URL changed' => [$current, ['open_id_client_url' => 'https://idp-b.example.com/realms/main'] + $current, true];
+        yield 'realm changed' => [$current, ['open_id_client_url' => 'https://idp-a.example.com/realms/other'] + $current, true];
+        yield 'realm case changed' => [$current, ['open_id_client_url' => 'https://idp-a.example.com/realms/Main'] + $current, true];
+        yield 'trailing slash added' => [$current, ['open_id_client_url' => 'https://idp-a.example.com/realms/main/'] + $current, false];
+        yield 'scheme and host case changed' => [$current, ['open_id_client_url' => 'HTTPS://IDP-A.Example.com/realms/main'] + $current, false];
+        yield 'surrounding whitespace added' => [$current, ['open_id_client_url' => ' https://idp-a.example.com/realms/main '] + $current, false];
+        yield 'provider URL configured for the first time' => [['open_id_client_url' => ''] + $current, $current, true];
+        yield 'provider URL cleared' => [$current, ['open_id_client_url' => null, 'open_id_mapping_field' => null], false];
+        yield 'mapping field changed' => [$current, ['open_id_mapping_field' => 'email'] + $current, true];
     }
 }

@@ -6,7 +6,6 @@ namespace Mautic\FormBundle\Tests\Form\Type;
 
 use Mautic\FormBundle\Form\Type\FormFieldNumberType;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,14 +14,11 @@ use Symfony\Component\Form\Test\TypeTestCase;
 final class FormFieldNumberTypeTest extends TypeTestCase
 {
     /**
-     * @var MockObject|FormBuilderInterface
+     * @var MockObject&FormBuilderInterface
      */
-    private $formBuilder;
+    private MockObject $formBuilder;
 
-    /**
-     * @var AbstractType<FormFieldNumberType>
-     */
-    private $form;
+    private FormFieldNumberType $form;
 
     protected function setUp(): void
     {
@@ -42,13 +38,13 @@ final class FormFieldNumberTypeTest extends TypeTestCase
         $matcher = $this->exactly(2);
 
         $this->formBuilder->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('placeholder', $parameters[0]);
                     $this->assertSame(TextType::class, $parameters[1]);
                     $this->assertSame([
                         'label'      => 'mautic.form.field.form.property_placeholder',
-                        'label_attr' => ['class' => 'control-label'],
+                        'label_attr' => ['class' => 'form-label'],
                         'attr'       => ['class' => 'form-control'],
                         'required'   => false,
                     ], $parameters[2]);
@@ -58,7 +54,7 @@ final class FormFieldNumberTypeTest extends TypeTestCase
                     $this->assertSame(IntegerType::class, $parameters[1]);
                     $this->assertSame([
                         'label'      => 'mautic.form.field.form.number_precision',
-                        'label_attr' => ['class' => 'control-label'],
+                        'label_attr' => ['class' => 'form-label'],
                         'data'       => 0,
                         'attr'       => [
                             'class'   => 'form-control',

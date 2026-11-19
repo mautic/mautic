@@ -1,0 +1,11 @@
+<td class="visible-md visible-lg {{ class|default('') }}">
+    {% for fieldGroup in fields %}
+        {% if fieldGroup[column].value is defined %}
+            {% if fieldGroup[column].normalizedValue is defined and fieldGroup[column].normalizedValue is string %}
+                {{ normalizeStringValue(fieldGroup[column].normalizedValue)|purify }}
+            {% elseif fieldGroup[column].value is not empty %}
+                {{ fieldGroup[column].value|purify }}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</td>

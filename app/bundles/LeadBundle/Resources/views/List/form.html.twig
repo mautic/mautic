@@ -25,9 +25,9 @@
 
 {# Tab content blocks #}
 {% set detailsTabContent %}
-<div class="pa-md">
+<div class="pa-16">
     <div class="row">
-        <div class="col-md-9 height-auto pt-lg">
+        <div class="col-md-9 height-auto pt-24">
             <div class="row">
                 <div class="col-md-6">
                     {{ form_row(form.name) }}
@@ -39,12 +39,13 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 height-auto pt-lg">
+        <div class="col-md-3 height-auto pt-24">
             {% set settingsTileContent %}
                 <div class="row layer-two">
                     <div class="col-xs-12">
                         {{ form_row(form.isPublished) }}
                         {{ form_row(form.category) }}
+                        {{ form_row(form.projects) }}
                         <div class="row">
                             {% set moreOptions %}
                                 {{ form_row(form.alias) }}
@@ -62,13 +63,10 @@
                     </div>
                 </div>
             {% endset %}
-            
-            {% include '@MauticCore/Components/tile--base.html.twig' with {
-                'tiles': [
-                    {
-                        'content': settingsTileContent
-                    }
-                ]
+
+            {% include '@MauticCore/Components/tile.html.twig' with {
+                'type': 'base',
+                'content': settingsTileContent
             } %}
         </div>
     </div>
@@ -76,11 +74,11 @@
 {% endset %}
 
 {% set filtersTabContent %}
-<div class="pa-md">
+<div class="pa-16">
     <div class="row">
         <div class="alert alert-info"><p>{{ 'mautic.lead.lead.segment.filter.info'|trans }}</p></div>
         <div class="form-group">
-            <div class="available-filters mb-md pl-0 col-md-4" data-prototype="{{ form_widget(form.filters.vars.prototype)|e }}" data-index="{{ index + 1 }}">
+            <div class="available-filters mb-16 ps-0 col-md-4" data-prototype="{{ form_widget(form.filters.vars.prototype)|e }}" data-index="{{ index + 1 }}">
                 <select class="chosen form-control" id="available_segment_filters">
                     <option value=""></option>
                     {% for object, field in form.vars.fields %}
@@ -89,7 +87,9 @@
                     <optgroup label="{{ header }}">
                         {% for value, params in field %}
                         {% set operators = params.operators is not empty ? params.operators|json_encode() : '{}' %}
-                        <option value="{{ value|e }}" id="available_{{ object }}_{{ value }}" data-field-object="{{ object }}" data-field-type="{{ params.properties.type }}" data-field-operators="{{ operators|e }}" class="segment-filter {{ icon }}">
+                        {% set objectLabel = translatorHasId('mautic.lead_list.filter.' ~ object) ? ('mautic.lead_list.filter.' ~ object)|trans : object|trans %}
+                        {% set label = 'mautic.lead_list.filter.field.label'|trans({'%object%': objectLabel, '%field%': params.label|capitalize|trans }) %}
+                        <option value="{{ value|e }}" id="available_{{ object }}_{{ value }}" data-field-label="{{ label }}" data-field-object="{{ object }}" data-field-type="{{ params.properties.type }}" data-field-operators="{{ operators|e }}" data-field-icon="{{ params.iconClass|default('') }}" class="segment-filter {{ params.iconClass|default('') }}">
                             {{ params.label|trans }}
                         </option>
                         {% endfor %}
@@ -100,8 +100,9 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-12 height-auto pt-lg ">
+        <div class="col-xs-12 height-auto pt-24 ">
             <div id="leadlist_filters" class="selected-filters">
+                {{ form_errors(form.filters) }}
                 {{ form_widget(form.filters) }}
             </div>
         </div>
@@ -110,11 +111,11 @@
 {% endset %}
 
 {% set preferenceCenterTabContent %}
-<div class="pa-md">
+<div class="pa-16">
     <div class="row mt-32">
         <div class="col-xs-12">
             {% set preferenceCenterOptions %}
-                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                {% include '@MauticCore/Components/pictogram.html.twig' with {
                     'pictogram': 'slider',
                     'size': '64'
                 } %}

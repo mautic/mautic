@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\EventListener\EnvironmentSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,12 +13,12 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class EnvironmentSubscriberTest extends TestCase
+final class EnvironmentSubscriberTest extends TestCase
 {
     private EnvironmentSubscriber $environmentSubscriber;
 
     /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelperMock;
 
@@ -31,15 +30,12 @@ class EnvironmentSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        Assert::assertSame(
-            [
-                KernelEvents::REQUEST => [
-                    ['onKernelRequestSetTimezone', 128],
-                    ['onKernelRequestSetLocale', 101],
-                ],
+        $this->assertSame([
+            KernelEvents::REQUEST => [
+                ['onKernelRequestSetTimezone', 128],
+                ['onKernelRequestSetLocale', 101],
             ],
-            $this->environmentSubscriber::getSubscribedEvents()
-        );
+        ], $this->environmentSubscriber::getSubscribedEvents());
     }
 
     public function testSetLocaleThatDoesNotHavePreviousSession(): void
@@ -79,8 +75,7 @@ class EnvironmentSubscriberTest extends TestCase
             ->with('en_US');
         $sessionInterfaceMock->expects($this->once())
             ->method('set')
-            ->with('_locale')
-            ->willReturn('en_US');
+            ->with('_locale');
         $this->coreParametersHelperMock->expects($this->never())
             ->method('get')
             ->with('locale');
@@ -115,8 +110,7 @@ class EnvironmentSubscriberTest extends TestCase
             ->with('en_GB');
         $sessionInterfaceMock->expects($this->once())
             ->method('set')
-            ->with('_locale')
-            ->willReturn('en_GB');
+            ->with('_locale');
 
         $this->environmentSubscriber->onKernelRequestSetLocale($requestEventMock);
     }

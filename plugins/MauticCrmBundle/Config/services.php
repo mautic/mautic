@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
         ->defaults()
@@ -19,6 +21,9 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('MauticPlugin\\MauticCrmBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+    $services->set('mautic_integration.service.transport', MauticPlugin\MauticCrmBundle\Services\Transport::class)
+        ->arg('$client', service('mautic.http.client'));
+    $services->alias(MauticPlugin\MauticCrmBundle\Services\Transport::class, 'mautic_integration.service.transport');
 
     $services->alias('mautic.integration.hubspot', MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration::class);
     $services->alias('mautic.integration.salesforce', MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration::class);

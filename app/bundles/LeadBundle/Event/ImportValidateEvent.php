@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class ImportValidateEvent extends Event
 {
-    private bool $skipIfExists;
-    private ?int $ownerId = null;
+    private bool $skipIfExists = false;
+
+    private bool $createNew = true;
+
+    private ?int $ownerId      = null;
 
     private ?int $list    = null;
 
@@ -29,8 +31,8 @@ class ImportValidateEvent extends Event
      * @param FormInterface<mixed> $form
      */
     public function __construct(
-        private string $routeObjectName,
-        private FormInterface $form,
+        private readonly string $routeObjectName,
+        private readonly FormInterface $form,
     ) {
     }
 
@@ -55,7 +57,7 @@ class ImportValidateEvent extends Event
      */
     public function importIsForRouteObject(string $routeObject): bool
     {
-        return $this->getRouteObjectName() === $routeObject;
+        return $this->routeObjectName === $routeObject;
     }
 
     public function getRouteObjectName(): string
@@ -73,7 +75,7 @@ class ImportValidateEvent extends Event
         $this->matchedFields = $matchedFields;
     }
 
-    public function getSkipIfExists(): bool
+    public function getSkipIfExists(): ?bool
     {
         return $this->skipIfExists;
     }
@@ -81,6 +83,16 @@ class ImportValidateEvent extends Event
     public function setSkipIfExists(bool $skipIfExists): void
     {
         $this->skipIfExists = $skipIfExists;
+    }
+
+    public function getCreateNew(): bool
+    {
+        return $this->createNew;
+    }
+
+    public function setCreateNew(bool $createNew): void
+    {
+        $this->createNew = $createNew;
     }
 
     /**

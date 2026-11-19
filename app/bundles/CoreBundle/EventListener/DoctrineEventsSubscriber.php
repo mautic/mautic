@@ -2,12 +2,19 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Events;
+use Doctrine\ORM\Id\SequenceGenerator;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class DoctrineEventsSubscriber implements EventSubscriber
+#[AsDoctrineListener(Events::loadClassMetadata)]
+#[AsDoctrineListener(ToolEvents::postGenerateSchema)]
+final class DoctrineEventsSubscriber
 {
     private array $deprecatedEntityTables = [];
 
@@ -15,16 +22,9 @@ class DoctrineEventsSubscriber implements EventSubscriber
      * @param string $tablePrefix
      */
     public function __construct(
+        #[Autowire(param: 'mautic.db_table_prefix')]
         private $tablePrefix,
     ) {
-    }
-
-    public function getSubscribedEvents(): array
-    {
-        return [
-            'loadClassMetadata',
-            'postGenerateSchema',
-        ];
     }
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $args): void
@@ -32,11 +32,12 @@ class DoctrineEventsSubscriber implements EventSubscriber
         // in the installer
         if (!defined('MAUTIC_TABLE_PREFIX') && empty($this->tablePrefix)) {
             return;
-        } elseif (empty($this->tablePrefix)) {
+        }
+        if (empty($this->tablePrefix)) {
             $this->tablePrefix = MAUTIC_TABLE_PREFIX;
         }
 
-        /** @var \Doctrine\ORM\Mapping\ClassMetadataInfo $classMetadata */
+        /** @var ClassMetadataInfo $classMetadata */
         $classMetadata = $args->getClassMetadata();
 
         // Do not re-apply the prefix in an inheritance hierarchy.
@@ -72,7 +73,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
             );
 
             foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
-                if (\Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY == $mapping['type']
+                if (ClassMetadataInfo::MANY_TO_MANY == $mapping['type']
                     && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])
                 ) {
                     $mappedTableName                                                     = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
@@ -88,7 +89,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
                 $classMetadata->setSequenceGeneratorDefinition($newDefinition);
                 $em = $args->getEntityManager();
                 if (isset($classMetadata->idGenerator)) {
-                    $sequenceGenerator = new \Doctrine\ORM\Id\SequenceGenerator(
+                    $sequenceGenerator = new SequenceGenerator(
                         $em->getConfiguration()->getQuoteStrategy()->getSequenceName(
                             $newDefinition,
                             $classMetadata,
@@ -127,7 +128,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
             foreach ($table->getIndexes() as $id => $index) {
                 $index_first_column = $this->trimQuotes(strtolower($index->getColumns()[0]));
 
-                if (!$index->isPrimary() && 1 == count($index->getColumns()) && $index_first_column === $pk_first_column) {
+                if (!$index->isPrimary() && 1 === count($index->getColumns()) && $index_first_column === $pk_first_column) {
                     $table->dropIndex($id);
                 }
             }

@@ -12,8 +12,10 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  */
 trait OptimisticLockTrait
 {
-    private int $version = 1;
-    private ?int $currentVersion;
+    private int $version = OptimisticLockInterface::INITIAL_VERSION;
+
+    private ?int $currentVersion = null;
+
     private bool $incrementVersion = false;
 
     public function getVersion(): int
@@ -46,7 +48,7 @@ trait OptimisticLockTrait
     {
         $builder->createField('version', Types::INTEGER)
             ->columnName('version')
-            ->option('default', 1)
+            ->option('default', OptimisticLockInterface::INITIAL_VERSION)
             ->option('unsigned', true)
             ->build();
     }

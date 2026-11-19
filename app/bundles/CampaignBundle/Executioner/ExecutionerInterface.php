@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Executioner;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -11,5 +13,5 @@ interface ExecutionerInterface
     /**
      * @return mixed
      */
-    public function execute(Campaign $campaign, ContactLimiter $limiter, OutputInterface $output = null);
+    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null);
 }

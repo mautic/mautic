@@ -4,13 +4,18 @@ namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExecuteEventCommand extends Command
+#[AsCommand(
+    name: 'mautic:campaigns:execute',
+    description: 'Execute specific scheduled events.'
+)]
+final class ExecuteEventCommand extends Command
 {
     use WriteCountTrait;
 
@@ -22,10 +27,9 @@ class ExecuteEventCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setName('mautic:campaigns:execute')
             ->addOption(
                 '--scheduled-log-ids',
                 null,
@@ -47,7 +51,7 @@ class ExecuteEventCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
         $now     = empty($input->getOption('execution-time')) ? null : new \DateTime($input->getOption('execution-time'));
         $ids     = $this->formatterHelper->simpleCsvToArray($input->getOption('scheduled-log-ids'), 'int');
@@ -57,6 +61,4 @@ class ExecuteEventCommand extends Command
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Execute specific scheduled events.';
 }

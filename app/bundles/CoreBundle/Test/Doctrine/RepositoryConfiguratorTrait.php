@@ -48,7 +48,7 @@ trait RepositoryConfiguratorTrait
     /**
      * @return object the repository for the entity
      */
-    private function configureRepository(string $entityClass, MockObject|EntityManagerInterface $entityManager = null)
+    private function configureRepository(string $entityClass, MockObject|EntityManagerInterface|null $entityManager = null)
     {
         $this->classMetadata   = $this->createMock(ClassMetadata::class);
         $this->entityManager   = $entityManager ?? $this->createMock(EntityManagerInterface::class);
@@ -68,8 +68,8 @@ trait RepositoryConfiguratorTrait
         $this->managerRegistry->method('getManagerForClass')->with($entityClass)->willReturn($this->entityManager);
         $this->entityManager->method('getClassMetadata')->with($entityClass)->willReturn($this->classMetadata);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
-        $this->connection->method('getExpressionBuilder')->willReturnCallback(fn () => new ExpressionBuilder($this->connection));
+        $this->connection->method('getExpressionBuilder')->willReturnCallback(fn (): ExpressionBuilder => new ExpressionBuilder($this->connection));
         $this->connection->method('executeQuery')->willReturn($this->result);
-        $this->connection->method('quote')->willReturnCallback(fn ($value) => "'$value'");
+        $this->connection->method('quote')->willReturnCallback(fn ($value): string => "'{$value}'");
     }
 }

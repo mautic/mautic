@@ -1,5 +1,7 @@
 {% extends not app.request.isXmlHttpRequest ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
+{% block headerTitle %}{{ integration }}{% endblock %}
+
 {% block content %}
   {% set leadId = lead is defined ? lead.id : null %}
 
@@ -7,7 +9,7 @@
     <style>.container { margin: auto !important; }</style>
     <!-- filter form -->
     <form method="post" action="{% if lead is defined %}{{ path('mautic_plugin_timeline_view', {'leadId': lead.id, 'integration': integration}) }}{% else %}{{ path('mautic_plugin_timeline_index', {'integration': integration}) }}{% endif %}" class="panel" id="timeline-filters">
-        <div class="form-control-icon pa-md">
+        <div class="form-control-icon pa-16">
             <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="{{ 'mautic.core.search.placeholder'|trans }}" value="{{ events.filters.search|e }}">
             <span class="the-icon ri-search-line text-secondary"></span>
         </div>
@@ -71,7 +73,7 @@
           <thead>
           <tr>
               <th class="timeline-icon">
-                  <a class="btn btn-sm btn-nospin btn-ghost" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
+                  <a class="btn btn-sm btn-nospin btn-ghost" data-activate-details="all" data-bs-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
                       <span class="ri-fw ri-corner-right-down-line"></span>
                   </a>
               </th>
@@ -121,7 +123,7 @@
 
               <tr class="timeline-row {{ cycle(['', 'timeline-row-highlighted'], loop.index) }} {% if event.feature is defined %}timeline-featured{% endif %}">
                   <td class="timeline-icon">
-                      <a data-activate-details="{{ loop.index }}" class="btn btn-sm btn-nospin btn-ghost {% if details is empty %}disabled{% endif %}" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_details'|trans }}" data-target="timeline-details-{{ loop.index }}">
+                      <a data-activate-details="{{ loop.index }}" class="btn btn-sm btn-nospin btn-ghost {% if details is empty %}disabled{% endif %}" data-bs-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_details'|trans }}" data-bs-target="timeline-details-{{ loop.index }}">
                           <span class="fa ri-fw {{ icon }}"></span>
                       </a>
                   </td>

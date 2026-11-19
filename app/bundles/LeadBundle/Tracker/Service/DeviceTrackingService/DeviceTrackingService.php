@@ -13,18 +13,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class DeviceTrackingService implements DeviceTrackingServiceInterface
 {
-    /**
-     * @var LeadDevice
-     */
-    private $trackedDevice;
+    private ?LeadDevice $trackedDevice = null;
 
     public function __construct(
-        private CookieHelper $cookieHelper,
-        private EntityManagerInterface $entityManager,
-        private LeadDeviceRepository $leadDeviceRepository,
-        private RandomHelperInterface $randomHelper,
-        private RequestStack $requestStack,
-        private CorePermissions $security,
+        private readonly CookieHelper $cookieHelper,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly LeadDeviceRepository $leadDeviceRepository,
+        private readonly RandomHelperInterface $randomHelper,
+        private readonly RequestStack $requestStack,
+        private readonly CorePermissions $security,
     ) {
     }
 
@@ -67,21 +64,11 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
             return $trackedDevice;
         }
 
-        // Check for an existing device for this contact to prevent blowing up the devices table
-        $existingDevice = $this->leadDeviceRepository->findOneBy(
-            [
-                'lead'        => $device->getLead(),
-                'device'      => $device->getDevice(),
-                'deviceBrand' => $device->getDeviceBrand(),
-                'deviceModel' => $device->getDeviceModel(),
-            ]
-        );
-
-        if (null !== $existingDevice) {
+        if (null !== $existingDevice = $this->leadDeviceRepository->findExistingDevice($device)) {
             $device = $existingDevice;
         }
 
-        if (null === $device->getTrackingId()) {
+        if (empty($device->getTrackingId())) {
             // Ensure all devices have a tracking ID (new devices will not and pre 2.13.0 devices may not)
             $device->setTrackingId($this->getUniqueTrackingIdentifier());
 
@@ -103,6 +90,11 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         $this->cookieHelper->deleteCookie('mtc_id');
     }
 
+    public function reset(): void
+    {
+        $this->trackedDevice = null;
+    }
+
     private function getTrackedIdentifier(): ?string
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -116,9 +108,9 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
             return $this->trackedDevice->getTrackingId();
         }
 
-        $deviceTrackingId = $this->cookieHelper->getCookie('mautic_device_id', null);
+        $deviceTrackingId = $this->cookieHelper->getCookie('mautic_device_id');
         if (null === $deviceTrackingId) {
-            $deviceTrackingId = $request->get('mautic_device_id', null);
+            $deviceTrackingId = $request->get('mautic_device_id');
         }
 
         return $deviceTrackingId;

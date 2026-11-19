@@ -4,21 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SearchWithCustomFieldDataFunctionalTest extends MauticMysqlTestCase
+final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
 {
     protected $useCleanupRollback = false;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataTestCreatingCustomFieldIndexableAndSearchable')]
+    #[DataProvider('dataTestCreatingCustomFieldIndexableAndSearchable')]
     public function testCreatingCustomFieldIndexableAndSearchable(int $isIndex, string $expectedValue): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
@@ -93,7 +88,7 @@ class SearchWithCustomFieldDataFunctionalTest extends MauticMysqlTestCase
         $crawler  = new Crawler($content['newContent'], $this->client->getInternalRequest()->getUri());
         $this->assertSame('Contacts 2', $crawler->filterXPath('//div[@id="globalSearchPanel"]//div[contains(@class, "text-secondary")]')->text());
 
-        $results = $crawler->filterXPath('//ul[contains(@class, "pa-0")]');
+        $results = $crawler->filterXPath('//ul[contains(concat(" ", normalize-space(@class), " "), " p-0 ")]');
         $this->assertCount(2, $results->filter('li'));
 
         foreach ($results->filter('li')->each(fn ($li) => $li->filter('a')->eq(0)->html()) as $i => $result) {
@@ -128,7 +123,7 @@ class SearchWithCustomFieldDataFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('ABC', $crawler->html());
         $this->assertStringNotContainsString('XYZ', $crawler->html());
 
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         $this->assertStringContainsString(
             $translator->trans('mautic.core.pagination.items', ['%count%' => 1]),
@@ -139,72 +134,5 @@ class SearchWithCustomFieldDataFunctionalTest extends MauticMysqlTestCase
             $translator->trans('mautic.core.pagination.pages', ['%count%' => 1]),
             $crawler->html()
         );
-    }
-
-    private function createSearchableField(string $name, string $object): void
-    {
-        $field = new LeadField();
-        $field->setName($name);
-        $field->setAlias($name);
-        $field->setObject($object);
-        $field->setDateAdded(new \DateTime());
-        $field->setDateAdded(new \DateTime());
-        $field->setDateModified(new \DateTime());
-        $field->setIsIndex(true);
-        $field->setType('text');
-
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
-        $fieldModel->saveEntity($field);
-    }
-
-    /**
-     * @param array<string, string|array<string, string>> $data
-     */
-    private function createContact(array $data): void
-    {
-        /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
-
-        $contact = (new Lead())
-            ->setFirstname($data['firstname'])
-            ->setLastname($data['lastname'])
-            ->setEmail($data['email'])
-            ->setCompany($data['company']);
-
-        foreach ($data['customFields'] ?? [] as $key => $value) {
-            $contact->addUpdatedField($key, $value);
-        }
-
-        $leadModel->saveEntity($contact);
-    }
-
-    /**
-     * @param array<string, string|array<string, string>> $data
-     */
-    private function createCompany(array $data): void
-    {
-        /** @var CompanyModel $companyModel */
-        $companyModel = static::getContainer()->get('mautic.lead.model.company');
-
-        $company = (new Company())
-            ->setName($data['name'] ?? null)
-            ->setEmail($data['email'] ?? null);
-
-        foreach ($data['customFields'] ?? [] as $key => $value) {
-            $company->addUpdatedField($key, $value);
-        }
-
-        $companyModel->saveEntity($company);
-
-        $this->em->clear();
-    }
-
-    private function performSearch(string $url): Response
-    {
-        $this->client->xmlHttpRequest(Request::METHOD_GET, $url);
-        $response = $this->client->getResponse();
-        $this->assertResponseIsSuccessful();
-
-        return $response;
     }
 }

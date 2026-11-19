@@ -26,7 +26,7 @@ use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class DynamicContentSubscriber implements EventSubscriberInterface
+final class DynamicContentSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
@@ -120,7 +120,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
             $dwc     =  $this->dynamicContentModel->getEntity($clickthrough['dynamic_content_id']);
             $utmTags = [];
-            if ($dwc && $dwc instanceof DynamicContent) {
+
+            if ($dwc instanceof DynamicContent) {
                 $utmTags = $dwc->getUtmTags();
             }
 
@@ -153,20 +154,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
-        $leadArray = [];
-        if ($lead instanceof Lead) {
-            $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
-        }
-
-        $result = [];
-        foreach ($tokens as $token => $dwc) {
-            $result[$token] = '';
-            if ($this->matchFilterForLead($dwc['filters'], $leadArray)) {
-                $result[$token] = $dwc['content'];
-            }
-        }
-        $content = str_replace(array_keys($result), array_values($result), $content);
+        $tokens = $this->dynamicContentHelper->findDwcTokens($content, $lead);
 
         // replace slots
         $dom = new \DOMDocument('1.0', 'utf-8');
@@ -177,6 +165,9 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
         for ($i = 0; $i < $contentSlots->length; ++$i) {
             $slot = $contentSlots->item($i);
+            if (!$slot instanceof \DOMElement) {
+                continue;
+            }
             if (!$slotName = $slot->getAttribute('data-param-slot-name')) {
                 continue;
             }
@@ -187,10 +178,38 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
             $newnode = $dom->createDocumentFragment();
             $newnode->appendXML('<![CDATA['.mb_encode_numericentity($slotContent, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8').']]>');
-            $slot->parentNode->replaceChild($newnode, $slot);
+            if ($slot->parentNode instanceof \DOMNode) {
+                $slot->parentNode->replaceChild($newnode, $slot);
+            }
         }
 
         $content = $dom->saveHTML();
+
+        // These tokens need to be replaced after the content, because otherwise the replaced tokens will have encoded
+        // HTML entities, which do not conform the tests.
+        $result = [];
+        foreach ($tokens as $token => $dwc) {
+            $result[$token] = $dwc['content'];
+        }
+
+        // Depending on the libxml version, DOMDocument may URL-encode { -> %7B and } -> %7D inside href, src and action values.
+        // Replace tokens (encoded or plain) inside those attributes with HTML-stripped, attribute-escaped content
+        // to avoid injecting HTML markup into attribute values, then replace the remaining tokens normally.
+        $content = preg_replace_callback(
+            '/(\b(?:href|src|action)\s*=\s*")([^"]*)(")/i',
+            static function (array $matches) use ($result): string {
+                $value = $matches[2];
+                foreach ($result as $token => $replacement) {
+                    $encodedToken = str_replace(['{', '}'], ['%7B', '%7D'], $token);
+                    $safe         = htmlspecialchars(strip_tags($replacement), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
+                    $value        = str_ireplace([$encodedToken, $token], $safe, $value);
+                }
+
+                return $matches[1].$value.$matches[3];
+            },
+            $content
+        ) ?? $content;
+        $content = str_replace(array_keys($result), array_values($result), $content);
 
         $event->setContent($content);
     }

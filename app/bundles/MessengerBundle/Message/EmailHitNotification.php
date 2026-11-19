@@ -7,14 +7,14 @@ namespace Mautic\MessengerBundle\Message;
 use Mautic\MessengerBundle\Message\Traits\MessageRequestTrait;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailHitNotification
+final class EmailHitNotification
 {
     use MessageRequestTrait;
 
     public function __construct(
         private string $statId,
         private Request $request,
-        \DateTimeInterface $eventTime = null,
+        ?\DateTimeInterface $eventTime = null,
     ) {
         $this->setEventTime($eventTime ?? new \DateTimeImmutable());
     }

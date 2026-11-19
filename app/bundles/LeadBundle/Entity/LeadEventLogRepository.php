@@ -98,7 +98,7 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @return array
      */
-    public function getEvents(Lead $contact = null, $bundle = null, $object = null, $actions = null, array $options = [])
+    public function getEvents(?Lead $contact = null, $bundle = null, $object = null, $actions = null, array $options = [])
     {
         $alias = $this->getTableAlias();
         $qb    = $this->getEntityManager()->getConnection()->createQueryBuilder()

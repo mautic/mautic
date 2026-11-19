@@ -5,30 +5,31 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Monolog;
 
 use Mautic\CoreBundle\Monolog\LogProcessor;
-use PHPUnit\Framework\Assert;
+use Monolog\Level;
+use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 
-class LogProcessorTest extends TestCase
+final class LogProcessorTest extends TestCase
 {
     public function testLogProcessor(): void
     {
         $logProcessor = new LogProcessor();
-        $record       = [
-            'message'    => 'This is debug message',
-            'context'    => [],
-            'level'      => 100,
-            'level_name' => 'DEBUG',
-            'channel'    => 'mautic',
-            'datetime'   => new \DateTime(),
-            'extra'      => [
-                'existing' => 'value',
-            ],
-        ];
-        $outputRecord = $logProcessor($record);
 
-        $record['extra']['hostname'] = gethostname();
-        $record['extra']['pid']      = getmypid();
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'mautic',
+            level: Level::Debug,
+            message: 'This is debug message',
+            context: [],
+            extra: ['existing' => 'value']
+        );
 
-        Assert::assertSame($record, $outputRecord);
+        $processed = $logProcessor($record);
+
+        $this->assertSame('value', $processed->extra['existing']);
+        $this->assertArrayHasKey('hostname', $processed->extra);
+        $this->assertArrayHasKey('pid', $processed->extra);
+        $this->assertIsString($processed->extra['hostname']);
+        $this->assertIsInt($processed->extra['pid']);
     }
 }

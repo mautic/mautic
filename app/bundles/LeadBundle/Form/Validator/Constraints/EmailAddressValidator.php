@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Mautic\EmailBundle\Exception\InvalidEmailException;
@@ -7,10 +9,10 @@ use Mautic\EmailBundle\Helper\EmailValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-class EmailAddressValidator extends ConstraintValidator
+final class EmailAddressValidator extends ConstraintValidator
 {
     public function __construct(
-        private EmailValidator $emailValidator,
+        private readonly EmailValidator $emailValidator,
     ) {
     }
 

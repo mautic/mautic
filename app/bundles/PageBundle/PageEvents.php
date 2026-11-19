@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle;
 
 /**
@@ -42,6 +44,16 @@ final class PageEvents
      * @var string
      */
     public const PAGE_ON_DISPLAY = 'mautic.page_on_display';
+
+    /**
+     * The mautic.page_on_toggle_publish event is dispatched right before a page is toggle publish.
+     *
+     * The event listener receives a
+     * Mautic\PageBundle\Event\PageEvent instance.
+     *
+     * @var string
+     */
+    public const PAGE_ON_TOGGLE_PUBLISH = 'mautic.page_on_toggle_publish';
 
     /**
      * The mautic.page_pre_save event is thrown right before a page is persisted.

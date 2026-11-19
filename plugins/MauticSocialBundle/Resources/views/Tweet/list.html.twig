@@ -14,7 +14,7 @@
         'action': currentRoute,
         'page_actions': {
             'templateButtons': {
-                'new': securityIsGranted('mauticSocial:tweet:create'),
+                'new': securityIsGranted('mauticSocial:tweets:create'),
             },
             'routeBase': 'mautic_tweet',
             'langVar': 'tweet',
@@ -23,7 +23,7 @@
           'langVar': 'mautic.social.tweets',
           'routeBase': 'mautic_tweet',
           'templateButtons': {
-              'delete': securityIsGranted('mauticSocial:tweet:delete'),
+              'delete': securityIsGranted('mauticSocial:tweets:delete'),
           },
       },
     }) }}

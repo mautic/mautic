@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Executioner\Result;
 
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\LeadBundle\Entity\Lead;
 
-class EvalutatedContactsTest extends \PHPUnit\Framework\TestCase
+final class EvalutatedContactsTest extends \PHPUnit\Framework\TestCase
 {
     public function testPassFail(): void
     {
@@ -22,7 +24,7 @@ class EvalutatedContactsTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $passed);
         $this->assertCount(1, $failed);
 
-        $this->assertTrue($passLead === $passed->first());
-        $this->assertTrue($failedLead === $failed->first());
+        $this->assertSame($passed->first(), $passLead);
+        $this->assertSame($failed->first(), $failedLead);
     }
 }

@@ -7,12 +7,14 @@
 {% set leadId = lead is defined ? lead.id : null %}
 {% extends tmpl is defined and 'index' == tmpl ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
+{% block headerTitle %}{{ integration }}{% endblock %}
+
 {% block content %}
   {% if not app.request.isXmlHttpRequest %}
     <style>.container { margin: auto !important; }</style>
     <!-- filter form -->
     <form method="post" action="{% if lead is defined %}{{ path('mautic_plugin_timeline_view', {'leadId': lead.id, 'integration': integration}) }}{% else %}{{ path('mautic_plugin_timeline_index', {'integration': integration}) }}{% endif %}" class="panel" id="timeline-filters">
-        <div class="form-control-icon pa-md">
+        <div class="form-control-icon pa-16">
             <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="{{ 'mautic.core.search.placeholder'|trans }}" value="{{ events.filters.search|e }}">
             <span class="the-icon ri-search-line text-secondary"></span>
         </div>
@@ -172,7 +174,7 @@
                                 attributes: {
                                     'data-activate-details': loop.index,
                                     'class': details is empty ? 'disabled' : '',
-                                    'data-toggle': 'tooltip',
+                                    'data-bs-toggle': 'tooltip',
                                 }
                             }
                         ]
@@ -181,7 +183,7 @@
                   </span>
 
                   <span class="timeline-icon">
-                      <a href="javascript:void(0);" class="btn btn-xs btn-nospin btn-ghost" data-toggle="tooltip" onclick="mQuery(this).toggleClass('btn-warning')" title="Mute notifications">
+                      <a href="javascript:void(0);" class="btn btn-xs btn-nospin btn-ghost" data-bs-toggle="tooltip" onclick="mQuery(this).toggleClass('btn-warning')" title="Mute notifications">
                           <span class="ri-notification-off-line"></span>
                       </a>
                   </span>

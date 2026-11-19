@@ -7,7 +7,7 @@ namespace MauticPlugin\GrapesJsBuilderBundle\Integration\Support;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration;
 
-class BuilderSupport extends GrapesJsBuilderIntegration implements BuilderInterface
+final class BuilderSupport extends GrapesJsBuilderIntegration implements BuilderInterface
 {
     /**
      * @var string[]

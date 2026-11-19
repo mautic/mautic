@@ -8,30 +8,33 @@ use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\Mapping\MappingException;
-use GuzzleHttp\Utils;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignControllerTest extends MauticMysqlTestCase
+final class CampaignControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
     use UserEntityTrait;
 
     private Lead $contactOne;
+
     private Lead $contactTwo;
+
     private Lead $contactThree;
+
     private Campaign $campaign;
 
     /**
@@ -41,7 +44,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
      */
     public function testContactsGridForValidPermissions(): void
     {
-        $nonAdminUser = $this->setupCampaignData(38);
+        $nonAdminUser = $this->setupCampaignData(38, 0);
 
         $this->loginOtherUser($nonAdminUser);
 
@@ -49,9 +52,9 @@ class CampaignControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString($this->contactOne->getName(), $content);
-        $this->assertStringContainsString($this->contactTwo->getName(), $content);
-        $this->assertStringContainsString($this->contactThree->getName(), $content);
+        $this->assertStringContainsString($this->contactOne->getName(), (string) $content);
+        $this->assertStringContainsString($this->contactTwo->getName(), (string) $content);
+        $this->assertStringContainsString($this->contactThree->getName(), (string) $content);
     }
 
     /**
@@ -62,7 +65,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
      */
     public function testContactsGridWhenIncompleteValidPermissions(): void
     {
-        $nonAdminUser = $this->setupCampaignData();
+        $nonAdminUser = $this->setupCampaignData(2, 0);
 
         $this->loginOtherUser($nonAdminUser);
 
@@ -70,7 +73,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('No Contacts Found', $content, $content);
+        $this->assertStringContainsString('No Contacts Found', (string) $content, $content);
     }
 
     /**
@@ -79,7 +82,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
      * @throws OptimisticLockException
      * @throws NotSupported
      */
-    private function setupCampaignData(int $bitwise = 2): User
+    private function setupCampaignData(int $bitwise, int $export): User
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->em->getRepository(User::class);
@@ -94,8 +97,9 @@ class CampaignControllerTest extends MauticMysqlTestCase
             'role'       => [
                 'name'        => 'perm_non_admin',
                 'permissions' => [
-                    'lead:leads'         => $bitwise,
-                    'campaign:campaigns' => 2,
+                    'lead:leads'             => $bitwise,
+                    'campaign:campaigns'     => 2,
+                    'campaign:export:enable' => $export,
                 ],
             ],
         ]);
@@ -197,7 +201,74 @@ class CampaignControllerTest extends MauticMysqlTestCase
             ],
         ];
 
-        Assert::assertSame($expectedEventsStatistics, $eventsStatistics, 'Events statistics doesn\'t match the actual events in the database.');
+        $this->assertSame($expectedEventsStatistics, $eventsStatistics, 'Events statistics doesn\'t match the actual events in the database.');
+    }
+
+    public function testIndexActionFiltersCampaignsBySegmentAliasQuickFilter(): void
+    {
+        $segmentPeople = $this->createSegment('people', []);
+        $segmentOther  = $this->createSegment('other', []);
+
+        $matchingCampaign = $this->createCampaign('Campaign For People');
+        $matchingCampaign->addList($segmentPeople);
+
+        $nonMatchingCampaign = $this->createCampaign('Campaign For Other');
+        $nonMatchingCampaign->addList($segmentOther);
+
+        $this->em->flush();
+
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/campaigns',
+            [
+                'search'  => 'list:people',
+                'filters' => json_encode(['list:people']),
+                'tmpl'    => 'list',
+            ]
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertStringContainsString($matchingCampaign->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString($nonMatchingCampaign->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString('No Results Found', (string) $responseData['newContent']);
+    }
+
+    public function testIndexActionFiltersCampaignsByFormQuickFilter(): void
+    {
+        $matchingForm    = $this->createFormEntity('matching-form');
+        $nonMatchingForm = $this->createFormEntity('other-form');
+        $this->em->flush();
+
+        $matchingCampaign = $this->createCampaign('Campaign For Matching Form');
+        $matchingCampaign->addForm($matchingForm);
+
+        $nonMatchingCampaign = $this->createCampaign('Campaign For Other Form');
+        $nonMatchingCampaign->addForm($nonMatchingForm);
+
+        $this->em->flush();
+
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/campaigns',
+            [
+                'search'  => sprintf('form:%d', $matchingForm->getId()),
+                'filters' => json_encode([sprintf('form:%d', $matchingForm->getId())]),
+                'tmpl'    => 'list',
+            ]
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertStringContainsString($matchingCampaign->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString($nonMatchingCampaign->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString('No Results Found', (string) $responseData['newContent']);
     }
 
     private function getCrawler(Campaign $campaign): Crawler
@@ -208,7 +279,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
         $url    = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $before->format('Y-m-d'), $after->format('Y-m-d'));
         $this->client->request('GET', $url);
         $response = $this->client->getResponse();
-        $body     = Utils::jsonDecode($response->getContent(), true);
+        $body     = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->client->restart();
 
         return new Crawler($body['actions']);
@@ -234,5 +305,164 @@ class CampaignControllerTest extends MauticMysqlTestCase
         }
 
         return $events;
+    }
+
+    private function createFormEntity(string $alias): Form
+    {
+        $form = new Form();
+        $form->setName($alias);
+        $form->setAlias($alias);
+        $this->em->persist($form);
+
+        return $form;
+    }
+
+    public function testExportAction(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(2, 1024);
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/export/'.$this->campaign->getId());
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame('application/zip', $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('.zip', (string) $response->headers->get('Content-Disposition'));
+    }
+
+    public function testBatchExportAction(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(2, 1024);
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request(
+            'GET',
+            '/s/campaigns/batchExport',
+            [
+                'filetype' => 'zip',
+                'ids'      => json_encode([$this->campaign->getId()]),
+            ]
+        );
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertEquals('application/zip', $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('.zip', (string) $response->headers->get('Content-Disposition'));
+    }
+
+    public function testExportActionAccessDenied(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(2, 0);
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/export/'.$this->campaign->getId());
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+    }
+
+    public function testExportActionCampaignNotFound(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(38, 1024);
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/export/999999'); // Non-existent campaign ID
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+    }
+
+    public function testExportFileNotCreated(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(38, 1024); // Ensures export permission
+
+        // Mock the ExportHelper to simulate file creation failure
+        $exportHelperMock = $this->createMock(ExportHelper::class);
+        $exportHelperMock->method('writeToZipFile')->willReturn('');
+
+        // Inject the mock into the container
+        self::getContainer()->set(ExportHelper::class, $exportHelperMock);
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/export/'.$this->campaign->getId());
+
+        $response        = $this->client->getResponse();
+        $responseContent = $response->getContent();
+
+        // Assert the response status and content
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertJson($responseContent);
+
+        $responseData = json_decode($responseContent, true);
+
+        $this->assertArrayHasKey('error', $responseData);
+        $this->assertStringContainsString('Export file could not be created', (string) $responseData['error']);
+
+        $this->assertArrayHasKey('flashes', $responseData);
+    }
+
+    public function testBatchExportAccessDenied(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(0, 0); // No permissions for view or export
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/batchExport');
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+    }
+
+    public function testBatchExportCampaignQuery(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(2, 1024); // Ensure view permissions
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/batchExport', [
+            'ids' => json_encode([]), // Empty IDs to trigger query
+        ]);
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
+
+    public function testBatchExportFileNotCreated(): void
+    {
+        $nonAdminUser = $this->setupCampaignData(2, 1024); // Ensure view and export permissions
+
+        // Mock the ExportHelper to simulate file creation failure
+        $exportHelperMock = $this->createMock(ExportHelper::class);
+        $exportHelperMock->method('writeToZipFile')->willReturn('/invalid/path/to/file.zip');
+
+        // Use the test container to replace the service with the mock
+        self::getContainer()->set(ExportHelper::class, $exportHelperMock);
+
+        $this->loginOtherUser($nonAdminUser);
+
+        $this->client->request('GET', '/s/campaigns/batchExport', [
+            'ids' => json_encode([$this->campaign->getId()]),
+        ]);
+
+        $response        = $this->client->getResponse();
+        $responseContent = $response->getContent();
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertJson($responseContent);
+
+        $responseData = json_decode($responseContent, true);
+
+        $this->assertArrayHasKey('error', $responseData);
+        $this->assertStringContainsString('Export file could not be created', (string) $responseData['error']);
     }
 }

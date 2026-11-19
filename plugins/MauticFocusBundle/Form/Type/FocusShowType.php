@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -12,10 +14,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<string, mixed>>
  */
-class FocusShowType extends AbstractType
+final class FocusShowType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -26,7 +28,7 @@ class FocusShowType extends AbstractType
             FocusListType::class,
             [
                 'label'      => 'mautic.focus.focusitem.selectitem',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.focus.focusitem.selectitem_descr',
@@ -36,7 +38,7 @@ class FocusShowType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.focus.choosefocus.notblank']
+                        message: 'mautic.focus.choosefocus.notblank'
                     ),
                 ],
                 'data' => $options['data']['focus'] ?? null,

@@ -2,7 +2,9 @@
 
 namespace Mautic\CoreBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,23 +15,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to install Mautic sample data.
  */
-class InstallDataCommand extends Command
-{
-    public function __construct(
-        private TranslatorInterface $translator,
-    ) {
-        parent::__construct();
-    }
-
-    protected function configure()
-    {
-        $this->setName('mautic:install:data')
-            ->setDefinition([
-                new InputOption(
-                    'force', null, InputOption::VALUE_NONE, 'Bypasses the verification check.'
-                ),
-            ])
-            ->setHelp(<<<'EOT'
+#[AsCommand(
+    name: 'mautic:install:data',
+    description: 'Installs Mautic with sample data',
+    help: <<<'TXT'
 The <info>%command.name%</info> command re-installs Mautic with sample data.
 
 <info>php %command.full_name%</info>
@@ -37,8 +26,24 @@ The <info>%command.name%</info> command re-installs Mautic with sample data.
 You can optionally specify to bypass the verification check with the --force option:
 
 <info>php %command.full_name% --force</info>
-EOT
-            );
+TXT
+)]
+final class InstallDataCommand extends Command
+{
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {
+        parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->setDefinition([
+                new InputOption(
+                    'force', null, InputOption::VALUE_NONE, 'Bypasses the verification check.'
+                ),
+            ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -47,6 +52,7 @@ EOT
         $force   = $options['force'];
 
         if (!$force) {
+            /** @var QuestionHelper $helper */
             $helper         = $this->getHelper('question');
             $questionString = $this->translator->trans('mautic.core.command.install_data_confirm').' (y = '.$this->translator->trans('mautic.core.form.yes').', n = '.$this->translator->trans('mautic.core.form.no').'): ';
             $question       = new ConfirmationQuestion($questionString, false);
@@ -112,6 +118,4 @@ EOT
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Installs Mautic with sample data';
 }

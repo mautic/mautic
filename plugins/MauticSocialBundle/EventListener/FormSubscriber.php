@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\EventListener;
 
 use Mautic\FormBundle\Event\FormBuilderEvent;
@@ -8,10 +10,11 @@ use MauticPlugin\MauticSocialBundle\Form\Type\SocialLoginType;
 use MauticPlugin\MauticSocialBundle\Integration\Config;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Config $config)
-    {
+    public function __construct(
+        private Config $config,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

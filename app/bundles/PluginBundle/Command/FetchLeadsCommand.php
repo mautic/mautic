@@ -4,36 +4,37 @@ namespace Mautic\PluginBundle\Command;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FetchLeadsCommand extends Command
+#[AsCommand(
+    name: 'mautic:integration:fetchleads',
+    description: 'Fetch leads from integration.',
+    aliases: [
+        'mautic:integration:synccontacts',
+    ]
+)]
+final class FetchLeadsCommand extends Command
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private IntegrationHelper $integrationHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly IntegrationHelper $integrationHelper,
     ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setName('mautic:integration:fetchleads')
-            ->setAliases(
-                [
-                    'mautic:integration:synccontacts',
-                ]
-            )
             ->addOption(
                 '--integration',
                 '-i',
                 InputOption::VALUE_REQUIRED,
-                'Fetch leads from integration. Integration must be enabled and authorised.',
-                null
+                'Fetch leads from integration. Integration must be enabled and authorised.'
             )
             ->addOption('--start-date', '-d', InputOption::VALUE_REQUIRED, 'Set start date for updated values.')
             ->addOption(
@@ -114,7 +115,7 @@ class FetchLeadsCommand extends Command
         $config            = $integrationObject->mergeConfigToFeatureSettings();
         $supportedFeatures = $integrationObject->getIntegrationSettings()->getSupportedFeatures();
 
-        defined('MAUTIC_CONSOLE_VERBOSITY') or define('MAUTIC_CONSOLE_VERBOSITY', $output->getVerbosity());
+        defined('MAUTIC_CONSOLE_VERBOSITY') || define('MAUTIC_CONSOLE_VERBOSITY', $output->getVerbosity());
 
         if (!isset($config['objects'])) {
             $config['objects'] = [];
@@ -142,7 +143,7 @@ class FetchLeadsCommand extends Command
                     $leadObjectName = 'Leads';
                 }
                 $contactObjectName = 'Contact';
-                if (in_array(strtolower('Contacts'), array_map(fn ($i): string => strtolower($i), $config['objects']), true)) {
+                if (in_array(strtolower('Contacts'), array_map(strtolower(...), $config['objects']), true)) {
                     $contactObjectName = 'Contacts';
                 }
 
@@ -158,7 +159,7 @@ class FetchLeadsCommand extends Command
                         $processed += (int) $results;
                     }
                 }
-                if (in_array(strtolower($contactObjectName), array_map(fn ($i): string => strtolower($i), $config['objects']), true)) {
+                if (in_array(strtolower($contactObjectName), array_map(strtolower(...), $config['objects']), true)) {
                     $output->writeln('');
                     $output->writeln('<comment>'.$this->translator->trans('mautic.plugin.command.fetch.contacts.starting').'</comment>');
                     $contactList = [];
@@ -282,6 +283,4 @@ class FetchLeadsCommand extends Command
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Fetch leads from integration.';
 }

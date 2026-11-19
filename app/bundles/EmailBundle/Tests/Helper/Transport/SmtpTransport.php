@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
 use Symfony\Component\Mailer\Envelope;
@@ -8,12 +10,12 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 
-class SmtpTransport implements TransportInterface
+final class SmtpTransport implements TransportInterface
 {
     /**
      * @var array<string, mixed>
      */
-    private $transports = []; // @phpstan-ignore-line
+    private array $transports = []; // @phpstan-ignore-line
 
     public Email $sentMessage;
 
@@ -22,7 +24,7 @@ class SmtpTransport implements TransportInterface
         $this->transports['main'] = $this;
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         if ($message instanceof Email) {
             $this->sentMessage = clone $message;

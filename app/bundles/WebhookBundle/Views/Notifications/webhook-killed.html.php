@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<p>Dear User,</p>
+<p>We wanted to bring to your attention that we've detected a failure in one of your configured webhook so we unpublished it automatically. This issue has been ongoing for a significant period and requires your immediate attention to prevent potential disruptions.</p>
+
+<h2>Details of the Issue:</h2>
+<div class="content">
+    <p><strong>Webhook Name/ID:</strong>
+        <a href="<?php echo $view['router']->url('mautic_webhook_action', ['objectAction' => 'view', 'objectId' => $webhook->getId()]); ?>">
+            <?php echo $webhook->getName(); ?>
+        </a>
+    </p>
+    <p><strong>Failure Started At:</strong> <?php echo $failing_since.' (UTC)'; ?></p>
+    <p><strong>Current Status:</strong> Failing</p>
+</div>
+
+<h2>Recommended Action:</h2>
+<div class="content">
+    <ul>
+        <li>Review the webhook configuration and ensure that the endpoint URL is correct and reachable.</li>
+        <li>Check any related server logs for error messages that might indicate the cause of the failure.</li>
+        <li>Please verify the authentication credentials, if required by the webhook endpoint.</li>
+    </ul>
+    <p>Our technical support team is available to assist you if necessary.</p>
+    <p>By resolving this promptly, you can prevent further complications from arising.</p>
+</div>
+
+<p class="footer">Thank you for your attention to this matter.</p>
+
+<p>Best Regards,</p>
+<p><?php echo $signature_from_name; ?></p>
+</body>
+</html>

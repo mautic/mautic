@@ -1,0 +1,65 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mautic\PluginBundle\Tests\Controller;
+
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Component\HttpFoundation\Request;
+
+final class PluginControllerTest extends MauticMysqlTestCase
+{
+    public function testConfigurePluginSuccessValidation(): void
+    {
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/plugins/config/Twilio');
+        $form       = $crawler->filter('form')->form();
+
+        $form->setValues([
+            'integration_details' => [
+                'isPublished' => 0,
+                'apiKeys'     => [
+                    'username' => 'valid_username',
+                    'password' => 'valid_password',
+                ],
+            ],
+        ]);
+
+        $this->client->submit($form);
+        self::assertResponseIsSuccessful();
+    }
+
+    public function testConfigurePluginValidationError(): void
+    {
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/plugins/config/Twilio');
+        $form       = $crawler->filter('form')->form();
+
+        $form->setValues([
+            'integration_details' => [
+                'isPublished' => 1,
+                'apiKeys'     => [
+                    'username' => '',
+                    'password' => 'bbb',
+                ],
+            ],
+        ]);
+
+        $crawler     = $this->client->submit($form);
+        $this->assertStringContainsString('A value is required.', $crawler->filter('#integration_details_apiKeys div')->html());
+    }
+
+    public function testReturnPluginVersion(): void
+    {
+        $this->testSymfonyCommand('mautic:plugins:install');
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/plugins/info/MauticFocusBundle');
+
+        $response = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+
+        $content = $response->getContent();
+        $this->assertJson($content);
+
+        $data = json_decode($content, true);
+        $this->assertArrayHasKey('pluginVersion', $data);
+        $this->assertSame('1.0', $data['pluginVersion']);
+    }
+}

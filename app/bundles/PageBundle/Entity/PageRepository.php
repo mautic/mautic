@@ -2,13 +2,18 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\FormBundle\Entity\Submission;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Page>
  */
 class PageRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
     public function getEntities(array $args = [])
     {
         $select = ['p'];
@@ -17,7 +22,7 @@ class PageRepository extends CommonRepository
             // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
             $sq = $this->_em->createQueryBuilder()
                 ->select('count(fs.id)')
-                ->from(\Mautic\FormBundle\Entity\Submission::class, 'fs')
+                ->from(Submission::class, 'fs')
                 ->where('fs.page = p');
 
             $select[] = '('.$sq->getDql().') as submission_count';
@@ -133,6 +138,22 @@ class PageRepository extends CommonRepository
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
+            case $this->translator->trans('mautic.page.searchcommand.isexpired'):
+            case $this->translator->trans('mautic.page.searchcommand.isexpired', [], null, 'en_US'):
+                $expr = sprintf(
+                    "(p.isPublished = :%1\$s AND p.publishDown IS NOT NULL AND p.publishDown <> '' AND p.publishDown < CURRENT_TIMESTAMP())",
+                    $unique
+                );
+                $forceParameters = [$unique => true];
+                break;
+            case $this->translator->trans('mautic.page.searchcommand.ispending'):
+            case $this->translator->trans('mautic.page.searchcommand.ispending', [], null, 'en_US'):
+                $expr = sprintf(
+                    "(p.isPublished = :%1\$s AND p.publishUp IS NOT NULL AND p.publishUp <> '' AND p.publishUp > CURRENT_TIMESTAMP())",
+                    $unique
+                );
+                $forceParameters = [$unique => true];
+                break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):
             case $this->translator->trans('mautic.core.searchcommand.lang', [], null, 'en_US'):
                 $langUnique      = $this->generateRandomParameterName();
@@ -141,17 +162,24 @@ class PageRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->or(
-                    $q->expr()->eq('p.language', ":$unique"),
-                    $q->expr()->like('p.language', ":$langUnique")
-                );
+                $expr            = '('.$q->expr()->eq('p.language', ":{$unique}").' OR '.$q->expr()->like('p.language', ":{$langUnique}").')';
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.page.searchcommand.isprefcenter'):
             case $this->translator->trans('mautic.page.searchcommand.isprefcenter', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('p.isPreferenceCenter', ":$unique");
+                $expr            = $q->expr()->eq('p.isPreferenceCenter', ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'page_id',
+                    'page_projects_xref',
+                    $this->getTableAlias(),
+                    $filter->string,
+                    $filter->not
+                );
         }
 
         if ($expr && $filter->not) {
@@ -162,7 +190,7 @@ class PageRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [$expr, $parameters];
@@ -178,9 +206,12 @@ class PageRepository extends CommonRepository
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
+            'mautic.page.searchcommand.isexpired',
+            'mautic.page.searchcommand.ispending',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
             'mautic.page.searchcommand.isprefcenter',
+            'mautic.project.searchcommand.name',
         ];
 
         return array_merge($commands, parent::getSearchCommands());
@@ -213,14 +244,13 @@ class PageRepository extends CommonRepository
             ->set('variant_start_date', ':date')
             ->setParameter('date', $date)
             ->where(
-                $qb->expr()->in('id', $relatedIds)
+                $qb->expr()->in('id', ':ids')
             )
+            ->setParameter('ids', $relatedIds, ArrayParameterType::INTEGER)
             ->executeStatement();
     }
 
     /**
-     * Up the hit count.
-     *
      * @param int        $increaseBy
      * @param bool|false $unique
      * @param bool|false $variant

@@ -7,6 +7,8 @@ use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,27 +19,29 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to send a scheduled broadcast.
  */
-class SendChannelBroadcastCommand extends ModeratedCommand
+#[AsCommand(
+    name: 'mautic:broadcasts:send',
+    description: 'Process contacts pending to receive a channel broadcast.',
+    help: <<<'TXT'
+                The <info>%command.name%</info> command is send a channel broadcast to pending contacts.
+
+<info>php %command.full_name% --channel=email --id=3</info>
+TXT
+)]
+final class SendChannelBroadcastCommand extends ModeratedCommand
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private EventDispatcherInterface $dispatcher,
+        private readonly TranslatorInterface $translator,
+        private readonly EventDispatcherInterface $dispatcher,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
-        $this->setName('mautic:broadcasts:send')
-            ->setHelp(
-                <<<'EOT'
-                The <info>%command.name%</info> command is send a channel broadcast to pending contacts.
-
-<info>php %command.full_name% --channel=email --id=3</info>
-EOT
-            )
+        $this
             ->setDefinition(
                 [
                     new InputOption(
@@ -121,12 +125,12 @@ EOT
             if ((int) $threadId > (int) $maxThreads) {
                 $output->writeln('--thread-id cannot be larger than --max-thread');
 
-                return \Symfony\Component\Console\Command\Command::FAILURE;
+                return Command::FAILURE;
             }
         }
 
         if (!$this->checkRunStatus($input, $output, $key)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         $event = new ChannelBroadcastEvent($channel, $channelId, $output);
@@ -176,8 +180,6 @@ EOT
 
         $this->completeRun();
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Process contacts pending to receive a channel broadcast.';
 }

@@ -11,8 +11,23 @@
 {% block content %}
 	{% if isIndex %}
 	<div id="page-list-wrapper" class="panel panel-default">
+		{%- set pageButtons = [] %}
+		{% if permissions.create %}
+			{% set pageButtons = pageButtons|merge([{
+				'attr': {
+					'class': 'btn btn-ghost btn--icon-only btn-nospin',
+					'href': '#InviteUserModal',
+					'data-bs-toggle': 'modal',
+				},
+				'iconClass': 'ri-team-line',
+				'tooltip': 'mautic.user.profile.invite',
+				'primary': true,
+			}]) %}
+		{% endif %}
 		{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
 			'searchValue': searchValue,
+			'searchScopes': searchScopes|default([]),
+			'searchScopeHint': searchScopeHint|default(null),
 			'action': currentRoute,
 			'page_actions': {
 				'templateButtons': {
@@ -20,6 +35,7 @@
 				},
 				'routeBase': 'user',
 				'langVar': 'user.user',
+				'customButtons': pageButtons,
 			},
 			'bulk_actions': {
 				'routeBase': 'user',
@@ -28,26 +44,41 @@
 					'delete': permissions['delete']
 				}
 			},
-			'quickFilters': [
-				{
-					'search': 'mautic.user.user.searchcommand.isadmin',
-					'label': 'mautic.user.role.form.isadmin',
-					'tooltip': 'mautic.core.search.quickfilter.is_admin',
-					'icon': 'ri-admin-line'
+			'quickFilters': {
+				'mautic.core.quick_filters.status': {
+					'conflictGroup': true,
+					'filters': [
+						{
+							'search': 'mautic.core.searchcommand.ispublished',
+							'label': 'mautic.core.form.active',
+							'tooltip': 'mautic.core.search.quickfilter.is_published',
+							'icon': 'ri-check-line'
+						},
+						{
+							'search': 'mautic.core.searchcommand.isunpublished',
+							'label': 'mautic.core.form.inactive',
+							'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
+							'icon': 'ri-close-line'
+						}
+					]
 				},
-				{
-					'search': 'mautic.core.searchcommand.ispublished',
-					'label': 'mautic.core.form.active',
-					'tooltip': 'mautic.core.search.quickfilter.is_published',
-					'icon': 'ri-check-line'
-				},
-				{
-					'search': 'mautic.core.searchcommand.isunpublished',
-					'label': 'mautic.core.form.inactive',
-					'tooltip': 'mautic.core.search.quickfilter.is_unpublished',
-					'icon': 'ri-close-line'
+				'mautic.core.quick_filters.others': {
+					'filters': [
+						{
+							'search': 'mautic.user.user.searchcommand.isadmin',
+							'label': 'mautic.user.role.form.isadmin',
+							'tooltip': 'mautic.core.search.quickfilter.is_admin',
+							'icon': 'ri-admin-line'
+						},
+						{
+							'search': 'mautic.user.user.searchcommand.neverloggedin',
+							'label': 'mautic.user.user.searchcommand.neverloggedin.label',
+							'tooltip': 'mautic.user.user.searchcommand.neverloggedin.description',
+							'icon': 'ri-login-box-line'
+						}
+					]
 				}
-			]
+			},
 		}) -}}
 		<div class="page-list">
 			{{ block('listResults') }}
@@ -55,6 +86,35 @@
 	</div>
 	{% else %}
 		{{ block('listResults') }}
+	{% endif %}
+
+	{% if isIndex and permissions.create and inviteForm %}
+		{% set modalAttributes = {} %}
+		{% if app.request.query.get('open') == 'invite' %}
+			{% set modalAttributes = modalAttributes|merge({'data-auto-open': 'true'}) %}
+		{% endif %}
+
+		{% include '@MauticCore/Components/modal.html.twig' with {
+			id: 'InviteUserModal',
+			modalLabel: 'mautic.user.invite.title',
+			modalContent: include('@MauticUser/User/invite.html.twig', { form: inviteForm }),
+			type: 'expressive',
+			modalAttributes: modalAttributes,
+			buttons: [
+				{
+					'label': 'mautic.core.form.cancel'|trans,
+					'variant': 'secondary',
+					'attributes': {
+						'data-bs-dismiss': 'modal'
+					}
+				},
+				{
+					'label': 'mautic.user.invite.send'|trans,
+					'variant': 'primary',
+					'onclick': "mQuery('#InviteUserModal').find('#invite-user-form button[type=submit]').trigger('click');"
+				}
+			]
+		} %}
 	{% endif %}
 {% endblock %}
 
@@ -98,7 +158,7 @@
 
 					{{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'user',
-                    'orderBy'    : 'r.name',
+                    'orderBy'    : 'u.lastLogin',
                     'text'       : 'mautic.user.lastlogin',
                     'class'      : 'visible-md visible-lg col-user-lastlogin',
                 }) -}}
@@ -128,7 +188,7 @@
                    }) -}}
 						</td>
 						<td class="visible-md visible-lg">
-							<img class="img img-responsive img-thumbnail w-44" src="{{ gravatarGetImage(item.getEmail(), '50') }}"/>
+							<img class="img img-fluid img-thumbnail w-44" src="{{ userAvatar(item.getId()) }}" alt=""/>
 						</td>
 						<td>
 							<div>

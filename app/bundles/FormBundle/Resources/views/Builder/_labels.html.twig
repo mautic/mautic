@@ -16,11 +16,13 @@
         'select': 'ri-list-check',
         'country': 'ri-map-pin-line',
         'number': 'ri-increase-decrease-line',
+        'slider': 'ri-equalizer-line',
         'tel': 'ri-phone-line',
         'email': 'ri-mail-line',
         'date': 'ri-calendar-line',
         'datetime': 'ri-calendar-schedule-line',
         'companyLookup': 'ri-building-line',
+        'rating': 'ri-star-line',
         'file': 'ri-file-upload-line'
     } %}
 
@@ -33,27 +35,28 @@
                     icon: typeIcons[field.type] ?? 'ri-input-field',
                     color: isConditional ? 'warm-gray' : 'high-contrast',
                     attributes: {
-                        'data-toggle': 'tooltip',
-                        'data-original-title': 'mautic.form.field.type'|trans
+                        'data-bs-toggle': 'tooltip',
+                        'data-bs-title': 'mautic.form.field.type'|trans
                     }
                 }
             ]
         } %}
     {% endif %}
 
-    {% if field.mappedObject is not empty and field.mappedField is not empty and mappedFields[field.mappedObject] is defined %}
+    {% if field.mappedObject is defined and field.mappedObject is not empty and field.mappedField is defined and field.mappedField is not empty and mappedFields[field.mappedObject] is defined %}
     <!-- Mapped field -->
+    {% set fieldCollection = mappedFields[field.mappedObject] %}
     {% set objectLabel = field.mappedObject == 'company' ? 'mautic.company.company'|trans|lower : (field.mappedObject == 'contact' ? 'mautic.lead.contact'|trans|lower : field.mappedObject|lower) %}
 
     {% include '@MauticCore/Helper/_tag.html.twig' with {
         'tags': [{
             'color': 'green',
             'icon': field.mappedObject == 'company' ? 'ri-building-3-line' : (field.mappedObject == 'contact' ? 'ri-contacts-book-line' : 'ri-shape-line'),
-            'label': fieldCollection[field.mappedField] is defined ? fieldCollection[field.mappedField].name :
+            'label': fieldCollection.getFieldByKey(field.mappedField, false) is not empty ? fieldCollection.getFieldByKey(field.mappedField).name :
                     (field.mappedObject == 'contact' ? ('mautic.lead.field.' ~ field.mappedField) :
                     (field.mappedObject == 'company' ? ('mautic.lead.field.' ~ field.mappedField) : field.mappedField)),
             'attributes': {
-                'data-toggle': 'tooltip',
+                'data-bs-toggle': 'tooltip',
                 'title': 'mautic.core.field.mapped.to'|trans({'%object%': objectLabel})
             }
         }]
@@ -112,7 +115,7 @@
                     icon: 'ri-forward-end-mini-fill',
                     color: 'blue',
                     'attributes': {
-                        'data-toggle': 'tooltip',
+                        'data-bs-toggle': 'tooltip',
                         'title': 'mautic.form.field.hide.if.submission.count'|trans({'%count%': field.showAfterXSubmissions})
                     }
                 }
@@ -177,6 +180,20 @@
         } %}
     {% endif %}
 
+    {% if field.validation.blockfreeemail is defined and field.validation.blockfreeemail == 1 %}
+    <!-- Blocked free email providers -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: 'mautic.form.field.type.email.blocked_free_providers',
+                    icon: 'ri-mail-forbid-fill',
+                    icon_only: true,
+                    color: 'blue'
+                }
+            ]
+        } %}
+    {% endif %}
+
     {% if field.isRequired is defined and field.isRequired == 1 %}
     <!-- Required -->
     {% include '@MauticCore/Helper/_tag.html.twig' with {
@@ -187,7 +204,7 @@
                 color: 'red',
                 icon_only: true,
                 attributes: {
-                    'class': 'ml-a'
+                    'class': 'ms-auto'
                 }
             }
         ]
@@ -197,7 +214,7 @@
 {% endset %}
 
 {% if footerContent|trim is not empty %}
-    <div class="d-flex ml-sm mr-sm mt-xs as-stretch gap-3 ai-center">
+    <div class="d-flex ms-12 me-12 mt-5 align-self-stretch gap-3 align-items-center">
         {{ footerContent|raw }}
     </div>
 {% endif %}

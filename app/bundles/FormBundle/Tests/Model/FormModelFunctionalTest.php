@@ -5,12 +5,90 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Model\FormModel;
+use Mautic\FormBundle\Tests\Helper\ConditionalFieldOrderTestData;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class FormModelFunctionalTest extends MauticMysqlTestCase
+final class FormModelFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
+    protected function setUp(): void
+    {
+        $this->configParams['form_field_autofill'] = true;
+
+        parent::setUp();
+    }
+
+    public function testConditionalFieldsPreserveOrderAfterDatabaseSave(): void
+    {
+        /** @var FormModel $formModel */
+        $formModel = self::getContainer()->get(FormModel::class);
+
+        // Parent session key must contain 'new' so FormConditionalSubscriber resolves it to a persisted field ID.
+        $sessionFields = ConditionalFieldOrderTestData::createSessionFields([
+            'parentKey'            => 'new_mautic_parent',
+            'withConditions'       => true,
+            'withSelectProperties' => true,
+        ]);
+
+        $form = new Form();
+        $form->setName('Conditional field order test');
+        $form->setAlias('cond_order_'.uniqid());
+        $form->setIsPublished(false);
+
+        $formModel->setFields($form, $sessionFields);
+        $formModel->saveEntity($form);
+
+        $formId = $form->getId();
+        $this->em->clear();
+
+        $reloaded = $formModel->getEntity($formId);
+        $this->assertInstanceOf(Form::class, $reloaded);
+        $this->assertSame(ConditionalFieldOrderTestData::getExpectedChildLabels(), $this->getConditionalChildLabels($reloaded));
+
+        $resaveSessionFields = [];
+        foreach ($reloaded->getFields() as $field) {
+            $sessionId = 'mautic_re_'.$field->getId();
+            $field->setSessionId($sessionId);
+            $fieldData = $field->convertToArray();
+            unset($fieldData['form']);
+            $fieldData['id']                 = $field->getId();
+            $resaveSessionFields[$sessionId] = $fieldData;
+        }
+
+        $formModel->setFields($reloaded, $resaveSessionFields);
+        $formModel->saveEntity($reloaded);
+        $this->em->clear();
+
+        $savedAgain = $formModel->getEntity($formId);
+        $this->assertInstanceOf(Form::class, $savedAgain);
+        $this->assertSame(ConditionalFieldOrderTestData::getExpectedChildLabels(), $this->getConditionalChildLabels($savedAgain));
+
+        $formModel->deleteEntity($savedAgain);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getConditionalChildLabels(Form $form): array
+    {
+        $labels = [];
+
+        foreach ($form->getFields() as $field) {
+            if ($field->getParent()) {
+                $labels[] = $field->getLabel();
+            }
+        }
+
+        return $labels;
+    }
 
     public function testPopulateValuesWithGetParameters(): void
     {
@@ -20,26 +98,26 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
             "/s/forms/preview/{$formId}?email=testform@test.com&firstname=test&description=test-test&checkbox=val1|val3"
         );
         $inputValue = $crawler->filter('input[type=email]')->attr('value');
-        self::assertSame('testform@test.com', $inputValue);
+        $this->assertSame('testform@test.com', $inputValue);
         $inputValue = $crawler->filter('input[type=text]')->attr('value');
-        self::assertSame('test', $inputValue);
+        $this->assertSame('test', $inputValue);
         $inputValue = $crawler->filter('textarea[name^=mauticform]')->html();
-        self::assertSame('test-test', $inputValue);
+        $this->assertSame('test-test', $inputValue);
         $inputValue = $crawler->filter('textarea[name^=mauticform]')->html();
-        self::assertSame('test-test', $inputValue);
+        $this->assertSame('test-test', $inputValue);
         $inputValue = $crawler->filter('input[value^=val1]')->attr('checked');
-        self::assertNotNull($inputValue, $crawler->html());
+        $this->assertNotNull($inputValue, $crawler->html());
         $inputValue = $crawler->filter('input[value^=val2]')->attr('checked');
-        self::assertNull($inputValue);
+        $this->assertNull($inputValue);
         $inputValue = $crawler->filter('input[value^=val3]')->attr('checked');
-        self::assertNotNull($inputValue);
+        $this->assertNotNull($inputValue);
 
         $this->createPage($formId);
         $crawler    = $this->client->request(Request::METHOD_GET, '/test-page?email=test%2Bpage@test.com&firstname=test');
         $inputValue = $crawler->filter('input[type=email]')->attr('value');
-        self::assertSame('test+page@test.com', $inputValue);
+        $this->assertSame('test+page@test.com', $inputValue);
         $inputValue = $crawler->filter('input[type=text]')->attr('value');
-        self::assertSame('test', $inputValue);
+        $this->assertSame('test', $inputValue);
     }
 
     private function createForm(): int
@@ -131,5 +209,118 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/pages/new', $pagePayload);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+    }
+
+    public function testLeadPopulateValuesWithLeadFields(): void
+    {
+        $multiselectFieldId = $this->createMultiselectLeadField();
+
+        /** @var FieldModel $fieldModel */
+        $fieldModel       = $this->getContainer()->get(FieldModel::class);
+        $multiselectField = $fieldModel->getEntity($multiselectFieldId);
+        $this->assertInstanceOf(LeadField::class, $multiselectField);
+        $fieldAlias       = $multiselectField->getAlias();
+
+        $form   = $this->createFormWithMultiselect($fieldAlias);
+        $formId = $form->getId();
+
+        $lead = new Lead();
+        $lead->setEmail('test@example.com');
+        $lead->addUpdatedField($fieldAlias, 'a|b');
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        $this->logoutUser();
+
+        /** @var ContactTracker $contactTracker */
+        $contactTracker = $this->getContainer()->get(ContactTracker::class);
+        $contactTracker->setTrackedContact($lead);
+
+        $this->client->request('GET', "/form/{$formId}");
+        $formCrawler = $this->client->getCrawler();
+        $checkboxA   = $formCrawler->filter('[id*="mauticform_checkboxgrp_checkbox_"][id$="_a0"]')->attr('checked');
+        $checkboxB   = $formCrawler->filter('[id*="mauticform_checkboxgrp_checkbox_"][id$="_b1"]')->attr('checked');
+        $checkboxC   = $formCrawler->filter('[id*="mauticform_checkboxgrp_checkbox_"][id$="_c2"]')->attr('checked');
+
+        $this->assertNotNull($checkboxA, 'Checkbox A should be preselected.');
+        $this->assertNotNull($checkboxB, 'Checkbox B should be preselected.');
+        $this->assertNull($checkboxC, 'Checkbox C should NOT be preselected.');
+    }
+
+    private function createFormWithMultiselect(string $leadFieldAlias): Form
+    {
+        $payload = [
+            'name'        => 'Test Form',
+            'formType'    => 'standalone',
+            'description' => 'API test',
+            'fields'      => [
+                [
+                    'label'                => 'email',
+                    'alias'                => 'email',
+                    'type'                 => 'email',
+                    'mappedField'          => 'email',
+                    'mappedObject'         => 'contact',
+                    'isAutoFill'           => true,
+                    'showWhenValueExists'  => false,
+                ],
+                [
+                    'label'                => $leadFieldAlias,
+                    'alias'                => $leadFieldAlias,
+                    'type'                 => 'checkboxgrp',
+                    'mappedField'          => $leadFieldAlias,
+                    'mappedObject'         => 'contact',
+                    'isAutoFill'           => true,
+                    'showWhenValueExists'  => true,
+
+                    'properties'     => [
+                        'syncList'        => 1,
+                        'labelAttributes' => null,
+                    ],
+                ],
+                [
+                    'label'     => 'Submit',
+                    'alias'     => 'submit',
+                    'type'      => 'button',
+                ],
+            ],
+            'postAction'  => 'return',
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        /** @var FormModel $formModel */
+        $formModel = $this->getContainer()->get(FormModel::class);
+
+        return $formModel->getEntity($response['form']['id']);
+    }
+
+    private function createMultiselectLeadField(): int
+    {
+        /** @var FieldModel $fieldModel */
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $alias      = 'test_multiselect_'.uniqid();
+
+        $field = new LeadField();
+        $field->setType('multiselect');
+        $field->setObject('lead');
+        $field->setAlias($alias);
+        $field->setName($alias);
+        $field->setLabel($alias);
+        $field->setGroup('core');
+
+        $properties = [
+            'list' => [
+                ['label' => 'a', 'value' => 'a'],
+                ['label' => 'b', 'value' => 'b'],
+                ['label' => 'c', 'value' => 'c'],
+            ],
+        ];
+        $field->setProperties($properties);
+
+        $fieldModel->saveEntity($field);
+
+        return $field->getId();
     }
 }

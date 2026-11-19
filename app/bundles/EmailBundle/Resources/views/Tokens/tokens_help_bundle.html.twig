@@ -1,15 +1,14 @@
-<h4 class="pa-md mt-lg fw-sb">Email specific</h4>
-<p class="text-secondary pi-md">{{'mautic.placeholder_tokens.email_tokens.explanation'|trans}}</p>
+{% set childContainer %}
+<p class="text-secondary pi-16">{{'mautic.placeholder_tokens.email_tokens.explanation'|trans}}</p>
 <ul id="emailTokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
   <!-- Email specific tokens -->
   <li class="panel">
-    <a role="button" id="headingEmailTokens" class="accordion-heading collapsed" data-toggle="collapse"
-      data-parent="#tokensAccordion" href="#collapseEmailTokens" aria-expanded="false"
+    <button type="button" id="headingEmailTokens" class="accordion-heading collapsed" data-bs-toggle="collapse" data-bs-target="#collapseEmailTokens" aria-expanded="false"
       aria-controls="collapseEmailTokens">
       <i class="ri-arrow-down-s-line accordion-arrow"></i>
       <span class="accordion-title">{{ 'mautic.placeholder_tokens.email_tokens'|trans }}</span>
-    </a>
-    <div id="collapseEmailTokens" class="collapse accordion-wrapper" role="tabpanel"
+    </button>
+    <div id="collapseEmailTokens" data-bs-parent="#tokensAccordion" class="collapse accordion-wrapper" role="tabpanel"
       aria-labelledby="headingEmailTokens">
 
       <table class="table table-hover">
@@ -53,3 +52,6 @@
     </div>
   </li>
 </ul>
+{% endset %}
+
+{% include '@MauticCore/Components/content-section.html.twig' with {'heading': 'mautic.placeholder_tokens.email_specific', 'childContainer': childContainer} %}

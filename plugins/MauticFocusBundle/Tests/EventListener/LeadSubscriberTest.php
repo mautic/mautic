@@ -14,29 +14,25 @@ use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\EventListener\LeadSubscriber;
 use MauticPlugin\MauticFocusBundle\FocusEventTypes;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 
-class LeadSubscriberTest extends CommonMocks
+final class LeadSubscriberTest extends CommonMocks
 {
     /**
-     * @var Translator|MockObject
+     * @var MockObject&Translator
      */
     private MockObject $translator;
 
     /**
-     * @var RouterInterface|MockObject
-     */
-    private MockObject $router;
-
-    /**
-     * @var FocusModel|(FocusModel&MockObject)|MockObject
+     * @var MockObject&FocusModel
      */
     private MockObject $focusModel;
 
     /**
-     * @var StatRepository|(StatRepository&MockObject)|MockObject
+     * @var MockObject&StatRepository
      */
     private MockObject $statRepository;
 
@@ -58,13 +54,12 @@ class LeadSubscriberTest extends CommonMocks
     protected function setUp(): void
     {
         $this->translator     = $this->createMock(Translator::class);
-        $this->router         = $this->createMock(RouterInterface::class);
         $this->focusModel     = $this->createMock(FocusModel::class);
         $this->statRepository = $this->createMock(StatRepository::class);
         $matcher              = $this->any();
 
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.focus.event.view', $parameters[0]);
 
@@ -75,6 +70,8 @@ class LeadSubscriberTest extends CommonMocks
 
                     return self::EVENT_TYPE_CLICK_NAME;
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
     }
 
@@ -90,13 +87,13 @@ class LeadSubscriberTest extends CommonMocks
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_NOTIFICATION, self::FOCUS_NAME, 'getStatsViewByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
-            FocusEventTypes::FOCUS_ON_VIEW, self::EVENT_TYPE_VIEW_NAME, self::FOCUS_NAME, $date, $lead
+            FocusEventTypes::FOCUS_ON_VIEW, self::EVENT_TYPE_VIEW_NAME, self::FOCUS_NAME, $date
         );
 
         $leadEvent  = new LeadTimelineEvent($lead);
         $subscriber = new LeadSubscriber(
             $this->translator,
-            $this->router,
+            $this->createStub(RouterInterface::class),
             $this->focusModel
         );
 
@@ -120,7 +117,7 @@ class LeadSubscriberTest extends CommonMocks
         $leadEvent  = new LeadTimelineEvent();
         $subscriber = new LeadSubscriber(
             $this->translator,
-            $this->router,
+            $this->createStub(RouterInterface::class),
             $this->focusModel
         );
 
@@ -143,13 +140,13 @@ class LeadSubscriberTest extends CommonMocks
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_CLICK, self::FOCUS_NAME, 'getStatsClickByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
-            FocusEventTypes::FOCUS_ON_CLICK, self::EVENT_TYPE_CLICK_NAME, self::FOCUS_NAME, $date, $lead
+            FocusEventTypes::FOCUS_ON_CLICK, self::EVENT_TYPE_CLICK_NAME, self::FOCUS_NAME, $date
         );
 
         $leadEvent  = new LeadTimelineEvent($lead);
         $subscriber = new LeadSubscriber(
             $this->translator,
-            $this->router,
+            $this->createStub(RouterInterface::class),
             $this->focusModel
         );
 
@@ -173,7 +170,7 @@ class LeadSubscriberTest extends CommonMocks
         $leadEvent  = new LeadTimelineEvent();
         $subscriber = new LeadSubscriber(
             $this->translator,
-            $this->router,
+            $this->createStub(RouterInterface::class),
             $this->focusModel
         );
 
@@ -190,6 +187,7 @@ class LeadSubscriberTest extends CommonMocks
             'results'=> [
                 [
                     'id'         => 1,
+                    'lead_id'    => 1,
                     'type'       => $statType,
                     'date_added' => $date,
                     'focus_id'   => 1,
@@ -214,7 +212,7 @@ class LeadSubscriberTest extends CommonMocks
     /**
      * @return array<string, mixed>
      */
-    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, \DateTime $date, ?Lead $lead=null): array
+    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, \DateTime $date): array
     {
         $leadEventLogId = 1;
 
@@ -228,7 +226,7 @@ class LeadSubscriberTest extends CommonMocks
             'eventType'       => $eventTypeName,
             'timestamp'       => $date,
             'icon'            => 'ri-search-line',
-            'contactId'       => $lead?->getId(),
+            'contactId'       => 1,
         ];
     }
 }

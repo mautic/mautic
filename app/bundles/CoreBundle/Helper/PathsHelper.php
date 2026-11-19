@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Composer\Autoload\ClassLoader;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 
 class PathsHelper
@@ -16,26 +17,35 @@ class PathsHelper
      */
     private $theme;
 
-    private string $imagePath;
+    private readonly string $imagePath;
 
-    private string $dashboardImportDir;
+    private readonly string $dashboardImportDir;
 
-    private string $dashboardUserImportDir;
+    private readonly string $dashboardUserImportDir;
 
-    private string $kernelCacheDir;
+    private readonly string $kernelCacheDir;
 
-    private string $kernelLogsDir;
+    private readonly string $kernelLogsDir;
 
-    private string $kernelRootDir;
+    private readonly string $kernelRootDir;
 
-    private string $temporaryDir;
+    private readonly string $temporaryDir;
 
-    private ?\Mautic\UserBundle\Entity\User $user;
+    private readonly ?\Mautic\UserBundle\Entity\User $user;
 
-    private string $importLeadsDir;
+    private readonly string $importLeadsDir;
 
-    public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
-    {
+    private readonly string $importCampaignDir;
+
+    private readonly string $localRoot;
+
+    public function __construct(
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        string $cacheDir,
+        string $logsDir,
+        string $rootDir,
+    ) {
         $root                         = $rootDir.'/app'; // Do not rename the variable, used in paths_helper.php
         $projectRoot                  = $this->getVendorRootPath();
         $this->user                   = $userHelper->getUser();
@@ -43,6 +53,7 @@ class PathsHelper
         $this->imagePath              = $this->removeTrailingSlash((string) $coreParametersHelper->get('image_path'));
         $this->dashboardImportDir     = $this->removeTrailingSlash((string) $coreParametersHelper->get('dashboard_import_dir'));
         $this->importLeadsDir         = $this->removeTrailingSlash((string) $coreParametersHelper->get('import_leads_dir'));
+        $this->importCampaignDir      = $this->removeTrailingSlash((string) $coreParametersHelper->get('import_campaigns_dir'));
         $this->temporaryDir           = $this->removeTrailingSlash((string) $coreParametersHelper->get('tmp_path'));
         $this->dashboardUserImportDir = $this->removeTrailingSlash((string) $coreParametersHelper->get('dashboard_import_user_dir'));
         $this->kernelCacheDir         = $this->removeTrailingSlash($cacheDir);
@@ -53,6 +64,12 @@ class PathsHelper
         include $root.'/config/paths_helper.php';
 
         $this->paths = $paths;
+
+        // Get local_root (webroot) from parameters - this is auto-detected from composer.json
+        // for recommended-project installations, or can be explicitly set in paths_local.php
+        $localRootParam = $this->removeTrailingSlash((string) $coreParametersHelper->get('local_root'));
+        // @phpstan-ignore nullCoalesce.offset (paths['root'] is always set by paths_helper.php include)
+        $this->localRoot = '' !== $localRootParam ? $localRootParam : ($this->paths['root'] ?? $rootDir);
     }
 
     public function getLocalConfigurationFile(): string
@@ -115,9 +132,27 @@ class PathsHelper
         return $this->getSystemPath('plugins', true);
     }
 
+    /**
+     * Returns the webroot directory path.
+     *
+     * For standard installations, this is the same as the project root.
+     * For recommended-project installations (with docroot/ or public/),
+     * this returns the actual webroot directory where media/, themes/,
+     * plugins/, etc. are located.
+     */
+    public function getLocalRoot(): string
+    {
+        return $this->localRoot;
+    }
+
     public function getImportLeadsPath(): string
     {
         return $this->getSystemPath('import.leads.dir', true);
+    }
+
+    public function getImportCampaignsPath(): string
+    {
+        return $this->getSystemPath('import.campaigns.dir', true);
     }
 
     /**
@@ -125,7 +160,7 @@ class PathsHelper
      */
     public function getVendorRootPath(): string
     {
-        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+        $reflection = new \ReflectionClass(ClassLoader::class);
 
         return dirname($reflection->getFileName(), 3);
     }
@@ -169,7 +204,7 @@ class PathsHelper
                 // these are absolute regardless as they are configurable
                 $globalPath = $this->dashboardImportDir;
 
-                if ('dashboard.global' == $name) {
+                if ('dashboard.global' === $name) {
                     return $globalPath;
                 }
 
@@ -188,6 +223,9 @@ class PathsHelper
             case 'import.leads.dir':
                 return $this->importLeadsDir;
 
+            case 'import.campaigns.dir':
+                return $this->importCampaignDir;
+
             default:
                 if (isset($this->paths[$name])) {
                     $path = $this->paths[$name];
@@ -195,7 +233,7 @@ class PathsHelper
                     // Assume system root if one is not set specifically
                     $path = $this->paths['root'];
                 } else {
-                    throw new \InvalidArgumentException("$name does not exist.");
+                    throw new \InvalidArgumentException("{$name} does not exist.");
                 }
         }
 
@@ -203,7 +241,16 @@ class PathsHelper
             return $path;
         }
 
-        $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];
+        // Webroot-relative paths should resolve from local_root (the actual webroot directory)
+        // for recommended-project installations where webroot is a subdirectory.
+        // Other paths resolve from the project root as before.
+        $webrootRelativePaths = ['themes', 'media', 'plugins', 'assets', 'images', 'translations'];
+        if (in_array($name, $webrootRelativePaths, true)) {
+            $rootPath = $this->localRoot;
+        } else {
+            $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];
+        }
+
         if (!str_contains($path, $rootPath)) {
             return $rootPath.'/'.$path;
         }

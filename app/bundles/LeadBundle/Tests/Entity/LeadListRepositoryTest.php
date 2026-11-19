@@ -11,23 +11,28 @@ use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadListRepositoryTest extends TestCase
+final class LeadListRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
+
+    private const DYNAMIC_COMMAND = 'is:dynamic';
+    private const STATIC_COMMAND  = 'is:static';
 
     private LeadListRepository $repository;
 
     /**
-     * @var QueryBuilder&MockObject
+     * @var MockObject&QueryBuilder
      */
     private MockObject $queryBuilderMock;
 
     /**
-     * @var Expr&MockObject
+     * @var MockObject&Expr
      */
     private MockObject $expressionMock;
 
@@ -41,32 +46,74 @@ class LeadListRepositoryTest extends TestCase
         $this->repository       = $this->configureRepository(LeadList::class);
     }
 
+    #[DataProvider('dbalSearchCommandNegationProvider')]
+    public function testDynamicAndStaticSearchCommandsUseDbalCompatibleNegation(string $command, bool $not, bool $expectNegation): void
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(static fn (string $id): string => match ($id) {
+            'mautic.lead.list.searchcommand.dynamic' => self::DYNAMIC_COMMAND,
+            'mautic.lead.list.searchcommand.static'  => self::STATIC_COMMAND,
+            default                                  => $id,
+        });
+        $this->repository->autowireCommonRepository($translator);
+
+        $queryBuilder = new QueryBuilder($this->connection);
+        $filter       = (object) ['command' => $command, 'string' => '', 'not' => $not, 'strict' => false];
+        $method       = new \ReflectionMethod(LeadListRepository::class, 'addSearchCommandWhereClause');
+
+        [$expression, $parameters] = $method->invoke($this->repository, $queryBuilder, $filter);
+
+        $expression = (string) $expression;
+        if ($expectNegation) {
+            $this->assertStringContainsString('NOT(', $expression);
+        } else {
+            $this->assertStringNotContainsString('NOT(', $expression);
+        }
+        $this->assertStringContainsString('l.filters IS NULL', $expression);
+        $this->assertCount(2, $parameters);
+        $this->assertSame([serialize([]), serialize(null)], array_values($parameters));
+        foreach (array_keys($parameters) as $parameter) {
+            $this->assertStringContainsString(':'.$parameter, $expression);
+        }
+    }
+
+    /**
+     * @return iterable<string, array{string, bool, bool}>
+     */
+    public static function dbalSearchCommandNegationProvider(): iterable
+    {
+        yield 'dynamic segment'                => [self::DYNAMIC_COMMAND, false, true];
+        yield 'negated dynamic segment'        => [self::DYNAMIC_COMMAND, true, false];
+        yield 'static segment'                 => [self::STATIC_COMMAND, false, false];
+        yield 'negated static segment'         => [self::STATIC_COMMAND, true, true];
+    }
+
     public function testIsContactInAnySegmentFalse(): void
     {
         $contactId = 1;
         $this->mockIsContactInAnySegment($contactId, []);
-        self::assertFalse($this->repository->isContactInAnySegment($contactId));
+        $this->assertFalse($this->repository->isContactInAnySegment($contactId));
     }
 
     public function testIsContactInAnySegmentTrue(): void
     {
         $contactId = 1;
         $this->mockIsContactInAnySegment($contactId, [1]);
-        self::assertTrue($this->repository->isContactInAnySegment($contactId));
+        $this->assertTrue($this->repository->isContactInAnySegment($contactId));
     }
 
     public function testIsNotContactInAnySegmentTrue(): void
     {
         $contactId = 1;
         $this->mockIsContactInAnySegment($contactId, []);
-        self::assertTrue($this->repository->isNotContactInAnySegment($contactId));
+        $this->assertTrue($this->repository->isNotContactInAnySegment($contactId));
     }
 
     public function testIsNotContactInAnySegmentFalse(): void
     {
         $contactId = 1;
         $this->mockIsContactInAnySegment($contactId, [1]);
-        self::assertFalse($this->repository->isNotContactInAnySegment($contactId));
+        $this->assertFalse($this->repository->isNotContactInAnySegment($contactId));
     }
 
     public function testIsContactInSegmentsNone(): void
@@ -75,7 +122,7 @@ class LeadListRepositoryTest extends TestCase
         $expectedSegmentIds = [1];
         $queryResult        = [];
         $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
-        self::assertFalse($this->repository->isContactInSegments($contactId, $expectedSegmentIds));
+        $this->assertFalse($this->repository->isContactInSegments($contactId, $expectedSegmentIds));
     }
 
     public function testIsContactInSegmentsOne(): void
@@ -84,7 +131,7 @@ class LeadListRepositoryTest extends TestCase
         $expectedSegmentIds = [1, 2];
         $queryResult        = [1];
         $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
-        self::assertTrue($this->repository->isContactInSegments($contactId, $expectedSegmentIds));
+        $this->assertTrue($this->repository->isContactInSegments($contactId, $expectedSegmentIds));
     }
 
     public function testIsContactInSegmentsAll(): void
@@ -93,7 +140,7 @@ class LeadListRepositoryTest extends TestCase
         $expectedSegmentIds = [1, 2];
         $queryResult        = [1, 2];
         $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
-        self::assertTrue($this->repository->isContactInSegments($contactId, $expectedSegmentIds));
+        $this->assertTrue($this->repository->isContactInSegments($contactId, $expectedSegmentIds));
     }
 
     public function testIsNotContactInSegmentsNone(): void
@@ -102,7 +149,7 @@ class LeadListRepositoryTest extends TestCase
         $expectedSegmentIds = [1];
         $queryResult        = [0];
         $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
-        self::assertTrue($this->repository->isNotContactInSegments($contactId, $expectedSegmentIds));
+        $this->assertTrue($this->repository->isNotContactInSegments($contactId, $expectedSegmentIds));
     }
 
     public function testIsNotContactInSegmentsOne(): void
@@ -111,7 +158,7 @@ class LeadListRepositoryTest extends TestCase
         $expectedSegmentIds = [1, 2];
         $queryResult        = [1];
         $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
-        self::assertFalse($this->repository->isNotContactInSegments($contactId, $expectedSegmentIds));
+        $this->assertFalse($this->repository->isNotContactInSegments($contactId, $expectedSegmentIds));
     }
 
     public function testIsNotContactInSegmentsAll(): void
@@ -120,7 +167,107 @@ class LeadListRepositoryTest extends TestCase
         $expectedSegmentIds = [1, 2];
         $queryResult        = [1, 2];
         $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
-        self::assertFalse($this->repository->isNotContactInSegments($contactId, $expectedSegmentIds));
+        $this->assertFalse($this->repository->isNotContactInSegments($contactId, $expectedSegmentIds));
+    }
+
+    public function testIsContactInAllSegmentsNoSegments(): void
+    {
+        $contactId          = 1;
+        $expectedSegmentIds = [1];
+        $queryResult        = [];
+        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->assertFalse($this->repository->isContactInAllSegments($contactId, $expectedSegmentIds));
+    }
+
+    public function testIsContactInAllSegmentsDoesNotMatch(): void
+    {
+        $contactId          = 1;
+        $expectedSegmentIds = [1, 2];
+        $queryResult        = [1];
+        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->assertFalse($this->repository->isContactInAllSegments($contactId, $expectedSegmentIds));
+    }
+
+    public function testIsContactInAllSegmentsMatches(): void
+    {
+        $contactId          = 1;
+        $expectedSegmentIds = [1, 2];
+        $queryResult        = [1, 2];
+        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->assertTrue($this->repository->isContactInSegments($contactId, $expectedSegmentIds));
+    }
+
+    public function testIsNotContactInAllSegmentsMatches(): void
+    {
+        $contactId          = 1;
+        $expectedSegmentIds = [1];
+        $queryResult        = [];
+        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->assertTrue($this->repository->isNotContactInAllSegments($contactId, $expectedSegmentIds));
+    }
+
+    public function testIsNotContactInAllSegmentsDoesNotMatch(): void
+    {
+        $contactId          = 1;
+        $expectedSegmentIds = [1, 2];
+        $queryResult        = [1, 2];
+        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->assertFalse($this->repository->isNotContactInAllSegments($contactId, $expectedSegmentIds));
+    }
+
+    /**
+     * @return iterable<string, array{bool, bool}>
+     */
+    public static function preferenceNegationProvider(): iterable
+    {
+        yield 'positive' => [false, true];
+        yield 'negated' => [true, false];
+    }
+
+    #[DataProvider('preferenceNegationProvider')]
+    public function testPreferenceSearchCommandUsesDbalColumnAndParameterValues(bool $not, bool $expected): void
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(static fn (string $id): string => $id);
+        $this->repository->autowireCommonRepository($translator);
+
+        $method = new \ReflectionMethod(LeadListRepository::class, 'addSearchCommandWhereClause');
+        $filter = (object) [
+            'command' => 'mautic.lead.list.searchcommand.ispreference',
+            'string'  => '',
+            'strict'  => true,
+            'not'     => $not,
+        ];
+        $queryBuilder = new QueryBuilder($this->connection);
+        [$expression, $parameters] = $method->invoke($this->repository, $queryBuilder, $filter);
+
+        $queryBuilder->select('l.id')->from('lead_lists', 'l')->where($expression);
+
+        $this->assertStringContainsString('l.is_preference_center', $queryBuilder->getSQL());
+        $this->assertSame([$expected], array_values($parameters));
+    }
+
+    #[DataProvider('preferenceNegationProvider')]
+    public function testPreferenceSearchCommandUsesOrmColumnAndParameterValues(bool $not, bool $expected): void
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(static fn (string $id): string => $id);
+        $this->repository->autowireCommonRepository($translator);
+
+        $method = new \ReflectionMethod(LeadListRepository::class, 'addSearchCommandWhereClause');
+        $this->entityManager->method('getExpressionBuilder')->willReturn(new Expr());
+        $filter = (object) [
+            'command' => 'mautic.lead.list.searchcommand.ispreference',
+            'string'  => '',
+            'strict'  => true,
+            'not'     => $not,
+        ];
+        $queryBuilder = new \Doctrine\ORM\QueryBuilder($this->entityManager);
+        [$expression, $parameters] = $method->invoke($this->repository, $queryBuilder, $filter);
+        $queryBuilder->where($expression);
+
+        $this->assertSame([$expected], array_values($parameters));
+        $this->assertStringContainsString('l.isPreferenceCenter =', $queryBuilder->getDQL());
     }
 
     /**
@@ -136,11 +283,11 @@ class LeadListRepositoryTest extends TestCase
                 AND manually_removed = 0
             LIMIT 1
 SQL;
-        $this->connection->expects(self::once())
+        $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with($sql, [$contactId], [\PDO::PARAM_INT])
             ->willReturn($this->result);
-        $this->result->expects(self::once())
+        $this->result->expects($this->once())
             ->method('fetchFirstColumn')
             ->willReturn($queryResult);
     }
@@ -159,7 +306,7 @@ SQL;
                 AND leadlist_id IN (?)
                 AND manually_removed = 0
 SQL;
-        $this->connection->expects(self::once())
+        $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with(
                 $sql,
@@ -168,7 +315,7 @@ SQL;
             )
             ->willReturn($this->result);
 
-        $this->result->expects(self::once())
+        $this->result->expects($this->once())
             ->method('fetchFirstColumn')
             ->willReturn($queryResult);
     }
@@ -194,27 +341,34 @@ SQL;
 
         $this->mockGetLeadCount($queryResult, false);
 
-        $this->queryBuilderMock->expects(self::once())
+        $this->queryBuilderMock->expects($this->once())
             ->method('from')
             ->with(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
             ->willReturnSelf();
 
-        $this->expressionMock->expects(self::once())
+        $this->expressionMock->expects($this->once())
             ->method('in')
-            ->with('l.leadlist_id', $listIds)
+            ->with('l.leadlist_id', ':listIds')
             ->willReturnSelf();
 
-        $this->expressionMock->expects(self::once())
+        $this->expressionMock->expects($this->once())
             ->method('eq')
             ->with('l.manually_removed', ':false')
             ->willReturnSelf();
 
-        $this->queryBuilderMock->expects(self::once())
+        $expectedCalls = [
+            ['listIds', $listIds, ArrayParameterType::INTEGER],
+            ['false', false, 'boolean'],
+        ];
+        $this->queryBuilderMock->expects($this->exactly(2))
             ->method('setParameter')
-            ->with('false', false, 'boolean')
-            ->willReturnSelf();
+            ->willReturnCallback(function (...$parameters) use (&$expectedCalls): MockObject {
+                $this->assertSame(array_shift($expectedCalls), $parameters);
 
-        self::assertSame(array_combine($listIds, $counts), $this->repository->getLeadCount($listIds));
+                return $this->queryBuilderMock;
+            });
+
+        $this->assertSame(array_combine($listIds, $counts), $this->repository->getLeadCount($listIds));
     }
 
     public function testGetSingleLeadCount(): void
@@ -237,10 +391,10 @@ SQL;
             ],
         ];
 
-        $this->queryBuilderMock->expects(self::once())
+        $this->queryBuilderMock->expects($this->once())
             ->method('getQueryPart')
             ->willReturn($fromPart);
-        $matcher = self::exactly(2);
+        $matcher = $this->exactly(2);
 
         $this->queryBuilderMock->expects($matcher)
             ->method('from')->willReturnCallback(function (...$parameters) use ($matcher) {
@@ -257,10 +411,10 @@ SQL;
                     return $this->queryBuilderMock;
                 }
             });
-        $matcher = self::exactly(2);
+        $matcher = $this->exactly(2);
 
         $this->expressionMock->expects($matcher)
-            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher, $listIds) {
+            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher, $listIds): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l.leadlist_id', $parameters[0]);
                     $this->assertSame($listIds[0], $parameters[1]);
@@ -273,7 +427,7 @@ SQL;
                 return $this->expressionMock;
             });
 
-        self::assertSame($counts[0], $this->repository->getLeadCount($listIds));
+        $this->assertSame($counts[0], $this->repository->getLeadCount($listIds));
     }
 
     /**
@@ -284,32 +438,32 @@ SQL;
         $this->connection->method('createQueryBuilder')
             ->willReturn($this->queryBuilderMock);
 
-        $this->queryBuilderMock->expects(self::once())
+        $this->queryBuilderMock->expects($this->once())
             ->method('select')
             ->with('count(l.lead_id) as thecount, l.leadlist_id')
             ->willReturnSelf();
 
-        $this->queryBuilderMock->expects(self::exactly(2))
+        $this->queryBuilderMock->expects($this->exactly(2))
             ->method('expr')
             ->willReturn($this->expressionMock);
 
         if ($addParam) {
-            $this->queryBuilderMock->expects(self::once())
+            $this->queryBuilderMock->expects($this->once())
                 ->method('setParameter')
                 ->with('false', false, 'boolean')
                 ->willReturnSelf();
         }
 
-        $this->queryBuilderMock->expects(self::once())
+        $this->queryBuilderMock->expects($this->once())
             ->method('where')
             ->with($this->expressionMock)
             ->willReturnSelf();
 
-        $this->queryBuilderMock->expects(self::once())
+        $this->queryBuilderMock->expects($this->once())
             ->method('executeQuery')
             ->willReturn($this->result);
 
-        $this->result->expects(self::once())
+        $this->result->expects($this->once())
             ->method('fetchAllAssociative')
             ->willReturn($queryResult);
     }

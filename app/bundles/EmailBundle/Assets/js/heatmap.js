@@ -32,7 +32,7 @@
         render() {
             this.renderModal();
             this.bindEvents();
-            this.$modal.modal('show');
+            this.$modal.each((index, element) => bootstrap.Modal.getOrCreateInstance(element).show());
         }
 
         fetchHeatmap(callback) {
@@ -135,7 +135,8 @@
             this.iframeDocument.write(this.content);
 
             const cssLink = document.createElement("link");
-            cssLink.href = "/app/bundles/EmailBundle/Assets/css/heatmap.css";
+            const baseUrl = window.mauticBaseUrl || '/';
+            cssLink.href = baseUrl + 'app/bundles/EmailBundle/Assets/css/heatmap.css';
             cssLink.rel = "stylesheet";
             cssLink.type = "text/css";
             this.iframeDocument.head.appendChild(cssLink);
@@ -143,7 +144,7 @@
             this.$iframeBody = $('body', this.iframeDocument);
             this.$iframeBody.addClass('heatmap-iframe-body');
             $modalContentDiv.append(this.legendTemplate);
-            $modalContentDiv.append('<button type="button" class="modal-heatmap-close close" data-dismiss="modal"><span aria-hidden="true">×</span></button>');
+            $modalContentDiv.append('<button type="button" class="modal-heatmap-close close" data-bs-dismiss="modal"><span aria-hidden="true">×</span></button>');
             this.iframeDocument.close();
         }
 

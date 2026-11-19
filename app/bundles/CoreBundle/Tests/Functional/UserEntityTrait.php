@@ -8,6 +8,7 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 trait UserEntityTrait
@@ -63,7 +64,7 @@ trait UserEntityTrait
         }
 
         /** @var PasswordHasherInterface $encoder */
-        $encoder = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $encoder = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $user->setPassword($encoder->hash('Maut1cR0cks!'));
 
         $this->em->persist($user);

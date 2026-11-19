@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Executioner\Logger;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -17,24 +18,27 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 
 class EventLogger
 {
-    private ArrayCollection $persistQueue;
+    /**
+     * @var Collection<int, LeadEventLog>
+     */
+    private readonly Collection $persistQueue;
 
-    private ArrayCollection $logs;
+    /**
+     * @var Collection<int, LeadEventLog>
+     */
+    private readonly Collection $logs;
 
     private array $contactRotations = [];
 
-    /**
-     * @var int
-     */
-    private $lastUsedCampaignIdToFetchRotation;
+    private int $lastUsedCampaignIdToFetchRotation;
 
     public function __construct(
-        private IpLookupHelper $ipLookupHelper,
-        private ContactTracker $contactTracker,
-        private LeadEventLogRepository $leadEventLogRepository,
-        private LeadRepository $leadRepository,
-        private SummaryModel $summaryModel,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly ContactTracker $contactTracker,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly SummaryModel $summaryModel,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         $this->persistQueue = new ArrayCollection();
         $this->logs         = new ArrayCollection();
@@ -51,7 +55,7 @@ class EventLogger
 
     public function persistLog(LeadEventLog $log): void
     {
-        $this->leadEventLogRepository->saveEntity($log);
+        $this->leadEventLogRepository->upsert($log);
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
             $this->summaryModel->updateSummary([$log]);
         }
@@ -60,31 +64,34 @@ class EventLogger
     /**
      * @param bool $isInactiveEvent
      */
-    public function buildLogEntry(Event $event, Lead $contact = null, $isInactiveEvent = false): LeadEventLog
+    public function buildLogEntry(Event $event, ?Lead $contact = null, $isInactiveEvent = false): LeadEventLog
     {
         $log = new LeadEventLog();
 
-        if (!defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED')) {
+        // No IP for a form submitter Mautic doesn't track
+        if (!defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') && !$this->ipLookupHelper->isVisitorUntracked()) {
             $log->setIpAddress($this->ipLookupHelper->getIpAddress());
         }
 
         $log->setEvent($event);
-        $log->setCampaign($event->getCampaign());
+        $log->setCampaign($campaign = $event->getCampaign());
 
         if (null === $contact) {
             $contact = $this->contactTracker->getContact();
         }
         $log->setLead($contact);
 
-        if ($isInactiveEvent) {
+        if (Event::TYPE_CONDITION === $event->getEventType()) {
+            $log->setNonActionPathTaken(null);
+        } elseif ($isInactiveEvent) {
             $log->setNonActionPathTaken(true);
         }
 
         $log->setDateTriggered(new \DateTime());
         $log->setSystemTriggered(defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED'));
 
-        if (isset($this->contactRotations[$contact->getId()]) && ($this->lastUsedCampaignIdToFetchRotation === $event->getCampaign()->getId())) {
-            $log->setRotation($this->contactRotations[$contact->getId()]['rotation']);
+        if (isset($this->contactRotations[$campaign->getId()][$contact->getId()]) && ($this->lastUsedCampaignIdToFetchRotation === $event->getCampaign()->getId())) {
+            $log->setRotation($this->contactRotations[$campaign->getId()][$contact->getId()]['rotation']);
         } else {
             // Likely a single contact handle such as decision processing
             $rotations   = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
@@ -116,7 +123,10 @@ class EventLogger
             return $this;
         }
 
-        $this->leadEventLogRepository->saveEntities($collection->getValues());
+        foreach ($collection as $log) {
+            $this->leadEventLogRepository->upsert($log);
+        }
+
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
             $this->summaryModel->updateSummary($collection->getValues());
         }
@@ -164,16 +174,25 @@ class EventLogger
     public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry)
     {
         $isDecision = Event::TYPE_DECISION === $event->getEventType();
+        $campaign   = $event->getCampaign();
 
         // Ensure each contact has a log entry to prevent them from being picked up again prematurely
         foreach ($contacts as $contact) {
-            if (isset($this->contactRotations[$contact->getId()]) && $this->contactRotations[$contact->getId()]['manually_removed']) {
+            if (isset($this->contactRotations[$campaign->getId()][$contact->getId()]) && $this->contactRotations[$campaign->getId()][$contact->getId()]['manually_removed']) {
                 continue;
             }
             $log = $this->buildLogEntry($event, $contact, $isInactiveEntry);
             $log->setIsScheduled(false);
             $log->setDateTriggered(new \DateTime());
             ChannelExtractor::setChannel($log, $event, $config);
+
+            if (!$isInactiveEntry) {
+                if (Event::TYPE_CONDITION === $event->getEventType()) {
+                    $log->setNonActionPathTaken(null);
+                } else {
+                    $log->setNonActionPathTaken(false);
+                }
+            }
 
             if ($isDecision) {
                 // Do not pre-persist decision logs as they must be evaluated first
@@ -186,12 +205,9 @@ class EventLogger
         return $this->persistQueuedLogs();
     }
 
-    /**
-     * @param int $campaignId
-     */
-    public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId): void
+    public function hydrateContactRotationsForNewLogs(array $contactIds, int $campaignId): void
     {
-        $this->contactRotations                  = $this->leadRepository->getContactRotations($contactIds, $campaignId);
+        $this->contactRotations[$campaignId]     = $this->leadRepository->getContactRotations($contactIds, $campaignId);
         $this->lastUsedCampaignIdToFetchRotation = $campaignId;
     }
 
@@ -201,10 +217,11 @@ class EventLogger
             return;
         }
 
-        $this->leadEventLogRepository->saveEntities($this->persistQueue->getValues());
+        foreach ($this->persistQueue as $log) {
+            $this->leadEventLogRepository->upsert($log);
+        }
 
         // Push them into the logs ArrayCollection to be used later.
-        /** @var LeadEventLog $log */
         foreach ($this->persistQueue as $log) {
             $this->logs->set($log->getId(), $log);
         }

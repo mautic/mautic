@@ -6,7 +6,7 @@ compile LESS
 return ['less' => "@primarycolor: #FF7F50;@color:#800080;h2{color: @primarycolor;}h3{color: @color;}"]
 --EXPECT--
 h2 {
-  color: #ff7f50;
+  color: #FF7F50;
 }
 h3 {
   color: #800080;

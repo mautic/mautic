@@ -64,7 +64,7 @@ As the legacy builder was removed these JS libraries were removed as well:
 - Removed `Mautic\CoreBundle\Factory\MauticFactory`, `'mautic.factory'` service.
 - Removed `Mautic\CampaignBundle\Entity::getEventsByChannel()` as unused and buggy. No replacement
 - Removed `Mautic\CoreBundle\Test::createAnotherClient()` as unused. No replacement.
-- Removed `Mautic\NotificationBundle\Entity::getLeadStats()` as unused and buggy. No replacment
+- Removed `Mautic\NotificationBundle\Entity::getLeadStats()` as unused and buggy. No replacement
 - Removed `Mautic\WebhookBundle\Entity::removeOldLogs()` as it was deprecated. Use `removeLimitExceedLogs()` instead.
 - Removed `Mautic\PageBundle\Entity::findByIds()` as unused and buggy. Use Doctrine's `findAllBy(['id' => [1,2]])` instead.
 - Removed `Mautic\PluginBundle\Controller::getIntegrationCampaignsAction()` as unused and buggy together with JS function `Mautic.getIntegrationCampaigns`
@@ -148,3 +148,7 @@ class NeedsSession
     }
 }
 ```
+
+# Notes
+
+- Migration file `app/migrations/Version20230522141144.php` has been removed. If you do not use the Mautic Citrix plugin or a fork of it, you can manually drop the `plugin_citrix_events` table from the database, as it is no longer used.

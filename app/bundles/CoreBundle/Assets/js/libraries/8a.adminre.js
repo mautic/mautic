@@ -241,16 +241,24 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
             // Per call
             // ================================
             BsTooltip: function () {
-                $("[data-toggle~=tooltip]").tooltip();
+                $("[data-bs-toggle~=tooltip]").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element));
             },
 
             // @MISC: BsPopover - Bootstrap popover
             // Per call
             // ================================
             BsPopover: function () {
-                $("[data-toggle~=popover]").popover({
+                $("[data-bs-toggle~=popover]:not([data-quick-filter])").each((index, element) => bootstrap.Popover.getOrCreateInstance(element, {
                     sanitize: false
+                }));
+                const quickFilterOptions = window.Mautic && Mautic.getQuickFilterPopoverOptions
+                    ? Mautic.getQuickFilterPopoverOptions()
+                    : { sanitize: false };
+                $("[data-quick-filter]").popover(quickFilterOptions);
+                $(document).on("mouseenter", "[data-bs-toggle~=popover][data-bs-trigger~=hover]", function () {
+                    $("[data-bs-toggle~=popover][data-bs-trigger~=hover]").not(this).each((index, element) => bootstrap.Popover.getInstance(element)?.hide());
                 });
+
             },
 
             // @MISC: IE9 input placeholder support
@@ -687,21 +695,21 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     // default click event handler
                     if(e.type === "click") {
                         // toggle hide and show
-                        if($(target).hasClass("in")) {
+                        if($(target).hasClass("show")) {
                             // hide the submenu
-                            $(target).collapse("hide");
+                            $(target).each((index, element) => bootstrap.Collapse.getOrCreateInstance(element, {toggle: false}).hide());
                             $this.parent().removeClass("open");
                         } else {
                             // hide other showed target if parent is defined
                             if(!!parent) {
-                                $(parent+" .in").each(function () {
-                                    $(this).collapse("hide");
+                                $(parent+" .show").each(function () {
+                                    $(this).each((index, element) => bootstrap.Collapse.getOrCreateInstance(element, {toggle: false}).hide());
                                     $(this).parent().removeClass("open");
                                 });
                             }
 
                             // show the submenu
-                            $(target).collapse("show");
+                            $(target).each((index, element) => bootstrap.Collapse.getOrCreateInstance(element, {toggle: false}).show());
                             $this.parent().addClass("open");
                         }
                     }

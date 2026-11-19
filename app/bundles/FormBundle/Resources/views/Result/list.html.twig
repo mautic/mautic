@@ -16,6 +16,17 @@
 
 {% block mauticContent %}formresult{% endblock %}
 
+{% block preHeader %}
+{{ include('@MauticCore/Helper/page_actions.html.twig', {
+    'templateButtons': {
+        'close': true,
+    },
+    'routeBase': 'form',
+    'langVar': 'form',
+    'targetLabel': 'mautic.form.forms'|trans
+}) }}
+{% endblock %}
+
 {% block headerTitle %}
   {{ 'mautic.form.result.header.index'|trans({'%name%': form.name}) }}
 {% endblock %}
@@ -61,21 +72,48 @@
         {% endif %}
     {% endif %}
 
-  {% set buttons = buttons|merge([{
-      'attr': {
-          'class': 'btn btn-ghost',
-          'href': path('mautic_form_action', {'objectAction': 'view', 'objectId': form.id}),
-          'data-toggle': 'ajax',
-      },
-      'iconClass': 'ri-close-line',
-      'btnText': 'mautic.core.form.close'|trans,
-  }]) %}
+  {% if securityHasEntityAccess('form:forms:editown', 'form:forms:editother', form.createdBy) %}
+      {% set buttons = buttons|merge([{
+          'attr': {
+              'class': 'btn btn-ghost',
+              'href': path('mautic_form_action', {'objectAction': 'edit', 'objectId': form.id}),
+              'data-toggle': 'ajax',
+          },
+          'iconClass': 'ri-edit-line',
+          'btnText': 'mautic.core.form.edit'|trans,
+      }]) %}
+  {% endif %}
 
   {{ include('@MauticCore/Helper/page_actions.html.twig', {'customButtons': buttons}) }}
 {% endblock %}
 
 {% block content %}
   <div class="page-list">
+    {% set bulkActionsCustom = [
+        {
+            'attr': {
+                'class': 'btn btn-ghost btn-sm btn-nospin',
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'href': path('mautic_form_results_add_segment', {'objectId': form.id}),
+                'data-header': 'mautic.form.result.add_to_segment'|trans,
+            },
+            'btnText': 'mautic.form.result.add_to_segment'|trans,
+            'iconClass': 'ri-pie-chart-line',
+        }
+      ] %}
+          {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+        'bulk_actions': {
+            'target': '#formResultTable',
+            'templateButtons': {
+                'delete': canDelete
+            },
+            'customButtons': bulkActionsCustom|default([]),
+            'routeBase': 'form_results',
+            'langVar': 'mautic.form.result',
+            'query': {'formId': form.id},
+        }
+    }) -}}
     {{ include('@MauticForm/Result/_list.html.twig') }}
   </div>
 {% endblock %}

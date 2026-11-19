@@ -9,7 +9,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<array<string|int|float|array<string|int|float>>|string|int|float, array<string|int|float|array<string|int|float>>|string|int|float>
  */
-class EscapeTransformer implements DataTransformerInterface
+final readonly class EscapeTransformer implements DataTransformerInterface
 {
     /**
      * @var string[]
@@ -26,10 +26,10 @@ class EscapeTransformer implements DataTransformerInterface
      *
      * @return array<string|int|float|array<string|int|float>>|string|int|float
      */
-    public function transform($value)
+    public function transform(mixed $value): mixed
     {
         if (is_array($value)) {
-            return array_map(fn ($value) => $this->unescape($value), $value);
+            return array_map($this->unescape(...), $value);
         }
 
         return $this->unescape($value);
@@ -40,10 +40,10 @@ class EscapeTransformer implements DataTransformerInterface
      *
      * @return array<string|int|float|array<string|int|float>>|string|int|float
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): mixed
     {
         if (is_array($value)) {
-            return array_map(fn ($value) => $this->escape($value), $value);
+            return array_map($this->escape(...), $value);
         }
 
         return $this->escape($value);

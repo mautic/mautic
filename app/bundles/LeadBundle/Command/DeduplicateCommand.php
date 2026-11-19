@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Service\ProcessQueue;
 use Mautic\LeadBundle\Deduplicate\ContactDeduper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,13 +16,22 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-class DeduplicateCommand extends Command
+#[AsCommand(
+    name: DeduplicateCommand::NAME,
+    description: 'Merge contacts based on same unique identifiers',
+    help: <<<'TXT'
+The <info>%command.name%</info> command will dedpulicate contacts based on unique identifier values. 
+
+<info>php %command.full_name%</info>
+TXT
+)]
+final class DeduplicateCommand extends Command
 {
     public const NAME = 'mautic:contacts:deduplicate';
 
     public function __construct(
-        private ContactDeduper $contactDeduper,
-        private ParameterBagInterface $params,
+        private readonly ContactDeduper $contactDeduper,
+        private readonly ParameterBagInterface $params,
     ) {
         parent::__construct();
     }
@@ -30,7 +40,7 @@ class DeduplicateCommand extends Command
     {
         parent::configure();
 
-        $this->setName(self::NAME)
+        $this
             ->addOption(
                 '--newer-into-older',
                 null,
@@ -50,13 +60,6 @@ class DeduplicateCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'The commands can run in multiple PHP processes. This option defines how many processes to run. Defaults to 1.',
                 1
-            )
-            ->setHelp(
-                <<<'EOT'
-The <info>%command.name%</info> command will dedpulicate contacts based on unique identifier values. 
-
-<info>php %command.full_name%</info>
-EOT
             );
     }
 
@@ -146,6 +149,4 @@ EOT
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Merge contacts based on same unique identifiers';
 }

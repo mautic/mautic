@@ -11,13 +11,10 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-/**
- * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
- */
-class DsnValidator extends ConstraintValidator
+final class DsnValidator extends ConstraintValidator
 {
     public function __construct(
-        private TransportFactory $transportFactory,
+        private readonly TransportFactory $transportFactory,
     ) {
     }
 

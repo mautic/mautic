@@ -4,9 +4,9 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class IcontactApi extends EmailMarketingApi
+final class IcontactApi extends EmailMarketingApi
 {
-    protected function request($endpoint, $parameters = [], $method = 'GET')
+    private function request(string $endpoint, array $parameters = [], string $method = 'GET')
     {
         $url = sprintf('%s/%s/c/%s/%s', $this->integration->getApiUrl(), $this->keys['accountId'], $this->keys['clientFolderId'], $endpoint);
 
@@ -17,9 +17,9 @@ class IcontactApi extends EmailMarketingApi
 
         if (is_array($response) && !empty($response['errors'])) {
             throw new ApiErrorException(implode(' ', $response['errors']));
-        } else {
-            return $response;
         }
+
+        return $response;
     }
 
     /**
@@ -43,13 +43,11 @@ class IcontactApi extends EmailMarketingApi
     }
 
     /**
-     * @param array $fields
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function subscribeLead($listId, $fields)
+    public function subscribeLead($listId, array $fields)
     {
         $fields['status'] = 'normal';
 

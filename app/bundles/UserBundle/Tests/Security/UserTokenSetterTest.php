@@ -10,8 +10,9 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Security\UserTokenSetter;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class UserTokenSetterTest extends AbstractMauticTestCase
+final class UserTokenSetterTest extends AbstractMauticTestCase
 {
     public function testSetUserMakesTheUserAvailableToUserHelper(): void
     {
@@ -23,12 +24,12 @@ class UserTokenSetterTest extends AbstractMauticTestCase
             ->with(1)
             ->willReturn($user);
 
-        $userTokenSetter = new UserTokenSetter($userModel, $this->getContainer()->get('security.token_storage'));
+        $userTokenSetter = new UserTokenSetter($userModel, $this->getContainer()->get(TokenStorageInterface::class));
 
         $userTokenSetter->setUser(1);
 
         /** @var UserHelper $userHelper */
-        $userHelper = $this->getContainer()->get('mautic.helper.user');
+        $userHelper = $this->getContainer()->get(UserHelper::class);
 
         $this->assertSame($user, $userHelper->getUser());
     }

@@ -25,7 +25,7 @@
     <div class="box-layout">
                 <!-- step container -->
         <div class="col-md-3">
-            <div class="pt-md pr-md pb-md">
+            <div class="pt-16 pe-16 pb-16">
                 <ul class="list-group list-group-tabs">
                     {% for integration in integrations %}
                         <li class="list-group-item{% if loop.index0 is same as(0) %} active{% endif %}" id="tab{{ integration.getName() }}">
@@ -42,7 +42,7 @@
         <!-- container -->
         <div class="col-md-9 bdr-l">
             <div id="remoteFileBrowser">
-                <div class="alert alert-warning col-md-6 col-md-offset-3 mt-md">
+                <div class="alert alert-warning col-md-6 col-md-offset-3 mt-16">
                     <p>{% trans %}mautic.asset.remote.select_service{% endtrans %}</p>
                 </div>
             </div>

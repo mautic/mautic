@@ -3,36 +3,37 @@
 namespace Mautic\PluginBundle\Command;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PushLeadActivityCommand extends Command
+#[AsCommand(
+    name: 'mautic:integration:pushleadactivity',
+    description: 'Push lead activity to integration.',
+    aliases: [
+        'mautic:integration:pushactivity',
+    ]
+)]
+final class PushLeadActivityCommand extends Command
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private IntegrationHelper $integrationHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly IntegrationHelper $integrationHelper,
     ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setName('mautic:integration:pushleadactivity')
-            ->setAliases(
-                [
-                    'mautic:integration:pushactivity',
-                ]
-            )
             ->addOption(
                 '--integration',
                 '-i',
                 InputOption::VALUE_REQUIRED,
-                'Integration name. Integration must be enabled and authorised.',
-                null
+                'Integration name. Integration must be enabled and authorised.'
             )
             ->addOption('--start-date', '-d', InputOption::VALUE_REQUIRED, 'Set start date for updated values.')
             ->addOption(
@@ -87,6 +88,4 @@ class PushLeadActivityCommand extends Command
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Push lead activity to integration.';
 }

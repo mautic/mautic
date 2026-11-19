@@ -3,11 +3,11 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
-use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
 trait CustomFieldRepositoryTrait
@@ -43,14 +43,15 @@ trait CustomFieldRepositoryTrait
         // Generate where clause first to know if we need to use distinct on primary ID or not
         $this->useDistinctCount = false;
         $this->buildWhereClause($dq, $args);
+        $groupBy = $dq->getQueryPart('groupBy');
 
         if (!empty($args['withTotalCount']) || !isset($args['count'])) {
             // Distinct is required here to get the correct count when group by is used due to applied filters
-            $countSelect = ($this->useDistinctCount) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
+            $countSelect = !empty($groupBy) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
             $dq->select($countSelect.' as count');
 
             // Advanced search filters may have set a group by and if so, let's remove it for the count.
-            if ($groupBy = $dq->getQueryPart('groupBy')) {
+            if ($groupBy) {
                 $dq->resetQueryPart('groupBy');
             }
 
@@ -82,9 +83,6 @@ trait CustomFieldRepositoryTrait
             $this->buildSelectClause($dq, $args);
 
             $results = $dq->executeQuery()->fetchAllAssociative();
-            if (isset($args['route']) && ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) {
-                unset($args['select']); // Our purpose of getting list of ids has already accomplished. We no longer need this.
-            }
 
             // loop over results to put fields in something that can be assigned to the entities
             $fieldValues = [];
@@ -182,10 +180,8 @@ trait CustomFieldRepositoryTrait
     /**
      * @param bool   $byGroup
      * @param string $object
-     *
-     * @return array
      */
-    public function getFieldValues($id, $byGroup = true, $object = 'lead')
+    public function getFieldValues($id, $byGroup = true, $object = 'lead'): array
     {
         // use DBAL to get entity fields
         $q = $this->getEntitiesDbalQueryBuilder();
@@ -199,6 +195,10 @@ trait CustomFieldRepositoryTrait
 
         $q->where($this->getTableAlias().'.id = '.(int) $id);
         $values = $q->executeQuery()->fetchAssociative();
+
+        if (!$values) {
+            return []; // As the entity does not exist, return an empty array
+        }
 
         return $this->formatFieldValues($values, $byGroup, $object);
     }
@@ -218,7 +218,7 @@ trait CustomFieldRepositoryTrait
         $table = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
         $col   = $this->getTableAlias().'.'.$field;
         $q     = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select("DISTINCT $col")
+            ->select("DISTINCT {$col}")
             ->from($table, 'l');
 
         $q->where(
@@ -229,7 +229,7 @@ trait CustomFieldRepositoryTrait
         );
 
         if (!empty($search)) {
-            $q->andWhere("$col LIKE :search")
+            $q->andWhere("{$col} LIKE :search")
                 ->setParameter('search', "{$search}%");
         }
 
@@ -256,6 +256,10 @@ trait CustomFieldRepositoryTrait
         }
     }
 
+    /**
+     * @param object $entity
+     * @param bool   $flush
+     */
     public function saveEntity($entity, $flush = true): void
     {
         $this->preSaveEntity($entity);
@@ -263,7 +267,7 @@ trait CustomFieldRepositoryTrait
         $this->getEntityManager()->persist($entity);
 
         if ($flush) {
-            $this->getEntityManager()->flush($entity);
+            $this->getEntityManager()->flush();
         }
 
         // Includes prefix
@@ -287,10 +291,8 @@ trait CustomFieldRepositoryTrait
 
     /**
      * Function to remove non custom field columns from an arrayed lead row.
-     *
-     * @param array $fixedFields
      */
-    protected function removeNonFieldColumns(&$r, $fixedFields = [])
+    protected function removeNonFieldColumns(array &$r, array $fixedFields = []): void
     {
         $baseCols = $this->getBaseColumns($this->getClassName(), true);
         foreach ($baseCols as $c) {
@@ -301,12 +303,7 @@ trait CustomFieldRepositoryTrait
         unset($r['owner_id']);
     }
 
-    /**
-     * @param array  $values
-     * @param bool   $byGroup
-     * @param string $object
-     */
-    protected function formatFieldValues($values, $byGroup = true, $object = 'lead'): array
+    protected function formatFieldValues(array $values, bool $byGroup = true, string $object = 'lead'): array
     {
         [$fields, $fixedFields] = $this->getCustomFieldList($object);
 
@@ -317,45 +314,42 @@ trait CustomFieldRepositoryTrait
 
         $fieldValues = [];
 
-        // loop over results to put fields in something that can be assigned to the entities
-        foreach ($values as $k => $r) {
-            if (isset($fields[$k])) {
-                $r = CustomFieldHelper::fixValueType($fields[$k]['type'], $r);
-
-                if (!is_null($r)) {
-                    switch ($fields[$k]['type']) {
-                        case 'number':
-                            $r = (float) $r;
-                            break;
-                        case 'boolean':
-                            $r = (int) $r;
-                            break;
-                    }
-                }
-
-                $alias = $fields[$k]['alias'];
-
-                if ($byGroup) {
-                    $group                                = $fields[$k]['group'];
-                    $fieldValues[$group][$alias]          = $fields[$k];
-                    $fieldValues[$group][$alias]['value'] = $r;
-                } else {
-                    $fieldValues[$alias]          = $fields[$k];
-                    $fieldValues[$alias]['value'] = $r;
-                }
-
-                unset($fields[$k]);
+        if ($byGroup) {
+            // Ensure each group key is present.
+            foreach ($this->getFieldGroups() as $g) {
+                $fieldValues[$g] = [];
             }
         }
 
-        if ($byGroup) {
-            // make sure each group key is present
-            $groups = $this->getFieldGroups();
-            foreach ($groups as $g) {
-                if (!isset($fieldValues[$g])) {
-                    $fieldValues[$g] = [];
-                }
+        // Loop over the results, transforming field values into values that can be assigned to the entities.
+        foreach ($values as $k => $r) {
+            if (!isset($fields[$k])) {
+                continue;
             }
+
+            ['type' => $type, 'alias' => $alias, 'group' => $group] = $fields[$k];
+
+            $r = CustomFieldHelper::fixValueType($type, $r);
+
+            if (null !== $r && 'boolean' === $type) {
+                /**
+                 * The fixValueType method used above sets boolean fields to
+                 * actual boolean. The previous iteration of this code cast
+                 * boolean fields to int for assignment to an entity, so we
+                 * retain that functionality here.
+                 */
+                $r = (int) $r;
+            }
+
+            if ($byGroup) {
+                $fieldValues[$group][$alias]          = $fields[$k];
+                $fieldValues[$group][$alias]['value'] = $r;
+            } else {
+                $fieldValues[$alias]          = $fields[$k];
+                $fieldValues[$alias]['value'] = $r;
+            }
+
+            unset($fields[$k]);
         }
 
         return $fieldValues;
@@ -380,17 +374,7 @@ trait CustomFieldRepositoryTrait
     {
         if (empty($this->customFieldList)) {
             // Get the list of custom fields
-            $connection = $this->getEntityManager()->getConnection();
-            $fq         = $connection->createQueryBuilder();
-            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
-                ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
-                ->where('f.is_published = :published')
-                ->andWhere($fq->expr()->eq('object', ':object'))
-                ->setParameter('published', true, 'boolean')
-                ->setParameter('object', $object)
-                ->addOrderBy('f.field_order', 'asc');
-            $result  = ResultCacheHelper::executeCachedDbalQuery($connection, $fq, new ResultCacheOptions(LeadField::CACHE_NAMESPACE));
-            $results = $result->fetchAllAssociative();
+            $results = $this->getFieldList($object);
 
             $fields      = [];
             $fixedFields = [];
@@ -407,7 +391,7 @@ trait CustomFieldRepositoryTrait
         return $this->customFieldList;
     }
 
-    protected function prepareDbalFieldsForSave(&$fields)
+    protected function prepareDbalFieldsForSave(array &$fields): void
     {
         // Ensure booleans are integers
         foreach ($fields as $field => &$value) {
@@ -418,9 +402,34 @@ trait CustomFieldRepositoryTrait
     }
 
     /**
+     * @return array<array<int|string>|int|string>
+     *
+     * @throws Exception
+     */
+    private function getFieldList(?string $object = null): array
+    {
+        // Get the list of custom fields
+        $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $fq->select(
+            'f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value'
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+            ->where('f.is_published = :published')
+            ->setParameter('published', true, 'boolean')
+            ->addOrderBy('f.field_order', 'asc');
+
+        if (null !== $object) {
+            $fq->andWhere($fq->expr()->eq('object', ':object'))
+                ->setParameter('object', $object);
+        }
+
+        return $fq->executeQuery()->fetchAllAssociative() ?: [];
+    }
+
+    /**
      * Inherit and use in class if required to do something to the entity prior to persisting.
      */
-    protected function preSaveEntity($entity)
+    protected function preSaveEntity(object $entity): void
     {
         // Inherit and use if required
     }
@@ -428,7 +437,7 @@ trait CustomFieldRepositoryTrait
     /**
      * Inherit and use in class if required to do something with the entity after persisting.
      */
-    protected function postSaveEntity($entity)
+    protected function postSaveEntity($entity): void
     {
         // Inherit and use if required
     }

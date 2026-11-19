@@ -4,51 +4,38 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Helper;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Helper\PointActionHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class PointActionHelperTest extends TestCase
+final class PointActionHelperTest extends TestCase
 {
     /**
-     * @var MockObject|EntityManagerInterface
+     * @var MockObject&HitRepository
      */
-    private $entityManager;
+    private MockObject $hitRepository;
 
     /**
-     * @var MockObject|HitRepository
+     * @var MockObject&Hit
      */
-    private $hitRepository;
-
-    /**
-     * @var MockObject|Lead
-     */
-    private $lead;
-
-    /**
-     * @var MockObject|Hit
-     */
-    private $eventDetails;
+    private MockObject $eventDetails;
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->hitRepository = $this->createMock(HitRepository::class);
-        $this->lead          = $this->createMock(Lead::class);
         $this->eventDetails  = $this->createMock(Hit::class);
 
-        $this->eventDetails->method('getLead')->willReturn($this->lead);
-        $this->entityManager->method('getRepository')->willReturn($this->hitRepository);
+        $this->eventDetails->method('getLead')->willReturn($this->createStub(Lead::class));
     }
 
     /**
      * @param array<string, mixed> $action
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('urlHitsActionDataProvider')]
+    #[DataProvider('urlHitsActionDataProvider')]
     public function testValidateUrlPageHitsAction(array $action, bool $expectedResult): void
     {
         $this->eventDetails->method('getUrl')->willReturn('https://example.com/ppk');
@@ -61,63 +48,102 @@ class PointActionHelperTest extends TestCase
         ]);
         $this->hitRepository->expects($this->never())->method('getLatestHit');
 
-        $pointActionHelper = new PointActionHelper($this->entityManager);
+        $pointActionHelper = new PointActionHelper($this->hitRepository);
         $result            = $pointActionHelper->validateUrlHit($this->eventDetails, $action);
 
         $this->assertSame($expectedResult, $result);
     }
 
     /**
-     * @return array<string, array<int, mixed>>
+     * @return \Iterator<string, array{array<string, mixed>, bool}>
      */
-    public static function urlHitsActionDataProvider(): array
+    public static function urlHitsActionDataProvider(): \Iterator
     {
-        return [
-            'url_matches_first_hit' => [
-                [
-                    'id'         => 2,
-                    'type'       => 'url.hit',
-                    'name'       => 'Hit page',
-                    'properties' => [
-                        'page_url'               => 'https://example.com/ppk',
-                        'page_hits'              => 1,
-                        'accumulative_time_unit' => 'H',
-                        'accumulative_time'      => 0,
-                        'returns_within_unit'    => 'H',
-                        'returns_within'         => 0,
-                        'returns_after_unit'     => 'H',
-                        'returns_after'          => 0,
-                    ],
-                    'points' => 5,
+        yield 'url_matches_first_hit' => [
+            [
+                'id'         => 2,
+                'type'       => 'url.hit',
+                'name'       => 'Hit page',
+                'properties' => [
+                    'page_url'               => 'https://example.com/ppk',
+                    'page_hits'              => 1,
+                    'accumulative_time_unit' => 'H',
+                    'accumulative_time'      => 0,
+                    'returns_within_unit'    => 'H',
+                    'returns_within'         => 0,
+                    'returns_after_unit'     => 'H',
+                    'returns_after'          => 0,
                 ],
-                true,
+                'points' => 5,
             ],
-            'url_does_not_match' => [
-                [
-                    'id'         => 3,
-                    'type'       => 'url.hit',
-                    'name'       => 'Invalid URL',
-                    'properties' => [
-                        'page_url'               => 'https://example.com/invalid',
-                        'page_hits'              => 1,
-                        'accumulative_time_unit' => 'H',
-                        'accumulative_time'      => 0,
-                        'returns_within_unit'    => 'H',
-                        'returns_within'         => 0,
-                        'returns_after_unit'     => 'H',
-                        'returns_after'          => 0,
-                    ],
-                    'points' => 5,
+            true,
+        ];
+
+        yield 'plain_text_matches_substring' => [
+            [
+                'id'         => 5,
+                'type'       => 'url.hit',
+                'name'       => 'Plain text URL match',
+                'properties' => [
+                    'page_url'               => 'example.com/pp',
+                    'page_hits'              => 1,
+                    'accumulative_time_unit' => 'H',
+                    'accumulative_time'      => 0,
+                    'returns_within_unit'    => 'H',
+                    'returns_within'         => 0,
+                    'returns_after_unit'     => 'H',
+                    'returns_after'          => 0,
                 ],
-                false,
+                'points' => 5,
             ],
+            true,
+        ];
+
+        yield 'legacy_wildcard_still_matches' => [
+            [
+                'id'         => 6,
+                'type'       => 'url.hit',
+                'name'       => 'Legacy wildcard URL match',
+                'properties' => [
+                    'page_url'               => '*example.com/ppk*',
+                    'page_hits'              => 1,
+                    'accumulative_time_unit' => 'H',
+                    'accumulative_time'      => 0,
+                    'returns_within_unit'    => 'H',
+                    'returns_within'         => 0,
+                    'returns_after_unit'     => 'H',
+                    'returns_after'          => 0,
+                ],
+                'points' => 5,
+            ],
+            true,
+        ];
+
+        yield 'url_does_not_match' => [
+            [
+                'id'         => 3,
+                'type'       => 'url.hit',
+                'name'       => 'Invalid URL',
+                'properties' => [
+                    'page_url'               => 'https://example.com/invalid',
+                    'page_hits'              => 1,
+                    'accumulative_time_unit' => 'H',
+                    'accumulative_time'      => 0,
+                    'returns_within_unit'    => 'H',
+                    'returns_within'         => 0,
+                    'returns_after_unit'     => 'H',
+                    'returns_after'          => 0,
+                ],
+                'points' => 5,
+            ],
+            false,
         ];
     }
 
     /**
      * @param array<string, mixed> $action
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('returnWithinActionDataProvider')]
+    #[DataProvider('returnWithinActionDataProvider')]
     public function testValidateUrlReturnWithinAction(array $action, bool $expectedResult): void
     {
         $this->eventDetails->method('getUrl')->willReturn('https://example.com/test/');
@@ -135,56 +161,54 @@ class PointActionHelperTest extends TestCase
         $latestHit->setTimestamp($threeHoursAgoTimestamp);
         $this->hitRepository->method('getLatestHit')->willReturn($latestHit);
 
-        $pointActionHelper = new PointActionHelper($this->entityManager);
+        $pointActionHelper = new PointActionHelper($this->hitRepository);
         $result            = $pointActionHelper->validateUrlHit($this->eventDetails, $action);
 
         $this->assertSame($expectedResult, $result);
     }
 
     /**
-     * @return array<string, array<int, mixed>>
+     * @return \Iterator<string, array{array<string, mixed>, bool}>
      */
-    public static function returnWithinActionDataProvider(): array
+    public static function returnWithinActionDataProvider(): \Iterator
     {
-        return [
-            'valid_return_within' => [
-                [
-                    'id'         => 1,
-                    'type'       => 'url.hit',
-                    'name'       => 'Test return within',
-                    'properties' => [
-                        'page_url'               => 'https://example.com/test/',
-                        'page_hits'              => null,
-                        'accumulative_time_unit' => 'H',
-                        'accumulative_time'      => 0,
-                        'returns_within_unit'    => 'H',
-                        'returns_within'         => 14400, // 4 hours in seconds
-                        'returns_after_unit'     => 'H',
-                        'returns_after'          => 0,
-                    ],
-                    'points' => 3,
+        yield 'valid_return_within' => [
+            [
+                'id'         => 1,
+                'type'       => 'url.hit',
+                'name'       => 'Test return within',
+                'properties' => [
+                    'page_url'               => 'https://example.com/test/',
+                    'page_hits'              => null,
+                    'accumulative_time_unit' => 'H',
+                    'accumulative_time'      => 0,
+                    'returns_within_unit'    => 'H',
+                    'returns_within'         => 14400, // 4 hours in seconds
+                    'returns_after_unit'     => 'H',
+                    'returns_after'          => 0,
                 ],
-                true,
+                'points' => 3,
             ],
-            'invalid_return_within' => [
-                [
-                    'id'         => 4,
-                    'type'       => 'url.hit',
-                    'name'       => 'Invalid Return Within',
-                    'properties' => [
-                        'page_url'               => 'https://example.com/test/',
-                        'page_hits'              => null,
-                        'accumulative_time_unit' => 'H',
-                        'accumulative_time'      => 0,
-                        'returns_within_unit'    => 'H',
-                        'returns_within'         => 3600, // 1 hour in seconds
-                        'returns_after_unit'     => 'H',
-                        'returns_after'          => 0,
-                    ],
-                    'points' => 3,
+            true,
+        ];
+        yield 'invalid_return_within' => [
+            [
+                'id'         => 4,
+                'type'       => 'url.hit',
+                'name'       => 'Invalid Return Within',
+                'properties' => [
+                    'page_url'               => 'https://example.com/test/',
+                    'page_hits'              => null,
+                    'accumulative_time_unit' => 'H',
+                    'accumulative_time'      => 0,
+                    'returns_within_unit'    => 'H',
+                    'returns_within'         => 3600, // 1 hour in seconds
+                    'returns_after_unit'     => 'H',
+                    'returns_after'          => 0,
                 ],
-                false,
+                'points' => 3,
             ],
+            false,
         ];
     }
 }

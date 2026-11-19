@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 
-class ClickthroughHelper
+final class ClickthroughHelper
 {
     /**
      * Encode an array to append to a URL.
@@ -19,9 +19,9 @@ class ClickthroughHelper
      *
      * @param bool $urlDecode
      *
-     * @return array
+     * @return mixed[]
      */
-    public static function decodeArrayFromUrl($string, $urlDecode = true)
+    public static function decodeArrayFromUrl($string, $urlDecode = true): array
     {
         $raw     = $urlDecode ? urldecode($string) : $string;
         $decoded = base64_decode($raw);
@@ -34,6 +34,20 @@ class ClickthroughHelper
             throw new InvalidDecodedStringException($decoded);
         }
 
-        return Serializer::decode($decoded);
+        try {
+            $result = Serializer::decode($decoded);
+
+            if (!is_array($result)) {
+                throw new InvalidDecodedStringException($decoded);
+            }
+        } catch (\Throwable $e) {
+            if (!$e instanceof InvalidDecodedStringException) {
+                throw new InvalidDecodedStringException($decoded, 0, $e);
+            }
+
+            throw $e;
+        }
+
+        return $result;
     }
 }

@@ -9,9 +9,9 @@ use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
- * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ * Needed for the E2E tests.
  */
-class NullTransportFactory implements TransportFactoryInterface
+final class NullTransportFactory implements TransportFactoryInterface
 {
     /**
      * @param mixed[] $options

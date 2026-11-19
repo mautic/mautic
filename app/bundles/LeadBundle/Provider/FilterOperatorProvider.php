@@ -17,8 +17,8 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
     private array $cachedOperators = [];
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private TranslatorInterface $translator,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -27,8 +27,8 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
      */
     public function getAllOperators(): array
     {
-        if (empty($this->cachedOperators)) {
-            $event = new LeadListFiltersOperatorsEvent([], $this->translator);
+        if ([] === $this->cachedOperators) {
+            $event = new LeadListFiltersOperatorsEvent([]);
 
             $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE);
 

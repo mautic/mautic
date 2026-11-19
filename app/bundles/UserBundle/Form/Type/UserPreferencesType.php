@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -9,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class UserPreferencesType extends AbstractType
+final class UserPreferencesType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -19,7 +21,7 @@ class UserPreferencesType extends AbstractType
             HiddenType::class,
             [
                 'label'      => 'mautic.user.preferences.theme',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -33,7 +35,7 @@ class UserPreferencesType extends AbstractType
             HiddenType::class,
             [
                 'label'      => 'mautic.user.preferences.reduce_transparency',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
             ]
         );
@@ -44,7 +46,7 @@ class UserPreferencesType extends AbstractType
             HiddenType::class,
             [
                 'label'      => 'mautic.user.preferences.reduce_motion',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
             ]
         );
@@ -55,7 +57,7 @@ class UserPreferencesType extends AbstractType
             HiddenType::class,
             [
                 'label'      => 'mautic.user.preferences.contrast_borders',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
             ]
         );
@@ -66,7 +68,7 @@ class UserPreferencesType extends AbstractType
             HiddenType::class,
             [
                 'label'      => 'mautic.user.preferences.enable_underlines',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
             ]
         );

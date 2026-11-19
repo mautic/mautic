@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
@@ -7,7 +9,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<string, string>
  */
-class SecondsConversionTransformer implements DataTransformerInterface
+final class SecondsConversionTransformer implements DataTransformerInterface
 {
     public function __construct(
         private $viewFormat = 'H',
@@ -21,7 +23,7 @@ class SecondsConversionTransformer implements DataTransformerInterface
      *
      * @return string
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): mixed
     {
         $value = (int) $value;
 
@@ -43,7 +45,7 @@ class SecondsConversionTransformer implements DataTransformerInterface
      *
      * @return string
      */
-    public function transform($value)
+    public function transform(mixed $value): mixed
     {
         $value = (int) $value;
 

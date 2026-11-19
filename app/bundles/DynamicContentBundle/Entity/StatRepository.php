@@ -2,6 +2,7 @@
 
 namespace Mautic\DynamicContentBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -9,7 +10,7 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 /**
  * @extends CommonRepository<Stat>
  */
-class StatRepository extends CommonRepository
+final class StatRepository extends CommonRepository
 {
     use TimelineTrait;
 
@@ -52,8 +53,9 @@ class StatRepository extends CommonRepository
                 $dynamicContentIds = [(int) $dynamicContentIds];
             }
             $q->where(
-                $q->expr()->in('s.dynamic_content_id', $dynamicContentIds)
-            );
+                $q->expr()->in('s.dynamic_content_id', ':dynamicContentIds')
+            )
+            ->setParameter('dynamicContentIds', $dynamicContentIds, ArrayParameterType::INTEGER);
         }
 
         $results = $q->executeQuery()->fetchAllAssociative();
@@ -66,23 +68,24 @@ class StatRepository extends CommonRepository
      *
      * @param array $dynamicContentIds
      */
-    public function getSentCounts($dynamicContentIds = [], \DateTime $fromDate = null): array
+    public function getSentCounts($dynamicContentIds = [], ?\DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.dynamic_content_id, count(s.id) as sent_count')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's')
             ->andWhere(
-                $q->expr()->in('e.dynamic_content_id', $dynamicContentIds)
-            );
+                $q->expr()->in('s.dynamic_content_id', ':dynamicContentIds')
+            )
+            ->setParameter('dynamicContentIds', $dynamicContentIds, ArrayParameterType::INTEGER);
 
         if (null !== $fromDate) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(
-                $q->expr()->gte('e.date_sent', $q->expr()->literal($dt->toUtcString()))
+                $q->expr()->gte('s.date_sent', $q->expr()->literal($dt->toUtcString()))
             );
         }
-        $q->groupBy('e.dynamic_content_id');
+        $q->groupBy('s.dynamic_content_id');
 
         // get a total number of sent DC stats first
         $results = $q->executeQuery()->fetchAllAssociative();
@@ -115,13 +118,13 @@ class StatRepository extends CommonRepository
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc', 'dc.id = s.dynamic_content_id');
 
         if ($leadId) {
-            $query->where($query->expr()->eq('s.lead_id', (int) $leadId));
+            $query->where('s.lead_id = :leadId')
+                ->setParameter('leadId', $leadId);
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere(
-                $query->expr()->like('dc.name', $query->expr()->literal('%'.$options['search'].'%'))
-            );
+            $query->andWhere('dc.name LIKE :search')
+                ->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'dc.name', 's.date_sent', ['sentDetails'], ['dateSent'], null, 's.id');
@@ -139,9 +142,6 @@ class StatRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * Delete a stat.
-     */
     public function deleteStat($id): void
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', ['id' => (int) $id]);

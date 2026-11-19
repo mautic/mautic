@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\LeadField;
 
 /**
  * @extends CommonRepository<Field>
@@ -22,5 +23,18 @@ class FieldRepository extends CommonRepository
             ->setParameter('formId', $formId)
             ->executeQuery()
             ->fetchOne();
+    }
+
+    /**
+     * @return Field[]
+     */
+    public function getFormFieldsMappedToLeadField(LeadField $customField): array
+    {
+        $qb = $this->createQueryBuilder('f')
+            ->select('f')
+            ->where('f.mappedField = :customField')
+            ->setParameter('customField', $customField->getAlias());
+
+        return $qb->getQuery()->getResult();
     }
 }

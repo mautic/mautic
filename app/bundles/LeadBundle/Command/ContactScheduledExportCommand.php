@@ -8,15 +8,20 @@ use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
+use Mautic\LeadBundle\Entity\ContactExportSchedulerRepository;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[AsCommand(
+    name: ContactScheduledExportCommand::COMMAND_NAME,
+    description: 'Export contacts which are scheduled in `contact_export_scheduler` table.'
+)]
 class ContactScheduledExportCommand extends Command
 {
     private const PICK_SCHEDULED_EXPORTS_LIMIT = 10;
@@ -24,10 +29,10 @@ class ContactScheduledExportCommand extends Command
     public const COMMAND_NAME                  = 'mautic:contacts:scheduled_export';
 
     public function __construct(
-        private ContactExportSchedulerModel $contactExportSchedulerModel,
-        private EventDispatcherInterface $eventDispatcher,
-        private FormatterHelper $formatterHelper,
-        private ProcessSignalService $processSignalService,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly FormatterHelper $formatterHelper,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly ContactExportSchedulerRepository $contactExportSchedulerRepository,
     ) {
         parent::__construct();
     }
@@ -35,7 +40,6 @@ class ContactScheduledExportCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName(self::COMMAND_NAME)
             ->addOption(
                 '--ids',
                 null,
@@ -54,10 +58,10 @@ class ContactScheduledExportCommand extends Command
 
         $ids = $this->formatterHelper->simpleCsvToArray($input->getOption('ids'), 'int');
 
-        if ($ids) {
-            $contactExportSchedulers = $this->contactExportSchedulerModel->getRepository()->findBy(['id' => $ids]);
+        if ([] !== $ids) {
+            $contactExportSchedulers = $this->contactExportSchedulerRepository->findBy(['id' => $ids]);
         } else {
-            $contactExportSchedulers = $this->contactExportSchedulerModel->getRepository()
+            $contactExportSchedulers = $this->contactExportSchedulerRepository
                 ->findBy([], [], self::PICK_SCHEDULED_EXPORTS_LIMIT);
         }
 
@@ -79,6 +83,4 @@ class ContactScheduledExportCommand extends Command
             return ExitCode::TERMINATED;
         }
     }
-
-    protected static $defaultDescription = 'Export contacts which are scheduled in `contact_export_scheduler` table.';
 }

@@ -1,32 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Report;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\UserBundle\Model\UserModel;
 
-class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
+final class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetLeadColumns(): void
     {
         $fieldModel = $this->createMock(FieldModel::class);
 
-        $listModel = $this->createMock(ListModel::class);
+        $listModel = $this->createStub(ListModel::class);
 
-        $userModel = $this->createMock(UserModel::class);
+        $userModel = $this->createStub(UserModel::class);
 
-        $leadModel = $this->createMock(LeadModel::class);
+        $leadModel = $this->createStub(LeadModel::class);
 
         $fieldModel->expects($this->exactly(2)) // We have 2 asserts
             ->method('getLeadFields')
             ->with()
             ->willReturn($this->getFields());
 
-        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel);
+        $dncReportService = $this->createStub(DncReportService::class);
+
+        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel, $dncReportService);
 
         $expected = [
             'l.id' => [
@@ -62,6 +67,10 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ],
             'u.last_name' => [
                 'label' => 'mautic.lead.report.owner_lastname',
+                'type'  => 'string',
+            ],
+            'l.generated_email_domain' => [
+                'label' => 'mautic.lead.report.generated_email_domain',
                 'type'  => 'string',
             ],
             'x.title' => [
@@ -162,7 +171,9 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn($tagList);
 
-        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel);
+        $dncReportService = $this->createStub(DncReportService::class);
+
+        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel, $dncReportService);
 
         $expected = [
             'l.id' => [
@@ -198,6 +209,10 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ],
             'u.last_name' => [
                 'label' => 'mautic.lead.report.owner_lastname',
+                'type'  => 'string',
+            ],
+            'l.generated_email_domain' => [
+                'label' => 'mautic.lead.report.generated_email_domain',
                 'type'  => 'string',
             ],
             'x.title' => [
@@ -270,18 +285,20 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $fieldModel = $this->createMock(FieldModel::class);
 
-        $listModel = $this->createMock(ListModel::class);
+        $listModel = $this->createStub(ListModel::class);
 
-        $userModel = $this->createMock(UserModel::class);
+        $userModel = $this->createStub(UserModel::class);
 
         $fieldModel->expects($this->exactly(2)) // We have 2 asserts
         ->method('getCompanyFields')
             ->with()
             ->willReturn($this->getFields());
 
-        $leadModel = $this->createMock(LeadModel::class);
+        $leadModel = $this->createStub(LeadModel::class);
 
-        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel);
+        $dncReportService = $this->createStub(DncReportService::class);
+
+        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel, $dncReportService);
 
         $expected = [
             'comp.id' => [
@@ -348,9 +365,9 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
+     * @return array<int, Field>
      */
-    private function getFields()
+    private function getFields(): array
     {
         $titleField = new Field();
         $titleField->setLabel('Title');

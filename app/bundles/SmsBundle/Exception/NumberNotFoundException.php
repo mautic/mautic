@@ -2,7 +2,7 @@
 
 namespace Mautic\SmsBundle\Exception;
 
-class NumberNotFoundException extends \Exception
+final class NumberNotFoundException extends \Exception
 {
     /**
      * @param string $number
@@ -13,7 +13,7 @@ class NumberNotFoundException extends \Exception
         private $number,
         $message = '',
         $code = 0,
-        \Throwable $previous = null,
+        ?\Throwable $previous = null,
     ) {
         if (!$message) {
             $message = "Phone number '{$number}' not found";

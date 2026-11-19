@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Value;
 
-class NormalizedValueDAO
+final class NormalizedValueDAO
 {
     public const BOOLEAN_TYPE     = 'boolean';
 

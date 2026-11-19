@@ -13,14 +13,28 @@
     'routeBase': 'campaign',
     'targetLabel': 'mautic.campaign.campaigns'|trans
   }) -}}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': campaign.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': campaign.category}) }}
+{{ include('@MauticProject/Modules/projects.html.twig', {'item': campaign}) }}
 {% endblock %}
 
 {% block headerTitle %}{{ campaign.name }}{% endblock %}
 
 {% block actions %}
+    {% set buttons = [] %}
+
+    {% if securityHasEntityAccess(permissions['campaign:campaigns:viewown'], permissions['campaign:campaigns:viewother'], campaign.createdBy) and enableExportPermission is not empty%}
+        {% set buttons = buttons|merge([{
+            'attr': {
+                'href': path('mautic_campaign_action', {'objectAction': 'share', 'objectId': campaign.id}),
+            },
+            'btnText': 'mautic.core.export'|trans,
+            'iconClass': 'ri-export-line',
+        }]) %}
+    {% endif %}
+
   {{- include('@MauticCore/Helper/page_actions.html.twig', {
     'item': campaign,
+    'customButtons': buttons,
     'templateButtons': {
         'edit': securityHasEntityAccess(
             permissions['campaign:campaigns:editown'],
@@ -40,6 +54,18 @@
 
 {% block publishStatus %}
   {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': campaign}) }}
+
+  {% if campaign.allowRestart is defined and campaign.allowRestart == 1 %}
+    <div class="label__divider"></div>
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            label: 'mautic.campaign.allow_restart'|trans,
+            icon: 'ri-restart-fill',
+            color: 'blue',
+            icon_only: true
+        }]
+    } %}
+  {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -49,15 +75,34 @@
     <div class="col-md-9 height-auto">
         <div>
             <!-- campaign detail header -->
-            {% include '@MauticCore/Helper/description.html.twig' with {'description': campaign.description} %}
+            {% include '@MauticCore/Helper/description--expanded.html.twig' with {'description': campaign.description} %}
             <!--/ campaign detail header -->
 
             <!-- campaign detail collapseable -->
-            <div class="collapse pr-md pl-md" id="campaign-details">
-                <div class="pr-md pl-md pb-md">
+            <div class="collapse pe-16 ps-16" id="campaign-details">
+                <div class="pe-16 ps-16 pb-16">
                     <div class="panel shd-none mb-0">
                         <table class="table table-hover mb-0">
                             <tbody>
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle">
+                                    {{ 'mautic.campaignconfig.campaign_republish_behavior'|trans }}
+                                </td>
+                                <td>
+                                    {{ ('mautic.campaignconfig.campaign_republish_behavior.' ~ (campaign.republishBehavior ?: 'use_global'))|trans }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle">
+                                    {{ 'mautic.campaign.last.publish.date'|trans }}
+                                    <span data-bs-toggle="tooltip"  title="{{ 'mautic.campaign.last.publish.date.tooltip'|trans }}">
+                                        <i class="ri-question-line"></i>
+                                    </span>
+                                </td>
+                                <td>
+                                    {{ lastPublishDate ? dateToFullConcat(lastPublishDate) : 'N/A' }}
+                                </td>
+                            </tr>
                             {{ include('@MauticCore/Helper/details.html.twig', {'entity': campaign}) }}
                             {% for sourceType, typeNames in sources %}
                               {% if typeNames is not empty %}
@@ -82,35 +127,52 @@
         <div>
             <!-- campaign detail collapseable toggler -->
             <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse"
-                       data-target="#campaign-details"><span
+                <span data-bs-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse"
+                       data-bs-target="#campaign-details"><span
                             class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
                 </span>
             </div>
             <!--/ campaign detail collapseable toggler -->
 
             {{ customContent('left.section.top', _context) }}
+            {% if securityIsGranted('lead:leads:viewown') %}
+                <div class="pa-16">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                                {
+                                    'title': 'mautic.campaign.stat.contacts'|trans,
+                                    'value': contactCount,
+                                    'tooltip': 'mautic.campaign.stat.contacts.tooltip'|trans,
+                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.campaign_membership'|trans) ~ ':' ~ campaign.id}),
+                                    'icon': 'ri-group-line'
+                                }
+                            ]}) }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
             {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
             {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
             <!-- some stats -->
-            <div class="stats-menu pl-md mt-lg">
+            <div class="stats-menu ps-16 mt-24">
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs nav-tabs-contained">
                     <li class="active">
-                        <a href="#stats-container" role="tab" data-toggle="tab">
+                        <a href="#stats-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">
                             {{ 'mautic.campaign.stats'|trans }}
                         </a>
                     </li>
                     {%  if showEmailStats|default(false) %}
                         <li>
-                            <a href="#campaign-email-stats" role="tab" data-toggle="tab" data-load="campaign-email-stats">
+                            <a href="#campaign-email-stats" role="tab" data-bs-toggle="tab" data-load="campaign-email-stats" class="nav-link">
                                 {{ 'mautic.campaign.email_stats'|trans }}
                             </a>
                         </li>
                     {% endif %}
                     <li>
-                        <a href="#reads-map-container" role="tab" data-toggle="tab" data-load="map">
+                        <a href="#reads-map-container" role="tab" data-bs-toggle="tab" data-load="map" class="nav-link">
                             {{ 'mautic.email.thead.maps'|trans }}
                         </a>
                     </li>
@@ -122,7 +184,7 @@
                     }) }}
                 </div>
             </div>
-            <div class="stats-menu__content tab-content pa-md mb-lg shd-sm">
+            <div class="stats-menu__content tab-content pa-16 mb-24 shd-sm">
                 <div class="tab-pane active bdr-w-0" id="stats-container">
                     <div id="campaign-graph-div" data-target-url="{{ path('mautic_campaign_graph', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
                         <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
@@ -139,9 +201,9 @@
                 <div class="tab-pane bdr-w-0" id="campaign-email-stats">
                     <div class="row">
                         <div class="col-md-6">
-                            <h4 class="text-muted ml-20 mb-md">{{ 'mautic.campaign.email_stats.weekday' | trans }}</h4>
+                            <h4 class="text-muted ms-24 mb-16">{{ 'mautic.campaign.email_stats.weekday' | trans }}</h4>
                             <div data-campaign-email-stats-weekdays="{{ path('mautic_campaign_metrics_email_weekdays', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
-                                <div class="d-flex jc-center ai-center">
+                                <div class="d-flex justify-content-center align-items-center">
                                     <div class="spinner fs-42">
                                         <i class="ri-loader-3-line ri-spin"></i>
                                     </div>
@@ -149,9 +211,9 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <h4 class="text-muted ml-20 mb-md">{{ 'mautic.campaign.email_stats.hour' | trans }}</h4>
+                            <h4 class="text-muted ms-24 mb-16">{{ 'mautic.campaign.email_stats.hour' | trans }}</h4>
                             <div data-campaign-email-stats-hours="{{ path('mautic_campaign_metrics_email_hours', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
-                                <div class="d-flex jc-center ai-center">
+                                <div class="d-flex justify-content-center align-items-center">
                                     <div class="spinner fs-42">
                                         <i class="ri-loader-3-line ri-spin"></i>
                                     </div>
@@ -169,27 +231,27 @@
             <!-- tabs controls -->
             <ul class="nav nav-tabs nav-tabs-contained" id="campaign_nav_header_ul">
                 <li class="active" id="preview_li">
-                    <a href="#preview-container" role="tab" data-toggle="tab">
+                    <a href="#preview-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">
                         {{ 'mautic.campaign.preview.header'|trans }}
                     </a>
                 </li>
                 <li class="" id="decisions_li">
-                    <a href="#decisions-container" role="tab" data-toggle="tab">
+                    <a href="#decisions-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         {{ 'mautic.campaign.event.decisions.header'|trans }}
                     </a>
                 </li>
                 <li class="" id="actions_li">
-                    <a href="#actions-container" role="tab" data-toggle="tab">
+                    <a href="#actions-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         {{ 'mautic.campaign.event.actions.header'|trans }}
                     </a>
                 </li>
                 <li class="" id="conditions_li">
-                    <a href="#conditions-container" role="tab" data-toggle="tab">
+                    <a href="#conditions-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         {{ 'mautic.campaign.event.conditions.header'|trans }}
                     </a>
                 </li>
                 <li class="">
-                    <a href="#leads-container" role="tab" data-toggle="tab">
+                    <a href="#leads-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         {{ 'mautic.lead.leads'|trans }}
                     </a>
                 </li>
@@ -199,7 +261,7 @@
         </div>
 
         <!-- start: tab-content -->
-        <div class="tab-content pa-md" id="campaign-tab-content"
+        <div class="tab-content pa-16" id="campaign-tab-content"
              data-event-target-url="{{ path('mautic_campaign_event_stats', {'objectId' : campaign.id, 'dateFromValue' : dateFrom|date('Y-m-d'), 'dateToValue' : dateTo|date('Y-m-d')}) }}">
             <!-- #events-container -->
                 <div class="active tab-pane fade in bdr-w-0" id="preview-container">

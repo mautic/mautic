@@ -6,7 +6,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 
-class EventBuilder
+final class EventBuilder
 {
     public static function buildActions(array $actions): array
     {

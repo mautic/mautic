@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -20,19 +19,19 @@ class ContactSegmentFilterDictionary
     /**
      * @var mixed[]
      */
-    private $filters = [];
+    private array $filters = [];
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
     /**
      * @return mixed[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
-        if (empty($this->filters)) {
+        if ([] === $this->filters) {
             $this->setDefaultFilters();
             $this->fetchFiltersFromSubscribers();
         }
@@ -104,9 +103,13 @@ class ContactSegmentFilterDictionary
             'field'               => 'id',
         ];
         $this->filters['lead_email_read_date']          = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table' => 'email_stats',
-            'field'         => 'date_read',
+            'type'                => ForeignFuncFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'email_stats',
+            'foreign_table_field' => 'lead_id',
+            'table'               => 'leads',
+            'table_field'         => 'id',
+            'func'                => 'max',
+            'field'               => 'date_read',
         ];
         $this->filters['lead_email_sent_date']          = [
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
@@ -137,7 +140,10 @@ class ContactSegmentFilterDictionary
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
         $this->filters['leadlist']                      = [
-            'type' => SegmentReferenceFilterQueryBuilder::getServiceId(),
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'lead_lists_leads',
+            'field'         => 'leadlist_id',
+            'where'         => 'lead_lists_leads.manually_removed = 0',
         ];
         $this->filters['globalcategory']                = [
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),

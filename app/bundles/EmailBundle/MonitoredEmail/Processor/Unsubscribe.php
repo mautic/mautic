@@ -18,11 +18,11 @@ class Unsubscribe implements ProcessorInterface
     private ?Message $message = null;
 
     public function __construct(
-        private TransportInterface $transport,
-        private ContactFinder $contactFinder,
-        private TranslatorInterface $translator,
-        private LoggerInterface $logger,
-        private DoNotContactModel $doNotContact,
+        private readonly TransportInterface $transport,
+        private readonly ContactFinder $contactFinder,
+        private readonly TranslatorInterface $translator,
+        private readonly LoggerInterface $logger,
+        private readonly DoNotContactModel $doNotContact,
     ) {
     }
 

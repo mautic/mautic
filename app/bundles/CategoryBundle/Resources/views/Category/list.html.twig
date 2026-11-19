@@ -19,6 +19,8 @@
                 </div> #}
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
+                'searchScopes': searchScopes|default([]),
+                'searchScopeHint': searchScopeHint|default(null),
                 'filters': {
                     'bundle': {
                         'options': categoryTypes,
@@ -52,20 +54,25 @@
                         'bundle': bundle
                     }
                 },
-                'quickFilters': [
-                    {
-                        'search': 'mautic.core.searchcommand.ispublished',
-                        'label': 'mautic.core.form.available',
-                        'tooltip': 'mautic.core.searchcommand.ispublished.description',
-                        'icon': 'ri-check-line'
-                    },
-                    {
-                        'search': 'mautic.core.searchcommand.isunpublished',
-                        'label': 'mautic.core.form.unavailable',
-                        'tooltip': 'mautic.core.searchcommand.isunpublished.description',
-                        'icon': 'ri-close-line'
+                'quickFilters': {
+                    'mautic.core.quick_filters.status': {
+                        'conflictGroup': true,
+                        'filters': [
+                            {
+                                'search': 'mautic.core.searchcommand.ispublished',
+                                'label': 'mautic.core.form.available',
+                                'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                                'icon': 'ri-check-line'
+                            },
+                            {
+                                'search': 'mautic.core.searchcommand.isunpublished',
+                                'label': 'mautic.core.form.unavailable',
+                                'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                                'icon': 'ri-close-line'
+                            }
+                        ]
                     }
-                ]
+                }
             }) -}}
             <div class="page-list">
                 {{ block('listResults') }}
@@ -163,11 +170,9 @@
                                     {{ customContent('category.name', _context) }}
                                 </div>
                                 {% set description = item.getDescription() %}
-                                {% if description %}
-                                    <div class="text-secondary mt-4">
-                                        <small>{{ description }}</small>
-                                    </div>
-                                {% endif %}
+                                {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                                    'description': item.description
+                                }) }}
                             </td>
                             <td class="visible-md visible-lg">
                                 {% if categoryTypes[item.getBundle()] is defined %}
@@ -201,8 +206,8 @@
             {% else %}
                 <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
                     {% set childContainer %}
-                        <div class="mt-32 mb-md">
-                            {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                        <div class="mt-32 mb-16">
+                            {% include '@MauticCore/Components/pictogram.html.twig' with {
                                 'pictogram': 'folder',
                                 'size': '80'
                             } %}

@@ -9,15 +9,15 @@ use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\TestCase;
 
-class TokenPersistenceFactoryTest extends TestCase
+final class TokenPersistenceFactoryTest extends TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $integrationsHelper;
-
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&Integration
+     */
     private \PHPUnit\Framework\MockObject\MockObject $integration;
 
-    public function setup(): void
+    protected function setup(): void
     {
-        $this->integrationsHelper = $this->createMock(IntegrationsHelper::class);
         $this->integration        = $this->createMock(Integration::class);
     }
 
@@ -32,11 +32,11 @@ class TokenPersistenceFactoryTest extends TestCase
             'expires_at'    => $expiresAt,
         ];
 
-        $this->integration->expects($this->any())
+        $this->integration
             ->method('getApiKeys')
             ->willReturn($apiKeys);
 
-        $factory          = new TokenPersistenceFactory($this->integrationsHelper);
+        $factory          = new TokenPersistenceFactory($this->createStub(IntegrationsHelper::class));
         $tokenPersistence = $factory->create($this->integration);
         $this->assertTrue($tokenPersistence->hasToken());
     }
@@ -52,11 +52,11 @@ class TokenPersistenceFactoryTest extends TestCase
             'expires_at'    => $expiresAt,
         ];
 
-        $this->integration->expects($this->any())
+        $this->integration
             ->method('getApiKeys')
             ->willReturn($apiKeys);
 
-        $factory          = new TokenPersistenceFactory($this->integrationsHelper);
+        $factory          = new TokenPersistenceFactory($this->createStub(IntegrationsHelper::class));
         $tokenPersistence = $factory->create($this->integration);
         $this->assertFalse($tokenPersistence->hasToken());
     }

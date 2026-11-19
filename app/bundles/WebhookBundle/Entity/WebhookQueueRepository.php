@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * @extends CommonRepository<WebhookQueue>
@@ -12,7 +16,7 @@ class WebhookQueueRepository extends CommonRepository
     /**
      * Deletes all the webhook queues by ID.
      *
-     * @param $idList array of webhookqueue IDs
+     * @param array $idList of webhookqueue IDs
      */
     public function deleteQueuesById(array $idList): void
     {
@@ -24,33 +28,31 @@ class WebhookQueueRepository extends CommonRepository
         $qb = $this->_em->getConnection()->createQueryBuilder();
         $qb->delete(MAUTIC_TABLE_PREFIX.'webhook_queue')
             ->where(
-                $qb->expr()->in('id', $idList)
+                $qb->expr()->in('id', ':ids')
             )
+            ->setParameter('ids', $idList, ArrayParameterType::INTEGER)
             ->executeStatement();
     }
 
     /**
-     * Gets a count of the webhook queues filtered by the webhook id.
-     *
-     * @param $id int (for Webhooks)
-     *
-     * @deprecated Use exists() instead
+     * @param array<int> $idList
      */
-    public function getQueueCountByWebhookId($id): int
+    public function incrementRetryCount(array $idList): void
     {
-        // if no id was sent (the hook was deleted) then return a count of 0
-        if (!$id) {
-            return 0;
+        if (!count($idList)) {
+            return;
         }
 
         $qb = $this->_em->getConnection()->createQueryBuilder();
-
-        return (int) $qb->select('count(*) as webhook_count')
-            ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', $this->getTableAlias())
-            ->where($this->getTableAlias().'.webhook_id = :id')
-            ->setParameter('id', $id)
-            ->executeQuery()
-            ->fetchOne();
+        $qb->update(MAUTIC_TABLE_PREFIX.'webhook_queue')
+            ->where(
+                $qb->expr()->in('id', ':ids')
+            )
+            ->set('retries', 'retries + 1')
+            ->set('date_modified', ':date_modified')
+            ->setParameter('ids', $idList, ArrayParameterType::INTEGER)
+            ->setParameter('date_modified', (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB))
+            ->executeStatement();
     }
 
     /**

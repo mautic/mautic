@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private ReportModel $reportModel,
@@ -38,7 +38,7 @@ class SearchSubscriber implements EventSubscriberInterface
             '@MauticReport/SubscribedEvents/Search/global.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.report.reports', $results);
         }
     }

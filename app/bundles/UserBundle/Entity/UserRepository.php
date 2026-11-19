@@ -2,16 +2,54 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\DBAL\Exception\RetryableException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\UserBundle\Exception\OidcException;
 
 /**
  * @extends CommonRepository<User>
  */
 class UserRepository extends CommonRepository
 {
+    /**
+     * Check both login identifiers before creating a new user.
+     * Requires InnoDB REPEATABLE READ or SERIALIZABLE isolation for gap locking.
+     */
+    public function saveNewUser(User $user): void
+    {
+        if ($user->getId()) {
+            throw new \InvalidArgumentException('Only new users can be created.');
+        }
+
+        try {
+            $this->getEntityManager()->wrapInTransaction(function () use ($user): void {
+                // Lock matching users and the index gaps for identifiers that do not exist yet.
+                // Keep these locks until commit so a competing registration cannot insert a conflict.
+                $duplicate = $this->createQueryBuilder('u')
+                    ->select('1')
+                    ->where('u.username IN (:identifiers) OR u.email IN (:identifiers)')
+                    ->setParameter('identifiers', [$user->getUsername(), $user->getEmail()])
+                    ->setMaxResults(1)
+                    ->getQuery()
+                    ->setLockMode(LockMode::PESSIMISTIC_WRITE)
+                    ->getOneOrNullResult();
+
+                if (null !== $duplicate) {
+                    throw new OidcException('mautic.open_id.registration.exception.identity_taken');
+                }
+
+                $this->getEntityManager()->persist($user);
+            });
+        } catch (RetryableException|UniqueConstraintViolationException $exception) {
+            throw new OidcException('mautic.open_id.registration.exception.identity_taken', 0, $exception);
+        }
+    }
+
     /**
      * Find user by username or email.
      */
@@ -49,7 +87,7 @@ class UserRepository extends CommonRepository
      *
      * @return array
      */
-    public function checkUniqueUsernameEmail($params)
+    public function checkUniqueUsernameEmail(array $params)
     {
         $q = $this->createQueryBuilder('u');
 
@@ -97,7 +135,7 @@ class UserRepository extends CommonRepository
     {
         $q = $this->_em->createQueryBuilder();
 
-        $q->select('partial u.{id, firstName, lastName}')
+        $q->select('DISTINCT partial u.{id, firstName, lastName, email}')
             ->from(User::class, 'u')
             ->leftJoin('u.role', 'r')
             ->leftJoin('r.permissions', 'p');
@@ -230,20 +268,24 @@ class UserRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
             case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('u.isPublished', ":$unique");
+                $expr            = $q->expr()->eq('u.isPublished', ":{$unique}");
                 $forceParameters = [$unique => true];
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
             case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('u.isPublished', ":$unique");
+                $expr            = $q->expr()->eq('u.isPublished', ":{$unique}");
                 $forceParameters = [$unique => false];
 
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.isadmin'):
             case $this->translator->trans('mautic.user.user.searchcommand.isadmin', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('r.isAdmin', ":$unique");
+                $expr            = $q->expr()->eq('r.isAdmin', ":{$unique}");
                 $forceParameters = [$unique => true];
+                break;
+            case $this->translator->trans('mautic.user.user.searchcommand.neverloggedin'):
+            case $this->translator->trans('mautic.user.user.searchcommand.neverloggedin', [], null, 'en_US'):
+                $expr = $q->expr()->isNull('u.lastLogin');
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
             case $this->translator->trans('mautic.core.searchcommand.email', [], null, 'en_US'):
@@ -287,7 +329,7 @@ class UserRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [$expr, $parameters];
@@ -303,6 +345,7 @@ class UserRepository extends CommonRepository
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.user.user.searchcommand.isadmin',
+            'mautic.user.user.searchcommand.neverloggedin',
             'mautic.core.searchcommand.name',
             'mautic.user.user.searchcommand.position',
             'mautic.user.user.searchcommand.role',
@@ -324,5 +367,17 @@ class UserRepository extends CommonRepository
     public function getTableAlias(): string
     {
         return 'u';
+    }
+
+    /**
+     * @return User[]
+     */
+    public function getAllAdminUsers(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->join('u.role', 'r')
+            ->where('r.isAdmin = 1')
+            ->getQuery()
+            ->getResult();
     }
 }

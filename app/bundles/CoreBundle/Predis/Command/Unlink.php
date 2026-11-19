@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Predis\Command;
 use Predis\Command\Command;
 use Predis\Command\PrefixableCommandInterface;
 
-class Unlink extends Command implements PrefixableCommandInterface
+final class Unlink extends Command implements PrefixableCommandInterface
 {
     public const ID = 'UNLINK';
 
@@ -17,20 +17,18 @@ class Unlink extends Command implements PrefixableCommandInterface
     }
 
     /**
-     * @param mixed[] $arguments
-     *
-     * @return mixed[]
+     * @param list<string> $arguments
      */
-    protected function filterArguments(array $arguments): array
+    public function setArguments(array $arguments): void
     {
-        return self::normalizeArguments($arguments);
+        parent::setArguments(self::normalizeArguments($arguments));
     }
 
     public function prefixKeys($prefix): void
     {
         if ($arguments = $this->getArguments()) {
             foreach ($arguments as &$key) {
-                $key = "$prefix$key";
+                $key = "{$prefix}{$key}";
             }
 
             $this->setRawArguments($arguments);

@@ -1,0 +1,8 @@
+{{ form_start(form) }}
+{{ form_row(form.isPublished) }}
+<hr />
+{{ form_widget(form.apiKeys) }}
+
+{% include '@MauticOutlook/Integration/form.html.twig' with {'mauticUrl': app.request.schemeAndHttpHost ~ '/index.php'} %}
+
+{{ form_end(form) }}

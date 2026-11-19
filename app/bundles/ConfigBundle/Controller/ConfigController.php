@@ -19,24 +19,31 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class ConfigController extends FormController
+final class ConfigController extends FormController
 {
+    private TokenStorageInterface $tokenStorage;
+
+    #[Required]
+    public function autowireConfigController(
+        TokenStorageInterface $tokenStorage,
+    ): void {
+        $this->tokenStorage = $tokenStorage;
+    }
+
     /**
      * Controller action for editing the application configuration.
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage)
+    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, ?string $activeTabId = null): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $dispatcher = $this->dispatcher;
-        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
         $fileFields = $event->getFileFields();
         $formThemes = $event->getFormThemes();
 
@@ -44,8 +51,27 @@ class ConfigController extends FormController
 
         $this->mergeParamsWithLocal($formConfigs, $pathsHelper);
 
+        // Each configuration tab is rendered as its own page so only one tab's fields are loaded at a time
+        $tabs = array_keys(array_filter($formConfigs, fn (array $config): bool => !empty($config['parameters'])));
+
+        if (null === $activeTabId) {
+            // Keep the legacy ?tab= links working, otherwise open the general settings
+            $legacyTab  = $request->query->get('tab');
+            $defaultTab = in_array('coreconfig', $tabs, true) ? 'coreconfig' : ($tabs[0] ?? 'coreconfig');
+
+            return $this->delegateRedirect($this->generateUrl('mautic_config_edit', [
+                'activeTabId' => in_array($legacyTab, $tabs, true) ? $legacyTab : $defaultTab,
+            ]));
+        }
+
+        if (!in_array($activeTabId, $tabs, true)) {
+            return $this->notFound();
+        }
+
+        $formConfigs = [$activeTabId => $formConfigs[$activeTabId]];
+
         // Create the form
-        $action = $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']);
+        $action = $this->generateUrl('mautic_config_edit', ['activeTabId' => $activeTabId]);
         $form   = $this->formFactory->create(
             ConfigType::class,
             $formConfigs,
@@ -58,10 +84,9 @@ class ConfigController extends FormController
         $originalNormData = $form->getNormData();
 
         $isWritable = $configurator->isFileWritable();
-        $openTab    = null;
 
         // Check for a submitted form and process it
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $isValid = false;
                 if ($isWritable && $isValid = $this->isFormValid($form)) {
@@ -76,7 +101,7 @@ class ConfigController extends FormController
                     $configEvent
                         ->setOriginalNormData($originalNormData)
                         ->setNormData($form->getNormData());
-                    $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_PRE_SAVE);
+                    $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_PRE_SAVE);
                     $formValues = $configEvent->getConfig();
 
                     $errors      = $configEvent->getErrors();
@@ -122,20 +147,16 @@ class ConfigController extends FormController
                             }
 
                             $configurator->write();
-                            $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
+                            $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
 
                             $this->addFlashMessage('mautic.config.config.notice.updated');
 
                             $cacheHelper->refreshConfig();
-
-                            if (!empty($formData['coreconfig']['last_shown_tab'])) {
-                                $openTab = $formData['coreconfig']['last_shown_tab'];
-                            }
                         } catch (\RuntimeException $exception) {
                             $this->addFlashMessage('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                         }
 
-                        $this->setLocale($request, $tokenStorage, $params);
+                        $this->setLocale($request, $params);
                     }
                 } elseif (!$isWritable) {
                     $form->addError(
@@ -149,15 +170,10 @@ class ConfigController extends FormController
             // If the form is saved or cancelled, redirect back to the dashboard
             if ($cancelled || $isValid) {
                 if (!$cancelled && $this->isFormApplied($form)) {
-                    $redirectParameters = ['objectAction' => 'edit'];
-                    if ($openTab) {
-                        $redirectParameters['tab'] = $openTab;
-                    }
-
-                    return $this->delegateRedirect($this->generateUrl('mautic_config_action', $redirectParameters));
-                } else {
-                    return $this->delegateRedirect($this->generateUrl('mautic_dashboard_index'));
+                    return $this->delegateRedirect($this->generateUrl('mautic_config_edit', ['activeTabId' => $activeTabId]));
                 }
+
+                return $this->delegateRedirect($this->generateUrl('mautic_dashboard_index'));
             }
         }
 
@@ -172,36 +188,34 @@ class ConfigController extends FormController
                     'formThemes'  => $formThemes,
                     'formConfigs' => $formConfigs,
                     'isWritable'  => $isWritable,
+                    'tabs'        => $tabs,
+                    'activeTab'   => $activeTabId,
                 ],
                 'contentTemplate' => '@MauticConfig/Config/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_config_index',
                     'mauticContent' => 'config',
-                    'route'         => $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']),
+                    'route'         => $action,
                 ],
             ]
         );
     }
 
-    /**
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function downloadAction(Request $request, BundleHelper $bundleHelper, $objectId)
+    public function downloadAction(Request $request, BundleHelper $bundleHelper, $objectId): Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $dispatcher = $this->dispatcher;
-        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();
 
         if (!in_array($objectId, $fileFields)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $content  = $this->coreParametersHelper->get($objectId);
@@ -222,20 +236,16 @@ class ConfigController extends FormController
         return $this->notFound();
     }
 
-    /**
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function removeAction(BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, $objectId)
+    public function removeAction(BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, $objectId): JsonResponse
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $success    = 0;
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $dispatcher = $this->dispatcher;
-        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();
@@ -286,9 +296,9 @@ class ConfigController extends FormController
     /**
      * @param array<string, string> $params
      */
-    private function setLocale(Request $request, TokenStorageInterface $tokenStorage, array $params): void
+    private function setLocale(Request $request, array $params): void
     {
-        $me = $tokenStorage->getToken()->getUser();
+        $me = $this->tokenStorage->getToken()->getUser();
         assert($me instanceof User);
         $locale = $me->getLocale();
 

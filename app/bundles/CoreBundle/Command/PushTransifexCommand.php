@@ -13,6 +13,7 @@ use Mautic\Transifex\Exception\ResponseException;
 use Mautic\Transifex\Exception\TransifexException;
 use Mautic\Transifex\Promise;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,23 +23,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to push language resources to Transifex.
  */
-class PushTransifexCommand extends Command
-{
-    public const NAME = 'mautic:transifex:push';
-
-    public function __construct(
-        private TransifexFactory $transifexFactory,
-        private TranslatorInterface $translator,
-        private LanguageHelper $languageHelper,
-    ) {
-        parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this->setName(self::NAME)
-            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
-            ->setHelp(<<<'EOT'
+#[AsCommand(
+    name: PushTransifexCommand::NAME,
+    description: 'Pushes Mautic translation resources to Transifex',
+    help: <<<'TXT'
 The <info>%command.name%</info> command is used to push translation resources to Transifex
 
 <info>php %command.full_name%</info>
@@ -46,8 +34,24 @@ The <info>%command.name%</info> command is used to push translation resources to
 You can optionally choose to update resources for one bundle only with the --bundle option:
 
 <info>php %command.full_name% --bundle AssetBundle</info>
-EOT
-            );
+TXT
+)]
+final class PushTransifexCommand extends Command
+{
+    public const NAME = 'mautic:transifex:push';
+
+    public function __construct(
+        private readonly TransifexFactory $transifexFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly LanguageHelper $languageHelper,
+    ) {
+        parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -66,7 +70,6 @@ EOT
         }
 
         $resources = $transifex->getConnector(Resources::class);
-        \assert($resources instanceof Resources);
 
         $existingResources = json_decode((string) $resources->getAll()->getBody(), true);
         $promises          = new \SplQueue();
@@ -129,6 +132,4 @@ EOT
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Pushes Mautic translation resources to Transifex';
 }

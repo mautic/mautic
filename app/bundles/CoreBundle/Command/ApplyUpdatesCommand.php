@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Exception\UpdateFailedException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Update\StepProvider;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
@@ -18,19 +19,36 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to update the application.
  */
-class ApplyUpdatesCommand extends Command
+#[AsCommand(
+    name: 'mautic:update:apply',
+    description: 'Updates the Mautic application',
+    help: <<<'TXT'
+                The <info>%command.name%</info> command updates the Mautic application.
+
+<info>php %command.full_name%</info>
+
+You can optionally specify to bypass the verification check with the --force option:
+
+<info>php %command.full_name% --force</info>
+
+To force install a local package, pass the full path to the package as follows:
+
+<info>php %command.full_name% --update-package=/path/to/updatepackage.zip</info>
+TXT
+)]
+final class ApplyUpdatesCommand extends Command
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private StepProvider $stepProvider,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly StepProvider $stepProvider,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
-        $this->setName('mautic:update:apply')
+        $this
             ->setDefinition(
                 [
                     new InputOption(
@@ -46,21 +64,6 @@ class ApplyUpdatesCommand extends Command
                         'Finalize the upgrade.'
                     ),
                 ]
-            )
-            ->setHelp(
-                <<<'EOT'
-                The <info>%command.name%</info> command updates the Mautic application.
-
-<info>php %command.full_name%</info>
-
-You can optionally specify to bypass the verification check with the --force option:
-
-<info>php %command.full_name% --force</info>
-
-To force install a local package, pass the full path to the package as follows:
-
-<info>php %command.full_name% --update-package=/path/to/updatepackage.zip</info>
-EOT
             );
     }
 
@@ -139,6 +142,4 @@ EOT
 
         return 0;
     }
-
-    protected static $defaultDescription = 'Updates the Mautic application';
 }

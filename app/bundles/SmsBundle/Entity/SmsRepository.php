@@ -5,12 +5,15 @@ namespace Mautic\SmsBundle\Entity;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Sms>
  */
 class SmsRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
     /**
      * Get a list of entities.
      *
@@ -23,25 +26,13 @@ class SmsRepository extends CommonRepository
             ->select($this->getTableAlias())
             ->from(Sms::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
-        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
+        if (empty($args['iterable_mode'])) {
             $q->leftJoin($this->getTableAlias().'.category', 'c');
         }
 
         $args['qb'] = $q;
 
         return parent::getEntities($args);
-    }
-
-    /**
-     * @depreacated The method is replaced by getPublishedBroadcastsIterable
-     *
-     * @param numeric|null $id
-     *
-     * @return \Doctrine\ORM\Internal\Hydration\IterableResult<Sms>
-     */
-    public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
-    {
-        return $this->getPublishedBroadcastsQuery($id)->iterate();
     }
 
     /**
@@ -55,7 +46,7 @@ class SmsRepository extends CommonRepository
     private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
-        $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
+        $expr = $this->getPublishedByDateOrmExpression($qb, null, true, true, false);
 
         $expr->add(
             $qb->expr()->eq($this->getTableAlias().'.smsType', $qb->expr()->literal('list'))
@@ -136,11 +127,21 @@ class SmsRepository extends CommonRepository
                     $unique     => $filter->string,
                 ];
                 $expr = $q->expr()->or(
-                    $q->expr()->eq('e.language', ":$unique"),
-                    $q->expr()->like('e.language', ":$langUnique")
+                    $q->expr()->eq('e.language', ":{$unique}"),
+                    $q->expr()->like('e.language', ":{$langUnique}")
                 );
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'sms_id',
+                    'sms_projects_xref',
+                    $this->getTableAlias(),
+                    $filter->string,
+                    $filter->not
+                );
         }
 
         if ($expr && $filter->not) {
@@ -151,7 +152,7 @@ class SmsRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [$expr, $parameters];
@@ -169,6 +170,7 @@ class SmsRepository extends CommonRepository
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
+            'mautic.project.searchcommand.name',
         ];
 
         return array_merge($commands, parent::getSearchCommands());
@@ -211,22 +213,25 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param bool   $viewOther
-     * @param string $smsType
+     * @param array<int> $ignoreIds
      *
      * @return array
      */
-    public function getSmsList($search = '', $limit = 10, $start = 0, $viewOther = false, $smsType = null)
-    {
+    public function getSmsList(
+        mixed $search = '',
+        int $limit = 10,
+        int $start = 0,
+        bool $viewOther = false,
+        ?string $smsType = null,
+        ?string $topLevel = null,
+        array $ignoreIds = [],
+    ) {
         $q = $this->createQueryBuilder('e');
-        $q->select('partial e.{id, name, language}');
+        $q->select('partial e.{id, name, language, media}');
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                   ->setParameter('search', $search);
             } else {
@@ -244,6 +249,15 @@ class SmsRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->eq('e.smsType', $q->expr()->literal($smsType))
             );
+        }
+
+        if ('translation' === $topLevel) {
+            $q->andWhere($q->expr()->isNull('e.translationParent'));
+        }
+
+        if ([] !== $ignoreIds) {
+            $q->andWhere($q->expr()->notIn('e.id', ':smsIds'))
+                ->setParameter('smsIds', $ignoreIds);
         }
 
         $q->orderBy('e.name');

@@ -2,7 +2,7 @@
     {% set toolbarButtons = [
         {
             'attr': {
-            'class': 'hidden-xs btn btn-ghost btn-icon btn-sm btn-nospin',
+            'class': 'hidden-xs btn btn-ghost btn--icon-only btn-sm btn-nospin',
             'href': 'javascript: void(0)',
             'onclick': 'Mautic.toggleLiveLeadListUpdate();',
             'id': 'liveModeButton',
@@ -16,7 +16,7 @@
     {% if 'list' == indexMode %}
         {% set toolbarButtons = toolbarButtons|merge([{
             'attr': {
-                'class': 'hidden-xs btn btn-icon btn-sm btn-nospin'~(anonymousShowing ? ' btn-primary' : ' btn-ghost'),
+                'class': 'hidden-xs btn btn--icon-only btn-sm btn-nospin'~(anonymousShowing ? ' btn-primary' : ' btn-ghost'),
                 'href': 'javascript: void(0)',
                 'onclick': 'Mautic.toggleAnonymousLeads();',
                 'id': 'anonymousLeadButton',
@@ -125,6 +125,17 @@
               'class': 'btn btn-ghost btn-sm btn-nospin',
               'data-toggle': 'ajaxmodal',
               'data-target': '#MauticSharedModal',
+              'href': path('mautic_contact_action', {'objectAction': 'batchFindReplace'}),
+              'data-header': 'mautic.core.find_replace'|trans,
+          },
+          'btnText': 'mautic.core.find_replace'|trans,
+          'iconClass': 'ri-find-replace-line',
+      },
+      {
+          'attr': {
+              'class': 'btn btn-ghost btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
               'href': path('mautic_contact_action', {'objectAction': 'batchDnc'}),
               'data-header': 'mautic.lead.batch.dnc'|trans,
           },
@@ -153,28 +164,51 @@
         'routeBase': 'contact',
         'langVar': 'lead.lead',
     },
-    'quickFilters': [
-        {
-            'search': 'mautic.core.searchcommand.ismine',
-            'label': 'mautic.core.searchcommand.ismine.label',
-            'tooltip': 'mautic.core.searchcommand.ismine.description',
-            'icon': 'ri-user-line'
+    'quickFilters': {
+        'mautic.core.quick_filters.ownership': {
+            'conflictGroup': true,
+            'filters': [
+                {
+                    'search': 'mautic.core.searchcommand.ismine',
+                    'label': 'mautic.core.searchcommand.ismine.label',
+                    'tooltip': 'mautic.core.searchcommand.ismine.description',
+                    'icon': 'ri-user-line'
+                },
+                {
+                    'search': 'mautic.lead.lead.searchcommand.isunowned',
+                    'label': 'mautic.lead.lead.searchcommand.isunowned.label',
+                    'tooltip': 'mautic.lead.lead.searchcommand.isunowned.description',
+                    'icon': 'ri-user-unfollow-line'
+                }
+            ]
         },
-        {
-            'search': 'mautic.lead.lead.searchcommand.isunowned',
-            'label': 'mautic.lead.lead.searchcommand.isunowned.label',
-            'tooltip': 'mautic.lead.lead.searchcommand.isunowned.description',
-            'icon': 'ri-user-unfollow-line'
+        'mautic.core.quick_filters.others': {
+            'filters': [
+                {
+                    'search': 'mautic.lead.lead.searchcommand.isunsegmented',
+                    'label': 'mautic.lead.lead.searchcommand.isunsegmented.label',
+                    'tooltip': 'mautic.lead.lead.searchcommand.isunsegmented.description',
+                    'icon': 'ri-list-check-2'
+                },
+                {
+                    'search': (('mautic.lead.lead.searchcommand.dnc'|trans) ~ ':' ~ ('mautic.lead.lead.searchcommand.dnc.any'|trans)),
+                    'label': 'mautic.lead.lead.searchcommand.dnc.label',
+                    'tooltip': 'mautic.lead.lead.searchcommand.dnc.description',
+                    'icon': 'ri-prohibited-line'
+                }
+            ]
         }
-    ]
+    },
+    'searchScopeHint': searchScopeHint|default(''),
+    'searchScopes': searchScopes|default([]),
 }) -}}
-<div class="btn-group ml-5 sr-only ">
-    <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.list'|trans }}" data-placement="left">
+<div class="btn-group ms-5 visually-hidden ">
+    <span data-bs-toggle="tooltip" title="{{ 'mautic.lead.tooltip.list'|trans }}" data-bs-placement="left">
       <a id="table-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'list'}) }}" data-toggle="ajax" class="btn btn-ghost">
           <i class="ri-table-line"></i>
       </a>
     </span>
-    <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.grid'|trans }}" data-placement="left">
+    <span data-bs-toggle="tooltip" title="{{ 'mautic.lead.tooltip.grid'|trans }}" data-bs-placement="left">
       <a id="card-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'grid'}) }}" data-toggle="ajax" class="btn btn-ghost">
         <i class="ri-layout-grid-line"></i>
       </a>

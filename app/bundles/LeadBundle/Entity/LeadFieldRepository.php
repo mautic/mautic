@@ -8,12 +8,28 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonRepository<LeadField>
  */
 class LeadFieldRepository extends CommonRepository
 {
+    /**
+     * @var array<int|string, array<string,mixed>>|null
+     */
+    private ?array $fields = null;
+
+    private LeadRepository $leadRepository;
+
+    #[Required]
+    public function autowireLeadFieldsRepository(
+        LeadRepository $leadRepository,
+    ): void {
+        $this->leadRepository = $leadRepository;
+    }
+
     /**
      * Retrieves array of aliases used to ensure unique alias for new fields.
      *
@@ -55,11 +71,31 @@ class LeadFieldRepository extends CommonRepository
 
         if ($includeEntityFields) {
             // add lead main column names to prevent attempt to create a field with the same name
-            $leadRepo = $this->_em->getRepository(Lead::class)->getBaseColumns(Lead::class, true);
+            $leadRepo = $this->leadRepository->getBaseColumns(Lead::class, true);
             $aliases  = array_merge($aliases, $leadRepo);
         }
 
         return $aliases;
+    }
+
+    /**
+     * @return array<int|string, array<string, mixed>>
+     */
+    public function getFields(): array
+    {
+        if (!isset($this->fields)) {
+            $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+                ->where('f.is_published = :published')
+                ->setParameter('published', true, 'boolean')
+                ->addOrderBy('f.field_order', 'asc');
+            $results = $fq->executeQuery()->fetchAllAssociative();
+
+            $this->fields = array_column($results, null, 'alias');
+        }
+
+        return $this->fields;
     }
 
     /**
@@ -79,27 +115,11 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @return array<int|string, array<string, mixed>>
-     */
-    public function getFields(): array
-    {
-        $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
-            ->where('f.is_published = :published')
-            ->setParameter('published', true, 'boolean')
-            ->addOrderBy('f.field_order', 'asc');
-        $results = $fq->executeQuery()->fetchAllAssociative();
-
-        return array_column($results, null, 'alias');
-    }
-
-    /**
      * Retrieves the aliases of searchable fields that are indexed and published.
      *
      * @return string[]
      */
-    public function getSearchableFieldAliases(string $object = null): array
+    public function getSearchableFieldAliases(?string $object = null): array
     {
         $fq = $this->createQueryBuilder($this->getTableAlias());
         $fq->select($this->getTableAlias().'.alias')
@@ -181,8 +201,6 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * Add company left join.
-     *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
     private function addCompanyLeftJoin($q): void
@@ -245,130 +263,153 @@ class LeadFieldRepository extends CommonRepository
 
             if (('eq' === $operatorExpr) || ('like' === $operatorExpr)) {
                 return !empty($result['id']);
-            } elseif (('neq' === $operatorExpr) || ('notLike' === $operatorExpr)) {
+            }
+            if (('neq' === $operatorExpr) || ('notLike' === $operatorExpr)) {
                 return empty($result['id']);
-            } else {
-                return false;
             }
-        } else {
-            $property = $this->getPropertyByField($field, $q);
-            if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
-                $doesSupportEmptyValue            = !in_array($fieldType, ['date', 'datetime'], true);
-                $compositeExpression              = ('empty' === $operatorExpr) ?
-                    $q->expr()->or(
-                        $q->expr()->isNull($property),
-                        $doesSupportEmptyValue ? $q->expr()->eq($property, $q->expr()->literal('')) : null
-                    )
-                    :
-                    $q->expr()->and(
-                        $q->expr()->isNotNull($property),
-                        $doesSupportEmptyValue ? $q->expr()->neq($property, $q->expr()->literal('')) : null
-                    );
-                $q->where(
-                    $q->expr()->and(
-                        $q->expr()->eq('l.id', ':lead'),
-                        $compositeExpression
-                    )
-                )
-                  ->setParameter('lead', (int) $lead);
-            } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
-                if ('regexp' === $operatorExpr) {
-                    $where = $property.' REGEXP  :value';
-                } else {
-                    $where = $property.' NOT REGEXP  :value';
-                }
 
-                $q->where(
-                    $q->expr()->and(
-                        $q->expr()->eq('l.id', ':lead'),
-                        $q->expr()->and($where)
-                    )
-                )
-                  ->setParameter('lead', (int) $lead)
-                  ->setParameter('value', $value);
-            } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
-                $values   = (!is_array($value)) ? [$value] : $value;
-                $operator = str_starts_with($operatorExpr, 'not') ? 'NOT REGEXP' : 'REGEXP';
-                $expr     = $q->expr()->and(
-                    $q->expr()->eq('l.id', ':lead')
-                );
-
-                $innerExpr = [];
-                foreach ($values as $v) {
-                    $v = $q->expr()->literal(
-                        InputHelper::clean($v)
-                    );
-
-                    $v           = trim($v, "'");
-                    $innerExpr[] = $property." $operator '\\\\|?$v\\\\|?'";
-                }
-
-                if (str_starts_with($operatorExpr, 'not')) {
-                    $expr = $expr->with($q->expr()->or(
-                        $q->expr()->isNull($property),
-                        $q->expr()->and(...$innerExpr)
-                    ));
-                } else {
-                    $expr = $expr->with($q->expr()->or(...$innerExpr));
-                }
-
-                $q->where($expr)
-                    ->setParameter('lead', (int) $lead)
-                    ->setParameter('values', $values, ArrayParameterType::STRING);
-            } else {
-                $expr = $q->expr()->and(
-                    $q->expr()->eq('l.id', ':lead')
-                );
-
-                if ('neq' === $operatorExpr) {
-                    // include null
-                    $expr = $expr->with(
-                        $q->expr()->or(
-                            $q->expr()->$operatorExpr($property, ':value'),
-                            $q->expr()->isNull($property)
-                        )
-                    );
-                } else {
-                    switch ($operatorExpr) {
-                        case 'startsWith':
-                            $operatorExpr    = 'like';
-                            $value           = $value.'%';
-                            break;
-                        case 'endsWith':
-                            $operatorExpr   = 'like';
-                            $value          = '%'.$value;
-                            break;
-                        case 'contains':
-                            $operatorExpr   = 'like';
-                            $value          = '%'.$value.'%';
-                            break;
-                    }
-
-                    $expr = $expr->with(
-                        $q->expr()->$operatorExpr($property, ':value')
-                    );
-                }
-
-                $q->where($expr)
-                  ->setParameter('lead', (int) $lead)
-                  ->setParameter('value', $value);
-            }
-            if (str_starts_with($property, 'u.')) {
-                // Match only against the latest UTM properties.
-                $q->orderBy('u.date_added', 'DESC');
-                $q->setMaxResults(1);
-            }
-            $result = $q->executeQuery()->fetchAssociative();
-
-            return !empty($result['id']);
+            return false;
         }
+        $property = $this->getPropertyByField($field, $q);
+        if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
+            $doesSupportEmptyValue            = !in_array($fieldType, ['date', 'datetime'], true);
+            $compositeExpression              = ('empty' === $operatorExpr) ?
+                $q->expr()->or(
+                    $q->expr()->isNull($property),
+                    $doesSupportEmptyValue ? $q->expr()->eq($property, $q->expr()->literal('')) : null
+                )
+                :
+                $q->expr()->and(
+                    $q->expr()->isNotNull($property),
+                    $doesSupportEmptyValue ? $q->expr()->neq($property, $q->expr()->literal('')) : null
+                );
+            $q->where(
+                $q->expr()->and(
+                    $q->expr()->eq('l.id', ':lead'),
+                    $compositeExpression
+                )
+            )
+              ->setParameter('lead', (int) $lead);
+        } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
+            if ('regexp' === $operatorExpr) {
+                $where = $property.' REGEXP  :value';
+            } else {
+                $where = $property.' NOT REGEXP  :value';
+            }
+
+            $q->where(
+                $q->expr()->and(
+                    $q->expr()->eq('l.id', ':lead'),
+                    $q->expr()->and($where)
+                )
+            )
+              ->setParameter('lead', (int) $lead)
+              ->setParameter('value', $value);
+        } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
+            $values   = (!is_array($value)) ? [$value] : $value;
+            $operator = str_starts_with($operatorExpr, 'not') ? 'NOT REGEXP' : 'REGEXP';
+            $expr     = $q->expr()->and(
+                $q->expr()->eq('l.id', ':lead')
+            );
+
+            $innerExpr  = [];
+            $paramCount = 0;
+            foreach ($values as $v) {
+                // Don't use InputHelper::clean() to avoid converting special characters to HTML entities
+                $paramName   = 'value'.$paramCount++;
+                $v           = trim((string) $v, "'");
+                $innerExpr[] = $property." {$operator} :".$paramName;
+                $q->setParameter($paramName, "\\|?{$v}\\|?");
+            }
+
+            if (str_starts_with($operatorExpr, 'not')) {
+                $expr = $expr->with($q->expr()->or(
+                    $q->expr()->isNull($property),
+                    $q->expr()->and(...$innerExpr)
+                ));
+            } else {
+                $expr = $expr->with($q->expr()->or(...$innerExpr));
+            }
+
+            $q->where($expr)
+                ->setParameter('lead', (int) $lead);
+        } else {
+            $expr = $q->expr()->and(
+                $q->expr()->eq('l.id', ':lead')
+            );
+
+            if ('neq' === $operatorExpr) {
+                // include null
+                $expr = $expr->with(
+                    $q->expr()->or(
+                        $q->expr()->{$operatorExpr}($property, ':value'),
+                        $q->expr()->isNull($property)
+                    )
+                );
+            } else {
+                switch ($operatorExpr) {
+                    case 'startsWith':
+                        $operatorExpr    = 'like';
+                        $value .= '%';
+                        break;
+                    case 'endsWith':
+                        $operatorExpr   = 'like';
+                        $value          = '%'.$value;
+                        break;
+                    case 'contains':
+                        $operatorExpr   = 'like';
+                        $value          = '%'.$value.'%';
+                        break;
+                }
+
+                $expr = $expr->with(
+                    $q->expr()->{$operatorExpr}($property, ':value')
+                );
+            }
+
+            $q->where($expr)
+              ->setParameter('lead', (int) $lead)
+              ->setParameter('value', $value);
+        }
+        if (str_starts_with($property, 'u.')) {
+            // Match only against the latest UTM properties.
+            $q->orderBy('u.date_added', 'DESC');
+            $q->setMaxResults(1);
+        }
+        $result = $q->executeQuery()->fetchAssociative();
+
+        return !empty($result['id']);
+    }
+
+    /**
+     * Compare a form result value with empty value for defined lead.
+     */
+    public function compareEmptyDateValue(int $lead, string $field, string $operatorExpr): bool
+    {
+        $q        = $this->_em->getConnection()->createQueryBuilder();
+        $property = $this->getPropertyByField($field, $q);
+        $q->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where(
+                $q->expr()->and(
+                    $q->expr()->eq('l.id', ':lead'),
+                    ('empty' === $operatorExpr) ?
+                        $q->expr()->isNull($property)
+                        :
+                        $q->expr()->isNotNull($property)
+                )
+            )
+            ->setParameter('lead', $lead, \PDO::PARAM_INT);
+        $result = $q->executeQuery()->fetchAssociative();
+
+        return !empty($result['id']);
     }
 
     /**
      * Compare a form result value with defined date value for defined lead.
      *
      * @param int    $lead  ID
-     * @param int    $field alias
+     * @param string $field alias
      * @param string $value to compare with
      */
     public function compareDateValue($lead, $field, $value): bool
@@ -407,8 +448,8 @@ class LeadFieldRepository extends CommonRepository
             ->where(
                 $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead'),
-                    $q->expr()->eq("MONTH(l. $field)", ':month'),
-                    $q->expr()->eq("DAY(l. $field)", ':day')
+                    $q->expr()->eq("MONTH(l. {$field})", ':month'),
+                    $q->expr()->eq("DAY(l. {$field})", ':day')
                 )
             )
             ->setParameter('lead', (int) $lead)
@@ -447,6 +488,8 @@ class LeadFieldRepository extends CommonRepository
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.ismine',
+            'mautic.lead.field.searchcommand.issystemdefault',
+            'mautic.lead.field.searchcommand.isusercreated',
             'mautic.lead.field.searchcommand.isindexed',
             'mautic.lead.field.searchcommand.isunique',
             'mautic.lead.field.searchcommand.type',
@@ -478,7 +521,7 @@ class LeadFieldRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -487,15 +530,16 @@ class LeadFieldRepository extends CommonRepository
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
         $prefix          = $this->getTableAlias();
+        $forceParameters = [];
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.field.searchcommand.isindexed'):
-                $expr            = $q->expr()->eq($prefix.'.isIndex', ":$unique");
+                $expr            = $q->expr()->eq($prefix.'.isIndex', ":{$unique}");
                 $forceParameters = [$unique => true];
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.field.searchcommand.isunique'):
-                $expr            = $q->expr()->eq($prefix.'.isUniqueIdentifer', ":$unique");
+                $expr            = $q->expr()->eq($prefix.'.isUniqueIdentifer', ":{$unique}");
                 $forceParameters = [$unique => true];
                 $returnParameter = true;
                 break;
@@ -503,29 +547,81 @@ class LeadFieldRepository extends CommonRepository
                 $forceParameters = [
                     $unique     => $filter->string,
                 ];
-                $expr            = $q->expr()->like($prefix.'.type', ":$unique");
+                $expr            = $q->expr()->like($prefix.'.type', ":{$unique}");
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.field.searchcommand.group'):
                 $forceParameters = [
                     $unique     => $filter->string,
                 ];
-                $expr            = $q->expr()->like($prefix.'.group', ":$unique");
+                $expr            = $q->expr()->like($prefix.'.group', ":{$unique}");
                 $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.lead.field.searchcommand.issystemdefault'):
+            case $this->translator->trans('mautic.lead.field.searchcommand.issystemdefault', [], null, 'en_US'):
+                [$expr, $forceParameters] = $this->getSystemAliasExpression($q, $prefix.'.alias');
+                $parameters               = [];
+                break;
+            case $this->translator->trans('mautic.lead.field.searchcommand.isusercreated'):
+            case $this->translator->trans('mautic.lead.field.searchcommand.isusercreated', [], null, 'en_US'):
+                [$expr, $forceParameters] = $this->getSystemAliasExpression($q, $prefix.'.alias');
+                $parameters               = [];
+                if ($expr) {
+                    $expr = $this->negateExpression($q, $expr);
+                }
                 break;
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $this->negateExpression($q, $expr);
         }
 
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [$expr, $parameters];
+    }
+
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     *
+     * @return array{0:mixed,1:array<string,mixed>}
+     */
+    private function getSystemAliasExpression($q, string $column): array
+    {
+        $parameter = $this->generateRandomParameterName();
+        $expr      = $q->expr()->in($column, ":{$parameter}");
+
+        $q->setParameter($parameter, $this->getSystemDefaultAliases(), ArrayParameterType::STRING);
+
+        return [$expr, []];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getSystemDefaultAliases(): array
+    {
+        return array_values(array_unique(array_merge(
+            array_keys(FieldModel::$coreFields),
+            array_keys(FieldModel::$coreCompanyFields),
+        )));
+    }
+
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param mixed                                                        $expr
+     */
+    private function negateExpression($q, $expr): object|string
+    {
+        if ($q instanceof \Doctrine\ORM\QueryBuilder) {
+            return $q->expr()->not($expr);
+        }
+
+        return sprintf('NOT(%s)', (string) $expr);
     }
 }

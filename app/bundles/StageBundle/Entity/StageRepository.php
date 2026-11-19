@@ -3,17 +3,32 @@
 namespace Mautic\StageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Stage>
  */
 class StageRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
     public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder($this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'c');
+
+        if (!empty($args['withContactCount'])) {
+            // Use a subquery so the main stage list query stays safe for pagination and sorting.
+            $sq = $this->_em->createQueryBuilder()
+                ->select('count(l.id)')
+                ->from(Lead::class, 'l')
+                ->where('l.stage = s');
+
+            $q->addSelect('('.$sq->getDql().') as contactCount');
+            unset($args['withContactCount']);
+        }
 
         $args['qb'] = $q;
 
@@ -23,6 +38,18 @@ class StageRepository extends CommonRepository
     public function getTableAlias(): string
     {
         return 's';
+    }
+
+    /**
+     * @return array<int, array{id: int, name: string, weight: int}>
+     */
+    public function getStageWeights(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s.id, s.name, s.weight')
+            ->orderBy('s.weight', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
     }
 
     /**
@@ -39,7 +66,7 @@ class StageRepository extends CommonRepository
             ->setParameter('type', $type);
 
         // make sure the published up and down dates are good
-        $expr = $this->getPublishedByDateExpression($q);
+        $expr = $this->getPublishedByDateOrmExpression($q);
 
         $q->where($expr);
 
@@ -85,7 +112,17 @@ class StageRepository extends CommonRepository
 
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        return $this->addStandardSearchCommandWhereClause($q, $filter);
+        return match ($filter->command) {
+            $this->translator->trans('mautic.project.searchcommand.name'), $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
+                $this->_em->getConnection()->createQueryBuilder(),
+                'stage_id',
+                'stage_projects_xref',
+                $this->getTableAlias(),
+                $filter->string,
+                $filter->not
+            ),
+            default => $this->addStandardSearchCommandWhereClause($q, $filter),
+        };
     }
 
     /**
@@ -93,28 +130,21 @@ class StageRepository extends CommonRepository
      */
     public function getSearchCommands(): array
     {
-        return $this->getStandardSearchCommands();
+        return array_merge(['mautic.project.searchcommand.name'], $this->getStandardSearchCommands());
     }
 
     /**
      * Get a list of lists.
      *
-     * @param bool   $user
-     * @param string $id
+     * @param bool|object $user
+     * @param string      $id
      *
-     * @return array
+     * @return array<int, array<string, mixed>>
      */
-    public function getStages($user = false, $id = '')
+    public function getStages($user = false, $id = ''): array
     {
-        static $stages = [];
-
         if (is_object($user)) {
             $user = $user->getId();
-        }
-
-        $key = (int) $user.$id;
-        if (isset($stages[$key])) {
-            return $stages[$key];
         }
 
         $q = $this->_em->createQueryBuilder()
@@ -137,11 +167,7 @@ class StageRepository extends CommonRepository
 
         $q->orderBy('s.name');
 
-        $results = $q->getQuery()->getArrayResult();
-
-        $stages[$key] = $results;
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
@@ -178,7 +204,7 @@ class StageRepository extends CommonRepository
     /**
      * @param string|int $value
      *
-     * @return array
+     * @return Stage|null
      */
     public function findByIdOrName($value)
     {

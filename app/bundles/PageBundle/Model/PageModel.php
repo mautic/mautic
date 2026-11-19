@@ -3,7 +3,9 @@
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use GuzzleHttp\Psr7\Query;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -13,6 +15,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\AbTest\VariantConverterService;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
@@ -20,13 +23,16 @@ use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -36,8 +42,12 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\MessengerBundle\Message\PageHitNotification;
 use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
@@ -46,11 +56,14 @@ use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -61,6 +74,18 @@ class PageModel extends FormModel implements GlobalSearchInterface
     use TranslationModelTrait;
     use VariantModelTrait;
     use BuilderModelTrait;
+
+    /**
+     * We have to limit length of some fields
+     * to store them in the database.
+     */
+    private const MAX_FIELD_LENGTH = 191;
+
+    /**
+     * An encoding to use to calculate
+     * length of a field.
+     */
+    private const STRING_ENCODING = 'UTF-8';
 
     /**
      * @var bool
@@ -82,7 +107,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
         private ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
         private ContactRequestHelper $contactRequestHelper,
-        EntityManager $em,
+        private VariantConverterService $variantConverterService,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -91,8 +117,16 @@ class PageModel extends FormModel implements GlobalSearchInterface
         LoggerInterface $mauticLogger,
         private StatRepository $statRepository,
         private BotRatioHelper $botRatioHelper,
+        private ValidatorInterface $validator,
+        private readonly PageRepository $pageRepository,
+        private readonly HitRepository $hitRepository,
+        private readonly EmailRepository $emailRepository,
+        private readonly UtmTagRepository $utmTagRepository,
+        private readonly RedirectRepository $redirectRepository,
+        private readonly TrackableRepository $trackableRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
-        $this->dateTimeHelper       = new DateTimeHelper();
+        $this->dateTimeHelper = new DateTimeHelper();
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -102,23 +136,16 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $this->catInUrl = $catInUrl;
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\PageRepository
-     */
-    public function getRepository()
+    public function getRepository(): PageRepository
     {
-        $repo = $this->em->getRepository(Page::class);
-        $repo->setCurrentUser($this->userHelper->getUser());
+        $this->pageRepository->setCurrentUser($this->userHelper->getUser());
 
-        return $repo;
+        return $this->pageRepository;
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\HitRepository
-     */
-    public function getHitRepository()
+    public function getHitRepository(): HitRepository
     {
-        return $this->em->getRepository(Hit::class);
+        return $this->hitRepository;
     }
 
     public function getPermissionBase(): string
@@ -157,7 +184,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $count     = $repo->checkPageUniqueAlias($testAlias, $pageIds);
                 ++$aliasTag;
             }
-            if ($testAlias != $alias) {
+            if ($testAlias !== $alias) {
                 $alias = $testAlias;
             }
             $entity->setAlias($alias);
@@ -194,7 +221,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -231,7 +258,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -250,12 +277,15 @@ class PageModel extends FormModel implements GlobalSearchInterface
             case 'post_delete':
                 $name = PageEvents::PAGE_POST_DELETE;
                 break;
+            case 'on_toggle_publish':
+                $name = PageEvents::PAGE_ON_TOGGLE_PUBLISH;
+                break;
             default:
                 return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new PageEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -280,13 +310,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
         $results = [];
-        switch ($type) {
-            case 'page':
-                $viewOther = $this->security->isGranted('page:pages:viewother');
-                $repo      = $this->getRepository();
-                $repo->setCurrentUser($this->userHelper->getUser());
-                $results = $repo->getPageList($filter, $limit, 0, $viewOther);
-                break;
+        if ('page' === $type) {
+            $viewOther = $this->security->isGranted('page:pages:viewother');
+            $repo      = $this->getRepository();
+            $repo->setCurrentUser($this->userHelper->getUser());
+            $results = $repo->getPageList($filter, $limit, 0, $viewOther);
         }
 
         return $results;
@@ -376,17 +404,18 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @throws \Exception
      */
-    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', Lead $lead = null, $query = [], \DateTime $dateTime = null): bool
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, $query = [], ?\DateTime $dateTime = null): bool
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous() || $request->cookies->get('Blocked-Tracking')) {
             return false;
         }
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-        if (!$ipAddress->isTrackable()) {
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
             return false;
         }
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         // Process the query
         if (empty($query) || !is_array($query)) {
@@ -395,7 +424,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         $dateTime  = $dateTime ?: new \DateTime();
         $userAgent = $request->server->get('HTTP_USER_AGENT');
-        if (array_key_exists('ct', $query) && array_key_exists('email', $query['ct']) && array_key_exists('stat', $query['ct'])) {
+        if (array_key_exists('ct', $query) && is_array($query['ct']) && array_key_exists('email', $query['ct']) && array_key_exists('stat', $query['ct'])) {
             /** @var Stat $stat */
             $stat = $this->statRepository->findOneBy(['trackingHash' => $query['ct']['stat']]);
             if (null !== $stat && $this->botRatioHelper->isHitByBot($stat, $dateTime, $ipAddress, (string) $userAgent)) {
@@ -417,7 +446,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $this->companyModel->saveEntity($companyEntity);
             }
 
-            if (!empty($company) and $companyEntity instanceof Company) {
+            if (!empty($company) && $companyEntity instanceof Company) {
                 // Save after the lead in for new leads created through the API and maybe other places
                 $this->companyModel->addLeadToCompany($companyEntity, $lead);
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
@@ -443,29 +472,17 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $userAgent);
 
-        $hit->setTrackingId($trackedDevice->getTrackingId());
+        $hit->setTrackingId($this->limitString($trackedDevice->getTrackingId()));
         $hit->setDeviceStat($trackedDevice);
 
-        // Wrap in a try/catch to prevent deadlock errors on busy servers
-        try {
-            $this->em->persist($hit);
-            $this->em->flush();
-        } catch (\Exception $exception) {
-            if (MAUTIC_ENV !== 'prod') {
-                throw $exception;
-            } else {
-                $this->logger->error(
-                    $exception->getMessage(),
-                    ['exception' => $exception]
-                );
-            }
-        }
+        // Persist first so the message carries a valid hit ID for async processing.
+        $this->em->persist($hit);
+        $this->em->flush();
 
-        // save hit to the cookie to use to update the exit time
-        if ($hit) {
+        if ($hit->getId()) {
             $this->cookieHelper->setCookie(
                 name: 'mautic_referer_id',
-                value: $hit->getId() ?: null,
+                value: $hit->getId(),
                 sameSite: Cookie::SAMESITE_NONE
             );
         }
@@ -491,8 +508,6 @@ class PageModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * Process page hit.
-     *
      * @throws \Exception
      */
     public function processPageHit(
@@ -502,7 +517,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         Lead $lead,
         bool $trackingNewlyGenerated,
         bool $activeRequest = true,
-        \DateTimeInterface $hitDate = null,
+        ?\DateTimeInterface $hitDate = null,
     ): void {
         // Store Page/Redirect association
         if ($page) {
@@ -524,16 +539,15 @@ class PageModel extends FormModel implements GlobalSearchInterface
                     $channel   = $clickthrough['channel'][0];
                     $channelId = (int) $clickthrough['channel'][1];
                 }
-                $hit->setSource($channel);
+                $hit->setSource($this->limitString($channel));
                 $hit->setSourceId($channelId);
             } elseif (!empty($clickthrough['source'])) {
-                $hit->setSource($clickthrough['source'][0]);
+                $hit->setSource($this->limitString($clickthrough['source'][0]));
                 $hit->setSourceId($clickthrough['source'][1]);
             }
 
             if (!empty($clickthrough['email'])) {
-                $emailRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Email::class);
-                if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
+                if ($emailEntity = $this->emailRepository->getEntity($clickthrough['email'])) {
                     $hit->setEmail($emailEntity);
                 }
             }
@@ -541,11 +555,15 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         $query = $hit->getQuery() ?: [];
 
-        if (isset($query['timezone_offset']) && !$lead->getTimezone()) {
-            // timezone_offset holds timezone offset in minutes. Multiply by 60 to get seconds.
-            // Multiply by -1 because Firgerprint2 seems to have it the other way around.
-            $timezone = (-1 * $query['timezone_offset'] * 60);
-            $lead->setTimezone($this->dateTimeHelper->guessTimezoneFromOffset($timezone));
+        if (!$lead->getTimezone()) {
+            if (isset($query['timezone'])) {
+                $lead->setTimezone($query['timezone']);
+            } elseif (isset($query['timezone_offset'])) {
+                // timezone_offset holds timezone offset in minutes. Multiply by 60 to get seconds.
+                // Multiply by -1 because Firgerprint2 seems to have it the other way around.
+                $timezone = (-1 * $query['timezone_offset'] * 60);
+                $lead->setTimezone($this->dateTimeHelper->guessTimezoneFromOffset($timezone));
+            }
         }
 
         $query = $this->cleanQuery($query);
@@ -554,7 +572,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             $hit->setReferer($query['page_referrer']);
         }
         if (isset($query['page_language'])) {
-            $hit->setPageLanguage($query['page_language']);
+            $hit->setPageLanguage($this->limitString($query['page_language']));
         }
 
         if ($pageTitle = $query['page_title'] ?? ($page instanceof Page ? $page->getTitle() : false)) {
@@ -564,11 +582,22 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
 
             $query['page_title'] = $pageTitle;
-            $hit->setUrlTitle($pageTitle);
+            $hit->setUrlTitle($this->limitString($pageTitle));
         }
 
         $hit->setQuery($query);
         $hit->setUrl($query['page_url'] ?? $request->getRequestUri());
+
+        /** @var ConstraintViolationList $errors */
+        $errors = $this->validator->validate($hit);
+        if ($errors->count() > 0) {
+            $this->logger->error((string) $errors);
+            // Remove the pre-persisted bare hit so no orphan row is left in the database.
+            $this->em->remove($hit);
+            $this->em->flush();
+
+            return;
+        }
 
         // Add entry to contact log table
         $this->setLeadManipulator($page, $hit, $lead);
@@ -580,67 +609,65 @@ class PageModel extends FormModel implements GlobalSearchInterface
             // Queue is consuming this hit outside of the lead's active request so this must be set in order for listeners to know who the request belongs to
             $this->contactTracker->setSystemContact($lead);
         }
-        $trackingId = $hit->getTrackingId();
-        if (!$trackingNewlyGenerated) {
-            $lastHit = $request->cookies->get('mautic_referer_id');
-            if (!empty($lastHit) && is_numeric($lastHit)) {
-                // this is not a new session so update the last hit if applicable with the date/time the user left
-                $this->getHitRepository()->updateHitDateLeft((int) $lastHit);
-            }
+
+        // Update previous hit's date_left if cookie exists
+        // This happens when user navigates from one page to another
+        $lastHit = $request->cookies->get('mautic_referer_id');
+        if (!empty($lastHit) && is_numeric($lastHit)) {
+            // Update the last hit with the date/time the user left
+            $this->hitRepository->updateHitDateLeft((int) $lastHit);
         }
 
         // Check if this is a unique page hit
-        $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
+        $trackingId = $hit->getTrackingId();
+        $isUnique   = $this->hitRepository->isUniquePageHit($page, $trackingId, $lead);
 
-        if (!empty($page)) {
-            if ($page instanceof Page) {
-                $hit->setPageLanguage($page->getLanguage());
+        if ($page instanceof Page) {
+            $hit->setPageLanguage($this->limitString($page->getLanguage()));
 
-                $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
+            $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
 
-                try {
-                    $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
-                } catch (\Exception $exception) {
-                    $this->logger->error(
-                        $exception->getMessage(),
-                        ['exception' => $exception]
+            try {
+                $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
+            } catch (\Exception $exception) {
+                $this->logger->error(
+                    $exception->getMessage(),
+                    ['exception' => $exception]
+                );
+            }
+        } elseif ($page instanceof Redirect) {
+            try {
+                $this->redirectRepository->upHitCount($page->getId(), 1, $isUnique);
+
+                // If this is a trackable, up the trackable counts as well
+                if ($hit->getSource() && $hit->getSourceId()) {
+                    $this->trackableRepository->upHitCount(
+                        $page->getId(),
+                        $hit->getSource(),
+                        $hit->getSourceId(),
+                        1,
+                        $isUnique
                     );
                 }
-            } elseif ($page instanceof Redirect) {
-                try {
-                    $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
-
-                    // If this is a trackable, up the trackable counts as well
-                    if ($hit->getSource() && $hit->getSourceId()) {
-                        $this->pageTrackableModel->getRepository()->upHitCount(
-                            $page->getId(),
-                            $hit->getSource(),
-                            $hit->getSourceId(),
-                            1,
-                            $isUnique
-                        );
-                    }
-                } catch (\Exception $exception) {
-                    if (MAUTIC_ENV !== 'prod') {
-                        throw $exception;
-                    } else {
-                        $this->logger->error(
-                            $exception->getMessage(),
-                            ['exception' => $exception]
-                        );
-                    }
+            } catch (\Exception $exception) {
+                if (MAUTIC_ENV !== 'prod') {
+                    throw $exception;
                 }
+                $this->logger->error(
+                    $exception->getMessage(),
+                    ['exception' => $exception]
+                );
             }
         }
 
         // glean info from the IP address
         $ipAddress = $hit->getIpAddress();
         if ($ipAddress && $details = $ipAddress->getIpDetails()) {
-            $hit->setCountry($details['country']);
-            $hit->setRegion($details['region']);
-            $hit->setCity($details['city']);
-            $hit->setIsp($details['isp']);
-            $hit->setOrganization($details['organization']);
+            $hit->setCountry($this->limitString($details['country']));
+            $hit->setRegion($this->limitString($details['region']));
+            $hit->setCity($this->limitString($details['city']));
+            $hit->setIsp($this->limitString($details['isp']));
+            $hit->setOrganization($this->limitString($details['organization']));
         }
 
         if (!$hit->getReferer()) {
@@ -648,7 +675,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         }
 
         $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
-        $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
+        $hit->setRemoteHost($this->limitString($request->server->get('REMOTE_HOST')));
 
         $this->setUtmTags($hit, $lead);
 
@@ -672,12 +699,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
         } catch (\Exception $exception) {
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
-            } else {
-                $this->logger->error(
-                    $exception->getMessage(),
-                    ['exception' => $exception]
-                );
             }
+            $this->logger->error(
+                $exception->getMessage(),
+                ['exception' => $exception]
+            );
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
@@ -688,7 +714,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         if (null !== $hitDate) {
             if (null === $lead->getLastActive() || $lead->getLastActive() < $hitDate) {
                 try {
-                    $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDate);
+                    $this->leadRepository->updateLastActive($lead->getId(), $hitDate);
                 } catch (\Exception $e) {
                     $data = [
                         'unique'             => ($isUnique ? 'true' : 'false'),
@@ -708,10 +734,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         }
     }
 
-    /**
-     * @param Redirect|Page|null $page
-     */
-    public function getHitQuery(Request $request, $page = null): array
+    public function getHitQuery(Request $request, Redirect|Page|null $page = null): array
     {
         $get  = $request->query->all();
         $post = $request->request->all();
@@ -742,7 +765,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @return array
      */
-    public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
+    public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
@@ -755,9 +778,9 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @return mixed[]
      */
-    public function getBounces(Page $page, \DateTime $fromDate = null): array
+    public function getBounces(Page $page, ?\DateTime $fromDate = null): array
     {
-        return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
+        return $this->hitRepository->getBounces($page->getId(), $fromDate);
     }
 
     /**
@@ -773,12 +796,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * Get line chart data of hits.
      *
-     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param array  $filter
-     * @param bool   $canViewOthers
+     * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string  $dateFormat
+     * @param bool    $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -891,7 +913,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true): array
     {
-        $timesOnSite = $this->getHitRepository()->getDwellTimeLabels();
+        $timesOnSite = $this->hitRepository->getDwellTimeLabels();
         $chart       = new PieChart();
         $query       = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
@@ -953,7 +975,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      * @param array $filters
      * @param bool  $canViewOthers
      */
-    public function getPopularPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
+    public function getPopularPages($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -982,7 +1004,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      * @param array $filters
      * @param bool  $canViewOthers
      */
-    public function getPageList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
+    public function getPageList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')
@@ -1006,11 +1028,15 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     private function getQueryFromUrl(string $pageUrl): array
     {
-        $query             = [];
-        $urlQuery          = parse_url($pageUrl, PHP_URL_QUERY);
+        $query    = [];
+        $urlQuery = parse_url($pageUrl, PHP_URL_QUERY);
+
+        if (empty($urlQuery)) {
+            return $query;
+        }
 
         if (is_string($urlQuery)) {
-            parse_str($urlQuery, $urlQueryArray);
+            $urlQueryArray = Query::parse($urlQuery);
 
             foreach ($urlQueryArray as $key => $value) {
                 if (is_string($value)) {
@@ -1038,7 +1064,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        if ($queryHasUtmTags && $lead) {
+        if ($queryHasUtmTags) {
             $utmTags = new UtmTag();
             $utmTags->setDateAdded($hit->getDateHit());
             $utmTags->setUrl($hit->getUrl());
@@ -1064,14 +1090,13 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $utmTags->setUtmSource($query['utm_source']);
             }
 
-            $repo = $this->em->getRepository(UtmTag::class);
-            $repo->saveEntity($utmTags);
+            $this->utmTagRepository->saveEntity($utmTags);
 
             $this->leadModel->setUtmTags($lead, $utmTags);
         }
     }
 
-    private function setLeadManipulator($page, Hit $hit, Lead $lead): void
+    private function setLeadManipulator(Page|Redirect|null $page, Hit $hit, Lead $lead): void
     {
         // Only save the lead and dispatch events if needed
         $source   = 'hit';
@@ -1096,7 +1121,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @return mixed|string
      */
-    private function getPageUrl(Request $request, $page)
+    private function getPageUrl(Request $request, Redirect|Page|null $page)
     {
         // Default to page_url set in the query from tracking pixel and/or contactfield token
         if ($pageURL = $request->get('page_url')) {
@@ -1110,13 +1135,13 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         // Use the current URL
         $isPageEvent = false;
-        if (str_contains($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
+        if (str_contains((string) $request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
             // Tracking pixel is used
             if ($request->server->get('QUERY_STRING')) {
                 parse_str($request->server->get('QUERY_STRING'), $query);
                 $isPageEvent = true;
             }
-        } elseif (str_contains($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
+        } elseif (str_contains((string) $request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
             $query       = $request->request->all();
             $isPageEvent = true;
         }
@@ -1134,7 +1159,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                     $decoded = true;
                 }
 
-                if (is_array($query) && !empty($query)) {
+                if (is_array($query) && [] !== $query) {
                     if (isset($query['page_url'])) {
                         $pageURL = $query['page_url'];
                         if (!$decoded) {
@@ -1185,12 +1210,24 @@ class PageModel extends FormModel implements GlobalSearchInterface
         return $pageURL.$request->server->get('SERVER_NAME').$request->server->get('REQUEST_URI');
     }
 
-    /*
+    /**
+     * Converts a variant to the main item and the original main item a variant.
+     */
+    public function convertWinnerVariant(VariantEntityInterface $entity): void
+    {
+        // let saveEntities() know it does not need to set variant start dates
+        $this->inConversion = true;
+
+        $this->variantConverterService->convertWinnerVariant($entity);
+        /** @var iterable<Page> $save */
+        $save = $this->variantConverterService->getUpdatedVariants();
+
+        // save the entities
+        $this->saveEntities($save, false);
+    }
+
+    /**
      * Cleans query params saving url values.
-     *
-     * @param $query array
-     *
-     * @return array
      */
     private function cleanQuery(array $query): array
     {
@@ -1203,5 +1240,25 @@ class PageModel extends FormModel implements GlobalSearchInterface
         }
 
         return $query;
+    }
+
+    /**
+     * This function limits $value to desired length.
+     *
+     * @param mixed $value The string to limit or other value to return as-is
+     *
+     * @return mixed The limited string or the original value if not a string
+     */
+    private function limitString($value)
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        if (self::MAX_FIELD_LENGTH >= mb_strwidth($value, self::STRING_ENCODING)) {
+            return $value;
+        }
+
+        return rtrim(mb_strimwidth($value, 0, self::MAX_FIELD_LENGTH, '', self::STRING_ENCODING));
     }
 }

@@ -2,12 +2,11 @@
 
 namespace Mautic\ApiBundle\Helper;
 
-class BatchIdToEntityHelper
+use Mautic\CoreBundle\Helper\CsvHelper;
+
+final class BatchIdToEntityHelper
 {
-    /**
-     * @var array
-     */
-    private $ids = [];
+    private array $ids = [];
 
     private array $originalKeys = [];
 
@@ -27,26 +26,20 @@ class BatchIdToEntityHelper
 
     public function hasIds(): bool
     {
-        return !empty($this->ids);
+        return [] !== $this->ids;
     }
 
-    /**
-     * @return array
-     */
-    public function getIds()
+    public function getIds(): array
     {
         return $this->ids;
     }
 
     public function hasErrors(): bool
     {
-        return !empty($this->errors);
+        return [] !== $this->errors;
     }
 
-    /**
-     * @return array
-     */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }
@@ -74,6 +67,15 @@ class BatchIdToEntityHelper
         $orderedEntities = [];
         foreach ($this->ids as $key => $id) {
             if (!isset($entitiesKeyedById[$id])) {
+                $hasPreviousId = array_filter(
+                    $entities,
+                    fn ($entity): bool => $id == $entity->getPreviousId()
+                );
+
+                if ([] !== $hasPreviousId) {
+                    $orderedEntities[$key] = array_shift($hasPreviousId);
+                }
+
                 continue;
             }
 
@@ -113,7 +115,7 @@ class BatchIdToEntityHelper
 
         // ['ids' => '1,2,3'] OR ['ids' => '1']
         if (str_contains($ids, ',') || is_numeric($ids)) {
-            $this->ids           = str_getcsv($ids);
+            $this->ids           = CsvHelper::strGetCsv($ids);
             $this->originalKeys  = array_keys($this->ids);
             $this->isAssociative = false;
 
@@ -153,7 +155,7 @@ class BatchIdToEntityHelper
 
     private function isAssociativeArray(array $array): bool
     {
-        if (empty($array)) {
+        if ([] === $array) {
             return false;
         }
         $firstKey = array_key_first($array);

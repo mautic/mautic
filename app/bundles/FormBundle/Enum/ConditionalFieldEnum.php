@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Enum;
 
-class ConditionalFieldEnum
+final class ConditionalFieldEnum
 {
     /**
      * @var string[]

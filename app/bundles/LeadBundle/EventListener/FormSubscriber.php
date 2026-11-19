@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
 use Mautic\FormBundle\Event\FieldCollectEvent;
@@ -10,6 +9,7 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\ObjectCollectEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\UtmTag;
@@ -19,22 +19,26 @@ use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 use Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
+use Mautic\LeadBundle\Form\Type\UpdateLeadActionType;
+use Mautic\LeadBundle\Helper\CustomFieldHelper;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        protected LeadModel $leadModel,
-        protected ContactTracker $contactTracker,
-        protected IpLookupHelper $ipLookupHelper,
-        protected LeadFieldRepository $leadFieldRepository,
+        private LeadModel $leadModel,
+        private ContactTracker $contactTracker,
+        private LeadFieldRepository $leadFieldRepository,
         private PointGroupModel $groupModel,
         private DoNotContact $doNotContact,
+        private FieldModel $leadFieldModel,
     ) {
     }
 
@@ -52,6 +56,7 @@ class FormSubscriber implements EventSubscriberInterface
                 ['onFormSubmitActionAddUtmTags', 3],
                 ['onFormSubmitActionScoreContactsCompanies', 4],
                 ['onFormSubmitActionRemoveFromDoNotContact', 5],
+                ['onFormSubmitActionUpdateLead', 5],
             ],
         ];
     }
@@ -81,32 +86,29 @@ class FormSubscriber implements EventSubscriberInterface
         ]);
 
         $event->addSubmitAction('lead.changetags', [
-            'group'             => 'mautic.lead.lead.submitaction',
-            'label'             => 'mautic.lead.lead.events.changetags',
-            'description'       => 'mautic.lead.lead.events.changetags_descr',
-            'formType'          => ModifyLeadTagsType::class,
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
-            'template'          => '@MauticLead/Action/tags.html.twig',
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.changetags',
+            'description' => 'mautic.lead.lead.events.changetags_descr',
+            'formType'    => ModifyLeadTagsType::class,
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'template'    => '@MauticLead/Action/tags.html.twig',
         ]);
 
         $event->addSubmitAction('lead.addutmtags', [
-            'group'             => 'mautic.lead.lead.submitaction',
-            'label'             => 'mautic.lead.lead.events.addutmtags',
-            'description'       => 'mautic.lead.lead.events.addutmtags_descr',
-            'formType'          => ActionAddUtmTagsType::class,
-            'formTheme'         => '@MauticLead/FormTheme/FormActionAddUtmTags/_formaction_properties_row.html.twig',
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.addutmtags',
+            'description' => 'mautic.lead.lead.events.addutmtags_descr',
+            'formType'    => ActionAddUtmTagsType::class,
+            'formTheme'   => '@MauticLead/FormTheme/FormActionAddUtmTags/_formaction_properties_row.html.twig',
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
 
         $event->addSubmitAction('lead.remove_do_not_contact', [
-            'group'             => 'mautic.lead.lead.submitaction',
-            'label'             => 'mautic.lead.lead.events.removedonotcontact',
-            'description'       => 'mautic.lead.lead.events.removedonotcontact_descr',
-            'formType'          => ActionRemoveDoNotContact::class,
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.removedonotcontact',
+            'description' => 'mautic.lead.lead.events.removedonotcontact_descr',
+            'formType'    => ActionRemoveDoNotContact::class,
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
 
         $event->addSubmitAction('lead.scorecontactscompanies', [
@@ -116,6 +118,15 @@ class FormSubscriber implements EventSubscriberInterface
             'formType'    => CompanyChangeScoreActionType::class,
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'template'    => '@MauticLead/Action/points.html.twig',
+        ]);
+
+        $event->addSubmitAction('lead.updatelead', [
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.updatelead',
+            'description' => 'mautic.lead.lead.events.updatelead_descr',
+            'formType'    => UpdateLeadActionType::class,
+            'formTheme'   => '@MauticLead/FormTheme/FormActionUpdateLead/_formaction_properties_row.html.twig',
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
     }
 
@@ -140,6 +151,13 @@ class FormSubscriber implements EventSubscriberInterface
                 )
             );
         }
+
+        // Add the owner and stage fields to the form
+        if ('lead' === $object) {
+            $event->appendField(new FieldCrate('ownerbyemail', 'mautic.lead.field.ownerbyemail', 'email', []));
+            $event->appendField(new FieldCrate('ownerbyid', 'mautic.lead.field.ownerbyid', 'text', []));
+            $event->appendField(new FieldCrate('stagebyname', 'mautic.lead.field.stagebyname', 'text', []));
+        }
     }
 
     public function onFormSubmitActionChangePoints(SubmissionEvent $event): void
@@ -148,7 +166,7 @@ class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -158,7 +176,7 @@ class FormSubscriber implements EventSubscriberInterface
         $pointsChangeLog->setType('form');
         $pointsChangeLog->setEventName($form->getId().':'.$form->getName());
         $pointsChangeLog->setActionName($event->getAction()->getName());
-        $pointsChangeLog->setIpAddress($this->ipLookupHelper->getIpAddress());
+        $pointsChangeLog->setIpAddress($event->getSubmission()->getIpAddress());
         $pointsChangeLog->setDateAdded(new \DateTime());
         $pointsChangeLog->setLead($contact);
 
@@ -170,7 +188,7 @@ class FormSubscriber implements EventSubscriberInterface
         $pointGroup   = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
         $points       = $properties['points'];
 
-        if (!empty($pointGroup)) {
+        if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
             $this->groupModel->adjustPoints($contact, $pointGroup, $points, $operator);
         } else {
             $contact->adjustPoints($points, $operator);
@@ -192,7 +210,7 @@ class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -215,7 +233,7 @@ class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -232,7 +250,7 @@ class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -272,7 +290,7 @@ class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -309,5 +327,59 @@ class FormSubscriber implements EventSubscriberInterface
         if (!empty($removeFrom)) {
             $this->leadModel->removeFromLists($lead, $removeFrom);
         }
+    }
+
+    public function onFormSubmitActionUpdateLead(SubmissionEvent $event): void
+    {
+        if (false === $event->checkContext('lead.updatelead')) {
+            return;
+        }
+
+        if (!$lead = $this->getSubmissionContact($event)) {
+            return;
+        }
+
+        $actionValues         = $event->getActionConfig();
+        $contactFieldMatches  = $event->getContactFieldMatches();
+        $fields               = $lead->getFields(true);
+
+        $mergedValues = array_merge($actionValues, array_filter(
+            $contactFieldMatches,
+            static fn ($value): bool => '' !== $value && null !== $value
+        ));
+
+        $processedValues = [];
+        foreach ($mergedValues as $alias => $value) {
+            if (isset($fields[$alias]) && 'boolean' === $fields[$alias]['type'] && 0 === $value) {
+                // 0 is interpreted as 'don't change the bool field' instead of setting it to false, so we change the field manually in this step
+                $lead->addUpdatedField($alias, 0);
+            }
+            if (is_string($value)) {
+                $processedValue = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
+                $fieldEntity    = $this->leadFieldModel->getEntityByAlias($alias);
+
+                if ($fieldEntity && ($charLimit = $fieldEntity->getCharLengthLimit()) && mb_strlen($processedValue) > $charLimit) {
+                    $processedValue = mb_substr($processedValue, 0, $charLimit);
+                }
+                $processedValues[$alias] = $processedValue;
+            } else {
+                $processedValues[$alias] = $value;
+            }
+        }
+
+        $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $processedValues), false);
+        $this->leadModel->saveEntity($lead);
+    }
+
+    /**
+     * A kiosk mode submission without contact fields has no contact, so the actions must not fall back to the contact the device cookie points to.
+     */
+    private function getSubmissionContact(SubmissionEvent $event): ?Lead
+    {
+        if (!$event->getSubmission()->getLead()) {
+            return null;
+        }
+
+        return $this->contactTracker->getContact();
     }
 }

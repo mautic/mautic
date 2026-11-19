@@ -65,7 +65,7 @@
                                       'href': path('mautic_report_schedule', {'reportId': item.id}),
                                   },
                                   'btnText': 'mautic.report.export.and.send'|trans,
-                                  'iconClass': 'ri-send-plane-line-o',
+                                  'iconClass': 'ri-send-plane-line',
                               },
                           ] %}
                         {% endif %}
@@ -88,10 +88,10 @@
                                 {{ item.name|e }}
                             </a>
                             {% if item.isScheduled %}
-                                <label class="control-label" data-toggle="tooltip"
-                                       data-container="body" data-placement="top" title=""
-                                       data-original-title="{{ 'mautic.report.is.scheduled'|trans }}">
-                                    <i class="ri-fw ri-send-plane-line-o"></i></label>
+                                <label class="form-label" data-bs-toggle="tooltip"
+                                       data-bs-container="body" data-bs-placement="top" title=""
+                                       data-bs-title="{{ 'mautic.report.is.scheduled'|trans }}">
+                                    <i class="ri-fw ri-send-plane-line"></i></label>
                             {% endif %}
                         </div>
                         {% if item.description %}

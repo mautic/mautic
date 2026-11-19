@@ -9,14 +9,17 @@ use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 class ProcessSignalService
 {
     public const SIGTERM  = 15;
+
     public const SIGINT   = 2;
+
     private const SIGNALS = [self::SIGTERM, self::SIGINT];
+
     private ?int $signal  = null;
 
     /**
      * @param int[] $signals
      */
-    public function registerSignalHandler(callable $beforeCallback = null, array $signals = self::SIGNALS): void
+    public function registerSignalHandler(?callable $beforeCallback = null, array $signals = self::SIGNALS): void
     {
         if (!function_exists('pcntl_signal')) {
             return;
@@ -65,7 +68,7 @@ class ProcessSignalService
      *
      * @throws SignalCaughtException
      */
-    public function throwExceptionIfSignalIsCaught(callable $stateCallable = null): void
+    public function throwExceptionIfSignalIsCaught(?callable $stateCallable = null): void
     {
         if (!$this->isSignalCaught()) {
             return;

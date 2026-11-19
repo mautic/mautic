@@ -1,6 +1,35 @@
 {% if quickFilters is defined and quickFilters is not empty %}
+{% if quickFilters|filter(group => group.filters is defined)|length > 0 %}
+    {% set firstGroupKey = quickFilters|filter(group => group.filters is defined and group.filters is not empty)|keys|first %}
+    <div class="d-flex flex-column gap-xs">
+        {% for groupKey, groupData in quickFilters %}
+            {% if groupData.filters is defined and groupData.filters is not empty %}
+                {% set conflictGroupName = (groupData.conflictGroup is defined and groupData.conflictGroup) ? groupKey : null %}
+
+                <div class="dropdown-header{% if groupKey == firstGroupKey %} mt-0{% endif %}">{{ groupKey|trans }}</div>
+                <div class="d-flex gap-xs pi-md flex-wrap">
+                    {% for filter in groupData.filters %}
+                        <button type="button" class="label label-outline label-selectable"
+                        data-filter="{{ filter.search|trans }}"
+                        {% if conflictGroupName %}
+                            data-conflict-group="{{ conflictGroupName }}"
+                        {% endif %}
+                        data-filter-action="toggle"
+                        aria-pressed="false"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-title="{{ filter.tooltip|trans }}">
+                            <i class="{{ filter.icon }}"></i>
+                            {{ filter.label|trans }}
+                        </button>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% else %}
     {% set filterGroups = {
-        'mautic.core.quick_filters.status': 'ispublished|isunpublished',
+        'mautic.core.quick_filters.status': 'ispublished|isunpublished|isexpired|ispending',
         'mautic.core.quick_filters.ownership': 'ismine|isunowned',
         'mautic.core.quick_filters.others': ''
     } %}
@@ -9,41 +38,43 @@
     {% for header, pattern in filterGroups %}
         {% set groupFilters = pattern
             ? quickFilters|filter(f => f.search matches '/' ~ pattern ~ '/')
-            : quickFilters|filter(f => not (f.search matches '/ispublished|isunpublished|ismine|isunowned/'))
+                            : quickFilters|filter(f => not (f.search matches '/ispublished|isunpublished|isexpired|ispending|ismine|isunowned/'))
         %}
         {% if groupFilters is not empty %}
             {% set visibleGroups = visibleGroups|merge([header]) %}
         {% endif %}
     {% endfor %}
 
-    <div class="d-flex fd-column gap-xs">
+    <div class="d-flex flex-column gap-5">
         {% for header, pattern in filterGroups %}
             {% set groupFilters = pattern
                 ? quickFilters|filter(f => f.search matches '/' ~ pattern ~ '/')
-                : quickFilters|filter(f => not (f.search matches '/ispublished|isunpublished|ismine|isunowned/'))
+                : quickFilters|filter(f => not (f.search matches '/ispublished|isunpublished|isexpired|ispending|ismine|isunowned/'))
             %}
 
             {% if groupFilters is not empty %}
                 <div class="dropdown-header{% if loop.first or visibleGroups|length == 1 %} mt-0{% endif %}">{{ header|trans }}</div>
-                <div class="d-flex gap-xs pi-md fw-wrap">
+                <div class="d-flex gap-5 pi-16 flex-wrap">
                     {% for filter in groupFilters %}
-                        <a class="label label-outline label-selectable"
+                        <button type="button" class="label label-outline label-selectable"
                         data-filter="{{ filter.search|trans }}"
                         {% if header == 'mautic.core.quick_filters.status' %}
                             data-conflict-group="status"
                         {% elseif header == 'mautic.core.quick_filters.ownership' %}
                             data-conflict-group="ownership"
                         {% endif %}
-                        onclick="Mautic.toggleFilter(this)"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        data-original-title="{{ filter.tooltip|trans }}">
+                        data-filter-action="toggle"
+                        aria-pressed="false"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-title="{{ filter.tooltip|trans }}">
                             <i class="{{ filter.icon }}"></i>
                             {{ filter.label|trans }}
-                        </a>
+                        </button>
                     {% endfor %}
                 </div>
             {% endif %}
         {% endfor %}
     </div>
+{% endif %}
 {% endif %}

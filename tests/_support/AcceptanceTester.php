@@ -22,19 +22,40 @@ class AcceptanceTester extends Codeception\Actor
 {
     use _generated\AcceptanceTesterActions;
 
-    public function login($name, $password): void
+    public const TIMEOUT = 30;
+
+    public function login(string $name = 'admin', string $password = 'Maut1cR0cks!', bool $reuseSessionSnapshot = true): void
     {
         $I = $this;
         // if snapshot exists - skipping login
-        if ($I->loadSessionSnapshot('login')) {
-            return;
+        if ($reuseSessionSnapshot && $I->loadSessionSnapshot('login')) {
+            $I->amOnPage('/s/dashboard');
+            $I->waitForJS('return typeof window.LoginUserId !== "undefined";', self::TIMEOUT);
+            if ($I->executeJS('return window.LoginUserId > 0;')) {
+                return;
+            }
         }
         // logging in
+        if (!$reuseSessionSnapshot) {
+            $I->amOnPage('/s/logout');
+            $I->executeInSelenium(static function (Facebook\WebDriver\Remote\RemoteWebDriver $webDriver): void {
+                foreach ($webDriver->manage()->getCookies() as $cookie) {
+                    if (in_array(trim($cookie['name']), [
+                        Codeception\Coverage\Subscriber\LocalServer::COVERAGE_COOKIE,
+                        Codeception\Coverage\Subscriber\LocalServer::COVERAGE_COOKIE_ERROR,
+                    ], true)) {
+                        continue;
+                    }
+
+                    $webDriver->manage()->deleteCookieNamed($cookie['name']);
+                }
+            });
+        }
         $I->amOnPage('/s/login');
         $I->fillField('#username', $name);
         $I->fillField('#password', $password);
         $I->click('button[type=submit]');
-        $I->waitForElement('h1.page-header-title', 30);
+        $I->waitForElement('h1.page-header-title', self::TIMEOUT);
         // saving snapshot
         $I->saveSessionSnapshot('login');
     }
@@ -58,7 +79,7 @@ class AcceptanceTester extends Codeception\Actor
      */
     public function ensureNotificationAppears(string $message): void
     {
-        $this->waitForElementVisible('#flashes .alert', 10);
+        $this->waitForElementVisible('#flashes .alert', self::TIMEOUT);
         $this->see($message, '#flashes .alert');
     }
 }

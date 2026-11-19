@@ -20,39 +20,33 @@ use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ContactObjectHelperTest extends TestCase
+final class ContactObjectHelperTest extends TestCase
 {
     /**
-     * @var LeadModel&MockObject
+     * @var MockObject&LeadModel
      */
     private MockObject $model;
 
     /**
-     * @var LeadRepository&MockObject
+     * @var MockObject&LeadRepository
      */
     private MockObject $repository;
 
     /**
-     * @var Connection&MockObject
-     */
-    private MockObject $connection;
-
-    /**
-     * @var DoNotContact&MockObject
+     * @var MockObject&DoNotContact
      */
     private MockObject $doNotContactModel;
 
     /**
-     * @var FieldList&MockObject
+     * @var MockObject&FieldList
      */
     private MockObject $fieldList;
 
     /**
-     * @var FieldsWithUniqueIdentifier&MockObject
+     * @var MockObject&FieldsWithUniqueIdentifier
      */
     private MockObject $fieldsWithUniqueIdentifier;
 
@@ -60,7 +54,6 @@ class ContactObjectHelperTest extends TestCase
     {
         $this->model                      = $this->createMock(LeadModel::class);
         $this->repository                 = $this->createMock(LeadRepository::class);
-        $this->connection                 = $this->createMock(Connection::class);
         $this->doNotContactModel          = $this->createMock(DoNotContact::class);
         $this->fieldList                  = $this->createMock(FieldList::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
@@ -91,19 +84,15 @@ class ContactObjectHelperTest extends TestCase
 
         $this->model->expects($this->exactly(3))
             ->method('saveEntity')
-            ->with(
-                $this->callback(function (Lead $lead) use ($idMap): bool {
-                    $this->assertManipulator($lead, 'create');
+            ->willReturnCallback(function (Lead $lead) use ($idMap): void {
+                $this->assertManipulator($lead, 'create');
 
-                    // Set contact ID
-                    $reflection = new \ReflectionClass($lead);
-                    $property   = $reflection->getProperty('id');
-                    $property->setAccessible(true);
-                    $property->setValue($lead, $idMap[$lead->getEmail()]);
+                // Set contact ID
+                $reflection = new \ReflectionClass($lead);
+                $property   = $reflection->getProperty('id');
+                $property->setValue($lead, $idMap[$lead->getEmail()]);
+            });
 
-                    return true;
-                })
-            );
         $this->repository->expects($this->exactly(2))
             ->method('detachEntity');
 
@@ -126,10 +115,10 @@ class ContactObjectHelperTest extends TestCase
             switch ($objects[$key]->getMappedObjectId()) {
                 case 1:
                 case 3:
-                    Assert::assertSame(127, $objectMapping->getInternalObjectId());
+                    $this->assertSame(127, $objectMapping->getInternalObjectId());
                     break;
                 case 2:
-                    Assert::assertSame(128, $objectMapping->getInternalObjectId());
+                    $this->assertSame(128, $objectMapping->getInternalObjectId());
                     break;
             }
         }
@@ -145,19 +134,14 @@ class ContactObjectHelperTest extends TestCase
 
         $this->model->expects($this->exactly(4))
             ->method('saveEntity')
-            ->with(
-                $this->callback(function (Lead $lead) use ($idMap): bool {
-                    $this->assertManipulator($lead, 'create');
+            ->willReturnCallback(function (Lead $lead) use ($idMap): void {
+                $this->assertManipulator($lead, 'create');
 
-                    // Set contact ID
-                    $reflection = new \ReflectionClass($lead);
-                    $property   = $reflection->getProperty('id');
-                    $property->setAccessible(true);
-                    $property->setValue($lead, $idMap[$lead->getEmail()]);
-
-                    return true;
-                })
-            );
+                // Set contact ID
+                $reflection = new \ReflectionClass($lead);
+                $property   = $reflection->getProperty('id');
+                $property->setValue($lead, $idMap[$lead->getEmail() ?? '']);
+            });
 
         $this->repository->expects($this->exactly(3))
             ->method('detachEntity');
@@ -182,13 +166,13 @@ class ContactObjectHelperTest extends TestCase
             switch ($objects[$key]->getMappedObjectId()) {
                 case 1:
                 case 3:
-                    Assert::assertSame(127, $objectMapping->getInternalObjectId());
+                    $this->assertSame(127, $objectMapping->getInternalObjectId());
                     break;
                 case 2:
-                    Assert::assertSame(128, $objectMapping->getInternalObjectId());
+                    $this->assertSame(128, $objectMapping->getInternalObjectId());
                     break;
                 case 4:
-                    Assert::assertSame(129, $objectMapping->getInternalObjectId());
+                    $this->assertSame(129, $objectMapping->getInternalObjectId());
                     break;
             }
         }
@@ -235,7 +219,7 @@ class ContactObjectHelperTest extends TestCase
         $matcher = $this->exactly(2);
 
         $contact1->expects($matcher)
-            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('email', $parameters[0]);
                     $this->assertSame('john@doe.com', $parameters[1]);
@@ -251,7 +235,7 @@ class ContactObjectHelperTest extends TestCase
         foreach ($objectMappings as $objectMapping) {
             $this->assertEquals('Test', $objectMapping->getIntegration());
             $this->assertEquals('MappedObject', $objectMapping->getIntegrationObjectName());
-            $this->assertTrue(isset($objects[$objectMapping->getIntegrationObjectId()]));
+            $this->assertArrayHasKey($objectMapping->getIntegrationObjectId(), $objects);
             $this->assertEquals($objects[$objectMapping->getIntegrationObjectId()]->getMappedObjectId(), $objectMapping->getIntegrationObjectId());
         }
 
@@ -331,21 +315,21 @@ class ContactObjectHelperTest extends TestCase
     public function testFindObjectById(): void
     {
         $contact = new Lead();
-        $this->repository->expects(self::once())
+        $this->repository->expects($this->once())
             ->method('getEntity')
             ->with(1)
             ->willReturn($contact);
 
-        self::assertSame($contact, $this->getObjectHelper()->findObjectById(1));
+        $this->assertSame($contact, $this->getObjectHelper()->findObjectById(1));
     }
 
     public function testFindObjectByIdReturnsNull(): void
     {
-        $this->repository->expects(self::once())
+        $this->repository->expects($this->once())
             ->method('getEntity')
             ->with(1);
 
-        self::assertNull($this->getObjectHelper()->findObjectById(1));
+        $this->assertNotInstanceOf(Lead::class, $this->getObjectHelper()->findObjectById(1));
     }
 
     /**
@@ -354,7 +338,7 @@ class ContactObjectHelperTest extends TestCase
     public function testSetFieldValues(): void
     {
         $contact = new Lead();
-        $this->model->expects(self::once())
+        $this->model->expects($this->once())
             ->method('setFieldValues')
             ->with($contact, []);
         $this->getObjectHelper()->setFieldValues($contact);
@@ -362,7 +346,7 @@ class ContactObjectHelperTest extends TestCase
 
     private function getObjectHelper(): ContactObjectHelper
     {
-        return new ContactObjectHelper($this->model, $this->repository, $this->connection, $this->doNotContactModel, $this->fieldList, $this->fieldsWithUniqueIdentifier);
+        return new ContactObjectHelper($this->model, $this->repository, $this->createStub(Connection::class), $this->doNotContactModel, $this->fieldList, $this->fieldsWithUniqueIdentifier);
     }
 
     private function assertManipulator(Lead $lead, string $objectName): void

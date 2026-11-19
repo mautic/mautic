@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\EntityLookupType;
@@ -10,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class SmsListType extends AbstractType
+final class SmsListType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -26,24 +28,30 @@ class SmsListType extends AbstractType
                     'limit'   => 0,
                     'start'   => 0,
                     'options' => [
-                        'sms_type' => $options['sms_type'],
+                        'sms_type'   => $options['sms_type'],
+                        'top_level'  => $options['top_level'],
+                        'ignore_ids' => $options['ignore_ids'],
                     ],
                 ],
                 'ajax_lookup_action' => function (Options $options): string {
                     $query = [
-                        'sms_type' => $options['sms_type'],
+                        'sms_type'   => $options['sms_type'],
+                        'top_level'  => $options['top_level'],
+                        'ignore_ids' => $options['ignore_ids'],
                     ];
 
                     return 'sms:getLookupChoiceList&'.http_build_query($query);
                 },
-                'multiple' => true,
-                'required' => false,
-                'sms_type' => 'template',
+                'multiple'   => true,
+                'required'   => false,
+                'sms_type'   => 'template',
+                'top_level'  => 'translation',
+                'ignore_ids' => [],
             ]
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return EntityLookupType::class;
     }

@@ -26,7 +26,7 @@
         'targetLabel'     : 'mautic.notification.mobile_notifications'|trans
     }
 ) -}}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': notification.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': notification.category}) }}
 {% endblock %}
 
 {% block actions %}
@@ -42,17 +42,42 @@
 
 {% block publishStatus %}
     {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': notification}, with_context=false) }}
+
+    {% set tags = [] %}
+
+    {# Translation tags #}
+    {% set tags = tags
+        |merge(notification.isTranslation and not notification.isTranslation(true)
+        ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
+        : [])
+        |merge(notification.isTranslation(true)
+        ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}), icon: 'ri-translate' }]
+        : [])
+    %}
+
+    {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
 {% endblock %}
+
+
+{% set translationContent = include('@MauticCore/Translation/index.html.twig',
+    {
+        'activeEntity'      : notification,
+        'translations'      : translations,
+        'model'             : 'notifications',
+        'actionRoute'       : 'mautic_mobile_notification_action',
+    }
+) %}
+{% set showTranslations = translationContent|trim is not empty %}
 
 {% block content %}
   <!-- start: box layout -->
   <div class="box-layout">
       <!-- left section -->
-      <div class="col-md-9 height-auto">
+      <div class="col-lg-8 col-md-7 height-auto">
           <div>
               <!-- notification detail collapseable -->
-              <div class="collapse pr-md pl-md" id="notification-details">
-                <div class="pr-md pl-md pb-md">
+              <div class="collapse pe-16 ps-16" id="notification-details">
+                <div class="pe-16 ps-16 pb-16">
                   <div class="panel shd-none mb-0">
                     <table class="table table-hover mb-0">
                       <tbody>
@@ -66,29 +91,41 @@
 
               <!-- notification detail collapseable toggler -->
               <div class="hr-expand nm">
-                  <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
-                      <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#notification-details"><span class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
+                  <span data-bs-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
+                      <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#notification-details"><span class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
                   </span>
               </div>
               <!--/ notification detail collapseable toggler -->
 
               <!-- some stats -->
-              <div class="pa-md">
+              <div class="pa-16">
                   <div class="row">
                       <div class="col-sm-12">
+                        {% if security.isGranted('lead:leads:viewown') %}
+                        {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {
+                                'title': 'mautic.lead.lead.contacts.mobile_sent',
+                                'value': notification.getSentCount(true),
+                                'link': path('mautic_contact_index', {
+                                    'search': ('mautic.lead.lead.searchcommand.mobile_sent'|trans) ~ ':' ~ notification.id
+                                }),
+                                'icon': 'ri-smartphone-line'
+                            }
+                        ]}) }}
+                        {% endif %}
                           <div class="panel">
                               <div class="panel-body box-layout">
-                                  <div class="col-md-3 va-m">
-                                      <h5 class="text-white dark-md fw-sb mb-xs">
+                                  <div class="col-md-3 align-middle">
+                                      <h5 class="text-white dark-md fw-sb mb-5">
                                           <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.core.stats'|trans }}
                                       </h5>
                                   </div>
-                                  <div class="col-md-9 va-m">
-                                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
+                                  <div class="col-md-9 align-middle">
+                                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'float-end'}) }}
                                   </div>
                               </div>
-                              <div class="pt-0 pl-15 pb-10 pr-15">
+                              <div class="d-flex flex-column pt-0 ps-16 pb-16 pe-16 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
@@ -100,21 +137,29 @@
               <!-- tabs controls -->
               <ul class="nav nav-tabs nav-tabs-contained">
                   <li class="active">
-                      <a href="#clicks-container" role="tab" data-toggle="tab">
+                      <a href="#clicks-container" role="tab" data-bs-toggle="tab" class="active nav-link">
                           {{ 'mautic.trackable.click_counts'|trans }}
                       </a>
                   </li>
                   <li class="">
-                      <a href="#contacts-container" role="tab" data-toggle="tab">
+                      <a href="#contacts-container" role="tab" data-bs-toggle="tab" class="nav-link">
                           {{ 'mautic.lead.leads'|trans }}
                       </a>
                   </li>
+
+                  {% if showTranslations %}
+                      <li>
+                          <a href="#translation-container" role="tab" data-bs-toggle="tab" class="nav-link">
+                              {{ 'mautic.core.translations'|trans }}
+                          </a>
+                      </li>
+                  {% endif %}
               </ul>
               <!--/ tabs controls -->
           </div>
 
           <!-- start: tab-content -->
-          <div class="tab-content pa-md">
+          <div class="tab-content pa-16">
               <div class="tab-pane active bdr-w-0" id="clicks-container">
                   {{ include('@MauticPage/Trackable/click_counts.html.twig', {
                       'trackables': trackables,
@@ -126,6 +171,12 @@
               <div class="tab-pane fade in bdr-w-0 page-list" id="contacts-container">
                   {{ contacts|raw }}
               </div>
+
+              {% if showTranslations %}
+                  <div class="tab-pane bdr-w-0" id="translation-container">
+                      {{ translationContent|raw }}
+                  </div>
+              {% endif %}
           </div>
           <!--/ tab-content -->
 
@@ -133,24 +184,12 @@
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-md-3 bdr-l height-auto">
+      <div class="col-lg-4 col-md-5 height-auto">
+        <div class="pa-16 mb-32 animation--slide-in-down">
+            {{ include('@MauticNotification/MobileNotification/preview.html.twig') }}
+        </div>
           <!-- activity feed -->
           {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}, with_context=false) }}
-
-          {% if security.isGranted('lead:leads:viewown') %}
-          {% include '@MauticCore/Components/contained-list--interactive.html.twig' with {
-              title: 'mautic.core.useful_links',
-              items: [
-                  {
-                      label: 'mautic.lead.lead.contacts.mobile_sent'|trans,
-                      link: path('mautic_contact_index', {
-                          'search': ('mautic.lead.lead.searchcommand.mobile_sent'|trans) ~ ':' ~ notification.id
-                      }),
-                      icon: 'ri-smartphone-line'
-                  }
-              ]
-          } %}
-          {% endif %}
       </div>
       <!--/ right section -->
       <input name="entityId" id="entityId" type="hidden" value="{{ notification.id|e }}" />

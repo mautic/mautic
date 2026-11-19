@@ -2,8 +2,13 @@
   "name": "Attract",
   "author": "Dropsolid",
   "authorUrl": "https://dropsolid.com",
-  "builder": ["grapesjsbuilder"],
+  "builder": [
+    "grapesjsbuilder"
+  ],
   "features": [
     "email"
+  ],
+  "tags": [
+    "promotion"
   ]
 }

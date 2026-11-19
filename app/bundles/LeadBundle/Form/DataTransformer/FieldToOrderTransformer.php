@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\DataTransformer;
 
 use Mautic\LeadBundle\Entity\LeadField;
@@ -9,7 +11,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<LeadField|null, int|null>
  */
-class FieldToOrderTransformer implements DataTransformerInterface
+final readonly class FieldToOrderTransformer implements DataTransformerInterface
 {
     public function __construct(
         private LeadFieldRepository $leadFieldRepository,
@@ -23,7 +25,7 @@ class FieldToOrderTransformer implements DataTransformerInterface
      *
      * @return LeadField|null
      */
-    public function transform($order)
+    public function transform(mixed $order): mixed
     {
         if (!$order) {
             return null;
@@ -39,7 +41,7 @@ class FieldToOrderTransformer implements DataTransformerInterface
      *
      * @return int|null
      */
-    public function reverseTransform($field)
+    public function reverseTransform(mixed $field): mixed
     {
         if (null === $field) {
             return null;

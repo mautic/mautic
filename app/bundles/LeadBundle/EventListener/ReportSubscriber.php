@@ -2,16 +2,17 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ColumnCollectEvent;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -22,7 +23,7 @@ use Mautic\ReportBundle\ReportEvents;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_LEADS                     = 'leads';
 
@@ -64,15 +65,16 @@ class ReportSubscriber implements EventSubscriberInterface
     private ?array $channelActions = null;
 
     public function __construct(
-        private LeadModel $leadModel,
-        private FieldModel $fieldModel,
-        private StageModel $stageModel,
-        private CampaignModel $campaignModel,
-        private EventCollector $eventCollector,
-        private CompanyModel $companyModel,
-        private CompanyReportData $companyReportData,
-        private FieldsBuilder $fieldsBuilder,
-        private Translator $translator,
+        private readonly LeadModel $leadModel,
+        private readonly FieldModel $fieldModel,
+        private readonly StageModel $stageModel,
+        private readonly EventCollector $eventCollector,
+        private readonly CompanyReportData $companyReportData,
+        private readonly FieldsBuilder $fieldsBuilder,
+        private readonly Translator $translator,
+        private readonly DncReportService $dncReportService,
+        private readonly CompanyRepository $companyRepository,
+        private readonly CampaignRepository $campaignRepository,
     ) {
     }
 
@@ -157,7 +159,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         'formula' => '(SELECT MAX(stage_log.date_added) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)',
                     ],
                 ];
-                $columns      = array_merge($columns, $stageColumns);
+                $columns      = array_merge($columns, $stageColumns, $this->dncReportService->getDncColumns());
             }
 
             $data = [
@@ -284,7 +286,7 @@ class ReportSubscriber implements EventSubscriberInterface
                             $qb->expr()->eq('log.is_scheduled', 0),
                             $qb->expr()->isNotNull('l.attribution'),
                             $qb->expr()->neq('l.attribution', 0),
-                            $qb->expr()->lte("DATE($localDateTriggered)", 'DATE(l.attribution_date)')
+                            $qb->expr()->lte("DATE({$localDateTriggered})", 'DATE(l.attribution_date)')
                         )
                     );
 
@@ -328,7 +330,7 @@ class ReportSubscriber implements EventSubscriberInterface
                             }
 
                             $expr = $expr->with(
-                                $expr->{$filter['operator']}($x, ":$filterParam")
+                                $expr->{$filter['operator']}($x, ":{$filterParam}")
                             );
                             $qb->setParameter($filterParam, $filter['value']);
                         }
@@ -343,7 +345,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 if ('multi' != $alias) {
                     // Get the min/max row and group by lead for first touch or last touch events
                     $func = ('first' == $alias) ? 'min' : 'max';
-                    $subQ->select("$func({$alias}log.date_triggered)")
+                    $subQ->select("{$func}({$alias}log.date_triggered)")
                         ->setMaxResults(1);
                     $qb->andWhere(
                         $qb->expr()->eq('log.date_triggered', sprintf('(%s)', $subQ->getSQL()))
@@ -391,7 +393,6 @@ class ReportSubscriber implements EventSubscriberInterface
         $graphs       = $event->getRequestedGraphs();
         $qb           = $event->getQueryBuilder();
         $pointLogRepo = $this->leadModel->getPointLogRepository();
-        $companyRepo  = $this->companyModel->getRepository();
 
         foreach ($graphs as $g) {
             $queryBuilder = clone $qb;
@@ -577,7 +578,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     break;
 
                 case 'mautic.lead.table.pie.company.country':
-                    $counts       = $companyRepo->getCompaniesByGroup($queryBuilder, 'companycountry');
+                    $counts       = $this->companyRepository->getCompaniesByGroup($queryBuilder, 'companycountry');
                     $chart        = new PieChart();
                     $companyCount = 0;
                     foreach ($counts as $count) {
@@ -606,7 +607,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $event->setGraph($g, $data);
                     break;
                 case 'mautic.lead.graph.pie.companies.industry':
-                    $counts       = $companyRepo->getCompaniesByGroup($queryBuilder, 'companyindustry');
+                    $counts       = $this->companyRepository->getCompaniesByGroup($queryBuilder, 'companyindustry');
                     $chart        = new PieChart();
                     $companyCount = 0;
                     foreach ($counts as $count) {
@@ -638,7 +639,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $limit  = 10;
                     $offset = 0;
 
-                    $items                  = $companyRepo->getMostCompanies($queryBuilder, $limit, $offset);
+                    $items                  = $this->companyRepository->getMostCompanies($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -779,10 +780,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addTable(self::CONTEXT_CONTACT_FREQUENCYRULES, $data, self::GROUP_CONTACTS);
     }
 
-    /**
-     * @param string $type
-     */
-    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, $type): void
+    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, string $type): void
     {
         $attributionColumns = [
             'log.campaign_id' => [
@@ -868,7 +866,7 @@ class ReportSubscriber implements EventSubscriberInterface
         unset($channelActions, $channels);
 
         // Setup available channels
-        $campaigns                  = $this->campaignModel->getRepository()->getSimpleList();
+        $campaigns                  = $this->campaignRepository->getSimpleList();
         $filters['log.campaign_id'] = [
             'label' => 'mautic.lead.report.attribution.filter.campaign',
             'type'  => 'select',
@@ -889,7 +887,7 @@ class ReportSubscriber implements EventSubscriberInterface
         ];
         unset($stages);
 
-        $context = "contact.attribution.$type";
+        $context = "contact.attribution.{$type}";
         $event
             ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_stages')
             ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_campaigns')
@@ -936,6 +934,8 @@ class ReportSubscriber implements EventSubscriberInterface
                     unset($row);
                 }
             }
+        } elseif ($event->checkContext([self::CONTEXT_LEADS])) {
+            $data = $this->dncReportService->processDncStatusDisplay($data);
         }
 
         $event->setData($data);

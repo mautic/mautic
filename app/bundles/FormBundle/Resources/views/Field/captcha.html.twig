@@ -3,13 +3,19 @@
 
 {% if field.properties.captcha is not defined or field.properties.captcha is empty %}
     {% set required = false %}
-    {% if inForm is not defined or inForm is empty or false == inForm %}
-        {# Use as a honeypot #}
-        {% set field = field|merge({
-                'containerAttributes': field.containerAttributes ~ ' style="display:none;"',
-        }) %}
-    {% else %}
-        {# Hide the input #}
+    {% set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
+    {% set containerAttributes = containerAttributes|merge({
+        'class': containerAttributes.class|default([])|merge(['mauticform-honeypot']),
+    }) %}
+    {% set containerAttributesString = '' %}
+    {% for attrName, attrValue in containerAttributes %}
+        {% set containerAttributesString = containerAttributesString ~ ' ' ~ attrName ~ '="' ~ (attrValue is iterable ? attrValue|join(' ') : attrValue) ~ '"' %}
+    {% endfor %}
+    {% set field = field|merge({
+        'containerAttributes': containerAttributesString|trim,
+    }) %}
+    {% if inForm is defined and (true == inForm or inForm is not empty) %}
+        {# Hide the input in the builder preview #}
         {% set type = 'hidden' %}
     {% endif %}
 {% endif %}

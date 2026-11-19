@@ -7,28 +7,32 @@ namespace Mautic\CampaignBundle\Command;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CampaignDeleteEventLogsCommand extends Command
+#[AsCommand(
+    name: CampaignDeleteEventLogsCommand::COMMAND_NAME,
+    description: 'Delete campaign event logs'
+)]
+final class CampaignDeleteEventLogsCommand extends Command
 {
-    protected static $defaultDescription = 'Delete campaign event logs';
-    /**
-     * @var string
-     */
     public const COMMAND_NAME = 'mautic:campaign:delete-event-logs';
 
-    public function __construct(private LeadEventLogRepository $leadEventLogRepository, private CampaignModel $campaignModel, private EventModel $eventModel)
-    {
+    public function __construct(
+        private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly CampaignModel $campaignModel,
+        private readonly EventModel $eventModel,
+    ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this->setName(self::COMMAND_NAME)
+        $this
             ->addArgument(
                 'campaign_event_ids',
                 InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
@@ -48,12 +52,13 @@ class CampaignDeleteEventLogsCommand extends Command
         $campaignId = (int) $input->getOption('campaign-id');
 
         if (!empty($campaignId)) {
+            // For entire campaign deletion, remove both events and logs
             $this->leadEventLogRepository->removeEventLogsByCampaignId($campaignId);
             $this->eventModel->deleteEventsByCampaignId($campaignId);
             $campaign = $this->campaignModel->getEntity($campaignId);
             $this->campaignModel->deleteCampaign($campaign);
         } elseif (!empty($eventIds)) {
-            $this->leadEventLogRepository->removeEventLogs($eventIds);
+            // For individual event deletion, just soft-delete the event but keep logs
             $this->eventModel->deleteEventsByEventIds($eventIds);
         }
 

@@ -1,0 +1,40 @@
+{% block nullable_yesno_button_group_widget %}
+    {% set attr = attr|default({})|merge(form.vars.attr|default({})) %}
+    {% set id = form.vars.id %}
+    {% set name = form.vars.full_name %}
+    {% set value = form.vars.value %}
+
+    {% set yes_choice = form.vars.choices[1] %}
+    {% set no_choice = form.vars.choices[0] %}
+
+    <div class="btn-group btn-block custom-button-group" data-toggle="buttons">
+
+        {# No Button #}
+        <label class="btn btn-default{% if value is not same as(null) and value is not same as('') and value == no_choice.value %} active{% endif %}">
+            <input type="radio"
+                   id="{{ id }}_{{ no_choice.value }}"
+                   name="{{ name }}"
+                   value="{{ no_choice.value }}"
+                   {% if value is not same as(null) and value is not same as('') and value == no_choice.value %}checked="checked"{% endif %}
+                   autocomplete="off"
+                   {% for attrname, attrvalue in attr|filter((v, k) => k not in ['tooltip', 'preaddon', 'preaddon_attr', 'postaddon_attr', 'help_icon']) %}
+                       {{ attrname }}="{{ attrvalue }}"
+                   {% endfor %}>
+            {{ no_choice.label|trans }}
+        </label>
+
+        {# Yes Button #}
+        <label class="btn btn-default{% if value is not same as(null) and value is not same as('') and value == yes_choice.value %} active{% endif %}">
+            <input type="radio"
+                   id="{{ id }}_{{ yes_choice.value }}"
+                   name="{{ name }}"
+                   value="{{ yes_choice.value }}"
+                   {% if value is not same as(null) and value is not same as('') and value == yes_choice.value %}checked="checked"{% endif %}
+                   autocomplete="off"
+                   {% for attrname, attrvalue in attr|filter((v, k) => k not in ['tooltip', 'preaddon', 'preaddon_attr', 'postaddon_attr', 'help_icon']) %}
+                       {{ attrname }}="{{ attrvalue }}"
+                   {% endfor %}>
+            {{ yes_choice.label|trans }}
+        </label>
+    </div>
+{% endblock %}

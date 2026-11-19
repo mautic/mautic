@@ -8,7 +8,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<array<mixed>, array<mixed>>
  */
-class SortableListTransformer implements DataTransformerInterface
+final class SortableListTransformer implements DataTransformerInterface
 {
     /**
      * @param bool $withLabels
@@ -23,7 +23,7 @@ class SortableListTransformer implements DataTransformerInterface
     /**
      * @return array<mixed>
      */
-    public function transform($array)
+    public function transform(mixed $array): mixed
     {
         if ($this->useKeyValuePairs) {
             return $this->transformKeyValuePair($array);
@@ -35,7 +35,7 @@ class SortableListTransformer implements DataTransformerInterface
     /**
      * @return array<mixed>
      */
-    public function reverseTransform($array)
+    public function reverseTransform(mixed $array): mixed
     {
         if ($this->useKeyValuePairs) {
             return $this->reverseTransformKeyValuePair($array);
@@ -55,14 +55,21 @@ class SortableListTransformer implements DataTransformerInterface
             return ['list' => []];
         }
 
-        $array['list'] = AbstractFormFieldHelper::parseList($array['list']);
-
-        if (!$this->withLabels) {
+        if ($this->withLabels) {
+            $array['list'] = AbstractFormFieldHelper::parseListForChoices(array_values($array['list']));
+            $formatted     = [];
+            foreach ($array['list'] as $label => $value) {
+                $formatted[] = [
+                    'label' => $label,
+                    'value' => $value,
+                ];
+            }
+            $array['list'] = $formatted;
+        } else {
+            $array['list'] = AbstractFormFieldHelper::parseList(array_values($array['list']));
             $array['list'] = array_keys($array['list']);
+            $array['list'] = AbstractFormFieldHelper::formatList(AbstractFormFieldHelper::FORMAT_SIMPLE_ARRAY, $array['list']);
         }
-
-        $format        = ($this->withLabels) ? AbstractFormFieldHelper::FORMAT_ARRAY : AbstractFormFieldHelper::FORMAT_SIMPLE_ARRAY;
-        $array['list'] = AbstractFormFieldHelper::formatList($format, $array['list']);
 
         return $array;
     }
@@ -70,7 +77,7 @@ class SortableListTransformer implements DataTransformerInterface
     /**
      * @return array<mixed>
      */
-    private function transformKeyValuePair($array): array
+    private function transformKeyValuePair(?array $array): array
     {
         if (null === $array) {
             return ['list' => []];

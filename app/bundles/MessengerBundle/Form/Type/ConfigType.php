@@ -9,12 +9,13 @@ use Mautic\MessengerBundle\Validator\Dsn;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -58,11 +59,12 @@ class ConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.messenger.config.retry_strategy.max_retries',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class' => 'form-control',
                 ],
+                'constraints' => $this->greaterThanOrEqualConstraint(0),
             ]
         );
 
@@ -71,11 +73,12 @@ class ConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.messenger.config.retry_strategy.delay',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class' => 'form-control',
                 ],
+                'constraints' => $this->greaterThanOrEqualConstraint(0),
             ]
         );
 
@@ -85,11 +88,15 @@ class ConfigType extends AbstractType
             [
                 'scale'      => 2,
                 'label'      => 'mautic.messenger.config.retry_strategy.multiplier',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class' => 'form-control',
                 ],
+                // Symfony's MultiplierRetryStrategy throws
+                // InvalidArgumentException for any multiplier < 1, which would
+                // otherwise crash the queue worker after the form is saved.
+                'constraints' => $this->greaterThanOrEqualConstraint(1),
             ]
         );
 
@@ -98,13 +105,22 @@ class ConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.messenger.config.retry_strategy.max_delay',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class' => 'form-control',
                 ],
+                'constraints' => $this->greaterThanOrEqualConstraint(0),
             ]
         );
+    }
+
+    /**
+     * @return list<GreaterThanOrEqual>
+     */
+    private function greaterThanOrEqualConstraint(int|float $value): array
+    {
+        return [new GreaterThanOrEqual(value: $value)];
     }
 
     public function getBlockPrefix(): string

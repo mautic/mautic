@@ -12,8 +12,10 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\SmsBundle\Entity\Sms;
 
-class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
 {
+    use ManagedLeadTrait;
+
     public function load(ObjectManager $manager): void
     {
         // Create an email for clicks
@@ -103,7 +105,7 @@ class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
     /**
      * @param array<string,mixed> $hitConfig
      */
-    protected function createHit(array $hitConfig, ObjectManager $manager): void
+    private function createHit(array $hitConfig, ObjectManager $manager): void
     {
         $hit = new Hit();
 
@@ -111,7 +113,7 @@ class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
         $hit->setUrl('https://mautic.org');
         $hit->setReferer('https://google.com');
         $hit->setUrlTitle('Test Title');
-        $hit->setLead($this->getReference('lead-'.$hitConfig['lead_id']));
+        $hit->setLead($this->getManagedLead($this->getReference('lead-'.$hitConfig['lead_id']), $manager));
         $hit->setDateHit($hitConfig['date_hit']);
         $hit->setCode(200);
         $hit->setTrackingId('abc');
@@ -126,10 +128,7 @@ class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
         $manager->flush();
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 6;
     }

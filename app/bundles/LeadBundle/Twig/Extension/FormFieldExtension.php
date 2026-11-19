@@ -10,14 +10,24 @@ use Twig\TwigFunction;
 
 final class FormFieldExtension extends AbstractExtension
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('leadFieldCountryChoices', [FormFieldHelper::class, 'getCountryChoices']),
-            new TwigFunction('leadFieldRegionChoices', [FormFieldHelper::class, 'getRegionChoices']),
-            new TwigFunction('leadFieldTimezonesChoices', [FormFieldHelper::class, 'getTimezonesChoices']),
-            new TwigFunction('leadFieldLocaleChoices', [FormFieldHelper::class, 'getLocaleChoices']),
-            new TwigFunction('leadFormFieldParseListForChoices', [FormFieldHelper::class, 'parseListForChoices']),
+            new TwigFunction('leadFieldCountryChoices', FormFieldHelper::getCountryChoices(...)),
+            new TwigFunction('leadFieldRegionChoices', FormFieldHelper::getRegionChoices(...)),
+            new TwigFunction('leadFieldTimezonesChoices', FormFieldHelper::getTimezonesChoices(...)),
+            new TwigFunction('leadFieldLocaleChoices', $this->getLeadFieldLocaleChoices(...)),
+            new TwigFunction('leadFormFieldParseListForChoices', FormFieldHelper::parseListForChoices(...)),
         ];
+    }
+
+    /**
+     * Get locale choices with proper key=>value.
+     *
+     * @return array<string, string>
+     */
+    public function getLeadFieldLocaleChoices(): array
+    {
+        return array_flip(FormFieldHelper::getLocaleChoices());
     }
 }

@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Facade;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 
-class EncryptionService
+final readonly class EncryptionService
 {
     public function __construct(
         private EncryptionHelper $encryptionHelper,
@@ -16,9 +16,9 @@ class EncryptionService
     /**
      * @param mixed $keys
      *
-     * @return array|string
+     * @return string|string[]
      */
-    public function encrypt($keys)
+    public function encrypt($keys): string|array
     {
         if (!is_array($keys)) {
             return $this->encryptionHelper->encrypt($keys);

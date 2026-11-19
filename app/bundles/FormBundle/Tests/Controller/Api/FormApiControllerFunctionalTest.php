@@ -7,8 +7,9 @@ namespace Mautic\FormBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -91,7 +92,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
      * @param array<string, mixed> $payload
      * @param array<string, mixed> $expectedResponse
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('formDataProvider')]
+    #[DataProvider('formDataProvider')]
     public function testAddAndEditForms(array $payload, array $expectedResponse): void
     {
         $this->client->request('POST', '/api/forms/new', $payload);
@@ -111,7 +112,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertIsArray($response['form']['fields']);
         $this->assertCount(count($payload['fields']), $response['form']['fields']);
-        for ($i = 0; $i < count($payload['fields']); ++$i) {
+        $counter = count($payload['fields']);
+        for ($i = 0; $i < $counter; ++$i) {
             $this->assertEquals($payload['fields'][$i]['label'], $response['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $response['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $response['form']['fields'][$i]['type']);
@@ -132,7 +134,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $responsePatch['form']['description']);
         $this->assertIsArray($responsePatch['form']['fields']);
         $this->assertCount(count($payload['fields']), $responsePatch['form']['fields']);
-        for ($i = 0; $i < count($payload['fields']); ++$i) {
+        $counter = count($payload['fields']);
+        for ($i = 0; $i < $counter; ++$i) {
             $this->assertEquals($payload['fields'][$i]['label'], $responsePatch['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $responsePatch['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $responsePatch['form']['fields'][$i]['type']);
@@ -143,120 +146,118 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, array<int, array<string, mixed>>>
+     * @return \Iterator<int, array<int, array<string, mixed>>>
      */
-    public static function formDataProvider(): array
+    public static function formDataProvider(): \Iterator
     {
-        return [
+        yield [
             [
-                [
-                    'name'        => 'Form API test',
-                    'formType'    => 'standalone',
-                    'isPublished' => true,
-                    'description' => 'Functional API test',
-                    'fields'      => [
-                        [
-                            'label'     => 'Email',
-                            'alias'     => 'email',
-                            'type'      => 'text',
-                            'leadField' => 'email',
-                        ],
-                        [
-                            'label'        => 'Company Address',
-                            'type'         => 'text',
-                            'alias'        => 'companyaddress1',
-                            'leadField'    => 'companyaddress1',
-                        ],
-                        [
-                            'label'        => 'Company Phone',
-                            'type'         => 'tel',
-                            'alias'        => 'phone',
-                            'leadField'    => 'companyphone',
-                        ],
-                        [
-                            'label'        => 'Country',
-                            'type'         => 'country',
-                            'alias'        => 'country',
-                            'mappedObject' => 'contact',
-                            'mappedField'  => 'country',
-                        ],
+                'name'        => 'Form API test',
+                'formType'    => 'standalone',
+                'isPublished' => true,
+                'description' => 'Functional API test',
+                'fields'      => [
+                    [
+                        'label'     => 'Email',
+                        'alias'     => 'email',
+                        'type'      => 'text',
+                        'leadField' => 'email',
                     ],
-                    'postAction'  => 'return',
+                    [
+                        'label'        => 'Company Address',
+                        'type'         => 'text',
+                        'alias'        => 'companyaddress1',
+                        'leadField'    => 'companyaddress1',
+                    ],
+                    [
+                        'label'        => 'Company Phone',
+                        'type'         => 'tel',
+                        'alias'        => 'phone',
+                        'leadField'    => 'companyphone',
+                    ],
+                    [
+                        'label'        => 'Country',
+                        'type'         => 'country',
+                        'alias'        => 'country',
+                        'mappedObject' => 'contact',
+                        'mappedField'  => 'country',
+                    ],
                 ],
-                [
-                    'newName'      => 'Form API test',
-                    'fields'       => [
-                        [
-                            'mappedObject' => 'contact',
-                            'leadField'    => 'email',
-                            'mappedField'  => 'email',
-                        ],
-                        [
-                            'mappedObject' => 'company',
-                            'leadField'    => 'companyaddress1',
-                            'mappedField'  => 'companyaddress1',
-                        ],
-                        [
-                            'mappedObject' => 'company',
-                            'leadField'    => 'companyphone',
-                            'mappedField'  => 'companyphone',
-                        ], [
-                            'mappedObject' => 'contact',
-                            'leadField'    => 'country',
-                            'mappedField'  => 'country',
-                        ],
+                'postAction'  => 'return',
+            ],
+            [
+                'newName'      => 'Form API test',
+                'fields'       => [
+                    [
+                        'mappedObject' => 'contact',
+                        'leadField'    => 'email',
+                        'mappedField'  => 'email',
+                    ],
+                    [
+                        'mappedObject' => 'company',
+                        'leadField'    => 'companyaddress1',
+                        'mappedField'  => 'companyaddress1',
+                    ],
+                    [
+                        'mappedObject' => 'company',
+                        'leadField'    => 'companyphone',
+                        'mappedField'  => 'companyphone',
+                    ], [
+                        'mappedObject' => 'contact',
+                        'leadField'    => 'country',
+                        'mappedField'  => 'country',
                     ],
                 ],
             ],
+        ];
+        yield [
             [
-                [
-                    'name'        => 'Form',
-                    'formType'    => 'standalone',
-                    'isPublished' => true,
-                    'description' => 'Functional API test2',
-                    'fields'      => [
-                        [
-                            'label'        => 'Lastname',
-                            'alias'        => 'lastname',
-                            'type'         => 'text',
-                            'mappedField'  => 'lastname',
-                            'mappedObject' => 'contact',
-                        ],
-                        [
-                            'label'        => 'Company Email',
-                            'type'         => 'text',
-                            'alias'        => 'companyemail1',
-                            'mappedField'  => 'companyemail',
-                            'mappedObject' => 'company',
-                            'leadField'    => 'companyemail',
-                        ],
-                        [
-                            'label'        => 'Phone',
-                            'type'         => 'tel',
-                            'alias'        => 'phone',
-                            'leadField'    => 'position',
-                        ],
+                'name'        => 'Form',
+                'formType'    => 'standalone',
+                'isPublished' => true,
+                'description' => 'Functional API test2',
+                'fields'      => [
+                    [
+                        'label'        => 'Lastname',
+                        'alias'        => 'lastname',
+                        'type'         => 'text',
+                        'mappedField'  => 'lastname',
+                        'mappedObject' => 'contact',
                     ],
-                    'postAction'  => 'return',
+                    [
+                        'label'        => 'Company Email',
+                        'type'         => 'text',
+                        'alias'        => 'companyemail1',
+                        'mappedField'  => 'companyemail',
+                        'mappedObject' => 'company',
+                        'leadField'    => 'companyemail',
+                    ],
+                    [
+                        'label'        => 'Phone',
+                        'type'         => 'tel',
+                        'alias'        => 'phone',
+                        'leadField'    => 'position',
+                    ],
                 ],
-                [
-                    'newName'      => 'Form API test',
-                    'fields'       => [
-                        [
-                            'mappedObject' => 'contact',
-                            'leadField'    => 'lastname',
-                            'mappedField'  => 'lastname',
-                        ],
-                        [
-                            'mappedObject' => 'company',
-                            'leadField'    => 'companyemail',
-                            'mappedField'  => 'companyemail',
-                        ],
-                        [
-                            'mappedObject' => 'contact',
-                            'leadField'    => 'position',
-                            'mappedField'  => 'position',
-                        ],
+                'postAction'  => 'return',
+            ],
+            [
+                'newName'      => 'Form API test',
+                'fields'       => [
+                    [
+                        'mappedObject' => 'contact',
+                        'leadField'    => 'lastname',
+                        'mappedField'  => 'lastname',
+                    ],
+                    [
+                        'mappedObject' => 'company',
+                        'leadField'    => 'companyemail',
+                        'mappedField'  => 'companyemail',
+                    ],
+                    [
+                        'mappedObject' => 'contact',
+                        'leadField'    => 'position',
+                        'mappedField'  => 'position',
                     ],
                 ],
             ],
@@ -271,7 +272,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertTrue(isset($response['form']['id']), $clientResponse->getContent());
+        $this->assertArrayHasKey('id', $response['form'], $clientResponse->getContent());
 
         $formId = $response['form']['id'];
 
@@ -345,7 +346,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $fieldCount     = $fieldCount + 1;
+        ++$fieldCount;
 
         $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertSame($formId, $response['form']['id']);
@@ -402,38 +403,39 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         // Ensure the submission was created properly.
         $submissions = $this->em->getRepository(Submission::class)->findAll();
 
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
         $submission = $submissions[0];
-        Assert::assertSame([
+        $this->assertSame([
             'email'       => 'john@doe.test',
+            'state'       => 'Plzeňský kraj',
             'number'      => 123.0,
             'company'     => 'Doe Corp',
             'phone'       => '+420444555666',
             'country'     => 'Czech Republic',
             'multiselect' => 'two',
-            'state'       => 'Plzeňský kraj',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(Lead::class, $contact);
 
-        Assert::assertSame('john@doe.test', $contact->getEmail());
-        Assert::assertSame('Czech Republic', $contact->getCountry());
-        Assert::assertSame('Plzeňský kraj', $contact->getState());
-        Assert::assertSame(123, $contact->getPoints());
-        Assert::assertSame('Doe Corp', $contact->getCompany());
+        $this->assertSame('john@doe.test', $contact->getEmail());
+        $this->assertSame('Czech Republic', $contact->getCountry());
+        $this->assertSame('Plzeňský kraj', $contact->getState());
+        $this->assertSame(123, $contact->getPoints());
+        $this->assertSame('Doe Corp', $contact->getCompany());
 
         $companies = $this->em->getRepository(Company::class)->findAll();
 
-        Assert::assertCount(1, $companies);
+        $this->assertCount(1, $companies);
 
         // A company should be created by the submission.
         /** @var Company $company */
         $company = $companies[0];
-        Assert::assertSame('Doe Corp', $company->getName());
-        Assert::assertSame('+420444555666', $company->getPhone());
+        $this->assertSame('Doe Corp', $company->getName());
+        $this->assertSame('+420444555666', $company->getPhone());
 
         // The previous request changes user to anonymous.
         $this->loginUser($this->em->getRepository(User::class)->findOneBy(['username' => 'admin']));
@@ -522,7 +524,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertIsArray($response['form']['fields']);
         $this->assertCount(count($payload['fields']), $response['form']['fields']);
-        for ($i = 0; $i < count($payload['fields']); ++$i) {
+        $counter = count($payload['fields']);
+        for ($i = 0; $i < $counter; ++$i) {
             $this->assertEquals($payload['fields'][$i]['label'], $response['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $response['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $response['form']['fields'][$i]['type']);
@@ -639,5 +642,67 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotEmpty($responseContent->errors, 'No errors were returned when trying to save an invalid form');
         $this->assertSame('Form Field ID 123 not found', $responseContent->errors[0]->message);
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND, 'Return code must be 404.');
+    }
+
+    public function testFormIsNotUnpublishedWhenEdited(): void
+    {
+        $payload = [
+            'name'        => 'Test Form with Fields',
+            'description' => 'Form that triggers transaction error',
+            'fields'      => [
+                [
+                    'label' => 'First Name',
+                    'type'  => 'text',
+                    'alias' => 'first_name',
+                ],
+                [
+                    'label' => 'Email Address',
+                    'type'  => 'email',
+                    'alias' => 'email',
+                ],
+            ],
+        ];
+
+        $this->client->request('POST', '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        if (isset($response['errors'][0])) {
+            $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
+        }
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED, 'Return code must be 201.');
+
+        $formId = $response['form']['id'];
+        $this->assertGreaterThan(0, $formId);
+        $this->assertTrue($response['form']['isPublished']);
+
+        $newFormName = 'Updated Form Name';
+
+        $payload = [
+            'name'   => $newFormName,
+            'fields' => [
+                [
+                    'label' => 'Modified Field',
+                    'type'  => 'text',
+                    'alias' => 'modified_field',
+                ],
+                [
+                    'label' => 'New Additional Field',
+                    'type'  => 'textarea',
+                    'alias' => 'additional_field',
+                ],
+            ],
+        ];
+        $this->client->request(Request::METHOD_PATCH, '/api/forms/'.$formId.'/edit', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        if (isset($response['errors'][0])) {
+            $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
+        }
+        self::assertResponseStatusCodeSame(Response::HTTP_OK, 'Return code must be 200.');
+
+        $this->assertSame($newFormName, $response['form']['name']);
+        $this->assertTrue($response['form']['isPublished']);
     }
 }

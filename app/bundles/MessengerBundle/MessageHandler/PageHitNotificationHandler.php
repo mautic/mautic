@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Handler\Acknowledger;
 
 #[AsMessageHandler]
-class PageHitNotificationHandler
+final readonly class PageHitNotificationHandler
 {
     public function __construct(
         private PageRepository $pageRepository,
@@ -32,7 +32,7 @@ class PageHitNotificationHandler
     /**
      * @throws InvalidPayloadException
      */
-    public function __invoke(PageHitNotification $message, Acknowledger $ack = null): void
+    public function __invoke(PageHitNotification $message, ?Acknowledger $ack = null): void
     {
         $parsed = $this->parseMessage($message);
         $this->pageModel->processPageHit(...$parsed);

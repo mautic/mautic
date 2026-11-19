@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional\Command;
 
+use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Model\ImportModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class ImportCommandTest extends MauticMysqlTestCase
+final class ImportCommandTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -61,7 +62,7 @@ class ImportCommandTest extends MauticMysqlTestCase
         $file    = fopen($tmpFile, 'wb');
 
         foreach ($this->csvRows as $line) {
-            fputcsv($file, $line);
+            CsvHelper::putCsv($file, $line);
         }
 
         fclose($file);
@@ -117,7 +118,7 @@ class ImportCommandTest extends MauticMysqlTestCase
         $import->setProperties($properties);
 
         /** @var ImportModel $importModel */
-        $importModel = static::getContainer()->get('mautic.lead.model.import');
+        $importModel = self::getContainer()->get(ImportModel::class);
         $importModel->saveEntity($import);
 
         return $import;

@@ -11,10 +11,11 @@
         'entity': entity,
         'status': 'available'
     }) -}}
+    <div class="label__divider"></div>
 
     {% set tags = [
         {
-            color: 'warm-gray',
+            color: 'high-contrast',
             label: entity.isCampaignBased
                 ? 'mautic.dwc.form.is.campaign'
                 : 'mautic.dwc.form.is.standalone'
@@ -23,10 +24,18 @@
 
     {% set tags = tags
         |merge(entity.isTranslation and not entity.isTranslation(true)
-            ? [{ color: 'warm-gray', label: 'mautic.core.icon_tooltip.translation' }]
+            ? [{ color: 'blue', label: 'mautic.core.icon_tooltip.translation', icon_only: true, icon: 'ri-translate' }]
             : [])
         |merge(entity.isTranslation(true)
-            ? [{ color: 'warm-gray', label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), icon: 'ri-translate' }]
+            ? [{ 
+                color: 'warm-gray', 
+                label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), 
+                icon: 'ri-translate',
+                attributes: {
+                    'href': path('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': translations.parent.id}),
+                    'data-toggle': 'ajax'
+                }
+            }]
             : [])
     %}
 
@@ -44,7 +53,7 @@
         'targetLabel'     : 'mautic.dynamicContent.dynamicContents'|trans
     }
 ) -}}
-{{ include('@MauticCore/Helper/category--inline.html.twig', {'category': entity.category}) }}
+{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': entity.category}) }}
 {% endblock %}
 
 {% block actions %}
@@ -97,11 +106,11 @@
                     {% endif %}
                 {% endset %}
 
-                {% include '@MauticCore/Helper/description.html.twig' with { 'description': description } %}
+                {% include '@MauticCore/Helper/description--expanded.html.twig' with { 'description': description } %}
               <!--/ page detail header -->
               <!-- page detail collapseable -->
-              <div class="collapse pr-md pl-md" id="page-details">
-                  <div class="pr-md pl-md pb-md">
+              <div class="collapse pe-16 ps-16" id="page-details">
+                  <div class="pe-16 ps-16 pb-16">
                       <div class="panel shd-none mb-0">
                           <table class="table table-hover mb-0">
                               <tbody>
@@ -126,8 +135,8 @@
           <div>
               <!-- page detail collapseable toggler -->
               <div class="hr-expand nm">
-                  <span data-toggle="tooltip" title="Detail">
-                      <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#page-details">
+                  <span data-bs-toggle="tooltip" title="Detail">
+                      <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#page-details">
                           <span class="caret"></span>
                           {{ 'mautic.core.details'|trans }}
                       </a>
@@ -136,22 +145,22 @@
               <!--/ page detail collapseable toggler -->
 
               <!-- some stats -->
-              <div class="pa-md">
+              <div class="pa-16">
                   <div class="row">
                       <div class="col-sm-12">
                           <div class="panel">
                               <div class="panel-body box-layout">
-                                  <div class="col-md-3 va-m">
-                                      <h5 class="text-white dark-md fw-sb mb-xs">
+                                  <div class="col-md-3 align-middle">
+                                      <h5 class="text-white dark-md fw-sb mb-5">
                                           <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.dynamicContent.views'|trans }}
                                       </h5>
                                   </div>
-                                  <div class="col-md-9 va-m">
-                                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
+                                  <div class="col-md-9 align-middle">
+                                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'float-end'}) }}
                                   </div>
                               </div>
-                              <div class="pt-0 pl-15 pb-10 pr-15">
+                              <div class="d-flex flex-column pt-0 ps-16 pb-16 pe-16 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
@@ -169,13 +178,13 @@
               <!-- tabs controls -->
               <ul class="nav nav-tabs nav-tabs-contained">
                   <li class="active">
-                      <a href="#clicks-container" role="tab" data-toggle="tab">
+                      <a href="#clicks-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">
                           {{ 'mautic.trackable.click_counts'|trans }}
                       </a>
                   </li>
                   {% if showTranslations %}
                   <li class>
-                      <a href="#translation-container" role="tab" data-toggle="tab">
+                      <a href="#translation-container" role="tab" data-bs-toggle="tab" class="nav-link">
                           {{ 'mautic.core.translations'|trans }}
                       </a>
                   </li>
@@ -184,7 +193,7 @@
               <!--/ tabs controls -->
           </div>
           <!-- start: tab-content -->
-          <div class="tab-content pa-md">
+          <div class="tab-content pa-16">
               <div class="tab-pane active active bdr-w-0" id="clicks-container">
                   {{ include('@MauticPage/Trackable/click_counts.html.twig', {'trackables': trackables, 'entity': entity, 'channel': 'dynamicContent'}) }}
 

@@ -25,7 +25,7 @@ class LogRepository extends CommonRepository
             ->setParameter('logMaxLimit', $logMaxLimit);
 
         return array_map(
-            static fn ($row): int => (int) $row['webhook_id'],
+            static fn (array $row): int => (int) $row['webhook_id'],
             $qb->executeQuery()->fetchAllAssociative()
         );
     }
@@ -50,7 +50,7 @@ class LogRepository extends CommonRepository
 
         if ($id) {
             $sql = "DELETE FROM {$table_name} WHERE webhook_id = (?) and id <= (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
-            while ($rows = $conn->executeQuery($sql, [$webHookId, $id], [ParameterType::INTEGER, ParameterType::INTEGER])->rowCount()) {
+            while ($rows = $conn->executeStatement($sql, [$webHookId, $id], [ParameterType::INTEGER, ParameterType::INTEGER])) {
                 $deletedLogs += $rows;
             }
         }
@@ -72,7 +72,7 @@ class LogRepository extends CommonRepository
      *
      * @return float|null
      */
-    public function getSuccessVsErrorStatusCodeRatio($webhookId, $limit)
+    public function getSuccessVsErrorStatusCodeRatio($webhookId, $limit): int|float|null
     {
         // Generate query to select last X = $limit rows
         $selectqb = $this->_em->getConnection()->createQueryBuilder();

@@ -1,0 +1,5 @@
+{% set svg_path = '@MauticCore/Assets/pictograms/' ~ pictogram ~ '.svg' %}
+
+<div class="pictogram animation--slide-in-up pictogram--size-{{ size }}" style="fill: {{ color|default('var(--icon-primary)') }}">
+    {{ source(svg_path) }}
+</div>

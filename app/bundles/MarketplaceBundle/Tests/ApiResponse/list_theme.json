@@ -1,0 +1,29 @@
+{
+    "results": [
+        {
+            "name": "example/newsletter-theme-one",
+            "display_name": "Newsletter Theme One",
+            "type": "mautic-theme",
+            "description": "A newsletter theme package.",
+            "url": "https://marketplace.mautic.org/packages/example/newsletter-theme-one",
+            "repository": "https://github.com/example/newsletter-theme",
+            "downloads": 123,
+            "favers": 4,
+            "average_rating": 4.5,
+            "total_reviews": 2
+        },
+        {
+            "name": "example/newsletter-theme-two",
+            "display_name": "Newsletter Theme Two",
+            "type": "mautic-theme",
+            "description": "A newsletter theme package.",
+            "url": "https://marketplace.mautic.org/packages/example/newsletter-theme-two",
+            "repository": "https://github.com/example/newsletter-theme",
+            "downloads": 123,
+            "favers": 4,
+            "average_rating": 4.5,
+            "total_reviews": 2
+        }
+    ],
+    "total": 2
+}

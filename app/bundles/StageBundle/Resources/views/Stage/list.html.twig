@@ -12,6 +12,8 @@
 <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
     {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
         'searchValue': searchValue,
+        'searchScopes': searchScopes|default([]),
+        'searchScopeHint': searchScopeHint|default(null),
         'action': currentRoute,
         'page_actions': {
             'templateButtons': {
@@ -25,32 +27,46 @@
                 'delete': permissions['stage:stages:delete']
             }
         },
-        'quickFilters': [
-            {
-                'search': 'mautic.core.searchcommand.ispublished',
-                'label': 'mautic.core.form.active',
-                'tooltip': 'mautic.core.searchcommand.ispublished.description',
-                'icon': 'ri-check-line'
+        'quickFilters': {
+            'mautic.core.quick_filters.status': {
+                'conflictGroup': true,
+                'filters': [
+                    {
+                        'search': 'mautic.core.searchcommand.ispublished',
+                        'label': 'mautic.core.form.active',
+                        'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                        'icon': 'ri-check-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.isunpublished',
+                        'label': 'mautic.core.form.inactive',
+                        'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                        'icon': 'ri-close-line'
+                    }
+                ]
             },
-            {
-                'search': 'mautic.core.searchcommand.isunpublished',
-                'label': 'mautic.core.form.inactive',
-                'tooltip': 'mautic.core.searchcommand.isunpublished.description',
-                'icon': 'ri-close-line'
+            'mautic.core.quick_filters.ownership': {
+                'conflictGroup': true,
+                'filters': [
+                    {
+                        'search': 'mautic.core.searchcommand.ismine',
+                        'label': 'mautic.core.searchcommand.ismine.label',
+                        'tooltip': 'mautic.core.searchcommand.ismine.description',
+                        'icon': 'ri-user-line'
+                    }
+                ]
             },
-            {
-                'search': 'mautic.core.searchcommand.isuncategorized',
-                'label': 'mautic.core.form.uncategorized',
-                'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
-                'icon': 'ri-folder-unknow-line'
-            },
-            {
-                'search': 'mautic.core.searchcommand.ismine',
-                'label': 'mautic.core.searchcommand.ismine.label',
-                'tooltip': 'mautic.core.searchcommand.ismine.description',
-                'icon': 'ri-user-line'
+            'mautic.core.quick_filters.others': {
+                'filters': [
+                    {
+                        'search': 'mautic.core.searchcommand.isuncategorized',
+                        'label': 'mautic.core.form.uncategorized',
+                        'tooltip': 'mautic.core.searchcommand.isuncategorized.description',
+                        'icon': 'ri-folder-unknow-line'
+                    }
+                ]
             }
-        ]
+        }
     }) }}
 
     <div class="page-list">
@@ -88,6 +104,14 @@
                         'text'       : 'mautic.core.category',
                         'class'      : 'visible-md visible-lg col-stage-category',
                     }) -}}
+                    {% if permissions['lead:leads:viewother'] %}
+                    {{- include('@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar' : 'stage',
+                        'text'       : 'mautic.lead.list.thead.leadcount',
+                        'class'      : 'visible-md visible-lg col-stage-leadcount',
+                    }) -}}
+                    {% endif %}
                     {{- include('@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'stage',
@@ -101,6 +125,33 @@
             {% for item in items %}
                 <tr>
                     <td>
+                    {% set stageContactsUrl = path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.stage_id'|trans ~ ':' ~ item.id}) %}
+                    {% set customButtons = (permissions['lead:leads:viewown'] or permissions['lead:leads:viewother']) ? [
+                        {
+                            'attr' : {
+                                'data-toggle' : 'ajax',
+                                'href'        : stageContactsUrl,
+                            },
+                            'btnText'   : 'mautic.lead.list.view_contacts'|trans,
+                            'iconClass' : 'ri-team-line',
+                            'priority'  : 100,
+                        }
+                    ] : [] %}
+                    {% if permissions['stage:stages:edit'] and permissions['stage:stages:delete'] %}
+                        {% set customButtons = customButtons|merge([
+                            {
+                                'attr' : {
+                                    'data-toggle' : 'ajaxmodal',
+                                    'data-target' : '#MauticSharedModal',
+                                    'data-header' : 'mautic.stage.header.merge'|trans,
+                                    'href'        : path('mautic_stage_action', { 'objectId' : item.getId(), 'objectAction' : 'merge' }),
+                                },
+                                'btnText'   : 'mautic.stage.merge'|trans,
+                                'iconClass' : 'ri-flag-line',
+                                'priority'  : 100,
+                            }
+                        ]) %}
+                    {% endif %}
                     {{- include('@MauticCore/Helper/list_actions.html.twig',
                             {
                                 'item'            : item,
@@ -109,6 +160,7 @@
                                     'clone'  : permissions['stage:stages:create'],
                                     'delete' : permissions['stage:stages:delete'],
                                 },
+                                'customButtons'   : customButtons,
                                 'routeBase' : 'stage',
                             }) -}}
                     </td>
@@ -129,15 +181,30 @@
                             {{ customContent('stage.name', _context) }}
                         </div>
                         {% set description = item.getDescription() %}
-                        {% if description %}
-                            <div class="text-secondary mt-4">
-                                <small>{{ description|purify }}</small>
-                            </div>
-                        {% endif %}
+                        {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                            'description': description
+                        }) }}
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
+                    {% if permissions['lead:leads:viewother'] %}
+                    <td class="visible-md visible-lg">
+                        {% set stageContactCount = contactCounts[item.id]|default(0) %}
+                        {% include '@MauticCore/Helper/_tag.html.twig' with {
+                            tags: [{
+                                label: 'mautic.lead.list.viewleads_count'|trans({'%count%': stageContactCount}),
+                                color: 'gray',
+                                size: 'sm',
+                                attributes: {
+                                    id: 'stage-contacts-count-' ~ item.id,
+                                    href: stageContactsUrl,
+                                    'data-toggle': 'ajax'
+                                }|filter((v, k) => 0 != (stageContactCount) or (k != 'href' and k != 'data-toggle'))
+                            }]
+                        } %}
+                    </td>
+                    {% endif %}
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
                 </tr>
             {% endfor %}
@@ -147,7 +214,7 @@
     <div class="panel-footer">
         {{- include('@MauticCore/Helper/pagination.html.twig',
             {
-                'totalItems' : items|length,
+                'totalItems' : totalItems,
                 'page'       : page,
                 'limit'      : limit,
                 'menuLinkId' : 'mautic_stage_index',
@@ -162,14 +229,14 @@
         {% else %}
             <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
                 {% set childContainer %}
-                    <div class="mt-32 mb-md">
-                        {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    <div class="mt-32 mb-16">
+                        {% include '@MauticCore/Components/pictogram.html.twig' with {
                             'pictogram': 'progress',
                             'size': '80'
                         } %}
                     </div>
                 {% endset %}
-        
+
                 {{ include('@MauticCore/Components/content-block.html.twig', {
                     heading: 'mautic.stage.contentblock.heading',
                     subheading: 'mautic.stage.contentblock.subheading',

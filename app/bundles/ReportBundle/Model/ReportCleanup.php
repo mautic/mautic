@@ -4,12 +4,13 @@ namespace Mautic\ReportBundle\Model;
 
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 
-class ReportCleanup
+final readonly class ReportCleanup
 {
     public const KEEP_FILE_DAYS = 7;
 
-    public function __construct(private FileHandler $fileHandler)
-    {
+    public function __construct(
+        private FileHandler $fileHandler,
+    ) {
     }
 
     public function cleanup(int $reportId): void
@@ -54,10 +55,6 @@ class ReportCleanup
         $now     = new \DateTime();
         $days    = $created->diff($now)->days;
 
-        if ($days > self::KEEP_FILE_DAYS) {
-            return true;
-        }
-
-        return false;
+        return $days > self::KEEP_FILE_DAYS;
     }
 }

@@ -287,7 +287,6 @@
         display: inline;
     }
 
-    /* Make fields display inline when using width classes */
     .mauticform-page-wrapper {
         display: flex;
         flex-wrap: wrap;
@@ -295,22 +294,14 @@
         margin: 0 -10px;
     }
 
-    /* Ensure field containers respect width classes */
+    .mauticform-page-hidden {
+        display: none !important;
+    }
+
     .mauticform-row {
         box-sizing: border-box;
         padding: 0 10px;
         margin-bottom: 15px;
-    }
-
-    /* Responsive adjustment for mobile */
-    @media (max-width: 767px) {
-        .mauticform-three-quarters-width,
-        .mauticform-two-thirds-width,
-        .mauticform-half-width,
-        .mauticform-one-third-width,
-        .mauticform-one-quarter-width {
-            width: 100%;
-        }
     }
 
     /**
@@ -449,7 +440,6 @@
         }
     }
 
-
     /*
     * When simply remaining on the form
     */
@@ -507,6 +497,23 @@
         }
         100% {
             transform: translate(-50%, -50%) rotate(360deg);
+        }
+    }
+
+    .mauticform-100 { width: 100%; }
+    .mauticform-75 { width: 75%; }
+    .mauticform-66 { width: 66.66%; }
+    .mauticform-50 { width: 50%; }
+    .mauticform-33 { width: 33.33%; }
+    .mauticform-25 { width: 25%; }
+
+    @media (max-width: 767px) {
+        .mauticform-75,
+        .mauticform-66,
+        .mauticform-50,
+        .mauticform-33,
+        .mauticform-25 {
+            width: 100%;
         }
     }
 </style>

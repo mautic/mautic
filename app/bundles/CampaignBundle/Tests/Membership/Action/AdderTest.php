@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Membership\Action;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -10,15 +12,15 @@ use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
 use Mautic\LeadBundle\Entity\Lead;
 
-class AdderTest extends \PHPUnit\Framework\TestCase
+final class AdderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
-     * @var LeadEventLogRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadEventLogRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
 
@@ -100,10 +102,39 @@ class AdderTest extends \PHPUnit\Framework\TestCase
         $this->getAdder()->updateExistingMembership($campaignMember, false);
     }
 
-    /**
-     * @return Adder
-     */
-    private function getAdder()
+    public function testManuallyRemovedCanBeAddedBackByManualActionWhenRestartIsDisabled(): void
+    {
+        $campaignMember = new CampaignMember();
+        $campaignMember->setManuallyRemoved(true);
+        $campaignMember->setRotation(1);
+        $campaign = new Campaign();
+        $campaign->setAllowRestart(false);
+        $campaignMember->setCampaign($campaign);
+
+        $this->getAdder()->updateExistingMembership($campaignMember, true);
+
+        $this->assertEquals(true, $campaignMember->wasManuallyAdded());
+        $this->assertEquals(2, $campaignMember->getRotation());
+    }
+
+    public function testNaturallyExitedContactCannotBeAddedBackByCampaignActionWhenRestartIsDisabled(): void
+    {
+        $this->expectException(ContactCannotBeAddedToCampaignException::class);
+
+        $campaignMember = new CampaignMember();
+        // Natural exits are marked as removed with an exit date.
+        $campaignMember->setManuallyRemoved(true);
+        $campaignMember->setDateLastExited(new \DateTime());
+        $campaignMember->setRotation(1);
+        $campaign = new Campaign();
+        $campaign->setAllowRestart(false);
+        $campaignMember->setCampaign($campaign);
+
+        // Campaign action "add to campaign" uses manual=true, which was the regression path.
+        $this->getAdder()->updateExistingMembership($campaignMember, true);
+    }
+
+    private function getAdder(): Adder
     {
         return new Adder($this->leadRepository, $this->leadEventLogRepository);
     }

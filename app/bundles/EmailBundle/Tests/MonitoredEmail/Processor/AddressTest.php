@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(Address::class)]
-class AddressTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(Address::class)]
+final class AddressTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that an email header with email addresses are parsed into array')]
+    #[TestDox('Test that an email header with email addresses are parsed into array')]
     public function testArrayOfAddressesAreReturnedFromEmailHeader(): void
     {
         $results = Address::parseList('<user@test.com>,<user2@test.com>');
@@ -21,11 +25,11 @@ class AddressTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Obtain hash ID from a special formatted email address')]
+    #[TestDox('Obtain hash ID from a special formatted email address')]
     public function testStatHashIsParsedFromEmail(): void
     {
         $hash = Address::parseAddressForStatHash('hello+bounce_123abc@test.com');
 
-        $this->assertEquals('123abc', $hash);
+        $this->assertSame('123abc', $hash);
     }
 }

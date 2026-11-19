@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\SmsBundle\Model\SmsModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private SmsModel $model,
@@ -35,7 +35,7 @@ class SearchSubscriber implements EventSubscriberInterface
             '@MauticSms/SubscribedEvents/Search/global.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.sms.smses.header', $results);
         }
     }

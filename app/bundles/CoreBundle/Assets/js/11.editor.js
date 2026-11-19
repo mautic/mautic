@@ -38,8 +38,6 @@ Mautic.configureAtWho = function(element, method) {
     Mautic.getTokens(method, function(tokens) {
         element.atwho('destroy');
 
-        Mautic.configureDynamicContentAtWhoTokens();
-
         // Add the dynamic content tokens
         mQuery.extend(tokens, Mautic.dynamicContentTokens);
 
@@ -93,35 +91,16 @@ Mautic.getTokens = function(method, callback) {
     });
 };
 
-/**
- * Append dynamic content tokens to at who
- */
-Mautic.configureDynamicContentAtWhoTokens = function() {
-    Mautic.dynamicContentTokens = {};
+Mautic.insertHtmlInEditor = function (obj, html) {
+    const ckEditor = ckEditors.get(obj[0]);
+    const viewFragment = ckEditor.data.processor.toView(html);
+    const modelFragment = ckEditor.data.toModel(viewFragment);
 
-    var dynamicContentTabs = mQuery('#dynamicContentTabs');
-
-    if (dynamicContentTabs.length === 0 && window.parent) {
-        dynamicContentTabs = mQuery(window.parent.document.getElementById('dynamicContentTabs'));
-    }
-
-    if (dynamicContentTabs.length) {
-        dynamicContentTabs.find('a[data-toggle="tab"]').each(function () {
-            var tokenText = mQuery(this).text();
-            var prototype = '{dynamiccontent="__tokenName__"}';
-            var newOption = prototype.replace(/__tokenName__/g, tokenText);
-
-            Mautic.dynamicContentTokens[newOption] = tokenText;
-        });
-    }
-};
-
-Mautic.insertTextInEditor = function (obj, text) {
-    const ckEditor = ckEditors.get( obj[0] );
-    ckEditor.model.change( writer => {
-        writer.insertText( text, ckEditor.model.document.selection.getFirstPosition() );
+    ckEditor.model.change(writer => {
+        const insertPosition = ckEditor.model.document.selection.getFirstPosition();
+        writer.insert(modelFragment, insertPosition);
     });
-}
+};
 
 Mautic.MentionLinks =  function (editor) {
 
@@ -175,13 +154,6 @@ Mautic.customItemRenderer = function (item) {
         tokenName = tokenName.substring(2);
     }
 
-    if (tokenId.match(/dwc=/i)){
-        const tn = tokenId.substr(5, tokenId.length - 6);
-        tokenName = tokenName + ' (' + tn + ')';
-    } else if (tokenId.match(/contactfield=company/i) && !tokenName.match(/company/i)){
-        tokenName = 'Company ' + tokenName;
-    }
-
     itemElement.textContent = tokenName;
     idElement.textContent = tokenId;
     itemElement.appendChild( idElement );
@@ -220,7 +192,6 @@ Mautic.getTokensForPlugIn = function(method) {
         success: function (response) {
             if (typeof response.tokens === 'object') {
                 Mautic.builderTokens = response.tokens;
-                Mautic.configureDynamicContentAtWhoTokens();
                 mQuery.extend(Mautic.builderTokens, Mautic.dynamicContentTokens);
                 Mautic.builderTokensForCkEditor = mQuery.map(Mautic.builderTokens, function(value, i) {
                     return {'id':i, 'name':value};
@@ -257,10 +228,10 @@ Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
         ckEditors.delete( textarea[0] )
     }
     const tokenCallback = textarea.attr('data-token-callback');
-    Mautic.InitCkEditor(textarea, Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback));
+    Mautic.InitCkEditor(textarea, Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback, textarea));
 }
 
-Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallback) {
+Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallback, textarea = null) {
     const defaultOptions = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
     const ckEditorToolbar = typeof ckEditorToolbarOptions != "undefined" && ckEditorToolbarOptions.length > 0 ? ckEditorToolbarOptions : defaultOptions;
     const ckEditorColors = [
@@ -280,6 +251,7 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
         { color: '#4c4ce6', label: 'Blue' },
         { color: '#994ce6', label: 'Purple' }
     ];
+    const allowFullHtml = textarea && typeof textarea.attr('allow-full-html') !== 'undefined';
     const ckEditorOption = {
         toolbar: {
             items: ckEditorToolbar,
@@ -324,7 +296,18 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
             allowedProtocols: [ 'https?', 'tel', 'sms', 'sftp', 'smb', 'slack' ]
         },
         htmlSupport: {
-            allow: [
+            fullPage: {
+                allowRenderStylesFromHead: allowFullHtml
+            },
+            allow: allowFullHtml ? [
+                {
+                    // Allow all HTML elements
+                    name: /.*/,
+                    attributes: true,
+                    classes: true,
+                    styles: true
+                }
+            ] : [
                 {
                     name: /^(a|span)$/,
                     attributes: true,

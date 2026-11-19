@@ -18,7 +18,7 @@
 
 {% set template = '<div class="col-md-6">{content}</div>' %}
 {% set properties = form.properties|default([]) %}
-{% set validation = form.validation|default([]) %}
+{% set validation = form.validation is defined ? form.validation : null %}
 
 {% set showAttributes = (form.labelAttributes is defined or form.inputAttributes is defined or form.containerAttributes is defined or properties.labelAttributes is defined or form.alias is defined) %}
 {% set showBehavior = (form.showWhenValueExists is defined or properties.showWhenValueExists is defined) %}
@@ -56,7 +56,7 @@
 
 <div class="bundle-form">
     <div class="bundle-form-header">
-        <h3 class="mb-lg">{{ fieldHeader }}</h3>
+        <h3 class="mb-24">{{ fieldHeader }}</h3>
     </div>
 
     {{ form_start(form) }}
@@ -64,7 +64,7 @@
     <div role="tabpanel">
         <ul class="nav nav-tabs nav-tabs-contained" role="tablist">
             <li role="presentation" class="active">
-                <a class="{% if generalTabError %}text-danger{% endif %}" href="#general" aria-controls="general" role="tab" data-toggle="tab">
+                <a class="nav-link active {% if generalTabError %}text-danger{% endif %}" href="#general" aria-controls="general" role="tab" data-bs-toggle="tab" aria-selected="true">
                     {{ 'mautic.form.field.section.general'|trans }}
                     {% if generalTabError %}
                         <i class="ri-alert-line"></i>
@@ -74,7 +74,7 @@
 
             {% if showConditions %}
                 <li role="presentation">
-                    <a class="{% if conditionsTabError %}text-danger{% endif %}" href="#conditions" aria-controls="conditions" role="tab" data-toggle="tab">
+                    <a class="nav-link {% if conditionsTabError %}text-danger{% endif %}" href="#conditions" aria-controls="conditions" role="tab" data-bs-toggle="tab">
                         {{ 'mautic.form.field.form.condition'|trans }}
                         {% if conditionsTabError %}
                             <i class="ri-alert-line"></i>
@@ -85,7 +85,7 @@
 
             {% if form.mappedField is defined %}
               <li role="presentation">
-                  <a href="#mappedfields" aria-controls="mappedfields" role="tab" data-toggle="tab">
+                  <a href="#mappedfields" aria-controls="mappedfields" role="tab" data-bs-toggle="tab" class="nav-link">
                       {{ 'mautic.form.field.section.mappedfield'|trans }}
                   </a>
               </li>
@@ -93,7 +93,7 @@
 
             {% if form.isRequired is defined %}
               <li role="presentation">
-                  <a href="#required" aria-controls="required" role="tab" data-toggle="tab">
+                  <a href="#required" aria-controls="required" role="tab" data-bs-toggle="tab" class="nav-link">
                       {{ 'mautic.form.field.section.validation'|trans }}
                   </a>
               </li>
@@ -101,7 +101,7 @@
 
             {% if showProperties %}
               <li role="presentation">
-                  <a class="{% if propertiesTabError %}text-danger{% endif %}" href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
+                  <a class="nav-link {% if propertiesTabError %}text-danger{% endif %}" href="#properties" aria-controls="properties" role="tab" data-bs-toggle="tab">
                       {{ 'mautic.form.field.section.properties'|trans }}
                       {% if propertiesTabError %}
                           <i class="ri-alert-line"></i>
@@ -112,7 +112,7 @@
 
             {% if showAttributes %}
               <li role="presentation">
-                  <a href="#attributes" aria-controls="attributes" role="tab" data-toggle="tab">
+                  <a href="#attributes" aria-controls="attributes" role="tab" data-bs-toggle="tab" class="nav-link">
                       {{ 'mautic.form.field.section.attributes'|trans }}
                   </a>
               </li>
@@ -120,7 +120,7 @@
 
             {% if showBehavior %}
               <li role="progressive-profiling">
-                  <a href="#progressive-profiling" aria-controls="progressive-profiling" role="tab" data-toggle="tab">
+                  <a href="#progressive-profiling" aria-controls="progressive-profiling" role="tab" data-bs-toggle="tab" class="nav-link">
                       {{ 'mautic.form.field.section.progressive.profiling'|trans }}
                   </a>
               </li>
@@ -128,7 +128,7 @@
         </ul>
 
         <!-- Tab panes -->
-        <div class="tab-content pa-lg">
+        <div class="tab-content pa-24">
             <div role="tabpanel" class="tab-pane active" id="general">
                 <div class="row">
                     {{ _self.row_if_exists(form, 'label') }}
@@ -156,23 +156,41 @@
                           {%- if form.isRequired is defined %}<div class="col-md-4">{{ form_row(form.isRequired) }}</div>{% endif %}
                           {%- if form.validationMessage is defined %}<div class="col-md-8">{{ form_row(form.validationMessage) }}</div>{% endif %}
                       </div>
-                  <div class="row">
-                      {% for name, property in validation %}
-                          {% if not form.validation[name].isRendered and 'labelAttributes' != name %}
-                            {% if 'hiddin' == form.validation[name].vars.block_prefixes[1] %}
-                                {{ form_row(form.validation[name]) }}
-                            {% else %}
-                                {% set col = 8 %}
-                                {% if 'chocie' == form.validation[name].vars.block_prefixes[1] %}
-                                    {% set col = 4 %}
-                                {% endif %}
-                                <div class="col-md-{{ col }}">
-                                    {{ form_row(form.validation[name]) }}
-                                </div>
-                            {% endif %}
+                      {% if validation %}
+                        <div class="row">
+                          {% if validation.minimum is defined %}
+                            <div class="col-md-4">{{ form_row(validation.minimum) }}</div>
                           {% endif %}
-                      {% endfor %}
-                  </div>
+                          {% if validation.min_message is defined %}
+                            <div class="col-md-8">{{ form_row(validation.min_message) }}</div>
+                          {% endif %}
+                        </div>
+                        <div class="row">
+                          {% if validation.maximum is defined %}
+                            <div class="col-md-4">{{ form_row(validation.maximum) }}</div>
+                          {% endif %}
+                          {% if validation.max_message is defined %}
+                            <div class="col-md-8">{{ form_row(validation.max_message) }}</div>
+                          {% endif %}
+                        </div>
+                        <div class="row">
+                            {% for name, property in validation %}
+                                {% if validation[name] is defined and not validation[name].isRendered and 'labelAttributes' != name %}
+                                  {% if 'hiddin' == validation[name].vars.block_prefixes[1] %}
+                                      {{ form_row(validation[name]) }}
+                                  {% else %}
+                                      {% set col = 8 %}
+                                      {% if 'chocie' == validation[name].vars.block_prefixes[1] %}
+                                          {% set col = 4 %}
+                                      {% endif %}
+                                      <div class="col-md-{{ col }}">
+                                          {{ form_row(validation[name]) }}
+                                      </div>
+                                  {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                      {% endif %}
               </div>
             {% endif %}
 
@@ -242,7 +260,7 @@
                 <div role="tabpanel" class="tab-pane" id="conditions">
                     <div class="row">
                         <div class="col-md-12">
-                            <label data-toggle="tooltip" data-container="body" data-placement="top" data-original-title="{{ 'mautic.form.field.form.condition.show.only.tooltip'|trans }}">
+                            <label data-bs-toggle="tooltip" data-bs-container="body" data-bs-placement="top" data-bs-title="{{ 'mautic.form.field.form.condition.show.only.tooltip'|trans }}">
                                 {{ 'mautic.form.field.form.condition.show.only'|trans }}
                                 <i class="ri-question-line"></i>
                             </label>

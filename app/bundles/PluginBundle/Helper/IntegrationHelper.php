@@ -2,13 +2,16 @@
 
 namespace Mautic\PluginBundle\Helper;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
@@ -40,13 +43,15 @@ class IntegrationHelper
     private array $byPlugin = [];
 
     public function __construct(
-        private ContainerInterface $container,
-        protected EntityManager $em,
+        private readonly ContainerInterface $container,
+        protected EntityManagerInterface $em,
         protected PathsHelper $pathsHelper,
         protected BundleHelper $bundleHelper,
         protected CoreParametersHelper $coreParametersHelper,
         protected Environment $twig,
         protected PluginModel $pluginModel,
+        private readonly IntegrationRepository $integrationRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 
@@ -74,7 +79,6 @@ class IntegrationHelper
             $plugins = $this->bundleHelper->getPluginBundles();
 
             // Get a list of already installed integrations
-            $integrationRepo = $this->em->getRepository(Integration::class);
             // get a list of plugins for filter
             $installedPlugins = $this->pluginModel->getEntities(
                 [
@@ -203,8 +207,8 @@ class IntegrationHelper
             }
 
             // Save newly found integrations
-            if (!empty($newIntegrations)) {
-                $integrationRepo->saveEntities($newIntegrations);
+            if ([] !== $newIntegrations) {
+                $this->integrationRepository->saveEntities($newIntegrations);
                 unset($newIntegrations);
             }
         }
@@ -235,7 +239,7 @@ class IntegrationHelper
             $integrationsWithFeatures = [];
             foreach ($withFeatures as $feature) {
                 if (isset($this->byFeatureList[$feature])) {
-                    $integrationsWithFeatures = $integrationsWithFeatures + $this->byFeatureList[$feature];
+                    $integrationsWithFeatures += $this->byFeatureList[$feature];
                 }
             }
 
@@ -336,11 +340,9 @@ class IntegrationHelper
      * @param bool $find If true, array of regexes to find a handle will be returned;
      *                   If false, array of URLs with a placeholder of %handle% will be returned
      *
-     * @return array
-     *
      * @todo Extend this method to allow plugins to add URLs to these arrays
      */
-    public function getSocialProfileUrlRegex($find = true)
+    public function getSocialProfileUrlRegex($find = true): array
     {
         if ($find) {
             // regex to find a match
@@ -361,46 +363,44 @@ class IntegrationHelper
                 'flickr' => "/flickr.com\/photos\/(.*?)($|\/)/",
                 'skype'  => "/skype:(.*?)($|\?)/",
             ];
-        } else {
-            // populate placeholder
-            return [
-                'twitter'    => 'https://twitter.com/%handle%',
-                'facebook'   => 'https://facebook.com/%handle%',
-                'linkedin'   => 'https://linkedin.com/in/%handle%',
-                'instagram'  => 'https://instagram.com/%handle%',
-                'pinterest'  => 'https://pinterest.com/%handle%',
-                'klout'      => 'https://klout.com/%handle%',
-                'youtube'    => 'https://youtube.com/user/%handle%',
-                'flickr'     => 'https://flickr.com/photos/%handle%',
-                'skype'      => 'skype:%handle%?call',
-            ];
         }
+
+        // populate placeholder
+        return [
+            'twitter'    => 'https://twitter.com/%handle%',
+            'facebook'   => 'https://facebook.com/%handle%',
+            'linkedin'   => 'https://linkedin.com/in/%handle%',
+            'instagram'  => 'https://instagram.com/%handle%',
+            'pinterest'  => 'https://pinterest.com/%handle%',
+            'klout'      => 'https://klout.com/%handle%',
+            'youtube'    => 'https://youtube.com/user/%handle%',
+            'flickr'     => 'https://flickr.com/photos/%handle%',
+            'skype'      => 'skype:%handle%?call',
+        ];
     }
 
     /**
      * Get array of integration entities.
-     *
-     * @return mixed
      */
-    public function getIntegrationSettings()
+    public function getIntegrationSettings(): array
     {
-        return $this->em->getRepository(Integration::class)->getIntegrations();
+        return $this->integrationRepository->getIntegrations();
     }
 
-    public function getCoreIntegrationSettings()
+    public function getCoreIntegrationSettings(): array
     {
-        return $this->em->getRepository(Integration::class)->getCoreIntegrations();
+        return $this->integrationRepository->getCoreIntegrations();
     }
 
     /**
      * Get the user's social profile data from cache or integrations if indicated.
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     * @param array                          $fields
-     * @param bool                           $refresh
-     * @param string                         $specificIntegration
-     * @param bool                           $persistLead
-     * @param bool                           $returnSettings
+     * @param Lead   $lead
+     * @param array  $fields
+     * @param bool   $refresh
+     * @param string $specificIntegration
+     * @param bool   $persistLead
+     * @param bool   $returnSettings
      *
      * @return array
      */
@@ -415,7 +415,7 @@ class IntegrationHelper
             // check to see if there are social profiles activated
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
 
-            /* @var \MauticPlugin\MauticSocialBundle\Integration\SocialIntegration $sn */
+            /** @var \MauticPlugin\MauticSocialBundle\Integration\SocialIntegration $sn */
             foreach ($socialIntegrations as $integration => $sn) {
                 $settings        = $sn->getIntegrationSettings();
                 $features        = $settings->getSupportedFeatures();
@@ -456,7 +456,7 @@ class IntegrationHelper
 
             if ($persistLead && !empty($socialCache)) {
                 $lead->setSocialCache($socialCache);
-                $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
+                $this->leadRepository->saveEntity($lead);
             }
         } elseif ($returnSettings) {
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
@@ -488,7 +488,7 @@ class IntegrationHelper
             $socialCache = [];
         }
         $lead->setSocialCache($socialCache);
-        $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
+        $this->leadRepository->saveEntity($lead);
 
         return $socialCache;
     }
@@ -518,7 +518,7 @@ class IntegrationHelper
 
                 // add the api keys for use within the share buttons
                 $shareSettings['keys']   = $apiKeys;
-                $shareBtns[$integration] = $this->twig->render($plugin->getBundle()."/Integration/$integration:share.html.twig", [
+                $shareBtns[$integration] = $this->twig->render($plugin->getBundle()."/Integration/{$integration}:share.html.twig", [
                     'settings' => $shareSettings,
                 ]);
             }
@@ -538,7 +538,7 @@ class IntegrationHelper
         $identifier      = (is_array($identifierField)) ? [] : false;
         $matchFound      = false;
 
-        $findMatch = function ($f, $fields) use (&$identifierField, &$identifier, &$matchFound): void {
+        $findMatch = function ($f, array $fields) use (&$identifierField, &$identifier, &$matchFound): void {
             if (is_array($identifier)) {
                 // there are multiple fields the integration can identify by
                 foreach ($identifierField as $idf) {

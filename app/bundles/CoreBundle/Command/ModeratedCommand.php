@@ -9,7 +9,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -27,11 +26,7 @@ abstract class ModeratedCommand extends Command
      */
     public const MODE_LOCK = 'file_lock';
 
-    protected $checkFile;
-
     protected $moderationKey;
-
-    protected $moderationTable = [];
 
     protected $moderationMode;
 
@@ -50,7 +45,7 @@ abstract class ModeratedCommand extends Command
 
     public function __construct(
         protected PathsHelper $pathsHelper,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct();
     }
@@ -58,7 +53,7 @@ abstract class ModeratedCommand extends Command
     /**
      * Set moderation options.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('--bypass-locking', null, InputOption::VALUE_NONE, 'Bypass locking.')
@@ -66,8 +61,7 @@ abstract class ModeratedCommand extends Command
                 '--timeout',
                 '-t',
                 InputOption::VALUE_REQUIRED,
-                'If getmypid() is disabled on this system, lock files will be used. This option will assume the process is dead after the specified number of seconds and will execute anyway. This is disabled by default.',
-                null
+                'If getmypid() is disabled on this system, lock files will be used. This option will assume the process is dead after the specified number of seconds and will execute anyway. This is disabled by default.'
             )
             ->addOption(
                 '--lock_mode',
@@ -135,7 +129,9 @@ abstract class ModeratedCommand extends Command
         }
 
         // Attempt to keep things tidy
-        @unlink($this->lockFile);
+        if ($this->lockFile && file_exists($this->lockFile)) {
+            unlink($this->lockFile);
+        }
     }
 
     private function checkStatus(): bool
@@ -157,7 +153,15 @@ abstract class ModeratedCommand extends Command
         );
 
         // Check if the PID is still running
-        $fp = fopen($this->lockFile, 'c+');
+        error_clear_last();
+        $fp = @fopen($this->lockFile, 'c+');
+        if (false === $fp) {
+            // This needs to throw an exception in order to not silently fail when there is an issue.
+            // Returning false here would report a permanent misconfiguration as ordinary lock
+            // contention, which every caller maps to a successful exit code.
+            throw new \RuntimeException(sprintf('%s could not be opened (%s). Check that the run directory is writable by the user running this command.', $this->lockFile, error_get_last()['message'] ?? 'reason unknown'));
+        }
+
         if (!flock($fp, LOCK_EX)) {
             $this->output->writeln("<error>Failed to lock {$this->lockFile}.</error>");
 
@@ -178,7 +182,7 @@ abstract class ModeratedCommand extends Command
         ftruncate($fp, 0);
         rewind($fp);
 
-        fputs($fp, (string) getmypid());
+        fwrite($fp, (string) getmypid());
         fflush($fp);
 
         flock($fp, LOCK_UN);
@@ -215,10 +219,7 @@ abstract class ModeratedCommand extends Command
         }
 
         $disabled = explode(',', ini_get('disable_functions'));
-        if (in_array('getmypid', $disabled) || in_array('posix_getpgid', $disabled)) {
-            return false;
-        }
 
-        return true;
+        return !in_array('getmypid', $disabled) && !in_array('posix_getpgid', $disabled);
     }
 }

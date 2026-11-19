@@ -1,8 +1,20 @@
 <mjml>
   <mj-head>
 	<!-- CSS-STYLE -->
-	<mj-style inline="inline"> p, li {margin:0 !important; padding:0; line-height:1.4em;}
+	<mj-style inline="inline"> p, li {margin:0 !important; padding:0; line-height:140%;}
 	</mj-style>
+	<mj-attributes>
+	  <mj-all font-family="Ubuntu, Helvetica, Arial, sans-serif" color="#000000"></mj-all>
+	  <mj-text font-size="16px"></mj-text>
+	  <mj-button border-radius="3px" padding="10px 25px"></mj-button>
+	  <mj-section></mj-section>
+
+	  <mj-class name="t-body" font-size="16px"></mj-class>
+	  <mj-class name="t-btn" inner-padding="10px 25px"></mj-class>
+	  <mj-class name="t-btn-primary" background-color="#000000" color="#ffffff" font-size="16px"></mj-class>
+	  <mj-class name="t-section"></mj-class>
+	  <mj-class name="t-surface-1" background-color="#ffffff"></mj-class>
+	</mj-attributes>
   </mj-head>
   <!-- BODY -->
   <mj-body background-color="#d0d0d0">
@@ -25,7 +37,7 @@
 		  <p>Your main headline goes here
 		  </p>
 		</mj-text>
-		<mj-text font-size="16px" align="center">
+		<mj-text mj-class="t-body" align="center">
 		  <p>Customize these sections with your brand voice, specific products or services, and relevant images. The key is to make each section informative, engaging, and aligned with your email marketing goals.
 		  </p>
 		</mj-text>
@@ -41,7 +53,7 @@
 		  <p>Column title
 		  </p>
 		</mj-text>
-		<mj-text font-size="16px" align="center">
+		<mj-text mj-class="t-body" align="center">
 		  <p>Share a story about your company, team, or production process. 
 		  </p>
 		</mj-text>
@@ -59,7 +71,7 @@
 	</mj-section>
 	<mj-section background-color="#ffffff">
 	  <mj-column width="550px">
-		<mj-text font-size="16px" align="center">
+		<mj-text mj-class="t-body" align="center">
 		  <p>You can also encourage readers to subscribe to your newsletter. Briefly explain what kind of content they can expect and how often.
 		  </p>
 		</mj-text>
@@ -81,7 +93,7 @@
 		  <p>Inverse column title
 		  </p>
 		</mj-text>
-		<mj-text font-size="16px" align="center">
+		<mj-text mj-class="t-body" align="center">
 		  <p>Keep it brief but engaging.
 		  </p>
 		</mj-text>
@@ -103,7 +115,7 @@
 		</mj-social>
 		<mj-spacer>
 		</mj-spacer>
-		<mj-text font-family="Ubuntu, Helvetica, Arial, sans-serif" line-height="1.5" align="center" padding-top="0px" padding-bottom="0px" font-size="12px" color="#{{ getTextOnBrandColor() }}">
+		<mj-text line-height="1.5" align="center" padding-top="0px" padding-bottom="0px" font-size="12px" color="#{{ getTextOnBrandColor() }}">
 		  <p>{brand=name}
 			<br/>11111 Beautiful City, 1212 Nice Street
 			<br/>Brazil

@@ -19,8 +19,8 @@ class Summary
 
     /**
      * @var \DateTimeImmutable|null
-     **/
-    private $dateTriggered;
+     */
+    private \DateTimeImmutable|\DateTimeInterface|null $dateTriggered = null;
 
     /**
      * @var int
@@ -47,10 +47,7 @@ class Summary
      */
     private $event;
 
-    /**
-     * @var Campaign|null
-     */
-    private $campaign;
+    private ?Campaign $campaign = null;
 
     /**
      * @var int|null
@@ -154,7 +151,7 @@ class Summary
         return $this->dateTriggered;
     }
 
-    public function setDateTriggered(\DateTimeImmutable $dateTriggered = null): void
+    public function setDateTriggered(?\DateTimeImmutable $dateTriggered = null): void
     {
         $this->dateTriggered = $dateTriggered;
     }

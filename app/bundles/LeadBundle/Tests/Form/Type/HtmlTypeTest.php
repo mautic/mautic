@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
 use Mautic\LeadBundle\Form\Type\HtmlType;
@@ -10,7 +12,7 @@ final class HtmlTypeTest extends TestCase
 {
     private HtmlType $htmlType;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->htmlType = new HtmlType();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Tests\DependencyInjection\Compiler;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -8,7 +10,7 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class SmsTransportPassTest extends TestCase
+final class SmsTransportPassTest extends TestCase
 {
     public function testProcess(): void
     {
@@ -39,7 +41,7 @@ class SmsTransportPassTest extends TestCase
         $container
             ->register('mautic.sms.transport_chain')
             ->setClass($transport::class)
-            ->setArguments(['foo', $this->createMock(IntegrationHelper::class)])
+            ->setArguments(['foo', $this->createStub(IntegrationHelper::class)])
             ->setShared(false)
             ->setSynthetic(true)
             ->setAbstract(true);
@@ -47,7 +49,7 @@ class SmsTransportPassTest extends TestCase
         $pass = new SmsTransportPass();
         $pass->process($container);
 
-        $this->assertEquals(2, count($container->findTaggedServiceIds('mautic.sms_transport')));
+        $this->assertCount(2, $container->findTaggedServiceIds('mautic.sms_transport'));
 
         $methodCalls = $container->getDefinition('mautic.sms.transport_chain')->getMethodCalls();
         $this->assertCount(count($methodCalls), $container->findTaggedServiceIds('mautic.sms_transport'));

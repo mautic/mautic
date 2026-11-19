@@ -121,6 +121,8 @@ class AppKernel extends Kernel
             new LightSaml\SpBundle\LightSamlSpBundle(),
             new FM\ElfinderBundle\FMElfinderBundle(),
             new Exercise\HTMLPurifierBundle\ExerciseHTMLPurifierBundle(),
+            new ApiPlatform\Symfony\Bundle\ApiPlatformBundle(),
+            new Symfonycasts\SassBundle\SymfonycastsSassBundle(),
 
             // Mautic Bundles
             new Mautic\ApiBundle\MauticApiBundle(),
@@ -143,6 +145,7 @@ class AppKernel extends Kernel
             new Mautic\PageBundle\MauticPageBundle(),
             new Mautic\PluginBundle\MauticPluginBundle(),
             new Mautic\PointBundle\MauticPointBundle(),
+            new Mautic\ProjectBundle\MauticProjectBundle(),
             new Mautic\ReportBundle\MauticReportBundle(),
             new Mautic\SmsBundle\MauticSmsBundle(),
             new Mautic\StageBundle\MauticStageBundle(),
@@ -330,9 +333,6 @@ class AppKernel extends Kernel
         return $this->getProjectDir().'/var/logs';
     }
 
-    /**
-     * Get local config file.
-     */
     public function getLocalConfigFile(): string
     {
         return ParameterLoader::getLocalConfigFile($this->getApplicationDir().'/app');

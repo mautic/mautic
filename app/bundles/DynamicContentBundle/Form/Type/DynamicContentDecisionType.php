@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DynamicContentBundle\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class DynamicContentDecisionType extends DynamicContentSendType
+final class DynamicContentDecisionType extends DynamicContentSendType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -15,14 +17,14 @@ class DynamicContentDecisionType extends DynamicContentSendType
             TextType::class,
             [
                 'label'      => 'mautic.dynamicContent.send.slot_name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip',
                 ],
                 'required'    => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'mautic.core.value.required']),
+                    new NotBlank(message: 'mautic.core.value.required'),
                 ],
             ]
         );
@@ -34,7 +36,7 @@ class DynamicContentDecisionType extends DynamicContentSendType
             DynamicContentListType::class,
             [
                 'label'      => 'mautic.dynamicContent.send.selectDynamicContents.default',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.dynamicContent.choose.dynamicContents',
@@ -44,7 +46,7 @@ class DynamicContentDecisionType extends DynamicContentSendType
                 'multiple'    => false,
                 'required'    => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'mautic.core.value.required']),
+                    new NotBlank(message: 'mautic.core.value.required'),
                 ],
             ]
         );

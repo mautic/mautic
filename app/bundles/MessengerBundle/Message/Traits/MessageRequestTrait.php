@@ -17,7 +17,7 @@ trait MessageRequestTrait
         return $this->eventTime;
     }
 
-    public function setEventTime(\DateTimeInterface $eventTime = null): self
+    public function setEventTime(?\DateTimeInterface $eventTime = null): self
     {
         $this->eventTime = $eventTime;
 
@@ -60,7 +60,7 @@ trait MessageRequestTrait
         );
 
         foreach ($data as $key => $item) {
-            $this->$key = $item;
+            $this->{$key} = $item;
         }
     }
 }

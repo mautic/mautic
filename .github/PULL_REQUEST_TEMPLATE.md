@@ -10,6 +10,12 @@ c = future major release
 * a.b for any bug fixes (e.g. 5.2, 6.0)
 * c.x for any bug fixes, features, enhancements or bug fixes with backward compatibility breaking changes (e.g. 7.x) -->
 
+<!-- 📄 DOCUMENTATION REVIEW REQUIRED:
+
+After you open this PR, Promptless automatically creates a documentation PR and leaves a comment here with the link. Once your code PR merges, review the documentation PR, request changes if needed, and approve it promptly.
+
+See "Reviewing documentation PRs from Promptless" in the community handbook for more details: https://contribute.mautic.org/en/latest/contributing/developer.html#reviewing-documentation-prs-from-promptless -->
+
 | Q                                      | A
 | -------------------------------------- | ---
 | Bug fix? (use the a.b branch)          | ✔️❌ <!-- Use emojis to indicate positive (green) or negative (red) for each item in the table. -->
@@ -48,9 +54,9 @@ Please write a short README for your feature/bugfix. This will help people under
 ### 📋 Steps to test this PR:
 
 <!--
-This part is crucial. Take the time to write very clear, annotated and step by step test instructions, because testers may not be developers.
+This part is really important. If you want your PR to be merged, take the time to write very clear, annotated and step by step test instructions. Do not assume any previous knowledge - testers may not be developers. Do not write steps performed by the CI. These steps are for manual testing.
 -->
-1. Open this PR on Gitpod or pull down for testing locally (see docs on testing PRs [here](https://contribute.mautic.org/contributing-to-mautic/tester))
+1. Open this PR on GitHub Codespaces or pull down for testing locally (see docs on testing PRs [here](https://contribute.mautic.org/contributing-to-mautic/tester))
 2. 
 
 <!--

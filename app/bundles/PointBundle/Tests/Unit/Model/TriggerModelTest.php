@@ -11,151 +11,113 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Form\Type\EmailToUserType;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Entity\TriggerEventRepository;
-use Mautic\PointBundle\Event\TriggerBuilderEvent;
-use Mautic\PointBundle\Event\TriggerExecutedEvent;
+use Mautic\PointBundle\Entity\TriggerRepository;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
 use Mautic\PointBundle\PointEvents;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TriggerModelTest extends \PHPUnit\Framework\TestCase
+final class TriggerModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var IpLookupHelper|MockObject
-     */
-    private MockObject $ipLookupHelper;
-
-    /**
-     * @var LeadModel|MockObject
-     */
-    private MockObject $leadModel;
-
-    /**
-     * @var TriggerEventModel|MockObject
-     */
-    private MockObject $triggerEventModel;
-
-    /**
-     * @var EventDispatcherInterface|MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     /**
-     * @var TranslatorInterface|MockObject
-     */
-    private MockObject $translator;
-
-    /**
-     * @var EntityManager|MockObject
-     */
-    private MockObject $entityManager;
-
-    /**
-     * @var TriggerEventRepository|MockObject
+     * @var MockObject&TriggerEventRepository
      */
     private MockObject $triggerEventRepository;
 
     private TriggerModel $triggerModel;
 
-    /**
-     * @var ContactTracker
-     */
-    private MockObject $contactTracker;
-
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
-        $this->leadModel              = $this->createMock(LeadModel::class);
-        $this->triggerEventModel      = $this->createMock(TriggerEventModel::class);
-        $this->contactTracker         = $this->createMock(ContactTracker::class);
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
-        $this->translator             = $this->createMock(Translator::class);
-        $this->entityManager          = $this->createMock(EntityManager::class);
         $this->triggerEventRepository = $this->createMock(TriggerEventRepository::class);
         $this->triggerModel           = new TriggerModel(
-            $this->ipLookupHelper,
-            $this->leadModel,
-            $this->triggerEventModel,
-            $this->contactTracker,
-            $this->entityManager,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(IpLookupHelper::class),
+            $this->createStub(LeadModel::class),
+            $this->createStub(TriggerEventModel::class),
+            $this->createStub(ContactTracker::class),
+            $this->createStub(EntityManager::class),
+            $this->createStub(CorePermissions::class),
             $this->dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->translator,
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(TriggerRepository::class), // $triggerRepository
+            $this->triggerEventRepository,
+            $this->createStub(LeadRepository::class), // $leadRepository
         );
 
-        // reset private static property events in TriggerModel
+        // reset private property cachedEvents in TriggerModel instance
         $reflectionClass = new \ReflectionClass(TriggerModel::class);
-        $property        = $reflectionClass->getProperty('events');
-        $property->setAccessible(true);
-        $property->setValue(null, []);
+        $property        = $reflectionClass->getProperty('cachedEvents');
+        $property->setValue($this->triggerModel, []);
     }
 
     public function testTriggerEvent(): void
     {
-        $triggerEvent = new TriggerEvent();
-        $contact      = new Lead();
+        $triggerEvent  = new TriggerEvent();
+        $contact       = new Lead();
+        $dispatchCalls = new \ArrayObject();
 
         $triggerEvent->setType('email.send_to_user');
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->triggerEventRepository);
 
         $this->triggerEventRepository->expects($this->once())
             ->method('find')
             ->willReturn($triggerEvent);
-        $matcher = $this->exactly(2);
 
-        $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher, $contact, $triggerEvent) {
-                if (1 === $matcher->numberOfInvocations()) {
-                    $callback = function (TriggerBuilderEvent $event) {
-                        // PHPUNIT calls this callback twice for unknown reason. We need to set it only once.
-                        if (array_key_exists('email.send_to_user', $event->getEvents())) {
-                            return;
-                        }
+        $this->dispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(function (object $event, ?string $eventName) use ($dispatchCalls, $contact, $triggerEvent): object {
+                $dispatchCalls->append($eventName);
 
-                        $event->addEvent(
-                            'email.send_to_user',
-                            [
-                                'group'           => 'mautic.email.point.trigger',
-                                'label'           => 'mautic.email.point.trigger.send_email_to_user',
-                                'formType'        => \Mautic\EmailBundle\Form\Type\EmailToUserType::class,
-                                'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_useremail_email'],
-                                'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
-                                'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
-                            ]
-                        );
-                    };
-                    $callback($event);
-                    $this->assertSame(PointEvents::TRIGGER_ON_BUILD, $eventName);
+                if (PointEvents::TRIGGER_ON_BUILD === $eventName) {
+                    // Emulate a subscriber:
+                    $event->addEvent(
+                        'email.send_to_user',
+                        [
+                            'group'           => 'mautic.email.point.trigger',
+                            'label'           => 'mautic.email.point.trigger.send_email_to_user',
+                            'formType'        => EmailToUserType::class,
+                            'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_useremail_email'],
+                            'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+                            'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
+                        ]
+                    );
+
+                    return $event;
                 }
-                if (2 === $matcher->numberOfInvocations()) {
-                    $callback = function (TriggerExecutedEvent $event) use ($contact, $triggerEvent) {
-                        $this->assertSame($contact, $event->getLead());
-                        $this->assertSame($triggerEvent, $event->getTriggerEvent());
-                    };
-                    $callback($event);
-                    $this->assertSame(EmailEvents::ON_SENT_EMAIL_TO_USER, $eventName);
-                }
+                if (EmailEvents::ON_SENT_EMAIL_TO_USER === $eventName) {
+                    $this->assertSame($contact, $event->getLead());
+                    $this->assertSame($triggerEvent, $event->getTriggerEvent());
 
-                return $event;
+                    return $event;
+                }
+                $this->fail("Unexpected event name: {$eventName}");
             });
 
         $this->triggerModel->triggerEvent($triggerEvent->convertToArray(), $contact, true);
+
+        // Assert both expected events were dispatched
+        $this->assertContains(PointEvents::TRIGGER_ON_BUILD, $dispatchCalls);
+        $this->assertContains(EmailEvents::ON_SENT_EMAIL_TO_USER, $dispatchCalls);
+        $this->assertCount(2, $dispatchCalls);
     }
 }

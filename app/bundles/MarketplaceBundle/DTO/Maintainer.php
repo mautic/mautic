@@ -8,15 +8,16 @@ final class Maintainer
 {
     public function __construct(
         public string $name,
-        public string $avatar,
+        public ?string $avatar,
     ) {
     }
 
-    public static function fromArray(array $array): Maintainer
+    public static function fromArray(array $array): self
     {
         return new self(
             $array['name'],
-            $array['avatar_url']
+            // Packages shared from Mautic have no maintainer avatar
+            $array['avatar_url'] ?? null
         );
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\EmailBundle\Entity\Email;
@@ -13,24 +15,21 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FormSubscriberTest extends TestCase
+final class FormSubscriberTest extends TestCase
 {
     /**
-     * @var MockObject|EmailModel
+     * @var MockObject&EmailModel
      */
-    protected $emailModel;
+    private MockObject $emailModel;
 
     /**
-     * @var MockObject|ContactTracker
+     * @var MockObject&ContactTracker
      */
-    protected $contactTracker;
+    private MockObject $contactTracker;
 
-    /**
-     * @var FormSubscriber
-     */
-    protected $formSubscriber;
+    private FormSubscriber $formSubscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->emailModel     = $this->createMock(EmailModel::class);
         $this->contactTracker = $this->createMock(ContactTracker::class);
@@ -47,8 +46,6 @@ class FormSubscriberTest extends TestCase
     {
         $reflection = new \ReflectionMethod($this->formSubscriber, 'getCurrentLead');
 
-        $reflection->setAccessible(true);
-
         $feedback    = ['lead.create' => ['lead' => ['email' => 'foobar']]];
         $currentLead = $reflection->invoke($this->formSubscriber, $feedback);
 
@@ -61,8 +58,6 @@ class FormSubscriberTest extends TestCase
     public function testGetCurrentLeadWithoutLeadInFeedback(): void
     {
         $reflection = new \ReflectionMethod($this->formSubscriber, 'getCurrentLead');
-
-        $reflection->setAccessible(true);
 
         $contact = new Lead();
         $contact->setFirstname('Test');
@@ -165,7 +160,7 @@ class FormSubscriberTest extends TestCase
 
         $action->expects($this->once())
             ->method('getForm')
-            ->willReturn($this->createMock(Form::class));
+            ->willReturn($this->createStub(Form::class));
 
         $this->emailModel->expects($this->once())
             ->method('getEntity')

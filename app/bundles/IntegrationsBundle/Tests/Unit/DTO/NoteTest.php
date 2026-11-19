@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Mautic\IntegrationsBundle\Tests\Unit\DTO;
+
 use Mautic\IntegrationsBundle\DTO\Note;
 use PHPUnit\Framework\TestCase;
 
@@ -20,9 +22,9 @@ final class NoteTest extends TestCase
 
     public function testGetterFunctionsThrowsException(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Type value can be either "%s" or "%s".', Note::TYPE_INFO, Note::TYPE_WARNING));
 
-        $noteObject = new Note('Notes', 'randomType');
+        new Note('Notes', 'randomType');
     }
 }

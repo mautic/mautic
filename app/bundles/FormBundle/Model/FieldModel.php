@@ -2,44 +2,46 @@
 
 namespace Mautic\FormBundle\Model;
 
-use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Event\FormFieldEvent;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonFormModel<Field>
  */
 class FieldModel extends CommonFormModel
 {
-    public function __construct(
-        protected LeadFieldModel $leadFieldModel,
-        EntityManager $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-        private RequestStack $requestStack,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    protected LeadFieldModel $leadFieldModel;
+
+    private RequestStack $requestStack;
+
+    private ColumnSchemaHelper $columnSchemaHelper;
+
+    private FieldRepository $fieldRepository;
+
+    #[Required]
+    public function autowireFieldModel(
+        LeadFieldModel $leadFieldModel,
+        RequestStack $requestStack,
+        ColumnSchemaHelper $columnSchemaHelper,
+        FieldRepository $fieldRepository,
+    ): void {
+        $this->leadFieldModel     = $leadFieldModel;
+        $this->requestStack       = $requestStack;
+        $this->columnSchemaHelper = $columnSchemaHelper;
+        $this->fieldRepository    = $fieldRepository;
     }
 
     private function getSession(): SessionInterface
@@ -52,9 +54,9 @@ class FieldModel extends CommonFormModel
      * @param string|null         $action
      * @param array               $options
      *
-     * @return \Symfony\Component\Form\FormInterface<mixed>
+     * @return FormInterface<mixed>
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if ($action) {
             $options['action'] = $action;
@@ -63,35 +65,9 @@ class FieldModel extends CommonFormModel
         return $formFactory->create(FieldType::class, $entity, $options);
     }
 
-    /**
-     * @deprecated to be removed in Mautic 4. This method is not used anymore.
-     *
-     * @return array{mixed[], mixed[]}
-     */
-    public function getObjectFields($object = 'lead'): array
+    public function getRepository(): FieldRepository
     {
-        $fields  = $this->leadFieldModel->getFieldListWithProperties($object);
-        $choices = [];
-
-        foreach ($fields as $alias => $field) {
-            if (empty($field['isPublished'])) {
-                continue;
-            }
-            if (!isset($choices[$field['group_label']])) {
-                $choices[$field['group_label']] = [];
-            }
-            $choices[$field['group_label']][$field['label']] = $alias;
-        }
-
-        return [$fields, $choices];
-    }
-
-    /**
-     * @return \Mautic\FormBundle\Entity\FieldRepository
-     */
-    public function getRepository()
-    {
-        return $this->em->getRepository(Field::class);
+        return $this->fieldRepository;
     }
 
     public function getPermissionBase(): string
@@ -152,7 +128,7 @@ class FieldModel extends CommonFormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Field) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -176,7 +152,7 @@ class FieldModel extends CommonFormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new FormFieldEvent($entity, $isNew);
             }
 
@@ -186,5 +162,19 @@ class FieldModel extends CommonFormModel
         }
 
         return null;
+    }
+
+    /**
+     * Updates the table structure for form results.
+     */
+    public function removeFieldColumn(Field $field): void
+    {
+        $form = $field->getForm();
+
+        $name = 'form_results_'.$form->getId().'_'.$form->getAlias();
+
+        $schemaHelper = $this->columnSchemaHelper->setName($name);
+        $schemaHelper->dropColumn($field->getAlias());
+        $schemaHelper->executeChanges();
     }
 }

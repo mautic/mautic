@@ -10,18 +10,28 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\LeadBundle\Field\BackgroundService;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UpdateCustomFieldCommand extends Command
-{
-    protected static $defaultDescription = 'Create custom field column in the background';
+#[AsCommand(
+    name: 'mautic:custom-field:update-column',
+    description: 'Create custom field column in the background',
+    help: <<<'TXT'
+The <info>%command.name%</info> command will create a column in a lead_fields table if the proces should run in background.
 
-    public function __construct(private BackgroundService $backgroundService, private TranslatorInterface $translator)
-    {
+<info>php %command.full_name%</info>
+TXT
+)]
+final class UpdateCustomFieldCommand extends Command
+{
+    public function __construct(
+        private readonly BackgroundService $backgroundService,
+        private readonly TranslatorInterface $translator,
+    ) {
         parent::__construct();
     }
 
@@ -29,16 +39,9 @@ class UpdateCustomFieldCommand extends Command
     {
         parent::configure();
 
-        $this->setName('mautic:custom-field:update-column')
+        $this
             ->addOption('--id', '-i', InputOption::VALUE_REQUIRED, 'LeadField ID.')
-            ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
-            ->setHelp(
-                <<<'EOT'
-The <info>%command.name%</info> command will create a column in a lead_fields table if the proces should run in background.
-
-<info>php %command.full_name%</info>
-EOT
-            );
+            ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

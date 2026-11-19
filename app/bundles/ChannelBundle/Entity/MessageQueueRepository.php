@@ -4,6 +4,7 @@ namespace Mautic\ChannelBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
@@ -62,7 +63,7 @@ class MessageQueueRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    public function getQueuedChannelCount($channel, array $ids = null): int
+    public function getQueuedChannelCount($channel, ?array $ids = null): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -73,17 +74,25 @@ class MessageQueueRepository extends CommonRepository
 
         if (!empty($ids)) {
             $expr = $expr->with(
-                $q->expr()->in($this->getTableAlias().'.channel_id', $ids)
+                $q->expr()->in($this->getTableAlias().'.channel_id', ':ids')
             );
         }
 
         return (int) $q->select('count(*)')
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', $this->getTableAlias())
             ->where($expr)
-            ->setParameter('channel', $channel)
-            ->setParameter('status', MessageQueue::STATUS_SENT)
-            ->setParameter('ids', $ids, ArrayParameterType::INTEGER)
-            ->executeQuery()
+            ->setParameters(
+                [
+                    'channel' => $channel,
+                    'status'  => MessageQueue::STATUS_SENT,
+                    'ids'     => $ids,
+                ],
+                [
+                    'channel' => Types::STRING,
+                    'status'  => Types::STRING,
+                    'ids'     => ArrayParameterType::INTEGER,
+                ]
+            )->executeQuery()
             ->fetchOne();
     }
 
@@ -103,13 +112,14 @@ class MessageQueueRepository extends CommonRepository
             mq.scheduled_date as scheduledDate, mq.last_attempt as lastAttempt, mq.date_sent as dateSent');
 
         if ($leadId) {
-            $query->where('mq.lead_id = '.(int) $leadId);
+            $query->where('mq.lead_id = :leadId')
+                ->setParameter('leadId', $leadId);
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->or(
-                $query->expr()->like('mq.channel', $query->expr()->literal('%'.$options['search'].'%'))
-            ));
+            $query->andWhere(
+                $query->expr()->like('mq.channel', ':search')
+            )->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'mq.channel', 'mq.date_published', [], ['dateAdded'], null, 'mq.id');

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\LeadBundle\Deduplicate\ContactDeduper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,12 +13,21 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-class DeduplicateIdsCommand extends Command
+#[AsCommand(
+    name: DeduplicateIdsCommand::NAME,
+    description: 'Merge contacts based on same unique identifiers',
+    help: <<<'TXT'
+The <info>%command.name%</info> command will dedpulicate contacts based on unique identifier values. 
+
+<info>php %command.full_name%</info>
+TXT
+)]
+final class DeduplicateIdsCommand extends Command
 {
     public const NAME = 'mautic:contacts:deduplicate:ids';
 
     public function __construct(
-        private ContactDeduper $contactDeduper,
+        private readonly ContactDeduper $contactDeduper,
     ) {
         parent::__construct();
     }
@@ -26,7 +36,7 @@ class DeduplicateIdsCommand extends Command
     {
         parent::configure();
 
-        $this->setName(self::NAME)
+        $this
             ->addOption(
                 '--newer-into-older',
                 null,
@@ -38,13 +48,6 @@ class DeduplicateIdsCommand extends Command
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Comma separated list of contact IDs to deduplicate. If not provided, all contacts will be deduplicated. Example: --contact-ids=23,3,11'
-            )
-            ->setHelp(
-                <<<'EOT'
-The <info>%command.name%</info> command will dedpulicate contacts based on unique identifier values. 
-
-<info>php %command.full_name%</info>
-EOT
             );
     }
 
@@ -56,7 +59,7 @@ EOT
         $progressBar    = new ProgressBar($output, $duplicateCount);
         $stopwatch      = new Stopwatch();
 
-        if (!$contactIds) {
+        if ([] === $contactIds) {
             $output->writeln('<error>No contacts to deduplicate.</error>');
 
             return Command::FAILURE;
@@ -78,6 +81,4 @@ EOT
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Merge contacts based on same unique identifiers';
 }

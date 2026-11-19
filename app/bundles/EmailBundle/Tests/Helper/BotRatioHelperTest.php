@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
+use DeviceDetector\DeviceDetector;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
+use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class BotRatioHelperTest extends TestCase
@@ -15,7 +18,7 @@ final class BotRatioHelperTest extends TestCase
      * @param array<string> $ipDoNotTrackList
      * @param array<string> $blockedUserAgents
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('hitBotScenariosProvider')]
+    #[DataProvider('hitBotScenariosProvider')]
     public function testIsHitByBot(
         string $sentBefore,
         int $botHelperTimeEmailThreshold,
@@ -26,6 +29,13 @@ final class BotRatioHelperTest extends TestCase
         float $botHelperBotRatioThreshold,
         bool $isBot,
     ): void {
+        $deviceDetectorMock = $this->createMock(DeviceDetector::class);
+        $deviceDetectorMock->method('parse');
+        $deviceDetectorMock->method('isBot')->willReturn(false);
+
+        $deviceDetectorFactoryMock = $this->createMock(DeviceDetectorFactoryInterface::class);
+        $deviceDetectorFactoryMock->method('create')->willReturn($deviceDetectorMock);
+
         // Time
         $emailHitDateTime = new \DateTime();
         $emailSent        = clone $emailHitDateTime;
@@ -36,7 +46,7 @@ final class BotRatioHelperTest extends TestCase
             ->willReturn($emailSent);
         // IP
         $ipAddress        = new IpAddress($ipAddressString);
-        $botRatioHelper   = new BotRatioHelper($botHelperBotRatioThreshold, $botHelperTimeEmailThreshold, $blockedUserAgents, $ipDoNotTrackList);
+        $botRatioHelper   = new BotRatioHelper($deviceDetectorFactoryMock, $botHelperBotRatioThreshold, $botHelperTimeEmailThreshold, $blockedUserAgents, $ipDoNotTrackList);
         $isEvaluatedAsBot = $botRatioHelper->isHitByBot($emailStatMock, $emailHitDateTime, $ipAddress, $userAgent);
         $this->assertSame($isBot, $isEvaluatedAsBot);
     }

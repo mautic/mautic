@@ -21,9 +21,9 @@ Mautic.reportOnLoad = function (container) {
         }
     } else {
         mQuery('#report-shelves .collapse').on('show.bs.collapse', function (e) {
-            var actives = mQuery('#report-shelves').find('.in, .collapsing');
+            var actives = mQuery('#report-shelves').find('.show, .collapsing');
             actives.each(function (index, element) {
-                mQuery(element).collapse('hide');
+                mQuery(element).each((index, element) => bootstrap.Collapse.getOrCreateInstance(element, {toggle: false}).hide());
                 var id = mQuery(element).attr('id');
                 mQuery('a[aria-controls="' + id + '"]').addClass('collapsed');
             })
@@ -81,7 +81,7 @@ Mautic.schedulePreview = function ($isScheduled, $unitTypeId, $scheduleDay, $sch
     var $schedulePreviewData = mQuery('#schedule_preview_data');
 
     var isScheduledVal = 0;
-    if (!mQuery($isScheduled).prop("checked")) { //$isScheduled.val() does not work
+    if (mQuery($isScheduled).prop("checked")) { //$isScheduled.val() does not work
         isScheduledVal = 1;
     }
 
@@ -109,7 +109,7 @@ Mautic.schedulePreview = function ($isScheduled, $unitTypeId, $scheduleDay, $sch
 
 Mautic.checkIsScheduled = function ($isScheduled) {
     var $scheduleForm = mQuery('#schedule-container .schedule_form');
-    if (!mQuery($isScheduled).prop("checked")) {
+    if (mQuery($isScheduled).prop("checked")) {
         $scheduleForm.show();
         return;
     }
@@ -164,7 +164,7 @@ Mautic.addReportRow = function (elId) {
     }
 
     Mautic.activateChosenSelect(mQuery('#' + elId + '_' + index + '_column'));
-    mQuery("#" + elId + " *[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
+    mQuery("#" + elId + " *[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true, container: 'body'}));
 
 };
 
@@ -205,6 +205,8 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
     var valueId = 'report_filters_' + idParts[2] + '_value';
     var valueName = 'report[filters][' + idParts[2] + '][value]';
 
+    valueEl.data('filter-type', filterType);
+
     // Replace the condition list with operators
     var currentOperator = mQuery('#report_filters_' + idParts[2] + '_condition').val();
     mQuery('#report_filters_' + idParts[2] + '_condition').html(operators[newValue]);
@@ -216,18 +218,31 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
     Mautic.destroyChosen(mQuery('#' + valueId));
 
     if (filterType == 'bool' || filterType == 'boolean') {
-        if (mQuery(valueEl).attr('type') != 'radio') {
-            var template = mQuery('#filterValueYesNoTemplate .btn-group').clone(true);
-            mQuery(template).find('input[type="radio"]').each(function () {
-                mQuery(this).attr('name', valueName);
-                var radioVal = mQuery(this).val();
-                mQuery(this).attr('id', valueId + '_' + radioVal);
-            });
-            mQuery(valueEl).replaceWith(template);
+        const yesId = valueId + '_1';
+        const noId = valueId + '_0';
+        const isYes = valueVal == '1';
+        const $template = mQuery('#filterValueYesNoTemplate').clone();
+        const $label = $template.find('#report_value_template_yesno_label');
+        const $yesOption = $template.find('#report_value_template_yesno_1');
+        const $noOption = $template.find('#report_value_template_yesno_0');
+
+        $template.removeAttr('id').addClass('toggle-container');
+        $yesOption.attr('name', valueName)
+            .attr('id', yesId);
+        $noOption.attr('name', valueName)
+            .attr('id', noId);
+        $label.attr('id', valueId + '_bool-label')
+            .attr('data-yes-id', yesId)
+            .attr('data-no-id', noId);
+
+        if (mQuery(valueEl).is(':radio')) {
+            mQuery(valueEl).closest('.toggle-container').replaceWith($template);
+        } else {
+            mQuery(valueEl).replaceWith($template);
         }
 
-        if (setup) {
-            mQuery('#' + valueId + '_' + valueVal).click();
+        if (!isYes) {
+            Mautic.toggleYesNo($label);
         }
     } else if (mQuery(valueEl).attr('type') != 'text') {
         var newValueEl = mQuery('<input type="text" />').attr({
@@ -277,16 +292,50 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
         Mautic.activateChosenSelect(newSelect);
     }
 
-    // Activate datetime
-    if (filterType == 'datetime' || filterType == 'date' || filterType == 'time') {
+    const dateTypes = ['datetime', 'date', 'time'];
+    const stringComparisonOperators = ['like', 'notLike', 'startsWith', 'endsWith', 'contains'];
+
+    if (dateTypes.includes(filterType)) {
         Mautic.activateDateTimeInputs('#' + valueId, filterType);
     } else if (mQuery('#' + valueId).hasClass('calendar-activated')) {
         mQuery('#' + valueId).datetimepicker('destroy');
     }
+
+    if (dateTypes.includes(filterType)) {
+        const inputElement = mQuery('#' + valueId);
+        if (inputElement.data('utc-tooltip-initialized')) {
+            return;
+        }
+
+        inputElement.attr('data-bs-toggle', 'tooltip')
+            .attr('data-bs-placement', 'bottom')
+            .attr('title', '...').each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, { trigger: 'manual' }));
+
+        inputElement.on('focus', function () {
+            const currentOperator = mQuery('#report_filters_' + idParts[2] + '_condition').val();
+            const currentFilterType = mQuery(this).data('filter-type');
+            let message = null;
+            if (dateTypes.includes(currentFilterType)) {
+                if (stringComparisonOperators.includes(currentOperator)) {
+                    message = Mautic.translate('mautic.report.filter.string_comparison_utc_tooltip');
+                } else {
+                    message = Mautic.translate('mautic.report.filter.date_comparison_timezone_tooltip');
+                }
+                const tooltip = bootstrap.Tooltip.getInstance(this);
+                this.removeAttribute('title');
+                tooltip.setContent({'.tooltip-inner': message});
+                tooltip.show();
+            }
+        }).on('blur', function () {
+            mQuery(this).each((index, element) => bootstrap.Tooltip.getInstance(element)?.hide());
+        });
+
+        inputElement.data('utc-tooltip-initialized', true);
+    }
 };
 
 Mautic.removeReportRow = function (container) {
-    mQuery("#" + container + " *[data-toggle='tooltip']").tooltip('destroy');
+    mQuery("#" + container + " *[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
     mQuery('#' + container).remove();
 };
 
@@ -431,5 +480,5 @@ Mautic.cloneReportRow = function (containerId) {
     }
 
     // Reinitialize tooltips
-    newContainer.find("*[data-toggle='tooltip']").tooltip({ html: true, container: 'body' });
+    newContainer.find("*[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, { html: true, container: 'body' }));
 };

@@ -10,9 +10,9 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\RawMessage;
 
-class InvalidTransport implements TransportInterface
+final class InvalidTransport implements TransportInterface
 {
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         throw new TransportException('Unknown DSN scheme. Please make sure the mailer DSN is configured properly.');
     }

@@ -3,14 +3,12 @@
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'mautic.core.close' | trans }}">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'mautic.core.close' | trans }}"></button>
         <h4 class="modal-title" id="keyboardShortcutsModalLabel">
           {{ "mautic.keyboard.shortcuts" | trans }}
         </h4>
       </div>
-      <div class="modal-body">
+      <div class="modal-body modal-scroll-content">
         <div class="row-no-gutters">
           <div class="col-md-12">
             {% set shortcuts = {
@@ -39,16 +37,16 @@
               {{ "mautic.keyboard.section.global" | trans }}
             </h4>
             {% for section, shortcut_list in shortcuts %}
-            <h5 class="mb-xs mt-md fw-sb">
+            <h5 class="mb-5 mt-16 fw-sb">
               {{ ('mautic.keyboard.section.' ~ section)|trans }}
             </h5>
             <table class="shortcut-table bsv-xs">
               {% for key, description in shortcut_list %}
-              <tr class="mb-xs">
+              <tr class="mb-5">
                 <td class="shortcut-description">
                   {{ description | trans }}
                 </td>
-                <td class="shortcut-keys text-right">
+                <td class="shortcut-keys text-end">
                   {% set parts = key|split(' / ') %}
                   {% for part in parts %}
                     {% if not loop.first %}
@@ -62,7 +60,7 @@
                       {% elseif k == '⌘' %}
                         {% set title = 'mautic.keyboard.command'|trans %}
                      {% endif %}
-                  <kbd{% if title %} title="{{ title }}" data-toggle="tooltip" {% endif %}>{{ k }}</kbd>
+                  <kbd{% if title %} title="{{ title }}" data-bs-toggle="tooltip" {% endif %}>{{ k }}</kbd>
                     {% endfor %}
                   {% endfor %}
                 </td>
@@ -79,8 +77,8 @@
             {{ include('@MauticEmail/KeyboardShortcuts/emails_shortcuts.html.twig', ignore_missing = true) }}
           </ul>
           <div class="alert alert-info col-xs-12">
-            <div class="d-flex jc-space-between ai-center small">
-              <div> <strong class="mr-xs">{{ 'mautic.keyboard.tip'|trans }}</strong><kbd>⌘</kbd> <i
+            <div class="d-flex justify-content-between align-items-center small">
+              <div> <strong class="me-5">{{ 'mautic.keyboard.tip'|trans }}</strong><kbd>⌘</kbd> <i
                   class="ri-arrow-right-line"></i> <kbd>Ctrl</kbd></div>
             </div>
           </div>

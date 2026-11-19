@@ -12,21 +12,50 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigFormType extends AbstractType
+final class ConfigFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $arrayLinebreakTransformer = new ArrayLinebreakTransformer();
+
+        $builder->add(
+            'form_field_autofill',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.form.config.form.form_field_autofill',
+                'attr'  => [
+                    'tooltip' => 'mautic.form.config.form.form_field_autofill.tooltip',
+                ],
+            ]
+        );
+
         $builder->add(
             $builder->create(
                 'do_not_submit_emails',
                 TextareaType::class,
                 [
                     'label'      => 'mautic.form.config.form.do_not_submit_email',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.form.config.form.do_not_submit_email.tooltip',
+                        'rows'    => 8,
+                    ],
+                    'required' => false,
+                ]
+            )->addViewTransformer($arrayLinebreakTransformer)
+        );
+
+        $builder->add(
+            $builder->create(
+                'blocked_free_email_providers',
+                TextareaType::class,
+                [
+                    'label'      => 'mautic.form.config.form.blocked_free_email_providers',
+                    'label_attr' => ['class' => 'form-label'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.form.config.form.blocked_free_email_providers.tooltip',
                         'rows'    => 8,
                     ],
                     'required' => false,
@@ -39,7 +68,7 @@ class ConfigFormType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.form.config.form_results_data_sources',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.form.config.form_results_data_sources.tooltip',

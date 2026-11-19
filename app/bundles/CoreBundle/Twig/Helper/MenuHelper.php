@@ -9,7 +9,7 @@ use Knp\Menu\Twig\Helper as KnpHelper;
 /**
  * final class MenuHelper.
  */
-final class MenuHelper
+final readonly class MenuHelper
 {
     public function __construct(
         private KnpHelper $helper,
@@ -39,10 +39,10 @@ final class MenuHelper
         foreach ($attributes as $name => $value) {
             $name  = trim($name);
             $value = trim($value);
-            if ($name == $value) {
-                $string .= " $name";
+            if ($name === $value) {
+                $string .= " {$name}";
             } else {
-                $string .= " $name=\"$value\"";
+                $string .= " {$name}=\"{$value}\"";
             }
         }
 
@@ -54,7 +54,7 @@ final class MenuHelper
      *
      * @param array<string, mixed> $options
      */
-    public function buildClasses(ItemInterface &$item, MatcherInterface &$matcher, $options): void
+    public function buildClasses(ItemInterface &$item, MatcherInterface &$matcher, array $options): void
     {
         $isAncestor = $matcher->isAncestor($item, $options['matchingDepth']);
         $isCurrent  = $matcher->isCurrent($item);
@@ -77,7 +77,7 @@ final class MenuHelper
         /** @var ItemInterface $item */
         foreach ($menu as $item) {
             if ($matcher->isCurrent($item)) {
-                return ($item->isDisplayed()) ? false : true;
+                return !$item->isDisplayed();
             }
         }
 

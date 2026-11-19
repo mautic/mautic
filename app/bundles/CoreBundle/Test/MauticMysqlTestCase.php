@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Test;
 
 use Doctrine\DBAL\Exception as DBALException;
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
@@ -26,20 +29,15 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected $useCleanupRollback = true;
 
-    public function __construct(?string $name = null)
-    {
-        parent::__construct($name);
-
-        $this->configParams += [
-            'db_driver' => 'pdo_mysql',
-        ];
-    }
-
     /**
      * @throws \Exception
      */
     protected function setUp(): void
     {
+        $this->configParams += [
+            'db_driver' => 'pdo_mysql',
+        ];
+
         $this->setUpInvoked = true;
 
         parent::setUp();
@@ -139,10 +137,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     protected function resetAutoincrement(array $tables): void
     {
         $prefix     = $this->getTablePrefix();
-        $connection = $this->connection;
 
         foreach ($tables as $table) {
-            $connection->executeQuery(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
+            $this->connection->executeStatement(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
         }
     }
 
@@ -166,20 +163,22 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     /**
      * @throws \Exception
      */
-    private function applySqlFromFile($file): void
+    private function applySqlFromFile(string $file): void
     {
-        $command = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" < "${:db_backup_file}"';
-        $envVars = [
-            'MYSQL_PWD'      => $this->connection->getParams()['password'],
-            'db_host'        => $this->connection->getParams()['host'],
-            'db_port'        => $this->connection->getParams()['port'],
-            'db_user'        => $this->connection->getParams()['user'],
-            'db_name'        => $this->connection->getParams()['dbname'],
-            'db_backup_file' => $file,
-        ];
+        $connectionParams = $this->connection->getParams();
+        $password         = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';
+        $command          = sprintf(
+            'mysql -h%s -P%s -u%s %s %s < %s',
+            escapeshellarg($connectionParams['host']),
+            escapeshellarg((string) $connectionParams['port']),
+            escapeshellarg($connectionParams['user']),
+            $password,
+            escapeshellarg($connectionParams['dbname']),
+            escapeshellarg($file)
+        );
 
         $process = Process::fromShellCommandline($command);
-        $process->run(null, $envVars);
+        $process->run();
 
         // executes after the command finishes
         if (!$process->isSuccessful()) {
@@ -266,19 +265,20 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function dumpToFile(string $sqlDumpFile): void
     {
-        $connection = $this->connection;
-        $command    = 'mysqldump --opt -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" > "${:db_backup_file}"';
-        $envVars    = [
-            'MYSQL_PWD'      => $this->connection->getParams()['password'],
-            'db_host'        => $this->connection->getParams()['host'],
-            'db_port'        => $this->connection->getParams()['port'],
-            'db_user'        => $this->connection->getParams()['user'],
-            'db_name'        => $this->connection->getParams()['dbname'],
-            'db_backup_file' => $sqlDumpFile,
-        ];
+        $connectionParams = $this->connection->getParams();
+        $password         = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';
+        $command          = sprintf(
+            'mysqldump --opt -h%s -P%s -u%s %s %s > %s',
+            escapeshellarg($connectionParams['host']),
+            escapeshellarg((string) $connectionParams['port']),
+            escapeshellarg($connectionParams['user']),
+            $password,
+            escapeshellarg($connectionParams['dbname']),
+            escapeshellarg($sqlDumpFile)
+        );
 
         $process = Process::fromShellCommandline($command);
-        $process->run(null, $envVars);
+        $process->run();
 
         // executes after the command finishes
         if (!$process->isSuccessful()) {
@@ -340,6 +340,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $path = $this->getLocalConfigFile();
 
+        if (!file_exists($path.'.backup')) {
+            return;
+        }
+
         if (!rename($path.'.backup', $path)) {
             throw new \RuntimeException(sprintf('Unable to move file %s => %s', $path.'.backup', $path));
         }
@@ -380,8 +384,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function clearCache(): void
     {
-        $cacheProvider = static::getContainer()->get('mautic.cache.provider');
-        \assert($cacheProvider instanceof CacheItemPoolInterface);
+        $cacheProvider = static::getContainer()->get(CacheProvider::class);
+        $this->assertInstanceOf(CacheItemPoolInterface::class, $cacheProvider);
         $cacheProvider->clear();
     }
 

@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
@@ -17,9 +18,9 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
     protected $logs;
 
     /**
-     * @var ArrayCollection|Lead[]
+     * @var Collection<int, Lead>
      */
-    private ArrayCollection $contacts;
+    private readonly Collection $contacts;
 
     private array $logContactXref = [];
 
@@ -53,7 +54,7 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
     /**
      * Return an array of Lead entities keyed by LeadEventLog ID.
      *
-     * @return Lead[]|ArrayCollection
+     * @return ArrayCollection<int, Lead>
      */
     public function getContacts()
     {
@@ -67,7 +68,6 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
     {
         $contacts = new ArrayCollection();
 
-        /** @var Lead $contact */
         foreach ($this->contacts as $contact) {
             $contacts->set($contact->getId(), $contact);
         }
@@ -97,11 +97,11 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
     public function findLogByContactId($id)
     {
         if (!isset($this->logContactXref[$id])) {
-            throw new NoContactsFoundException("$id not found");
+            throw new NoContactsFoundException("{$id} not found");
         }
 
         if (!$this->logs->offsetExists($this->logContactXref[$id])) {
-            throw new NoContactsFoundException("$id was found in the xref table but no log was found");
+            throw new NoContactsFoundException("{$id} was found in the xref table but no log was found");
         }
 
         return $this->logs->get($this->logContactXref[$id]);

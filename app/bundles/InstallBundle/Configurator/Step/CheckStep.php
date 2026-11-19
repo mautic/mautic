@@ -9,12 +9,12 @@ use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CheckStep implements StepInterface
+final class CheckStep implements StepInterface
 {
     /**
      * Flag if the configuration file is writable.
      */
-    private bool $configIsWritable;
+    private readonly bool $configIsWritable;
 
     /**
      * Absolute path to cache directory.
@@ -53,14 +53,14 @@ class CheckStep implements StepInterface
      */
     public function __construct(
         Configurator $configurator,
-        private string $projectDir,
+        private readonly string $projectDir,
         RequestStack $requestStack,
-        private OpenSSLCipher $openSSLCipher,
+        private readonly OpenSSLCipher $openSSLCipher,
     ) {
         $request = $requestStack->getCurrentRequest();
 
         $this->configIsWritable = $configurator->isFileWritable();
-        if (!empty($request)) {
+        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
             $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
     }
@@ -94,7 +94,7 @@ class CheckStep implements StepInterface
 
         foreach (\DateTimeZone::listAbbreviations() as $abbreviations) {
             foreach ($abbreviations as $abbreviation) {
-                $timezones[$abbreviation['timezone_id']] = true;
+                $timezones[$abbreviation['timezone_id'] ?? ''] = true;
             }
         }
 
@@ -210,9 +210,7 @@ class CheckStep implements StepInterface
 
         if (class_exists('\\Collator')) {
             try {
-                if (is_null(new \Collator('fr_FR'))) {
-                    $messages[] = 'mautic.install.intl.config';
-                }
+                new \Collator('fr_FR');
             } catch (\Exception) {
                 $messages[] = 'mautic.install.intl.config';
             }

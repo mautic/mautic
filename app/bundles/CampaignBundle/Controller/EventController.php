@@ -2,28 +2,19 @@
 
 namespace Mautic\CampaignBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Form\Type\EventType;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
-use Mautic\FormBundle\Helper\FormFieldHelper;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class EventController extends CommonFormController
+final class EventController extends CommonFormController
 {
     /**
      * @var string[]
@@ -34,42 +25,50 @@ class EventController extends CommonFormController
         Event::TYPE_CONDITION,
     ];
 
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        private EventCollector $eventCollector,
-        private DateHelper $dateHelper,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-        private CampaignModel $campaignModel,
-    ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private EventCollector $eventCollector;
+
+    private DateHelper $dateHelper;
+
+    private CampaignModel $campaignModel;
+
+    private EventModel $eventModel;
+
+    #[Required]
+    public function autowireEventController(
+        EventCollector $eventCollector,
+        DateHelper $dateHelper,
+        CampaignModel $campaignModel,
+        EventModel $eventModel,
+    ): void {
+        $this->eventCollector = $eventCollector;
+        $this->dateHelper = $dateHelper;
+        $this->campaignModel = $campaignModel;
+        $this->eventModel = $eventModel;
     }
 
     /**
-     * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @var array<string, array<string, mixed>>
      */
-    public function newAction(Request $request)
+    private array $modifiedEvents = [];
+
+    /**
+     * @var array<int, string>
+     */
+    private array $deletedEvents = [];
+
+    /**
+     * Generates new form and processes post data.
+     */
+    public function newAction(Request $request): JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
-        $method  = $request->getMethod();
-        $session = $request->getSession();
-        if ('POST' === $method) {
-            $event                = $request->request->all()['campaignevent'] ?? [];
-            $type                 = $event['type'];
-            $eventType            = $event['eventType'];
-            $campaignId           = $event['campaignId'];
-            $event['triggerDate'] = (!empty($event['triggerDate'])) ? (new DateTimeHelper($event['triggerDate']))->getDateTime() : null;
+        $this->setCampaignElements($request->request);
+        if ('1' === $request->request->get('submit')) {
+            $event      = $request->request->all()['campaignevent'] ?? [];
+            $type       = $event['type'];
+            $eventType  = $event['eventType'];
+            $campaignId = $event['campaignId'];
         } else {
             $type       = $request->query->get('type');
             $eventType  = $request->query->get('eventType');
@@ -118,16 +117,16 @@ class EventController extends CommonFormController
         $form->get('campaignId')->setData($campaignId);
 
         // Check for a submitted form and process it
-        if ('POST' == $method) {
+        if ('1' === $request->request->get('submit')) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
 
                     // form is valid so process the data
-                    $keyId = 'new'.hash('sha1', uniqid((string) mt_rand()));
+                    $keyId = 'new'.bin2hex(random_bytes(32));
 
-                    // save the properties to session
-                    $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified');
+                    // save the properties to return with request
+                    $modifiedEvents = $this->modifiedEvents;
                     $formData       = $form->getData();
                     $event          = array_merge($event, $formData);
                     $event['id']    = $event['tempId']    = $keyId;
@@ -136,7 +135,7 @@ class EventController extends CommonFormController
                         $event['name'] = $this->translator->trans($event['settings']['label']);
                     }
                     $modifiedEvents[$keyId] = $event;
-                    $session->set('mautic.campaign.'.$campaignId.'.events.modified', $modifiedEvents);
+                    $this->modifiedEvents   = $modifiedEvents;
                 } else {
                     $success = 0;
                 }
@@ -164,8 +163,13 @@ class EventController extends CommonFormController
         $passthroughVars = [
             'mauticContent' => 'campaignEvent',
             'success'       => $success,
+            'formSubmitted' => $form->isSubmitted(),
             'route'         => false,
         ];
+
+        if (1 === $success) {
+            $passthroughVars['modifiedEvents'] = $modifiedEvents;
+        }
 
         if (!empty($keyId)) {
             $passthroughVars = array_merge($passthroughVars, $this->eventViewVars($event, $campaignId, 'new'));
@@ -176,36 +180,41 @@ class EventController extends CommonFormController
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->ajaxAction(
-                $request,
-                [
-                    'contentTemplate' => '@MauticCampaign/Event/form.html.twig',
-                    'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars,
-                ]
-            );
         }
+
+        return $this->ajaxAction(
+            $request,
+            [
+                'contentTemplate' => '@MauticCampaign/Event/form.html.twig',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars,
+            ]
+        );
     }
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, $objectId)
+    public function editAction(Request $request, string $objectId): JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
-        $session       = $request->getSession();
         $valid         = $cancelled = false;
         $method        = $request->getMethod();
         $campaignEvent = $request->request->all()['campaignevent'] ?? [];
-        $campaignId    = 'POST' === $method
-            ? ($campaignEvent['campaignId'] ?? '')
+        $campaignId    = 'POST' === $method && !empty($campaignEvent['campaignId'])
+            ? $campaignEvent['campaignId']
             : $request->query->get('campaignId');
-        $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
-        $event          = array_key_exists($objectId, $modifiedEvents) ? $modifiedEvents[$objectId] : [];
 
-        if ('POST' === $method) {
+        $this->setCampaignElements($request->request);
+        $event = $this->modifiedEvents[$objectId] ?? [];
+        if (empty($event)) {
+            $eventEntity = $this->eventModel->getEntity($objectId);
+            if (null === $eventEntity) {
+                return $this->modalAccessDenied();
+            }
+            $event = $eventEntity->convertToArray();
+        }
+
+        if ('1' === $request->request->get('submit')) {
             $event = array_merge($event, [
                 'anchor'          => $campaignEvent['anchor'] ?? '',
                 'anchorEventType' => $campaignEvent['anchorEventType'] ?? '',
@@ -259,7 +268,7 @@ class EventController extends CommonFormController
         $supportedEvents = $this->eventCollector->getEventsArray()[$event['eventType']];
         $form            = $this->formFactory->create(
             EventType::class,
-            $event,
+            (array) $event,
             [
                 'action'   => $this->generateUrl('mautic_campaignevent_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 'settings' => $supportedEvents[$event['type']],
@@ -268,9 +277,10 @@ class EventController extends CommonFormController
         $event['settings'] = $supportedEvents[$event['type']];
 
         $form->get('campaignId')->setData($campaignId);
+        $modifiedEvents = $this->modifiedEvents;
 
         // Check for a submitted form and process it
-        if ('POST' === $method) {
+        if ('1' === $request->request->get('submit')) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $formData = $form->getData();
@@ -280,11 +290,7 @@ class EventController extends CommonFormController
                     if (empty($event['name'])) {
                         $event['name'] = $event['settings']['label'];
                     }
-
                     $modifiedEvents[$objectId] = $event;
-
-                    // Save the modified event properties to session
-                    $session->set('mautic.campaign.'.$campaignId.'.events.modified', $modifiedEvents);
                 }
             }
         }
@@ -297,7 +303,11 @@ class EventController extends CommonFormController
         $passthroughVars = [
             'mauticContent' => 'campaignEvent',
             'success'       => !$cancelled && $valid,
+            'formSubmitted' => $form->isSubmitted(),
             'route'         => false,
+            'modifiedEvents'=> $modifiedEvents,
+            'eventId'       => $event['id'] ?? '',
+            'event'         => $event,
         ];
 
         if (!$cancelled && !$valid) {
@@ -331,17 +341,11 @@ class EventController extends CommonFormController
         return new JsonResponse($passthroughVars);
     }
 
-    /**
-     * Deletes the entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse
     {
-        $campaignId     = $request->query->get('campaignId');
-        $session        = $request->getSession();
-        $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
-        $deletedEvents  = $session->get('mautic.campaign.'.$campaignId.'.events.deleted', []);
+        $this->setCampaignElements($request->request);
+        $modifiedEvents = $this->modifiedEvents;
+        $deletedEvents  = $this->deletedEvents;
 
         // ajax only for form fields
         if (!$request->isXmlHttpRequest()
@@ -353,27 +357,32 @@ class EventController extends CommonFormController
                 'MATCH_ONE'
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $event = $modifiedEvents[$objectId] ?? null;
 
-        if ('POST' == $request->getMethod() && null !== $event) {
-            $events            = $this->eventCollector->getEventsArray();
-            $event['settings'] = $events[$event['eventType']][$event['type']];
+        if ('POST' === $request->getMethod() && null !== $event) {
+            $events = $this->eventCollector->getEventsArray();
+            if (isset($event['eventType'], $event['type']) && isset($events[$event['eventType']][$event['type']])) {
+                $event['settings'] = $events[$event['eventType']][$event['type']];
+            }
 
             // Add the field to the delete list
             if (!in_array($objectId, $deletedEvents)) {
                 // If event is new don't add to deleted list
                 if (!str_contains($objectId, 'new')) {
-                    $deletedEvents[] = $objectId;
-                    $session->set('mautic.campaign.'.$campaignId.'.events.deleted', $deletedEvents);
+                    $redirectEvent = $request->get('redirectTo');
+
+                    $deletedEvents[] = [
+                        'id'            => $objectId,
+                        'redirectEvent' => $redirectEvent ?: null,
+                    ];
                 }
 
                 // Always remove from modified list if deleted
                 if (isset($modifiedEvents[$objectId])) {
                     unset($modifiedEvents[$objectId]);
-                    $session->set('mautic.campaign.'.$campaignId.'.events.modified', $modifiedEvents);
                 }
             }
 
@@ -384,6 +393,7 @@ class EventController extends CommonFormController
                 'eventId'       => $objectId,
                 'deleted'       => 1,
                 'event'         => $event,
+                'deletedEvents' => $deletedEvents,
             ];
         } else {
             $dataArray = ['success' => 0];
@@ -392,17 +402,12 @@ class EventController extends CommonFormController
         return new JsonResponse($dataArray);
     }
 
-    /**
-     * Undeletes the entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function undeleteAction(Request $request, $objectId)
+    public function undeleteAction(Request $request, $objectId): JsonResponse
     {
         $campaignId     = $request->query->get('campaignId');
-        $session        = $request->getSession();
-        $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
-        $deletedEvents  = $session->get('mautic.campaign.'.$campaignId.'.events.deleted', []);
+        $this->setCampaignElements($request->request);
+        $modifiedEvents = $this->modifiedEvents;
+        $deletedEvents  = $this->deletedEvents;
 
         // ajax only for form fields
         if (!$request->isXmlHttpRequest()
@@ -414,20 +419,23 @@ class EventController extends CommonFormController
                 'MATCH_ONE'
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $event = $modifiedEvents[$objectId] ?? null;
 
-        if ('POST' == $request->getMethod() && null !== $event) {
-            $events            = $this->eventCollector->getEventsArray();
-            $event['settings'] = $events[$event['eventType']][$event['type']];
+        if ('POST' === $request->getMethod() && null !== $event) {
+            $events = $this->eventCollector->getEventsArray();
+            if (isset($event['eventType'], $event['type']) && isset($events[$event['eventType']][$event['type']])) {
+                $event['settings'] = $events[$event['eventType']][$event['type']];
+            }
 
             // add the field to the delete list
-            if (in_array($objectId, $deletedEvents)) {
-                $key = array_search($objectId, $deletedEvents);
-                unset($deletedEvents[$key]);
-                $session->set('mautic.campaign.'.$campaignId.'.events.deleted', $deletedEvents);
+            foreach ($deletedEvents as $key => $deleteInfo) {
+                if (isset($deleteInfo['id']) && $deleteInfo['id'] === $objectId) {
+                    unset($deletedEvents[$key]);
+                    break;
+                }
             }
 
             $template = (empty($event['settings']['template'])) ? '@MauticCampaign/Event/_generic.html.twig'
@@ -451,6 +459,7 @@ class EventController extends CommonFormController
                         'campaignId' => $campaignId,
                     ]
                 ),
+                'deletedEvents' => $deletedEvents,
             ];
         } else {
             $dataArray = ['success' => 0];
@@ -463,7 +472,8 @@ class EventController extends CommonFormController
     {
         $campaignId     = $request->query->get('campaignId');
         $session        = $request->getSession();
-        $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
+        $this->setCampaignElements($request->request);
+        $modifiedEvents = $this->modifiedEvents;
         $campaign       = $this->campaignModel->getEntity($campaignId);
 
         // ajax only for form fields
@@ -476,12 +486,12 @@ class EventController extends CommonFormController
                 'MATCH_ONE'
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $event = $modifiedEvents[$objectId] ?? null;
 
-        if ('POST' == $request->getMethod() && null !== $event) {
+        if ('POST' === $request->getMethod() && null !== $event) {
             $keyId          = 'new'.hash('sha1', uniqid((string) mt_rand()));
             $event['id']    = $event['tempId']    = $keyId;
             $session->set('mautic.campaign.events.clone.storage', $event);
@@ -508,7 +518,7 @@ class EventController extends CommonFormController
     {
         $campaignId     = $request->query->get('campaignId');
         $session        = $request->getSession();
-        $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
+        $this->setCampaignElements($request->request);
         $event          = $session->get('mautic.campaign.events.clone.storage');
 
         if (empty($event)) {
@@ -521,14 +531,16 @@ class EventController extends CommonFormController
         $keyId          = 'new'.hash('sha1', uniqid((string) mt_rand()));
         $event['id']    = $event['tempId'] = $keyId;
 
+        $modifiedEvents         = $this->modifiedEvents;
         $modifiedEvents[$keyId] = $event;
-        $session->set('mautic.campaign.'.$campaignId.'.events.modified', $modifiedEvents);
+        $this->modifiedEvents   = $modifiedEvents;
 
-        $passThroughVars               = [
+        $passThroughVars = [
             'mauticContent'     => 'campaignEvent',
             'clearCloneStorage' => true,
             'success'           => 1,
             'route'             => false,
+            'modifiedEvents'    => $modifiedEvents,
         ];
 
         $passThroughVars = array_merge($passThroughVars, $this->eventViewVars($event, $campaignId, 'insert'));
@@ -612,5 +624,15 @@ class EventController extends CommonFormController
         }
 
         return $passThroughVars;
+    }
+
+    private function setCampaignElements(ParameterBag $request): void
+    {
+        if ($request->get('modifiedEvents')) {
+            $this->modifiedEvents = json_decode($request->get('modifiedEvents'), true);
+        }
+        if ($request->get('deletedEvents')) {
+            $this->deletedEvents = json_decode($request->get('deletedEvents'), true);
+        }
     }
 }

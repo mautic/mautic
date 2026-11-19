@@ -2,6 +2,13 @@
 
 namespace Mautic\FormBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -11,144 +18,172 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\Serializer\Attribute\Groups;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "field:read"
- *        },
- *       "swagger_definition_name"="Read"
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "field:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('form:forms:viewown')"),
+        new Post(security: "is_granted('form:forms:create')"),
+        new Get(security: "is_granted('form:forms:viewown', object)"),
+        new Put(security: "is_granted('form:forms:editown', object)"),
+        new Patch(security: "is_granted('form:forms:editother', object)"),
+        new Delete(security: "is_granted('form:forms:deleteown', object)"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['field:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['field:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Field implements UuidInterface
 {
     use UuidTrait;
 
-    public const TABLE_NAME = 'form_fields';
+    public const TABLE_NAME  = 'form_fields';
+
+    public const ENTITY_NAME = 'form_field';
 
     /**
      * @var int
      */
+    #[Groups(['field:read', 'form:read', 'campaign:read', 'email:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $label;
 
     /**
      * @var bool|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $showLabel = true;
 
     /**
      * @var string
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $alias;
 
     /**
      * @var string
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $type;
 
     /**
      * @var bool
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $isCustom = false;
 
     /**
      * @var array
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $customParameters = [];
 
     /**
      * @var string|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $defaultValue;
 
     /**
      * @var bool
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $isRequired = false;
 
     /**
      * @var string|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $validationMessage;
 
     /**
      * @var string|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $helpMessage;
 
     /**
      * @var int|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $order = 0;
 
     /**
      * @var array
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $properties = [];
 
     /**
-     * @var array
+     * @var array|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $validation = [];
 
     /**
      * @var array<string,mixed>|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $conditions = [];
 
     /**
      * @var Form|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $form;
 
     /**
      * @var string|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $labelAttributes;
 
     /**
      * @var string|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $inputAttributes;
 
     /**
      * @var string|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $containerAttributes;
 
     /**
      * @var string|null
+     *
+     * @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $leadField;
 
     /**
      * @var bool|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $saveResult = true;
 
     /**
      * @var bool|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $isAutoFill = false;
 
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private bool $isReadOnly = false;
 
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private string $fieldWidth = '100%';
 
     /**
@@ -161,36 +196,41 @@ class Field implements UuidInterface
     /**
      * @var bool|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $showWhenValueExists;
 
     /**
      * @var int|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $showAfterXSubmissions;
 
     /**
      * @var bool|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $alwaysDisplay;
 
     /**
      * @var string|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $parent;
 
     /**
      * @var string|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $mappedObject;
 
     /**
      * @var string|null
      */
+    #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $mappedField;
 
-    /**
-     * Reset properties on clone.
-     */
+    public ?int $deletedId = null;
+
     public function __clone()
     {
         $this->id   = null;
@@ -226,6 +266,7 @@ class Field implements UuidInterface
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('fields')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         $builder->addNullableField('labelAttributes', Types::STRING, 'label_attr');
@@ -291,13 +332,12 @@ class Field implements UuidInterface
     }
 
     /**
-     * @param string $prop
-     * @param mixed  $val
+     * @param mixed $val
      */
-    private function isChanged($prop, $val): void
+    private function isChanged(string $prop, $val): void
     {
-        if ($this->$prop != $val) {
-            $this->changes[$prop] = [$this->$prop, $val];
+        if ($this->{$prop} != $val) {
+            $this->changes[$prop] = [$this->{$prop}, $val];
         }
     }
 
@@ -310,9 +350,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -320,13 +358,9 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set label.
-     *
      * @param string $label
-     *
-     * @return Field
      */
-    public function setLabel($label)
+    public function setLabel($label): static
     {
         $this->isChanged('label', $label);
         $this->label = $label;
@@ -335,9 +369,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get label.
-     *
-     * @return string
+     * @return string|null
      */
     public function getLabel()
     {
@@ -345,13 +377,9 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set alias.
-     *
      * @param string $alias
-     *
-     * @return Field
      */
-    public function setAlias($alias)
+    public function setAlias($alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -360,9 +388,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get alias.
-     *
-     * @return string
+     * @return string|null
      */
     public function getAlias()
     {
@@ -370,13 +396,9 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
-     *
-     * @return Field
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -385,9 +407,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get type.
-     *
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -395,13 +415,9 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set defaultValue.
-     *
      * @param string $defaultValue
-     *
-     * @return Field
      */
-    public function setDefaultValue($defaultValue)
+    public function setDefaultValue($defaultValue): static
     {
         $this->isChanged('defaultValue', $defaultValue);
         $this->defaultValue = $defaultValue;
@@ -410,9 +426,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get defaultValue.
-     *
-     * @return string
+     * @return string|null
      */
     public function getDefaultValue()
     {
@@ -420,13 +434,9 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set isRequired.
-     *
      * @param bool $isRequired
-     *
-     * @return Field
      */
-    public function setIsRequired($isRequired)
+    public function setIsRequired($isRequired): static
     {
         $this->isChanged('isRequired', $isRequired);
         $this->isRequired = $isRequired;
@@ -435,8 +445,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get isRequired.
-     *
      * @return bool
      */
     public function getIsRequired()
@@ -451,17 +459,13 @@ class Field implements UuidInterface
      */
     public function isRequired()
     {
-        return $this->getIsRequired();
+        return $this->isRequired;
     }
 
     /**
-     * Set order.
-     *
      * @param int $order
-     *
-     * @return Field
      */
-    public function setOrder($order)
+    public function setOrder($order): static
     {
         $this->isChanged('order', $order);
         $this->order = $order;
@@ -470,9 +474,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get order.
-     *
-     * @return int
+     * @return int|null
      */
     public function getOrder()
     {
@@ -480,13 +482,9 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set properties.
-     *
      * @param array $properties
-     *
-     * @return Field
      */
-    public function setProperties($properties)
+    public function setProperties($properties): static
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;
@@ -495,8 +493,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get properties.
-     *
      * @return array
      */
     public function getProperties()
@@ -505,13 +501,9 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set validation.
-     *
-     * @param array $validation
-     *
-     * @return Field
+     * @param array|null $validation
      */
-    public function setValidation($validation)
+    public function setValidation($validation): static
     {
         $this->isChanged('validation', $validation);
         $this->validation = $validation;
@@ -520,9 +512,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get validation.
-     *
-     * @return array
+     * @return array|null
      */
     public function getValidation()
     {
@@ -530,13 +520,9 @@ class Field implements UuidInterface
     }
 
     /**
-     * Set validationMessage.
-     *
      * @param string $validationMessage
-     *
-     * @return Field
      */
-    public function setValidationMessage($validationMessage)
+    public function setValidationMessage($validationMessage): static
     {
         $this->isChanged('validationMessage', $validationMessage);
         $this->validationMessage = $validationMessage;
@@ -545,19 +531,14 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get validationMessage.
-     *
-     * @return string
+     * @return string|null
      */
     public function getValidationMessage()
     {
         return $this->validationMessage;
     }
 
-    /**
-     * @return Field
-     */
-    public function setForm(Form $form)
+    public function setForm(Form $form): static
     {
         $this->form = $form;
 
@@ -565,8 +546,6 @@ class Field implements UuidInterface
     }
 
     /**
-     * Get form.
-     *
      * @return Form|null
      */
     public function getForm()
@@ -576,10 +555,8 @@ class Field implements UuidInterface
 
     /**
      * @param string $labelAttributes
-     *
-     * @return Field
      */
-    public function setLabelAttributes($labelAttributes)
+    public function setLabelAttributes($labelAttributes): static
     {
         $this->isChanged('labelAttributes', $labelAttributes);
         $this->labelAttributes = $labelAttributes;
@@ -588,7 +565,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLabelAttributes()
     {
@@ -597,10 +574,8 @@ class Field implements UuidInterface
 
     /**
      * @param string $inputAttributes
-     *
-     * @return Field
      */
-    public function setInputAttributes($inputAttributes)
+    public function setInputAttributes($inputAttributes): static
     {
         $this->isChanged('inputAttributes', $inputAttributes);
         $this->inputAttributes = $inputAttributes;
@@ -609,7 +584,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getInputAttributes()
     {
@@ -617,17 +592,14 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getContainerAttributes()
     {
         return $this->containerAttributes;
     }
 
-    /**
-     * @return $this
-     */
-    public function setContainerAttributes($containerAttributes)
+    public function setContainerAttributes($containerAttributes): static
     {
         $this->containerAttributes = $containerAttributes;
 
@@ -644,10 +616,8 @@ class Field implements UuidInterface
 
     /**
      * @param bool $showLabel
-     *
-     * @return Field
      */
-    public function setShowLabel($showLabel)
+    public function setShowLabel($showLabel): static
     {
         $this->isChanged('showLabel', $showLabel);
         $this->showLabel = $showLabel;
@@ -670,15 +640,13 @@ class Field implements UuidInterface
      */
     public function showLabel()
     {
-        return $this->getShowLabel();
+        return $this->showLabel;
     }
 
     /**
      * @param string $helpMessage
-     *
-     * @return Field
      */
-    public function setHelpMessage($helpMessage)
+    public function setHelpMessage($helpMessage): static
     {
         $this->isChanged('helpMessage', $helpMessage);
         $this->helpMessage = $helpMessage;
@@ -687,7 +655,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getHelpMessage()
     {
@@ -696,10 +664,8 @@ class Field implements UuidInterface
 
     /**
      * @param bool $isCustom
-     *
-     * @return Field
      */
-    public function setIsCustom($isCustom)
+    public function setIsCustom($isCustom): static
     {
         $this->isCustom = $isCustom;
 
@@ -721,15 +687,13 @@ class Field implements UuidInterface
      */
     public function isCustom()
     {
-        return $this->getIsCustom();
+        return $this->isCustom;
     }
 
     /**
      * @param array $customParameters
-     *
-     * @return Field
      */
-    public function setCustomParameters($customParameters)
+    public function setCustomParameters($customParameters): static
     {
         $this->customParameters = $customParameters;
 
@@ -763,7 +727,7 @@ class Field implements UuidInterface
     /**
      * @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
      *
-     * @return mixed
+     * @return string|null
      */
     public function getLeadField()
     {
@@ -781,7 +745,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return bool|null
      */
     public function getSaveResult()
     {
@@ -813,7 +777,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function getShowWhenValueExists()
     {
@@ -829,7 +793,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getShowAfterXSubmissions()
     {
@@ -849,7 +813,7 @@ class Field implements UuidInterface
      *
      * @param array|null $submissions
      */
-    public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null): bool
+    public function showForContact($submissions = null, ?Lead $lead = null, ?Form $form = null, ?DisplayManager $displayManager = null): bool
     {
         // Always show in the kiosk mode
         if (null !== $form && true === $form->getInKioskMode()) {
@@ -902,11 +866,11 @@ class Field implements UuidInterface
             return true;
         }
 
-        if (!isset($data[$parentField->getAlias()])) {
+        if (!isset($data[$parentField->getAlias() ?? ''])) {
             return false;
         }
 
-        $sendValues = $data[$parentField->getAlias()];
+        $sendValues = $data[$parentField->getAlias() ?? ''];
         if (!is_array($sendValues)) {
             $sendValues = [$sendValues];
         }
@@ -942,14 +906,14 @@ class Field implements UuidInterface
 
     public function hasChoices(): bool
     {
-        $properties = $this->getProperties();
+        $properties = $this->properties;
 
-        return 'checkboxgrp' === $this->getType()
-            || (key_exists('multiple', $properties) && 1 === $properties['multiple']);
+        return 'checkboxgrp' === $this->type
+            || (array_key_exists('multiple', $properties) && 1 === $properties['multiple']);
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function isAlwaysDisplay()
     {
@@ -974,10 +938,8 @@ class Field implements UuidInterface
 
     /**
      * @param array<string, mixed> $conditions
-     *
-     * @return Field
      */
-    public function setConditions($conditions)
+    public function setConditions($conditions): static
     {
         $this->isChanged('conditions', $conditions);
         $this->conditions = $conditions;
@@ -987,10 +949,8 @@ class Field implements UuidInterface
 
     /**
      * @param string $parent
-     *
-     * @return Field
      */
-    public function setParent($parent)
+    public function setParent($parent): static
     {
         $this->isChanged('parent', $parent);
         $this->parent = $parent;
@@ -999,20 +959,20 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getParent()
     {
         return $this->parent;
     }
 
-    private function findParentFieldInForm(): ?Field
+    private function findParentFieldInForm(): ?self
     {
         if (!$this->parent) {
             return null;
         }
 
-        $fields = $this->getForm()->getFields();
+        $fields = $this->form->getFields();
         foreach ($fields as $field) {
             if (intval($field->getId()) === intval($this->parent)) {
                 return $field;
@@ -1050,6 +1010,12 @@ class Field implements UuidInterface
             return;
         }
 
+        /**
+         * Ignoring this line because the leadField is deprecated and will be removed in Mautic 4.
+         * Todo: Use mappedObject or mappedField instead.
+         *
+         * @phpstan-ignore-next-line
+         */
         $this->leadField = null;
     }
 
@@ -1063,7 +1029,7 @@ class Field implements UuidInterface
         return empty($this->fieldWidth) ? '100%' : $this->fieldWidth;
     }
 
-    public function setFieldWidth(?string $fieldWidth): Field
+    public function setFieldWidth(?string $fieldWidth): self
     {
         $this->isChanged('fieldWidth', $fieldWidth);
         $this->fieldWidth = $fieldWidth;
@@ -1074,5 +1040,10 @@ class Field implements UuidInterface
     public function setIsReadOnly(?bool $isReadOnly): void
     {
         $this->isReadOnly = $isReadOnly ?? false;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->form?->getCreatedBy();
     }
 }

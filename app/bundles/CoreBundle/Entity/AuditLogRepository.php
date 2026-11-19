@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -19,7 +20,7 @@ class AuditLogRepository extends CommonRepository
     /**
      * @return int
      */
-    public function getAuditLogsCount(Lead $lead, array $filters = null)
+    public function getAuditLogsCount(Lead $lead, ?array $filters = null)
     {
         $query = $this->_em->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'al')
@@ -29,7 +30,8 @@ class AuditLogRepository extends CommonRepository
             ->setParameter('id', $lead->getId());
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -51,7 +53,7 @@ class AuditLogRepository extends CommonRepository
      *
      * @return array
      */
-    public function getAuditLogs(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    public function getAuditLogs(Lead $lead, ?array $filters = null, ?array $orderBy = null, $page = 1, $limit = 25)
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
@@ -61,7 +63,8 @@ class AuditLogRepository extends CommonRepository
             ->setParameter('id', $lead->getId());
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -102,17 +105,19 @@ class AuditLogRepository extends CommonRepository
     /**
      * @return array
      */
-    public function getAuditLogsForLeads(array $listOfContacts, array $filters = null, array $orderBy = null, $dateAdded = null)
+    public function getAuditLogsForLeads(array $listOfContacts, ?array $filters = null, ?array $orderBy = null, $dateAdded = null)
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
             ->where('al.bundle = \'lead\'')
             ->andWhere('al.object = \'lead\'');
         $query
-            ->andWhere($query->expr()->in('al.objectId', $listOfContacts));
+            ->andWhere($query->expr()->in('al.objectId', ':listOfContacts'))
+            ->setParameter('listOfContacts', $listOfContacts, ArrayParameterType::INTEGER);
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+            $query->andWhere('al.details LIKE :search')
+                ->setParameter('search', '%'.$filters['search'].'%');
         }
 
         if (is_array($filters) && !empty($filters['includeEvents'])) {
@@ -151,9 +156,9 @@ class AuditLogRepository extends CommonRepository
     /**
      * Get array of objects which belongs to the object.
      *
-     * @param string|null $object
-     * @param string|null $id
-     * @param int         $limit
+     * @param string|null     $object
+     * @param int|string|null $id
+     * @param int             $limit
      *
      * @return array
      */
@@ -194,7 +199,7 @@ class AuditLogRepository extends CommonRepository
     /**
      * @return array
      */
-    public function getLeadIpLogs(Lead $lead = null, array $options = [])
+    public function getLeadIpLogs(?Lead $lead = null, array $options = [])
     {
         $qb  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sqb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -223,6 +228,13 @@ class AuditLogRepository extends CommonRepository
                     $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dateTimeHelper->toUtcString($dateTimeFormat)))
                 )
             );
+        }
+
+        if (!empty($options['leadIds'])) {
+            // Just a check to ensure reused IDs (happens with innodb) doesn't infect data
+            $sqb->innerJoin('l', MAUTIC_TABLE_PREFIX.'leads', 'ld', 'ld.id = l.object_id AND l.date_added >= ld.date_added')
+                ->andWhere($sqb->expr()->in('l.object_id', ':leadIds'))
+                ->addGroupBy('l.object_id');
         }
 
         $qb
@@ -258,6 +270,6 @@ class AuditLogRepository extends CommonRepository
         $sql        = "UPDATE {$table_name} SET ip_address = '*.*.*.*' WHERE ip_address != '*.*.*.*'";
         $conn       = $this->getEntityManager()->getConnection();
 
-        return $conn->executeQuery($sql)->rowCount();
+        return $conn->executeStatement($sql);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -16,8 +16,9 @@ use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Helper\PageConfigInterface;
-use Mautic\PageBundle\Model\PageModel;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
@@ -34,22 +35,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Page>
  */
-class PageType extends AbstractType
+final class PageType extends AbstractType
 {
-    private ?\Mautic\UserBundle\Entity\User $user;
+    private readonly ?\Mautic\UserBundle\Entity\User $user;
 
-    /**
-     * @var bool
-     */
-    private $canViewOther = false;
+    private readonly bool $canViewOther;
 
     public function __construct(
-        private EntityManager $em,
-        private PageModel $model,
+        private readonly EntityManagerInterface $em,
         CorePermissions $corePermissions,
         UserHelper $userHelper,
-        private ThemeHelperInterface $themeHelper,
-        private PageConfigInterface $pageConfig,
+        private readonly ThemeHelperInterface $themeHelper,
+        private readonly PageConfigInterface $pageConfig,
+        private readonly PageRepository $pageRepository,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
         $this->user         = $userHelper->getUser();
@@ -65,7 +63,7 @@ class PageType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.title',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -141,10 +139,10 @@ class PageType extends AbstractType
         $builder->add('sessionId', HiddenType::class);
 
         // Custom field for redirect URL
-        $this->model->getRepository()->setCurrentUser($this->user);
+        $this->pageRepository->setCurrentUser($this->user);
 
         $redirectUrlDataOptions = '';
-        $pages                  = $this->model->getRepository()->getPageList('', 0, 0, $this->canViewOther, 'variant', [$options['data']->getId()]);
+        $pages                  = $this->pageRepository->getPageList('', 0, 0, $this->canViewOther, 'variant', [$options['data']->getId()]);
         foreach ($pages as $page) {
             $redirectUrlDataOptions .= "|{$page['alias']}";
         }
@@ -163,7 +161,7 @@ class PageType extends AbstractType
                 PageListType::class,
                 [
                     'label'      => 'mautic.core.form.translation_parent',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.core.form.translation_parent.help',
@@ -219,7 +217,7 @@ class PageType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.page.form.metadescription',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control', 'maxlength' => 160],
                 'required'   => false,
             ]
@@ -230,7 +228,7 @@ class PageType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.page.form.headscript',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'rows'    => '8',
@@ -245,7 +243,7 @@ class PageType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.page.form.footerscript',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'rows'    => '8',
@@ -275,7 +273,7 @@ class PageType extends AbstractType
                 'required'   => true,
                 'label'      => 'mautic.page.form.redirecturl',
                 'label_attr' => [
-                    'class' => 'control-label',
+                    'class' => 'form-label',
                 ],
                 'attr' => [
                     'class'        => 'form-control',
@@ -296,7 +294,7 @@ class PageType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.alias',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.page.help.alias',
@@ -314,12 +312,14 @@ class PageType extends AbstractType
             ]
         );
 
+        $builder->add('projects', ProjectType::class);
+
         $builder->add(
             'language',
             LocaleType::class,
             [
                 'label'      => 'mautic.core.language',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.page.form.language.help',
@@ -328,12 +328,16 @@ class PageType extends AbstractType
             ]
         );
 
+        $builder->add('version', HiddenType::class, [
+            'mapped' => false,
+        ]);
+
         $extraButtons['pre_extra_buttons'] = [
             [
                 'name'  => 'builder',
                 'label' => 'mautic.core.builder',
                 'attr'  => [
-                    'class'   => 'btn btn-ghost btn-dnd btn-nospin btn-builder text-interactive',
+                    'class'   => 'btn btn-tertiary btn-dnd btn-nospin btn-builder text-interactive',
                     'icon'    => 'ri-layout-line',
                     'onclick' => "Mautic.launchBuilder('page');",
                 ],
@@ -341,7 +345,7 @@ class PageType extends AbstractType
         ];
 
         $draftActionButtons = $this->getDraftActionButtons($options['data']);
-        if (!empty($draftActionButtons)) {
+        if ([] !== $draftActionButtons) {
             $extraButtons['post_extra_buttons'] = $draftActionButtons;
         }
         $builder->add('buttons',

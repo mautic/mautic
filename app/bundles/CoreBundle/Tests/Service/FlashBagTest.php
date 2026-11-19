@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Service;
 
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -12,7 +14,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBag as SymfonyFlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FlashBagTest extends TestCase
+final class FlashBagTest extends TestCase
 {
     /**
      * @var MockObject&SymfonyFlashBag
@@ -35,7 +37,7 @@ class FlashBagTest extends TestCase
     private MockObject $requestStack;
 
     /**
-     * @var NotificationModel&MockObject
+     * @var MockObject&NotificationModel
      */
     private MockObject $notificationModel;
 
@@ -152,6 +154,11 @@ class FlashBagTest extends TestCase
     public function testAddTypeNotice(): void
     {
         $this->assertAddTypeCases(FlashBag::LEVEL_NOTICE, 'ri-information-2-line');
+    }
+
+    public function testAddTypeSuccess(): void
+    {
+        $this->assertAddTypeCases(FlashBag::LEVEL_SUCCESS, 'text-success ri-check-line');
     }
 
     public function testAddTypeDefault(): void

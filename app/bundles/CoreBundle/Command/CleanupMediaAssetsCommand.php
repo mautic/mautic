@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,25 +13,21 @@ use Symfony\Component\Finder\Finder;
 /**
  * CLI Command to clean up obsolete files in the media folder.
  */
-class CleanupMediaAssetsCommand extends Command
-{
-    public function __construct(
-        private PathsHelper $pathsHelper,
-    ) {
-        parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this->setName('mautic:assets:cleanup')
-          ->setHelp(
-              <<<'EOT'
+#[AsCommand(
+    name: 'mautic:assets:cleanup',
+    description: 'Cleans up obsolete files in the media folder that are present in the app/assets folder',
+    help: <<<'TXT'
                 The <info>%command.name%</info> command is used to clean up obsolete files in the media folder that are present in the app/assets folder.
 
 <info>php %command.full_name%</info>
-EOT
-          );
-        parent::configure();
+TXT
+)]
+final class CleanupMediaAssetsCommand extends Command
+{
+    public function __construct(
+        private readonly PathsHelper $pathsHelper,
+    ) {
+        parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -80,6 +77,4 @@ EOT
 
         return Command::SUCCESS;
     }
-
-    protected static $defaultDescription = 'Cleans up obsolete files in the media folder that are present in the app/assets folder';
 }

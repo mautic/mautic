@@ -9,31 +9,31 @@
 <div class="box-layout">
     <!-- step container -->
     <div class="col-md-3 height-auto">
-        <div class="pr-lg pl-lg pt-md pb-md">
+        <div class="pe-24 ps-24 pt-16 pb-16">
             <!-- Nav tabs -->
             <ul class="list-group list-group-tabs" role="tablist">
-                <li role="presentation" class="list-group-item in active">
-                    <a href="#phpinfo" aria-controls="phpinfo" role="tab" data-toggle="tab" class="list-group-item-heading">
+                <li role="presentation" class="list-group-item show active">
+                    <a href="#phpinfo" aria-controls="phpinfo" role="tab" data-bs-toggle="tab" class="nav-link active list-group-item-heading" aria-selected="true">
                         {{ 'mautic.sysinfo.tab.phpinfo'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
-                    <a href="#recommendations" aria-controls="phpinfo" role="tab" data-toggle="tab" class="list-group-item-heading">
+                    <a href="#recommendations" aria-controls="recommendations" role="tab" data-bs-toggle="tab" class="nav-link list-group-item-heading">
                         {{ 'mautic.sysinfo.tab.recommendations'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
-                    <a href="#folders" aria-controls="folders" role="tab" data-toggle="tab" class="list-group-item-heading">
+                    <a href="#folders" aria-controls="folders" role="tab" data-bs-toggle="tab" class="nav-link list-group-item-heading">
                         {{ 'mautic.sysinfo.tab.folders'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
-                    <a href="#log" aria-controls="log" role="tab" data-toggle="tab" class="list-group-item-heading">
+                    <a href="#log" aria-controls="log" role="tab" data-bs-toggle="tab" class="nav-link list-group-item-heading">
                         {{ 'mautic.sysinfo.tab.log'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
-                    <a href="#dbinfo" aria-controls="dbinfo" role="tab" data-toggle="tab" class="list-group-item-heading">
+                    <a href="#dbinfo" aria-controls="dbinfo" role="tab" data-bs-toggle="tab" class="nav-link list-group-item-heading">
                         {{ 'mautic.sysinfo.tab.dbinfo'|trans }}
                     </a>
                 </li>
@@ -47,13 +47,13 @@
 
         <!-- Tab panes -->
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane fade in active bdr-w-0" id="phpinfo">
-                <div class="pt-md pr-md pl-md pb-md">
+            <div role="tabpanel" class="tab-pane fade show active bdr-w-0" id="phpinfo">
+                <div class="pt-16 pe-16 ps-16 pb-16">
                     {{ phpInfo|raw }}
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="recommendations">
-                <div class="pt-md pr-md pl-md pb-md">
+                <div class="pt-16 pe-16 ps-16 pb-16">
                     {% if recommendations is empty and requirements is empty %}
                         <div class="alert alert-info">
                             {{ 'mautic.sysinfo.no.recommendations'|trans }}
@@ -72,8 +72,8 @@
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="folders">
-                <div class="pt-md pr-md pl-md pb-md">
-                    <h2 class="pb-md">{{ 'mautic.sysinfo.folders.title'|trans }}</h2>
+                <div class="pt-16 pe-16 ps-16 pb-16">
+                    <h2 class="pb-16">{{ 'mautic.sysinfo.folders.title'|trans }}</h2>
                     <table class="table table-hover">
                         <thead>
                             <tr>
@@ -82,7 +82,7 @@
                             </tr>
                         </thead>
                         {% for folder, isWritable in folders %}
-                            <tr class="{% if isWritable %}success{% else %}danger{% endif %}">
+                            <tr class="{% if isWritable %}bg-success{% else %}bg-danger{% endif %}">
                                 <td>{{ folder }}</td>
                                 <td>
                                     {% if isWritable %}
@@ -97,8 +97,8 @@
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="log">
-                <div class="pt-md pr-md pl-md pb-md">
-                    <h2 class="pb-md">{{ 'mautic.sysinfo.log.title'|trans }}</h2>
+                <div class="pt-16 pe-16 ps-16 pb-16">
+                    <h2 class="pb-16">{{ 'mautic.sysinfo.log.title'|trans }}</h2>
                     {% if log is defined and log is not empty %}
                         <pre>{{ log }}</pre>
                     {% else %}
@@ -109,9 +109,9 @@
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="dbinfo">
-                <div class="pt-md pr-md pl-md pb-md">
-                    <h2 class="pb-md">{{ 'mautic.sysinfo.dbinfo.title'|trans }}</h2>
-                    <table class="table table-hover">
+                <div class="pt-16 pe-16 ps-16 pb-16">
+                    <h2 class="pb-16">{{ 'mautic.sysinfo.dbinfo.title'|trans }}</h2>
+                    <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>{{ 'mautic.sysinfo.dbinfo.property'|trans }}</th>

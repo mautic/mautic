@@ -9,7 +9,7 @@ use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class Fetcher
+final class Fetcher
 {
     private ?array $mailboxes = null;
 
@@ -18,16 +18,13 @@ class Fetcher
     private int $processedMessageCounter = 0;
 
     public function __construct(
-        private Mailbox $imapHelper,
-        private EventDispatcherInterface $dispatcher,
-        private TranslatorInterface $translator,
+        private readonly Mailbox $imapHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
-    /**
-     * @return $this
-     */
-    public function setMailboxes(array $mailboxes)
+    public function setMailboxes(array $mailboxes): static
     {
         $this->mailboxes = $mailboxes;
 
@@ -65,7 +62,7 @@ class Fetcher
                     $messages  = $this->getMessages($mailIds, $limit, $markAsSeen);
                     $processed = count($messages);
 
-                    if ($messages) {
+                    if ([] !== $messages) {
                         $event->setMessages($messages)
                             ->setKeys($mailboxes);
                         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PARSE);
@@ -86,10 +83,7 @@ class Fetcher
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getLog()
+    public function getLog(): array
     {
         return $this->log;
     }
