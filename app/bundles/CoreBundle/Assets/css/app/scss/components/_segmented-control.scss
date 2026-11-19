@@ -115,7 +115,7 @@
     position: absolute;
     z-index: -1;
     inset-block: var(--segmented-control-padding);
-    inset-inline-start: 0;
+    left: 0;
     inline-size: var(--segmented-control-width);
     border-radius: calc(var(--segmented-control-radius) - var(--segmented-control-padding));
     background-color: var(--segmented-control-surface);
