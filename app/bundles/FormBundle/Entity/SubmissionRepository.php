@@ -601,6 +601,16 @@ class SubmissionRepository extends CommonRepository
             ->executeStatement();
     }
 
+    public function recordDeletedContact(int $contactId): void
+    {
+        $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'form_submissions')
+            ->set('deleted_lead_id', ':contactId')
+            ->where('lead_id = :contactId')
+            ->setParameter('contactId', $contactId)
+            ->executeStatement();
+    }
+
     /**
      * @param int[] $excludedFormIds
      *
@@ -715,20 +725,13 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * A deleted contact leaves its submissions with lead_id = NULL, and the database deletes its devices.
-     * Other submissions can also have lead_id = NULL: untracked submitters (kiosk mode, Do Not Track,
-     * Global Privacy Control, bots) have no tracking ID, and a visitor with the Blocked-Tracking cookie has
-     * the tracking ID of a device that still exists. So only a submission with the tracking ID of a deleted
-     * device belongs to a deleted contact.
+     * LeadSubscriber::onLeadPreDelete() records the contact in deleted_lead_id before the foreign key sets lead_id to NULL.
+     * Submissions without this record are never deleted: they never had a contact, or their contact was deleted
+     * before Mautic recorded deleted contacts, or without the contact model (for example by mautic:maintenance:cleanup).
      */
     private function whereSubmissionOfDeletedContact(DbalQueryBuilder $qb, string $submissionTable): void
     {
         $qb->andWhere($submissionTable.'.lead_id IS NULL')
-            ->andWhere($submissionTable.'.tracking_id IS NOT NULL')
-            ->andWhere(sprintf(
-                'NOT EXISTS (SELECT 1 FROM %slead_devices ld WHERE ld.tracking_id = %s.tracking_id)',
-                MAUTIC_TABLE_PREFIX,
-                $submissionTable
-            ));
+            ->andWhere($submissionTable.'.deleted_lead_id IS NOT NULL');
     }
 }

@@ -22,14 +22,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME,
     description: 'Deletes form submissions and their form results records of contacts that were deleted',
     help: <<<'TXT'
-When Mautic deletes a contact, the form submissions of the contact stay in the database without a contact.
-The submitted values also stay in the form results tables (form_results_<form ID>_<form alias>).
+When Mautic deletes a contact, it records the contact in the form submissions of the contact. The submissions stay in the database
+without a contact, and the submitted values stay in the form results tables (form_results_<form ID>_<form alias>).
 This command deletes these submissions and their form results records for all forms.
 
-<comment>This includes anonymous contacts that mautic:maintenance:cleanup deletes.</comment>
-For example, the command deletes the answers of anonymous visitors to a survey form without fields mapped to contact fields,
-after the cleanup deleted these visitors. Use --dry-run to check which forms are affected before you delete,
-and --exclude to keep the submissions of these forms.
+Submissions without this record are not deleted: submissions that never had a contact, submissions of contacts
+that were deleted before Mautic recorded deleted contacts, and submissions of contacts that mautic:maintenance:cleanup deleted.
 
 <info>php %command.full_name%</info>
 
@@ -39,7 +37,7 @@ Count the submissions of deleted contacts for each form. Nothing is deleted:
 Only delete the submissions of one form:
 <info>php %command.full_name% --form-id=12</info>
 
-Delete the submissions of all forms except the forms 3 and 7, for example survey forms:
+Delete the submissions of all forms except the forms 3 and 7:
 <info>php %command.full_name% --exclude=3 --exclude=7</info>
 TXT
 )]
