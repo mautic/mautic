@@ -1,15 +1,8 @@
 {% set overflow = overflow is defined ? 'nav-overflow-tabs' : '' %}
-{% if verticalTabColWidth is not defined %}
-    {% set verticalTabColWidth = 3 %}
-{% endif %}
-{% set verticalContentColWidth = 12 - verticalTabColWidth %}
-{% set vertical, button = vertical is defined ? vertical : '', button is defined ? button : [] %}
-{% if vertical is not empty %}
-<div class="box-layout">
-{% endif %}
-<div class="tab-container {{ overflow }}{{ vertical is not empty ? ' height-auto col-xs-' ~ verticalTabColWidth ~ ' pe-0 border-end' : '' }}">
+{% set button = button is defined ? button : [] %}
+<div class="tab-container {{ overflow }}">
     {% if button is not empty %}
-    <div class="tab-button{{ (vertical is not empty) ? ' tab-button-' ~ vertical : '' }}">
+    <div class="tab-button">
         <a href="javascript:void(0);"
            role="tab"
            class="btn btn-primary btn-lg btn-block btn-nospin"
@@ -24,7 +17,7 @@
     {% endif %}
     <ul{{ (deletable is defined and deletable is string) ? ' data-delete-action="' ~ deletable ~ '" ' : '' }}
         {{ (sortable is defined and sortable is string) ? ' data-sort-action="' ~ sortable ~ '" ' : '' }}
-            class="{{ (deletable is defined and deletable is not empty) ? 'nav-deletable ' : '' }}nav nav-tabs nav-tabs-contained {{ (vertical is not empty) ? 'tabs-' ~ vertical ~ ' pt-0 border-bottom-0  border-end-0' : 'tabs-horizontal' }}{{ sortable is defined and sortable is not empty ? ' sortable' : '' }}">
+            class="{{ (deletable is defined and deletable is not empty) ? 'nav-deletable ' : '' }}nav nav-tabs nav-tabs-contained tabs-horizontal{{ sortable is defined and sortable is not empty ? ' sortable' : '' }}">
         {% for tabKey, tab in tabs %}
             {% set class = (tab.class is defined and tab.class is not empty) ? ' ' ~ tab.class : '' %}
             {% if tab.attr is defined and tab.attr is iterable %}
@@ -53,7 +46,7 @@
         {% endfor %}
     </ul>
 </div>
-<div class="tab-content{{ vertical is not empty ? ' col-xs-' ~ verticalContentColWidth ~' ps-0 pt-0 height-auto' : ' p-16' }}">
+<div class="tab-content p-16">
     {% for tab in tabs %}
         {% set containerClass = (tab.containerClass is defined and tab['containerClass'] is not empty) ? ' ' ~ tab['containerClass'] : '' %}
         {% if tab['containerAttr'] is defined and tab['containerAttr'] is iterable %}
@@ -77,6 +70,3 @@
     </div>
     {% endif %}
 </div>
-{% if vertical is not empty %}
-</div>
-{% endif %}
