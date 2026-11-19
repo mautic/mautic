@@ -89,6 +89,26 @@ final class BootstrapMarkupTest extends TestCase
         $this->assertSame('0', $checkedChoices->attr('value'));
     }
 
+    public function testSegmentedControlPassesChoiceAttributesToInputs(): void
+    {
+        $formFactory = Forms::createFormFactoryBuilder()
+            ->addType(new ButtonGroupType())
+            ->addType(new SegmentedControlType())
+            ->getFormFactory();
+        $form = $formFactory->createNamed('mode', SegmentedControlType::class, 'a', [
+            'choices'                   => ['A' => 'a', 'B' => 'b'],
+            'choice_attr'               => ['B' => ['data-test' => 'choice-b', 'class' => 'custom-choice']],
+            'choice_translation_domain' => false,
+        ]);
+        $html = $this->twig->createTemplate('{{ form_widget(form) }}')->render(['form' => $form->createView()]);
+
+        $crawler = new Crawler($html);
+
+        $this->assertSame('choice-b', $crawler->filter('input[value="b"]')->attr('data-test'));
+        $this->assertSame('btn-check custom-choice', $crawler->filter('input[value="b"]')->attr('class'));
+        $this->assertNull($crawler->filter('input[value="a"]')->attr('data-test'));
+    }
+
     public function testDisabledButtonGroupRetainsDisabledInputs(): void
     {
         $form = Forms::createFormFactory()->createNamed('direction', ButtonGroupType::class, 'outgoing', [
