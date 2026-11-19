@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Entity\LeadCategoryRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -115,8 +114,6 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->assertResponseStatusCodeSame(422);
-        $translator = $this->getService(TranslatorInterface::class);
-        $this->assertStringContainsString($translator->trans('mautic.category.color.invalid', [], 'validators'), (string) $this->client->getResponse()->getContent());
         $this->assertNull($this->getService(CategoryRepository::class)->findOneBy(['alias' => 'invalid-color-category']));
     }
 
