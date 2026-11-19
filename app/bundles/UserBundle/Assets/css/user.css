@@ -1,16 +1,8 @@
 /* UserBundle */
 
-.profile-details {
-    margin-bottom: 20px;
-}
+.col-user-id, .col-role-id { width: 75px; }
 
-.col-user-id, .col-role-id {
-    width: 75px;
-}
-
-.col-user-avatar {
-    width: 75px;
-}
+.col-user-avatar { width: 75px; }
 
 .mautic-logo {
     width: 150px;
@@ -18,22 +10,16 @@
     background: #ffffff;
 }
 
-.mautic-logo > svg.mautic-logo-figure .circle {
-    fill: #4e5e9e;
-}
+.mautic-logo > svg.mautic-logo-figure .circle { fill: #4e5e9e; }
 
 .mautic-logo > svg.mautic-logo-figure .m,
 .mautic-logo > svg.mautic-logo-figure .m-arrow {
       fill: #fdb933;
 }
 
-span.input-group-addon i.fa {
-    width: 20px;
-}
+span.input-group-addon i.fa { width: 20px; }
 
-.inline-login .login-form {
-    margin: 20px;
-}
+.inline-login .login-form { margin: 20px; }
 
 .accent-color {
     width: 28px;
