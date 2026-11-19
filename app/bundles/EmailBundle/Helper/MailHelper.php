@@ -866,8 +866,9 @@ class MailHelper
 
                 // Ingore the get_contents errors and use the path in the image src instead if it cannot be fetched.
                 if ($imageContent = @file_get_contents($path)) {
-                    // Keep the URL if it isn't an image, e.g. a dynamic URL that pointed to a script once the query was dropped.
-                    if (!str_starts_with((string) (new \finfo(FILEINFO_MIME_TYPE))->buffer($imageContent), 'image/')) {
+                    // Keep the URL if it isn't an image, embedding it would only add an unexpected attachment.
+                    $contentType = (string) (new \finfo(FILEINFO_MIME_TYPE))->buffer($imageContent);
+                    if (!str_starts_with($contentType, 'image/')) {
                         continue;
                     }
 

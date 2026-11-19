@@ -1196,6 +1196,44 @@ final class MailHelperTest extends TestCase
         }
     }
 
+    public function testThatWeDontEmbedAlreadyEmbeddedImages(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(6))->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_convert_embed_images', null, true],
+                    ['mailer_append_tracking_pixel', null, true],
+                    ['mailer_from_name', null, 'Test'],
+                    ['mailer_append_tracking_pixel', null, true],
+                    ['secret_key', null, 'secret'],
+                ]
+            );
+
+        $this->router->method('generate')->willReturn('http://tracking.url');
+
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+
+        $email = new Email();
+        $email->setUseOwnerAsMailer(false);
+        $email->setFromName('Test');
+        $email->setSubject('Test');
+        $email->setCustomHtml('<img src="cid:abcdefg">');
+        $mailer->setEmail($email);
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+        }
+
+        $mailer->send();
+
+        $body = $transport->getMessage()->getHtmlBody();
+
+        $this->assertSame('<img src="cid:abcdefg"><img height="1" width="1" src="{tracking_pixel}" alt="" />', $body);
+    }
+
     public function testLocalImagesWithQueryStringOrEncodedCharactersAreEmbedded(): void
     {
         $this->coreParametersHelper->expects($this->atLeast(5))->method('get')
@@ -1289,44 +1327,6 @@ final class MailHelperTest extends TestCase
         $this->assertCount(0, $message->getAttachments());
         $this->assertStringContainsString('src="'.$nullByteUrl.'"', $body);
         $this->assertStringContainsString('src="'.$scriptUrl.'"', $body);
-    }
-
-    public function testThatWeDontEmbedAlreadyEmbeddedImages(): void
-    {
-        $this->coreParametersHelper->expects($this->atLeast(6))->method('get')
-            ->willReturnMap(
-                [
-                    ['mailer_from_email', null, 'nobody@nowhere.com'],
-                    ['mailer_convert_embed_images', null, true],
-                    ['mailer_append_tracking_pixel', null, true],
-                    ['mailer_from_name', null, 'Test'],
-                    ['mailer_append_tracking_pixel', null, true],
-                    ['secret_key', null, 'secret'],
-                ]
-            );
-
-        $this->router->method('generate')->willReturn('http://tracking.url');
-
-        $transport = new BatchTransport();
-        $mailer    = $this->createMailHelperWithTransport($transport);
-
-        $email = new Email();
-        $email->setUseOwnerAsMailer(false);
-        $email->setFromName('Test');
-        $email->setSubject('Test');
-        $email->setCustomHtml('<img src="cid:abcdefg">');
-        $mailer->setEmail($email);
-
-        foreach ($this->contacts as $contact) {
-            $mailer->addTo($contact['email']);
-            $mailer->setLead($contact);
-        }
-
-        $mailer->send();
-
-        $body = $transport->getMessage()->getHtmlBody();
-
-        $this->assertSame('<img src="cid:abcdefg"><img height="1" width="1" src="{tracking_pixel}" alt="" />', $body);
     }
 
     public function testAddToWithLongAddress(): void
