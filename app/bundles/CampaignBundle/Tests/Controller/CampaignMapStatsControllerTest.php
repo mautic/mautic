@@ -30,7 +30,7 @@ final class CampaignMapStatsControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->mapController           = new CampaignMapStatsController($this->createStub(CampaignModel::class), static::getContainer()->get(TranslatorInterface::class));
+        $this->mapController           = new CampaignMapStatsController($this->createStub(CampaignModel::class), self::getContainer()->get(TranslatorInterface::class));
     }
 
     /**

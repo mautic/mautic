@@ -64,7 +64,7 @@ final class MapHelperTest extends MauticMysqlTestCase
 
     private function getLegendText(): string
     {
-        return static::getContainer()->get(TranslatorInterface::class)->trans(CampaignMapStatsController::LEGEND_TEXT);
+        return self::getContainer()->get(TranslatorInterface::class)->trans(CampaignMapStatsController::LEGEND_TEXT);
     }
 
     public function testGetOptionLegendText(): void
