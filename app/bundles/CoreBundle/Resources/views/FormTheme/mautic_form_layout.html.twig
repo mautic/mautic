@@ -63,10 +63,13 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% block segmented_control_widget %}
 {% set options = [] %}
 {% for child in form %}
-    {% set options = options|merge([{value: child.vars.value, label: child.vars.label, disabled: child.vars.disabled, icon: segmented_control.icons[child.vars.value]|default(null)}]) %}
+    {% set options = options|merge([{value: child.vars.value, label: child.vars.label, disabled: child.vars.disabled, required: child.vars.required, icon: segmented_control.icons[child.vars.value]|default(null)}]) %}
 {% endfor %}
 {% set params = {
     options: options,
+    label: label is not empty ? label : name|humanize,
+    translation_domain: translation_domain,
+    label_translation_parameters: label_translation_parameters,
     value: form.vars.value,
     name: full_name,
     id: id,
