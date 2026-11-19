@@ -727,7 +727,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         $this->assertStringContainsString($categoryTitle, $texts['Categorised (categorised)']);
-        $this->assertStringNotContainsString($categoryTitle, $texts['Uncategorised (uncategorised)']);
+        $this->assertSame($this->translator->trans('mautic.core.form.uncategorized'), trim($texts['Uncategorised (uncategorised)']));
 
         foreach (['ASC' => ['Uncategorised', 'Categorised'], 'DESC' => ['Categorised', 'Uncategorised']] as $direction => $expected) {
             $crawler = $this->client->request(Request::METHOD_GET, '/s/segments?orderby=cat.title&orderbydir='.$direction);
