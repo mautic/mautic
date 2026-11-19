@@ -56,17 +56,13 @@ final class MessageQueueModel extends FormModel
         return $this->messageQueueRepository;
     }
 
-    /**
-     * @param int   $attempts
-     * @param int   $priority
-     */
     public function processFrequencyRules(
         array &$leads,
-        $channel,
-        $channelId,
+        string $channel,
+        int|string $channelId,
         $campaignEventId = null,
-        $attempts = 3,
-        $priority = MessageQueue::PRIORITY_NORMAL,
+        int $attempts = 3,
+        int $priority = MessageQueue::PRIORITY_NORMAL,
         ?array $messageQueue = null,
         string $statTableName = 'email_stats',
         string $statContactColumn = 'lead_id',
@@ -118,8 +114,6 @@ final class MessageQueueModel extends FormModel
      *
      * @param string   $channel
      * @param int      $channelId
-     * @param int      $maxAttempts
-     * @param int      $priority
      * @param int|null $campaignEventId
      */
     public function queue(
@@ -127,8 +121,8 @@ final class MessageQueueModel extends FormModel
         $channel,
         $channelId,
         \DateInterval $scheduledInterval,
-        $maxAttempts = 1,
-        $priority = 1,
+        int $maxAttempts = 1,
+        int $priority = 1,
         $campaignEventId = null,
         array $options = [],
     ): bool {
@@ -302,7 +296,7 @@ final class MessageQueueModel extends FormModel
         $message->setProcessed();
     }
 
-    public function getQueuedChannelCount($channel, ?array $channelIds = []): int
+    public function getQueuedChannelCount(string $channel, ?array $channelIds = []): int
     {
         return $this->messageQueueRepository->getQueuedChannelCount($channel, $channelIds);
     }

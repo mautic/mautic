@@ -611,7 +611,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      *
      * @throws \Exception
      */
-    public function addLead($lead, $lists, bool $manuallyAdded = false, bool $batchProcess = false, $searchListLead = 1, $dateManipulated = null): void
+    public function addLead($lead, $lists, bool $manuallyAdded = false, bool $batchProcess = false, int $searchListLead = 1, $dateManipulated = null): void
     {
         if (null == $dateManipulated) {
             $dateManipulated = new \DateTime();
@@ -673,7 +673,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 continue;
             }
 
-            if (-1 == $searchListLead) {
+            if (-1 === $searchListLead) {
                 $listLead = null;
             } elseif ($searchListLead) {
                 $listLead = $this->listLeadRepository->findOneBy(
@@ -1202,7 +1202,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * @param $segmentId *
      */
-    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name'): array
+    public function getSegmentsWithDependenciesOnSegment($segmentId, string $returnProperty = 'name'): array
     {
         $filter = [
             'force'  => [

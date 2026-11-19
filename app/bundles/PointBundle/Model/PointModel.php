@@ -178,7 +178,7 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
      *
      * @throws \ReflectionException
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, ?Lead $lead = null, bool $allowUserRequest = false, bool $storeIpAddress = true): void
+    public function triggerAction(string $type, $eventDetails = null, $typeId = null, ?Lead $lead = null, bool $allowUserRequest = false, bool $storeIpAddress = true): void
     {
         // only trigger actions for not logged Mautic users
         if (!$this->security->isAnonymous() && !$allowUserRequest) {

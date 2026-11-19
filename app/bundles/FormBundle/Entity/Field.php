@@ -200,7 +200,7 @@ class Field implements UuidInterface
 
     private ?array $changes = null;
 
-    private $sessionId;
+    private int|string|null $sessionId = null;
 
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     #[ORM\Column(name: 'show_when_value_exists', type: Types::BOOLEAN, nullable: true)]
@@ -606,18 +606,12 @@ class Field implements UuidInterface
         return $this->customParameters;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getSessionId()
+    public function getSessionId(): int|string|null
     {
         return $this->sessionId;
     }
 
-    /**
-     * @param mixed $sessionId
-     */
-    public function setSessionId($sessionId): void
+    public function setSessionId(int|string|null $sessionId): void
     {
         $this->sessionId = $sessionId;
     }

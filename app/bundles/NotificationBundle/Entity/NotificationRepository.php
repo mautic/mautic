@@ -114,17 +114,14 @@ final class NotificationRepository extends CommonRepository
 
     /**
      * Up the click/sent counts.
-     *
-     * @param string $type
-     * @param int    $increaseBy
      */
-    public function upCount($id, $type = 'sent', $increaseBy = 1): void
+    public function upCount($id, string $type = 'sent', int $increaseBy = 1): void
     {
         try {
             $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
             $q->update(MAUTIC_TABLE_PREFIX.'push_notifications')
-                ->set($type.'_count', $type.'_count + '.(int) $increaseBy)
+                ->set($type.'_count', $type.'_count + '.$increaseBy)
                 ->where('id = '.(int) $id);
 
             $q->executeStatement();
