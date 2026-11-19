@@ -74,10 +74,7 @@ final class FocusController extends AbstractStandardFormController
         return parent::getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, $args);
     }
 
-    /**
-     * @param int $page
-     */
-    public function indexAction(Request $request, FocusSearchScopeProvider $focusSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, FocusSearchScopeProvider $focusSearchScopeProvider, int $page = 1): Response
     {
         $this->indexSearchScopes = $focusSearchScopeProvider->getScopes();
 

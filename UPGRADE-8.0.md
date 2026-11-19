@@ -1459,6 +1459,28 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\UserBundle\Security\Provider\UserProvider` | `saveUser()` (`bool $createIfNotExists`) |
     | `Mautic\WebhookBundle\Model\WebhookModel` | `killWebhook()` (`string $reason`) |
 
+- Controller methods across bundles now declare native scalar parameter types based on their docblock and the values their routes and callers pass. Callers in files with `declare(strict_types=1)` that pass another type (e.g. an integer to a `string` id) now get a `TypeError` - cast the argument to the new type. Plugin controllers that extend these classes and override one of these methods must keep the override compatible - drop the parameter type or use the parent's (or a wider) type.
+
+    | Class | Method | New parameter types |
+    | --- | --- | --- |
+    | `Mautic\ApiBundle\Controller\ClientController` | `newAction()` (`$objectId`) | `int\|string` |
+    | `Mautic\CampaignBundle\Controller\SourceController` | `newAction()` (`$objectId`) | `int\|string` |
+    | `Mautic\CategoryBundle\Controller\CategoryController` | `executeCategoryAction()` (`$objectId`, `$objectModel`) | `int\|string`, `string` |
+    | `Mautic\CoreBundle\Controller\AbstractStandardFormController` | `getTemplateName()` (`$file`), `getTranslatedString()` (`$string`), `viewStandard()` (`$itemName`) | `string` |
+    | `Mautic\CoreBundle\Controller\CommonController` | `forwardWithPost()` (`$controller`), `addFlashMessage()` (`$level`, `$domain`) | `string`, `string`, `string\|false\|null` |
+    | `Mautic\DashboardBundle\Controller\DashboardController` | `widgetAction()` (`$widgetId`), `applyDashboardFileAction()` (`$file`) | `int\|string`, `?string` |
+    | `Mautic\EmailBundle\Controller\EmailController` | `winnerAction()`, `sendAction()`, `sendExampleAction()` (`$objectId`) | `int\|string` |
+    | `Mautic\FormBundle\Controller\ResultController` | `exportAction()` (`$format`) | `string` |
+    | `Mautic\LeadBundle\Controller\Api\LeadApiController` | `applyUtmTagsAction()` (`$method`) | `string` |
+    | `Mautic\LeadBundle\Controller\LeadController` | `emailAction()` (`$objectId`) | `int\|string` |
+    | `Mautic\LeadBundle\Controller\NoteController` | `executeNoteAction()` (`$objectId`) | `int\|string` |
+    | `Mautic\PageBundle\Controller\PageController` | `exportAction()` (`$format`) | `string` |
+    | `Mautic\PluginBundle\Controller\PluginController` | `configAction()` (`$activeTab`) | `string` |
+    | `Mautic\ReportBundle\Controller\ReportController` | `exportAction()` (`$format`), `downloadAction()` (`$format`) | `string` |
+    | `MauticPlugin\MauticFocusBundle\Controller\FocusController` | `indexAction()` (`$page`) | `int` |
+    | `MauticPlugin\MauticFullContactBundle\Controller\FullContactController` | `lookupPersonAction()`, `lookupCompanyAction()` (`$objectId`) | `string` |
+    | `MauticPlugin\MauticTagManagerBundle\Controller\TagController` | `indexAction()` (`$page`) | `int` |
+
 - Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
 
     | Class | Method | New parameter types |
