@@ -9,6 +9,7 @@ return RectorConfig::configure()
     ->withParallel(timeoutSeconds: 300)
     ->withPaths([
         __DIR__.'/app/bundles',
+        __DIR__.'/app/tests',
         __DIR__.'/plugins',
         __DIR__.'/app/middlewares',
         // __DIR__.'/utils',
@@ -57,7 +58,7 @@ return RectorConfig::configure()
 
         // removes empty #[AsEventListener] methods from anonymous listener classes used as test input
         Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Test/AttributeEventListenerRegistrarTest.php',
+            __DIR__.'/app/tests/CoreBundle/Tests/Unit/Test/AttributeEventListenerRegistrarTest.php',
         ],
 
         // Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
@@ -67,11 +68,11 @@ return RectorConfig::configure()
 
         // test fixtures
         __DIR__.'/plugins/*/node_modules/*',
-        __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Helper/resource/',
+        __DIR__.'/app/tests/CoreBundle/Tests/Unit/Helper/resource/',
 
         UnserializeToSerializerDecodeRector::class => [
             // tests
-            __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
+            __DIR__.'/app/tests/UserBundle/Tests/Entity/UserTest.php',
             // reproduces what DBAL's own ArrayType did before DBAL 4 removed it: the objects
             // have to be unserialized so that convertToPHPValue can drop the ones that would
             // carry null bytes. Serializer::decode() refuses the whole value instead, which
