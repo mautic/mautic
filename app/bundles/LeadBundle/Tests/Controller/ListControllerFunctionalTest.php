@@ -705,21 +705,20 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentListShowsCategoryAfterName(): void
     {
-        $category = new Category();
-        $category->setTitle('Newsletters');
+        $categoryTitle = 'Newsletters';
+        $category      = new Category();
+        $category->setTitle($categoryTitle);
         $category->setAlias('newsletters');
         $category->setBundle('segment');
         $this->em->persist($category);
 
-        $segment = $this->saveSegment('Categorised', 'categorised', []);
-        $segment->setCategory($category);
-        $this->em->persist($segment);
+        $categorised = (new LeadList())->setCategory($category);
+        $this->saveSegment('Categorised', 'categorised', [], $categorised);
         $this->saveSegment('Uncategorised', 'uncategorised', []);
-        $this->em->flush();
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
 
-        $this->assertStringContainsString('Category', $crawler->filterXPath("//table[@id='leadListTable']//thead//th[3]")->text());
+        $this->assertCount(1, $crawler->filterXPath("//table[@id='leadListTable']//thead//th[3][contains(@class, 'col-leadlist-category')]"));
 
         $texts = [];
         foreach ($crawler->filterXPath("//table[@id='leadListTable']//tbody//tr") as $row) {
@@ -727,8 +726,14 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
             $texts[trim($rowCrawler->filterXPath('.//td[2]//a')->text())] = $rowCrawler->filterXPath('.//td[3]')->text();
         }
 
-        $this->assertStringContainsString('Newsletters', $texts['Categorised (categorised)']);
-        $this->assertStringNotContainsString('Newsletters', $texts['Uncategorised (uncategorised)']);
+        $this->assertStringContainsString($categoryTitle, $texts['Categorised (categorised)']);
+        $this->assertStringNotContainsString($categoryTitle, $texts['Uncategorised (uncategorised)']);
+
+        foreach (['ASC' => ['Uncategorised', 'Categorised'], 'DESC' => ['Categorised', 'Uncategorised']] as $direction => $expected) {
+            $crawler = $this->client->request(Request::METHOD_GET, '/s/segments?orderby=cat.title&orderbydir='.$direction);
+            $names   = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr/td[2]//a")->each(static fn (Crawler $a): string => trim(explode(' (', $a->text())[0]));
+            $this->assertSame($expected, $names, $direction);
+        }
     }
 
     public function testUnpublishedSegmentDoesNotShowRebuildingLabel(): void
