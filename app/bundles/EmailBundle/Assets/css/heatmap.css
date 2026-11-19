@@ -21,7 +21,6 @@
     color: #fff;
 }
 
-
 .heatmap-iframe {
     display: block;
     width: 100%;
@@ -32,9 +31,7 @@
 }
 
 @media (min-width: 768px) {
-    .heatmap-iframe {
-        height: 90vh;
-    }
+    .heatmap-iframe { height: 90vh; }
 }
 
 body.heatmap-iframe-body a.heatmap-link {
@@ -70,14 +67,10 @@ body.heatmap-iframe-body a.heatmap-link {
 }
 
 @media (min-width: 768px) {
-    .heatmap-legend {
-        display: block;
-    }
+    .heatmap-legend { display: block; }
 }
 
-.heatmap-legend a {
-    color: rgba(255, 255, 255, 0.6);
-}
+.heatmap-legend a { color: rgba(255, 255, 255, 0.6); }
 .heatmap-legend a.active,
 .heatmap-legend a:focus,
 .heatmap-legend a:hover {
@@ -92,9 +85,7 @@ body.heatmap-iframe-body a.heatmap-link {
     line-height: 1.1;
 }
 
-.heatmap-legend > p:nth-child(1) {
-    margin-top: 0;
-}
+.heatmap-legend > p:nth-child(1) { margin-top: 0; }
 
 .heatmap-legend > p:nth-child(2) {
     color: #fff;
@@ -102,34 +93,17 @@ body.heatmap-iframe-body a.heatmap-link {
     margin-bottom: 20px;
 }
 
-.heatmap-legend > p:nth-child(3) {
-    margin-bottom: 5px;
-}
-
-.heatmap-scale {
-    display: flex;
-}
+.heatmap-legend > p:nth-child(3) { margin-bottom: 5px; }
 
 .heatmap-scale-header,
 .heatmap-scale-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     padding: 10px 0;
     font-size: 12px;
 }
 
-.heatmap-scale-footer {
-    padding-bottom: 0;
-}
-
-.heatmap-scale-header > div,
-.heatmap-scale-footer > div {
-
-}
+.heatmap-scale-footer { padding-bottom: 0; }
 
 .heatmap-scale-bar {
-    position: relative;
     width: 47px;
     height: 16px;
     background: #fff;
@@ -140,17 +114,11 @@ body.heatmap-iframe-body a.heatmap-link {
     border-radius: 2px 0 0 2px;
 }
 
-.heatmap-scale-bar:nth-child(2) {
-    background: linear-gradient(to right, #0a85ff, #f0df42);
-}
+.heatmap-scale-bar:nth-child(2) { background: linear-gradient(to right, #0a85ff, #f0df42); }
 
-.heatmap-scale-bar:nth-child(3) {
-    background: linear-gradient(to right, #f0df42, #f8c344);
-}
+.heatmap-scale-bar:nth-child(3) { background: linear-gradient(to right, #f0df42, #f8c344); }
 
-.heatmap-scale-bar:nth-child(4) {
-    background: linear-gradient(to right, #f8c344, #ff843a);
-}
+.heatmap-scale-bar:nth-child(4) { background: linear-gradient(to right, #f8c344, #ff843a); }
 
 .heatmap-scale-bar:nth-child(5) {
     background: linear-gradient(to right, #ff843a, #f83834);
