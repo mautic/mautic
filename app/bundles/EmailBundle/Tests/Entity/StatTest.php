@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Entity;
 
 use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatOpenDetail;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +23,9 @@ final class StatTest extends TestCase
 
         // Add as many openDetails entries as specified in $count
         for ($i = 0; $i < $count; ++$i) {
-            $stat->addOpenDetails(sprintf('Open %d of %d', $i + 1, $count));
+            $stat->addOpenDetails([
+                'data' => sprintf('Open %d of %d', $i + 1, $count),
+            ]);
         }
 
         // Assert that the openCount reflects the total number of openDetails
@@ -53,6 +56,153 @@ final class StatTest extends TestCase
         yield 'one past threshold' => [Stat::MAX_OPEN_DETAILS + 1];
         yield 'slightly above threshold' => [Stat::MAX_OPEN_DETAILS + 10];
         yield 'well beyond threshold' => [Stat::MAX_OPEN_DETAILS * 10];
+    }
+
+    public function testAddBounceDetailsRoundTripsInOrder(): void
+    {
+        $stat = new Stat();
+
+        $stat->addBounceDetails(['datetime' => '2026-01-01 00:00:00', 'reason' => 'Mailbox full']);
+        $stat->addBounceDetails(['datetime' => '2026-01-02 00:00:00', 'reason' => 'Unknown user']);
+
+        $this->assertCount(2, $stat->getDataOpenDetails());
+        $this->assertEquals(
+            [
+                ['datetime' => '2026-01-01 00:00:00', 'reason' => 'Mailbox full'],
+                ['datetime' => '2026-01-02 00:00:00', 'reason' => 'Unknown user'],
+            ],
+            $stat->getOpenDetails()[StatOpenDetail::BOUNCES_KEY]
+        );
+    }
+
+    public function testAddBounceDetailsDoesNotIncreaseOpenCount(): void
+    {
+        $stat = new Stat();
+
+        $stat->addBounceDetails(['datetime' => '2026-01-01 00:00:00', 'reason' => 'Mailbox full']);
+
+        $this->assertSame(0, $stat->getOpenCount());
+    }
+
+    public function testAddBounceDetailsIsRecordedWhenOpenDetailsAreAtCapacity(): void
+    {
+        $stat = new Stat();
+        for ($i = 0; $i < Stat::MAX_OPEN_DETAILS; ++$i) {
+            $stat->addOpenDetails(['data' => $i]);
+        }
+
+        $stat->addBounceDetails(['datetime' => '2026-01-01 00:00:00', 'reason' => 'Mailbox full']);
+
+        $this->assertCount(Stat::MAX_OPEN_DETAILS + 1, $stat->getDataOpenDetails());
+        $this->assertEquals(
+            [['datetime' => '2026-01-01 00:00:00', 'reason' => 'Mailbox full']],
+            $stat->getOpenDetails()[StatOpenDetail::BOUNCES_KEY]
+        );
+    }
+
+    public function testAddOpenDetailsStoresNonArrayDetailsWrappedInAnArray(): void
+    {
+        $stat = new Stat();
+        $stat->addOpenDetails('UA-string');
+
+        $this->assertSame([['data' => 'UA-string']], $stat->getOpenDetails());
+        $this->assertSame(1, $stat->getOpenCount());
+    }
+
+    public function testAddBounceDetailsKeepsNewestBouncesAtBounceLimit(): void
+    {
+        $stat = new Stat();
+        for ($i = 0; $i <= Stat::MAX_BOUNCE_DETAILS; ++$i) {
+            $stat->addBounceDetails(['reason' => 'Bounce '.$i]);
+        }
+
+        $bounces = $stat->getOpenDetails()[StatOpenDetail::BOUNCES_KEY];
+
+        $this->assertCount(Stat::MAX_BOUNCE_DETAILS, $bounces);
+        $this->assertSame('Bounce 1', $bounces[0]['reason']);
+        $this->assertSame('Bounce '.Stat::MAX_BOUNCE_DETAILS, end($bounces)['reason']);
+    }
+
+    public function testGetOpenDetailsMergesBounceAndOpenRows(): void
+    {
+        $stat = new Stat();
+        $stat->addOpenDetails(['datetime' => '2026-01-01 00:00:00', 'useragent' => 'UA-open']);
+        $stat->addBounceDetails(['datetime' => '2026-01-02 00:00:00', 'reason' => 'Mailbox full']);
+
+        $this->assertEquals(
+            [
+                0                           => ['datetime' => '2026-01-01 00:00:00', 'useragent' => 'UA-open'],
+                StatOpenDetail::BOUNCES_KEY => [
+                    ['datetime' => '2026-01-02 00:00:00', 'reason' => 'Mailbox full'],
+                ],
+            ],
+            $stat->getOpenDetails()
+        );
+    }
+
+    public function testChildRowWithoutBouncesKeyReadsBackAsOpenDetail(): void
+    {
+        // A child row is read as an open detail whenever it has no 'bounces' key, regardless of
+        // whether it was written by setOpenDetail() directly rather than through addOpenDetails().
+        $stat  = new Stat();
+        $entry = new StatOpenDetail();
+        $entry->setStat($stat);
+        $entry->setDateSent(new \DateTime());
+        $entry->setOpenDetail(['datetime' => '2026-01-01 00:00:00', 'useragent' => 'UA-open']);
+        $stat->getDataOpenDetails()->add($entry);
+
+        $this->assertEquals(
+            [['datetime' => '2026-01-01 00:00:00', 'useragent' => 'UA-open']],
+            $stat->getOpenDetails()
+        );
+    }
+
+    public function testAddOpenDetailsWithoutIncreasingOpenCountCapsOnRowCount(): void
+    {
+        $stat = new Stat();
+
+        for ($i = 0; $i < Stat::MAX_OPEN_DETAILS + 5; ++$i) {
+            $stat->addOpenDetails(['data' => $i], false);
+        }
+
+        $this->assertSame(0, $stat->getOpenCount());
+        $this->assertCount(Stat::MAX_OPEN_DETAILS, $stat->getDataOpenDetails());
+    }
+
+    public function testSetOpenDetailsRoundTripPreservesContentWithoutAFlush(): void
+    {
+        $stat = new Stat();
+        $stat->addOpenDetails(['datetime' => '2026-01-01 00:00:00', 'useragent' => 'UA-open']);
+        $stat->addBounceDetails(['datetime' => '2026-01-02 00:00:00', 'reason' => 'Mailbox full']);
+
+        $stat->setOpenDetails($stat->getOpenDetails());
+
+        $this->assertCount(2, $stat->getDataOpenDetails());
+        $this->assertEquals(
+            [
+                0                           => ['datetime' => '2026-01-01 00:00:00', 'useragent' => 'UA-open'],
+                StatOpenDetail::BOUNCES_KEY => [
+                    ['datetime' => '2026-01-02 00:00:00', 'reason' => 'Mailbox full'],
+                ],
+            ],
+            $stat->getOpenDetails()
+        );
+    }
+
+    public function testSetOpenDetailsReplacesEntriesAddedBeforeItWasCalled(): void
+    {
+        $stat = new Stat();
+        $stat->addOpenDetails(['datetime' => '2026-01-01 00:00:00', 'useragent' => 'UA-open']);
+
+        $stat->setOpenDetails([
+            ['datetime' => '2026-02-01 00:00:00', 'useragent' => 'UA-replacement'],
+        ]);
+
+        $this->assertCount(1, $stat->getDataOpenDetails());
+        $this->assertEquals(
+            [['datetime' => '2026-02-01 00:00:00', 'useragent' => 'UA-replacement']],
+            $stat->getOpenDetails()
+        );
     }
 
     public function testChanges(): void

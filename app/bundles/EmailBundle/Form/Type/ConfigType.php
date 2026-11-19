@@ -612,6 +612,21 @@ final class ConfigType extends AbstractType
                 'required'   => false,
             ]
         );
+
+        $builder->add(
+            'email_stats_compaction_threshold_days',
+            NumberType::class,
+            [
+                'scale'      => 0,
+                'label'      => 'mautic.email.config.email.stats.compaction.threshold',
+                'label_attr' => ['class' => 'form-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.email.stats.compaction.threshold.tooltip',
+                ],
+                'required'   => true,
+            ]
+        );
     }
 
     public function getBlockPrefix(): string

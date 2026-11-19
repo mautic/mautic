@@ -6,10 +6,12 @@ namespace Mautic\EmailBundle\Tests\Controller\Api;
 
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatOpenDetail;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
@@ -600,7 +602,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check that the email reply was created correctly.
         $this->assertSame('1', $fetchedReplyData['total']);
-        $this->assertSame($stat->getId(), $fetchedReplyData['stats'][0]['stat_id']);
+        $this->assertSame((string) $stat->getId(), $fetchedReplyData['stats'][0]['stat_id']);
         $this->assertMatchesRegularExpression('/api-[a-z0-9]*/', $fetchedReplyData['stats'][0]['message_id']);
 
         // Get the email stat that was just updated from the stat API.
@@ -610,9 +612,57 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check that the email stat was updated correctly/
         $this->assertSame('1', $fetchedStatData['total']);
-        $this->assertSame($stat->getId(), $fetchedStatData['stats'][0]['id']);
+        $this->assertSame((string) $stat->getId(), $fetchedStatData['stats'][0]['id']);
         $this->assertSame('1', $fetchedStatData['stats'][0]['is_read']);
         $this->assertMatchesRegularExpression('/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/', $fetchedStatData['stats'][0]['date_read']);
+    }
+
+    public function testStatsApiReturnsOpenAndBounceDetailsInEmailStatsOpenDetails(): void
+    {
+        /** @var StatRepository $statRepository */
+        $statRepository = self::getContainer()->get(StatRepository::class);
+
+        $stat = new Stat();
+        $stat->setTrackingHash('tracking_hash_open_details');
+        $stat->setEmailAddress('john@doe.email');
+        $stat->setDateSent(new \DateTime());
+        $stat->addOpenDetails(['useragent' => 'UA-open-details-test']);
+        $stat->addBounceDetails(['reason' => 'Mailbox full']);
+        $statRepository->saveEntity($stat);
+
+        $query = ['where' => [['col' => 'id', 'expr' => 'eq', 'val' => $stat->getId()]]];
+        $this->client->request('GET', '/api/stats/email_stats', $query);
+        $this->assertResponseIsSuccessful();
+        $fetched = json_decode($this->client->getResponse()->getContent(), true);
+
+        $openDetails = Serializer::decode($fetched['stats'][0]['open_details']);
+        $this->assertSame('UA-open-details-test', $openDetails[0]['useragent']);
+        $this->assertSame('Mailbox full', $openDetails['bounces'][0]['reason']);
+    }
+
+    public function testStatsApiSkipsOpenDetailsThatCannotBeDecoded(): void
+    {
+        /** @var StatRepository $statRepository */
+        $statRepository = self::getContainer()->get(StatRepository::class);
+
+        $stat = new Stat();
+        $stat->setTrackingHash('tracking_hash_bad_open_details');
+        $stat->setEmailAddress('john@doe.email');
+        $stat->setDateSent(new \DateTime());
+        $stat->addOpenDetails(['useragent' => 'UA-good']);
+        $statRepository->saveEntity($stat);
+
+        $this->connection->insert(
+            $this->em->getClassMetadata(StatOpenDetail::class)->getTableName(),
+            ['stat_id' => $stat->getId(), 'date_sent' => (new \DateTime())->format('Y-m-d H:i:s'), 'open_detail' => 'O:8:"stdClass":0:{}']
+        );
+
+        $query = ['where' => [['col' => 'id', 'expr' => 'eq', 'val' => $stat->getId()]]];
+        $this->client->request('GET', '/api/stats/email_stats', $query);
+        $this->assertResponseIsSuccessful();
+        $fetched = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertSame([['useragent' => 'UA-good']], Serializer::decode($fetched['stats'][0]['open_details']));
     }
 
     public function testSendAction(): void

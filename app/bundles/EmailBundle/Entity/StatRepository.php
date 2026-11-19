@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
@@ -520,8 +521,98 @@ class StatRepository extends CommonRepository
             ['openDetails'],
             ['dateRead', 'dateSent'],
             $timeToReadParser,
-            's.id'
+            's.id',
+            postCallback: empty($options['basic_select']) ? $this->loadAndDeserializeOpenDetails(...) : null,
         );
+    }
+
+    /**
+     * Load and deserialize open details for a set of stats, merging the legacy `open_details`
+     * column (already decoded by `getTimelineResults()`) with the compacted child rows.
+     *
+     * @param array<int,array<string,mixed>> $results
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public function loadAndDeserializeOpenDetails(array &$results): array
+    {
+        $statIds = array_column($results, 'id');
+        if (!$statIds) {
+            return $results;
+        }
+        $query   = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats_open_details', 'sod')
+            ->select('sod.stat_id, sod.open_detail')
+            ->where(
+                $query->expr()->in('sod.stat_id', ':statIds')
+            )
+            ->setParameter('statIds', $statIds, ArrayParameterType::INTEGER)
+            ->orderBy('sod.id');
+        $openDetails = $query->executeQuery()->fetchAllAssociative();
+        $resultById  = [];
+        foreach ($results as &$stat) {
+            $stat['openDetails']     = is_array($stat['openDetails'] ?? null) ? $stat['openDetails'] : [];
+            $resultById[$stat['id']] = &$stat;
+        }
+        unset($stat);
+        foreach ($openDetails as $detail) {
+            if (null === $detail['open_detail']) {
+                continue;
+            }
+            $openDetail = $this->decodeOpenDetails($detail['open_detail']);
+            if (!is_array($openDetail)) {
+                continue;
+            }
+            $resultById[$detail['stat_id']]['openDetails'] = StatOpenDetail::mergeOpenDetail(
+                $resultById[$detail['stat_id']]['openDetails'],
+                $openDetail,
+            );
+        }
+
+        return $results;
+    }
+
+    /**
+     * @return array{total: mixed, results: array<int,array<string,mixed>>}
+     */
+    public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], ?array $select = null, array $allowedJoins = []): array
+    {
+        $rows = parent::getRows($start, $limit, $order, $where, $select, $allowedJoins);
+        if (!$rows['results'] || !array_key_exists('open_details', $rows['results'][0]) || !array_key_exists('id', $rows['results'][0])) {
+            return $rows;
+        }
+
+        // Open details are held in the legacy column and child rows, so return them merged in the column's format.
+        $stats = array_map(
+            fn (array $row): array => [
+                'id'          => $row['id'],
+                'openDetails' => null === $row['open_details'] ? [] : $this->decodeOpenDetails($row['open_details']),
+            ],
+            $rows['results']
+        );
+        $stats = $this->loadAndDeserializeOpenDetails($stats);
+
+        foreach ($rows['results'] as $index => &$row) {
+            if ($stats[$index]['openDetails']) {
+                $row['open_details'] = serialize($stats[$index]['openDetails']);
+            }
+        }
+        unset($row);
+
+        return $rows;
+    }
+
+    /**
+     * Serializer::decode() rejects any text resembling a serialised object, even inside a string value, so client-supplied
+     * text such as a user agent can trigger a false alarm; such values are skipped rather than failing the read.
+     */
+    private function decodeOpenDetails(string $value): mixed
+    {
+        try {
+            return Serializer::decode($value);
+        } catch (\InvalidArgumentException|\ErrorException) {
+            return null;
+        }
     }
 
     /**
