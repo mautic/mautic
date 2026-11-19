@@ -7,10 +7,10 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
+use Mautic\CoreBundle\Form\Type\SegmentedControlType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
@@ -39,7 +39,7 @@ final class AssetType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('asset.asset', $options));
 
-        $builder->add('storageLocation', ButtonGroupType::class, [
+        $builder->add('storageLocation', SegmentedControlType::class, [
             'label'   => 'mautic.asset.asset.form.storageLocation',
             'choices' => [
                 'mautic.asset.asset.form.storageLocation.local'  => 'local',
