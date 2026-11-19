@@ -477,7 +477,7 @@ final class IntegrationHelper
         return ($returnSettings) ? [$socialCache, $featureSettings] : $socialCache;
     }
 
-    public function clearIntegrationCache(object $lead, bool $integration = false): array
+    public function clearIntegrationCache(object $lead, string|false $integration = false): array
     {
         $socialCache = $lead->getSocialCache();
         if (!empty($integration)) {
