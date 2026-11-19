@@ -294,6 +294,53 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('http://localhost', $download->getReferer());
     }
 
+    public function testDownloadWithoutATrackingIdIsCountedButNotAsUnique(): void
+    {
+        $asset = new Asset();
+
+        $this->corePermissions->method('isAnonymous')->willReturn(true);
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
+        $this->contactTracker->method('getContact')->willReturn(null);
+        $this->deviceTrackingService->method('getTrackedDevice')->willReturn(null);
+
+        // Without an identifier Mautic can't tell whether the visitor downloaded the asset before
+        $this->assetRepository->expects($this->once())
+            ->method('upDownloadCount')
+            ->with($asset->getId(), 1, false);
+        $this->entityManager->expects($this->never())->method('persist');
+
+        $this->assetModel->trackDownload($asset, new Request());
+    }
+
+    /**
+     * @return iterable<string, array{bool}>
+     */
+    public static function failedDownloadProvider(): iterable
+    {
+        yield 'tracked visitor' => [true];
+        yield 'visitor with a privacy signal' => [false];
+    }
+
+    #[DataProvider('failedDownloadProvider')]
+    public function testDeniedOrMissingFileIsNotCountedAsADownload(bool $trackable): void
+    {
+        $asset = new Asset();
+
+        $this->corePermissions->method('isAnonymous')->willReturn(true);
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn($trackable);
+        $this->ipLookupHelper->method('isRequestCountable')->willReturn(true);
+        $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress('203.0.113.30'));
+        $this->contactTracker->method('getContact')->willReturn(new Lead());
+        $trackedDevice = $this->createStub(LeadDevice::class);
+        $trackedDevice->method('getTrackingId')->willReturn('failed-download-device');
+        $this->deviceTrackingService->method('getTrackedDevice')->willReturn($trackedDevice);
+
+        $this->assetRepository->expects($this->never())->method('upDownloadCount');
+
+        $this->assetModel->trackDownload($asset, new Request(), 401);
+        $this->assetModel->trackDownload($asset, new Request(), 404);
+    }
+
     #[DataProvider('getEntityBySlugsProvider')]
     public function testGetEntityBySlugs(
         string $slug,

@@ -273,6 +273,18 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->getIpHelper($request, $coreParametersHelper)->isRequestCountable());
     }
 
+    public function testIsRequestCountableKeepsAnExcludedVisitorOutBehindAnUntrustedProxy(): void
+    {
+        // The proxy isn't in the trusted proxies, so only Mautic's own lookup sees the excluded visitor behind it
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')
+            ->willReturnCallback(static fn (string $name): ?array => 'do_not_track_ips' === $name ? ['73.77.245.52'] : null);
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '198.51.100.7', 'HTTP_X_FORWARDED_FOR' => '73.77.245.52']);
+        $request->headers->set('DNT', '1');
+
+        $this->assertFalse($this->getIpHelper($request, $coreParametersHelper)->isRequestCountable());
+    }
+
     public function testIsRequestCountableChecksTheVisitorBehindATrustedProxy(): void
     {
         // The proxy is excluded, the visitor it forwards for isn't
