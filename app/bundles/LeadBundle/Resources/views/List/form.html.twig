@@ -140,26 +140,27 @@
 </div>
 {% endset %}
 
+{% set detailsTab = {
+    'title': 'mautic.core.details',
+    'id': 'details',
+    'content': detailsTabContent
+} %}
+{% set filtersTab = {
+    'title': 'mautic.core.filters',
+    'id': 'filters',
+    'content': filtersTabContent
+} %}
+{% set preferenceCenterTab = {
+    'title': 'mautic.lead.list.quickfilter.preference_center',
+    'id': 'preference-center',
+    'content': preferenceCenterTabContent
+} %}
+{% set tabs = form.filters.vars.valid ? [detailsTab, filtersTab, preferenceCenterTab] : [filtersTab, detailsTab, preferenceCenterTab] %}
+
 <div class="box-layout">
     <div class="col-xs-12 height-auto">
         {% include '@MauticCore/Helper/nav_tabs.html.twig' with {
-            'tabs': [
-                {
-                    'title': 'mautic.core.details',
-                    'id': 'details',
-                    'content': detailsTabContent
-                },
-                {
-                    'title': 'mautic.core.filters',
-                    'id': 'filters',
-                    'content': filtersTabContent
-                },
-                {
-                    'title': 'Preference center',
-                    'id': 'preference-center',
-                    'content': preferenceCenterTabContent
-                }
-            ],
+            'tabs': tabs,
             'style': 'line'
         } %}
     </div>
