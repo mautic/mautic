@@ -45,6 +45,7 @@ final class ConfigType extends AbstractType
                     'unsubscribe_message'    => 'html',
                     'resubscribe_message'    => 'html',
                     'webview_text'           => 'html',
+                    'forward_text'           => 'html',
                     // Encode special chars to keep congruent with Email entity custom headers
                     'mailer_custom_headers'  => 'clean',
                 ]
@@ -86,6 +87,26 @@ final class ConfigType extends AbstractType
                     ? $options['data']['webview_text']
                     : $this->translator->trans(
                         'mautic.email.webview.text',
+                        ['%link%' => '|URL|']
+                    ),
+            ]
+        );
+
+        $builder->add(
+            'forward_text',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.email.config.forward_text',
+                'label_attr' => ['class' => 'form-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.forward_text.tooltip',
+                ],
+                'required'   => false,
+                'data'       => (array_key_exists('forward_text', $options['data']) && !empty($options['data']['forward_text']))
+                    ? $options['data']['forward_text']
+                    : $this->translator->trans(
+                        'mautic.email.forward.text',
                         ['%link%' => '|URL|']
                     ),
             ]
@@ -449,6 +470,21 @@ final class ConfigType extends AbstractType
                 ],
                 'data'       => !empty($options['data']['disable_unsubscribe_link_header']),
                 'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'email_forward_limit',
+            NumberType::class,
+            [
+                'scale'      => 0,
+                'label'      => 'mautic.email.config.forward.limit',
+                'label_attr' => ['class' => 'form-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.forward.limit.tooltip',
+                ],
+                'required'   => true,
             ]
         );
 

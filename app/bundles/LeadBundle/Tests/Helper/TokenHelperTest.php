@@ -265,6 +265,20 @@ final class TokenHelperTest extends \PHPUnit\Framework\TestCase
         yield ['{contactfield=randomField}', 'randomField'];
     }
 
+    public function testTokenDefaultsAreUsedWhenThereIsNoContact(): void
+    {
+        $content = 'Hi {contactfield=firstname|there}, from {contactfield=city} {contactfield=firstname|there}';
+
+        $this->assertSame(
+            [
+                '{contactfield=firstname|there}' => 'there',
+                '{contactfield=city}'            => '',
+            ],
+            TokenHelper::findLeadTokenDefaults($content)
+        );
+        $this->assertSame([], TokenHelper::findLeadTokenDefaults('No tokens here'));
+    }
+
     #[DataProvider('dataLabelProvider')]
     public function testLabelFormatForSelect(string $token, string|int $result): void
     {

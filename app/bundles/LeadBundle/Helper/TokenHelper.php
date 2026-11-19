@@ -68,6 +68,26 @@ final class TokenHelper
         return $replace ? $content : $tokenList;
     }
 
+    /**
+     * The contact tokens in the content with their default values, for a message that has no contact
+     * behind it, such as a copy of an email forwarded to somebody else.
+     *
+     * @return array<string, string>
+     */
+    public static function findLeadTokenDefaults(string $content): array
+    {
+        $tokenList = [];
+        if (!preg_match_all(self::REGEX, $content, $matches)) {
+            return $tokenList;
+        }
+
+        foreach ($matches[3] as $key => $match) {
+            $tokenList[$matches[0][$key]] = self::getTokenDefaultValue($match);
+        }
+
+        return $tokenList;
+    }
+
     public static function validToken(string $content): bool
     {
         return (bool) preg_match(self::REGEX, $content);

@@ -107,6 +107,11 @@ class MailHelper
      */
     protected $internalSend = false;
 
+    /**
+     * The message is a copy of a sent email that its recipient asked to pass on to somebody else.
+     */
+    protected bool $forwardedCopy = false;
+
     protected ?string $idHash = null;
 
     /**
@@ -623,6 +628,7 @@ class MailHelper
         $this->idHash           = null;
         $this->contentHash      = null;
         $this->internalSend     = false;
+        $this->forwardedCopy    = false;
         $this->fatal            = false;
         $this->idHashState      = true;
 
@@ -1184,7 +1190,7 @@ class MailHelper
     }
 
     /**
-     * @param array<string, mixed> $lead
+     * @param array<string, mixed>|null $lead
      */
     public function setLead($lead, $interalSend = false): void
     {
@@ -1200,6 +1206,20 @@ class MailHelper
     public function isInternalSend()
     {
         return $this->internalSend;
+    }
+
+    /**
+     * Mark the message as a copy for somebody other than the original recipient: no unsubscribe or
+     * preference links, no unsubscribe header, and nothing that points back at the original recipient.
+     */
+    public function setForwardedCopy(bool $forwardedCopy): void
+    {
+        $this->forwardedCopy = $forwardedCopy;
+    }
+
+    public function isForwardedCopy(): bool
+    {
+        return $this->forwardedCopy;
     }
 
     /**
@@ -1334,6 +1354,7 @@ class MailHelper
         $unsubscribeBodyText = $this->coreParametersHelper->get('unsubscribe_text') ?? '';
         if (!$email
             || $email->getSendToDnc()
+            || $this->forwardedCopy
             || $this->coreParametersHelper->get('disable_unsubscribe_link_header')
             || !self::isUnsubscribeHeadersRequired($this->getBody(), $unsubscribeBodyText)) {
             return $headers;

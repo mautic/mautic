@@ -1,0 +1,58 @@
+{% extends "@MauticCore/Theme/message.html.twig" %}
+
+{% block message_content %}
+    <div class="row align-self-center justify-content-center validation-row">
+        <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
+            {% block forward_content %}
+                <div class="well validation-card">
+                    <h1 class="text-center">{{ 'mautic.email.forward.header'|trans }}</h1>
+                    {% if message is defined and message is not empty %}
+                        <p class="text-center">{{ message }}</p>
+                    {% else %}
+                        <p>{{ 'mautic.email.forward.message'|trans }}</p>
+                        {{ form_start(form) }}
+                        {{ form_label(emailAddressField) }}
+                        <div class="input-group {% if not emailAddressValid %}has-error{% endif %}">
+                            {{ form_widget(emailAddressField) }}
+                            <span class="input-group-btn">
+                                {{ form_row(submitField) }}
+                            </span>
+                        </div>
+                        {% if emailAddressHasErrors %}
+                            <div class="validate-alert" role="alert" aria-live="polite">
+                                {{ form_errors(emailAddressField) }}
+                            </div>
+                        {% endif %}
+                        {{ form_end(form) }}
+                    {% endif %}
+                </div>
+            {% endblock %}
+        </div>
+    </div>
+
+    <style>
+        .validation-row {
+            padding-right: 10px;
+            padding-left: 10px;
+        }
+
+        .validation-card {
+            margin-top: 30px;
+        }
+
+        .validate-alert {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border: 1px solid #ebccd1;
+            border-radius: 4px;
+            background: #fdf2f2;
+            color: #a94442;
+        }
+
+        @media (min-width: 992px) {
+            .validation-card {
+                margin-top: 50px;
+            }
+        }
+    </style>
+{% endblock %}
