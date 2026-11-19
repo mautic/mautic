@@ -12,6 +12,7 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\SmsBundle\Integration\TwilioIntegration;
 use Mautic\SmsBundle\Tests\SmsTestHelperTrait;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Psr\Log\NullLogger;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
@@ -38,17 +39,35 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         );
     }
 
-    public function testSavingRefreshesTheLeftPanel(): void
+    // MenuBuilder keeps built menus in a static for the whole PHP process, so each left panel test needs its own process.
+    #[RunInSeparateProcess]
+    public function testPublishingAddsSmsToTheLeftPanel(): void
     {
         $this->configureTwilioWithArrayTransport();
 
-        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
-        $this->assertIsArray($response);
-        $this->assertSame(1, $response['closeModal'] ?? null);
-        $this->assertIsString($response['sidebar'] ?? null);
-        // Not asserting the SMS menu item: MenuBuilder keeps built menus in a static for the whole PHP process,
-        // so a menu rendered by an earlier test is reused here.
-        $this->assertStringContainsString('<div class="sidebar-content">', $response['sidebar']);
+        $this->assertStringContainsString('/s/sms', $this->getRefreshedLeftPanel());
+    }
+
+    #[RunInSeparateProcess]
+    public function testUnpublishingRemovesSmsFromTheLeftPanel(): void
+    {
+        // published without rendering the menu, which would then be reused for the response below
+        $settings = new Integration();
+        $settings->setName(TwilioIntegration::NAME);
+        $settings->setIsPublished(true);
+        $this->em->persist($settings);
+        $this->em->flush();
+
+        $crawler     = $this->client->request('GET', '/s/plugins/config/Twilio');
+        $this->assertResponseIsSuccessful();
+        $form        = $crawler->selectButton('integration_config[buttons][save]')->form();
+        $isPublished = $form['integration_config[isPublished]'];
+        $this->assertInstanceOf(ChoiceFormField::class, $isPublished);
+        $isPublished->select('0');
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $this->assertStringNotContainsString('/s/sms', $this->getRefreshedLeftPanel());
     }
 
     public function testBlankAuthTokenKeepsTheSavedOne(): void
@@ -128,6 +147,17 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         // nothing left to move: the migration is skipped
         $this->expectException(SkipMigration::class);
         $this->createMigration()->preUp($schema);
+    }
+
+    private function getRefreshedLeftPanel(): string
+    {
+        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $this->assertIsArray($response);
+        $this->assertSame(1, $response['closeModal'] ?? null);
+        $this->assertIsString($response['sidebar'] ?? null);
+        $this->assertStringContainsString('<div class="sidebar-content">', $response['sidebar']);
+
+        return $response['sidebar'];
     }
 
     private function createMigration(): Version20261109130000
