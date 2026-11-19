@@ -78,10 +78,10 @@ final class ProjectRepositoryTest extends TestCase
      */
     public static function associationFilterProvider(): iterable
     {
-        yield ['has:emails', 'email_projects_xref'];
-        yield ['has:campaigns', 'campaign_projects_xref'];
-        yield ['has:pages', 'page_projects_xref'];
-        yield ['has:assets', 'asset_projects_xref'];
+        yield 'has emails' => ['has:emails', 'email_projects_xref'];
+        yield 'has campaigns' => ['has:campaigns', 'campaign_projects_xref'];
+        yield 'has pages' => ['has:pages', 'page_projects_xref'];
+        yield 'has assets' => ['has:assets', 'asset_projects_xref'];
     }
 
     public function testAssociationFilterSupportsNegation(): void

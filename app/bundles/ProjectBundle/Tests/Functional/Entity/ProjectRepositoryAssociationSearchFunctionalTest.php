@@ -114,7 +114,7 @@ final class ProjectRepositoryAssociationSearchFunctionalTest extends MauticMysql
         $this->createEmail('Listed email only project', $projectWithEmailOnly);
         $this->createCampaign('Listed campaign with email project', $projectWithEmailAndCampaign);
 
-        $this->client->request('GET', '/s/projects', ['tmpl' => 'list', 'search' => 'has:emails has:campaigns']);
+        $this->client->request('GET', '/s/projects', ['tmpl' => 'list', 'search' => 'has:emails has:campaigns'], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
         $this->assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();

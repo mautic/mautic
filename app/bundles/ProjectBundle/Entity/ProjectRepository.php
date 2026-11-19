@@ -37,10 +37,7 @@ final class ProjectRepository extends CommonRepository
         }
 
         foreach (self::ASSOCIATION_FILTERS as $translationKey => $association) {
-            $command   = $this->translator->trans($translationKey);
-            $commandEn = $this->translator->trans($translationKey, [], null, 'en_US');
-
-            if ($filter->command === $command || $filter->command === $commandEn) {
+            if ($filter->command === $this->translator->trans($translationKey) || $filter->command === $this->translator->trans($translationKey, [], null, 'en_US')) {
                 return $this->buildAssociationExpression($q, $association, (bool) $filter->not);
             }
         }
