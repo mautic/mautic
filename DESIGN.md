@@ -240,7 +240,7 @@ pictogram: "Use for decorative illustrations, such as empty states, by name and 
 
 Use to choose one option from a small set of mutually exclusive options, shown side by side so the user sees all of them at once. Use it for 2 to 4 concise options that fit on one line at the control width, such as Contact/Company or Local/Remote. Do not use it for long descriptions or multi-line choices. For more than 4 options, use a select. For a single yes/no or on/off choice, use a toggle.
 
-Match the [UIBrik reference](https://uibrik.com/components/segmented-control): a muted pill-shaped track with a 25px radius, a lighter sliding selection without a border or shadow, and dark text on the selection in the light theme. Options: `size` (sm, md, lg), `equal_width`, `draggable` (press the selected option and drag to scrub across the others, on by default), `duration` and an icon per option.
+Match the [UIBrik reference](https://uibrik.com/components/segmented-control): a muted pill-shaped track with a 25px radius, a lighter sliding selection with no border and a subtle shadow, and dark text on the selection in the light theme. Options: `size` (sm, md, lg), `equal_width`, `draggable` (press the selected option and drag to scrub across the others, on by default), `duration` and an icon per option.
 
 ```yaml
 segmented-control: "Use to pick one of 2 to 4 short, mutually exclusive options that fit on one line. Not for long or multi-line choices, or yes/no."
