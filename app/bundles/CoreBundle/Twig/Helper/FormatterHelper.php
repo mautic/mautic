@@ -136,7 +136,7 @@ final readonly class FormatterHelper
      *
      * @return array<string, string>|array<int, string>
      */
-    public function simpleCsvToArray(?string $csv, string $type = 'html'): array
+    public function simpleCsvToArray(?string $csv, string $type = 'string'): array
     {
         if (!$csv) {
             return [];

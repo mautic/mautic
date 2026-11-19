@@ -1522,7 +1522,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\CoreBundle\Helper\UrlHelper` | `getUrlsFromPlaintext()` (`$text`), `isValidUrl()` (`$url`) | `string` |
     | `Mautic\CoreBundle\Twig\Helper\AssetsHelper` | `getOverridableUrl()`, `getUrl()` (`$path`), `addScript()` (`$location`, `$name`), `addScriptDeclaration()` (`$script`, `$location`), `addCustomDeclaration()` (`$declaration`, `$location`), `outputScripts()` (`$location`), `includeScript()` (`$onLoadCallback`, `$alreadyLoadedCallback`), `getCountryFlag()` (`$class`) | `string`, `?string` for `$name` |
     | `Mautic\CoreBundle\Twig\Helper\ButtonHelper` | `renderButtons()` (`$dropdownHtml`, `$closingDropdownHtml`) | `string` |
-    | `Mautic\CoreBundle\Twig\Helper\FormatterHelper` | `_()` (`$type`, `$round`), `arrayToString()` (`$delimiter`), `simpleArrayToHtml()` (`$delimeter`), `simpleCsvToArray()` (`$type`, now defaults to `'html'`) | `string`, `int`, `string`, `string`, `string` |
+    | `Mautic\CoreBundle\Twig\Helper\FormatterHelper` | `_()` (`$type`, `$round`), `arrayToString()` (`$delimiter`), `simpleArrayToHtml()` (`$delimeter`), `simpleCsvToArray()` (`$type`, now defaults to `'string'`) | `string`, `int`, `string`, `string`, `string` |
     | `Mautic\CoreBundle\Twig\Helper\GravatarHelper` | `getImage()` (`$size`) | `string` |
     | `Mautic\DynamicContentBundle\Helper\DynamicContentHelper` | `getDwcsBySlotName()` (`$slotName`, `$publishedOnly`) | `string`, `bool` |
     | `Mautic\EmailBundle\Helper\EmailValidator` | `validate()` (`$address`), `doPluginValidation()` (`$address`) | `?string`, `string` |
