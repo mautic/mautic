@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\SegmentedControlType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -171,7 +172,7 @@ final class ConfigType extends AbstractType
 
         $builder->add(
             'peak_interaction_timer_cache_timeout',
-            ChoiceType::class,
+            SegmentedControlType::class,
             [
                 'label'      => 'mautic.config.peak_interaction_timer.cache_timeout',
                 'label_attr' => ['class' => 'form-label'],
@@ -194,7 +195,7 @@ final class ConfigType extends AbstractType
 
         $builder->add(
             'peak_interaction_timer_fetch_interactions_from',
-            ChoiceType::class,
+            SegmentedControlType::class,
             [
                 'label'      => 'mautic.config.peak_interaction_timer.fetch_interactions_from',
                 'label_attr' => ['class' => 'form-label'],

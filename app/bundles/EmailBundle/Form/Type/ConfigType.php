@@ -6,13 +6,13 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\ConfigBundle\Form\Type\DsnType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\Type\SegmentedControlType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\EmailBundle\Validator\Dsn;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -482,7 +482,7 @@ final class ConfigType extends AbstractType
         );
         $builder->add(
             'email_frequency_time',
-            ChoiceType::class,
+            SegmentedControlType::class,
             [
                 'choices'           => [
                     'day'   => 'DAY',
