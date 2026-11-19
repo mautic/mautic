@@ -20,6 +20,7 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\SMimeHelper;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
@@ -1198,7 +1199,7 @@ final class MailHelperTest extends TestCase
 
     public function testImagesAreEmbeddedAgainAfterTheMailerIsReset(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->atLeast(5))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_from_email', null, 'nobody@nowhere.com'],
@@ -1229,6 +1230,7 @@ final class MailHelperTest extends TestCase
             $mailer->send();
 
             $message = $transport->getMessage();
+            $this->assertInstanceOf(MauticMessage::class, $message);
             $this->assertCount(1, $message->getAttachments(), 'The image must be embedded in every message.');
             $this->assertStringContainsString('src="cid:'.md5($sampleImagePath).'"', (string) $message->getHtmlBody());
         }
