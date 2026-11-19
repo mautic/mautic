@@ -60,6 +60,27 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 </div>
 {% endblock %}
 
+{% block segmented_control_widget %}
+{% set options = [] %}
+{% for child in form %}
+    {% set options = options|merge([{value: child.vars.value, label: child.vars.label, disabled: child.vars.disabled, icon: segmented_control.icons[child.vars.value]|default(null)}]) %}
+{% endfor %}
+{% set params = {
+    options: options,
+    value: form.vars.value,
+    name: full_name,
+    id: id,
+    attr: attr|filter((v, k) => k not in ['class', 'tooltip']),
+    size: segmented_control.size,
+    equalWidth: segmented_control.equalWidth,
+    draggable: segmented_control.draggable
+} %}
+{% if segmented_control.duration is not null %}
+    {% set params = params|merge({duration: segmented_control.duration}) %}
+{% endif %}
+{% include '@MauticCore/Components/segmented-control.html.twig' with params only %}
+{% endblock %}
+
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:button_row.html.php #}
 {% block button_row %}
 {{ form_widget(form) }}
