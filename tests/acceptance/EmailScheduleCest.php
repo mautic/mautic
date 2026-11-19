@@ -8,11 +8,6 @@ use Step\Acceptance\SegmentStep;
 
 final class EmailScheduleCest
 {
-    public function _before(AcceptanceTester $I): void
-    {
-        $I->login();
-    }
-
     public function triggeredEmailShowsScheduleOptionsOnCreate(AcceptanceTester $I): void
     {
         $I->login(reuseSessionSnapshot: false);
@@ -46,6 +41,7 @@ final class EmailScheduleCest
 
     public function segmentEmailHidesScheduleOptionsOnCreate(AcceptanceTester $I): void
     {
+        $I->login();
         $I->amOnPage(EmailsPage::URL);
 
         // Create a new email
@@ -71,6 +67,7 @@ final class EmailScheduleCest
 
     public function createTriggeredEmailAndVerifyScheduleOptionsOnEdit(AcceptanceTester $I, EmailStep $email): void
     {
+        $I->login();
         $name = 'Triggered Email '.date('YmdHis');
 
         $email->createTriggeredEmail($name);
@@ -99,6 +96,7 @@ final class EmailScheduleCest
 
     public function createSegmentEmailAndVerifyScheduleNoticeTogglesOnEdit(AcceptanceTester $I, SegmentStep $segment, EmailStep $email): void
     {
+        $I->login();
         $contactSegmentName = 'Segment '.date('YmdHis');
 
         $segment->createAContactSegment($contactSegmentName);
@@ -144,6 +142,7 @@ final class EmailScheduleCest
 
     public function createSegmentEmailAndVerifyScheduleButtonOnView(AcceptanceTester $I, SegmentStep $segment, EmailStep $email): void
     {
+        $I->login();
         $contactSegmentName = 'Segment '.date('YmdHis');
 
         $segment->createAContactSegment($contactSegmentName);
