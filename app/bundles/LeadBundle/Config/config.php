@@ -138,10 +138,6 @@ return [
                     'companyId' => '\d+',
                 ],
             ],
-            'mautic_segment_contacts' => [
-                'path'       => '/segment/view/{objectId}/contact/{page}',
-                'controller' => 'Mautic\LeadBundle\Controller\ListController::contactsAction',
-            ],
             'mautic_contact_stats' => [
                 'path'       => '/contacts/view/{objectId}/stats',
                 'controller' => 'Mautic\LeadBundle\Controller\LeadController::contactStatsAction',
