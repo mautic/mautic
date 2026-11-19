@@ -6,6 +6,7 @@ namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\BrowserKit\Cookie;
@@ -17,6 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class AssetDownloadCountFunctionalTest extends MauticMysqlTestCase
 {
+    private const LOCAL_FILE = 'download-count-test.txt';
+
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -93,6 +96,44 @@ final class AssetDownloadCountFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(0, $this->em->getRepository(Download::class)->findBy(['asset' => $asset->getId()]));
     }
 
+    public function testFirstDownloadAfterAMissingFileStillCountsAsUnique(): void
+    {
+        $uploadDir = self::getContainer()->get(CoreParametersHelper::class)->get('upload_dir');
+        $file      = $uploadDir.'/'.self::LOCAL_FILE;
+        @unlink($file);
+
+        $asset = new Asset();
+        $asset->setTitle('Local asset');
+        $asset->setAlias('local-asset');
+        $asset->setStorageLocation('local');
+        $asset->setPath(self::LOCAL_FILE);
+        $asset->setIsPublished(true);
+        $this->em->persist($asset);
+        $this->em->flush();
+        $this->logoutUser();
+
+        try {
+            // The same browser first asks for the file while it is missing
+            $this->client->request(Request::METHOD_GET, '/asset/'.$asset->getSlug());
+            $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+            $this->assertSame(['0', '0'], $this->fetchCounts($asset));
+            // The attempt stays on the contact's history
+            $this->assertSame(1, $this->em->getRepository(Download::class)->count(['asset' => $asset->getId(), 'code' => Response::HTTP_NOT_FOUND]));
+
+            file_put_contents($file, 'restored');
+
+            $this->client->request(Request::METHOD_GET, '/asset/'.$asset->getSlug());
+            $this->assertResponseIsSuccessful();
+            $this->assertSame(['1', '1'], $this->fetchCounts($asset), 'The first real download is a unique one.');
+
+            $this->client->request(Request::METHOD_GET, '/asset/'.$asset->getSlug());
+            $this->assertResponseIsSuccessful();
+            $this->assertSame(['2', '1'], $this->fetchCounts($asset), 'The second one is not.');
+        } finally {
+            @unlink($file);
+        }
+    }
+
     public function testDownloadsAreNotCountedWhileAggregateAnalyticsOff(): void
     {
         $asset = $this->createAsset();
@@ -114,6 +155,22 @@ final class AssetDownloadCountFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/asset/'.$asset->getSlug(), [], [], $server);
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND, 'the visitor gets the file either way');
         $this->assertSame($asset->getRemotePath(), $this->client->getResponse()->headers->get('Location'));
+    }
+
+    /**
+     * Read straight from the table, so the entity manager the requests share is left alone between them.
+     *
+     * @return array{string, string} the total and the unique download count
+     */
+    private function fetchCounts(Asset $asset): array
+    {
+        $counts = $this->connection->fetchNumeric(
+            'SELECT download_count, unique_download_count FROM '.MAUTIC_TABLE_PREFIX.'assets WHERE id = ?',
+            [$asset->getId()]
+        );
+        $this->assertIsArray($counts);
+
+        return [(string) $counts[0], (string) $counts[1]];
     }
 
     private function assertCounts(Asset $asset, int $total, int $unique): void
