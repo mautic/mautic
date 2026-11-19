@@ -16,7 +16,7 @@ Mautic.userOnLoad = function (container) {
         }
 
         if (mQuery('#InviteUserModal').data('auto-open')) {
-            mQuery('#InviteUserModal').modal('show');
+            mQuery('#InviteUserModal').each((index, element) => bootstrap.Modal.getOrCreateInstance(element).show());
         }
     }
 
