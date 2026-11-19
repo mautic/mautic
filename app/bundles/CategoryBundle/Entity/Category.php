@@ -81,7 +81,7 @@ class Category extends FormEntity implements UuidInterface
      * @var string|null
      */
     #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
-    #[Regex(pattern: '/^(?:#?(?:[a-f0-9]{3}|[a-f0-9]{6}))?$/i', message: 'mautic.category.color.invalid')]
+    #[Regex(pattern: '/^(?:#?(?:[a-f0-9]{3}|[a-f0-9]{6}))?$/iD', message: 'mautic.category.color.invalid')]
     #[ORM\Column(type: 'string', length: 7, nullable: true)]
     private $color;
 

@@ -2,7 +2,7 @@
 {% set hasCategory = category is defined and category is not empty and category.title is not empty %}
 {% set title = hasCategory ? category.title : 'mautic.core.form.uncategorized'|trans %}
 {% set categoryColor = category.color is defined ? category.color|default('') : '' %}
-{% set colorIsHex = categoryColor matches '/^#?(?:[a-f0-9]{3}|[a-f0-9]{6})$/i' %}
+{% set colorIsHex = categoryColor matches '/^#?(?:[a-f0-9]{3}|[a-f0-9]{6})$/iD' %}
 {% set color = colorIsHex ? (categoryColor|slice(0, 1) == '#' ? categoryColor : '#' ~ categoryColor) : 'var(--label-background-gray)' %}
 
 {% if type == 'inline' %}
