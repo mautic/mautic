@@ -4,7 +4,9 @@
 			<div class="d-flex flex-column flex-wrap flex-lg-nowrap">
 				{{ preHeader|raw }}
 				<h1 class="float-start page-header-title">{{ headerTitle|purify }}</h1>
-			<div class="mt-24 d-flex gap-5">{{ publishStatus|raw }}</div>
+				{% if publishStatus is not empty %}
+					<div class="mt-24 d-flex gap-5">{{ publishStatus|raw }}</div>
+				{% endif %}
 			{{ customContent('page.header.left', _context) }}
 			</div>
 
