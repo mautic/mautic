@@ -201,10 +201,8 @@ final class UserModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @param string $type
      */
-    public function getLookupResults($type, ?string $filter = '', int|string|null $limit = 10): array
+    public function getLookupResults(string $type, ?string $filter = '', int|string|null $limit = 10): array
     {
         $results = [];
 

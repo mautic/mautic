@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
@@ -11,16 +13,11 @@ use Mautic\EmailBundle\Entity\Stat;
  */
 final class FrequencyRuleRepository extends CommonRepository
 {
-    /**
-     * @param string      $channel
-     * @param string|null $defaultFrequencyNumber
-     * @param string|null $defaultFrequencyTime
-     */
     public function getAppliedFrequencyRules(
-        $channel,
+        string $channel,
         array $leadIds,
-        $defaultFrequencyNumber,
-        $defaultFrequencyTime,
+        ?string $defaultFrequencyNumber,
+        ?string $defaultFrequencyTime,
         string $statTable = 'email_stats',
         string $statContactColumn = 'lead_id',
         string $statSentColumn = 'date_sent',
@@ -107,10 +104,7 @@ final class FrequencyRuleRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @param string $channel
-     */
-    private function getCustomFrequencyRuleViolations($channel, array $leadIds, string $statTable, string $statContactColumn, string $statSentColumn): array
+    private function getCustomFrequencyRuleViolations(string $channel, array $leadIds, string $statTable, string $statContactColumn, string $statSentColumn): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -152,14 +146,10 @@ final class FrequencyRuleRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @param string $defaultFrequencyNumber
-     * @param string $defaultFrequencyTime
-     */
     private function getDefaultFrequencyRuleViolations(
         array $leadIds,
-        $defaultFrequencyNumber,
-        $defaultFrequencyTime,
+        ?string $defaultFrequencyNumber,
+        ?string $defaultFrequencyTime,
         string $statTable,
         string $statContactColumn,
         string $statSentColumn,

@@ -56,7 +56,7 @@ final class LeadChangeEventDispatcher
             return;
         }
 
-        $pointsEvent = new Events\PointsChangeEvent($this->lead, $this->changes['points'][0], $this->changes['points'][1]);
+        $pointsEvent = new Events\PointsChangeEvent($this->lead, (int) $this->changes['points'][0], (int) $this->changes['points'][1]);
         $this->dispatcher->dispatch($pointsEvent);
     }
 

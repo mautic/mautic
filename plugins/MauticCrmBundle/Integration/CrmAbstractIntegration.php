@@ -486,7 +486,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param string               $priorityObject
      * @param array<string, mixed> $config
      */
-    protected function getFieldsByPriority(array $config, $priorityObject, $direction): array
+    protected function getFieldsByPriority(array $config, $priorityObject, int $direction): array
     {
         return isset($config['update_'.$priorityObject]) ? array_keys($config['update_'.$priorityObject], $direction) : array_keys($config['leadFields'] ?? []);
     }
@@ -526,7 +526,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param array<string, mixed> $integrationData
      */
-    public function getBlankFieldsToUpdateInMautic(array $matchedFields, array $leadFieldValues, $objectFields, array $integrationData, $object = 'Lead')
+    public function getBlankFieldsToUpdateInMautic(array $matchedFields, array $leadFieldValues, $objectFields, array $integrationData, ?string $object = 'Lead')
     {
         foreach ($objectFields as $integrationField => $mauticField) {
             if (isset($leadFieldValues[$mauticField]) && empty($leadFieldValues[$mauticField]['value']) && !empty($integrationData[$integrationField.'__'.$object]) && $this->translator->trans('mautic.integration.form.lead.unknown') !== $integrationData[$integrationField.'__'.$object]) {
@@ -610,15 +610,13 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param mixed  $value
-     * @param string $fieldType
-     *
      * @return mixed
      */
-    protected function limitString($value, $fieldType = '')
+    protected function limitString($value, string $fieldType = '')
     {
         // We must not convert boolean values to string, otherwise "false" will be converted to an empty string.
         // "False" has to be converted to 0 instead.
-        if (('text' == $fieldType) && !is_bool($value)) {
+        if (('text' === $fieldType) && !is_bool($value)) {
             return substr($value, 0, 255);
         }
 

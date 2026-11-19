@@ -220,7 +220,7 @@ final class StatRepository extends CommonRepository
      * @param array<int,int|string>|int|null $emailIds
      * @param array<int,int|string>|int|null $listId
      */
-    public function getReadCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
+    public function getReadCount(array|int|null $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
         return $this->getStatusCount('is_read', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -235,11 +235,10 @@ final class StatRepository extends CommonRepository
     }
 
     /**
-     * @param string                              $column
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
      */
-    public function getStatusCount($column, $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
+    public function getStatusCount(string $column, $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

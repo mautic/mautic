@@ -85,15 +85,12 @@ final class TrackableRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    /**
-     * @param int $increaseBy
-     */
-    public function upHitCount($redirectId, $channel, $channelId, $increaseBy = 1, bool $unique = false): void
+    public function upHitCount($redirectId, $channel, $channelId, int $increaseBy = 1, bool $unique = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'channel_url_trackables')
-            ->set('hits', 'hits + '.(int) $increaseBy)
+            ->set('hits', 'hits + '.$increaseBy)
             ->where(
                 $q->expr()->and(
                     $q->expr()->eq('redirect_id', (string) ((int) $redirectId)),
@@ -104,7 +101,7 @@ final class TrackableRepository extends CommonRepository
             ->setParameter('channel', $channel);
 
         if ($unique) {
-            $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
+            $q->set('unique_hits', 'unique_hits + '.$increaseBy);
         }
 
         $q->executeStatement();
@@ -112,10 +109,8 @@ final class TrackableRepository extends CommonRepository
 
     /**
      * Get hit count.
-     *
-     * @param string $countColumn
      */
-    public function getCount($channel, $channelIds, $listId, ?ChartQuery $chartQuery = null, bool $combined = false, $countColumn = 'ph.id'): array|int
+    public function getCount(string $channel, $channelIds, $listId, ?ChartQuery $chartQuery = null, bool $combined = false, string $countColumn = 'ph.id'): array|int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('count('.$countColumn.') as click_count')

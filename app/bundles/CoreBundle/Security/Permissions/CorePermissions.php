@@ -90,7 +90,7 @@ class CorePermissions implements ResetInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function getPermissionObject($bundle, bool $throwException = true): false|AbstractPermissions
+    public function getPermissionObject(string $bundle, bool $throwException = true): false|AbstractPermissions
     {
         if (empty($bundle)) {
             throw new \InvalidArgumentException("Bundle and permission type must be specified. {$bundle} given.");
@@ -333,12 +333,8 @@ class CorePermissions implements ResetInterface
 
     /**
      * Checks if the user has access to the requested entity.
-     *
-     * @param string|bool $ownPermission
-     * @param string|bool $otherPermission
-     * @param User|int    $ownerId
      */
-    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId = 0): bool
+    public function hasEntityAccess(bool|string $ownPermission, bool|string $otherPermission, User|int|null $ownerId = 0): bool
     {
         $user = $this->userHelper->getUser();
         if (!is_object($user)) {

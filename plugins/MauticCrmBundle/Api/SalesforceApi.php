@@ -45,14 +45,11 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param string $method
-     * @param bool   $isRetry
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function request($operation, array $elementData = [], $method = 'GET', $isRetry = false, $object = null, $queryUrl = null)
+    public function request(?string $operation, array $elementData = [], string $method = 'GET', bool $isRetry = false, $object = null, $queryUrl = null)
     {
         if (!$object) {
             $object = $this->object;
@@ -61,7 +58,7 @@ final class SalesforceApi extends CrmApi
         $requestUrl = RequestUrl::get($this->integration->getApiUrl(), $queryUrl, $operation, $object);
 
         $settings   = $this->requestSettings;
-        if ('PATCH' == $method) {
+        if ('PATCH' === $method) {
             $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
         }
 
@@ -204,7 +201,7 @@ final class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function createObject(array $data, $sfObject)
+    public function createObject(array $data, string $sfObject)
     {
         $objectData = $this->request('', $data, 'POST', false, $sfObject);
         $this->integration->getLogger()->debug('SALESFORCE: POST createObject '.$sfObject.' '.var_export($data, true).var_export($objectData, true));
@@ -312,14 +309,13 @@ final class SalesforceApi extends CrmApi
     /**
      * Get Salesforce leads.
      *
-     * @param string|array $query  String for a SOQL query or array to build query
-     * @param string       $object
+     * @param string|array $query String for a SOQL query or array to build query
      *
      * @return array{totalSize: int, records: array<mixed>}|mixed|string
      *
      * @throws ApiErrorException
      */
-    public function getLeads(string|array $query, $object)
+    public function getLeads(string|array $query, string $object)
     {
         $queryUrl = $this->integration->getQueryUrl();
 
@@ -517,12 +513,11 @@ final class SalesforceApi extends CrmApi
 
     /**
      * @param mixed $response
-     * @param bool  $isRetry
      *
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function analyzeResponse($response, $isRetry): void
+    private function analyzeResponse($response, bool $isRetry): void
     {
         if (is_array($response)) {
             if (!empty($response['errors'])) {

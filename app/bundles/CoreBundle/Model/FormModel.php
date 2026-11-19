@@ -245,9 +245,8 @@ class FormModel extends AbstractCommonModel
      * Set timestamps and user ids.
      *
      * @param TEntity $entity
-     * @param bool   $isNew
      */
-    public function setTimestamps(object &$entity, $isNew, bool $unlock = true): void
+    public function setTimestamps(object &$entity, bool $isNew, bool $unlock = true): void
     {
         // unlock the row if applicable
         if ($unlock && method_exists($entity, 'setCheckedOut')) {
