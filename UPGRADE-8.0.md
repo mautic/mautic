@@ -559,7 +559,15 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
     `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
 
-- Bootstrap Vertical Tabs stylesheet `app/bundles/CoreBundle/Assets/css/libraries/bootstrap/_bootstrap-vertical-tabs.scss` removed together with its `@import` in `_libraries.scss` and the `.modal-body.p-0 .tabs-left`/`.tabs-right` border-radius override in `app/bundles/CoreBundle/Assets/css/app/scss/_custom.scss`. The `.tabs-left`, `.tabs-right` and `.vertical-text` classes no longer have styles, and the `overflowNavs` plugin and tab sorting no longer have a vertical mode: overflow handling and sorting are always horizontal. Do not call `overflowNavs` on vertical tab lists; it constrains the list to a 42px horizontal row and clips vertically stacked tabs. Use Bootstrap's vertical navigation (`.nav` with `.flex-column`) without `overflowNavs`, or provide a vertical overflow container. The Dynamic Content tabs in the email editor no longer carry `.tabs-left`.
+- The Bootstrap Vertical Tabs stylesheet `app/bundles/CoreBundle/Assets/css/libraries/bootstrap/_bootstrap-vertical-tabs.scss`, its `@import` in `_libraries.scss`, and the `.modal-body.p-0 .tabs-left`/`.tabs-right` border-radius override in `app/bundles/CoreBundle/Assets/css/app/scss/_custom.scss` were removed.
+
+    | Removed class | Replacement |
+    |---|---|
+    | `.tabs-left` | Bootstrap vertical navigation with `.nav` and `.flex-column`, placed on the left with the surrounding layout |
+    | `.tabs-right` | Bootstrap vertical navigation with `.nav` and `.flex-column`, placed on the right with the surrounding layout |
+    | `.vertical-text` | None; remove this class. |
+
+    Tab sorting and `overflowNavs` now handle horizontal lists only. Do not call `overflowNavs` on vertical lists; use Bootstrap's vertical navigation without the plugin or provide a vertical overflow container. The Dynamic Content tabs in the email editor no longer use `.tabs-left`.
 
 ## Changed code
 
