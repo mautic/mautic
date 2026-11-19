@@ -60,7 +60,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => 'Company custom field']);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadField::class, $field);
+        $this->assertInstanceOf(LeadField::class, $field);
         $this->assertSame('company', $field->getObject());
     }
 
