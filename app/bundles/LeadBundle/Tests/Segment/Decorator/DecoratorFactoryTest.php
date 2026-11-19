@@ -71,7 +71,7 @@ final class DecoratorFactoryTest extends TestCase
         );
     }
 
-    public function testPrimaryCompanyDecorator(): void
+    public function testAssociatedCompanyDecorator(): void
     {
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
             'object' => ContactSegmentFilterCrate::COMPANY_OBJECT,
@@ -85,10 +85,10 @@ final class DecoratorFactoryTest extends TestCase
         );
     }
 
-    public function testCompanyAllDecorator(): void
+    public function testPrimaryCompanyDecorator(): void
     {
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
-            'object' => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+            'object' => ContactSegmentFilterCrate::COMPANY_PRIMARY_OBJECT,
             'field'  => 'companycity',
             'type'   => 'text',
         ]);

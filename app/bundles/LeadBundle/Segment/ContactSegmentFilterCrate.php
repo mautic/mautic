@@ -6,9 +6,9 @@ class ContactSegmentFilterCrate
 {
     public const CONTACT_OBJECT   = 'lead';
 
-    public const COMPANY_OBJECT   = 'company';
+    public const COMPANY_OBJECT         = 'company';
 
-    public const COMPANY_ALL_OBJECT = 'company_all';
+    public const COMPANY_PRIMARY_OBJECT = 'company_primary';
 
     public const BEHAVIORS_OBJECT = 'behaviors';
 
@@ -89,7 +89,7 @@ class ContactSegmentFilterCrate
 
     public function isCompanyType(): bool
     {
-        return in_array($this->object, [self::COMPANY_OBJECT, self::COMPANY_ALL_OBJECT], true);
+        return in_array($this->object, [self::COMPANY_OBJECT, self::COMPANY_PRIMARY_OBJECT], true);
     }
 
     public function isBehaviorsType(): bool
