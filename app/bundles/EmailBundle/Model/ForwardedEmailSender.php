@@ -73,13 +73,9 @@ final readonly class ForwardedEmailSender
 
         $this->emailValidator->validate($toAddress);
 
-        if ($this->isLimitReached($stat)) {
-            throw new ForwardLimitReachedException();
-        }
+        $forward = $this->reserveForward($stat);
 
         if (!$this->isContactable($toAddress)) {
-            $this->emailForwardRepository->saveEntity(new EmailForward($stat));
-
             return;
         }
 
@@ -89,17 +85,43 @@ final readonly class ForwardedEmailSender
         $mailer->setEmail($email, false, [], true);
 
         if (!$mailer->setTo($toAddress)) {
+            $this->emailForwardRepository->deleteEntity($forward);
+
             throw new InvalidEmailException($toAddress, implode('; ', $mailer->getErrors()));
         }
 
         if (!$mailer->send(true)) {
+            $this->emailForwardRepository->deleteEntity($forward);
             $errors = $mailer->getErrors();
             unset($errors['failures']);
 
             throw new EmailCouldNotBeSentException(implode('; ', $errors));
         }
+    }
 
-        $this->emailForwardRepository->saveEntity(new EmailForward($stat));
+    /**
+     * The forward is stored before the copy goes out and counted afterwards, so requests that arrive together
+     * can't send more copies than the limit allows. It is removed again when no copy was sent.
+     *
+     * @throws ForwardLimitReachedException
+     */
+    private function reserveForward(Stat $stat): EmailForward
+    {
+        if ($this->isLimitReached($stat)) {
+            throw new ForwardLimitReachedException();
+        }
+
+        $forward = new EmailForward($stat);
+        $this->emailForwardRepository->saveEntity($forward);
+
+        $limit = (int) $this->coreParametersHelper->get(self::CONFIG_LIMIT);
+        if ($limit > 0 && $this->emailForwardRepository->countByStat($stat) > $limit) {
+            $this->emailForwardRepository->deleteEntity($forward);
+
+            throw new ForwardLimitReachedException();
+        }
+
+        return $forward;
     }
 
     /**

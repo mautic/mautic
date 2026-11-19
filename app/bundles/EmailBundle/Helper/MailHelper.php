@@ -1350,11 +1350,19 @@ class MailHelper
             - if 'Disable unsubscribe link in header' setting is true in email configuration
         */
 
+        if ($this->forwardedCopy) {
+            // Whoever gets the copy never subscribed, so headers set on the email or in the configuration go as well
+            return array_filter(
+                $headers,
+                static fn (string $name): bool => !in_array(strtolower($name), ['list-unsubscribe', 'list-unsubscribe-post'], true),
+                ARRAY_FILTER_USE_KEY
+            );
+        }
+
         $email               = $this->email;
         $unsubscribeBodyText = $this->coreParametersHelper->get('unsubscribe_text') ?? '';
         if (!$email
             || $email->getSendToDnc()
-            || $this->forwardedCopy
             || $this->coreParametersHelper->get('disable_unsubscribe_link_header')
             || !self::isUnsubscribeHeadersRequired($this->getBody(), $unsubscribeBodyText)) {
             return $headers;

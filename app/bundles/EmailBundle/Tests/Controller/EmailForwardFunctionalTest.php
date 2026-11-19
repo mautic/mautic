@@ -12,6 +12,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -65,6 +66,8 @@ final class EmailForwardFunctionalTest extends MauticMysqlTestCase
         $this->configParams['email_forward_limit']         = self::FORWARD_LIMIT;
         // A monitored inbox adds its own unsubscribe address to the headers of a normal send
         $this->configParams['monitored_email']             = self::MONITORED_INBOX;
+        // So does an unsubscribe header set by hand in the configuration
+        $this->configParams['mailer_custom_headers']       = ['List-Unsubscribe' => '<mailto:configured-unsubscribe@example.test>'];
         $this->configParams['forward_text']                = str_contains($this->name(), 'ConfiguredForwardText') ? self::CONFIGURED_FORWARD_TEXT : null;
 
         parent::setUp();
@@ -261,6 +264,7 @@ final class EmailForwardFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         self::assertResponseIsSuccessful();
+        $this->assertCount(1, $this->client->getCrawler()->filter('.validate-alert'), 'The page says why nothing was sent.');
         $this->assertCount(0, self::getMailerMessages());
         $this->assertSame(0, $this->em->getRepository(EmailForward::class)->count(['stat' => $stat]));
     }
@@ -327,6 +331,8 @@ final class EmailForwardFunctionalTest extends MauticMysqlTestCase
         $lead = new Lead();
         $lead->setFirstname(self::RECIPIENT_FIRSTNAME);
         $lead->setEmail(self::RECIPIENT_EMAIL);
+        // The owner's details must not reach the copy either
+        $lead->setOwner($this->em->getRepository(User::class)->findOneBy(['username' => 'admin']));
         $this->em->persist($lead);
 
         return $lead;

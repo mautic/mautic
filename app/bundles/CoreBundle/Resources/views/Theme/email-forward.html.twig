@@ -18,8 +18,9 @@
                                 {{ form_row(submitField) }}
                             </span>
                         </div>
-                        {% if emailAddressHasErrors %}
+                        {% if emailAddressHasErrors or formHasErrors %}
                             <div class="validate-alert" role="alert" aria-live="polite">
+                                {{ form_errors(form) }}
                                 {{ form_errors(emailAddressField) }}
                             </div>
                         {% endif %}

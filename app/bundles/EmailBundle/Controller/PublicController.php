@@ -289,6 +289,7 @@ final class PublicController extends CommonFormController
                 'emailAddressField'     => $formView['emailAddress'],
                 'emailAddressValid'     => $formView['emailAddress']->vars['valid'],
                 'emailAddressHasErrors' => count($formView['emailAddress']->vars['errors']) > 0,
+                'formHasErrors'         => count($formView->vars['errors']) > 0,
                 'submitField'           => $formView['submit'],
                 'template'              => $themeName,
             ]
