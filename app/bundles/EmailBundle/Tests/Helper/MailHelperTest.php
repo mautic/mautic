@@ -1234,6 +1234,101 @@ final class MailHelperTest extends TestCase
         $this->assertSame('<img src="cid:abcdefg"><img height="1" width="1" src="{tracking_pixel}" alt="" />', $body);
     }
 
+    public function testLocalImagesWithQueryStringOrEncodedCharactersAreEmbedded(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(5))->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_convert_embed_images', null, true],
+                    ['mailer_from_name', null, 'Test'],
+                    ['secret_key', null, 'secret'],
+                    ['site_url', null, 'https://mautic.url'],
+                ]
+            );
+
+        $rootPath = sys_get_temp_dir().'/mautic-embed-'.bin2hex(random_bytes(4));
+        mkdir($rootPath.'/media/images', 0777, true);
+        $sampleImagePath = __DIR__.'/../../../../assets/images/avatar.png';
+        copy($sampleImagePath, $rootPath.'/media/images/My File.png');
+        copy($sampleImagePath, $rootPath.'/media/images/logo.png');
+        $this->pathsHelper->method('getRootPath')->willReturn($rootPath);
+
+        $this->router->method('generate')->willReturn('http://tracking.url');
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+
+        $encodedUrl    = 'https://mautic.url/media/images/My%20File.png';
+        $cacheBusted   = 'https://mautic.url/media/images/logo.png?v1a2b3c4d#top';
+        $email         = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<img src="'.$encodedUrl.'"> <img src="'.$cacheBusted.'">');
+
+        try {
+            $mailer->setEmail($email);
+            $mailer->addTo($this->contacts[0]['email']);
+            $mailer->setLead($this->contacts[0]);
+            $mailer->send();
+        } finally {
+            unlink($rootPath.'/media/images/My File.png');
+            unlink($rootPath.'/media/images/logo.png');
+            rmdir($rootPath.'/media/images');
+            rmdir($rootPath.'/media');
+            rmdir($rootPath);
+        }
+
+        $message = $transport->getMessage();
+        $body    = (string) $message->getHtmlBody();
+        $this->assertCount(2, $message->getAttachments());
+        $this->assertStringContainsString('src="cid:'.md5($encodedUrl).'"', $body);
+        $this->assertStringContainsString('src="cid:'.md5($cacheBusted).'"', $body);
+    }
+
+    public function testLocalUrlsWithNullByteOrNonImageContentAreNotEmbedded(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(5))->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_convert_embed_images', null, true],
+                    ['mailer_from_name', null, 'Test'],
+                    ['secret_key', null, 'secret'],
+                    ['site_url', null, 'https://mautic.url'],
+                ]
+            );
+
+        $rootPath = sys_get_temp_dir().'/mautic-embed-'.bin2hex(random_bytes(4));
+        mkdir($rootPath);
+        file_put_contents($rootPath.'/thumbnail.php', '<?php echo "not an image";');
+        $this->pathsHelper->method('getRootPath')->willReturn($rootPath);
+
+        $this->router->method('generate')->willReturn('http://tracking.url');
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+
+        $nullByteUrl = 'https://mautic.url/media/images/a%00.png';
+        $scriptUrl   = 'https://mautic.url/thumbnail.php?id=42';
+        $email       = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<img src="'.$nullByteUrl.'"> <img src="'.$scriptUrl.'">');
+
+        try {
+            $mailer->setEmail($email);
+            $mailer->addTo($this->contacts[0]['email']);
+            $mailer->setLead($this->contacts[0]);
+            $mailer->send();
+        } finally {
+            unlink($rootPath.'/thumbnail.php');
+            rmdir($rootPath);
+        }
+
+        $message = $transport->getMessage();
+        $body    = (string) $message->getHtmlBody();
+        $this->assertCount(0, $message->getAttachments());
+        $this->assertStringContainsString('src="'.$nullByteUrl.'"', $body);
+        $this->assertStringContainsString('src="'.$scriptUrl.'"', $body);
+    }
+
     public function testAddToWithLongAddress(): void
     {
         $params = [
