@@ -53,7 +53,7 @@
                   </ul>
                   <!--/ tabs controls -->
 
-                  <div class="tab-content pa-md">
+                  <div class="tab-content pa-16">
                       <div class="tab-pane fade show active bdr-w-0" id="details-container">
                           <div class="row">
                               <div class="col-md-6">
@@ -70,7 +70,7 @@
                       <div class="tab-pane fade bdr-w-0" id="fields-container">
                           <div id="mauticforms_fields">
                               <div class="row">
-                                  <div class="available-fields mb-md col-sm-4">
+                                  <div class="available-fields mb-16 col-sm-4">
                                       <select class="chosen form-builder-new-component" data-placeholder="{{ 'mautic.form.form.component.fields'|trans }}">
                                           <option value=""></option>
                                           {% for field, fieldType in fields %}
@@ -84,9 +84,9 @@
                                   </div>
                               </div>
                               <div class="row">
-                                  <div class="col-sm-12 mb-10">
+                                  <div class="col-sm-12 mb-12">
                                       {{ form_label(form.progressiveProfilingLimit) }}
-                                      <div class="ml-5 mr-5" style="display:inline-block;">
+                                      <div class="ms-5 me-5" style="display:inline-block;">
                                           {{ form_widget(form.progressiveProfilingLimit) }}
                                       </div>
                                       <div class="has-error" style="display:inline-block;">
@@ -131,7 +131,7 @@
                       <div class="tab-pane fade bdr-w-0" id="actions-container">
                           <div id="mauticforms_actions">
                               <div class="row">
-                                  <div class="available-actions mb-md col-sm-4">
+                                  <div class="available-actions mb-16 col-sm-4">
                                       <select class="chosen form-builder-new-component" data-placeholder="{{ 'mautic.form.form.component.submitactions'|trans }}">
                                           <option value=""></option>
                                           {% for group, groupActions in actions %}
@@ -175,7 +175,7 @@
           </div>
       </div>
       <div class="col-md-3 height-auto bdr-l">
-          <div class="pr-lg pl-lg pt-md pb-md">
+          <div class="pe-24 ps-24 pt-16 pb-16">
               {{ form_row(form.category) }}
               {{ form_row(form.projects) }}
               {{ form_row(form.isPublished, {
@@ -193,7 +193,7 @@
               {{ form_row(form.renderStyle) }}
               {{ form_row(form.template) }}
               {{ form_row(form.language) }}
-              <h3 class="mt-32 mb-sm type-heading-02">{{ 'mautic.form.builder.advanced_options'|trans }}</h3>
+              <h3 class="mt-32 mb-12 type-heading-02">{{ 'mautic.form.builder.advanced_options'|trans }}</h3>
                 <div class="row">
                     {% set submissionLimitAccordion = {
                         'id': 'submission_limit',

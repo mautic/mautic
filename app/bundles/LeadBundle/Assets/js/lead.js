@@ -366,20 +366,6 @@ Mautic.leadlistOnLoad = function(container, response) {
         });
     }
 
-    // segment contact filters
-    var segmentContactForm = mQuery('#segment-contact-filters');
-
-    if (segmentContactForm.length) {
-        segmentContactForm.on('change', function() {
-            segmentContactForm.submit();
-        }).on('keyup', function() {
-            segmentContactForm.delay(200).submit();
-        }).on('submit', function(e) {
-            e.preventDefault();
-            Mautic.refreshSegmentContacts(segmentContactForm);
-        });
-    }
-
     jQuery(document).ajaxComplete(function(){
         Mautic.ajaxifyForm('daterange');
     });
@@ -1089,13 +1075,6 @@ Mautic.refreshLeadNotes = function(form) {
     });
 };
 
-Mautic.refreshSegmentContacts = function(form) {
-    Mautic.postForm(mQuery(form), function (response) {
-        response.target = '#contacts-container';
-        Mautic.processPageContent(response);
-    });
-};
-
 Mautic.toggleLeadList = function(toggleId, leadId, listId) {
     var action = mQuery('#' + toggleId).hasClass('ri-toggle-fill') ? 'remove' : 'add';
     var query = "action=lead:toggleLeadList&leadId=" + leadId + "&listId=" + listId + "&listAction=" + action;
@@ -1254,9 +1233,7 @@ Mautic.reloadLeadImportProgress = function() {
         Mautic.ajaxActionRequest('lead:getImportProgress', {}, function(response) {
             if (response.progress) {
                 if (response.progress[0] > 0) {
-                    mQuery('.imported-count').html(response.progress[0]);
-                    mQuery('.progress-bar-import').attr('aria-valuenow', response.progress[0]).css('width', response.percent + '%');
-                    mQuery('.progress-bar-import span.visually-hidden').html(response.percent + '%');
+                    Mautic.updateProgressBar('#leadImportProgress', response.progress[0], response.percent, response.progress[1]);
                 }
             }
         }, false, false, "GET");
@@ -1730,7 +1707,6 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
 };
 
 Mautic.listOnLoad = function(container, response) {
-    Mautic.loadAndProcessPageContent('#contacts-container');
     Mautic.loadAndProcessPageContent('#segment-stats');
 
     const segmentDependenciesTab = mQuery('a#segment-dependencies');
@@ -1738,37 +1714,49 @@ Mautic.listOnLoad = function(container, response) {
     let jsPlumbData = null;
 
     if (segmentDependenciesTab.length) {
-        mQuery(document).on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
-            if (mQuery(e.target).attr('id') !== 'segment-dependencies') {
-                return;
-            }
-
+        const showSegmentDependencies = () => {
             if (!segmentDependenciesLoaded) {
                 segmentDependenciesLoaded = true;
+                const requestedSegmentId = mQuery('input#entityId').val();
                 mQuery.ajax({
                     showLoadingBar: true,
                     url: mauticAjaxUrl,
                     type: 'GET',
                     data: {
                         action: 'lead:getSegmentDependencyTree',
-                        id: mQuery('input#entityId').val()
+                        id: requestedSegmentId
                     },
                     dataType: 'json',
                     success: function (response) {
                         Mautic.stopPageLoadingBar();
+                        if (mQuery('input#entityId').val() !== requestedSegmentId) {
+                            segmentDependenciesLoaded = false;
+                            return;
+                        }
                         Mautic.renderSegmentTree('#segment-dependencies-container', response);
                         jsPlumbData = response;
                     },
                     error: function (request, textStatus, errorThrown) {
+                        segmentDependenciesLoaded = false;
                         Mautic.processAjaxError(request, textStatus, errorThrown);
                     }
                 });
             } else if (jsPlumbData) {
                 Mautic.renderSegmentTree('#segment-dependencies-container', jsPlumbData);
             }
+        };
+
+        mQuery(document).on('shown.bs.tab.segmentDependencies', 'a[data-bs-toggle="tab"]', function (e) {
+            if (mQuery(e.target).attr('id') === 'segment-dependencies') {
+                showSegmentDependencies();
+            }
         });
 
-        mQuery(document).on('hide.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
+        if (segmentDependenciesTab.hasClass('active')) {
+            showSegmentDependencies();
+        }
+
+        mQuery(document).on('hide.bs.tab.segmentDependencies', 'a[data-bs-toggle="tab"]', function (e) {
             if (mQuery(e.target).attr('id') === 'segment-dependencies') {
                 Mautic.cleanSegmentDependencies();
             }
@@ -1777,6 +1765,7 @@ Mautic.listOnLoad = function(container, response) {
 };
 
 Mautic.listOnUnload = function() {
+    mQuery(document).off('.segmentDependencies');
     Mautic.cleanSegmentDependencies();
 }
 

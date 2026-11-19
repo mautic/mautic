@@ -237,10 +237,11 @@ final class ConfigType extends AbstractType
             [
                 'label'      => 'mautic.open_id.config.mapping_field',
                 'label_attr' => ['class' => 'control-label'],
+                'help'       => 'mautic.open_id.config.links_reset.help',
                 'attr'       => [
                     'class'           => 'form-control',
                     'data-disable-on' => self::DISABLED_IF,
-                    'tooltip'         => 'mautic.open_id.config.mapping_field.tooltip',
+                    'tooltip'         => 'mautic.open_id.config.links_reset.tooltip',
                 ],
                 'constraints' => [
                     new Callback(callback: $requiredIfOpenIdIsEnabled),
@@ -294,9 +295,11 @@ final class ConfigType extends AbstractType
                 'label'            => 'mautic.open_id.config.client_url',
                 'label_attr'       => ['class' => 'control-label'],
                 'default_protocol' => null,
+                'help'             => 'mautic.open_id.config.links_reset.help',
                 'attr'             => [
-                    'class'        => 'form-control',
+                    'class'           => 'form-control',
                     'data-disable-on' => self::DISABLED_IF,
+                    'tooltip'         => 'mautic.open_id.config.links_reset.tooltip',
                 ],
                 'constraints' => [
                     new Callback(callback: $requiredIfOpenIdIsEnabled),
@@ -332,8 +335,8 @@ final class ConfigType extends AbstractType
                 'label'      => 'mautic.open_id.config.client_secret',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'        => 'form-control',
-                    'placeholder'  => $clientSecret ? str_repeat('*', 256) : '',
+                    'class'           => 'form-control',
+                    'placeholder'     => $clientSecret ? str_repeat('*', 256) : '',
                     'data-disable-on' => self::DISABLED_IF,
                 ],
                 'required'    => !$this->clientCredentials->getClientSecret(),

@@ -8,7 +8,7 @@
         {{ content|raw }}
 
         {% if button is defined %}
-        <div class="tile__button-wrapper mt-md">
+        <div class="tile__button-wrapper mt-16">
             {% set button = button %}
             {% if button.variant is not defined or button.variant != 'link' %}
                 {% set button = button|merge({'variant': 'tertiary', 'wide': true}) %}

@@ -24,7 +24,7 @@ final class VideoHitRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $query->select('h.id, h.url, h.date_hit, h.time_watched, h.duration, h.referer, h.user_agent')
+        $query->select('h.id, h.lead_id, h.url, h.date_hit, h.time_watched, h.duration, h.referer, h.user_agent')
             ->from(MAUTIC_TABLE_PREFIX.'video_hits', 'h');
 
         if ($leadId) {

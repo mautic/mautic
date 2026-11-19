@@ -190,13 +190,12 @@ Mautic.emailSendOnUnload = function () {
 };
 
 Mautic.sendEmailBatch = function () {
-    var data = 'id=' + mQuery('.progress-bar-send').data('email') + '&pending=' + mQuery('.progress-bar-send').attr('aria-valuemax') + '&batchlimit=' + mQuery('.progress-bar-send').data('batchlimit');
+    const progressContainer = mQuery('.email-send-progress');
+    const data = 'id=' + progressContainer.data('email') + '&pending=' + progressContainer.data('pending') + '&batchlimit=' + progressContainer.data('batchlimit');
     Mautic.sendEmailBatchXhr = Mautic.ajaxActionRequest('email:sendBatch', data, function (response) {
         if (response.progress) {
             if (response.progress[0] > 0) {
-                mQuery('.imported-count').html(response.progress[0]);
-                mQuery('.progress-bar-send').attr('aria-valuenow', response.progress[0]).css('width', response.percent + '%');
-                mQuery('.progress-bar-send span.visually-hidden').html(response.percent + '%');
+                Mautic.updateProgressBar(progressContainer, response.progress[0], response.percent, response.progress[1]);
             }
 
             if (response.progress[0] >= response.progress[1]) {
@@ -553,7 +552,7 @@ Mautic.toggleMailerIsOwnerWarningMessage = function(radioSelector) {
         let warning = mQuery('<div/>');
         warning.attr('id', warningMessageId);
         warning.html(checkedRadio.attr('data-warning'));
-        warning.addClass('alert alert-warning mt-md');
+        warning.addClass('alert alert-warning mt-16');
         checkedRadio.closest('.form-group').append(warning);
     }
 }

@@ -68,7 +68,8 @@ class EventLogger
     {
         $log = new LeadEventLog();
 
-        if (!defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED')) {
+        // No IP for a form submitter Mautic doesn't track
+        if (!defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') && !$this->ipLookupHelper->isVisitorUntracked()) {
             $log->setIpAddress($this->ipLookupHelper->getIpAddress());
         }
 
