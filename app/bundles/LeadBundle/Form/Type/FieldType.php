@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\SegmentedControlType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -630,22 +631,18 @@ final class FieldType extends AbstractType
 
         $builder->add(
             'object',
-            ChoiceType::class,
+            SegmentedControlType::class,
             [
                 'choices' => [
                     'mautic.lead.contact'    => 'lead',
                     'mautic.company.company' => 'company',
                 ],
-                'expanded'    => false,
-                'multiple'    => false,
-                'label'       => 'mautic.lead.field.object',
-                'placeholder' => false,
-                'attr'        => [
-                    'class'    => 'form-control',
+                'label'      => 'mautic.lead.field.object',
+                'attr'       => [
                     'onchange' => 'Mautic.updateLeadFieldOrderChoiceList();',
                 ],
-                'required'    => false,
-                'disabled'    => ($disabled || !$new),
+                'required'   => false,
+                'disabled'   => ($disabled || !$new),
             ]
         );
 

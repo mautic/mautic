@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -40,6 +41,28 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
         $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
         $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
         $this->assertArrayHasKey('field_s', $columns);
+    }
+
+    public function testNewCompanyFieldKeepsSubmittedObjectValue(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
+
+        self::assertResponseIsSuccessful();
+        $this->assertCount(2, $crawler->filter('#leadfield_object input[name="leadfield[object]"]'));
+
+        $form = $crawler->selectButton('Save')->form();
+        $form['leadfield[label]']->setValue('Company custom field');
+        $objectField = $form['leadfield[object]'];
+        $this->assertInstanceOf(ChoiceFormField::class, $objectField);
+        $objectField->select('company');
+
+        $this->client->submit($form);
+
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString('Edit Custom Field - Company custom field', strip_tags($this->client->getResponse()->getContent()));
+        $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => 'Company custom field']);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadField::class, $field);
+        $this->assertSame('company', $field->getObject());
     }
 
     public function testNewDateField(): void
