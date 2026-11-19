@@ -75,24 +75,18 @@ final readonly class ForwardedEmailSender
 
         $forward = $this->reserveForward($stat);
 
-        if (!$this->isContactable($toAddress)) {
-            return;
-        }
-
         try {
-            $mailer = $this->mailHelper->getMailer();
-            $mailer->setLead(null, true);
-            $mailer->setForwardedCopy(true);
-            $mailer->setEmail($email, false, [], true);
-
-            if (!$mailer->setTo($toAddress)) {
-                throw new InvalidEmailException($toAddress, implode('; ', $mailer->getErrors()));
-            }
+            $mailer = $this->isContactable($toAddress) ? $this->prepareCopy($email, $toAddress) : null;
         } catch (\Throwable $exception) {
             // Nothing was sent yet, so the copy doesn't count
             $this->emailForwardRepository->deleteEntity($forward);
 
             throw $exception;
+        }
+
+        if (null === $mailer) {
+            // No copy goes to this address, but the attempt stays counted
+            return;
         }
 
         if (!$mailer->send(true)) {
@@ -102,6 +96,23 @@ final readonly class ForwardedEmailSender
 
             throw new EmailCouldNotBeSentException(implode('; ', $errors));
         }
+    }
+
+    /**
+     * @throws InvalidEmailException
+     */
+    private function prepareCopy(Email $email, string $toAddress): MailHelper
+    {
+        $mailer = $this->mailHelper->getMailer();
+        $mailer->setLead(null, true);
+        $mailer->setForwardedCopy(true);
+        $mailer->setEmail($email, false, [], true);
+
+        if (!$mailer->setTo($toAddress)) {
+            throw new InvalidEmailException($toAddress, implode('; ', $mailer->getErrors()));
+        }
+
+        return $mailer;
     }
 
     /**

@@ -12,6 +12,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -289,6 +290,26 @@ final class EmailForwardFunctionalTest extends MauticMysqlTestCase
         );
         $this->assertStringNotContainsString(self::FRIEND_EMAIL, $crawler->text());
         $this->assertSame(0, $this->em->getRepository(EmailForward::class)->count(['stat' => $stat]), 'A copy that was not sent does not count.');
+    }
+
+    public function testForwardIsNotCountedWhenTheAddressCouldNotBeChecked(): void
+    {
+        $stat = $this->createSentEmail();
+
+        $friend = new Lead();
+        $friend->setEmail(self::FRIEND_EMAIL);
+        $this->em->persist($friend);
+        $this->em->flush();
+
+        $doNotContact = $this->createMock(DoNotContactModel::class);
+        $doNotContact->method('isContactable')->willThrowException(new \RuntimeException('The lookup failed'));
+        self::getContainer()->set(DoNotContactModel::class, $doNotContact);
+
+        $this->submitForward(self::FRIEND_EMAIL);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_INTERNAL_SERVER_ERROR);
+        $this->assertCount(0, self::getMailerMessages());
+        $this->assertSame(0, $this->em->getRepository(EmailForward::class)->count(['stat' => $stat]), 'Nothing went out, so nothing is counted.');
     }
 
     public function testForwardRejectsAnInvalidAddress(): void

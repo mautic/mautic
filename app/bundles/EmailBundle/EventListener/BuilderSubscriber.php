@@ -188,7 +188,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
      *
      * @param array<string, mixed>|Lead|null $lead
      */
-    private function addRecipientLinkTokens(EmailSendEvent $event, ?Email $email, $lead, string $idHash): void
+    private function addRecipientLinkTokens(EmailSendEvent $event, ?Email $email, array|Lead|null $lead, string $idHash): void
     {
         // Get email
         $toEmail = null;
