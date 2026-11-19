@@ -14,6 +14,7 @@ use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\ReportBundle\Entity\Report;
+use Symfony\Component\DomCrawler\Crawler;
 
 final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 {
@@ -73,7 +74,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $searchIds = implode(',', [$segmentRead->getId(), $segmentSent->getId()]);
-        $this->assertStringContainsString("/s/segments?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
+        $this->assertCount(1, (new Crawler((string) $jsonResponse['usagesHtml']))->filter("a[href=\"/s/segments?search=ids:{$searchIds}\"]"));
     }
 
     public function testEmailUsageInCampaigns(): void
@@ -88,7 +89,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $searchIds = implode(',', [$campaign->getId()]);
-        $this->assertStringContainsString("/s/campaigns?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
+        $this->assertCount(1, (new Crawler((string) $jsonResponse['usagesHtml']))->filter("a[href=\"/s/campaigns?search=ids:{$searchIds}\"]"));
     }
 
     public function testEmailUsageWithoutDuplicates(): void
@@ -105,7 +106,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $formId = $formWithEmailSend->getId();
-        $this->assertStringNotContainsString("/s/forms?search=ids:{$formId},{$formId}", (string) $jsonResponse['usagesHtml']);
+        $this->assertCount(0, (new Crawler((string) $jsonResponse['usagesHtml']))->filter("a[href=\"/s/forms?search=ids:{$formId},{$formId}\"]"));
     }
 
     public function testEmailUsageInForms(): void
@@ -124,7 +125,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $searchIds = implode(',', [$formWithEmailSend->getId(), $formWithEmailSendToUser->getId()]);
-        $this->assertStringContainsString("/s/forms?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
+        $this->assertCount(1, (new Crawler((string) $jsonResponse['usagesHtml']))->filter("a[href=\"/s/forms?search=ids:{$searchIds}\"]"));
     }
 
     public function testEmailUsageInPointActions(): void
@@ -140,7 +141,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $searchIds = implode(',', [$pointActionIsSent->getId(), $pointActionIsOpen->getId()]);
-        $this->assertStringContainsString("/s/points?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
+        $this->assertCount(1, (new Crawler((string) $jsonResponse['usagesHtml']))->filter("a[href=\"/s/points?search=ids:{$searchIds}\"]"));
     }
 
     public function testEmailUsageInPointTriggers(): void
@@ -155,7 +156,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $searchIds = implode(',', [$pointActionIsSent->getId()]);
-        $this->assertStringContainsString("/s/points/triggers?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
+        $this->assertCount(1, (new Crawler((string) $jsonResponse['usagesHtml']))->filter("a[href=\"/s/points/triggers?search=ids:{$searchIds}\"]"));
     }
 
     public function testEmailUsageInReports(): void
@@ -171,7 +172,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $searchIds = implode(',', [$emailReport->getId(), $emailStatsReport->getId()]);
-        $this->assertStringContainsString("/s/reports?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
+        $this->assertCount(1, (new Crawler((string) $jsonResponse['usagesHtml']))->filter("a[href=\"/s/reports?search=ids:{$searchIds}\"]"));
     }
 
     private function createEmailReport(int $emailId): Report

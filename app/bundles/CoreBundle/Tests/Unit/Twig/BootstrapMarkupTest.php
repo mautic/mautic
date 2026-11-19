@@ -79,4 +79,48 @@ final class BootstrapMarkupTest extends TestCase
 
         $this->assertCount(2, (new Crawler($html))->filter('input.btn-check:disabled + label.btn'));
     }
+
+    public function testPartitionBarEscapesDynamicAttributesAcrossVariants(): void
+    {
+        $items = [[
+            'label' => 'Contacts & accounts',
+            'value' => 2,
+            'href'  => '/s/campaigns?name=Campaign One&owner=Anderson',
+        ]];
+        $expectedAttributes = [
+            'legend' => ['href="&#x2F;s&#x2F;campaigns&#x3F;name&#x3D;Campaign&#x20;One&amp;owner&#x3D;Anderson"'],
+            'labels' => ['title="Contacts&#x20;&amp;&#x20;accounts"'],
+            'linked' => [
+                'aria-label="Contacts&#x20;&amp;&#x20;accounts&#x3A;&#x20;2"',
+                'data-bs-title="Contacts&#x20;&amp;&#x20;accounts&#x3A;&#x20;2"',
+            ],
+        ];
+
+        foreach ($expectedAttributes as $variant => $attributes) {
+            $html = $this->twig->render('Components/partition-bar.html.twig', [
+                'items'   => $items,
+                'variant' => $variant,
+            ]);
+
+            foreach ($attributes as $attribute) {
+                $this->assertStringContainsString($attribute, $html);
+            }
+
+            $this->assertSame($items[0]['href'], (new Crawler($html))->filter('a[href]')->attr('href'));
+
+            if ('linked' !== $variant) {
+                $this->assertStringContainsString('Contacts &amp; accounts', $html);
+            }
+        }
+    }
+
+    public function testPartitionBarEscapesVariantInClassAttribute(): void
+    {
+        $html = $this->twig->render('Components/partition-bar.html.twig', [
+            'items'   => [['label' => 'Campaign', 'value' => 1]],
+            'variant' => 'labels" data-test="injected',
+        ]);
+
+        $this->assertStringNotContainsString(' data-test="injected"', $html);
+    }
 }
