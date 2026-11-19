@@ -392,7 +392,7 @@ final class MailHelper
      *
      * @return bool|array
      */
-    public function queue(bool $dispatchSendEvent = false, $returnMode = self::QUEUE_RESET_TO)
+    public function queue(bool $dispatchSendEvent = false, string $returnMode = self::QUEUE_RESET_TO)
     {
         if ($this->tokenizationEnabled) {
             // Dispatch event to get custom tokens from listeners
@@ -636,9 +636,8 @@ final class MailHelper
      *
      * @param string $filePath
      * @param string $fileName
-     * @param string $contentType
      */
-    public function attachFile($filePath, $fileName = null, $contentType = null, bool $inline = false): void
+    public function attachFile($filePath, $fileName = null, ?string $contentType = null, bool $inline = false): void
     {
         if ($inline) {
             $this->message->embedFromPath($filePath, $fileName, $contentType);
@@ -734,10 +733,7 @@ final class MailHelper
         $this->plainTextSet = true;
     }
 
-    /**
-     * @param string $contentType
-     */
-    public function setBody($content, $contentType = 'text/html', $charset = null, bool $ignoreTrackingPixel = false): void
+    public function setBody($content, string $contentType = 'text/html', $charset = null, bool $ignoreTrackingPixel = false): void
     {
         if (!$ignoreTrackingPixel && $this->coreParametersHelper->get('mailer_append_tracking_pixel')) {
             // Append tracking pixel
@@ -1400,7 +1396,7 @@ final class MailHelper
     /**
      * Log exception.
      */
-    private function logError(string|\Exception $error, $context = null): void
+    private function logError(string|\Exception $error, ?string $context = null): void
     {
         if ($error instanceof \Exception) {
             $exceptionContext = ['exception' => $error];

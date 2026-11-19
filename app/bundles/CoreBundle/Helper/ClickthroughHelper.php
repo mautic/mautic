@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
@@ -19,7 +21,7 @@ final class ClickthroughHelper
      *
      * @return mixed[]
      */
-    public static function decodeArrayFromUrl($string, bool $urlDecode = true): array
+    public static function decodeArrayFromUrl(string $string, bool $urlDecode = true): array
     {
         $raw     = $urlDecode ? urldecode($string) : $string;
         $decoded = base64_decode($raw);
