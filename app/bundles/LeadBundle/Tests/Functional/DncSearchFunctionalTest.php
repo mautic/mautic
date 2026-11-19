@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional;
 
-use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,8 +20,8 @@ final class DncSearchFunctionalTest extends MauticMysqlTestCase
         $contact2 = $this->createContact('contact2@test.com');
         $contact3 = $this->createContact('contact3@test.com');
 
-        $this->addDncRecord($contact1->getId(), 'email');
-        $this->addDncRecord($contact2->getId(), 'sms');
+        $this->addDncRecord($contact1, 'email');
+        $this->addDncRecord($contact2, 'sms');
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=dnc%3Aany');
         $this->assertResponseIsSuccessful();
@@ -39,8 +38,8 @@ final class DncSearchFunctionalTest extends MauticMysqlTestCase
         $contact2 = $this->createContact('sms-dnc@test.com');
         $contact3 = $this->createContact('no-dnc@test.com');
 
-        $this->addDncRecord($contact1->getId(), 'email');
-        $this->addDncRecord($contact2->getId(), 'sms');
+        $this->addDncRecord($contact1, 'email');
+        $this->addDncRecord($contact2, 'sms');
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=dnc%3Aemail');
         $this->assertResponseIsSuccessful();
@@ -64,7 +63,7 @@ final class DncSearchFunctionalTest extends MauticMysqlTestCase
         $contact1 = $this->createContact('dnc-contact@test.com');
         $contact2 = $this->createContact('normal-contact@test.com');
 
-        $this->addDncRecord($contact1->getId(), 'email');
+        $this->addDncRecord($contact1, 'email');
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=!dnc%3Aany');
         $this->assertResponseIsSuccessful();
@@ -80,10 +79,10 @@ final class DncSearchFunctionalTest extends MauticMysqlTestCase
         $contact2 = $this->createContact('single-dnc@test.com');
         $contact3 = $this->createContact('no-dnc-multiple@test.com');
 
-        $this->addDncRecord($contact1->getId(), 'email');
-        $this->addDncRecord($contact1->getId(), 'sms');
+        $this->addDncRecord($contact1, 'email');
+        $this->addDncRecord($contact1, 'sms');
 
-        $this->addDncRecord($contact2->getId(), 'email');
+        $this->addDncRecord($contact2, 'email');
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=dnc%3Aany');
         $this->assertResponseIsSuccessful();
@@ -121,12 +120,15 @@ final class DncSearchFunctionalTest extends MauticMysqlTestCase
         return $contact;
     }
 
-    private function addDncRecord(int $contactId, string $channel): void
+    private function addDncRecord(Lead $contact, string $channel): void
     {
-        $this->em->getConnection()->executeStatement(
-            'INSERT INTO '.MAUTIC_TABLE_PREFIX.'lead_donotcontact (lead_id, channel, reason, comments, date_added) VALUES (?, ?, ?, ?, ?)',
-            [$contactId, $channel, 1, 'Test DNC', new \DateTime()],
-            [Types::INTEGER, Types::STRING, Types::INTEGER, Types::STRING, Types::DATETIME_MUTABLE]
-        );
+        $dnc = new \Mautic\LeadBundle\Entity\DoNotContact();
+        $dnc->setLead($contact);
+        $dnc->setChannel($channel);
+        $dnc->setReason(1);
+        $dnc->setComments('Test DNC');
+        $dnc->setDateAdded(new \DateTime());
+        $this->em->persist($dnc);
+        $this->em->flush();
     }
 }

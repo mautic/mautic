@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
@@ -18,6 +19,7 @@ final class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
+        $platform         = $this->getConnection()->getDatabasePlatform();
         $leadsTableAlias  = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator   = $filter->getOperator();
         $batchLimiters    = $filter->getBatchLimiters();
@@ -96,9 +98,12 @@ final class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     ->select('NULL')->from($filter->getTable(), $tableAlias)
                     ->andWhere($tableAlias.'.'.$foreignContactColumn.' = '.$leadsTableAlias.'.id');
 
+                // Datetime cant use LIKE, we need to cast fields into TEXT
+                $field = DatabasePlatform::castIfStrict($platform, $tableAlias.'.'.$filter->getField());
+
                 $expression = $subQueryBuilder->expr()->or(
                     $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
-                    $subQueryBuilder->expr()->like($tableAlias.'.'.$filter->getField(), $filterParametersHolder)
+                    $subQueryBuilder->expr()->like($field, $filterParametersHolder)
                 );
 
                 $subQueryBuilder->andWhere($expression);
@@ -112,8 +117,17 @@ final class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
 
-                $not        = ('notRegexp' === $filterOperator) ? ' NOT' : '';
-                $expression = $tableAlias.'.'.$filter->getField().$not.' REGEXP '.$filterParametersHolder;
+                $fieldExpression = DatabasePlatform::castIfStrict(
+                    $platform,
+                    $tableAlias.'.'.$filter->getField()
+                );
+
+                $expression = DatabasePlatform::getRegexpExpression(
+                    $platform,
+                    $fieldExpression,
+                    $filterParametersHolder,
+                    'notRegexp' === $filterOperator
+                );
 
                 $subQueryBuilder->andWhere($expression);
 
@@ -166,8 +180,15 @@ final class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
 
+                // Fix: Apply cast as text for 'like' and 'notLike' in PostgreSQL
+                $field = in_array($filterOperator, ['like', 'notLike']) ?
+                    DatabasePlatform::castIfStrict(
+                        $platform,
+                        $tableAlias.'.'.$filter->getField()
+                    ) : $tableAlias.'.'.$filter->getField();
+
                 $expression = $subQueryBuilder->expr()->{$filterOperator}(
-                    $tableAlias.'.'.$filter->getField(),
+                    $field,
                     $filterParametersHolder
                 );
                 $subQueryBuilder->andWhere($expression);

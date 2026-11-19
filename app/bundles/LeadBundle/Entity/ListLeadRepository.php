@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -71,15 +72,47 @@ class ListLeadRepository extends CommonRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * Deletes anonymous contacts (leads where date_identified IS NULL) from lead list relations.
+     *
+     * @return int Number of deleted rows
+     */
     public function deleteAnonymousContacts(): int
     {
         $conn           = $this->getEntityManager()->getConnection();
         $tableName      = $this->getTableName();
         $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
         $tempTableName  = 'to_delete';
-        $conn->executeQuery(sprintf('DROP TEMPORARY TABLE IF EXISTS %s', $tempTableName));
-        $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select lll.leadlist_id, lll.lead_id from %s lll join %s l on l.id = lll.lead_id where l.date_identified is null;', $tempTableName, $tableName, $leadsTableName));
-        $deleteQuery       = sprintf('DELETE lll FROM %s lll JOIN (SELECT leadlist_id, lead_id FROM %s LIMIT %d) d USING (leadlist_id, lead_id); ', $tableName, $tempTableName, self::DELETE_BATCH_SIZE);
+        $platform       = $conn->getDatabasePlatform();
+
+        // Drop temporary table (platform-safe)
+        $conn->executeStatement(
+            DatabasePlatform::getDropTemporaryTableSql($platform, $tempTableName, true)
+        );
+
+        $selectSql = sprintf(
+            'SELECT lll.leadlist_id, lll.lead_id
+            FROM %s lll
+            JOIN %s l ON l.id = lll.lead_id
+            WHERE l.date_identified IS NULL',
+            $tableName,
+            $leadsTableName
+        );
+
+        // Create temporary table with the select (platform-safe)
+        $conn->executeStatement(
+            DatabasePlatform::getCreateTemporaryTableSql($platform, $tempTableName, $selectSql)
+        );
+
+        // Build the delete query (platform-safe)
+        $deleteQuery = DatabasePlatform::getDeleteAnonymousContactsUsingTempTableSql(
+            $platform,
+            $tableName,
+            $tempTableName,
+            ['leadlist_id', 'lead_id'],
+            self::DELETE_BATCH_SIZE
+        );
+
         $deletedRecordCount= 0;
         while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
             $deletedRecordCount += $deletedRows;
@@ -90,12 +123,21 @@ class ListLeadRepository extends CommonRepository
 
     public function removeLeadsByListId(int $listId): void
     {
-        $table_name = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
-        $conn       = $this->getEntityManager()->getConnection();
+        $tableName   = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
+        $conn        = $this->getEntityManager()->getConnection();
+        $listIdParam = 'listId';
+
+        $deleteQuery = DatabasePlatform::getDeleteByListIdSql(
+            $conn->getDatabasePlatform(),
+            $tableName,
+            self::DELETE_BATCH_SIZE,
+            ':'.$listIdParam,
+        );
+
         do {
             $deletedRows = $conn->executeStatement(
-                "DELETE FROM {$table_name} WHERE leadlist_id = :listId LIMIT ".self::DELETE_BATCH_SIZE,
-                ['listId' => $listId]
+                $deleteQuery,
+                [$listIdParam => $listId]
             );
         } while ($deletedRows > 0);
     }

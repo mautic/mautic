@@ -24,6 +24,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
+
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -407,11 +409,77 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
     {
         $form = $this->createForm('test', 'test');
 
-        // Persist entities if provided
-        if (isset($inputValues['entities'])) {
-            foreach ($inputValues['entities'] as $entity) {
-                $this->em->persist($entity);
-            }
+        // On PostgreSQL the ID does not always get 1
+        // (sequence starts higher due to unit tests race condition)
+        switch ($inputValues['type']) {
+            case 'asset.download':
+                $category = new Category();
+                $category->setTitle('Category');
+                $category->setAlias('category');
+                $category->setBundle('global');
+
+                $this->em->persist($category);
+
+                $asset = new Asset();
+                $asset->setTitle('test');
+                $asset->setAlias('test');
+                $asset->setCategory($category);
+
+                $this->em->persist($asset);
+                $this->em->flush();
+
+                $inputValues['properties'] = [
+                    'category' => $category->getId(),
+                    'asset'    => null,
+                ];
+                break;
+            case 'email.send.user':
+                $user = $this->getUser(self::ADMIN_USER);
+
+                $email = new Email();
+                $email->setName('Email');
+                $email->setSubject('Test Subject');
+                $email->setIsPublished(true);
+                $this->em->persist($email);
+
+                $this->em->flush();
+
+                $inputValues['properties'] = [
+                    'useremail' => ['email' => $email->getId()],
+                    'user_id'   => [$user->getId()],
+                ];
+
+                break;
+            case 'lead.changelist':
+                $segmentOne = new LeadList();
+                $segmentOne->setName('list one');
+                $segmentOne->setAlias('list_one');
+                $segmentOne->setPublicName('list_one');
+                $segmentOne->setFilters([]);
+                $this->em->persist($segmentOne);
+
+                $segmentTwo = new LeadList();
+                $segmentTwo->setName('list two');
+                $segmentTwo->setAlias('list_two');
+                $segmentTwo->setPublicName('list_two');
+                $segmentTwo->setFilters([]);
+                $this->em->persist($segmentTwo);
+
+                $this->em->flush();
+
+                $inputValues['properties'] = [
+                    'addToLists'      => [$segmentOne->getId()],
+                    'removeFromLists' => [$segmentTwo->getId()],
+                ];
+                break;
+            default:
+                // Persist any entities provided in the data set
+                if (!empty($inputValues['entities'])) {
+                    foreach ($inputValues['entities'] as $entity) {
+                        $this->em->persist($entity);
+                    }
+                    $this->em->flush();
+                }
         }
 
         // create form action
@@ -449,16 +517,6 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
      */
     public static function dataTestLabelsForFormActions(): iterable
     {
-        $category = new Category();
-        $category->setTitle('Category');
-        $category->setAlias('category');
-        $category->setBundle('global');
-
-        $asset = new Asset();
-        $asset->setTitle('test');
-        $asset->setAlias('test');
-        $asset->setCategory($category);
-
         yield 'Action: Download asset using category' => [
             // input
             [
@@ -467,17 +525,13 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
                     'asset'    => null,
                     'category' => 1,
                 ],
-                'entities' => [
-                    $category,
-                    $asset,
-                ],
             ],
             // expected
             [
                 [
                     'message'     => 'mautic.form.field.asset.use_category',
                     'message_arg' => [
-                        '%category_name%' => $category->getTitle(),
+                        '%category_name%' => 'Category',
                     ],
                 ],
             ],
@@ -529,11 +583,6 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
                     'useremail' => ['email' => 1],
                     'user_id'   => [1],
                 ],
-                'entities' => [
-                    (new Email())->setName('Email')
-                        ->setSubject('Test Subject')
-                        ->setIsPublished(true),
-                ],
             ],
             // expected
             [
@@ -548,18 +597,6 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $segmentOne = new LeadList();
-        $segmentOne->setName('list one');
-        $segmentOne->setAlias('list_one');
-        $segmentOne->setPublicName('list_one');
-        $segmentOne->setFilters([]);
-
-        $segmentTwo = new LeadList();
-        $segmentTwo->setName('list two');
-        $segmentTwo->setAlias('list_two');
-        $segmentTwo->setPublicName('list_two');
-        $segmentTwo->setFilters([]);
-
         yield 'Action: Change segments' => [
             // input
             [
@@ -568,19 +605,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
                     'addToLists'      => [1],
                     'removeFromLists' => [2],
                 ],
-                'entities' => [
-                    $segmentOne,
-                    $segmentTwo,
-                ],
             ],
             // expected
             [
                 [
-                    'message'     => $segmentOne->getName(),
+                    'message'     => 'list one',
                     'message_arg' => [],
                 ],
                 [
-                    'message'     => $segmentTwo->getName(),
+                    'message'     => 'list two',
                     'message_arg' => [],
                 ],
             ],

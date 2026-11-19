@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\IntegrationsBundle\Migration\Engine;
 use Mautic\PluginBundle\Entity\Plugin;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -39,18 +40,33 @@ final readonly class PluginDatabase
             return;
         }
 
-        $schemaTool = new SchemaTool($this->em);
-        $schema     = $schemaTool->getSchemaFromMetadata(array_values($metadata));
+        $schemaTool    = new SchemaTool($this->em);
+        $schema        = $schemaTool->getSchemaFromMetadata(array_values($metadata));
+        $schemaManager = $this->connection->createSchemaManager();
+        $platform      = $this->connection->getDatabasePlatform();
 
         // Schema listeners (e.g. Symfony Messenger) add their own tables, which may already exist
-        $existingTables = array_map(strtolower(...), $this->connection->createSchemaManager()->listTableNames());
+        $existingTables = array_map(strtolower(...), $schemaManager->listTableNames());
         foreach ($schema->getTables() as $table) {
             if (in_array(strtolower($table->getName()), $existingTables, true)) {
                 $schema->dropTable($table->getName());
             }
         }
 
-        $installQueries = $schema->toSql($this->connection->getDatabasePlatform());
+        if (DatabasePlatform::isPostgreSQL($platform)) {
+            $existingSequences = [];
+            foreach ($schemaManager->listSequences() as $existingSequence) {
+                $existingSequences[] = strtolower($existingSequence->getName());
+            }
+
+            foreach ($schema->getSequences() as $sequence) {
+                if (in_array(strtolower($sequence->getName()), $existingSequences, true)) {
+                    $schema->dropSequence($sequence->getName());
+                }
+            }
+        }
+
+        $installQueries = $schema->toSql($platform);
 
         foreach ($installQueries as $q) {
             // Check if the query is a DDL statement

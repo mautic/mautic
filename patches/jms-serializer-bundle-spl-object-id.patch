@@ -1,0 +1,15 @@
+diff --git a/vendor/jms/serializer-bundle/Debug/RunsListener.php b/vendor/jms/serializer-bundle/Debug/RunsListener.php
+index a1e6c6520c..9f5c9a4b56 100644
+--- a/vendor/jms/serializer-bundle/Debug/RunsListener.php
++++ b/vendor/jms/serializer-bundle/Debug/RunsListener.php
+@@ -14,8 +14,8 @@ final class RunsListener
+     public function saveRunInfo(Event $event)
+     {
+         $context = $event->getContext();
+-        if (!isset($this->runs[$context->getDirection()][spl_object_hash($context)])) {
+-            $this->runs[$context->getDirection()][spl_object_hash($context)] = [
++        if (!isset($this->runs[$context->getDirection()][spl_object_id($context)])) {
++            $this->runs[$context->getDirection()][spl_object_id($context)] = [
+                 'type' => $event->getType()
+             ];
+         }

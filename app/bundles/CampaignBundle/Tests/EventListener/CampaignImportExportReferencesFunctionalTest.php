@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -374,8 +375,9 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
 
         // The form is imported before its fields, the results table still needs their columns
         $table   = MAUTIC_TABLE_PREFIX.'form_results_'.$newForm->getId().'_'.$newForm->getAlias();
-        $columns = $this->connection->fetchFirstColumn('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?', [$table]);
-        $this->assertContains('email', $columns);
+        $this->assertNotEmpty(
+            DatabasePlatform::getColumnMetadata($this->connection, $table, 'email')
+        );
 
         // The cached form HTML is built before the fields are imported, so the public page needs it rebuilt
         $crawler = $this->client->request('GET', '/form/'.$newForm->getId());
@@ -416,14 +418,32 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         }
         $export[$entityName][0]['alias'] = $alias;
 
-        $countTables = fn (): int => (int) $this->connection->fetchOne(
-            'SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE ?',
-            [MAUTIC_TABLE_PREFIX.'form_results_%']
-        );
-        $countColumns = fn (): int => (int) $this->connection->fetchOne(
-            'SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND COLUMN_NAME = ?',
-            ['review_extra']
-        );
+        $sm = $this->connection->createSchemaManager();
+        $countTables = static function () use ($sm): int {
+            $prefix = MAUTIC_TABLE_PREFIX.'form_results_';
+            $n      = 0;
+            foreach ($sm->listTableNames() as $name) {
+                if (str_starts_with($name, $prefix)) {
+                    ++$n;
+                }
+            }
+
+            return $n;
+        };
+
+        $countColumns = static function () use ($sm): int {
+            $n = 0;
+            foreach ($sm->listTableNames() as $name) {
+                foreach ($sm->listTableColumns($name) as $column) {
+                    if ('review_extra' === $column->getName()) {
+                        ++$n;
+                    }
+                }
+            }
+
+            return $n;
+        };
+
         $tables  = $countTables();
         $columns = $countColumns();
 
@@ -556,8 +576,12 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
     private function dropColumns(string $table, string $prefix): void
     {
         $table = MAUTIC_TABLE_PREFIX.$table;
-        foreach ($this->connection->fetchFirstColumn('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME LIKE ?', [$table, $prefix.'%']) as $column) {
-            $this->connection->executeStatement("ALTER TABLE {$table} DROP COLUMN {$column}");
+        $sm     = $this->connection->createSchemaManager();
+        foreach ($sm->listTableColumns($table) as $column) {
+            $name = $column->getName();
+            if (str_starts_with($name, $prefix)) {
+                $this->connection->executeStatement("ALTER TABLE {$table} DROP COLUMN {$name}");
+            }
         }
     }
 

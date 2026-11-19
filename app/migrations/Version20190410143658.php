@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -8,58 +10,64 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20190410143658 extends AbstractMauticMigration
 {
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
+    protected const TABLE_NAME = 'lead_donotcontact';
+    protected const INDEX_NAME = 'leadid_reason_channel';
+
     public function preUp(Schema $schema): void
     {
-        $newIndexName = $this->getNewIndexName();
-        $tableName    = $this->getTableName();
-        $table        = $schema->getTable($tableName);
+        $tableName    = $this->getPrefixedTableName(self::TABLE_NAME);
+        $newIndexName = $this->getPrefixedIndexName(self::INDEX_NAME);
 
-        if (true === $table->hasIndex($newIndexName)) {
-            throw new SkipMigration('Schema includes this migration');
+        // Check real existence via SQL (case-insensitive where needed)
+        if ($this->indexExists($tableName, $newIndexName)) {
+            throw new SkipMigration('The composite index already exists - skipping');
         }
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
     public function up(Schema $schema): void
     {
-        $newIndexName = $this->getNewIndexName();
-        $tableName    = $this->getTableName();
-        $oldIndexName = $this->getOldIndexName($tableName);
+        $tableName    = $this->getPrefixedTableName(self::TABLE_NAME);
+        $newIndexName = $this->getPrefixedIndexName(self::INDEX_NAME);
 
-        $this->addSql("ALTER TABLE {$tableName} ADD INDEX {$newIndexName} (lead_id, channel, reason);");
-        if ($schema->getTable($tableName)->hasIndex($oldIndexName)) {
-            $this->addSql("ALTER TABLE {$tableName} DROP INDEX {$oldIndexName};");
+        // Skip creation if already exists (extra safety)
+        if ($this->indexExists($tableName, $newIndexName)) {
+            return;
+        }
+
+        $this->createIndex(
+            $tableName,
+            $newIndexName,
+            ['lead_id', 'channel', 'reason']
+        );
+
+        // Drop any old single-column lead_id indexes (find dynamically)
+        $oldIndexes = $this->findSingleLeadIdIndexes($tableName);
+
+        foreach ($oldIndexes as $oldName) {
+            $this->dropIndex(
+                $tableName,
+                $oldName,
+            );
         }
     }
 
     /**
-     * @param string $tableName
+     * Find any single-column indexes on lead_id (to safely drop old ones).
      *
-     * @return string
+     * @return array<string>
      */
-    private function getOldIndexName($tableName)
+    private function findSingleLeadIdIndexes(string $tableName): array
     {
-        return $this->generatePropertyName($tableName, 'idx', ['lead_id']);
-    }
+        $indexes = $this->getIndexes($tableName);
 
-    /**
-     * @return string
-     */
-    private function getNewIndexName()
-    {
-        return "{$this->prefix}leadid_reason_channel";
-    }
+        $toDrop = [];
+        foreach ($indexes as $index) {
+            $columns = $index->getColumns();
+            if (1 === count($columns) && 'lead_id' === $columns[0]) {
+                $toDrop[] = $index->getName();
+            }
+        }
 
-    /**
-     * @return string
-     */
-    private function getTableName()
-    {
-        return "{$this->prefix}lead_donotcontact";
+        return $toDrop;
     }
 }

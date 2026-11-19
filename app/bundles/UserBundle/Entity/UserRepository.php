@@ -2,11 +2,13 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Exception\RetryableException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Exception\OidcException;
@@ -18,7 +20,15 @@ class UserRepository extends CommonRepository
 {
     /**
      * Check both login identifiers before creating a new user.
-     * Requires InnoDB REPEATABLE READ or SERIALIZABLE isolation for gap locking.
+     *
+     * MySQL: InnoDB gap locks from SELECT … FOR UPDATE serialize concurrent inserts.
+     * PostgreSQL: transaction-scoped advisory locks on normalized identifiers
+     * (DatabasePlatform::acquireIdentityLocks) provide the same serialization —
+     * SELECT … FOR UPDATE alone does not lock missing keys on PostgreSQL.
+     *
+     * Uses a connection-level transaction instead of EntityManager::wrapInTransaction()
+     * so that a business-rule rejection (OidcException) does NOT close the EntityManager.
+     * wrapInTransaction() calls $em->close() on any Throwable, which poisons later tests.
      */
     public function saveNewUser(User $user): void
     {
@@ -26,27 +36,71 @@ class UserRepository extends CommonRepository
             throw new \InvalidArgumentException('Only new users can be created.');
         }
 
+        $em         = $this->getEntityManager();
+        $connection = $em->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+
+        $identifiers = [
+            DatabasePlatform::normalizeSearchValue($platform, (string) $user->getUsername()),
+            DatabasePlatform::normalizeSearchValue($platform, (string) $user->getEmail()),
+        ];
+
+        $connection->beginTransaction();
         try {
-            $this->getEntityManager()->wrapInTransaction(function () use ($user): void {
-                // Lock matching users and the index gaps for identifiers that do not exist yet.
-                // Keep these locks until commit so a competing registration cannot insert a conflict.
-                $duplicate = $this->createQueryBuilder('u')
-                    ->select('1')
-                    ->where('u.username IN (:identifiers) OR u.email IN (:identifiers)')
-                    ->setParameter('identifiers', [$user->getUsername(), $user->getEmail()])
-                    ->setMaxResults(1)
-                    ->getQuery()
-                    ->setLockMode(LockMode::PESSIMISTIC_WRITE)
-                    ->getOneOrNullResult();
+            // PostgreSQL: block concurrent registrants on the same identity keys.
+            // MySQL: no-op; gap locks from the FOR UPDATE query below are sufficient.
+            DatabasePlatform::acquireIdentityLocks($connection, $identifiers);
 
-                if (null !== $duplicate) {
-                    throw new OidcException('mautic.open_id.registration.exception.identity_taken');
-                }
+            $usernameMatch = DatabasePlatform::getCaseInsensitiveComparison(
+                $platform,
+                'u.username',
+                ':identifiers',
+                'IN'
+            );
+            $emailMatch = DatabasePlatform::getCaseInsensitiveComparison(
+                $platform,
+                'u.email',
+                ':identifiers',
+                'IN'
+            );
 
-                $this->getEntityManager()->persist($user);
-            });
-        } catch (RetryableException|UniqueConstraintViolationException $exception) {
+            // Lock matching users (and MySQL index gaps) until commit so a competing
+            // registration cannot insert a conflict.
+            $duplicate = $this->createQueryBuilder('u')
+                ->select('1')
+                ->where("{$usernameMatch} OR {$emailMatch}")
+                ->setParameter('identifiers', $identifiers)
+                ->setMaxResults(1)
+                ->getQuery()
+                ->setLockMode(LockMode::PESSIMISTIC_WRITE)
+                ->getOneOrNullResult();
+
+            if (null !== $duplicate) {
+                $connection->rollBack();
+                throw new OidcException('mautic.open_id.registration.exception.identity_taken');
+            }
+
+            $em->persist($user);
+            $em->flush();
+            $connection->commit();
+        } catch (OidcException $exception) {
+            if ($connection->isTransactionActive()) {
+                $connection->rollBack();
+            }
+            throw $exception;
+        } catch (RetryableException|UniqueConstraintViolationException|DriverException $exception) {
+            // RetryableException / LockWaitTimeoutException: lock wait (MySQL gap / PG advisory).
+            // DriverException: PostgreSQL lock_timeout (SQLSTATE 55P03) if not converted by DBAL.
+            // UniqueConstraintViolationException: concurrent insert won the race.
+            if ($connection->isTransactionActive()) {
+                $connection->rollBack();
+            }
             throw new OidcException('mautic.open_id.registration.exception.identity_taken', 0, $exception);
+        } catch (\Throwable $exception) {
+            if ($connection->isTransactionActive()) {
+                $connection->rollBack();
+            }
+            throw $exception;
         }
     }
 
@@ -55,13 +109,18 @@ class UserRepository extends CommonRepository
      */
     public function findByIdentifier(string $identifier): ?User
     {
-        $q = $this->createQueryBuilder('u')
-            ->where('u.username = :identifier OR u.email = :identifier')
-            ->setParameter('identifier', $identifier);
+        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+        $value    = DatabasePlatform::normalizeSearchValue($platform, $identifier);
 
-        $result = $q->getQuery()->getResult();
+        $usernameMatch = DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.username', ':id', '=');
+        $emailMatch    = DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.email', ':id', '=');
 
-        return (!empty($result)) ? $result[0] : null;
+        return $this->createQueryBuilder('u')
+            ->where("{$usernameMatch} OR {$emailMatch}")
+            ->setParameter('id', $value)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     public function setLastLogin($user): void
@@ -83,23 +142,41 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * Checks to ensure that a username and/or email is unique.
+     * Checks to ensure that a username and/or email is unique (case-insensitive).
      *
      * @return array
      */
     public function checkUniqueUsernameEmail(array $params)
     {
-        $q = $this->createQueryBuilder('u');
+        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+        $q        = $this->createQueryBuilder('u');
+        $parts    = [];
 
         if (isset($params['email'])) {
-            $q->where('u.username = :email OR u.email = :email')
-                ->setParameter('email', $params['email']);
+            $email = DatabasePlatform::normalizeSearchValue($platform, (string) $params['email']);
+            $parts[] = '('
+                .DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.username', ':email', '=')
+                .' OR '
+                .DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.email', ':email', '=')
+                .')';
+            $q->setParameter('email', $email);
         }
 
         if (isset($params['username'])) {
-            $q->orWhere('u.username = :username OR u.email = :username')
-                ->setParameter('username', $params['username']);
+            $username = DatabasePlatform::normalizeSearchValue($platform, (string) $params['username']);
+            $parts[] = '('
+                .DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.username', ':username', '=')
+                .' OR '
+                .DatabasePlatform::getCaseInsensitiveComparison($platform, 'u.email', ':username', '=')
+                .')';
+            $q->setParameter('username', $username);
         }
+
+        if ([] === $parts) {
+            return [];
+        }
+
+        $q->where(implode(' OR ', $parts));
 
         return $q->getQuery()->getResult();
     }
@@ -376,7 +453,9 @@ class UserRepository extends CommonRepository
     {
         return $this->createQueryBuilder('u')
             ->join('u.role', 'r')
-            ->where('r.isAdmin = 1')
+            ->where('r.isAdmin = :true')
+            ->setParameter('true', true, 'boolean')
+            ->orderBy('u.id', 'ASC') // Fix non-deterministic ordering
             ->getQuery()
             ->getResult();
     }

@@ -13,12 +13,15 @@ use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
 
 final class SubjectIdTest extends MauticMysqlTestCase
 {
+    private string $prefix;
     private User $linkedUser;
     private User $unlinkedUser;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $role = new Role();
         $role->setName('Admin');
@@ -101,11 +104,15 @@ final class SubjectIdTest extends MauticMysqlTestCase
 
     public function testSubjectUserIsUnique(): void
     {
-        $subjectId = new OidcSubjectId($this->linkedUser, 'test2');
-
         $this->expectException(UniqueConstraintViolationException::class);
-        $this->em->persist($subjectId);
-        $this->em->flush();
+
+        $this->connection->insert(
+            $this->prefix.OidcSubjectId::TABLE_NAME,
+            [
+                'user_id'    => $this->linkedUser->getId(),
+                'subject_id' => 'test2',
+            ]
+        );
     }
 
     public function testSubjectIdIsCaseSensitive(): void
@@ -127,10 +134,14 @@ final class SubjectIdTest extends MauticMysqlTestCase
 
     public function testSubjectIdIsUnique(): void
     {
-        $subjectId = new OidcSubjectId($this->unlinkedUser, 'linked_admin');
-
         $this->expectException(UniqueConstraintViolationException::class);
-        $this->em->persist($subjectId);
-        $this->em->flush();
+
+        $this->connection->insert(
+            $this->prefix.OidcSubjectId::TABLE_NAME,
+            [
+                'user_id'    => $this->unlinkedUser->getId(),
+                'subject_id' => 'linked_admin',
+            ]
+        );
     }
 }

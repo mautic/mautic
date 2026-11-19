@@ -1,0 +1,190 @@
+diff --git a/src/Driver/PDO/PgSQL/Driver.php b/src/Driver/PDO/PgSQL/Driver.php
+index 1c586d6..f775c59 100644
+--- a/src/Driver/PDO/PgSQL/Driver.php
++++ b/src/Driver/PDO/PgSQL/Driver.php
+@@ -7,9 +7,12 @@ use Doctrine\DBAL\Driver\PDO\Connection;
+ use Doctrine\DBAL\Driver\PDO\Exception;
+ use Doctrine\Deprecations\Deprecation;
+ use PDO;
++use Pdo\Pgsql;
+ use PDOException;
+ use SensitiveParameter;
+ 
++use const PHP_VERSION_ID;
++
+ final class Driver extends AbstractPostgreSQLDriver
+ {
+     /**
+@@ -41,11 +44,14 @@ final class Driver extends AbstractPostgreSQLDriver
+             throw Exception::new($exception);
+         }
+ 
++        $disablePreparesAttr = PHP_VERSION_ID >= 80400
++            ? Pgsql::ATTR_DISABLE_PREPARES
++            : PDO::PGSQL_ATTR_DISABLE_PREPARES;
+         if (
+-            ! isset($driverOptions[PDO::PGSQL_ATTR_DISABLE_PREPARES])
+-            || $driverOptions[PDO::PGSQL_ATTR_DISABLE_PREPARES] === true
++            ! isset($driverOptions[$disablePreparesAttr])
++            || $driverOptions[$disablePreparesAttr] === true
+         ) {
+-            $pdo->setAttribute(PDO::PGSQL_ATTR_DISABLE_PREPARES, true);
++            $pdo->setAttribute($disablePreparesAttr, true);
+         }
+ 
+         $connection = new Connection($pdo);
+diff --git a/src/Platforms/PostgreSQLPlatform.php b/src/Platforms/PostgreSQLPlatform.php
+index 9e6648c..c1bc29e 100644
+--- a/src/Platforms/PostgreSQLPlatform.php
++++ b/src/Platforms/PostgreSQLPlatform.php
+@@ -403,16 +403,34 @@ SQL
+      */
+     public function getListTableIndexesSQL($table, $database = null)
+     {
+-        return 'SELECT quote_ident(relname) as relname, pg_index.indisunique, pg_index.indisprimary,
+-                       pg_index.indkey, pg_index.indrelid,
+-                       pg_get_expr(indpred, indrelid) AS where
+-                 FROM pg_class, pg_index
+-                 WHERE oid IN (
+-                    SELECT indexrelid
+-                    FROM pg_index si, pg_class sc, pg_namespace sn
+-                    WHERE ' . $this->getTableWhereClause($table, 'sc', 'sn') . '
+-                    AND sc.oid=si.indrelid AND sc.relnamespace = sn.oid
+-                 ) AND pg_index.indexrelid = oid';
++        // Kept for BC with anything still calling the deprecated platform SQL
++        // directly. Schema introspection in 3.7+ uses SchemaManager::selectIndexColumns().
++        // Shape matches the old contract (indkey + indrelid) so external callers
++        // that re-implement the N+1 resolution still work.
++        return sprintf(
++            <<<'SQL'
++SELECT
++    quote_ident(i.relname) AS relname,
++    ix.indisunique,
++    ix.indisprimary,
++    ix.indkey,
++    ix.indrelid,
++    pg_get_expr(ix.indpred, ix.indrelid) AS "where"
++FROM
++    pg_class t
++    JOIN pg_namespace n ON n.oid = t.relnamespace
++    JOIN pg_index ix ON t.oid = ix.indrelid
++    JOIN pg_class i ON i.oid = ix.indexrelid
++WHERE
++    %s
++    AND t.relkind IN ('r', 'm', 'p')
++    AND i.relkind = 'i'
++ORDER BY
++    i.relname
++SQL
++            ,
++            $this->getTableWhereClause($table, 't', 'n')
++        );
+     }
+ 
+     /**
+diff --git a/src/Schema/PostgreSQLSchemaManager.php b/src/Schema/PostgreSQLSchemaManager.php
+index 13fde63..39a4a8a 100644
+--- a/src/Schema/PostgreSQLSchemaManager.php
++++ b/src/Schema/PostgreSQLSchemaManager.php
+@@ -292,36 +292,20 @@ SQL,
+      */
+     protected function _getPortableTableIndexesList($tableIndexes, $tableName = null)
+     {
+-        $buffer = [];
+-        foreach ($tableIndexes as $row) {
+-            $colNumbers    = array_map('intval', explode(' ', $row['indkey']));
+-            $columnNameSql = sprintf(
+-                'SELECT attnum, attname FROM pg_attribute WHERE attrelid=%d AND attnum IN (%s) ORDER BY attnum ASC',
+-                $row['indrelid'],
+-                implode(' ,', $colNumbers),
+-            );
+-
+-            $indexColumns = $this->_conn->fetchAllAssociative($columnNameSql);
+-
+-            // required for getting the order of the columns right.
+-            foreach ($colNumbers as $colNum) {
+-                foreach ($indexColumns as $colRow) {
+-                    if ($colNum !== $colRow['attnum']) {
+-                        continue;
+-                    }
+-
+-                    $buffer[] = [
+-                        'key_name' => $row['relname'],
+-                        'column_name' => trim($colRow['attname']),
+-                        'non_unique' => ! $row['indisunique'],
+-                        'primary' => $row['indisprimary'],
+-                        'where' => $row['where'],
+-                    ];
+-                }
+-            }
+-        }
+-
+-        return parent::_getPortableTableIndexesList($buffer, $tableName);
++        // Back-ported from doctrine/dbal 4.x: rows already contain one entry per
++        // index column (attname resolved via LATERAL UNNEST in selectIndexColumns).
++        return parent::_getPortableTableIndexesList(array_map(
++            static function (array $row): array {
++                return [
++                    'key_name' => $row['relname'],
++                    'column_name' => $row['attname'],
++                    'non_unique' => ! $row['indisunique'],
++                    'primary' => (bool) $row['indisprimary'],
++                    'where' => $row['where'],
++                ];
++            },
++            $tableIndexes,
++        ), $tableName);
+     }
+ 
+     /**
+@@ -669,31 +653,36 @@ SQL;
+         $sql = 'SELECT';
+ 
+         if ($tableName === null) {
+-            $sql .= ' tc.relname AS table_name, tn.nspname AS schema_name,';
++            $sql .= ' c.relname AS table_name, n.nspname AS schema_name,';
+         }
+ 
++        // Back-ported from doctrine/dbal 4.x selectIndexColumns():
++        // expand indkey via LATERAL UNNEST so column names are resolved in a
++        // single query (no N+1 against pg_attribute) and column order is preserved.
+         $sql .= <<<'SQL'
+                    quote_ident(ic.relname) AS relname,
+                    i.indisunique,
+                    i.indisprimary,
+-                   i.indkey,
+-                   i.indrelid,
+-                   pg_get_expr(indpred, indrelid) AS "where"
++                   pg_get_expr(i.indpred, i.indrelid) AS "where",
++                   quote_ident(a.attname) AS attname
+               FROM pg_index i
+-                   JOIN pg_class AS tc ON tc.oid = i.indrelid
+-                   JOIN pg_namespace tn ON tn.oid = tc.relnamespace
++                   JOIN pg_class AS c ON c.oid = i.indrelid
++                   JOIN pg_namespace n ON n.oid = c.relnamespace
+                    JOIN pg_class AS ic ON ic.oid = i.indexrelid
+-             WHERE ic.oid IN (
+-                SELECT indexrelid
+-                FROM pg_index i, pg_class c, pg_namespace n
++                   JOIN LATERAL UNNEST(i.indkey) WITH ORDINALITY AS keys(attnum, ord)
++                        ON TRUE
++                   JOIN pg_attribute a
++                        ON a.attrelid = c.oid
++                            AND a.attnum = keys.attnum
+ SQL;
+ 
+-        $conditions = array_merge([
+-            'c.oid = i.indrelid',
+-            'c.relnamespace = n.oid',
+-        ], $this->buildQueryConditions($tableName));
++        $conditions = $this->buildQueryConditions($tableName);
++        // Only real tables / partitioned tables / materialized views; indexes only.
++        $conditions[] = "c.relkind IN ('r', 'p', 'm')";
++        $conditions[] = "ic.relkind = 'i'";
+ 
+-        $sql .= ' WHERE ' . implode(' AND ', $conditions) . ')';
++        $sql .= ' WHERE ' . implode(' AND ', $conditions);
++        $sql .= ' ORDER BY keys.ord';
+ 
+         return $this->_conn->executeQuery($sql);
+     }

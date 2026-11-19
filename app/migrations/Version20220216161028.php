@@ -11,24 +11,68 @@ final class Version20220216161028 extends AbstractMauticMigration
 {
     public function up(Schema $schema): void
     {
-        $oldAndNewValues = [
-            $this->connection->quote('Val d\'Oise') => $this->connection->quote('Val-d\'Oise'),
-            $this->connection->quote('Réunion')     => $this->connection->quote('La Réunion'),
+        // 1. Fix state values in leads and companies
+        $stateUpdates = [
+            'Val d\'Oise' => 'Val-d\'Oise',
+            'Réunion'     => 'La Réunion',
         ];
 
-        foreach ($oldAndNewValues as $old => $new) {
-            $this->addSql("UPDATE `{$this->prefix}leads` SET `state` = {$new} WHERE `state` = {$old}");
-            $this->addSql("UPDATE `{$this->prefix}companies` SET `companystate` = {$new} WHERE `companystate` = {$old}");
+        foreach ($stateUpdates as $old => $new) {
+            $oldQuoted = $this->connection->quote($old);
+            $newQuoted = $this->connection->quote($new);
+
+            // leads.state
+            $leadsTable = $this->getPrefixedTableName('leads');
+            $this->addSql(sprintf(
+                'UPDATE %s SET %s = %s WHERE %s = %s',
+                $leadsTable,
+                $this->connection->quoteIdentifier('state'),
+                $newQuoted,
+                $this->connection->quoteIdentifier('state'),
+                $oldQuoted
+            ));
+
+            // companies.companystate
+            $companiesTable = $this->getPrefixedTableName('companies');
+            $this->addSql(sprintf(
+                'UPDATE %s SET %s = %s WHERE %s = %s',
+                $companiesTable,
+                $this->connection->quoteIdentifier('companystate'),
+                $newQuoted,
+                $this->connection->quoteIdentifier('companystate'),
+                $oldQuoted
+            ));
         }
 
-        $filterOldAndNewValues = [
-            $this->connection->quote('s:6:"filter";s:10:"Val d\'Oise";') => $this->connection->quote('s:6:"filter";s:10:"Val-d\'Oise";'),
-            $this->connection->quote('s:6:"filter";s:8:"Réunion";')      => $this->connection->quote('s:6:"filter";s:11:"La Réunion";'),
+        // 2. Fix serialized filters in dynamic content, segments, emails
+        $serializedUpdates = [
+            's:6:"filter";s:10:"Val d\'Oise";' => 's:6:"filter";s:10:"Val-d\'Oise";',
+            's:6:"filter";s:8:"Réunion";'      => 's:6:"filter";s:11:"La Réunion";',
         ];
-        foreach ($filterOldAndNewValues as $old => $new) {
-            $this->addSql("UPDATE `{$this->prefix}dynamic_content` SET `filters` = REPLACE(`filters`, {$old}, {$new})");
-            $this->addSql("UPDATE `{$this->prefix}lead_lists` SET `filters` = REPLACE(`filters`, {$old}, {$new})");
-            $this->addSql("UPDATE `{$this->prefix}emails` SET `dynamic_content` = REPLACE(`dynamic_content`, {$old}, {$new})");
+
+        foreach ($serializedUpdates as $oldSerialized => $newSerialized) {
+            $oldQuoted = $this->connection->quote($oldSerialized);
+            $newQuoted = $this->connection->quote($newSerialized);
+
+            $tables = [
+                'dynamic_content' => 'filters',
+                'lead_lists'      => 'filters',
+                'emails'          => 'dynamic_content',
+            ];
+
+            foreach ($tables as $table => $column) {
+                $fullTable = $this->getPrefixedTableName($table);
+                $this->addSql(sprintf(
+                    'UPDATE %s SET %s = REPLACE(%s, %s, %s) WHERE %s LIKE %s',
+                    $fullTable,
+                    $this->connection->quoteIdentifier($column),
+                    $this->connection->quoteIdentifier($column),
+                    $oldQuoted,
+                    $newQuoted,
+                    $this->connection->quoteIdentifier($column),
+                    $this->connection->quote('%'.$oldSerialized.'%')
+                ));
+            }
         }
     }
 }

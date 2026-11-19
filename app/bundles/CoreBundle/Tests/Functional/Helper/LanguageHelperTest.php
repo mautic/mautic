@@ -31,7 +31,7 @@ final class LanguageHelperTest extends MauticMysqlTestCase
         $this->assertNotEmpty(array_filter(
             $languageFiles[$bundle],
             static fn (string $file): bool => 1 === preg_match(
-                sprintf('/app\/bundles\/%s\/Translations\/en_US\/(messages|validators|flashes)\.ini/', $bundle),
+                sprintf('/app\/bundles\/%s\/Translations\/en_US\/(messages|validators|flashes|javascript)\.ini/', $bundle),
                 $file
             )
         ));

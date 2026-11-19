@@ -61,7 +61,6 @@ trait CustomFieldRepositoryTrait
             } else {
                 $statement = $dq->executeQuery();
             }
-
             $result = $statement->fetchAllAssociative();
             $total  = ($result) ? $result[0]['count'] : 0;
         } else {

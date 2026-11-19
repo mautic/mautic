@@ -6,6 +6,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -180,6 +181,7 @@ class LeadRepository extends CommonRepository
             )
             // Order by ID so we can query by greater than X contact ID when batching
             ->orderBy('l.lead_id')
+            ->groupBy('l.lead_id, l.date_added') // make pgsql happy
             ->setMaxResults($limiter->getBatchLimit())
             ->setParameter('campaignId', (int) $campaignId)
             ->setParameter('decisionId', (int) $decisionId);
@@ -274,6 +276,7 @@ class LeadRepository extends CommonRepository
                 )
                 // Order by ID so we can query by greater than X contact ID when batching
                 ->orderBy('l.lead_id')
+                ->groupBy('l.lead_id') // make pgsql happy
                 ->setParameter('campaignId', (int) $campaignId);
 
             // Contact IDs
@@ -494,7 +497,7 @@ class LeadRepository extends CommonRepository
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
-            ->set('cl.rotation', 'cl.rotation + 1')
+            ->set('rotation', 'rotation + 1')
             ->where(
                 $q->expr()->and(
                     $q->expr()->in('cl.lead_id', ':contactIds'),
@@ -635,7 +638,7 @@ class LeadRepository extends CommonRepository
         ->groupBy("{$leadAlias}.country")
         ->orderBy("{$leadAlias}.country", 'ASC')
         ->setParameter('campaign', $campaign->getId())
-        ->setParameter('false', false)
+        ->setParameter('false', false, 'boolean')
         ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))
         ->setParameter('dateTo', $dateToObject->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
 
@@ -648,9 +651,36 @@ class LeadRepository extends CommonRepository
         $tableName      = $this->getTableName();
         $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
         $tempTableName  = 'to_delete';
-        $conn->executeQuery(sprintf('DROP TEMPORARY TABLE IF EXISTS %s', $tempTableName));
-        $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select DISTINCT lll.lead_id from %s lll join %s l on l.id = lll.lead_id where l.date_identified is null;', $tempTableName, $tableName, $leadsTableName));
-        $deleteQuery       = sprintf('DELETE lll FROM %s lll JOIN (SELECT lead_id FROM %s LIMIT %d) d USING (lead_id); ', $tableName, $tempTableName, self::DELETE_BATCH_SIZE);
+        $platform       = $conn->getDatabasePlatform();
+
+        // Drop temporary table (platform-safe)
+        $conn->executeStatement(
+            DatabasePlatform::getDropTemporaryTableSql($platform, $tempTableName, true)
+        );
+
+        $selectSql = sprintf(
+            'SELECT DISTINCT lll.lead_id
+            FROM %s lll
+            JOIN %s l ON l.id = lll.lead_id
+            WHERE l.date_identified IS NULL',
+            $tableName,
+            $leadsTableName
+        );
+
+        // Create temporary table with the select (platform-safe)
+        $conn->executeStatement(
+            DatabasePlatform::getCreateTemporaryTableSql($platform, $tempTableName, $selectSql)
+        );
+
+        // Build the delete query (platform-safe)
+        $deleteQuery = DatabasePlatform::getDeleteAnonymousContactsUsingTempTableSql(
+            $platform,
+            $tableName,
+            $tempTableName,
+            ['lead_id'],
+            self::DELETE_BATCH_SIZE
+        );
+
         $deletedRecordCount= 0;
         while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
             $deletedRecordCount += $deletedRows;

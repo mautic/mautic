@@ -4,87 +4,106 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 
 final class Version20250804003400 extends AbstractMauticMigration
 {
-    private string $leadListsTable;
+    private const PATTERN = '%s:4:"type";s:11:"multiselect";%';
 
-    public function preUp(Schema $schema): void
+    private function getLeadListsTable(): string
     {
-        $this->leadListsTable = $this->prefix.'lead_lists';
+        return $this->prefix.'lead_lists';
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function getMultiselectLists(): array
+    {
+        $table = $this->getLeadListsTable();
+
+        /** @var QueryBuilder $qb */
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('id', 'filters')
+            ->from($table)
+            ->where($qb->expr()->like('filters', ':pattern'))
+            ->setParameter('pattern', self::PATTERN);
+
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 
     public function up(Schema $schema): void
     {
-        $sql                  = 'SELECT id, filters FROM '.$this->leadListsTable.' WHERE filters LIKE "%multiselect%"';
-        $listsWithMultiselect = $this->connection->executeQuery($sql)->fetchAllAssociative();
+        $table = $this->getLeadListsTable();
+        $lists = $this->getMultiselectLists();
 
-        foreach ($listsWithMultiselect as $listData) {
-            $filters = unserialize($listData['filters'], ['allowed_classes' => false]);
+        foreach ($lists as $listData) {
+            $filters = unserialize($listData['filters'] ?? '', ['allowed_classes' => false]);
+            if (!is_array($filters)) {
+                continue;
+            }
+
             $changed = false;
-            foreach ($filters as $index => $filter) {
-                if ('multiselect' !== $filter['type']) {
+            foreach ($filters as &$filter) {
+                if (($filter['type'] ?? '') !== 'multiselect') {
                     continue;
                 }
 
-                if (OperatorOptions::INCLUDING_ANY === $filter['operator']) {
-                    $filters[$index]['operator'] = OperatorOptions::INCLUDING_ALL;
-                    $changed                     = true;
-                } elseif (OperatorOptions::EXCLUDING_ANY === $filter['operator']) {
-                    $filters[$index]['operator'] = OperatorOptions::EXCLUDING_ALL;
-                    $changed                     = true;
+                if (($filter['operator'] ?? '') === OperatorOptions::INCLUDING_ANY) {
+                    $filter['operator'] = OperatorOptions::INCLUDING_ALL;
+                    $changed            = true;
+                } elseif (($filter['operator'] ?? '') === OperatorOptions::EXCLUDING_ANY) {
+                    $filter['operator'] = OperatorOptions::EXCLUDING_ALL;
+                    $changed            = true;
                 }
             }
+            unset($filter);
 
             if ($changed) {
-                $this->addSql(
-                    'UPDATE '.$this->leadListsTable.' SET filters = :filters WHERE id = :id',
-                    [
-                        'filters' => serialize($filters),
-                        'id'      => $listData['id'],
-                    ]
+                $this->connection->update(
+                    $table,
+                    ['filters' => serialize($filters)],
+                    ['id'      => (int) $listData['id']]
                 );
             }
         }
     }
 
-    public function preDown(Schema $schema): void
-    {
-        $this->leadListsTable = $this->prefix.'lead_lists';
-    }
-
     public function down(Schema $schema): void
     {
-        $sql                  = 'SELECT id, filters FROM '.$this->leadListsTable.' WHERE filters LIKE "%multiselect%"';
-        $listsWithMultiselect = $this->connection->executeQuery($sql)->fetchAllAssociative();
+        $table = $this->getLeadListsTable();
+        $lists = $this->getMultiselectLists();
 
-        foreach ($listsWithMultiselect as $listData) {
-            $filters = unserialize($listData['filters'], ['allowed_classes' => false]);
+        foreach ($lists as $listData) {
+            $filters = unserialize($listData['filters'] ?? '', ['allowed_classes' => false]);
+            if (!is_array($filters)) {
+                continue;
+            }
+
             $changed = false;
-            foreach ($filters as $index => $filter) {
-                if ('multiselect' !== $filter['type']) {
+            foreach ($filters as &$filter) {
+                if (($filter['type'] ?? '') !== 'multiselect') {
                     continue;
                 }
 
-                if (OperatorOptions::INCLUDING_ALL === $filter['operator']) {
-                    $filters[$index]['operator'] = OperatorOptions::INCLUDING_ANY;
-                    $changed                     = true;
-                } elseif (OperatorOptions::EXCLUDING_ALL === $filter['operator']) {
-                    $filters[$index]['operator'] = OperatorOptions::EXCLUDING_ANY;
-                    $changed                     = true;
+                if (($filter['operator'] ?? '') === OperatorOptions::INCLUDING_ALL) {
+                    $filter['operator'] = OperatorOptions::INCLUDING_ANY;
+                    $changed            = true;
+                } elseif (($filter['operator'] ?? '') === OperatorOptions::EXCLUDING_ALL) {
+                    $filter['operator'] = OperatorOptions::EXCLUDING_ANY;
+                    $changed            = true;
                 }
             }
+            unset($filter);
 
             if ($changed) {
-                $this->addSql(
-                    'UPDATE '.$this->leadListsTable.' SET filters = :filters WHERE id = :id',
-                    [
-                        'filters' => serialize($filters),
-                        'id'      => $listData['id'],
-                    ]
+                $this->connection->update(
+                    $table,
+                    ['filters' => serialize($filters)],
+                    ['id'      => (int) $listData['id']]
                 );
             }
         }

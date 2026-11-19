@@ -339,13 +339,34 @@ final class ImportController extends FormController
                                 $this->requestStack->getSession()->set('mautic.'.$object.'.import.config', $config);
 
                                 // Get the headers for matching
-                                $headers = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+                                // $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']) is deprecated
+                                // Below workaround for this deprecation in PHP8.6+
+                                $file->setFlags(\SplFileObject::DROP_NEW_LINE);
+                                $line = $file->fgets();
+                                $headers = str_getcsv(
+                                    $line,
+                                    $config['delimiter'],
+                                    $config['enclosure'],
+                                    $config['escape']
+                                );
+                                // End of workaround
 
                                 // Get the number of lines so we can track progress
                                 $file->seek(PHP_INT_MAX);
                                 $linecount = $file->key();
 
-                                if (!empty($headers) && is_array($headers)) {
+                                // Workaround for PHP8.6+ backward incompatibility
+                                // PHP 8.6+ counts a trailing newline as an extra empty line
+                                if (\PHP_VERSION_ID >= 80600 && $linecount > 0) {
+                                    $file->seek($linecount);
+                                    $last = $file->current();
+                                    if (false === $last || null === $last || '' === $last || "\0" === $last) {
+                                        --$linecount;
+                                    }
+                                }
+
+                                // Treat a single null field (blank line) as no headers
+                                if ([null] !== $headers) {
                                     $headers = CsvHelper::sanitizeHeaders($headers);
 
                                     $this->requestStack->getSession()->set('mautic.'.$object.'.import.headers', $headers);
@@ -531,7 +552,7 @@ final class ImportController extends FormController
         return !$browserImportLimit && $this->getFormButton($form, ['buttons', 'save'])->isClicked();
     }
 
-    protected function getLineCountLimit()
+    protected function getLineCountLimit(): int
     {
         return $this->coreParametersHelper->get('background_import_if_more_rows_than', 0);
     }

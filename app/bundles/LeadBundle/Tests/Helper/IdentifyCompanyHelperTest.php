@@ -6,8 +6,9 @@ namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
+use PHPUnit\Framework\TestCase;
 
-final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
+final class IdentifyCompanyHelperTest extends TestCase
 {
     public function testFindCompanyByName(): void
     {
@@ -16,7 +17,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         $expected = [
-            'companyname'    => 'Mautic',
+            'companyname' => 'Mautic',
         ];
 
         $model = $this->createMock(CompanyModel::class);
@@ -29,10 +30,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper                     = new IdentifyCompanyHelper();
-        $reflection                 = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method                     = $reflection->getMethod('findCompany');
-        [$resultCompany, $entities] = $method->invokeArgs($helper, [$company, $model]);
+        [$resultCompany] = IdentifyCompanyHelper::findCompany($company, $model);
 
         $this->assertEquals($expected, $resultCompany);
     }
@@ -45,8 +43,8 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         $expected = [
-            'companyname'    => 'Mautic',
-            'companyemail'   => 'hello@mautic.org',
+            'companyname'  => 'Mautic',
+            'companyemail' => 'hello@mautic.org',
         ];
 
         $model = $this->createMock(CompanyModel::class);
@@ -59,10 +57,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper                     = new IdentifyCompanyHelper();
-        $reflection                 = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method                     = $reflection->getMethod('findCompany');
-        [$resultCompany, $entities] = $method->invokeArgs($helper, [$company, $model]);
+        [$resultCompany] = IdentifyCompanyHelper::findCompany($company, $model);
 
         $this->assertEquals($expected, $resultCompany);
     }
@@ -91,10 +86,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper                     = new IdentifyCompanyHelper();
-        $reflection                 = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method                     = $reflection->getMethod('findCompany');
-        [$resultCompany, $entities] = $method->invokeArgs($helper, [$company, $model]);
+        [$resultCompany] = IdentifyCompanyHelper::findCompany($company, $model);
 
         $this->assertEquals($expected, $resultCompany);
     }

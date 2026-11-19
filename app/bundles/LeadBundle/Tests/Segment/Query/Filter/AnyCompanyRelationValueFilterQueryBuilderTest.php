@@ -16,7 +16,8 @@ final class AnyCompanyRelationValueFilterQueryBuilderTest extends AbstractRelati
 
         $this->queryBuilder = new AnyCompanyRelationValueFilterQueryBuilder(
             $this->randomParameter,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->connectionMock
         );
     }
 
