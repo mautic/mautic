@@ -16,8 +16,10 @@ use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
+use PhpParser\Node\NullableType;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\UnionType;
 use PhpParser\NodeFinder;
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
@@ -80,36 +82,41 @@ final class EntityEventListenerMustCheckInstanceofRule implements Rule
 
     private function matchGenericEntityEventClass(Param $param): ?string
     {
-        if (!$param->type instanceof Name) {
-            return null;
+        $type = $param->type instanceof NullableType ? $param->type->type : $param->type;
+        $types = $type instanceof UnionType ? $type->types : [$type];
+
+        foreach ($types as $singleType) {
+            if ($singleType instanceof Name && in_array($singleType->toString(), self::GENERIC_ENTITY_EVENT_CLASSES, true)) {
+                return $singleType->toString();
+            }
         }
 
-        $className = $param->type->toString();
-        if (!in_array($className, self::GENERIC_ENTITY_EVENT_CLASSES, true)) {
-            return null;
-        }
-
-        return $className;
+        return null;
     }
 
     private function hasEntityInstanceofCheck(ClassMethod $classMethod, string $eventVariableName): bool
     {
         $nodeFinder = new NodeFinder();
 
-        // variables holding "$event->getEntity()"
-        $entityVariableNames = [];
-        foreach ($nodeFinder->findInstanceOf((array) $classMethod->stmts, Assign::class) as $assign) {
-            if ($assign->var instanceof Variable && is_string($assign->var->name) && $this->isGetEntityCall($assign->expr, $eventVariableName)) {
-                $entityVariableNames[] = $assign->var->name;
-            }
-        }
+        // walk in source order, so only instanceof after "$var = $event->getEntity()" counts
+        $nodes = $nodeFinder->find((array) $classMethod->stmts, fn (Node $node): bool => $node instanceof Assign || $node instanceof Instanceof_);
 
-        foreach ($nodeFinder->findInstanceOf((array) $classMethod->stmts, Instanceof_::class) as $instanceof) {
-            if ($this->isGetEntityCall($instanceof->expr, $eventVariableName)) {
+        // variables currently holding "$event->getEntity()"
+        $entityVariableNames = [];
+        foreach ($nodes as $node) {
+            if ($node instanceof Assign) {
+                if ($node->var instanceof Variable && is_string($node->var->name)) {
+                    $entityVariableNames[$node->var->name] = $this->isGetEntityCall($node->expr, $eventVariableName);
+                }
+
+                continue;
+            }
+
+            if ($node instanceof Instanceof_ && $this->isGetEntityCall($node->expr, $eventVariableName)) {
                 return true;
             }
 
-            if ($instanceof->expr instanceof Variable && in_array($instanceof->expr->name, $entityVariableNames, true)) {
+            if ($node instanceof Instanceof_ && $node->expr instanceof Variable && is_string($node->expr->name) && ($entityVariableNames[$node->expr->name] ?? false)) {
                 return true;
             }
         }
