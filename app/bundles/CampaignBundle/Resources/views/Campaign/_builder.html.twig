@@ -8,7 +8,7 @@
     - canvasSettings
 #}
 <div id="campaign-builder" class="hide builder campaign-builder live animation--slide-in-down">
-    <div id="builder-errors" class="alert alert-danger" role="alert" style="display: none;">
+    <div id="builder-errors" class="alert alert-danger position-fixed" role="alert" style="display: none;">
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ 'mautic.core.close'|trans }}"></button>
         <span></span>
     </div>
@@ -51,11 +51,11 @@
         }
     } %}
     <div class="builder-content">
-        <div id="CampaignCanvas">
-            <div id="CampaignEvent_newsource{% if campaignSources is defined and campaignSources is not empty %}_hide{% endif %}" class="text-center list-campaign-source list-campaign-leadsource">
-                <div class="campaign-event-content">
+        <div id="CampaignCanvas" class="position-relative">
+            <div id="CampaignEvent_newsource{% if campaignSources is defined and campaignSources is not empty %}_hide{% endif %}" class="text-center position-absolute list-campaign-source list-campaign-leadsource">
+                <div class="campaign-event-content position-relative">
                     <div>
-                        <span class="campaign-event-name ellipsis">
+                        <span class="campaign-event-name d-inline-block align-middle text-truncate">
                             <i class="me-12 ri-team-line"></i> {{ 'mautic.campaign.add_new_source'|trans }}
                         </span>
                     </div>
@@ -86,7 +86,7 @@
                   'campaignId': campaignId,
             }) -}}
         </div>
-        <div id="EventJumpOverlay"></div>
+        <div id="EventJumpOverlay" class="position-absolute top-0 start-0"></div>
     </div>
 </div>
 <!-- dropped coordinates -->

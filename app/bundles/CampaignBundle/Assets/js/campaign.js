@@ -2912,7 +2912,7 @@ Mautic.previewCampaignEventDetails = function() {
     });
 
     const renderEventDetails = function($el, data) {
-        const $dl = mQuery('<dl class="dl-horizontal campaign-event-details-dl"/>');
+        const $dl = mQuery('<dl class="dl-horizontal mb-0"/>');
 
         Object.entries(data).forEach(([key, stat]) => {
             const translationKey = 'mautic.campaign.event.' + key;

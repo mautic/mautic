@@ -264,7 +264,7 @@
         <div class="tab-content p-16" id="campaign-tab-content"
              data-event-target-url="{{ path('mautic_campaign_event_stats', {'objectId' : campaign.id, 'dateFromValue' : dateFrom|date('Y-m-d'), 'dateToValue' : dateTo|date('Y-m-d')}) }}">
             <!-- #events-container -->
-                <div class="active tab-pane fade in border-0" id="preview-container">
+                <div class="active tab-pane fade in border-0 w-100 overflow-auto" id="preview-container">
                     <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                     <div class="clearfix"></div>
                 </div>

@@ -21,15 +21,15 @@
 
 {% set cloneTileContent %}
 <h3 class="type-heading-02 mb-24">{{ 'mautic.campaign.event.clone.header'|trans }}</h3>
-<div class="type-helper-text-01 campaign-paste-detail">
+<div class="type-helper-text-01 d-block text-truncate">
     <span>{{ 'mautic.campaign.event.clone.name'|trans }}: </span><span data-campaign-event-clone="sourceEventName"></span>
 </div>
-<div class="type-helper-text-01 campaign-paste-detail">
+<div class="type-helper-text-01 d-block text-truncate">
     <span>{{ 'mautic.campaign.event.clone.from'|trans }}: </span><span data-campaign-event-clone="sourceCampaignName"></span>
 </div>
 {% endset %}
 
-<div class="hide" id="CampaignEventPanel">
+<div class="hide position-absolute flex-column" id="CampaignEventPanel">
     <div id="CampaignEventPanelGroups">
         <div class="row">
             <div class="me-0 ms-0 ps-5 pe-5 campaign-group-container col-md-4" id="DecisionGroupSelector">

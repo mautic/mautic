@@ -7,24 +7,24 @@
 {% if update is not defined %}
   <div id="CampaignEvent_{{ event['id'] }}"
        data-type="{{ event['eventType'] }}"
-       class="draggable list-campaign-event list-campaign-{{ event['eventType'] }}"
+       class="draggable position-absolute list-campaign-event list-campaign-{{ event['eventType'] }}"
        data-event="{{ event['type'] }}"
        data-event-id="{{ event['id'] }}">
 {% endif %}
-    <div class="campaign-event-type">
+    <div class="campaign-event-type position-relative">
 
     {% if event['eventType'] == 'decision' %}
-    <div class="campaign-event-content flex-nowrap gap-5 align-items-center flex-row d-flex flex-grow-1 p-16">
+    <div class="campaign-event-content position-relative flex-nowrap gap-5 align-items-center flex-row d-flex flex-grow-1 p-16">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.when'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
         {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
         <span class="campaign-event-name label label-info ms-5 me-24 ellipsis">{{ idString ~ event['name'] }}</span>
-        <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ms-auto campaign-event-icon event-type-color"></i>
+        <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ms-auto campaign-event-icon event-type-color d-inline-flex align-items-center justify-content-center"></i>
     </div>
 
     {% elseif event['eventType'] == 'action' %}
-        <div class="campaign-event-content d-flex flex-nowrap align-items-center gap-12">
-            <div class="campaign-event-icon p-12 me-5"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
+        <div class="campaign-event-content position-relative overflow-hidden d-flex flex-nowrap align-items-center gap-12">
+            <div class="campaign-event-icon p-12 me-5 d-inline-flex align-items-center justify-content-center"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
             <div class="d-flex flex-column align-items-start">
                 <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
                 {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
@@ -33,19 +33,19 @@
         </div>
 
     {% elseif event['eventType'] == 'condition' %}
-    <div class="campaign-event-content flex-nowrap gap-5 align-items-center flex-row d-flex flex-grow-1 p-16">
+    <div class="campaign-event-content position-relative flex-nowrap gap-5 align-items-center flex-row d-flex flex-grow-1 p-16">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.if'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
             {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
             <span class="campaign-event-name label label-warning ms-5 me-24 ellipsis">{{ idString ~ event['name'] }}</span>
-        <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ms-auto campaign-event-icon event-type-color"></i>
+        <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ms-auto campaign-event-icon event-type-color d-inline-flex align-items-center justify-content-center"></i>
     </div>
     {% endif %}
     </div>
 
 
 {% if update is not defined %}
-    <div class="campaign-event-buttons hide">
+    <div class="campaign-event-buttons position-absolute hide">
         {% include '@MauticCore/Helper/button.html.twig' with {
             buttons: [
                 {

@@ -10,8 +10,8 @@
         {% set percentLabel = ('danger' == typeClass) ? 'mautic.report.campaign.no.percent' : 'mautic.report.campaign.yes.percent' %}
         {% set percentProp  = ('danger' == typeClass) ? 'noPercent' : 'yesPercent' %}
         <li class="list-group-item">
-            <div class="progress-bar progress-bar-{{ typeClass }}" style="width:{{ event.yesPercent }}%; left: 0;"></div>
-            <div class="progress-bar progress-bar-danger" style="width:{{ event['noPercent'] }}%; left: {{ event['yesPercent'] }}%"></div>
+            <div class="progress-bar position-absolute top-0 progress-bar-{{ typeClass }}" style="width:{{ event.yesPercent }}%; left: 0;"></div>
+            <div class="progress-bar position-absolute top-0 progress-bar-danger" style="width:{{ event['noPercent'] }}%; left: {{ event['yesPercent'] }}%"></div>
             <div class="box-layout">
                 <div class="visible-sm visible-md visible-lg col-stats">
                     <span class="mt-5 label label-{{ typeClass }}" data-bs-toggle="tooltip" title="{{ percentLabel|trans }}">
