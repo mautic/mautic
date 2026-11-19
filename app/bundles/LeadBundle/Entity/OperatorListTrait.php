@@ -55,8 +55,6 @@ trait OperatorListTrait
                 OperatorOptions::NOT_EMPTY,
                 OperatorOptions::LIKE,
                 OperatorOptions::NOT_LIKE,
-                OperatorOptions::BETWEEN,
-                OperatorOptions::NOT_BETWEEN,
                 OperatorOptions::REGEXP,
                 OperatorOptions::NOT_REGEXP,
                 OperatorOptions::STARTS_WITH,
@@ -86,8 +84,6 @@ trait OperatorListTrait
                 OperatorOptions::NOT_EMPTY,
                 OperatorOptions::LIKE,
                 OperatorOptions::NOT_LIKE,
-                OperatorOptions::BETWEEN,
-                OperatorOptions::NOT_BETWEEN,
                 OperatorOptions::REGEXP,
                 OperatorOptions::NOT_REGEXP,
                 OperatorOptions::DATE,
@@ -230,6 +226,10 @@ trait OperatorListTrait
 
         if ('datetime' === $type) {
             return 'date';
+        }
+
+        if ('int' === $type || 'integer' === $type) {
+            return 'number';
         }
 
         if (!array_key_exists($type, $this->typeOperators)) {

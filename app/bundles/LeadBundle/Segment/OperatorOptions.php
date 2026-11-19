@@ -122,13 +122,11 @@ final class OperatorOptions
             'label'       => 'mautic.lead.list.form.operator.between',
             'expr'        => 'between', // special case
             'negate_expr' => 'notBetween',
-            'hide'        => true,
         ],
         self::NOT_BETWEEN => [
             'label'       => 'mautic.lead.list.form.operator.notbetween',
             'expr'        => 'notBetween', // special case
             'negate_expr' => 'between',
-            'hide'        => true,
         ],
         self::IN_LAST => [
             'label'       => 'mautic.lead.list.form.operator.inlast',

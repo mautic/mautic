@@ -1100,6 +1100,26 @@ final class LoadSegmentsData extends AbstractFixture implements OrderedFixtureIn
                 ],
                 'populate' => true,
             ],
+            [ // ID 55
+                'name'    => 'segment has X number of browsing sessions',
+                'alias'   => 'segment-has-x-number-of-browsing-sessions',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'behaviors',
+                        'type'     => 'number',
+                        'field'    => 'sessions',
+                        'operator' => 'between',
+                        'filter'   => [
+                            'from' => '0',
+                            'to'   => '5',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {

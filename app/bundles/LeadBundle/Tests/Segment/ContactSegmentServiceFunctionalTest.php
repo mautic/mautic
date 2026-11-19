@@ -193,6 +193,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'segment-having-company'                                             => 50,
             'segment-not-having-company'                                         => 4,
             'has-email-and-visited-url'                                          => 4,
+            'segment-has-x-number-of-browsing-sessions'                          => 54,
         ];
     }
 

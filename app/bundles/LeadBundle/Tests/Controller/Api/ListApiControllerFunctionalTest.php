@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CoreBundle\Helper\IntHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
 use Mautic\LeadBundle\Entity\Company;
@@ -932,6 +933,127 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         yield [OperatorOptions::IN_LAST, 2];
         yield [OperatorOptions::IN_NEXT, 2];
+    }
+
+    #[DataProvider('errorProvider')]
+    public function testBetweenFilterErrorsForNumberType(string $value, string $errorMessage): void
+    {
+        $filters = [[
+            'glue'       => 'and',
+            'field'      => 'points',
+            'object'     => 'lead',
+            'type'       => 'number',
+            'operator'   => 'between',
+            'properties' => [
+                'filter' => [
+                    'number_from' => 0,
+                    'number_to'   => $value,
+                ],
+            ],
+        ]];
+
+        $this->client->request('POST', '/api/segments/new', ['name' => 'Points range filter', 'filters' => $filters]);
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
+        $this->assertStringContainsString($errorMessage, (string) $clientResponse->getContent(), 'The error message was not found in the response');
+    }
+
+    /**
+     * @return \Iterator<string, array<int, string>>
+     */
+    public static function errorProvider(): \Iterator
+    {
+        yield 'invalid_value' => ['abc', 'This value should be a valid number.'];
+        yield 'empty_value' => ['', 'A value is required.'];
+    }
+
+    #[DataProvider('limitProvider')]
+    public function testBetweenFilterForNumberType(string $operator, int|float $lowerLimit, int|float $upperLimit, int $memberCount): void
+    {
+        $filters = [[
+            'glue'        => 'and',
+            'field'       => 'points',
+            'object'      => 'lead',
+            'type'        => 'number',
+            'operator'    => $operator,
+            'properties'  => [
+                'filter' => [
+                    'number_from' => $lowerLimit,
+                    'number_to'   => $upperLimit,
+                ],
+            ],
+        ]];
+
+        $this->client->request('POST', '/api/segments/new', ['name' => 'Points range filter', 'filters' => $filters]);
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode());
+        $segmentId = json_decode($clientResponse->getContent(), true)['list']['id'];
+
+        $leadWithLessThanLowerLimitPoints = new Lead();
+        $leadWithLessThanLowerLimitPoints->setPoints($lowerLimit - 5);
+
+        $leadWithMoreThanUpperLimitPoints = new Lead();
+        $leadWithMoreThanUpperLimitPoints->setPoints($upperLimit + 5);
+
+        $leadWithLowerLimitPoints = new Lead();
+        $leadWithLowerLimitPoints->setPoints($lowerLimit);
+
+        $leadWithUpperLimitPoints = new Lead();
+        $leadWithUpperLimitPoints->setPoints($upperLimit);
+
+        $leadWithMeanOfLimitPoints = new Lead();
+        $leadWithMeanOfLimitPoints->setPoints(($lowerLimit + $upperLimit) / 2);
+
+        $this->em->persist($leadWithLessThanLowerLimitPoints);
+        $this->em->persist($leadWithMoreThanUpperLimitPoints);
+        $this->em->persist($leadWithLowerLimitPoints);
+        $this->em->persist($leadWithUpperLimitPoints);
+        $this->em->persist($leadWithMeanOfLimitPoints);
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segmentId]);
+
+        $this->assertSame(0, $commandTester->getStatusCode(), 'Update lead lists command was not successful');
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentId]);
+
+        $this->assertCount($memberCount, $members, 'The segment does not have the expected number of members');
+
+        $leadsWithinRange = [$leadWithMeanOfLimitPoints->getId(), $leadWithUpperLimitPoints->getId(), $leadWithLowerLimitPoints->getId()];
+        $leadsOutOfRange  = [$leadWithLessThanLowerLimitPoints->getId(), $leadWithMoreThanUpperLimitPoints->getId()];
+
+        if (0 === $memberCount) {
+            $expectedMembers = [];
+        } elseif (5 === $memberCount) {
+            $expectedMembers = array_merge($leadsWithinRange, $leadsOutOfRange);
+        } else {
+            $expectedMembers = OperatorOptions::BETWEEN === $operator ? $leadsWithinRange : $leadsOutOfRange;
+        }
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        $this->assertSame($expectedMembers, $actualMembers, 'The expected and the actual members in the segment do not match');
+    }
+
+    /**
+     * @return \Iterator<string, array<int, (float | int | string)>>
+     */
+    public static function limitProvider(): \Iterator
+    {
+        yield 'both_positive_between' => [OperatorOptions::BETWEEN, 5, 15, 3];
+        yield 'both_negative_between' => [OperatorOptions::BETWEEN, -15, -5, 3];
+        yield 'negative_positive_between' => [OperatorOptions::BETWEEN, -5, 5, 3];
+        yield 'both_positive_not_between' => [OperatorOptions::NOT_BETWEEN, 5, 15, 2];
+        yield 'both_negative_not_between' => [OperatorOptions::NOT_BETWEEN, -15, -5, 2];
+        yield 'negative_positive_not_between' => [OperatorOptions::NOT_BETWEEN, -5, 5, 2];
+        yield 'first_number_greater_than_second_between' => [OperatorOptions::BETWEEN, 15, 5, 0];
+        yield 'first_number_greater_than_second_not_between' => [OperatorOptions::NOT_BETWEEN, 15, 5, 5];
+        yield 'float_numbers_between' => [OperatorOptions::BETWEEN, 5.0, 15.5, 3];
+        yield 'float_numbers_not_between' => [OperatorOptions::NOT_BETWEEN, 5.0, 15.5, 2];
+        yield 'int_max_between' => [OperatorOptions::BETWEEN, IntHelper::MIN_INTEGER_VALUE + 5, IntHelper::MAX_INTEGER_VALUE - 5, 3];
+        yield 'int_max_not_between' => [OperatorOptions::NOT_BETWEEN, IntHelper::MIN_INTEGER_VALUE + 5, IntHelper::MAX_INTEGER_VALUE - 5, 2];
     }
 
     /**
