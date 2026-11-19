@@ -31,8 +31,8 @@
 {{ form_start(form) }}
 <div class="box-layout">
     <!-- container -->
-    <div class="col-md-8 height-auto bdr-r">
-        <div class="pa-16">
+    <div class="col-md-8 height-auto border-end">
+        <div class="p-16">
             <div class="row">
                 <div class="col-md-6">{{ form_row(form.label) }}</div>
                 <div class="col-md-6">{{ form_row(form.alias) }}</div>
@@ -127,7 +127,7 @@
         ] %}
         {% set tilesHtml %}
         <div class="mb-32">
-            <div class="grid grid-cols-4 gap-12">
+            <div class="row g-3">
             {% for type in itemTypes %}
                 {% for item in type.items %}
                     {% set tileContent %}
@@ -141,9 +141,9 @@
                         }]
                     } %}
                     </div>
-                        <span class="type-heading-02 break-word">{{ item.heading|trans }}</span>
+                        <span class="type-heading-02 text-break">{{ item.heading|trans }}</span>
                         {% if item.copy is defined %}
-                            <span class="type-label-01 mt-12 break-word">{{ item.copy|trans }}</span>
+                            <span class="type-label-01 mt-12 text-break">{{ item.copy|trans }}</span>
                         {% endif %}
                         <div class="mt-auto pt-16">
                         {% include '@MauticCore/Helper/_tag.html.twig' with {
@@ -155,7 +155,9 @@
                         } %}
                         </div>
                     {% endset %}
-                    {% include '@MauticCore/Components/tile.html.twig' with {type: 'base', content: tileContent} only %}
+                    <div class="col-12 col-lg-6 col-xl-3">
+                        {% include '@MauticCore/Components/tile.html.twig' with {type: 'base', content: tileContent, className: 'h-100'} only %}
+                    </div>
                 {% endfor %}
             {% endfor %}
                 </div>
@@ -177,7 +179,7 @@
 
             } only %}
         {% endset %}
-        <div class="pa-16">
+        <div class="p-16">
         {% include '@MauticCore/Components/card.html.twig' with {
             heading: 'mautic.lead.field.shouldbe.heading',
             href: '',

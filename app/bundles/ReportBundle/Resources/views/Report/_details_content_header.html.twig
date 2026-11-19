@@ -8,7 +8,7 @@
 <div id="report-shelves" class="mb-5" aria-multiselectable="true">
     <div class="collapse pe-16 ps-16" id="report-details">
         <div class="pe-16 ps-16 pb-16">
-            <div class="panel shd-none mb-0">
+            <div class="panel shadow-none mb-0">
                 <table class="table table-hover mb-0">
                     <tbody>
                       {{ include('@MauticCore/Helper/details.html.twig', {'entity': report}) }}
@@ -20,7 +20,7 @@
     {% if dynamicFilterFields is not empty %}
     <div class="collapse {% if showDynamicFilters %}in{% endif %}" id="report-filters">
         <div class="pe-16 ps-16 pb-16">
-            <div class="panel shd-none mb-0 pa-24">
+            <div class="panel shadow-none mb-0 p-24">
                 <div class="row">
                     {{ form_start(dynamicFilterForm) }}
                     {% for child in dynamicFilterFields %}

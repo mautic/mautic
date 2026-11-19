@@ -2,7 +2,7 @@
     {% for stat in stats %}
     <div class="col-xs-12 col-lg-3">
         {% set tileContent %}
-            <div class="d-flex flex-column justify-content-between {% if stats|length == 4 %}ar-2-1{% endif %} flex-grow-1">
+            <div class="d-flex flex-column justify-content-between {% if stats|length == 4 %}as-2-1{% endif %} flex-grow-1">
                 <span class="text-secondary mb-24 ellipsis">
                     {{ stat.title|trans }}
                     {% if stat.tooltip is defined %}

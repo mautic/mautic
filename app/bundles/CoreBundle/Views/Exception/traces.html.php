@@ -41,7 +41,7 @@ echo "<ol>\n";
 $root = realpath(__DIR__.'/../../../../../');
 
 foreach ($traces as $trace) {
-    echo '<li class="pt-3 break-word">';
+    echo '<li class="pt-3 text-break">';
     if (isset($trace['file'])) {
         $trace['file'] = str_replace($root, '', $trace['file']);
         echo "<strong>{$trace['file']}";

@@ -516,6 +516,49 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Deprecated method `Mautic\CoreBundle\Entity\CommonRepository::getPublishedByDateExpression()` removed. Use `getPublishedByDateOrmExpression()` for a `Doctrine\ORM\QueryBuilder` or `getPublishedByDateDbalExpression()` for a `Doctrine\DBAL\Query\QueryBuilder`; both take the same arguments.
 - Deprecated property `leadField` removed from `Mautic\FormBundle\Entity\Field` together with `getLeadField()` and `setLeadField()`. Use `mappedObject` and `mappedField` (`getMappedObject()`/`getMappedField()`) instead. The `lead_field` column is dropped from the `form_fields` table by a migration, which first copies any value not yet present in `mapped_field` (and the matching `mapped_object`). API impact: form fields in `/api/forms` responses no longer include `leadField`, and a `leadField` sent in a request is ignored - send `mappedObject` (`contact` or `company`) and `mappedField` instead. Custom form field templates must read `field.mappedField` instead of `field.leadField`.
 
+- Responsive float and text-alignment classes now use Bootstrap 5's mobile-first breakpoint names: `md` starts at 768px, `lg` at 992px and `xl` at 1200px. The old `xs` float classes apply only below 768px, so pair the base float class with `float-md-none`.
+    | Removed class | Bootstrap 5 replacement |
+    |---|---|
+    | `.pull-right-xs` | `.float-end .float-md-none` |
+    | `.pull-left-xs` | `.float-start .float-md-none` |
+    | `.pull-right-sm` | `.float-md-end` |
+    | `.pull-left-sm` | `.float-md-start` |
+    | `.pull-right-md` | `.float-lg-end` |
+    | `.pull-left-md` | `.float-lg-start` |
+    | `.pull-right-lg` | `.float-xl-end` |
+    | `.pull-left-lg` | `.float-xl-start` |
+    | `.text-right-sm` | `.text-md-end` |
+    | `.text-left-sm` | `.text-md-start` |
+    | `.text-right-md` | `.text-lg-end` |
+    | `.text-left-md` | `.text-lg-start` |
+    | `.text-right-lg` | `.text-xl-end` |
+    | `.text-left-lg` | `.text-xl-start` |
+
+    | Removed class | Bootstrap class |
+    |---|---|
+    | `.bdr-a` | `.border` |
+    | `.bdr-w-0` | `.border-0` |
+    | `.bdr-l` | `.border-start` |
+    | `.bdr-r` | `.border-end` |
+    | `.bdr-t` | `.border-top` |
+    | `.bdr-b` | `.border-bottom` |
+    | `.bdr-l-wdh-0` | `.border-start-0` |
+    | `.bdr-r-wdh-0` | `.border-end-0` |
+    | `.bdr-t-wdh-0` | `.border-top-0` |
+    | `.bdr-b-wdh-0` | `.border-bottom-0` |
+    | `.bdr-rds-0` | `.rounded-0` |
+    | `.bdr-rds`, `.bdr-rds-sm`, `.bdr-rds-lg` | No direct equivalent. The radius comes from Mautic's theme, and in the default brand `.rounded-1` or `.rounded-3` would give a different radius. No callers in the repository. |
+    | `.bdr-rds-circle` | `.rounded-circle` |
+    | `.ovf-h` | `.overflow-hidden` |
+    | `.va-t` | `.align-top` |
+    | `.va-m` | `.align-middle` |
+    | `.va-b` | `.align-bottom` |
+    | `.fs-1` | `.flex-shrink-1` |
+
+    Mautic sets `--bs-border-color` to `--border-subtle`, so Bootstrap border utilities keep Mautic's border colour. A custom theme that replaces `--border-subtle` must also set `--bs-border-color` to keep the same appearance.
+
+    `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
+
 ## Changed code
 
 - `Mautic\NotificationBundle\Integration\OneSignalIntegration` now extends `Mautic\IntegrationsBundle\Integration\BasicIntegration` instead of the deprecated `Mautic\PluginBundle\Integration\AbstractIntegration`, so it is no longer an `AbstractIntegration`. Methods that only `AbstractIntegration` provides no longer exist on it, for example `getKeys()`, `getDecryptedApiKeys()`, `getFormSettings()` and `isCoreIntegration()`; it still has `getName()`, `getDisplayName()`, `getIcon()`, `getIntegrationSettings()` and `getSupportedFeatures()`. Load the integration with its API keys decrypted through the new `Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper` (`getIntegration()` / `getPublishedIntegration()`) instead of `Mautic\PluginBundle\Helper\IntegrationHelper::getIntegrationObject('OneSignal')` and `getKeys()` / `getDecryptedApiKeys()`.

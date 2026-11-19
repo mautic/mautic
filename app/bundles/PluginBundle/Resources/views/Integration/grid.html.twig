@@ -58,7 +58,7 @@
   {% endif %}
 
   {% if items|length > 0 %}
-      <div class="pa-16">
+      <div class="p-16">
           <div class="row shuffle-integrations native-integrations">
               {% for item in items %}
                   {% if item.plugin in plugins|keys %}
@@ -66,8 +66,8 @@
                   {% else %}
                       {% set pluginTitle = item.name ~ ' - ' ~ item.display %}
                   {% endif %}
-                  <div class="shuffle shuffle-item grid ma-12 float-start text-center integration plugin{{ item.plugin }} integration-{{ item.name }} {% if not item.enabled %}integration-disabled{% endif %}">
-                      <div class="panel overflow-hidden pa-12">
+                  <div class="shuffle shuffle-item m-12 float-start text-center integration plugin{{ item.plugin }} integration-{{ item.name }} {% if not item.enabled %}integration-disabled{% endif %}">
+                      <div class="panel overflow-hidden p-12">
                           <a href="{{ path((item.isBundle ? 'mautic_plugin_info' : 'mautic_plugin_config'), {'name': item.name}) }}"
                              {% if item.isBundle %}data-footer="false"{% endif %}
                              data-prevent-dismiss="true"
