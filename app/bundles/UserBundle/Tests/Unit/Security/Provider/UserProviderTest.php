@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Unit\Security\Provider;
 
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use Mautic\UserBundle\Event\PostSaveUserEvent;
-use Mautic\UserBundle\Event\PreSaveUserEvent;
 use Mautic\UserBundle\Security\Provider\UserProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -30,11 +30,14 @@ final class UserProviderTest extends TestCase
         $hasher = $this->createStub(UserPasswordHasherInterface::class);
         $hasher->method('hashPassword')->willReturn('hashed-password');
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(PreSaveUserEvent::class, static function (PreSaveUserEvent $event): void {
-            $event->getUser()->setTimezone('Europe/Prague');
+        $dispatcher->addListener(EntityPreSave::class, static function (EntityPreSave $event): void {
+            $user = $event->getEntity();
+            if ($user instanceof User) {
+                $user->setTimezone('Europe/Prague');
+            }
         });
         $savedEvent = null;
-        $dispatcher->addListener(PostSaveUserEvent::class, static function (PostSaveUserEvent $event) use (&$savedEvent): void {
+        $dispatcher->addListener(EntityPostSave::class, static function (EntityPostSave $event) use (&$savedEvent): void {
             $savedEvent = $event;
         });
 
@@ -47,9 +50,9 @@ final class UserProviderTest extends TestCase
         $this->assertSame('new@example.com', $persistedUser->getEmail());
         $this->assertSame('hashed-password', $persistedUser->getPassword());
         $this->assertSame('Europe/Prague', $persistedUser->getTimezone());
-        $this->assertInstanceOf(PostSaveUserEvent::class, $savedEvent);
+        $this->assertInstanceOf(EntityPostSave::class, $savedEvent);
         $this->assertTrue($savedEvent->isNew());
-        $this->assertSame($user, $savedEvent->getUser());
+        $this->assertSame($user, $savedEvent->getEntity());
     }
 
     public function testCreateUserStillValidatesRequiredFields(): void

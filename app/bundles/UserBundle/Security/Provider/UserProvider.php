@@ -4,12 +4,12 @@ namespace Mautic\UserBundle\Security\Provider;
 
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use Mautic\UserBundle\Event\PostSaveUserEvent;
-use Mautic\UserBundle\Event\PreSaveUserEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -141,8 +141,8 @@ final readonly class UserProvider implements UserProviderInterface
             );
         }
 
-        if ($this->dispatcher->hasListeners(PreSaveUserEvent::class)) {
-            $this->dispatcher->dispatch(new PreSaveUserEvent($user, $isNew));
+        if ($this->dispatcher->hasListeners(EntityPreSave::class)) {
+            $this->dispatcher->dispatch(new EntityPreSave($user, $isNew));
         }
 
         if ($createOnly) {
@@ -151,8 +151,8 @@ final readonly class UserProvider implements UserProviderInterface
             $this->userRepository->saveEntity($user);
         }
 
-        if ($this->dispatcher->hasListeners(PostSaveUserEvent::class)) {
-            $this->dispatcher->dispatch(new PostSaveUserEvent($user, $isNew));
+        if ($this->dispatcher->hasListeners(EntityPostSave::class)) {
+            $this->dispatcher->dispatch(new EntityPostSave($user, $isNew));
         }
 
         return $user;
