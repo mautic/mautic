@@ -25,7 +25,7 @@ final class FullContact_Name extends FullContact_Base
      * @param string $name
      * @param string $casing -> valid values are uppercase, lowercase, titlecase
      */
-    public function normalizer($name, $casing = 'titlecase'): ?\stdClass
+    public function normalizer($name, string $casing = 'titlecase'): ?\stdClass
     {
         $this->_resourceUri = '/name/normalizer.json';
         $this->_execute(['q' => $name, 'method' => 'normalizer', 'casing' => $casing]);
@@ -40,7 +40,7 @@ final class FullContact_Name extends FullContact_Base
      * @param string $type   -> valid values are email and username
      * @param string $casing -> valid values are uppercase, lowercase, titlecase
      */
-    public function deducer($value, $type = 'email', $casing = 'titlecase'): ?\stdClass
+    public function deducer($value, string $type = 'email', string $casing = 'titlecase'): ?\stdClass
     {
         $this->_resourceUri = '/name/deducer.json';
         $this->_execute([$type => $value, 'method' => 'deducer', 'casing' => $casing]);
@@ -53,9 +53,8 @@ final class FullContact_Name extends FullContact_Base
      *
      * @param string $name1
      * @param string $name2
-     * @param string $casing
      */
-    public function similarity($name1, $name2, $casing = 'titlecase'): ?\stdClass
+    public function similarity($name1, $name2, string $casing = 'titlecase'): ?\stdClass
     {
         $this->_resourceUri = '/name/similarity.json';
         $this->_execute(['q1' => $name1, 'q2' => $name2, 'method' => 'similarity', 'casing' => $casing]);
@@ -63,7 +62,7 @@ final class FullContact_Name extends FullContact_Base
         return $this->response_obj;
     }
 
-    public function stats($value, $type = 'givenName', $casing = 'titlecase'): ?\stdClass
+    public function stats($value, string $type = 'givenName', string $casing = 'titlecase'): ?\stdClass
     {
         $this->_resourceUri = '/name/stats.json';
         $this->_execute([$type => $value, 'method' => 'stats', 'casing' => $casing]);
@@ -71,7 +70,7 @@ final class FullContact_Name extends FullContact_Base
         return $this->response_obj;
     }
 
-    public function parser($name, $casing = 'titlecase'): ?\stdClass
+    public function parser($name, string $casing = 'titlecase'): ?\stdClass
     {
         $this->_resourceUri = '/name/parser.json';
         $this->_execute(['q' => $name, 'method' => 'parser', 'casing' => $casing]);

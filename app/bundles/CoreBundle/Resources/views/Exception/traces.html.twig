@@ -60,7 +60,7 @@
 
 <ol>
 {% for trace in traces %}
-    <li class="pt-3 break-word">
+    <li class="pt-3 text-break">
     {% if trace.file is defined and trace.file is not empty %}
         {% set traceFile = trace.file|split(root)|join('') %}
         <strong>

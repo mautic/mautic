@@ -111,7 +111,7 @@
               <!-- page detail collapseable -->
               <div class="collapse pe-16 ps-16" id="page-details">
                   <div class="pe-16 ps-16 pb-16">
-                      <div class="panel shd-none mb-0">
+                      <div class="panel shadow-none mb-0">
                           <table class="table table-hover mb-0">
                               <tbody>
                               {{ include('@MauticCore/Helper/details.html.twig', {'entity': entity}) }}
@@ -145,7 +145,7 @@
               <!--/ page detail collapseable toggler -->
 
               <!-- some stats -->
-              <div class="pa-16">
+              <div class="p-16">
                   <div class="row">
                       <div class="col-sm-12">
                           <div class="panel">
@@ -193,14 +193,14 @@
               <!--/ tabs controls -->
           </div>
           <!-- start: tab-content -->
-          <div class="tab-content pa-16">
-              <div class="tab-pane active active bdr-w-0" id="clicks-container">
+          <div class="tab-content p-16">
+              <div class="tab-pane active active border-0" id="clicks-container">
                   {{ include('@MauticPage/Trackable/click_counts.html.twig', {'trackables': trackables, 'entity': entity, 'channel': 'dynamicContent'}) }}
 
               </div>
               <!-- #translation-container -->
               {% if showTranslations %}
-                  <div class="tab-pane bdr-w-0" id="translation-container">
+                  <div class="tab-pane border-0" id="translation-container">
                       {{ translationContent|raw }}
                   </div>
               {% endif %}
@@ -211,7 +211,7 @@
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-md-3 bdr-l height-auto">
+      <div class="col-md-3 border-start height-auto">
           <hr class="hr-w-2" style="width:50%">
           <!-- recent activity -->
           {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}

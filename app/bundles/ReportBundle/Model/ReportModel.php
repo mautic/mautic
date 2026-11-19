@@ -193,7 +193,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
      *
      * @return mixed
      */
-    public function buildAvailableReports($context, ?string $reportSource = null)
+    public function buildAvailableReports(string $context, ?string $reportSource = null)
     {
         if (empty($this->reportBuilderData[$context])) {
             // Check to see if all has been obtained
@@ -202,7 +202,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
                 $this->reportBuilderData[$context]['graphs'] = $this->reportBuilderData['all']['graphs'][$context] ?? [];
             } else {
                 // build them
-                $eventContext = ('all' == $context) ? '' : $context;
+                $eventContext = ('all' === $context) ? '' : $context;
 
                 $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper, $reportSource);
                 $this->dispatcher->dispatch($event);
@@ -210,7 +210,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
                 $tables = $event->getTables();
                 $graphs = $event->getGraphs();
 
-                if ('all' == $context) {
+                if ('all' === $context) {
                     $this->reportBuilderData[$context]['tables'] = $tables;
                     $this->reportBuilderData[$context]['graphs'] = $graphs;
                 } else {
@@ -234,10 +234,8 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Builds the table lookup data for the report forms.
-     *
-     * @param string $context
      */
-    public function getTableData($context = 'all', ?string $reportSource = null): array
+    public function getTableData(string $context = 'all', ?string $reportSource = null): array
     {
         $data = $this->buildAvailableReports($context, $reportSource);
 

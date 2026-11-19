@@ -1,6 +1,6 @@
 {% block _mobile_notification_mobileSettings_widget %}
   {% if 'ios' in integrationSettings.platforms %}
-      <div class="tab-pane fade in bdr-w-0" id="ios-notification-container">
+      <div class="tab-pane fade in border-0" id="ios-notification-container">
           <div class="row">
               <div class="col-md-6">
                   {{ form_row(form.ios_subtitle) }}
@@ -23,7 +23,7 @@
       </div>
   {% endif %}
   {% if 'android' in integrationSettings.platforms %}
-      <div class="tab-pane fade in bdr-w-0" id="android-notification-container">
+      <div class="tab-pane fade in border-0" id="android-notification-container">
           <div class="row">
               <div class="col-md-6">
                   {{ form_row(form.android_small_icon) }}

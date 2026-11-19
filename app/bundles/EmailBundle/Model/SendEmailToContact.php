@@ -217,11 +217,13 @@ final class SendEmailToContact
         $this->errorMessages[$this->contact['id']]  = $errorMessages;
         $this->failedContacts[$this->contact['id']] = $this->contact['email'];
 
-        try {
-            $stat = $this->statHelper->getStat($this->contact['email']);
-            $this->downEmailSentCount($stat->getEmailId());
-            $this->statHelper->markForDeletion($stat);
-        } catch (StatNotFoundException) {
+        if (is_string($this->contact['email'])) {
+            try {
+                $stat = $this->statHelper->getStat($this->contact['email']);
+                $this->downEmailSentCount($stat->getEmailId());
+                $this->statHelper->markForDeletion($stat);
+            } catch (StatNotFoundException) {
+            }
         }
 
         if ($hasBadEmail) {

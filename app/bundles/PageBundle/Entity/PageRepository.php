@@ -238,23 +238,20 @@ final class PageRepository extends CommonRepository implements ResettableVariant
             ->executeStatement();
     }
 
-    /**
-     * @param int $increaseBy
-     */
-    public function upHitCount($id, $increaseBy = 1, bool $unique = false, bool $variant = false): void
+    public function upHitCount($id, int $increaseBy = 1, bool $unique = false, bool $variant = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'pages')
-            ->set('hits', 'hits + '.(int) $increaseBy)
+            ->set('hits', 'hits + '.$increaseBy)
             ->where('id = '.(int) $id);
 
         if ($unique) {
-            $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
+            $q->set('unique_hits', 'unique_hits + '.$increaseBy);
         }
 
         if ($variant) {
-            $q->set('variant_hits', 'variant_hits + '.(int) $increaseBy);
+            $q->set('variant_hits', 'variant_hits + '.$increaseBy);
         }
 
         $q->executeStatement();

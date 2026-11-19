@@ -73,7 +73,7 @@ final class QueryBuilder extends BaseQueryBuilder
      *
      * @throws QueryException
      */
-    public function addJoinCondition($alias, $expr): static
+    public function addJoinCondition(string $alias, $expr): static
     {
         $result = $parts = $this->getQueryPart('join');
 
@@ -123,7 +123,7 @@ final class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    public function getTableAlias(string $table, $joinType = null): array|bool|string
+    public function getTableAlias(string $table, ?string $joinType = null): array|bool|string
     {
         if (null === $joinType) {
             $tables = $this->getTableAliases();
@@ -210,10 +210,7 @@ final class QueryBuilder extends BaseQueryBuilder
         return $tables;
     }
 
-    /**
-     * @param string $table
-     */
-    public function isJoinTable($table): bool
+    public function isJoinTable(string $table): bool
     {
         $queryParts = $this->getQueryParts();
 
@@ -282,7 +279,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * This function assembles correct logic for segment processing, this is to replace andWhere and orWhere (virtualy
      *  as they need to be kept). You may not use andWhere in filters!!!
      */
-    public function addLogic(string|CompositeExpression $expression, $glue): void
+    public function addLogic(string|CompositeExpression $expression, string $glue): void
     {
         // little setup
         $glue = strtolower($glue);

@@ -299,6 +299,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Deprecated class `Mautic\CoreBundle\Helper\EmojiMap\UnicodeToShortEmojiMap` removed with no replacement.
 - Class `Mautic\CoreBundle\Helper\EmojiHelper` removed with no replacement. All emoji conversion calls were dropped; emoji are stored and rendered as UTF-8 (`utf8mb4`) directly.
 - Emoji sprite stylesheet `app/bundles/CoreBundle/Assets/css/libraries/emoji/` (`_emoji.scss` + `emoji.png`) removed together with its `@import` in `_libraries.scss`. It styled the `span.emoji-sizer`/`.emoji-outer`/`.emoji-inner` markup that `EmojiHelper::toHtml()` used to emit, which is no longer produced. Custom themes relying on those classes must ship their own CSS.
+- Bootstrap Glyphicons font files `app/bundles/CoreBundle/Assets/css/libraries/bootstrap/glyphicons-halflings-regular.*` and the `$icon-font-path`, `$icon-font-name` and `$icon-font-svg-id` SCSS variables removed with no replacement. Nothing in core used them. Custom themes referencing them must remove those references. Themes that render Glyphicons icons must ship their own icon font.
 - Deprecated constant `Mautic\CampaignBundle\CampaignEvents::ON_EVENT_EXECUTION` (`mautic.campaign_on_event_execution`) removed. Listen to the `Mautic\CampaignBundle\Event\ExecutedEvent` and `FailedEvent` event classes instead.
 - Deprecated constant `Mautic\CampaignBundle\CampaignEvents::ON_EVENT_DECISION_TRIGGER` (`mautic.campaign_on_event_decision_trigger`) removed. Listen to `CampaignEvents::ON_EVENT_DECISION_EVALUATION` instead.
 - Deprecated class `Mautic\CampaignBundle\Event\CampaignDecisionEvent` removed. It was only dispatched with the removed `ON_EVENT_DECISION_TRIGGER` event. Use `Mautic\CampaignBundle\Event\DecisionEvent` instead.
@@ -528,6 +529,83 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Protected methods `Mautic\CoreBundle\Model\FormModel::dispatchEventFromBatch()` and `Mautic\LeadBundle\Model\LeadModel::dispatchEventFromBatch()` removed; `dispatchEvent()` now covers both the single and batch save paths. The only behavioral difference was `LeadEvent::setAlreadyProcessedInBatch()`, whose value is read nowhere, so during batch saves `LeadEvent::isAlreadyProcessedInBatch()` now returns `false` instead of `true`.
 - Deprecated method `Mautic\CoreBundle\Entity\CommonRepository::getPublishedByDateExpression()` removed. Use `getPublishedByDateOrmExpression()` for a `Doctrine\ORM\QueryBuilder` or `getPublishedByDateDbalExpression()` for a `Doctrine\DBAL\Query\QueryBuilder`; both take the same arguments.
 - Deprecated property `leadField` removed from `Mautic\FormBundle\Entity\Field` together with `getLeadField()` and `setLeadField()`. Use `mappedObject` and `mappedField` (`getMappedObject()`/`getMappedField()`) instead. The `lead_field` column is dropped from the `form_fields` table by a migration, which first copies any value not yet present in `mapped_field` (and the matching `mapped_object`). API impact: form fields in `/api/forms` responses no longer include `leadField`, and a `leadField` sent in a request is ignored - send `mappedObject` (`contact` or `company`) and `mappedField` instead. Custom form field templates must read `field.mappedField` instead of `field.leadField`.
+
+- Responsive float and text-alignment classes now use Bootstrap 5's mobile-first breakpoint names: `md` starts at 768px, `lg` at 992px and `xl` at 1200px. The old `xs` float classes apply only below 768px, so pair the base float class with `float-md-none`.
+    | Removed class | Bootstrap 5 replacement |
+    |---|---|
+    | `.pull-right-xs` | `.float-end .float-md-none` |
+    | `.pull-left-xs` | `.float-start .float-md-none` |
+    | `.pull-right-sm` | `.float-md-end` |
+    | `.pull-left-sm` | `.float-md-start` |
+    | `.pull-right-md` | `.float-lg-end` |
+    | `.pull-left-md` | `.float-lg-start` |
+    | `.pull-right-lg` | `.float-xl-end` |
+    | `.pull-left-lg` | `.float-xl-start` |
+    | `.text-right-sm` | `.text-md-end` |
+    | `.text-left-sm` | `.text-md-start` |
+    | `.text-right-md` | `.text-lg-end` |
+    | `.text-left-md` | `.text-lg-start` |
+    | `.text-right-lg` | `.text-xl-end` |
+    | `.text-left-lg` | `.text-xl-start` |
+
+    | Removed class | Bootstrap class |
+    |---|---|
+    | `.bdr-a` | `.border` |
+    | `.bdr-w-0` | `.border-0` |
+    | `.bdr-l` | `.border-start` |
+    | `.bdr-r` | `.border-end` |
+    | `.bdr-t` | `.border-top` |
+    | `.bdr-b` | `.border-bottom` |
+    | `.bdr-l-wdh-0` | `.border-start-0` |
+    | `.bdr-r-wdh-0` | `.border-end-0` |
+    | `.bdr-t-wdh-0` | `.border-top-0` |
+    | `.bdr-b-wdh-0` | `.border-bottom-0` |
+    | `.bdr-rds-0` | `.rounded-0` |
+    | `.bdr-rds`, `.bdr-rds-sm`, `.bdr-rds-lg` | No direct equivalent. The radius comes from Mautic's theme, and in the default brand `.rounded-1` or `.rounded-3` would give a different radius. No callers in the repository. |
+    | `.bdr-rds-circle` | `.rounded-circle` |
+    | `.ovf-h` | `.overflow-hidden` |
+    | `.va-t` | `.align-top` |
+    | `.va-m` | `.align-middle` |
+    | `.va-b` | `.align-bottom` |
+    | `.fs-1` | `.flex-shrink-1` |
+
+    Mautic sets `--bs-border-color` to `--border-subtle`, so Bootstrap border utilities keep Mautic's border colour. A custom theme that replaces `--border-subtle` must also set `--bs-border-color` to keep the same appearance.
+
+    `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
+
+- Custom background colour classes removed. Bootstrap's `.bg-*` utilities now apply, with the Carbon colours for `.bg-primary`, `.bg-success`, `.bg-info`, `.bg-warning` and `.bg-danger`. The removed classes also forced the text colour, so add a text utility where the text must stay readable. The `bg-color` SCSS mixin and `app/bundles/CoreBundle/Assets/css/app/scss/components/_colors.scss` (with its `@import` in `app/bundles/CoreBundle/Assets/css/app.scss`) were removed.
+    | Removed class | Bootstrap 5 replacement |
+    |---|---|
+    | `.bg-auto` | `.bg-body` |
+    | `.bg-white`, `.bg-transparent` | Same class, now from Bootstrap. No forced text colour. |
+    | `.bg-primary` | Same class. Add `.text-on-color`. |
+    | `.bg-success`, `.bg-info`, `.bg-warning`, `.bg-danger` | Same class. Add `.text-inverse`. |
+
+- Unused Bootstrap 3 compatibility styles removed from `app/bundles/CoreBundle/Assets/css/libraries/bootstrap/_bootstrap-3-compatibility.scss`, and the `.pager` rule from `app/bundles/CoreBundle/Assets/css/app/scss/components/_pagination.scss`. Classes used together are listed with a plus sign.
+    | Removed class | Bootstrap 5 replacement |
+    |---|---|
+    | `.sr-only` | `.visually-hidden` |
+    | `.sr-only-focusable` | `.visually-hidden-focusable` |
+    | `.visible-xs-block`, `.visible-xs-inline`, `.visible-xs-inline-block` | `.d-block` / `.d-inline` / `.d-inline-block` with `.d-md-none` (below 768px) |
+    | `.visible-sm-block`, `.visible-sm-inline`, `.visible-sm-inline-block` | `.d-md-block` / `.d-md-inline` / `.d-md-inline-block` with `.d-lg-none` (768px–991px) |
+    | `.visible-md-block`, `.visible-md-inline`, `.visible-md-inline-block` | `.d-lg-block` / `.d-lg-inline` / `.d-lg-inline-block` with `.d-xl-none` (992px–1199px) |
+    | `.visible-lg-block`, `.visible-lg-inline`, `.visible-lg-inline-block` | `.d-xl-block` / `.d-xl-inline` / `.d-xl-inline-block` (1200px and wider) |
+    | `.visible-print-block`, `.visible-print-inline`, `.visible-print-inline-block` | `.d-print-block` / `.d-print-inline` / `.d-print-inline-block` |
+    | `.hidden-xs`, `.hidden-sm`, `.hidden-md`, `.hidden-lg` | `.hidden-xs`: `.d-none` + `.d-md-block`; `.hidden-sm`: `.d-md-none` + `.d-lg-block`; `.hidden-md`: `.d-lg-none` + `.d-xl-block`; `.hidden-lg`: `.d-xl-none` |
+    | `.hidden-print` | `.d-print-none` |
+    | `.navbar-default`, `.navbar-inverse` | `.navbar` with `.navbar-dark` or a `.bg-*` utility |
+    | `.navbar-fixed-top`, `.navbar-fixed-bottom` | `.fixed-top`, `.fixed-bottom` |
+    | `.navbar-static-top` | `.navbar`. Bootstrap 5 navbars are not fixed or sticky by default. |
+    | `.navbar-btn`, `.navbar-link`, `.text-justify`, `.text-hide` | No replacement. |
+    | `.nav-stacked` | `.flex-column` |
+    | `.pager` | `.pagination` and `.page-item` |
+    | `.embed-responsive`, `.embed-responsive-16by9`, `.embed-responsive-4by3` | Put `.ratio` with `.ratio-16x9` or `.ratio-4x3` on the wrapper |
+    | `.embed-responsive-item` | Remove from the child; the ratio is now defined on the wrapper |
+    | `.media-left`, `.media-middle`, `.media-bottom` | Flex utilities such as `.d-flex`, `.align-items-center` and `.flex-shrink-0` |
+
+    `.dropdown-menu-left` (use `.dropdown-menu-start`) and `.carousel-control .icon-prev`/`.icon-next` (use `.carousel-control-prev`/`.carousel-control-next`) only lost their standalone rules. Their rules nested inside other selectors are still in the compatibility file. In a legacy `.navbar-right` dropdown without `data-bs-popper`, retain the left alignment explicitly; `.dropdown-menu-start` alone does not override the navbar's right alignment.
+
+    The removed mixins are `hide-text`, `text-hide`, `img-retina`, `resizable`, `animation-name`, `animation-duration`, `animation-timing-function`, `animation-delay`, `animation-iteration-count`, `animation-direction`, `animation-fill-mode`, `content-columns`, `hyphens`, `scaleX`, `scaleY`, `skew`, `rotate`, `rotateX`, `rotateY`, `perspective-origin`, `transform-origin`, `transition-delay`, `gradient-horizontal`, `gradient-directional`, `gradient-horizontal-three-colors`, `gradient-vertical-three-colors`, `gradient-radial`, and `make-xs-column`, `make-xs-column-offset`, `make-xs-column-push`, `make-xs-column-pull`, `make-sm-column`, `make-sm-column-offset`, `make-sm-column-push`, `make-sm-column-pull`, `make-md-column`, `make-md-column-offset`, `make-md-column-push`, `make-md-column-pull`, `make-lg-column`, `make-lg-column-offset`, `make-lg-column-push`, and `make-lg-column-pull`. They have no direct replacement. Other Bootstrap 3 SCSS mixins and variables remain defined in `_bootstrap-3-compatibility.scss` and `_bootstrap-mautic-custom-variables.scss`.
 
 ## Changed code
 
@@ -1274,6 +1352,127 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\WebhookBundle\Controller\WebhookController` | `editAction()` (`$ignorePost`) | `bool` |
     | `MauticPlugin\MauticFocusBundle\Controller\FocusController` | `editAction()` (`$ignorePost`) | `bool` |
 
+- Many more public and protected methods now declare native scalar parameter types (`string`, `int`, `bool`, `float` and their nullable or union forms) inferred from their call sites, replacing docblock-only types. Callers that pass `null` where it is not allowed, a value PHP cannot coerce, or any other type from a file with `declare(strict_types=1)` now hit a `TypeError`. If you extend one of these classes and override a method, keep the override compatible - either drop the parameter type or use the parent's type (or a wider one). Notable contract changes: `ListModel::getSegmentsWithDependenciesOnSegment()` no longer accepts `null` for `$returnProperty` - pass `''` to get entities; `LeadBuildSearchEvent::setString()` now takes a `string` instead of an `array`, and `getString()`/`getCommand()` declare a native `string` return type, so overrides must declare it too.
+
+    | Class | Methods (new parameter types) |
+    | --- | --- |
+    | `MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi` | `fetchAllRecords()` (`string $endpoint`); `getCampaignMembers()` (`int $page`); `getCompanies()` (`int $page`); `getContacts()` (`int $page`) |
+    | `MauticPlugin\MauticCrmBundle\Api\DynamicsApi` | `createLead()` (`string $object`); `createLeads()` (`string $object`, `bool $isUpdate`); `getLeadFields()` (`string $object`); `updateLeads()` (`string $object`) |
+    | `MauticPlugin\MauticCrmBundle\Api\HubspotApi` | `createLead()` (`bool $updateLink`); `getLeadFields()` (`string $object`) |
+    | `MauticPlugin\MauticCrmBundle\Api\SalesforceApi` | `createObject()` (`string $sfObject`); `getLeads()` (`string $object`); `request()` (`?string $operation`, `string $method`, `bool $isRetry`) |
+    | `MauticPlugin\MauticCrmBundle\Api\SugarcrmApi` | `getLeads()` (`string $object`); `request()` (`string $sMethod`, `string $method`, `?string $object`) |
+    | `MauticPlugin\MauticCrmBundle\Api\ZohoApi` | `createLead()` (`string $object`); `getLeadFields()` (`string $object`); `updateLead()` (`string $object`) |
+    | `MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper` | `getContactIdByKey()` (`int\|string $key`); `setObject()` (`string $object`) |
+    | `MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration` | `getRecordList()` (`?string $index`); `getRecords()` (`string $object`); `saveSyncedData()` (`string $mauticObjectReference`) |
+    | `MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration` | `getBlankFieldsToUpdateInMautic()` (`?string $object`); `getFieldsByPriority()` (`int $direction`); `limitString()` (`string $fieldType`) |
+    | `MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration` | `formatLeadDataForCreateOrUpdate()` (`bool $updateLink`); `getCompanies()` (`int\|string\|false $id`) |
+    | `MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration` | `getCompanyName()` (`string $field`, `string $searchBy`); `getSalesforceObjectsByEmails()` (`string $sfObject`); `pushLeadDoNotContactByDate()` (`string $channel`); `pushLeadToCampaign()` (`string $status`) |
+    | `MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration` | `cleanSugarData()` (`string $object`); `getObjectDataToUpdate()` (`string $object`) |
+    | `MauticPlugin\MauticFocusBundle\Model\FocusModel` | `getContent()` (`string $url`) |
+    | `MauticPlugin\MauticFullContactBundle\Services\FullContact_Base` | `setWebhookUrl()` (`bool $json`) |
+    | `MauticPlugin\MauticFullContactBundle\Services\FullContact_Location` | `enrichment()` (`bool $includeZeroPopulation`, `string $casing`); `normalizer()` (`bool $includeZeroPopulation`, `string $casing`) |
+    | `MauticPlugin\MauticFullContactBundle\Services\FullContact_Name` | `deducer()` (`string $type`, `string $casing`); `normalizer()` (`string $casing`); `parser()` (`string $casing`); `similarity()` (`string $casing`); `stats()` (`string $type`, `string $casing`) |
+    | `MauticPlugin\MauticTagManagerBundle\Entity\TagRepository` | `countOccurrences()` (`string $tag`) |
+    | `Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver` | `addProperties()` (`bool $addToListGroup`, `bool $useGetter`); `addProperty()` (`bool $useGetter`); `setRoot()` (`string $root`) |
+    | `Mautic\CampaignBundle\Entity\LeadEventLogRepository` | `hasBeenInCampaignRotation()` (`int $rotation`) |
+    | `Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor` | `getAction()` (`string $key`); `getCondition()` (`string $key`); `getDecision()` (`string $key`) |
+    | `Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor` | `getProperty()` (`string $property`) |
+    | `Mautic\CampaignBundle\Executioner\Result\Counter` | `advanceEvaluated()` (`int $step`); `advanceEventCount()` (`int $step`); `advanceExecuted()` (`int $step`); `advanceTotalEvaluated()` (`int $step`); `advanceTotalExecuted()` (`int $step`); `advanceTotalScheduled()` (`int $step`) |
+    | `Mautic\CampaignBundle\Membership\EventDispatcher` | `dispatchBatchMembershipChange()` (`string $action`); `dispatchMembershipChange()` (`string $action`) |
+    | `Mautic\CampaignBundle\Membership\MembershipBuilder` | `build()` (`int $runLimit`) |
+    | `Mautic\ChannelBundle\Model\MessageModel` | `getChannelName()` (`string $nameColumn`) |
+    | `Mautic\ChannelBundle\Model\MessageQueueModel` | `getQueuedChannelCount()` (`string $channel`); `processFrequencyRules()` (`string $channel`, `int\|string $channelId`, `int $attempts`, `int $priority`); `queue()` (`int $maxAttempts`, `int $priority`) |
+    | `Mautic\ConfigBundle\Model\SysinfoModel` | `tail()` (`int $lines`, `int $buffer`) |
+    | `Mautic\CoreBundle\Command\ModeratedCommand` | `checkRunStatus()` (`string $moderationKey`) |
+    | `Mautic\CoreBundle\Configurator\Configurator` | `addStep()` (`int $priority`); `getStep()` (`int $index`) |
+    | `Mautic\CoreBundle\Doctrine\AbstractMauticMigration` | `generatePropertyName()` (`string $type`) |
+    | `Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder` | `addBigIntIdField()` (`string $fieldName`, `string $columnName`); `addIdColumns()` (`string $nameColumn`, `string $descriptionColumn` - pass `''` instead of `null` to skip a column); `addNullableField()` (`string $name`, `?string $columnName`) |
+    | `Mautic\CoreBundle\ErrorHandler\ErrorHandler` | `handleError()` (`string $file`, `int $line`); `register()` (`string $environment`) |
+    | `Mautic\CoreBundle\Menu\MenuHelper` | `createMenuStructure()` (`int $depth`, `int $defaultPriority`, `string $type`); `placeOrphans()` (`int $depth`, `string $type`); `resetOrphans()` (`string $type`); `sortByPriority()` (`int $defaultPriority`) |
+    | `Mautic\CoreBundle\Model\FormModel` | `setTimestamps()` (`bool $isNew`) |
+    | `Mautic\CoreBundle\Model\NotificationModel` | `clearNotification()` (`?int $limit`); `getNotificationContent()` (`?int $limit`) |
+    | `Mautic\CoreBundle\Security\Permissions\CorePermissions` | `getPermissionObject()` (`string $bundle`); `hasEntityAccess()` (`bool\|string $ownPermission`, `bool\|string $otherPermission`, `User\|int\|null $ownerId`) |
+    | `Mautic\DynamicContentBundle\Entity\DynamicContentRepository` | `upSentCount()` (`int $increaseBy`) |
+    | `Mautic\EmailBundle\Entity\EmailRepository` | `checkDoNotEmail()` (`string $email`) |
+    | `Mautic\EmailBundle\Entity\StatRepository` | `getReadCount()` (`array\|int\|null $emailIds`); `getStatusCount()` (`string $column`) |
+    | `Mautic\EmailBundle\Model\EmailModel` | `getBestHours()` (`int $timeFormat`); `getEmailGeneralStats()` (`bool $includeVariants`); `getUpcomingEmails()` (`int $limit`); `sendEmailToLists()` (`?int $limit`, `?int $batch`); `setEmailDoNotContact()` (`int $reason`) |
+    | `Mautic\EmailBundle\Model\TransportCallback` | `addFailureByAddress()` (`int $dncReason`); `addFailureByContactId()` (`int $dncReason`); `addFailureByHashId()` (`string $hashId`, `int $dncReason`) |
+    | `Mautic\EmailBundle\MonitoredEmail\Mailbox` | `clearFlag()` (`string $flag`); `getMailboxSettings()` (`?string $bundle`, `string $mailbox`); `saveMail()` (`string $filename`); `searchMailbox()` (`string $criteria`); `setConnectionArgs()` (`int $options`, `int $retriesNum`); `setFlag()` (`string $flag`); `sortMails()` (`int $criteria`); `switchMailbox()` (`?string $mailbox`) |
+    | `Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer` | `addCriteria()` (`string $criteria`, `string $mailbox`) |
+    | `Mautic\EmailBundle\MonitoredEmail\Processor\Address` | `parseAddressForStatHash()` (`string $address`); `parseList()` (`string $addresses`) |
+    | `Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BodyParser` | `parse()` (`?string $knownEmail`) |
+    | `Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper` | `map()` (`string $category`) |
+    | `Mautic\EmailBundle\MonitoredEmail\Processor\Reply` | `createReplyByHash()` (`string $messageId`) |
+    | `Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail` | `__construct()` (`?string $contactEmail`, `string $unsubscriptionAddress`) |
+    | `Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder` | `find()` (`?string $returnPathEmail`) |
+    | `Mautic\EmailBundle\Stat\StatHelper` | `getStat()` (`string $emailAddress`); `storeStat()` (`string $emailAddress`) |
+    | `Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions` | `setUnit()` (`string $unit`) |
+    | `Mautic\EmailBundle\Stats\StatHelperContainer` | `getHelper()` (`string $name`) |
+    | `Mautic\FormBundle\Entity\SubmissionRepository` | `getMostSubmitted()` (`string $column`, `string $as`) |
+    | `Mautic\FormBundle\Exception\ValidationException` | `__construct()` (`string $message`) |
+    | `Mautic\FormBundle\Model\FormModel` | `getLeadSubmissions()` (`int $limit`) |
+    | `Mautic\FormBundle\Model\SubmissionModel` | `exportResults()` (`string $format`) |
+    | `Mautic\InstallBundle\Install\InstallService` | `saveConfiguration()` (`bool $clearCache`) |
+    | `Mautic\IntegrationsBundle\Entity\ObjectMappingRepository` | `getIntegrationObject()` (`string $internalObjectName`) |
+    | `Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO` | `addFieldMapping()` (`string $internalField`, `string $integrationField`, `string $direction`, `bool $isRequired`) |
+    | `Mautic\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO` | `__construct()` (`string $type`, `string $value`) |
+    | `Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO` | `__construct()` (`string $type`) |
+    | `Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException` | `__construct()` (`string $object`) |
+    | `Mautic\IntegrationsBundle\Sync\Logger\DebugLogger` | `log()` (`string $integration`, `string $message`) |
+    | `Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException` | `__construct()` (`mixed $olderValue`) |
+    | `Mautic\LeadBundle\Entity\CompanyRepository` | `getAjaxSimpleList()` (`string $valueColumn`); `getCompanies()` (`string $id`) |
+    | `Mautic\LeadBundle\Entity\DoNotContactRepository` | `getChannelList()` (`?string $channel`); `getCount()` (`?string $channel`, `?int $reason`) |
+    | `Mautic\LeadBundle\Entity\FrequencyRuleRepository` | `getAppliedFrequencyRules()` (`string $channel`, `?string $defaultFrequencyNumber`, `?string $defaultFrequencyTime`) |
+    | `Mautic\LeadBundle\Entity\LeadEventLogRepository` | `getEvents()` (`?string $bundle`, `?string $object`); `getFailedRows()` (`string $bundle`, `string $object`); `getSpecificRows()` (`string $action`, `string $bundle`, `string $object`) |
+    | `Mautic\LeadBundle\Entity\LeadFieldRepository` | `compareValue()` (`string $field`); `getAliases()` (`?string $object`) |
+    | `Mautic\LeadBundle\Entity\LeadRepository` | `getLeadsByFieldValue()` (`string $field`); `updateContactPoints()` (`int $tries`); `updateLastActive()` (`?int $leadId`) |
+    | `Mautic\LeadBundle\Event\ChannelSubscriptionChange` | `__construct()` (`string $channel`) |
+    | `Mautic\LeadBundle\Event\LeadBuildSearchEvent` | `__construct()` (`string $string`, `string $command`); `setString()` (`string $string`); `getString()` and `getCommand()` now return `string` and the `protected` properties are typed, so subclasses must declare matching types |
+    | `Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent` | `addChoice()` (`string $object`, `string $choiceKey`) |
+    | `Mautic\LeadBundle\Event\LeadTimelineEvent` | `addEventType()` (`string $eventTypeKey`); `addToCounter()` (`string $eventType`, `array\|int $count`); `isApplicable()` (`string $eventType`); `subtractFromCounter()` (`int $count`) |
+    | `Mautic\LeadBundle\Event\PointsChangeEvent` | `__construct()` (`int $old`, `int $new`) |
+    | `Mautic\LeadBundle\Model\FieldModel` | `getLookupResults()` (`int $limit`); `reorderFieldsByList()` (`int $start`) |
+    | `Mautic\LeadBundle\Model\ImportModel` | `getImportedRowsLineChartData()` (`string $unit`); `process()` (`int $limit`) |
+    | `Mautic\LeadBundle\Model\LeadModel` | `getLookupResults()` (`string $type`) |
+    | `Mautic\LeadBundle\Model\ListModel` | `addLead()` (`int $searchListLead`); `getSegmentsWithDependenciesOnSegment()` (`string $returnProperty`) |
+    | `Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault` | `__construct()` (`?string $originalValue`) |
+    | `Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval` | `__construct()` (`array\|string $originalValue`) |
+    | `Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder` | `func()` (`string $func`) |
+    | `Mautic\LeadBundle\Segment\Query\QueryBuilder` | `addJoinCondition()` (`string $alias`); `addLogic()` (`string $glue`); `getTableAlias()` (`?string $joinType`); `isJoinTable()` (`string $table`) |
+    | `Mautic\LeadBundle\Services\ContactSegmentFilterDictionary` | `getFilter()` (`string $filterKey`); `getFilterProperty()` (`string $filterKey`, `string $property`) |
+    | `Mautic\NotificationBundle\Entity\NotificationRepository` | `upCount()` (`string $type`, `int $increaseBy`) |
+    | `Mautic\NotificationBundle\Model\NotificationModel` | `createStatEntry()` (`?string $source`) |
+    | `Mautic\PageBundle\Entity\HitRepository` | `getEmailClickthroughHitCount()` (`int $code`) |
+    | `Mautic\PageBundle\Entity\PageRepository` | `upHitCount()` (`int $increaseBy`) |
+    | `Mautic\PageBundle\Entity\RedirectRepository` | `upHitCount()` (`int $increaseBy`) |
+    | `Mautic\PageBundle\Entity\TrackableRepository` | `getCount()` (`string $channel`, `string $countColumn`); `upHitCount()` (`int $increaseBy`) |
+    | `Mautic\PageBundle\Model\TrackableModel` | `getTrackableByUrl()` (`string $channel`); `getTrackableList()` (`string $channel`) |
+    | `Mautic\PageBundle\Model\VideoModel` | `hitVideo()` (`string $code`) |
+    | `Mautic\PluginBundle\Entity\IntegrationEntityRepository` | `findLeadsToCreate()` (`int\|false $limit`, `string $internalEntity`); `findLeadsToDelete()` (`string $internalEntity`); `findLeadsToUpdate()` (`string $integration`, `string $internalEntity`, `string $leadFields`, `int\|false $limit`); `getIntegrationEntityByLead()` (`?string $integration`); `getIntegrationsEntityId()` (`string $integration`, `?string $integrationEntity`, `string $internalEntity`, `int $start`, `int $limit`); `markAsDeleted()` (`string $integration`, `string $internalEntityType`); `updateErrorLeads()` (`string $internalEntity`) |
+    | `Mautic\PluginBundle\Exception\ApiErrorException` | `__construct()` (`string $message`, `int $code`) |
+    | `Mautic\PluginBundle\Integration\AbstractIntegration` | `cleanPushData()` (`string $fieldType`); `createIntegrationEntity()` (`string $integrationEntity`, `bool $persist`); `getLastSyncDate()` (`bool $ignoreEntityChanges`); `getLeadDoNotContact()` (`string $channel`); `getRequiredFields()` (`string $fieldType`); `makeRequest()` (`string $method`); `matchFieldName()` (`string $subfield`); `mergeApiKeys()` (`bool $return`); `parseCallbackResponse()` (`bool $postAuthorization`) |
+    | `Mautic\PointBundle\Model\PointModel` | `triggerAction()` (`string $type`) |
+    | `Mautic\ReportBundle\Crate\ReportDataResult` | `getType()` (`string $column`) |
+    | `Mautic\ReportBundle\Event\ReportBuilderEvent` | `addGraph()` (`string $context`, `string $type`, `string $graphId`); `addTable()` (`string $context`, `?string $group`); `getCategoryColumns()` (`string $prefix`); `getIpColumn()` (`string $prefix`); `getLeadColumns()` (`string $prefix`); `getStandardColumns()` (`?string $idLink`) |
+    | `Mautic\ReportBundle\Event\ReportGeneratorEvent` | `getFilterValues()` (`string $column`) |
+    | `Mautic\ReportBundle\Model\CsvExporter` | `export()` (`?int $page`) |
+    | `Mautic\ReportBundle\Model\ExportHandler` | `getHandler()` (`string $fileName`) |
+    | `Mautic\ReportBundle\Model\ExportResponse` | `setResponseHeaders()` (`string $fileName`) |
+    | `Mautic\ReportBundle\Model\ReportModel` | `buildAvailableReports()` (`string $context`); `getTableData()` (`string $context`) |
+    | `Mautic\ReportBundle\Scheduler\Date\DateBuilder` | `getPreviewDays()` (`bool $isScheduled`, `string $scheduleUnit`, `string $scheduleDay`, `string $scheduleMonthFrequency`) |
+    | `Mautic\ReportBundle\Scheduler\Model\SendSchedule` | `send()` (`string $csvFilePath`) |
+    | `Mautic\ReportBundle\Scheduler\Option\ExportOption` | `__construct()` (`int\|string\|null $reportId`) |
+    | `Mautic\SmsBundle\Entity\SmsRepository` | `upCount()` (`string $type`, `int $increaseBy`) |
+    | `Mautic\SmsBundle\Exception\NumberNotFoundException` | `__construct()` (`string $number`) |
+    | `Mautic\SmsBundle\Sms\TransportChain` | `addTransport()` (`string $alias`, `string $translatableAlias`, `string $integrationAlias`) |
+    | `Mautic\StageBundle\Entity\StageRepository` | `getStages()` (`string $id`) |
+    | `Mautic\StatsBundle\Aggregate\Calculator` | `getCountsByHour()` (`string $labelFormat`); `getSumsByDay()` (`string $labelFormat`); `getSumsByMonth()` (`string $labelFormat`); `getSumsByWeek()` (`string $labelFormat`); `getSumsByYear()` (`string $labelFormat`) |
+    | `Mautic\StatsBundle\Aggregate\Collection\DAO\StatDAO` | `addStat()` (`int $value`) |
+    | `Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO` | `getYear()` (`int $year`) |
+    | `Mautic\UserBundle\Model\UserModel` | `getLookupResults()` (`string $type`) |
+    | `Mautic\UserBundle\Security\Provider\UserProvider` | `saveUser()` (`bool $createIfNotExists`) |
+    | `Mautic\WebhookBundle\Model\WebhookModel` | `killWebhook()` (`string $reason`) |
+
 - Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
 
     | Class | Method | New parameter types |
@@ -1531,6 +1730,13 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\CoreBundle\Helper\InputHelper::_()` types `$mask` as `array|string`. Passing `null` now throws; omit the argument to use the default `'clean'` mask.
     - `MauticPlugin\MauticCrmBundle\Api\SalesforceApi::getLeads()` types `$query` as `string|array`. Passing `null` now throws; pass a SOQL query string or an array to build the query.
     - `Mautic\EmailBundle\Helper\MailHelper::setLead()` types `$lead` as `array` and `Mautic\EmailBundle\Helper\MailHelper::getLead()` returns `?array`. Passing a `Mautic\LeadBundle\Entity\Lead` entity now throws; pass the contact's field array instead (e.g. `$lead->getProfileFields()`).
+    - `Mautic\CoreBundle\Helper\InputHelper::url()` types `$defaultProtocol` as `?string`. Passing `false` from a file with `declare(strict_types=1)` now throws a `TypeError`; without strict types it is coerced to `''` and still falls back to `http`. Pass `null` to fall back to `http`, or a protocol string.
+    - `Mautic\CoreBundle\Twig\Extension\ContentExtension::getCustomContent()` (Twig function `customContent()`) types `$context` as `?string`. Pass a string context or `null`.
+    - `Mautic\CoreBundle\Twig\Helper\FormatterHelper::simpleCsvToArray()` types `$csv` as `?string`. Pass a comma-separated string or `null`.
+    - `Mautic\PluginBundle\Entity\IntegrationEntityRepository::getIntegrationsEntityId()` types `$startDate` and `$endDate` as `?string`. Passing a `\DateTimeInterface` now throws; pass a date string or `null`.
+    - `MauticPlugin\MauticFocusBundle\Model\FocusModel::addStat()` types `$type` as `string`. Passing `null` now throws; pass a stat type such as `Stat::TYPE_FORM`.
+    - `Mautic\CoreBundle\Helper\ArrayHelper::getValue()` and `Mautic\CoreBundle\Helper\ArrayHelper::pickValue()` type `$key` as `int|string`. Passing `null`, which previously looked up the `''` key, now throws; pass `''` explicitly or skip the call.
+    - `Mautic\FormBundle\Entity\Field::setSessionId()` types `$sessionId` as `int|string|null` and `Mautic\FormBundle\Entity\Field::getSessionId()` declares the `int|string|null` return type. Pass the session id as `int` or `string`. If you extend `Field`, an override of `getSessionId()` needs a return type compatible with `int|string|null` (a narrower one like `: string` is fine), and an override of `setSessionId()` must keep `$sessionId` untyped or typed as `int|string|null`, otherwise PHP raises a fatal error.
 
 ### Native parameter and return types for plugin extension points
 

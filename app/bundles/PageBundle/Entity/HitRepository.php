@@ -95,10 +95,8 @@ final class HitRepository extends CommonRepository
 
     /**
      * Get an array of hits via an email clickthrough.
-     *
-     * @param int $code
      */
-    public function getEmailClickthroughHitCount($emailIds, ?\DateTimeInterface $fromDate = null, $code = 200, ?\DateTime $toDate = null): array
+    public function getEmailClickthroughHitCount($emailIds, ?\DateTimeInterface $fromDate = null, int $code = 200, ?\DateTime $toDate = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -124,7 +122,7 @@ final class HitRepository extends CommonRepository
                 ->setParameter('dateTo', $dateHelper->toUtcString());
         }
 
-        $q->andWhere($q->expr()->eq('h.code', (string) ((int) $code)));
+        $q->andWhere($q->expr()->eq('h.code', (string) $code));
 
         $results = $q->executeQuery()->fetchAllAssociative();
 

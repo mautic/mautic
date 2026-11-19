@@ -119,15 +119,13 @@ final class DynamicContentRepository extends CommonRepository
 
     /**
      * Up the sent counts.
-     *
-     * @param int $increaseBy
      */
-    public function upSentCount($id, $increaseBy = 1): void
+    public function upSentCount($id, int $increaseBy = 1): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'dynamic_content')
-            ->set('sent_count', 'sent_count + '.(int) $increaseBy)
+            ->set('sent_count', 'sent_count + '.$increaseBy)
             ->where('id = '.(int) $id);
 
         $q->executeStatement();

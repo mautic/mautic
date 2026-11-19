@@ -17,7 +17,7 @@
   {% set sections = {'favorites': 'mautic.core.theme.favorites', 'others': 'mautic.core.theme.others'} %}
   <div data-theme-select data-theme-type="{{ type }}">
   {% for section, sectionLabel in sections %}
-  <h2 class="type-heading-02 mb-md{{ 'others' == section ? ' mt-lg' : '' }}" id="theme-select-{{ section }}-heading">{{ sectionLabel|trans }}</h2>
+  <h2 class="type-heading-02 mb-16{{ 'others' == section ? ' mt-24' : '' }}" id="theme-select-{{ section }}-heading">{{ sectionLabel|trans }}</h2>
   {% if 'favorites' == section %}
       <p class="type-body-01 text-helper{{ hasVisibleFavorites ? ' hide' : '' }}" data-theme-favorites-placeholder>{{ 'mautic.core.theme.favorites.placeholder'|trans }}</p>
   {% endif %}
@@ -38,7 +38,7 @@
             <div class="col-md-3 theme-list {{ themeInfo.visibility.hidden|default(false) is empty ? '' : 'hide' }}" data-theme-order="{{ loop.index0 }}">
                 <div class="panel panel-default {% if isSelected %}theme-selected{% endif %}">
                     <div class="panel-body text-center">
-                        <div class="d-flex align-items-center justify-content-center gap-xs">
+                        <div class="d-flex align-items-center justify-content-center gap-5">
                             <h3 id="{{ themeNameId }}">{{ themeInfo.name }}</h3>
                             {% include '@MauticCore/Helper/button.html.twig' with {
                                 buttons: [

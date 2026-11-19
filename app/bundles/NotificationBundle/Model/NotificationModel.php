@@ -134,10 +134,9 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
     }
 
     /**
-     * @param string $source
      * @param int    $sourceId
      */
-    public function createStatEntry(Notification $notification, Lead $lead, $source = null, $sourceId = null): void
+    public function createStatEntry(Notification $notification, Lead $lead, ?string $source = null, $sourceId = null): void
     {
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());

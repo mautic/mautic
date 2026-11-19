@@ -56,7 +56,7 @@
             <!-- asset detail collapseable -->
             <div class="collapse pe-16 ps-16" id="asset-details">
                 <div class="pe-16 ps-16 pb-16">
-                    <div class="panel shd-none mb-0">
+                    <div class="panel shadow-none mb-0">
                         <table class="table table-hover mb-0">
                             <tbody>
                                 {{ include('@MauticCore/Helper/details.html.twig', {'entity': item}) }}
@@ -133,7 +133,7 @@
 
             {% if item.dateStarted %}
             <!-- some stats -->
-            <div class="pa-16">
+            <div class="p-16">
                 <div class="row">
                     <div class="col-md-4">
                         <div class="panel">
@@ -180,7 +180,7 @@
         </div>
 
         <!-- start: tab-content -->
-        <div class="tab-content pa-16 preview-detail">
+        <div class="tab-content p-16 preview-detail">
         {% if failedRows is not empty and failedRows|length > 0 %}
         <h3>{{ 'mautic.lead.import.failed.rows'|trans }}</h3>
             <table class="table table-hover">
@@ -219,7 +219,7 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bdr-l height-auto">
+    <div class="col-md-3 border-start height-auto">
 
         <!-- activity feed -->
         {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}

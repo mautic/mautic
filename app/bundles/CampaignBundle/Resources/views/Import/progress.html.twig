@@ -20,7 +20,7 @@
     ) %}
     {% set id = hasErrors ? 'campaignImportError' : 'campaignImportSuccess' %}
 
-    <div class="row ma-24" id="{{ id }}">
+    <div class="row m-24" id="{{ id }}">
         <div class="col-sm-offset-3 col-sm-6 text-center">
             <div class="panel panel-{% if hasErrors %}danger{% elseif isComplete %}success{% else %}info{% endif %}">
                 <div class="panel-heading text-center">
@@ -109,7 +109,7 @@
                         {% for group in importSummary %}
                             {% if group.update is defined and 'email' in group.update|keys %}
                                 {% set emailName = group.update['email'].names[0] %}
-                                <h4 class="text-info pa-12">
+                                <h4 class="text-info p-12">
                                     {{ 'mautic.campaign.campaign.import.email_notice'|trans({'%emailName%': emailName}) }}
                                 </h4>
                             {% endif %}

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Page\Acceptance;
 
 final class ContactPage
@@ -28,7 +30,7 @@ final class ContactPage
     public static $saveButton         = '.btn-save.btn-copy';
 
     // Edit Contact Form
-    public static $editForm     = '#core > div.pa-16.bdr-b > h4';
+    public static $editForm     = '#core > div.p-16.border-bottom > h4';
 
     // Delete Contact alert
     public static $ConfirmDelete = 'button.btn.btn-danger';
@@ -118,15 +120,5 @@ final class ContactPage
     public static function route($param): string
     {
         return self::$URL.$param;
-    }
-
-    /**
-     * @var \AcceptanceTester;
-     */
-    private $acceptanceTester;
-
-    public function __construct(\AcceptanceTester $I)
-    {
-        $this->acceptanceTester = $I;
     }
 }

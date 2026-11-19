@@ -571,9 +571,8 @@ final class LeadEventLogRepository extends CommonRepository
     /**
      * @param int $contactId
      * @param int $campaignId
-     * @param int $rotation
      */
-    public function hasBeenInCampaignRotation($contactId, $campaignId, $rotation): bool
+    public function hasBeenInCampaignRotation($contactId, $campaignId, int $rotation): bool
     {
         $qb = $this->getReplicaConnection()->createQueryBuilder();
         $qb->select('log.rotation')
@@ -587,7 +586,7 @@ final class LeadEventLogRepository extends CommonRepository
             )
             ->setParameter('contactId', (int) $contactId)
             ->setParameter('campaignId', (int) $campaignId)
-            ->setParameter('rotation', (int) $rotation)
+            ->setParameter('rotation', $rotation)
             ->setMaxResults(1);
 
         $results = $qb->executeQuery()->fetchAllAssociative();

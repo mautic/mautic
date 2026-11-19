@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Scheduler\Date;
 
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
@@ -16,13 +18,7 @@ final readonly class DateBuilder
     ) {
     }
 
-    /**
-     * @param bool   $isScheduled
-     * @param string $scheduleUnit
-     * @param string $scheduleDay
-     * @param string $scheduleMonthFrequency
-     */
-    public function getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency): array
+    public function getPreviewDays(bool $isScheduled, string $scheduleUnit, string $scheduleDay, string $scheduleMonthFrequency): array
     {
         $entity = new SchedulerEntity($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
         $count  = $entity->isScheduledNow() ? 1 : 10;
