@@ -1320,7 +1320,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration` | `formatLeadDataForCreateOrUpdate()` (`bool $updateLink`); `getCompanies()` (`int\|string\|false $id`) |
     | `MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration` | `getCompanyName()` (`string $field`, `string $searchBy`); `getSalesforceObjectsByEmails()` (`string $sfObject`); `pushLeadDoNotContactByDate()` (`string $channel`); `pushLeadToCampaign()` (`string $status`) |
     | `MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration` | `cleanSugarData()` (`string $object`); `getObjectDataToUpdate()` (`string $object`) |
-    | `MauticPlugin\MauticFocusBundle\Model\FocusModel` | `addStat()` (`string $type`); `getContent()` (`string $url`) |
+    | `MauticPlugin\MauticFocusBundle\Model\FocusModel` | `getContent()` (`string $url`) |
     | `MauticPlugin\MauticFullContactBundle\Services\FullContact_Base` | `setWebhookUrl()` (`bool $json`) |
     | `MauticPlugin\MauticFullContactBundle\Services\FullContact_Location` | `enrichment()` (`bool $includeZeroPopulation`, `string $casing`); `normalizer()` (`bool $includeZeroPopulation`, `string $casing`) |
     | `MauticPlugin\MauticFullContactBundle\Services\FullContact_Name` | `deducer()` (`string $type`, `string $casing`); `normalizer()` (`string $casing`); `parser()` (`string $casing`); `similarity()` (`string $casing`); `stats()` (`string $type`, `string $casing`) |
