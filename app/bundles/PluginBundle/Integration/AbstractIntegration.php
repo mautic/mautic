@@ -1556,7 +1556,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param Lead|array $entity
      */
-    public function populateCompanyData(object|array $entity, $config = []): array
+    public function populateCompanyData(object|array $entity, array $config = []): array
     {
         if (!isset($config['companyFields'])) {
             $config = $this->mergeConfigToFeatureSettings($config);
@@ -2365,7 +2365,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return int
      */
-    public function getLeadDoNotContactByDate($channel, $records, $object, $lead, $integrationData, $params = [])
+    public function getLeadDoNotContactByDate($channel, $records, $object, $lead, $integrationData, array $params = [])
     {
         return $records;
     }
