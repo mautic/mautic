@@ -1501,8 +1501,51 @@ final class MailHelperTest extends TestCase
         $this->assertSame($trackedHtml, $mailer->getBody());
         $mailer->send(true);
 
-        $this->assertMatchesRegularExpression('#^Text <a href="https://mautic\.com">Mautic</a> <img src="cid:abc" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79"/> <img src="https://mautic\.com/fake\.jpg">\{unsubscribe_url\}<img height="1" width="1" src="/tracking\.gif\?ct=[A-Za-z0-9%]+" alt="" />$#', $mailer->message->getHtmlBody());
+        $this->assertMatchesRegularExpression('#^Text <a href="https://mautic\.com">Mautic</a> <img src="cid:abc" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79\.png" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79\.png"/> <img src="https://mautic\.com/fake\.jpg">\{unsubscribe_url\}<img height="1" width="1" src="/tracking\.gif\?ct=[A-Za-z0-9%]+" alt="" />$#', $mailer->message->getHtmlBody());
         $this->assertSame($trackedHtml, $mailer->getBody());
+
+        $attachments = $mailer->message->getAttachments();
+        $this->assertCount(1, $attachments);
+        $this->assertSame('image/png', $attachments[0]->getContentType());
+        $this->assertSame('2cb7cfd2ffccfbbbaf0e4d8891df2d79.png', $attachments[0]->getFilename());
+    }
+
+    public function testNonImageContentIsNotEmbedded(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(5))->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_convert_embed_images', null, true],
+                    ['mailer_from_name', null, 'Test'],
+                    ['secret_key', null, 'secret'],
+                    ['site_url', null, 'https://mautic.url'],
+                ]
+            );
+
+        $this->router->method('generate')->willReturn('http://tracking.url');
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+
+        $textFile = tempnam(sys_get_temp_dir(), 'mautic-embed-');
+        file_put_contents($textFile, 'not an image');
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<img src="'.$textFile.'">');
+
+        try {
+            $mailer->setEmail($email);
+            $mailer->addTo($this->contacts[0]['email']);
+            $mailer->setLead($this->contacts[0]);
+            $mailer->send();
+        } finally {
+            unlink($textFile);
+        }
+
+        $message = $transport->getMessage();
+        $this->assertCount(0, $message->getAttachments());
+        $this->assertStringContainsString('src="'.$textFile.'"', (string) $message->getHtmlBody());
     }
 
     public function testEmailWithDefaultSignature(): void
