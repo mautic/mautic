@@ -48,7 +48,7 @@
                                     {% set attr = attr|merge({'class': attr.class ~ ' float-start'}) %}
                                     {{ form_widget(form.lead_channels['frequency_number_' ~ channel.value], {'attr': attr}) }}
                                     {{ form_label(form.lead_channels['frequency_time_' ~ channel.value]) }}
-                                    <div class="frequency-select">{{ form_widget(form.lead_channels['frequency_time_' ~ channel.value]) }}</div>
+                                    <div class="frequency-select float-end">{{ form_widget(form.lead_channels['frequency_time_' ~ channel.value]) }}</div>
                                 </div>
                             </div>
                     </td>
