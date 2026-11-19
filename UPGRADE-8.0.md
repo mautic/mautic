@@ -555,7 +555,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `.va-b` | `.align-bottom` |
     | `.fs-1` | `.flex-shrink-1` |
 
-    Mautic does not set `--bs-border-color`, so Bootstrap border utilities use Bootstrap's default border colour. A custom theme that needs a themed border colour for these utilities must set `--bs-border-color`.
+    Mautic sets `--bs-border-color` to `--border-subtle`, so Bootstrap border utilities keep Mautic's border colour. A custom theme that replaces `--border-subtle` must also set `--bs-border-color` to keep the same appearance.
 
     `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
 
