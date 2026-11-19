@@ -20,6 +20,7 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\SMimeHelper;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
@@ -1193,6 +1194,45 @@ final class MailHelperTest extends TestCase
         $metadata = $transport->getMessage()->getMetadata();
         foreach ($this->contacts as $contact) {
             $this->assertMatchesRegularExpression('#^http:\/\/tracking\.url\?ct=[A-Za-z0-9%]+$#', $metadata[$contact['email']]['tokens']['{tracking_pixel}']);
+        }
+    }
+
+    public function testImagesAreEmbeddedAgainAfterTheMailerIsReset(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(5))->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_convert_embed_images', null, true],
+                    ['mailer_from_name', null, 'Test'],
+                    ['secret_key', null, 'secret'],
+                    ['site_url', null, 'https://mautic.url'],
+                ]
+            );
+
+        $this->router->method('generate')->willReturn('http://tracking.url');
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+
+        // We should use a local image to avoid network requests.
+        $sampleImagePath = __DIR__.'/../../../../assets/images/avatar.png';
+
+        // Simulate two batches sent by the same long-running process.
+        foreach ([$this->contacts[0], $this->contacts[1]] as $contact) {
+            $email = new Email();
+            $email->setSubject('Test');
+            $email->setCustomHtml('<img src="'.$sampleImagePath.'">');
+
+            $mailer->reset(true);
+            $mailer->setEmail($email);
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->send();
+
+            $message = $transport->getMessage();
+            $this->assertInstanceOf(MauticMessage::class, $message);
+            $this->assertCount(1, $message->getAttachments(), 'The image must be embedded in every message.');
+            $this->assertStringContainsString('src="cid:'.md5($sampleImagePath).'"', (string) $message->getHtmlBody());
         }
     }
 
