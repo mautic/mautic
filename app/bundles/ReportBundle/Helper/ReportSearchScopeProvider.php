@@ -31,6 +31,9 @@ final class ReportSearchScopeProvider extends AbstractSearchScopeProvider
 
     protected function getAdditionalCommandKeys(): array
     {
-        return $this->reportModel->getCommandList();
+        return array_values(array_filter(
+            $this->reportModel->getCommandList(),
+            static fn (string $commandKey): bool => 'mautic.report.report.searchcommand.source' !== $commandKey,
+        ));
     }
 }

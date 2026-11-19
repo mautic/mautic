@@ -27,6 +27,8 @@ final class FieldSearchScopeProvider extends AbstractSearchScopeProvider
             SearchScopePresets::isMine(),
             SearchScopePresets::command('mautic.lead.field.searchcommand.isindexed'),
             SearchScopePresets::command('mautic.lead.field.searchcommand.isunique'),
+            SearchScopePresets::command('mautic.lead.field.searchcommand.issystemdefault'),
+            SearchScopePresets::command('mautic.lead.field.searchcommand.isusercreated'),
             SearchScopePresets::command('mautic.lead.field.searchcommand.type'),
             SearchScopePresets::command('mautic.lead.field.searchcommand.group'),
             SearchScopePresets::ids(),

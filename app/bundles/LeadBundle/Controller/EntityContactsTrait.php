@@ -114,7 +114,6 @@ trait EntityContactsTrait
                 'orderBy'        => $orderBy,
                 'orderByDir'     => $orderByDir,
                 'select'         => ListController::SEGMENT_CONTACT_FIELDS,
-                'route'          => $route,
             ],
             $entityJoinTable,
             $entityId,
