@@ -21,6 +21,9 @@ final class PointSearchScopeProviderTest extends SearchScopeProviderTestCase
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.core.searchcommand.ismine' => 'is:mine',
                 'mautic.project.searchcommand.name' => 'project:name',
+                'mautic.point.searchcommand.type_gain.filter' => 'type:gain',
+                'mautic.point.searchcommand.type_loss.filter' => 'type:loss',
+                'mautic.point.searchcommand.isrepeatable' => 'is:repeatable',
                 default => $key,
             });
 
@@ -36,5 +39,14 @@ final class PointSearchScopeProviderTest extends SearchScopeProviderTestCase
     protected function expectedDynamicCommands(): array
     {
         return ['is:mine'];
+    }
+
+    public function testGetScopesPinsPointCommands(): void
+    {
+        $commands = array_column($this->getScopes(), 'command');
+
+        $this->assertContains('type:gain', $commands);
+        $this->assertContains('type:loss', $commands);
+        $this->assertContains('is:repeatable', $commands);
     }
 }
