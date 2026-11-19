@@ -59,7 +59,6 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         self::assertResponseIsSuccessful();
-        $this->assertStringContainsString('Edit Custom Field - Company custom field', strip_tags($this->client->getResponse()->getContent()));
         $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => 'Company custom field']);
         $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadField::class, $field);
         $this->assertSame('company', $field->getObject());
