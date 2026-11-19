@@ -577,7 +577,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     </div>
     ```
 
-    Tab sorting and `overflowNavs` now handle horizontal lists only. Do not call `overflowNavs` on vertical lists; use Bootstrap's vertical navigation without the plugin or provide a vertical overflow container. The Dynamic Content tabs in the email editor no longer use `.tabs-left`.
+    Tab sorting and the overflow plugin now handle horizontal lists only. `Mautic.activateSortableTabs` sorts along the x axis only, so drag sorting on vertical tabs was removed with no replacement. Do not call `Mautic.activateOverflowTabs` (`$.fn.overflowNavs`) on vertical lists; use Bootstrap's vertical navigation without the plugin or provide a vertical overflow container. The Dynamic Content tabs in the email editor no longer use `.tabs-left`.
 
 - Custom background colour classes removed. Bootstrap's `.bg-*` utilities now apply, with the Carbon colours for `.bg-primary`, `.bg-success`, `.bg-info`, `.bg-warning` and `.bg-danger`. The removed classes also forced the text colour, so add a text utility where the text must stay readable. The `bg-color` SCSS mixin and `app/bundles/CoreBundle/Assets/css/app/scss/components/_colors.scss` (with its `@import` in `app/bundles/CoreBundle/Assets/css/app.scss`) were removed.
     | Removed class | Bootstrap 5 replacement |
