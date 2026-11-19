@@ -41,6 +41,11 @@ class Submission
     private $trackingId;
 
     /**
+     * @var int|string|null
+     */
+    private $deletedLeadId;
+
+    /**
      * @var \DateTimeInterface
      */
     private $dateSubmitted;
@@ -67,7 +72,8 @@ class Submission
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(SubmissionRepository::class)
             ->addIndex(['tracking_id'], 'form_submission_tracking_search')
-            ->addIndex(['date_submitted'], 'form_date_submitted');
+            ->addIndex(['date_submitted'], 'form_date_submitted')
+            ->addIndex(['deleted_lead_id'], 'form_submission_deleted_lead');
 
         $builder->addBigIntIdField();
 
@@ -82,6 +88,13 @@ class Submission
 
         $builder->createField('trackingId', 'string')
             ->columnName('tracking_id')
+            ->nullable()
+            ->build();
+
+        // The ID of the contact, recorded before Mautic deletes the contact and the foreign key sets lead_id to NULL
+        $builder->createField('deletedLeadId', 'bigint')
+            ->columnName('deleted_lead_id')
+            ->option('unsigned', true)
             ->nullable()
             ->build();
 
@@ -244,6 +257,18 @@ class Submission
     public function setLead(?Lead $lead = null): static
     {
         $this->lead = $lead;
+
+        return $this;
+    }
+
+    public function getDeletedLeadId(): ?int
+    {
+        return null === $this->deletedLeadId ? null : (int) $this->deletedLeadId;
+    }
+
+    public function setDeletedLeadId(?int $deletedLeadId): self
+    {
+        $this->deletedLeadId = $deletedLeadId;
 
         return $this;
     }
