@@ -49,7 +49,7 @@
 
 <div class="tabs-container{% if variant == 'vertical' %} tabs-container--vertical{% endif %}">
     <ul class="nav nav-tabs{% if variant == 'line' %} nav-tabs--default{% elseif variant == 'contained' %} nav-tabs--contained{% elseif variant == 'iconOnly' %} nav-tabs--default nav-tabs--icon-only{% elseif variant == 'vertical' %} nav-tabs--vertical nav-tabs--contained{% endif %}"
-        role="tablist">
+        role="tablist"{% if variant == 'vertical' %} aria-orientation="vertical"{% endif %}>
         {% for tab in tabs %}
             {%- set tabLabel = tab.label|default(tab.title|default('')) -%}
             {%- set tabId = tab.id|default(_self.generateTabId(tabLabel)) -%}
