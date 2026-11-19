@@ -68,6 +68,28 @@ final class CompanyType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'tags',
+            TagType::class,
+            [
+                'by_reference' => false,
+                'attr'         => [
+                    'id'                   => 'company_tags',
+                    'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
+                    'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
+                    'data-allow-add'       => 'true',
+                    'onchange'             => 'Mautic.createLeadTag(this)',
+                    'autocomplete'         => 'off',
+                    'multiple'             => 'multiple',
+                    'aria-label'           => $this->translator->trans('mautic.company.tags.aria.label'),
+                    'aria-describedby'     => 'company_tags_help',
+                    'aria-expanded'        => 'false',
+                    'role'                 => 'combobox',
+                    'aria-multiselectable' => 'true',
+                ],
+            ]
+        );
+
         $builder->add('projects', ProjectType::class);
 
         if (!empty($options['update_select'])) {
