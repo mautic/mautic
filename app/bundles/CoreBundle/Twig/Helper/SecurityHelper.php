@@ -39,13 +39,11 @@ final readonly class SecurityHelper
     /**
      * Helper function to check if the logged in user has access to an entity.
      *
-     * @param string|bool $ownPermission
-     * @param string|bool $otherPermission
-     * @param User|int    $ownerId
+     * @param User|int $ownerId
      */
-    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId): bool
+    public function hasEntityAccess(string|bool $ownPermission, string|bool $otherPermission, $ownerId, string|bool|null $sameRolePermission = null): bool
     {
-        return $this->security->hasEntityAccess($ownPermission, $otherPermission, $ownerId);
+        return $this->security->hasEntityAccess($ownPermission, $otherPermission, $ownerId, $sameRolePermission);
     }
 
     public function isGranted(string $permission): bool

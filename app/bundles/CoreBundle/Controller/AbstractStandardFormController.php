@@ -801,21 +801,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     {
         // set some permissions
         $permissions = $this->security->isGranted(
-            [
-                $this->getPermissionBase().':view',
-                $this->getPermissionBase().':viewown',
-                $this->getPermissionBase().':viewother',
-                $this->getPermissionBase().':create',
-                $this->getPermissionBase().':edit',
-                $this->getPermissionBase().':editown',
-                $this->getPermissionBase().':editother',
-                $this->getPermissionBase().':delete',
-                $this->getPermissionBase().':deleteown',
-                $this->getPermissionBase().':deleteother',
-                $this->getPermissionBase().':publish',
-                $this->getPermissionBase().':publishown',
-                $this->getPermissionBase().':publishother',
-            ],
+            array_merge([$this->getPermissionBase().':view'], $this->getStandardPermissionKeys($this->getPermissionBase(), true)),
             'RETURN_ARRAY',
             null,
             true
@@ -847,9 +833,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $model = $this->getModel($this->getModelName());
         $repo  = $model->getRepository();
 
-        if (!$permissions[$this->getPermissionBase().':viewother']) {
-            $filter['force'][] = ['column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
-        }
+        $this->addRoleBasedFilter($filter, $permissions, $this->getPermissionBase().':viewother', $this->getPermissionBase().':viewsamerole', $repo->getTableAlias().'.createdBy');
 
         $orderBy    = $session->get('mautic.'.$this->getSessionBase().'.orderby', $repo->getTableAlias().'.'.$this->getDefaultOrderColumn());
         $orderByDir = $session->get('mautic.'.$this->getSessionBase().'.orderbydir', $this->getDefaultOrderDirection());
@@ -1109,26 +1093,13 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 'logs'        => $logs,
                 'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'details') : 'details',
                 'permissions' => $this->security->isGranted(
-                    [
-                        $this->getPermissionBase().':view',
-                        $this->getPermissionBase().':viewown',
-                        $this->getPermissionBase().':viewother',
-                        $this->getPermissionBase().':create',
-                        $this->getPermissionBase().':edit',
-                        $this->getPermissionBase().':editown',
-                        $this->getPermissionBase().':editother',
-                        $this->getPermissionBase().':delete',
-                        $this->getPermissionBase().':deleteown',
-                        $this->getPermissionBase().':deleteother',
-                        $this->getPermissionBase().':publish',
-                        $this->getPermissionBase().':publishown',
-                        $this->getPermissionBase().':publishother',
-                    ],
+                    array_merge([$this->getPermissionBase().':view'], $this->getStandardPermissionKeys($this->getPermissionBase())),
                     'RETURN_ARRAY',
                     null,
                     true
                 ),
-                'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted($entity::ENTITY_NAME.':export:enable', 'MATCH_ONE'),
+                'enableExportPermission' => $this->security->isAdmin()
+                    || $this->security->isGranted(explode(':', $this->getPermissionBase())[0].':export:enable', 'MATCH_ONE', null, true),
             ],
             'contentTemplate' => $this->getTemplateName('details.html.twig'),
             'passthroughVars' => [

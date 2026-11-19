@@ -34,6 +34,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     private const ADMIN_USER = 'admin';
 
+    private const SALES_USER_2 = 'sales2';
     private const BATCH_DOWNLOAD_PATH = '/s/assets/batchDownload';
 
     protected function setUp(): void
@@ -457,7 +458,23 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     public function testEditWithPermissions(string $route, array $permission, int $expectedStatusCode, string $userCreatorUN): void
     {
         $userCreator = $this->getUser($userCreatorUN);
+        if (!$userCreator && self::SALES_USER_2 === $userCreatorUN) {
+            $sales       = $this->getUser(self::SALES_USER);
+            $this->assertInstanceOf(User::class, $sales);
+            $userCreator = new User();
+            $userCreator->setUsername(self::SALES_USER_2);
+            $userCreator->setFirstName('Sales');
+            $userCreator->setLastName('Two');
+            $userCreator->setEmail('sales2@example.com');
+            $userCreator->setPassword($sales->getPassword());
+            $userCreator->setRole($sales->getRole());
+            $userCreator->setIsPublished(true);
+            $this->em->persist($userCreator);
+            $this->em->flush();
+        }
+        $this->assertInstanceOf(User::class, $userCreator);
         $userEditor  = $this->getUser(self::SALES_USER);
+        $this->assertInstanceOf(User::class, $userEditor);
         $this->setPermission($userEditor, ['asset:assets' => $permission]);
 
         $asset = new Asset();
@@ -541,6 +558,20 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
             'expectedStatusCode' => Response::HTTP_OK,
             'userCreatorUN'      => self::SALES_USER,
         ];
+
+        yield 'The sales user with view same role permission can view asset created by same role user' => [
+            'route'              => 'view',
+            'permission'         => ['viewown', 'viewsamerole'],
+            'expectedStatusCode' => Response::HTTP_OK,
+            'userCreatorUN'      => self::SALES_USER_2,
+        ];
+
+        yield 'The sales user with view same role permission cannot view asset created by admin' => [
+            'route'              => 'view',
+            'permission'         => ['viewown', 'viewsamerole'],
+            'expectedStatusCode' => Response::HTTP_FORBIDDEN,
+            'userCreatorUN'      => self::ADMIN_USER,
+        ];
     }
 
     public function testAssetUploadPathTraversal(): void
@@ -604,7 +635,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         }
     }
 
-    private function getUser(string $username): User
+    private function getUser(string $username): ?User
     {
         $repository = $this->em->getRepository(User::class);
 

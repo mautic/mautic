@@ -166,7 +166,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class, 'mautic.cipher.openssl');
     $services->set('mautic.security', Mautic\CoreBundle\Security\Permissions\CorePermissions::class)
         ->arg('$bundles', param('mautic.bundles'))
-        ->arg('$pluginBundles', param('mautic.plugin.bundles'));
+        ->arg('$pluginBundles', param('mautic.plugin.bundles'))
+        ->arg('$userRepository', service('mautic.user.repository'));
     $services->alias(Mautic\CoreBundle\Security\Permissions\CorePermissions::class, 'mautic.security');
 
     $services->set('mautic.exception.listener', Mautic\CoreBundle\EventListener\ExceptionListener::class)

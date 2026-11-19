@@ -33,6 +33,14 @@ final class PageController extends FormController
     use CategoryListFiltersTrait;
     use FormErrorMessagesTrait;
 
+    private const PERMISSION_PAGES_VIEW_OWN        = 'page:pages:viewown';
+
+    private const PERMISSION_PAGES_VIEW_OTHER      = 'page:pages:viewother';
+
+    private const PERMISSION_PREFCENTER_VIEW_OWN   = 'page:preference_center:viewown';
+
+    private const PERMISSION_PREFCENTER_VIEW_OTHER = 'page:preference_center:viewother';
+
     private PageModel $pageModel;
 
     #[Required]
@@ -45,21 +53,18 @@ final class PageController extends FormController
     public function indexAction(Request $request, PageConfig $pageConfig, PageHelperFactoryInterface $pageHelperFactory, PageModel $model, PageSearchScopeProvider $pageSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
-        $permissions = $this->security->isGranted([
-            'page:pages:viewown',
-            'page:pages:viewother',
-            'page:pages:create',
-            'page:pages:editown',
-            'page:pages:editother',
-            'page:pages:deleteown',
-            'page:pages:deleteother',
-            'page:pages:publishown',
-            'page:pages:publishother',
-            'page:preference_center:viewown',
-            'page:preference_center:viewother',
-        ], 'RETURN_ARRAY');
+        $permissionBase = 'page:pages';
+        $permissions    = $this->security->isGranted(
+            array_merge(
+                $this->getStandardPermissionKeys($permissionBase),
+                [self::PERMISSION_PREFCENTER_VIEW_OWN, self::PERMISSION_PREFCENTER_VIEW_OTHER]
+            ),
+            'RETURN_ARRAY',
+            null,
+            true
+        );
 
-        if (!$permissions['page:pages:viewown'] && !$permissions['page:pages:viewother']) {
+        if (!$this->hasStandardViewPermission($permissions, $permissionBase)) {
             $this->throwAccessDenied();
         }
 
@@ -74,11 +79,9 @@ final class PageController extends FormController
 
         $request->getSession()->set('mautic.page.filter', $search);
 
-        if (!$permissions['page:pages:viewother']) {
-            $filter['force'][] = ['column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
-        }
+        $this->addStandardRoleBasedFilter($filter, $permissions, $permissionBase, 'p.createdBy');
 
-        if (!$permissions['page:preference_center:viewown'] && !$permissions['page:preference_center:viewother']) {
+        if (!$permissions[self::PERMISSION_PREFCENTER_VIEW_OWN] && !$permissions[self::PERMISSION_PREFCENTER_VIEW_OTHER]) {
             $filter['where'][] = [
                 'expr' => 'orX',
                 'val'  => [
@@ -86,7 +89,7 @@ final class PageController extends FormController
                     ['column' => 'p.isPreferenceCenter', 'expr' => 'eq', 'value' => 0],
                 ],
             ];
-        } elseif (!$permissions['page:preference_center:viewother']) {
+        } elseif (!$permissions[self::PERMISSION_PREFCENTER_VIEW_OTHER]) {
             $filter['where'][] = [
                 'expr' => 'orX',
                 'val'  => [
@@ -137,6 +140,7 @@ final class PageController extends FormController
         );
 
         $count = count($pages);
+
         if ($count && $count < ($start + 1)) {
             $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_page_index', ['page' => $lastPage]);
@@ -213,11 +217,11 @@ final class PageController extends FormController
             ]);
         }
         if (!$this->security->hasEntityAccess(
-            'page:pages:viewown', 'page:pages:viewother', $activePage->getCreatedBy()
+            self::PERMISSION_PAGES_VIEW_OWN, self::PERMISSION_PAGES_VIEW_OTHER, $activePage->getCreatedBy()
         )
             || ($activePage->getIsPreferenceCenter()
             && !$this->security->hasEntityAccess(
-                'page:preference_center:viewown', 'page:preference_center:viewother', $activePage->getCreatedBy()
+                self::PERMISSION_PREFCENTER_VIEW_OWN, self::PERMISSION_PREFCENTER_VIEW_OTHER, $activePage->getCreatedBy()
             ))) {
             $this->throwAccessDenied();
         }
@@ -332,17 +336,20 @@ final class PageController extends FormController
                 'variants'     => $variants,
                 'translations' => $translations,
                 'permissions'  => $this->security->isGranted([
-                    'page:pages:viewown',
-                    'page:pages:viewother',
+                    self::PERMISSION_PAGES_VIEW_OWN,
+                    self::PERMISSION_PAGES_VIEW_OTHER,
+                    'page:pages:viewsamerole',
                     'page:pages:create',
                     'page:pages:editown',
                     'page:pages:editother',
+                    'page:pages:editsamerole',
                     'page:pages:deleteown',
                     'page:pages:deleteother',
+                    'page:pages:deletesamerole',
                     'page:pages:publishown',
                     'page:pages:publishother',
-                    'page:preference_center:viewown',
-                    'page:preference_center:viewother',
+                    self::PERMISSION_PREFCENTER_VIEW_OWN,
+                    self::PERMISSION_PREFCENTER_VIEW_OTHER,
                 ], 'RETURN_ARRAY'),
                 'stats' => [
                     'pageviews' => $pageviews,
@@ -532,10 +539,10 @@ final class PageController extends FormController
             );
         }
         if (!$this->security->hasEntityAccess(
-            'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+            self::PERMISSION_PAGES_VIEW_OWN, self::PERMISSION_PAGES_VIEW_OTHER, $entity->getCreatedBy()
         )
             || ($entity->getIsPreferenceCenter() && !$this->security->hasEntityAccess(
-                'page:preference_center:viewown', 'page:preference_center:viewother', $entity->getCreatedBy()
+                self::PERMISSION_PREFCENTER_VIEW_OWN, self::PERMISSION_PREFCENTER_VIEW_OTHER, $entity->getCreatedBy()
             ))) {
             $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
@@ -698,7 +705,7 @@ final class PageController extends FormController
         if (null != $entity) {
             if (!$this->security->isGranted('page:pages:create')
                 || !$this->security->hasEntityAccess(
-                    'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+                    self::PERMISSION_PAGES_VIEW_OWN, self::PERMISSION_PAGES_VIEW_OTHER, $entity->getCreatedBy()
                 )
             ) {
                 $this->throwAccessDenied();
@@ -862,7 +869,7 @@ final class PageController extends FormController
             $isNew  = false;
             $entity = $model->getEntity($objectId);
             if (null == $entity || !$this->security->hasEntityAccess(
-                'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+                self::PERMISSION_PAGES_VIEW_OWN, self::PERMISSION_PAGES_VIEW_OTHER, $entity->getCreatedBy()
             )) {
                 $this->throwAccessDenied();
             }
@@ -903,7 +910,7 @@ final class PageController extends FormController
 
         if ($parent || !$this->security->isGranted('page:pages:create')
                 || !$this->security->hasEntityAccess(
-                    'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+                    self::PERMISSION_PAGES_VIEW_OWN, self::PERMISSION_PAGES_VIEW_OTHER, $entity->getCreatedBy()
                 )
         ) {
             $this->throwAccessDenied();
@@ -1023,8 +1030,8 @@ final class PageController extends FormController
             );
         }
         if (!$this->security->hasEntityAccess(
-            'page:pages:viewown',
-            'page:pages:viewother',
+            self::PERMISSION_PAGES_VIEW_OWN,
+            self::PERMISSION_PAGES_VIEW_OTHER,
             $activePage->getCreatedBy()
         )
         ) {
@@ -1161,8 +1168,8 @@ final class PageController extends FormController
             );
         }
         if (!$this->security->hasEntityAccess(
-            'page:pages:viewown',
-            'page:pages:viewother',
+            self::PERMISSION_PAGES_VIEW_OWN,
+            self::PERMISSION_PAGES_VIEW_OTHER,
             $activePage->getCreatedBy()
         )
         ) {
