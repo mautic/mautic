@@ -559,6 +559,33 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
     `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
 
+- Custom background colour classes removed. Bootstrap's `.bg-*` utilities now apply, with the Carbon colours for `.bg-primary`, `.bg-success`, `.bg-info`, `.bg-warning` and `.bg-danger`. The removed classes also forced the text colour, so add a text utility where the text must stay readable. The `bg-color` SCSS mixin and `app/bundles/CoreBundle/Assets/css/app/scss/components/_colors.scss` (with its `@import` in `app/bundles/CoreBundle/Assets/css/app.scss`) were removed.
+    | Removed class | Bootstrap 5 replacement |
+    |---|---|
+    | `.bg-auto` | `.bg-body` |
+    | `.bg-white`, `.bg-transparent` | Same class, now from Bootstrap. No forced text colour. |
+    | `.bg-primary` | Same class. Add `.text-on-color`. |
+    | `.bg-success`, `.bg-info`, `.bg-warning`, `.bg-danger` | Same class. Add `.text-inverse`. |
+
+- Unused Bootstrap 3 compatibility styles removed from `app/bundles/CoreBundle/Assets/css/libraries/bootstrap/_bootstrap-3-compatibility.scss`, and the `.pager` rule from `app/bundles/CoreBundle/Assets/css/app/scss/components/_pagination.scss`. Classes used together are listed with a plus sign.
+    | Removed class | Bootstrap 5 replacement |
+    |---|---|
+    | `.sr-only` | `.visually-hidden` |
+    | `.sr-only-focusable` | `.visually-hidden-focusable` |
+    | `.visible-{xs,sm,md,lg}-{block,inline,inline-block}`, `.visible-print-{block,inline,inline-block}` | `.d-*` and `.d-print-*` display utilities, for example `.d-none` + `.d-md-block` |
+    | `.navbar-default`, `.navbar-inverse` | `.navbar` with `.navbar-dark` or a `.bg-*` utility |
+    | `.navbar-fixed-top`, `.navbar-fixed-bottom` | `.fixed-top`, `.fixed-bottom` |
+    | `.navbar-static-top` | `.navbar`. Bootstrap 5 navbars are not fixed or sticky by default. |
+    | `.navbar-btn`, `.navbar-link`, `.text-justify`, `.text-hide` | No replacement. |
+    | `.nav-stacked` | `.flex-column` |
+    | `.pager` | `.pagination` and `.page-item` |
+    | `.embed-responsive`, `.embed-responsive-16by9`, `.embed-responsive-4by3`, `.embed-responsive-item` | `.ratio`, `.ratio-16x9`, `.ratio-4x3` |
+    | `.media-left`, `.media-middle`, `.media-bottom` | Flex utilities such as `.d-flex`, `.align-items-center` and `.flex-shrink-0` |
+
+    `.dropdown-menu-left` (use `.dropdown-menu-start`) and `.carousel-control .icon-prev`/`.icon-next` (use `.carousel-control-prev`/`.carousel-control-next`) only lost their standalone rules. Their rules nested inside other selectors are still in the compatibility file.
+
+    The unused SCSS mixins for CSS animation and transition longhands, 2D transforms (`rotate`, `rotateX`, `rotateY`, `scaleX`, `scaleY`, `skew`, `transform-origin`), `gradient-*` variants, `make-{xs,sm,md,lg}-column` with its `-offset`, `-pull` and `-push` variants, `content-columns`, `hide-text`, `text-hide`, `hyphens`, `img-retina`, `perspective-origin` and `resizable` were removed. The Bootstrap 3 SCSS variables stay defined in `_bootstrap-mautic-custom-variables.scss`.
+
 ## Changed code
 
 - `Mautic\NotificationBundle\Integration\OneSignalIntegration` now extends `Mautic\IntegrationsBundle\Integration\BasicIntegration` instead of the deprecated `Mautic\PluginBundle\Integration\AbstractIntegration`, so it is no longer an `AbstractIntegration`. Methods that only `AbstractIntegration` provides no longer exist on it, for example `getKeys()`, `getDecryptedApiKeys()`, `getFormSettings()` and `isCoreIntegration()`; it still has `getName()`, `getDisplayName()`, `getIcon()`, `getIntegrationSettings()` and `getSupportedFeatures()`. Load the integration with its API keys decrypted through the new `Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper` (`getIntegration()` / `getPublishedIntegration()`) instead of `Mautic\PluginBundle\Helper\IntegrationHelper::getIntegrationObject('OneSignal')` and `getKeys()` / `getDecryptedApiKeys()`.
