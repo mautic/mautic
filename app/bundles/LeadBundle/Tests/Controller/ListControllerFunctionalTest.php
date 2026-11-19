@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -700,6 +701,34 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Lead List 2 (without filters) should NOT have the filter icon
         $filterIconCount = $rowWithoutFilters->filterXPath('.//td[2]//div//i[@class="ri-fw ri-filter-2-fill fs-14"]')->count();
         $this->assertSame(0, $filterIconCount);
+    }
+
+    public function testSegmentListShowsCategoryAfterName(): void
+    {
+        $category = new Category();
+        $category->setTitle('Newsletters');
+        $category->setAlias('newsletters');
+        $category->setBundle('segment');
+        $this->em->persist($category);
+
+        $segment = $this->saveSegment('Categorised', 'categorised', []);
+        $segment->setCategory($category);
+        $this->em->persist($segment);
+        $this->saveSegment('Uncategorised', 'uncategorised', []);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+
+        $this->assertStringContainsString('Category', $crawler->filterXPath("//table[@id='leadListTable']//thead//th[3]")->text());
+
+        $texts = [];
+        foreach ($crawler->filterXPath("//table[@id='leadListTable']//tbody//tr") as $row) {
+            $rowCrawler = new Crawler($row);
+            $texts[trim($rowCrawler->filterXPath('.//td[2]//a')->text())] = $rowCrawler->filterXPath('.//td[3]')->text();
+        }
+
+        $this->assertStringContainsString('Newsletters', $texts['Categorised (categorised)']);
+        $this->assertStringNotContainsString('Newsletters', $texts['Uncategorised (uncategorised)']);
     }
 
     public function testUnpublishedSegmentDoesNotShowRebuildingLabel(): void
