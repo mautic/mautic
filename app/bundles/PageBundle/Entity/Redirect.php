@@ -47,7 +47,8 @@ class Redirect extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('page_redirects')
-            ->setCustomRepositoryClass(RedirectRepository::class);
+            ->setCustomRepositoryClass(RedirectRepository::class)
+            ->addIndex(['redirect_id'], 'redirect_id_search');
 
         $builder->addBigIntIdField();
 
