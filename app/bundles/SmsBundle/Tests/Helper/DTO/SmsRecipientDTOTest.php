@@ -40,6 +40,12 @@ final class SmsRecipientDTOTest extends TestCase
         );
         $this->assertSame(['key' => 'value'], $this->dto2->getSubstitutionData());
 
+        $this->dto1->setResult('Provider rejected a private phone number');
+        $this->assertFalse($this->dto1->getResult());
+        $this->assertStringNotContainsString('Provider rejected', json_encode($this->dto1, JSON_THROW_ON_ERROR));
+        $this->dto1->setResult(true);
+        $this->assertTrue($this->dto1->getResult());
+
         $choices = $this->collection->toChoices();
         $this->assertSame(1, array_keys($choices)[0]);
         $recipient = $this->collection->getFieldByKey(2);

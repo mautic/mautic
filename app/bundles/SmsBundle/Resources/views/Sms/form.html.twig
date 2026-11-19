@@ -92,8 +92,15 @@
 
 <div id="leadList"{% if 'template' == type %} class="hide"{% endif %}>
     {{ form_row(form.lists) }}
+</div>
+
+<div id="smsScheduleDates"{% if 'list' == type %} class="hide"{% endif %}>
     {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
     {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
+</div>
+
+<div id="smsScheduleOptionsNotice" class="alert alert-info{% if 'list' != type %} hide{% endif %}">
+    {{ 'mautic.sms.send.schedule.options_notice'|trans }}
 </div>
 
 <div class="hide">

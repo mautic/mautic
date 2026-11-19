@@ -80,7 +80,7 @@ class SmsRepository extends CommonRepository
             )
             ->setParameter('smsId', $smsId)
             // Order by ID so we can query by greater than X contact ID when batching
-            ->orderBy('lll.lead_id');
+            ->orderBy('l.id', 'ASC');
 
         return $q;
     }
