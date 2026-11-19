@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Command;
 
 use Mautic\CoreBundle\Helper\ExitCode;
+use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\FormBundle\Helper\FormUploader;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -24,7 +27,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     help: <<<'TXT'
 When Mautic deletes a contact, it records the contact in the form submissions of the contact. The submissions stay in the database
 without a contact, and the submitted values stay in the form results tables (form_results_<form ID>_<form alias>).
-This command deletes these submissions and their form results records for all forms.
+This command deletes these submissions, their form results records and their uploaded files, for all forms.
 
 Submissions without this record are not deleted: submissions that never had a contact, submissions of contacts
 that were deleted before Mautic recorded deleted contacts, and submissions of contacts that mautic:maintenance:cleanup deleted.
@@ -50,6 +53,8 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
     public function __construct(
         private readonly FormRepository $formRepository,
         private readonly SubmissionRepository $submissionRepository,
+        private readonly FormUploader $formUploader,
+        private readonly FileUploader $fileUploader,
         private readonly TranslatorInterface $translator,
         private readonly LoggerInterface $logger,
     ) {
@@ -122,7 +127,7 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
             try {
                 $count = $dryRun
                     ? ($counts[(int) $form->getId()] ?? 0)
-                    : $this->deleteSubmissionsOfForm($form, $batchLimit, $existingResultsTables);
+                    : $this->deleteSubmissionsOfForm($form, $batchLimit, $existingResultsTables, $output);
             } catch (\Exception $e) {
                 $this->logger->error('An exception occurred while deleting the submissions of deleted contacts.', ['formId' => $form->getId(), 'exception' => $e]);
                 $output->writeln('<error>'.$e->getMessage().'</error>');
@@ -152,11 +157,13 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
     /**
      * @param array<string, int> $existingResultsTables
      */
-    private function deleteSubmissionsOfForm(Form $form, int $batchLimit, array $existingResultsTables): int
+    private function deleteSubmissionsOfForm(Form $form, int $batchLimit, array $existingResultsTables, OutputInterface $output): int
     {
         $formId             = (int) $form->getId();
         $resultsTableExists = isset($existingResultsTables[$this->submissionRepository->getResultsTableName($formId, $form->getAlias())]);
+        $fileFields         = $resultsTableExists ? $this->getFileFields($form) : [];
         $deleted            = 0;
+        $kept               = 0;
         $lastId             = 0;
 
         do {
@@ -166,14 +173,81 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
                 break;
             }
 
-            $deleted += $this->submissionRepository->deleteSubmissionsOfDeletedContacts($form, $submissionIds, $resultsTableExists);
-            $lastId = max($submissionIds);
+            $lastId           = max($submissionIds);
+            $deletableIds     = $this->deleteUploadedFiles($form, $fileFields, $submissionIds);
+            $kept += count($submissionIds) - count($deletableIds);
+            $deleted += $this->submissionRepository->deleteSubmissionsOfDeletedContacts($form, $deletableIds, $resultsTableExists);
         } while (count($submissionIds) === $batchLimit);
 
         if ($deleted > 0) {
             $this->logger->info(sprintf('Deleted %d submissions of deleted contacts of form %d.', $deleted, $formId));
         }
 
+        if ($kept > 0) {
+            $output->writeln('<comment>'.$this->translator->trans('mautic.forms.command.deleted_contact_submissions.files_not_deleted', [
+                '%form_id%'          => $formId,
+                '%form_name%'        => $form->getName(),
+                '%submission_count%' => $kept,
+            ]).'</comment>');
+        }
+
         return $deleted;
+    }
+
+    /**
+     * @return array<string, Field> Field alias => field
+     */
+    private function getFileFields(Form $form): array
+    {
+        $fileFields = [];
+
+        foreach ($form->getFields() as $field) {
+            if ($field->isFileType()) {
+                $fileFields[$field->getAlias()] = $field;
+            }
+        }
+
+        return $fileFields;
+    }
+
+    /**
+     * Deletes the uploaded files of the submissions, as FormUploader::deleteUploadedFiles() does for a single submission.
+     * A submission whose file could not be deleted is kept, so that the next run still knows the file.
+     *
+     * @param array<string, Field> $fileFields
+     * @param int[]                $submissionIds
+     *
+     * @return int[] The IDs of the submissions that have no uploaded files anymore
+     */
+    private function deleteUploadedFiles(Form $form, array $fileFields, array $submissionIds): array
+    {
+        $fileNames    = $this->submissionRepository->getUploadedFileNames($form, array_keys($fileFields), $submissionIds);
+        $deletableIds = [];
+
+        foreach ($submissionIds as $submissionId) {
+            $filesDeleted = true;
+
+            foreach ($fileNames[$submissionId] ?? [] as $alias => $fileName) {
+                if (basename($fileName) !== $fileName) {
+                    $this->logger->warning('A form submission of a deleted contact refers to an invalid file name. The file name is ignored.', ['submissionId' => $submissionId, 'fileName' => $fileName]);
+
+                    continue;
+                }
+
+                $filePath = $this->formUploader->getCompleteFilePath($fileFields[$alias], $fileName);
+                $this->fileUploader->delete($filePath);
+
+                if (file_exists($filePath)) {
+                    $filesDeleted = false;
+                    $this->logger->error('The uploaded file of a form submission of a deleted contact could not be deleted.', ['submissionId' => $submissionId, 'filePath' => $filePath]);
+                }
+            }
+
+            if ($filesDeleted) {
+                $deletableIds[] = $submissionId;
+            }
+        }
+
+        return $deletableIds;
     }
 }

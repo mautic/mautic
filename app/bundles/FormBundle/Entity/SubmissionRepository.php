@@ -679,6 +679,43 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
+     * @param string[] $fieldAliases  Aliases of fields of type "file"
+     * @param int[]    $submissionIds
+     *
+     * @return array<int, array<string, string>> Submission ID => [field alias => file name]
+     */
+    public function getUploadedFileNames(Form $form, array $fieldAliases, array $submissionIds): array
+    {
+        if ([] === $fieldAliases || [] === $submissionIds) {
+            return [];
+        }
+
+        $connection       = $this->getEntityManager()->getConnection();
+        $databasePlatform = $connection->getDatabasePlatform();
+        $columns          = array_map(static fn (string $alias): string => 'r.'.$databasePlatform->quoteIdentifier($alias), $fieldAliases);
+
+        $rows = $connection->createQueryBuilder()
+            ->select('r.submission_id', ...$columns)
+            ->from($this->getResultsTableName($form->getId(), $form->getAlias()), 'r')
+            ->where('r.submission_id IN (:submissionIds)')
+            ->setParameter('submissionIds', $submissionIds, ArrayParameterType::INTEGER)
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $fileNames = [];
+
+        foreach ($rows as $row) {
+            foreach ($fieldAliases as $alias) {
+                if (is_string($row[$alias] ?? null) && '' !== $row[$alias]) {
+                    $fileNames[(int) $row['submission_id']][$alias] = $row[$alias];
+                }
+            }
+        }
+
+        return $fileNames;
+    }
+
+    /**
      * @param int[] $submissionIds
      */
     public function deleteSubmissionsOfDeletedContacts(Form $form, array $submissionIds, bool $resultsTableExists): int

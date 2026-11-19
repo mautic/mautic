@@ -4,25 +4,42 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Command;
 
+use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Command\DeleteSubmissionsOfDeletedContactsCommand;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Tests\FormTestHelperTrait;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Psr\Log\NullLogger;
 use Symfony\Component\Console\Exception\InvalidOptionException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTestCase
 {
     use FormTestHelperTrait;
 
     protected $useCleanupRollback = false;
+
+    /**
+     * @var string[]
+     */
+    private array $uploadDirectories = [];
+
+    protected function beforeTearDown(): void
+    {
+        (new Filesystem())->remove($this->uploadDirectories);
+    }
 
     public function testSubmissionsOfDeletedContactsAreDeletedInAllForms(): void
     {
@@ -260,6 +277,58 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $this->assertSame(0, $this->countSubmissionsWithoutContact());
     }
 
+    public function testUploadedFilesOfDeletedContactsAreDeleted(): void
+    {
+        $form           = $this->createFormViaApi($this->getPayLoad(['fields' => $this->getFieldsWithFileField()]));
+        $keptContact    = $this->createContact('kept@example.com');
+        $deletedContact = $this->createContact('deleted@example.com');
+        $keptFile       = $this->createUploadedFile($form, 'document', 'kept.pdf');
+        $deletedFile    = $this->createUploadedFile($form, 'document', 'deleted.pdf');
+
+        $this->createTrackedSubmission($form, $keptContact, 'Kept', ['document' => 'kept.pdf']);
+        $this->createTrackedSubmission($form, $deletedContact, 'Deleted', ['document' => 'deleted.pdf']);
+        $this->deleteContactViaApi($deletedContact);
+
+        $this->em->clear();
+        $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME, ['--dry-run' => true]);
+        $this->assertFileExists($deletedFile);
+
+        $commandTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME);
+
+        $this->assertStringContainsString('Deleted 1 form submissions of deleted contacts', $commandTester->getDisplay());
+        $this->assertFileDoesNotExist($deletedFile);
+        $this->assertFileExists($keptFile);
+        $this->assertSame(['Kept'], $this->getResultsNames($form));
+    }
+
+    public function testSubmissionIsKeptWhenItsUploadedFileCannotBeDeleted(): void
+    {
+        $form           = $this->createFormViaApi($this->getPayLoad(['fields' => $this->getFieldsWithFileField()]));
+        $deletedContact = $this->createContact('deleted@example.com');
+        $file           = $this->createUploadedFile($form, 'document', 'locked.pdf');
+        $this->createTrackedSubmission($form, $deletedContact, 'Locked', ['document' => 'locked.pdf']);
+        $this->deleteContactViaApi($deletedContact);
+
+        // A file uploader that cannot delete the file, for example because of missing permissions.
+        $command = new DeleteSubmissionsOfDeletedContactsCommand(
+            self::getContainer()->get(FormRepository::class),
+            self::getContainer()->get(SubmissionRepository::class),
+            self::getContainer()->get(FormUploader::class),
+            $this->createStub(FileUploader::class),
+            self::getContainer()->get(TranslatorInterface::class),
+            new NullLogger()
+        );
+
+        $this->em->clear();
+        $commandTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME, [], $command);
+
+        $display = $commandTester->getDisplay();
+        $this->assertStringContainsString('1 form submissions were kept, because their uploaded files could not be deleted.', $display);
+        $this->assertStringContainsString('Deleted 0 form submissions of deleted contacts', $display);
+        $this->assertFileExists($file);
+        $this->assertSame(['Locked'], $this->getResultsNames($form));
+    }
+
     public function testAllBatchesAreDeleted(): void
     {
         $form           = $this->createFormViaApi($this->getPayLoad());
@@ -325,19 +394,21 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
     /**
      * Creates a submission with the tracking ID of a new device of the contact, as for a tracked submitter.
      *
-     * @param array<string, mixed> $form
+     * @param array<string, mixed>  $form
+     * @param array<string, string> $results
      */
-    private function createTrackedSubmission(array $form, Lead $contact, string $name): int
+    private function createTrackedSubmission(array $form, Lead $contact, string $name, array $results = []): int
     {
-        return $this->createSubmission($form, $contact, $name, $this->createDevice($contact)->getTrackingId());
+        return $this->createSubmission($form, $contact, $name, $this->createDevice($contact)->getTrackingId(), $results);
     }
 
     /**
      * Creates a submission and its record in the form results table.
      *
-     * @param array<string, mixed> $form
+     * @param array<string, mixed>  $form
+     * @param array<string, string> $results
      */
-    private function createSubmission(array $form, ?Lead $contact, string $name, ?string $trackingId = null): int
+    private function createSubmission(array $form, ?Lead $contact, string $name, ?string $trackingId = null, array $results = []): int
     {
         $submission = new Submission();
         $submission->setForm($this->em->getReference(Form::class, $form['id']));
@@ -345,10 +416,38 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $submission->setTrackingId($trackingId);
         $submission->setDateSubmitted(new \DateTime());
         $submission->setReferer('https://example.com/form');
-        $submission->setResults(['name' => $name]);
+        $submission->setResults(['name' => $name] + $results);
         self::getContainer()->get(SubmissionRepository::class)->saveEntity($submission);
 
         return $submission->getId();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function getFieldsWithFileField(): array
+    {
+        return [
+            ['label' => 'Name', 'type' => 'text', 'alias' => 'name'],
+            ['label' => 'Document', 'type' => 'file', 'alias' => 'document', 'properties' => ['allowed_file_size' => 1, 'allowed_file_extensions' => ['pdf']]],
+            ['label' => 'Submit', 'type' => 'button'],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $form
+     */
+    private function createUploadedFile(array $form, string $fieldAlias, string $fileName): string
+    {
+        $fieldIds = array_column($form['fields'], 'id', 'alias');
+        $field    = $this->em->find(Field::class, $fieldIds[$fieldAlias]);
+        $this->assertInstanceOf(Field::class, $field);
+
+        $filePath = self::getContainer()->get(FormUploader::class)->getCompleteFilePath($field, $fileName);
+        (new Filesystem())->dumpFile($filePath, 'Personal data');
+        $this->uploadDirectories[] = dirname($filePath, 2);
+
+        return $filePath;
     }
 
     private function createDevice(Lead $contact): LeadDevice
