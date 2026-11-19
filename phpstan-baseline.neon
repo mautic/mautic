@@ -2659,12 +2659,6 @@ parameters:
 			path: app/bundles/FormBundle/Entity/Field.php
 
 		-
-			message: '#^Property Mautic\\FormBundle\\Entity\\Field\:\:\$sessionId has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/FormBundle/Entity/Field.php
-
-		-
 			message: '#^Property Mautic\\FormBundle\\Entity\\Form\:\:\$id \(int\) does not accept null\.$#'
 			identifier: assign.propertyType
 			count: 1
