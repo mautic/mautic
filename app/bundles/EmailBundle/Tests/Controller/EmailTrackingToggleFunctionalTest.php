@@ -10,8 +10,10 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -114,6 +116,49 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
             $this->assertSame([], $trackables, 'no trackable row is created for an untracked link');
             $this->assertSame([], $redirects, 'no redirect row is created for an untracked link');
         }
+    }
+
+    public function testSendsInSeparateRunsShareOneStoredCopyWhileTrackingIsOff(): void
+    {
+        $segment = $this->createSegment('tracking-toggle-copies', []);
+        $email   = $this->createEmail('Stored copy');
+        $email->setSubject('Stored copy');
+        $email->setEmailType('list');
+        $email->setLists([$segment]);
+        $email->setTemplate('blank');
+        $email->setCustomHtml('<!DOCTYPE html><html><body><a href="'.self::LINK_URL.'">offer</a></body></html>');
+        $email->setTrackingEnabled(false);
+        $this->em->persist($email);
+        $this->em->flush();
+        $emailId = $email->getId();
+
+        $copyIds = [];
+        foreach (['alice@example.com', 'bob@example.com'] as $address) {
+            // Each contact gets the email in a run of its own, as they would hours apart
+            $this->setUpSymfony($this->configParams);
+            $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+            $this->assertInstanceOf(User::class, $admin);
+            $this->loginUser($admin);
+
+            $segment = $this->em->getRepository(LeadList::class)->findOneBy(['alias' => 'tracking-toggle-copies']);
+            $this->assertInstanceOf(LeadList::class, $segment);
+            $contact = $this->createLead('', '', $address);
+            $this->createListLead($segment, $contact);
+            $this->em->flush();
+
+            $this->setCsrfHeader();
+            $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', ['id' => $emailId, 'pending' => 1]);
+            $this->assertResponseIsSuccessful();
+
+            $copyId = $this->connection->fetchOne(
+                'SELECT copy_id FROM '.MAUTIC_TABLE_PREFIX.'email_stats WHERE email_id = ? AND email_address = ?',
+                [$emailId, $address]
+            );
+            $this->assertNotEmpty($copyId, $address.' got the email');
+            $copyIds[] = $copyId;
+        }
+
+        $this->assertSame($copyIds[0], $copyIds[1], 'The same unchanged email is stored once.');
     }
 
     /**

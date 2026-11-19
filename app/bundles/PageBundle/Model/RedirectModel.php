@@ -178,7 +178,7 @@ class RedirectModel extends FormModel
             if (isset($byUrl[$url])) {
                 $return[$key] = $byUrl[$url];
             } else {
-                $redirect      = $this->createRedirectEntity($url);
+                $redirect      = $persistRedirects ? $this->createRedirectEntity($url) : $this->createUnsavedRedirectEntity($url);
                 $newEntities[] = $redirect;
                 $return[$key]  = $redirect;
             }
@@ -204,6 +204,18 @@ class RedirectModel extends FormModel
         $redirect->setRedirectId();
 
         $this->setTimestamps($redirect, true);
+
+        return $redirect;
+    }
+
+    /**
+     * A Redirect entity that is only used to build a token for a link that won't be tracked. Its ID comes from
+     * the URL, so the same content gets the same token, and the same stored copy, every time it is sent.
+     */
+    public function createUnsavedRedirectEntity(string $url): Redirect
+    {
+        $redirect = $this->createRedirectEntity($url);
+        $redirect->setRedirectId(substr(hash('sha1', $url), 0, 25));
 
         return $redirect;
     }
