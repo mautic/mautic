@@ -5,7 +5,7 @@
 
 {% if type == 'inline' %}
     <div class="d-flex align-items-center mt-12 float-end">
-        <div class="category--inline d-inline-flex align-items-center h-32 pe-5" data-bs-toggle="tooltip" data-bs-placement="right" title="{{ title|striptags|e('html_attr') }}">
+        <div class="category--inline d-inline-flex align-items-center h-32 pe-5" data-bs-toggle="tooltip" data-bs-placement="right" tabindex="0" role="img" aria-label="{{ title|striptags|e('html_attr') }}" title="{{ title|striptags|e('html_attr') }}">
             <span class="category--inline-color d-inline-flex align-items-center justify-content-center" style="--category-color: {{ color|e('html_attr') }};">
                 <i class="ri-folder-6-fill fs-10"></i>
             </span>
