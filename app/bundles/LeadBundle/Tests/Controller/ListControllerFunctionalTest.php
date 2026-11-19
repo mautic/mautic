@@ -928,6 +928,32 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('1', (string) $html);
     }
 
+    public function testManuallyRemovedContactsStatLinksToSourceSearch(): void
+    {
+        $segment = $this->saveSegment('removed-test', 'removed-test');
+        $contact = new Lead();
+        $contact->setFirstname('Removed');
+        $this->em->persist($contact);
+        $this->em->flush();
+        $segmentContact = new ListLead();
+        $segmentContact->setList($segment);
+        $segmentContact->setLead($contact);
+        $segmentContact->setDateAdded(new \DateTime());
+        $segmentContact->setManuallyAdded(false);
+        $segmentContact->setManuallyRemoved(true);
+        $this->em->persist($segmentContact);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/segmentStats/'.$segment->getId());
+        $this->assertResponseIsSuccessful();
+
+        $card = $crawler->filter('a.tile--clickable[href*="segment_source:manually_removed"]');
+        $this->assertCount(1, $card);
+        $this->assertStringContainsString('Manually removed contacts', $card->text());
+        $this->assertStringContainsString('segment:removed-test', urldecode((string) $card->attr('href')));
+        $this->assertStringContainsString('1', $card->text());
+    }
+
     /**
      * @param array<mixed> $filter
      */
