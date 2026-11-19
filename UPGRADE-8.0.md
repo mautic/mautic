@@ -1534,7 +1534,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\LeadBundle\Helper\CustomFieldValueHelper` | `normalize()` (`$type`) | `?string` |
     | `Mautic\PageBundle\Helper\TrackingHelper` | `displayInitCode()` (`$service`) | `string` |
     | `Mautic\PluginBundle\Helper\Cleaner` | `clean()` (`$fieldType`) | `string` |
-    | `Mautic\PluginBundle\Helper\IntegrationHelper` | `getIntegrationObjects()` (`$alphabetical`, `$publishedOnly`), `getIntegrationObject()` (`$name`), `getSocialProfileUrlRegex()` (`$find`), `getUserProfiles()` (`$refresh`, `$persistLead`, `$returnSettings`), `clearIntegrationCache()` (`$integration`) | `bool`, `string`, `bool`, `bool`, `string|false` |
+    | `Mautic\PluginBundle\Helper\IntegrationHelper` | `getIntegrationObjects()` (`$alphabetical`, `$publishedOnly`), `getIntegrationObject()` (`$name`), `getSocialProfileUrlRegex()` (`$find`), `getUserProfiles()` (`$refresh`, `$persistLead`, `$returnSettings`), `clearIntegrationCache()` (`$integration`) | `bool`, `string`, `bool`, `bool`, `string\|false` |
     | `Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper` | `getWeekLabel()` (`$labelFormat`) | `string` |
     | `MauticPlugin\MauticFullContactBundle\Helper\LookupHelper` | `lookupContact()`, `lookupCompany()` (`$notify`, `$checkAuto`) | `bool` |
 
