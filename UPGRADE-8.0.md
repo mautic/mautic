@@ -572,19 +572,25 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     |---|---|
     | `.sr-only` | `.visually-hidden` |
     | `.sr-only-focusable` | `.visually-hidden-focusable` |
-    | `.visible-{xs,sm,md,lg}-{block,inline,inline-block}`, `.visible-print-{block,inline,inline-block}` | `.d-*` and `.d-print-*` display utilities, for example `.d-none` + `.d-md-block` |
+    | `.visible-xs-block`, `.visible-xs-inline`, `.visible-xs-inline-block` | `.d-block` / `.d-inline` / `.d-inline-block` below 768px, paired with `.d-sm-none` |
+    | `.visible-sm-block`, `.visible-sm-inline`, `.visible-sm-inline-block` | `.d-sm-block` / `.d-sm-inline` / `.d-sm-inline-block`, paired with `.d-none` and `.d-md-none` |
+    | `.visible-md-block`, `.visible-md-inline`, `.visible-md-inline-block` | `.d-md-block` / `.d-md-inline` / `.d-md-inline-block`, paired with `.d-none` and `.d-lg-none` |
+    | `.visible-lg-block`, `.visible-lg-inline`, `.visible-lg-inline-block` | `.d-lg-block` / `.d-lg-inline` / `.d-lg-inline-block`, paired with `.d-none` |
+    | `.visible-print-block`, `.visible-print-inline`, `.visible-print-inline-block` | `.d-print-block` / `.d-print-inline` / `.d-print-inline-block` |
+    | `.hidden-xs`, `.hidden-sm`, `.hidden-md`, `.hidden-lg`, `.hidden-print` | Invert the matching `.visible-*`/`.d-print-*` range above; Bootstrap 5 has no direct bounded `hidden-*` utility |
     | `.navbar-default`, `.navbar-inverse` | `.navbar` with `.navbar-dark` or a `.bg-*` utility |
     | `.navbar-fixed-top`, `.navbar-fixed-bottom` | `.fixed-top`, `.fixed-bottom` |
     | `.navbar-static-top` | `.navbar`. Bootstrap 5 navbars are not fixed or sticky by default. |
     | `.navbar-btn`, `.navbar-link`, `.text-justify`, `.text-hide` | No replacement. |
     | `.nav-stacked` | `.flex-column` |
     | `.pager` | `.pagination` and `.page-item` |
-    | `.embed-responsive`, `.embed-responsive-16by9`, `.embed-responsive-4by3`, `.embed-responsive-item` | `.ratio`, `.ratio-16x9`, `.ratio-4x3` |
+    | `.embed-responsive`, `.embed-responsive-16by9`, `.embed-responsive-4by3` | Put `.ratio` with `.ratio-16x9` or `.ratio-4x3` on the wrapper |
+    | `.embed-responsive-item` | Remove from the child; the ratio is now defined on the wrapper |
     | `.media-left`, `.media-middle`, `.media-bottom` | Flex utilities such as `.d-flex`, `.align-items-center` and `.flex-shrink-0` |
 
-    `.dropdown-menu-left` (use `.dropdown-menu-start`) and `.carousel-control .icon-prev`/`.icon-next` (use `.carousel-control-prev`/`.carousel-control-next`) only lost their standalone rules. Their rules nested inside other selectors are still in the compatibility file.
+    `.dropdown-menu-left` (use `.dropdown-menu-start`) and `.carousel-control .icon-prev`/`.icon-next` (use `.carousel-control-prev`/`.carousel-control-next`) only lost their standalone rules. Their rules nested inside other selectors are still in the compatibility file. In a legacy `.navbar-right` dropdown without `data-bs-popper`, retain the left alignment explicitly; `.dropdown-menu-start` alone does not override the navbar's right alignment.
 
-    The unused SCSS mixins for CSS animation and transition longhands, 2D transforms (`rotate`, `rotateX`, `rotateY`, `scaleX`, `scaleY`, `skew`, `transform-origin`), `gradient-*` variants, `make-{xs,sm,md,lg}-column` with its `-offset`, `-pull` and `-push` variants, `content-columns`, `hide-text`, `text-hide`, `hyphens`, `img-retina`, `perspective-origin` and `resizable` were removed. The Bootstrap 3 SCSS variables stay defined in `_bootstrap-mautic-custom-variables.scss`.
+    The removed mixins are `hide-text`, `text-hide`, `img-retina`, `resizable`, `animation-name`, `animation-duration`, `animation-timing-function`, `animation-delay`, `animation-iteration-count`, `animation-direction`, `animation-fill-mode`, `content-columns`, `hyphens`, `scaleX`, `scaleY`, `skew`, `rotate`, `rotateX`, `rotateY`, `perspective-origin`, `transform-origin`, `transition-delay`, `gradient-horizontal`, `gradient-directional`, `gradient-horizontal-three-colors`, `gradient-vertical-three-colors`, `gradient-radial`, and `make-xs-column`, `make-xs-column-offset`, `make-xs-column-push`, `make-xs-column-pull`, `make-sm-column`, `make-sm-column-offset`, `make-sm-column-push`, `make-sm-column-pull`, `make-md-column`, `make-md-column-offset`, `make-md-column-push`, `make-md-column-pull`, `make-lg-column`, `make-lg-column-offset`, `make-lg-column-push`, and `make-lg-column-pull`. They have no direct replacement. Other Bootstrap 3 SCSS mixins and variables remain defined in `_bootstrap-3-compatibility.scss` and `_bootstrap-mautic-custom-variables.scss`.
 
 ## Changed code
 
