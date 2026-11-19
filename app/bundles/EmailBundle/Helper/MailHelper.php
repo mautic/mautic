@@ -40,6 +40,7 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
+use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -859,8 +860,17 @@ class MailHelper
 
                 // Ingore the get_contents errors and use the path in the image src instead if it cannot be fetched.
                 if ($imageContent = @file_get_contents($path)) {
-                    $this->message->embed($imageContent, md5($match));
-                    $this->embedImagesReplaces[$match] = 'cid:'.md5($match);
+                    $name        = md5($match);
+                    $contentType = (string) (new \finfo(FILEINFO_MIME_TYPE))->buffer($imageContent);
+                    if (str_starts_with($contentType, 'image/')) {
+                        $extension = MimeTypes::getDefault()->getExtensions($contentType)[0] ?? null;
+                        $name .= $extension ? '.'.$extension : '';
+                    } else {
+                        $contentType = null;
+                    }
+
+                    $this->message->embed($imageContent, $name, $contentType);
+                    $this->embedImagesReplaces[$match] = 'cid:'.$name;
                 }
             }
             $content = strtr($content, $this->embedImagesReplaces);
