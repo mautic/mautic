@@ -78,6 +78,7 @@ final class BootstrapMarkupTest extends TestCase
             ->addType(new SegmentedControlType())
             ->getFormFactory();
         $form = $formFactory->createNamed('mode', SegmentedControlType::class, '0', [
+            'label'                    => 'Mode',
             'choices'                  => ['Zero' => '0', 'Double zero' => '00'],
             'choice_translation_domain' => false,
         ]);
