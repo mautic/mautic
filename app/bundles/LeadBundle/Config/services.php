@@ -205,8 +205,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->get(Mautic\LeadBundle\Entity\CompanyRepository::class)
         ->call('setUniqueIdentifiersOperator', ['%mautic.company_unique_identifiers_operator%']);
     $services->get(Mautic\LeadBundle\Entity\LeadRepository::class)
-        ->call('setUniqueIdentifiersOperator', ['%mautic.contact_unique_identifiers_operator%'])
-        ->call('setListLeadRepository', [\Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.lead.repository.list_lead')]);
+        ->call('setUniqueIdentifiersOperator', ['%mautic.contact_unique_identifiers_operator%']);
 
     $services->set(PrimaryCompanyRelationValueFilterQueryBuilder::class)
         ->args([service('mautic.lead.model.random_parameter_name'), service('event_dispatcher')]);
