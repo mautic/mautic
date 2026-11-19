@@ -566,7 +566,16 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `.tabs-left` | Bootstrap vertical navigation with `.nav` and `.flex-column`, placed on the left with the surrounding layout |
     | `.tabs-right` | Bootstrap vertical navigation with `.nav` and `.flex-column`, placed on the right with the surrounding layout |
     | `.vertical-text` | None; remove this class. |
-    | `vertical` and `verticalTabColWidth` options on `@MauticCore/Helper/tabs.html.twig` | No vertical layout option remains in this helper; build `.nav` with `.flex-column` and manage placement and overflow in the caller. |
+    | `vertical` and `verticalTabColWidth` options on `@MauticCore/Helper/tabs.html.twig` | Passing either option is ignored; the helper renders horizontal tabs. Callers must build `.nav.flex-column`, placement, and overflow themselves. |
+
+    The helper no longer adds the `.box-layout` wrapper or the `.col-xs-*`, `.height-auto`, `.border-end`, `.ps-0`, and `.pt-0` classes; callers must build their own grid. For example:
+
+    ```html
+    <div class="row">
+      <ul class="nav nav-tabs flex-column col-md-3" role="tablist">...</ul>
+      <div class="tab-content col-md-9">...</div>
+    </div>
+    ```
 
     Tab sorting and `overflowNavs` now handle horizontal lists only. Do not call `overflowNavs` on vertical lists; use Bootstrap's vertical navigation without the plugin or provide a vertical overflow container. The Dynamic Content tabs in the email editor no longer use `.tabs-left`.
 
