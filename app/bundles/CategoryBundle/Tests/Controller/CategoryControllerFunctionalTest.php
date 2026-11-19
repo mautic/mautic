@@ -160,7 +160,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $body = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertStringContainsString(
             $this->translator->trans('mautic.category.color.invalid', [], 'validators'),
-            $body['newContent']
+            (string) $body['newContent']
         );
 
         $this->em->refresh($category);

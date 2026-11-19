@@ -568,6 +568,8 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
     Uncategorized items in the expanded type now render their text with `text-secondary`.
 
+- Category colours must be a 3- or 6-digit hex value, with or without `#`, or empty. Saving a category with another value, such as `Blue` or `rgb(255, 0, 0)`, fails with `Enter a valid 3- or 6-digit hex color.`, both in the category form and through the API, so API clients must send a hex or empty value. Existing categories that store another value render with the gray label colour until their colour is changed to a 3- or 6-digit hex value. Existing 4- and 8-digit hex values keep their colour on display.
+
 - Custom background colour classes removed. Bootstrap's `.bg-*` utilities now apply, with the Carbon colours for `.bg-primary`, `.bg-success`, `.bg-info`, `.bg-warning` and `.bg-danger`. The removed classes also forced the text colour, so add a text utility where the text must stay readable. The `bg-color` SCSS mixin and `app/bundles/CoreBundle/Assets/css/app/scss/components/_colors.scss` (with its `@import` in `app/bundles/CoreBundle/Assets/css/app.scss`) were removed.
     | Removed class | Bootstrap 5 replacement |
     |---|---|

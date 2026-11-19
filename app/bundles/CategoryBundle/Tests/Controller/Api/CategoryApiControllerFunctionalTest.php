@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CategoryBundle\Tests\Controller\Api;
 
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
@@ -12,6 +13,7 @@ use Mautic\LeadBundle\Entity\LeadCategoryRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -113,9 +115,9 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->assertResponseStatusCodeSame(422);
-        $responseData = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame('Enter a valid 3- or 6-digit hex color.', $responseData['violations'][0]['message']);
-        $this->assertNull($this->em->getRepository(Category::class)->findOneBy(['alias' => 'invalid-color-category']));
+        $translator = $this->getService(TranslatorInterface::class);
+        $this->assertStringContainsString($translator->trans('mautic.category.color.invalid', [], 'validators'), (string) $this->client->getResponse()->getContent());
+        $this->assertNull($this->getService(CategoryRepository::class)->findOneBy(['alias' => 'invalid-color-category']));
     }
 
     public function testContactsCategoriesEndpointWorks(): void
