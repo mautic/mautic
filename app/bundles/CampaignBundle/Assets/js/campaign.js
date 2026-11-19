@@ -2299,7 +2299,7 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
 
             });
 
-        mQuery('#CampaignEventPanel').removeClass('hide');
+        mQuery('#CampaignEventPanel').removeClass('d-none').addClass('d-flex');
         mQuery('#CampaignEventPanelGroups').removeClass('hide');
         mQuery('#CampaignEventPanelLists').addClass('hide');
 
@@ -2320,7 +2320,7 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
 
         mQuery('#CampaignEventPanelGroups').addClass('hide');
         mQuery('#CampaignEventPanelLists').removeClass('hide');
-        mQuery('#CampaignEventPanel').removeClass('hide');
+        mQuery('#CampaignEventPanel').removeClass('d-none').addClass('d-flex');
 
         if (groups.length === 1) {
             setTimeout(function () {
@@ -2831,7 +2831,7 @@ Mautic.clearCampaignEventClone = function() {
 }
 
 Mautic.hideCampaignEventPanel = function() {
-    mQuery('#CampaignEventPanel').addClass('hide');
+    mQuery('#CampaignEventPanel').removeClass('d-flex').addClass('d-none');
 }
 
 Mautic.getCampaignBuilderHtmlElements = function() {

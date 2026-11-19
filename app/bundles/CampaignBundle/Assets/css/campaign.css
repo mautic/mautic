@@ -2,19 +2,7 @@
     width: 75px;
 }
 
-.campaign-builder .btns-builder {
-    position: fixed;
-    top: 15px;
-    right: 30px;
-    z-index: 1040;
-}
-
-.campaign-builder .builder-content {
-    right: 0;
-}
-
 .campaign-builder #builder-errors {
-    position: fixed;
     top: 52px;
     right: 30px;
     z-index: 1040;
@@ -25,7 +13,6 @@
 }
 
 #CampaignEventPanel {
-    display: flex;
     height: auto;
     padding: 10px 20px;
     background-color: var(--background);
@@ -158,7 +145,6 @@
 .campaign-event-icon {
     color: var(--icon-inverse);
     font-size: 20px;
-    text-align: center;
 }
 
 .campaign-event-content {
@@ -264,14 +250,7 @@
     height: 10000px !important;
 }
 
-.campaign-builder .builder-content {
-    height: auto;
-    width: auto;
-    bottom: 0;
-}
-
 .campaign-builder.live .builder-content {
-    overflow: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
     cursor: grab;
@@ -316,10 +295,6 @@
     transform: scale(.8);
 }
 
-.preview .builder-content {
-    overflow: visible;
-}
-
 .preview .builder-active {
     width: 100%;
     height: auto;
@@ -352,9 +327,7 @@
 #actions-container .spinner,
 #conditions-container .spinner,
 #campaign-graph-div .spinner {
-    text-align: center;
     line-height: 250px;
-    font-size: 24px;
 }
 
 :root {
