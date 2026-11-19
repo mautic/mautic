@@ -17,13 +17,13 @@ final class TrackingConfigTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $getSnippet = static function (string $ariaLabel) use ($crawler): string {
-            $snippet = $crawler->filter(sprintf('pre[aria-label="%s"]', $ariaLabel));
+            $snippet = $crawler->filter(sprintf('[role="group"][aria-label="%s"]', $ariaLabel));
             Assert::assertCount(1, $snippet);
 
             return $snippet->text();
         };
 
-        $essential = $getSnippet('Essential script (before consent)');
+        $essential = $getSnippet('Before consent');
         $this->assertStringContainsString('/mautic-essential.js', $essential);
         $this->assertStringContainsString("dispatchEvent('mauticEssentialReady')", $essential);
         $this->assertStringNotContainsString('/mautic-tracking.js', $essential);
@@ -31,7 +31,7 @@ final class TrackingConfigTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('MauticTrackingObject', $essential);
         $this->assertStringNotContainsString('pageview', $essential);
 
-        $tracking = $getSnippet('Tracking add-on (after consent)');
+        $tracking = $getSnippet('After consent');
         $this->assertStringContainsString('/mautic-tracking.js', $tracking);
         $this->assertStringContainsString("d.addEventListener('mauticEssentialReady',enableTracking)", $tracking);
         $this->assertStringContainsString('w.MauticJS.runtimeReady !== true', $tracking);
@@ -56,6 +56,7 @@ final class TrackingConfigTest extends MauticMysqlTestCase
         $this->assertNotFalse($trackingPosition);
         $this->assertLessThan($trackingPosition, $essentialPosition);
 
-        $this->assertCount(0, $crawler->filter('pre:contains("/mtc.js")'));
+        $this->assertGreaterThan(0, $crawler->filter('[data-code-block]')->count());
+        $this->assertCount(0, $crawler->filter('[data-code-block]:contains("/mtc.js")'));
     }
 }
