@@ -488,7 +488,7 @@ final class ConfigType extends AbstractType
                     'min'     => 0,
                 ],
                 'required'    => true,
-                'constraints' => [new NotNull(), new GreaterThanOrEqual(0)],
+                'constraints' => [new NotNull(message: 'mautic.core.value.required'), new GreaterThanOrEqual(0)],
             ]
         );
 
