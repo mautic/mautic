@@ -98,6 +98,11 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         $trackables = $this->em->getRepository(Trackable::class)->findBy(['channel' => 'email', 'channelId' => $email->getId()]);
         $redirects  = $this->em->getRepository(Redirect::class)->findBy(['url' => self::LINK_URL]);
 
+        // The sent copy keeps the email's choice, so turning tracking on later doesn't track it
+        $stat = $this->em->getRepository(Stat::class)->findOneBy(['email' => $email->getId()]);
+        $this->assertInstanceOf(Stat::class, $stat);
+        $this->assertSame($trackingEnabled, $stat->getTrackingEnabled());
+
         if ($trackingEnabled) {
             $this->assertStringContainsString('/r/', $link[1], 'the link goes through a tracked link');
             $this->assertMatchesRegularExpression('#/email/[^"/]+\.gif#', $body, 'the open pixel is added');
@@ -126,6 +131,21 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         $stat = $this->createSentStat(false);
 
         $this->client->request(Request::METHOD_GET, sprintf($uri, $stat->getTrackingHash()), [], [], ['REMOTE_ADDR' => '203.0.113.90']);
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('analytics-code', (string) $this->client->getResponse()->getContent());
+
+        $this->em->clear();
+        $stat = $this->em->find(Stat::class, $stat->getId());
+        $this->assertInstanceOf(Stat::class, $stat);
+        $this->assertFalse($stat->getIsRead());
+    }
+
+    #[DataProvider('openProvider')]
+    public function testCopySentWithTrackingOffStaysUntrackedAfterTheEmailTurnsTrackingOn(string $uri): void
+    {
+        $stat = $this->createSentStat(true, false);
+
+        $this->client->request(Request::METHOD_GET, sprintf($uri, $stat->getTrackingHash()), [], [], ['REMOTE_ADDR' => '203.0.113.92']);
         $this->assertResponseIsSuccessful();
         $this->assertStringNotContainsString('analytics-code', (string) $this->client->getResponse()->getContent());
 
@@ -250,7 +270,7 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         return json_decode((string) $this->client->getResponse()->getContent(), true)['email'];
     }
 
-    private function createSentStat(bool $trackingEnabled): Stat
+    private function createSentStat(bool $trackingEnabled, bool $copyTrackingEnabled = true): Stat
     {
         $contact = new Lead();
         $contact->setEmail('opened@example.com');
@@ -266,7 +286,8 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         $stat->setEmail($email);
         $stat->setLead($contact);
         $stat->setEmailAddress('opened@example.com');
-        $stat->setTrackingHash('tracking_toggle_'.($trackingEnabled ? 'on' : 'off'));
+        $stat->setTrackingEnabled($copyTrackingEnabled);
+        $stat->setTrackingHash('tracking_toggle_'.($trackingEnabled ? 'on' : 'off').'_'.($copyTrackingEnabled ? 'on' : 'off'));
         $stat->setDateSent((new \DateTime())->modify('-80 second'));
         $this->em->persist($stat);
         $this->em->flush();

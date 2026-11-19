@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\Stat;
 
 final class Version20261029160000 extends PreUpAssertionMigration
 {
@@ -15,7 +16,12 @@ final class Version20261029160000 extends PreUpAssertionMigration
 
     protected function preUpAssertions(): void
     {
-        $this->skipAssertion(fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName(Email::TABLE_NAME))->hasColumn(self::COLUMN_NAME), sprintf('Column %s already exists', self::COLUMN_NAME));
+        foreach ([Email::TABLE_NAME, Stat::TABLE_NAME] as $tableName) {
+            $this->skipAssertion(
+                fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName($tableName))->hasColumn(self::COLUMN_NAME),
+                sprintf('Column %s.%s already exists', $tableName, self::COLUMN_NAME)
+            );
+        }
     }
 
     public function getDescription(): string
@@ -25,12 +31,19 @@ final class Version20261029160000 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        // Existing emails keep tracking, as before
-        $schema->getTable($this->getPrefixedTableName(Email::TABLE_NAME))->addColumn(self::COLUMN_NAME, Types::BOOLEAN, ['default' => true]);
+        // Existing emails keep tracking, as before. Each sent copy keeps the email's choice from when it was sent.
+        foreach ([Email::TABLE_NAME, Stat::TABLE_NAME] as $tableName) {
+            $table = $schema->getTable($this->getPrefixedTableName($tableName));
+            if (!$table->hasColumn(self::COLUMN_NAME)) {
+                $table->addColumn(self::COLUMN_NAME, Types::BOOLEAN, ['default' => true]);
+            }
+        }
     }
 
     public function down(Schema $schema): void
     {
-        $schema->getTable($this->getPrefixedTableName(Email::TABLE_NAME))->dropColumn(self::COLUMN_NAME);
+        foreach ([Email::TABLE_NAME, Stat::TABLE_NAME] as $tableName) {
+            $schema->getTable($this->getPrefixedTableName($tableName))->dropColumn(self::COLUMN_NAME);
+        }
     }
 }

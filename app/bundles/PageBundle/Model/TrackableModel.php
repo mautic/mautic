@@ -248,9 +248,9 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return array{string|string[],Redirect[]|Trackable[]}
      */
-    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, bool $usingClickthrough = true): array
+    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, $usingClickthrough = true): array
     {
-        return $this->parseContentForTrackableTokens($content, $contentTokens, $channel, $channelId, $usingClickthrough, true);
+        return $this->parseContentForTrackableTokens($content, $contentTokens, $channel, $channelId, (bool) $usingClickthrough, true);
     }
 
     /**

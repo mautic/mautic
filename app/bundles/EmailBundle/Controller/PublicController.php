@@ -118,8 +118,9 @@ final class PublicController extends CommonFormController
                 $content = '';
             }
 
-            // The analytics code tracks the visitor, so an email with tracking off doesn't get it in the browser either
-            if (!$stat->getEmail() instanceof Email || $stat->getEmail()->getTrackingEnabled()) {
+            // The analytics code tracks the visitor, so a copy sent with tracking off, or an email that has it off now,
+            // doesn't get it in the browser either
+            if ($stat->allowsTracking()) {
                 $content = $analyticsHelper->addCode($content);
             }
 

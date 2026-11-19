@@ -1702,6 +1702,8 @@ class MailHelper
 
         if ($emailExists) {
             $stat->setEmail($this->email);
+            // Kept with the copy, so it stays untracked if the email turns tracking on later
+            $stat->setTrackingEnabled($this->email->getTrackingEnabled());
         }
 
         // Note if a lead

@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -59,6 +60,12 @@ class Stat
      * @var bool
      */
     private $viewedInBrowser = false;
+
+    /**
+     * Whether the email allowed tracking when it was sent. A copy sent with tracking off stays untracked even if the
+     * email turns tracking on later.
+     */
+    private bool $trackingEnabled = true;
 
     /**
      * @var \DateTimeInterface|null
@@ -172,6 +179,11 @@ class Stat
 
         $builder->createField('viewedInBrowser', 'boolean')
             ->columnName('viewed_in_browser')
+            ->build();
+
+        $builder->createField('trackingEnabled', Types::BOOLEAN)
+            ->columnName('tracking_enabled')
+            ->option('default', 1)
             ->build();
 
         $builder->createField('dateRead', 'datetime')
@@ -453,6 +465,25 @@ class Stat
     {
         $this->addChange('viewedInBrowser', $this->viewedInBrowser, $viewedInBrowser);
         $this->viewedInBrowser = $viewedInBrowser;
+    }
+
+    public function getTrackingEnabled(): bool
+    {
+        return $this->trackingEnabled;
+    }
+
+    public function setTrackingEnabled(bool $trackingEnabled): void
+    {
+        $this->trackingEnabled = $trackingEnabled;
+    }
+
+    /**
+     * Opens are recorded only when both the email and this copy of it allow tracking, so a copy sent with tracking off
+     * is not tracked after tracking is turned on.
+     */
+    public function allowsTracking(): bool
+    {
+        return $this->trackingEnabled && (!$this->email instanceof Email || $this->email->getTrackingEnabled());
     }
 
     /**
