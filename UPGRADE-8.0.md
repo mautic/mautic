@@ -1481,6 +1481,21 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `MauticPlugin\MauticFullContactBundle\Controller\FullContactController` | `lookupPersonAction()`, `lookupCompanyAction()` (`$objectId`) | `string` |
     | `MauticPlugin\MauticTagManagerBundle\Controller\TagController` | `indexAction()` (`$page`) | `int` |
 
+- Methods across several bundles now declare native `array` parameter types based on the values their callers pass. Callers that pass a value of another type (e.g. a single id instead of an array of ids) now get a `TypeError` - wrap the value in an array. Plugins that extend these classes and override one of these methods must keep the override compatible - drop the parameter type or use the parent's (or a wider) type.
+
+    | Class | Method | New parameter types |
+    | --- | --- | --- |
+    | `Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor` | `getProperty()` (`$default`) | `?array` |
+    | `Mautic\CampaignBundle\Model\CampaignModel` | `setLeadSources()` (`$deletedSources`) | `array` |
+    | `Mautic\CoreBundle\Entity\CommonEntity` | `addChange()` (`$value`) | `array` |
+    | `Mautic\LeadBundle\Entity\Lead` | `setSocialCache()` (`$cache`) | `array` |
+    | `Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder` | `between()` (`$arr`) | `array` |
+    | `Mautic\PageBundle\Entity\HitRepository` | `getEmailClickthroughHitCount()` (`$emailIds`) - a single id is no longer wrapped automatically | `array` |
+    | `Mautic\PageBundle\Entity\PageRepository` | `checkPageUniqueAlias()` (`$ignoreIds`) | `array` |
+    | `Mautic\PageBundle\Model\PageModel` | `getDeviceGranularityData()` (`$filters`) | `array` |
+    | `Mautic\PluginBundle\Integration\AbstractIntegration` | `populateCompanyData()` (`$config`), `getLeadDoNotContactByDate()` (`$params`) | `array` |
+    | `Mautic\WebhookBundle\Model\WebhookModel` | `queueWebhooksByType()`, `queueWebhook()` (`$payload`) | `array` |
+
 - Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
 
     | Class | Method | New parameter types |

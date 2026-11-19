@@ -100,10 +100,6 @@ final class HitRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        if (!is_array($emailIds)) {
-            $emailIds = [$emailIds];
-        }
-
         $q->select('count(distinct(h.tracking_id)) as hit_count, h.email_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
             ->where($q->expr()->in('h.email_id', ':emailIds'))
