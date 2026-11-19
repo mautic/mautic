@@ -49,6 +49,17 @@ class LeadListRepository extends CommonRepository
      */
     protected $companyTableSchema;
 
+    public function getEntities(array $args = [])
+    {
+        $q = $this->getEntityManager()->createQueryBuilder();
+        $q->select($this->getTableAlias().', cat')
+            ->from(LeadList::class, $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->leftJoin($this->getTableAlias().'.category', 'cat');
+        $args['qb'] = $q;
+
+        return parent::getEntities($args);
+    }
+
     private function getSingleEntity(int $id, bool $ignoreDeleted = true): ?LeadList
     {
         try {
