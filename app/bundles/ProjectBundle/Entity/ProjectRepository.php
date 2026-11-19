@@ -77,14 +77,15 @@ final class ProjectRepository extends CommonRepository
             return [(string) $expr, []];
         }
 
+        $associatedAlias = $this->generateRandomParameterName();
         $subQuery = $this->_em->getConnection()->createQueryBuilder()
             ->select('projectxref.project_id')
             ->from(MAUTIC_TABLE_PREFIX.$association['xrefTable'], 'projectxref');
 
         if (isset($association['entityTable'], $association['xrefEntityColumn'])) {
             $subQuery
-                ->innerJoin('projectxref', MAUTIC_TABLE_PREFIX.$association['entityTable'], 'associated', sprintf('associated.id = projectxref.%s', $association['xrefEntityColumn']))
-                ->where('associated.deleted IS NULL');
+                ->innerJoin('projectxref', MAUTIC_TABLE_PREFIX.$association['entityTable'], $associatedAlias, sprintf('%s.id = projectxref.%s', $associatedAlias, $association['xrefEntityColumn']))
+                ->where(sprintf('%s.deleted IS NULL', $associatedAlias));
         }
 
         $expr = $negation

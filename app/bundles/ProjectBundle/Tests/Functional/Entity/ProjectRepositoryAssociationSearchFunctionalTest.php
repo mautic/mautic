@@ -105,6 +105,23 @@ final class ProjectRepositoryAssociationSearchFunctionalTest extends MauticMysql
         $this->assertNotContains($projectWithEmailAndCampaign, $emailsWithoutCampaigns);
     }
 
+    public function testCombinedAssociationSearchCommandsRenderProjectList(): void
+    {
+        $projectWithEmailAndCampaign = $this->createProject('Listed project with email and campaign');
+        $projectWithEmailOnly        = $this->createProject('Listed project with email only');
+
+        $this->createEmail('Listed email with campaign project', $projectWithEmailAndCampaign);
+        $this->createEmail('Listed email only project', $projectWithEmailOnly);
+        $this->createCampaign('Listed campaign with email project', $projectWithEmailAndCampaign);
+
+        $this->client->request('GET', '/s/projects', ['tmpl' => 'list', 'search' => 'has:emails has:campaigns']);
+
+        $this->assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('Listed project with email and campaign', $content);
+        $this->assertStringNotContainsString('Listed project with email only', $content);
+    }
+
     private function createEmail(string $name, Project $project): Email
     {
         $email = new Email();
