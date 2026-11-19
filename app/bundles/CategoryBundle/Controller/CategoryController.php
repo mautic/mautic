@@ -31,7 +31,7 @@ final class CategoryController extends AbstractFormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['bundle' => 'category', 'objectId' => 0],
     )]
-    public function executeCategoryAction(Request $request, $bundle, $objectAction, int $objectId = 0, string $objectModel = ''): Response
+    public function executeCategoryAction(Request $request, $bundle, $objectAction, int|string $objectId = 0, string $objectModel = ''): Response
     {
         if (method_exists($this, $objectAction.'Action')) {
             return $this->forward(

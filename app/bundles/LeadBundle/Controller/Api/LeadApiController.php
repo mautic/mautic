@@ -590,7 +590,6 @@ final class LeadApiController extends CommonApiController
      *
      * @param int              $id
      * @param array<mixed>|int $data
-     * @param 'addUTMTags'|'removeUtmTags' $method
      */
     protected function applyUtmTagsAction($id, string $method, $data): Response
     {

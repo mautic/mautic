@@ -1409,7 +1409,7 @@ final class LeadController extends AbstractFormController
         );
     }
 
-    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, EmailModel $emailModel, int $objectId = 0): JsonResponse|Response
+    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, EmailModel $emailModel, int|string $objectId = 0): JsonResponse|Response
     {
         $valid = $cancelled = false;
 

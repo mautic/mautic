@@ -1465,21 +1465,21 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | --- | --- | --- |
     | `Mautic\ApiBundle\Controller\ClientController` | `newAction()` (`$objectId`) | `int\|string` |
     | `Mautic\CampaignBundle\Controller\SourceController` | `newAction()` (`$objectId`) | `int\|string` |
-    | `Mautic\CategoryBundle\Controller\CategoryController` | `executeCategoryAction()` (`$objectId`, `$objectModel`) | `int`, `string` |
+    | `Mautic\CategoryBundle\Controller\CategoryController` | `executeCategoryAction()` (`$objectId`, `$objectModel`) | `int\|string`, `string` |
     | `Mautic\CoreBundle\Controller\AbstractStandardFormController` | `getTemplateName()` (`$file`), `getTranslatedString()` (`$string`), `viewStandard()` (`$itemName`) | `string` |
     | `Mautic\CoreBundle\Controller\CommonController` | `forwardWithPost()` (`$controller`), `addFlashMessage()` (`$level`, `$domain`) | `string`, `string`, `string\|false\|null` |
     | `Mautic\DashboardBundle\Controller\DashboardController` | `widgetAction()` (`$widgetId`), `applyDashboardFileAction()` (`$file`) | `int\|string`, `?string` |
-    | `Mautic\EmailBundle\Controller\EmailController` | `winnerAction()`, `sendAction()`, `sendExampleAction()` (`$objectId`) | `int` |
+    | `Mautic\EmailBundle\Controller\EmailController` | `winnerAction()`, `sendAction()`, `sendExampleAction()` (`$objectId`) | `int\|string` |
     | `Mautic\FormBundle\Controller\ResultController` | `exportAction()` (`$format`) | `string` |
     | `Mautic\LeadBundle\Controller\Api\LeadApiController` | `applyUtmTagsAction()` (`$method`) | `string` |
-    | `Mautic\LeadBundle\Controller\LeadController` | `emailAction()` (`$objectId`) | `int` |
-    | `Mautic\LeadBundle\Controller\NoteController` | `executeNoteAction()` (`$objectId`) | `int` |
+    | `Mautic\LeadBundle\Controller\LeadController` | `emailAction()` (`$objectId`) | `int\|string` |
+    | `Mautic\LeadBundle\Controller\NoteController` | `executeNoteAction()` (`$objectId`) | `int\|string` |
     | `Mautic\PageBundle\Controller\PageController` | `exportAction()` (`$format`) | `string` |
     | `Mautic\PluginBundle\Controller\PluginController` | `configAction()` (`$activeTab`) | `string` |
     | `Mautic\ReportBundle\Controller\ReportController` | `exportAction()` (`$format`), `downloadAction()` (`$format`) | `string` |
-    | `MauticPlugin\MauticFocusBundle\Controller\FocusController` | `indexAction()` (`$page`) | `int` |
+    | `MauticPlugin\MauticFocusBundle\Controller\FocusController` | `indexAction()` (`$page`) | `int\|string` |
     | `MauticPlugin\MauticFullContactBundle\Controller\FullContactController` | `lookupPersonAction()`, `lookupCompanyAction()` (`$objectId`) | `string` |
-    | `MauticPlugin\MauticTagManagerBundle\Controller\TagController` | `indexAction()` (`$page`) | `int` |
+    | `MauticPlugin\MauticTagManagerBundle\Controller\TagController` | `indexAction()` (`$page`) | `int\|string` |
 
 - Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
 

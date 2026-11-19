@@ -685,7 +685,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * Get the template file.
      *
      * @return string
-     * @param 'details.html.twig'|'form.html.twig'|'list.html.twig' $file
      */
     protected function getTemplateName(string $file)
     {
@@ -717,7 +716,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * Get custom or core translation.
      *
      * @return string
-     * @param 'error.notfound'|'notice.batch_deleted' $string
      */
     protected function getTranslatedString(string $string)
     {

@@ -420,6 +420,9 @@ class CommonController extends AbstractController implements MauticController
      * Executes an action defined in route.
      *
      * @param string $objectAction
+     * @param int    $objectId
+     * @param int    $objectSubId
+     * @param string $objectModel
      */
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
