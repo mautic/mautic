@@ -32,6 +32,30 @@ final class EntityEventListenerMustCheckInstanceofRuleTest extends RuleTestCase
         ]);
     }
 
+    public function testNullableAndUnionEventType(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/EntityEventInstanceof/NullableUnionMissingInstanceofSubscriber.php'], [
+            [
+                'Method "onNullable()" listens to generic "Mautic\CoreBundle\Event\EntityPostSave" event that fires for every entity. Check "$event->getEntity()" with instanceof first.',
+                12,
+            ],
+            [
+                'Method "onUnion()" listens to generic "Mautic\CoreBundle\Event\EntityPostSave" event that fires for every entity. Check "$event->getEntity()" with instanceof first.',
+                17,
+            ],
+        ]);
+    }
+
+    public function testInstanceofBeforeAssign(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/EntityEventInstanceof/InstanceofBeforeAssignSubscriber.php'], [
+            [
+                'Method "onPostSave()" listens to generic "Mautic\CoreBundle\Event\EntityPostSave" event that fires for every entity. Check "$event->getEntity()" with instanceof first.',
+                11,
+            ],
+        ]);
+    }
+
     public function testSkipInstanceofOnEntityVariable(): void
     {
         $this->analyse([__DIR__.'/Fixture/EntityEventInstanceof/InstanceofVariableSubscriber.php'], []);
