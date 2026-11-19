@@ -1,5 +1,11 @@
 //UserBundle
 Mautic.userOnLoad = function (container) {
+    mQuery(container + ' #reset-dismissed-tips').closest('[data-component="hold-to-confirm"]')
+        .off('mautic:hold-to-confirm:confirm.resetDismissedTips')
+        .on('mautic:hold-to-confirm:confirm.resetDismissedTips', function () {
+            Mautic.resetDismissedElements();
+        });
+
     if (mQuery(container + ' form[name="user"]').length) {
         if (mQuery('#user_position').length) {
             Mautic.activateTypeahead('#user_position', { displayKey: 'position' });
