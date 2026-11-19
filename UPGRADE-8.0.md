@@ -1502,6 +1502,63 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `MauticPlugin\MauticFullContactBundle\Controller\FullContactController` | `lookupPersonAction()`, `lookupCompanyAction()` (`$objectId`) | `string` |
     | `MauticPlugin\MauticTagManagerBundle\Controller\TagController` | `indexAction()` (`$page`) | `int` |
 
+- Methods across several bundles now declare native `array` parameter types based on the values their callers pass. Callers that pass a value of another type (e.g. a single id instead of an array of ids) now get a `TypeError` - wrap the value in an array. Plugins that extend these classes and override one of these methods must keep the override compatible - drop the parameter type or use the parent's (or a wider) type.
+
+    | Class | Method | New parameter types |
+    | --- | --- | --- |
+    | `Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor` | `getProperty()` (`$default`) | `?array` |
+    | `Mautic\CampaignBundle\Model\CampaignModel` | `setLeadSources()` (`$deletedSources`) | `array` |
+    | `Mautic\CoreBundle\Entity\CommonEntity` | `addChange()` (`$value`) | `array` |
+    | `Mautic\LeadBundle\Entity\Lead` | `setSocialCache()` (`$cache`) | `array` |
+    | `Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder` | `between()` (`$arr`) | `array` |
+    | `Mautic\PageBundle\Entity\HitRepository` | `getEmailClickthroughHitCount()` (`$emailIds`) - a single id is no longer wrapped automatically | `array` |
+    | `Mautic\PageBundle\Entity\PageRepository` | `checkPageUniqueAlias()` (`$ignoreIds`) | `array` |
+    | `Mautic\PageBundle\Model\PageModel` | `getDeviceGranularityData()` (`$filters`) | `array` |
+    | `Mautic\PluginBundle\Integration\AbstractIntegration` | `populateCompanyData()` (`$config`), `getLeadDoNotContactByDate()` (`$params`) | `array` |
+    | `Mautic\WebhookBundle\Model\WebhookModel` | `queueWebhooksByType()`, `queueWebhook()` (`$payload`) | `array` |
+
+- Helper methods across bundles now declare native scalar parameter types based on their docblock and the literal values their callers pass. Callers that pass `null` to a non-nullable parameter, or another type from a file with `declare(strict_types=1)` (e.g. an integer to a `string` parameter), now get a `TypeError` - cast the argument to the new type. Plugins that implement `RandomHelperInterface` or extend these classes and override one of these methods must keep the override compatible - drop the parameter type or use the parent's (or a wider) type; an override of `PieChart::buildFullLabel()` or `SeriesPieChart::buildFullLabel()` must also return `string`.
+
+    | Class | Method | New parameter types |
+    | --- | --- | --- |
+    | `Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper` | `setName()` (`$table`) | `string` |
+    | `Mautic\CoreBundle\Helper\BundleHelper` | `getBundleConfig()` (`$configKey`) | `string` |
+    | `Mautic\CoreBundle\Helper\Chart\AbstractChart` | `truncate()` (`$length`, `$append`) | `int`, `string` |
+    | `Mautic\CoreBundle\Helper\Chart\BarChart` | `setDataset()` (`$order`), `generateColors()` (`$datasetId`) | `?int`, `int` |
+    | `Mautic\CoreBundle\Helper\Chart\PieChart` | `setDataset()` (`$value`), `buildFullLabel()` (`$label`, `$value`, returns `string`) | `int`, `string`, `int` |
+    | `Mautic\CoreBundle\Helper\Chart\SeriesPieChart` | `buildFullLabel()` (`$label`, `$value`, returns `string`) | `string`, `int` |
+    | `Mautic\CoreBundle\Helper\ClickthroughHelper` | `decodeArrayFromUrl()` (`$string`) | `string` |
+    | `Mautic\CoreBundle\Helper\ColorHelper` | `toRgba()` (`$alpha`) | `float\|int` |
+    | `Mautic\CoreBundle\Helper\CoreParametersHelper` | `get()` (`$name`) | `string` |
+    | `Mautic\CoreBundle\Helper\DateTimeHelper` | `toLocalString()` (`$format`), `getDiff()` (`$format`), `buildInterval()` (`$interval`, `$unit`), `modify()` (`$string`), `validateMysqlDateTimeUnit()` (`$unit`) | `?string`, `?string`, `int`, `string`, `string`, `string` |
+    | `Mautic\CoreBundle\Helper\FileHelper` | `convertPHPSizeToBytes()` (`$sSize`) | `string` |
+    | `Mautic\CoreBundle\Helper\InputHelper` | `email()` (`$value`), `transliterate()` (`$value`) | `string`, `?string` |
+    | `Mautic\CoreBundle\Helper\Language\Installer` | `install()` (`$languageCode`) | `string` |
+    | `Mautic\CoreBundle\Helper\PathsHelper` | `getSystemPath()` (`$name`) | `string` |
+    | `Mautic\CoreBundle\Helper\PhoneNumberHelper` | `formatDelimitedNational()` (`$delimiter`) | `string` |
+    | `Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface` | `generate()` (`$length`, `$charlist`) | `int`, `string` |
+    | `Mautic\CoreBundle\Helper\SearchStringHelper` | `parseSearchString()` (`$input`) | `string` |
+    | `Mautic\CoreBundle\Helper\Serializer` | `decode()` (`$serializedString`) | `string` |
+    | `Mautic\CoreBundle\Helper\UpdateHelper` | `fetchPackage()` (`$package`) | `string` |
+    | `Mautic\CoreBundle\Helper\UrlHelper` | `getUrlsFromPlaintext()` (`$text`), `isValidUrl()` (`$url`) | `string` |
+    | `Mautic\CoreBundle\Twig\Helper\AssetsHelper` | `getOverridableUrl()`, `getUrl()` (`$path`), `addScript()` (`$location`, `$name`), `addScriptDeclaration()` (`$script`, `$location`), `addCustomDeclaration()` (`$declaration`, `$location`), `outputScripts()` (`$location`), `includeScript()` (`$onLoadCallback`, `$alreadyLoadedCallback`), `getCountryFlag()` (`$class`) | `string`, `?string` for `$name` |
+    | `Mautic\CoreBundle\Twig\Helper\ButtonHelper` | `renderButtons()` (`$dropdownHtml`, `$closingDropdownHtml`) | `string` |
+    | `Mautic\CoreBundle\Twig\Helper\FormatterHelper` | `_()` (`$type`, `$round`), `arrayToString()` (`$delimiter`), `simpleArrayToHtml()` (`$delimeter`), `simpleCsvToArray()` (`$type`, now defaults to `'string'`) | `string`, `int`, `string`, `string`, `string` |
+    | `Mautic\CoreBundle\Twig\Helper\GravatarHelper` | `getImage()` (`$size`) | `string` |
+    | `Mautic\DynamicContentBundle\Helper\DynamicContentHelper` | `getDwcsBySlotName()` (`$slotName`, `$publishedOnly`) | `string`, `bool` |
+    | `Mautic\EmailBundle\Helper\EmailValidator` | `validate()` (`$address`), `doPluginValidation()` (`$address`) | `?string`, `string` |
+    | `Mautic\EmailBundle\Helper\MailHelper` | `queue()` (`$returnMode`), `attachFile()` (`$contentType`), `setBody()` (`$contentType`) | `string`, `?string`, `string` |
+    | `Mautic\EmailBundle\Stats\Helper\AbstractHelper` | `limitQueryToCreator()` (`$emailIdColumn`) | `string` |
+    | `Mautic\FormBundle\Helper\FormFieldHelper` | `populateField()` (`$formName`) | `string` |
+    | `Mautic\FormBundle\Helper\FormUploader` | `getCompleteFilePath()` (`$fileName`) | `string` |
+    | `Mautic\LeadBundle\Helper\CustomFieldHelper` | `fixValueType()` (`$type`) | `string` |
+    | `Mautic\LeadBundle\Helper\CustomFieldValueHelper` | `normalize()` (`$type`) | `?string` |
+    | `Mautic\PageBundle\Helper\TrackingHelper` | `displayInitCode()` (`$service`) | `string` |
+    | `Mautic\PluginBundle\Helper\Cleaner` | `clean()` (`$fieldType`) | `string` |
+    | `Mautic\PluginBundle\Helper\IntegrationHelper` | `getIntegrationObjects()` (`$alphabetical`, `$publishedOnly`), `getIntegrationObject()` (`$name`), `getSocialProfileUrlRegex()` (`$find`), `getUserProfiles()` (`$refresh`, `$persistLead`, `$returnSettings`), `clearIntegrationCache()` (`$integration`) | `bool`, `string`, `bool`, `bool`, `string\|false` |
+    | `Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper` | `getWeekLabel()` (`$labelFormat`) | `string` |
+    | `MauticPlugin\MauticFullContactBundle\Helper\LookupHelper` | `lookupContact()`, `lookupCompany()` (`$notify`, `$checkAuto`) | `bool` |
+
 - Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
 
     | Class | Method | New parameter types |
@@ -1769,6 +1826,12 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\CoreBundle\Twig\Extension\ButtonExtension::addButtonsFromTemplate()` (Twig function `buttonsAddFromTemplate()`) types `$item` as `?object`. Passing an array or scalar now throws; pass the entity. The `edit`, `clone`, `abtest` and `delete` buttons call methods on `$item`, so `null` is only valid when none of these are enabled.
     - `Mautic\PointBundle\Model\PointModel::triggerAction()` types `$eventDetails` as `?object`. Passing an array or scalar now throws; pass an object or `null`. The value is passed through to the point action callback, so callbacks that typed it as `array` must accept `?object` instead.
     - `MauticPlugin\MauticFocusBundle\Model\FocusModel::addStat()` types `$data` as `?object`. Passing an array or scalar now throws. `Stat::TYPE_CLICK` requires the page hit and `Stat::TYPE_FORM` the form submission; pass `null` only for `Stat::TYPE_NOTIFICATION`, which does not use `$data`.
+    - `Mautic\CoreBundle\Twig\Helper\ButtonHelper::setLocation()` types `$location` as `?string`.
+    - `Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail::setType()` types `$bounceType` as `?string`, and `getType()` now declares a `?string` return type.
+    - `Mautic\EmailBundle\MonitoredEmail\Search\Result::setEmail()` types `$email` as `string`. Passing `null` now throws; pass the email address. `getEmail()` now declares a `?string` return type.
+    - `Mautic\LeadBundle\Entity\Lead::setColor()` types `$color` as `string`. Passing `null` now throws; pass a color string. `getColor()` now declares a `?string` return type, so a subclass overriding it must declare `?string` (or `string`).
+    - `Mautic\NotificationBundle\Event\NotificationSendEvent::__construct()` and `setHeading()` type `$heading` as `?string`, and `getHeading()` now declares a `?string` return type.
+    - `Mautic\PluginBundle\Entity\Integration::setName()` types `$name` as `string`. Passing `null` now throws; pass the integration name.
 
 ### Native parameter and return types for plugin extension points
 

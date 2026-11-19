@@ -217,7 +217,7 @@ final class WebhookModel extends FormModel
         return $this->eventRepository->getEntitiesByEventType($type);
     }
 
-    public function queueWebhooksByType(string $type, $payload, array $groups = []): void
+    public function queueWebhooksByType(string $type, array $payload, array $groups = []): void
     {
         $this->queueWebhooks(
             $this->getEventWebooksByType($type),
@@ -250,7 +250,7 @@ final class WebhookModel extends FormModel
     /**
      * Creates a WebhookQueue entity, sets the date and returns the created entity.
      */
-    public function queueWebhook(Webhook $webhook, $event, $payload, array $serializationGroups = []): WebhookQueue
+    public function queueWebhook(Webhook $webhook, $event, array $payload, array $serializationGroups = []): WebhookQueue
     {
         $serializedPayload = $this->serializeData($payload, $serializationGroups);
 

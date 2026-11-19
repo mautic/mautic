@@ -200,11 +200,7 @@ final class FormFieldHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @param string $name
-     * @param string $type
-     */
-    protected static function getField($name, $type): Field
+    protected static function getField(string $name, string $type): Field
     {
         $field = new Field();
 
