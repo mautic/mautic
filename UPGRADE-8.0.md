@@ -1477,9 +1477,9 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\PageBundle\Controller\PageController` | `exportAction()` (`$format`) | `string` |
     | `Mautic\PluginBundle\Controller\PluginController` | `configAction()` (`$activeTab`) | `string` |
     | `Mautic\ReportBundle\Controller\ReportController` | `exportAction()` (`$format`), `downloadAction()` (`$format`) | `string` |
-    | `MauticPlugin\MauticFocusBundle\Controller\FocusController` | `indexAction()` (`$page`) | `int\|string` |
+    | `MauticPlugin\MauticFocusBundle\Controller\FocusController` | `indexAction()` (`$page`) | `int` |
     | `MauticPlugin\MauticFullContactBundle\Controller\FullContactController` | `lookupPersonAction()`, `lookupCompanyAction()` (`$objectId`) | `string` |
-    | `MauticPlugin\MauticTagManagerBundle\Controller\TagController` | `indexAction()` (`$page`) | `int\|string` |
+    | `MauticPlugin\MauticTagManagerBundle\Controller\TagController` | `indexAction()` (`$page`) | `int` |
 
 - Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
 
