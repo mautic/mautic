@@ -572,12 +572,13 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     |---|---|
     | `.sr-only` | `.visually-hidden` |
     | `.sr-only-focusable` | `.visually-hidden-focusable` |
-    | `.visible-xs-block`, `.visible-xs-inline`, `.visible-xs-inline-block` | `.d-block` / `.d-inline` / `.d-inline-block` below 768px, paired with `.d-sm-none` |
-    | `.visible-sm-block`, `.visible-sm-inline`, `.visible-sm-inline-block` | `.d-sm-block` / `.d-sm-inline` / `.d-sm-inline-block`, paired with `.d-none` and `.d-md-none` |
-    | `.visible-md-block`, `.visible-md-inline`, `.visible-md-inline-block` | `.d-md-block` / `.d-md-inline` / `.d-md-inline-block`, paired with `.d-none` and `.d-lg-none` |
-    | `.visible-lg-block`, `.visible-lg-inline`, `.visible-lg-inline-block` | `.d-lg-block` / `.d-lg-inline` / `.d-lg-inline-block`, paired with `.d-none` |
+    | `.visible-xs-block`, `.visible-xs-inline`, `.visible-xs-inline-block` | `.d-block` / `.d-inline` / `.d-inline-block` with `.d-md-none` (below 768px) |
+    | `.visible-sm-block`, `.visible-sm-inline`, `.visible-sm-inline-block` | `.d-md-block` / `.d-md-inline` / `.d-md-inline-block` with `.d-lg-none` (768px–991px) |
+    | `.visible-md-block`, `.visible-md-inline`, `.visible-md-inline-block` | `.d-lg-block` / `.d-lg-inline` / `.d-lg-inline-block` with `.d-xl-none` (992px–1199px) |
+    | `.visible-lg-block`, `.visible-lg-inline`, `.visible-lg-inline-block` | `.d-xl-block` / `.d-xl-inline` / `.d-xl-inline-block` (1200px and wider) |
     | `.visible-print-block`, `.visible-print-inline`, `.visible-print-inline-block` | `.d-print-block` / `.d-print-inline` / `.d-print-inline-block` |
-    | `.hidden-xs`, `.hidden-sm`, `.hidden-md`, `.hidden-lg`, `.hidden-print` | Invert the matching `.visible-*`/`.d-print-*` range above; Bootstrap 5 has no direct bounded `hidden-*` utility |
+    | `.hidden-xs`, `.hidden-sm`, `.hidden-md`, `.hidden-lg` | `.hidden-xs`: `.d-none` + `.d-md-block`; `.hidden-sm`: `.d-md-none` + `.d-lg-block`; `.hidden-md`: `.d-lg-none` + `.d-xl-block`; `.hidden-lg`: `.d-xl-none` |
+    | `.hidden-print` | `.d-print-none` |
     | `.navbar-default`, `.navbar-inverse` | `.navbar` with `.navbar-dark` or a `.bg-*` utility |
     | `.navbar-fixed-top`, `.navbar-fixed-bottom` | `.fixed-top`, `.fixed-bottom` |
     | `.navbar-static-top` | `.navbar`. Bootstrap 5 navbars are not fixed or sticky by default. |
