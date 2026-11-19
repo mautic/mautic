@@ -133,14 +133,14 @@ Mautic.leadOnLoad = function (container, response) {
         }
     }
 
-    var leadMap = [];
+    let leadMap;
 
     mQuery(document).on('shown.bs.tab', '[data-bs-target="#place-container"], a#load-lead-map', () => {
         leadMap = Mautic.initMap('#place-container', 'markers');
     });
 
     mQuery('[data-bs-toggle="tab"]').not('[data-bs-target="#place-container"], a#load-lead-map').on('shown.bs.tab', function (e) {
-        if (leadMap.length) {
+        if (leadMap) {
             leadMap.destroyMap();
             leadMap = undefined;
         }
