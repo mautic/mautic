@@ -860,14 +860,14 @@ class MailHelper
 
                 // Ingore the get_contents errors and use the path in the image src instead if it cannot be fetched.
                 if ($imageContent = @file_get_contents($path)) {
-                    $name        = md5($match);
+                    // Keep the URL if it isn't an image, embedding it would only add an unexpected attachment.
                     $contentType = (string) (new \finfo(FILEINFO_MIME_TYPE))->buffer($imageContent);
-                    if (str_starts_with($contentType, 'image/')) {
-                        $extension = MimeTypes::getDefault()->getExtensions($contentType)[0] ?? null;
-                        $name .= $extension ? '.'.$extension : '';
-                    } else {
-                        $contentType = null;
+                    if (!str_starts_with($contentType, 'image/')) {
+                        continue;
                     }
+
+                    $extension = MimeTypes::getDefault()->getExtensions($contentType)[0] ?? null;
+                    $name      = md5($match).($extension ? '.'.$extension : '');
 
                     $this->message->embed($imageContent, $name, $contentType);
                     $this->embedImagesReplaces[$match] = 'cid:'.$name;
