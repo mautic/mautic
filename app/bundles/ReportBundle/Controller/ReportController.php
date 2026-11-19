@@ -120,6 +120,7 @@ final class ReportController extends FormController
                     'model'       => $this->reportModel,
                     'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'security'    => $this->security,
+                    'focusStatsAvailable' => array_key_exists('focus_stats', $this->reportModel->getTableData()),
                 ],
                 'contentTemplate' => '@MauticReport/Report/list.html.twig',
                 'passthroughVars' => [
