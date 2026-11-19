@@ -79,9 +79,12 @@
                 'q2min': 'ri-reset-left-line',
                 'q15min': 'replay-15-fill',
                 'hourly': 'ri-history-fill 24-hours-fill',
-                'daily': 'ri-calendar-schedule-fill'
+                'daily': 'ri-calendar-schedule-fill',
+                'days': 'ri-calendar-event-fill'
             }[item.properties.frequency],
-            label: ('mautic.focus.form.frequency.' ~ item.properties.frequency ~ '.description'),
+            label: ('days' == item.properties.frequency)
+                ? 'mautic.focus.form.frequency.days.description'|trans({'%count%': item.properties.frequency_days|default(1)})
+                : ('mautic.focus.form.frequency.' ~ item.properties.frequency ~ '.description'),
             color: 'blue',
             icon_only: true
         }]

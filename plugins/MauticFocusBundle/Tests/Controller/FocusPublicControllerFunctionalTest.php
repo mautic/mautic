@@ -43,6 +43,48 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
 
     #[PreserveGlobalState(false)]
     #[RunInSeparateProcess]
+    public function testScriptEngagesEveryNumberOfDaysFromPageViewNumber(): void
+    {
+        /** @var FocusModel $focusModel */
+        $focusModel = self::getContainer()->get(FocusModel::class);
+        $focus      = $this->createFocus('popup');
+        $focus->setProperties(array_merge($focus->getProperties(), [
+            'frequency'      => 'days',
+            'frequency_days' => 7,
+            'min_page_views' => 2,
+        ]));
+        $focusModel->saveEntity($focus);
+
+        $this->client->request(Request::METHOD_GET, "/focus/{$focus->getId()}.js");
+        $this->assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+
+        // 7 days in seconds since the last engagement.
+        $this->assertMatchesRegularExpression("/case\\s*['\"]days['\"]\\s*:\\s*engage\\s*=\\s*\\(now-lastEngaged\\)>=604800/", $content);
+        $this->assertStringContainsString("mautic_focus_{$focus->getId()}_page_views", $content);
+        $this->assertMatchesRegularExpression('/if\\(Focus\\.getPageViews\\(\\)<2\\)/', $content);
+        $this->assertStringContainsString('Focus.countPageView()', $content);
+    }
+
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testScriptWithoutPageViewThresholdDoesNotCountPageViews(): void
+    {
+        /** @var FocusModel $focusModel */
+        $focusModel = self::getContainer()->get(FocusModel::class);
+        $focus      = $this->createFocus('popup');
+        $focusModel->saveEntity($focus);
+
+        $this->client->request(Request::METHOD_GET, "/focus/{$focus->getId()}.js");
+        $this->assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+
+        $this->assertStringNotContainsString('_page_views', $content);
+        $this->assertStringNotContainsString('countPageView', $content);
+    }
+
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testInactiveFocusItemScript(): void
     {
         /** @var FocusModel $focusModel */

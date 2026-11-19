@@ -12,6 +12,8 @@
 {%- set animate = props.animate is not defined or (props.animate is defined and props.animate is not empty) -%}
 {%- set linkActivation = props.link_activation is not defined or (props.link_activation is defined and props.link_activation is not empty) -%}
 {%- set clickUrl = clickUrl|default(props.content.link_url) -%}
+{%- set frequencyDays = (props.frequency_days is defined and props.frequency_days matches '/^[1-9][0-9]*$/') ? props.frequency_days : 1 -%}
+{%- set minPageViews = (props.min_page_views is defined and props.min_page_views matches '/^[1-9][0-9]*$/') ? props.min_page_views : 1 -%}
 
 {%- if '5seconds' == props.when -%}
     {%- set useTimeout = 5 -%}
@@ -60,6 +62,9 @@
                     console.log('initialize()');
 
                 Focus.insertStyleIntoHead();
+                {% if minPageViews > 1 %}
+                Focus.countPageView();
+                {% endif %}
                 Focus.registerFocusEvent();
 
                 // Add class to body
@@ -324,6 +329,15 @@
             engageVisitor: function () {
                 var now = Math.floor(Date.now() / 1000);
 
+                {% if minPageViews > 1 %}
+                if (Focus.getPageViews() < {{ minPageViews }}) {
+                    if (Focus.debug)
+                        console.log('Page view ' + Focus.getPageViews() + ' of {{ minPageViews }}; abort');
+
+                    return false;
+                }
+                {% endif %}
+
                 if (Focus.cookies.hasItem('mautic_focus_{{ focus.id }}')) {
                     if (Focus.debug)
                         console.log('Cookie exists thus checking frequency');
@@ -399,6 +413,19 @@
                                     debugMsg += 'continue';
                                 } else {
                                     debugMsg += 'engage in ' + (120 - (now - lastEngaged)) + ' seconds';
+                                }
+                                console.log(debugMsg);
+                            }
+
+                            break;
+                        case 'days':
+                            engage = (now - lastEngaged) >= {{ frequencyDays * 86400 }};
+                            if (Focus.debug) {
+                                var debugMsg = 'Engage every {{ frequencyDays }} days, ';
+                                if (engage) {
+                                    debugMsg += 'continue';
+                                } else {
+                                    debugMsg += 'engage in ' + ({{ frequencyDays * 86400 }} - (now - lastEngaged)) + ' seconds';
                                 }
                                 console.log(debugMsg);
                             }
@@ -681,6 +708,18 @@
                 var closeCount = Focus.getCloseCount();
                 Focus.cookies.setItem('mautic_focus_{{ focus.id }}_closed', ++closeCount);
             },
+            {% if minPageViews > 1 %}
+
+            // Pages viewed in this browser session where this focus is embedded
+            getPageViews: function () {
+                return parseInt(Focus.cookies.getItem('mautic_focus_{{ focus.id }}_page_views')) || 0;
+            },
+
+            // A session cookie on the root path, so every page of the site adds to the same count
+            countPageView: function () {
+                Focus.cookies.setItem('mautic_focus_{{ focus.id }}_page_views', Focus.getPageViews() + 1, null, '/');
+            },
+            {% endif %}
 
             // Cookie handling
             cookies: {
