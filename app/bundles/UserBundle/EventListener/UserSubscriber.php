@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Event\PostSaveUserEvent;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class UserSubscriber
@@ -33,15 +32,6 @@ final readonly class UserSubscriber
         } elseif ($entity instanceof Role) {
             $this->logRoleSave($entity, $event->isNew(), $event->getChanges());
         }
-    }
-
-    // UserProvider saves users outside the model, so it keeps dispatching the dedicated event.
-    #[AsEventListener(
-        event: PostSaveUserEvent::class,
-    )]
-    public function onUserPostSave(PostSaveUserEvent $event): void
-    {
-        $this->logUserSave($event->getUser(), $event->isNew(), $event->getChanges());
     }
 
     #[AsEventListener(

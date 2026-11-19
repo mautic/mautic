@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Event\PostSaveUserEvent;
 use Mautic\UserBundle\EventListener\UserSubscriber;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
@@ -127,26 +126,6 @@ final class UserSubscriberTest extends TestCase
         $subscriber = $this->createSubscriber($auditLogModel);
         $entity     = $user;
         $subscriber->onEntityPostSave(new EntityPostSave($entity, true));
-    }
-
-    public function testDedicatedUserSaveEventFromProviderIsLogged(): void
-    {
-        $user = $this->createMock(User::class);
-        $user->method('getId')->willReturn(7);
-        $user->method('getChanges')->willReturn(['username' => [null, 'sso']]);
-
-        $auditLogModel = $this->createMock(AuditLogModel::class);
-        $auditLogModel->expects($this->once())
-            ->method('writeToLog')
-            ->with($this->callback(function (array $log): bool {
-                $this->assertSame('user', $log['object']);
-                $this->assertSame('update', $log['action']);
-                $this->assertSame(7, $log['objectId']);
-                return true;
-            }));
-
-        $subscriber = $this->createSubscriber($auditLogModel);
-        $subscriber->onUserPostSave(new PostSaveUserEvent($user, false));
     }
 
     private function createSubscriber(AuditLogModel $auditLogModel): UserSubscriber
