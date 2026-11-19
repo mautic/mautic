@@ -51,10 +51,8 @@ final class TagController extends AbstractFormController
 
     /**
      * Generate's default list view.
-     *
-     * @param int $page
      */
-    public function indexAction(Request $request, TagSearchScopeProvider $tagSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, TagSearchScopeProvider $tagSearchScopeProvider, int $page = 1): Response
     {
         // Use overwritten tag model so overwritten repository can be fetched,
         // we need it to define table alias so we can define sort order.

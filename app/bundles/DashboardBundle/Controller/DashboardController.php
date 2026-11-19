@@ -128,7 +128,7 @@ final class DashboardController extends AbstractFormController
         path: '/s/dashboard/widget/{widgetId}',
         name: 'mautic_dashboard_widget',
     )]
-    public function widgetAction(Request $request, WidgetService $widgetService, Environment $twig, $widgetId): JsonResponse
+    public function widgetAction(Request $request, WidgetService $widgetService, Environment $twig, int|string $widgetId): JsonResponse
     {
         if (!$request->isXmlHttpRequest()) {
             throw new NotFoundHttpException('Not found.');
@@ -403,10 +403,8 @@ final class DashboardController extends AbstractFormController
 
     /**
      * Applies dashboard layout.
-     *
-     * @param string|null $file
      */
-    public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, RouterInterface $urlGenerator, $file = null): RedirectResponse
+    public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, RouterInterface $urlGenerator, ?string $file = null): RedirectResponse
     {
         if (!$file) {
             $file = $request->attributes->all()['file'] ?? $request->query->all()['file'] ?? $request->request->all()['file'] ?? null;

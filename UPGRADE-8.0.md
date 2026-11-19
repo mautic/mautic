@@ -559,6 +559,40 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
     `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
 
+- Custom background colour classes removed. Bootstrap's `.bg-*` utilities now apply, with the Carbon colours for `.bg-primary`, `.bg-success`, `.bg-info`, `.bg-warning` and `.bg-danger`. The removed classes also forced the text colour, so add a text utility where the text must stay readable. The `bg-color` SCSS mixin and `app/bundles/CoreBundle/Assets/css/app/scss/components/_colors.scss` (with its `@import` in `app/bundles/CoreBundle/Assets/css/app.scss`) were removed.
+    | Removed class | Bootstrap 5 replacement |
+    |---|---|
+    | `.bg-auto` | `.bg-body` |
+    | `.bg-white`, `.bg-transparent` | Same class, now from Bootstrap. No forced text colour. |
+    | `.bg-primary` | Same class. Add `.text-on-color`. |
+    | `.bg-success`, `.bg-info`, `.bg-warning`, `.bg-danger` | Same class. Add `.text-inverse`. |
+
+- Unused Bootstrap 3 compatibility styles removed from `app/bundles/CoreBundle/Assets/css/libraries/bootstrap/_bootstrap-3-compatibility.scss`, and the `.pager` rule from `app/bundles/CoreBundle/Assets/css/app/scss/components/_pagination.scss`. Classes used together are listed with a plus sign.
+    | Removed class | Bootstrap 5 replacement |
+    |---|---|
+    | `.sr-only` | `.visually-hidden` |
+    | `.sr-only-focusable` | `.visually-hidden-focusable` |
+    | `.visible-xs-block`, `.visible-xs-inline`, `.visible-xs-inline-block` | `.d-block` / `.d-inline` / `.d-inline-block` with `.d-md-none` (below 768px) |
+    | `.visible-sm-block`, `.visible-sm-inline`, `.visible-sm-inline-block` | `.d-md-block` / `.d-md-inline` / `.d-md-inline-block` with `.d-lg-none` (768px–991px) |
+    | `.visible-md-block`, `.visible-md-inline`, `.visible-md-inline-block` | `.d-lg-block` / `.d-lg-inline` / `.d-lg-inline-block` with `.d-xl-none` (992px–1199px) |
+    | `.visible-lg-block`, `.visible-lg-inline`, `.visible-lg-inline-block` | `.d-xl-block` / `.d-xl-inline` / `.d-xl-inline-block` (1200px and wider) |
+    | `.visible-print-block`, `.visible-print-inline`, `.visible-print-inline-block` | `.d-print-block` / `.d-print-inline` / `.d-print-inline-block` |
+    | `.hidden-xs`, `.hidden-sm`, `.hidden-md`, `.hidden-lg` | `.hidden-xs`: `.d-none` + `.d-md-block`; `.hidden-sm`: `.d-md-none` + `.d-lg-block`; `.hidden-md`: `.d-lg-none` + `.d-xl-block`; `.hidden-lg`: `.d-xl-none` |
+    | `.hidden-print` | `.d-print-none` |
+    | `.navbar-default`, `.navbar-inverse` | `.navbar` with `.navbar-dark` or a `.bg-*` utility |
+    | `.navbar-fixed-top`, `.navbar-fixed-bottom` | `.fixed-top`, `.fixed-bottom` |
+    | `.navbar-static-top` | `.navbar`. Bootstrap 5 navbars are not fixed or sticky by default. |
+    | `.navbar-btn`, `.navbar-link`, `.text-justify`, `.text-hide` | No replacement. |
+    | `.nav-stacked` | `.flex-column` |
+    | `.pager` | `.pagination` and `.page-item` |
+    | `.embed-responsive`, `.embed-responsive-16by9`, `.embed-responsive-4by3` | Put `.ratio` with `.ratio-16x9` or `.ratio-4x3` on the wrapper |
+    | `.embed-responsive-item` | Remove from the child; the ratio is now defined on the wrapper |
+    | `.media-left`, `.media-middle`, `.media-bottom` | Flex utilities such as `.d-flex`, `.align-items-center` and `.flex-shrink-0` |
+
+    `.dropdown-menu-left` (use `.dropdown-menu-start`) and `.carousel-control .icon-prev`/`.icon-next` (use `.carousel-control-prev`/`.carousel-control-next`) only lost their standalone rules. Their rules nested inside other selectors are still in the compatibility file. In a legacy `.navbar-right` dropdown without `data-bs-popper`, retain the left alignment explicitly; `.dropdown-menu-start` alone does not override the navbar's right alignment.
+
+    The removed mixins are `hide-text`, `text-hide`, `img-retina`, `resizable`, `animation-name`, `animation-duration`, `animation-timing-function`, `animation-delay`, `animation-iteration-count`, `animation-direction`, `animation-fill-mode`, `content-columns`, `hyphens`, `scaleX`, `scaleY`, `skew`, `rotate`, `rotateX`, `rotateY`, `perspective-origin`, `transform-origin`, `transition-delay`, `gradient-horizontal`, `gradient-directional`, `gradient-horizontal-three-colors`, `gradient-vertical-three-colors`, `gradient-radial`, and `make-xs-column`, `make-xs-column-offset`, `make-xs-column-push`, `make-xs-column-pull`, `make-sm-column`, `make-sm-column-offset`, `make-sm-column-push`, `make-sm-column-pull`, `make-md-column`, `make-md-column-offset`, `make-md-column-push`, `make-md-column-pull`, `make-lg-column`, `make-lg-column-offset`, `make-lg-column-push`, and `make-lg-column-pull`. They have no direct replacement. Other Bootstrap 3 SCSS mixins and variables remain defined in `_bootstrap-3-compatibility.scss` and `_bootstrap-mautic-custom-variables.scss`.
+
 ## Changed code
 
 - `Mautic\NotificationBundle\Integration\OneSignalIntegration` now extends `Mautic\IntegrationsBundle\Integration\BasicIntegration` instead of the deprecated `Mautic\PluginBundle\Integration\AbstractIntegration`, so it is no longer an `AbstractIntegration`. Methods that only `AbstractIntegration` provides no longer exist on it, for example `getKeys()`, `getDecryptedApiKeys()`, `getFormSettings()` and `isCoreIntegration()`; it still has `getName()`, `getDisplayName()`, `getIcon()`, `getIntegrationSettings()` and `getSupportedFeatures()`. Load the integration with its API keys decrypted through the new `Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper` (`getIntegration()` / `getPublishedIntegration()`) instead of `Mautic\PluginBundle\Helper\IntegrationHelper::getIntegrationObject('OneSignal')` and `getKeys()` / `getDecryptedApiKeys()`.
@@ -1446,6 +1480,28 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\UserBundle\Security\Provider\UserProvider` | `saveUser()` (`bool $createIfNotExists`) |
     | `Mautic\WebhookBundle\Model\WebhookModel` | `killWebhook()` (`string $reason`) |
 
+- Controller methods across bundles now declare native scalar parameter types based on their docblock and the values their routes and callers pass. Callers in files with `declare(strict_types=1)` that pass another type (e.g. an integer to a `string` id) now get a `TypeError` - cast the argument to the new type. Plugin controllers that extend these classes and override one of these methods must keep the override compatible - drop the parameter type or use the parent's (or a wider) type.
+
+    | Class | Method | New parameter types |
+    | --- | --- | --- |
+    | `Mautic\ApiBundle\Controller\ClientController` | `newAction()` (`$objectId`) | `int\|string` |
+    | `Mautic\CampaignBundle\Controller\SourceController` | `newAction()` (`$objectId`) | `int\|string` |
+    | `Mautic\CategoryBundle\Controller\CategoryController` | `executeCategoryAction()` (`$objectId`, `$objectModel`) | `int\|string`, `string` |
+    | `Mautic\CoreBundle\Controller\AbstractStandardFormController` | `getTemplateName()` (`$file`), `getTranslatedString()` (`$string`), `viewStandard()` (`$itemName`) | `string` |
+    | `Mautic\CoreBundle\Controller\CommonController` | `forwardWithPost()` (`$controller`), `addFlashMessage()` (`$level`, `$domain`) | `string`, `string`, `string\|false\|null` |
+    | `Mautic\DashboardBundle\Controller\DashboardController` | `widgetAction()` (`$widgetId`), `applyDashboardFileAction()` (`$file`) | `int\|string`, `?string` |
+    | `Mautic\EmailBundle\Controller\EmailController` | `winnerAction()`, `sendAction()`, `sendExampleAction()` (`$objectId`) | `int\|string` |
+    | `Mautic\FormBundle\Controller\ResultController` | `exportAction()` (`$format`) | `string` |
+    | `Mautic\LeadBundle\Controller\Api\LeadApiController` | `applyUtmTagsAction()` (`$method`) | `string` |
+    | `Mautic\LeadBundle\Controller\LeadController` | `emailAction()` (`$objectId`) | `int\|string` |
+    | `Mautic\LeadBundle\Controller\NoteController` | `executeNoteAction()` (`$objectId`) | `int\|string` |
+    | `Mautic\PageBundle\Controller\PageController` | `exportAction()` (`$format`) | `string` |
+    | `Mautic\PluginBundle\Controller\PluginController` | `configAction()` (`$activeTab`) | `string` |
+    | `Mautic\ReportBundle\Controller\ReportController` | `exportAction()` (`$format`), `downloadAction()` (`$format`) | `string` |
+    | `MauticPlugin\MauticFocusBundle\Controller\FocusController` | `indexAction()` (`$page`) | `int` |
+    | `MauticPlugin\MauticFullContactBundle\Controller\FullContactController` | `lookupPersonAction()`, `lookupCompanyAction()` (`$objectId`) | `string` |
+    | `MauticPlugin\MauticTagManagerBundle\Controller\TagController` | `indexAction()` (`$page`) | `int` |
+
 - Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
 
     | Class | Method | New parameter types |
@@ -1710,6 +1766,9 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `MauticPlugin\MauticFocusBundle\Model\FocusModel::addStat()` types `$type` as `string`. Passing `null` now throws; pass a stat type such as `Stat::TYPE_FORM`.
     - `Mautic\CoreBundle\Helper\ArrayHelper::getValue()` and `Mautic\CoreBundle\Helper\ArrayHelper::pickValue()` type `$key` as `int|string`. Passing `null`, which previously looked up the `''` key, now throws; pass `''` explicitly or skip the call.
     - `Mautic\FormBundle\Entity\Field::setSessionId()` types `$sessionId` as `int|string|null` and `Mautic\FormBundle\Entity\Field::getSessionId()` declares the `int|string|null` return type. Pass the session id as `int` or `string`. If you extend `Field`, an override of `getSessionId()` needs a return type compatible with `int|string|null` (a narrower one like `: string` is fine), and an override of `setSessionId()` must keep `$sessionId` untyped or typed as `int|string|null`, otherwise PHP raises a fatal error.
+    - `Mautic\CoreBundle\Twig\Extension\ButtonExtension::addButtonsFromTemplate()` (Twig function `buttonsAddFromTemplate()`) types `$item` as `?object`. Passing an array or scalar now throws; pass the entity. The `edit`, `clone`, `abtest` and `delete` buttons call methods on `$item`, so `null` is only valid when none of these are enabled.
+    - `Mautic\PointBundle\Model\PointModel::triggerAction()` types `$eventDetails` as `?object`. Passing an array or scalar now throws; pass an object or `null`. The value is passed through to the point action callback, so callbacks that typed it as `array` must accept `?object` instead.
+    - `MauticPlugin\MauticFocusBundle\Model\FocusModel::addStat()` types `$data` as `?object`. Passing an array or scalar now throws. `Stat::TYPE_CLICK` requires the page hit and `Stat::TYPE_FORM` the form submission; pass `null` only for `Stat::TYPE_NOTIFICATION`, which does not use `$data`.
 
 ### Native parameter and return types for plugin extension points
 
