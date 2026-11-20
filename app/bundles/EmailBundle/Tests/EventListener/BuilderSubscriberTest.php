@@ -92,10 +92,11 @@ final class BuilderSubscriberTest extends TestCase
 
         $unsubscribeTokenizedText = '<a href="|URL|">Unsubscribe</a> {contactfield=companyname} {contactfield=lastname}';
 
-        $this->coreParametersHelper->expects($this->exactly(8))->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(9))->method('get')->willReturnMap([
             ['unsubscribe_text', null, $unsubscribeTokenizedText],
             ['validate_unsubscribe_emails', null, true],
             ['webview_text', null, 'Just a text'],
+            ['forward_text', null, 'Forward text'],
             ['default_signature_text', null, 'Default Signature'],
             ['brand_name', null, 'Brand Name'],
             ['mailer_from_email', null, 'nobody@nowhere.com'],

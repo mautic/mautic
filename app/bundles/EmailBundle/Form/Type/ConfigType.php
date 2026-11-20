@@ -18,7 +18,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -45,6 +47,7 @@ final class ConfigType extends AbstractType
                     'unsubscribe_message'    => 'html',
                     'resubscribe_message'    => 'html',
                     'webview_text'           => 'html',
+                    'forward_text'           => 'html',
                     // Encode special chars to keep congruent with Email entity custom headers
                     'mailer_custom_headers'  => 'clean',
                 ]
@@ -86,6 +89,26 @@ final class ConfigType extends AbstractType
                     ? $options['data']['webview_text']
                     : $this->translator->trans(
                         'mautic.email.webview.text',
+                        ['%link%' => '|URL|']
+                    ),
+            ]
+        );
+
+        $builder->add(
+            'forward_text',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.email.config.forward_text',
+                'label_attr' => ['class' => 'form-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.forward_text.tooltip',
+                ],
+                'required'   => false,
+                'data'       => (isset($options['data']['forward_text']) && '' !== $options['data']['forward_text'])
+                    ? $options['data']['forward_text']
+                    : $this->translator->trans(
+                        'mautic.email.forward.text',
                         ['%link%' => '|URL|']
                     ),
             ]
@@ -449,6 +472,23 @@ final class ConfigType extends AbstractType
                 ],
                 'data'       => !empty($options['data']['disable_unsubscribe_link_header']),
                 'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'email_forward_limit',
+            NumberType::class,
+            [
+                'scale'      => 0,
+                'label'      => 'mautic.email.config.forward.limit',
+                'label_attr' => ['class' => 'form-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.forward.limit.tooltip',
+                    'min'     => 0,
+                ],
+                'required'    => true,
+                'constraints' => [new NotNull(message: 'mautic.core.value.required'), new GreaterThanOrEqual(0)],
             ]
         );
 

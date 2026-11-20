@@ -59,6 +59,12 @@ final readonly class ProcessUnsubscribeSubscriber implements EventSubscriberInte
         if ($this->coreParametersHelper->get('disable_unsubscribe_link_header')) {
             return;
         }
+
+        // Whoever gets a forwarded copy never subscribed, so there is nothing for them to unsubscribe from
+        if ($event->isForwardedCopy()) {
+            return;
+        }
+
         $helper = $event->getHelper();
         if ($helper && $unsubscribeEmail = $helper->generateUnsubscribeEmail()) {
             $headers          = $event->getTextHeaders();

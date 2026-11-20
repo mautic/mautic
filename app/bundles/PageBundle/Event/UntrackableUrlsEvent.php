@@ -16,6 +16,7 @@ final class UntrackableUrlsEvent extends Event
         '{resubscribe_url}',
         '{unsubscribe_url}',
         '{dnc_url}',
+        '{forward_url}',
         '{trackable=(.*?)}',
     ];
 

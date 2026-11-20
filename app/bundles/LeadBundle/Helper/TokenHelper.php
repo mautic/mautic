@@ -8,6 +8,11 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 
 final class TokenHelper
 {
+    /**
+     * What may follow the "|" in a contact token to format its value, instead of a default value.
+     */
+    private const VALUE_MODIFIERS = ['true', 'date', 'time', 'datetime', 'label'];
+
     public const REGEX = '/({|%7B)(contact|company)field=(.*?)(}|%7D)/';
 
     private const DATETIME_REGEX = '/({|%7B)datetime=(.*?)(}|%7D)/';
@@ -66,6 +71,28 @@ final class TokenHelper
         }
 
         return $replace ? $content : $tokenList;
+    }
+
+    /**
+     * The contact tokens in the content with their default values, for a message that has no contact
+     * behind it, such as a copy of an email forwarded to somebody else.
+     *
+     * @return array<string, string>
+     */
+    public static function findLeadTokenDefaults(string $content): array
+    {
+        $tokenList = [];
+        if (!preg_match_all(self::REGEX, $content, $matches)) {
+            return $tokenList;
+        }
+
+        foreach ($matches[3] as $key => $match) {
+            $defaultValue = self::getTokenDefaultValue($match);
+            // A modifier says how to format the value, it is not a text to show instead of it
+            $tokenList[$matches[0][$key]] = in_array($defaultValue, self::VALUE_MODIFIERS, true) ? '' : $defaultValue;
+        }
+
+        return $tokenList;
     }
 
     public static function validToken(string $content): bool
@@ -145,7 +172,7 @@ final class TokenHelper
                     break;
             }
         }
-        if (in_array($defaultValue, ['true', 'date', 'time', 'datetime', 'label'])) {
+        if (in_array($defaultValue, self::VALUE_MODIFIERS, true)) {
             return $value;
         }
 
