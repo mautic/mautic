@@ -263,12 +263,12 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $untracked = $this->ipLookupHelper->isVisitorUntracked();
 
         parse_str((string) $request->server->get('QUERY_STRING'), $queryArray);
-        $refererURL       = $untracked ? $event->getSubmission()->getReferer() : $request->server->get('HTTP_REFERER');
+        $httpReferer      = $request->server->get('HTTP_REFERER');
+        $refererURL       = $untracked ? $event->getSubmission()->getReferer() : $httpReferer;
         $refererParsedUrl = parse_url((string) $refererURL);
 
-        if (isset($refererParsedUrl['query'])) {
-            parse_str($refererParsedUrl['query'], $queryReferer);
-        }
+        // The tags come from the page the form was submitted from, as the submission's referer can be the form's return URL instead
+        parse_str((string) parse_url((string) $httpReferer, PHP_URL_QUERY), $queryReferer);
 
         $query = $request->query->all();
         $url   = $request->server->get('REQUEST_URI');

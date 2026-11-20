@@ -147,6 +147,62 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /**
+     * @param array<string, string> $server
+     */
+    #[DataProvider('trackabilityProvider')]
+    public function testUtmTagsComeFromTheSubmitUrlAndTheReferringPageNotTheReturnUrl(array $server, bool $expectTracking): void
+    {
+        $formId = $this->createForm([
+            [
+                'label'        => 'Email',
+                'type'         => 'email',
+                'alias'        => 'email',
+                'mappedObject' => 'contact',
+                'mappedField'  => 'email',
+            ],
+        ], actions: [[
+            'name'       => 'Record UTM tags',
+            'type'       => 'lead.addutmtags',
+            'properties' => [],
+        ]]);
+
+        // The form sends the visitor to another page than the one it was submitted from, and that page has no UTM tags
+        $returnUrl = '/thanks';
+        $referer   = 'http://localhost/signup?utm_campaign=referring-page&utm_source=newsletter&recipient_id=12345#form';
+
+        $this->logoutUser();
+        $this->client->followRedirects(false);
+        $this->client->request(
+            Request::METHOD_POST,
+            "/form/submit?formId={$formId}&utm_campaign=submit-url&recipient_id=12345",
+            ['mauticform' => ['formId' => $formId, 'email' => 'visitor@example.com', 'return' => $returnUrl]],
+            [],
+            $server + ['HTTP_REFERER' => $referer]
+        );
+        $this->assertResponseRedirects();
+
+        $this->em->clear();
+        $submission = $this->em->getRepository(Submission::class)->findOneBy(['form' => $formId]);
+        $this->assertInstanceOf(Submission::class, $submission);
+        $this->assertSame($returnUrl, $submission->getReferer());
+        $this->assertSame($expectTracking, null !== $submission->getTrackingId());
+
+        $utmTag = $this->em->getRepository(UtmTag::class)->findOneBy(['lead' => $submission->getLead()]);
+        $this->assertInstanceOf(UtmTag::class, $utmTag);
+
+        // A tag on the submit URL wins, and the referring page fills in the tags the submit URL does not have
+        $this->assertSame('submit-url', $utmTag->getUtmCampaign());
+        $this->assertSame('newsletter', $utmTag->getUtmSource());
+
+        // An untracked submitter's record keeps the submission's sanitized referer, and the recipient ID is not saved anywhere
+        $this->assertSame($expectTracking ? $referer : $returnUrl, $utmTag->getReferer());
+        $this->assertSame($expectTracking, str_contains((string) json_encode([$utmTag->getReferer(), $utmTag->getUrl(), $utmTag->getQuery()]), '12345'));
+        if (!$expectTracking) {
+            $this->assertSame(['utm_campaign' => 'submit-url'], $utmTag->getQuery());
+        }
+    }
+
     public function testAnonymousSubmissionWithPrivacySignalCreatesNoContact(): void
     {
         // Without a contact field there is nothing to save to a contact, so an untracked visitor gets none
