@@ -955,9 +955,7 @@ final class PublicController extends CommonFormController
 
             $stat->setSource('email.client');
 
-            if ($stat || 'Outlook' !== $integration) { // Outlook requests the tracking gif on send
-                $this->emailModel->hitEmail($idHash, $request); // add email event
-            }
+            $this->emailModel->hitEmail($idHash, $request);
         }
     }
 

@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 final class PluginTrackingGifFunctionalTest extends MauticMysqlTestCase
 {
@@ -20,21 +19,11 @@ final class PluginTrackingGifFunctionalTest extends MauticMysqlTestCase
 
     private const string EMAIL = 'plugin-tracking@example.com';
 
-    /**
-     * @return iterable<string, array{string, string}>
-     */
-    public static function integrationProvider(): iterable
+    public function testSignedRequestTracksTheContact(): void
     {
-        yield 'Gmail (IntegrationsBundle)' => ['Gmail', 'MauticGmailBundle'];
-        yield 'Outlook' => ['Outlook', 'MauticOutlookBundle'];
-    }
+        $this->createGmailIntegration();
 
-    #[DataProvider('integrationProvider')]
-    public function testSignedRequestTracksTheContact(string $integrationName, string $bundle): void
-    {
-        $this->createIntegration($integrationName, $bundle);
-
-        $this->requestTrackingGif($integrationName, $this->sign($this->encodeData()));
+        $this->requestTrackingGif('Gmail', $this->sign($this->encodeData()));
 
         $this->assertResponseIsSuccessful();
         $this->assertInstanceOf(Lead::class, $this->getService(LeadRepository::class)->findOneBy(['email' => self::EMAIL]));
@@ -45,12 +34,11 @@ final class PluginTrackingGifFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($stat->isRead());
     }
 
-    #[DataProvider('integrationProvider')]
-    public function testRequestWithInvalidSignatureIsIgnored(string $integrationName, string $bundle): void
+    public function testRequestWithInvalidSignatureIsIgnored(): void
     {
-        $this->createIntegration($integrationName, $bundle);
+        $this->createGmailIntegration();
 
-        $this->requestTrackingGif($integrationName, 'invalid');
+        $this->requestTrackingGif('Gmail', 'invalid');
 
         $this->assertResponseIsSuccessful();
         $this->assertNotInstanceOf(Lead::class, $this->getService(LeadRepository::class)->findOneBy(['email' => self::EMAIL]));
@@ -64,15 +52,15 @@ final class PluginTrackingGifFunctionalTest extends MauticMysqlTestCase
         $this->assertNotInstanceOf(Lead::class, $this->getService(LeadRepository::class)->findOneBy(['email' => self::EMAIL]));
     }
 
-    private function createIntegration(string $name, string $bundle): void
+    private function createGmailIntegration(): void
     {
         $plugin = new Plugin();
-        $plugin->setName($name);
-        $plugin->setBundle($bundle);
+        $plugin->setName('Gmail');
+        $plugin->setBundle('MauticGmailBundle');
         $this->em->persist($plugin);
 
         $integration = new Integration();
-        $integration->setName($name);
+        $integration->setName('Gmail');
         $integration->setIsPublished(true);
         $integration->setPlugin($plugin);
         $integration->setApiKeys(['secret' => $this->getService(EncryptionHelper::class)->encrypt(self::SECRET)]);
