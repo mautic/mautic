@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Controller;
 
+use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
@@ -501,13 +502,16 @@ final class PublicController extends AbstractFormController
             $url = UrlHelper::appendQueryToUrl($url, http_build_query($query));
         }
 
-        // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
-        // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
-        $ipAddress = $ipLookupHelper->getIpAddress();
+        // A request isn't trackable when it came from a configured "do not track" IP or user agent, which keeps
+        // simulated clicks from 3rd party services such as URL shorteners out, or carries a privacy signal.
+        // With link click tracking off, every click is handled as untracked.
+        // The visitor is only looked up when the click is tracked, since the lookup stores their IP address.
+        $isRequestTrackable = $ipLookupHelper->isRequestTrackable();
+        $isClickTrackable   = $isRequestTrackable && $this->coreParametersHelper->get('track_link_clicks', true);
 
         $isHitTrackable = false;
         if (null !== $ct && '' !== $ct) {
-            if ($ipAddress->isTrackable()) {
+            if ($isClickTrackable) {
                 // Search replace lead fields in the URL
                 try {
                     $lead           = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
@@ -546,16 +550,48 @@ final class PublicController extends AbstractFormController
             }
         }
 
+        // A click from a message is still counted, with nothing that links it to the visitor. A clickthrough
+        // that doesn't decode counts as no clickthrough.
+        $clickthrough = $isClickTrackable ? [] : $this->decodeClickthrough($ct);
+        if ([] !== $clickthrough) {
+            try {
+                $pageModel->countUntrackedClick($redirect, $clickthrough);
+            } catch (DBALException $e) {
+                // A count that couldn't be written mustn't keep the visitor from the link
+                $logger->error('Could not count an untracked click: '.$e->getMessage(), ['exception' => $e]);
+            }
+        }
+
         $url = UrlHelper::sanitizeAbsoluteUrl($url);
 
         if (!UrlHelper::isValidUrl($url)) {
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
         }
 
+        // The cookie tells the page or asset the link leads to whether this visitor is tracked. With link click
+        // tracking off the click isn't recorded, but the visitor still may be, so it follows the request and not the setting.
+        $isTrackingBlocked = $isClickTrackable ? !$isHitTrackable : !$isRequestTrackable;
+
         $response =  $this->redirect($url);
-        $response->headers->setCookie(new Cookie('Blocked-Tracking', (string) !$isHitTrackable, strtotime('now + 15 seconds')));
+        $response->headers->setCookie(new Cookie('Blocked-Tracking', (string) $isTrackingBlocked, strtotime('now + 15 seconds')));
 
         return $response;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function decodeClickthrough(mixed $ct): array
+    {
+        if (!is_string($ct) || '' === $ct) {
+            return [];
+        }
+
+        try {
+            return ClickthroughHelper::decodeArrayFromUrl($ct);
+        } catch (InvalidDecodedStringException) {
+            return [];
+        }
     }
 
     /**

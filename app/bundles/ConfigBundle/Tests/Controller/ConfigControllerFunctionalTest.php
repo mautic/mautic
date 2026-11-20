@@ -346,6 +346,38 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('0', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][aggregate_analytics]']->getValue());
     }
 
+    public function testTrackAssetDownloadsDefaultsToEnabledAndCanBeDisabled(): void
+    {
+        $this->assertSame('1', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][track_asset_downloads]']->getValue());
+        $this->assertStringContainsString('Track asset downloads', (string) $this->client->getResponse()->getContent());
+
+        $this->submitConfigPage('trackingconfig', [
+            'config[trackingconfig][track_asset_downloads]' => '0',
+        ]);
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('track_asset_downloads', $configParameters);
+        $this->assertFalse((bool) $configParameters['track_asset_downloads']);
+
+        $this->assertSame('0', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][track_asset_downloads]']->getValue());
+    }
+
+    public function testTrackLinkClicksDefaultsToEnabledAndCanBeDisabled(): void
+    {
+        $this->assertSame('1', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][track_link_clicks]']->getValue());
+        $this->assertStringContainsString('Track link clicks', (string) $this->client->getResponse()->getContent());
+
+        $this->submitConfigPage('trackingconfig', [
+            'config[trackingconfig][track_link_clicks]' => '0',
+        ]);
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('track_link_clicks', $configParameters);
+        $this->assertFalse((bool) $configParameters['track_link_clicks']);
+
+        $this->assertSame('0', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][track_link_clicks]']->getValue());
+    }
+
     public function testRestrictedAssetFieldIsNotRenderedInConfigForm(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/assetconfig');
