@@ -50,27 +50,19 @@
         </div>
     {% endif %}
 {% endblock %}
-{# active, id, name, content #}
-{% set tabs, active = [], true %}
-{% set _channel = '' %}
+{% set tabs = [] %}
 {% for channel, config in channels %}
     {% if form.channels[channel] is defined %}
+        {% set hasErrors = formContainsErrors(form.channels[channel]) %}
         {% set tab = {
-            'active'        : active,
-            'id'            : 'channel_' ~ channel,
-            'name'          : config.label,
-            'content'       : form_row(form.channels[channel]),
-            'containerAttr' : {
-                'style' : 'min-height: 200px;',
-            },
+            'id'         : 'channel_' ~ channel,
+            'label'      : config.label,
+            'content'    : '<div style="min-height: 200px;">' ~ form_row(form.channels[channel]) ~ '</div>',
+            'className'  : 'pa-16',
+            'hasError'   : hasErrors,
+            'renderIcon' : 'ri-checkbox-circle-line ' ~ (form.channels[channel].isEnabled.vars.data ? 'text-success' : 'text-secondary'),
         } %}
-        {% if formContainsErrors(form.channels[channel]) %}
-            {% set tab = tab|merge({'class': 'text-danger', 'icon': 'ri-alert-fill'}) %}
-        {% elseif form.channels[channel].isEnabled.vars.data %}
-            {% set tab = tab|merge({'published': true}) %}
-        {% endif %}
-
-        {% set tabs, active = tabs|merge([tab]), false %}
+        {% set tabs = tabs|merge([tab]) %}
     {% endif %}
 {% endfor %}
 {% set formTabs = tabs %}

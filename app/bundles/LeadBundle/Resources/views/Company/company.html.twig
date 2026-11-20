@@ -84,20 +84,11 @@
 
             <!-- lead detail collapseable -->
             <div class="collapse pe-16 ps-16" id="lead-details">
-                <ul class="pt-16 nav nav-tabs nav-tabs-contained" role="tablist">
+                {% set companyTabs = [] %}
                     {% for g in fields|keys %}
                         {% if fields[g] is not empty %}
-                            <li class="{% if loop.first %}active{% endif %}">
-                                <a href="#{{ g }}" class="nav-link group{% if loop.first %} active{% endif %}" data-bs-toggle="tab">{{ ('mautic.lead.field.group.'~g)|trans }}</a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-
-                <!-- start: tab-content -->
-                <div class="tab-content pa-16">
-                    {% for group in fields|keys %}
-                        <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ group }}">
+                        {% set companyTabContent %}
+                        {% set group = g %}
                             <div class="pe-16 ps-16 pb-16">
                                 <div class="panel shd-none mb-0">
                                     <table class="table table-hover mb-0">
@@ -114,7 +105,7 @@
                                                           {% if field.value is iterable and 'multiselect' == field.type %}
                                                               {{ field.value|join(', ') }}
                                                           {% elseif 'url' == field.type %}
-                                                              <a href="{{ field.value }}" target="_blank">{{ field.value }}</a>
+                                                                  <a href="{{ field.value|e('html_attr') }}" target="_blank">{{ field.value }}</a>
                                                           {% else %}
                                                               {{ field.normalizedValue }}
                                                           {% endif %}
@@ -127,9 +118,11 @@
                                     </table>
                                 </div>
                             </div>
-                        </div>
+                        {% endset %}
+                        {% set companyTabs = companyTabs|merge([{'id': g, 'label': ('mautic.lead.field.group.' ~ g)|trans, 'content': companyTabContent, 'className': 'pa-16'}]) %}
+                    {% endif %}
                     {% endfor %}
-                </div>
+                {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': companyTabs, 'variant': 'contained'}) }}
             </div>
             <!--/ lead detail collapseable -->
         </div>
