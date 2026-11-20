@@ -57,7 +57,7 @@
                         </div>
                     {% endif %}
 
-                    <div class="d-flex flex-column gap-12 abtest-sidebar-actions">
+                    <div class="d-flex flex-column gap-12 abtest-sidebar-actions w-100">
                         {% include '@MauticCore/Helper/button.html.twig' with {
                             buttons: [{
                                 label: 'mautic.email.ab_test.form.abtest.add',
@@ -95,7 +95,7 @@
                             '%date%': dateToFullConcat(email.getPublishUp())
                         }) }}
                     </div>
-                    <div class="d-flex flex-column gap-12 abtest-sidebar-actions">
+                    <div class="d-flex flex-column gap-12 abtest-sidebar-actions w-100">
                         {% include '@MauticCore/Helper/button.html.twig' with {
                             buttons: [{
                                 label: 'mautic.email.ab_test.form.abtest.add',
