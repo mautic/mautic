@@ -11667,11 +11667,6 @@ parameters:
 			count: 1
 			path: plugins/MauticFocusBundle/Entity/StatRepository.php
 
-		-
-			message: '#^Method MauticPlugin\\MauticFocusBundle\\Helper\\TokenHelper\:\:findFocusTokens\(\) has parameter \$content with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticFocusBundle/Helper/TokenHelper.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticFocusBundle\\Model\\FocusModel\:\:getContent\(\) should return array but returns string\.$#'

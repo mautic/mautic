@@ -316,6 +316,59 @@ JS);
         $I->assertSame([], $I->executeJS('return window.mauticScriptErrors;'));
     }
 
+    public function dwcEnhancementLoadsOnlyAllowedFocusEndpoints(\AcceptanceTester $I): void
+    {
+        $scriptUrl = $this->getMauticUrl($I).'/mautic-essential.js';
+        $this->loadScripts($I, [$scriptUrl]);
+
+        $loadedScripts = $I->executeJS(<<<'JS'
+var loadedScripts = [];
+var essentialScript = Array.from(document.scripts).filter(function (script) {
+    return script.src && new URL(script.src).pathname.endsWith('/mautic-essential.js');
+})[0];
+var essentialUrl = new URL(essentialScript.src);
+var mauticBaseUrl = essentialUrl.origin + essentialUrl.pathname.slice(0, -'/mautic-essential.js'.length);
+var content = [
+    '<script src="' + mauticBaseUrl + '/focus/1.js"></script>',
+    "<script src='" + mauticBaseUrl + "/focus/2.js'></script>",
+    '<script src="focus/4.js"></script>',
+    '<script src="' + mauticBaseUrl + '/focus/3/tracking.js"></script>',
+    '<script src="' + mauticBaseUrl + '/focus/9/display.js"></script>',
+    '<script src="' + mauticBaseUrl + '/focus/0.js"></script>',
+    '<script src="' + mauticBaseUrl + '/load?next=/focus/5.js"></script>',
+    '<script src="https://tracker.example/focus/6.js"></script>',
+    '<script src="https://tracker.example/load?next=/focus/7.js"></script>',
+    '<script data-src="' + mauticBaseUrl + '/focus/8.js"></script>',
+    '<script src="http://["></script>',
+    '<script src="' + mauticBaseUrl + '/other.js"></script>'
+].join('');
+MauticJS.initializeForms = function () {};
+MauticJS.insertScript = function (url) {
+    loadedScripts.push(url);
+};
+
+MauticJS.enhanceDynamicContent(content);
+var beforeTracking = loadedScripts.slice();
+MauticJS.trackingEnabled = true;
+MauticJS.enhanceDynamicContent(content);
+
+return {
+    beforeTracking: beforeTracking,
+    afterTracking: loadedScripts.slice(beforeTracking.length)
+};
+JS);
+
+        $mauticBaseUrl = $this->getMauticUrl($I);
+        // The Focus script is the same before and after tracking, it loads its own tracking later
+        $expectedScripts = [
+            $mauticBaseUrl.'/focus/1.js',
+            $mauticBaseUrl.'/focus/2.js',
+            $mauticBaseUrl.'/focus/4.js',
+        ];
+        $I->assertSame($expectedScripts, $loadedScripts['beforeTracking']);
+        $I->assertSame($expectedScripts, $loadedScripts['afterTracking']);
+    }
+
     public function essentialThenTrackingRequestsDwcOnce(\AcceptanceTester $I): void
     {
         // After consent (essential + tracking loaded together), DWC fallback should
@@ -476,7 +529,7 @@ JS);
         if (null === $this->corsConfigParameters) {
             $parameters = [];
             if ($this->corsConfigExisted) {
-                include_once $configPath;
+                include $configPath;
             }
             $this->corsConfigParameters = $parameters;
         }
