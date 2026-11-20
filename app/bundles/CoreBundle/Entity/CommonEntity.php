@@ -51,6 +51,8 @@ abstract class CommonEntity implements \Stringable
 
     /**
      * @param string $prop
+     *
+     * @return void
      */
     protected function isChanged($prop, mixed $val)
     {
