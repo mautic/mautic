@@ -142,9 +142,10 @@ final class ContactExportSchedulerModel extends AbstractCommonModel
         $resultsCallback = fn (array $contact) => $contact;
         $iterator        = new IteratorExportDataModel(
             $this->leadModel,
-            ['fieldValuesOnly' => true, 'withStage' => true, 'resolveMergedContacts' => false] + $data,
+            $data,
             $resultsCallback,
-            true
+            true,
+            $this->leadModel->getExportRows(...)
         );
         /** @var \DateTimeImmutable $scheduledDateTime */
         $scheduledDateTime = $contactExportScheduler->getScheduledDateTime();

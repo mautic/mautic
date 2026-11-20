@@ -60,4 +60,24 @@ final class ContactExportLimitFunctionalTest extends MauticMysqlTestCase
             (string) $responseData['flashes']
         );
     }
+
+    public function testExportWithinLimitCountsOnlySelectedContacts(): void
+    {
+        $this->loadFixtures([LoadLeadData::class]);
+
+        $contactModel = self::getContainer()->get(LeadModel::class);
+        Assert::assertInstanceOf(LeadModel::class, $contactModel);
+        $ids = [];
+        for ($i = 0; $i < 2; ++$i) {
+            $contact = new Lead();
+            $contact->setFirstname("Selected{$i}");
+            $contact->setEmail("selected{$i}@test.com");
+            $contactModel->saveEntity($contact);
+            $ids[] = $contact->getId();
+        }
+
+        $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=csv&ids='.urlencode(json_encode($ids)));
+
+        self::assertResponseIsSuccessful();
+    }
 }

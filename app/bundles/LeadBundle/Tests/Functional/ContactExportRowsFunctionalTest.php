@@ -27,7 +27,7 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
     }
 
-    public function testFieldValueRowsMatchProfileFields(): void
+    public function testExportRowsMatchProfileFieldsFollowedByStage(): void
     {
         $this->createColourField();
         $stage = $this->createStage('Lead', true);
@@ -39,39 +39,35 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
         $leadModel = $this->getLeadModel();
         $expected  = [];
         foreach ($leadModel->getEntities($args)['results'] as $id => $lead) {
-            $expected[$id] = ['id' => (int) $lead->getId()] + $lead->getProfileFields();
+            $expected[$id] = ['id' => (int) $lead->getId()] + $lead->getProfileFields() + ['stage' => $lead->getStage()?->getName()];
         }
         $this->em->clear();
 
-        $rows = $leadModel->getEntities(['fieldValuesOnly' => true] + $args)['results'];
+        $rows = $leadModel->getExportRows($args);
 
         $this->assertSame($expected, $rows);
         $this->assertSame('r', $rows[$ada->getId()]['favourite_colour'], 'Raw value is exported, not the list label.');
     }
 
-    public function testStageIsTheLastColumnForEveryRowShape(): void
+    public function testExportRowsEndWithTheStageNameWhetherOrNotItIsPublished(): void
     {
         $published   = $this->createContact('Ada', null, $this->createStage('Published', true));
         $unpublished = $this->createContact('Bob', null, $this->createStage('Unpublished', false));
         $none        = $this->createContact('Cat', null, null);
         $this->em->clear();
 
-        $args          = ['fieldValuesOnly' => true, 'withStage' => true] + $this->argsFor([$published->getId(), $unpublished->getId(), $none->getId()]);
-        $withCount     = $this->getLeadModel()->getEntities($args)['results'];
-        $withoutCount  = $this->getLeadModel()->getEntities(['withTotalCount' => false] + $args);
+        $rows = $this->getLeadModel()->getExportRows($this->argsFor([$published->getId(), $unpublished->getId(), $none->getId()]));
 
-        foreach ([$withCount, $withoutCount] as $rows) {
-            $this->assertSame(
-                [$published->getId() => 'Published', $unpublished->getId() => 'Unpublished', $none->getId() => null],
-                array_map(fn (array $row): mixed => $row['stage'], $rows)
-            );
-            foreach ($rows as $row) {
-                $this->assertSame('stage', array_key_last($row));
-            }
+        $this->assertSame(
+            [$published->getId() => 'Published', $unpublished->getId() => 'Unpublished', $none->getId() => null],
+            array_map(fn (array $row): mixed => $row['stage'], $rows)
+        );
+        foreach ($rows as $row) {
+            $this->assertSame('stage', array_key_last($row));
         }
     }
 
-    public function testContactEntitiesResolveMergedAwayIdsUnlessOptedOut(): void
+    public function testContactEntitiesResolveMergedAwayIds(): void
     {
         $survivor = $this->createContact('Ada', null, null);
         $oldId    = $this->createMergeRecord($survivor);
@@ -80,8 +76,17 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
         $entities = $this->getLeadModel()->getEntities($args);
         $this->assertSame([$survivor->getId()], array_keys($entities));
         $this->assertSame($oldId, $entities[$survivor->getId()]->getPreviousId());
+    }
 
-        $this->assertSame([], $this->getLeadModel()->getEntities(['resolveMergedContacts' => false] + $args));
+    public function testExportRowsAndCountIncludeOnlyStoredContacts(): void
+    {
+        $stored   = $this->createContact('Ada', null, null);
+        $survivor = $this->createContact('Bob', null, null);
+        $oldId    = $this->createMergeRecord($survivor);
+        $args     = $this->argsFor([$stored->getId(), $oldId]);
+
+        $this->assertSame([$stored->getId()], array_keys($this->getLeadModel()->getExportRows($args)));
+        $this->assertSame(1, $this->getLeadModel()->getExportCount($args));
     }
 
     public function testScheduledExportSkipsMergedAwayContactIds(): void

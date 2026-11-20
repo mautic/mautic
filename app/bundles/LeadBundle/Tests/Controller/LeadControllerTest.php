@@ -1328,12 +1328,9 @@ EMAIL;
         $this->assertNotNull($auditLog);
         $this->assertArrayHasKey('args', $auditLog->getDetails(), json_encode($auditLog, JSON_PRETTY_PRINT));
         $this->assertSame([
-            'fieldValuesOnly'       => true,
-            'withStage'             => true,
-            'resolveMergedContacts' => false,
-            'start'                 => 0,
-            'limit'                 => 200,
-            'filter'                => [
+            'start'  => 0,
+            'limit'  => 200,
+            'filter' => [
                 'string' => '',
                 'force'  => ' !is:anonymous',
             ],

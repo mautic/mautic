@@ -489,14 +489,13 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         );
 
         $contactCount = isset($contacts['results']) ? count($contacts['results']) : count($contacts);
-        if ($contactCount && (!empty($args['withPrimaryCompany']) || !empty($args['withChannelRules']) || !empty($args['withStage']))) {
+        if ($contactCount && (!empty($args['withPrimaryCompany']) || !empty($args['withChannelRules']))) {
             $withTotalCount = (array_key_exists('withTotalCount', $args) && $args['withTotalCount']);
             /** @var Lead[] $tmpContacts */
             $tmpContacts = ($withTotalCount) ? $contacts['results'] : $contacts;
 
             $withCompanies   = !empty($args['withPrimaryCompany']);
             $withPreferences = !empty($args['withChannelRules']);
-            $withStage       = !empty($args['withStage']);
             $contactIds      = array_keys($tmpContacts);
 
             if ($withCompanies) {
@@ -506,10 +505,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             if ($withPreferences) {
                 $frequencyRules = $this->frequencyRuleRepository->getFrequencyRules(null, $contactIds);
                 $dncRules = $this->doNotContactRepository->getChannelList(null, $contactIds);
-            }
-
-            if ($withStage) {
-                $stageNames = $this->getStageNamesForContacts($contactIds);
             }
 
             foreach ($contactIds as $id) {
@@ -546,11 +541,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         $tmpContacts[$id]->setChannelRules($channelRules);
                     }
                 }
-
-                // Lead entities already carry their stage
-                if ($withStage && is_array($tmpContacts[$id])) {
-                    $tmpContacts[$id]['stage'] = $stageNames[$id] ?? null;
-                }
             }
 
             if ($withTotalCount) {
@@ -561,6 +551,36 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         return $contacts;
+    }
+
+    /**
+     * Stored contacts as export rows: id, field values in profile-field order, then stage name.
+     *
+     * @param mixed[] $args
+     *
+     * @return array<int, array<string, mixed>> keyed by contact id
+     */
+    public function getExportRows(array $args): array
+    {
+        $rows = $this->getFieldValueRowsWithCustomFields('lead', $args);
+        if (!$rows) {
+            return [];
+        }
+
+        $stageNames = $this->getStageNamesForContacts(array_keys($rows));
+        foreach ($rows as $id => $row) {
+            $rows[$id]['stage'] = $stageNames[$id] ?? null;
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param mixed[] $args
+     */
+    public function getExportCount(array $args): int
+    {
+        return $this->getCountWithCustomFields('lead', $args);
     }
 
     /**

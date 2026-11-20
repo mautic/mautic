@@ -327,14 +327,9 @@ class LeadModel extends FormModel
      */
     public function getEntities(array $args = [])
     {
-        $entities = parent::getEntities($args);
-        // Callers that page through an id list must pass resolveMergedContacts => false, as each page would re-add the merged contacts.
-        if (!($args['resolveMergedContacts'] ?? true)) {
-            return $entities;
-        }
-
+        $entities   = parent::getEntities($args);
         $contactIds = $this->getContactIdsFromArgs($args);
-        $counter    = count($contactIds);
+        $counter = count($contactIds);
         for ($i = 0; $i < $counter; ++$i) {
             $contactId = (int) $contactIds[$i];
             if (empty($entities[$contactId])) {
@@ -343,17 +338,6 @@ class LeadModel extends FormModel
 
                     if (isset($entities[$entity->getId()])) {
                         // The entity is already in the array, so skip the field hydration.
-                        continue;
-                    }
-
-                    if (!empty($args['fieldValuesOnly'])) {
-                        // Same row shape as the rest of the results
-                        $mergedRows = $this->getRepository()->getEntities([
-                            'filter'          => ['force' => [['column' => 'l.id', 'expr' => 'eq', 'value' => $entity->getId()]]],
-                            'fieldValuesOnly' => true,
-                            'withStage'       => !empty($args['withStage']),
-                        ]);
-                        $entities = array_slice($entities, $i, 0, true) + $mergedRows + $entities;
                         continue;
                     }
 
@@ -368,6 +352,34 @@ class LeadModel extends FormModel
         }
 
         return $entities;
+    }
+
+    /**
+     * Stored contacts matching the filter, orderBy and start/limit args as plain export rows; merged-away ids are not resolved.
+     *
+     * @param array<mixed> $args
+     *
+     * @return array<int, array<string, mixed>> keyed by contact id
+     */
+    public function getExportRows(array $args): array
+    {
+        $repository = $this->getRepository();
+        $repository->setCurrentUser($this->userHelper->getUser());
+
+        return $repository->getExportRows($args);
+    }
+
+    /**
+     * Number of stored contacts matching the filter args; merged-away ids are not resolved.
+     *
+     * @param array<mixed> $args
+     */
+    public function getExportCount(array $args): int
+    {
+        $repository = $this->getRepository();
+        $repository->setCurrentUser($this->userHelper->getUser());
+
+        return $repository->getExportCount($args);
     }
 
     /**

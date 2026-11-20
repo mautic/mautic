@@ -66,6 +66,27 @@ final class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(3, $this->iteratorExportDataModel->getTotal());
     }
 
+    public function testFetcherSuppliesEachPageInPlaceOfGetEntities(): void
+    {
+        $this->commonModel->expects($this->never())->method('getEntities');
+        $this->commonModel->method('getRepository')->willReturn($this->createStub(CommonRepository::class));
+
+        $requestedStarts = [];
+        $fetcher         = function (array $args) use (&$requestedStarts): array {
+            $requestedStarts[] = $args['start'];
+
+            return match ($args['start']) {
+                0       => [1 => ['id' => 1], 2 => ['id' => 2]],
+                default => [],
+            };
+        };
+
+        $iterator = new IteratorExportDataModel($this->commonModel, ['limit' => 1000], fn ($row) => $row, false, $fetcher);
+
+        $this->assertSame([['id' => '1'], ['id' => '2']], iterator_to_array($iterator, false));
+        $this->assertSame([0, 2], $requestedStarts);
+    }
+
     public function testWorkflowWithoutItems(): void
     {
         $this->commonModel->expects($this->once())

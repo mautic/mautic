@@ -20,8 +20,14 @@ class IteratorExportDataModel implements \Iterator
     private int $totalResult = 0;
 
     /**
-     * @param AbstractCommonModel<T> $model
-     * @param array<mixed>           $args
+     * @var (callable(array<mixed>): mixed[])|null
+     */
+    private $fetcher;
+
+    /**
+     * @param AbstractCommonModel<T>                 $model
+     * @param array<mixed>                           $args
+     * @param (callable(array<mixed>): mixed[])|null $fetcher returns the items for one page of args; defaults to the model's getEntities() results
      *
      * @template T of object
      */
@@ -30,8 +36,10 @@ class IteratorExportDataModel implements \Iterator
         private readonly array $args,
         callable $callback,
         private readonly bool $skipOrdering = false,
+        ?callable $fetcher = null,
     ) {
         $this->callback     = $callback;
+        $this->fetcher      = $fetcher;
     }
 
     /**
@@ -113,7 +121,8 @@ class IteratorExportDataModel implements \Iterator
             $this->model,
             $this->args,
             $this->callback,
-            $this->skipOrdering
+            $this->skipOrdering,
+            $this->fetcher
         );
         $this->totalResult = $this->data ? count($this->data) : 0;
         $this->total += $this->totalResult;
