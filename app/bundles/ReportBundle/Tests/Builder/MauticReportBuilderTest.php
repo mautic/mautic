@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Event\ReportFilterConditionEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\RelativeDateHelper;
 use Mautic\ReportBundle\ReportEvents;
@@ -722,6 +723,103 @@ final class MauticReportBuilderTest extends TestCase
         $condition = $builder->getTagCondition($filter);
 
         $this->assertSame('l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 0, 2))', $condition);
+    }
+
+    public function testFilterConditionFromListenerReplacesDefaultConditionAndKeepsGlue(): void
+    {
+        $report = $this->buildReportWithFilters([
+            $this->buildFilter('a.isPublished', 'eq', '1'),
+            $this->buildFilter('x.custom', 'in', '3', 'or'),
+            $this->buildFilter('a.name', 'contains', 'John'),
+        ]);
+        $customDefinition = $this->buildFilterDefinition('Custom', 'select', 'custom');
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(
+            ReportFilterConditionEvent::class,
+            function (ReportFilterConditionEvent $event) use ($report, $customDefinition): void {
+                if ('x.custom' !== $event->getFilter()['column']) {
+                    return;
+                }
+
+                $this->assertSame($report, $event->getReport());
+                $this->assertSame($customDefinition, $event->getFilterDefinition());
+                $event->setCondition('a.id IN (SELECT custom_id FROM custom_xref)');
+            }
+        );
+
+        $query = (new MauticReportBuilder($dispatcher, $this->connection, $report, $this->channelListHelper))->getQuery([
+            'columns' => ['a.someField' => []],
+            'filters' => $this->buildPublishedAndNameFilterDefinitions() + ['x.custom' => $customDefinition],
+        ]);
+
+        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+            SELECT `a`.`someField` WHERE (a.isPublished = :i0caisPublished) OR ((a.id IN (SELECT custom_id FROM custom_xref)) AND (a.name LIKE :i2caname))
+        ')), $query->getSql());
+    }
+
+    public function testFilterConditionEventWithoutConditionKeepsDefaultCondition(): void
+    {
+        $report = $this->buildReportWithFilters([
+            $this->buildFilter('a.name', 'contains', 'John'),
+        ]);
+
+        $dispatched = 0;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(
+            ReportFilterConditionEvent::class,
+            function () use (&$dispatched): void {
+                ++$dispatched;
+            }
+        );
+
+        $query = (new MauticReportBuilder($dispatcher, $this->connection, $report, $this->channelListHelper))->getQuery([
+            'columns' => ['a.someField' => []],
+            'filters' => $this->buildPublishedAndNameFilterDefinitions(),
+        ]);
+
+        $this->assertSame(1, $dispatched);
+        $this->assertSame('SELECT `a`.`someField` WHERE a.name LIKE :i0caname', $query->getSql());
+    }
+
+    /**
+     * @param string[] $value
+     */
+    #[DataProvider('builtInFilterColumnProvider')]
+    public function testFilterConditionFromListenerOverridesBuiltInFilter(string $column, array $value): void
+    {
+        $report = $this->buildReportWithFilters([
+            [
+                'column'    => $column,
+                'glue'      => 'and',
+                'value'     => $value,
+                'condition' => 'in',
+            ],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(
+            ReportFilterConditionEvent::class,
+            function (ReportFilterConditionEvent $event): void {
+                $event->setCondition('l.id IN (SELECT custom_id FROM custom_xref)');
+            }
+        );
+
+        $query = (new MauticReportBuilder($dispatcher, $this->connection, $report, $this->channelListHelper))->getQuery([
+            'columns' => ['a.someField' => []],
+            'filters' => [$column => $this->buildFilterDefinition('Built-in', 'multiselect', $column)],
+        ]);
+
+        $this->assertSame('SELECT `a`.`someField` WHERE l.id IN (SELECT custom_id FROM custom_xref)', $query->getSql());
+    }
+
+    /**
+     * @return iterable<string, array{string, string[]}>
+     */
+    public static function builtInFilterColumnProvider(): iterable
+    {
+        yield 'tag' => ['tag', ['1']];
+        yield 'dnc_preferences' => ['dnc_preferences', ['email:1']];
     }
 
     private function buildBuilder(Report $report): MauticReportBuilder
