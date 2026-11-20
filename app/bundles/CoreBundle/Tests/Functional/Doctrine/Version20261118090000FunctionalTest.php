@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\Doctrine;
 
+use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -62,11 +63,7 @@ final class Version20261118090000FunctionalTest extends MauticMysqlTestCase
         $this->assertSame(['theme' => 'dark'], Serializer::decode((string) $savedPreferences));
         $this->assertTrue($schema->getTable($this->tableName)->getColumn('preferences')->getNotnull());
 
-        try {
-            $this->connection->insert($this->tableName, ['id' => 3, 'preferences' => null]);
-            $this->fail('The migrated column must reject NULL preferences.');
-        } catch (\Throwable $exception) {
-            $this->assertNotEmpty($exception->getMessage());
-        }
+        $this->expectException(NotNullConstraintViolationException::class);
+        $this->connection->insert($this->tableName, ['id' => 3, 'preferences' => null]);
     }
 }
