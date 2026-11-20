@@ -378,7 +378,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
             }
         }
 
-        return $reflection->invokeArgs($this, $pass);
+        return $reflection->invokeArgs($reflection->isStatic() ? null : $this, $pass);
     }
 
     /**

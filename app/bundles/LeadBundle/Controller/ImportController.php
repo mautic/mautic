@@ -322,7 +322,10 @@ final class ImportController extends FormController
 
                                 $fileData->move($importDir, $fileName);
 
-                                $file = new \SplFileObject($fullPath);
+                                $file = fopen($fullPath, 'r');
+                                if (false === $file) {
+                                    throw new \RuntimeException("Cannot open {$fullPath}.");
+                                }
 
                                 $config = $form->getData();
                                 unset($config['file']);
@@ -339,11 +342,14 @@ final class ImportController extends FormController
                                 $this->requestStack->getSession()->set('mautic.'.$object.'.import.config', $config);
 
                                 // Get the headers for matching
-                                $headers = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+                                $headers = fgetcsv($file, null, $config['delimiter'], $config['enclosure'], $config['escape']);
 
                                 // Get the number of lines so we can track progress
-                                $file->seek(PHP_INT_MAX);
-                                $linecount = $file->key();
+                                $linecount = 0;
+                                while (false !== fgets($file)) {
+                                    ++$linecount;
+                                }
+                                fclose($file);
 
                                 if (!empty($headers) && is_array($headers)) {
                                     $headers = CsvHelper::sanitizeHeaders($headers);
