@@ -29,7 +29,8 @@ class SendSchedule
 
         $transformer = new ArrayStringTransformer();
         $report      = $scheduler->getReport();
-        $emails      = $transformer->reverseTransform($report->getToAddress());
+        $data        = $scheduler->getData();
+        $emails      =  $data['email_to_send_report'] ?? $transformer->reverseTransform($report->getToAddress());
         $subject     = $this->messageSchedule->getSubject($report);
         $message     = $this->messageSchedule->getMessageForAttachedFile($report);
 
@@ -56,7 +57,7 @@ class SendSchedule
         $this->mailer->setSubject($subject);
         $this->mailer->setBody($message);
         $this->mailer->parsePlainText($message);
-        $this->mailer->send(true);
+        $this->mailer->send(false);
 
         // Attachment file removal will be done in \Mautic\MessengerBundle\MessageHandler\RemoveReportAttachmentHandler
     }
