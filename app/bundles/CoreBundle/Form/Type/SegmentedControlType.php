@@ -27,17 +27,9 @@ final class SegmentedControlType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'size'        => 'md',
-            'equal_width' => false,
-            'draggable'   => true,
-            'duration'    => null,
-            'icons'       => [],
+            'draggable' => true,
         ]);
-        $resolver->setAllowedValues('size', ['sm', 'md', 'lg']);
-        $resolver->setAllowedTypes('equal_width', 'bool');
         $resolver->setAllowedTypes('draggable', 'bool');
-        $resolver->setAllowedTypes('duration', ['null', 'int', 'float']);
-        $resolver->setAllowedTypes('icons', 'array');
     }
 
     /**
@@ -46,11 +38,7 @@ final class SegmentedControlType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['segmented_control'] = [
-            'size'       => $options['size'],
-            'equalWidth' => $options['equal_width'],
-            'draggable'  => $options['draggable'],
-            'duration'   => $options['duration'],
-            'icons'      => $options['icons'],
+            'draggable' => $options['draggable'],
         ];
     }
 }
