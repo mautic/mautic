@@ -15,8 +15,8 @@ final class CheckboxComponentTest extends TestCase
 
     protected function setUp(): void
     {
-        $loader = new FilesystemLoader(dirname(__DIR__, 2).'/Resources/views');
-        $loader->addPath(dirname(__DIR__, 2).'/Resources/views', 'MauticCore');
+        $loader = new FilesystemLoader(dirname(__DIR__, 4).'/bundles/CoreBundle/Resources/views');
+        $loader->addPath(dirname(__DIR__, 4).'/bundles/CoreBundle/Resources/views', 'MauticCore');
         $this->twig = new Environment($loader);
         $this->twig->addFilter(new TwigFilter('trans', static fn (string $value): string => $value));
         $this->twig->addFilter(new TwigFilter('purify', static fn (string $value): string => $value, ['is_safe' => ['html']]));
@@ -24,7 +24,7 @@ final class CheckboxComponentTest extends TestCase
 
     public function testLoginCheckboxDoesNotInheritRequiredState(): void
     {
-        $template = file_get_contents(dirname(__DIR__, 3).'/UserBundle/Resources/views/Security/login.html.twig');
+        $template = file_get_contents(dirname(__DIR__, 4).'/bundles/UserBundle/Resources/views/Security/login.html.twig');
         $this->assertNotFalse($template);
         $this->assertSame(1, preg_match("/{% include '@MauticCore\/Components\/checkbox.html.twig'.*?%}/s", $template, $matches));
 

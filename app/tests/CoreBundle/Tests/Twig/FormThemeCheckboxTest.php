@@ -26,7 +26,7 @@ final class FormThemeCheckboxTest extends TestCase
 {
     public function testRequiredChoiceGroupAndCheckboxRequiredStateAreRenderedCorrectly(): void
     {
-        $views  = dirname(__DIR__, 2).'/Resources/views';
+        $views  = dirname(__DIR__, 4).'/bundles/CoreBundle/Resources/views';
         $loader = new FilesystemLoader([dirname(__DIR__, 5).'/vendor/symfony/twig-bridge/Resources/views/Form']);
         $loader->addPath($views, 'MauticCore');
         $twig = new Environment(new ChainLoader([

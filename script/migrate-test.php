@@ -237,6 +237,22 @@ $testFixes = [
     'app/tests/CoreBundle/Tests/Twig/ConfirmTemplateTest.php' => [
         ["dirname(__DIR__, 2).'/Resources/views'", "dirname(__DIR__, 4).'/bundles/CoreBundle/Resources/views'"],
     ],
+    'app/tests/CoreBundle/Tests/Twig/CheckboxComponentTest.php' => [
+        ["dirname(__DIR__, 2).'/Resources/views'", "dirname(__DIR__, 4).'/bundles/CoreBundle/Resources/views'"],
+        ["dirname(__DIR__, 3).'/UserBundle/Resources/views/Security/login.html.twig'", "dirname(__DIR__, 4).'/bundles/UserBundle/Resources/views/Security/login.html.twig'"],
+    ],
+    'app/tests/CoreBundle/Tests/Twig/FormThemeCheckboxTest.php' => [
+        ["dirname(__DIR__, 2).'/Resources/views'", "dirname(__DIR__, 4).'/bundles/CoreBundle/Resources/views'"],
+    ],
+    'app/tests/CoreBundle/Tests/Twig/ListQuickFiltersTemplateTest.php' => [
+        ["dirname(__DIR__, 2).'/Resources/views'", "dirname(__DIR__, 4).'/bundles/CoreBundle/Resources/views'"],
+    ],
+    'app/tests/CoreBundle/Tests/Unit/Twig/BootstrapMarkupTest.php' => [
+        ["__DIR__.'/../../../Resources/views'", "dirname(__DIR__, 5).'/bundles/CoreBundle/Resources/views'"],
+    ],
+    'app/tests/CoreBundle/Tests/Unit/Twig/Helper/ReadyToSendPublishStatusIconTest.php' => [
+        ["__DIR__.'/../../../../Resources/views/Helper'", "dirname(__DIR__, 6).'/bundles/CoreBundle/Resources/views/Helper'"],
+    ],
     'app/tests/EmailBundle/Tests/Unit/Twig/TimelineEventTemplateTest.php' => [
         ["dirname(__DIR__, 3).'/Resources/views/SubscribedEvents/Timeline'", "dirname(__DIR__, 5).'/bundles/EmailBundle/Resources/views/SubscribedEvents/Timeline'"],
     ],

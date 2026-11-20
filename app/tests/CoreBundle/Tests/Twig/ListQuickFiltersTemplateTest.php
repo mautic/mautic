@@ -15,7 +15,7 @@ final class ListQuickFiltersTemplateTest extends TestCase
 
     protected function setUp(): void
     {
-        $loader = new FilesystemLoader(dirname(__DIR__, 2).'/Resources/views');
+        $loader = new FilesystemLoader(dirname(__DIR__, 4).'/bundles/CoreBundle/Resources/views');
         $this->twig = new Environment($loader);
 
         $this->twig->addFilter(new TwigFilter('trans', static fn (string $value): string => $value));
