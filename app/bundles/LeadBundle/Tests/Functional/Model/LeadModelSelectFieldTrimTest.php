@@ -11,7 +11,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

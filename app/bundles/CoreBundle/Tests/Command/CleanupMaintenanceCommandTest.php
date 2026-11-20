@@ -9,7 +9,9 @@ use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

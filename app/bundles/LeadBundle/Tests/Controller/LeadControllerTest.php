@@ -41,6 +41,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\Group('non-parallel')]
 final class LeadControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
