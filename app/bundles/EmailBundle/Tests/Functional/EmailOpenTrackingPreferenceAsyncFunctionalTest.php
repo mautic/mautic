@@ -62,6 +62,19 @@ final class EmailOpenTrackingPreferenceAsyncFunctionalTest extends MauticMysqlTe
         $this->assertOpenNotRecorded($stat);
     }
 
+    public function testOpenOfAnEmailWithTrackingOffIsNotQueuedOrRecorded(): void
+    {
+        [, $stat] = $this->createSentEmail('queued-email-off@example.com', false);
+
+        $this->openEmail($stat);
+
+        $this->assertCount(0, $this->getHitTransport()->getSent(), 'nothing about the open of an email with tracking off is queued');
+
+        $this->consumeQueuedHits();
+
+        $this->assertOpenNotRecorded($stat);
+    }
+
     public function testQueuedOpenIsRecordedForAContactWhoAllowsTracking(): void
     {
         [, $stat] = $this->createSentEmail('queued-allowed@example.com');
@@ -77,7 +90,7 @@ final class EmailOpenTrackingPreferenceAsyncFunctionalTest extends MauticMysqlTe
     /**
      * @return array{Lead, Stat}
      */
-    private function createSentEmail(string $address): array
+    private function createSentEmail(string $address, bool $emailTrackingEnabled = true): array
     {
         $contact = new Lead();
         $contact->setEmail($address);
@@ -88,6 +101,7 @@ final class EmailOpenTrackingPreferenceAsyncFunctionalTest extends MauticMysqlTe
         $email->setSubject('Queued tracking preference');
         $email->setEmailType('template');
         $email->setIsPublished(true);
+        $email->setTrackingEnabled($emailTrackingEnabled);
         $this->em->persist($email);
 
         $stat = new Stat();

@@ -138,7 +138,7 @@ final class EmailApiController extends CommonApiController
      * Sends the email to a specific lead.
      *
      * @param int $id     Email ID
-     * @param int $leadId Lead ID
+     * @param int $leadId
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -247,9 +247,16 @@ final class EmailApiController extends CommonApiController
             unset($parameters['sendToDnc']);
         }
 
-        if (Request::METHOD_PUT === $method && !array_key_exists('sendToDnc', $parameters)) {
-            // use default value, in case of PUT method it does not use default value if entity is already exist and tried to call setter method with null value.
-            $parameters['sendToDnc'] = false;
+        if (Request::METHOD_PUT === $method) {
+            // use default values, in case of PUT method it does not use default value if entity is already exist and tried to call setter method with null value.
+            if (!array_key_exists('sendToDnc', $parameters)) {
+                $parameters['sendToDnc'] = false;
+            }
+
+            if (!array_key_exists('trackingEnabled', $parameters)) {
+                // A PUT that leaves the option out keeps the email's choice, so an update can't turn tracking back on by accident
+                $parameters['trackingEnabled'] = $entity->getId() ? $entity->getTrackingEnabled() : true;
+            }
         }
 
         if (Request::METHOD_PATCH === $method && !array_key_exists('dynamicContent', $parameters)) {
