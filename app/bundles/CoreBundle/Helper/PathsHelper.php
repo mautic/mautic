@@ -252,8 +252,14 @@ class PathsHelper
             $rootPath = $this->paths['root'];
         }
 
-        if ($path !== $rootPath && !str_starts_with($path, $rootPath.'/')) {
-            return $rootPath.'/'.$path;
+        $rootPath = rtrim($rootPath, '/');
+        if ('' === $rootPath) {
+            $rootPath = '/';
+        }
+
+        $rootPathPrefix = '/' === $rootPath ? $rootPath : $rootPath.'/';
+        if ($path !== $rootPath && !str_starts_with($path, $rootPathPrefix)) {
+            return $rootPathPrefix.$path;
         }
 
         return $path;

@@ -77,7 +77,7 @@ final class PathsHelperTest extends TestCase
     {
         $pathsProperty = new \ReflectionProperty(PathsHelper::class, 'paths');
         $paths         = $pathsProperty->getValue($this->helper);
-        $paths['images_root'] = __DIR__.'/resource/paths/public-images';
+        $paths['images_root'] = __DIR__.'/resource/paths/public-images/';
         $pathsProperty->setValue($this->helper, $paths);
 
         $this->assertSame(
@@ -104,11 +104,22 @@ final class PathsHelperTest extends TestCase
     {
         $pathsProperty = new \ReflectionProperty(PathsHelper::class, 'paths');
         $paths         = $pathsProperty->getValue($this->helper);
-        $paths['translations_root'] = '/configured-root';
+        $paths['translations_root'] = '/configured-root/';
         $paths['translations']      = '/configured-root/translations';
         $pathsProperty->setValue($this->helper, $paths);
 
         $this->assertSame('/configured-root/translations', $this->helper->getTranslationsPath());
+    }
+
+    public function testFilesystemRootPrefixesRelativePath(): void
+    {
+        $pathsProperty = new \ReflectionProperty(PathsHelper::class, 'paths');
+        $paths         = $pathsProperty->getValue($this->helper);
+        $paths['translations_root'] = '/';
+        $paths['translations']      = 'translations';
+        $pathsProperty->setValue($this->helper, $paths);
+
+        $this->assertSame('/translations', $this->helper->getTranslationsPath());
     }
 
     public function testPathMatchingConfiguredRootExactlyIsUnchanged(): void
