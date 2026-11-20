@@ -1261,8 +1261,9 @@ class MailHelper
 
     /**
      * Detect an MJML root opening tag, including attribute-bearing forms like
-     * <mjml lang="en">. Used by MailHelper::setEmail() to decide whether the
-     * theme fallback output is uncompiled MJML that must not be sent.
+     * <mjml lang="en">. Shared by MailHelper::setEmail() (send-time fallback
+     * check) and EmailModel::validateMjmlThemeHasCustomHtml() (save-time
+     * validation) so the two gates can never diverge on what counts as MJML.
      */
     public static function hasMjmlRootTag(string $html): bool
     {
