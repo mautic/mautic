@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Doctrine;
 
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\Migrations\Version20261118090000;
 use Psr\Log\NullLogger;
@@ -57,8 +58,8 @@ final class Version20261118090000FunctionalTest extends MauticMysqlTestCase
         $nullPreferences  = $this->connection->fetchOne("SELECT preferences FROM {$this->tableName} WHERE id = 1");
         $savedPreferences = $this->connection->fetchOne("SELECT preferences FROM {$this->tableName} WHERE id = 2");
 
-        $this->assertSame([], unserialize((string) $nullPreferences, ['allowed_classes' => false]));
-        $this->assertSame(['theme' => 'dark'], unserialize((string) $savedPreferences, ['allowed_classes' => false]));
+        $this->assertSame([], Serializer::decode((string) $nullPreferences));
+        $this->assertSame(['theme' => 'dark'], Serializer::decode((string) $savedPreferences));
         $this->assertTrue($schema->getTable($this->tableName)->getColumn('preferences')->getNotnull());
 
         try {
