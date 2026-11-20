@@ -259,7 +259,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function cloneStandard(Request $request, $objectId)
     {
-        $model  = $this->getFormModel();
+        $model  = $this->getModel($this->getModelName());
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
@@ -540,7 +540,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function getFormEntity(string $action, &$objectId = null, bool &$isClone = false)
     {
-        $model = $this->getFormModel();
+        $model = $this->getModel($this->getModelName());
 
         switch ($action) {
             case 'new':
@@ -580,7 +580,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
-        $items = $this->getFormModel()->getEntities(
+        $items = $this->getModel($this->getModelName())->getEntities(
             array_merge(
                 [
                     'start'      => $start,
@@ -623,7 +623,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function getPermissionBase()
     {
-        return $this->getFormModel()->getPermissionBase();
+        return $this->getModel($this->getModelName())->getPermissionBase();
     }
 
     /**
@@ -858,7 +858,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
         $filter = ['string' => $search, 'force' => []];
 
-        $model = $this->getFormModel();
+        $model = $this->getModel($this->getModelName());
         $repo  = $model->getRepository();
 
         if (!$permissions[$this->getPermissionBase().':viewother']) {
@@ -1066,7 +1066,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function viewStandard(Request $request, $objectId, $logObject = null, $logBundle = null, $listPage = null, string $itemName = 'item')
     {
-        $model    = $this->getFormModel();
+        $model    = $this->getModel($this->getModelName());
         $entity   = $model->getEntity($objectId);
 
         if (null === $entity) {
