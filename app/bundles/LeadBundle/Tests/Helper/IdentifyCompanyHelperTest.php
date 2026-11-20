@@ -29,9 +29,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $reflection                 = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method                     = $reflection->getMethod('findCompany');
-        [$resultCompany, $entities] = $method->invokeArgs(null, [$company, $model]);
+        [$resultCompany, $entities] = IdentifyCompanyHelper::findCompany($company, $model);
 
         $this->assertEquals($expected, $resultCompany);
     }
@@ -58,9 +56,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $reflection                 = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method                     = $reflection->getMethod('findCompany');
-        [$resultCompany, $entities] = $method->invokeArgs(null, [$company, $model]);
+        [$resultCompany, $entities] = IdentifyCompanyHelper::findCompany($company, $model);
 
         $this->assertEquals($expected, $resultCompany);
     }
@@ -89,9 +85,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $reflection                 = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method                     = $reflection->getMethod('findCompany');
-        [$resultCompany, $entities] = $method->invokeArgs(null, [$company, $model]);
+        [$resultCompany, $entities] = IdentifyCompanyHelper::findCompany($company, $model);
 
         $this->assertEquals($expected, $resultCompany);
     }
