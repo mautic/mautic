@@ -913,8 +913,8 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         }
 
         $this->em->clear();
-        $this->assertNull($this->em->getRepository(Email::class)->findOneBy(['name' => 'Batch valid email']));
-        $this->assertNull($this->em->getRepository(Email::class)->findOneBy(['name' => 'Batch uncompiled MJML email']));
+        $this->assertNotInstanceOf(Email::class, $this->em->getRepository(Email::class)->findOneBy(['name' => 'Batch valid email']));
+        $this->assertNotInstanceOf(Email::class, $this->em->getRepository(Email::class)->findOneBy(['name' => 'Batch uncompiled MJML email']));
     }
 
     private function sendEmail(Email $email, Lead $contact): void

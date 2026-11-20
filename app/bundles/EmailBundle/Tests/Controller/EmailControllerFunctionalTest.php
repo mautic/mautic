@@ -1354,10 +1354,11 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Provide HTML or plain-text content', (string) $response->getContent());
     }
 
-    public function testSaveAllowsPublishedEmailWithThemeOnlyBody(): void
+    public function testSaveRejectsPublishedEmailWithUncompiledMjmlTheme(): void
     {
-        // Compatibility: an active email whose body comes entirely from a
-        // rendered theme must keep saving — the theme supplies the HTML.
+        // An active email whose body would come entirely from an MJML theme
+        // has no compiled HTML and no plain text: the theme only supplies raw
+        // <mjml> markup, so the model save boundary must reject it.
         $payload = [
             'name'        => 'Theme-only body email',
             'subject'     => 'Test subject',
@@ -1371,10 +1372,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
         $response = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
-        $content = json_decode($response->getContent(), true);
-        $this->assertArrayHasKey('email', $content);
-        $this->assertSame('blank', $content['email']['template']);
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode(), $response->getContent());
+        $this->assertStringContainsString('MJML', (string) $response->getContent());
     }
 
     public function testSaveAllowsInactiveDraftWithoutAnyBody(): void
