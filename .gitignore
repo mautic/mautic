@@ -108,7 +108,6 @@ phpstan.neon.dist
 /plugins/*
 !/plugins/GrapesJsBuilderBundle
 !/plugins/MauticCloudStorageBundle
-!/plugins/MauticCrmBundle
 !/plugins/MauticDynamicsBundle
 !/plugins/MauticEmailMarketingBundle
 !/plugins/MauticFocusBundle

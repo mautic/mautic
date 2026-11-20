@@ -16,11 +16,6 @@
             "target": "git@github.com:mautic/plugin-cloudstorage.git"
         },
         {
-            "name": "MauticCrmBundle",
-            "directory": "plugins/MauticCrmBundle",
-            "target": "git@github.com:mautic/plugin-crm.git"
-        },
-        {
             "name": "MauticEmailMarketingBundle",
             "directory": "plugins/MauticEmailMarketingBundle",
             "target": "git@github.com:mautic/plugin-emailmarketing.git"

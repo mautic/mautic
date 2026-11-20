@@ -12,14 +12,11 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\Plugin;
-use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
-use Mautic\PluginBundle\PluginEvents;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -61,31 +58,14 @@ final class ConfigFormTest extends KernelTestCase
 
     public function testOauth(): void
     {
-        $connectWiseHeader = ['appcookie' => 'rookie'];
-        self::getContainer()->get(EventDispatcherInterface::class)->addListener(
-            PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_DECRYPT,
-            function (PluginIntegrationKeyEvent $event) use ($connectWiseHeader): PluginIntegrationKeyEvent {
-                $event->setKeys($connectWiseHeader);
-
-                return $event;
-            }
-        );
-
         $plugins    = $this->getIntegrationObject()->getIntegrationObjects();
         $url        = 'https://test.com';
         $parameters = ['a' => 'testa', 'b' => 'testb'];
         $method     = 'GET';
         $authType   = 'oauth2';
 
-        $expected                = [];
-        $expected['Connectwise'] = $this->getOauthData('', ['clientId' => $connectWiseHeader['appcookie']]);
-        $expected['Twilio']      = $this->getOauthData('');
-        $expected['Vtiger']      = $this->getOauthData('sessionName');
-        $expected['Dynamics']    = $this->getOauthData('access_token');
-        $expected['Salesforce']  = $this->getOauthData('access_token');
-        $expected['Sugarcrm']    = $this->getOauthData('access_token');
-        $expected['Zoho']        = $this->getOauthData('access_token');
-        $expected['Hubspot']     = $this->getOauthData('hapikey');
+        $expected           = [];
+        $expected['Twilio'] = $this->getOauthData('');
 
         foreach ($plugins as $index => $integration) {
             if (!$integration instanceof AbstractIntegration) {
@@ -156,7 +136,7 @@ final class ConfigFormTest extends KernelTestCase
                     'result_cache'   => new ResultCacheOptions(Plugin::CACHE_NAMESPACE),
                 ]
             )->willReturn([
-                'MauticCrmBundle' => ['id' => 1],
+                'MauticEmailMarketingBundle' => ['id' => 1],
             ]);
 
         return new IntegrationHelper(

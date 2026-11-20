@@ -270,11 +270,6 @@ parameters:
             identifier: classConstant.deprecatedClass
             message: '#class\s+Mautic#'
 
-        # child class generic
-        -
-            message: '#Call to an undefined method TApiHelper of MauticPlugin\\MauticCrmBundle\\Api\\CrmApi::getLeads\(\)#'
-            path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
         -
             identifier: mautic.noTablePrefixDefinitionInTests
             path: app/bundles/CoreBundle/Test/EventListener/MaintenanceSubscriberTest.php

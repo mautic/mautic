@@ -33,7 +33,6 @@
     "mautic/core-lib": "*",
     "mautic/grapes-js-builder-bundle": "*",
     "mautic/plugin-cloudstorage": "*",
-    "mautic/plugin-crm": "*",
     "mautic/plugin-emailmarketing": "*",
     "mautic/plugin-focus": "*",
     "mautic/plugin-fullcontact": "*",
