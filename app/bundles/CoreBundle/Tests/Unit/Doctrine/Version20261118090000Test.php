@@ -20,6 +20,7 @@ final class Version20261118090000Test extends TestCase
         $connection = $this->createStub(Connection::class);
         $connection->method('createSchemaManager')->willReturn($this->createStub(AbstractSchemaManager::class));
         $connection->method('getDatabasePlatform')->willReturn(new MySQLPlatform());
+        $connection->method('fetchFirstColumn')->willReturn([1, 2]);
 
         $migration = new Version20261118090000($connection, new NullLogger());
         $migration->setPrefix('');
@@ -30,7 +31,7 @@ final class Version20261118090000Test extends TestCase
         $migration->up($schema);
 
         $this->assertSame(
-            "UPDATE users SET preferences = 'a:0:{}' WHERE preferences IS NULL",
+            "UPDATE users SET preferences = 'a:0:{}' WHERE id BETWEEN 1 AND 2 AND preferences IS NULL",
             $migration->getSql()[0]->getStatement()
         );
         $this->assertTrue($table->getColumn('preferences')->getNotnull());
