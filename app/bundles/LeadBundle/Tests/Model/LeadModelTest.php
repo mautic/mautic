@@ -215,26 +215,36 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->companyModelMock->method('getCompanyLeadRepository')->willReturn($this->companyLeadRepositoryMock);
     }
 
-    public function testModifyTagsReattachesExistingDetachedTag(): void
+    public function testModifyTagsReattachesExistingDetachedTagAcrossImportBatches(): void
     {
-        $lead        = new Lead();
+        $firstLead   = new Lead();
+        $secondLead  = new Lead();
         $detachedTag = new Tag('import-tag');
-        $managedTag  = new Tag('import-tag');
+        $firstManagedTag  = new Tag('import-tag');
+        $secondManagedTag = new Tag('import-tag');
 
         ReflectionHelper::setValue($detachedTag, 'id', 123);
-        ReflectionHelper::setValue($managedTag, 'id', 123);
+        ReflectionHelper::setValue($firstManagedTag, 'id', 123);
+        ReflectionHelper::setValue($secondManagedTag, 'id', 123);
 
-        $this->tagRepositoryMock->expects($this->once())
+        $this->tagRepositoryMock->expects($this->exactly(2))
             ->method('getTagsByName')
             ->with(['import-tag'])
-            ->willReturn(['import-tag' => $detachedTag]);
-        $this->entityManagerMock->expects($this->once())
+            ->willReturnOnConsecutiveCalls(
+                ['import-tag' => $detachedTag],
+                ['import-tag' => $detachedTag],
+            );
+        $this->entityManagerMock->expects($this->exactly(2))
             ->method('getReference')
             ->with(Tag::class, 123)
-            ->willReturn($managedTag);
+            ->willReturnOnConsecutiveCalls($firstManagedTag, $secondManagedTag);
 
-        $this->assertTrue($this->leadModel->modifyTags($lead, ['import-tag'], null, false));
-        $this->assertTrue($lead->getTags()->contains($managedTag));
+        // The same tag can be returned detached again when the importer starts
+        // the next batch after clearing the EntityManager.
+        $this->assertTrue($this->leadModel->modifyTags($firstLead, ['import-tag'], null, false));
+        $this->assertTrue($this->leadModel->modifyTags($secondLead, ['import-tag'], null, false));
+        $this->assertTrue($firstLead->getTags()->contains($firstManagedTag));
+        $this->assertTrue($secondLead->getTags()->contains($secondManagedTag));
     }
 
     public function testIpLookupDoesNotAddCompanyIfConfiguredSo(): void
