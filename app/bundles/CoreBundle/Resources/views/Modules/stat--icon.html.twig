@@ -3,17 +3,17 @@
     <div class="col-xs-12 col-lg-3">
         {% set tileContent %}
             <div class="d-flex flex-column justify-content-between {% if stats|length == 4 %}as-2-1{% endif %} flex-grow-1">
-                <span class="text-secondary mb-24 ellipsis">
+                <span class="text-secondary mb-24 text-truncate d-block">
                     {{ stat.title|trans }}
                     {% if stat.tooltip is defined %}
                         <i class="ri-information-line ms-3" data-bs-toggle="tooltip" title="{{ stat.tooltip|trans }}"></i>
                     {% endif %}
                 </span>
                 {% if stat.desc is defined %}
-                    <span class="text-secondary small mb-12 ellipsis">{{ stat.desc|trans }}</span>
+                    <span class="text-secondary small mb-12 text-truncate d-block">{{ stat.desc|trans }}</span>
                 {% endif %}
                 <span class="d-flex lh-1 align-items-center justify-content-between fs-40">
-                    <div class="fw-b {% if stat.link is defined and stat.value != 0 and stat.value != '0%' %}text-interactive{% endif %}" {% if stat.value_attr is defined %}{{ stat.value_attr|raw }}{% endif %}>{% if stat.value == 0 or stat.value == '0%' %}--{% else %}{{ stat.value|raw }}{% endif %}</div>
+                    <div class="fw-bold {% if stat.link is defined and stat.value != 0 and stat.value != '0%' %}text-interactive{% endif %}" {% if stat.value_attr is defined %}{{ stat.value_attr|raw }}{% endif %}>{% if stat.value == 0 or stat.value == '0%' %}--{% else %}{{ stat.value|raw }}{% endif %}</div>
                     {% if stat.icon is defined and stat.icon and (stat.link is not defined or stat.value == 0) %}
                         <i class="{{ stat.icon }} fs-22" aria-hidden="true"></i>
                     {% endif %}

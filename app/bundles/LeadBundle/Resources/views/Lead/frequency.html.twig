@@ -37,7 +37,7 @@
                             } only %}
                     </th>
                     <td class="col-md-1" style="vertical-align: top">
-                        <div id="is-contactable-{{ channel.value }}" class="{% if not isContactable %}text-secondary{% endif %} fw-sb">
+                        <div id="is-contactable-{{ channel.value }}" class="{% if not isContactable %}text-secondary{% endif %} fw-semibold">
                             {{ getChannelLabel(channel.value) }}
                         </div>
                     </td>
@@ -68,7 +68,7 @@
                         <div id="frequency_{{ channel.value }}"
                              class="{% if isHidden %}hide{% endif %}">
                             <div>
-                                <label class="text-secondary fw-n">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
+                                <label class="text-secondary fw-normal">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
                             </div>
                             <div>
                                 {{ form_widget(form['lead_channels']['contact_pause_start_date_' ~ channel.value]) }}

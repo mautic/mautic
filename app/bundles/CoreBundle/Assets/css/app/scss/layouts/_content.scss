@@ -34,35 +34,9 @@
   > .content-body {
     width: 100%;
     float: left;
-
-    // container
-    // -------------------------
-    .container-fluid {
-      &.container-xs {
-        padding-left: 5px;
-        padding-right: 5px;
-      }
-      &.container-sm {
-        padding-left: 10px;
-        padding-right: 10px;
-      }
-      &.container-md {
-        padding-left: 15px;
-        padding-right: 15px;
-      }
-      &.container-lg {
-        padding-left: 20px;
-        padding-right: 20px;
-      }
-    }
   }
   &.content-only {
     width: 100%;
-    .page-header {
-      padding-top: 30px;
-      padding-left: 30px;
-      margin: -15px -15px 0 -15px;
-    }
     &.container {
       padding-left: 0;
       padding-right: 0;

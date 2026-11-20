@@ -15,10 +15,10 @@
 
     {% if event['eventType'] == 'decision' %}
     <div class="campaign-event-content flex-nowrap gap-5 align-items-center flex-row d-flex flex-grow-1 p-16">
-        <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.when'|trans }}</span>
+        <span class="h5 fw-bold event-type-color">{{ 'mautic.campaign.when'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
         {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
-        <span class="campaign-event-name label label-info ms-5 me-24 ellipsis">{{ idString ~ event['name'] }}</span>
+        <span class="campaign-event-name label label-info ms-5 me-24 text-truncate d-block">{{ idString ~ event['name'] }}</span>
         <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ms-auto campaign-event-icon event-type-color"></i>
     </div>
 
@@ -28,16 +28,16 @@
             <div class="d-flex flex-column align-items-start">
                 <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
                 {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
-                <span class="campaign-event-name ellipsis">{{ idString ~ event['name'] }}</span>
+                <span class="campaign-event-name text-truncate d-block">{{ idString ~ event['name'] }}</span>
             </div>
         </div>
 
     {% elseif event['eventType'] == 'condition' %}
     <div class="campaign-event-content flex-nowrap gap-5 align-items-center flex-row d-flex flex-grow-1 p-16">
-        <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.if'|trans }}</span>
+        <span class="h5 fw-bold event-type-color">{{ 'mautic.campaign.if'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
             {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
-            <span class="campaign-event-name label label-warning ms-5 me-24 ellipsis">{{ idString ~ event['name'] }}</span>
+            <span class="campaign-event-name label label-warning ms-5 me-24 text-truncate d-block">{{ idString ~ event['name'] }}</span>
         <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ms-auto campaign-event-icon event-type-color"></i>
     </div>
     {% endif %}

@@ -559,6 +559,27 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
     `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
 
+- Custom typography classes removed in favour of Bootstrap 5 utilities. The `.text-success`, `.text-warning`, `.text-danger` colours and the remaining `.fs-*` sizes now come from the Bootstrap `$utilities` maps in `_bootstrap.scss`, so those class names still work. `.text-danger` now uses the theme error text colour (`--text-error`) instead of a fixed red, and links with `.text-danger`, `.text-success`, `.text-warning` or `.text-white` no longer darken on hover.
+    | Removed class | Replacement |
+    |---|---|
+    | `.fw-b` | `.fw-bold` |
+    | `.fw-sb` | `.fw-semibold` |
+    | `.fw-n` | `.fw-normal` |
+    | `.fw-t` | `.fw-light` |
+    | `.tt-u` | `.text-uppercase` |
+    | `.ellipsis` | `.text-truncate` + `.d-block` |
+    | `.text-help` | `.text-helper` + `.type-helper-text-01` |
+    | `.text-white.dark-*` | `.text-secondary`. The colour is not identical: the old classes darkened white. |
+    | `.text-twitter`, `.text-facebook`, `.text-google` | No replacement. The `$brand-twitter`, `$brand-facebook` and `$brand-google` SCSS variables were removed too. |
+    | `.container-fluid.container-xs`, `.container-fluid.container-sm`, `.container-fluid.container-md`, `.container-fluid.container-lg` | Bootstrap `.px-*` utilities. Only the Mautic padding override of 5, 10, 15 and 20px inside the content body was removed; Bootstrap's own `.container-sm`, `.container-md` and `.container-lg` still exist. The spacing scale has no 10, 15 or 20px, so pick the closest step. |
+    | `.fs-1`, `.fs-2`, `.fs-3`, `.fs-4`, `.fs-5`, `.fs-6`, `.fs-8`, `.fs-11`, `.fs-24`, `.fs-26`, `.fs-28`, `.fs-32`, `.fs-34`, `.fs-36`, `.fs-38`, `.fs-44`, `.fs-48`, `.fs-50`, `.fs-52`, `.fs-54`, `.fs-56`, `.fs-base`, `.fs-b-p`, `.fs-u-e`, `.fs-u-p` | No replacement. Remaining sizes: `.fs-10`, `.fs-12`, `.fs-14`, `.fs-16`, `.fs-18`, `.fs-20`, `.fs-22`, `.fs-30`, `.fs-40`, `.fs-42`, `.fs-46` and `.fs-b-e`. |
+
+    The `.light-xs`, `.dark-xs`, `.dark-sm`, `.dark-md` and `.dark-lg` modifiers of `.text-white`, `.text-success`, `.text-warning` and `.text-danger`, and the `text-emphasis-variants` SCSS mixin, were removed.
+
+    The Mautic `.page-header` rules in `_type.scss` (15px padding, top margin, no bottom border), their `.container` and `.container-xs` to `.container-lg` negative-margin resets, the `.content-only .page-header` override and the `.blockquote-reverse` rule were removed. The Bootstrap 3 compatibility stylesheet still defines `.page-header` (bottom margin and 1px bottom border) and `.blockquote-reverse` (right padding and 5px right border), so those now apply. Add your own spacing classes where the old page header spacing is needed.
+
+    The `$blockquote-small-color`, `$blockquote-font-size`, `$blockquote-border-color` and `$page-header-border-color` SCSS variables were removed from `_bootstrap-mautic-custom-variables.scss`. The compatibility stylesheet now supplies `!default` fallbacks, with fixed grey values instead of the theme tokens `var(--text-secondary)` and `var(--border-no-color)`.
+
 - Custom background colour classes removed. Bootstrap's `.bg-*` utilities now apply, with the Carbon colours for `.bg-primary`, `.bg-success`, `.bg-info`, `.bg-warning` and `.bg-danger`. The removed classes also forced the text colour, so add a text utility where the text must stay readable. The `bg-color` SCSS mixin and `app/bundles/CoreBundle/Assets/css/app/scss/components/_colors.scss` (with its `@import` in `app/bundles/CoreBundle/Assets/css/app.scss`) were removed.
     | Removed class | Bootstrap 5 replacement |
     |---|---|

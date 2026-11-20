@@ -848,14 +848,6 @@ $text-muted:                  $gray-light;
 $abbr-border-color:           $gray-light;
 //** Headings small color
 $headings-small-color:        var(--text-secondary);
-//** Blockquote small color
-$blockquote-small-color:      var(--text-secondary);
-//** Blockquote font size
-$blockquote-font-size:        ($font-size-base * 1.25);
-//** Blockquote border color
-$blockquote-border-color:     var(--border-no-color);
-//** Page header border color
-$page-header-border-color:    $gray-lighter;
 //** Width of horizontal description list titles
 $dl-horizontal-offset:        $component-offset-horizontal;
 //** Point at which .dl-horizontal becomes horizontal
