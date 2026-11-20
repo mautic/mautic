@@ -15,7 +15,7 @@ final class ReadyToSendPublishStatusIconTest extends TestCase
 {
     public function testReadyToSendStatusRendersActiveToggle(): void
     {
-        $loader = new FilesystemLoader(__DIR__.'/../../../../Resources/views/Helper');
+        $loader = new FilesystemLoader(dirname(__DIR__, 6).'/bundles/CoreBundle/Resources/views/Helper');
         $twig   = new Environment($loader);
         $twig->addExtension(new TranslationExtension());
         $twig->addFilter(new TwigFilter('parse_str', static fn (string $query): array => []));

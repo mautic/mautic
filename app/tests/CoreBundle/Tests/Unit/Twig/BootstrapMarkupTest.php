@@ -25,7 +25,7 @@ final class BootstrapMarkupTest extends TestCase
 
     protected function setUp(): void
     {
-        $loader = new FilesystemLoader(__DIR__.'/../../../Resources/views');
+        $loader = new FilesystemLoader(dirname(__DIR__, 5).'/bundles/CoreBundle/Resources/views');
         $loader->addPath(dirname(new \ReflectionClass(FormExtension::class)->getFileName(), 2).'/Resources/views/Form');
         $this->twig = new Environment($loader, ['autoescape' => 'html']);
         $this->twig->addExtension(new TranslationExtension());
