@@ -1556,6 +1556,8 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `LeadBundle\Controller\FrequencyRuleTrait` | `getFrequencyRuleForm()` (`&$viewParameters`) | `array` |
     | `LeadBundle\Controller\Api\CustomFieldsApiControllerTrait` | `setCustomFieldValues()` (`$parameters`) | `array` |
 
+- The constructor of `Mautic\PluginBundle\Helper\oAuthHelper` now requires `Mautic\PluginBundle\Integration\AbstractIntegration` instead of `Mautic\PluginBundle\Integration\UnifiedIntegrationInterface` for `$integration`. The helper calls methods that only `AbstractIntegration` provides, so an integration that only implements the interface could not use it. Pass an `AbstractIntegration` instance.
+
 - Methods in `Mautic\PluginBundle\Integration\AbstractIntegration` and `MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration` that documented `@return array` now declare a native `array` return type. Most third-party integrations extend one of these classes, so if yours overrides one of the methods below, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with AbstractIntegration::method(): array":
 
     | Class | Methods |
