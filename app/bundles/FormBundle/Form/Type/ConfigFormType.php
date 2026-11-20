@@ -99,7 +99,6 @@ final class ConfigFormType extends AbstractType
                 'label'             => 'mautic.form.config.form.successful_submit_action',
                 'required'          => true,
                 'attr'              => [
-                    'class'   => 'form-control',
                     'tooltip' => 'mautic.form.config.form.successful_submit_action.tooltip',
                 ],
             ]
