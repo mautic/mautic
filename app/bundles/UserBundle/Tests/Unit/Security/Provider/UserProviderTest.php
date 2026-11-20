@@ -55,6 +55,28 @@ final class UserProviderTest extends TestCase
         $this->assertSame($user, $savedEvent->getEntity());
     }
 
+    public function testPostSaveListenerSeesChangesReadByPreSaveListener(): void
+    {
+        $hasher = $this->createStub(UserPasswordHasherInterface::class);
+        $hasher->method('hashPassword')->willReturn('hashed-password');
+        $dispatcher = new EventDispatcher();
+        $preSaveChanges = null;
+        $dispatcher->addListener(EntityPreSave::class, static function (EntityPreSave $event) use (&$preSaveChanges): void {
+            $preSaveChanges = $event->getChanges();
+        });
+        $postSaveChanges = null;
+        $dispatcher->addListener(EntityPostSave::class, static function (EntityPostSave $event) use (&$postSaveChanges): void {
+            $postSaveChanges = $event->getChanges();
+        });
+
+        $provider = new UserProvider($this->createStub(UserRepository::class), $this->createStub(PermissionRepository::class), $dispatcher, $hasher, $this->createStub(TranslatorInterface::class));
+        $provider->createUser($this->newUser());
+
+        $this->assertIsArray($preSaveChanges);
+        $this->assertNotEmpty($preSaveChanges);
+        $this->assertSame($preSaveChanges, $postSaveChanges);
+    }
+
     public function testCreateUserStillValidatesRequiredFields(): void
     {
         $repository = $this->createMock(UserRepository::class);
