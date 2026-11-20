@@ -141,8 +141,10 @@ final readonly class UserProvider implements UserProviderInterface
             );
         }
 
+        $preSaveEvent = null;
         if ($this->dispatcher->hasListeners(EntityPreSave::class)) {
-            $this->dispatcher->dispatch(new EntityPreSave($user, $isNew));
+            $preSaveEvent = new EntityPreSave($user, $isNew);
+            $this->dispatcher->dispatch($preSaveEvent);
         }
 
         if ($createOnly) {
@@ -152,7 +154,12 @@ final readonly class UserProvider implements UserProviderInterface
         }
 
         if ($this->dispatcher->hasListeners(EntityPostSave::class)) {
-            $this->dispatcher->dispatch(new EntityPostSave($user, $isNew));
+            $postSaveEvent = new EntityPostSave($user, $isNew);
+            if ($preSaveEvent instanceof EntityPreSave) {
+                $postSaveEvent->inheritStateFrom($preSaveEvent);
+            }
+
+            $this->dispatcher->dispatch($postSaveEvent);
         }
 
         return $user;
