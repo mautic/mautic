@@ -20,10 +20,7 @@ final class ColumnSchemaHelper
      */
     private readonly AbstractSchemaManager $sm;
 
-    /**
-     * @var string
-     */
-    private $tableName;
+    private ?string $tableName = null;
 
     private ?Table $fromTable = null;
 
@@ -43,7 +40,7 @@ final class ColumnSchemaHelper
      *
      * @throws SchemaException
      */
-    public function setName($table, bool $addPrefix = true): static
+    public function setName(string $table, bool $addPrefix = true): static
     {
         $this->tableName = ($addPrefix) ? $this->prefix.$table : $table;
 

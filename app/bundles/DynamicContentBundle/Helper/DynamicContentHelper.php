@@ -172,12 +172,9 @@ final readonly class DynamicContentHelper
     }
 
     /**
-     * @param string $slotName
-     * @param bool   $publishedOnly
-     *
      * @return array|Paginator
      */
-    public function getDwcsBySlotName($slotName, $publishedOnly = false): iterable
+    public function getDwcsBySlotName(string $slotName, bool $publishedOnly = false): iterable
     {
         $filter = [
             'where' => [

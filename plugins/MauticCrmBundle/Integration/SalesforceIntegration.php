@@ -3055,7 +3055,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param Lead $lead
      */
-    public function getLeadDoNotContactByDate($channel, $matchedFields, $object, $lead, $sfData, $params = [])
+    public function getLeadDoNotContactByDate($channel, $matchedFields, $object, $lead, $sfData, array $params = [])
     {
         if (isset($matchedFields['mauticContactIsContactableByEmail']) && $this->updateDncByDate()) {
             $matchedFields['internal_entity_id']    = $lead->getId();

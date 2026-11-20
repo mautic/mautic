@@ -435,7 +435,7 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
     /**
      * Add and/or delete lead sources from a campaign.
      */
-    public function setLeadSources(Campaign $entity, $addedSources, $deletedSources): void
+    public function setLeadSources(Campaign $entity, $addedSources, array $deletedSources): void
     {
         foreach ($addedSources as $type => $sources) {
             foreach ($sources as $id => $label) {

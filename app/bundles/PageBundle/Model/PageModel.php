@@ -918,7 +918,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * Get bar chart data of hits.
      */
-    public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], bool $canViewOthers = true): array
+    public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
 

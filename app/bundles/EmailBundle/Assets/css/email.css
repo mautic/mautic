@@ -1,16 +1,10 @@
 /* EmailBundle */
 
-.col-email-id {
-    width: 75px;
-}
+.col-email-id { width: 75px; }
 
-.email-builder .builder-panel .panel-body {
-    padding: 5px 0;
-}
+.email-builder .builder-panel .panel-body { padding: 5px 0; }
 
-.table-bordered {
-	border-left: 0;
-}
+.table-bordered { border-left: 0; }
 
 .table-bordered.email-list > thead > tr > th:first-child, .table-bordered.email-list > tbody > tr > td:first-child,
 .table-bordered.email-template > thead > tr > th:first-child, .table-bordered.email-template > tbody > tr > td:first-child {
@@ -20,10 +14,6 @@
 .table-bordered.email-list > thead > tr > th:last-child, .table-bordered.email-list > tbody > tr > td:last-child,
 .table-bordered.email-template > thead > tr > th:last-child, .table-bordered.email-template > tbody > tr > td:last-child {
     border-right: 0px;
-}
-
-.email-filters {
-
 }
 
 .clickable-stat a { color: #fff; }
@@ -44,10 +34,6 @@
     scrollbar-width: thin; /* Firefox */
 }
 
-.abtest-sidebar-actions {
-    width: 100%;
-}
-
 .abtest-sidebar-actions > .btn,
 .abtest-sidebar-actions > .btn-group,
 .abtest-sidebar-actions > .btn + .btn,
@@ -57,19 +43,13 @@
     margin-left: 0;
 }
 
-.abtest-sidebar-actions .btn {
-    justify-content: flex-start;
-}
+.abtest-sidebar-actions .btn { justify-content: flex-start; }
 
 .abtest-sidebar-actions .btn-primary,
 .abtest-sidebar-actions .btn-tertiary {
     gap: var(--spacing-03);
 }
 
-.abtest-sidebar-actions .btn i {
-    order: 0;
-}
+.abtest-sidebar-actions .btn i { order: 0; }
 
-.abtest-sidebar-actions .btn span {
-    width: auto;
-}
+.abtest-sidebar-actions .btn span { width: auto; }

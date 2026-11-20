@@ -42,14 +42,14 @@ final class PageRepository extends CommonRepository implements ResettableVariant
     /**
      * @param string $alias
      */
-    public function checkPageUniqueAlias($alias, $ignoreIds = []): int
+    public function checkPageUniqueAlias($alias, array $ignoreIds = []): int
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as alias_count')
             ->where('e.alias = :alias');
         $q->setParameter('alias', $alias);
 
-        if (!empty($ignoreIds)) {
+        if ($ignoreIds !== []) {
             $q->andWhere(
                 $q->expr()->notIn('e.id', ':ignoreIds')
             )

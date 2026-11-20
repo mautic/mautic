@@ -778,7 +778,6 @@ final class ReportController extends AbstractFormController
 
     /**
      * @param int    $objectId
-     * @param string $format
      *
      * @throws \Exception
      */
@@ -788,7 +787,7 @@ final class ReportController extends AbstractFormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['format' => 'csv', 'objectId' => 0],
     )]
-    public function exportAction(Request $request, $objectId, $format = 'csv'): Response
+    public function exportAction(Request $request, $objectId, string $format = 'csv'): Response
     {
         $entity   = $this->reportModel->getEntity($objectId);
 
@@ -883,7 +882,6 @@ final class ReportController extends AbstractFormController
 
     /**
      * @param int    $reportId
-     * @param string $format
      *
      * @throws \Exception
      */
@@ -892,7 +890,7 @@ final class ReportController extends AbstractFormController
         name: 'mautic_report_download',
         defaults: ['format' => 'csv'],
     )]
-    public function downloadAction(FileHandler $fileHandler, $reportId, $format = 'csv'): Response|BinaryFileResponse
+    public function downloadAction(FileHandler $fileHandler, $reportId, string $format = 'csv'): Response|BinaryFileResponse
     {
         if ('csv' !== $format) {
             throw new \Exception($this->translator->trans('mautic.format.invalid', ['%format%' => $format, '%validFormats%' => 'csv']));
