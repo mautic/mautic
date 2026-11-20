@@ -20,7 +20,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<LeadNote>
  */
-final class NoteModel extends FormModel
+class NoteModel extends FormModel
 {
     public static function getName(): string
     {
