@@ -80,7 +80,7 @@ class Log
 
     public function setStatusCode(int|string $statusCode): static
     {
-        $this->statusCode = $statusCode;
+        $this->statusCode = (string) $statusCode;
 
         return $this;
     }
