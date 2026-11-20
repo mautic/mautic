@@ -6,6 +6,10 @@
 
 ## Removed code
 
+### Microsoft Outlook integration
+
+Mautic 8 removes the bundled Outlook integration (`mautic/plugin-outlook`). Before upgrading, uninstall the legacy Mautic add-in from Outlook and remove any explicit requirement for the package from your project’s `composer.json`. After upgrading, clear the application cache and run `bin/console mautic:plugins:reload` to mark the removed plugin as missing. Existing contact and email history is retained.
+
 ### Social media integrations
 
 `MauticSocialBundle` and the bundled `mautic/plugin-social` package have been removed. This removes the Facebook, Twitter/X, Instagram and Foursquare integrations, Social Monitoring, tweets, the `twitter.tweet` campaign action and the `plugin.loginSocial` form field. CRM integrations in `MauticCrmBundle` are unaffected, as are contact social-profile fields and social links in emails.
@@ -23,7 +27,6 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
 - `Mautic\CoreBundle\Entity\DateAddedTrait::addDateAddedField()` was removed (#17532). The trait now maps `$dateAdded` with a Doctrine column attribute. Remove calls to the helper from custom `loadMetadata()` methods and ensure the consuming entity has a class-level `#[ORM\Entity]` so the trait's attribute mapping is loaded. Verify that the `date_added` column remains mapped before applying schema changes.
 - `Mautic\PluginBundle\Model\IntegrationEntityModel::getRecordList()` was removed (#18066), with no replacement method. Callers that need its old result must build the mapping themselves from the integration's records: each record's `Id` was used as the array key and as the value of an inner `['id' => $record['Id']]` array.
-- `MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration` now extends `Mautic\IntegrationsBundle\Integration\BasicIntegration` instead of `Mautic\PluginBundle\Integration\AbstractIntegration` (#18135). Calls to `getAuthenticationType()`, `getRequiredKeyFields()`, `getFormNotes()` and inherited legacy `AbstractIntegration` methods are no longer available. Use the IntegrationsBundle interfaces and configuration support instead: `MauticPlugin\MauticOutlookBundle\Integration\Support\ConfigSupport` provides the configuration template and `OutlookKeysType` authentication form. Update code that requires Outlook to be an `AbstractIntegration`. The previous class was final, so this migration affects callers rather than existing subclasses.
 
 - Unused method `Mautic\ChannelBundle\Model\MessageModel::getMarketingMessagesEventLogs()` removed. It had no callers and failed when called, as it relied on a non-existing repository method. Use `Mautic\ChannelBundle\Model\MessageModel::getLeadStatsPost()` with an explicit date range to get chart data instead.
 - `Mautic\SmsBundle\Entity\Sms` no longer implements `Mautic\CoreBundle\Entity\VariantEntityInterface` nor uses `VariantEntityTrait`. SMS never stored variants (the `sms_messages` table has no variant columns), so the following methods were removed from `Sms` with no replacement: `Sms::addVariantChild()`, `Sms::removeVariantChild()`, `Sms::getVariantChildren()`, `Sms::setVariantParent()`, `Sms::getVariantParent()`, `Sms::removeVariantParent()`, `Sms::setVariantSettings()`, `Sms::getVariantSettings()`, `Sms::getVariantStartDate()`, `Sms::setVariantStartDate()`, `Sms::isVariant()`, `Sms::isParent()`, `Sms::hasVariants()`, `Sms::clearVariants()`, `Sms::getVariants()`, `Sms::getRelatedEntityIds()`, `Sms::clearVariantSettings()`, `Sms::isEnableAbTest()`, `Sms::getVariantsPendingCount()`, `Sms::getVariantEndDate()`.
