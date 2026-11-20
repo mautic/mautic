@@ -40,6 +40,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -125,12 +126,15 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $download->setUtmSource($request->get('utm_source'));
         $download->setUtmTerm($request->get('utm_term'));
 
+        // Denied (401) or missing (404) files weren't downloaded, so they don't count as downloads
+        $countsAsDownload = $code < Response::HTTP_BAD_REQUEST;
+
         // The asset tracks downloads and the request is trackable (includes IP, bot, privacy signal, and prefetch checks).
         // The asset goes first, since the trackability check looks up and stores the visitor's IP address.
         if (!$asset->getTrackDownloads() || !$this->ipLookupHelper->isRequestTrackable()) {
             // Still counted, but with nothing that links it to the visitor. Without an identifier it can't count as unique.
             // Bots, excluded IP addresses and prefetches aren't counted, privacy signals are.
-            if (empty($systemEntry) && $this->ipLookupHelper->isRequestCountable()) {
+            if ($countsAsDownload && empty($systemEntry) && $this->ipLookupHelper->isRequestCountable()) {
                 $this->upDownloadCount($asset, 1, false);
             }
 
@@ -252,9 +256,11 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $download->setTrackingId($trackingId);
 
         // Skip persisting download record when there is no tracking context
-        // (e.g. programmatic/API requests without a browser session).
+        // (e.g. programmatic/API requests without a browser session). Without an identifier it can't count as unique.
         if (null === $trackingId && empty($systemEntry)) {
-            $this->upDownloadCount($asset, 1, true);
+            if ($countsAsDownload) {
+                $this->upDownloadCount($asset, 1, false);
+            }
 
             return;
         }
@@ -262,7 +268,9 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         if (empty($systemEntry)) {
             $download->setAsset($asset);
 
-            $this->upDownloadCount($asset, 1, $isUnique);
+            if ($countsAsDownload) {
+                $this->upDownloadCount($asset, 1, $isUnique);
+            }
         }
 
         // check for existing IP
