@@ -39,8 +39,10 @@ abstract class ModeratedCommand extends Command
 
     private ?LockInterface $lock = null;
 
+    /** @var array<string, LockInterface> */
     private array $locks = [];
 
+    /** @var array<string, string> */
     private array $lockFiles = [];
 
     /** @var array<string, true> */
@@ -132,10 +134,11 @@ abstract class ModeratedCommand extends Command
      */
     protected function completeRun(): void
     {
-        foreach (array_reverse($this->locks) as $lock) {
+        $locks = $this->locks;
+        foreach (array_reverse($locks) as $lock) {
             $lock->release();
         }
-        if (null !== $this->lock && !in_array($this->lock, $this->locks, true)) {
+        if (null !== $this->lock && !in_array($this->lock, $locks, true)) {
             $this->lock->release();
         }
         $this->lock = null;
@@ -143,14 +146,15 @@ abstract class ModeratedCommand extends Command
         $this->heldKeys = [];
 
         // Attempt to keep things tidy
-        foreach ($this->lockFiles as $lockFile) {
+        $lockFiles = $this->lockFiles;
+        foreach ($lockFiles as $lockFile) {
             if (file_exists($lockFile)) {
                 unlink($lockFile);
             }
         }
         $this->lockFiles = [];
 
-        if ($this->lockFile && file_exists($this->lockFile)) {
+        if ($this->lockFile && !in_array($this->lockFile, $lockFiles, true) && file_exists($this->lockFile)) {
             unlink($this->lockFile);
         }
         $this->lockFile = null;
@@ -191,14 +195,48 @@ abstract class ModeratedCommand extends Command
         return true;
     }
 
+    /**
+     * Release additional locks after the protected unit of work has finished.
+     * The command-level lock remains held until the whole command exits.
+     *
+     * @param array<int, string> $moderationKeys
+     */
+    protected function releaseAdditionalRunLocks(array $moderationKeys): void
+    {
+        foreach (array_unique($moderationKeys) as $moderationKey) {
+            $fullKey = $this->getName().$moderationKey;
+            if (isset($this->locks[$fullKey])) {
+                $this->locks[$fullKey]->release();
+                unset($this->locks[$fullKey]);
+            }
+
+            if (isset($this->lockFiles[$fullKey])) {
+                $lockFile = $this->lockFiles[$fullKey];
+                if (file_exists($lockFile)) {
+                    unlink($lockFile);
+                }
+                unset($this->lockFiles[$fullKey]);
+                if ($lockFile === $this->lockFile) {
+                    $this->lockFile = null;
+                }
+            }
+
+            unset($this->heldKeys[$fullKey]);
+        }
+    }
+
     private function releaseLocksFrom(int $lockCount, int $lockFileCount): void
     {
         while (count($this->locks) > $lockCount) {
-            array_pop($this->locks)->release();
+            $key = array_key_last($this->locks);
+            $this->locks[$key]->release();
+            unset($this->locks[$key]);
         }
 
         while (count($this->lockFiles) > $lockFileCount) {
-            $lockFile = array_pop($this->lockFiles);
+            $key      = array_key_last($this->lockFiles);
+            $lockFile = $this->lockFiles[$key];
+            unset($this->lockFiles[$key]);
             if (file_exists($lockFile)) {
                 unlink($lockFile);
             }
@@ -256,7 +294,7 @@ abstract class ModeratedCommand extends Command
         flock($fp, LOCK_UN);
         fclose($fp);
         $this->lockFile = $lockFile;
-        $this->lockFiles[] = $lockFile;
+        $this->lockFiles[$moderationKey] = $lockFile;
 
         return true;
     }
@@ -283,7 +321,7 @@ abstract class ModeratedCommand extends Command
         }
 
         $this->lock = $lock;
-        $this->locks[] = $lock;
+        $this->locks[$moderationKey] = $lock;
 
         return true;
     }

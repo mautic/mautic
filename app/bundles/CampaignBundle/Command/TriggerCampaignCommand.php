@@ -231,8 +231,13 @@ final class TriggerCampaignCommand extends ModeratedCommand
                 $statusCode = ExitCode::SUCCESS;
                 $campaign = $this->campaignRepository->getEntity($id);
                 if ($campaign instanceof Campaign) {
-                    if ($this->checkCampaignEmailLocks($input, $output, $campaign)) {
-                        $this->triggerCampaign($campaign);
+                    $emailLockKeys = $this->getCampaignEmailLockKeys($campaign);
+                    if ($this->checkCampaignEmailLocks($input, $output, $emailLockKeys)) {
+                        try {
+                            $this->triggerCampaign($campaign);
+                        } finally {
+                            $this->releaseAdditionalRunLocks($emailLockKeys);
+                        }
                     }
                 } else {
                     $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
@@ -265,8 +270,13 @@ final class TriggerCampaignCommand extends ModeratedCommand
             $campaigns = $this->campaignRepository->getEntities($filter);
 
             foreach ($campaigns as $campaign) {
-                if ($this->checkCampaignEmailLocks($input, $output, $campaign)) {
-                    $this->triggerCampaign($campaign);
+                $emailLockKeys = $this->getCampaignEmailLockKeys($campaign);
+                if ($this->checkCampaignEmailLocks($input, $output, $emailLockKeys)) {
+                    try {
+                        $this->triggerCampaign($campaign);
+                    } finally {
+                        $this->releaseAdditionalRunLocks($emailLockKeys);
+                    }
                 }
                 if ($this->limiter->hasCampaignLimit()) {
                     $this->limiter->resetCampaignLimitRemaining();
@@ -283,10 +293,25 @@ final class TriggerCampaignCommand extends ModeratedCommand
         return $exitCode;
     }
 
-    private function checkCampaignEmailLocks(InputInterface $input, OutputInterface $output, Campaign $campaign): bool
+    /**
+     * @param array<int, string> $emailLockKeys
+     */
+    private function checkCampaignEmailLocks(InputInterface $input, OutputInterface $output, array $emailLockKeys): bool
+    {
+        if ([] === $emailLockKeys) {
+            return true;
+        }
+
+        return $this->checkAdditionalRunStatus($input, $output, $emailLockKeys);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getCampaignEmailLockKeys(Campaign $campaign): array
     {
         if (!$campaign->isPublished()) {
-            return true;
+            return [];
         }
 
         $emailIds = [];
@@ -307,9 +332,9 @@ final class TriggerCampaignCommand extends ModeratedCommand
         }
 
         // Mautic's duplicate-send rule is based on contact + marketing email,
-        // not on the segment. Lock the email for the whole trigger run so
-        // overlapping or different segments cannot race before email_stats is
-        // written. Different emails remain independently runnable.
+        // not on the segment. Lock the email while this campaign is executing
+        // so overlapping or different segments cannot race before email_stats
+        // is written. Different emails remain independently runnable.
         $moderationKeys = [];
         foreach (array_unique($emailIds) as $emailId) {
             $moderationKeys[] = sprintf('campaign-email-%d', $emailId);
@@ -317,11 +342,7 @@ final class TriggerCampaignCommand extends ModeratedCommand
 
         sort($moderationKeys);
 
-        return $this->checkAdditionalRunStatus(
-            $input,
-            $output,
-            $moderationKeys
-        );
+        return $moderationKeys;
     }
 
     /**

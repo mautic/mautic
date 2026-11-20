@@ -302,4 +302,61 @@ final class ModeratedCommandTest extends TestCase
         // Assert that the lock file is removed
         $this->assertFileDoesNotExist($this->lockFilePath);
     }
+
+    public function testAdditionalLockCanBeReusedAndIsReleasedWithTheRun(): void
+    {
+        $cacheDir = __DIR__.'/resource/cache/tmp';
+        $this->pathsHelper->method('getSystemPath')->with('cache')->willReturn($cacheDir);
+        $this->input->method('getOption')
+            ->willReturnCallback(
+                fn (string $name): string|false|null => match ($name) {
+                    'lock_mode'      => ModeratedCommand::MODE_FLOCK,
+                    'bypass-locking' => false,
+                    default          => null,
+                }
+            );
+
+        $this->assertTrue($this->fakeModeratedCommand->runWithKey($this->input, $this->output, '-main'));
+        $this->assertTrue($this->fakeModeratedCommand->checkAdditional($this->input, $this->output, ['campaign-email-1']));
+        $this->assertTrue($this->fakeModeratedCommand->checkAdditional($this->input, $this->output, ['campaign-email-1']));
+
+        $this->fakeModeratedCommand->forceCompleteRun();
+
+        $secondCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
+        $this->assertTrue($secondCommand->runWithKey($this->input, $this->output, '-other-main'));
+        $this->assertTrue($secondCommand->checkAdditional($this->input, $this->output, ['campaign-email-1']));
+        $secondCommand->forceCompleteRun();
+        rmdir($cacheDir.'/../run');
+    }
+
+    public function testAdditionalLockAcquisitionRollsBackWhenAFollowingKeyIsBusy(): void
+    {
+        $cacheDir = __DIR__.'/resource/cache/tmp';
+        $this->pathsHelper->method('getSystemPath')->with('cache')->willReturn($cacheDir);
+        $this->input->method('getOption')
+            ->willReturnCallback(
+                fn (string $name): string|false|null => match ($name) {
+                    'lock_mode'      => ModeratedCommand::MODE_FLOCK,
+                    'bypass-locking' => false,
+                    default          => null,
+                }
+            );
+
+        $firstCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
+        $secondCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
+        $this->assertTrue($firstCommand->runWithKey($this->input, $this->output, '-first-main'));
+        $this->assertTrue($firstCommand->checkAdditional($this->input, $this->output, ['campaign-email-2']));
+        $this->assertTrue($secondCommand->runWithKey($this->input, $this->output, '-second-main'));
+
+        $this->assertFalse($secondCommand->checkAdditional($this->input, $this->output, ['campaign-email-1', 'campaign-email-2']));
+
+        $thirdCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
+        $this->assertTrue($thirdCommand->runWithKey($this->input, $this->output, '-third-main'));
+        $this->assertTrue($thirdCommand->checkAdditional($this->input, $this->output, ['campaign-email-1']));
+
+        $thirdCommand->forceCompleteRun();
+        $secondCommand->forceCompleteRun();
+        $firstCommand->forceCompleteRun();
+        rmdir($cacheDir.'/../run');
+    }
 }
