@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\RedisStore;
 
@@ -36,7 +37,16 @@ abstract class ModeratedCommand extends Command
 
     protected $lockFile;
 
-    private ?\Symfony\Component\Lock\LockInterface $lock = null;
+    private ?LockInterface $lock = null;
+
+    /** @var array<string, LockInterface> */
+    private array $locks = [];
+
+    /** @var array<string, string> */
+    private array $lockFiles = [];
+
+    /** @var array<string, true> */
+    private array $heldKeys = [];
 
     /**
      * @var OutputInterface
@@ -110,7 +120,7 @@ abstract class ModeratedCommand extends Command
         }
 
         // Check if the command is currently running
-        if (!$this->checkStatus()) {
+        if (!$this->checkStatus($this->moderationKey)) {
             $output->writeln('<error>Script in progress. Can force execution by using --bypass-locking.</error>');
 
             return false;
@@ -124,45 +134,169 @@ abstract class ModeratedCommand extends Command
      */
     protected function completeRun(): void
     {
-        if ($this->lock) {
+        $locks = $this->locks;
+        foreach (array_reverse($locks) as $lock) {
+            $lock->release();
+        }
+        if (null !== $this->lock && !in_array($this->lock, $locks, true)) {
             $this->lock->release();
         }
+        $this->lock = null;
+        $this->locks = [];
+        $this->heldKeys = [];
 
         // Attempt to keep things tidy
-        if ($this->lockFile && file_exists($this->lockFile)) {
+        $lockFiles = $this->lockFiles;
+        foreach ($lockFiles as $lockFile) {
+            if (file_exists($lockFile)) {
+                unlink($lockFile);
+            }
+        }
+        $this->lockFiles = [];
+
+        if ($this->lockFile && !in_array($this->lockFile, $lockFiles, true) && file_exists($this->lockFile)) {
             unlink($this->lockFile);
         }
+        $this->lockFile = null;
     }
 
-    private function checkStatus(): bool
+    /**
+     * @param array<int, string> $moderationKeys
+     */
+    protected function checkAdditionalRunStatus(InputInterface $input, OutputInterface $output, array $moderationKeys): bool
     {
-        if (self::MODE_PID === $this->moderationMode && $this->isPidSupported()) {
-            return $this->checkPid();
+        if ((bool) $input->getOption('bypass-locking') || (bool) $input->getOption('force')) {
+            return true;
         }
 
-        return $this->checkFlock();
+        $lockCount     = count($this->locks);
+        $lockFileCount = count($this->lockFiles);
+        $newKeys = [];
+        foreach (array_unique($moderationKeys) as $moderationKey) {
+            $fullKey = $this->getName().$moderationKey;
+            if (isset($this->heldKeys[$fullKey])) {
+                continue;
+            }
+
+            if (!$this->checkStatus($fullKey, false)) {
+                $this->releaseLocksFrom($lockCount, $lockFileCount);
+                $output->writeln('<error>Script in progress. Can force execution by using --bypass-locking.</error>');
+
+                return false;
+            }
+
+            $newKeys[] = $fullKey;
+        }
+
+        foreach ($newKeys as $key) {
+            $this->heldKeys[$key] = true;
+        }
+
+        return true;
     }
 
-    private function checkPid(): bool
+    /**
+     * Release additional locks after the protected unit of work has finished.
+     * The command-level lock remains held until the whole command exits.
+     *
+     * @param array<int, string> $moderationKeys
+     */
+    protected function releaseAdditionalRunLocks(array $moderationKeys): void
     {
-        $this->lockFile = sprintf(
+        foreach (array_unique($moderationKeys) as $moderationKey) {
+            $fullKey = $this->getName().$moderationKey;
+            if (isset($this->locks[$fullKey])) {
+                $this->locks[$fullKey]->release();
+                unset($this->locks[$fullKey]);
+            }
+
+            if (isset($this->lockFiles[$fullKey])) {
+                $lockFile = $this->lockFiles[$fullKey];
+                if (file_exists($lockFile)) {
+                    unlink($lockFile);
+                }
+                unset($this->lockFiles[$fullKey]);
+                if ($lockFile === $this->lockFile) {
+                    $this->lockFile = null;
+                }
+            }
+
+            unset($this->heldKeys[$fullKey]);
+        }
+    }
+
+    /**
+     * Refresh expiring locks while a long-running command is processing work.
+     * File locks are unaffected; Redis-backed locks renew their lease here.
+     */
+    protected function refreshRunLocks(): void
+    {
+        $locks = $this->locks;
+        if (null !== $this->lock && !in_array($this->lock, $locks, true)) {
+            $locks[] = $this->lock;
+        }
+
+        foreach ($locks as $lock) {
+            try {
+                $lock->refresh($this->lockExpiration ?? 3600);
+            } catch (\Throwable $exception) {
+                throw new \RuntimeException('Unable to refresh a campaign execution lock.', 0, $exception);
+            }
+        }
+    }
+
+    private function releaseLocksFrom(int $lockCount, int $lockFileCount): void
+    {
+        while (count($this->locks) > $lockCount) {
+            $key = array_key_last($this->locks);
+            $this->locks[$key]->release();
+            unset($this->locks[$key]);
+        }
+
+        while (count($this->lockFiles) > $lockFileCount) {
+            $key      = array_key_last($this->lockFiles);
+            $lockFile = $this->lockFiles[$key];
+            unset($this->lockFiles[$key]);
+            if (file_exists($lockFile)) {
+                unlink($lockFile);
+            }
+            if ($lockFile === $this->lockFile) {
+                $this->lockFile = null;
+            }
+        }
+    }
+
+    private function checkStatus(string $moderationKey, bool $announce = true): bool
+    {
+        if (self::MODE_PID === $this->moderationMode && $this->isPidSupported()) {
+            return $this->checkPid($moderationKey, $announce);
+        }
+
+        return $this->checkFlock($moderationKey);
+    }
+
+    private function checkPid(string $moderationKey, bool $announce): bool
+    {
+        $lockFile = sprintf(
             '%s/sf.%s.%s.lock',
             $this->runDirectory,
-            preg_replace('/[^a-z0-9\._-]+/i', '-', $this->moderationKey),
-            hash('sha256', $this->moderationKey)
+            preg_replace('/[^a-z0-9\._-]+/i', '-', $moderationKey),
+            hash('sha256', $moderationKey)
         );
 
         // Check if the PID is still running
-        $fp = fopen($this->lockFile, 'c+');
+        $fp = fopen($lockFile, 'c+');
         if (!flock($fp, LOCK_EX)) {
-            $this->output->writeln("<error>Failed to lock {$this->lockFile}.</error>");
+            $this->output->writeln("<error>Failed to lock {$lockFile}.</error>");
 
             return false;
         }
 
         $pid = fgets($fp, 8192);
         if ($pid && posix_getpgid((int) $pid)) {
-            $this->output->writeln('<info>Script with pid '.$pid.' in progress.</info>');
+            if ($announce) {
+                $this->output->writeln('<info>Script with pid '.$pid.' in progress.</info>');
+            }
 
             flock($fp, LOCK_UN);
             fclose($fp);
@@ -179,11 +313,13 @@ abstract class ModeratedCommand extends Command
 
         flock($fp, LOCK_UN);
         fclose($fp);
+        $this->lockFile = $lockFile;
+        $this->lockFiles[$moderationKey] = $lockFile;
 
         return true;
     }
 
-    private function checkFlock(): bool
+    private function checkFlock(string $moderationKey): bool
     {
         switch ($this->moderationMode) {
             case self::MODE_REDIS:
@@ -197,10 +333,17 @@ abstract class ModeratedCommand extends Command
                 $store = new FlockStore($this->runDirectory);
         }
 
-        $factory    = new LockFactory($store);
-        $this->lock = $factory->createLock($this->moderationKey, $this->lockExpiration);
+        $factory = new LockFactory($store);
+        $lock    = $factory->createLock($moderationKey, $this->lockExpiration);
 
-        return $this->lock->acquire();
+        if (!$lock->acquire()) {
+            return false;
+        }
+
+        $this->lock = $lock;
+        $this->locks[$moderationKey] = $lock;
+
+        return true;
     }
 
     public function isPidSupported(): bool

@@ -26,6 +26,32 @@ final class FakeModeratedCommand extends ModeratedCommand
         $this->completeRun();
     }
 
+    /**
+     * @param array<int, string> $moderationKeys
+     */
+    public function checkAdditional(InputInterface $input, OutputInterface $output, array $moderationKeys): bool
+    {
+        return $this->checkAdditionalRunStatus($input, $output, $moderationKeys);
+    }
+
+    /**
+     * @param array<int, string> $moderationKeys
+     */
+    public function releaseAdditional(array $moderationKeys): void
+    {
+        $this->releaseAdditionalRunLocks($moderationKeys);
+    }
+
+    public function refreshLocks(): void
+    {
+        $this->refreshRunLocks();
+    }
+
+    public function runWithKey(InputInterface $input, OutputInterface $output, string $key): bool
+    {
+        return $this->checkRunStatus($input, $output, $key);
+    }
+
     public function setLock(?LockInterface $lock = null): void
     {
         $reflection  = new \ReflectionClass($this);

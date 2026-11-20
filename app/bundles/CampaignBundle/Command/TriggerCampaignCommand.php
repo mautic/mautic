@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Event\JobExtendTimeEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -225,18 +226,28 @@ final class TriggerCampaignCommand extends ModeratedCommand
         if (!$this->checkRunStatus($input, $this->output, $moderationKey)) {
             return Command::SUCCESS;
         }
+        $refreshLocks = function (): void {
+            $this->refreshRunLocks();
+        };
+        $this->dispatcher->addListener(JobExtendTimeEvent::class, $refreshLocks);
         try {
             // Specific campaign;
             if ($id) {
                 $statusCode = ExitCode::SUCCESS;
                 $campaign = $this->campaignRepository->getEntity($id);
                 if ($campaign instanceof Campaign) {
-                    $this->triggerCampaign($campaign);
+                    $emailLockKeys = $this->getCampaignEmailLockKeys($campaign);
+                    if ($this->checkCampaignEmailLocks($input, $output, $emailLockKeys)) {
+                        try {
+                            $this->triggerCampaign($campaign);
+                        } finally {
+                            $this->releaseAdditionalRunLocks($emailLockKeys);
+                        }
+                    }
                 } else {
                     $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
                     $statusCode = ExitCode::FAILURE;
                 }
-                $this->completeRun();
 
                 return (int) $statusCode;
             }
@@ -264,20 +275,80 @@ final class TriggerCampaignCommand extends ModeratedCommand
             $campaigns = $this->campaignRepository->getEntities($filter);
 
             foreach ($campaigns as $campaign) {
-                $this->triggerCampaign($campaign);
+                $emailLockKeys = $this->getCampaignEmailLockKeys($campaign);
+                if ($this->checkCampaignEmailLocks($input, $output, $emailLockKeys)) {
+                    try {
+                        $this->triggerCampaign($campaign);
+                    } finally {
+                        $this->releaseAdditionalRunLocks($emailLockKeys);
+                    }
+                }
                 if ($this->limiter->hasCampaignLimit()) {
                     $this->limiter->resetCampaignLimitRemaining();
                 }
             }
 
-            $this->completeRun();
-
             return ExitCode::SUCCESS;
         } catch (SignalCaughtException) {
             $exitCode = ExitCode::TERMINATED;
+        } finally {
+            $this->dispatcher->removeListener(JobExtendTimeEvent::class, $refreshLocks);
+            $this->completeRun();
         }
 
         return $exitCode;
+    }
+
+    /**
+     * @param array<int, string> $emailLockKeys
+     */
+    private function checkCampaignEmailLocks(InputInterface $input, OutputInterface $output, array $emailLockKeys): bool
+    {
+        if ([] === $emailLockKeys) {
+            return true;
+        }
+
+        return $this->checkAdditionalRunStatus($input, $output, $emailLockKeys);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getCampaignEmailLockKeys(Campaign $campaign): array
+    {
+        if (!$campaign->isPublished()) {
+            return [];
+        }
+
+        $emailIds = [];
+        foreach ($campaign->getEvents() as $event) {
+            if ('email.send' !== $event->getType()) {
+                continue;
+            }
+
+            $properties = $event->getProperties();
+            if ('marketing' !== ($properties['email_type'] ?? null)) {
+                continue;
+            }
+
+            $emailId = (int) ($properties['email'] ?? 0);
+            if ($emailId > 0) {
+                $emailIds[] = $emailId;
+            }
+        }
+
+        // Mautic's duplicate-send rule is based on contact + marketing email,
+        // not on the segment. Lock the email while this campaign is executing
+        // so overlapping or different segments cannot race before email_stats
+        // is written. Different emails remain independently runnable.
+        $moderationKeys = [];
+        foreach (array_unique($emailIds) as $emailId) {
+            $moderationKeys[] = sprintf('campaign-email-%d', $emailId);
+        }
+
+        sort($moderationKeys);
+
+        return $moderationKeys;
     }
 
     /**
