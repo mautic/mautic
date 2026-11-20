@@ -92,6 +92,8 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    // An earlier API test defines MAUTIC_API_REQUEST for the whole PHP process, which turns CSRF off for every form.
+    #[RunInSeparateProcess]
     public function testInvalidCsrfTokenDoesNotSaveAnUnpublishedConfiguration(): void
     {
         $this->configureTwilioWithArrayTransport();
@@ -103,10 +105,9 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(ChoiceFormField::class, $isPublished);
         $isPublished->select('0');
         $form['integration_config[apiKeys][username]']->setValue('new_username');
-        $values = $form->getPhpValues();
-        $values['integration_config']['_token'] = 'invalid';
+        $form['integration_config[_token]']->setValue('invalid');
 
-        $crawler = $this->client->request($form->getMethod(), $form->getUri(), $values);
+        $crawler = $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
         $this->em->clear();
