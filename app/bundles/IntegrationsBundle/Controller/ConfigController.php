@@ -31,6 +31,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 final class ConfigController extends AbstractFormController
 {
@@ -132,6 +133,11 @@ final class ConfigController extends AbstractFormController
             return $this->showForm($request, $form, $formExtension);
         }
 
+        // An unpublished configuration may be saved with errors, but never without a submitted form and a valid CSRF token
+        if (!$form->isSubmitted() || $this->hasCsrfError($form)) {
+            return $this->showForm($request, $form, $formExtension);
+        }
+
         // Save the integration configuration
         $integrationsHelper->saveIntegrationConfiguration($this->integrationConfiguration);
 
@@ -149,6 +155,20 @@ final class ConfigController extends AbstractFormController
 
         // Otherwise close the modal
         return $this->closeForm($request);
+    }
+
+    /**
+     * @param FormInterface<mixed> $form
+     */
+    private function hasCsrfError(FormInterface $form): bool
+    {
+        foreach ($form->getErrors() as $error) {
+            if ($error->getCause() instanceof CsrfToken) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -239,6 +259,7 @@ final class ConfigController extends AbstractFormController
             'name'          => $this->integrationConfiguration->getName(),
             'mauticContent' => 'integrationsConfig',
             'flashes'       => $this->getFlashContent(),
+            'sidebar'       => $this->renderView('@MauticCore/LeftPanel/index.html.twig'),
         ];
 
         if ($this->integrationObject instanceof ConfigFormAuthorizeButtonInterface) {
