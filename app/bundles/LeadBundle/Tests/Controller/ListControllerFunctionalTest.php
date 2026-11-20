@@ -982,7 +982,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
                 'unit'     => 'day',
             ],
             'foo',
-            'Please enter an integer.',
+            'This value is not a valid integer.',
         ];
 
         yield [
@@ -992,7 +992,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
                 'unit'     => 'day',
             ],
             '2.5',
-            'Please enter an integer.',
+            'This value is not a valid integer.',
         ];
 
         yield [
