@@ -388,7 +388,7 @@ final class MailHelperTest extends TestCase
 
     public function testQueuedOwnerAsMailerDoesNotMergeOwnerlessContactsSharingFromAddress(): void
     {
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
             ['mailer_from_email', null, 'sales@example.com'],
             ['mailer_from_name', null, 'Sales'],
             ['mailer_reply_to_email', null, 'support@example.com'],
