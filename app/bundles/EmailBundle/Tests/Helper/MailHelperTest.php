@@ -430,7 +430,7 @@ final class MailHelperTest extends TestCase
         $this->coreParametersHelper->expects($this->atLeast(6))->method('get')->willReturnMap(
             [
                 ['mailer_return_path', false, null],
-                ['mailer_from_email', null, 'nobody@nowhere.com'],
+                ['mailer_from_email', null, '{contactfield=email}'],
                 ['mailer_from_name', null, 'No Body'],
                 ['mailer_address_length_limit', null, 320],
                 ['brand_name', null, null],
@@ -498,7 +498,7 @@ final class MailHelperTest extends TestCase
 
         $this->assertSame(['sender1@somewhere.com', 'sender2@somewhere.com'], $transport->getFromAddresses());
         $this->assertSame(['Sender 1', 'Sender 2'], $transport->getFromNames());
-        $this->assertSame(['nobody@nowhere.com', 'nobody@nowhere.com'], $transport->getReplyToAddresses());
+        $this->assertSame(['sender1@somewhere.com', 'sender2@somewhere.com'], $transport->getReplyToAddresses());
     }
 
     public function testBatchIsEnabledWithBcTokenInterface(): void
