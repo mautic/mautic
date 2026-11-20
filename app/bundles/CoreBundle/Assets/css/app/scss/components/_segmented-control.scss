@@ -1,5 +1,5 @@
 .segmented-control {
-    --segmented-control-padding: 3px;
+    --segmented-control-padding: calc(var(--spacing-01) + 1px);
     --segmented-control-height: 36px;
     --segmented-control-radius: 25px;
     --segmented-control-surface: var(--layer-02);
@@ -15,7 +15,7 @@
     padding: var(--segmented-control-padding);
     border-radius: var(--segmented-control-radius);
     background-color: var(--layer-01);
-    font-size: 14px;
+    font-size: var(--body-compact-01-font-size);
     box-shadow: none;
     user-select: none;
 
@@ -24,11 +24,11 @@
         align-self: stretch;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: calc(var(--spacing-02) + 2px);
         block-size: auto;
         min-block-size: 0;
         margin: 0;
-        padding: 0 14px;
+        padding: 0 calc(var(--spacing-04) + 2px);
         border: 0;
         border-radius: calc(var(--segmented-control-radius) - var(--segmented-control-padding)) !important;
         background: transparent;
@@ -64,23 +64,23 @@
     }
 
     &--sm {
-        --segmented-control-padding: 2px;
+        --segmented-control-padding: var(--spacing-01);
         --segmented-control-height: 32px;
-        font-size: 13px;
+        font-size: calc(var(--body-compact-01-font-size) - 1px);
 
         > .btn {
-            padding: 0 12px;
+            padding: 0 var(--spacing-04);
         }
     }
 
     &--lg {
-        --segmented-control-padding: 4px;
+        --segmented-control-padding: var(--spacing-02);
         --segmented-control-height: 44px;
-        font-size: 15px;
+        font-size: calc(var(--body-compact-01-font-size) + 1px);
 
         > .btn {
-            gap: 8px;
-            padding: 0 16px;
+            gap: var(--spacing-03);
+            padding: 0 var(--spacing-05);
         }
     }
 
@@ -123,8 +123,8 @@
     opacity: 0;
     translate: var(--segmented-control-x);
     transition:
-        translate var(--segmented-control-duration) cubic-bezier(0.22, 1, 0.36, 1),
-        inline-size var(--segmented-control-duration) cubic-bezier(0.22, 1, 0.36, 1),
+        translate var(--segmented-control-duration) var(--easing-standard-expressive),
+        inline-size var(--segmented-control-duration) var(--easing-standard-expressive),
         scale var(--duration-productive) var(--easing-standard-productive);
 
     [data-segmented-control-dragging] > & {

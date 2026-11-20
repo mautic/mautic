@@ -177,7 +177,6 @@ final class ConfigType extends AbstractType
                 'label'      => 'mautic.config.peak_interaction_timer.cache_timeout',
                 'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
                     'tooltip' => 'mautic.config.peak_interaction_timer.cache_timeout.tooltip',
                 ],
                 'choices' => [
@@ -200,7 +199,6 @@ final class ConfigType extends AbstractType
                 'label'      => 'mautic.config.peak_interaction_timer.fetch_interactions_from',
                 'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
                     'tooltip' => 'mautic.config.peak_interaction_timer.fetch_interactions_from.tooltip',
                 ],
                 'choices' => [
