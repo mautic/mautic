@@ -13,6 +13,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Mautic\UserBundle\Entity\User;
@@ -48,7 +49,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
     joinTable: new ORM\JoinTable(name: 'company_projects_xref'),
 )])]
-class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
+class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface, IdentifierInterface
 {
     use CustomFieldEntityTrait;
     use ProjectTrait;
