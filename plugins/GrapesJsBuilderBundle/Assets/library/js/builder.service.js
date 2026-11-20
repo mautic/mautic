@@ -418,7 +418,12 @@ export default class BuilderService {
       }
 
       try {
-        return originalRun(...args);
+        const result = originalRun(...args);
+        if (false === result && typeof MauticVars !== 'undefined') {
+          MauticVars.formSubmitInProgress = false;
+        }
+
+        return result;
       } catch (error) {
         if (typeof MauticVars !== 'undefined') {
           MauticVars.formSubmitInProgress = false;
@@ -731,7 +736,11 @@ export default class BuilderService {
       }
     });
 
-    const triggerBuilderHide = () => {
+    const triggerBuilderHide = (event) => {
+      if (false === event?.result) {
+        return;
+      }
+
       this.persistEditorState();
       // trigger hide event on DOM element
       mQuery('.builder').trigger('builder:hide', [this.editor]);
@@ -753,10 +762,14 @@ export default class BuilderService {
           this.cacheOptimisticLockVersion();
         });
     }
-    this.editor.on('run:mautic-editor-page-html-close', triggerBuilderHide);
-    this.editor.on('run:mautic-editor-email-html-close', triggerBuilderHide);
-    this.editor.on('run:mautic-editor-email-mjml-close', triggerBuilderHide);
-    this.editor.on('run:preset-mautic:apply-form', () => this.persistEditorState());
+    this.editor.on('command:run:mautic-editor-page-html-close', triggerBuilderHide);
+    this.editor.on('command:run:mautic-editor-email-html-close', triggerBuilderHide);
+    this.editor.on('command:run:mautic-editor-email-mjml-close', triggerBuilderHide);
+    this.editor.on('command:run:preset-mautic:apply-form', (event) => {
+      if (false !== event?.result) {
+        this.persistEditorState();
+      }
+    });
 
     this.editor.on('load', () => {
       if (this.isPageContext()) {
@@ -1262,7 +1275,12 @@ export default class BuilderService {
   initEmailMjml() {
     const components = MjmlService.getOriginalContentMjml();
     // validate
-    MjmlService.mjmlToHtml(components);
+    try {
+      MjmlService.mjmlToHtml(components);
+    } catch (error) {
+      console.warn(error.message);
+      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')}\n${error.message}`);
+    }
 
     const mjHeadContent = extractMjHeadContent(components);
 
