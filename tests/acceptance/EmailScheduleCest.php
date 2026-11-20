@@ -67,7 +67,7 @@ final class EmailScheduleCest
 
     public function createTriggeredEmailAndVerifyScheduleOptionsOnEdit(AcceptanceTester $I, EmailStep $email): void
     {
-        $I->login();
+        $I->login(reuseSessionSnapshot: false);
         $name = 'Triggered Email '.date('YmdHis');
 
         $email->createTriggeredEmail($name);
