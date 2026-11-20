@@ -71,6 +71,12 @@
         }) }}
     </td>
     <td class="visible-md visible-lg">
+        {% set category = item.getCategory() %}
+        {% set catName  = category ? category.getTitle() : 'mautic.core.form.uncategorized'|trans %}
+        {% set color = (category) ? '#' ~ category.getColor() : '' %}
+        <div class="d-flex ai-center gap-xs"><span class="label label-gray label-category" style="background: {{ color }};"> </span> {{ catName }}</div>
+    </td>
+    <td class="visible-md visible-lg">
         <span size="sm" class="label {{ item.needsRebuild() ? 'label-info' : 'label-gray' }} col-count" data-id="{{ item.id }}">
             <a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.list'|trans ~ ':' ~ item.alias}) }}"
                 data-toggle="ajax">{{ (item.needsRebuild() ? 'mautic.lead.list.building' : 'mautic.lead.list.viewleads_count')|trans({'%count%': leadCounts[item.id]}) }}</a>
