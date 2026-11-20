@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
@@ -51,7 +52,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
     joinTable: new ORM\JoinTable(name: 'stage_projects_xref'),
 )])]
-class Stage extends FormEntity implements UuidInterface
+class Stage extends FormEntity implements UuidInterface, IdentifierInterface
 {
     use UuidTrait;
     use ProjectTrait;
