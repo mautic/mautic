@@ -112,7 +112,7 @@ abstract class PageTestAbstract extends TestCase
 
         $coreParametersHelper
             ->method('get')
-            ->willReturnCallback(function ($parameter) use ($transliterationEnabled, $validatePageHitRequiredData) {
+            ->willReturnCallback(function (string $parameter) use ($transliterationEnabled, $validatePageHitRequiredData) {
                 if ('transliterate_page_title' === $parameter) {
                     return $transliterationEnabled;
                 }
