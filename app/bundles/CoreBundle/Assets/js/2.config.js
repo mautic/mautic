@@ -37,7 +37,7 @@ Mautic.getIpLookupFormConfig = function() {
 
 Mautic.configOnLoad = function(container) {
     // Expand the collapsed sections that contain validation errors so they are visible
-    mQuery(container + ' .accordion-wrapper').has('.has-error').collapse('show');
+    mQuery(container + ' .accordion-wrapper').has('.has-error').each((index, element) => bootstrap.Collapse.getOrCreateInstance(element, {toggle: false}).show());
 
     document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
         const attributeName = radio.dataset.attributeToggle;
