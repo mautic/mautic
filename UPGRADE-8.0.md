@@ -559,6 +559,26 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
     `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
 
+- The Bootstrap Vertical Tabs stylesheet `app/bundles/CoreBundle/Assets/css/libraries/bootstrap/_bootstrap-vertical-tabs.scss`, its `@import` in `_libraries.scss`, and the `.modal-body.p-0 .tabs-left`/`.tabs-right` border-radius override in `app/bundles/CoreBundle/Assets/css/app/scss/_custom.scss` were removed.
+
+    | Removed class | Replacement |
+    |---|---|
+    | `.tabs-left` | Bootstrap vertical navigation with `.nav` and `.flex-column`, placed on the left with the surrounding layout |
+    | `.tabs-right` | Bootstrap vertical navigation with `.nav` and `.flex-column`, placed on the right with the surrounding layout |
+    | `.vertical-text` | None; remove this class. |
+    | `vertical` and `verticalTabColWidth` options on `@MauticCore/Helper/tabs.html.twig` | Passing either option is ignored; the helper renders horizontal tabs. Callers must build `.nav.flex-column`, placement, and overflow themselves. |
+
+    The helper no longer adds the `.box-layout` wrapper or the `.col-xs-*`, `.height-auto`, `.border-end`, `.ps-0`, and `.pt-0` classes; callers must build their own grid. For example:
+
+    ```html
+    <div class="row">
+      <ul class="nav nav-tabs flex-column col-md-3" role="tablist">...</ul>
+      <div class="tab-content col-md-9">...</div>
+    </div>
+    ```
+
+    Tab sorting and the overflow plugin now handle horizontal lists only. `Mautic.activateSortableTabs` sorts along the x axis only, so drag sorting on vertical tabs was removed with no replacement. Do not call `Mautic.activateOverflowTabs` (`$.fn.overflowNavs`) on vertical lists; use Bootstrap's vertical navigation without the plugin or provide a vertical overflow container. The Dynamic Content tabs in the email editor no longer use `.tabs-left`.
+
 - Custom background colour classes removed. Bootstrap's `.bg-*` utilities now apply, with the Carbon colours for `.bg-primary`, `.bg-success`, `.bg-info`, `.bg-warning` and `.bg-danger`. The removed classes also forced the text colour, so add a text utility where the text must stay readable. The `bg-color` SCSS mixin and `app/bundles/CoreBundle/Assets/css/app/scss/components/_colors.scss` (with its `@import` in `app/bundles/CoreBundle/Assets/css/app.scss`) were removed.
     | Removed class | Bootstrap 5 replacement |
     |---|---|

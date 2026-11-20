@@ -82,7 +82,7 @@ Mautic.activateSortableTabs = function(tabs) {
     mQuery(tabs).sortable(
         {
             container: 'ul.nav',
-            axis: mQuery(tabs).hasClass('tabs-right') || mQuery(tabs).hasClass('tabs-left') ? 'y' : 'x',
+            axis: 'x',
             stop: function (e, ui) {
                 var action = mQuery(tabs).attr('data-sort-action');
                 mQuery.ajax({
