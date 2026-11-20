@@ -9,6 +9,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
 final class DynamicContentControllerTest extends MauticMysqlTestCase
@@ -64,6 +65,58 @@ final class DynamicContentControllerTest extends MauticMysqlTestCase
         $dynamicContent         = $model->getEntity($this->dwc->getId());
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertContains((string) $tag1->getId(), $dynamicContent->getFilters()[0]['filter']);
+    }
+
+    public function testDwcWithContactFieldDateTimeType(): void
+    {
+        $date     = (new \DateTime())->format('Y-m-d');
+        $dateTime = (new \DateTime())->format('Y-m-d H:i');
+
+        $filters = [
+            [
+                'glue'     => 'and',
+                'field'    => 'date_added',
+                'object'   => 'lead',
+                'type'     => 'date',
+                'filter'   => $date,
+                'display'  => null,
+                'operator' => 'lt',
+            ],
+            [
+                'glue'     => 'and',
+                'field'    => 'date_modified',
+                'object'   => 'lead',
+                'type'     => 'datetime',
+                'filter'   => $dateTime,
+                'display'  => null,
+                'operator' => 'lt',
+            ],
+        ];
+
+        $dwc = new DynamicContent();
+        $dwc->setIsPublished(true)
+            ->setName('Test Dynamic Content')
+            ->setContent('<p> some content </p>')
+            ->setIsCampaignBased(false)
+            ->setSlotName('dwc-test')
+            ->setFilters($filters);
+
+        $model = self::$container->get('mautic.dynamicContent.model.dynamicContent');
+        $model->saveEntity($dwc);
+
+        $crawler  = $this->client->request('POST', '/s/dwc/edit/'.$dwc->getId());
+
+        // Verify that dwc is able to edit
+        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $dwcForm  = $crawler->selectButton('Save & Close')->form();
+
+        Assert::assertEquals($date, $dwcForm['dwc[filters][0][filter]']->getValue());
+        Assert::assertEquals($dateTime, $dwcForm['dwc[filters][1][filter]']->getValue());
+
+        // resubmit the dwc form to verify save action
+        $this->client->submit($dwcForm);
+        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
     private function createTag(string $tagName): Tag
