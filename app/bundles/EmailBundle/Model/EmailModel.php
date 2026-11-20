@@ -46,6 +46,7 @@ use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
+use Mautic\EmailBundle\Exception\MjmlThemeEmptyCustomHtmlException;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -80,6 +81,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Error\Error as TwigError;
 
 /**
  * @extends FormModel<Email>
@@ -226,6 +228,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $entity->setEmailType('template');
         }
 
+        // Block the bad state early: a published email with an MJML theme and
+        // empty customHtml has no compiled body. GrapesJS should compile the
+        // theme into customHtml before publishing; sending without it delivers
+        // uncompiled <mjml> or an empty body. Drafts are allowed through so the
+        // user can save and open the builder later.
+        $this->validateMjmlThemeHasCustomHtml($entity);
+
         // Ensure that list emails are published
         if ('list' == $entity->getEmailType()) {
             // Ensure that this email has the same lists assigned as the translated parent if applicable
@@ -277,10 +286,63 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
+     * Validate that a published email using an MJML theme has compiled customHtml.
+     *
+     * Bundled themes since Mautic 5 use MJML. GrapesJS compiles the MJML into
+     * customHtml client-side. If a published email is saved with an MJML theme
+     * but empty customHtml, it has no usable HTML body — sending would deliver
+     * uncompiled <mjml> markup or an empty email. This method blocks that bad
+     * state at save time so it is caught before send. Unpublished/draft emails
+     * are allowed through so the user can save and open the builder later, and
+     * emails with a plain text body are allowed through because MailHelper can
+     * send those as a text/plain message even when the theme fallback is
+     * skipped (the send path only hard-fails when plain text is empty too).
+     *
+     * @throws MjmlThemeEmptyCustomHtmlException
+     */
+    public function validateMjmlThemeHasCustomHtml(Email $email): void
+    {
+        $template = $email->getTemplate();
+        if (empty($template) || !empty($email->getCustomHtml()) || !empty($email->getPlainText()) || !$email->getIsPublished()) {
+            return;
+        }
+
+        $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+
+        try {
+            $renderedHtml = $this->themeHelper->renderThemeTemplate($logicalName, [
+                'content'  => $email->getContent(),
+                'email'    => $email,
+                'template' => $template,
+            ]);
+        } catch (TwigError) {
+            // If the theme template cannot be rendered, skip validation —
+            // MailHelper::setEmail() will handle the fallback at send time.
+            return;
+        }
+
+        if (MailHelper::hasMjmlRootTag($renderedHtml)) {
+            throw new MjmlThemeEmptyCustomHtmlException(sprintf('The "%s" theme uses MJML which must be compiled into customHtml before saving. Please open the email in the builder to compile the template.', $template));
+        }
+    }
+
+    /**
      * Save an array of entities.
      */
     public function saveEntities($entities, $unlock = true): void
     {
+        // Validate the whole batch before anything is persisted: checking
+        // inside the persistence loop would still commit the entities that ran
+        // before the one that fails.
+        if ($entities instanceof \Traversable) {
+            $entities = iterator_to_array($entities, false);
+        }
+        foreach ($entities as $entity) {
+            if ($entity instanceof Email) {
+                $this->validateMjmlThemeHasCustomHtml($entity);
+            }
+        }
+
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
         $i         = 0;
@@ -1642,7 +1704,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
-        $mailer->setEmail($email, false, $assetAttachments, !$saveStat);
+        // A false setEmail() means the message cannot be composed (an MJML theme
+        // with no compiled customHtml and no plain text leaves no usable body).
+        // Abort before queueing to any recipient instead of delivering empty
+        // emails; the queue()/getErrors() handling below resets the error between
+        // recipients, so a mid-loop abort would not protect them.
+        if (!$mailer->setEmail($email, false, $assetAttachments, !$saveStat)) {
+            return $mailer->getErrors();
+        }
         $mailer->setCc($cc);
         $mailer->setBcc($bcc);
 
@@ -2282,9 +2351,19 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $mailer = $this->mailHelper->getMailer(true);
         $mailer->setLead($leadFields, true);
         $mailer->setTokens($tokens);
-        $mailer->setEmail($email, false, $assetAttachments, !$saveStat);
 
         $errors = [];
+
+        // A false setEmail() means the message cannot be composed (an MJML theme
+        // with no compiled customHtml and no plain text leaves no usable body).
+        // Report it as the sample send's error instead of queueing empty emails.
+        if (!$mailer->setEmail($email, false, $assetAttachments, !$saveStat)) {
+            $errorArray = $mailer->getErrors();
+            unset($errorArray['failures']);
+            $errors[] = implode('; ', $errorArray);
+
+            return $errors;
+        }
         foreach ($users as $user) {
             $idHash = uniqid();
             $mailer->setIdHash($idHash, $saveStat);
