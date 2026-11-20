@@ -111,6 +111,31 @@ final class PathsHelperTest extends TestCase
         $this->assertSame('/configured-root/translations', $this->helper->getTranslationsPath());
     }
 
+    public function testPathMatchingConfiguredRootExactlyIsUnchanged(): void
+    {
+        $pathsProperty = new \ReflectionProperty(PathsHelper::class, 'paths');
+        $paths         = $pathsProperty->getValue($this->helper);
+        $paths['translations_root'] = '/configured-root';
+        $paths['translations']      = '/configured-root';
+        $pathsProperty->setValue($this->helper, $paths);
+
+        $this->assertSame('/configured-root', $this->helper->getTranslationsPath());
+    }
+
+    public function testPathBeginningWithConfiguredRootNameButOutsideDirectoryIsPrefixed(): void
+    {
+        $pathsProperty = new \ReflectionProperty(PathsHelper::class, 'paths');
+        $paths         = $pathsProperty->getValue($this->helper);
+        $paths['translations_root'] = 'configured-root';
+        $paths['translations']      = 'configured-root-other/translations';
+        $pathsProperty->setValue($this->helper, $paths);
+
+        $this->assertSame(
+            'configured-root/configured-root-other/translations',
+            $this->helper->getTranslationsPath(),
+        );
+    }
+
     public function testGetTranslationsPath(): void
     {
         $this->assertSame(__DIR__.'/resource/paths/translations', $this->helper->getTranslationsPath());
