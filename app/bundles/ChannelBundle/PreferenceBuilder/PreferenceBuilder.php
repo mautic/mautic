@@ -90,6 +90,11 @@ final class PreferenceBuilder
 
             // Build priority based on channel rules
             foreach ($channelRules as $channel => $rule) {
+                // Ignore rules (DNC entries, frequency rules/preferences) for channels that are not part of this message
+                if (!array_key_exists($channel, $channels)) {
+                    continue;
+                }
+
                 $this->addChannelRule($channel, $rule, $log, $priority);
                 ++$priority;
                 unset($allChannels[$channel]);
