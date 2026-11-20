@@ -92,6 +92,35 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    public function testInvalidCsrfTokenDoesNotSaveAnUnpublishedConfiguration(): void
+    {
+        $this->configureTwilioWithArrayTransport();
+
+        $crawler     = $this->client->request('GET', '/s/plugins/config/Twilio');
+        $this->assertResponseIsSuccessful();
+        $form        = $crawler->selectButton('integration_config[buttons][save]')->form();
+        $isPublished = $form['integration_config[isPublished]'];
+        $this->assertInstanceOf(ChoiceFormField::class, $isPublished);
+        $isPublished->select('0');
+        $form['integration_config[apiKeys][username]']->setValue('new_username');
+        $form['integration_config[_token]']->setValue('invalid');
+
+        $crawler = $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $this->em->clear();
+        $integrationConfig = self::getContainer()->get(IntegrationRepository::class)->findOneBy(['name' => TwilioIntegration::NAME]);
+        $this->assertInstanceOf(Integration::class, $integrationConfig);
+        $this->assertTrue($integrationConfig->getIsPublished());
+        $this->assertSame(
+            ['username' => 'test_username', 'password' => 'test_password'],
+            self::getContainer()->get(EncryptionService::class)->decrypt($integrationConfig->getApiKeys())
+        );
+
+        // the form is shown again instead of the modal closing
+        $this->assertCount(1, $crawler->filter('#integration_config_apiKeys_username'));
+    }
+
     public function testKeysAreRequiredOnlyWhilePublished(): void
     {
         // opens the config page directly: no settings row exists until the page creates it
