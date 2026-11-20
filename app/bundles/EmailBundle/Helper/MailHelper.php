@@ -2050,7 +2050,8 @@ class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set and global reply-to is not configured.
-        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+        $fromAddress = $emailToSend?->getFromAddress();
+        if ($emailToSend && null !== $fromAddress && !(new AddressDTO($fromAddress))->isEmailTokenized() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
             return;
