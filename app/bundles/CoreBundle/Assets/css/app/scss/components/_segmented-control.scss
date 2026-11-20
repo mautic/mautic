@@ -1,5 +1,5 @@
 .segmented-control {
-    --segmented-control-padding: calc(var(--spacing-01) + 1px);
+    --segmented-control-padding: calc(var(--spacing-01) * 1.5);
     --segmented-control-height: 36px;
     --segmented-control-radius: 25px;
     --segmented-control-surface: var(--layer-02);
@@ -24,11 +24,11 @@
         align-self: stretch;
         align-items: center;
         justify-content: center;
-        gap: calc(var(--spacing-02) + 2px);
+        gap: calc(var(--spacing-02) + var(--spacing-01));
         block-size: auto;
         min-block-size: 0;
         margin: 0;
-        padding: 0 calc(var(--spacing-04) + 2px);
+        padding: 0 calc(var(--spacing-04) + var(--spacing-01));
         border: 0;
         border-radius: calc(var(--segmented-control-radius) - var(--segmented-control-padding)) !important;
         background: transparent;
@@ -66,7 +66,7 @@
     &--sm {
         --segmented-control-padding: var(--spacing-01);
         --segmented-control-height: 32px;
-        font-size: calc(var(--body-compact-01-font-size) - 1px);
+        font-size: var(--typography-body-productive);
 
         > .btn {
             padding: 0 var(--spacing-04);
@@ -76,7 +76,7 @@
     &--lg {
         --segmented-control-padding: var(--spacing-02);
         --segmented-control-height: 44px;
-        font-size: calc(var(--body-compact-01-font-size) + 1px);
+        font-size: var(--typography-body-expressive);
 
         > .btn {
             gap: var(--spacing-03);
