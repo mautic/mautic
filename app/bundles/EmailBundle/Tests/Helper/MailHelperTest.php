@@ -281,7 +281,9 @@ final class MailHelperTest extends TestCase
 
     public function testQueuedOwnerAsMailer(): void
     {
-        $this->coreParametersHelper->method('get')->willReturnMap($this->defaultParams);
+        $params   = $this->defaultParams;
+        $params[] = ['mailer_reply_to_email', null, 'support@example.com'];
+        $this->coreParametersHelper->method('get')->willReturnMap($params);
 
         $this->contactRepository->method('getLeadOwner')
             ->willReturnOnConsecutiveCalls(
@@ -318,7 +320,7 @@ final class MailHelperTest extends TestCase
         $this->assertCount(3, $replyToAddresses);
         $this->assertCount(3, $metadatas);
         $this->assertEquals(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
-        $this->assertEquals(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $replyToAddresses);
+        $this->assertEquals(['owner1@owner.com', 'support@example.com', 'owner2@owner.com'], $replyToAddresses);
 
         foreach ($metadatas as $key => $metadata) {
             $this->assertArrayHasKey($this->contacts[$key]['email'], $metadata);
@@ -382,6 +384,47 @@ final class MailHelperTest extends TestCase
             ['replytooverride@nowhere.com', 'replytooverride@nowhere.com', 'replytooverride@nowhere.com'],
             $transport->getReplyToAddresses()
         );
+    }
+
+    public function testQueuedOwnerAsMailerDoesNotMergeOwnerlessContactsSharingFromAddress(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'sales@example.com'],
+            ['mailer_from_name', null, 'Sales'],
+            ['mailer_reply_to_email', null, 'support@example.com'],
+            ['mailer_address_length_limit', null, 320],
+        ]);
+
+        $this->contactRepository->method('getLeadOwner')
+            ->willReturnOnConsecutiveCalls(
+                ['email' => 'sales@example.com', 'first_name' => 'Sales', 'last_name' => null, 'signature' => 'owner 1'],
+                ['email' => 'owner2@owner.com', 'first_name' => 'owner 2', 'last_name' => null, 'signature' => 'owner 2'],
+            );
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+
+        $email = new Email();
+        $email->setUseOwnerAsMailer(true);
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+
+        $mailer->setEmail($email);
+        $mailer->enableQueue();
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $this->assertTrue($mailer->flushQueue([]));
+
+        $this->assertEquals(['sales@example.com', 'sales@example.com', 'owner2@owner.com'], $transport->getFromAddresses());
+        $this->assertEquals(['sales@example.com', 'support@example.com', 'owner2@owner.com'], $transport->getReplyToAddresses());
+
+        $metadatas = $transport->getMetadatas();
+        $this->assertSame(['contact1@somewhere.com', 'contact4@somewhere.com'], array_keys($metadatas[0]));
+        $this->assertSame(['contact2@somewhere.com'], array_keys($metadatas[1]));
     }
 
     public function testMailAsOwnerWithEncodedCharactersInName(): void
