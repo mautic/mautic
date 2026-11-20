@@ -75,7 +75,7 @@
                         }) }}
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
+                        {{ include('@MauticCore/Components/category.html.twig', {'type': 'expanded', 'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">{{ ('mautic.focus.type.' ~ item.type)|trans }}</td>
                     <td class="visible-md visible-lg">{{ ('mautic.focus.style.' ~ item.style)|trans }}</td>

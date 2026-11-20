@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CategoryBundle\Tests\Controller\Api;
 
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
@@ -63,6 +64,57 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         $this->assertTrue($foundCategory, 'Test category should be found in the API response');
+    }
+
+    public function testApiAcceptsThreeDigitHexCategoryColor(): void
+    {
+        $this->loginUser($this->createUser());
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/v2/categories',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/ld+json',
+                'HTTP_ACCEPT'  => 'application/ld+json',
+            ],
+            json_encode([
+                'title'  => 'Hex color category',
+                'alias'  => 'hex-color-category',
+                'bundle' => 'global',
+                'color'  => '#abc',
+            ], JSON_THROW_ON_ERROR)
+        );
+
+        $this->assertResponseStatusCodeSame(201);
+        $responseData = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame('#abc', $responseData['color']);
+    }
+
+    public function testApiRejectsNonHexCategoryColor(): void
+    {
+        $this->loginUser($this->createUser());
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/v2/categories',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/ld+json',
+                'HTTP_ACCEPT'  => 'application/ld+json',
+            ],
+            json_encode([
+                'title'  => 'Invalid color category',
+                'alias'  => 'invalid-color-category',
+                'bundle' => 'global',
+                'color'  => 'rgb(255, 0, 0)',
+            ], JSON_THROW_ON_ERROR)
+        );
+
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertNull($this->getService(CategoryRepository::class)->findOneBy(['alias' => 'invalid-color-category']));
     }
 
     public function testContactsCategoriesEndpointWorks(): void

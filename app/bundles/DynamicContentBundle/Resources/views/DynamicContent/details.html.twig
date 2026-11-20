@@ -53,7 +53,7 @@
         'targetLabel'     : 'mautic.dynamicContent.dynamicContents'|trans
     }
 ) -}}
-{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': entity.category}) }}
+{{ include('@MauticCore/Components/category.html.twig', {'type': 'inline', 'category': entity.category}) }}
 {% endblock %}
 
 {% block actions %}

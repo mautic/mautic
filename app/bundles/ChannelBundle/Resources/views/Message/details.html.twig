@@ -18,7 +18,7 @@
         'targetLabel'     : 'mautic.channel.messages'|trans
     }
 ) -}}
-{{ include('@MauticCore/Modules/category--inline.html.twig', {'category': item.category}) }}
+{{ include('@MauticCore/Components/category.html.twig', {'type': 'inline', 'category': item.category}) }}
 {% endblock %}
 
 {% block actions %}
