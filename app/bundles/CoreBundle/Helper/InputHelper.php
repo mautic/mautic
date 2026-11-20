@@ -107,11 +107,9 @@ final class InputHelper
      * Wrapper function to clean inputs.  $mask can be an array of keys as the field names and values as the cleaning
      * function to be used for the specific field.
      *
-     * @param mixed $value
-     *
      * @return mixed
      */
-    public static function _($value, array|string $mask = 'clean', bool $urldecode = false)
+    public static function _(mixed $value, array|string $mask = 'clean', bool $urldecode = false)
     {
         if (is_array($value)) {
             foreach ($value as $k => &$v) {

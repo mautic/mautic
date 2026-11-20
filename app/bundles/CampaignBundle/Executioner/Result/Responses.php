@@ -34,10 +34,7 @@ final class Responses
         }
     }
 
-    /**
-     * @param mixed $response
-     */
-    public function setResponse(Event $event, $response): void
+    public function setResponse(Event $event, mixed $response): void
     {
         switch ($event->getEventType()) {
             case Event::TYPE_ACTION:

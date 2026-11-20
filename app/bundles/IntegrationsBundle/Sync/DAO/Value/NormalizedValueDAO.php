@@ -47,14 +47,10 @@ final class NormalizedValueDAO
      */
     private $normalizedValue;
 
-    /**
-     * @param mixed  $value
-     * @param mixed  $normalizedValue
-     */
     public function __construct(
         private readonly string $type,
-        private $value,
-        $normalizedValue = null,
+        private readonly mixed $value,
+        mixed $normalizedValue = null,
     ) {
         $this->normalizedValue = $normalizedValue ?: $value;
     }

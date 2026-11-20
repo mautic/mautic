@@ -405,10 +405,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param string     $prop
-     * @param mixed      $val
-     * @param mixed|null $oldValue
      */
-    protected function isChanged($prop, $val, $oldValue = null): void
+    protected function isChanged($prop, mixed $val, mixed $oldValue = null): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $oldValue ?? $this->{$getter}();
@@ -1280,10 +1278,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->primaryCompany;
     }
 
-    /**
-     * @param mixed $primaryCompany
-     */
-    public function setPrimaryCompany($primaryCompany): static
+    public function setPrimaryCompany(mixed $primaryCompany): static
     {
         $this->primaryCompany = $primaryCompany;
 

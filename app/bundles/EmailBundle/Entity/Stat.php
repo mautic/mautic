@@ -494,10 +494,7 @@ class Stat
         return $this->changes;
     }
 
-    /**
-     * @param mixed $currentValue
-     */
-    private function addChange(string $property, $currentValue, \DateTime|bool|int|float|string|null $newValue): void
+    private function addChange(string $property, mixed $currentValue, \DateTime|bool|int|float|string|null $newValue): void
     {
         if ($currentValue === $newValue) {
             return;

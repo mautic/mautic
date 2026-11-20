@@ -94,7 +94,7 @@ class FormModel extends AbstractCommonModel
      * @param TEntity $entity
      * @param mixed  $extra  Can be used by model to determine what to unlock
      */
-    public function unlockEntity(object $entity, $extra = null): void
+    public function unlockEntity(object $entity, mixed $extra = null): void
     {
         // unlock the row if applicable
         if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId()) {
