@@ -42,6 +42,11 @@ final class FakeModeratedCommand extends ModeratedCommand
         $this->releaseAdditionalRunLocks($moderationKeys);
     }
 
+    public function refreshLocks(): void
+    {
+        $this->refreshRunLocks();
+    }
+
     public function runWithKey(InputInterface $input, OutputInterface $output, string $key): bool
     {
         return $this->checkRunStatus($input, $output, $key);

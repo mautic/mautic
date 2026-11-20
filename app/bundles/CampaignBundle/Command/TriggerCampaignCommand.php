@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Event\JobExtendTimeEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -225,6 +226,10 @@ final class TriggerCampaignCommand extends ModeratedCommand
         if (!$this->checkRunStatus($input, $this->output, $moderationKey)) {
             return Command::SUCCESS;
         }
+        $refreshLocks = function (): void {
+            $this->refreshRunLocks();
+        };
+        $this->dispatcher->addListener(JobExtendTimeEvent::class, $refreshLocks);
         try {
             // Specific campaign;
             if ($id) {
@@ -287,6 +292,7 @@ final class TriggerCampaignCommand extends ModeratedCommand
         } catch (SignalCaughtException) {
             $exitCode = ExitCode::TERMINATED;
         } finally {
+            $this->dispatcher->removeListener(JobExtendTimeEvent::class, $refreshLocks);
             $this->completeRun();
         }
 

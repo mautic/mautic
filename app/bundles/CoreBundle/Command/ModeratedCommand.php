@@ -225,6 +225,26 @@ abstract class ModeratedCommand extends Command
         }
     }
 
+    /**
+     * Refresh expiring locks while a long-running command is processing work.
+     * File locks are unaffected; Redis-backed locks renew their lease here.
+     */
+    protected function refreshRunLocks(): void
+    {
+        $locks = $this->locks;
+        if (null !== $this->lock && !in_array($this->lock, $locks, true)) {
+            $locks[] = $this->lock;
+        }
+
+        foreach ($locks as $lock) {
+            try {
+                $lock->refresh($this->lockExpiration ?? 3600);
+            } catch (\Throwable $exception) {
+                throw new \RuntimeException('Unable to refresh a campaign execution lock.', 0, $exception);
+            }
+        }
+    }
+
     private function releaseLocksFrom(int $lockCount, int $lockFileCount): void
     {
         while (count($this->locks) > $lockCount) {

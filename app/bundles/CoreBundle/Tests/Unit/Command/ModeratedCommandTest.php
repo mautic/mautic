@@ -303,60 +303,90 @@ final class ModeratedCommandTest extends TestCase
         $this->assertFileDoesNotExist($this->lockFilePath);
     }
 
+    public function testRefreshesTheActiveLock(): void
+    {
+        $lock = $this->createMock(LockInterface::class);
+        $lock->expects($this->once())
+            ->method('refresh')
+            ->with(3600);
+
+        $this->fakeModeratedCommand->setLock($lock);
+        $this->fakeModeratedCommand->refreshLocks();
+    }
+
     public function testAdditionalLockCanBeReusedAndIsReleasedWithTheRun(): void
     {
         $cacheDir = __DIR__.'/resource/cache/tmp';
-        $this->pathsHelper->method('getSystemPath')->with('cache')->willReturn($cacheDir);
-        $this->input->method('getOption')
-            ->willReturnCallback(
-                fn (string $name): string|false|null => match ($name) {
-                    'lock_mode'      => ModeratedCommand::MODE_FLOCK,
-                    'bypass-locking' => false,
-                    default          => null,
-                }
-            );
+        try {
+            $this->pathsHelper->method('getSystemPath')->with('cache')->willReturn($cacheDir);
+            $this->input->method('getOption')
+                ->willReturnCallback(
+                    fn (string $name): string|false|null => match ($name) {
+                        'lock_mode'      => ModeratedCommand::MODE_FLOCK,
+                        'bypass-locking' => false,
+                        default          => null,
+                    }
+                );
 
-        $this->assertTrue($this->fakeModeratedCommand->runWithKey($this->input, $this->output, '-main'));
-        $this->assertTrue($this->fakeModeratedCommand->checkAdditional($this->input, $this->output, ['campaign-email-1']));
-        $this->assertTrue($this->fakeModeratedCommand->checkAdditional($this->input, $this->output, ['campaign-email-1']));
+            $this->assertTrue($this->fakeModeratedCommand->runWithKey($this->input, $this->output, '-main'));
+            $this->assertTrue($this->fakeModeratedCommand->checkAdditional($this->input, $this->output, ['campaign-email-1']));
+            $this->assertTrue($this->fakeModeratedCommand->checkAdditional($this->input, $this->output, ['campaign-email-1']));
 
-        $this->fakeModeratedCommand->forceCompleteRun();
+            $this->fakeModeratedCommand->forceCompleteRun();
 
-        $secondCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
-        $this->assertTrue($secondCommand->runWithKey($this->input, $this->output, '-other-main'));
-        $this->assertTrue($secondCommand->checkAdditional($this->input, $this->output, ['campaign-email-1']));
-        $secondCommand->forceCompleteRun();
-        rmdir($cacheDir.'/../run');
+            $secondCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
+            $this->assertTrue($secondCommand->runWithKey($this->input, $this->output, '-other-main'));
+            $this->assertTrue($secondCommand->checkAdditional($this->input, $this->output, ['campaign-email-1']));
+            $secondCommand->forceCompleteRun();
+        } finally {
+            $this->removeRunDirectory($cacheDir.'/../run');
+        }
     }
 
     public function testAdditionalLockAcquisitionRollsBackWhenAFollowingKeyIsBusy(): void
     {
         $cacheDir = __DIR__.'/resource/cache/tmp';
-        $this->pathsHelper->method('getSystemPath')->with('cache')->willReturn($cacheDir);
-        $this->input->method('getOption')
-            ->willReturnCallback(
-                fn (string $name): string|false|null => match ($name) {
-                    'lock_mode'      => ModeratedCommand::MODE_FLOCK,
-                    'bypass-locking' => false,
-                    default          => null,
-                }
-            );
+        try {
+            $this->pathsHelper->method('getSystemPath')->with('cache')->willReturn($cacheDir);
+            $this->input->method('getOption')
+                ->willReturnCallback(
+                    fn (string $name): string|false|null => match ($name) {
+                        'lock_mode'      => ModeratedCommand::MODE_FLOCK,
+                        'bypass-locking' => false,
+                        default          => null,
+                    }
+                );
 
-        $firstCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
-        $secondCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
-        $this->assertTrue($firstCommand->runWithKey($this->input, $this->output, '-first-main'));
-        $this->assertTrue($firstCommand->checkAdditional($this->input, $this->output, ['campaign-email-2']));
-        $this->assertTrue($secondCommand->runWithKey($this->input, $this->output, '-second-main'));
+            $firstCommand  = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
+            $secondCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
+            $this->assertTrue($firstCommand->runWithKey($this->input, $this->output, '-first-main'));
+            $this->assertTrue($firstCommand->checkAdditional($this->input, $this->output, ['campaign-email-2']));
+            $this->assertTrue($secondCommand->runWithKey($this->input, $this->output, '-second-main'));
 
-        $this->assertFalse($secondCommand->checkAdditional($this->input, $this->output, ['campaign-email-1', 'campaign-email-2']));
+            $this->assertFalse($secondCommand->checkAdditional($this->input, $this->output, ['campaign-email-1', 'campaign-email-2']));
 
-        $thirdCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
-        $this->assertTrue($thirdCommand->runWithKey($this->input, $this->output, '-third-main'));
-        $this->assertTrue($thirdCommand->checkAdditional($this->input, $this->output, ['campaign-email-1']));
+            $thirdCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
+            $this->assertTrue($thirdCommand->runWithKey($this->input, $this->output, '-third-main'));
+            $this->assertTrue($thirdCommand->checkAdditional($this->input, $this->output, ['campaign-email-1']));
 
-        $thirdCommand->forceCompleteRun();
-        $secondCommand->forceCompleteRun();
-        $firstCommand->forceCompleteRun();
-        rmdir($cacheDir.'/../run');
+            $thirdCommand->forceCompleteRun();
+            $secondCommand->forceCompleteRun();
+            $firstCommand->forceCompleteRun();
+        } finally {
+            $this->removeRunDirectory($cacheDir.'/../run');
+        }
+    }
+
+    private function removeRunDirectory(string $runDirectory): void
+    {
+        foreach (glob($runDirectory.'/*') ?: [] as $file) {
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
+
+        if (is_dir($runDirectory)) {
+            rmdir($runDirectory);
+        }
     }
 }
