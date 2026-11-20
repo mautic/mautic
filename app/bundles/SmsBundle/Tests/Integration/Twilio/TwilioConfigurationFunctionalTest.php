@@ -103,9 +103,10 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(ChoiceFormField::class, $isPublished);
         $isPublished->select('0');
         $form['integration_config[apiKeys][username]']->setValue('new_username');
-        $form['integration_config[_token]']->setValue('invalid');
+        $values = $form->getPhpValues();
+        $values['integration_config']['_token'] = 'invalid';
 
-        $crawler = $this->client->submit($form);
+        $crawler = $this->client->request($form->getMethod(), $form->getUri(), $values);
         $this->assertResponseIsSuccessful();
 
         $this->em->clear();
