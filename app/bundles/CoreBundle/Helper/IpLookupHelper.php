@@ -15,6 +15,18 @@ class IpLookupHelper
     private const UNTRACKED_VISITOR = 'mautic_untracked_visitor';
 
     /**
+     * Server keys that may hold the visitor's address when a proxy forwards the request, checked in this order.
+     */
+    private const FORWARDED_IP_HOLDERS = [
+        'HTTP_CLIENT_IP',
+        'HTTP_X_FORWARDED_FOR',
+        'HTTP_X_FORWARDED',
+        'HTTP_X_CLUSTER_CLIENT_IP',
+        'HTTP_FORWARDED_FOR',
+        'HTTP_FORWARDED',
+    ];
+
+    /**
      * @var array
      */
     protected $doNotTrackIps;
@@ -67,37 +79,37 @@ class IpLookupHelper
      */
     public function getIpAddressFromRequest()
     {
+        // 127.0.0.1 if everything else fails
+        return $this->findIpAddressInServer([...self::FORWARDED_IP_HOLDERS, 'REMOTE_ADDR']) ?? '127.0.0.1';
+    }
+
+    /**
+     * @param string[] $ipHolders
+     */
+    private function findIpAddressInServer(array $ipHolders): ?string
+    {
         $request = $this->getRequest();
 
-        if (null !== $request) {
-            $ipHolders = [
-                'HTTP_CLIENT_IP',
-                'HTTP_X_FORWARDED_FOR',
-                'HTTP_X_FORWARDED',
-                'HTTP_X_CLUSTER_CLIENT_IP',
-                'HTTP_FORWARDED_FOR',
-                'HTTP_FORWARDED',
-                'REMOTE_ADDR',
-            ];
+        if (null === $request) {
+            return null;
+        }
 
-            foreach ($ipHolders as $key) {
-                if ($request->server->get($key)) {
-                    $ip = trim($request->server->get($key));
+        foreach ($ipHolders as $key) {
+            if ($request->server->get($key)) {
+                $ip = trim($request->server->get($key));
 
-                    if (str_contains($ip, ',')) {
-                        $ip = $this->getClientIpFromProxyList($ip);
-                    }
+                if (str_contains($ip, ',')) {
+                    $ip = $this->getClientIpFromProxyList($ip);
+                }
 
-                    // Validate IP
-                    if (null !== $ip && $this->ipIsValid($ip)) {
-                        return $ip;
-                    }
+                // Validate IP
+                if (null !== $ip && $this->ipIsValid($ip)) {
+                    return $ip;
                 }
             }
         }
 
-        // if everything else fails
-        return '127.0.0.1';
+        return null;
     }
 
     /**
@@ -305,21 +317,32 @@ class IpLookupHelper
         try {
             // Unlike getIpAddressFromRequest(), forwarded headers only count from a trusted proxy, so a visitor
             // can't send one to get past the exclusion list, and a private address is kept so it can be excluded
-            $address = $request->getClientIp();
+            $clientAddress = $request->getClientIp();
         } catch (ConflictingHeadersException) {
             // A trusted proxy sent forwarded headers that disagree, so the visitor can't be told apart
             return false;
         }
 
-        if (null === $address) {
+        if (null === $clientAddress) {
             return false;
         }
 
-        // Checked on an unsaved entity, so nothing about the visitor is stored
-        $ipAddress = new IpAddress($address);
-        $this->setDoNotTrackList($ipAddress, $address);
+        // A forwarded address that isRequestTrackable() found excluded stays excluded, so a proxy missing from the
+        // trusted proxies can't turn an excluded visitor into a counted one. The 127.0.0.1 fallback isn't an address
+        // the visitor sent, so it isn't checked.
+        $forwardedAddress = $this->findIpAddressInServer(self::FORWARDED_IP_HOLDERS);
 
-        return $ipAddress->isTrackable();
+        foreach (array_unique(array_filter([$clientAddress, $forwardedAddress])) as $address) {
+            // Checked on an unsaved entity, so nothing about the visitor is stored
+            $ipAddress = new IpAddress($address);
+            $this->setDoNotTrackList($ipAddress, $address);
+
+            if (!$ipAddress->isTrackable()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function isPrefetch(Request $request): bool

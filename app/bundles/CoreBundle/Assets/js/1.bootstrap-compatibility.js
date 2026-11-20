@@ -764,6 +764,12 @@ window.MauticInstallLegacyAffix = function (jQuery) {
                 element.removeAttribute(bootstrapName);
                 delete owned[bootstrapName];
             } else {
+                if ('data-placement' === legacyName && /^auto(?:\s|$)/.test(legacyValue)) {
+                    legacyValue = legacyValue.replace(/^auto\s*/, '') || 'top';
+                    if (!element.hasAttribute('data-bs-fallback-placements')) {
+                        element.setAttribute('data-bs-fallback-placements', '["top","right","bottom","left"]');
+                    }
+                }
                 element.setAttribute(bootstrapName, legacyValue);
                 owned[bootstrapName] = legacyValue;
             }
