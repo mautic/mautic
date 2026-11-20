@@ -62,6 +62,13 @@ final class CustomFieldValueHelperTest extends TestCase
         $this->assertEquals('Second option', $normalizedFields['core']['test']['normalizedValue']);
     }
 
+    public function testNormalizeNullSelectValue(): void
+    {
+        $properties = 'a:1:{s:4:"list";a:1:{i:0;a:2:{s:5:"label";s:12:"First option";s:5:"value";s:5:"first";}}}';
+
+        $this->assertNull(CustomFieldValueHelper::normalize(null, CustomFieldValueHelper::TYPE_SELECT, $properties));
+    }
+
     public function testNormalizeValueSelectWithoutProperties(): void
     {
         $fields['core']['test'] = [

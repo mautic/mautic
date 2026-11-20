@@ -686,7 +686,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return string
      */
-    protected function getTemplateName($file)
+    protected function getTemplateName(string $file)
     {
         $namespaces = [
             $this->getTemplateBase(),
@@ -717,7 +717,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return string
      */
-    protected function getTranslatedString($string)
+    protected function getTranslatedString(string $string)
     {
         return $this->translator->hasId($this->getTranslationBase().'.'.$string) ? $this->getTranslationBase()
             .'.'.$string : 'mautic.core.'.$string;
@@ -1058,11 +1058,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * @param string|null $logObject
      * @param string|null $logBundle
      * @param string|null $listPage
-     * @param string      $itemName
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    protected function viewStandard(Request $request, $objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item')
+    protected function viewStandard(Request $request, $objectId, $logObject = null, $logBundle = null, $listPage = null, string $itemName = 'item')
     {
         $model    = $this->getModel($this->getModelName());
         $entity   = $model->getEntity($objectId);

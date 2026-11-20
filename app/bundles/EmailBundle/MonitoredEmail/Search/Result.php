@@ -16,10 +16,7 @@ final class Result
      */
     private array $contacts = [];
 
-    /**
-     * @var string
-     */
-    private $email;
+    private ?string $email = null;
 
     public function getStat(): ?Stat
     {
@@ -60,18 +57,12 @@ final class Result
         $this->contacts = $contacts;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    /**
-     * @param mixed $email
-     */
-    public function setEmail($email): static
+    public function setEmail(string $email): static
     {
         $this->email = $email;
 
