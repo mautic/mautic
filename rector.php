@@ -9,6 +9,7 @@ return RectorConfig::configure()
     ->withParallel(timeoutSeconds: 300)
     ->withPaths([
         __DIR__.'/app/bundles',
+        __DIR__.'/app/tests',
         __DIR__.'/plugins',
         // __DIR__.'/utils',
     ])
@@ -58,7 +59,7 @@ return RectorConfig::configure()
 
         // adds dead "return false" after self::fail(); fixed upstream in rector-phpunit #801, drop after next tag
         Rector\PHPUnit\CodeQuality\Rector\MethodCall\WillReturnCallbackFallbackToReturnFalseRector::class => [
-            __DIR__.'/app/bundles/UserBundle/Tests/EventListener/ApiUserSubscriberTest.php',
+            __DIR__.'/app/tests/UserBundle/Tests/EventListener/ApiUserSubscriberTest.php',
         ],
 
         // Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
@@ -68,11 +69,11 @@ return RectorConfig::configure()
 
         // test fixtures
         __DIR__.'/plugins/*/node_modules/*',
-        __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Helper/resource/',
+        __DIR__.'/app/tests/CoreBundle/Tests/Unit/Helper/resource/',
 
         UnserializeToSerializerDecodeRector::class => [
             // tests
-            __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
+            __DIR__.'/app/tests/UserBundle/Tests/Entity/UserTest.php',
             // reproduces what DBAL's own ArrayType did before DBAL 4 removed it: the objects
             // have to be unserialized so that convertToPHPValue can drop the ones that would
             // carry null bytes. Serializer::decode() refuses the whole value instead, which
