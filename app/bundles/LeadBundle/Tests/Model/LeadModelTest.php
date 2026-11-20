@@ -229,11 +229,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->tagRepositoryMock->expects($this->exactly(2))
             ->method('getTagsByName')
-            ->with(['import-tag'])
-            ->willReturnOnConsecutiveCalls(
-                ['import-tag' => $detachedTag],
-                ['import-tag' => $detachedTag],
-            );
+            ->with(['import-tag'])->willReturn(['import-tag' => $detachedTag]);
         $this->entityManagerMock->expects($this->exactly(2))
             ->method('getReference')
             ->with(Tag::class, 123)
