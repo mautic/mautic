@@ -34,6 +34,9 @@ final readonly class SendSmsSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * Removes contacts that have opted out of the SMS channel.
+     */
     public function dncFilter(DncEvent $event): void
     {
         $dnc = $this->dncRepo->getChannelList('sms', array_keys($event->getContacts()));
@@ -45,6 +48,9 @@ final readonly class SendSmsSubscriber implements EventSubscriberInterface
         $event->removeContacts(array_keys($dnc));
     }
 
+    /**
+     * Moves frequency-limited contacts from immediate sending into the message queue.
+     */
     public function queueFilter(QueueEvent $event): void
     {
         $options         = $event->getOptions();
@@ -67,10 +73,19 @@ final readonly class SendSmsSubscriber implements EventSubscriberInterface
         $event->queueContacts($queuedContacts);
     }
 
+    /**
+     * Removes contacts whose SMS number is empty after trimming whitespace.
+     */
     public function genericFilter(FilterEvent $event): void
     {
-        $contactsWithoutNumbers = array_filter($event->getContacts(), fn (Lead $contact): bool => empty($contact->getLeadPhoneNumber()));
+        $contactsWithoutNumbers = array_filter(
+            $event->getContacts(),
+            fn (Lead $contact): bool => '' === trim((string) $contact->getLeadPhoneNumber()),
+        );
 
-        $event->removeContacts(array_map(fn (Lead $contact): int => $contact->getId(), $contactsWithoutNumbers));
+        $event->removeContacts(
+            array_map(fn (Lead $contact): int => $contact->getId(), $contactsWithoutNumbers),
+            FilterEvent::REMOVAL_REASON_MISSING_NUMBER,
+        );
     }
 }
