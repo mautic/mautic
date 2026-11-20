@@ -17,6 +17,8 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['form_field_autofill'] = true;
+        // Autofill needs a tracked submitter, whatever the installer set
+        $this->configParams['form_track_submitters'] = true;
 
         parent::setUp();
     }
