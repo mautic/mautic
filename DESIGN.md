@@ -236,16 +236,6 @@ modal:
 pictogram: "Use for decorative illustrations, such as empty states, by name and size."
 ```
 
-### segmented-control
-
-Use to choose one option from a small set of mutually exclusive options, shown side by side so the user sees all of them at once. Use it for 2 to 4 concise options that fit on one line at the control width, such as Contact/Company or Local/Remote. Do not use it for long descriptions or multi-line choices. For more than 4 options, use a select. For a single yes/no or on/off choice, use a toggle.
-
-Match the [UIBrik reference](https://uibrik.com/components/segmented-control): a muted pill-shaped track with a 25px radius, a lighter sliding selection with no border and a subtle shadow, and dark text on the selection in the light theme. Option: `draggable` (press the selected option and drag to scrub across the others, on by default).
-
-```yaml
-segmented-control: "Use to pick one of 2 to 4 short, mutually exclusive options that fit on one line. Not for long or multi-line choices, or yes/no."
-```
-
 ### tile
 
 Use for a compact block of content with an optional button or click target. Tile is the main component to create a layer: place content inside a tile to add a new layer on top of the background.
@@ -257,14 +247,6 @@ tile:
   expandable: "Use for content that the user can expand to read more."
   expandable-interactive: "Use for expandable content that has interactive elements inside."
   mini: "Use for a small clickable block with an icon."
-```
-
-### toggle
-
-Use to turn one setting on or off, or to answer a yes/no or positive/negative question, and the choice applies right away or on save. When the two options are not opposites of each other (for example Local and Remote), use a segmented control instead, even with only 2 options.
-
-```yaml
-toggle: "Use for a single yes/no, on/off or positive/negative choice."
 ```
 
 ### toggletip
