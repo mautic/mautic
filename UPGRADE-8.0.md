@@ -1725,7 +1725,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\UserBundle\Entity\Role`: `setName(?string $name)`, `setDescription(?string $description)`
     - `Mautic\UserBundle\Entity\User`: `setPassword(string $password)`, `setPlainPassword(?string $plainPassword)`, `setCurrentPassword(?string $currentPassword)`, `setFirstName(?string $firstName)`, `setLastName(?string $lastName)`, `setEmail(?string $email)`, `setPosition(?string $position)`, `setTimezone(?string $timezone)`, `setSignature(?string $signature)`
     - `Mautic\UserBundle\Entity\UserToken`: `setAuthorizator(string $authorizator)`, `setOneTimeOnly(bool $oneTimeOnly)`
-    - `Mautic\WebhookBundle\Entity\Log`: `setStatusCode(int|string $statusCode)`
+    - `Mautic\WebhookBundle\Entity\Log`: `setStatusCode(int|string $statusCode)` - passing `null`, an array or (with `strict_types`) a float now throws a `TypeError`; the value is stored as a string, so `getStatusCode()` returns a string (e.g. `'200'`) even when an int was passed - compare with `== 200` or cast to `int`
     - `Mautic\WebhookBundle\Entity\Webhook`: `setName(?string $name)`, `setWebhookUrl(?string $webhookUrl)`, `setSecret(?string $secret)`
     - `Mautic\WebhookBundle\Entity\WebhookQueue`: `setPayload(string $payload)`
     - `MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder`: `setCustomMjml(?string $customMjml)`
