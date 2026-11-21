@@ -18,6 +18,28 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
     // Creating a custom field alters the leads table (DDL), which commits the transaction, so rollback cleanup must be disabled.
     protected $useCleanupRollback = false;
 
+    public function testContactDetailsLoadWithOnlyFullGroupByEnabled(): void
+    {
+        $contact = new Lead();
+        $contact->setFirstname('Strict grouping contact');
+        $contact->setEmail('strict-grouping@example.invalid');
+        $this->em->persist($contact);
+        $this->em->flush();
+        $contactId = $contact->getId();
+        $this->em->clear();
+
+        $original = (string) $this->connection->fetchOne('SELECT @@SESSION.sql_mode');
+        $strict = implode(',', array_unique([...array_filter(explode(',', $original)), 'ONLY_FULL_GROUP_BY']));
+        $this->connection->executeStatement('SET SESSION sql_mode = ?', [$strict]);
+        try {
+            $this->client->request('GET', '/s/contacts/view/'.$contactId);
+            $this->assertResponseIsSuccessful();
+            $this->assertStringContainsString('Strict grouping contact', (string) $this->client->getResponse()->getContent());
+        } finally {
+            $this->connection->executeStatement('SET SESSION sql_mode = ?', [$original]);
+        }
+    }
+
     public function testCustomFieldOrderIsRespected(): void
     {
         $lead = new Lead();
