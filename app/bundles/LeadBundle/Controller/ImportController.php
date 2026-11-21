@@ -344,10 +344,15 @@ final class ImportController extends FormController
                                 // Get the headers for matching
                                 $headers = fgetcsv($file, null, $config['delimiter'], $config['enclosure'], $config['escape']);
 
-                                // Get the number of lines so we can track progress
+                                // Get the number of lines so we can track progress. This counts the line breaks in the
+                                // whole file, which is the index SplFileObject::key() returned after seeking to the end
+                                // before PHP 8.6 and what ImportModel::process() compares the last imported line with.
+                                rewind($file);
                                 $linecount = 0;
-                                while (false !== fgets($file)) {
-                                    ++$linecount;
+                                while (false !== ($line = fgets($file))) {
+                                    if (str_ends_with($line, "\n")) {
+                                        ++$linecount;
+                                    }
                                 }
                                 fclose($file);
 
