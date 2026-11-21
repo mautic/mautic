@@ -351,6 +351,8 @@ Mautic.onPageLoad = function (container, response, inModal) {
         bootstrap.Tab.getOrCreateInstance(element);
     });
 
+    Mautic.initSegmentedControl(container);
+
     //initialize tooltips
     const pageTooltips = mQuery(container + " *[data-bs-toggle='tooltip']");
     pageTooltips.each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true, container: 'body'}));

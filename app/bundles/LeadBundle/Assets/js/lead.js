@@ -983,7 +983,7 @@ Mautic.updateLeadFieldBooleanLabels = function(el, label) {
 
 Mautic.updateLeadFieldOrderChoiceList = function () {
     formData = {
-        'object': mQuery('#leadfield_object').val(),
+        'object': mQuery('#leadfield_object input:checked').val(),
         'group': mQuery('#leadfield_group').val()
     };
     Mautic.ajaxActionRequest('lead:updateLeadFieldOrderChoiceList', formData, function(response) {

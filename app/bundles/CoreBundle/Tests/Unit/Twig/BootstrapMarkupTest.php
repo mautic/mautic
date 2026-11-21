@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Twig;
 
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\CoreBundle\Form\Type\SegmentedControlType;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
@@ -26,6 +27,7 @@ final class BootstrapMarkupTest extends TestCase
     protected function setUp(): void
     {
         $loader = new FilesystemLoader(__DIR__.'/../../../Resources/views');
+        $loader->addPath(__DIR__.'/../../../Resources/views', 'MauticCore');
         $loader->addPath(dirname((new \ReflectionClass(FormExtension::class))->getFileName(), 2).'/Resources/views/Form');
         $this->twig = new Environment($loader, ['autoescape' => 'html']);
         $this->twig->addExtension(new TranslationExtension());
@@ -67,6 +69,44 @@ final class BootstrapMarkupTest extends TestCase
         $this->assertSame('outgoing', $crawler->filter('input.btn-check:checked')->attr('value'));
         $this->assertSame('direction_1', $crawler->filter('input.btn-check:checked + label')->attr('for'));
         $this->assertCount(0, $crawler->filter('[data-toggle="buttons"], label input'));
+    }
+
+    public function testSegmentedControlSelectsOnlyTheExactChoiceValue(): void
+    {
+        $formFactory = Forms::createFormFactoryBuilder()
+            ->addType(new ButtonGroupType())
+            ->addType(new SegmentedControlType())
+            ->getFormFactory();
+        $form = $formFactory->createNamed('mode', SegmentedControlType::class, '0', [
+            'label'                    => 'Mode',
+            'choices'                  => ['Zero' => '0', 'Double zero' => '00'],
+            'choice_translation_domain' => false,
+        ]);
+        $html = $this->twig->createTemplate('{{ form_widget(form) }}')->render(['form' => $form->createView()]);
+        $checkedChoices = (new Crawler($html))->filter('input.btn-check:checked');
+
+        $this->assertCount(1, $checkedChoices);
+        $this->assertSame('0', $checkedChoices->attr('value'));
+    }
+
+    public function testSegmentedControlPassesChoiceAttributesToInputs(): void
+    {
+        $formFactory = Forms::createFormFactoryBuilder()
+            ->addType(new ButtonGroupType())
+            ->addType(new SegmentedControlType())
+            ->getFormFactory();
+        $form = $formFactory->createNamed('mode', SegmentedControlType::class, 'a', [
+            'choices'                   => ['A' => 'a', 'B' => 'b'],
+            'choice_attr'               => ['B' => ['data-test' => 'choice-b', 'class' => 'custom-choice']],
+            'choice_translation_domain' => false,
+        ]);
+        $html = $this->twig->createTemplate('{{ form_widget(form) }}')->render(['form' => $form->createView()]);
+
+        $crawler = new Crawler($html);
+
+        $this->assertSame('choice-b', $crawler->filter('input[value="b"]')->attr('data-test'));
+        $this->assertSame('btn-check custom-choice', $crawler->filter('input[value="b"]')->attr('class'));
+        $this->assertNull($crawler->filter('input[value="a"]')->attr('data-test'));
     }
 
     public function testDisabledButtonGroupRetainsDisabledInputs(): void
