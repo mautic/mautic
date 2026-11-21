@@ -1,11 +1,4 @@
-.col-point-id, .col-pointtrigger-id {
-    width: 75px;
-}
-
-.trigger-event-group-header {
-    font-size: 1.1em;
-    font-weight: bold;
-}
+.col-point-id, .col-pointtrigger-id { width: 75px; }
 
 #triggerEvents .trigger-event-row {
     padding: 20px;
@@ -15,24 +8,9 @@
     transition: var(--transition-all-productive);
 }
 
-#triggerEvents .trigger-event-row .event-label {
-    font-size: 1.1em;
-    font-weight: bold;
-    display: block;
-}
+#triggerEvents .trigger-event-row:hover { background-color: var(--layer-hover); }
 
-#triggerEvents .trigger-event-row .event-descr {
-    font-size: 0.9em;
-    display: block;
-}
-
-#triggerEvents .trigger-event-row:hover {
-    background-color: var(--layer-hover);
-}
-
-#triggerEvents .trigger-event-row.bg-danger:hover {
-    background-color: var(--support-error-inverse);
-}
+#triggerEvents .trigger-event-row.bg-danger:hover { background-color: var(--support-error-inverse); }
 
 #triggerEvents .form-buttons {
     float: right;
@@ -42,6 +20,3 @@
     transform: translateY(-50%);
 }
 
-.col-pointtrigger-color {
-    width: 50px;
-}

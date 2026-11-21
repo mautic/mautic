@@ -98,7 +98,7 @@ $utilities: map-merge($utilities, (
 
 $utilities: map-merge($utilities, (
   "width": map-merge(map-get($utilities, "width"), (
-    "values": map-merge(map-get(map-get($utilities, "width"), "values"), (44: 44px))
+    "values": map-merge(map-get(map-get($utilities, "width"), "values"), map-merge(map-remove($spacers, 0, 1, 2, 3, 4, 5), (44: 44px)))
   )),
   "height": map-merge(map-get($utilities, "height"), (
     "values": map-merge(map-get(map-get($utilities, "height"), "values"), (32: 32px, 48: 48px, 384: 384px))
