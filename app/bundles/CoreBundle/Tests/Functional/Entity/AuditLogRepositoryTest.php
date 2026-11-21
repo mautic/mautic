@@ -34,13 +34,13 @@ final class AuditLogRepositoryTest extends MauticMysqlTestCase
         $this->withOnlyFullGroupBy(function () use ($contact, $first): void {
             $repository = $this->em->getRepository(AuditLog::class);
             $rows = $repository->getLeadIpLogs($contact, ['paginated' => true]);
-            self::assertSame(1, (int) $rows['total']);
-            self::assertCount(1, $rows['results']);
+            $this->assertSame(1, (int) $rows['total']);
+            $this->assertCount(1, $rows['results']);
             $row = $rows['results'][0];
-            self::assertSame($contact->getId(), (int) $row['lead_id']);
-            self::assertSame('203.0.113.10', $row['ip_address']);
-            self::assertSame($first->getId(), (int) $row['id']);
-            self::assertSame('2025-01-12 12:00:00', $row['date_added']->format('Y-m-d H:i:s'));
+            $this->assertSame($contact->getId(), (int) $row['lead_id']);
+            $this->assertSame('203.0.113.10', $row['ip_address']);
+            $this->assertSame($first->getId(), (int) $row['id']);
+            $this->assertSame('2025-01-12 12:00:00', $row['date_added']->format('Y-m-d H:i:s'));
         });
     }
 
@@ -62,19 +62,19 @@ final class AuditLogRepositoryTest extends MauticMysqlTestCase
         $this->withOnlyFullGroupBy(function () use ($first, $second): void {
             $repository = $this->em->getRepository(AuditLog::class);
             $rows = $repository->getLeadIpLogs(null, ['paginated' => true]);
-            self::assertSame(3, (int) $rows['total']);
-            self::assertCount(3, $rows['results']);
+            $this->assertSame(3, (int) $rows['total']);
+            $this->assertCount(3, $rows['results']);
             $identities = array_map(static fn (array $row): string => $row['lead_id'].':'.$row['ip_address'], $rows['results']);
-            self::assertEqualsCanonicalizing([
+            $this->assertEqualsCanonicalizing([
                 $first->getId().':203.0.113.10',
                 $second->getId().':203.0.113.10',
                 $second->getId().':203.0.113.20',
             ], $identities);
 
             $page = $repository->getLeadIpLogs(null, ['paginated' => true, 'limit' => 1, 'order' => ['timestamp', 'DESC']]);
-            self::assertSame(3, (int) $page['total']);
-            self::assertCount(1, $page['results']);
-            self::assertSame('203.0.113.20', $page['results'][0]['ip_address']);
+            $this->assertSame(3, (int) $page['total']);
+            $this->assertCount(1, $page['results']);
+            $this->assertSame('203.0.113.20', $page['results'][0]['ip_address']);
         });
     }
 
