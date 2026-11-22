@@ -65,7 +65,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     abstract protected function getModelName(): string;
 
-    protected function getFormModel(): FormModel
+    private function getFormModel(): FormModel
     {
         $model = $this->getModel($this->getModelName());
         if (!$model instanceof FormModel) {
