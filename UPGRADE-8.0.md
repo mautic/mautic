@@ -595,6 +595,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
 ## Changed code
 
+- `Mautic\CoreBundle\Controller\AbstractStandardFormController::deleteStandard()` and `batchDeleteStandard()` now require the model returned for `getModelName()` to extend `Mautic\CoreBundle\Model\FormModel` and throw a `LogicException` otherwise, as `editStandard()` and `newStandard()` already did.
 - `Mautic\NotificationBundle\Integration\OneSignalIntegration` now extends `Mautic\IntegrationsBundle\Integration\BasicIntegration` instead of the deprecated `Mautic\PluginBundle\Integration\AbstractIntegration`, so it is no longer an `AbstractIntegration`. Methods that only `AbstractIntegration` provides no longer exist on it, for example `getKeys()`, `getDecryptedApiKeys()`, `getFormSettings()` and `isCoreIntegration()`; it still has `getName()`, `getDisplayName()`, `getIcon()`, `getIntegrationSettings()` and `getSupportedFeatures()`. Load the integration with its API keys decrypted through the new `Mautic\NotificationBundle\Helper\OneSignalIntegrationHelper` (`getIntegration()` / `getPublishedIntegration()`) instead of `Mautic\PluginBundle\Helper\IntegrationHelper::getIntegrationObject('OneSignal')` and `getKeys()` / `getDecryptedApiKeys()`.
 - Methods removed from `Mautic\NotificationBundle\Integration\OneSignalIntegration`. The configuration form is now `Mautic\NotificationBundle\Integration\Support\ConfigSupport`:
 
