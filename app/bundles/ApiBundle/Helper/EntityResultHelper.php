@@ -35,11 +35,9 @@ final class EntityResultHelper
     }
 
     /**
-     * @param mixed $entityRow
-     *
      * @return mixed
      */
-    private function getEntityData($entityRow)
+    private function getEntityData(mixed $entityRow)
     {
         if (is_array($entityRow) && isset($entityRow[0])) {
             return $this->getDataForArray($entityRow);

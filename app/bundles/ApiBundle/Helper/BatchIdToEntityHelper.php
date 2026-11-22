@@ -110,10 +110,7 @@ final class BatchIdToEntityHelper
         $this->extractIdsFromParams($parameters);
     }
 
-    /**
-     * @param mixed $ids
-     */
-    private function extractIdsFromIdKey($ids): void
+    private function extractIdsFromIdKey(mixed $ids): void
     {
         // ['ids' => [1,2,3]]
         if (is_array($ids)) {
