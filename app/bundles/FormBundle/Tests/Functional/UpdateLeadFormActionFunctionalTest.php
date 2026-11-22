@@ -56,11 +56,18 @@ final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($formElement);
 
         $this->em->clear();
+        $leadFieldValues = $this->em->getRepository(Lead::class)->getFieldValues($lead->getId(), false);
+
         foreach ($expectedLeadData as $field => $value) {
-            $leadFieldValue = $lead->getFieldValue($field);
+            $leadFieldValue = $leadFieldValues[$field]['value'] ?? null;
+
             if ('{datetime=now}' === $value) {
+                $this->assertIsString($leadFieldValue);
+
                 $actualValue = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $leadFieldValue);
-                $diff        = abs($actualValue->getTimestamp() - (new \DateTime())->getTimestamp());
+                $this->assertInstanceOf(\DateTimeImmutable::class, $actualValue);
+
+                $diff = abs($actualValue->getTimestamp() - (new \DateTime())->getTimestamp());
                 $this->assertLessThan(60, $diff, "The {$field} is not within 60 seconds of now.");
             } else {
                 $this->assertEquals($value, $leadFieldValue ?? null, "Field {$field} does not match");

@@ -105,7 +105,7 @@ final class FormModelTest extends TestCase
         }
     }
 
-    public function testSaveEntityToCheckDateAddedAndDateModified(): void
+    public function testSaveEntityIfDateModifiedIsUpdatedOnlyWhenEntityChanges(): void
     {
         $corePermissionsMock      = $this->createStub(CorePermissions::class);
         $dispatcherMock           = $this->createStub(EventDispatcherInterface::class);
@@ -146,8 +146,18 @@ final class FormModelTest extends TestCase
 
         $dateModified1 = $lead->getDateModified();
         $dateAdded1    = $lead->getDateAdded();
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateModified1);
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateAdded1);
+        $this->assertLessThanOrEqual(1, abs($dateModified1->getTimestamp() - $dateAdded1->getTimestamp()));
 
-        // Step 2: Update the existing entity and save it
+        // Step 2: Save the entity again without making any changes
+        $lead->resetChanges();
+        $formModel->saveEntity($lead);
+        $this->assertSame($dateModified1, $lead->getDateModified(), 'Date modified should not be updated when the entity has no changes');
+
+        // Step 3: Update the existing entity and save it
+        $previousDateModified = new \DateTime('2000-01-01 00:00:00');
+        $lead->setDateModified($previousDateModified);
         $lead->setTitle('Lorem ipsum');
         $formModel->saveEntity($lead);
 
@@ -155,6 +165,12 @@ final class FormModelTest extends TestCase
         $dateAdded2    = $lead->getDateAdded();
 
         $this->assertSame($dateAdded1, $dateAdded2, 'Date added should not be updated after saving the entity again');
-        $this->assertSame($dateModified1, $dateModified2, 'Date modified should not be updated after saving the entity again');
+        $this->assertGreaterThan($previousDateModified->getTimestamp(), $dateModified2->getTimestamp(), 'Date modified should be updated after saving the entity again');
+
+        // Step 4: Update the DNC channel status and save the entity
+        $lead->resetChanges();
+        $lead->setChanges(['dnc_channel_status' => []]);
+        $formModel->saveEntity($lead);
+        $this->assertSame($dateModified2, $lead->getDateModified(), 'Date modified should not be updated when only the DNC channel status changes');
     }
 }

@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -299,7 +300,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->setCustomRepositoryClass(LeadRepository::class)
             ->addLifecycleEvent('checkDateIdentified', 'preUpdate')
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
-            ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
+            ->addLifecycleEvent('checkAttributionDateOnUpdate', 'preUpdate')
             ->addLifecycleEvent('checkAttributionDate', 'prePersist')
             ->addLifecycleEvent('checkDateAdded', 'prePersist')
             ->addIndex(['date_added'], 'lead_date_added')
@@ -1412,6 +1413,18 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         } elseif (empty($attribution) && !empty($attributionDate)) {
             $this->addUpdatedField('attribution_date', null);
         }
+    }
+
+    /**
+     * Preserve custom-field-only saves when updating the modification timestamp
+     */
+    public function checkAttributionDateOnUpdate(PreUpdateEventArgs $event): void
+    {
+        if (['dateModified'] === array_keys($event->getEntityChangeSet())) {
+            return;
+        }
+
+        $this->checkAttributionDate();
     }
 
     /**

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -238,6 +240,42 @@ final class LeadTest extends TestCase
         $lead->checkAttributionDate();
         $this->assertNull($lead->getFieldValue('attribution_date'));
         $this->assertNotEmpty($lead->getChanges());
+    }
+
+    public function testAttributionDateIsUnchangedForTimestampOnlyUpdate(): void
+    {
+        $lead = new Lead();
+        $lead->addUpdatedField('attribution_date', '2017-09-09');
+
+        $changes = [
+            'dateModified' => [
+                new \DateTime('2000-01-01'),
+                new \DateTime('2001-01-01')
+            ]
+        ];
+
+        $lead->checkAttributionDateOnUpdate(new PreUpdateEventArgs($lead, $this->createStub(EntityManagerInterface::class), $changes));
+        $this->assertSame('2017-09-09', $lead->getFieldValue('attribution_date'));
+    }
+
+    public function testAttributionDateIsCheckedForMappedFieldUpdate(): void
+    {
+        $lead = new Lead();
+        $lead->addUpdatedField('attribution_date', '2017-09-09');
+
+        $changes = [
+            'dateModified' => [
+                new \DateTime('2000-01-01'),
+                new \DateTime('2001-01-01'),
+            ],
+            'firstname'    => [
+                'Old',
+                'New',
+            ],
+        ];
+
+        $lead->checkAttributionDateOnUpdate(new PreUpdateEventArgs($lead, $this->createStub(EntityManagerInterface::class), $changes));
+        $this->assertNull($lead->getFieldValue('attribution_date'));
     }
 
     public function testAttributionDateIsNotChangedWhen0ChangedToNull(): void

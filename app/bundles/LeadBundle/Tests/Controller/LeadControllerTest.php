@@ -415,6 +415,57 @@ final class LeadControllerTest extends MauticMysqlTestCase
         ], $auditLog->getDetails()['fields']);
     }
 
+    public function testDateModifiedIsPersistedWhenContactIsEditedViaUI(): void
+    {
+        $email   = 'modified-date-contact@example.com';
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues([
+            'lead[firstname]' => 'Original',
+            'lead[lastname]'  => 'Contact',
+            'lead[email]'     => $email,
+        ]);
+
+        $this->client->submit($form);
+        self::assertResponseIsSuccessful();
+
+        /** @var Lead $contact */
+        $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => $email]);
+        $this->assertInstanceOf(Lead::class, $contact);
+
+        $contactId    = $contact->getId();
+        $dateAdded    = $contact->getDateAdded();
+        $dateModified = $contact->getDateModified();
+        $this->assertNotNull($dateAdded);
+        $this->assertNotNull($dateModified);
+        $this->assertLessThanOrEqual(1, abs($dateModified->getTimestamp() - $dateAdded->getTimestamp()));
+
+        $previousDateModified = new \DateTime('2000-01-01 00:00:00');
+        $this->connection->update(
+            $this->em->getClassMetadata(Lead::class)->getTableName(),
+            ['date_modified' => $previousDateModified->format('Y-m-d H:i:s')],
+            ['id' => $contactId]
+        );
+        $this->em->clear();
+
+        $contact = $this->em->getRepository(Lead::class)->find($contactId);
+        $this->assertInstanceOf(Lead::class, $contact);
+        $this->assertSame($previousDateModified->getTimestamp(), $contact->getDateModified()->getTimestamp());
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/'.$contactId);
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues(['lead[firstname]' => 'Updated']);
+        $this->client->submit($form);
+        self::assertResponseIsSuccessful();
+
+        $this->em->clear();
+        $updatedContact = $this->em->getRepository(Lead::class)->find($contactId);
+        $this->assertInstanceOf(Lead::class, $updatedContact);
+        $this->assertSame('Updated', $updatedContact->getFirstname());
+        $this->assertSame($dateAdded->getTimestamp(), $updatedContact->getDateAdded()->getTimestamp());
+        $this->assertGreaterThan($previousDateModified->getTimestamp(), $updatedContact->getDateModified()->getTimestamp());
+    }
+
     /**
      * Only tests if a contact export is scheduled for CSV file.
      */

@@ -76,11 +76,12 @@ final class ImportCommandTest extends MauticMysqlTestCase
     {
         $csvFile = $this->generateSmallCSV();
 
-        $now    = new \DateTime();
+        $now          = new \DateTime();
+        $dateModified = (clone $now)->modify('-3 hours');
+
         $import = new Import();
         $import->setIsPublished(true);
-        $import->setDateAdded($now->modify('-4 hours'));
-        $import->setDateModified($now->modify('-3 hours'));
+        $import->setDateAdded((clone $now)->modify('-4 hours'));
         $import->setCreatedBy(1);
         $import->setDir('/tmp');
         $import->setFile(basename($csvFile));
@@ -91,6 +92,7 @@ final class ImportCommandTest extends MauticMysqlTestCase
         $import->setIgnoredCount(0);
         $import->setStatus($status);
         $import->setObject('lead');
+
         $properties = [
             'fields'   => [
                 'file'      => 'file',
@@ -120,6 +122,13 @@ final class ImportCommandTest extends MauticMysqlTestCase
         /** @var ImportModel $importModel */
         $importModel = self::getContainer()->get(ImportModel::class);
         $importModel->saveEntity($import);
+
+        $this->connection->update(
+            $this->em->getClassMetadata(Import::class)->getTableName(),
+            ['date_modified' => $dateModified->format('Y-m-d H:i:s')],
+            ['id' => $import->getId()]
+        );
+        $this->em->clear();
 
         return $import;
     }
