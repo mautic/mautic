@@ -72,10 +72,7 @@ final class OpenIDConnectBridge extends OpenIDConnectClient implements ClientBri
         }
     }
 
-    /**
-     * @param mixed $value
-     */
-    protected function setSessionKey(string $key, $value): void
+    protected function setSessionKey(string $key, mixed $value): void
     {
         $this->requireSession();
         $this->session->set($key, $value);

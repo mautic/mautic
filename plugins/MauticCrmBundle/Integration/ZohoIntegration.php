@@ -1227,9 +1227,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param array $fields
      * @param array $keys
-     * @param mixed $object
      */
-    public function prepareFieldsForSync($fields, $keys, $object = null): array
+    public function prepareFieldsForSync($fields, $keys, mixed $object = null): array
     {
         $leadFields = [];
         $object ??= 'Leads';
