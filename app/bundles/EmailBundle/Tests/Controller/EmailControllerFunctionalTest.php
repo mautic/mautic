@@ -1710,7 +1710,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $auditLog = $auditLogs[0];
         $this->assertInstanceOf(AuditLog::class, $auditLog);
         $details = $auditLog->getDetails();
-        $this->assertCount(1, $details);
+        $this->assertCount(2, $details);
         $this->assertArrayHasKey('variantSettings', $details);
         $variantSettings = $details['variantSettings'];
         $this->assertCount(2, $variantSettings);
@@ -1744,7 +1744,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $auditLog = $auditLogs[0];
         $this->assertInstanceOf(AuditLog::class, $auditLog);
         $details = $auditLog->getDetails();
-        $this->assertCount(1, $details);
+        $this->assertCount(2, $details);
         $this->assertArrayHasKey('lists', $details);
         $lists = $details['lists'];
         $this->assertCount(2, $lists);
