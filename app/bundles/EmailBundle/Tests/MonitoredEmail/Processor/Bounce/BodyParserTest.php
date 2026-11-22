@@ -42,7 +42,7 @@ BODY;
 
         $this->assertEquals('recipient@example.net', $bounce->getContactEmail());
         $this->assertEquals(Category::UNKNOWN, $bounce->getRuleCategory());
-        $this->assertEquals(Type::HARD, $bounce->getType());
+        $this->assertSame(Type::HARD, $bounce->getType());
         $this->assertTrue($bounce->isFinal());
     }
 
