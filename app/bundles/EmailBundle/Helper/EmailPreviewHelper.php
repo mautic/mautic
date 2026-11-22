@@ -63,6 +63,8 @@ final readonly class EmailPreviewHelper
                 'tokens'       => $tokens,
                 'internalSend' => true,
                 'lead'         => $contact,
+                // Marks public/admin preview so GrapesJS can convert MJML → HTML.
+                'source'       => ['publicPreview' => true],
             ]
         );
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
