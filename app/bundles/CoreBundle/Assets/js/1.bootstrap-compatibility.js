@@ -764,6 +764,12 @@ window.MauticInstallLegacyAffix = function (jQuery) {
                 element.removeAttribute(bootstrapName);
                 delete owned[bootstrapName];
             } else {
+                if ('data-placement' === legacyName && /^auto(?:\s|$)/.test(legacyValue)) {
+                    legacyValue = legacyValue.replace(/^auto\s*/, '') || 'top';
+                    if (!element.hasAttribute('data-bs-fallback-placements')) {
+                        element.setAttribute('data-bs-fallback-placements', '["top","right","bottom","left"]');
+                    }
+                }
                 element.setAttribute(bootstrapName, legacyValue);
                 owned[bootstrapName] = legacyValue;
             }
@@ -1209,8 +1215,13 @@ window.MauticInstallLegacyAffix = function (jQuery) {
         if (!container || !container.querySelectorAll || !window.bootstrap || !window.bootstrap.Popover) {
             return;
         }
-        container.querySelectorAll('[data-bs-toggle="popover"]:not([data-toggle="popover"])').forEach(function (element) {
-            window.bootstrap.Popover.getOrCreateInstance(element);
+        const popoverSelector = '[data-bs-toggle="popover"]:not([data-toggle="popover"]):not([data-quick-filter])';
+        const elements = Array.from(container.querySelectorAll(popoverSelector));
+        if (container.matches && container.matches(popoverSelector)) {
+            elements.unshift(container);
+        }
+        elements.forEach(function (element) {
+            window.bootstrap.Popover.getOrCreateInstance(element, {sanitize: false});
         });
     }
 

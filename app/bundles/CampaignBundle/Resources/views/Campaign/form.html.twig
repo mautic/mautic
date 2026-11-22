@@ -16,7 +16,7 @@
 <div class="box-layout">
     <!-- container -->
     <div class="col-md-9 height-auto bdr-r">
-        <div class="pa-md">
+        <div class="pa-16">
             {% if entity.id and entity.isPublished %}
                 <div class="alert alert-danger"><p>{{ 'mautic.campaign.modify.warning'|trans }}</p></div>
             {% endif %}
@@ -34,7 +34,7 @@
         </div>
     </div>
     <div class="col-md-3 height-auto">
-        <div class="pr-lg pl-lg pt-md pb-md">
+        <div class="pe-24 ps-24 pt-16 pb-16">
             {{ form_row(form.category) }}
             {{ form_row(form.projects) }}
             {{ form_row(form.allowRestart) }}

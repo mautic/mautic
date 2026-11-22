@@ -55,6 +55,11 @@ return RectorConfig::configure()
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
+        // Keep saveUser() compatible with authentication plugins overriding its untyped return.
+        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class => [
+            __DIR__.'/app/bundles/UserBundle/Security/Provider/UserProvider.php',
+        ],
+
         // @todo move to "twig" group
         Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,

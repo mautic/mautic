@@ -599,6 +599,25 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString($pageMessage, (string) $content);
     }
 
+    public function testIndexActionWithCompanyWithoutName(): void
+    {
+        $company = new Company();
+        $company->setIsPublished(true);
+        $company->setCity('Prague');
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $companyModel->saveEntity($company);
+
+        $this->client->request(Request::METHOD_GET, '/s/companies');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString(
+            '/s/companies/view/'.$company->getId(),
+            (string) $this->client->getResponse()->getContent()
+        );
+    }
+
     protected function createLead(string $firstName = 'Firstname', string $lastName = 'Lastname', string $email = 'test@test.com', string $phoneNumber = '555-666-777'): Lead
     {
         $lead = new Lead();

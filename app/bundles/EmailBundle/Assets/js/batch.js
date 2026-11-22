@@ -17,7 +17,7 @@ Mautic.emailBatchSubmit = function() {
 
 function setCategory(id, newCategory) {
     const tr = document.querySelector("#row_email_" + id);
-    const div = tr.querySelector("div.d-flex.align-items-center.gap-xs");
+    const div = tr.querySelector("div.d-flex.align-items-center.gap-5");
     const span = div.querySelector("span");
 
     div.textContent = newCategory.name;
@@ -27,7 +27,7 @@ function setCategory(id, newCategory) {
 }
 
 Mautic.emailBatchSubmitCallback = function( response ) {
-    mQuery('#MauticSharedModal').modal('hide');
+    mQuery('#MauticSharedModal').each((index, element) => Mautic.hideModal(element));
     console.log("Received: " + JSON.stringify(response));
     response.affected.forEach( function(id){
         setCategory(id, response.newCategory);

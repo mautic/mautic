@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+tone_instructions: "Be concise. Use short sentences and simple, plain words a non-native English speaker understands. Write more only when needed to explain a security, BC or data issue. No idioms, filler, praise or repetition."
 reviews:
   auto_review:
     enabled: true
@@ -13,6 +14,125 @@ reviews:
     ignore_usernames:
       - "dependabot[bot]"
       - "allcontributors[bot]"
+  # Walkthrough sections that add noise to Mautic PRs.
+  changed_files_summary: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  suggested_reviewers: false
+  review_info: false
+  in_progress_fortune: false
+  enable_prompt_for_ai_agents: false
+  related_prs: false
+  finishing_touches:
+    unit_tests:
+      enabled: false
+    fix_ci:
+      enabled: false
+    resolve_merge_conflict:
+      enabled: false
+    autofix:
+      enabled: false
+  auto_apply_labels: true
+  labeling_instructions:
+    - label: "bug"
+      instructions: "Apply when the PR fixes incorrect behavior."
+    - label: "enhancement"
+      instructions: "Apply when the PR improves an existing feature without being a bug fix."
+    - label: "feature"
+      instructions: "Apply when the PR adds a new user-facing feature."
+    - label: "refactoring"
+      instructions: "Apply when the PR restructures code without changing behavior."
+    - label: "chore"
+      instructions: "Apply when the PR only maintains the repository (tooling, configuration, housekeeping). Also apply to merge-up PRs, which merge a release branch or tag into a higher branch (for example 7.2 into 7.x, 7.x into 8.x, or 7.2.2 into 8.x). They have a title like 'Merge 7.x into 8.x' and their commits are mostly merges of already-merged PRs plus conflict fixes. Give merge-up PRs only this label, no others."
+    - label: "user-interface"
+      instructions: "Apply when the PR changes appearance, layout or interactivity (Twig, CSS/SCSS, JS)."
+    - label: "translations"
+      instructions: "Apply when the PR changes translation (*.ini) files."
+    - label: "automated-tests"
+      instructions: "Apply when the PR adds or changes unit, functional or e2e tests."
+    - label: "db-migrations"
+      instructions: "Apply when the PR adds or changes a Doctrine migration."
+    - label: "deprecation"
+      instructions: "Apply when the PR deprecates code, templates or configuration."
+    - label: "bc-break"
+      instructions: "Apply when the PR breaks backward compatibility or edits an UPGRADE-*.md file with removals."
+    - label: "API"
+      instructions: "Apply when the PR changes the REST API."
+    - label: "CI"
+      instructions: "Apply when the PR changes GitHub Actions workflows or other CI configuration."
+    - label: "plugin"
+      instructions: "Apply when the PR changes files under plugins/ or app/bundles/PluginBundle."
+    - label: "builder-grapesjs"
+      instructions: "Apply when the PR changes plugins/GrapesJsBuilderBundle."
+    - label: "focus-items"
+      instructions: "Apply when the PR changes plugins/MauticFocusBundle."
+    - label: "email"
+      instructions: "Apply when the PR changes app/bundles/EmailBundle."
+    - label: "email-integrations"
+      instructions: "Apply when the PR changes mail transports (app/bundles/EmailBundle/Mailer/Transport) or mail provider integrations."
+    - label: "forms"
+      instructions: "Apply when the PR changes app/bundles/FormBundle."
+    - label: "campaigns"
+      instructions: "Apply when the PR changes app/bundles/CampaignBundle."
+    - label: "contacts"
+      instructions: "Apply when the PR changes contact code in app/bundles/LeadBundle (Lead entity, contact controllers, model, views), not only segment, company, tag or field code."
+    - label: "segments"
+      instructions: "Apply when the PR changes app/bundles/LeadBundle/Segment or the LeadList entity, repository or views."
+    - label: "companies"
+      instructions: "Apply when the PR changes company code in app/bundles/LeadBundle (Company entity, model, controller, views)."
+    - label: "custom-fields"
+      instructions: "Apply when the PR changes app/bundles/LeadBundle/Field or the LeadField entity, model or views."
+    - label: "tags"
+      instructions: "Apply when the PR changes the Tag entity, model, controller or views in app/bundles/LeadBundle."
+    - label: "import-export"
+      instructions: "Apply when the PR changes contact or company import or export code."
+    - label: "landing-pages"
+      instructions: "Apply when the PR changes app/bundles/PageBundle."
+    - label: "assets"
+      instructions: "Apply when the PR changes app/bundles/AssetBundle."
+    - label: "reports"
+      instructions: "Apply when the PR changes app/bundles/ReportBundle."
+    - label: "dashboard"
+      instructions: "Apply when the PR changes app/bundles/DashboardBundle."
+    - label: "points-scoring"
+      instructions: "Apply when the PR changes app/bundles/PointBundle."
+    - label: "stages"
+      instructions: "Apply when the PR changes app/bundles/StageBundle."
+    - label: "sms"
+      instructions: "Apply when the PR changes app/bundles/SmsBundle."
+    - label: "webhooks"
+      instructions: "Apply when the PR changes app/bundles/WebhookBundle."
+    - label: "dynamic-content"
+      instructions: "Apply when the PR changes app/bundles/DynamicContentBundle."
+    - label: "categories"
+      instructions: "Apply when the PR changes app/bundles/CategoryBundle."
+    - label: "channels"
+      instructions: "Apply when the PR changes app/bundles/ChannelBundle, except marketing messages."
+    - label: "marketing-messages"
+      instructions: "Apply when the PR changes the marketing messages (Message entity, model, controller or views in app/bundles/ChannelBundle)."
+    - label: "configuration"
+      instructions: "Apply when the PR changes app/bundles/ConfigBundle or the configuration form of another bundle."
+    - label: "roles"
+      instructions: "Apply when the PR changes users, roles or permissions in app/bundles/UserBundle."
+    - label: "authentication"
+      instructions: "Apply when the PR changes login, SAML, SSO or API authentication (app/bundles/UserBundle/Security, app/bundles/ApiBundle auth)."
+    - label: "installation"
+      instructions: "Apply when the PR changes app/bundles/InstallBundle."
+    - label: "projects"
+      instructions: "Apply when the PR changes app/bundles/ProjectBundle."
+    - label: "marketplace"
+      instructions: "Apply when the PR changes app/bundles/MarketplaceBundle."
+    - label: "themes"
+      instructions: "Apply when the PR changes files under themes/."
+    - label: "tracking"
+      instructions: "Apply when the PR changes contact tracking (app/bundles/LeadBundle/Tracker, the tracking pixel or mtc.js)."
+  mutually_exclusive_groups:
+    type:
+      - "bug"
+      - "enhancement"
+      - "feature"
+      - "refactoring"
+      - "chore"
   path_instructions:
     - path: "**/*.php"
       instructions: |
@@ -129,7 +249,162 @@ reviews:
     # coverage threshold would warn on almost every PHP PR.
     docstrings:
       mode: "off"
+    # Mautic PR descriptions follow the repository template; the check is
+    # always skipped.
+    description:
+      mode: "off"
+    title:
+      mode: "off"
+    issue_assessment:
+      mode: "off"
+    custom_checks:
+      - name: "PR template"
+        mode: "warning"
+        instructions: |
+          Check that the PR description uses the repository PR template
+          (.github/PULL_REQUEST_TEMPLATE.md). HTML comments (<!-- ... -->) do
+          not count as content.
+
+          Pass when all of these are true:
+          1. The description contains the template table with the rows
+             "Bug fix?", "New feature/enhancement?", "Deprecations?",
+             "BC breaks?" and "Automated tests included?".
+          2. Each of those five rows is answered with exactly one of ✔️ or ❌,
+             not left as the template's placeholder "✔️❌" and not empty.
+          3. The description has a "Description" heading followed by text
+             that explains the change.
+          4. The description has a "Steps to test this PR" heading followed
+             by at least one step beyond the template's first step about
+             GitHub Codespaces, and the second step is not left empty.
+
+          Otherwise fail, and name which of the points above are missing.
+
+          Always pass, without checking, for merge-up PRs that merge one
+          release branch or tag into a higher branch (title like "Merge 7.x
+          into 8.x" or "Merge 7.2.2 into 8.x").
 knowledge_base:
   # Uses guideline files in the repo (such as AGENTS.md) as review context.
   code_guidelines:
     enabled: true
+issue_enrichment:
+  # Comment on new and edited issues with possible duplicates, related issues
+  # and PRs, and suggested assignees.
+  auto_enrich:
+    enabled: true
+  # Implementation plans (summary, research, phases, tasks, agent prompts) on
+  # issues. Kept on to see how useful they are; turn off if they add noise.
+  planning:
+    enabled: true
+    auto_planning:
+      enabled: true
+  labeling:
+    auto_apply_labels: true
+    # GitHub issues are used for bug reports (the issue template adds "bug" and
+    # "needs-triage"). Labels below set the type, difficulty, triage state and
+    # affected area.
+    labeling_instructions:
+      # Type
+      - label: "bug"
+        instructions: "Apply when the issue reports incorrect behavior, an error or a crash in existing functionality."
+      - label: "enhancement"
+        instructions: "Apply when the issue asks to improve an existing feature and does not report incorrect behavior. Do not apply together with bug or feature."
+      - label: "feature"
+        instructions: "Apply when the issue asks for new functionality that does not exist yet. Do not apply together with bug or enhancement."
+      # Difficulty
+      - label: "T1"
+        instructions: "Difficulty level. Apply exactly one of T1, T2 or T3; when the criteria of more than one fit, apply only the highest. Apply T1 when the fix is likely small and local: one file or a few lines, with a clear cause and no database or BC impact. Do not apply together with T2 or T3."
+      - label: "T2"
+        instructions: "Difficulty level. Apply exactly one of T1, T2 or T3; when the criteria of more than one fit, apply only the highest. Apply T2 when the fix likely touches several files within one bundle, the cause is understood, and none of the T3 criteria fit. Do not apply together with T1 or T3."
+      - label: "T3"
+        instructions: "Difficulty level. Apply exactly one of T1, T2 or T3; when the criteria of more than one fit, apply only the highest. Apply T3 when the fix likely spans several bundles, needs a database migration, affects backward compatibility or performance on large databases, or the cause is unclear. Do not apply together with T1 or T2."
+      - label: "good first issue"
+        instructions: "Apply only together with T1, when the problem is clearly described, easy to reproduce and the likely fix is obvious to a new contributor."
+      # Triage state
+      - label: "pending-feedback"
+        instructions: "Apply when the report lacks the information needed to reproduce it (steps, Mautic version, PHP version, error message or logs), so the author must reply first."
+      - label: "duplicate"
+        instructions: "Apply only when an existing open or closed issue clearly reports the same problem with the same cause. Mention that issue in the comment."
+      - label: "regression"
+        instructions: "Apply only when the report says the behavior worked in an earlier Mautic version and broke after an upgrade."
+      - label: "user-interface"
+        instructions: "Apply when the issue is about appearance, layout or interactivity in the Mautic UI."
+      - label: "accessibility"
+        instructions: "Apply when the issue is about keyboard use, screen readers, contrast or other accessibility problems."
+      - label: "performance-scalability"
+        instructions: "Apply when the issue is about slow pages, slow commands, timeouts, high memory use or problems with large databases."
+      - label: "translations"
+        instructions: "Apply when the issue is about missing, wrong or untranslated UI text."
+      - label: "API"
+        instructions: "Apply when the issue is about the REST API."
+      - label: "CI"
+        instructions: "Apply when the issue is about GitHub Actions workflows or other CI configuration."
+      - label: "plugin"
+        instructions: "Apply when the issue is about a plugin or integration, or the plugin manager."
+      - label: "builder-grapesjs"
+        instructions: "Apply when the issue is about the GrapesJS email or landing page builder."
+      - label: "focus-items"
+        instructions: "Apply when the issue is about focus items."
+      - label: "email"
+        instructions: "Apply when the issue is about emails: creating, sending, A/B tests, tracking opens and clicks, or unsubscribes."
+      - label: "email-integrations"
+        instructions: "Apply when the issue is about mail transports, DSN settings or mail provider integrations (bounces, webhooks)."
+      - label: "forms"
+        instructions: "Apply when the issue is about forms, form fields, form actions or form submissions."
+      - label: "campaigns"
+        instructions: "Apply when the issue is about campaigns, the campaign builder or campaign events."
+      - label: "contacts"
+        instructions: "Apply when the issue is about contacts: the contact list, contact details, merging or the timeline."
+      - label: "segments"
+        instructions: "Apply when the issue is about segments, segment filters or segment rebuilds."
+      - label: "companies"
+        instructions: "Apply when the issue is about companies."
+      - label: "custom-fields"
+        instructions: "Apply when the issue is about custom contact or company fields."
+      - label: "tags"
+        instructions: "Apply when the issue is about tags."
+      - label: "import-export"
+        instructions: "Apply when the issue is about importing or exporting contacts, companies or other data."
+      - label: "landing-pages"
+        instructions: "Apply when the issue is about landing pages."
+      - label: "assets"
+        instructions: "Apply when the issue is about assets (file uploads and downloads)."
+      - label: "reports"
+        instructions: "Apply when the issue is about reports."
+      - label: "dashboard"
+        instructions: "Apply when the issue is about the dashboard or its widgets."
+      - label: "points-scoring"
+        instructions: "Apply when the issue is about points, point actions, point triggers or point groups."
+      - label: "stages"
+        instructions: "Apply when the issue is about stages."
+      - label: "sms"
+        instructions: "Apply when the issue is about text messages (SMS)."
+      - label: "webhooks"
+        instructions: "Apply when the issue is about webhooks."
+      - label: "dynamic-content"
+        instructions: "Apply when the issue is about dynamic web content or dynamic email content."
+      - label: "categories"
+        instructions: "Apply when the issue is about categories."
+      - label: "channels"
+        instructions: "Apply when the issue is about channels in general (for example web notifications or the preference center), not one specific channel that has its own label."
+      - label: "marketing-messages"
+        instructions: "Apply when the issue is about marketing messages."
+      - label: "configuration"
+        instructions: "Apply when the issue is about the Configuration page or saving settings."
+      - label: "roles"
+        instructions: "Apply when the issue is about users, roles or permissions."
+      - label: "authentication"
+        instructions: "Apply when the issue is about login, password reset, SAML, SSO or API authentication."
+      - label: "installation"
+        instructions: "Apply when the issue is about installing Mautic, the installer, or upgrading with migrations."
+      - label: "projects"
+        instructions: "Apply when the issue is about projects."
+      - label: "marketplace"
+        instructions: "Apply when the issue is about the Marketplace."
+      - label: "themes"
+        instructions: "Apply when the issue is about themes."
+      - label: "tracking"
+        instructions: "Apply when the issue is about contact tracking: the tracking script (mtc.js), the tracking pixel, page hits or identifying visitors."
+      - label: "queue"
+        instructions: "Apply when the issue is about the message queue or messenger workers."
+      - label: "search"
+        instructions: "Apply when the issue is about searching or filtering in list pages."

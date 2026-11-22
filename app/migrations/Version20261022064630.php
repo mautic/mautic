@@ -26,7 +26,7 @@ final class Version20261022064630 extends PreUpAssertionMigration
     {
         $table = $schema->createTable($this->prefix.OidcSubjectId::TABLE_NAME);
         $table->addColumn('user_id', 'integer', ['unsigned' => true]);
-        $table->addColumn('subject_id', 'string', ['length' => 255, 'default' => null, 'notnull' => false]);
+        $table->addColumn('subject_id', 'string', ['length' => 255, 'default' => null, 'notnull' => false, 'platformOptions' => ['collation' => 'utf8mb4_bin']]);
         $table->addUniqueIndex(['subject_id'], 'openid_subject_id');
         $table->setPrimaryKey(['user_id']);
         $table->addForeignKeyConstraint($this->prefix.'users', ['user_id'], ['id'], ['onDelete' => 'CASCADE']);

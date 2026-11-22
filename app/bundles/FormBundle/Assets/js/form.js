@@ -249,7 +249,8 @@ Mautic.formFieldOnLoad = function (container, response) {
         });
 
         //initialize tooltips
-        mQuery(fieldContainer).find("*[data-toggle='tooltip'], *[data-bs-toggle='tooltip']").tooltip({html: true});
+        window.MauticBootstrapCompatibility?.mirrorLegacyMarkup(fieldContainer[0]);
+        mQuery(fieldContainer).find("*[data-bs-toggle='tooltip'], *[data-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true}));
 
         //initialize ajax'd modals
         mQuery(fieldContainer).find("[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
@@ -261,7 +262,7 @@ Mautic.formFieldOnLoad = function (container, response) {
         Mautic.initHideItemButton(fieldContainer);
 
         //show fields panel
-        if (!mQuery('#fields-panel').hasClass('in')) {
+        if (!mQuery('#fields-panel').hasClass('show')) {
             mQuery('a[href="#fields-panel"]').trigger('click');
         }
 
@@ -320,7 +321,8 @@ Mautic.formActionOnLoad = function (container, response) {
             return Mautic.ajaxifyLink(this, event);
         });
         //initialize tooltips
-        mQuery(actionId + " *[data-toggle='tooltip'], " + actionId + " *[data-bs-toggle='tooltip']").tooltip({html: true});
+        window.MauticBootstrapCompatibility?.mirrorLegacyMarkup(mQuery(actionId)[0]);
+        mQuery(actionId).find("*[data-bs-toggle='tooltip'], *[data-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true}));
 
         //initialize ajax'd modals
         mQuery(actionId + " [data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
@@ -338,7 +340,7 @@ Mautic.formActionOnLoad = function (container, response) {
         });
 
         //show actions panel
-        if (!mQuery('#actions-panel').hasClass('in')) {
+        if (!mQuery('#actions-panel').hasClass('show')) {
             mQuery('a[href="#actions-panel"]').trigger('click');
         }
 

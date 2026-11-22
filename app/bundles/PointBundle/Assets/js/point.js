@@ -51,7 +51,8 @@ Mautic.pointTriggerEventOnLoad = function (container, response) {
         }
 
         //initialize tooltips
-        mQuery(eventId + " *[data-toggle='tooltip'], " + eventId + " *[data-bs-toggle='tooltip']").tooltip({html: true});
+        window.MauticBootstrapCompatibility?.mirrorLegacyMarkup(mQuery(eventId)[0]);
+        mQuery(eventId).find("*[data-bs-toggle='tooltip'], *[data-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true}));
 
         //activate new stuff
         mQuery(eventId + " a[data-toggle='ajax']").click(function (event) {
@@ -77,7 +78,7 @@ Mautic.pointTriggerEventOnLoad = function (container, response) {
         });
 
         //show events panel
-        if (!mQuery('#events-panel').hasClass('in')) {
+        if (!mQuery('#events-panel').hasClass('show')) {
             mQuery('a[href="#events-panel"]').trigger('click');
         }
 

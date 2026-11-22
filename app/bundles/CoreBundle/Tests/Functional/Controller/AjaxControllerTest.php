@@ -819,7 +819,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
             '\s*<\/div>\n\n'.
             '<div id="globalSearchPanel">\n'. // Matches the search panel div
             '\s*<!-- No results message -->\n'. // Matches the "No results message" comment
-            '\s*<div class="text-center text-secondary mt-sm">\n'. // Matches the no-results div
+            '\s*<div class="text-center text-secondary mt-12">\n'. // Matches the no-results div
             '\s*.*?\n'. // Matches random text inside the no-results div
             '\s*<\/div>\n'.
             '\s*<\/div>/s',

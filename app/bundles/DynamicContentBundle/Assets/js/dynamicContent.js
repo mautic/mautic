@@ -23,7 +23,7 @@ Mautic.dwcGenerator = (function() {
 
     // Determine the active tab (plugin or HTML)
     const getActiveTabType = () => {
-        const activePane = document.querySelector('.tab-pane.active.in') || document.querySelector('.tab-pane.active');
+        const activePane = document.querySelector('.tab-pane.active.show') || document.querySelector('.tab-pane.active');
         if (!activePane) return 'plugin'; // Default to 'plugin' if none found
         return activePane.id === 'dwc--generator-plugins' ? 'plugin' : 'html';
     };
@@ -252,20 +252,6 @@ Mautic.dynamicFiltersOnLoad = function(container, response) {
             }
         });
 
-    }
-
-    // segment contact filters
-    var segmentContactForm = mQuery('#segment-contact-filters');
-
-    if (segmentContactForm.length) {
-        segmentContactForm.on('change', function() {
-            segmentContactForm.submit();
-        }).on('keyup', function() {
-            segmentContactForm.delay(200).submit();
-        }).on('submit', function(e) {
-            e.preventDefault();
-            Mautic.refreshSegmentContacts(segmentContactForm);
-        });
     }
 };
 
