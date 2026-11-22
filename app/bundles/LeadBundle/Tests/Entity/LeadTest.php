@@ -292,8 +292,8 @@ final class LeadTest extends TestCase
         $changes = [
             'dateModified' => [
                 new \DateTime('2000-01-01'),
-                new \DateTime('2001-01-01')
-            ]
+                new \DateTime('2001-01-01'),
+            ],
         ];
 
         $lead->checkAttributionDateOnUpdate(new PreUpdateEventArgs($lead, $this->createStub(EntityManagerInterface::class), $changes));

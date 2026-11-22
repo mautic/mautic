@@ -1440,7 +1440,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Preserve custom-field-only saves when updating the modification timestamp
+     * Preserve custom-field-only saves when updating the modification timestamp.
      */
     public function checkAttributionDateOnUpdate(PreUpdateEventArgs $event): void
     {
