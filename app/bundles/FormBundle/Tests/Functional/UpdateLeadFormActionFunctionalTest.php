@@ -61,7 +61,13 @@ final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
         foreach ($expectedLeadData as $field => $value) {
             $leadFieldValue = $leadFieldValues[$field]['value'] ?? null;
 
-            if ('{datetime=now}' === $value) {
+            if ('{date=now}' === $value) {
+                $this->assertIsString($leadFieldValue);
+
+                $actualValue = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $leadFieldValue);
+                $this->assertInstanceOf(\DateTimeImmutable::class, $actualValue);
+                $this->assertSame((new \DateTime())->format('Y-m-d'), $actualValue->format('Y-m-d'));
+            } elseif ('{datetime=now}' === $value) {
                 $this->assertIsString($leadFieldValue);
 
                 $actualValue = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $leadFieldValue);
@@ -109,6 +115,21 @@ final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
             ],
             'expectedLeadData' => [
                 'attribution_date' => '{datetime=now}',
+            ],
+        ];
+        yield 'Update attribution amount and set its date' => [
+            'leadData' => [
+                'email' => 'attribution@test.com',
+            ],
+            'formData' => [
+                'email' => 'attribution@test.com',
+            ],
+            'actionProperties' => [
+                'attribution' => 100,
+            ],
+            'expectedLeadData' => [
+                'attribution'      => 100,
+                'attribution_date' => '{date=now}',
             ],
         ];
         yield 'Form data wins over action properties for same field' => [

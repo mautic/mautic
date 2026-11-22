@@ -1444,7 +1444,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function checkAttributionDateOnUpdate(PreUpdateEventArgs $event): void
     {
-        if (['dateModified'] === array_keys($event->getEntityChangeSet())) {
+        if (['dateModified'] === array_keys($event->getEntityChangeSet()) && !array_key_exists('attribution', $this->getUpdatedFields())) {
             return;
         }
 
