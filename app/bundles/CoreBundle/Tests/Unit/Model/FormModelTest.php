@@ -164,6 +164,8 @@ final class FormModelTest extends TestCase
         $dateModified2 = $lead->getDateModified();
         $dateAdded2    = $lead->getDateAdded();
 
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateModified2);
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateAdded2);
         $this->assertSame($dateAdded1->getTimestamp(), $dateAdded2->getTimestamp(), 'Date added should not be updated after saving the entity again');
         $this->assertGreaterThan($previousDateModified->getTimestamp(), $dateModified2->getTimestamp(), 'Date modified should be updated after saving the entity again');
 

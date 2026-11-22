@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Doctrine\ORM\ORMException;
 use Illuminate\Support\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
@@ -31,7 +32,6 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\StageBundle\Entity\Stage;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -60,7 +60,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
      */
     protected function createLeadCompany(Lead $contactA, Company $company): CompanyLead
     {
@@ -436,8 +436,8 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $contactId    = $contact->getId();
         $dateAdded    = $contact->getDateAdded();
         $dateModified = $contact->getDateModified();
-        $this->assertNotNull($dateAdded);
-        $this->assertNotNull($dateModified);
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateAdded);
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateModified);
         $this->assertLessThanOrEqual(1, abs($dateModified->getTimestamp() - $dateAdded->getTimestamp()));
 
         $previousDateModified = new \DateTime('2000-01-01 00:00:00');
