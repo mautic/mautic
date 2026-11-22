@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\ListParser\Exception\FormatNotSupportedException;
 
 final class ArrayListParser implements ListParserInterface
 {
-    public function parse($list): array
+    public function parse(mixed $list): array
     {
         if (!is_array($list)) {
             throw new FormatNotSupportedException();
