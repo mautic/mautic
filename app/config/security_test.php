@@ -1,5 +1,10 @@
 <?php
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+
+/** @var ContainerBuilder $container */
+/** @var PhpFileLoader $loader */
 $loader->import('security.php');
 
 // Support HTTP basic auth for test logins

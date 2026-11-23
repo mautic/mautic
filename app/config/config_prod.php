@@ -1,7 +1,11 @@
 <?php
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
+/** @var ContainerBuilder $container */
+/** @var PhpFileLoader $loader */
 $root          = $container->getParameter('mautic.application_dir').'/app';
 $configBaseDir = ParameterLoader::getLocalConfigBaseDir($root);
 

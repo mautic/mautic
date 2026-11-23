@@ -3,8 +3,10 @@
 use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Test\EnvLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
+/** @var PhpFileLoader $loader */
 /** @var Symfony\Component\DependencyInjection\ContainerBuilder $container */
 
 // Include path settings
