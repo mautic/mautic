@@ -26,7 +26,13 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
     private const string PREHEADER_TEXT = 'Preheader text';
 
-    protected $useCleanupRollback = false;
+    protected function setUp(): void
+    {
+        // full database reset: this test creates a custom field, which alters the leads table
+        $this->useCleanupRollback = 'testPreviewEmailForDynamicContentVariantsWithCustomField' !== $this->name();
+
+        parent::setUp();
+    }
 
     public function testPreviewPage(): void
     {

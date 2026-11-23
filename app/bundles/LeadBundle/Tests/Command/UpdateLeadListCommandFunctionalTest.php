@@ -27,7 +27,18 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
-    protected $useCleanupRollback = false; // This should be here, because test is changing DDL of the leads table.
+    protected function setUp(): void
+    {
+        // full database reset: these tests create custom fields, which alter the leads and companies tables
+        $this->useCleanupRollback = !in_array($this->name(), [
+            'testCustomFieldIncludeExclude',
+            'testCustomFieldSelectIncludeExclude',
+            'testCompanyCustomFieldSelectIncludeExclude',
+            'testCompanyCustomFieldIncludeExclude',
+        ], true);
+
+        parent::setUp();
+    }
 
     public function testFailWhenSegmentDoesNotExist(): void
     {

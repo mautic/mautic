@@ -32,10 +32,14 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
     private TranslatorInterface $translator;
 
-    protected $useCleanupRollback = false;
-
     protected function setUp(): void
     {
+        // full database reset: these tests create a company custom field, which alters the companies table
+        $this->useCleanupRollback = !in_array($this->name(), [
+            'testInTheLastAndInTheNextFilter',
+            'testInLastAndInNextFilterForCompanyCustomField',
+        ], true);
+
         parent::setUp();
 
         $this->listModel  = $this->getService(ListModel::class);
