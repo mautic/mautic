@@ -55,14 +55,16 @@ final class SegmentStressTest extends MauticMysqlTestCase
     {
         // bulk insert, the ORM is too slow for this amount of contacts
         $connection = $this->em->getConnection();
-        $dateAdded  = (new \DateTime())->format('Y-m-d H:i:s');
+        $dateAdded  = new \DateTime()->format('Y-m-d H:i:s');
 
         foreach (array_chunk(range(0, 10000), 1000) as $chunk) {
             $rows   = [];
             $params = [];
             foreach ($chunk as $i) {
                 $rows[] = '(?, ?, 1, 0, ?)';
-                array_push($params, 'fn'.$i, 'ln'.$i, $dateAdded);
+                $params[] = 'fn'.$i;
+                $params[] = 'ln'.$i;
+                $params[] = $dateAdded;
             }
 
             $connection->executeStatement(
