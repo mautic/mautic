@@ -272,8 +272,6 @@ jobs:
 
     - name: Install dependencies
       uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
-      with:
-        composer-options: ${{ matrix.commands == 'Identifier order' && '--no-scripts' || '' }}
       env:
         NPM_CONFIG_CACHE: ./var/cache/js/npm
 
