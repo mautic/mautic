@@ -73,7 +73,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return iterable<string, array{string, object, string}>
+     * @return iterable<string, array{string, mixed, string}>
      */
     private function dataForGlobalSearch(): iterable
     {
