@@ -152,6 +152,19 @@ final class CheckboxComponentTest extends TestCase
         $this->assertStringNotContainsString('name=', $output);
     }
 
+    public function testChipVariantAddsChipClasses(): void
+    {
+        $output = $this->render([
+            'name'    => 'chips',
+            'variant' => 'chip',
+            'items'   => [['label' => 'Chip', 'value' => '1', 'checked' => true]],
+        ]);
+
+        $this->assertStringContainsString('checkbox-chips', $output);
+        $this->assertStringContainsString('form-check--chip', $output);
+        $this->assertStringNotContainsString('form-check--chip', $this->render(['items' => [['label' => 'Plain', 'value' => '1']]]));
+    }
+
     /**
      * @param array<string, mixed> $variables
      */

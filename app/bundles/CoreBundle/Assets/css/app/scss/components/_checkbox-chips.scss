@@ -1,0 +1,76 @@
+.checkbox-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.form-check--chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 0;
+    margin: 0;
+    padding: .5rem 1.25rem .5rem 1rem;
+    gap: .75rem;
+    border: 1px solid var(--icon-primary);
+    border-radius: 999px;
+    background-color: var(--background);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color var(--duration-productive) var(--easing-standard-productive), color var(--duration-productive) var(--easing-standard-productive);
+
+    .form-check-input {
+        position: static;
+        flex: none;
+        float: none;
+        margin: 0;
+        inline-size: 1.125rem;
+        block-size: 1.125rem;
+        border-color: currentcolor;
+        border-radius: 0;
+        background-color: transparent;
+
+        &:checked {
+            border-color: var(--text-inverse);
+            background-color: var(--text-inverse);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='none' stroke='%23161616' stroke-width='2.5' d='M3.5 10.5l4.5 4.5 8.5-10'/%3E%3C/svg%3E");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 100%;
+        }
+    }
+
+    .form-check-label {
+        margin: 0;
+        color: inherit;
+        font-size: 1rem;
+        line-height: 1.5;
+
+        &::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+        }
+    }
+
+    &:hover {
+        background-color: var(--layer-hover);
+    }
+
+    &:has(.form-check-input:checked) {
+        border-color: var(--layer-selected-inverse);
+        background-color: var(--layer-selected-inverse);
+        color: var(--text-inverse);
+    }
+
+    &:has(.form-check-input:focus-visible) {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
+    }
+
+    &:has(.form-check-input:disabled) {
+        cursor: not-allowed;
+        opacity: .5;
+    }
+}

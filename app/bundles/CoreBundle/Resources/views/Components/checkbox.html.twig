@@ -5,11 +5,12 @@
 {% set wrapperClass = wrapperClass|default('') %}
 {% set inline = inline|default(false) %}
 {% set reverse = reverse|default(false) %}
+{% set chip = (variant|default('')) == 'chip' %}
 {% set required = required|default(false) %}
 {% set base_id = (name ?: 'checkbox')|replace({'[': '-', ']': '', ' ': '-', '.': '-'}) %}
 {% set help_id = helpText ? base_id ~ '-help' : null %}
 
-<fieldset class="{{ [wrapperClass, 'border-0', 'p-0', 'm-0']|filter(value => value is not empty)|join(' ')|escape('html_attr') }}" style="min-width: 0; border: 0; padding: 0; margin: 0;">
+<fieldset class="{{ [wrapperClass, chip ? 'checkbox-chips' : '', 'border-0', 'p-0', 'm-0']|filter(value => value is not empty)|join(' ')|escape('html_attr') }}" style="min-width: 0; border: 0; padding: 0; margin: 0;">
     {% if legend %}
         <legend class="form-label mb-2">{{ legend|trans }}</legend>
     {% endif %}
@@ -24,6 +25,10 @@
 
         {% if inline %}
             {% set classes = classes|merge(['form-check-inline']) %}
+        {% endif %}
+
+        {% if chip %}
+            {% set classes = classes|merge(['form-check--chip']) %}
         {% endif %}
 
         {% if reverse %}
