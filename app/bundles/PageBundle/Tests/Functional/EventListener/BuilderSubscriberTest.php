@@ -28,7 +28,7 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
 
     public const CUSTOM_CATEGORY_SELECTOR          = '.pref-categorylist input';
 
-    public const CUSTOM_PREFERRED_CHANNEL_SELECTOR = '.pref-preferredchannel select';
+    public const CUSTOM_PREFERRED_CHANNEL_SELECTOR = '.pref-preferredchannel [role="radiogroup"]';
 
     public const CUSTOM_CHANNEL_FREQ_SELECTOR      = '.pref-channelfrequency div[data-contact-frequency="1"]';
 
