@@ -1,4 +1,4 @@
-<div class="table-responsive campaign-changelog">
+<div class="table-responsive campaign-changelog mw-100">
     <ul class="media-list media-list-feed">
         <li class="media">
             <!-- Changelog : Events -->
@@ -39,11 +39,11 @@
                                             <td>{{ subKey }}</td>
                                             <td>
                                                 <pre
-                                                    class="text-muted">{{ subChange[0] is same as([]) or subChange[0] is null ? '""' : subChange[0]|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                                                    class="text-muted mw-100 overflow-y-auto">{{ subChange[0] is same as([]) or subChange[0] is null ? '""' : subChange[0]|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
                                             </td>
                                             <td>
                                                 <pre
-                                                    class="text-muted">{{ subChange[1] is same as([]) or subChange[1] is null ? '' : subChange[1]|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                                                    class="text-muted mw-100 overflow-y-auto">{{ subChange[1] is same as([]) or subChange[1] is null ? '' : subChange[1]|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -109,10 +109,10 @@
                                 <tr>
                                     <td>{{ key }}</td>
                                     <td>
-                                            <pre class="text-muted">{{ value[0]|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                                            <pre class="text-muted mw-100 overflow-y-auto">{{ value[0]|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
                                     </td>
                                     <td>
-                                            <pre class="text-muted">{{ value[1]|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                                            <pre class="text-muted mw-100 overflow-y-auto">{{ value[1]|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
                                     </td>
                                 </tr>
                             {% endif %}

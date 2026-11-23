@@ -187,7 +187,7 @@
             <div class="stats-menu__content tab-content p-16 mb-24 shd-sm">
                 <div class="tab-pane active border-0" id="stats-container">
                     <div id="campaign-graph-div" data-target-url="{{ path('mautic_campaign_graph', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
-                        <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                        <div class="spinner text-center fs-24"><i class="fa fa-spin fa-spinner"></i></div>
                         <div class="clearfix"></div>
                     </div>
                 </div>
@@ -264,27 +264,27 @@
         <div class="tab-content p-16" id="campaign-tab-content"
              data-event-target-url="{{ path('mautic_campaign_event_stats', {'objectId' : campaign.id, 'dateFromValue' : dateFrom|date('Y-m-d'), 'dateToValue' : dateTo|date('Y-m-d')}) }}">
             <!-- #events-container -->
-                <div class="active tab-pane fade in border-0" id="preview-container">
+                <div class="active tab-pane fade in border-0 w-100 overflow-auto" id="preview-container">
                     <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                     <div class="clearfix"></div>
                 </div>
                 <div class="tab-pane fade in border-0" id="decisions-container">
-                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                    <div class="spinner text-center fs-24"><i class="fa fa-spin fa-spinner"></i></div>
                     <div class="clearfix"></div>
                 </div>
                 <div class="tab-pane fade in border-0" id="actions-container">
-                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                    <div class="spinner text-center fs-24"><i class="fa fa-spin fa-spinner"></i></div>
                     <div class="clearfix"></div>
                 </div>
                 <div class="tab-pane fade in border-0" id="conditions-container">
-                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                    <div class="spinner text-center fs-24"><i class="fa fa-spin fa-spinner"></i></div>
                     <div class="clearfix"></div>
                 </div>
             <!--/ #events-container -->
             <div class="tab-pane fade in border-0 page-list"
                  id="leads-container"
                  data-target-url="{{ path('mautic_campaign_contacts', {'objectId': campaign.id, 'page': app.session.get('mautic.campaign.contact.page', 1)}) }}">
-                <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
+                <div class="spinner text-center fs-24"><i class="ri-loader-3-line ri-spin"></i></div>
                 <div class="clearfix"></div>
             </div>
             {{ customContent('tabs.content', _context) }}
