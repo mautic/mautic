@@ -1,5 +1,8 @@
 <?php
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+/** @var ContainerBuilder $container */
 $container->loadFromExtension('fos_oauth_server', [
     'db_driver'           => 'orm',
     'client_class'        => Mautic\ApiBundle\Entity\oAuth2\Client::class,
