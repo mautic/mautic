@@ -33,10 +33,14 @@
         &:checked {
             border-color: var(--text-inverse);
             background-color: var(--text-inverse);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='none' stroke='%23161616' stroke-width='2.5' d='M3.5 10.5l4.5 4.5 8.5-10'/%3E%3C/svg%3E");
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: 100%;
+            background-image: none;
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2.5' d='M3.5 10.5l4.5 4.5 8.5-10'/%3E%3C/svg%3E"), linear-gradient(#000, #000);
+            mask-position: center;
+            mask-repeat: no-repeat;
+            mask-size: 100%, 100%;
+            mask-origin: border-box;
+            mask-clip: border-box;
+            mask-composite: exclude;
         }
     }
 
