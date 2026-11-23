@@ -1,0 +1,230 @@
+{% macro attributes(attr) -%}
+    {%- for name, value in attr|default({})|filter((value, name) => value is not same as(false)) %} {{ name|e('html_attr') }}="{{ value|e('html_attr') }}"{% endfor -%}
+{%- endmacro %}
+
+{% macro cell(value) -%}
+    {%- if value is iterable -%}
+        {%- set content -%}
+            {%- if value.icon|default('') %}<i class="{{ value.icon|e('html_attr') }} me-8" aria-hidden="true"></i>{% endif -%}
+            {%- if value.html is defined %}{{ value.html|purify }}{% else %}{{ value.label|default('') }}{% endif -%}
+        {%- endset -%}
+        {%- if value.href|default('') -%}
+            <a href="{{ value.href|e('html_attr') }}"{% if value.className|default('') %} class="{{ value.className|e('html_attr') }}"{% endif %}{{ _self.attributes(value.attr) }}>{{ content }}</a>
+        {%- elseif value.className|default('') -%}
+            <span class="{{ value.className|e('html_attr') }}">{{ content }}</span>
+        {%- else -%}
+            {{ content }}
+        {%- endif -%}
+    {%- else -%}
+        {{ value }}
+    {%- endif -%}
+{%- endmacro %}
+
+{% macro sortValue(value) -%}
+    {%- if value is iterable -%}
+        {{ value.sortValue ?? value.label ?? '' }}
+    {%- else -%}
+        {{ value }}
+    {%- endif -%}
+{%- endmacro %}
+
+{% set columns = columns|default([]) %}
+{% set rows = rows|default([]) %}
+{% set size = size|default('md') %}
+{% set selection = selection|default(null) %}
+{% set isExpandable = expandable|default(false) %}
+{% set hasBatchExpansion = isExpandable and (batchExpansion|default(false)) %}
+{% set isLoading = loading|default(false) %}
+{% set toolbarActions = toolbarActions|default([]) %}
+{% set batchActions = batchActions|default([]) %}
+{% set baseId = (id|default('data-table-' ~ random()))|replace({' ': '-', '[': '-', ']': '', '.': '-'}) %}
+{% set hasRowActions = rows|filter(row => row.actions|default([]) is not empty)|length > 0 %}
+{% set columnCount = columns|length + (isExpandable ? 1 : 0) + (selection ? 1 : 0) + (hasRowActions ? 1 : 0) %}
+{% set hasToolbarContent = searchable|default(false) or toolbarActions is not empty %}
+{% set hasToolbar = hasToolbarContent or batchActions is not empty %}
+{% set accessibleName = label|default(title|default('')) %}
+
+{% set classes = ['data-table', 'data-table--' ~ size] %}
+{% if zebra|default(false) %}{% set classes = classes|merge(['data-table--zebra']) %}{% endif %}
+{% if stickyHeader|default(false) %}{% set classes = classes|merge(['data-table--sticky-header']) %}{% endif %}
+{% if topAligned|default(false) %}{% set classes = classes|merge(['data-table--top-aligned']) %}{% endif %}
+
+<section class="data-table-container data-table-container--{{ size|e('html_attr') }}{{ className|default('') ? ' ' ~ className|e('html_attr') : '' }}" id="{{ baseId|e('html_attr') }}"
+    data-data-table
+    data-selection="{{ selection|default('')|e('html_attr') }}"
+    data-label-expand="{{ 'mautic.core.data_table.expand_row'|trans|e('html_attr') }}"
+    data-label-collapse="{{ 'mautic.core.data_table.collapse_row'|trans|e('html_attr') }}"
+    data-label-expand-all="{{ 'mautic.core.data_table.expand_all'|trans|e('html_attr') }}"
+    data-label-collapse-all="{{ 'mautic.core.data_table.collapse_all'|trans|e('html_attr') }}"
+    data-label-selected="{{ 'mautic.core.data_table.selected'|trans({'%count%': 99999})|e('html_attr') }}"
+    data-label-selected-one="{{ 'mautic.core.data_table.selected'|trans({'%count%': 1})|e('html_attr') }}">
+    {% if title|default('') %}
+        <div class="data-table__header">
+            <h2 class="data-table__title" id="{{ baseId|e('html_attr') }}-title">{{ title|trans }}</h2>
+            {% if description|default('') %}
+                <p class="data-table__description" id="{{ baseId|e('html_attr') }}-description">{{ description|trans }}</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if hasToolbar %}
+        <div class="data-table__toolbar{{ hasToolbarContent ? '' : ' data-table__toolbar--batch-only' }}">
+            {% if selection == 'multi' and batchActions is not empty %}
+                <div class="data-table__batch-actions" hidden>
+                    <p class="data-table__batch-summary" aria-live="polite"></p>
+                    <div class="data-table__batch-buttons">
+                        {% include '@MauticCore/Helper/button.html.twig' with {'buttons': batchActions} only %}
+                        <button type="button" class="btn btn-ghost btn-nospin" data-data-table-cancel>{{ 'mautic.core.form.cancel'|trans }}</button>
+                    </div>
+                </div>
+            {% endif %}
+            {% if hasToolbarContent %}
+                <div class="data-table__toolbar-content">
+                    {% if searchable|default(false) %}
+                        <div class="data-table__search">
+                            <label class="visually-hidden" for="{{ baseId|e('html_attr') }}-search">{{ 'mautic.core.data_table.search'|trans }}</label>
+                            <i class="ri-search-line data-table__search-icon" aria-hidden="true"></i>
+                            <input type="search" class="form-control" id="{{ baseId|e('html_attr') }}-search" placeholder="{{ (searchPlaceholder|default('mautic.core.search.placeholder'))|trans|e('html_attr') }}" autocomplete="off" data-data-table-search>
+                        </div>
+                    {% endif %}
+                    {% if toolbarActions is not empty %}
+                        <div class="data-table__toolbar-actions">
+                            {% include '@MauticCore/Helper/button.html.twig' with {'buttons': toolbarActions} only %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="data-table__content" tabindex="0" role="region"{% if accessibleName %} aria-label="{{ accessibleName|trans|e('html_attr') }}"{% endif %}{% if maxHeight|default('') %} style="--data-table-max-height: {{ maxHeight|e('html_attr') }}"{% endif %}>
+        <table class="{{ classes|join(' ')|e('html_attr') }}"
+            {%- if title|default('') %} aria-labelledby="{{ baseId|e('html_attr') }}-title"{% endif %}
+            {%- if description|default('') %} aria-describedby="{{ baseId|e('html_attr') }}-description"{% endif %}
+            {%- if not (title|default('')) and accessibleName %} aria-label="{{ accessibleName|trans|e('html_attr') }}"{% endif %}
+            {%- if isLoading %} aria-busy="true"{% endif %}>
+            <thead>
+                <tr>
+                    {% if isExpandable %}
+                        <th scope="col" class="data-table__expand-cell">
+                            {% if hasBatchExpansion %}
+                                <button type="button" class="data-table__expand-button" data-data-table-expand-all aria-expanded="false" aria-label="{{ 'mautic.core.data_table.expand_all'|trans|e('html_attr') }}">
+                                    <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+                                </button>
+                            {% else %}
+                                <span class="visually-hidden">{{ 'mautic.core.data_table.expand_row'|trans }}</span>
+                            {% endif %}
+                        </th>
+                    {% endif %}
+                    {% if selection %}
+                        <th scope="col" class="data-table__select-cell">
+                            {% if selection == 'multi' %}
+                                <input type="checkbox" class="form-check-input" id="{{ baseId|e('html_attr') }}-select-all" data-data-table-select-all aria-label="{{ 'mautic.core.data_table.select_all'|trans|e('html_attr') }}">
+                            {% else %}
+                                <span class="visually-hidden">{{ 'mautic.core.data_table.select_row'|trans }}</span>
+                            {% endif %}
+                        </th>
+                    {% endif %}
+                    {% for column in columns %}
+                        {% set sortState = column.sort|default(null) %}
+                        <th scope="col" id="{{ baseId|e('html_attr') }}-header-{{ column.key|e('html_attr') }}"
+                            class="{{ column.align|default('start') == 'end' ? 'data-table__cell--end' : '' }}{{ column.className|default('') ? ' ' ~ column.className|e('html_attr') : '' }}"
+                            {%- if column.width|default('') %} style="inline-size: {{ column.width|e('html_attr') }}"{% endif %}
+                            {%- if column.sortable|default(false) or column.sortHref|default('') %} aria-sort="{{ sortState == 'asc' ? 'ascending' : (sortState == 'desc' ? 'descending' : 'none') }}"{% endif %}>
+                            {% if column.sortHref|default('') %}
+                                <a class="data-table__sort" href="{{ column.sortHref|e('html_attr') }}" data-toggle="ajax">
+                                    <span class="data-table__sort-label">{{ column.label|trans }}</span>
+                                    <i class="ri-arrow-up-line data-table__sort-icon" aria-hidden="true"></i>
+                                    <i class="ri-arrow-up-down-line data-table__sort-icon-unsorted" aria-hidden="true"></i>
+                                </a>
+                            {% elseif column.sortable|default(false) %}
+                                <button type="button" class="data-table__sort" data-data-table-sort="{{ column.key|e('html_attr') }}">
+                                    <span class="data-table__sort-label">{{ column.label|trans }}</span>
+                                    <i class="ri-arrow-up-line data-table__sort-icon" aria-hidden="true"></i>
+                                    <i class="ri-arrow-up-down-line data-table__sort-icon-unsorted" aria-hidden="true"></i>
+                                </button>
+                            {% else %}
+                                <span class="data-table__header-label">{{ column.label|trans }}</span>
+                            {% endif %}
+                        </th>
+                    {% endfor %}
+                    {% if hasRowActions %}
+                        <th scope="col" class="data-table__actions-cell"><span class="visually-hidden">{{ 'mautic.core.actions'|trans }}</span></th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% if isLoading %}
+                    {% for placeholder in 1..5 %}
+                        <tr class="data-table__skeleton-row" aria-hidden="true">
+                            {% for index in 1..max(columnCount, 1) %}
+                                <td><span class="data-table__skeleton"></span></td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    {% for row in rows %}
+                        {% set rowId = (row.id ?? loop.index0)|replace({' ': '-', '[': '-', ']': '', '.': '-'}) %}
+                        {% set isSelected = row.isSelected|default(false) %}
+                        {% set isExpanded = isExpandable and row.expansion is defined and row.isExpanded|default(false) %}
+                        {% set rowClasses = ['data-table__row'] %}
+                        {% if isSelected %}{% set rowClasses = rowClasses|merge(['data-table__row--selected']) %}{% endif %}
+                        {% if isExpanded %}{% set rowClasses = rowClasses|merge(['data-table__row--expanded']) %}{% endif %}
+                        {% if loop.index is even %}{% set rowClasses = rowClasses|merge(['data-table__row--alt']) %}{% endif %}
+                        {% if row.className|default('') %}{% set rowClasses = rowClasses|merge([row.className]) %}{% endif %}
+                        <tr class="{{ rowClasses|join(' ')|e('html_attr') }}" data-parent-row="{{ rowId|e('html_attr') }}">
+                            {% if isExpandable %}
+                                <td class="data-table__expand-cell">
+                                    {% if row.expansion is defined %}
+                                        <button type="button" class="data-table__expand-button" data-data-table-expand aria-expanded="{{ isExpanded ? 'true' : 'false' }}" aria-controls="{{ baseId|e('html_attr') }}-expanded-{{ rowId|e('html_attr') }}" aria-label="{{ (isExpanded ? 'mautic.core.data_table.collapse_row' : 'mautic.core.data_table.expand_row')|trans|e('html_attr') }}">
+                                            <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                            {% if selection %}
+                                <td class="data-table__select-cell">
+                                    <input type="{{ selection == 'multi' ? 'checkbox' : 'radio' }}" class="form-check-input" id="{{ baseId|e('html_attr') }}-select-{{ rowId|e('html_attr') }}" name="{{ (selection == 'multi' ? row.name|default(baseId ~ '-select[]') : baseId ~ '-select')|e('html_attr') }}" value="{{ rowId|e('html_attr') }}" data-data-table-select aria-label="{{ 'mautic.core.data_table.select_row'|trans|e('html_attr') }}"{{ isSelected ? ' checked' : '' }}{{ row.isDisabled|default(false) ? ' disabled' : '' }}>
+                                </td>
+                            {% endif %}
+                            {% for column in columns %}
+                                {% set value = row.cells[column.key] ?? null %}
+                                <td headers="{{ baseId|e('html_attr') }}-header-{{ column.key|e('html_attr') }}"{% if column.align|default('start') == 'end' %} class="data-table__cell--end"{% endif %} data-sort-value="{{ _self.sortValue(value)|e('html_attr') }}">{{ _self.cell(value) }}</td>
+                            {% endfor %}
+                            {% if hasRowActions %}
+                                <td class="data-table__actions-cell">
+                                    {% if row.actions|default([]) is not empty %}
+                                        <div class="dropdown">
+                                            <button type="button" class="btn btn-ghost btn--icon-only btn-sm btn-nospin" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" aria-label="{{ 'mautic.core.actions'|trans|e('html_attr') }}">
+                                                <i class="ri-more-2-fill" aria-hidden="true"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                {% for action in row.actions %}
+                                                    <li>
+                                                        <a class="dropdown-item{{ action.danger|default(false) ? ' text-danger' : '' }}" href="{{ (action.href|default('javascript:void(0);'))|e('html_attr') }}"{{ _self.attributes(action.attr) }}>
+                                                            {% if action.icon|default('') %}<i class="{{ action.icon|e('html_attr') }} me-8" aria-hidden="true"></i>{% endif %}{{ action.label|trans }}
+                                                        </a>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                        </tr>
+                        {% if isExpandable and row.expansion is defined %}
+                            <tr class="data-table__expanded-row" id="{{ baseId|e('html_attr') }}-expanded-{{ rowId|e('html_attr') }}" data-child-row{{ isExpanded ? '' : ' hidden' }}>
+                                <td colspan="{{ columnCount }}">
+                                    <div class="data-table__expansion">{{ row.expansion|purify }}</div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    <tr class="data-table__empty-row"{{ rows is empty ? '' : ' hidden' }}>
+                        <td colspan="{{ max(columnCount, 1) }}">{{ (emptyMessage|default('mautic.core.data_table.empty'))|trans }}</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</section>
