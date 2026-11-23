@@ -1,0 +1,62 @@
+<style>
+.segmented-control {
+    position: relative;
+    display: inline-flex;
+    align-items: stretch;
+    max-width: 100%;
+    padding: 3px;
+    border-radius: 25px;
+    background-color: #f4f4f4;
+    font-size: 14px;
+    user-select: none;
+}
+
+.segmented-control__indicator {
+    display: none;
+}
+
+.segmented-control > .btn-check {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    pointer-events: none;
+}
+
+.segmented-control > .btn {
+    float: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 22px !important;
+    background: transparent;
+    box-shadow: none;
+    color: #525252;
+    font-size: inherit;
+    font-weight: 500;
+    line-height: 30px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.segmented-control > .btn:hover {
+    color: #161616;
+}
+
+.segmented-control > .btn-check:checked + .btn {
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    color: #161616;
+}
+
+.segmented-control > .btn-check:disabled + .btn {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.segmented-control > .btn-check:focus-visible + .btn {
+    outline: 2px solid #0f62fe;
+    outline-offset: -2px;
+}
+</style>
