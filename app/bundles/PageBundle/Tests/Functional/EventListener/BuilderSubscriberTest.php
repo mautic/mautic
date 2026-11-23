@@ -83,7 +83,10 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
             'secretHash' => $mailHashHelper->getEmailHash($lead->getEmail()),
         ], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $crawler = $this->client->request(Request::METHOD_GET, $unsubscribeUrl);
+        // the page is public; a logged-in user gets ROLE_API once MAUTIC_API_REQUEST was defined by an earlier test, which disables CSRF
+        $this->logoutUser();
+
+        $crawler =$this->client->request(Request::METHOD_GET, $unsubscribeUrl);
 
         $this->assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
 
