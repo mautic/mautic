@@ -22,8 +22,6 @@ final class UntrackedVisitorPixelFunctionalTest extends MauticMysqlTestCase
 
     private const string EXCLUDED_IP = '203.0.113.64';
 
-    protected $useCleanupRollback = false;
-
     protected function setUp(): void
     {
         $this->configParams['do_not_track_ips'] = [self::EXCLUDED_IP];

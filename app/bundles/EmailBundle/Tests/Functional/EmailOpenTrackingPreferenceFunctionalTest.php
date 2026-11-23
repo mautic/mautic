@@ -18,8 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class EmailOpenTrackingPreferenceFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     public function testOpenIsNotRecordedForAContactWhoTurnedTrackingOff(): void
     {
         [$email, $stat] = $this->createSentEmail('pixel-off@example.com', false);
