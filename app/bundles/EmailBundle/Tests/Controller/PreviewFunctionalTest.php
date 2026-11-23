@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
@@ -25,14 +26,6 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
     use CreateTestEntitiesTrait;
 
     private const string PREHEADER_TEXT = 'Preheader text';
-
-    protected function setUp(): void
-    {
-        // full database reset: this test creates a custom field, which alters the leads table
-        $this->useCleanupRollback = 'testPreviewEmailForDynamicContentVariantsWithCustomField' !== $this->name();
-
-        parent::setUp();
-    }
 
     public function testPreviewPage(): void
     {
@@ -219,6 +212,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertPageContent($url, 'Default content - not in segment or wrong country', self::PREHEADER_TEXT);
     }
 
+    #[ResetDatabase('creates a custom field, which alters the leads table')]
     public function testPreviewEmailForDynamicContentVariantsWithCustomField(): void
     {
         // Create custom field

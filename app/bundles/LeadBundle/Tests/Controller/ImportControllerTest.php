@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\ImportCommand;
 use Mautic\LeadBundle\Entity\Company;
@@ -34,14 +35,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class ImportControllerTest extends MauticMysqlTestCase
 {
     private const string IMPORT_CANCELED_MESSAGE = 'Import canceled for file test.csv';
-
-    protected function setUp(): void
-    {
-        // full database reset: this test creates a custom field, which alters the leads table
-        $this->useCleanupRollback = 'testImportWithSkipIfExistsFlagTrue' !== $this->name();
-
-        parent::setUp();
-    }
 
     public function testImportWithoutFile(): void
     {
@@ -310,6 +303,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         );
     }
 
+    #[ResetDatabase('creates a custom field, which alters the leads table')]
     public function testImportWithSkipIfExistsFlagTrue(): void
     {
         $this->createBooleanField();

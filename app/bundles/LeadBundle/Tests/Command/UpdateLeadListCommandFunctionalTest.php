@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Command;
 
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
@@ -26,19 +27,6 @@ use Symfony\Component\Console\Command\Command;
 final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
-
-    protected function setUp(): void
-    {
-        // full database reset: these tests create custom fields, which alter the leads and companies tables
-        $this->useCleanupRollback = !in_array($this->name(), [
-            'testCustomFieldIncludeExclude',
-            'testCustomFieldSelectIncludeExclude',
-            'testCompanyCustomFieldSelectIncludeExclude',
-            'testCompanyCustomFieldIncludeExclude',
-        ], true);
-
-        parent::setUp();
-    }
 
     public function testFailWhenSegmentDoesNotExist(): void
     {
@@ -739,6 +727,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
      * @param array<int> $addFieldsToSegment
      */
     #[DataProvider('provideIncludeExclude')]
+    #[ResetDatabase('creates custom fields, which alter the leads and companies tables')]
     public function testCustomFieldIncludeExclude(string $filter, int $expected, array $addFieldsToContact, array $addFieldsToSegment): void
     {
         $fieldAlias = 'test_inc_ex_field';
@@ -844,6 +833,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
      * @param array<int> $addFieldsToSegment
      */
     #[DataProvider('provideSingleIncludeExclude')]
+    #[ResetDatabase('creates custom fields, which alter the leads and companies tables')]
     public function testCustomFieldSelectIncludeExclude(string $filter, int $expected, int $addFieldToContact, array $addFieldsToSegment): void
     {
         $fieldAlias = 'test_inc_ex_single_field';
@@ -965,6 +955,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
      * @param array<int> $addFieldsToSegment
      */
     #[DataProvider('provideSingleIncludeExclude')]
+    #[ResetDatabase('creates custom fields, which alter the leads and companies tables')]
     public function testCompanyCustomFieldSelectIncludeExclude(string $filter, int $expected, int $addFieldToCompany, array $addFieldsToSegment): void
     {
         $fieldAlias = 'test_company_inc_ex_single_field';
@@ -1052,6 +1043,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
      * @param array<int> $addFieldsToSegment
      */
     #[DataProvider('provideIncludeExclude')]
+    #[ResetDatabase('creates custom fields, which alter the leads and companies tables')]
     public function testCompanyCustomFieldIncludeExclude(string $filter, int $expected, array $addFieldsToCompany, array $addFieldsToSegment): void
     {
         $fieldAlias = 'test_company_inc_ex_field';

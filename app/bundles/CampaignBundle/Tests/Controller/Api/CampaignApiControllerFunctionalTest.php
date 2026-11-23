@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -32,13 +33,6 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        // full database reset: these tests import forms and custom fields, which create and alter tables
-        $this->useCleanupRollback = !in_array($this->name(), [
-            'testImportCampaignActionJson',
-            'testImportCampaignActionRejectsACraftedFieldAlias',
-            'testImportCampaignActionZip',
-        ], true);
-
         $this->configParams['mailer_from_name']  = 'Mautic Admin';
         $this->configParams['mailer_from_email'] = 'admin@email.com';
 
@@ -422,6 +416,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
     }
 
+    #[ResetDatabase('imports forms and custom fields, which create and alter tables')]
     public function testImportCampaignActionJson(): void
     {
         $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
@@ -450,6 +445,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertContains('Import successful: Imported campaigns are switched off by default.', $responseData);
     }
 
+    #[ResetDatabase('imports forms and custom fields, which create and alter tables')]
     public function testImportCampaignActionRejectsACraftedFieldAlias(): void
     {
         $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
@@ -469,6 +465,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($forms, $this->getContainer()->get(FormRepository::class)->count([]));
     }
 
+    #[ResetDatabase('imports forms and custom fields, which create and alter tables')]
     public function testImportCampaignActionZip(): void
     {
         $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);

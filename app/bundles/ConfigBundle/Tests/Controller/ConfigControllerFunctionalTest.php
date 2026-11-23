@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ConfigBundle\Tests\Controller;
 
 use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -23,9 +24,6 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        // full database reset: this test re-creates the client to apply the changed config
-        $this->useCleanupRollback = 'testConfigNotFoundPageConfiguration' !== $this->name();
-
         $this->configParams['config_allowed_parameters'] = [
             'kernel.project_dir',
         ];
@@ -218,6 +216,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         return str_replace('%', '%%', $value);
     }
 
+    #[ResetDatabase('re-creates the client to apply the changed config')]
     public function testConfigNotFoundPageConfiguration(): void
     {
         // insert published record

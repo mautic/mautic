@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
 use Mautic\LeadBundle\Entity\Company;
@@ -34,12 +35,6 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        // full database reset: these tests create a company custom field, which alters the companies table
-        $this->useCleanupRollback = !in_array($this->name(), [
-            'testInTheLastAndInTheNextFilter',
-            'testInLastAndInNextFilterForCompanyCustomField',
-        ], true);
-
         parent::setUp();
 
         $this->listModel  = $this->getService(ListModel::class);
@@ -812,6 +807,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     #[DataProvider('operatorProvider')]
+    #[ResetDatabase('creates a company custom field, which alters the companies table')]
     public function testInTheLastAndInTheNextFilter(string $operator, int $expected): void
     {
         $filters = [
@@ -878,6 +874,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     #[DataProvider('operatorProvider')]
+    #[ResetDatabase('creates a company custom field, which alters the companies table')]
     public function testInLastAndInNextFilterForCompanyCustomField(string $operator, int $expectedCount): void
     {
         $company = $this->createCompanyWithDateCustomField('CompanyABC', $operator);
