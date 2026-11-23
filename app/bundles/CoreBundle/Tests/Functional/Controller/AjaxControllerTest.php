@@ -51,7 +51,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
      */
     public function testGlobalSearch(): void
     {
-        $searchCases = iterator_to_array(self::dataForGlobalSearch());
+        $searchCases = iterator_to_array($this->dataForGlobalSearch());
 
         foreach ($searchCases as [, $entity]) {
             $this->em->persist($entity);
@@ -75,7 +75,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array{string, object, string}>
      */
-    private static function dataForGlobalSearch(): iterable
+    private function dataForGlobalSearch(): iterable
     {
         // Api
         $apiClient = self::createApiClient('client');
@@ -96,7 +96,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Campaign
-        $campaign = self::createCampaign();
+        $campaign = $this->createCampaign();
 
         yield 'Search Campaign' => [
             'campaign',
@@ -105,7 +105,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Channel: Marketing Messages
-        $message = self::createMessage();
+        $message = $this->createMessage();
 
         yield 'Search Marketing Messages' => [
             'marketing',
@@ -114,7 +114,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Dynamic Content
-        $dwc = self::createDynamicContent();
+        $dwc = $this->createDynamicContent();
 
         yield 'Search Dynamic Content' => [
             'dynamic',
@@ -123,7 +123,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Email
-        $email = self::createEmail();
+        $email = $this->createEmail();
 
         yield 'Search Email' => [
             'email',
@@ -141,7 +141,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Lead
-        $lead = self::createLead();
+        $lead = $this->createLead();
 
         yield 'Search Contact' => [
             'john',
@@ -150,7 +150,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Companies
-        $company = self::createCompany();
+        $company = $this->createCompany();
 
         yield 'Search Companies' => [
             'maut',
@@ -159,7 +159,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Segment
-        $segment = self::createSegment();
+        $segment = $this->createSegment();
 
         yield 'Search Segment' => [
             'news',
@@ -168,7 +168,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Notification Mobile
-        $notification = self::createNotification('Notification Mobile', true);
+        $notification = $this->createNotification('Notification Mobile', true);
 
         yield 'Search Notification Mobile' => [
             'mobile',
@@ -177,7 +177,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Notification Web
-        $notification = self::createNotification('Notification Web');
+        $notification = $this->createNotification('Notification Web');
 
         yield 'Search Notification Web' => [
             'web',
@@ -186,7 +186,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Page
-        $page = self::createPage();
+        $page = $this->createPage();
 
         yield 'Search Page' => [
             'landing',
@@ -195,7 +195,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Point Action
-        $pointAction = self::createPointAction();
+        $pointAction = $this->createPointAction();
 
         yield 'Search Point Action' => [
             'action',
@@ -204,7 +204,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Point Group
-        $pointGroup = self::createPointGroup();
+        $pointGroup = $this->createPointGroup();
 
         yield 'Search Points Group' => [
             'group',
@@ -213,7 +213,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Point Trigger
-        $pointTrigger = self::createPointTrigger();
+        $pointTrigger = $this->createPointTrigger();
 
         yield 'Search Point Trigger' => [
             'trigger',
@@ -222,7 +222,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Report
-        $report = self::createReport();
+        $report = $this->createReport();
 
         yield 'Search Report' => [
             'lead',
@@ -242,7 +242,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Stage
-        $stage = self::createStage();
+        $stage = $this->createStage();
 
         yield 'Search Stage' => [
             'stage',
@@ -261,7 +261,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Focus
-        $focus = self::createFocus('Focus');
+        $focus = $this->createFocus('Focus');
 
         yield 'Search Focus' => [
             'focus',
@@ -422,10 +422,10 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
     public function testGlobalSearchForMoreLink(): void
     {
-        $contactOne   = self::createLead('contact-1@mautic-test.com');
-        $contactTwo   = self::createLead('contact-2@mautic-test.com');
-        $contactThree = self::createLead('contact-3@mautic-test.com');
-        $contactFour  = self::createLead('contact-4@mautic-test.com');
+        $contactOne   = $this->createLead('contact-1@mautic-test.com');
+        $contactTwo   = $this->createLead('contact-2@mautic-test.com');
+        $contactThree = $this->createLead('contact-3@mautic-test.com');
+        $contactFour  = $this->createLead('contact-4@mautic-test.com');
 
         $client1 = self::createApiClient('Client1');
         $client2 = self::createApiClient('Client2');
@@ -619,7 +619,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $asset;
     }
 
-    private static function createCampaign(): Campaign
+    private function createCampaign(): Campaign
     {
         $campaign = new Campaign();
         $campaign->setName('Campaign');
@@ -627,7 +627,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $campaign;
     }
 
-    private static function createMessage(): Message
+    private function createMessage(): Message
     {
         $channel = new Channel();
         $channel->setChannel('email');
@@ -642,7 +642,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $message;
     }
 
-    private static function createDynamicContent(): DynamicContent
+    private function createDynamicContent(): DynamicContent
     {
         $dwc = new DynamicContent();
         $dwc->setName('Dynamic Content');
@@ -650,7 +650,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $dwc;
     }
 
-    private static function createEmail(): Email
+    private function createEmail(): Email
     {
         $email = new Email();
         $email->setName('Email');
@@ -669,7 +669,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $form;
     }
 
-    private static function createLead(string $email = 'jon@example.com'): Lead
+    private function createLead(string $email = 'jon@example.com'): Lead
     {
         $lead = new Lead();
         $lead->setFirstname('John');
@@ -678,7 +678,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    private static function createCompany(): Company
+    private function createCompany(): Company
     {
         $company = new Company();
         $company->setName('Mautic');
@@ -686,7 +686,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $company;
     }
 
-    private static function createSegment(): LeadList
+    private function createSegment(): LeadList
     {
         $segment = new LeadList();
         $segment->setAlias('newsletter');
@@ -697,7 +697,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $segment;
     }
 
-    private static function createNotification(string $name, bool $isMobile = false): Notification
+    private function createNotification(string $name, bool $isMobile = false): Notification
     {
         $notification = new Notification();
         $notification->setName($name);
@@ -708,7 +708,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $notification;
     }
 
-    private static function createPage(): Page
+    private function createPage(): Page
     {
         $page = new Page();
         $page->setTitle('Landing Page');
@@ -717,7 +717,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $page;
     }
 
-    private static function createPointAction(): Point
+    private function createPointAction(): Point
     {
         $pointAction = new Point();
         $pointAction->setName('Read email action');
@@ -728,7 +728,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $pointAction;
     }
 
-    private static function createPointGroup(): Group
+    private function createPointGroup(): Group
     {
         $pointGroup = new Group();
         $pointGroup->setName('New Group');
@@ -736,7 +736,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $pointGroup;
     }
 
-    private static function createPointTrigger(): Trigger
+    private function createPointTrigger(): Trigger
     {
         $pointTrigger = new Trigger();
         $pointTrigger->setName('Trigger');
@@ -744,7 +744,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $pointTrigger;
     }
 
-    private static function createReport(): Report
+    private function createReport(): Report
     {
         $report = new Report();
         $report->setName('Lead and points');
@@ -753,7 +753,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $report;
     }
 
-    private static function createStage(): Stage
+    private function createStage(): Stage
     {
         $stage = new Stage();
         $stage->setName('Stage');
@@ -761,7 +761,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         return $stage;
     }
 
-    private static function createFocus(string $name): Focus
+    private function createFocus(string $name): Focus
     {
         $focus = new Focus();
         $focus->setName($name);
