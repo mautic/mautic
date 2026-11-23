@@ -42,7 +42,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         $this->setUpInvoked = true;
 
-        if ([] !== (new \ReflectionMethod($this, $this->name()))->getAttributes(ResetDatabase::class)) {
+        if ([] !== new \ReflectionMethod($this, $this->name())->getAttributes(ResetDatabase::class)) {
             $this->useCleanupRollback = false;
         }
 
