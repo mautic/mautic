@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,7 +54,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['show_contact_preferences'] = 0;
         }
 
-        if (in_array($this->name(), ['testContactPreferencesSaveMessage', 'testLandingPageContactPreferencesSaveMessage'])) {
+        if (in_array($this->name(), ['testContactPreferencesSaveMessage', 'testLandingPageContactPreferencesSaveMessage', 'testContactPreferencesKeepsSavedPreferredChannel'])) {
             $this->configParams['show_contact_segments']           = 1;
             $this->configParams['show_contact_frequency']          = 1;
             $this->configParams['show_contact_pause_dates']        = 1;
@@ -73,6 +74,38 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         parent::setUp();
+    }
+
+    public function testContactPreferencesKeepsSavedPreferredChannel(): void
+    {
+        $this->enableSmsTransport();
+
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
+
+        self::assertResponseIsSuccessful();
+        $this->assertCount(1, $crawler->filter('#preferred_channel .segmented-control input[type="radio"][value="sms"]'));
+        $form = $crawler->filter('form')->form();
+        $form->setValues(['lead_contact_frequency_rules[lead_channels][preferred_channel]' => 'sms']);
+        $this->client->submit($form);
+        self::assertResponseIsSuccessful();
+
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
+
+        self::assertResponseIsSuccessful();
+        $this->assertSame('sms', $crawler->filter('#preferred_channel .segmented-control input[type="radio"]:checked')->attr('value'));
+    }
+
+    private function enableSmsTransport(): void
+    {
+        $integration = self::getContainer()->get(IntegrationHelper::class)->getIntegrationObject('Twilio');
+        $settings    = $integration->getIntegrationSettings();
+        $settings->setIsPublished(true);
+        $this->em->persist($settings);
+        $this->em->flush();
     }
 
     public function testMailerCallbackWhenNoTransportProccessesIt(): void
