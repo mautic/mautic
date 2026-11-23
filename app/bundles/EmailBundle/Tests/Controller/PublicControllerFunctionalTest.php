@@ -139,6 +139,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
 
         self::assertResponseIsSuccessful();
+        $this->assertCount(1, $crawler->filter('#preferred_channel .segmented-control input[type="radio"][value="email"]'));
         $form = $crawler->filter('form')->form();
 
         // Unsubscribe from email.
