@@ -13,17 +13,11 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList as Segment;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\PreserveGlobalState;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-#[PreserveGlobalState(false)]
-#[RunTestsInSeparateProcesses]
 final class BuilderSubscriberTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     // Custom preference center page
     public const string CUSTOM_SEGMENT_SELECTOR           = '.pref-segmentlist input';
 
@@ -89,7 +83,10 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
             'secretHash' => $mailHashHelper->getEmailHash($lead->getEmail()),
         ], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $crawler = $this->client->request(Request::METHOD_GET, $unsubscribeUrl);
+        // the page is public; a logged-in user gets ROLE_API once MAUTIC_API_REQUEST was defined by an earlier test, which disables CSRF
+        $this->logoutUser();
+
+        $crawler =$this->client->request(Request::METHOD_GET, $unsubscribeUrl);
 
         $this->assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
 

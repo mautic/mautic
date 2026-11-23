@@ -22,8 +22,6 @@ final class EmailOpenTrackingPreferenceAsyncFunctionalTest extends MauticMysqlTe
 {
     private const string HIT_TRANSPORT = 'messenger.transport.hit';
 
-    protected $useCleanupRollback = false;
-
     protected function setUp(): void
     {
         $this->configParams['messenger_dsn_hit'] = 'in-memory://default';

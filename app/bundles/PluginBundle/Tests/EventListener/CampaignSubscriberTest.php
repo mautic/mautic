@@ -47,7 +47,7 @@ final class CampaignSubscriberTest extends TestCase
         $contact      = $pendingEvent->getPending()->first()->getLead();
 
         $integration = $this->createPublishedIntegration(true);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
+        $this->assertInstanceOf(Lead::class, $contact);
         $integration->expects($this->once())
             ->method('pushContact')
             ->with($contact, ['list_settings' => ['list' => 'a1']]);

@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 final class ApiErrorException extends \Exception
 {
-    private $contactId;
+    private int|string|null $contactId = null;
 
     private ?Lead $contact = null;
 
@@ -17,18 +17,12 @@ final class ApiErrorException extends \Exception
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getContactId()
+    public function getContactId(): int|string|null
     {
         return $this->contactId;
     }
 
-    /**
-     * @param mixed $contactId
-     */
-    public function setContactId($contactId): static
+    public function setContactId(int|string|null $contactId): static
     {
         $this->contactId = $contactId;
 

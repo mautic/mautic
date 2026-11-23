@@ -16,7 +16,7 @@ trait TimelineTrait
      * @param string       $timestampColumn       Name of column to sort timestamp by
      * @param array<mixed> $serializedColumns     Array of columns to unserialize
      * @param array<mixed> $dateTimeColumns       Array of columns to be converted to \DateTime
-     * @param mixed|null   $resultsParserCallback Callback to custom parse results
+     * @param ?callable    $resultsParserCallback Callback to custom parse results
      * @param string|null  $secondaryOrdering     Name of column for secondary sort
      * @param string|null  $leadIdColumn          Lead ID column for the leadIds filter, defaults to lead_id of the timestamp column's table
      *
@@ -29,7 +29,7 @@ trait TimelineTrait
         string $timestampColumn,
         array $serializedColumns = [],
         array $dateTimeColumns = [],
-        $resultsParserCallback = null,
+        ?callable $resultsParserCallback = null,
         ?string $secondaryOrdering = null,
         ?string $leadIdColumn = null,
     ): array {

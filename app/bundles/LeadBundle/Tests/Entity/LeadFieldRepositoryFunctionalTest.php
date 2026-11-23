@@ -12,9 +12,19 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback     = false;
-
     private const string ADMINISTRATOR_VALUE = "administrator's";
+
+    protected function setUp(): void
+    {
+        // full database reset: these tests create custom fields, which alter the leads table
+        $this->useCleanupRollback = !in_array($this->name(), [
+            'testCompareValueInOperatorWithMultiselectField',
+            'testCompareValueInOperatorWithSpecialCharacters',
+            'testExcludeUnpublishedField',
+        ], true);
+
+        parent::setUp();
+    }
 
     public function testCompareValueEqualsOperator(): void
     {

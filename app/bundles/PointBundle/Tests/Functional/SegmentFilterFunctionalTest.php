@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     public function testGroupPointSegmentFilter(): void
     {
         $application = new Application(self::$kernel);

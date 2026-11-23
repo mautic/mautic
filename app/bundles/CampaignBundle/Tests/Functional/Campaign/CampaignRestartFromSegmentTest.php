@@ -18,8 +18,6 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
 {
     use CampaignEntitiesTrait;
 
-    protected $useCleanupRollback = false;
-
     public function testCampaignRestartsWhenContactReturnsToSegment(): void
     {
         // Arrange: create a segment and a campaign with "Allow contact to restart campaign" enabled

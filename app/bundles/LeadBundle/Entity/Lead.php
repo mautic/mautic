@@ -310,7 +310,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     private int $previousId = 0;
 
-    private $primaryCompany;
+    private ?array $primaryCompany = null;
 
     /**
      * Used to determine order of preferred channels.
@@ -1272,18 +1272,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         }
     }
 
-    /**
-     * @return mixed
-     */
-    public function getPrimaryCompany()
+    public function getPrimaryCompany(): ?array
     {
         return $this->primaryCompany;
     }
 
-    /**
-     * @param mixed $primaryCompany
-     */
-    public function setPrimaryCompany($primaryCompany): static
+    public function setPrimaryCompany(?array $primaryCompany): static
     {
         $this->primaryCompany = $primaryCompany;
 

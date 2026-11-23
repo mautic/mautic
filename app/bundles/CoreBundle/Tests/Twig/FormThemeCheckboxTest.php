@@ -17,7 +17,10 @@ use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
+use Twig\RuntimeLoader\RuntimeLoaderInterface;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
+use Twig\TwigTest;
 
 final class FormThemeCheckboxTest extends TestCase
 {
@@ -35,16 +38,16 @@ final class FormThemeCheckboxTest extends TestCase
         $twig->addFilter(new TwigFilter('purify', static fn (string $value): string => $value, ['is_safe' => ['html']]));
         $twig->addFilter(new TwigFilter('trans', static fn (string $value): string => $value));
         $twig->addFilter(new TwigFilter('humanize', static fn (string $value): string => ucfirst(str_replace('_', ' ', $value))));
-        $twig->addTest(new \Twig\TwigTest('numeric', static fn ($value): bool => is_numeric($value)));
-        $twig->addTest(new \Twig\TwigTest('string', static fn ($value): bool => is_string($value)));
-        $twig->addFunction(new \Twig\TwigFunction('toggleYesNo', static fn (): string => ''));
-        $twig->addFunction(new \Twig\TwigFunction('formFieldFormatList', static fn (): string => ''));
-        $twig->addFunction(new \Twig\TwigFunction('path', static fn (): string => '#'));
-        $twig->addFunction(new \Twig\TwigFunction('asset', static fn (): string => '#'));
-        $twig->addFunction(new \Twig\TwigFunction('mautic_asset', static fn (): string => '#'));
+        $twig->addTest(new TwigTest('numeric', static fn ($value): bool => is_numeric($value)));
+        $twig->addTest(new TwigTest('string', static fn ($value): bool => is_string($value)));
+        $twig->addFunction(new TwigFunction('toggleYesNo', static fn (): string => ''));
+        $twig->addFunction(new TwigFunction('formFieldFormatList', static fn (): string => ''));
+        $twig->addFunction(new TwigFunction('path', static fn (): string => '#'));
+        $twig->addFunction(new TwigFunction('asset', static fn (): string => '#'));
+        $twig->addFunction(new TwigFunction('mautic_asset', static fn (): string => '#'));
         $twig->addExtension(new FormExtension());
         $renderer = new FormRenderer(new TwigRendererEngine(['form_div_layout.html.twig'], $twig));
-        $twig->addRuntimeLoader(new readonly class($renderer) implements \Twig\RuntimeLoader\RuntimeLoaderInterface {
+        $twig->addRuntimeLoader(new readonly class($renderer) implements RuntimeLoaderInterface {
             public function __construct(
                 private FormRendererInterface $renderer
             )

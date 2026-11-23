@@ -11,12 +11,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * Mailchimp Marketing API 3.0.
  */
-class MailchimpClient
+readonly class MailchimpClient
 {
     private const string VERSION = '3.0';
 
     public function __construct(
-        private readonly HttpClientInterface $httpClient,
+        private HttpClientInterface $httpClient,
     ) {
     }
 

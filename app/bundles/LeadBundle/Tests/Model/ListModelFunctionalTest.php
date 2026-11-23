@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
@@ -144,7 +145,7 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
         $segmentModel = self::getContainer()->get(ListModel::class);
 
         /** @var LeadRepository $contactRepository */
-        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $contactRepository = $this->getContainer()->get(LeadRepository::class);
 
         $segment = new LeadList();
         $segment->setName('Test Segment');
@@ -155,7 +156,7 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
 
         $segmentModel->addLead($contact, $segment, false);
 
-        $listLead = $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findOneBy([
+        $listLead = $this->getContainer()->get(ListLeadRepository::class)->findOneBy([
             'lead' => $contact,
             'list' => $segment,
         ]);
@@ -166,7 +167,7 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
         $segmentModel->addLead($contact, $segment, true);
 
         $this->em->clear();
-        $listLead = $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findOneBy([
+        $listLead = $this->getContainer()->get(ListLeadRepository::class)->findOneBy([
             'lead' => $contact,
             'list' => $segment,
         ]);

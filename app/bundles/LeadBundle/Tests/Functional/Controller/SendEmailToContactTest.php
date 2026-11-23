@@ -15,8 +15,6 @@ use Symfony\Component\Mime\Message;
 
 final class SendEmailToContactTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     private SMimeHelper $sMimeHelper;
 
     protected function setUp(): void

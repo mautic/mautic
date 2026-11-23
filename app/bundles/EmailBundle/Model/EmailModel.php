@@ -983,7 +983,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get the number of leads this email will be sent to.
      *
-     * @param mixed $listId          Leads for a specific lead list
+     * @param ?int  $listId          Leads for a specific lead list
      * @param bool  $countOnly       If true, return count otherwise array of leads
      * @param int   $limit           Max number of leads to retrieve
      * @param bool  $includeVariants If false, emails sent to a variant will not be included
@@ -994,7 +994,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getPendingLeads(
         Email $email,
-        $listId = null,
+        ?int $listId = null,
         bool $countOnly = false,
         $limit = null,
         bool $includeVariants = true,

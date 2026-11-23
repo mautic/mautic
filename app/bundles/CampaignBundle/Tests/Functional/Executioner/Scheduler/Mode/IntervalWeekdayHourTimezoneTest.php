@@ -31,8 +31,6 @@ use Mautic\LeadBundle\Entity\Lead;
  */
 final class IntervalWeekdayHourTimezoneTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     public function testHourRestrictionIsAppliedAfterDayOfWeekReschedulingForContactWithNonUtcTimezone(): void
     {
         $campaign = new Campaign();

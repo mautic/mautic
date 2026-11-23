@@ -1,12 +1,12 @@
 {% set route = route|default('mautic_campaignevent_action') %}
 
 {% if update is not defined %}
-<div id="CampaignEvent_{{ event['id'] }}" data-type="{{ event['eventType'] }}" class="draggable list-campaign-event list-campaign-{{ event['eventType'] }} list-campaign-jump" data-event="{{ event['type'] }}" data-event-id="{{ event['id'] }}">
+<div id="CampaignEvent_{{ event['id'] }}" data-type="{{ event['eventType'] }}" class="draggable position-absolute list-campaign-event list-campaign-{{ event['eventType']|e('html_attr') }} list-campaign-jump" data-event="{{ event['type'] }}" data-event-id="{{ event['id'] }}">
 {% endif %}
-<div class="campaign-event-type">
+<div class="campaign-event-type position-relative">
 
-<div class="campaign-event-content d-flex flex-nowrap align-items-center gap-12">
-    <div class="campaign-event-icon p-12 me-5"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
+<div class="campaign-event-content position-relative overflow-hidden d-flex flex-nowrap align-items-center gap-12">
+    <div class="campaign-event-icon text-center p-12 me-5 d-inline-flex align-items-center justify-content-center"><i class="{{ getCampaignEventIcon(event['type'])|e('html_attr') }}"></i></div>
 
         <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
         {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
@@ -18,7 +18,7 @@
 </div>
 </div>
 {% if update is not defined %}
-<div class="campaign-event-buttons hide">
+<div class="campaign-event-buttons position-absolute hide">
     {% include '@MauticCore/Helper/button.html.twig' with {
         buttons: [
             {

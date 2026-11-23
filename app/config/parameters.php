@@ -1,5 +1,8 @@
 <?php
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+/** @var ContainerBuilder $container */
 $root = $container->getParameter('mautic.application_dir').'/app';
 include __DIR__.'/paths_helper.php';
 

@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-class BatchCompanyContactAssignmentModel
+final readonly class BatchCompanyContactAssignmentModel
 {
     private const string MESSAGE_ADDED             = 'Contact added to company';
 
@@ -32,11 +32,11 @@ class BatchCompanyContactAssignmentModel
     private const string LOG_ACTION_PREFIX         = 'Lead added to the company, ';
 
     public function __construct(
-        private readonly CompanyModel $companyModel,
-        private readonly LeadModel $leadModel,
-        private readonly CorePermissions $security,
-        private readonly LeadRepository $leadRepository,
-        private readonly LoggerInterface $logger,
+        private CompanyModel $companyModel,
+        private LeadModel $leadModel,
+        private CorePermissions $security,
+        private LeadRepository $leadRepository,
+        private LoggerInterface $logger,
     ) {
     }
 

@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Mautic\MarketplaceBundle\Twig;
 
 use League\CommonMark\GithubFlavoredMarkdownConverter;
+use Twig\Attribute\AsTwigFilter;
 
 final class MarkdownExtension
 {
-    #[\Twig\Attribute\AsTwigFilter(name: 'marketplace_markdown')]
+    #[AsTwigFilter(name: 'marketplace_markdown')]
     public function render(mixed $markdown): string
     {
         if (!is_string($markdown) || '' === trim($markdown)) {

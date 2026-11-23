@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Controller\Api;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -14,6 +15,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -30,9 +32,15 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
+        // full database reset: these tests import forms and custom fields, which create and alter tables
+        $this->useCleanupRollback = !in_array($this->name(), [
+            'testImportCampaignActionJson',
+            'testImportCampaignActionRejectsACraftedFieldAlias',
+            'testImportCampaignActionZip',
+        ], true);
+
         $this->configParams['mailer_from_name']  = 'Mautic Admin';
         $this->configParams['mailer_from_email'] = 'admin@email.com';
-        $this->useCleanupRollback                = false;
 
         parent::setUp();
     }
@@ -444,21 +452,21 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testImportCampaignActionRejectsACraftedFieldAlias(): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $payload = FixtureHelper::getPayload();
         $payload[0][Field::ENTITY_NAME][0]['alias'] = 'review_field LONGTEXT, ADD review_extra';
-        $campaigns                                  = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\CampaignRepository::class)->count([]);
-        $forms                                      = $this->getContainer()->get(\Mautic\FormBundle\Entity\FormRepository::class)->count([]);
+        $campaigns                                  = $this->getContainer()->get(CampaignRepository::class)->count([]);
+        $forms                                      = $this->getContainer()->get(FormRepository::class)->count([]);
 
         $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], [], [], json_encode($payload));
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $this->assertStringContainsString('review_field LONGTEXT, ADD review_extra', (string) json_decode($this->client->getResponse()->getContent(), true)['error']);
-        $this->assertSame($campaigns, $this->getContainer()->get(\Mautic\CampaignBundle\Entity\CampaignRepository::class)->count([]));
-        $this->assertSame($forms, $this->getContainer()->get(\Mautic\FormBundle\Entity\FormRepository::class)->count([]));
+        $this->assertSame($campaigns, $this->getContainer()->get(CampaignRepository::class)->count([]));
+        $this->assertSame($forms, $this->getContainer()->get(FormRepository::class)->count([]));
     }
 
     public function testImportCampaignActionZip(): void

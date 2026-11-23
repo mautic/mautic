@@ -2,7 +2,7 @@
 
 namespace Mautic\PluginBundle\Helper;
 
-use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -29,7 +29,7 @@ final class oAuthHelper
      * @param array<string, mixed> $settings
      */
     public function __construct(
-        UnifiedIntegrationInterface $integration,
+        AbstractIntegration $integration,
         private readonly ?Request $request = null,
         array $settings = [],
     ) {

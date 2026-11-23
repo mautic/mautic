@@ -27,7 +27,7 @@ final class FileLogHandlerTest extends TestCase
     {
         $this->coreParametersHelper->expects($this->exactly(4))->method('get')
             ->willReturnCallback(
-                function ($key) {
+                function (string $key) {
                     switch ($key) {
                         case 'log_path':
                             return '/var/logs';
@@ -57,7 +57,7 @@ final class FileLogHandlerTest extends TestCase
     {
         $this->coreParametersHelper->expects($this->exactly(4))->method('get')
             ->willReturnCallback(
-                function ($key) {
+                function (string $key) {
                     switch ($key) {
                         case 'log_path':
                             return '/var/logs';

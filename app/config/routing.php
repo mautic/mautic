@@ -1,12 +1,16 @@
 <?php
 
+use Symfony\Component\Routing\Loader\PhpFileLoader;
 use Symfony\Component\Routing\RouteCollection;
+
+/** @var PhpFileLoader $loader */
 
 // loads Mautic's custom routing in src/Mautic/BaseBundle/Routing/MauticLoader.php which
 // loads all of the Mautic bundles' routing.php files
 $collection = new RouteCollection();
 
 // loads api_platform
+/** @var RouteCollection $apiCollection */
 $apiCollection = $loader->import('.', 'api_platform');
 $apiCollection->addPrefix('/api/v2/');
 $collection->addCollection($apiCollection);

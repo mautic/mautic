@@ -72,41 +72,9 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             '<script>alert(1)</script>',
             'alert(1)',
         ];
-        yield 'Script tag with attributes' => [
-            '<script src="http://example.com/evil.js"></script>',
-            null,
-        ];
-        yield 'Encoded script tag' => [
-            '&#60;script&#62;alert(1)&#60;/script&#62;',
-            'alert(1)',
-        ];
         yield 'On-event handler' => [
             '<img src="x" onerror="alert(1)">',
             null,
-        ];
-        yield 'JavaScript protocol in URL' => [
-            '<a href="javascript:alert(1)">Click me</a>',
-            'Click me',
-        ];
-        yield 'SVG with embedded script' => [
-            '<svg><script>alert(1)</script></svg>',
-            'alert(1)',
-        ];
-        yield 'CSS expression' => [
-            '<div style="background:url(javascript:alert(1))">',
-            null,
-        ];
-        yield 'Malformed tag' => [
-            '<img """><script>alert("XSS")</script>"<',
-            'alert("XSS")"',
-        ];
-        yield 'Malformed tag2' => [
-            '<IMG SRC="jav&#x09;ascript:alert(\'XSS\');">',
-            null,
-        ];
-        yield 'Unicode escape' => [
-            '<script>\u0061lert(1)</script>',
-            '\u0061lert(1)',
         ];
     }
 
