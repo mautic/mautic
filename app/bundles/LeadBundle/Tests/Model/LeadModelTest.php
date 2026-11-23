@@ -31,6 +31,7 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadPostBatchSaveEvent;
@@ -880,7 +881,7 @@ final class LeadModelTest extends TestCase
 
         $this->leadModel->modifyTags($lead, $payload, null, false);
 
-        $tagNames = array_map(fn ($tag): ?string => $tag->getTag(), $lead->getTags()->getValues());
+        $tagNames = array_map(fn (Tag $tag): ?string => $tag->getTag(), $lead->getTags()->getValues());
         $this->assertSame(null === $expectedSanitized ? [] : [$expectedSanitized], $tagNames);
     }
 
