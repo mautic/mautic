@@ -30,12 +30,15 @@ final class FieldModelTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    /**
-     * Debug wires up DBAL's query logging, which the index assertions below read.
-     *
-     * @var array<string, mixed>
-     */
-    protected array $clientOptions = ['debug' => true];
+    protected function setUp(): void
+    {
+        // Debug wires up DBAL's query logging, which the index assertions read.
+        if ('testUniqueIdentifierIndexToggleForContacts' === $this->name()) {
+            $this->clientOptions = ['debug' => true];
+        }
+
+        parent::setUp();
+    }
 
     /**
      * @param array<string, mixed[]> $filters
