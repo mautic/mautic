@@ -19,6 +19,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
+use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -101,8 +103,24 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     private function enableSmsTransport(): void
     {
+        $integrationEntity = $this->em->getRepository(Integration::class)->findOneBy(['name' => 'Twilio']);
+        if (!$integrationEntity) {
+            $plugin = new Plugin();
+            $plugin->setName('Twilio');
+            $plugin->setBundle('SmsBundle');
+            $this->em->persist($plugin);
+
+            $integrationEntity = new Integration();
+            $integrationEntity->setName('Twilio');
+            $integrationEntity->setPlugin($plugin);
+            $this->em->persist($integrationEntity);
+        }
+        $integrationEntity->setIsPublished(true);
+        $this->em->flush();
+
         $integration = self::getContainer()->get(IntegrationHelper::class)->getIntegrationObject('Twilio');
-        $settings    = $integration->getIntegrationSettings();
+        $this->assertNotFalse($integration, 'The Twilio integration must be registered for the SMS channel.');
+        $settings = $integration->getIntegrationSettings();
         $settings->setIsPublished(true);
         $this->em->persist($settings);
         $this->em->flush();
