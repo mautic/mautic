@@ -109,6 +109,24 @@ final class BootstrapMarkupTest extends TestCase
         $this->assertNull($crawler->filter('input[value="a"]')->attr('data-test'));
     }
 
+    public function testSegmentedControlForwardsCallerClassToGroup(): void
+    {
+        $formFactory = Forms::createFormFactoryBuilder()
+            ->addType(new ButtonGroupType())
+            ->addType(new SegmentedControlType())
+            ->getFormFactory();
+        $form = $formFactory->createNamed('mode', SegmentedControlType::class, 'a', [
+            'choices'                   => ['A' => 'a', 'B' => 'b'],
+            'attr'                      => ['class' => 'caller-class'],
+            'choice_translation_domain' => false,
+        ]);
+        $html = $this->twig->createTemplate('{{ form_widget(form) }}')->render(['form' => $form->createView()]);
+        $crawler = new Crawler($html);
+
+        $this->assertCount(1, $crawler->filter('.segmented-control.caller-class'));
+        $this->assertCount(0, $crawler->filter('input.caller-class'));
+    }
+
     public function testDisabledButtonGroupRetainsDisabledInputs(): void
     {
         $form = Forms::createFormFactory()->createNamed('direction', ButtonGroupType::class, 'outgoing', [
