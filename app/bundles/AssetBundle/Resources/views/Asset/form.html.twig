@@ -19,7 +19,7 @@
         <div class="p-16">
 	        <div class="row">
 		        <div class="col-lg-6">
-					<div class="col-md-7 ps-0">
+					<div class="col-md-7 ps-0{% if not integrations and startOnLocal %} hide{% endif %}">
 						{{ form_row(form.storageLocation) }}
 					</div>
 			        <div class="text-start mt-24 mb-24{% if startOnLocal %}  hide {% endif %}" id="remote-button">
