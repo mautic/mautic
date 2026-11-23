@@ -44,6 +44,17 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
 
     protected function parseResponse($response): void
     {
+        /**
+         * @var object{
+         *     error?: string,
+         *     postal?: object{code: string},
+         *     country?: object{names: object{en: string}},
+         *     city?: object{names: object{en: string}},
+         *     subdivisions?: list<object{names: object{en: string}}>,
+         *     location: object{latitude: float, longitude: float, time_zone: string},
+         *     traits: object{isp?: string, organization?: string}
+         * }|null $data
+         */
         $data = json_decode($response);
 
         if ($data) {
