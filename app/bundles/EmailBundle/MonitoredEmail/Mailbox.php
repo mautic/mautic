@@ -8,6 +8,11 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Exception\MailboxException;
 use Mautic\EmailBundle\MonitoredEmail\Exception\NotConfiguredException;
 
+/**
+ * @phpstan-type ImapAddress object{personal?: string, mailbox?: string, host?: string}
+ * @phpstan-type ImapParameter object{attribute: string, value: string}
+ * @phpstan-type ImapPart object{type: int, encoding: int, ifsubtype: int, subtype?: string, ifid: int, id?: string, parameters?: list<ImapParameter>, dparameters?: list<ImapParameter>, parts?: list<\stdClass>}
+ */
 final class Mailbox
 {
     /**
@@ -646,6 +651,7 @@ final class Mailbox
      */
     public function getMailsInfo(array $mailsIds): array|false
     {
+        /** @var \stdClass[]|false $mails */
         $mails = imap_fetch_overview($this->getImapStream(), implode(',', $mailsIds), FT_UID);
         if (is_array($mails) && count($mails)) {
             foreach ($mails as $mail) {
@@ -755,6 +761,18 @@ final class Mailbox
     public function getMail($mailId, bool $markAsSeen = true): Message
     {
         $header     = imap_fetchheader($this->getImapStream(), $mailId, FT_UID);
+        /**
+         * @var \stdClass&object{
+         *     date?: string,
+         *     subject?: string,
+         *     from: list<ImapAddress>,
+         *     to?: list<ImapAddress>,
+         *     cc?: list<ImapAddress>,
+         *     reply_to?: list<ImapAddress>,
+         *     return_path?: string,
+         *     references?: string
+         * } $headObject
+         */
         $headObject = imap_rfc822_parse_headers($header);
 
         $mail           = new Message();
@@ -830,6 +848,9 @@ final class Mailbox
         return $mail;
     }
 
+    /**
+     * @param ImapPart $partStructure
+     */
     private function initMailPart(Message $mail, $partStructure, $partNum, bool $markAsSeen = true, bool $isDsn = false, bool $isFbl = false): void
     {
         $options = FT_UID;
@@ -958,6 +979,9 @@ final class Mailbox
         }
     }
 
+    /**
+     * @param ImapPart $partStructure
+     */
     private function getParameters($partStructure): array
     {
         $params = [];
@@ -983,6 +1007,7 @@ final class Mailbox
     private function decodeMimeStr($string, string $charset = 'utf-8'): string
     {
         $newString = '';
+        /** @var list<\stdClass> $elements */
         $elements  = imap_mime_header_decode($string);
         $counter = count($elements);
         for ($i = 0; $i < $counter; ++$i) {

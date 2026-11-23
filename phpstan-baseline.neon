@@ -2131,19 +2131,7 @@ parameters:
 			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:getParameters\(\) has parameter \$partStructure with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:initMailPart\(\) has parameter \$partNum with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:initMailPart\(\) has parameter \$partStructure with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
