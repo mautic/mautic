@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Entity\PluginRepository;
 
 final class ReloadCommandFunctionalTest extends MauticMysqlTestCase
 {
@@ -39,7 +40,7 @@ final class ReloadCommandFunctionalTest extends MauticMysqlTestCase
     {
         $this->testSymfonyCommand('mautic:plugins:reload');
 
-        $this->assertInstanceOf(Plugin::class, $this->getContainer()->get(\Mautic\PluginBundle\Entity\PluginRepository::class)->findOneBy(['bundle' => 'MauticFocusBundle']));
+        $this->assertInstanceOf(Plugin::class, $this->getContainer()->get(PluginRepository::class)->findOneBy(['bundle' => 'MauticFocusBundle']));
         $this->assertFocusSchemaIsComplete();
     }
 

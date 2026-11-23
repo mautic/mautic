@@ -7,6 +7,7 @@ namespace Mautic\UserBundle\Tests\EventListener;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\OidcSubjectId;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 final class ConfigSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -20,7 +21,7 @@ final class ConfigSubscriberFunctionalTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->em->persist(new OidcSubjectId($user, 'admin-subject'));
         $this->em->flush();

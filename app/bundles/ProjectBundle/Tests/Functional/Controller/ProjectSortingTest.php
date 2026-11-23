@@ -6,6 +6,7 @@ namespace Mautic\ProjectBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
 
 final class ProjectSortingTest extends MauticMysqlTestCase
@@ -27,7 +28,7 @@ final class ProjectSortingTest extends MauticMysqlTestCase
     /**
      * @param array<int, string> $expectedOrder
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('sortingProvider')]
+    #[DataProvider('sortingProvider')]
     public function testProjectListSorting(string $orderBy, array $expectedOrder): void
     {
         // When a user clicks the table header for the first time they get a DESC sort
