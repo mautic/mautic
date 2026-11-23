@@ -33,32 +33,28 @@ final class FormEmbedTrackingFunctionalTest extends MauticMysqlTestCase
      */
     public static function formLoadProvider(): iterable
     {
-        // The script embed used with mautic-essential.js never tracks the visitor
-        yield 'script embed' => ['/form/generate.js?id=%d', []];
         yield 'iframe embed with Global Privacy Control' => ['/form/embed/%d', ['HTTP_SEC_GPC' => '1']];
         yield 'public form page with Do Not Track' => ['/form/%d', ['HTTP_DNT' => '1']];
     }
 
     /**
-     * Run separately because the script embed defines the global MAUTIC_NON_TRACKABLE_REQUEST constant.
-     *
      * @param array<string, string> $server
      */
     #[DataProvider('formLoadProvider')]
-    #[PreserveGlobalState(false)]
-    #[RunInSeparateProcess]
     public function testLoadingFormWritesNoIdentifiers(string $url, array $server): void
     {
-        $formId = $this->createProgressiveProfilingForm();
+        $this->assertLoadingFormWritesNoIdentifiers($url, $server);
+    }
 
-        $this->logoutUser();
-        $this->client->request(Request::METHOD_GET, sprintf($url, $formId), [], [], $server);
-        $this->assertResponseIsSuccessful();
-
-        $cookieJar = $this->client->getCookieJar();
-        $this->assertNotInstanceOf(Cookie::class, $cookieJar->get('mautic_device_id'));
-        $this->assertNotInstanceOf(Cookie::class, $cookieJar->get('mtc_id'));
-        $this->assertCount(0, $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findAll());
+    /**
+     * The script embed used with mautic-essential.js never tracks the visitor.
+     * Run separately because it defines the global MAUTIC_NON_TRACKABLE_REQUEST constant.
+     */
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testLoadingScriptEmbedWritesNoIdentifiers(): void
+    {
+        $this->assertLoadingFormWritesNoIdentifiers('/form/generate.js?id=%d', []);
     }
 
     public function testLoadingFormWithPrivacySignalStoresNoIpAddress(): void
@@ -71,6 +67,23 @@ final class FormEmbedTrackingFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(\Mautic\CoreBundle\Entity\IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.9']));
+    }
+
+    /**
+     * @param array<string, string> $server
+     */
+    private function assertLoadingFormWritesNoIdentifiers(string $url, array $server): void
+    {
+        $formId = $this->createProgressiveProfilingForm();
+
+        $this->logoutUser();
+        $this->client->request(Request::METHOD_GET, sprintf($url, $formId), [], [], $server);
+        $this->assertResponseIsSuccessful();
+
+        $cookieJar = $this->client->getCookieJar();
+        $this->assertNotInstanceOf(Cookie::class, $cookieJar->get('mautic_device_id'));
+        $this->assertNotInstanceOf(Cookie::class, $cookieJar->get('mtc_id'));
+        $this->assertCount(0, $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findAll());
     }
 
     private function createProgressiveProfilingForm(): int
