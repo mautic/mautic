@@ -53,17 +53,23 @@ final class SegmentStressTest extends MauticMysqlTestCase
 
     private function saveContacts(): void
     {
-        for ($i = 0; $i <= 10000; ++$i) {
-            $this->createLead('fn'.$i, 'ln'.$i);
+        // bulk insert, the ORM is too slow for this amount of contacts
+        $connection = $this->em->getConnection();
+        $dateAdded  = (new \DateTime())->format('Y-m-d H:i:s');
 
-            if (0 === $i % 100) {
-                $this->em->flush();
-                $this->em->clear();
+        foreach (array_chunk(range(0, 10000), 1000) as $chunk) {
+            $rows   = [];
+            $params = [];
+            foreach ($chunk as $i) {
+                $rows[] = '(?, ?, 1, 0, ?)';
+                array_push($params, 'fn'.$i, 'ln'.$i, $dateAdded);
             }
-        }
 
-        $this->em->flush();
-        $this->em->clear();
+            $connection->executeStatement(
+                'INSERT INTO '.MAUTIC_TABLE_PREFIX.'leads (firstname, lastname, is_published, points, date_added) VALUES '.implode(', ', $rows),
+                $params
+            );
+        }
     }
 
     private function saveSegment(): LeadList
