@@ -46,28 +46,36 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
     protected $useCleanupRollback = false;
 
-    #[DataProvider('dataForGlobalSearch')]
-    public function testGlobalSearch(string $searchString, mixed $entity, string $expectedLink): void
+    /**
+     * All entities are created at once, to avoid a full database reset per search
+     */
+    public function testGlobalSearch(): void
     {
-        $this->em->persist($entity);
+        $searchCases = iterator_to_array(self::dataForGlobalSearch());
+
+        foreach ($searchCases as [, $entity]) {
+            $this->em->persist($entity);
+        }
 
         $this->em->flush();
         $this->em->clear();
 
-        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=globalSearch&global_search='.$searchString.'&tmp=list');
-        $response = $this->client->getResponse();
-        $this->assertResponseIsSuccessful();
+        foreach ($searchCases as $caseName => [$searchString, $entity, $expectedLink]) {
+            $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=globalSearch&global_search='.$searchString.'&tmp=list');
+            $response = $this->client->getResponse();
+            $this->assertResponseIsSuccessful($caseName);
 
-        $content      = \json_decode($response->getContent(), true);
-        $expectedLink = rtrim($expectedLink, '/').'/'.$entity->getId();
+            $content      = \json_decode($response->getContent(), true);
+            $expectedLink = rtrim($expectedLink, '/').'/'.$entity->getId();
 
-        $this->assertStringContainsString($expectedLink, (string) $content['newContent']);
+            $this->assertStringContainsString($expectedLink, (string) $content['newContent'], $caseName);
+        }
     }
 
     /**
-     * @return iterable<string, array{string, mixed}>
+     * @return iterable<string, array{string, object, string}>
      */
-    public static function dataForGlobalSearch(): iterable
+    private static function dataForGlobalSearch(): iterable
     {
         // Api
         $apiClient = self::createApiClient('client');
