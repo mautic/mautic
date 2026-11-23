@@ -21,10 +21,11 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private string $prefix;
 
-    protected $useCleanupRollback = false;
-
     protected function setUp(): void
     {
+        // full database reset: this test re-creates the client to apply the changed config
+        $this->useCleanupRollback = 'testConfigNotFoundPageConfiguration' !== $this->name();
+
         $this->configParams['config_allowed_parameters'] = [
             'kernel.project_dir',
         ];

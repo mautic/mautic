@@ -18,7 +18,13 @@ use Symfony\Component\HttpFoundation\Response;
 #[AllowMockObjectsWithoutExpectations]
 final class CampaignImportControllerTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
+    protected function setUp(): void
+    {
+        // full database reset: this test imports forms and custom fields, which create and alter tables
+        $this->useCleanupRollback = 'testProgressActionImportValidData' !== $this->name();
+
+        parent::setUp();
+    }
 
     public function testNewAction(): void
     {

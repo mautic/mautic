@@ -33,9 +33,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportControllerTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     private const string IMPORT_CANCELED_MESSAGE = 'Import canceled for file test.csv';
+
+    protected function setUp(): void
+    {
+        // full database reset: this test creates a custom field, which alters the leads table
+        $this->useCleanupRollback = 'testImportWithSkipIfExistsFlagTrue' !== $this->name();
+
+        parent::setUp();
+    }
 
     public function testImportWithoutFile(): void
     {

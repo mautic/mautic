@@ -32,9 +32,15 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
+        // full database reset: these tests import forms and custom fields, which create and alter tables
+        $this->useCleanupRollback = !in_array($this->name(), [
+            'testImportCampaignActionJson',
+            'testImportCampaignActionRejectsACraftedFieldAlias',
+            'testImportCampaignActionZip',
+        ], true);
+
         $this->configParams['mailer_from_name']  = 'Mautic Admin';
         $this->configParams['mailer_from_email'] = 'admin@email.com';
-        $this->useCleanupRollback                = false;
 
         parent::setUp();
     }
