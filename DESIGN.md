@@ -230,6 +230,17 @@ modal:
   expressive: "Use for content: text, media and reading."
 ```
 
+### offcanvas
+
+Use to show secondary content or actions in a panel at the edge of the screen without leaving the page.
+
+```yaml
+offcanvas:
+  end: "Default. Use for details, filters and settings related to the current page."
+  start: "Use for navigation or content that belongs on the left."
+  bottom: "Use for short content that should span the page width."
+```
+
 ### pictogram
 
 ```yaml

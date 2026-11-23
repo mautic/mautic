@@ -83,3 +83,12 @@
     }
   }
 }
+
+.offcanvas-backdrop {
+  background-color: var(--overlay);
+  backdrop-filter: blur(4px);
+
+  &.show {
+    opacity: 1;
+  }
+}

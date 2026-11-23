@@ -823,6 +823,14 @@ Mautic.onPageUnload = function (container, response) {
         mQuery(container + " *[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
         mQuery(container).find("*[data-bs-toggle='tab'], *[data-bs-toggle='pill']").each((index, element) => bootstrap.Tab.getInstance(element)?.dispose());
 
+        mQuery(container).find('.offcanvas.show').each((index, element) => {
+            const offcanvas = bootstrap.Offcanvas.getInstance(element);
+            if (offcanvas) {
+                element.addEventListener('hidden.bs.offcanvas', () => offcanvas.dispose(), {once: true});
+                offcanvas.hide();
+            }
+        });
+
         //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
         if (typeof MauticVars.modalsReset == 'undefined') {
             MauticVars.modalsReset = {};
