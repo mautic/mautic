@@ -64,11 +64,11 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->client->request(Request::METHOD_POST, self::BATCH_DOWNLOAD_PATH, $parameters);
     }
 
-    public function testStorageLocationHiddenWithoutPublishedCloudProvider(): void
+    public function testRemoteBrowseButtonHiddenWithoutPublishedCloudProvider(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/assets/new');
         $this->assertResponseIsSuccessful();
-        $this->assertCount(1, $crawler->filter('.hide #asset_storageLocation_0'));
+        $this->assertCount(1, $crawler->filter('#asset_storageLocation_1'));
         $this->assertCount(0, $crawler->filter('#remote-button a'));
     }
 
