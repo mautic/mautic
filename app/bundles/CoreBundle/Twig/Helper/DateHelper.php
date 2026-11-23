@@ -105,10 +105,10 @@ final readonly class DateHelper
     /**
      * Returns date/time like Today, 10:00 AM.
      *
-     * @param string|int<min, -1>|int<1, max>|\DateTimeInterface $datetime
+     * @param string|int<min, -1>|int<1, max>|\DateTimeInterface|null $datetime
      * @param bool                                               $forceDateForNonText If true, return as full date/time rather than "29 days ago"
      */
-    public function toText(string|int|\DateTimeInterface $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s', bool $forceDateForNonText = false): string
+    public function toText(string|int|\DateTimeInterface|null $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s', bool $forceDateForNonText = false): string
     {
         if (empty($datetime)) {
             return '';

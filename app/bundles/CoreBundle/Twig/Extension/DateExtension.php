@@ -20,7 +20,7 @@ final readonly class DateExtension
      * @param bool  $forceDateForNonText If true, return as full date/time rather than "29 days ago"
      */
     #[AsTwigFunction(name: 'dateToText', isSafe: ['all'])]
-    public function toText(int|string|\DateTimeInterface $datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s', bool $forceDateForNonText = false): string
+    public function toText(int|string|\DateTimeInterface|null $datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s', bool $forceDateForNonText = false): string
     {
         return $this->dateHelper->toText($datetime, $timezone, $fromFormat, $forceDateForNonText);
     }
