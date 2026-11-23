@@ -494,24 +494,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public static function provideHtmlForEmailTracking(): \Generator
     {
-        $variantQuotes   = ['single quote' => "'", 'double quote' => '"'];
-        $variantSpaces   = ['no space' => '$', 'start space' => ' $', 'end space' => '$ ', 'both spaces' => ' $ '];
-        $variantNewlines = ['no newlines' => '$', 'start \r\n' => "\r\n$", 'end \r\n' => "$\r\n", 'both \r\n' => "\r\n$\r\n", 'start \n' => "\n$", 'end \n' => "$\n", 'both \n' => "\n$\n"];
-
-        foreach ($variantQuotes as $quotesName => $variantQuote) {
-            foreach ($variantSpaces as $spaceName => $variantSpace) {
-                foreach ($variantNewlines as $newLineName => $variantNewline) {
-                    $href = $variantQuote
-                        .str_replace('$', str_replace('$', 'https://mautic.org', $variantSpace), $variantNewline)
-                        .$variantQuote;
-
-                    yield $quotesName.', '.$spaceName.', '.$newLineName => [
-                        'Ahoy <i>{contactfield=email}</i><a href='.$href.'>Mautic</a>',
-                        'single quote' === $quotesName,
-                    ];
-                }
-            }
-        }
+        // Whitespace/newline variants around href are covered in TrackableModelTest
+        yield 'single quote, both spaces, both \r\n' => ["Ahoy <i>{contactfield=email}</i><a href='\r\n https://mautic.org \r\n'>Mautic</a>", true];
+        yield 'double quote, both spaces, both \n' => ["Ahoy <i>{contactfield=email}</i><a href=\"\n https://mautic.org \n\">Mautic</a>", false];
     }
 
     public function testSegmentEmailSendWithAdvancedOptions(): void
