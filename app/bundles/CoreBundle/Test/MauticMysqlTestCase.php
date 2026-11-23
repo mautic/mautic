@@ -222,7 +222,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function resetDatabase(): void
     {
-        $this->applySqlFromFile($this->getSqlFilePath('reset_db'));
+        // run on the open connection to avoid spawning a mysql process per test
+        $this->connection->executeStatement((string) file_get_contents($this->getSqlFilePath('reset_db')));
+        // the reset file switches autocommit off for speed, restore it for this connection
+        $this->connection->executeStatement('SET autocommit=1');
     }
 
     /**
