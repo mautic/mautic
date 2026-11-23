@@ -11,8 +11,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 final class EventModelFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     public function testDeleteEvents(): void
     {
         // Create a campaign.

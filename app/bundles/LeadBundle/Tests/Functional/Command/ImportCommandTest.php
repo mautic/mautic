@@ -12,8 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class ImportCommandTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     /**
      * @var array|string[][]
      */
