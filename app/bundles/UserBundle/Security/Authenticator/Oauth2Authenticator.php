@@ -31,7 +31,7 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
      * token user's identifier when one is available instead of always using the
      * OAuth client identifier.
      */
-    public function authenticate(Request $request): Passport
+    public function authenticate(Request $request): SelfValidatingPassport
     {
         try {
             $tokenString = $this->serverService->getBearerToken($request);
