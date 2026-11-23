@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * Builds the data pushed to an email marketing service from a push action's field mapping.
  */
-final class ContactFieldMapper
+final readonly class ContactFieldMapper
 {
     public const string CONTACT_ID = 'mauticContactId';
 
@@ -22,8 +22,8 @@ final class ContactFieldMapper
     public const string CONTACT_IS_CONTACTABLE_BY_EMAIL = 'mauticContactIsContactableByEmail';
 
     public function __construct(
-        private readonly UrlGeneratorInterface $router,
-        private readonly DoNotContactModel $doNotContactModel,
+        private UrlGeneratorInterface $router,
+        private DoNotContactModel $doNotContactModel,
     ) {
     }
 
