@@ -31,6 +31,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected $useCleanupRollback = true;
 
+    private float $profileTestStart = 0.0;
+
+    private float $profileBodyStart = 0.0;
+
     /**
      * @throws \Exception
      */
@@ -46,9 +50,15 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $this->useCleanupRollback = false;
         }
 
+        $this->profileTestStart = $t = StepProfiler::now();
         parent::setUp();
-        $this->backupLocalConfig();
+        StepProfiler::add('mysql setUp: parent::setUp (kernel boot + client)', $t);
 
+        $t = StepProfiler::now();
+        $this->backupLocalConfig();
+        StepProfiler::add('mysql setUp: backupLocalConfig', $t);
+
+        $t = StepProfiler::now();
         if (!$this->isDatabasePrepared()) {
             $this->prepareDatabase();
 
@@ -58,17 +68,33 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             }
 
             $this->markDatabasePrepared();
+            StepProfiler::add('mysql setUp: prepareDatabase (first test only)', $t);
+        } else {
+            StepProfiler::add('mysql setUp: isDatabasePrepared check', $t);
         }
 
+        $t = StepProfiler::now();
         $userRepository = $this->getService(UserRepository::class);
 
         $user = $userRepository->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
+        StepProfiler::add('mysql setUp: user lookup', $t);
+
+        $t = StepProfiler::now();
         $this->loginUser($user); // also creates session
+        StepProfiler::add('mysql setUp: loginUser', $t);
 
         if ($this->useCleanupRollback) {
+            $t = StepProfiler::now();
             $this->beforeBeginTransaction();
+            StepProfiler::add('mysql setUp: beforeBeginTransaction hook', $t);
+
+            $t = StepProfiler::now();
             $this->connection->beginTransaction();
+            StepProfiler::add('mysql setUp: beginTransaction', $t);
         }
+
+        StepProfiler::add('mysql setUp: TOTAL', $this->profileTestStart);
+        $this->profileBodyStart = StepProfiler::now();
     }
 
     /**
@@ -76,10 +102,23 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     final protected function tearDown(): void
     {
+        $tearDownStart = StepProfiler::now();
+        if ($this->profileBodyStart > 0.0) {
+            StepProfiler::add('mysql test body (incl. subclass setUp after parent::setUp)', $this->profileBodyStart);
+        }
+
         date_default_timezone_set('UTC');
+        $t = StepProfiler::now();
         $this->restoreLocalConfig();
+        StepProfiler::add('mysql tearDown: restoreLocalConfig', $t);
+
+        $t = StepProfiler::now();
         $customFieldsReset = $this->resetCustomFields();
+        StepProfiler::add('mysql tearDown: resetCustomFields', $t);
+
+        $t = StepProfiler::now();
         $this->beforeTearDown();
+        StepProfiler::add('mysql tearDown: beforeTearDown hook', $t);
 
         if (!$this->setUpInvoked) {
             throw new \LogicException('You omitted invoking parent::setUp(). This may lead to side effects.');
@@ -88,20 +127,42 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $isTransactionActive = $this->connection->isTransactionActive();
 
         if ($isTransactionActive && $this->useCleanupRollback) {
+            $t = StepProfiler::now();
             $this->insertRollbackCheckData();
+            StepProfiler::add('mysql tearDown: insertRollbackCheckData', $t);
+
+            $t = StepProfiler::now();
             $this->connection->rollback();
+            StepProfiler::add('mysql tearDown: rollback', $t);
         }
 
+        $t = StepProfiler::now();
         $this->afterRollback();
+        StepProfiler::add('mysql tearDown: afterRollback hook', $t);
 
-        if (!$this->useCleanupRollback || !$isTransactionActive || $customFieldsReset || !$this->wasRollbackSuccessful()) {
+        $t                     = StepProfiler::now();
+        $needsReset            = !$this->useCleanupRollback || !$isTransactionActive || $customFieldsReset || !$this->wasRollbackSuccessful();
+        StepProfiler::add('mysql tearDown: wasRollbackSuccessful check', $t);
+
+        if ($needsReset) {
+            $t = StepProfiler::now();
             $this->resetDatabase();
+            StepProfiler::add('mysql tearDown: resetDatabase (mysql CLI reset_db)', $t);
+            StepProfiler::add($this->useCleanupRollback ? 'mysql reset reason: rollback failed or custom fields' : 'mysql reset reason: useCleanupRollback=false', $t);
         }
 
         $this->restoreShellVerbosity();
-        $this->clearCache();
 
+        $t = StepProfiler::now();
+        $this->clearCache();
+        StepProfiler::add('mysql tearDown: clearCache', $t);
+
+        $t = StepProfiler::now();
         parent::tearDown();
+        StepProfiler::add('mysql tearDown: parent::tearDown (kernel shutdown)', $t);
+
+        StepProfiler::add('mysql tearDown: TOTAL', $tearDownStart);
+        StepProfiler::add('mysql whole test (setUp start - tearDown end)', $this->profileTestStart);
     }
 
     /**
