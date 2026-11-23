@@ -699,6 +699,7 @@ TEXT;
 
         $this->assertCount(1, $trackables);
         $token = array_key_first($trackables);
+        /** @var non-empty-array<string, Trackable> $trackables */
         $this->assertSame('https://mautic.org', $trackables[$token]->getRedirect()->getUrl());
         $this->assertSame('Ahoy <i>{contactfield=email}</i><a href='.$quote.$token.$quote.'>Mautic</a>', $content);
     }
