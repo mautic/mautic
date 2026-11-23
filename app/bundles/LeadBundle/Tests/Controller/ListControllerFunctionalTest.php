@@ -282,12 +282,15 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $segment   = $this->saveSegment('Lead List 1', 'lead-list-1', $filters);
+        // modified in the past, so the build below is newer and the segment is not shown as "Building"
+        $segment = new LeadList();
+        $segment->setDateModified(new \DateTime('-1 minute'));
+
+        $segment   = $this->saveSegment('Lead List 1', 'lead-list-1', $filters, $segment);
         $segmentId = $segment->getId();
         $this->segmentCountCacheHelper->deleteSegmentContactCount($segmentId);
 
         // Check segment count UI for no contacts.
-        usleep(1000000);
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId, '--env' => 'test']);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
