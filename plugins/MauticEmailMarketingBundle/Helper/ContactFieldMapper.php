@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * Builds the data pushed to an email marketing service from a push action's field mapping.
  */
-class ContactFieldMapper
+final class ContactFieldMapper
 {
     public const string CONTACT_ID = 'mauticContactId';
 

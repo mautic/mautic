@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Exception;
 
-class PushContactException extends \Exception
+final class PushContactException extends \Exception
 {
 }

@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-class BatchCompanyContactAssignmentModel
+final class BatchCompanyContactAssignmentModel
 {
     private const string MESSAGE_ADDED             = 'Contact added to company';
 
