@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatDeviceRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactTrackingPreferenceHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -29,9 +31,9 @@ final class EmailOpenTrackingPreferenceFunctionalTest extends MauticMysqlTestCas
         $this->assertFalse($stat->getIsRead());
         $this->assertNotInstanceOf(\DateTimeInterface::class, $stat->getLastOpened());
         $this->assertNotInstanceOf(IpAddress::class, $stat->getIpAddress());
-        $this->assertCount(0, $this->getContainer()->get(\Mautic\EmailBundle\Entity\StatDeviceRepository::class)->findBy(['stat' => $stat]));
+        $this->assertCount(0, $this->getContainer()->get(StatDeviceRepository::class)->findBy(['stat' => $stat]));
         $this->assertSame(0, $this->getReadCount($email));
-        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(\Mautic\CoreBundle\Entity\IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.70']), 'the contact\'s IP address is not stored');
+        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.70']), 'the contact\'s IP address is not stored');
     }
 
     /**
@@ -54,7 +56,7 @@ final class EmailOpenTrackingPreferenceFunctionalTest extends MauticMysqlTestCas
         $this->assertInstanceOf(Stat::class, $stat);
         $this->assertTrue($stat->getIsRead());
         $this->assertInstanceOf(\DateTimeInterface::class, $stat->getLastOpened());
-        $this->assertCount(1, $this->getContainer()->get(\Mautic\EmailBundle\Entity\StatDeviceRepository::class)->findBy(['stat' => $stat]));
+        $this->assertCount(1, $this->getContainer()->get(StatDeviceRepository::class)->findBy(['stat' => $stat]));
         $this->assertSame(1, $this->getReadCount($email));
     }
 

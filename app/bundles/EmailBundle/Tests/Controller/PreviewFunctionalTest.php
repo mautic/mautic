@@ -493,7 +493,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
     public function testPreviewEmailForUnauthorizedCompany(): void
     {
-        $admin = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $admin = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $admin);
 
         $user           = $this->createNonAdminUser(['viewown', 'create'], 34);
@@ -547,7 +547,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
     public function testPreviewEmailForCompanyOfOtherUserWithViewOtherPermission(): void
     {
-        $admin = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $admin = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $admin);
 
         $user    = $this->createNonAdminUser(['viewother'], 4);

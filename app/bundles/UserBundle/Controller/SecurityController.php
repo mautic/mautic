@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
+use Mautic\UserBundle\Exception\OidcAuthorizationException;
 use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Security\OIDC\ClientCredentials;
 use Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface;
@@ -197,7 +198,7 @@ final class SecurityController extends CommonController implements EventSubscrib
             if ($authenticatedRedirect) {
                 return $authenticatedRedirect;
             }
-        } catch (\Mautic\UserBundle\Exception\OidcAuthorizationException $e) {
+        } catch (OidcAuthorizationException $e) {
             $logger->error('OpenID Connect: Login action failed', ['exception' => $e, 'message' => $e->getMessage()]);
         }
 

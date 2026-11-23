@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\ThemeFavoritesHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -156,7 +157,7 @@ final class ThemeFavoritesFunctionalTest extends MauticMysqlTestCase
     private function getStoredFavorites(): array
     {
         $this->em->clear();
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
 
         return $user->getPreferences()[ThemeFavoritesHelper::PREFERENCE_KEY] ?? [];

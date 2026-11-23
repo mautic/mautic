@@ -15,6 +15,7 @@ use Mautic\UserBundle\Security\OIDC\OidcAuthenticator;
 use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -137,7 +138,7 @@ final class AuthenticatorTest extends TestCase
         $authenticator = new OidcAuthenticator($parameters, $credentialsFactory, $userProvider, $urlGenerator, $flashBag, $translator);
         $result        = $authenticator->onAuthenticationSuccess($request, $token, $firewallName);
 
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_FOUND, $result->getStatusCode(), (string) $result->getContent());
+        $this->assertSame(Response::HTTP_FOUND, $result->getStatusCode(), (string) $result->getContent());
         $this->assertSame('https://mautic.local', $result->getTargetUrl());
     }
 
@@ -157,7 +158,7 @@ final class AuthenticatorTest extends TestCase
         $authenticator = new OidcAuthenticator($parameters, $credentialsFactory, $userProvider, $urlGenerator, $flashBag, $translator);
         $result        = $authenticator->onAuthenticationFailure($request, $exception);
 
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_FOUND, $result->getStatusCode(), (string) $result->getContent());
+        $this->assertSame(Response::HTTP_FOUND, $result->getStatusCode(), (string) $result->getContent());
         $this->assertSame('https://mautic.local', $result->getTargetUrl());
     }
 

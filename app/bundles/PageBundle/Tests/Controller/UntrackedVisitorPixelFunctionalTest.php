@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\PageBundle\Entity\HitRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -68,7 +71,7 @@ final class UntrackedVisitorPixelFunctionalTest extends MauticMysqlTestCase
         $this->assertNull($response['device_id'] ?? null, 'the device is not recognised');
         $this->assertNoTrackingCookieSet();
         $this->assertIpAddressNotStored('203.0.113.60');
-        $this->assertCount(0, $this->getContainer()->get(\Mautic\PageBundle\Entity\HitRepository::class)->findAll());
+        $this->assertCount(0, $this->getContainer()->get(HitRepository::class)->findAll());
     }
 
     /**
@@ -78,7 +81,7 @@ final class UntrackedVisitorPixelFunctionalTest extends MauticMysqlTestCase
     public function testMtcDoesNotCreateAContactForANewVisitor(string $method, string $uri, array $server): void
     {
         $this->logoutUser();
-        $contacts = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->count([]);
+        $contacts = $this->getContainer()->get(LeadRepository::class)->count([]);
 
         $this->client->request($method, $uri, ['page_url' => 'https://example.com/'], [], $server + ['REMOTE_ADDR' => '203.0.113.61']);
         $this->assertResponseIsSuccessful();
@@ -87,7 +90,7 @@ final class UntrackedVisitorPixelFunctionalTest extends MauticMysqlTestCase
         $this->assertNull($response['id'] ?? null);
         $this->assertNoTrackingCookieSet();
         $this->assertIpAddressNotStored('203.0.113.61');
-        $this->assertSame($contacts, $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->count([]));
+        $this->assertSame($contacts, $this->getContainer()->get(LeadRepository::class)->count([]));
     }
 
     /**
@@ -104,7 +107,7 @@ final class UntrackedVisitorPixelFunctionalTest extends MauticMysqlTestCase
 
         $this->assertNoTrackingCookieSet();
         $this->assertIpAddressNotStored('203.0.113.62');
-        $this->assertCount(0, $this->getContainer()->get(\Mautic\PageBundle\Entity\HitRepository::class)->findAll());
+        $this->assertCount(0, $this->getContainer()->get(HitRepository::class)->findAll());
     }
 
     /**
@@ -197,6 +200,6 @@ final class UntrackedVisitorPixelFunctionalTest extends MauticMysqlTestCase
 
     private function assertIpAddressNotStored(string $address): void
     {
-        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(\Mautic\CoreBundle\Entity\IpAddressRepository::class)->findOneBy(['ipAddress' => $address]), 'the visitor\'s IP address is not stored');
+        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(IpAddressRepository::class)->findOneBy(['ipAddress' => $address]), 'the visitor\'s IP address is not stored');
     }
 }

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -66,7 +68,7 @@ final class FormEmbedTrackingFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/form/{$formId}", [], [], ['HTTP_SEC_GPC' => '1', 'REMOTE_ADDR' => '203.0.113.9']);
         $this->assertResponseIsSuccessful();
 
-        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(\Mautic\CoreBundle\Entity\IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.9']));
+        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.9']));
     }
 
     /**
@@ -83,7 +85,7 @@ final class FormEmbedTrackingFunctionalTest extends MauticMysqlTestCase
         $cookieJar = $this->client->getCookieJar();
         $this->assertNotInstanceOf(Cookie::class, $cookieJar->get('mautic_device_id'));
         $this->assertNotInstanceOf(Cookie::class, $cookieJar->get('mtc_id'));
-        $this->assertCount(0, $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findAll());
+        $this->assertCount(0, $this->getContainer()->get(LeadRepository::class)->findAll());
     }
 
     private function createProgressiveProfilingForm(): int

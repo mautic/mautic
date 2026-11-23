@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
+use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
+use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Event\EntityExportEvent;
@@ -23,13 +26,13 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\StageBundle\Entity\Stage;
-use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -212,8 +215,8 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $this->assertSame($newIds[Email::ENTITY_NAME][$email->getId()], $actions['email.send.lead']['email']);
         $this->assertSame([$newIds[LeadList::ENTITY_NAME][$segment->getId()]], $actions['lead.changelist']['addToLists']);
         $this->assertSame(['form-action-tag', '2027'], $actions['lead.changetags']['add_tags']);
-        $this->assertInstanceOf(Tag::class, $this->getContainer()->get(\Mautic\LeadBundle\Entity\TagRepository::class)->findOneBy(['tag' => 'form-action-tag']));
-        $this->assertInstanceOf(Tag::class, $this->getContainer()->get(\Mautic\LeadBundle\Entity\TagRepository::class)->findOneBy(['tag' => '2027']));
+        $this->assertInstanceOf(Tag::class, $this->getContainer()->get(TagRepository::class)->findOneBy(['tag' => 'form-action-tag']));
+        $this->assertInstanceOf(Tag::class, $this->getContainer()->get(TagRepository::class)->findOneBy(['tag' => '2027']));
         $this->assertSame($newIds[Group::ENTITY_NAME][$group->getId()], $actions['lead.pointschange']['group']);
         $this->assertSame(['email' => $newIds[Email::ENTITY_NAME][$email->getId()]], $actions['email.send.user']['useremail']);
         $this->assertSame([], $actions['email.send.user']['user_id']);
@@ -266,9 +269,9 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $newIds = $this->importAsAnotherInstance($export);
 
         $imported = $this->em->find(LeadList::class, $newIds[LeadList::ENTITY_NAME][$segment->getId()]);
-        $newTag   = $this->getContainer()->get(\Mautic\LeadBundle\Entity\TagRepository::class)->findOneBy(['tag' => 'segment-filter-tag']);
+        $newTag   = $this->getContainer()->get(TagRepository::class)->findOneBy(['tag' => 'segment-filter-tag']);
         $this->assertInstanceOf(Tag::class, $newTag);
-        $newZeroTag = $this->getContainer()->get(\Mautic\LeadBundle\Entity\TagRepository::class)->findOneBy(['tag' => '0']);
+        $newZeroTag = $this->getContainer()->get(TagRepository::class)->findOneBy(['tag' => '0']);
         $this->assertInstanceOf(Tag::class, $newZeroTag);
         $this->assertInstanceOf(LeadList::class, $imported);
 
@@ -317,7 +320,7 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $newIds = $this->importAsAnotherInstance($this->exportCampaign($campaign));
 
         // Without the MJML, the builder reads the email as HTML and breaks its layout
-        $imported = $this->getContainer()->get(\MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository::class)->findOneBy(['email' => $newIds[Email::ENTITY_NAME][$email->getId()]]);
+        $imported = $this->getContainer()->get(GrapesJsBuilderRepository::class)->findOneBy(['email' => $newIds[Email::ENTITY_NAME][$email->getId()]]);
         $this->assertInstanceOf(GrapesJsBuilder::class, $imported);
         $this->assertSame($mjml, $imported->getCustomMjml());
     }
@@ -344,9 +347,9 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $newIds = $this->importAsAnotherInstance($export);
         $events = $this->getImportedEvents($newIds[Campaign::ENTITY_NAME][$campaign->getId()]);
 
-        $this->assertInstanceOf(Tag::class, $this->getContainer()->get(\Mautic\LeadBundle\Entity\TagRepository::class)->findOneBy(['tag' => 'brand-new-tag']));
+        $this->assertInstanceOf(Tag::class, $this->getContainer()->get(TagRepository::class)->findOneBy(['tag' => 'brand-new-tag']));
         // A tag named like a number is still a name, not an ID
-        $this->assertInstanceOf(Tag::class, $this->getContainer()->get(\Mautic\LeadBundle\Entity\TagRepository::class)->findOneBy(['tag' => '2026']));
+        $this->assertInstanceOf(Tag::class, $this->getContainer()->get(TagRepository::class)->findOneBy(['tag' => '2026']));
         $this->assertReference(['brand-new-tag', '2026'], $events['lead.changetags'], 'add_tags');
 
         // The imported field gets another alias next to the existing one with the same alias
@@ -647,7 +650,7 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
     private function getImportedEvents(int $campaignId): array
     {
         $events = [];
-        foreach ($this->getContainer()->get(\Mautic\CampaignBundle\Entity\EventRepository::class)->findBy(['campaign' => $campaignId]) as $event) {
+        foreach ($this->getContainer()->get(EventRepository::class)->findBy(['campaign' => $campaignId]) as $event) {
             $events[$event->getType()] = $event;
         }
 
