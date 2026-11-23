@@ -61,7 +61,11 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['mailer_from_name']       = 'Mautic Admin';
         $this->configParams['mailer_from_email']      = 'admin@email.com';
         $this->configParams['mailer_custom_headers']  = ['x-global-custom-header' => 'value123'];
-        $this->clientOptions                          = ['debug' => true];
+
+        // Debug enables the profiler, needed only by tests reading the db collector.
+        if (in_array($this->name(), ['testProfileEmailDetailPageForUnsentEmail', 'testProfileEmailDetailPageForSentEmail', 'testEmailDetailsPageShouldNotHavePendingCount'], true)) {
+            $this->clientOptions = ['debug' => true];
+        }
 
         parent::setUp();
     }
