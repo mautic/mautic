@@ -165,3 +165,12 @@
     -webkit-transform: translateX(-1em);
     transform: translateX(-1em)
 }
+
+.toggle__label-text {
+    display: block;
+    margin-block-end: .5rem;
+    font-size: var(--label-01-font-size, 0.75rem);
+    line-height: var(--label-01-line-height, 1.33333);
+    letter-spacing: var(--label-01-letter-spacing, 0.32px);
+    color: var(--text-secondary, #525252)
+}

@@ -1,0 +1,64 @@
+{% set id = id|default('toggle') %}
+{% set name = name|default(id) %}
+{% set label = label|default(null) %}
+{% set hideLabel = hideLabel|default(false) %}
+{% set ariaLabel = ariaLabel|default(null) %}
+{% set labelOn = labelOn|default('mautic.core.form.yes') %}
+{% set labelOff = labelOff|default('mautic.core.form.no') %}
+{% set valueOn = valueOn|default('1') %}
+{% set valueOff = valueOff|default('0') %}
+{% set checked = checked|default(false) %}
+{% set size = size|default(null) %}
+{% set disabled = disabled|default(false) %}
+{% set readonly = readonly|default(false) %}
+{% set attributes = attributes|default({}) %}
+{% set data = data|default({}) %}
+{% set classes = ['toggle'] %}
+{% if disabled %}{% set classes = classes|merge(['toggle--disabled']) %}{% endif %}
+{% if readonly %}{% set classes = classes|merge(['toggle--readonly']) %}{% endif %}
+
+<div class="{{ classes|join(' ')|escape('html_attr') }}"
+     data-yes="{{ labelOn|trans|escape('html_attr') }}"
+     data-no="{{ labelOff|trans|escape('html_attr') }}"
+     data-yes-value="{{ valueOn|escape('html_attr') }}"
+     data-no-value="{{ valueOff|escape('html_attr') }}"
+     {% for data_key, data_value in data %}
+         data-{{ data_key|escape('html_attr') }}="{{ data_value|trans|escape('html_attr') }}"
+     {% endfor %}>
+    {% for choice_value in [valueOn, valueOff] %}
+        <input type="radio"
+               id="{{ id|escape('html_attr') }}_{{ choice_value|escape('html_attr') }}"
+               name="{{ name|escape('html_attr') }}"
+               value="{{ choice_value|escape('html_attr') }}"
+               {% if (checked and choice_value == valueOn) or (not checked and choice_value == valueOff) %}checked{% endif %}
+               style="display: none;"
+               {% for attr_key, attr_value in attributes %}
+                   {% if attr_value is not same as(false) and attr_value is not null %}
+                       {{ attr_key|escape('html_attr') }}{% if attr_value is not same as(true) %}="{{ attr_value|escape('html_attr') }}"{% endif %}
+                   {% endif %}
+               {% endfor %}>
+    {% endfor %}
+
+    <label id="{{ id|escape('html_attr') }}_label"
+           class="toggle__label"
+           data-yes-id="{{ id|escape('html_attr') }}_{{ valueOn|escape('html_attr') }}"
+           data-no-id="{{ id|escape('html_attr') }}_{{ valueOff|escape('html_attr') }}"
+           onclick="Mautic.toggleYesNo(this);"
+           role="switch"
+           tabindex="0"
+           onkeydown="Mautic.handleKeyDown(event, this)"
+           {% if label %}aria-labelledby="{{ id|escape('html_attr') }}_label_text"{% elseif ariaLabel %}aria-label="{{ ariaLabel|trans|escape('html_attr') }}"{% endif %}
+           aria-checked="{{ checked ? 'true' : 'false' }}">
+        {% if label %}
+            <span id="{{ id|escape('html_attr') }}_label_text" class="toggle__label-text{{ hideLabel ? ' visually-hidden' : '' }}">{{ label|trans }}</span>
+        {% endif %}
+        <div class="toggle__appearance"{% if size %} size="{{ size|escape('html_attr') }}"{% endif %}>
+            <div class="toggle__switch{{ checked ? ' toggle__switch--checked' : '' }}">
+                <svg class="toggle__check" width="6px" height="5px" viewBox="0 0 6 5" aria-hidden="true">
+                    <path d="M2.2 2.7L5 0 6 1 2.2 5 0 2.7 1 1.5z"></path>
+                </svg>
+            </div>
+            <span class="toggle__text" aria-hidden="true">{{ (checked ? labelOn : labelOff)|trans }}</span>
+        </div>
+    </label>
+</div>
