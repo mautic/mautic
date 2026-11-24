@@ -497,7 +497,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
                 } catch (Exception $exception) {
                     $this->logger->warning($exception->getMessage());
 
-                    return;
+                    return null;
                 }
             }
         }

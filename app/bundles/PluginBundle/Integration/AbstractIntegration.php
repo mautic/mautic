@@ -1661,7 +1661,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $matchedFields = $this->populateMauticLeadData($data);
 
         if ($matchedFields === []) {
-            return;
+            return null;
         }
 
         // Find unique identifier fields used by the integration
@@ -1723,7 +1723,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             } catch (\Exception $exception) {
                 $this->logger->warning($exception->getMessage());
 
-                return;
+                return null;
             }
         }
 
