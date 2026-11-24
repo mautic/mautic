@@ -10,10 +10,7 @@ final class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMi
 {
     public const PRIORITY = 10;
 
-    /**
-     * @var HttpKernelInterface
-     */
-    private $app;
+    private readonly \Symfony\Component\HttpKernel\HttpKernelInterface $app;
 
     /**
      * @var string

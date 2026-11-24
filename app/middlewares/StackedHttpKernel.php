@@ -20,10 +20,8 @@ final class StackedHttpKernel implements HttpKernelInterface, TerminableInterfac
 {
     /**
      * The decorated kernel.
-     *
-     * @var HttpKernelInterface
      */
-    private $kernel;
+    private readonly \Symfony\Component\HttpKernel\HttpKernelInterface $kernel;
 
     /**
      * A set of middlewares that are wrapped around this kernel.

@@ -11,10 +11,7 @@ final class CatchExceptionMiddleware implements HttpKernelInterface, Prioritized
 {
     public const PRIORITY = 100;
 
-    /**
-     * @var HttpKernelInterface
-     */
-    private $app;
+    private readonly \Symfony\Component\HttpKernel\HttpKernelInterface $app;
 
     public function __construct(HttpKernelInterface $app)
     {
