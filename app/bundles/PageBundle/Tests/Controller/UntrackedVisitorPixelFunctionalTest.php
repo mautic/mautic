@@ -200,6 +200,6 @@ final class UntrackedVisitorPixelFunctionalTest extends MauticMysqlTestCase
 
     private function assertIpAddressNotStored(string $address): void
     {
-        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(IpAddressRepository::class)->findOneBy(['ipAddress' => $address]), 'the visitor\'s IP address is not stored');
+        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(IpAddressRepository::class)->findOneBy(['ipAddress' => $address]), "the visitor's IP address is not stored");
     }
 }

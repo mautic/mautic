@@ -153,16 +153,16 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->getService(ReportModel::class)->saveEntity($report);
 
         // Check sql injection in parameter orderby
-        $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id\'');
+        $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId()."&orderby=a_id'");
 
         // Check sql injection in parameter name
-        $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'\'&orderby=a_id');
+        $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId()."'&orderby=a_id");
 
         // Check sql injection in parameter tmpl
-        $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'?tmpl=list\'&name=report.'.$report->getId().'&orderby=a_id');
+        $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId()."?tmpl=list'&name=report.".$report->getId().'&orderby=a_id');
 
         // Check sql injection in parameter id
-        $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'\'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
+        $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId()."'?tmpl=list&name=report.".$report->getId().'&orderby=a_id');
 
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
         self::assertResponseIsSuccessful();

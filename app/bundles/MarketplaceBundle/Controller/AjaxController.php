@@ -207,14 +207,14 @@ final class AjaxController extends CommonAjaxController
             $exitCode = $this->cacheHelper->clearSymfonyCache();
 
             if (0 !== $exitCode) {
-                $this->logger->error('Could not clear Mautic\'s cache. Please try again.');
+                $this->logger->error("Could not clear Mautic's cache. Please try again.");
 
                 return $this->sendJsonResponse([
                     'error' => $this->translator->trans('marketplace.package.cache.clear.failed'),
                 ], 500);
             }
         } catch (\Exception $e) {
-            $this->logger->error('Could not clear Mautic\'s cache. Details: '.$e->getMessage());
+            $this->logger->error("Could not clear Mautic's cache. Details: ".$e->getMessage());
 
             return $this->sendJsonResponse([
                 'error' => $this->translator->trans('marketplace.package.cache.clear.failed'),

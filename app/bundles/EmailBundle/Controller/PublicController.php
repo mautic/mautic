@@ -918,7 +918,7 @@ final class PublicController extends CommonFormController
             parse_str($gz, $query);
         } else {
             // signatures don't match: stop
-            $this->mauticLogger->log('error', $integration.': signatures don\'t match');
+            $this->mauticLogger->log('error', $integration.": signatures don't match");
 
             unset($query);
         }

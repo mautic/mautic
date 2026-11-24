@@ -12,15 +12,15 @@ final class WidgetTest extends TestCase
     public function testWidgetNameXssAttempt(): void
     {
         $widget = new Widget();
-        $widget->setName('csrf<script>console.log(\'name\');</script>');
-        $this->assertEquals('csrfconsole.log(\'name\');', $widget->getName());
+        $widget->setName("csrf<script>console.log('name');</script>");
+        $this->assertEquals("csrfconsole.log('name');", $widget->getName());
     }
 
     public function testWidgetTypeXssAttempt(): void
     {
         $widget = new Widget();
-        $widget->setType('map.of.leads<script>console.log(\'yellow\');</script>');
-        $this->assertEquals('map.of.leadsconsole.log(\'yellow\');', $widget->getType());
+        $widget->setType("map.of.leads<script>console.log('yellow');</script>");
+        $this->assertEquals("map.of.leadsconsole.log('yellow');", $widget->getType());
     }
 
     public function testToArrayEmpty(): void

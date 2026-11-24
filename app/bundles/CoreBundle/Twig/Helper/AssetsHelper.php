@@ -406,7 +406,7 @@ final class AssetsHelper
                 $builderName = 'legacy';
             }
 
-            echo '<script>Mautic.getActiveBuilderName = function() { return \''.$builderName.'\'; }</script>'."\n";
+            echo "<script>Mautic.getActiveBuilderName = function() { return '".$builderName."'; }</script>"."\n";
         }
     }
 
@@ -470,7 +470,7 @@ final class AssetsHelper
      */
     public function includeStylesheet($assetFilePath): string
     {
-        return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\''.$this->getUrl($assetFilePath).'\');</script>';
+        return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\''.$this->getUrl($assetFilePath)."');</script>";
     }
 
     /**

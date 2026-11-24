@@ -425,7 +425,7 @@ final class MailHelperTest extends TestCase
         $this->assertCount(3, $fromAddresses); // 3, not 4, because the last contact has the same owner as the first contact.
         $this->assertCount(3, $fromNames);
         $this->assertSame(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
-        $this->assertSame(['owner 1', 'No Body\'s Business', 'owner 2'], $fromNames);
+        $this->assertSame(['owner 1', "No Body's Business", 'owner 2'], $fromNames);
     }
 
     public function testQueuedAdvancedFromUsesResolvedMetadataFromAddressOnFlush(): void

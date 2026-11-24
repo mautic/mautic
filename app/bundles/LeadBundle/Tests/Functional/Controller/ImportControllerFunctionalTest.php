@@ -58,7 +58,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $html = $this->client->submit($form);
 
-        $this->assertStringContainsString('Match the columns from the imported file to Mautic\'s contact fields.', $html->text(null, false));
+        $this->assertStringContainsString("Match the columns from the imported file to Mautic's contact fields.", $html->text(null, false));
 
         $importButton = $html->selectButton('Import');
         $importForm   = $importButton->form();
@@ -252,7 +252,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->assertStringContainsString(
-            'Match the columns from the imported file to Mautic\'s contact fields.',
+            "Match the columns from the imported file to Mautic's contact fields.",
             $html->text(null, false)
         );
 
@@ -438,7 +438,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $html = $this->client->submit($form);
 
-        $this->assertStringContainsString('Match the columns from the imported file to Mautic\'s contact fields.', $html->text());
+        $this->assertStringContainsString("Match the columns from the imported file to Mautic's contact fields.", $html->text());
 
         return $this->testSymfonyCommand('mautic:import', [
             '-e'      => 'dev',

@@ -60,7 +60,7 @@ final class ClientType extends AbstractType
                     'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'    => 'form-control',
-                        'onchange' => 'Mautic.refreshApiClientForm(\''.$this->router->generate('mautic_client_action', ['objectAction' => 'new']).'\', this)',
+                        'onchange' => "Mautic.refreshApiClientForm('".$this->router->generate('mautic_client_action', ['objectAction' => 'new'])."', this)",
                     ],
                     'choices' => [
                         'OAuth 2'    => 'oauth2',

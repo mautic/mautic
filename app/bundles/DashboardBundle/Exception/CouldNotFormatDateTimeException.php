@@ -7,7 +7,7 @@ namespace Mautic\DashboardBundle\Exception;
 final class CouldNotFormatDateTimeException extends \Exception
 {
     public function __construct(
-        string $message = 'Can\'t format date object to string',
+        string $message = "Can't format date object to string",
         int $code = 0,
         ?\Throwable $throwable = null,
     ) {

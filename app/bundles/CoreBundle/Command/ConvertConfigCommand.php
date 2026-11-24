@@ -53,7 +53,7 @@ final class ConvertConfigCommand extends Command
                     'save-php-config',
                     null,
                     InputOption::VALUE_NONE,
-                    'When used, the theme\'s PHP config file will be saved.'
+                    "When used, the theme's PHP config file will be saved."
                 ),
             ]);
     }

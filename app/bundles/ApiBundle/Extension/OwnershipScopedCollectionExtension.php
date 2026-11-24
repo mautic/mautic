@@ -184,7 +184,7 @@ final readonly class OwnershipScopedCollectionExtension implements QueryCollecti
             // widen a "view own" collection to every record instead of narrowing it.
             if (!$metadata->hasAssociation($associationName)) {
                 throw new \LogicException(sprintf(
-                    '%s declares #[OwnershipParent(\'%s\')] but has no such association. Available: %s.',
+                    "%s declares #[OwnershipParent('%s')] but has no such association. Available: %s.",
                     $resourceClass,
                     $associationName,
                     implode(', ', $metadata->getAssociationNames()) ?: 'none'
@@ -213,7 +213,7 @@ final readonly class OwnershipScopedCollectionExtension implements QueryCollecti
             // Same reasoning: the entity says its owner lives on the parent, so a parent
             // that carries no ownership of its own leaves nothing to filter by.
             throw new \LogicException(sprintf(
-                '%s declares #[OwnershipParent(\'%s\')] but %s has neither an owner nor a createdBy field.',
+                "%s declares #[OwnershipParent('%s')] but %s has neither an owner nor a createdBy field.",
                 $resourceClass,
                 $associationName,
                 $targetClass

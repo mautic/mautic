@@ -110,6 +110,6 @@ final readonly class SegmentLogReportSubscriber
 
     private function generateLeftJoinCondition(string $alias, string $action): string
     {
-        return 'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.`action` =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
+        return 'l.id = '.$alias.'.lead_id  AND '.$alias.".bundle = 'lead' AND ".$alias.".object = 'segment'  AND ".$alias.".`action` ='".$action."' AND ".$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
     }
 }

@@ -268,7 +268,7 @@ final class ReportSubscriber
             case self::CONTEXT_CONTACT_ATTRIBUTION_MULTI:
             case self::CONTEXT_CONTACT_ATTRIBUTION_FIRST:
             case self::CONTEXT_CONTACT_ATTRIBUTION_LAST:
-                $localDateTriggered = 'CONVERT_TZ(log.date_triggered,\'UTC\',\''.date_default_timezone_get().'\')';
+                $localDateTriggered = "CONVERT_TZ(log.date_triggered,'UTC','".date_default_timezone_get()."')";
                 $event->applyDateFilters($qb, 'attribution_date', 'l', true);
                 $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
                     ->join('l', MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log', 'l.id = log.lead_id')
@@ -431,22 +431,22 @@ final class ReportSubscriber
                     $groupBy = str_replace('mautic.lead.graph.pie.attribution_', '', $g);
                     switch ($groupBy) {
                         case 'stages':
-                            $attributionQb->select('CONCAT_WS(\':\', ss.id, ss.name) as slice, l.attribution as contact_attribution')
+                            $attributionQb->select("CONCAT_WS(':', ss.id, ss.name) as slice, l.attribution as contact_attribution")
                                 ->groupBy('l.id, ss.id');
                             break;
                         case 'campaigns':
                             $attributionQb->select(
-                                'CONCAT_WS(\':\', c.id, c.name) as slice, l.attribution as contact_attribution'
+                                "CONCAT_WS(':', c.id, c.name) as slice, l.attribution as contact_attribution"
                             )
                                 ->groupBy('l.id, c.id');
                             break;
                         case 'actions':
-                            $attributionQb->select('SUBSTRING_INDEX(e.type, \'.\', -1) as slice, l.attribution as contact_attribution')
-                                ->groupBy('l.id, SUBSTRING_INDEX(e.type, \'.\', -1)');
+                            $attributionQb->select("SUBSTRING_INDEX(e.type, '.', -1) as slice, l.attribution as contact_attribution")
+                                ->groupBy("l.id, SUBSTRING_INDEX(e.type, '.', -1)");
                             break;
                         case 'channels':
-                            $attributionQb->select('SUBSTRING_INDEX(e.type, \'.\', 1) as slice, l.attribution as contact_attribution')
-                                ->groupBy('l.id, SUBSTRING_INDEX(e.type, \'.\', 1)');
+                            $attributionQb->select("SUBSTRING_INDEX(e.type, '.', 1) as slice, l.attribution as contact_attribution")
+                                ->groupBy("l.id, SUBSTRING_INDEX(e.type, '.', 1)");
                             break;
                     }
 
@@ -814,13 +814,13 @@ final class ReportSubscriber
             ],
             'channel' => [
                 'alias'   => 'channel',
-                'formula' => 'SUBSTRING_INDEX(e.type, \'.\', 1)',
+                'formula' => "SUBSTRING_INDEX(e.type, '.', 1)",
                 'label'   => 'mautic.lead.report.attribution.channel',
                 'type'    => 'string',
             ],
             'channel_action' => [
                 'alias'   => 'channel_action',
-                'formula' => 'SUBSTRING_INDEX(e.type, \'.\', -1)',
+                'formula' => "SUBSTRING_INDEX(e.type, '.', -1)",
                 'label'   => 'mautic.lead.report.attribution.channel_action',
                 'type'    => 'string',
             ],

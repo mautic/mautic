@@ -20,8 +20,8 @@ final class EventAccessorTest extends TestCase
     private array $events = [
         Event::TYPE_ACTION    => [
             'lead.scorecontactscompanies' => [
-                'label'          => 'Add to company\'s score',
-                'description'    => 'This action will add the specified value to the company\'s existing score',
+                'label'          => "Add to company's score",
+                'description'    => "This action will add the specified value to the company's existing score",
                 'formType'       => CompanyChangeScoreActionType::class,
                 'batchEventName' => 'mautic.lead.on_campaign_trigger_action',
             ],

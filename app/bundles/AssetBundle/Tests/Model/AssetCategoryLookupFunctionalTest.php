@@ -30,7 +30,7 @@ final class AssetCategoryLookupFunctionalTest extends MauticMysqlTestCase
         $titles = $this->lookup('Invoic');
 
         $this->assertContains('Invoices', $titles, 'An asset category matching the search must be returned.');
-        $this->assertContains('Invoicing shared', $titles, 'Global categories are offered alongside the bundle\'s own.');
+        $this->assertContains('Invoicing shared', $titles, "Global categories are offered alongside the bundle's own.");
         $this->assertNotContains('Invoice pages', $titles, 'A category belonging to another bundle must not be offered.');
     }
 

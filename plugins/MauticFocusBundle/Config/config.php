@@ -9,7 +9,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Focus;
 
 return [
     'name'        => 'Mautic Focus',
-    'description' => 'Drive visitor\'s focus on your website with Mautic Focus',
+    'description' => "Drive visitor's focus on your website with Mautic Focus",
     'version'     => '1.0',
     'author'      => 'Mautic, Inc',
 

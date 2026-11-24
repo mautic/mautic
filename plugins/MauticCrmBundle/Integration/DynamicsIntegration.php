@@ -916,7 +916,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
         $availableFields    = $this->getAvailableLeadFields();
         $oparams            = [];
         $oparams['$select'] = implode(',', array_keys($availableFields[$object]));
-        $oparams['$filter'] = $seachColumn.' eq \''.$searchValue.'\'';
+        $oparams['$filter'] = $seachColumn." eq '".$searchValue."'";
         $data               = $this->getApiHelper()->getLeads($oparams);
 
         return (isset($data['value'][0]) && !empty($data['value'][0])) ? $data['value'][0] : [];

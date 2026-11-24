@@ -128,7 +128,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
 
         $this->makeEventExecutionPass($listener);
         $this->eventExecutioner->executeLogs($event, new ArrayCollection($logs));
-        $this->assertSame(self::ADD_POINTS, $contact->getPoints(), 'Points should be added as the log\'s version has been reset when execution failed.');
+        $this->assertSame(self::ADD_POINTS, $contact->getPoints(), "Points should be added as the log's version has been reset when execution failed.");
         $this->assertFalse($this->testHandler->hasWarningThatContains(sprintf(
             'Campaign event log ID "%s" was skipped as it had been executed already.',
             $log->getId(),

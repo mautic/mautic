@@ -93,7 +93,7 @@ final class ReportModelTest extends TestCase
         $allowedColumns->choices     = ['read_ratio' => 'Read ratio'];
         $allowedColumns->definitions = [
             'read_ratio' => [
-                'formula' => 'IFNULL(ROUND((e.read_count/e.sent_count)*100, 1), \'0.0\')',
+                'formula' => "IFNULL(ROUND((e.read_count/e.sent_count)*100, 1), '0.0')",
                 'suffix'  => '%',
             ],
         ];
@@ -102,7 +102,7 @@ final class ReportModelTest extends TestCase
 
         $this->assertTrue($result['hasOrderBy']);
         $this->assertSame(
-            ['(IFNULL(ROUND((e.read_count/e.sent_count)*100, 1), \'0.0\')) + 0 DESC'],
+            ["(IFNULL(ROUND((e.read_count/e.sent_count)*100, 1), '0.0')) + 0 DESC"],
             $result['orderBy']
         );
     }
@@ -113,7 +113,7 @@ final class ReportModelTest extends TestCase
         $allowedColumns->choices     = ['read_ratio' => 'Read ratio'];
         $allowedColumns->definitions = [
             'read_ratio' => [
-                'formula' => 'IFNULL(ROUND((e.read_count/e.sent_count)*100, 1), \'0.0\')',
+                'formula' => "IFNULL(ROUND((e.read_count/e.sent_count)*100, 1), '0.0')",
                 'suffix'  => '%',
             ],
         ];

@@ -194,7 +194,7 @@ final readonly class ReportSubscriber
                         'cut2.channel_id'
                     )
                         ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut2')
-                        ->where('cut2.channel = \'notification\'')
+                        ->where("cut2.channel = 'notification'")
                         ->groupBy('cut2.channel_id');
                     $qb->leftJoin('pn', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'pn.id = cut.channel_id');
                 }
@@ -217,7 +217,7 @@ final readonly class ReportSubscriber
                             'ph',
                             'cut2.redirect_id = ph.redirect_id AND cut2.channel_id = ph.source_id'
                         )
-                        ->where('cut2.channel = \'email\' AND ph.source = \'email\'')
+                        ->where("cut2.channel = 'email' AND ph.source = 'email'")
                         ->groupBy('cut2.channel_id, ph.lead_id');
                     $qb->leftJoin('pn', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'pn.id = cut.channel_id AND pns.lead_id = cut.lead_id');
                 }

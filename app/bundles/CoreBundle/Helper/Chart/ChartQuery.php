@@ -569,7 +569,7 @@ class ChartQuery extends AbstractChart
         $defaultTimezoneOffset = $this->dateTimeHelper->getLocalTimezoneOffset();
         $columnName            = "CONVERT_TZ({$columnName}, '+00:00', '{$defaultTimezoneOffset}')";
 
-        return 'DATE_FORMAT('.$columnName.', \''.$dbUnit.'\')';
+        return 'DATE_FORMAT('.$columnName.", '".$dbUnit."')";
     }
 
     private function getGeneratedColumnForDateColumn(QueryBuilder $query, string $dateColumn, string $tablePrefix): ?GeneratedColumn

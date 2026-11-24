@@ -158,7 +158,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Edit project: '.$project->getName(), (string) $clientResponseContent, 'The return must contain \'Edit project\' text');
+        $this->assertStringContainsString('Edit project: '.$project->getName(), (string) $clientResponseContent, "The return must contain 'Edit project' text");
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['project_entity[name]']->setValue($projectName);

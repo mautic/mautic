@@ -499,7 +499,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             'expectedPublishDown' => null,
         ];
 
-        yield 'Sales user without the publish permission cannot publish admin\'s email' => [
+        yield "Sales user without the publish permission cannot publish admin's email" => [
             'creatorUsername'     => 'admin',
             'permissions'         => ['editother'],
             'expectedIsPublished' => false,
@@ -515,7 +515,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             'expectedPublishDown' => null,
         ];
 
-        yield 'Sales user with the publish other permission can publish admin\'s email' => [
+        yield "Sales user with the publish other permission can publish admin's email" => [
             'creatorUsername'     => 'admin',
             'permissions'         => ['editother', 'publishother'],
             'expectedIsPublished' => true,
@@ -531,7 +531,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             'expectedPublishDown' => '2024-12-21T15:45:00+00:00',
         ];
 
-        yield 'Sales user with the publish own permission cannot publish admin\'s email' => [
+        yield "Sales user with the publish own permission cannot publish admin's email" => [
             'creatorUsername'     => 'admin',
             'permissions'         => ['editother', 'publishown'],
             'expectedIsPublished' => false,
