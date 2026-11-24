@@ -196,7 +196,7 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
         $existingActions = $entity->getEvents();
 
         foreach ($sessionEvents as $properties) {
-            $isNew = (!empty($properties['id']) && isset($existingActions[$properties['id']])) ? false : true;
+            $isNew = !(!empty($properties['id']) && isset($existingActions[$properties['id']]));
             $event = !$isNew ? $existingActions[$properties['id']] : new TriggerEvent();
 
             foreach ($properties as $f => $v) {
