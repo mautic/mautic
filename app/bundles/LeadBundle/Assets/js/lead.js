@@ -1221,7 +1221,7 @@ Mautic.leadNoteOnLoad = function (container, response) {
             count = parseInt(response.noteCount);
         }
 
-        noteCountWrapper.text(count);
+        Mautic.updateTabCount('NoteCount', count);
     }
 };
 
