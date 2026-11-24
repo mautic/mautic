@@ -61,11 +61,11 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% endblock %}
 
 {% block segmented_control_widget %}
+{% set locked = (attr.readonly is defined and attr.readonly is not empty) or (attr.disabled is defined and attr.disabled is not empty) %}
 {% set options = [] %}
 {% for child in form %}
-    {% set options = options|merge([{value: child.vars.value, label: child.vars.label, translation_domain: child.vars.translation_domain, label_translation_parameters: child.vars.label_translation_parameters, disabled: child.vars.disabled, required: child.vars.required, attr: child.vars.attr}]) %}
+    {% set options = options|merge([{value: child.vars.value, label: child.vars.label, translation_domain: child.vars.translation_domain, label_translation_parameters: child.vars.label_translation_parameters, disabled: child.vars.disabled or locked, required: child.vars.required, attr: child.vars.attr}]) %}
 {% endfor %}
-{% set locked = (attr.readonly is defined and attr.readonly is not empty) or (attr.disabled is defined and attr.disabled is not empty) %}
 {% set params = {
     options: options,
     label: label is not empty ? label : name|replace({'_': ' '})|capitalize,
