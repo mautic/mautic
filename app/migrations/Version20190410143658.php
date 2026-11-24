@@ -48,7 +48,7 @@ final class Version20190410143658 extends AbstractMauticMigration
     /**
      * @return string
      */
-    private function getNewIndexName()
+    private function getNewIndexName(): string
     {
         return "{$this->prefix}leadid_reason_channel";
     }
@@ -56,7 +56,7 @@ final class Version20190410143658 extends AbstractMauticMigration
     /**
      * @return string
      */
-    private function getTableName()
+    private function getTableName(): string
     {
         return "{$this->prefix}lead_donotcontact";
     }
