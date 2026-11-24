@@ -45,15 +45,13 @@ final class FormConditionalSubscriberTest extends TestCase
     {
         $parentField = new Field();
         $childField  = new Field();
-        $parentId    = 'new_parent_id';
-        $childId     = 'new_child_id';
         $form        = new Form();
 
-        ReflectionHelper::setEntityId($parentField, $parentId);
-        $parentField->setSessionId($parentId);
-        ReflectionHelper::setEntityId($childField, $childId);
-        $childField->setSessionId($childId);
-        $childField->setParent($parentId);
+        ReflectionHelper::setEntityId($parentField, 123);
+        $parentField->setSessionId('new_parent_id');
+        ReflectionHelper::setEntityId($childField, 456);
+        $childField->setSessionId('new_child_id');
+        $childField->setParent('new_parent_id');
 
         $form->addField(0, $parentField);
         $form->addField(1, $childField);
@@ -66,6 +64,8 @@ final class FormConditionalSubscriberTest extends TestCase
             ->method('deleteFields');
 
         $this->subscriber->onFormPostSave(new EntityPostSave($form, true));
+
+        $this->assertSame('123', $childField->getParent());
     }
 
     /**
