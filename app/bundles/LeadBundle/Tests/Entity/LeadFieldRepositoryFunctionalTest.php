@@ -132,7 +132,7 @@ final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($repository->compareValue($lead->getId(), 'country', ['United Kingdom'], 'notIn'));
     }
 
-    #[ResetDatabase('creates custom fields, which alter the leads table')]
+    #[ResetDatabase]
     public function testCompareValueInOperatorWithMultiselectField(): void
     {
         $field = new LeadField();
@@ -174,7 +174,7 @@ final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($repository->compareValue($lead->getId(), 'colors', ['red', 'yellow'], 'in'));
     }
 
-    #[ResetDatabase('creates custom fields, which alter the leads table')]
+    #[ResetDatabase]
     public function testCompareValueInOperatorWithSpecialCharacters(): void
     {
         $field = new LeadField();
@@ -219,7 +219,7 @@ final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($repository->compareValue($lead2->getId(), 'job_title', ['manager&supervisor'], 'in'));
     }
 
-    #[ResetDatabase('creates custom fields, which alter the leads table')]
+    #[ResetDatabase]
     public function testExcludeUnpublishedField(): void
     {
         $field = new LeadField();

@@ -216,7 +216,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         return str_replace('%', '%%', $value);
     }
 
-    #[ResetDatabase('re-creates the client to apply the changed config')]
+    #[ResetDatabase]
     public function testConfigNotFoundPageConfiguration(): void
     {
         // insert published record

@@ -807,7 +807,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     #[DataProvider('operatorProvider')]
-    #[ResetDatabase('creates a company custom field, which alters the companies table')]
+    #[ResetDatabase]
     public function testInTheLastAndInTheNextFilter(string $operator, int $expected): void
     {
         $filters = [
@@ -874,7 +874,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     #[DataProvider('operatorProvider')]
-    #[ResetDatabase('creates a company custom field, which alters the companies table')]
+    #[ResetDatabase]
     public function testInLastAndInNextFilterForCompanyCustomField(string $operator, int $expectedCount): void
     {
         $company = $this->createCompanyWithDateCustomField('CompanyABC', $operator);

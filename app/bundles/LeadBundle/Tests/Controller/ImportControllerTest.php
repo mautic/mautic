@@ -303,7 +303,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         );
     }
 
-    #[ResetDatabase('creates a custom field, which alters the leads table')]
+    #[ResetDatabase]
     public function testImportWithSkipIfExistsFlagTrue(): void
     {
         $this->createBooleanField();

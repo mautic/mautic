@@ -212,7 +212,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertPageContent($url, 'Default content - not in segment or wrong country', self::PREHEADER_TEXT);
     }
 
-    #[ResetDatabase('creates a custom field, which alters the leads table')]
+    #[ResetDatabase]
     public function testPreviewEmailForDynamicContentVariantsWithCustomField(): void
     {
         // Create custom field

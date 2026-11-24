@@ -196,7 +196,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
 
-    #[ResetDatabase('imports forms and custom fields, which create and alter tables')]
+    #[ResetDatabase]
     public function testProgressActionImportValidData(): void
     {
         $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);

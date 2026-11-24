@@ -416,7 +416,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
     }
 
-    #[ResetDatabase('imports forms and custom fields, which create and alter tables')]
+    #[ResetDatabase]
     public function testImportCampaignActionJson(): void
     {
         $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
@@ -445,7 +445,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertContains('Import successful: Imported campaigns are switched off by default.', $responseData);
     }
 
-    #[ResetDatabase('imports forms and custom fields, which create and alter tables')]
+    #[ResetDatabase]
     public function testImportCampaignActionRejectsACraftedFieldAlias(): void
     {
         $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
@@ -465,7 +465,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($forms, $this->getContainer()->get(FormRepository::class)->count([]));
     }
 
-    #[ResetDatabase('imports forms and custom fields, which create and alter tables')]
+    #[ResetDatabase]
     public function testImportCampaignActionZip(): void
     {
         $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);

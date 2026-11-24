@@ -727,7 +727,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
      * @param array<int> $addFieldsToSegment
      */
     #[DataProvider('provideIncludeExclude')]
-    #[ResetDatabase('creates custom fields, which alter the leads and companies tables')]
+    #[ResetDatabase]
     public function testCustomFieldIncludeExclude(string $filter, int $expected, array $addFieldsToContact, array $addFieldsToSegment): void
     {
         $fieldAlias = 'test_inc_ex_field';
@@ -833,7 +833,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
      * @param array<int> $addFieldsToSegment
      */
     #[DataProvider('provideSingleIncludeExclude')]
-    #[ResetDatabase('creates custom fields, which alter the leads and companies tables')]
+    #[ResetDatabase]
     public function testCustomFieldSelectIncludeExclude(string $filter, int $expected, int $addFieldToContact, array $addFieldsToSegment): void
     {
         $fieldAlias = 'test_inc_ex_single_field';
@@ -955,7 +955,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
      * @param array<int> $addFieldsToSegment
      */
     #[DataProvider('provideSingleIncludeExclude')]
-    #[ResetDatabase('creates custom fields, which alter the leads and companies tables')]
+    #[ResetDatabase]
     public function testCompanyCustomFieldSelectIncludeExclude(string $filter, int $expected, int $addFieldToCompany, array $addFieldsToSegment): void
     {
         $fieldAlias = 'test_company_inc_ex_single_field';
@@ -1043,7 +1043,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
      * @param array<int> $addFieldsToSegment
      */
     #[DataProvider('provideIncludeExclude')]
-    #[ResetDatabase('creates custom fields, which alter the leads and companies tables')]
+    #[ResetDatabase]
     public function testCompanyCustomFieldIncludeExclude(string $filter, int $expected, array $addFieldsToCompany, array $addFieldsToSegment): void
     {
         $fieldAlias = 'test_company_inc_ex_field';

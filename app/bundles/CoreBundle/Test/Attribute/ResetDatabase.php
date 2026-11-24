@@ -9,10 +9,6 @@ namespace Mautic\CoreBundle\Test\Attribute;
  * e.g. because it alters the schema (custom fields) or re-creates the client.
  */
 #[\Attribute(\Attribute::TARGET_METHOD)]
-final readonly class ResetDatabase
+final class ResetDatabase
 {
-    public function __construct(
-        public string $reason,
-    ) {
-    }
 }
