@@ -42,7 +42,7 @@
 {% set columnCount = columns|length + (isExpandable ? 1 : 0) + (selection ? 1 : 0) + (hasRowActions ? 1 : 0) %}
 {% set hasToolbarContent = searchable|default(false) or toolbarActions is not empty %}
 {% set hasToolbar = hasToolbarContent or batchActions is not empty %}
-{% set accessibleName = label|default(title|default('')) %}
+{% set accessibleName = label|default(title|default(accessibleName|default(''))) %}
 
 {% set classes = ['data-table', 'data-table--' ~ size] %}
 {% if zebra|default(false) %}{% set classes = classes|merge(['data-table--zebra']) %}{% endif %}
@@ -184,7 +184,7 @@
                             {% endif %}
                             {% if selection %}
                                 <td class="data-table__select-cell">
-                                    <input type="{{ selection == 'multi' ? 'checkbox' : 'radio' }}" class="form-check-input{{ row.selectionClassName|default('') ? ' ' ~ row.selectionClassName|e('html_attr') : '' }}" id="{{ baseId|e('html_attr') }}-select-{{ rowId|e('html_attr') }}" name="{{ (selection == 'multi' ? row.name|default(baseId ~ '-select[]') : baseId ~ '-select')|e('html_attr') }}" value="{{ rowId|e('html_attr') }}" data-data-table-select aria-label="{{ 'mautic.core.data_table.select_row'|trans|e('html_attr') }}"{{ isSelected ? ' checked' : '' }}{{ row.isDisabled|default(false) ? ' disabled' : '' }}>
+                                    <input type="{{ selection == 'multi' ? 'checkbox' : 'radio' }}" class="form-check-input{{ row.selectionClassName|default('') ? ' ' ~ row.selectionClassName|e('html_attr') : '' }}" id="{{ baseId|e('html_attr') }}-select-{{ rowId|e('html_attr') }}" name="{{ (selection == 'multi' ? row.name|default(baseId ~ '-select[]') : baseId ~ '-select')|e('html_attr') }}" value="{{ rowId|e('html_attr') }}" data-data-table-select{{ _self.attributes(row.selectionAttr) }} aria-label="{{ 'mautic.core.data_table.select_row'|trans|e('html_attr') }}"{{ isSelected ? ' checked' : '' }}{{ row.isDisabled|default(false) ? ' disabled' : '' }}>
                                 </td>
                             {% endif %}
                             {% for column in columns %}

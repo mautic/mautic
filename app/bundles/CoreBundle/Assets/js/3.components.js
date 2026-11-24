@@ -88,14 +88,15 @@ Mautic.updateDataTableSelection = function (table) {
         return;
     }
 
-    const selectable = checkboxes.filter((input) => !input.disabled);
-    const selected = selectable.filter((input) => input.checked).length;
+    const selected = checkboxes.filter((input) => input.checked && !input.disabled).length;
+    const selectable = checkboxes.filter((input) => !input.disabled && !input.closest('tr').hidden);
+    const visibleSelected = selectable.filter((input) => input.checked).length;
     const selectAll = table.querySelector('[data-data-table-select-all]');
     const batch = table.querySelector('.data-table__batch-actions');
 
     if (selectAll) {
-        selectAll.checked = selectable.length > 0 && selected === selectable.length;
-        selectAll.indeterminate = selected > 0 && selected < selectable.length;
+        selectAll.checked = selectable.length > 0 && visibleSelected === selectable.length;
+        selectAll.indeterminate = visibleSelected > 0 && visibleSelected < selectable.length;
     }
 
     if (batch) {
@@ -159,6 +160,7 @@ Mautic.filterDataTable = function (table, query) {
 
     table.querySelector('.data-table__empty-row').hidden = visible > 0;
     Mautic.updateDataTableZebra(table);
+    Mautic.updateDataTableSelection(table);
 };
 
 document.addEventListener('click', (event) => {
@@ -194,9 +196,10 @@ document.addEventListener('change', (event) => {
     }
 
     if (event.target.matches('[data-data-table-select-all]')) {
+        const checked = event.target.checked;
         table.querySelectorAll('tbody tr:not([hidden]) [data-data-table-select]:not(:disabled)').forEach((input) => {
-            input.checked = event.target.checked;
-            input.dispatchEvent(new Event('change', {bubbles: false}));
+            input.checked = checked;
+            input.dispatchEvent(new Event('change', {bubbles: true}));
         });
         Mautic.updateDataTableSelection(table);
     } else if (event.target.matches('[data-data-table-select]')) {

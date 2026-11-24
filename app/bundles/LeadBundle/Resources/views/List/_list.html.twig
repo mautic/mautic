@@ -85,6 +85,7 @@
     {% set rows = rows|merge([{
         id: item.id,
         selectionClassName: 'list-checkbox',
+        selectionAttr: {'data-toggle': 'selectrow', 'data-target': 'tbody'},
         actionsHtml: actionsHtml,
         cells: {
             name: {trustedHtml: nameHtml, sortValue: item.name},

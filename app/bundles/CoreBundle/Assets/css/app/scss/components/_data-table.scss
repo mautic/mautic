@@ -258,7 +258,7 @@ $data-table-motion: 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
     }
 }
 
-.data-table--zebra .data-table__row--alt > td {
+.data-table--zebra .data-table__row--alt:not(.data-table__row--selected) > td {
     background-color: var(--layer-accent);
 }
 
