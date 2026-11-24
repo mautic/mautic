@@ -49,12 +49,6 @@ parameters:
 			path: app/bundles/ApiBundle/Event/ClientEvent.php
 
 		-
-			message: '#^Access to an undefined property Mautic\\ApiBundle\\Entity\\oAuth2\\Client\:\:\$deletedId\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/bundles/ApiBundle/EventListener/ClientSubscriber.php
-
-		-
 			message: '#^Method Mautic\\ApiBundle\\Model\\ClientModel\:\:revokeAccess\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2440,12 +2434,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/IpLookupHelper.php
 
 		-
-			message: '#^Access to an undefined property Psr\\Http\\Message\\ResponseInterface\:\:\$code\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/bundles/CoreBundle/Helper/LanguageHelper.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\LanguageHelper\:\:extractLanguagePackage\(\) has parameter \$languageCode with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2702,12 +2690,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/IpLookup/IpstackLookup.php
-
-		-
-			message: '#^Access to an undefined property GeoIp2\\Record\\Location\:\:\$postalCode\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/bundles/CoreBundle/IpLookup/MaxmindDownloadLookup.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Menu\\MenuHelper\:\:getParameter\(\) has parameter \$name with no type specified\.$#'
