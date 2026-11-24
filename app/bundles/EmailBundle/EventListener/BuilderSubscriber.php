@@ -299,11 +299,13 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
     public function convertUrlsToTokens(EmailSendEvent $event): void
     {
-        if ($event->isInternalSend()) {
+        if ($event->isInternalSend() && !$event->isForwardedCopy()) {
             return;
         }
 
-        $disableTrackableUrls = $this->coreParametersHelper->get('disable_trackable_urls');
+        // Whoever opens a forwarded copy is not the original recipient, so its links are never tracked. They keep
+        // the UTM tags of the email, which say nothing about a person.
+        $disableTrackableUrls = $event->isForwardedCopy() || $this->coreParametersHelper->get('disable_trackable_urls');
         $shortenEnabled       = $this->coreParametersHelper->get('shortener_email_enable', false);
 
         $email          = $event->getEmail();

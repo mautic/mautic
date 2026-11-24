@@ -94,7 +94,8 @@ final readonly class ForwardedEmailSender
             $errors = $mailer->getErrors();
             unset($errors['failures']);
 
-            throw new EmailCouldNotBeSentException(implode('; ', $errors));
+            // The reason is logged, and nothing about whoever was to get the copy may be kept
+            throw new EmailCouldNotBeSentException(str_ireplace($toAddress, '[address]', implode('; ', $errors)));
         }
     }
 

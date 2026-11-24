@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\UserBundle\Entity\User;
+use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -216,6 +217,23 @@ final class EmailForwardFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(1, $this->em->getRepository(EmailForward::class)->count(['stat' => $stat]), 'The attempt counts toward the limit.');
     }
 
+    public function testCopyKeepsTheUtmTagsOfTheEmailOnLinksThatAreNotTracked(): void
+    {
+        $stat = $this->createSentEmail();
+        $stat->getEmail()->setUtmTags(['utmSource' => 'newsletter', 'utmCampaign' => 'spring']);
+        $this->em->flush();
+
+        $this->submitForward(self::FRIEND_EMAIL);
+
+        self::assertResponseIsSuccessful();
+        $message = self::getMailerMessage();
+        $this->assertInstanceOf(MauticMessage::class, $message);
+        $html = (string) $message->getHtmlBody();
+        $this->assertStringContainsString(self::PUBLIC_LINK.'?utm_source=newsletter&utm_campaign=spring', html_entity_decode($html));
+        $this->assertStringNotContainsString('/r/', $html, 'The copy must not use tracked redirects.');
+        $this->assertStringNotContainsString(self::TRACKING_HASH, $html);
+    }
+
     public function testCopyLinksToTheWebViewWhenTheEmailHasAPublicPreview(): void
     {
         $stat = $this->createSentEmail();
@@ -277,8 +295,14 @@ final class EmailForwardFunctionalTest extends MauticMysqlTestCase
         $mailer->method('getMailer')->willReturnSelf();
         $mailer->method('setTo')->willReturn(true);
         $mailer->method('send')->willReturn(false);
-        $mailer->method('getErrors')->willReturn(['The mail server refused the message']);
+        $mailer->method('getErrors')->willReturn(['The mail server refused '.self::FRIEND_EMAIL]);
         self::getContainer()->set(MailHelper::class, $mailer);
+
+        $logger = $this->createMock(Logger::class);
+        $logger->expects($this->once())
+            ->method('error')
+            ->with($this->logicalNot($this->stringContains(self::FRIEND_EMAIL)));
+        self::getContainer()->set('monolog.logger.mautic', $logger);
 
         $crawler = $this->submitForward(self::FRIEND_EMAIL);
 
