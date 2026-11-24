@@ -6,12 +6,18 @@
 {% set inline = inline|default(false) %}
 {% set reverse = reverse|default(false) %}
 {% set required = required|default(false) %}
+{% set aiLabel = aiLabel|default(false) %}
 {% set base_id = (name ?: 'checkbox')|replace({'[': '-', ']': '', ' ': '-', '.': '-'}) %}
 {% set help_id = helpText ? base_id ~ '-help' : null %}
 
 <fieldset class="{{ [wrapperClass, 'border-0', 'p-0', 'm-0']|filter(value => value is not empty)|join(' ')|escape('html_attr') }}" style="min-width: 0; border: 0; padding: 0; margin: 0;">
     {% if legend %}
-        <legend class="form-label mb-2">{{ legend|trans }}</legend>
+        <legend class="form-label mb-2{{ aiLabel ? ' form-check-group-ai__legend' : '' }}">
+            {{ legend|trans }}
+            {% if aiLabel %}
+                {% include '@MauticCore/Components/ai-label.html.twig' with ({inline: true, size: 'sm'}|merge(aiLabel is iterable ? aiLabel : {})) only %}
+            {% endif %}
+        </legend>
     {% endif %}
 
     {% for item in items %}

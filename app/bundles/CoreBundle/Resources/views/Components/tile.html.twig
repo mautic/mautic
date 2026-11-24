@@ -4,8 +4,9 @@
 
 {# === BASE TYPE === #}
 {% if type == 'base' %}
-    <div class="tile {{ className|default('') }}" id="tile-{{ random() }}">
+    <div class="tile{{ aiLabel is defined and aiLabel ? ' tile--ai' : '' }} {{ className|default('') }}" id="tile-{{ random() }}">
         {{ content|raw }}
+        {% if aiLabel is defined and aiLabel %}{% include '@MauticCore/Components/ai-label.html.twig' with (aiLabel is iterable ? aiLabel : {}) only %}{% endif %}
 
         {% if button is defined %}
         <div class="tile__button-wrapper mt-16">
@@ -21,8 +22,9 @@
 {# === CLICKABLE TYPE === #}
 {% elseif type == 'clickable' %}
     {% if href is defined and href is not empty %}
-        <a class="tile tile--clickable {{ className|default('') }}" id="clickable-tile-{{ random() }}" href="{{ href }}" {% if attributes is defined and attributes is not empty %}{% for attr_key, attr_value in attributes %}{{ attr_key }}="{{ attr_value }}" {% endfor %}{% endif %}>
+        <a class="tile tile--clickable{{ aiLabel is defined and aiLabel ? ' tile--ai' : '' }} {{ className|default('') }}" id="clickable-tile-{{ random() }}" href="{{ href }}" {% if attributes is defined and attributes is not empty %}{% for attr_key, attr_value in attributes %}{{ attr_key }}="{{ attr_value }}" {% endfor %}{% endif %}>
             {{ content|raw }}
+            {% if aiLabel is defined and aiLabel %}{% include '@MauticCore/Components/ai-label.html.twig' with {static: true} only %}{% endif %}
             {% if icon is defined %}
                 <div class="tile-icon">
                     <i class="{{ icon }}" aria-hidden="true"></i>
@@ -30,8 +32,9 @@
             {% endif %}
         </a>
     {% else %}
-        <button type="button" class="tile tile--clickable {{ className|default('') }}" id="clickable-tile-{{ random() }}" {% if onclick is defined %}onclick="{{ onclick }}"{% endif %} {% if attributes is defined and attributes is not empty %}{% for attr_key, attr_value in attributes %}{{ attr_key }}="{{ attr_value }}" {% endfor %}{% endif %}>
+        <button type="button" class="tile tile--clickable{{ aiLabel is defined and aiLabel ? ' tile--ai' : '' }} {{ className|default('') }}" id="clickable-tile-{{ random() }}" {% if onclick is defined %}onclick="{{ onclick }}"{% endif %} {% if attributes is defined and attributes is not empty %}{% for attr_key, attr_value in attributes %}{{ attr_key }}="{{ attr_value }}" {% endfor %}{% endif %}>
             {{ content|raw }}
+            {% if aiLabel is defined and aiLabel %}{% include '@MauticCore/Components/ai-label.html.twig' with {static: true} only %}{% endif %}
             {% if icon is defined %}
                 <div class="tile-icon">
                     <i class="{{ icon }}" aria-hidden="true"></i>
@@ -44,7 +47,7 @@
 {% elseif type == 'expandable' %}
     {% set randomId = random() %}
     <button type="button"
-            class="tile tile--expandable collapsed {{ className|default('') }}"
+            class="tile tile--expandable collapsed{{ aiLabel is defined and aiLabel ? ' tile--ai' : '' }} {{ className|default('') }}"
             data-bs-toggle="collapse"
             data-bs-target="#collapse-{{ randomId }}"
             aria-expanded="false"
@@ -52,6 +55,7 @@
             title="{{ 'mautic.core.interact_to_expand_tile'|trans }}"
             id="expandable-tile-{{ randomId }}"
             tabindex="0">
+        {% if aiLabel is defined and aiLabel %}{% include '@MauticCore/Components/ai-label.html.twig' with {static: true} only %}{% endif %}
         <div>
             <div class="tile-content">
                 <div class="tile-content__above-the-fold">
@@ -74,7 +78,8 @@
 {# === EXPANDABLE-INTERACTIVE TYPE === #}
 {% elseif type == 'expandable-interactive' %}
     {% set randomId = random() %}
-    <div class="tile tile--expandable tile--expandable--interactive" id="expandable-tile-{{ randomId }}">
+    <div class="tile tile--expandable tile--expandable--interactive{{ aiLabel is defined and aiLabel ? ' tile--ai' : '' }}" id="expandable-tile-{{ randomId }}">
+        {% if aiLabel is defined and aiLabel %}{% include '@MauticCore/Components/ai-label.html.twig' with (aiLabel is iterable ? aiLabel : {}) only %}{% endif %}
         <div>
             <div class="tile-content">
                 <div class="tile-content__above-the-fold">
@@ -102,9 +107,10 @@
 
 {# === MINI TYPE === #}
 {% elseif type == 'mini' %}
-    <a href="{{ href|default('#') }}" class="tile tile--clickable {{ className|default('') }}" {% if attributes is defined and attributes is not empty %}{% for attr_key, attr_value in attributes %}{{ attr_key }}="{{ attr_value }}" {% endfor %}{% endif %}>
+    <a href="{{ href|default('#') }}" class="tile tile--clickable{{ aiLabel is defined and aiLabel ? ' tile--ai' : '' }} {{ className|default('') }}" {% if attributes is defined and attributes is not empty %}{% for attr_key, attr_value in attributes %}{{ attr_key }}="{{ attr_value }}" {% endfor %}{% endif %}>
         <div class="d-flex justify-content-between align-items-center">
             <div class="tile-title">{{ title|trans }}</div>
+            {% if aiLabel is defined and aiLabel %}{% include '@MauticCore/Components/ai-label.html.twig' with {static: true} only %}{% endif %}
             {% if icon is defined %}
                 <div class="tile-icon">
                     <i class="{{ icon }} text-interactive"></i>

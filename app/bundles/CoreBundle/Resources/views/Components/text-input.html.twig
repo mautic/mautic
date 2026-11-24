@@ -25,6 +25,7 @@
         required: required|default(false),
         describedby: describedby,
         render_feedback: false,
+        aiLabel: aiLabel|default(false),
         wrapperClass: '',
         attributes: invalid ? attributes|merge({'aria-invalid': 'true', class: (attributes.class|default('') ~ ' is-invalid')|trim}) : attributes,
     } only %}
