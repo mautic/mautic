@@ -693,7 +693,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return string
      */
-    protected function getTemplateName(string $file)
+    protected function getTemplateName(string $file): string
     {
         $namespaces = [
             $this->getTemplateBase(),

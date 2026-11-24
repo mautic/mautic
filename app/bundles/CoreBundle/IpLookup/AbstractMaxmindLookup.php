@@ -28,7 +28,7 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
     /**
      * @return string
      */
-    protected function getUrl()
+    protected function getUrl(): string
     {
         $url = 'https://geoip.maxmind.com/geoip/v2.1/';
 
