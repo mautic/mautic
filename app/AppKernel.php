@@ -17,10 +17,7 @@ class AppKernel extends Kernel
      */
     private $installed;
 
-    /**
-     * @var ParameterLoader|null
-     */
-    private $parameterLoader;
+    private ?\Mautic\CoreBundle\Loader\ParameterLoader $parameterLoader = null;
 
     /**
      * @var string
