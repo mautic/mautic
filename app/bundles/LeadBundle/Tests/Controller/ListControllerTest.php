@@ -24,7 +24,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler         = $this->client->request('GET', '/s/segments');
+        $crawler         = $this->client->request('GET', '/s/segments?tmpl=list&name=lead.list');
         $responseContent = (string) $this->client->getResponse()->getContent();
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('col-leadlist-dateAdded', $responseContent, 'The return must contain the created at date column');
