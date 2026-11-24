@@ -13,7 +13,7 @@ final class Version20190524124819 extends PreUpAssertionMigration
 {
     protected function preUpAssertions(): void
     {
-        $this->skipAssertion(fn (Schema $schema) => $schema->getTable("{$this->prefix}lead_fields")->hasColumn('is_index'), sprintf('Schema includes this migration'));
+        $this->skipAssertion(fn (Schema $schema) => $schema->getTable("{$this->prefix}lead_fields")->hasColumn('is_index'), 'Schema includes this migration');
     }
 
     public function up(Schema $schema): void
