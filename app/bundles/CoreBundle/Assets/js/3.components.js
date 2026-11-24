@@ -196,6 +196,7 @@ document.addEventListener('change', (event) => {
     if (event.target.matches('[data-data-table-select-all]')) {
         table.querySelectorAll('tbody tr:not([hidden]) [data-data-table-select]:not(:disabled)').forEach((input) => {
             input.checked = event.target.checked;
+            input.dispatchEvent(new Event('change', {bubbles: false}));
         });
         Mautic.updateDataTableSelection(table);
     } else if (event.target.matches('[data-data-table-select]')) {

@@ -6,12 +6,12 @@
     {%- if value is iterable -%}
         {%- set content -%}
             {%- if value.icon|default('') %}<i class="{{ value.icon|e('html_attr') }} me-8" aria-hidden="true"></i>{% endif -%}
-            {%- if value.html is defined %}{{ value.html|purify }}{% else %}{{ value.label|default('') }}{% endif -%}
+            {%- if value.trustedHtml is defined %}{{ value.trustedHtml }}{% elseif value.html is defined %}{{ value.html|purify }}{% else %}{{ value.label|default('') }}{% endif -%}
         {%- endset -%}
         {%- if value.href|default('') -%}
             <a href="{{ value.href|e('html_attr') }}"{% if value.className|default('') %} class="{{ value.className|e('html_attr') }}"{% endif %}{{ _self.attributes(value.attr) }}>{{ content }}</a>
-        {%- elseif value.className|default('') -%}
-            <span class="{{ value.className|e('html_attr') }}">{{ content }}</span>
+        {%- elseif value.className|default('') or value.attr|default([]) is not empty -%}
+            <span{% if value.className|default('') %} class="{{ value.className|e('html_attr') }}"{% endif %}{{ _self.attributes(value.attr) }}>{{ content }}</span>
         {%- else -%}
             {{ content }}
         {%- endif -%}
@@ -38,7 +38,7 @@
 {% set toolbarActions = toolbarActions|default([]) %}
 {% set batchActions = batchActions|default([]) %}
 {% set baseId = (id|default('data-table-' ~ random()))|replace({' ': '-', '[': '-', ']': '', '.': '-'}) %}
-{% set hasRowActions = rows|filter(row => row.actions|default([]) is not empty)|length > 0 %}
+{% set hasRowActions = rows|filter(row => row.actions|default([]) is not empty or row.actionsHtml|default('') is not empty)|length > 0 %}
 {% set columnCount = columns|length + (isExpandable ? 1 : 0) + (selection ? 1 : 0) + (hasRowActions ? 1 : 0) %}
 {% set hasToolbarContent = searchable|default(false) or toolbarActions is not empty %}
 {% set hasToolbar = hasToolbarContent or batchActions is not empty %}
@@ -184,16 +184,18 @@
                             {% endif %}
                             {% if selection %}
                                 <td class="data-table__select-cell">
-                                    <input type="{{ selection == 'multi' ? 'checkbox' : 'radio' }}" class="form-check-input" id="{{ baseId|e('html_attr') }}-select-{{ rowId|e('html_attr') }}" name="{{ (selection == 'multi' ? row.name|default(baseId ~ '-select[]') : baseId ~ '-select')|e('html_attr') }}" value="{{ rowId|e('html_attr') }}" data-data-table-select aria-label="{{ 'mautic.core.data_table.select_row'|trans|e('html_attr') }}"{{ isSelected ? ' checked' : '' }}{{ row.isDisabled|default(false) ? ' disabled' : '' }}>
+                                    <input type="{{ selection == 'multi' ? 'checkbox' : 'radio' }}" class="form-check-input{{ row.selectionClassName|default('') ? ' ' ~ row.selectionClassName|e('html_attr') : '' }}" id="{{ baseId|e('html_attr') }}-select-{{ rowId|e('html_attr') }}" name="{{ (selection == 'multi' ? row.name|default(baseId ~ '-select[]') : baseId ~ '-select')|e('html_attr') }}" value="{{ rowId|e('html_attr') }}" data-data-table-select aria-label="{{ 'mautic.core.data_table.select_row'|trans|e('html_attr') }}"{{ isSelected ? ' checked' : '' }}{{ row.isDisabled|default(false) ? ' disabled' : '' }}>
                                 </td>
                             {% endif %}
                             {% for column in columns %}
                                 {% set value = row.cells[column.key] ?? null %}
-                                <td headers="{{ baseId|e('html_attr') }}-header-{{ column.key|e('html_attr') }}"{% if column.align|default('start') == 'end' %} class="data-table__cell--end"{% endif %} data-sort-value="{{ _self.sortValue(value)|e('html_attr') }}">{{ _self.cell(value) }}</td>
+                                <td headers="{{ baseId|e('html_attr') }}-header-{{ column.key|e('html_attr') }}"{% set cellClasses = (column.align|default('start') == 'end' ? ['data-table__cell--end'] : [])|merge(column.className|default('') ? [column.className] : []) %}{% if cellClasses %} class="{{ cellClasses|join(' ')|e('html_attr') }}"{% endif %} data-sort-value="{{ _self.sortValue(value)|e('html_attr') }}">{{ _self.cell(value) }}</td>
                             {% endfor %}
                             {% if hasRowActions %}
                                 <td class="data-table__actions-cell">
-                                    {% if row.actions|default([]) is not empty %}
+                                    {% if row.actionsHtml|default('') %}
+                                        {{ row.actionsHtml }}
+                                    {% elseif row.actions|default([]) is not empty %}
                                         <div class="dropdown">
                                             <button type="button" class="btn btn-ghost btn--icon-only btn-sm btn-nospin" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" aria-label="{{ 'mautic.core.actions'|trans|e('html_attr') }}">
                                                 <i class="ri-more-2-fill" aria-hidden="true"></i>
