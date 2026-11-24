@@ -344,7 +344,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
                 if (null !== $handle) {
                     $this->csvExporter->export($reportDataResult, $handle, $page);
 
-                    return;
+                    return null;
                 }
 
                 $response = new StreamedResponse(

@@ -319,6 +319,7 @@ final class CampaignApiController extends CommonApiController
         if (Request::METHOD_PUT === $method && [] !== $deletedEvents) {
             $this->eventModel->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
         }
+        return null;
     }
 
     /**
