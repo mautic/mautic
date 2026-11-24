@@ -69,7 +69,7 @@ final readonly class NotificationHelper
                 },';
             }
 
-            $oneSignalInit = <<<JS
+            $oneSignalInit = <<<JS_WRAP
 var scrpt = document.createElement('link');
 scrpt.rel ='manifest';
 scrpt.href ='/manifest.json';
@@ -116,7 +116,7 @@ OneSignal.push(function() {
         });
     };
 });
-JS;
+JS_WRAP;
 
             if (!$https && $notificationSubdomainName) {
                 $oneSignalInit .= <<<'JS'
