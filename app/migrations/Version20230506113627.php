@@ -12,7 +12,7 @@ final class Version20230506113627 extends PreUpAssertionMigration
     protected const TABLE_NAME = 'message_queue';
     protected const INDEX_NAME = 'message_queue_date_published';
 
-    protected function preUpAssertions(): void
+    public function preUpAssertions(): void
     {
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
         $indexName = $this->getPrefixedIndexName(self::INDEX_NAME);

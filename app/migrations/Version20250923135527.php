@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250923135527 extends PreUpAssertionMigration
@@ -44,7 +45,12 @@ final class Version20250923135527 extends PreUpAssertionMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP FOREIGN KEY '.self::CONSTRAINT_NAME);
+        $table = $this->getPrefixedTableName();
+        if (DatabasePlatform::isPostgreSQL($this->connection->getDatabasePlatform())) {
+            $this->addSql("ALTER TABLE $table DROP CONSTRAINT IF EXISTS ".self::CONSTRAINT_NAME);
+        } else {
+            $this->addSql("ALTER TABLE $table DROP FOREIGN KEY ".self::CONSTRAINT_NAME);
+        }
 
         $this->dropIndex(
             $this->getPrefixedTableName(),

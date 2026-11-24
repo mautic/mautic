@@ -12,7 +12,7 @@ final class Version20230506113422 extends PreUpAssertionMigration
     protected const TABLE_NAME = 'dynamic_content_stats';
     protected const INDEX_NAME = 'stat_dynamic_content_date_sent';
 
-    protected function preUpAssertions(): void
+    public function preUpAssertions(): void
     {
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
         $indexName = $this->getPrefixedIndexName(self::INDEX_NAME);

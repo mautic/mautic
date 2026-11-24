@@ -12,7 +12,7 @@ final class Version20230506113731 extends PreUpAssertionMigration
     protected const TABLE_NAME = 'lead_stages_change_log';
     protected const INDEX_NAME = 'lead_stages_change_log_date_added';
 
-    protected function preUpAssertions(): void
+    public function preUpAssertions(): void
     {
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
         $indexName = $this->getPrefixedIndexName(self::INDEX_NAME);

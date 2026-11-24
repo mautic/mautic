@@ -63,10 +63,9 @@ final class Version20250804003400 extends AbstractMauticMigration
             unset($filter);
 
             if ($changed) {
-                $this->connection->update(
-                    $table,
-                    ['filters' => serialize($filters)],
-                    ['id'      => (int) $listData['id']]
+                $this->addSql(
+                    sprintf('UPDATE %s SET filters = ? WHERE id = ?', $table),
+                    [serialize($filters), (int) $listData['id']]
                 );
             }
         }
@@ -100,10 +99,9 @@ final class Version20250804003400 extends AbstractMauticMigration
             unset($filter);
 
             if ($changed) {
-                $this->connection->update(
-                    $table,
-                    ['filters' => serialize($filters)],
-                    ['id'      => (int) $listData['id']]
+                $this->addSql(
+                    sprintf('UPDATE %s SET filters = ? WHERE id = ?', $table),
+                    [serialize($filters), (int) $listData['id']]
                 );
             }
         }

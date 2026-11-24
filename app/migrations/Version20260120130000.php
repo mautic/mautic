@@ -29,7 +29,7 @@ final class Version20260120130000 extends AbstractMauticMigration
         $functions = [
             // date_format emulation
             "CREATE OR REPLACE FUNCTION date_format(tz timestamp with time zone, fmt text)
-             RETURNS text LANGUAGE plpgsql IMMUTABLE AS \$\$
+             RETURNS text LANGUAGE plpgsql STABLE AS \$\$
              DECLARE
                  f text := fmt;
              BEGIN
@@ -37,8 +37,8 @@ final class Version20260120130000 extends AbstractMauticMigration
                  f := REPLACE(f, '%Y', 'YYYY');
                  f := REPLACE(f, '%y', 'YY');
                  f := REPLACE(f, '%m', 'MM');
-                 f := REPLACE(f, '%c', 'FMMonth');
-                 f := REPLACE(f, '%M', 'Month');
+                 f := REPLACE(f, '%c', 'FMMM');
+                 f := REPLACE(f, '%M', 'FMMonth');
                  f := REPLACE(f, '%b', 'Mon');
                  f := REPLACE(f, '%e', 'FMDD');
                  f := REPLACE(f, '%d', 'DD');
@@ -55,22 +55,23 @@ final class Version20260120130000 extends AbstractMauticMigration
              \$\$;",
 
             // convert_tz
-            'CREATE OR REPLACE FUNCTION convert_tz(dt timestamp with time zone, from_tz text, to_tz text)
-            RETURNS timestamp with time zone LANGUAGE plpgsql IMMUTABLE AS $$
-            DECLARE
-                result timestamptz;
+            "CREATE OR REPLACE FUNCTION convert_tz(dt timestamp with time zone, from_tz text, to_tz text)
+            RETURNS timestamp with time zone LANGUAGE plpgsql STABLE AS \$\$
             BEGIN
-                IF dt IS NULL THEN
+                IF dt IS NULL OR from_tz IS NULL OR to_tz IS NULL THEN
                     RETURN NULL;
                 END IF;
+            
                 BEGIN
-                    result := dt AT TIME ZONE from_tz AT TIME ZONE to_tz;
-                EXCEPTION WHEN invalid_parameter_value THEN
+                    -- Works identically for named zones ('America/New_York'),
+                    -- offsets ('+02:00'), or any mix of both:
+                    RETURN (((dt AT TIME ZONE 'UTC') AT TIME ZONE from_tz) AT TIME ZONE to_tz) AT TIME ZONE 'UTC';
+            
+                EXCEPTION WHEN invalid_parameter_value OR invalid_text_representation THEN
                     RETURN NULL;
                 END;
-                RETURN result;
-            END;
-            $$',
+            END
+            \$\$",
 
             // ifnull / isnull
             'CREATE OR REPLACE FUNCTION ifnull(a anyelement, b anyelement) RETURNS anyelement LANGUAGE sql IMMUTABLE AS $$SELECT coalesce($1,$2);$$',
@@ -102,7 +103,7 @@ final class Version20260120130000 extends AbstractMauticMigration
              \$\$;",
 
             // from_unixtime / unix_timestamp
-            'CREATE OR REPLACE FUNCTION from_unixtime(ts bigint) RETURNS timestamp with time zone LANGUAGE sql IMMUTABLE AS $$SELECT to_timestamp(ts);$$',
+            'CREATE OR REPLACE FUNCTION from_unixtime(ts bigint) RETURNS timestamp with time zone LANGUAGE sql STABLE AS $$SELECT to_timestamp(ts);$$',
             'CREATE OR REPLACE FUNCTION unix_timestamp(ts timestamp with time zone) RETURNS bigint LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(EPOCH FROM ts)::bigint;$$',
             'CREATE OR REPLACE FUNCTION unix_timestamp() RETURNS bigint LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(EPOCH FROM now())::bigint;$$',
 

@@ -12,7 +12,7 @@ final class Version20230506113812 extends PreUpAssertionMigration
     protected const TABLE_NAME = 'lead_utmtags';
     protected const INDEX_NAME = 'utm_date_added';
 
-    protected function preUpAssertions(): void
+    public function preUpAssertions(): void
     {
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
         $indexName = $this->getPrefixedIndexName(self::INDEX_NAME);
