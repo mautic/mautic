@@ -40,11 +40,11 @@ final readonly class CustomFieldIndex
             $this->updateUniqueIdentifierIndex($leadField);
 
             $modifySchema->executeChanges();
-        } catch (DriverException $e) {
-            if (1069 === $e->getCode() /* ER_TOO_MANY_KEYS */) {
-                $this->logger->warning($e->getMessage());
+        } catch (DriverException $driverException) {
+            if (1069 === $driverException->getCode() /* ER_TOO_MANY_KEYS */) {
+                $this->logger->warning($driverException->getMessage());
             } else {
-                throw $e;
+                throw $driverException;
             }
         }
     }
@@ -67,11 +67,11 @@ final readonly class CustomFieldIndex
             $modifySchema->allowColumn($alias);
 
             $modifySchema->executeChanges();
-        } catch (DriverException $e) {
-            if (1069 === $e->getCode() /* ER_TOO_MANY_KEYS */) {
-                $this->logger->warning($e->getMessage());
+        } catch (DriverException $driverException) {
+            if (1069 === $driverException->getCode() /* ER_TOO_MANY_KEYS */) {
+                $this->logger->warning($driverException->getMessage());
             } else {
-                throw $e;
+                throw $driverException;
             }
         }
     }

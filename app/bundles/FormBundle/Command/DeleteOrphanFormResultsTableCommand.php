@@ -70,9 +70,9 @@ final class DeleteOrphanFormResultsTableCommand extends Command
 
         try {
             $validFormTables = $this->formRepository->getValidFormResultsTable();
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $this->logger->error('An exception occurred in retrieving orphan form results table');
-            $this->logger->error($e->getMessage());
+            $this->logger->error($exception->getMessage());
         }
 
         $tempTables = [];

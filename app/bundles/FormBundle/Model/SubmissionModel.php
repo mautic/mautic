@@ -381,15 +381,15 @@ final class SubmissionModel extends CommonFormModel
         // Now handle post submission actions
         try {
             $this->executeFormActions($submissionEvent);
-        } catch (ValidationException $exception) {
+        } catch (ValidationException $validationException) {
             // The action invalidated the form for whatever reason
             $this->deleteEntity($submission);
 
-            if ($validationErrors = $exception->getViolations()) {
+            if ($validationErrors = $validationException->getViolations()) {
                 return ['errors' => $validationErrors];
             }
 
-            return ['errors' => [$exception->getMessage()]];
+            return ['errors' => [$validationException->getMessage()]];
         }
 
         // update contact fields with transform values
@@ -467,8 +467,8 @@ final class SubmissionModel extends CommonFormModel
         // deleting form submission record in form results table
         try {
             $this->submissionRepository->deleteFormResultsTableRecord($submission);
-        } catch (\Exception $e) {
-            $this->logger->error($e);
+        } catch (\Exception $exception) {
+            $this->logger->error($exception);
         }
 
         parent::deleteEntity($submission);

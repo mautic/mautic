@@ -61,8 +61,8 @@ final class UnusedIpDeleteCommand extends ModeratedCommand
             $limit       = $input->getOption('limit') ?? self::DEFAULT_LIMIT;
             $deletedRows = $this->ipAddressModel->deleteUnusedIpAddresses((int) $limit);
             $output->writeln(sprintf('<info>%s unused IP addresses have been deleted</info>', $deletedRows));
-        } catch (Exception $e) {
-            $output->writeln(sprintf('<error>Deletion of unused IP addresses failed because of database error: %s</error>', $e->getMessage()));
+        } catch (Exception $exception) {
+            $output->writeln(sprintf('<error>Deletion of unused IP addresses failed because of database error: %s</error>', $exception->getMessage()));
             $this->completeRun();
 
             return Command::FAILURE;

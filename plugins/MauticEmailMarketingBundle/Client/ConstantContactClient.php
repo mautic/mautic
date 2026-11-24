@@ -83,8 +83,8 @@ readonly class ConstantContactClient
         try {
             $response = $this->httpClient->request($method, sprintf('https://api.constantcontact.com/%s/%s', self::VERSION, $endpoint), $options);
             $data     = $response->toArray(false);
-        } catch (ExceptionInterface $e) {
-            throw new ApiException($e->getMessage(), 0, $e);
+        } catch (ExceptionInterface $exception) {
+            throw new ApiException($exception->getMessage(), 0, $exception);
         }
 
         if (!empty($data[0]['error_message'])) {

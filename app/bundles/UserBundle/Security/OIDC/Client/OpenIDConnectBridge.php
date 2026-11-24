@@ -53,8 +53,8 @@ final class OpenIDConnectBridge extends OpenIDConnectClient implements ClientBri
     {
         try {
             return parent::authenticate();
-        } catch (OpenIDConnectClientException $e) {
-            throw new OidcAuthorizationException($e->getMessage(), $e->getCode(), $e);
+        } catch (OpenIDConnectClientException $openidConnectClientException) {
+            throw new OidcAuthorizationException($openidConnectClientException->getMessage(), $openidConnectClientException->getCode(), $openidConnectClientException);
         }
     }
 
@@ -67,8 +67,8 @@ final class OpenIDConnectBridge extends OpenIDConnectClient implements ClientBri
     {
         try {
             return parent::requestUserInfo($claim);
-        } catch (OpenIDConnectClientException $e) {
-            throw new OidcAuthorizationException($e->getMessage(), $e->getCode(), $e);
+        } catch (OpenIDConnectClientException $openidConnectClientException) {
+            throw new OidcAuthorizationException($openidConnectClientException->getMessage(), $openidConnectClientException->getCode(), $openidConnectClientException);
         }
     }
 
@@ -99,8 +99,8 @@ final class OpenIDConnectBridge extends OpenIDConnectClient implements ClientBri
             $this->getProviderConfigValue('authorization_endpoint');
 
             return null;
-        } catch (OpenIDConnectClientException $e) {
-            return $e->getMessage();
+        } catch (OpenIDConnectClientException $openidConnectClientException) {
+            return $openidConnectClientException->getMessage();
         }
     }
 

@@ -22,8 +22,8 @@ final readonly class ChannelExtension
     {
         try {
             return $this->dncReasonHelper->toText($reasonId);
-        } catch (UnknownDncReasonException $e) {
-            return $e->getMessage();
+        } catch (UnknownDncReasonException $unknownDncReasonException) {
+            return $unknownDncReasonException->getMessage();
         }
     }
 

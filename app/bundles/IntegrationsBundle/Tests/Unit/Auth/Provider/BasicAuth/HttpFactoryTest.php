@@ -112,8 +112,8 @@ final class HttpFactoryTest extends TestCase
         try {
             // Triggering an exception so we can extract the request
             $client->request('get', 'http://foobar.invalid/test');
-        } catch (ConnectException $exception) {
-            $headers = $exception->getRequest()->getHeaders();
+        } catch (ConnectException $connectException) {
+            $headers = $connectException->getRequest()->getHeaders();
             $this->assertArrayHasKey('Authorization', $headers);
 
             $this->assertEquals('Basic '.base64_encode('foo:bar'), $headers['Authorization'][0]);

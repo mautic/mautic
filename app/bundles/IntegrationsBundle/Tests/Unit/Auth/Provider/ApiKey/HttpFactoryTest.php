@@ -127,8 +127,8 @@ final class HttpFactoryTest extends TestCase
         try {
             // Triggering an exception so we can extract the request
             $client->request('get', 'http://foobar.invalid/test');
-        } catch (ConnectException $exception) {
-            $query = $exception->getRequest()->getUri()->getQuery();
+        } catch (ConnectException $connectException) {
+            $query = $connectException->getRequest()->getUri()->getQuery();
             $this->assertEquals('abc=123', $query);
         }
     }

@@ -92,11 +92,11 @@ final class CampaignMembershipFunctionalTest extends MauticMysqlTestCase
         try {
             // Regression path: campaign action add-to-campaign re-adds with manual=true.
             $adder->updateExistingMembership($campaignLeadEntity, true);
-        } catch (ContactCannotBeAddedToCampaignException $e) {
+        } catch (ContactCannotBeAddedToCampaignException $contactCannotBeAddedToCampaignException) {
             $didThrow = true;
             $this->assertStringContainsString(
                 'cannot restart',
-                $e->getMessage()
+                $contactCannotBeAddedToCampaignException->getMessage()
             );
         }
 

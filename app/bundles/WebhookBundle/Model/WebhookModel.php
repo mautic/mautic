@@ -328,14 +328,14 @@ final class WebhookModel extends FormModel
 
                 throw new ErrorException($webhook->getWebhookUrl().' returned '.$responseStatusCode.' with payload: '.json_encode($payload));
             }
-        } catch (Exception $e) {
-            $message = $e->getMessage();
+        } catch (Exception $exception) {
+            $message = $exception->getMessage();
             if ($this->isSick($webhook)) {
                 if (!$this->disableAutoUnpublish && !$webhook->wasModifiedRecently()) {
                     $this->killWebhook($webhook);
                     $message .= ' '.$this->translator->trans('mautic.webhook.killed', ['%limit%' => $this->disableLimit]);
                 }
-                $this->markWebhookUnHealthy($webhook, $e->getMessage());
+                $this->markWebhookUnHealthy($webhook, $exception->getMessage());
             } else {
                 $this->markWebhookHealthy($webhook);
             }

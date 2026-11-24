@@ -717,8 +717,8 @@ final class AssetController extends AbstractStandardFormController
             $zipPath            = $archiveBuilder->buildArchive($downloadableAssets);
 
             return $batchDownloadResponder->createResponse($zipPath);
-        } catch (BatchDownloadException $e) {
-            return $this->createBatchDownloadErrorResponse($e->getMessage());
+        } catch (BatchDownloadException $batchDownloadException) {
+            return $this->createBatchDownloadErrorResponse($batchDownloadException->getMessage());
         }
     }
 

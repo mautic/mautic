@@ -21,8 +21,8 @@ final class FileManagerController extends AjaxController
     {
         try {
             $response = $this->sendJsonResponse(['data'=> $fileManager->uploadFiles($request)]);
-        } catch (FileUploadException $error) {
-            return new Response($error->getMessage(), Response::HTTP_BAD_REQUEST);
+        } catch (FileUploadException $fileUploadException) {
+            return new Response($fileUploadException->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
         return $response;

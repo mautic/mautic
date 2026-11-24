@@ -191,7 +191,7 @@ final class ImportController extends AbstractStandardFormController
     {
         try {
             $initEvent = $this->dispatchImportOnInit();
-        } catch (AccessDeniedException $e) {
+        } catch (AccessDeniedException $accessDeniedException) {
             $this->throwAccessDenied();
         }
 
@@ -251,10 +251,10 @@ final class ImportController extends AbstractStandardFormController
                             'line_count_limit' => $this->getLineCountLimit(),
                         ]
                     );
-                } catch (LogicException $e) {
+                } catch (LogicException $accessDeniedException) {
                     $this->resetImport($object);
                     $this->removeImportFile($fullPath);
-                    $this->logger->log(LogLevel::INFO, "Import for file {$fullPath} failed with: {$e->getMessage()}.");
+                    $this->logger->log(LogLevel::INFO, "Import for file {$fullPath} failed with: {$accessDeniedException->getMessage()}.");
 
                     return $this->newAction($request, true);
                 }
@@ -367,8 +367,8 @@ final class ImportController extends AbstractStandardFormController
 
                                     return $this->newAction($request, true);
                                 }
-                            } catch (FileException $e) {
-                                if (str_contains($e->getMessage(), 'upload_max_filesize')) {
+                            } catch (FileException $accessDeniedException) {
+                                if (str_contains($accessDeniedException->getMessage(), 'upload_max_filesize')) {
                                     $errorMessage    = 'mautic.lead.import.filetoolarge';
                                     $errorParameters = [
                                         '%upload_max_filesize%' => ini_get('upload_max_filesize'),

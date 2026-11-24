@@ -89,8 +89,8 @@ class IcontactIntegration extends BasicIntegration implements BasicInterface, Pu
 
         try {
             $this->client->subscribe($this->getIntegrationConfiguration()->getApiKeys(), (string) $listSettings['list'], $data);
-        } catch (ApiException $e) {
-            throw new PushContactException($e->getMessage(), 0, $e);
+        } catch (ApiException $apiException) {
+            throw new PushContactException($apiException->getMessage(), 0, $apiException);
         }
     }
 }

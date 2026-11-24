@@ -65,16 +65,16 @@ final class RealTimeExecutioner
 
         try {
             $this->fetchCurrentContact();
-        } catch (CampaignNotExecutableException $exception) {
-            $this->logger->debug('CAMPAIGN: '.$exception->getMessage());
+        } catch (CampaignNotExecutableException $campaignNotExecutableException) {
+            $this->logger->debug('CAMPAIGN: '.$campaignNotExecutableException->getMessage());
 
             return $this->responses;
         }
 
         try {
             $this->fetchCampaignData($type);
-        } catch (CampaignNotExecutableException $exception) {
-            $this->logger->debug('CAMPAIGN: '.$exception->getMessage());
+        } catch (CampaignNotExecutableException $campaignNotExecutableException) {
+            $this->logger->debug('CAMPAIGN: '.$campaignNotExecutableException->getMessage());
 
             return $this->responses;
         }
@@ -85,8 +85,8 @@ final class RealTimeExecutioner
 
             try {
                 $this->evaluateDecisionForContact($event, $passthrough, $channel, $channelId);
-            } catch (DecisionNotApplicableException $exception) {
-                $this->logger->debug('CAMPAIGN: Event ID '.$event->getId().' is not applicable ('.$exception->getMessage().')');
+            } catch (DecisionNotApplicableException $campaignNotExecutableException) {
+                $this->logger->debug('CAMPAIGN: Event ID '.$event->getId().' is not applicable ('.$campaignNotExecutableException->getMessage().')');
 
                 continue;
             }

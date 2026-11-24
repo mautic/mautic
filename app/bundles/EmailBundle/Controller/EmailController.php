@@ -1206,11 +1206,11 @@ final class EmailController extends AbstractStandardFormController
                 $postActionVars['viewParameters']
             );
             $postActionVars['contentTemplate'] = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
-        } catch (InvalidRenderedHtmlException $e) {
+        } catch (InvalidRenderedHtmlException $invalidRenderedHtmlException) {
             $postActionVars['flashes'] = [
                 [
                     'type' => 'error',
-                    'msg'  => $e->getMessage(),
+                    'msg'  => $invalidRenderedHtmlException->getMessage(),
                 ],
             ];
         }

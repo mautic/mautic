@@ -160,10 +160,10 @@ final class ThemeController extends AbstractFormController
 
         try {
             $zipPath = $themeHelper->zip($themeName);
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $flashes[] = [
                 'type' => 'error',
-                'msg'  => $e->getMessage(),
+                'msg'  => $exception->getMessage(),
             ];
             $error = true;
         }

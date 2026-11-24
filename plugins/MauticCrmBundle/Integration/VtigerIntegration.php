@@ -186,11 +186,11 @@ final class VtigerIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
 
             if (!$silenceExceptions) {
-                throw $e;
+                throw $exception;
             }
         }
 

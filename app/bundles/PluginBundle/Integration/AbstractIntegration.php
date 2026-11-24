@@ -797,15 +797,15 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     ]);
                     break;
             }
-        } catch (RequestException $exception) {
+        } catch (RequestException $requestException) {
             if (!empty($settings['return_raw'])) {
-                return $exception->getResponse();
+                return $requestException->getResponse();
             }
 
             return [
                 'error' => [
-                    'message' => $exception->getResponse()->getBody()->getContents(),
-                    'code'    => $exception->getCode(),
+                    'message' => $requestException->getResponse()->getBody()->getContents(),
+                    'code'    => $requestException->getCode(),
                 ],
             ];
         }

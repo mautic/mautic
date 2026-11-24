@@ -211,16 +211,16 @@ class ImportModel extends FormModel
             if (!$this->process($import, $progress, $limit)) {
                 throw new ImportFailedException($import->getStatusInfo());
             }
-        } catch (ORMException $e) {
+        } catch (ORMException $ormException) {
             // The EntityManager is probably closed. The entity cannot be saved.
             $info = $this->translator->trans(
                 'mautic.lead.import.database.exception',
-                ['%message%' => $e->getMessage()]
+                ['%message%' => $ormException->getMessage()]
             );
 
             $import->setStatus($import::DELAYED)->setStatusInfo($info);
 
-            throw new ImportFailedException('Database had been overloaded', $e->getCode(), $e);
+            throw new ImportFailedException('Database had been overloaded', $ormException->getCode(), $ormException);
         }
 
         $import->end();
@@ -260,8 +260,8 @@ class ImportModel extends FormModel
     {
         try {
             $file = new \SplFileObject($import->getFilePath());
-        } catch (\Exception $e) {
-            $import->setStatusInfo('SplFileObject cannot read the file. '.$e->getMessage());
+        } catch (\Exception $exception) {
+            $import->setStatusInfo('SplFileObject cannot read the file. '.$exception->getMessage());
             $import->setStatus(Import::FAILED);
             $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
 
@@ -332,9 +332,9 @@ class ImportModel extends FormModel
                         $this->logDebug('Entity on line '.$lineNumber.' has been created', $import);
                         $import->increaseInsertedCount();
                     }
-                } catch (\Exception $e) {
+                } catch (\Exception $exception) {
                     // Email validation likely failed
-                    $errorMessage = $e->getMessage();
+                    $errorMessage = $exception->getMessage();
                 }
             }
 

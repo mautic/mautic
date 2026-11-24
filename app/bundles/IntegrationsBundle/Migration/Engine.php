@@ -28,7 +28,7 @@ final readonly class Engine
     {
         try {
             $migrationClasses = $this->getMigrationClasses();
-        } catch (PathNotFoundException $e) {
+        } catch (PathNotFoundException $pathNotFoundException) {
             return;
         }
 
@@ -54,10 +54,10 @@ final readonly class Engine
             if (!$connection instanceof \PDO || $connection->inTransaction()) {
                 $this->entityManager->commit();
             }
-        } catch (Exception $e) {
+        } catch (Exception $pathNotFoundException) {
             $this->entityManager->rollback();
 
-            throw $e;
+            throw $pathNotFoundException;
         }
     }
 

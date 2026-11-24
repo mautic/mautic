@@ -60,8 +60,8 @@ final class FileUploader
             } catch (FileException) {
                 throw new FileUploadException($this->translator->trans('mautic.core.fileuploader.upload_error'));
             }
-        } catch (FilePathException $e) {
-            throw new FileUploadException($e->getMessage(), $e->getCode(), $e);
+        } catch (FilePathException $filePathException) {
+            throw new FileUploadException($filePathException->getMessage(), $filePathException->getCode(), $filePathException);
         }
     }
 

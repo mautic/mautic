@@ -305,11 +305,11 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
 
             if (!$silenceExceptions) {
-                throw $e;
+                throw $exception;
             }
         }
 
@@ -743,12 +743,12 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                 // Return success if any Contact or Lead was updated or created
                 return ($personFound) ? $people : false;
             }
-        } catch (Exception $e) {
-            if ($e instanceof ApiErrorException) {
-                $e->setContact($lead);
+        } catch (Exception $exception) {
+            if ($exception instanceof ApiErrorException) {
+                $exception->setContact($lead);
             }
 
-            $this->logIntegrationError($e);
+            $this->logIntegrationError($exception);
         }
 
         return false;
@@ -814,8 +814,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                 // Return success if any company was updated or created
                 return $companies;
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return false;
@@ -870,10 +870,10 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                     $progress->finish();
                 }
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
 
-            $this->failureFetchingLeads = $e->getMessage();
+            $this->failureFetchingLeads = $exception->getMessage();
         }
 
         $this->logger->debug('SALESFORCE: '.$this->getApiHelper()->getRequestCounter().' API requests made for getLeads: '.$object);
@@ -1288,8 +1288,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         $campaigns = [];
         try {
             $campaigns = $this->getApiHelper()->getCampaigns();
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $campaigns;
@@ -1444,8 +1444,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         $campaignMemberStatus = [];
         try {
             $campaignMemberStatus = $this->getApiHelper()->getCampaignMemberStatus($campaignId);
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $campaignMemberStatus;

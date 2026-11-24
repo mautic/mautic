@@ -27,14 +27,14 @@ final readonly class FileUploadValidator
 
         try {
             $this->checkExtension($fileExtension, $allowedExtensions, $extensionErrorMsg);
-        } catch (FileInvalidException $e) {
-            $errors[] = $e->getMessage();
+        } catch (FileInvalidException $fileInvalidException) {
+            $errors[] = $fileInvalidException->getMessage();
         }
 
         try {
             $this->checkFileSize($fileSize, $maxUploadSize, $sizeErrorMsg);
-        } catch (FileInvalidException $e) {
-            $errors[] = $e->getMessage();
+        } catch (FileInvalidException $fileInvalidException) {
+            $errors[] = $fileInvalidException->getMessage();
         }
 
         if ([] !== $errors) {

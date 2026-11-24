@@ -64,8 +64,8 @@ final readonly class CampaignSubscriber
         try {
             $this->leadModel->changeStage($log->getLead(), $stage, $log->getEvent()->getName());
             $pendingEvent->pass($log);
-        } catch (UnexpectedValueException $exception) {
-            $pendingEvent->passWithError($log, $exception->getMessage());
+        } catch (UnexpectedValueException $unexpectedValueException) {
+            $pendingEvent->passWithError($log, $unexpectedValueException->getMessage());
         }
     }
 }

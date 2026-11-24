@@ -51,11 +51,11 @@ final class StatsApiController extends CommonApiController
                 $response['total']    = $results['total'];
                 $response[$itemsName] = $results['results'];
             }
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $response['errors'] = [
                 [
-                    'message' => $e->getMessage(),
-                    'code'    => $e->getCode(),
+                    'message' => $exception->getMessage(),
+                    'code'    => $exception->getCode(),
                 ],
             ];
         }

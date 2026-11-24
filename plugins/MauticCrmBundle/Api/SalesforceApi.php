@@ -662,10 +662,10 @@ final class SalesforceApi extends CrmApi
         try {
             $leadsQuery = sprintf($baseQuery, implode(', ', $fields));
             $response   = $this->request('queryAll', ['q' => $leadsQuery], 'GET', $isRetry, null, $queryUrl);
-        } catch (ApiErrorException $e) {
-            [$missingField, $entityType] = $this->parseMissingField($e->getMessage());
+        } catch (ApiErrorException $apiErrorException) {
+            [$missingField, $entityType] = $this->parseMissingField($apiErrorException->getMessage());
             if (!$missingField) {
-                throw $e;
+                throw $apiErrorException;
             }
             if ('HasOptedOutOfEmail' == $missingField) {
                 // Unset field as it is not accessible

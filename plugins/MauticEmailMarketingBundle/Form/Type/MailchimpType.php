@@ -38,9 +38,9 @@ final class MailchimpType extends AbstractType
         try {
             $lists = $this->client->getLists($keys);
             asort($lists);
-        } catch (ApiException $e) {
+        } catch (ApiException $apiException) {
             $lists = [];
-            $error = $e->getMessage();
+            $error = $apiException->getMessage();
         }
 
         $listSettings = $builder->create('list_settings', FormType::class, ['label' => false]);
@@ -99,8 +99,8 @@ final class MailchimpType extends AbstractType
 
         try {
             $fields = $this->client->getMergeFields($keys, $listId);
-        } catch (ApiException $e) {
-            $form->get('list_settings')->get('list')->addError(new FormError($e->getMessage()));
+        } catch (ApiException $apiException) {
+            $form->get('list_settings')->get('list')->addError(new FormError($apiException->getMessage()));
 
             return;
         }

@@ -45,14 +45,14 @@ final class MembershipBuilder
 
         try {
             $contactsProcessed += $this->addNewlyQualifiedMembers($contactsProcessed);
-        } catch (RunLimitReachedException $exception) {
-            return $exception->getContactsProcessed();
+        } catch (RunLimitReachedException $runLimitReachedException) {
+            return $runLimitReachedException->getContactsProcessed();
         }
 
         try {
             $contactsProcessed += $this->removeUnqualifiedMembers($contactsProcessed);
-        } catch (RunLimitReachedException $exception) {
-            return $exception->getContactsProcessed();
+        } catch (RunLimitReachedException $runLimitReachedException) {
+            return $runLimitReachedException->getContactsProcessed();
         }
 
         return $contactsProcessed;

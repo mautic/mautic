@@ -128,10 +128,10 @@ class TagModel extends FormModel
             $this->deleteEntity($secondaryTag);
             $this->dispatcher->dispatch(new TagPostMergeEvent($primaryTag, $secondaryTag));
             $this->em->commit();
-        } catch (\Throwable $exception) {
+        } catch (\Throwable $throwable) {
             $this->em->rollback();
 
-            throw $exception;
+            throw $throwable;
         }
 
         return $primaryTag;

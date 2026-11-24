@@ -382,8 +382,8 @@ final class CampaignSubscriber
                 }
             }
             $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $tokenizedValues), false);
-        } catch (ImportFailedException $e) {
-            $event->fail($log, $e->getMessage());
+        } catch (ImportFailedException $importFailedException) {
+            $event->fail($log, $importFailedException->getMessage());
         }
 
         foreach ($values as $alias => $value) {

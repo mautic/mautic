@@ -319,15 +319,15 @@ final readonly class ContactSegmentService
             $end = microtime(true) - $start;
 
             $this->logger->debug('Segment QB: Query took: '.$this->formatPeriod($end).', Result count: '.count($result), ['segmentId' => $segmentId]);
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             $this->logger->error(
-                'Segment QB: Query Exception: '.$e->getMessage(),
+                'Segment QB: Query Exception: '.$exception->getMessage(),
                 [
                     'query'      => $qb->getSQL(),
                     'parameters' => $qb->getParameters(),
                 ]
             );
-            throw $e;
+            throw $exception;
         }
 
         return $result;
@@ -350,15 +350,15 @@ final readonly class ContactSegmentService
                 'Segment QB: Query took: '.$this->formatPeriod($end).'ms. Result count: '.count($result),
                 ['segmentId' => $segmentId]
             );
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             $this->logger->error(
-                'Segment QB: Query Exception: '.$e->getMessage(),
+                'Segment QB: Query Exception: '.$exception->getMessage(),
                 [
                     'query'      => $qb->getSQL(),
                     'parameters' => $qb->getParameters(),
                 ]
             );
-            throw $e;
+            throw $exception;
         }
 
         return $result;

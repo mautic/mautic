@@ -44,8 +44,8 @@ final class SalesforceApiTest extends TestCase
             $api->request('/test');
 
             $this->fail('ApiErrorException not thrown');
-        } catch (ApiErrorException $exception) {
-            $this->assertSame($message, $exception->getMessage());
+        } catch (ApiErrorException $apiErrorException) {
+            $this->assertSame($message, $apiErrorException->getMessage());
         }
     }
 
@@ -104,8 +104,8 @@ final class SalesforceApiTest extends TestCase
         try {
             $api->request('/test');
             $this->fail('ApiErrorException not thrown');
-        } catch (ApiErrorException $exception) {
-            $this->assertSame($message, $exception->getMessage());
+        } catch (ApiErrorException $apiErrorException) {
+            $this->assertSame($message, $apiErrorException->getMessage());
         }
     }
 
@@ -165,8 +165,8 @@ final class SalesforceApiTest extends TestCase
             $api->request('/test');
 
             $this->fail('ApiErrorException not thrown');
-        } catch (ApiErrorException $exception) {
-            $this->assertSame($message, $exception->getMessage());
+        } catch (ApiErrorException $apiErrorException) {
+            $this->assertSame($message, $apiErrorException->getMessage());
         }
     }
 

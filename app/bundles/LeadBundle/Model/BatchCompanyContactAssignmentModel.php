@@ -300,10 +300,10 @@ final readonly class BatchCompanyContactAssignmentModel
     {
         try {
             $this->logContactCompanyAssignments($contact, $addedCompanyIds, $companiesById, $eventName);
-        } catch (\Throwable $e) {
+        } catch (\Throwable $throwable) {
             $this->logger->error(
                 'Failed to log company assignment for contact {contactId}: {message}',
-                ['contactId' => $contact->getId(), 'message' => $e->getMessage(), 'exception' => $e]
+                ['contactId' => $contact->getId(), 'message' => $throwable->getMessage(), 'exception' => $throwable]
             );
         }
     }

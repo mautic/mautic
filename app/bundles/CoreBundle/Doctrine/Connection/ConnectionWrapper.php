@@ -44,11 +44,11 @@ final class ConnectionWrapper extends Connection
     {
         try {
             return parent::getServerVersion();
-        } catch (Exception $originalException) {
+        } catch (Exception $exception) {
             $params = $this->getParams();
 
             if (!isset($params['dbname'])) {
-                throw $originalException;
+                throw $exception;
             }
 
             unset($params['dbname']);
@@ -58,7 +58,7 @@ final class ConnectionWrapper extends Connection
             } catch (\Throwable) {
                 // the server is unreachable for another reason, or the driver cannot connect
                 // without a database; report the failure that was asked about
-                throw $originalException;
+                throw $exception;
             }
         }
     }

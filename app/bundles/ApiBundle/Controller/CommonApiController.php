@@ -141,14 +141,14 @@ class CommonApiController extends FetchCommonApiController
 
         try {
             $this->model->deleteEntity($entity);
-        } catch (DeleteEntityDependencyException $e) {
+        } catch (DeleteEntityDependencyException $deleteEntityDependencyException) {
             $msg = $this->translator->trans(
                 'mautic.api.dependent.entity.delete.error',
                 ['%id%'   => $entity->getId()],
                 'validators'
             );
 
-            return $this->returnError($msg, $e->getCode(), $e->getErrors());
+            return $this->returnError($msg, $deleteEntityDependencyException->getCode(), $deleteEntityDependencyException->getErrors());
         }
         $this->preSerializeEntity($entity);
         $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK);

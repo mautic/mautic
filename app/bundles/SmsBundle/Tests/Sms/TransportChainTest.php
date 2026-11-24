@@ -80,8 +80,8 @@ final class TransportChainTest extends MauticMysqlTestCase
 
         try {
             $this->transportChain->sendSms($lead, 'Yeah');
-        } catch (\Exception $e) {
-            $message = $e->getMessage();
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
             $this->assertSame('Primary SMS transport is not enabled', $message);
         }
     }

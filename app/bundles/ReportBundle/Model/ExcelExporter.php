@@ -68,8 +68,8 @@ final readonly class ExcelExporter
             $objWriter->setPreCalculateFormulas(false);
 
             $objWriter->save($output);
-        } catch (Exception $e) {
-            throw new \Exception('PHPSpreadsheet Error', 0, $e);
+        } catch (Exception $exception) {
+            throw new \Exception('PHPSpreadsheet Error', 0, $exception);
         }
     }
 

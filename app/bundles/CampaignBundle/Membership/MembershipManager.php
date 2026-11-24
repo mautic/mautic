@@ -155,12 +155,12 @@ final class MembershipManager
 
             // Notify listeners
             $this->eventDispatcher->dispatchMembershipChange($contact, $campaign, Remover::NAME);
-        } catch (ContactAlreadyRemovedFromCampaignException $exception) {
+        } catch (ContactAlreadyRemovedFromCampaignException $contactAlreadyRemovedFromCampaignException) {
             // Do nothing
 
             $this->logger->debug(
                 "CAMPAIGN: Contact ID {$contact->getId()} was already removed from campaign ID {$campaign->getId()}.",
-                $exception->toArray()
+                $contactAlreadyRemovedFromCampaignException->toArray()
             );
         }
     }

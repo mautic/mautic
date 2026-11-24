@@ -41,8 +41,8 @@ final class MessageOfTheDayCommand extends Command
             }
 
             $this->renderMessage($output, $selectedMessage);
-        } catch (MessageOfTheDayException $e) {
-            $output->writeln('<comment>Skipped MOTD: '.$e->getMessage().'</comment>');
+        } catch (MessageOfTheDayException $messageOfTheDayException) {
+            $output->writeln('<comment>Skipped MOTD: '.$messageOfTheDayException->getMessage().'</comment>');
 
             return Command::SUCCESS;
         }

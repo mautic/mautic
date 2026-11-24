@@ -90,7 +90,7 @@ final class UpdateHelper
             if (!$overrideCache && is_readable($cacheFile)) {
                 return $this->checkCachedUpdateData($cacheFile, $updateStability);
             }
-        } catch (UpdateCacheDataNeedsToBeRefreshedException $exception) {
+        } catch (UpdateCacheDataNeedsToBeRefreshedException $updateCacheDataNeedsToBeRefreshedException) {
             // Fetch a fresh list
         }
 
@@ -110,20 +110,20 @@ final class UpdateHelper
                 'error'   => true,
                 'message' => 'mautic.core.updater.error.fetching.updates',
             ];
-        } catch (RequestException $exception) {
-            if ($exception->getResponse() instanceof ResponseInterface) {
+        } catch (RequestException $updateCacheDataNeedsToBeRefreshedException) {
+            if ($updateCacheDataNeedsToBeRefreshedException->getResponse() instanceof ResponseInterface) {
                 $this->logger->error(
                     sprintf(
                         'UPDATE CHECK: Could not fetch a release list: %s (%s)',
-                        $exception->getResponse()->getStatusCode(),
-                        $exception->getResponse()->getReasonPhrase()
+                        $updateCacheDataNeedsToBeRefreshedException->getResponse()->getStatusCode(),
+                        $updateCacheDataNeedsToBeRefreshedException->getResponse()->getReasonPhrase()
                     )
                 );
             } else {
                 $this->logger->error(
                     sprintf(
                         'UPDATE CHECK: Could not fetch a release list: %s',
-                        $exception->getMessage()
+                        $updateCacheDataNeedsToBeRefreshedException->getMessage()
                     )
                 );
             }
@@ -132,8 +132,8 @@ final class UpdateHelper
                 'error'   => true,
                 'message' => 'mautic.core.updater.error.fetching.updates',
             ];
-        } catch (\Exception $exception) {
-            $this->logger->error(sprintf('UPDATE CHECK: %s', $exception->getMessage()));
+        } catch (\Exception $updateCacheDataNeedsToBeRefreshedException) {
+            $this->logger->error(sprintf('UPDATE CHECK: %s', $updateCacheDataNeedsToBeRefreshedException->getMessage()));
 
             return [
                 'error'   => true,

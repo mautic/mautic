@@ -53,17 +53,17 @@ final readonly class BackgroundService
 
         try {
             $this->fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent($leadField);
-        } catch (NoListenerException $e) {
+        } catch (NoListenerException $noListenerException) {
         }
 
         try {
             $this->customFieldColumn->processCreateLeadColumn($leadField, false);
-        } catch (DriverException|SchemaException|\Mautic\CoreBundle\Exception\SchemaException $e) {
+        } catch (DriverException|SchemaException|\Mautic\CoreBundle\Exception\SchemaException $noListenerException) {
             $this->customFieldNotification->customFieldCannotBeCreated($leadField, $userId);
-            throw $e;
-        } catch (CustomFieldLimitException $e) {
+            throw $noListenerException;
+        } catch (CustomFieldLimitException $noListenerException) {
             $this->customFieldNotification->customFieldLimitWasHit($leadField, $userId);
-            throw $e;
+            throw $noListenerException;
         }
 
         $leadField->setColumnWasCreated();

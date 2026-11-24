@@ -128,8 +128,8 @@ readonly class MailchimpClient
         try {
             $response = $this->httpClient->request($method, sprintf('%s/%s/%s', $apiUrl, self::VERSION, $endpoint), $options);
             $data     = $response->toArray(false);
-        } catch (ExceptionInterface $e) {
-            throw new ApiException($e->getMessage(), 0, $e);
+        } catch (ExceptionInterface $exception) {
+            throw new ApiException($exception->getMessage(), 0, $exception);
         }
 
         if (!empty($data['status']) && 'error' === $data['status']) {

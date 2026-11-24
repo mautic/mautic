@@ -41,8 +41,8 @@ final readonly class UploadFieldValidator
             $this->fileUploadValidator->validate($file->getSize(), $file->getClientOriginalExtension(), $maxUploadSize, $allowedExtensions, 'mautic.form.submission.error.file.extension', 'mautic.form.submission.error.file.size');
 
             return $file;
-        } catch (FileInvalidException $e) {
-            throw new FileValidationException($e->getMessage(), $e->getCode(), $e);
+        } catch (FileInvalidException $fileInvalidException) {
+            throw new FileValidationException($fileInvalidException->getMessage(), $fileInvalidException->getCode(), $fileInvalidException);
         }
     }
 }

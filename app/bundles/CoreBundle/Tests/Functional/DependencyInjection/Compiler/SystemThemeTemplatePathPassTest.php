@@ -26,8 +26,8 @@ final class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
         try {
             // Delete the cache directory
             $filesystem->remove($cacheDir);
-        } catch (IOExceptionInterface $exception) {
-            echo 'An error occurred while deleting the cache directory at '.$exception->getPath();
+        } catch (IOExceptionInterface $ioException) {
+            echo 'An error occurred while deleting the cache directory at '.$ioException->getPath();
         }
 
         // Assert that the cache directory no longer exists

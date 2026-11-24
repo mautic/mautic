@@ -235,8 +235,8 @@ final class EmailApiController extends CommonApiController
     {
         try {
             $replyService->createReplyByHash($trackingHash, "api-{$randomHelper->generate()}");
-        } catch (EntityNotFoundException $e) {
-            return $this->notFound($e->getMessage());
+        } catch (EntityNotFoundException $entityNotFoundException) {
+            return $this->notFound($entityNotFoundException->getMessage());
         }
 
         return $this->handleView(

@@ -434,8 +434,8 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         try {
             self::getContainer()->get(EventDispatcherInterface::class)->dispatch(new EntityImportEvent(Campaign::ENTITY_NAME, $export, null));
             $this->fail('The import with a crafted alias was not rejected.');
-        } catch (InvalidImportAliasException $e) {
-            $this->assertStringContainsString($alias, $e->getMessage());
+        } catch (InvalidImportAliasException $invalidImportAliasException) {
+            $this->assertStringContainsString($alias, $invalidImportAliasException->getMessage());
         }
 
         $this->em->clear();

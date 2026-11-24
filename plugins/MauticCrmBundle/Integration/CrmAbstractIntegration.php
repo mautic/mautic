@@ -77,8 +77,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
                 return true;
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return false;
@@ -96,8 +96,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
                 return $this->amendLeadDataBeforeMauticPopulate($result, $object);
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $executed;

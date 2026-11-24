@@ -145,8 +145,8 @@ final class HSTSMiddlewareTest extends AbstractMauticTestCase
     {
         try {
             return $this->middleware->handle(Request::create('s/login', Request::METHOD_GET));
-        } catch (\Exception $e) {
-            throw new PHPUnitException($e->getMessage());
+        } catch (\Exception $exception) {
+            throw new PHPUnitException($exception->getMessage());
         }
     }
 }

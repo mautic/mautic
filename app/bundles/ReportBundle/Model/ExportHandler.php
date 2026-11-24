@@ -64,8 +64,8 @@ final class ExportHandler
     {
         try {
             $this->filePathResolver->createDirectory($this->dir);
-        } catch (FilePathException $e) {
-            throw new FileIOException('Could not create directory '.$this->dir, 0, $e);
+        } catch (FilePathException $filePathException) {
+            throw new FileIOException('Could not create directory '.$this->dir, 0, $filePathException);
         }
 
         return $this->dir.'/'.$fileName.'.csv';

@@ -176,9 +176,9 @@ final class AjaxController extends CommonAjaxController
 
         try {
             $transport->send($email);
-        } catch (TransportExceptionInterface $e) {
+        } catch (TransportExceptionInterface $transportException) {
             $success = 0;
-            $message = $e->getMessage();
+            $message = $transportException->getMessage();
         }
 
         return $this->sendJsonResponse(['success' => $success, 'message' => $message]);
