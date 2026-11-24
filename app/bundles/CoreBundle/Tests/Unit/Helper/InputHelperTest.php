@@ -173,7 +173,7 @@ final class InputHelperTest extends TestCase
         ];
 
         // PHP 7.3.26 changed behavior for this type of URL but in either case, the <img> tag is sanitized
-        $sanitizedUrl = (\version_compare(PHP_VERSION, '7.3.26', '>=')) ?
+        $sanitizedUrl = (PHP_VERSION_ID >= 70326) ?
             'http://&#60;img&#62;:&#60;img&#62;@www.mautic.org' :
             'http://:@www.mautic.org';
         yield [
