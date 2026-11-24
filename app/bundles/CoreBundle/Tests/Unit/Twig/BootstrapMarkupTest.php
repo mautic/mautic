@@ -151,7 +151,12 @@ final class BootstrapMarkupTest extends TestCase
             ])
         );
 
-        $this->assertCount(1, $render(['attr' => ['readonly' => 'readonly']])->filter('.segmented-control.segmented-control--locked'));
-        $this->assertCount(0, $render([])->filter('.segmented-control--locked'));
+        $locked = $render(['attr' => ['readonly' => 'readonly']]);
+        $this->assertCount(1, $locked->filter('.segmented-control.segmented-control--locked'));
+        $this->assertCount(2, $locked->filter('input.btn-check:disabled'));
+
+        $unlocked = $render([]);
+        $this->assertCount(0, $unlocked->filter('.segmented-control--locked'));
+        $this->assertCount(0, $unlocked->filter('input.btn-check:disabled'));
     }
 }
