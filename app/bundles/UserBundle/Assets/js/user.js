@@ -144,6 +144,7 @@ Mautic.onPermissionChange = function (changedPermission, bundle) {
             });
         });
         mQuery('.' + bundle + '_granted').html(granted);
-        $ratio.find('span').text(granted + ' / ' + $ratio.data('total'));
+        const ratioText = granted + ' / ' + $ratio.data('total');
+        $ratio.attr('aria-label', ratioText).find('span').text(ratioText);
     }
 };

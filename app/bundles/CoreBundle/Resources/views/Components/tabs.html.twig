@@ -5,7 +5,7 @@
 {%- endmacro %}
 
 {% macro tabContent(tab, tabId, isActive, variant, layer) %}
-    <div class="tab-pane fade{% if isActive %} show active{% endif %}{% if tab.className is defined and tab.className %} {{ tab.className|e('html_attr') }}{% endif %}{% if variant in ['contained', 'vertical'] %} layer-{{ layer }}{% endif %}"
+    <div class="tab-pane fade{% if isActive %} show active{% endif %}{% if tab.className is defined and tab.className %} {{ tab.className|e('html_attr') }}{% endif %}{% if variant in ['contained', 'vertical'] %} layer-{{ layer|e('html_attr') }}{% endif %}"
          id="{{ tabId|e('html_attr') }}"
          {%- for attrName, attrValue in tab.paneAttributes|default({}) %} {{ attrName }}="{{ attrValue|e('html_attr') }}"{% endfor %}
          role="tabpanel"
