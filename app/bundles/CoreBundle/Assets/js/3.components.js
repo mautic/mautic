@@ -30,6 +30,7 @@ Mautic.initDataTable = function (container) {
     mQuery(container).find('[data-data-table]').addBack('[data-data-table]').each(function () {
         Mautic.updateDataTableSelection(this);
         Mautic.updateDataTableZebra(this);
+        Mautic.updateDataTableExpandAll(this);
     });
 };
 
@@ -60,7 +61,7 @@ Mautic.setDataTableRowExpanded = function (table, row, expanded) {
     button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     button.setAttribute('aria-label', table.dataset[expanded ? 'labelCollapse' : 'labelExpand']);
     row.classList.toggle('data-table__row--expanded', expanded);
-    child.hidden = !expanded;
+    child.hidden = row.hidden || !expanded;
 };
 
 Mautic.updateDataTableExpandAll = function (table) {
@@ -158,7 +159,11 @@ Mautic.filterDataTable = function (table, query) {
         visible += match ? 1 : 0;
     });
 
-    table.querySelector('.data-table__empty-row').hidden = visible > 0;
+    const emptyRow = table.querySelector('.data-table__empty-row');
+
+    if (emptyRow) {
+        emptyRow.hidden = visible > 0;
+    }
     Mautic.updateDataTableZebra(table);
     Mautic.updateDataTableSelection(table);
 };
