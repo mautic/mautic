@@ -152,8 +152,8 @@ class IcontactClient
         try {
             $response = $this->httpClient->request($method, $url, $options);
             $data     = $response->toArray(false);
-        } catch (ExceptionInterface $e) {
-            throw new ApiException($e->getMessage(), 0, $e);
+        } catch (ExceptionInterface $exception) {
+            throw new ApiException($exception->getMessage(), 0, $exception);
         }
 
         if (!empty($data['errors'])) {

@@ -61,14 +61,14 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
 
         try {
             $distUrl = $this->getDistUrl($packageName);
-        } catch (\Exception $e) {
-            return ['success' => false, 'summary' => [], 'errors' => [$e->getMessage()]];
+        } catch (\Exception $exception) {
+            return ['success' => false, 'summary' => [], 'errors' => [$exception->getMessage()]];
         }
 
         try {
             $zipPath = $this->downloadZip($distUrl);
-        } catch (\Exception $e) {
-            return ['success' => false, 'summary' => [], 'errors' => ['Failed to download package: '.$e->getMessage()]];
+        } catch (\Exception $exception) {
+            return ['success' => false, 'summary' => [], 'errors' => ['Failed to download package: '.$exception->getMessage()]];
         }
 
         try {
@@ -102,9 +102,9 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
                     $summary[] = $status;
                 }
             }
-        } catch (\RuntimeException $e) {
-            $errors[] = 'Import failed: '.$e->getMessage();
-            $this->logger->error('Resource import failed for '.$packageName.': '.$e->getMessage());
+        } catch (\RuntimeException $exception) {
+            $errors[] = 'Import failed: '.$exception->getMessage();
+            $this->logger->error('Resource import failed for '.$packageName.': '.$exception->getMessage());
         } finally {
             $this->removeFile($zipPath);
         }
@@ -191,9 +191,9 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
                     }
                 },
             ]);
-        } catch (GuzzleException $e) {
+        } catch (GuzzleException $guzzleException) {
             $this->removeFile($filePath);
-            throw new \RuntimeException('Download failed: '.$e->getMessage(), $e->getCode(), $e);
+            throw new \RuntimeException('Download failed: '.$guzzleException->getMessage(), $guzzleException->getCode(), $guzzleException);
         }
 
         if ($response->getStatusCode() >= 300) {

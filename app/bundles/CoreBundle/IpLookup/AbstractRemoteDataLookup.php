@@ -62,9 +62,9 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
                 ]);
 
             $this->parseResponse($response->getBody());
-        } catch (GuzzleException $exception) {
+        } catch (GuzzleException $guzzleException) {
             if ($this->logger) {
-                $this->logger->warning('IP LOOKUP: '.$exception->getMessage());
+                $this->logger->warning('IP LOOKUP: '.$guzzleException->getMessage());
             }
         }
     }

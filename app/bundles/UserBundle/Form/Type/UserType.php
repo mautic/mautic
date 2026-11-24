@@ -295,8 +295,8 @@ final class UserType extends AbstractType
 
                     try {
                         $this->linker->editLinkToUser($subjectId, $subjectId->getUser());
-                    } catch (OidcIdTakenException $e) {
-                        $error = new FormError($this->translator->trans($e->getMessage()));
+                    } catch (OidcIdTakenException $oidcIdTakenException) {
+                        $error = new FormError($this->translator->trans($oidcIdTakenException->getMessage()));
                         $form->get('subjectID')->addError($error);
                     }
                 }, -10);

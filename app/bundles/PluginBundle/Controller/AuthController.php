@@ -44,8 +44,8 @@ final class AuthController extends AbstractFormController
 
         try {
             $error = $integrationObject->authCallback();
-        } catch (\InvalidArgumentException $e) {
-            $session->set('mautic.integration.postauth.message', [$e->getMessage(), [], 'error']);
+        } catch (\InvalidArgumentException $invalidArgumentException) {
+            $session->set('mautic.integration.postauth.message', [$invalidArgumentException->getMessage(), [], 'error']);
             $redirectUrl = $this->generateUrl('mautic_integration_auth_postauth', ['integration' => $integration]);
             if ($isAjax) {
                 return new JsonResponse(['url' => $redirectUrl]);

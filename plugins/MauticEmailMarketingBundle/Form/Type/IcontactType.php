@@ -38,9 +38,9 @@ final class IcontactType extends AbstractType
         try {
             $lists = $this->client->getLists($keys);
             asort($lists);
-        } catch (ApiException $e) {
+        } catch (ApiException $apiException) {
             $lists    = [];
-            $errors[] = $e->getMessage();
+            $errors[] = $apiException->getMessage();
         }
 
         $fields = [];
@@ -58,8 +58,8 @@ final class IcontactType extends AbstractType
                     'required' => false,
                 ];
             }
-        } catch (ApiException $e) {
-            $errors[] = $e->getMessage();
+        } catch (ApiException $apiException) {
+            $errors[] = $apiException->getMessage();
         }
 
         $listSettings = $builder->create('list_settings', FormType::class, ['label' => false]);

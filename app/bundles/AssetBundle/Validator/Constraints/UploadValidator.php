@@ -92,8 +92,8 @@ final class UploadValidator extends ConstraintValidator
 
         try {
             $this->fileUploadValidator->checkExtension($extension, $this->getAllowedExtensions());
-        } catch (FileInvalidException $e) {
-            $this->addViolation($e);
+        } catch (FileInvalidException $fileInvalidException) {
+            $this->addViolation($fileInvalidException);
 
             return false;
         }
@@ -101,8 +101,8 @@ final class UploadValidator extends ConstraintValidator
         if ($file && ($mimeType = $file->getMimeType())) {
             try {
                 $this->fileUploadValidator->checkMimeTypesMatchExtension([$mimeType], $extension);
-            } catch (FileInvalidException $e) {
-                $this->addViolation($e);
+            } catch (FileInvalidException $fileInvalidException) {
+                $this->addViolation($fileInvalidException);
 
                 return false;
             }
@@ -133,8 +133,8 @@ final class UploadValidator extends ConstraintValidator
             $this->fileUploadValidator->checkMimeType($mimeType, $this->getAllowedExtensions());
 
             return true;
-        } catch (FileInvalidException $e) {
-            $this->addViolation($e);
+        } catch (FileInvalidException $fileInvalidException) {
+            $this->addViolation($fileInvalidException);
 
             return false;
         }

@@ -70,7 +70,7 @@ final class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, 
             try {
                 // Attempt to load the real user.
                 return $this->userProvider->loadUserByIdentifier($identifier);
-            } catch (UserNotFoundException $e) {
+            } catch (UserNotFoundException $userNotFoundException) {
                 // If real user is not found, provide a dummy user and still 'check' the credentials to prevent
                 // user enumeration via response timing comparison.
                 // We check it against a pre-calculated hash so the verify functions take roughly
@@ -79,7 +79,7 @@ final class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, 
                 $user = new User();
                 $this->passwordHasherFactory->getPasswordHasher($user)->verify('$2y$13$aAwXNyqA87lcXQQuk8Cp6eo2amRywLct29oG2uWZ8lYBeamFZ8UhK', $credentials['password']);
                 // Rethrow exception
-                throw $e;
+                throw $userNotFoundException;
             }
         };
 

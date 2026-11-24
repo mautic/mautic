@@ -154,8 +154,8 @@ final class PrivateAddressChecker
             $ips = $this->resolveHostName($host);
 
             return array_any($ips, fn (string $ip): bool => in_array($ip, $this->allowedPrivateAddresses, true));
-        } catch (\Exception $e) {
-            throw new \InvalidArgumentException('URL validation failed: '.$e->getMessage(), $e->getCode(), $e);
+        } catch (\Exception $exception) {
+            throw new \InvalidArgumentException('URL validation failed: '.$exception->getMessage(), $exception->getCode(), $exception);
         }
     }
 

@@ -134,8 +134,8 @@ New line',
                 ['remote_email' => 'email']
             );
             $this->fail('Expected ValidationException was not thrown.');
-        } catch (ValidationException $exception) {
-            $this->assertSame(['email' => 'Required value'], $exception->getViolations());
+        } catch (ValidationException $validationException) {
+            $this->assertSame(['email' => 'Required value'], $validationException->getViolations());
         }
     }
 

@@ -111,10 +111,10 @@ final readonly class PluginDatabase
             }
 
             $db->commit();
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $db->rollback();
 
-            throw $e;
+            throw $exception;
         }
     }
 

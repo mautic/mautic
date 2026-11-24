@@ -99,8 +99,8 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
         try {
             $repository->saveNewUser($user);
             $this->fail('The duplicate user must not be inserted.');
-        } catch (OidcException $exception) {
-            $this->assertSame('mautic.open_id.registration.exception.identity_taken', $exception->getMessage());
+        } catch (OidcException $oidcException) {
+            $this->assertSame('mautic.open_id.registration.exception.identity_taken', $oidcException->getMessage());
             $this->assertNull($user->getId());
         }
     }

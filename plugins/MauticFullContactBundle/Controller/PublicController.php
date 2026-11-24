@@ -229,7 +229,7 @@ final class PublicController extends FormController
                     );
                 }
             }
-        } catch (\Exception $ex) {
+        } catch (\Exception $exception) {
             try {
                 if ($notify && $lead && (!$lead->imported)) {
                     if ($user = $this->userModel->getEntity($notify)) {
@@ -237,7 +237,7 @@ final class PublicController extends FormController
                             sprintf(
                                 $this->translator->trans('mautic.plugin.fullcontact.unable'),
                                 $lead->getEmail(),
-                                $ex->getMessage()
+                                $exception->getMessage()
                             ),
                             'FullContact Plugin',
                             'ri-error-warning-line',
@@ -383,7 +383,7 @@ final class PublicController extends FormController
                     );
                 }
             }
-        } catch (\Exception $ex) {
+        } catch (\Exception $exception) {
             try {
                 if ($notify && $company) {
                     if ($user = $this->userModel->getEntity($notify)) {
@@ -391,7 +391,7 @@ final class PublicController extends FormController
                             sprintf(
                                 $this->translator->trans('mautic.plugin.fullcontact.unable'),
                                 $company->getName(),
-                                $ex->getMessage()
+                                $exception->getMessage()
                             ),
                             'FullContact Plugin',
                             'ri-error-warning-line',

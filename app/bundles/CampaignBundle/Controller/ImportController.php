@@ -366,13 +366,13 @@ final class ImportController extends AbstractFormController
             $this->removeImportFile($fullPath);
             $session->set('mautic.campaign.import.summary', $importSummary);
             $this->resetImport();
-        } catch (\RuntimeException $e) {
-            $this->logger->error($e->getMessage());
+        } catch (\RuntimeException $runtimeException) {
+            $this->logger->error($runtimeException->getMessage());
             $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
 
             $this->removeImportFile($fullPath);
             $importSummary = [
-                EntityImportEvent::ERRORS => [$e->getMessage()],
+                EntityImportEvent::ERRORS => [$runtimeException->getMessage()],
             ];
         }
 
@@ -393,14 +393,14 @@ final class ImportController extends AbstractFormController
     {
         try {
             $fileData = $importHelper->readZipFile($fullPath);
-        } catch (\RuntimeException $e) {
-            $this->logger->error($e->getMessage());
+        } catch (\RuntimeException $runtimeException) {
+            $this->logger->error($runtimeException->getMessage());
             $this->removeImportFile($fullPath);
 
             return [
                 [
                     'errors' => [
-                        'messages' => [$e->getMessage()],
+                        'messages' => [$runtimeException->getMessage()],
                     ],
                 ],
             ];

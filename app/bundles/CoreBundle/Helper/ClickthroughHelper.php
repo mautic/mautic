@@ -40,12 +40,12 @@ final class ClickthroughHelper
             if (!is_array($result)) {
                 throw new InvalidDecodedStringException($decoded);
             }
-        } catch (\Throwable $e) {
-            if (!$e instanceof InvalidDecodedStringException) {
-                throw new InvalidDecodedStringException($decoded, 0, $e);
+        } catch (\Throwable $throwable) {
+            if (!$throwable instanceof InvalidDecodedStringException) {
+                throw new InvalidDecodedStringException($decoded, 0, $throwable);
             }
 
-            throw $e;
+            throw $throwable;
         }
 
         return $result;

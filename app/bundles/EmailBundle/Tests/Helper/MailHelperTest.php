@@ -1445,8 +1445,8 @@ final class MailHelperTest extends TestCase
         try {
             $mailer->message->getBody();
             $this->fail('The body should be empty before send');
-        } catch (LogicException $e) {
-            $this->assertSame('A message must have a text or an HTML part or attachments.', $e->getMessage());
+        } catch (LogicException $logicException) {
+            $this->assertSame('A message must have a text or an HTML part or attachments.', $logicException->getMessage());
         }
 
         $this->assertSame($trackedHtml, $mailer->getBody());

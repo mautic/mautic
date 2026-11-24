@@ -66,8 +66,8 @@ final class FileApiController extends CommonApiController
     {
         try {
             $path = $this->getAbsolutePath($request, $pathsHelper, $dir, true);
-        } catch (\Exception $e) {
-            return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
+        } catch (\Exception $exception) {
+            return $this->returnError($exception->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
 
         $response = [$this->entityNameOne => []];
@@ -110,8 +110,8 @@ final class FileApiController extends CommonApiController
     {
         try {
             $filePath = $this->getAbsolutePath($request, $pathsHelper, $dir);
-        } catch (\Exception $e) {
-            return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
+        } catch (\Exception $exception) {
+            return $this->returnError($exception->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
 
         $fnames = scandir($filePath);
@@ -147,8 +147,8 @@ final class FileApiController extends CommonApiController
 
         try {
             $filePath = $this->getAbsolutePath($request, $pathsHelper, $dir).'/'.basename($file);
-        } catch (\Exception $e) {
-            return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
+        } catch (\Exception $exception) {
+            return $this->returnError($exception->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
 
         if (!file_exists($filePath)) {
@@ -216,10 +216,10 @@ final class FileApiController extends CommonApiController
             }
 
             return $path;
-        } catch (\Exception $e) {
-            $this->mauticLogger->error($e->getMessage(), ['exception' => $e]);
+        } catch (\Exception $exception) {
+            $this->mauticLogger->error($exception->getMessage(), ['exception' => $exception]);
 
-            throw $e;
+            throw $exception;
         }
     }
 

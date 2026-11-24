@@ -66,9 +66,9 @@ final class ThemeApiController extends CommonApiController
         try {
             $themeZip->move($dir, $fileName);
             $response['success'] = $this->themeHelper->install($dir.'/'.$fileName);
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             return $this->returnError(
-                $this->translator->trans($e->getMessage(), [], 'validators')
+                $this->translator->trans($exception->getMessage(), [], 'validators')
             );
         }
 
@@ -96,8 +96,8 @@ final class ThemeApiController extends CommonApiController
 
         try {
             $themeZip = $this->themeHelper->zip($theme);
-        } catch (\Exception $e) {
-            return $this->returnError($e->getMessage());
+        } catch (\Exception $exception) {
+            return $this->returnError($exception->getMessage());
         }
 
         if (!$themeZip) {
@@ -132,8 +132,8 @@ final class ThemeApiController extends CommonApiController
 
         try {
             $themes = $this->themeHelper->getInstalledThemes('all', true, false, false);
-        } catch (\Exception $e) {
-            return $this->returnError($e->getMessage());
+        } catch (\Exception $exception) {
+            return $this->returnError($exception->getMessage());
         }
 
         $view = $this->view(['themes' => $themes]);
@@ -161,8 +161,8 @@ final class ThemeApiController extends CommonApiController
         try {
             $this->themeHelper->delete($theme);
             $response = ['success' => true];
-        } catch (\Exception $e) {
-            return $this->returnError($e->getMessage());
+        } catch (\Exception $exception) {
+            return $this->returnError($exception->getMessage());
         }
 
         $view = $this->view($response);

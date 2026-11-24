@@ -49,8 +49,8 @@ final class DeleteContactSecondaryCompaniesCommand extends Command
 
         try {
             $this->companyLeadsRepository->removeAllSecondaryCompanies();
-        } catch (ORMException $e) {
-            $errorMessage = $this->translator->trans('mautic.lead.command.error', ['%name%' => self::NAME, '%error%' => $e->getMessage()]);
+        } catch (ORMException $ormException) {
+            $errorMessage = $this->translator->trans('mautic.lead.command.error', ['%name%' => self::NAME, '%error%' => $ormException->getMessage()]);
             $output->writeln($errorMessage);
             $this->logger->error($errorMessage);
         }

@@ -63,8 +63,8 @@ final class SendWinnerEmailCommand extends ModeratedCommand
         try {
             $this->sendWinnerService->processWinnerEmails($emailId);
             $output->writeln($this->sendWinnerService->getOutputMessages());
-        } catch (RecordNotFoundException $e) {
-            $output->writeln($e->getMessage());
+        } catch (RecordNotFoundException $recordNotFoundException) {
+            $output->writeln($recordNotFoundException->getMessage());
         }
 
         if ($this->sendWinnerService->shouldTryAgain()) {

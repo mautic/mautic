@@ -60,12 +60,12 @@ final class DetailController extends CommonController
 
         try {
             $packageDetail = $this->packageModel->getPackageDetail("{$vendor}/{$package}");
-        } catch (ApiException $e) {
-            if (Response::HTTP_NOT_FOUND === $e->getCode()) {
+        } catch (ApiException $apiException) {
+            if (Response::HTTP_NOT_FOUND === $apiException->getCode()) {
                 return $this->notFound();
             }
 
-            throw $e;
+            throw $apiException;
         }
 
         $packageFullName = "{$vendor}/{$package}";

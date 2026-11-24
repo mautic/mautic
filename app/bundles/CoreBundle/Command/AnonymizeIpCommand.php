@@ -38,8 +38,8 @@ final class AnonymizeIpCommand extends Command
             $anonymizedRows = $this->ipAddressRepository->anonymizeAllIpAddress();
             $anonymizedRows += $this->auditLogRepository->anonymizeAllIpAddress();
             $output->writeln(sprintf('<info>%s IP addresses have been anonymized</info>', $anonymizedRows));
-        } catch (DBALException $e) {
-            return $this->exitWithError(sprintf('Anonymization of IP addresses failed because of database error: %s', $e->getMessage()), $output);
+        } catch (DBALException $dbalException) {
+            return $this->exitWithError(sprintf('Anonymization of IP addresses failed because of database error: %s', $dbalException->getMessage()), $output);
         }
 
         return Command::SUCCESS;

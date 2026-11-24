@@ -838,8 +838,8 @@ final class MailHelper
             $this->queuedRecipients = array_merge($this->queuedRecipients, $addresses);
 
             return true;
-        } catch (\Exception $e) {
-            $this->logError($e, 'to');
+        } catch (\Exception $exception) {
+            $this->logError($exception, 'to');
 
             return false;
         }
@@ -869,8 +869,8 @@ final class MailHelper
             $this->queuedRecipients[$address] = $name;
 
             return true;
-        } catch (\Exception $e) {
-            $this->logError($e, 'to');
+        } catch (\Exception $exception) {
+            $this->logError($exception, 'to');
 
             return false;
         }
@@ -911,8 +911,8 @@ final class MailHelper
             }
 
             return true;
-        } catch (\Exception $e) {
-            $this->logError($e, $type);
+        } catch (\Exception $exception) {
+            $this->logError($exception, $type);
 
             return false;
         }
@@ -943,8 +943,8 @@ final class MailHelper
             $this->message->addCc(new AddressDTO($address, $name ?? '')->toMailerAddress());
 
             return true;
-        } catch (\Exception $e) {
-            $this->logError($e, 'cc');
+        } catch (\Exception $exception) {
+            $this->logError($exception, 'cc');
 
             return false;
         }
@@ -975,8 +975,8 @@ final class MailHelper
             $this->message->addBcc(new AddressDTO($address, $name)->toMailerAddress());
 
             return true;
-        } catch (\Exception $e) {
-            $this->logError($e, 'bcc');
+        } catch (\Exception $exception) {
+            $this->logError($exception, 'bcc');
 
             return false;
         }
@@ -1021,8 +1021,8 @@ final class MailHelper
             foreach ((array) $addresses as $address) {
                 $this->message->replyTo(new AddressDTO($address, $name)->toMailerAddress());
             }
-        } catch (\Exception $e) {
-            $this->logError($e, 'reply to');
+        } catch (\Exception $exception) {
+            $this->logError($exception, 'reply to');
         }
     }
 
@@ -1035,8 +1035,8 @@ final class MailHelper
     {
         try {
             $this->message->returnPath($address);
-        } catch (\Exception $e) {
-            $this->logError($e, 'return path');
+        } catch (\Exception $exception) {
+            $this->logError($exception, 'return path');
         }
     }
 
@@ -1063,8 +1063,8 @@ final class MailHelper
         try {
             $this->message->from($from->toMailerAddress());
             $this->message->sender($from->toMailerAddress());
-        } catch (\Exception $e) {
-            $this->logError($e, 'from');
+        } catch (\Exception $exception) {
+            $this->logError($exception, 'from');
         }
     }
 

@@ -99,8 +99,8 @@ final class WidgetApiController extends CommonApiController
 
         try {
             DateTimeHelper::validateMysqlDateTimeUnit($unit);
-        } catch (\InvalidArgumentException $e) {
-            return $this->returnError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+        } catch (\InvalidArgumentException $invalidArgumentException) {
+            return $this->returnError($invalidArgumentException->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
         if ($timezone) {

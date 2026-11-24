@@ -63,8 +63,8 @@ final class AvatarExtension
             }
 
             return $this->style = Style::fromJson($definition);
-        } catch (\Throwable $exception) {
-            $this->logger->error('Unable to load the Line Face avatar style.', ['exception' => $exception]);
+        } catch (\Throwable $throwable) {
+            $this->logger->error('Unable to load the Line Face avatar style.', ['exception' => $throwable]);
             $this->styleUnavailable = true;
 
             return null;

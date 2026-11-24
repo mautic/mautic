@@ -89,8 +89,8 @@ class MailchimpIntegration extends BasicIntegration implements BasicInterface, P
                 (bool) ($listSettings['doubleOptin'] ?? true),
                 (bool) ($listSettings['sendWelcome'] ?? true)
             );
-        } catch (ApiException $e) {
-            throw new PushContactException($e->getMessage(), 0, $e);
+        } catch (ApiException $apiException) {
+            throw new PushContactException($apiException->getMessage(), 0, $apiException);
         }
     }
 

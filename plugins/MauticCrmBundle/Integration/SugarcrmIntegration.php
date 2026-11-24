@@ -359,11 +359,11 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
 
             if (!$silenceExceptions) {
-                throw $e;
+                throw $exception;
             }
         }
 
@@ -404,8 +404,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
                 return $executed;
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $executed;
@@ -541,8 +541,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
                 return $executed;
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $executed;
@@ -1068,8 +1068,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
                 return true;
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return false;

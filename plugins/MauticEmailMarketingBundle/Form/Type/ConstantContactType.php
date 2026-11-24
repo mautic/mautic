@@ -38,9 +38,9 @@ final class ConstantContactType extends AbstractType
         try {
             $lists = $this->client->getLists($this->integrationKeys->get(ConstantContactIntegration::NAME));
             asort($lists);
-        } catch (ApiException $e) {
+        } catch (ApiException $apiException) {
             $lists = [];
-            $error = $e->getMessage();
+            $error = $apiException->getMessage();
         }
 
         $fields = [];

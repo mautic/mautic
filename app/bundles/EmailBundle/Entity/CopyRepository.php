@@ -33,8 +33,8 @@ final class CopyRepository extends CommonRepository
             );
 
             return true;
-        } catch (\Exception $e) {
-            error_log($e);
+        } catch (\Exception $exception) {
+            error_log($exception);
 
             return false;
         }

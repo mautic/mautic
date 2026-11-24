@@ -498,8 +498,8 @@ final class SubmissionModelTest extends TestCase
         try {
             $getExportHeaderRef = $this->getAccessibleReflectionMethod('getExportHeader');
             $header             = $getExportHeaderRef->invokeArgs($this->submissionModel, [$form, $viewOnlyFields]);
-        } catch (\ReflectionException $e) {
-            $this->fail($e->getMessage());
+        } catch (\ReflectionException $reflectionException) {
+            $this->fail($reflectionException->getMessage());
         }
 
         $this->assertCount(6, $header);
@@ -516,8 +516,8 @@ final class SubmissionModelTest extends TestCase
             $getExportHeaderForPageRef = $this->getAccessibleReflectionMethod('getExportHeaderForPage');
             $header1                   = $getExportHeaderForPageRef->invokeArgs($this->submissionModel, []);
             $header2                   = $getExportHeaderForPageRef->invokeArgs($this->submissionModel, ['xlsx']);
-        } catch (\ReflectionException $e) {
-            $this->fail($e->getMessage());
+        } catch (\ReflectionException $reflectionException) {
+            $this->fail($reflectionException->getMessage());
         }
 
         $this->assertCount(6, $header1);
@@ -535,8 +535,8 @@ final class SubmissionModelTest extends TestCase
         try {
             $putCsvExportRowRef = $this->getAccessibleReflectionMethod('putCsvExportRow');
             $putCsvExportRowRef->invokeArgs($this->submissionModel, [$handle, $header]);
-        } catch (\ReflectionException $e) {
-            $this->fail($e->getMessage());
+        } catch (\ReflectionException $reflectionException) {
+            $this->fail($reflectionException->getMessage());
         }
 
         fclose($handle);
@@ -577,8 +577,8 @@ final class SubmissionModelTest extends TestCase
         try {
             $getExportRowRef = $this->getAccessibleReflectionMethod('getExportRow');
             $result          = $getExportRowRef->invokeArgs($this->submissionModel, [$fixture, $viewOnlyFields]);
-        } catch (\ReflectionException $e) {
-            $this->fail($e->getMessage());
+        } catch (\ReflectionException $reflectionException) {
+            $this->fail($reflectionException->getMessage());
         }
 
         $this->assertIsArray($result);
@@ -610,8 +610,8 @@ final class SubmissionModelTest extends TestCase
             $getExportRowForPageRef = $this->getAccessibleReflectionMethod('getExportRowForPage');
             $row1                   = $getExportRowForPageRef->invokeArgs($this->submissionModel, [$fixture]);
             $row2                   = $getExportRowForPageRef->invokeArgs($this->submissionModel, [$fixture, 'xlsx']);
-        } catch (\ReflectionException $e) {
-            $this->fail($e->getMessage());
+        } catch (\ReflectionException $reflectionException) {
+            $this->fail($reflectionException->getMessage());
         }
 
         $this->assertIsArray($row1);

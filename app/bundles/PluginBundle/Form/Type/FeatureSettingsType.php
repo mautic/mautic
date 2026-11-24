@@ -70,9 +70,9 @@ final class FeatureSettingsType extends AbstractType
                     $fields = [];
                 }
                 $error = '';
-            } catch (\Exception $e) {
-                $error = $e->getMessage();
-                $this->logger->error($e);
+            } catch (\Exception $exception) {
+                $error = $exception->getMessage();
+                $this->logger->error($exception);
 
                 // Prevent pagination from confusing things by using the cache
                 $page   = 1;

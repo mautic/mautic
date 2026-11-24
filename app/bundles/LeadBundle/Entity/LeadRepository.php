@@ -1440,8 +1440,8 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
 
         try {
             $qb->executeStatement();
-        } catch (DriverException $exception) {
-            $message = $exception->getMessage();
+        } catch (DriverException $driverException) {
+            $message = $driverException->getMessage();
 
             if (str_contains($message, 'Deadlock') && $tries <= 3) {
                 ++$tries;

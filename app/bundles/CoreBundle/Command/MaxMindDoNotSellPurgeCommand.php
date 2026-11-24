@@ -93,8 +93,8 @@ final class MaxMindDoNotSellPurgeCommand extends Command
             $output->writeln("\n<info>Purge complete.</info>\n");
 
             return Command::SUCCESS;
-        } catch (\Exception $e) {
-            $output->writeln("\n<error>".$e->getMessage().'</error>');
+        } catch (\Exception $exception) {
+            $output->writeln("\n<error>".$exception->getMessage().'</error>');
 
             return Command::FAILURE;
         }

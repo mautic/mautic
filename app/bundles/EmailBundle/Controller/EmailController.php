@@ -1208,11 +1208,11 @@ final class EmailController extends AbstractStandardFormController
                 $postActionVars['viewParameters']
             );
             $postActionVars['contentTemplate'] = self::class.'::viewAction';
-        } catch (InvalidRenderedHtmlException $e) {
+        } catch (InvalidRenderedHtmlException $invalidRenderedHtmlException) {
             $postActionVars['flashes'] = [
                 [
                     'type' => 'error',
-                    'msg'  => $e->getMessage(),
+                    'msg'  => $invalidRenderedHtmlException->getMessage(),
                 ],
             ];
         }

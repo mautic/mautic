@@ -268,10 +268,10 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (ApiErrorException $exception) {
-            $this->logIntegrationError($exception);
+        } catch (ApiErrorException $apiErrorException) {
+            $this->logIntegrationError($apiErrorException);
             if (!$silenceExceptions) {
-                throw $exception;
+                throw $apiErrorException;
             }
 
             return [];
@@ -333,8 +333,8 @@ final class DynamicsIntegration extends CrmAbstractIntegration
 
                 return true;
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return false;
@@ -416,8 +416,8 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $executed;
@@ -495,8 +495,8 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $executed;

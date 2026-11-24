@@ -67,14 +67,14 @@ final readonly class UploadSubscriber
 
         try {
             $this->fileUploadValidator->checkFileSize($file->getSize(), (string) $maxSizeMB);
-        } catch (FileInvalidException $e) {
-            throw new ValidationException($e->getMessage(), $e->getCode(), $e);
+        } catch (FileInvalidException $fileInvalidException) {
+            throw new ValidationException($fileInvalidException->getMessage(), $fileInvalidException->getCode(), $fileInvalidException);
         }
 
         try {
             $this->fileUploadValidator->checkExtension($file->getExtension(), $extensions);
-        } catch (FileInvalidException $e) {
-            throw new ValidationException($e->getMessage(), $e->getCode(), $e);
+        } catch (FileInvalidException $fileInvalidException) {
+            throw new ValidationException($fileInvalidException->getMessage(), $fileInvalidException->getCode(), $fileInvalidException);
         }
 
         \assert($file instanceof UploadedFile);
@@ -84,8 +84,8 @@ final readonly class UploadSubscriber
                 $file->getClientMimeType(),
                 $file->getMimeType(),
             ], $file->getExtension());
-        } catch (FileInvalidException $e) {
-            throw new ValidationException($e->getMessage(), $e->getCode(), $e);
+        } catch (FileInvalidException $fileInvalidException) {
+            throw new ValidationException($fileInvalidException->getMessage(), $fileInvalidException->getCode(), $fileInvalidException);
         }
     }
 }

@@ -35,8 +35,8 @@ final readonly class EmailHitNotificationHandler
                 $message->getEventTime(),
                 true
             );
-        } catch (RetryableException $e) {
-            throw new RecoverableMessageHandlingException($e->getMessage(), $e->getCode(), $e);
+        } catch (RetryableException $retryableException) {
+            throw new RecoverableMessageHandlingException($retryableException->getMessage(), $retryableException->getCode(), $retryableException);
         }
     }
 }

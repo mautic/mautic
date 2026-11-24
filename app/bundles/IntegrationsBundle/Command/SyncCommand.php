@@ -100,8 +100,8 @@ final class SyncCommand extends Command
 
         try {
             $inputOptions = new InputOptionsDAO(array_merge($input->getArguments(), $input->getOptions()));
-        } catch (InvalidValueException $e) {
-            $io->error($e->getMessage());
+        } catch (InvalidValueException $invalidValueException) {
+            $io->error($invalidValueException->getMessage());
 
             return Command::FAILURE;
         }
@@ -113,12 +113,12 @@ final class SyncCommand extends Command
             defined('MAUTIC_AUDITLOG_USER') || define('MAUTIC_AUDITLOG_USER', $inputOptions->getIntegration());
 
             $this->syncService->processIntegrationSync($inputOptions);
-        } catch (\Throwable $e) {
+        } catch (\Throwable $invalidValueException) {
             if ('dev' === $input->getOption('env') || (defined('MAUTIC_ENV') && MAUTIC_ENV === 'dev')) {
-                throw $e;
+                throw $invalidValueException;
             }
 
-            $io->error($e->getMessage());
+            $io->error($invalidValueException->getMessage());
 
             return Command::FAILURE;
         }
