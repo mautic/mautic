@@ -912,9 +912,6 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, array<string, mixed>>
-     */
-    /**
      * @param array<string, array<int, string>> $permissions
      */
     private function createUserWithPermissions(array $permissions): User
