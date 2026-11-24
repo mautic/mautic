@@ -769,7 +769,7 @@ final class Mailbox
          *     to?: list<ImapAddress>,
          *     cc?: list<ImapAddress>,
          *     reply_to?: list<ImapAddress>,
-         *     return_path?: string,
+         *     return_path?: list<ImapAddress>,
          *     references?: string
          * } $headObject
          */
@@ -1007,8 +1007,12 @@ final class Mailbox
     private function decodeMimeStr($string, string $charset = 'utf-8'): string
     {
         $newString = '';
-        /** @var list<\stdClass> $elements */
+        /** @var list<\stdClass>|false $elements */
         $elements  = imap_mime_header_decode($string);
+        if (false === $elements) {
+            return $string;
+        }
+
         $counter = count($elements);
         for ($i = 0; $i < $counter; ++$i) {
             if ('default' == $elements[$i]->charset) {
