@@ -33,7 +33,7 @@ if ($input->hasParameterOption('--no-debug', true)) {
     putenv('APP_DEBUG='.$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');
 }
 
-require dirname(__DIR__).'/app/config/bootstrap.php';
+require __DIR__.'/../app/config/bootstrap.php';
 
 if ($_SERVER['APP_DEBUG']) {
     umask(0000);
