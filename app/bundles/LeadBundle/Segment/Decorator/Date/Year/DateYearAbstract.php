@@ -23,7 +23,7 @@ abstract class DateYearAbstract extends DateOptionAbstract
         return $dateTimeHelper->toLocalString('Y-%');
     }
 
-    protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate)
+    protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate): string
     {
         return '!=' === $leadSegmentFilterCrate->getOperator() ? 'notLike' : 'like';
     }
