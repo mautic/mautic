@@ -92,7 +92,7 @@
             leadcount: {trustedHtml: countHtml},
             dateAdded: item.dateAdded ? {label: dateToDate(item.dateAdded), attr: {title: dateToFullConcat(item.dateAdded)}} : '',
             dateModified: item.dateModified ? {label: dateToDate(item.dateModified), attr: {title: dateToFullConcat(item.dateModified)}} : '',
-            createdByUser: item.createdByUser|purify,
+            createdByUser: item.createdByUser,
             id: item.id,
         },
     }]) %}

@@ -188,6 +188,7 @@ document.addEventListener('click', (event) => {
     } else {
         table.querySelectorAll('tbody [data-data-table-select]:checked').forEach((input) => {
             input.checked = false;
+            input.dispatchEvent(new Event('change', {bubbles: true}));
         });
         Mautic.updateDataTableSelection(table);
     }
@@ -196,18 +197,22 @@ document.addEventListener('click', (event) => {
 document.addEventListener('change', (event) => {
     const table = event.target.closest('[data-data-table]');
 
-    if (!table) {
+    if (!table || !event.target.matches('[data-data-table-select-all]')) {
         return;
     }
 
-    if (event.target.matches('[data-data-table-select-all]')) {
-        const checked = event.target.checked;
-        table.querySelectorAll('tbody tr:not([hidden]) [data-data-table-select]:not(:disabled)').forEach((input) => {
-            input.checked = checked;
-            input.dispatchEvent(new Event('change', {bubbles: true}));
-        });
-        Mautic.updateDataTableSelection(table);
-    } else if (event.target.matches('[data-data-table-select]')) {
+    const checked = event.target.checked;
+    table.querySelectorAll('tbody tr:not([hidden]) [data-data-table-select]:not(:disabled)').forEach((input) => {
+        input.checked = checked;
+        input.dispatchEvent(new Event('change', {bubbles: true}));
+    });
+    Mautic.updateDataTableSelection(table);
+});
+
+mQuery(document).off('change.dataTable').on('change.dataTable', '[data-data-table-select]', function () {
+    const table = this.closest('[data-data-table]');
+
+    if (table) {
         Mautic.updateDataTableSelection(table);
     }
 });
