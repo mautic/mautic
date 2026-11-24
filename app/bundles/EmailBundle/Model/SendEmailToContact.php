@@ -205,7 +205,7 @@ final class SendEmailToContact
     /**
      * @throws FailedToSendToContactException
      */
-    private function failContact(bool $hasBadEmail = true, array|null|string $errorMessages = null): void
+    private function failContact(bool $hasBadEmail = true, array|null|string $errorMessages = null): never
     {
         if (null === $errorMessages) {
             // Clear the errors so it doesn't stop the next send
