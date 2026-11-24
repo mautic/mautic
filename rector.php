@@ -51,9 +51,6 @@ return RectorConfig::configure()
         // widening the public return types to \DateTime|bool|null is out of scope for this bump
         __DIR__.'/app/bundles/CoreBundle/Helper/DateTimeHelper.php',
 
-        // dropping the code changes getCode() of the new exception to 0, e.g. marketplace ApiException 404 checks
-        Rector\CodeQuality\Rector\New_\NarrowPreviousExceptionCodeArgRector::class,
-
         // prefer implicit compare on object|null
         Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector::class,
 
