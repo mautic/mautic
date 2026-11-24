@@ -143,7 +143,7 @@ final class TokenHelper
                     break;
             }
         }
-        if (in_array($defaultValue, ['true', 'date', 'time', 'datetime', 'label'])) {
+        if (in_array($defaultValue, ['true', 'date', 'time', 'datetime', 'label'], true)) {
             return $value;
         }
 
