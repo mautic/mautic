@@ -135,7 +135,7 @@ Mautic.leadOnLoad = function (container, response) {
 
     let leadMap;
 
-    mQuery(document).on('shown.bs.tab', '[data-bs-target="#place-container"], a#load-lead-map', () => {
+    mQuery(document).off('shown.bs.tab.leadMap').on('shown.bs.tab.leadMap', '[data-bs-target="#place-container"], a#load-lead-map', () => {
         leadMap = Mautic.initMap('#place-container', 'markers');
     });
 
