@@ -1498,7 +1498,7 @@ class LeadModel extends FormModel
                 $tagsDeleted = true;
             } else {
                 // Remove tag so that what's left are new tags
-                $key = array_search($tag->getId(), $tags);
+                $key = array_search($tag->getId(), $tags, true);
                 unset($tags[$key]);
             }
         }

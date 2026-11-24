@@ -766,7 +766,7 @@ class FieldModel extends FormModel
         $fields = $this->leadFieldRepository->findBy([], ['order' => 'ASC']);
         foreach ($fields as $field) {
             if (in_array($field->getId(), $list)) {
-                $order = ((int) array_search($field->getId(), $list) + $start);
+                $order = ((int) array_search($field->getId(), $list, true) + $start);
                 $field->setOrder($order);
                 $this->em->persist($field);
             }
