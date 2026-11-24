@@ -72,6 +72,21 @@
         min-height: var(--spacing-10);
     }
 
+    .form-field-ai > .form-control {
+        height: var(--spacing-10);
+        padding: 33px var(--spacing-08) 10px var(--spacing-05);
+        border-radius: 0;
+        background-color: transparent;
+        box-shadow: none;
+        outline: 0;
+    }
+
+    .form-field-ai > textarea.form-control {
+        height: auto;
+        min-height: var(--spacing-10);
+        padding-bottom: var(--spacing-05);
+    }
+
     .form-field-with-action > .form-control,
     .form-field-with-number > .form-control {
         height: var(--spacing-10);

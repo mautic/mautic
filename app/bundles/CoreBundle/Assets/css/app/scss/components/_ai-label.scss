@@ -216,3 +216,14 @@ $ai-label-inline-sizes: (
 .ai-label__button--static {
     pointer-events: none;
 }
+
+.label--ai {
+    @include ai-popover-gradient(default, 0, var(--layer));
+    border: 1px solid transparent;
+    color: var(--text-primary);
+}
+
+th > .ai-label,
+td > .ai-label {
+    margin-inline: var(--spacing-02);
+}

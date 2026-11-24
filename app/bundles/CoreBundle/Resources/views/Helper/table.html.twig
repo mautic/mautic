@@ -5,7 +5,10 @@
         <thead>
             <tr>
                 {% for headItem in headItems %}
-                    <th>{{ headItem|trans }}</th>
+                    <th>
+                        {% if headItem.label is defined %}{{ headItem.label|trans }}{% else %}{{ headItem|trans }}{% endif %}
+                        {% if headItem.aiLabel is defined and headItem.aiLabel %}{% include '@MauticCore/Components/ai-label.html.twig' with ({inline: true, size: 'sm'}|merge(headItem.aiLabel is iterable ? headItem.aiLabel : {})) only %}{% endif %}
+                    </th>
                 {% endfor %}
             </tr>
         </thead>
@@ -22,6 +25,7 @@
                                         {{ item.value|slice(0, shortenLinkText) }}
                                     </a>
                                 {% elseif item.value is defined %}
+                                    {% if item.aiLabel is defined and item.aiLabel %}{% include '@MauticCore/Components/ai-label.html.twig' with ({inline: true, size: 'sm'}|merge(item.aiLabel is iterable ? item.aiLabel : {})) only %}{% endif %}
                                     {{ item.value }}
                                 {% else %}
                                     {{ item }}
