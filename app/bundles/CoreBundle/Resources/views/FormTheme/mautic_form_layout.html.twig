@@ -61,10 +61,12 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% endblock %}
 
 {% block segmented_control_widget %}
-{% set locked = (attr.readonly is defined and attr.readonly is not empty) or (attr.disabled is defined and attr.disabled is not empty) %}
+{% set disabled = attr.disabled is defined and attr.disabled is not empty %}
+{% set readonly = attr.readonly is defined and attr.readonly is not empty %}
+{% set locked = disabled or readonly %}
 {% set options = [] %}
 {% for child in form %}
-    {% set options = options|merge([{value: child.vars.value, label: child.vars.label, translation_domain: child.vars.translation_domain, label_translation_parameters: child.vars.label_translation_parameters, disabled: child.vars.disabled or locked, required: child.vars.required, attr: child.vars.attr}]) %}
+    {% set options = options|merge([{value: child.vars.value, label: child.vars.label, translation_domain: child.vars.translation_domain, label_translation_parameters: child.vars.label_translation_parameters, disabled: child.vars.disabled or disabled, required: child.vars.required, attr: child.vars.attr}]) %}
 {% endfor %}
 {% set params = {
     options: options,
@@ -74,7 +76,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     value: form.vars.value,
     name: full_name,
     id: id,
-    attr: attr|filter((v, k) => k not in ['class', 'tooltip']),
+    attr: attr|filter((v, k) => k not in ['class', 'tooltip'])|merge(readonly and not disabled ? {tabindex: '-1'} : {}),
     className: (attr.class|default('') ~ (locked ? ' segmented-control--locked' : ''))|trim,
     draggable: segmented_control.draggable
 } %}
