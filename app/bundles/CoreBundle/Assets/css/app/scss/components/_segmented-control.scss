@@ -98,6 +98,10 @@
         touch-action: pan-y;
     }
 
+    &--locked {
+        pointer-events: none;
+    }
+
     &[data-segmented-control-dragging] {
         cursor: grabbing;
 
@@ -122,10 +126,6 @@
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
     opacity: 0;
     translate: var(--segmented-control-x);
-    transition:
-        translate var(--segmented-control-duration) var(--easing-standard-expressive),
-        inline-size var(--segmented-control-duration) var(--easing-standard-expressive),
-        scale var(--duration-productive) var(--easing-standard-productive);
 
     [data-segmented-control-dragging] > & {
         translate: var(--segmented-control-drag-x, var(--segmented-control-x));
@@ -141,9 +141,13 @@
 
     .is-initialized > & {
         opacity: 1;
-    }
+        transition:
+            translate var(--segmented-control-duration) var(--easing-standard-expressive),
+            inline-size var(--segmented-control-duration) var(--easing-standard-expressive),
+            scale var(--duration-productive) var(--easing-standard-productive);
 
-    @media (prefers-reduced-motion: reduce) {
-        transition: none;
+        @media (prefers-reduced-motion: reduce) {
+            transition: none;
+        }
     }
 }
