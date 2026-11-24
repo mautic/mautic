@@ -200,7 +200,9 @@ final class EmailController extends AbstractStandardFormController
         $session->set('mautic.email.filter', $filter['string']);
 
         if (!empty($currentFilters)) {
-            $listAliases = $catIds = $templates = [];
+            $listAliases = [];
+            $catIds = [];
+            $templates = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 if ($type === $categoryFilterPrefix) {
                     $type = self::FILTER_TYPE_CATEGORY;

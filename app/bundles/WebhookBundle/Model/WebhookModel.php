@@ -261,7 +261,8 @@ final class WebhookModel extends FormModel
 
         // fire events for when the queues are created
         if ($this->dispatcher->hasListeners(Events\WebhookQueueEvent::class)) {
-            $webhookQueueEvent = $event = new Events\WebhookQueueEvent($queue, $webhook, true);
+            $webhookQueueEvent = new Events\WebhookQueueEvent($queue, $webhook, true);
+            $event = $webhookQueueEvent;
             $this->dispatcher->dispatch($webhookQueueEvent);
         }
 

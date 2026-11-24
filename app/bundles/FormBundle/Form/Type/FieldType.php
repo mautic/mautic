@@ -49,17 +49,17 @@ final class FieldType extends AbstractType
             'helpMessage'         => 'strict_html',
         ];
 
-        $addHelpMessage         =
-        $addShowLabel           =
-        $allowCustomAlias       =
-        $addDefaultValue        =
-        $addLabelAttributes     =
-        $addInputAttributes     =
-        $addContainerAttributes =
-        $addMappedFieldList     =
-        $addSaveResult          =
-        $addBehaviorFields      =
-        $addIsRequired          =
+        $addHelpMessage         = true;
+        $addShowLabel           = true;
+        $allowCustomAlias       = true;
+        $addDefaultValue        = true;
+        $addLabelAttributes     = true;
+        $addInputAttributes     = true;
+        $addContainerAttributes = true;
+        $addMappedFieldList     = true;
+        $addSaveResult          = true;
+        $addBehaviorFields      = true;
+        $addIsRequired          = true;
         $addFieldWidth          = true;
 
         if (!empty($options['customParameters'])) {
@@ -104,7 +104,12 @@ final class FieldType extends AbstractType
             $type = $options['data']['type'];
             switch ($type) {
                 case 'freetext':
-                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addMappedFieldList      = $addSaveResult      = $addBehaviorFields      = false;
+                    $addHelpMessage      = false;
+                    $addDefaultValue      = false;
+                    $addIsRequired      = false;
+                    $addMappedFieldList      = false;
+                    $addSaveResult      = false;
+                    $addBehaviorFields      = false;
                     $labelText           = 'mautic.form.field.form.header';
                     $showLabelText       = 'mautic.form.field.form.showheader';
                     $inputAttributesText = 'mautic.form.field.form.freetext_attributes';
@@ -114,7 +119,12 @@ final class FieldType extends AbstractType
                     $cleanMasks['properties'] = 'html';
                     break;
                 case 'freehtml':
-                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addMappedFieldList      = $addSaveResult      = $addBehaviorFields      = false;
+                    $addHelpMessage      = false;
+                    $addDefaultValue      = false;
+                    $addIsRequired      = false;
+                    $addMappedFieldList      = false;
+                    $addSaveResult      = false;
+                    $addBehaviorFields      = false;
                     $labelText           = 'mautic.form.field.form.header';
                     $showLabelText       = 'mautic.form.field.form.showheader';
                     $inputAttributesText = 'mautic.form.field.form.freehtml_attributes';
@@ -123,16 +133,40 @@ final class FieldType extends AbstractType
                     $cleanMasks['properties'] = 'html';
                     break;
                 case 'button':
-                    $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = $addMappedFieldList = $addSaveResult = $addBehaviorFields = false;
+                    $addHelpMessage = false;
+                    $addShowLabel = false;
+                    $addDefaultValue = false;
+                    $addLabelAttributes = false;
+                    $addIsRequired = false;
+                    $addMappedFieldList = false;
+                    $addSaveResult = false;
+                    $addBehaviorFields = false;
                     break;
                 case 'hidden':
-                    $addHelpMessage = $addShowLabel = $addLabelAttributes = $addIsRequired = $addFieldWidth = false;
+                    $addHelpMessage = false;
+                    $addShowLabel = false;
+                    $addLabelAttributes = false;
+                    $addIsRequired = false;
+                    $addFieldWidth = false;
                     break;
                 case 'captcha':
-                    $addShowLabel = $addIsRequired = $addDefaultValue = $addMappedFieldList = $addSaveResult = $addBehaviorFields = false;
+                    $addShowLabel = false;
+                    $addIsRequired = false;
+                    $addDefaultValue = false;
+                    $addMappedFieldList = false;
+                    $addSaveResult = false;
+                    $addBehaviorFields = false;
                     break;
                 case 'pagebreak':
-                    $addShowLabel = $allowCustomAlias = $addHelpMessage = $addIsRequired = $addDefaultValue = $addMappedFieldList = $addSaveResult = $addBehaviorFields = $addFieldWidth = false;
+                    $addShowLabel = false;
+                    $allowCustomAlias = false;
+                    $addHelpMessage = false;
+                    $addIsRequired = false;
+                    $addDefaultValue = false;
+                    $addMappedFieldList = false;
+                    $addSaveResult = false;
+                    $addBehaviorFields = false;
+                    $addFieldWidth = false;
                     break;
                 case 'select':
                     $cleanMasks['properties']['list']['list']['label'] = 'strict_html';
@@ -142,7 +176,9 @@ final class FieldType extends AbstractType
                     $cleanMasks['properties']['optionlist']['list']['label'] = 'strict_html';
                     break;
                 case 'file':
-                    $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
+                    $addShowLabel = false;
+                    $addDefaultValue = false;
+                    $addBehaviorFields = false;
                     break;
                 case 'rating':
                     $addDefaultValue = false;

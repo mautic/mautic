@@ -69,9 +69,11 @@ final readonly class WebhookNotificationSender
     private function getToAndCCUsers(Webhook $webhook): array
     {
         try {
-            $owner = $toUser = $this->entityManager->getReference(User::class, $webhook->getCreatedBy());
+            $owner = $this->entityManager->getReference(User::class, $webhook->getCreatedBy());
+            $toUser = $owner;
         } catch (MissingIdentifierField) {
-            $owner = $toUser = null;
+            $owner = null;
+            $toUser = null;
         }
 
         $ccToUser = null;

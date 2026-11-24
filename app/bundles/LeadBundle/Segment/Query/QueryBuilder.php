@@ -75,7 +75,8 @@ final class QueryBuilder extends BaseQueryBuilder
      */
     public function addJoinCondition(string $alias, $expr): static
     {
-        $result = $parts = $this->getQueryPart('join');
+        $result = $this->getQueryPart('join');
+        $parts = $result;
 
         foreach ($parts as $tbl => $joins) {
             foreach ($joins as $key => $join) {

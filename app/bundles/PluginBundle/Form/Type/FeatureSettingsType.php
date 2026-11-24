@@ -76,7 +76,8 @@ final class FeatureSettingsType extends AbstractType
 
                 // Prevent pagination from confusing things by using the cache
                 $page   = 1;
-                $fields = $integrationCompanyFields = [];
+                $fields = [];
+                $integrationCompanyFields = [];
             }
 
             $enableDataPriority = $integrationObject->getDataPriority();

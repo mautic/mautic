@@ -329,7 +329,8 @@ final class ButtonHelper
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : 0);
 
                 if ($ap === $bp) {
-                    $aText = $bText = '';
+                    $aText = '';
+                    $bText = '';
 
                     // Sort alphabetically
                     if (isset($a['confirm']) && isset($a['confirm']['btnText'])) {

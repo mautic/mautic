@@ -97,7 +97,8 @@ final class AuthController extends AbstractFormController
             $userData = $session->get('mautic.integration.'.$integration.'.userdata');
         }
 
-        $message = $type = '';
+        $message = '';
+        $type = '';
         $alert   = 'success';
         if (!empty($postMessage)) {
             $message = $this->translator->trans($postMessage[0], $postMessage[1], 'flashes');

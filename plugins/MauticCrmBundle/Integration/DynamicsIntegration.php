@@ -723,7 +723,9 @@ final class DynamicsIntegration extends CrmAbstractIntegration
         $config                = $this->mergeConfigToFeatureSettings();
         $fieldsToUpdateInCrm   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields            = array_unique(array_values($config['leadFields'] ?? []));
-        $totalUpdated          = $totalCreated          = $totalErrors          = 0;
+        $totalUpdated          = 0;
+        $totalCreated          = 0;
+        $totalErrors          = 0;
 
         if ($key = array_search('mauticContactTimelineLink', $leadFields, true)) {
             unset($leadFields[$key]);

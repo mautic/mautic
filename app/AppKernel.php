@@ -284,7 +284,8 @@ class AppKernel extends Kernel
             }
 
             // We need 1 level deeper than the parent method, as the app folder contains a composer.json file
-            $dir = $rootDir = \dirname($dir, 2);
+            $dir = \dirname($dir, 2);
+            $rootDir = $dir;
             while (!is_file($dir.'/composer.json')) {
                 if ($dir === \dirname($dir)) {
                     return $this->projectDir = $rootDir;

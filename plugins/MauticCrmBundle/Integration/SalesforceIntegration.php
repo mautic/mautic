@@ -1897,7 +1897,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     {
         if (is_array($response)) {
             foreach ($response as $item) {
-                $contactId      = $integrationEntityId      = $campaignId      = null;
+                $contactId      = null;
+                $integrationEntityId      = null;
+                $campaignId      = null;
                 $object         = 'Lead';
                 $internalObject = 'lead';
                 if (!empty($item['referenceId'])) {

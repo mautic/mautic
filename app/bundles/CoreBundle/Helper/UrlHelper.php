@@ -38,7 +38,9 @@ final class UrlHelper
      */
     public static function rel2abs($rel)
     {
-        $path = $host = $scheme = '';
+        $path = '';
+        $host = '';
+        $scheme = '';
 
         $ssl    = !empty($_SERVER['HTTPS']) && 'on' == $_SERVER['HTTPS'];
         $scheme = strtolower($_SERVER['SERVER_PROTOCOL']);

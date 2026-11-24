@@ -69,7 +69,8 @@ final class FieldController extends CommonFormController
     public function newAction(Request $request, Environment $twig): JsonResponse|Response
     {
         $success = 0;
-        $valid   = $cancelled   = false;
+        $valid   = false;
+        $cancelled   = false;
         $method  = $request->getMethod();
         $session = $request->getSession();
 
@@ -243,7 +244,8 @@ final class FieldController extends CommonFormController
         $formId    = 'POST' === $method ? ($formfield['formId'] ?? '') : $request->query->get('formId');
         $fields    = $session->get('mautic.form.'.$formId.'.fields.modified', []);
         $success   = 0;
-        $valid     = $cancelled = false;
+        $valid     = false;
+        $cancelled = false;
         $formField = array_key_exists($objectId, $fields) ? $fields[$objectId] : [];
 
         if ($formField) {

@@ -977,7 +977,8 @@ final class SubmissionModel extends CommonFormModel
 
         // Closure to get data and unique fields
         $getData = function (array $currentFields, bool $uniqueOnly = false) use ($leadFields, $uniqueLeadFields): array {
-            $uniqueFieldsWithData = $data = [];
+            $uniqueFieldsWithData = [];
+            $data = [];
             foreach ($leadFields as $alias => $properties) {
                 if (isset($currentFields[$alias])) {
                     $value        = $currentFields[$alias];

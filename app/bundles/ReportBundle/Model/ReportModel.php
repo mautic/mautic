@@ -436,15 +436,18 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
 
         $paginate        = !empty($options['paginate']);
         $reportPage      = $options['reportPage'] ?? 1;
-        $data            = $graphs            = [];
+        $data            = [];
+        $graphs            = [];
         $reportGenerator = new ReportGenerator($this->dispatcher, $this->getConnection(), $entity, $this->channelListHelper, $formFactory);
 
         $selectedColumns = $entity->getColumns();
-        $totalResults    = $limit    = 0;
+        $totalResults    = 0;
+        $limit    = 0;
 
         // Prepare the query builder
         $tableDetails      = $this->getTableData($entity->getSource());
-        $dataColumns       = $dataAggregatorColumns = [];
+        $dataColumns       = [];
+        $dataAggregatorColumns = [];
         $aggregatorColumns = ($aggregators = $entity->getAggregators()) ? $aggregators : [];
 
         foreach ($aggregatorColumns as $aggregatorColumn) {

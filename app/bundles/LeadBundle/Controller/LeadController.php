@@ -1359,7 +1359,8 @@ final class LeadController extends AbstractFormController
             // Get a list of lists for the lead
             $leadsLists = $this->leadModel->getLists($lead, true, true);
         } else {
-            $lists = $leadsLists = [];
+            $lists = [];
+            $leadsLists = [];
         }
 
         return $this->delegateView(
@@ -1411,7 +1412,8 @@ final class LeadController extends AbstractFormController
 
     public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, EmailModel $emailModel, int|string $objectId = 0): JsonResponse|Response
     {
-        $valid = $cancelled = false;
+        $valid = false;
+        $cancelled = false;
 
         /** @var Lead $lead */
         $lead = $this->leadModel->getEntity($objectId);
