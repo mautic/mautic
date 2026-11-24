@@ -17,6 +17,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use Mautic\UserBundle\Model\RoleModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
