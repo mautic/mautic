@@ -782,6 +782,68 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('We are sorry to see you go!', strip_tags((string) $this->client->getResponse()->getContent()));
     }
 
+    public function testValidationGrantAllowsImmediateOppositeActionWithoutRetypingEmail(): void
+    {
+        $stat       = $this->getStat();
+        $email      = $stat->getEmailAddress();
+        $secretHash = $this->getSecretHash($email);
+        $idHash     = $stat->getTrackingHash();
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/validate/unsubscribe/'.$secretHash.'/'.$idHash);
+        $form    = $crawler->selectButton('Verify email')->form();
+        $form['validate_email[emailAddress]'] = (string) $email;
+        $this->client->submit($form);
+
+        $resubscribePath = '/email/validate/resubscribe/'.$secretHash.'/'.$idHash;
+        $crawler         = $this->client->request(Request::METHOD_GET, $resubscribePath);
+        $emailField      = $crawler->filter('input[type="email"]');
+
+        $this->assertSame((string) $email, $emailField->attr('value'));
+        $this->assertSame('readonly', $emailField->attr('readonly'));
+
+        $this->client->submit($crawler->selectButton('Verify email')->form());
+
+        $this->assertStringContainsString('has been re-subscribed', strip_tags((string) $this->client->getResponse()->getContent()));
+
+        // The consumed grant cannot be replayed for the same action. The successful
+        // resubscribe creates a new grant for the opposite action instead.
+        $crawler    = $this->client->request(Request::METHOD_GET, $resubscribePath);
+        $emailField = $crawler->filter('input[type="email"]');
+        $this->assertNull($emailField->attr('readonly'));
+
+        $crawler    = $this->client->request(Request::METHOD_GET, '/email/validate/unsubscribe/'.$secretHash.'/'.$idHash);
+        $emailField = $crawler->filter('input[type="email"]');
+        $this->assertSame((string) $email, $emailField->attr('value'));
+        $this->assertSame('readonly', $emailField->attr('readonly'));
+    }
+
+    public function testValidationGrantExpiresAndRequiresEmailAgain(): void
+    {
+        $stat       = $this->getStat();
+        $email      = $stat->getEmailAddress();
+        $secretHash = $this->getSecretHash($email);
+        $idHash     = $stat->getTrackingHash();
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/validate/unsubscribe/'.$secretHash.'/'.$idHash);
+        $form = $crawler->selectButton('Verify email')->form();
+        $form['validate_email[emailAddress]'] = (string) $email;
+        $this->client->submit($form);
+
+        $session = $this->client->getRequest()->getSession();
+        $grant   = $session->get('mautic.email.validation_grant');
+        $this->assertIsArray($grant);
+        $grant['expiresAt'] = time() - 1;
+        $session->set('mautic.email.validation_grant', $grant);
+        $session->save();
+
+        $crawler    = $this->client->request(Request::METHOD_GET, '/email/validate/resubscribe/'.$secretHash.'/'.$idHash);
+        $emailField = $crawler->filter('input[type="email"]');
+        $this->assertNull($emailField->attr('readonly'));
+        $this->assertNull($emailField->attr('value'));
+    }
+
     public function testValidateEmailFormShowsErrorForMismatchedEmail(): void
     {
         $stat       = $this->getStat();

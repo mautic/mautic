@@ -55,6 +55,8 @@ final class PublicController extends CommonFormController
     private const MESSAGE_TYPE_PREFERENCE_CENTER = 'preference_center';
     private const MESSAGE_TYPE_RESUBSCRIBED      = 'resubscribed';
     private const MESSAGE_TYPE_UNSUBSCRIBED      = 'unsubscribed';
+    private const VALIDATION_GRANT_SESSION_KEY   = 'mautic.email.validation_grant';
+    private const VALIDATION_GRANT_TTL           = 180;
 
     private LeadRepository $leadRepository;
 
@@ -184,20 +186,26 @@ final class PublicController extends CommonFormController
         }
 
         $formAction = $this->generateUrl('mautic_email_validate_email_form', ['action' => $action, 'secretHash' => $secretHash, 'idHash' => $idHash]);
+        $validationGrant = $this->getValidationGrant($request, $action, $secretHash, $idHash);
         $form       = $this->formFactory->create(
             ValidateEmailType::class,
-            null,
+            null !== $validationGrant ? ['emailAddress' => $validationGrant['email']] : null,
             [
                 'action'             => $formAction,
                 'secret_hash'        => $secretHash,
                 'stat_email_address' => $stat ? $stat->getEmailAddress() : null,
+                'validated_email'    => $validationGrant['email'] ?? null,
             ]
         );
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $validatedEmail = $stat ? $stat->getEmailAddress() : $form->get('emailAddress')->getData();
+            $validatedEmail = $validationGrant['email'] ?? ($stat ? $stat->getEmailAddress() : $form->get('emailAddress')->getData());
+
+            if (null !== $validationGrant) {
+                $this->consumeValidationGrant($request, $action, $secretHash, $idHash);
+            }
 
             return $this->redirectToRoute(
                 "mautic_email_{$action}",
@@ -319,9 +327,9 @@ final class PublicController extends CommonFormController
 
             if (!$isHeadRequest && (!$showContactPreferences || $isUnsubscribeAll || !$lead)) {
                 if ($hasStat) {
-                    $message = $this->getUnsubscribeMessage($idHash, $model, $stat);
+                    $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $request);
                 } elseif ($lead && $lead instanceof Lead) {
-                    $message = $this->getUnsubscribeMessageLead($idHash, $model, $lead, $urlEmail);
+                    $message = $this->getUnsubscribeMessageLead($idHash, $model, $lead, $urlEmail, $request);
                 }
             } elseif ($lead) {
                 $params = ['idHash' => $idHash, 'urlEmail' => $urlEmail];
@@ -508,7 +516,7 @@ final class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function resubscribeAction(ContactTracker $contactTracker, EmailModel $model, MailHashHelper $mailHash, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, string $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
+    public function resubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, MailHashHelper $mailHash, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, string $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
     {
         $stat    = $model->getEmailStatus($idHash);
         $hasStat = $stat instanceof Stat;
@@ -520,6 +528,7 @@ final class PublicController extends CommonFormController
                 if ($isCorrectHash) {
                     $email = $lead = false;
                     $model->removeDoNotContact($urlEmail);
+                    $this->grantValidation($request, 'unsubscribe', $idHash, $urlEmail, $secretHash);
                     $message = $this->buildResubscribeSuccessMessage($urlEmail, $secretHash, $idHash);
                 } else {
                     $email   = false;
@@ -562,6 +571,7 @@ final class PublicController extends CommonFormController
             if ($isCorrectHash) {
                 $email = $lead = false;
                 $model->removeDoNotContact($urlEmail);
+                $this->grantValidation($request, 'unsubscribe', $idHash, $urlEmail, $secretHash);
                 $message = $this->buildResubscribeSuccessMessage($urlEmail, $secretHash, $idHash);
             } else {
                 $email   = $lead   = false;
@@ -971,18 +981,89 @@ final class PublicController extends CommonFormController
         return $this->leadRepository->getLeadByEmail($email);
     }
 
-    public function getUnsubscribeMessage(string $idHash, $model, $stat): string
+    public function getUnsubscribeMessage(string $idHash, $model, $stat, ?Request $request = null): string
     {
         $model->setDoNotContact($stat, $this->translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
+
+        if ($request instanceof Request) {
+            $email = $stat->getEmailAddress();
+            $this->grantValidation($request, 'resubscribe', $idHash, $email, $this->mailHashHelper->getEmailHash($email));
+        }
 
         return $this->getUnsubscribeText($stat->getEmailAddress(), $idHash);
     }
 
-    public function getUnsubscribeMessageLead(string $idHash, EmailModel $model, Lead $lead, string $urlEmail): string
+    public function getUnsubscribeMessageLead(string $idHash, EmailModel $model, Lead $lead, string $urlEmail, ?Request $request = null): string
     {
         $model->setDoNotContactLead($lead, $this->translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
+        if ($request instanceof Request) {
+            $this->grantValidation($request, 'resubscribe', $idHash, $urlEmail, $this->mailHashHelper->getEmailHash($urlEmail));
+        }
+
         return $this->getUnsubscribeText($urlEmail, $idHash);
+    }
+
+    /**
+     * @return array{action: string, idHash: string, secretHash: string, email: string, token: string, expiresAt: int}|null
+     */
+    private function getValidationGrant(Request $request, string $action, string $secretHash, string $idHash): ?array
+    {
+        $grant = $request->getSession()->get(self::VALIDATION_GRANT_SESSION_KEY);
+
+        if (!is_array($grant)
+            || !isset($grant['action'], $grant['idHash'], $grant['secretHash'], $grant['email'], $grant['token'], $grant['expiresAt'])
+            || !is_string($grant['action'])
+            || !is_string($grant['idHash'])
+            || !is_string($grant['secretHash'])
+            || !is_string($grant['email'])
+            || !is_string($grant['token'])
+            || !is_int($grant['expiresAt'])
+        ) {
+            $request->getSession()->remove(self::VALIDATION_GRANT_SESSION_KEY);
+
+            return null;
+        }
+
+        if ($grant['expiresAt'] <= time()) {
+            $request->getSession()->remove(self::VALIDATION_GRANT_SESSION_KEY);
+
+            return null;
+        }
+
+        // Keep a valid grant for its original action if an unrelated validation
+        // link is opened in the same browser session.
+        if (!hash_equals($grant['action'], $action)
+            || !hash_equals($grant['idHash'], $idHash)
+            || !hash_equals($grant['secretHash'], $secretHash)
+        ) {
+            return null;
+        }
+
+        return $grant;
+    }
+
+    private function consumeValidationGrant(Request $request, string $action, string $secretHash, string $idHash): void
+    {
+        if (null !== $this->getValidationGrant($request, $action, $secretHash, $idHash)) {
+            $request->getSession()->remove(self::VALIDATION_GRANT_SESSION_KEY);
+        }
+    }
+
+    private function grantValidation(Request $request, string $action, string $idHash, string $email, string $secretHash): void
+    {
+        if (!$this->coreParametersHelper->get('validate_unsubscribe_emails')) {
+            return;
+        }
+
+        $request->getSession()->set(self::VALIDATION_GRANT_SESSION_KEY, [
+            'action'     => $action,
+            'idHash'     => $idHash,
+            'secretHash' => $secretHash,
+            'email'      => $email,
+            'token'      => bin2hex(random_bytes(32)),
+            'expiresAt'  => time() + self::VALIDATION_GRANT_TTL,
+        ]);
     }
 
     private function getUnsubscribeText(string $email, string $idHash): string
