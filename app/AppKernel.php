@@ -187,7 +187,7 @@ class AppKernel extends Kernel
             $bundles[] = new Symfony\Bundle\MakerBundle\MakerBundle();
         }
 
-        if (in_array($this->getEnvironment(), ['test'])) {
+        if ($this->getEnvironment() == 'test') {
             $bundles[] = new Liip\FunctionalTestBundle\LiipFunctionalTestBundle();
             $bundles[] = new Liip\TestFixturesBundle\LiipTestFixturesBundle();
         }
