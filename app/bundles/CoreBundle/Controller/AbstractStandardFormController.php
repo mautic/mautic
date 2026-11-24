@@ -65,6 +65,16 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     abstract protected function getModelName(): string;
 
+    private function getFormModel(): FormModel
+    {
+        $model = $this->getModel($this->getModelName());
+        if (!$model instanceof FormModel) {
+            throw new \LogicException(sprintf('Model "%s" must extend %s.', $this->getModelName(), FormModel::class));
+        }
+
+        return $model;
+    }
+
     /**
      * Support non-index pages such as modal forms.
      */
@@ -124,7 +134,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            $model     = $this->getModel($this->getModelName());
+            $model     = $this->getFormModel();
             $ids       = json_decode($request->query->get('ids', ''));
             $deleteIds = [];
 
@@ -283,7 +293,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $page      = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
         $returnUrl = $this->generateUrl($this->getIndexRoute(), ['page' => $page]);
         $flashes   = [];
-        $model     = $this->getModel($this->getModelName());
+        $model     = $this->getFormModel();
         $entity    = $model->getEntity($objectId);
 
         $postActionVars = [
@@ -343,10 +353,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     protected function editStandard(Request $request, $objectId, bool $ignorePost = false)
     {
         $isClone = false;
-        $model   = $this->getModel($this->getModelName());
-        if (!$model instanceof FormModel) {
-            throw new \Exception($model::class.' must extend '.FormModel::class);
-        }
+        $model   = $this->getFormModel();
 
         $entity = $this->getFormEntity('edit', $objectId, $isClone);
 
@@ -934,10 +941,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $this->throwAccessDenied();
         }
 
-        $model = $this->getModel($this->getModelName());
-        if (!$model instanceof FormModel) {
-            throw new \Exception($model::class.' must extend '.FormModel::class);
-        }
+        $model = $this->getFormModel();
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
