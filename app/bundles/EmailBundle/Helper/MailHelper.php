@@ -1171,8 +1171,21 @@ class MailHelper
         // Append pixel to body before send
         $this->appendTrackingPixel = true;
 
+        $this->markIdHashUntrackedIfTrackingOff();
+    }
+
+    /**
+     * A copy of an email with tracking off gets a marked hash, so it stays untracked if the email turns tracking on
+     * later. The hash can be set before or after the email, so this runs from both.
+     */
+    private function markIdHashUntrackedIfTrackingOff(): void
+    {
+        if (null !== $this->idHash && $this->email instanceof Email && !$this->email->getTrackingEnabled()) {
+            $this->idHash = Stat::markHashUntracked($this->idHash);
+        }
+
         // Add the trackingID to the $message object in order to update the stats if the email failed to send
-        $this->message->updateLeadIdHash($idHash);
+        $this->message->updateLeadIdHash($this->idHash);
     }
 
     /**
@@ -1240,6 +1253,10 @@ class MailHelper
         }
 
         $this->email = $email;
+
+        if (null !== $this->idHash) {
+            $this->markIdHashUntrackedIfTrackingOff();
+        }
 
         $subject = $email->getSubject();
 
@@ -1702,8 +1719,6 @@ class MailHelper
 
         if ($emailExists) {
             $stat->setEmail($this->email);
-            // Kept with the copy, so it stays untracked if the email turns tracking on later
-            $stat->setTrackingEnabled($this->email->getTrackingEnabled());
         }
 
         // Note if a lead

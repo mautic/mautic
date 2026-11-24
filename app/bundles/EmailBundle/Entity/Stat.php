@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -19,6 +18,8 @@ class Stat
     public const MAX_OPEN_DETAILS = 1000;
 
     public const TABLE_NAME = 'email_stats';
+
+    public const UNTRACKED_HASH_PREFIX = 'untracked-';
 
     private ?string $id = null;
 
@@ -60,12 +61,6 @@ class Stat
      * @var bool
      */
     private $viewedInBrowser = false;
-
-    /**
-     * Whether the email allowed tracking when it was sent. A copy sent with tracking off stays untracked even if the
-     * email turns tracking on later.
-     */
-    private bool $trackingEnabled = true;
 
     /**
      * @var \DateTimeInterface|null
@@ -179,11 +174,6 @@ class Stat
 
         $builder->createField('viewedInBrowser', 'boolean')
             ->columnName('viewed_in_browser')
-            ->build();
-
-        $builder->createField('trackingEnabled', Types::BOOLEAN)
-            ->columnName('tracking_enabled')
-            ->option('default', 1)
             ->build();
 
         $builder->createField('dateRead', 'datetime')
@@ -467,14 +457,18 @@ class Stat
         $this->viewedInBrowser = $viewedInBrowser;
     }
 
-    public function getTrackingEnabled(): bool
+    /**
+     * A copy sent with tracking off has this prefix on its tracking hash, so it stays untracked if the email turns
+     * tracking on later.
+     */
+    public static function markHashUntracked(string $trackingHash): string
     {
-        return $this->trackingEnabled;
+        return self::isHashUntracked($trackingHash) ? $trackingHash : self::UNTRACKED_HASH_PREFIX.$trackingHash;
     }
 
-    public function setTrackingEnabled(bool $trackingEnabled): void
+    public static function isHashUntracked(?string $trackingHash): bool
     {
-        $this->trackingEnabled = $trackingEnabled;
+        return null !== $trackingHash && str_starts_with($trackingHash, self::UNTRACKED_HASH_PREFIX);
     }
 
     /**
@@ -483,7 +477,11 @@ class Stat
      */
     public function allowsTracking(): bool
     {
-        return $this->trackingEnabled && (!$this->email instanceof Email || $this->email->getTrackingEnabled());
+        if (self::isHashUntracked($this->trackingHash)) {
+            return false;
+        }
+
+        return !$this->email instanceof Email || $this->email->getTrackingEnabled();
     }
 
     /**

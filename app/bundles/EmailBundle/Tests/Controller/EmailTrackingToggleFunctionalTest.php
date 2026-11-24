@@ -8,7 +8,11 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Mautic\EmailBundle\Model\TransportCallback;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Redirect;
@@ -103,7 +107,7 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         // The sent copy keeps the email's choice, so turning tracking on later doesn't track it
         $stat = $this->em->getRepository(Stat::class)->findOneBy(['email' => $email->getId()]);
         $this->assertInstanceOf(Stat::class, $stat);
-        $this->assertSame($trackingEnabled, $stat->getTrackingEnabled());
+        $this->assertSame(!$trackingEnabled, Stat::isHashUntracked($stat->getTrackingHash()));
 
         if ($trackingEnabled) {
             $this->assertStringContainsString('/r/', $link[1], 'the link goes through a tracked link');
@@ -159,6 +163,80 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         }
 
         $this->assertSame($copyIds[0], $copyIds[1], 'The same unchanged email is stored once.');
+    }
+
+    public function testLinksInACopySentWithTrackingOffWorkWithItsMarkedHash(): void
+    {
+        $segment = $this->createSegment('tracking-toggle-links', []);
+        $contact = $this->createLead('', '', 'links@example.com');
+        $this->createListLead($segment, $contact);
+
+        $email = $this->createEmail('Marked hash');
+        $email->setSubject('Marked hash');
+        $email->setEmailType('list');
+        $email->setLists([$segment]);
+        $email->setTemplate('blank');
+        $email->setCustomHtml('<!DOCTYPE html><html><body><a href="{webview_url}">web</a><a href="{unsubscribe_url}">unsub</a></body></html>');
+        $email->setTrackingEnabled(false);
+        $this->em->persist($email);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', ['id' => $email->getId(), 'pending' => 1]);
+        $this->assertResponseIsSuccessful();
+
+        $message = self::getMailerMessagesByToAddress('links@example.com')[0] ?? null;
+        $this->assertInstanceOf(MauticMessage::class, $message);
+        $body = quoted_printable_decode($message->getBody()->bodyToString());
+
+        $stat = $this->em->getRepository(Stat::class)->findOneBy(['email' => $email->getId()]);
+        $this->assertInstanceOf(Stat::class, $stat);
+        $hash = (string) $stat->getTrackingHash();
+        $this->assertTrue(Stat::isHashUntracked($hash), 'the copy is marked untracked on its hash');
+        $this->assertSame($hash, $message->getLeadIdHash(), 'the message carries the same hash for send failures');
+
+        preg_match('/<a href="([^"]*)">web<\/a><a href="([^"]*)">unsub<\/a>/', $body, $links);
+        $this->assertCount(3, $links, $body);
+        $this->assertStringContainsString('/email/view/'.$hash, $links[1]);
+        $this->assertStringEndsWith('/'.$hash, $links[2], 'the unsubscribe link carries the marked hash');
+
+        $this->logoutUser();
+
+        $this->client->request(Request::METHOD_GET, (string) parse_url($links[1], PHP_URL_PATH));
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('>unsub</a>', (string) $this->client->getResponse()->getContent(), 'the browser view shows the copy');
+
+        $this->client->request(Request::METHOD_GET, (string) parse_url($links[2], PHP_URL_PATH));
+        $this->assertResponseIsSuccessful();
+
+        // Where the address check form sends the recipient
+        $secretHash = self::getContainer()->get(MailHashHelper::class)->getEmailHash('links@example.com');
+        $this->client->request(Request::METHOD_GET, sprintf('/email/unsubscribe/%s/%s/%s', $hash, 'links@example.com', $secretHash));
+        $this->assertResponseIsSuccessful();
+
+        $this->em->clear();
+        $dnc = $this->em->getRepository(DoNotContact::class)->findBy(['lead' => $contact->getId(), 'reason' => DoNotContact::UNSUBSCRIBED]);
+        $this->assertCount(1, $dnc, 'the unsubscribe link finds the copy by its marked hash');
+
+        $stat = $this->em->find(Stat::class, $stat->getId());
+        $this->assertInstanceOf(Stat::class, $stat);
+        $this->assertFalse($stat->getIsRead(), 'the browser view of an untracked copy is not an open');
+    }
+
+    public function testBounceFindsACopySentWithTrackingOffByItsMarkedHash(): void
+    {
+        $stat = $this->createSentStat(true, false);
+        $hash = (string) $stat->getTrackingHash();
+
+        // A bounce to the return path address carries the hash after the underscore
+        $this->assertSame($hash, Address::parseAddressForStatHash('bounces+bounce_'.$hash.'@example.com'));
+
+        self::getContainer()->get(TransportCallback::class)->addFailureByHashId($hash, 'Mailbox not found');
+
+        $this->em->clear();
+        $dnc = $this->em->getRepository(DoNotContact::class)->findBy(['lead' => $stat->getLead()?->getId(), 'reason' => DoNotContact::BOUNCED]);
+        $this->assertCount(1, $dnc, 'the bounce is recorded on the contact who got the copy');
     }
 
     /**
@@ -331,8 +409,8 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         $stat->setEmail($email);
         $stat->setLead($contact);
         $stat->setEmailAddress('opened@example.com');
-        $stat->setTrackingEnabled($copyTrackingEnabled);
-        $stat->setTrackingHash('tracking_toggle_'.($trackingEnabled ? 'on' : 'off').'_'.($copyTrackingEnabled ? 'on' : 'off'));
+        $trackingHash = 'trackingtoggle'.($trackingEnabled ? 'on' : 'off').($copyTrackingEnabled ? 'on' : 'off');
+        $stat->setTrackingHash($copyTrackingEnabled ? $trackingHash : Stat::markHashUntracked($trackingHash));
         $stat->setDateSent((new \DateTime())->modify('-80 second'));
         $this->em->persist($stat);
         $this->em->flush();
