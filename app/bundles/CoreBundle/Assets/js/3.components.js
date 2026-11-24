@@ -36,6 +36,9 @@ Mautic.initSegmentedControl = function (container) {
             }
             control.style.setProperty('--segmented-control-x', checked.offsetLeft + 'px');
             control.style.setProperty('--segmented-control-width', checked.offsetWidth + 'px');
+            if (checked.offsetWidth) {
+                control.classList.add('is-initialized');
+            }
         };
 
         if (control.dataset.segmentedControlReady) {
@@ -45,7 +48,6 @@ Mautic.initSegmentedControl = function (container) {
         control.dataset.segmentedControlReady = 'true';
 
         update();
-        requestAnimationFrame(() => control.classList.add('is-initialized'));
         control.addEventListener('change', update);
 
         if (control.classList.contains('segmented-control--draggable')) {

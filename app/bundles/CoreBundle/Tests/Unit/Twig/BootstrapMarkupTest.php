@@ -137,4 +137,21 @@ final class BootstrapMarkupTest extends TestCase
 
         $this->assertCount(2, (new Crawler($html))->filter('input.btn-check:disabled + label.btn'));
     }
+
+    public function testSegmentedControlGetsLockedClassWhenReadonly(): void
+    {
+        $formFactory = Forms::createFormFactoryBuilder()
+            ->addType(new ButtonGroupType())
+            ->addType(new SegmentedControlType())
+            ->getFormFactory();
+        $options = ['choice_translation_domain' => false, 'choices' => ['A' => 'a', 'B' => 'b']];
+        $render = fn (array $formOptions): Crawler => new Crawler(
+            $this->twig->createTemplate('{{ form_widget(form) }}')->render([
+                'form' => $formFactory->createNamed('mode', SegmentedControlType::class, 'a', $formOptions + $options)->createView(),
+            ])
+        );
+
+        $this->assertCount(1, $render(['attr' => ['readonly' => 'readonly']])->filter('.segmented-control.segmented-control--locked'));
+        $this->assertCount(0, $render([])->filter('.segmented-control--locked'));
+    }
 }
