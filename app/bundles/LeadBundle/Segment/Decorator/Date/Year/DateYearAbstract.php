@@ -13,7 +13,7 @@ abstract class DateYearAbstract extends DateOptionAbstract
     /**
      * @return string
      */
-    protected function getModifierForBetweenRange()
+    protected function getModifierForBetweenRange(): string
     {
         return '+1 year';
     }
