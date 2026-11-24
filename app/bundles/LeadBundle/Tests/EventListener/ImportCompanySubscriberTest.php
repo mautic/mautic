@@ -133,7 +133,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber->onFieldMapping($event);
         $this->assertTrue($event->objectSupported);
         $this->assertSame([
-            'mautic.lead.company' => [
+            'mautic.lead.company_primary' => [
                 'some fields',
             ],
             'mautic.lead.special_fields' => [

@@ -80,7 +80,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
 
             $event->fields = [
                 'mautic.lead.contact'        => $contactFields,
-                'mautic.lead.company'        => $this->fieldList->getFieldList(false, false, ['isPublished' => true, 'object' => 'company']),
+                'mautic.lead.company_primary' => $this->fieldList->getFieldList(false, false, ['isPublished' => true, 'object' => 'company']),
                 'mautic.lead.special_fields' => $specialFields,
             ];
         }
