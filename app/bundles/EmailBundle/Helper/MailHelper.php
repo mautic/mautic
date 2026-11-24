@@ -514,8 +514,9 @@ class MailHelper
 
                 break;
             case self::QUEUE_FULL_RESET:
-                $this->message        = $this->getMessageInstance();
-                $this->attachedAssets = [];
+                $this->message             = $this->getMessageInstance();
+                $this->attachedAssets      = [];
+                $this->embedImagesReplaces = [];
                 $this->clearErrors();
                 break;
             case self::QUEUE_RETURN_ERRORS:
@@ -639,6 +640,7 @@ class MailHelper
             $this->email               = null;
             $this->copies              = [];
             $this->message             = $this->getMessageInstance();
+            $this->embedImagesReplaces = [];
             $this->subject             = '';
             $this->subjectInitial      = null;
             $this->plainText           = '';
