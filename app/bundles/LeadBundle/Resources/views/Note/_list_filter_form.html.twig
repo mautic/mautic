@@ -18,7 +18,7 @@
             {% set noteItems = noteItems|merge([{ name: 'noteTypes[]', value: typeKey, checked: typeKey in noteType, label: typeName }]) %}
         {% endfor %}
         {% include '@MauticCore/Components/checkbox.html.twig' with {
-            inline: true,
+            variant: 'chip',
             items: noteItems
         } only %}
     </div>
