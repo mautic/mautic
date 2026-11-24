@@ -31,14 +31,12 @@ Mautic.initSegmentedControl = function (container) {
         const control = this;
         const update = () => {
             const checked = control.querySelector('.btn-check:checked + .btn');
-            if (!checked) {
+            if (!checked || !checked.offsetWidth) {
                 return;
             }
             control.style.setProperty('--segmented-control-x', checked.offsetLeft + 'px');
             control.style.setProperty('--segmented-control-width', checked.offsetWidth + 'px');
-            if (checked.offsetWidth) {
-                control.classList.add('is-initialized');
-            }
+            control.classList.add('is-initialized');
         };
 
         if (control.dataset.segmentedControlReady) {
