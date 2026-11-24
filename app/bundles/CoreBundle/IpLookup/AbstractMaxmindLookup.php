@@ -80,6 +80,9 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
                     }
                 }
 
+                $this->latitude  = '';
+                $this->longitude = '';
+                $this->timezone  = '';
                 if (isset($data->location)) {
                     $location = $data->location;
                     if (isset($location->latitude)) {
