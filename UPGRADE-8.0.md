@@ -718,7 +718,9 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\StageBundle\StageEvents::STAGE_PRE_SAVE` / `STAGE_POST_SAVE` / `STAGE_PRE_DELETE` / `STAGE_POST_DELETE` | `Mautic\StageBundle\Entity\Stage` |
     | `MauticPlugin\MauticFocusBundle\FocusEvents::PRE_SAVE` / `POST_SAVE` / `PRE_DELETE` / `POST_DELETE` | `MauticPlugin\MauticFocusBundle\Entity\Focus` |
 
-    The matching per-entity event classes (`CategoryEvent`, `MessageEvent`, `StageEvent`, etc.) are no longer dispatched for these actions but remain in place; only the constants above were removed.
+    The matching per-entity event classes were only dispatched for these actions and are removed as well: `Mautic\CategoryBundle\Event\CategoryEvent`, `Mautic\ChannelBundle\Event\MessageEvent`, `Mautic\DynamicContentBundle\Event\DynamicContentEvent`, `Mautic\FormBundle\Event\FormEvent`, `Mautic\PointBundle\Event\PointEvent`, `Mautic\PointBundle\Event\TriggerEvent`, `Mautic\PointBundle\Event\GroupEvent`, `Mautic\ReportBundle\Event\ReportEvent`, `Mautic\StageBundle\Event\StageEvent` and `MauticPlugin\MauticFocusBundle\Event\FocusEvent`.
+
+    `Mautic\CategoryBundle\CategoryEvents` (with its unused `CATEGORY_ON_BUNDLE_LIST_BUILD` constant) and `Mautic\PointBundle\PointGroupEvents` (with its unused `SCORE_CHANGE` constant) are removed too.
 
 ## Changed code
 
