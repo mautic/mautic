@@ -12,7 +12,7 @@ final class Version20220208032455 extends PreUpAssertionMigration
 {
     protected function preUpAssertions(): void
     {
-        $this->skipAssertion(function (Schema $schema) {
+        $this->skipAssertion(function (Schema $schema): bool {
             $sql         = sprintf('select id from %s%s limit 1', $this->prefix, 'forms');
             $recordCount = $this->connection->executeQuery($sql)->fetchOne();
 

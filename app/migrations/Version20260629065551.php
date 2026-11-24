@@ -12,7 +12,7 @@ final class Version20260629065551 extends PreUpAssertionMigration
 {
     protected function preUpAssertions(): void
     {
-        $this->skipAssertion(function (Schema $schema) {
+        $this->skipAssertion(function (Schema $schema): bool {
             $table = $schema->getTable($this->getTableName());
 
             return count($table->getIndexes()) >= IndexHelper::MAX_COUNT_ALLOWED || $table->hasIndex($this->getIndexName());
