@@ -12,7 +12,7 @@
 {% set disabled = disabled|default(false) %}
 {% set readonly = readonly|default(false) %}
 {% set attributes = attributes|default({}) %}
-{% set data = data|default({}) %}
+{% set labelledby = labelledby|default(null) %}
 {% set classes = ['toggle'] %}
 {% if disabled %}{% set classes = classes|merge(['toggle--disabled']) %}{% endif %}
 {% if readonly %}{% set classes = classes|merge(['toggle--readonly']) %}{% endif %}
@@ -22,8 +22,8 @@
      data-no="{{ labelOff|trans|escape('html_attr') }}"
      data-yes-value="{{ valueOn|escape('html_attr') }}"
      data-no-value="{{ valueOff|escape('html_attr') }}"
-     {% for data_key, data_value in data %}
-         data-{{ data_key|escape('html_attr') }}="{{ data_value|trans|escape('html_attr') }}"
+     {% for data_key in ['none', 'start', 'both', 'end'] %}
+         {% if attributes['data-' ~ data_key] is defined %}data-{{ data_key }}="{{ attributes['data-' ~ data_key]|trans|escape('html_attr') }}"{% endif %}
      {% endfor %}>
     {% for choice_value in [valueOn, valueOff] %}
         <input type="radio"
@@ -47,7 +47,7 @@
            role="switch"
            tabindex="0"
            onkeydown="Mautic.handleKeyDown(event, this)"
-           {% if label %}aria-labelledby="{{ id|escape('html_attr') }}_label_text"{% elseif ariaLabel %}aria-label="{{ ariaLabel|trans|escape('html_attr') }}"{% endif %}
+           {% if label %}aria-labelledby="{{ id|escape('html_attr') }}_label_text"{% elseif labelledby %}aria-labelledby="{{ labelledby|escape('html_attr') }}"{% elseif ariaLabel %}aria-label="{{ ariaLabel|trans|escape('html_attr') }}"{% endif %}
            aria-checked="{{ checked ? 'true' : 'false' }}">
         {% if label %}
             <span id="{{ id|escape('html_attr') }}_label_text" class="toggle__label-text{{ hideLabel ? ' visually-hidden' : '' }}">{{ label|trans }}</span>

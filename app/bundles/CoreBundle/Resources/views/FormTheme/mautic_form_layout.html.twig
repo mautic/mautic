@@ -225,6 +225,9 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% if not label %}
     {% set label = name|humanize %}
 {% endif %}
+{% if 'yesno_button_group' in form.vars.block_prefixes %}
+    {% set label_attr = label_attr|merge({'id': id ~ '_form_label'}) %}
+{% endif %}
 {% set tooltip = form.vars.attr.tooltip is defined and form.vars.attr.tooltip is not empty ? form.vars.attr.tooltip|trans : false %}
 <label {% for k, v in label_attr %}
     {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
@@ -564,12 +567,14 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
     {% set yes_choice = form.vars.choices[1] %}
     {% set no_choice = form.vars.choices[0] %}
 
-    {% set publish_data = id is defined and 'Publish' in id ? {
-        'none': attr['data-none']|default('mautic.core.form.inactive_regardless_of_scheduling'),
-        'start': attr['data-start']|default('mautic.core.form.active_on_scheduled_date'),
-        'both': attr['data-both']|default('mautic.core.form.active_during_scheduled_period'),
-        'end': attr['data-end']|default('mautic.core.form.active_until_scheduled_end')
-    } : {} %}
+    {% if id is defined and 'Publish' in id %}
+        {% set attr = {
+            'data-none': 'mautic.core.form.inactive_regardless_of_scheduling',
+            'data-start': 'mautic.core.form.active_on_scheduled_date',
+            'data-both': 'mautic.core.form.active_during_scheduled_period',
+            'data-end': 'mautic.core.form.active_until_scheduled_end',
+        }|merge(attr) %}
+    {% endif %}
 
     {% include '@MauticCore/Components/toggle.html.twig' with {
         'id': id,
@@ -583,7 +588,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
         'disabled': attr.disabled|default(false),
         'readonly': attr.readonly|default(false),
         'attributes': attr,
-        'data': publish_data,
+        'labelledby': id ~ '_form_label',
     } only %}
 {% endblock %}
 
