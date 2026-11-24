@@ -30,7 +30,7 @@ final class StackedHttpKernel implements HttpKernelInterface, TerminableInterfac
      *
      * @var array
      */
-    private $middlewares = [];
+    private $middlewares;
 
     /**
      * Constructs a stacked HTTP kernel.
