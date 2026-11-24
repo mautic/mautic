@@ -18,6 +18,9 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Event\AbstractEntityEvent;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
@@ -33,9 +36,6 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Entity\StatDeviceRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
-use Mautic\EmailBundle\Event\EmailEvent;
-use Mautic\EmailBundle\Event\EmailPostSaveEvent;
-use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
@@ -1033,16 +1033,30 @@ final class EmailModelTest extends TestCase
         $email = new Email();
         $email->setEmailType('list');
         $email->addTranslationChild($child = new Email());
-        $listener   = function (EmailEvent $event) use ($child): void {
-            $isChild = $event->getEmail() === $child;
+        $calls    = [];
+        $listener = function (AbstractEntityEvent $event) use ($child, &$calls): void {
+            $isChild = $event->getEntity() === $child;
             $this->assertSame($isChild, $this->emailModel->isUpdatingTranslationChildren());
+            $calls[] = [$event::class, $isChild];
         };
-        $this->eventDispatcher->addListener(EmailPreSaveEvent::class, $listener);
-        $this->eventDispatcher->addListener(EmailPostSaveEvent::class, $listener);
+        // mock dispatcher, so run the listener on dispatch
+        $this->eventDispatcher->method('hasListeners')->willReturn(true);
+        $this->eventDispatcher->method('dispatch')->willReturnCallback(function (object $event) use ($listener): object {
+            if ($event instanceof EntityPreSave || $event instanceof EntityPostSave) {
+                $listener($event);
+            }
+
+            return $event;
+        });
         $emailRepository = $this->createStub(EmailRepository::class);
         $this->entityManager->method('getRepository')->willReturn($emailRepository);
         $this->emailModel->saveEntity($email);
         $this->assertFalse($this->emailModel->isUpdatingTranslationChildren());
+
+        $this->assertContains([EntityPreSave::class, false], $calls);
+        $this->assertContains([EntityPostSave::class, false], $calls);
+        $this->assertContains([EntityPreSave::class, true], $calls);
+        $this->assertContains([EntityPostSave::class, true], $calls);
     }
 
     /**
