@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 final class FormFieldHelperTest extends TestCase
 {
-    private ?string $defaultUploadDir;
+    private ?string $defaultUploadDir = null;
 
     protected function setUp(): void
     {

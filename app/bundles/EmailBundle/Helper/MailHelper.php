@@ -81,9 +81,9 @@ final class MailHelper
 
     private AddressDTO $systemFrom;
 
-    private ?string $replyTo;
+    private ?string $replyTo = null;
 
-    private ?string $systemReplyTo;
+    private ?string $systemReplyTo = null;
 
     private readonly int $addressLengthLimit;
 
