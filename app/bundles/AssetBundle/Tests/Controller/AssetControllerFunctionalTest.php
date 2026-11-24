@@ -107,6 +107,17 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertCount($expectedCount, $crawler->filter('#tabAmazonS3'));
     }
 
+    public function testFetchRemoteFilesRejectsUnpublishedCloudProvider(): void
+    {
+        $this->createCloudStorageIntegration(false);
+
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', ['action' => 'asset:fetchRemoteFiles', 'provider' => 'AmazonS3', 'path' => '']);
+        $this->assertResponseIsSuccessful();
+        $responseData = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $this->assertSame(0, $responseData['success']);
+        $this->assertArrayNotHasKey('message', $responseData);
+    }
+
     private function createCloudStorageIntegration(bool $isPublished): void
     {
         $plugin = new Plugin();
