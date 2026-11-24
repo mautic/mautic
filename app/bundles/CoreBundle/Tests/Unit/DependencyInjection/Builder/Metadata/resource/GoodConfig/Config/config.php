@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\Controller\AjaxController;
 use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
 
 return [
@@ -9,7 +10,7 @@ return [
         'main' => [
             'mautic_core_ajax' => [
                 'path'       => '/ajax',
-                'controller' => 'Mautic\CoreBundle\Controller\AjaxController::delegateAjaxAction',
+                'controller' => AjaxController::class.'::delegateAjaxAction',
             ],
         ],
     ],

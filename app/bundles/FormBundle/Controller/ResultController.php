@@ -70,7 +70,7 @@ final class ResultController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $formPage],
-                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
+                    'contentTemplate' => FormController::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'form',
@@ -310,7 +310,7 @@ final class ResultController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $formPage],
-                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
+                    'contentTemplate' => FormController::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'form',

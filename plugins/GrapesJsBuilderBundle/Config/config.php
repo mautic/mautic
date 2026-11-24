@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController;
+use MauticPlugin\GrapesJsBuilderBundle\Controller\GrapesJsController;
+
 return [
     'name'        => 'GrapesJS Builder',
     'description' => 'GrapesJS Builder with MJML support for Mautic',
@@ -11,23 +14,23 @@ return [
         'main'   => [
             'grapesjsbuilder_upload' => [
                 'path'       => '/grapesjsbuilder/upload',
-                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::uploadAction',
+                'controller' => FileManagerController::class.'::uploadAction',
             ],
             'grapesjsbuilder_delete' => [
                 'path'       => '/grapesjsbuilder/delete',
-                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::deleteAction',
+                'controller' => FileManagerController::class.'::deleteAction',
             ],
             'grapesjsbuilder_media' => [
                 'path'       => '/grapesjsbuilder/media',
-                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::getMediaAction',
+                'controller' => FileManagerController::class.'::getMediaAction',
             ],
             'grapesjsbuilder_builder' => [
                 'path'       => '/grapesjsbuilder/{objectType}/{objectId}',
-                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\GrapesJsController::builderAction',
+                'controller' => GrapesJsController::class.'::builderAction',
             ],
             'grapesjsbuilder_editor_state' => [
                 'path'       => '/grapesjsbuilder/{objectType}/{objectId}/editor-state',
-                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\GrapesJsController::editorStateAction',
+                'controller' => GrapesJsController::class.'::editorStateAction',
                 'methods'    => ['GET'],
             ],
         ],

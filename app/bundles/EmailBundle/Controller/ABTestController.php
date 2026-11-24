@@ -62,7 +62,7 @@ final class ABTestController extends AbstractFormController
                     [
                         'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
                         'viewParameters'  => $viewParameters,
-                        'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::viewAction',
+                        'contentTemplate' => EmailController::class.'::viewAction',
                         'passthroughVars' => [
                             'mauticContent' => 'email',
                             'closeModal'    => 1,

@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\Controller\AjaxController;
+use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Controller\DefaultController;
+use Mautic\CoreBundle\Controller\LockController;
 use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
 use Mautic\CoreBundle\IpLookup\GeobytesLookup;
 use Mautic\CoreBundle\IpLookup\GeoipsLookup;
@@ -21,15 +25,15 @@ return [
         'public' => [
             'mautic_secure_root' => [
                 'path'       => '/s',
-                'controller' => 'Mautic\CoreBundle\Controller\DefaultController::redirectSecureRootAction',
+                'controller' => DefaultController::class.'::redirectSecureRootAction',
             ],
             'mautic_secure_root_slash' => [
                 'path'       => '/s/',
-                'controller' => 'Mautic\CoreBundle\Controller\DefaultController::redirectSecureRootAction',
+                'controller' => DefaultController::class.'::redirectSecureRootAction',
             ],
             'mautic_remove_trailing_slash' => [
                 'path'         => '/{url}',
-                'controller'   => 'Mautic\CoreBundle\Controller\CommonController::removeTrailingSlashAction',
+                'controller'   => CommonController::class.'::removeTrailingSlashAction',
                 'requirements' => [
                     'url' => '.*/$',
                 ],
@@ -39,11 +43,11 @@ return [
         'main' => [
             'mautic_core_ajax' => [
                 'path'       => '/ajax',
-                'controller' => 'Mautic\CoreBundle\Controller\AjaxController::delegateAjaxAction',
+                'controller' => AjaxController::class.'::delegateAjaxAction',
             ],
             'mautic_core_form_action' => [
                 'path'       => '/action/{objectAction}/{objectModel}/{objectId}',
-                'controller' => 'Mautic\CoreBundle\Controller\LockController::executeAction',
+                'controller' => LockController::class.'::executeAction',
                 'defaults'   => [
                     'objectModel' => '',
                 ],

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController;
+use MauticPlugin\MauticFocusBundle\Controller\FocusController;
+use MauticPlugin\MauticFocusBundle\Controller\PublicController;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 
 return [
@@ -15,21 +17,21 @@ return [
         'main' => [
             'mautic_focus_index' => [
                 'path'       => '/focus/{page}',
-                'controller' => 'MauticPlugin\MauticFocusBundle\Controller\FocusController::indexAction',
+                'controller' => FocusController::class.'::indexAction',
             ],
             'mautic_focus_action' => [
                 'path'       => '/focus/{objectAction}/{objectId}',
-                'controller' => 'MauticPlugin\MauticFocusBundle\Controller\FocusController::executeAction',
+                'controller' => FocusController::class.'::executeAction',
             ],
         ],
         'public' => [
             'mautic_focus_generate' => [
                 'path'       => '/focus/{id}.js',
-                'controller' => 'MauticPlugin\MauticFocusBundle\Controller\PublicController::generateAction',
+                'controller' => PublicController::class.'::generateAction',
             ],
             'mautic_focus_pixel' => [
                 'path'       => '/focus/{id}/viewpixel.gif',
-                'controller' => 'MauticPlugin\MauticFocusBundle\Controller\PublicController::viewPixelAction',
+                'controller' => PublicController::class.'::viewPixelAction',
             ],
         ],
         'api' => [
@@ -41,7 +43,7 @@ return [
             ],
             'mautic_api_focusjs' => [
                 'path'       => '/focus/{id}/js',
-                'controller' => 'MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController::generateJsAction',
+                'controller' => FocusApiController::class.'::generateJsAction',
                 'method'     => 'POST',
             ],
         ],

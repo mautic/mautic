@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Helper\CampaignContactCountHelper;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CoreBundle\Controller\Api\StatsApiController;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -376,7 +377,7 @@ final class CampaignApiController extends CommonApiController
         ];
 
         return $this->forward(
-            'Mautic\CoreBundle\Controller\Api\StatsApiController::listAction',
+            StatsApiController::class.'::listAction',
             [
                 'table'     => 'campaign_leads',
                 'itemsName' => 'contacts',

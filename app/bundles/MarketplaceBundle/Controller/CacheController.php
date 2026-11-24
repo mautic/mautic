@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\MarketplaceBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\MarketplaceBundle\Controller\Package\ListController;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,7 +39,7 @@ final class CacheController extends CommonController
         }
 
         return $this->forward(
-            'Mautic\MarketplaceBundle\Controller\Package\ListController::listAction'
+            ListController::class.'::listAction'
         );
     }
 }
