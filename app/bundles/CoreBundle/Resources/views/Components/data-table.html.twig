@@ -132,7 +132,7 @@
                             {%- if column.width|default('') %} style="inline-size: {{ column.width|e('html_attr') }}"{% endif %}
                             {%- if column.sortable|default(false) or column.sortHref|default('') %} aria-sort="{{ sortState == 'asc' ? 'ascending' : (sortState == 'desc' ? 'descending' : 'none') }}"{% endif %}>
                             {% if column.sortHref|default('') %}
-                                <a class="data-table__sort" href="{{ column.sortHref|e('html_attr') }}" data-toggle="ajax">
+                                <a class="data-table__sort" href="{{ column.sortHref|e('html_attr') }}" data-toggle="ajax" data-target="{{ target|default('.page-list')|e('html_attr') }}">
                                     <span class="data-table__sort-label">{{ column.label|trans }}</span>
                                     <i class="ri-arrow-up-line data-table__sort-icon" aria-hidden="true"></i>
                                     <i class="ri-arrow-up-down-line data-table__sort-icon-unsorted" aria-hidden="true"></i>
