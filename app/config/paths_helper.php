@@ -3,7 +3,7 @@
 include 'paths.php';
 
 // Closure to replace kernel.project_dir placeholders
-$replaceRootPlaceholder = function (&$value) use ($projectRoot, &$replaceRootPlaceholder) {
+$replaceRootPlaceholder = function (&$value) use ($projectRoot, &$replaceRootPlaceholder): void {
     if (is_array($value)) {
         foreach ($value as &$v) {
             $replaceRootPlaceholder($v);
