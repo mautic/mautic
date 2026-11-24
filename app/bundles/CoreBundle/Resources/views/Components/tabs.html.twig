@@ -70,7 +70,7 @@
                         role="tab"
                         aria-controls="{{ tabId|e('html_attr') }}"
                         {% if variant == 'iconOnly' %}aria-label="{{ tabLabel|trans|e('html_attr') }}"{% endif %}
-                        aria-selected="{{ isActive ? 'true' : 'false' }}"
+                        aria-selected="{{ (isActive ? 'true' : 'false')|e('html_attr') }}"
                         {% if isDisabled %}disabled tabindex="-1"{% endif %}>
                     {% if variant == 'iconOnly' %}
                         <div class="tabs__nav-item-label-wrapper">
