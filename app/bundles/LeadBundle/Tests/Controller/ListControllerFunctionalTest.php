@@ -674,7 +674,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check segment count UI for no contacts.
         $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
-        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $leadListsTableRows = $crawler->filterXPath("//section[@id='leadListTable']//tbody/tr[@data-parent-row]");
         $this->assertCount(2, $leadListsTableRows);
 
         // Find rows by segment name to avoid relying on table order
@@ -759,15 +759,15 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
 
-        $warningSegmentRow = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr[contains(., 'TEST-Warning-Segment')]");
+        $warningSegmentRow = $crawler->filterXPath("//section[@id='leadListTable']//tbody/tr[@data-parent-row][contains(., 'TEST-Warning-Segment')]");
         $warningIcon       = $warningSegmentRow->filterXPath('.//i[@class="text-danger ri-error-warning-line fs-14"]');
         $this->assertCount(1, $warningIcon);
 
-        $freshSegmentRow = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr[contains(., 'TEST-Fresh-Segment')]");
+        $freshSegmentRow = $crawler->filterXPath("//section[@id='leadListTable']//tbody/tr[@data-parent-row][contains(., 'TEST-Fresh-Segment')]");
         $warningIcon     = $freshSegmentRow->filterXPath('.//i[@class="text-danger ri-error-warning-line fs-14"]');
         $this->assertCount(0, $warningIcon);
 
-        $unpublishedSegmentRow = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr[contains(., 'TEST-Unpublished-Segment')]");
+        $unpublishedSegmentRow = $crawler->filterXPath("//section[@id='leadListTable']//tbody/tr[@data-parent-row][contains(., 'TEST-Unpublished-Segment')]");
         $warningIcon           = $unpublishedSegmentRow->filterXPath('.//i[@class="text-danger ri-error-warning-line fs-14"]');
         $this->assertCount(0, $warningIcon);
     }

@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Symfony\Component\DomCrawler\Crawler;
 
 final class ListControllerTest extends MauticMysqlTestCase
 {
-    use ControllerTrait;
-
     /**
      * Index action should return status code 200.
      */
@@ -26,13 +24,30 @@ final class ListControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $urlAlias   = 'segments';
-        $routeAlias = 'leadlist';
-        $column     = 'dateModified';
-        $column2    = 'name';
-        $tableAlias = 'l.';
+        $crawler         = $this->client->request('GET', '/s/segments');
+        $responseContent = (string) $this->client->getResponse()->getContent();
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('col-leadlist-dateAdded', $responseContent, 'The return must contain the created at date column');
+        $this->assertStringContainsString('col-leadlist-dateModified', $responseContent, 'The return must contain the modified date column');
+        $this->assertSortState($crawler, 'dateModified', 'descending');
 
-        $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
+        $crawler = $this->client->request('GET', '/s/segments?tmpl=list&name=lead.list&orderby=l.dateModified');
+        $this->assertSortState($crawler, 'dateModified', 'ascending');
+
+        $crawler = $this->client->request('GET', '/s/segments?tmpl=list&name=lead.list&orderby=l.name');
+        $this->assertSortState($crawler, 'name', 'ascending');
+
+        $crawler = $this->client->request('GET', '/s/segments?tmpl=list&name=lead.list&orderby=l.name');
+        $this->assertSortState($crawler, 'name', 'descending');
+    }
+
+    private function assertSortState(Crawler $crawler, string $column, string $direction): void
+    {
+        $this->assertCount(
+            1,
+            $crawler->filterXPath(sprintf("//th[contains(@class,'col-leadlist-%s') and @aria-sort='%s']", $column, $direction)),
+            sprintf('The %s column must be sorted %s', $column, $direction)
+        );
     }
 
     /**

@@ -101,11 +101,11 @@
 {% set dir = app.session.get('mautic.lead.list.orderbydir', 'ASC') %}
 {% set columns = [] %}
 {% for column in [
-    {key: 'name', label: 'mautic.core.name', orderBy: 'l.name'},
+    {key: 'name', label: 'mautic.core.name', orderBy: 'l.name', className: 'col-leadlist-name'},
     {key: 'leadcount', label: 'mautic.lead.list.thead.leadcount', className: 'visible-md visible-lg col-leadlist-leadcount'},
-    {key: 'dateAdded', label: 'mautic.lead.import.label.dateAdded', orderBy: 'l.dateAdded', className: 'visible-md visible-lg'},
-    {key: 'dateModified', label: 'mautic.lead.import.label.dateModified', orderBy: 'l.dateModified', className: 'visible-md visible-lg'},
-    {key: 'createdByUser', label: 'mautic.core.createdby', orderBy: 'l.createdByUser', className: 'visible-md visible-lg'},
+    {key: 'dateAdded', label: 'mautic.lead.import.label.dateAdded', orderBy: 'l.dateAdded', className: 'visible-md visible-lg col-leadlist-dateAdded'},
+    {key: 'dateModified', label: 'mautic.lead.import.label.dateModified', orderBy: 'l.dateModified', className: 'visible-md visible-lg col-leadlist-dateModified'},
+    {key: 'createdByUser', label: 'mautic.core.createdby', orderBy: 'l.createdByUser', className: 'visible-md visible-lg col-leadlist-createdByUser'},
     {key: 'id', label: 'mautic.core.id', orderBy: 'l.id', className: 'visible-md visible-lg col-leadlist-id'},
 ] %}
     {% set columns = columns|merge([column|merge(column.orderBy is defined ? {
