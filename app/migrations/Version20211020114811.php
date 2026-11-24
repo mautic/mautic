@@ -23,22 +23,22 @@ final class Version20211020114811 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => !$schema->getTable($this->getPrefixedTableName(self::COMPANIES_TABLE))->hasIndex(self::INDEX_COMPANY_MATCH),
+            fn (Schema $schema): bool => !$schema->getTable($this->getPrefixedTableName(self::COMPANIES_TABLE))->hasIndex(self::INDEX_COMPANY_MATCH),
             sprintf('The index %s does not exist in the %s table.', self::INDEX_COMPANY_MATCH, $this->getPrefixedTableName(self::COMPANIES_TABLE))
         );
 
         $this->skipAssertion(
-            fn (Schema $schema) => !$schema->getTable($this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE))->hasIndex(self::INDEX_INTEGRATION_OBJECT),
+            fn (Schema $schema): bool => !$schema->getTable($this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE))->hasIndex(self::INDEX_INTEGRATION_OBJECT),
             sprintf('The index %s does not exist in the %s table.', self::INDEX_INTEGRATION_OBJECT, $this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE))
         );
 
         $this->skipAssertion(
-            fn (Schema $schema) => !$schema->getTable($this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE))->hasIndex(self::INDEX_INTEGRATION_REFERENCE),
+            fn (Schema $schema): bool => !$schema->getTable($this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE))->hasIndex(self::INDEX_INTEGRATION_REFERENCE),
             sprintf('The index %s does not exist in the %s table.', self::INDEX_INTEGRATION_REFERENCE, $this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE))
         );
 
         $this->skipAssertion(
-            fn () => empty($this->getTables()),
+            fn (): bool => empty($this->getTables()),
             'No tables require character set conversion.'
         );
     }

@@ -15,7 +15,7 @@ final class Version20250207035735 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => false === $schema->getTable($this->getPrefixedTableName())
+            fn (Schema $schema): bool => false === $schema->getTable($this->getPrefixedTableName())
                 ->getColumn('is_short_visible')
                 ->getDefault(),
             sprintf('Column %s already has a default set', 'is_short_visible')

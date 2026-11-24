@@ -16,7 +16,7 @@ final class Version20250904111834 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => $this->hasColumn($schema, 'date_linked')
+            fn (Schema $schema): bool => $this->hasColumn($schema, 'date_linked')
                 && $this->hasColumn($schema, 'date_added'),
             "Table {$this->getPrefixedTableName()} already has 'date_linked' and 'date_added' column"
         );
