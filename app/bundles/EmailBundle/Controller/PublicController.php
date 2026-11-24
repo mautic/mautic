@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -12,12 +11,9 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
-use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
-use Mautic\EmailBundle\Exception\ForwardLimitReachedException;
-use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Form\Type\EmailPreviewOptionsType;
-use Mautic\EmailBundle\Form\Type\ForwardEmailType;
 use Mautic\EmailBundle\Form\Type\ValidateEmailType;
 use Mautic\EmailBundle\Helper\EmailAddressLinkMatcher;
 use Mautic\EmailBundle\Helper\EmailConfig;
@@ -26,7 +22,6 @@ use Mautic\EmailBundle\Helper\EmailPreviewHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\EmailBundle\Model\ForwardedEmailSender;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
@@ -45,7 +40,6 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
@@ -230,110 +224,32 @@ final class PublicController extends CommonFormController
     }
 
     /**
-     * Lets the recipient of a sent email send a copy of it to somebody else. The copy carries
-     * none of the links, headers or tracking that belong to the original recipient.
+     * The copy of an email that its recipients pass on to somebody else. It is the same for everybody: it carries
+     * none of the links or tracking that belong to a recipient, and whoever opens it is not recorded.
      */
-    public function forwardAction(Request $request, ForwardedEmailSender $forwardedEmailSender, string $idHash): Response
+    public function forwardAction(AssetsHelper $assetsHelper, MailHashHelper $mailHash, string $objectId, string $hash): Response
     {
-        $stat = $this->emailModel->getEmailStatus($idHash);
-        if (!$stat instanceof Stat || !$forwardedEmailSender->isAvailable($stat)) {
+        $email = $this->emailModel->getEntity((int) $objectId);
+        if (!$email instanceof Email || !$email->isPublished() || !hash_equals($mailHash->getForwardHash((int) $email->getId()), $hash)) {
             return $this->notFound();
         }
 
-        // Same as the unsubscribe page: shown in the language of the contact who got the email. The contact is
-        // loaded through the model, since the preferred locale is a contact field.
-        $contact = $stat->getLead() instanceof Lead ? $this->leadModel->getEntity($stat->getLead()->getId()) : null;
-        if ($contact instanceof Lead && $language = $contact->getPreferredLocale()) {
-            $this->translator->setLocale($language);
-        }
-
-        [$contentTemplate, $themeName] = $this->resolveForwardTemplate($stat->getEmail());
-
-        if ($forwardedEmailSender->isLimitReached($stat)) {
-            return $this->renderForwardMessage($contentTemplate, $themeName, 'mautic.email.forward.limit_reached');
-        }
-
-        $form = $this->formFactory->create(
-            ForwardEmailType::class,
+        $event = new EmailSendEvent(
             null,
-            ['action' => $this->generateUrl('mautic_email_forward', ['idHash' => $idHash])]
+            [
+                'content'       => $this->generateContent($email, $assetsHelper, false),
+                'email'         => $email,
+                'tokens'        => ['{tracking_pixel}' => ''],
+                'internalSend'  => true,
+                'forwardedCopy' => true,
+            ]
         );
-        $form->handleRequest($request);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $toAddress = trim((string) $form->get('emailAddress')->getData());
+        $response = new Response($event->getContent(true));
+        $response->headers->set('X-Robots-Tag', 'noindex');
 
-            try {
-                $forwardedEmailSender->send($stat, $toAddress);
-
-                return $this->renderForwardMessage($contentTemplate, $themeName, 'mautic.email.forward.success', ['%email%' => $toAddress]);
-            } catch (InvalidEmailException $exception) {
-                $form->get('emailAddress')->addError(new FormError($exception->getMessage()));
-            } catch (ForwardLimitReachedException) {
-                return $this->renderForwardMessage($contentTemplate, $themeName, 'mautic.email.forward.limit_reached');
-            } catch (EmailCouldNotBeSentException $exception) {
-                $this->mauticLogger->error('A forwarded copy of email '.$stat->getEmail()->getId().' could not be sent: '.$exception->getMessage());
-
-                return $this->renderForwardMessage($contentTemplate, $themeName, 'mautic.email.forward.failed');
-            }
-        }
-
-        $formView = $form->createView();
-
-        // The theme sandbox only allows property access on Mautic objects, so the
-        // template gets the child views and their state instead of reading FormView.
-        return new Response($this->themeHelper->renderThemeTemplate(
-            $contentTemplate,
-            [
-                'form'                  => $formView,
-                'emailAddressField'     => $formView['emailAddress'],
-                'emailAddressValid'     => $formView['emailAddress']->vars['valid'],
-                'emailAddressHasErrors' => count($formView['emailAddress']->vars['errors']) > 0,
-                'formHasErrors'         => count($formView->vars['errors']) > 0,
-                'submitField'           => $formView['submit'],
-                'template'              => $themeName,
-            ]
-        ));
-    }
-
-    /**
-     * @param array<string, string> $parameters
-     */
-    private function renderForwardMessage(string $contentTemplate, string $themeName, string $messageKey, array $parameters = []): Response
-    {
-        return new Response($this->themeHelper->renderThemeTemplate(
-            $contentTemplate,
-            [
-                'message'  => $this->translator->trans($messageKey, $parameters),
-                'template' => $themeName,
-            ]
-        ));
-    }
-
-    /**
-     * The email's own theme may ship a forward page; otherwise the core page is used.
-     *
-     * @return array{0: string, 1: string}
-     */
-    private function resolveForwardTemplate(Email $email): array
-    {
-        $themeName = $email->getTemplate();
-        if (!$themeName || 'mautic_code_mode' === $themeName) {
-            $themeName = $this->coreParametersHelper->get('theme');
-        }
-
-        try {
-            $contentTemplate = $this->themeHelper->checkForTwigTemplate('@themes/'.$themeName.'/html/email-forward.html.twig');
-        } catch (BadConfigurationException) {
-            return ['@MauticCore/Theme/email-forward.html.twig', $themeName];
-        }
-
-        // Use the same theme that was found above.
-        if (preg_match('#^@themes/([^/]+)/#', $contentTemplate, $matches)) {
-            $themeName = $matches[1];
-        }
-
-        return [$contentTemplate, $themeName];
+        return $response;
     }
 
     public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, EmailDefaultsHelper $emailDefaultsHelper, string $idHash, ?string $secretHash = null, ?string $urlEmail = null): Response

@@ -13,6 +13,7 @@ use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Entity\Trackable;
@@ -181,6 +182,10 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
         $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
         $event->addToken('{brand=name}', (string) $this->coreParametersHelper->get('brand_name'));
+
+        $forwardUrl = $this->getForwardUrl($email);
+        $event->addToken('{forward_url}', $forwardUrl);
+        $event->addToken('{forward_text}', $this->getForwardText($forwardUrl));
     }
 
     /**
@@ -218,20 +223,15 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
 
         // We will replace tokens in unsubscribe text too
-        $unsubscribeText = \Mautic\LeadBundle\Helper\TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
+        $unsubscribeText = TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
         $unsubscribeText = str_replace('|URL|', $unsubscribeUrl, $unsubscribeText);
         $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
         $event->addToken('{unsubscribe_url}', $unsubscribeUrl);
         $event->addToken('{dnc_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe_all', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
         $event->addToken('{resubscribe_url}', $resubscribeUrl);
 
-        $webviewText = $this->coreParametersHelper->get('webview_text');
-        if (!$webviewText) {
-            $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
-        }
         $webviewLink = $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]);
-        $webviewText = str_replace('|URL|', $webviewLink, $webviewText);
-        $event->addToken('{webview_text}', EmojiHelper::toHtml($webviewText));
+        $event->addToken('{webview_text}', $this->getWebviewText($webviewLink));
 
         // Show public email preview if the lead is not known to prevent 404
         if (empty($lead['id']) && $email) {
@@ -239,10 +239,16 @@ final class BuilderSubscriber implements EventSubscriberInterface
         } else {
             $event->addToken('{webview_url}', $webviewLink);
         }
+    }
 
-        $forwardUrl = $this->getForwardUrl($event);
-        $event->addToken('{forward_url}', $forwardUrl);
-        $event->addToken('{forward_text}', $this->getForwardText($forwardUrl));
+    private function getWebviewText(string $webviewLink): string
+    {
+        $webviewText = $this->coreParametersHelper->get('webview_text');
+        if (!$webviewText) {
+            $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
+        }
+
+        return EmojiHelper::toHtml(str_replace('|URL|', $webviewLink, $webviewText));
     }
 
     /**
@@ -264,36 +270,56 @@ final class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * The forward link only works for an email that was really sent, so previews and other
-     * internal sends get no link at all.
+     * Opens a new message in the mail client of whoever clicks it, already holding a link to the copy of the email
+     * that is meant to be passed on. Mautic sends nothing itself and never learns who the message goes to.
      */
-    private function getForwardUrl(EmailSendEvent $event): string
+    private function getForwardUrl(?Email $email): string
     {
-        $idHash = $event->getIdHash();
-        if ($event->isInternalSend() || null === $idHash || '' === $idHash) {
+        $copyUrl = $this->getForwardedCopyUrl($email);
+        if ('' === $copyUrl) {
             return '';
         }
 
-        return $this->emailModel->buildUrl('mautic_email_forward', ['idHash' => $idHash]);
+        // The subject may greet the recipient by name, which is not for whoever the message goes to
+        $subject  = (string) $email->getSubject();
+        $defaults = TokenHelper::findLeadTokenDefaults($subject);
+        $subject  = str_replace(array_keys($defaults), $defaults, $subject);
+
+        return 'mailto:?subject='.rawurlencode($this->translator->trans('mautic.email.forward.mail.subject', ['%subject%' => $subject]))
+            .'&body='.rawurlencode($this->translator->trans('mautic.email.forward.mail.body', ['%link%' => $copyUrl]));
     }
 
     /**
-     * A forwarded copy must carry nothing that acts on, or points back at, the original recipient.
+     * The page with the copy of the email that carries nothing of any recipient. An email that isn't saved yet has
+     * no such page.
+     */
+    private function getForwardedCopyUrl(?Email $email): string
+    {
+        if (null === $email || null === $email->getId()) {
+            return '';
+        }
+
+        return $this->emailModel->buildUrl(
+            'mautic_email_forward',
+            ['objectId' => $email->getId(), 'hash' => $this->mailHash->getForwardHash((int) $email->getId())]
+        );
+    }
+
+    /**
+     * A forwarded copy must carry nothing that acts on, or points back at, the original recipient. Its web view
+     * is the copy itself.
      */
     private function addForwardedCopyTokens(EmailSendEvent $event, ?Email $email): void
     {
-        // The public preview is the only web view that isn't the original recipient's own copy
-        $previewUrl = $email && $email->isPublicPreview() ? $this->emailModel->buildUrl('mautic_email_preview', ['objectId' => $email->getId()]) : '';
+        $copyUrl = $this->getForwardedCopyUrl($email);
 
         $event->addTokens([
             '{unsubscribe_text}' => '',
             '{unsubscribe_url}'  => '',
             '{dnc_url}'          => '',
             '{resubscribe_url}'  => '',
-            '{forward_url}'      => '',
-            '{forward_text}'     => '',
-            '{webview_text}'     => '',
-            '{webview_url}'      => $previewUrl,
+            '{webview_text}'     => '' === $copyUrl ? '' : $this->getWebviewText($copyUrl),
+            '{webview_url}'      => $copyUrl,
         ]);
     }
 

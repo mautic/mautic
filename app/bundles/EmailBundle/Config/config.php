@@ -92,8 +92,11 @@ return [
                 'defaults'   => ['urlEmail' => null, 'secretHash' => null], // @todo make the secretHash required after a few years.
             ],
             'mautic_email_forward' => [
-                'path'       => '/email/forward/{idHash}',
-                'controller' => 'Mautic\EmailBundle\Controller\PublicController::forwardAction',
+                'path'         => '/email/forward/{objectId}/{hash}',
+                'controller'   => 'Mautic\EmailBundle\Controller\PublicController::forwardAction',
+                'requirements' => [
+                    'objectId' => '\d+',
+                ],
             ],
             'mautic_email_validate_email_form' => [
                 'path'       => '/email/validate/{action}/{secretHash}/{idHash}',
@@ -201,7 +204,6 @@ return [
         ],
         'mailer_is_owner'                                                   => false,
         'disable_unsubscribe_link_header'                                   => false,
-        'email_forward_limit'                                               => 5,
         'default_signature_text'                                            => null,
         'email_frequency_number'                                            => 0,
         'email_frequency_time'                                              => 'DAY',

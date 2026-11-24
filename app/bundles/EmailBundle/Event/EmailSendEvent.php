@@ -87,11 +87,7 @@ class EmailSendEvent extends CommonEvent
             $this->internalSend = $helper->isInternalSend();
         }
 
-        if (isset($args['forwardedCopy'])) {
-            $this->forwardedCopy = (bool) $args['forwardedCopy'];
-        } elseif (null !== $helper) {
-            $this->forwardedCopy = $helper->isForwardedCopy();
-        }
+        $this->forwardedCopy = (bool) ($args['forwardedCopy'] ?? false);
     }
 
     /**
@@ -105,7 +101,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * A copy of a sent email going to somebody other than the original recipient.
+     * A copy of the email shown to somebody the recipient passed it on to.
      */
     public function isForwardedCopy(): bool
     {

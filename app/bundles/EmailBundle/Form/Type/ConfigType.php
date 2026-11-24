@@ -18,9 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -472,23 +470,6 @@ final class ConfigType extends AbstractType
                 ],
                 'data'       => !empty($options['data']['disable_unsubscribe_link_header']),
                 'required'   => false,
-            ]
-        );
-
-        $builder->add(
-            'email_forward_limit',
-            NumberType::class,
-            [
-                'scale'      => 0,
-                'label'      => 'mautic.email.config.forward.limit',
-                'label_attr' => ['class' => 'form-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.forward.limit.tooltip',
-                    'min'     => 0,
-                ],
-                'required'    => true,
-                'constraints' => [new NotNull(message: 'mautic.core.value.required'), new GreaterThanOrEqual(0)],
             ]
         );
 
