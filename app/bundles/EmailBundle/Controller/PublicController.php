@@ -516,7 +516,7 @@ final class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function resubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, MailHashHelper $mailHash, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, string $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
+    public function resubscribeAction(ContactTracker $contactTracker, EmailModel $model, MailHashHelper $mailHash, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, string $idHash, ?string $urlEmail = null, ?string $secretHash = null, ?Request $request = null): Response
     {
         $stat    = $model->getEmailStatus($idHash);
         $hasStat = $stat instanceof Stat;
@@ -528,7 +528,9 @@ final class PublicController extends CommonFormController
                 if ($isCorrectHash) {
                     $email = $lead = false;
                     $model->removeDoNotContact($urlEmail);
-                    $this->grantValidation($request, 'unsubscribe', $idHash, $urlEmail, $secretHash);
+                    if ($request instanceof Request) {
+                        $this->grantValidation($request, 'unsubscribe', $idHash, $urlEmail, $secretHash);
+                    }
                     $message = $this->buildResubscribeSuccessMessage($urlEmail, $secretHash, $idHash);
                 } else {
                     $email   = false;
@@ -571,7 +573,9 @@ final class PublicController extends CommonFormController
             if ($isCorrectHash) {
                 $email = $lead = false;
                 $model->removeDoNotContact($urlEmail);
-                $this->grantValidation($request, 'unsubscribe', $idHash, $urlEmail, $secretHash);
+                if ($request instanceof Request) {
+                    $this->grantValidation($request, 'unsubscribe', $idHash, $urlEmail, $secretHash);
+                }
                 $message = $this->buildResubscribeSuccessMessage($urlEmail, $secretHash, $idHash);
             } else {
                 $email   = $lead   = false;

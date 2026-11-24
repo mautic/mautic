@@ -35,6 +35,8 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     private const UNSUBSCRIBE_TESTS = [
         'testUnsubscribeWithEmailStat',
         'testUnsubscribeEmail',
+        'testValidationGrantAllowsImmediateOppositeActionWithoutRetypingEmail',
+        'testValidationGrantExpiresAndRequiresEmailAgain',
         'testHeadRequestWithNoShowContactPreferences',
         'testUnsubscribeWithExistingStatRejectsDifferentValidEmailHashPair',
         'testUnsubscribeWithDeletedStatAllowsValidEmailHashPair',
@@ -784,7 +786,8 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testValidationGrantAllowsImmediateOppositeActionWithoutRetypingEmail(): void
     {
-        $stat       = $this->getStat();
+        $lead       = $this->createLead();
+        $stat       = $this->getStat(null, $lead);
         $email      = $stat->getEmailAddress();
         $secretHash = $this->getSecretHash($email);
         $idHash     = $stat->getTrackingHash();
@@ -794,6 +797,12 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $form    = $crawler->selectButton('Verify email')->form();
         $form['validate_email[emailAddress]'] = (string) $email;
         $this->client->submit($form);
+
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+        $dncRecords    = $dncRepository->findBy(['lead' => $lead->getId()]);
+        $this->assertCount(1, $dncRecords);
+        $this->assertSame(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason());
 
         $resubscribePath = '/email/validate/resubscribe/'.$secretHash.'/'.$idHash;
         $crawler         = $this->client->request(Request::METHOD_GET, $resubscribePath);
@@ -805,6 +814,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($crawler->selectButton('Verify email')->form());
 
         $this->assertStringContainsString('has been re-subscribed', strip_tags((string) $this->client->getResponse()->getContent()));
+        $this->assertCount(0, $dncRepository->findBy(['lead' => $lead->getId()]));
 
         // The consumed grant cannot be replayed for the same action. The successful
         // resubscribe creates a new grant for the opposite action instead.
@@ -820,7 +830,8 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testValidationGrantExpiresAndRequiresEmailAgain(): void
     {
-        $stat       = $this->getStat();
+        $lead       = $this->createLead();
+        $stat       = $this->getStat(null, $lead);
         $email      = $stat->getEmailAddress();
         $secretHash = $this->getSecretHash($email);
         $idHash     = $stat->getTrackingHash();
@@ -830,6 +841,11 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $form = $crawler->selectButton('Verify email')->form();
         $form['validate_email[emailAddress]'] = (string) $email;
         $this->client->submit($form);
+
+        /** @var DoNotContact[] $dncRecords */
+        $dncRecords = $this->em->getRepository(DoNotContact::class)->findBy(['lead' => $lead->getId()]);
+        $this->assertCount(1, $dncRecords);
+        $this->assertSame(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason());
 
         $session = $this->client->getRequest()->getSession();
         $grant   = $session->get('mautic.email.validation_grant');
