@@ -1478,7 +1478,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\LeadBundle\Event\LeadTimelineEvent` | `addEventType()` (`string $eventTypeKey`); `addToCounter()` (`string $eventType`, `array\|int $count`); `isApplicable()` (`string $eventType`); `subtractFromCounter()` (`int $count`) |
     | `Mautic\LeadBundle\Event\PointsChangeEvent` | `__construct()` (`int $old`, `int $new`) |
     | `Mautic\LeadBundle\Model\FieldModel` | `getLookupResults()` (`int $limit`); `reorderFieldsByList()` (`int $start`) |
-    | `Mautic\LeadBundle\Model\ImportModel` | `getImportedRowsLineChartData()` (`string $unit`); `process()` (`int $limit`) |
+    | `Mautic\LeadBundle\Model\ImportModel` | `getImportedRowsLineChartData()` (`string $unit`); `isEmptyCsvRow()` (`array $row`); `process()` (`int $limit`) |
     | `Mautic\LeadBundle\Model\LeadModel` | `getLookupResults()` (`string $type`) |
     | `Mautic\LeadBundle\Model\ListModel` | `addLead()` (`int $searchListLead`); `getSegmentsWithDependenciesOnSegment()` (`string $returnProperty`) |
     | `Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault` | `__construct()` (`?string $originalValue`) |
@@ -1758,7 +1758,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\LeadBundle\Entity\Company`: `setScore(?int $score)`, `setName(?string $name)`, `setEmail(?string $email)`, `setAddress1(?string $address1)`, `setAddress2(?string $address2)`, `setPhone(?string $phone)`, `setCity(?string $city)`, `setState(?string $state)`, `setZipcode(?string $zipcode)`, `setCountry(?string $country)`, `setWebsite(?string $website)`, `setIndustry(?string $industry)`, `setDescription(?string $description)`
     - `Mautic\LeadBundle\Entity\DoNotContact`: `setReason(int $reason)`, `setChannel(string $channel)`
     - `Mautic\LeadBundle\Entity\FrequencyRule`: `setFrequencyNumber(int|string|null $frequencyNumber)`, `setFrequencyTime(?string $frequencyTime)`, `setChannel(string $channel)`
-    - `Mautic\LeadBundle\Entity\Import`: `setDir(string $dir)`, `setStatus(int $status)`, `setStatusInfo(string $info)`
+    - `Mautic\LeadBundle\Entity\Import`: `setDefault(string $key, array|int|bool|null $value)`, `setDir(string $dir)`, `setStatus(int $status)`, `setStatusInfo(string $info)`
     - `Mautic\LeadBundle\Entity\Lead`: `setId(int $id)`, `adjustPoints(int $points, string $operator)`, `setPoints(?int $points)`, `stageChangeLogEntry(?string $name)`, `addCompanyChangeLogEntry(?string $type, ?string $name)`, `setNewlyCreated(bool $newlyCreated)`, `setPreferredProfileImage(?string $source)`, `setTitle(?string $title)`, `setFirstname(?string $firstname)`, `setLastname(?string $lastname)`, `setPhone(?string $phone)`, `setMobile(?string $mobile)`, `setAddress1(?string $address1)`, `setAddress2(?string $address2)`, `setCity(?string $city)`, `setState(?string $state)`, `setZipcode(?string $zipcode)`, `setTimezone(?string $timezone)`, `setCountry(?string $country)`, `setEmail(?string $email)`, `setPrimaryCompany(?array $primaryCompany)`
     - `Mautic\LeadBundle\Entity\LeadCategory`: `setManuallyRemoved(bool $manuallyRemoved)`
     - `Mautic\LeadBundle\Entity\LeadDevice`: `setClientInfo(array|string|null $clientInfo)`, `setDeviceBrand(?string $brand)`, `setDeviceOsName(string $deviceOsName)`, `setTrackingId(string $trackingId)`
