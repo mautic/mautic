@@ -14,9 +14,9 @@ use Symfony\Component\DomCrawler\Crawler;
 
 final class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private const HISTORICAL_ACTOR = 'Historical actor';
-
     use CreateEntityTrait;
+
+    private const HISTORICAL_ACTOR = 'Historical actor';
 
     protected function setUp(): void
     {
