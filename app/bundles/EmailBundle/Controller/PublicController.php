@@ -553,7 +553,8 @@ final class PublicController extends CommonFormController
                 // Coming from validate form — verify hash before performing action.
                 $isCorrectHash = $mailHash->getEmailHash($urlEmail) === $secretHash;
                 if ($isCorrectHash) {
-                    $email = $lead = false;
+                    $email = false;
+                    $lead = false;
                     $model->removeDoNotContact($urlEmail);
                     $message = $this->buildResubscribeSuccessMessage($urlEmail, $secretHash, $idHash);
                 } else {
@@ -595,11 +596,13 @@ final class PublicController extends CommonFormController
             $isCorrectHash = $mailHash->getEmailHash($urlEmail) === $secretHash;
 
             if ($isCorrectHash) {
-                $email = $lead = false;
+                $email = false;
+                $lead = false;
                 $model->removeDoNotContact($urlEmail);
                 $message = $this->buildResubscribeSuccessMessage($urlEmail, $secretHash, $idHash);
             } else {
-                $email   = $lead   = false;
+                $email   = false;
+                $lead   = false;
                 $message = $this->translator->trans('mautic.email.stat_record.not_found');
             }
         }

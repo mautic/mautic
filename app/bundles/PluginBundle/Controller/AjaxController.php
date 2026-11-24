@@ -148,7 +148,8 @@ final class AjaxController extends CommonAjaxController
                     ['csrf_protection' => false]
                 );
             } else {
-                $data           = $statusData           = [];
+                $data           = [];
+                $statusData           = [];
                 $objectSettings = $object->getIntegrationSettings();
                 $defaults       = $objectSettings->getFeatureSettings();
                 if (method_exists($object, 'getCampaigns')) {

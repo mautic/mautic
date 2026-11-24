@@ -144,7 +144,8 @@ final class DashboardSubscriberTest extends TestCase
             ->with('mautic.lead.lead.anonymous')
             ->willReturn('whatever');
 
-        $logs   = $expectedLogs   = [];
+        $logs   = [];
+        $expectedLogs   = [];
         $logs[] = $expectedLogs[] = ['something', 'else']; // corrupt database data
         $logs[] = $expectedLogs[] = ['bundle' => 'null', 'object' => 'object', 'objectId' => 123];
         $logs[] = $expectedLogs[] = ['bundle' => 'model', 'object' => 'not_form_model', 'objectId' => 234];

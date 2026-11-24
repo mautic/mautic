@@ -1158,10 +1158,13 @@ final class CampaignController extends AbstractStandardFormController
      */
     private function applyCampaignListFilters(array $currentFilters, array $categories, string $categoryFilterPrefix, array &$listFilters, array &$filter): array
     {
-        $joinLists = $joinForms = false;
+        $joinLists = false;
+        $joinForms = false;
 
         if ([] !== $currentFilters) {
-            $listAliases = $catIds = $formIds = [];
+            $listAliases = [];
+            $catIds = [];
+            $formIds = [];
 
             foreach ($currentFilters as $type => $typeFilters) {
                 $type = $type === $categoryFilterPrefix ? 'category' : $type;

@@ -40,7 +40,8 @@ final class TriggerEventController extends CommonFormController
     public function newAction(Request $request): JsonResponse|Response
     {
         $success = 0;
-        $valid   = $cancelled   = false;
+        $valid   = false;
+        $cancelled   = false;
         $method  = $request->getMethod();
         $session = $request->getSession();
 
@@ -164,7 +165,8 @@ final class TriggerEventController extends CommonFormController
         $triggerId    = 'POST' === $method ? ($triggerEvent['triggerId'] ?? '') : $request->query->get('triggerId');
         $events       = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified', []);
         $success      = 0;
-        $valid        = $cancelled = false;
+        $valid        = false;
+        $cancelled = false;
         $triggerEvent = $events[$objectId] ?? null;
 
         if (null !== $triggerEvent) {

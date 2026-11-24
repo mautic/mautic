@@ -1487,13 +1487,15 @@ class LeadModel extends FormModel
     public function setTags(Lead $lead, array $tags, bool $removeOrphans = false): void
     {
         $currentTags  = $lead->getTags();
-        $leadModified = $tagsDeleted = false;
+        $leadModified = false;
+        $tagsDeleted = false;
 
         foreach ($currentTags as $tag) {
             if (!in_array($tag->getId(), $tags)) {
                 // Tag has been removed
                 $lead->removeTag($tag);
-                $leadModified = $tagsDeleted = true;
+                $leadModified = true;
+                $tagsDeleted = true;
             } else {
                 // Remove tag so that what's left are new tags
                 $key = array_search($tag->getId(), $tags);
@@ -2136,7 +2138,8 @@ class LeadModel extends FormModel
     public function setPrimaryCompany($companyId, $leadId): array
     {
         $companyArray      = [];
-        $oldPrimaryCompany = $newPrimaryCompany = false;
+        $oldPrimaryCompany = false;
+        $newPrimaryCompany = false;
 
         $lead = $this->getEntity($leadId);
 

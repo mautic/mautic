@@ -75,7 +75,8 @@ final class FetchLeadsCommand extends Command
         $interval      = $input->getOption('time-interval');
         $limit         = $input->getOption('limit');
         $fetchAll      = $input->getOption('fetch-all');
-        $leadsExecuted = $contactsExecuted = null;
+        $leadsExecuted = null;
+        $contactsExecuted = null;
 
         // @TODO Since integration is mandatory it should really be turned into an agument, but that would not be B.C.
         if (!$integration) {
@@ -148,7 +149,9 @@ final class FetchLeadsCommand extends Command
                     $contactObjectName = 'Contacts';
                 }
 
-                $updated = $created = $processed = 0;
+                $updated = 0;
+                $created = 0;
+                $processed = 0;
                 if (in_array($leadObjectName, $config['objects'])) {
                     $leadList = [];
                     $results  = $integrationObject->getLeads($params, null, $leadsExecuted, $leadList, $leadObjectName);
@@ -198,7 +201,9 @@ final class FetchLeadsCommand extends Command
                     $config['objects']
                 )
             ) {
-                $updated = $created = $processed = 0;
+                $updated = 0;
+                $created = 0;
+                $processed = 0;
                 $output->writeln('<info>'.$this->translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
                 $output->writeln('<comment>'.$this->translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
 

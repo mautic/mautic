@@ -47,7 +47,8 @@ final class SourceController extends CommonFormController
     public function newAction(Request $request, int|string $objectId = 0): JsonResponse|Response
     {
         $success = 0;
-        $valid   = $cancelled   = false;
+        $valid   = false;
+        $cancelled   = false;
         $this->setCampaignElements($request->request);
         if ('1' === $request->request->get('submit')) {
             $source     = $request->request->all()['campaign_leadsource'] ?? [];
@@ -159,7 +160,8 @@ final class SourceController extends CommonFormController
         }
 
         $success = 0;
-        $valid   = $cancelled   = false;
+        $valid   = false;
+        $cancelled   = false;
 
         if (!in_array($sourceType, $this->supportedSourceTypes)) {
             return $this->modalAccessDenied();

@@ -421,7 +421,8 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
     ): array {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $alias = $prefix = $this->getTableAlias();
+        $alias = $this->getTableAlias();
+        $prefix = $alias;
         if (!empty($prefix)) {
             $prefix .= '.';
         }

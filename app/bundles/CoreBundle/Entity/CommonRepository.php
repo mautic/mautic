@@ -690,7 +690,8 @@ abstract class CommonRepository extends ServiceEntityRepository
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $alias = $prefix = $this->getTableAlias();
+        $alias = $this->getTableAlias();
+        $prefix = $alias;
         if (!empty($prefix)) {
             $prefix .= '.';
         }

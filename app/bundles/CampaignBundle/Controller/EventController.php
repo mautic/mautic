@@ -75,7 +75,8 @@ final class EventController extends CommonFormController
     public function newAction(Request $request): JsonResponse|Response
     {
         $success = 0;
-        $valid   = $cancelled   = false;
+        $valid   = false;
+        $cancelled   = false;
         $this->setCampaignElements($request->request);
         if ('1' === $request->request->get('submit')) {
             $event      = $request->request->all()['campaignevent'] ?? [];
@@ -210,7 +211,8 @@ final class EventController extends CommonFormController
      */
     public function editAction(Request $request, string $objectId): JsonResponse|Response
     {
-        $valid         = $cancelled = false;
+        $valid         = false;
+        $cancelled = false;
         $method        = $request->getMethod();
         $campaignEvent = $request->request->all()['campaignevent'] ?? [];
         $campaignId    = 'POST' === $method && !empty($campaignEvent['campaignId'])

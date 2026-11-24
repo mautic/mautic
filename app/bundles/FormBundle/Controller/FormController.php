@@ -450,7 +450,10 @@ class FormController extends CommonFormController
         } else {
             // clear out existing fields in case the form was refreshed, browser closed, etc
             $this->clearSessionComponents($request, $sessionId);
-            $modifiedFields = $modifiedActions = $deletedActions = $deletedFields = [];
+            $modifiedFields = [];
+            $modifiedActions = [];
+            $deletedActions = [];
+            $deletedFields = [];
 
             $form->get('sessionId')->setData($sessionId);
 

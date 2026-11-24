@@ -40,7 +40,8 @@ final class ActionController extends CommonFormController
     public function newAction(Request $request): JsonResponse|Response
     {
         $success = 0;
-        $valid   = $cancelled   = false;
+        $valid   = false;
+        $cancelled   = false;
         $method  = $request->getMethod();
         $session = $request->getSession();
 
@@ -164,7 +165,8 @@ final class ActionController extends CommonFormController
         $formId     = 'POST' === $method ? ($formaction['formId'] ?? '') : $request->query->get('formId');
         $actions    = $session->get('mautic.form.'.$formId.'.actions.modified', []);
         $success    = 0;
-        $valid      = $cancelled      = false;
+        $valid      = false;
+        $cancelled      = false;
         $formAction = $actions[$objectId] ?? null;
 
         if (null !== $formAction) {

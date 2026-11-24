@@ -27,7 +27,8 @@ final readonly class CampaignContactCountHelper
      */
     public function getContactCounts(array $campaignIds): array
     {
-        $contactCounts = $campaignIdsForCountFromDb = [];
+        $contactCounts = [];
+        $campaignIdsForCountFromDb = [];
         foreach ($campaignIds as $campaignId) {
             $cacheKey = $this->generateCacheKey($campaignId);
             if ($this->cacheProvider->hasItem($cacheKey)) {

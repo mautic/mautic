@@ -21,7 +21,8 @@ final class EventModelFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($campaign);
         $this->em->flush();
 
-        $currentEvents = $deletedEvents = [];
+        $currentEvents = [];
+        $deletedEvents = [];
         // Create Events
         foreach (range(1, 5) as $item) {
             $event = new Event();

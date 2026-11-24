@@ -68,7 +68,8 @@ final class PluginController extends AbstractFormController
         $session->set('mautic.integrations.filter', $pluginFilter);
 
         $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
-        $integrations       = $foundPlugins       = [];
+        $integrations       = [];
+        $foundPlugins       = [];
 
         foreach ($integrationObjects as $name => $object) {
             $settings = $object->getIntegrationSettings();

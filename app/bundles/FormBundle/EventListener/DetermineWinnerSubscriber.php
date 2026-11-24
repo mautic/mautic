@@ -50,7 +50,9 @@ final readonly class DetermineWinnerSubscriber
             $counts = ('page' === $type) ? $this->submissionRepository->getSubmissionCountsByPage($ids, $startDate) : $this->submissionRepository->getSubmissionCountsByEmail($ids, $startDate);
 
             if ([] !== $counts) {
-                $submissions = $support = $data = [];
+                $submissions = [];
+                $support = [];
+                $data = [];
                 $hasResults  = [];
 
                 $submissionLabel = $this->translator->trans('mautic.form.abtest.label.submissions');
