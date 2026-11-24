@@ -13,7 +13,7 @@ if (function_exists('set_time_limit')) {
     set_time_limit(0);
 }
 
-defined('IN_MAUTIC_CONSOLE') or define('IN_MAUTIC_CONSOLE', 1);
+defined('IN_MAUTIC_CONSOLE') || define('IN_MAUTIC_CONSOLE', 1);
 
 define('MAUTIC_ROOT_DIR', realpath(__DIR__.'/..'));
 
