@@ -406,7 +406,7 @@ final class AssetsHelper
                 $builderName = 'legacy';
             }
 
-            echo "<script>Mautic.getActiveBuilderName = function() { return '".$builderName."'; }</script>"."\n";
+            echo "<script>Mautic.getActiveBuilderName = function() { return '".$builderName."'; }</script>\n";
         }
     }
 
