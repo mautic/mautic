@@ -1,6 +1,6 @@
 <?php
 
-include 'paths.php';
+include __DIR__ . '/paths.php';
 
 // Closure to replace kernel.project_dir placeholders
 $replaceRootPlaceholder = function (&$value) use ($projectRoot, &$replaceRootPlaceholder) {
