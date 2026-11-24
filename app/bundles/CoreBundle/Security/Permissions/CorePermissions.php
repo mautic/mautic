@@ -407,7 +407,7 @@ class CorePermissions implements ResetInterface
     {
         $userEntity = $this->userHelper->getUser();
 
-        return !($userEntity instanceof User && !$userEntity->isGuest());
+        return !$userEntity instanceof User || $userEntity->isGuest();
     }
 
     protected function getTranslator(): TranslatorInterface
