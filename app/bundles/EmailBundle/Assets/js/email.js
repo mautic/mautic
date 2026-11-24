@@ -603,7 +603,7 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
 
             parentElement.remove();
             tabLink.remove();
-            var nextTab = tabContainer.find('[data-bs-toggle="tab"]').first();
+            const nextTab = tabContainer.find('[data-bs-toggle="tab"]').first();
             if (nextTab.length) {
                 bootstrap.Tab.getOrCreateInstance(nextTab[0]).show();
             }

@@ -123,7 +123,7 @@ Mautic.onPermissionChange = function (changedPermission, bundle) {
     }
 
     //update granted numbers
-    var $ratio = mQuery('#' + bundle + '-permission-ratio');
+    const $ratio = mQuery('#' + bundle + '-permission-ratio');
     if (mQuery('.' + bundle + '_granted').length || $ratio.length) {
         var granted = 0;
         var levelPerms = MauticVars.permissionList[bundle];

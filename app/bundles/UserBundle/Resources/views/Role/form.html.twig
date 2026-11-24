@@ -40,11 +40,12 @@
     {% for child in form.permissions.children %}
 									{% if 'newbundle' == child.vars.value %}
             {% if currentBundle is not null %}
+                {% set bundleContent %}<div class="pt-16 pe-16 ps-16 pb-16">{{ currentContent|raw }}</div>{% endset %}
                 {% set permissionTabs = permissionTabs|merge([{
                     'id': currentBundle ~ 'PermissionTab',
                     'label': permissionsConfig['config'][currentBundle]['label'],
                     'renderTag': {'label': permissionsConfig['config'][currentBundle]['ratio'][0] ~ ' / ' ~ permissionsConfig['config'][currentBundle]['ratio'][1], 'color': 'gray', 'attributes': {'id': currentBundle ~ '-permission-ratio', 'data-total': permissionsConfig['config'][currentBundle]['ratio'][1]}},
-                    'content': '<div class="pt-16 pe-16 ps-16 pb-16">' ~ currentContent ~ '</div>',
+                    'content': bundleContent,
                     'className': 'bdr-w-0'
                 }]) %}
 										{% endif %}
@@ -56,11 +57,12 @@
 									{% endif %}
 								{% endfor %}
     {% if currentBundle is not null %}
+        {% set bundleContent %}<div class="pt-16 pe-16 ps-16 pb-16">{{ currentContent|raw }}</div>{% endset %}
         {% set permissionTabs = permissionTabs|merge([{
             'id': currentBundle ~ 'PermissionTab',
             'label': permissionsConfig['config'][currentBundle]['label'],
             'renderTag': {'label': permissionsConfig['config'][currentBundle]['ratio'][0] ~ ' / ' ~ permissionsConfig['config'][currentBundle]['ratio'][1], 'color': 'gray', 'attributes': {'id': currentBundle ~ '-permission-ratio', 'data-total': permissionsConfig['config'][currentBundle]['ratio'][1]}},
-            'content': '<div class="pt-16 pe-16 ps-16 pb-16">' ~ currentContent ~ '</div>',
+            'content': bundleContent,
             'className': 'bdr-w-0'
         }]) %}
     {% endif %}
