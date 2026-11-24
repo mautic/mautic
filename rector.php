@@ -41,11 +41,9 @@ return RectorConfig::configure()
         '*/Fixture/*',
         '*/Source/*',
 
-        // form event subscribers register on the Form dispatcher via addEventSubscriber(), which needs EventSubscriberInterface;
         // SecurityController listens on kernel.request but a controller cannot expose a public non-action method;
         // DashboardSubscriber base defines listener methods that subclasses override, and method attributes do not inherit to an override
         Rector\Symfony\CodeQuality\Rector\Class_\EventSubscriberToAttributeRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Form/EventListener',
             __DIR__.'/app/bundles/UserBundle/Controller/SecurityController.php',
             __DIR__.'/app/bundles/DashboardBundle/EventListener/DashboardSubscriber.php',
         ],
@@ -53,12 +51,15 @@ return RectorConfig::configure()
         // widening the public return types to \DateTime|bool|null is out of scope for this bump
         __DIR__.'/app/bundles/CoreBundle/Helper/DateTimeHelper.php',
 
+        // dropping the code changes getCode() of the new exception to 0, e.g. marketplace ApiException 404 checks
+        Rector\CodeQuality\Rector\New_\NarrowPreviousExceptionCodeArgRector::class,
+
         // prefer implicit compare on object|null
         Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector::class,
 
-        // adds dead "return false" after self::fail(); fixed upstream in rector-phpunit #801, drop after next tag
-        Rector\PHPUnit\CodeQuality\Rector\MethodCall\WillReturnCallbackFallbackToReturnFalseRector::class => [
-            __DIR__.'/app/bundles/UserBundle/Tests/EventListener/ApiUserSubscriberTest.php',
+        // removes empty #[AsEventListener] methods from anonymous listener classes used as test input
+        Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Test/AttributeEventListenerRegistrarTest.php',
         ],
 
         // Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
