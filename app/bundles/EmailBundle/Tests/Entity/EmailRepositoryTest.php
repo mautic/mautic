@@ -310,7 +310,7 @@ final class EmailRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
 
-        $this->assertSame('(e.isPublished = :par1 AND e.publishDown IS NOT NULL AND e.publishDown <> \'\' AND e.publishDown < CURRENT_TIMESTAMP())', (string) $expr);
+        $this->assertSame("(e.isPublished = :par1 AND e.publishDown IS NOT NULL AND e.publishDown <> '' AND e.publishDown < CURRENT_TIMESTAMP())", (string) $expr);
         $this->assertSame(['par1' => true], $params);
     }
 
@@ -323,7 +323,7 @@ final class EmailRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
 
-        $this->assertSame('(e.isPublished = :par1 AND e.publishUp IS NOT NULL AND e.publishUp <> \'\' AND e.publishUp > CURRENT_TIMESTAMP())', (string) $expr);
+        $this->assertSame("(e.isPublished = :par1 AND e.publishUp IS NOT NULL AND e.publishUp <> '' AND e.publishUp > CURRENT_TIMESTAMP())", (string) $expr);
         $this->assertSame(['par1' => true], $params);
     }
 

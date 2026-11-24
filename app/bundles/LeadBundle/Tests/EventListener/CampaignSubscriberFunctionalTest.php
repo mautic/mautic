@@ -747,7 +747,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $event2 = new Event();
         $event2->setCampaign($campaign);
-        $event2->setName('Change contact\'s stage');
+        $event2->setName("Change contact's stage");
         $event2->setType('stage.change');
         $event2->setEventType('action');
         $event2->setTriggerMode('immediate');
@@ -909,7 +909,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $event2 = new Event();
         $event2->setCampaign($campaign);
-        $event2->setName('Change contact\'s points');
+        $event2->setName("Change contact's points");
         $event2->setType('lead.changepoints');
         $event2->setEventType('action');
         $event2->setTriggerMode('immediate');

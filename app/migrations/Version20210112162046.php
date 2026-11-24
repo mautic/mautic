@@ -34,7 +34,7 @@ final class Version20210112162046 extends AbstractMauticMigration
     {
         $this->skipIf(
             !$this->indexExists($schema),
-            sprintf('Index `%s` doesn\'t exist. Skipping reverting the migration', self::INDEX_NAME)
+            sprintf("Index `%s` doesn't exist. Skipping reverting the migration", self::INDEX_NAME)
         );
     }
 

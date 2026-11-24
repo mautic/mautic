@@ -148,7 +148,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         yield 'No properties' => [
             [
             ],
-            'A \'positive\' label is required.',
+            "A 'positive' label is required.",
         ];
 
         yield 'Only Yes' => [
@@ -157,7 +157,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
                     'yes' => 'Yes',
                 ],
             ],
-            'A \'negative\' label is required.',
+            "A 'negative' label is required.",
         ];
 
         yield 'Only No' => [
@@ -166,7 +166,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
                     'no' => 'No',
                 ],
             ],
-            'A \'positive\' label is required.',
+            "A 'positive' label is required.",
         ];
     }
 

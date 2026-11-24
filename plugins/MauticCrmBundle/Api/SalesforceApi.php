@@ -112,7 +112,7 @@ final class SalesforceApi extends CrmApi
             unset($fields[array_search('HasOptedOutOfEmail', $fields, true)]);
             $fields[]    = 'Id';
             $fields      = implode(', ', array_unique($fields));
-            $findContact = 'select '.$fields.' from Contact where email = \''.$this->escapeQueryValue($data['Contact']['Email']).'\'';
+            $findContact = 'select '.$fields." from Contact where email = '".$this->escapeQueryValue($data['Contact']['Email'])."'";
             $response    = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
 
             if (!empty($response['records'])) {
@@ -125,7 +125,7 @@ final class SalesforceApi extends CrmApi
             unset($fields[array_search('HasOptedOutOfEmail', $fields, true)]);
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
-            $findLead = 'select '.$fields.' from Lead where email = \''.$this->escapeQueryValue($data['Lead']['Email']).'\' and ConvertedContactId = NULL';
+            $findLead = 'select '.$fields." from Lead where email = '".$this->escapeQueryValue($data['Lead']['Email'])."' and ConvertedContactId = NULL";
             $response = $this->request('queryAll', ['q' => $findLead], 'GET', false, null, $queryUrl);
 
             if (!empty($response['records'])) {
@@ -156,18 +156,18 @@ final class SalesforceApi extends CrmApi
             $fields = $this->integration->getFieldsForQuery('Account');
 
             if (!empty($data['company']['BillingCountry'])) {
-                $appendToQuery .= ' and BillingCountry =  \''.$this->escapeQueryValue($data['company']['BillingCountry']).'\'';
+                $appendToQuery .= " and BillingCountry =  '".$this->escapeQueryValue($data['company']['BillingCountry'])."'";
             }
             if (!empty($data['company']['BillingCity'])) {
-                $appendToQuery .= ' and BillingCity =  \''.$this->escapeQueryValue($data['company']['BillingCity']).'\'';
+                $appendToQuery .= " and BillingCity =  '".$this->escapeQueryValue($data['company']['BillingCity'])."'";
             }
             if (!empty($data['company']['BillingState'])) {
-                $appendToQuery .= ' and BillingState =  \''.$this->escapeQueryValue($data['company']['BillingState']).'\'';
+                $appendToQuery .= " and BillingState =  '".$this->escapeQueryValue($data['company']['BillingState'])."'";
             }
 
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
-            $query    = 'select '.$fields.' from Account where Name = \''.$this->escapeQueryValue($data['company']['Name']).'\''.$appendToQuery;
+            $query    = 'select '.$fields." from Account where Name = '".$this->escapeQueryValue($data['company']['Name'])."'".$appendToQuery;
             $response = $this->request('queryAll', ['q' => $query], 'GET', false, null, $queryUrl);
 
             if (!empty($response['records'])) {
@@ -491,7 +491,7 @@ final class SalesforceApi extends CrmApi
     {
         $names     = array_map($this->escapeQueryValue(...), $names);
         $queryUrl  = $this->integration->getQueryUrl();
-        $findQuery = 'select Id, '.$requiredFieldString.' from Account where isDeleted = false and Name in (\''.implode("','", $names).'\')';
+        $findQuery = 'select Id, '.$requiredFieldString." from Account where isDeleted = false and Name in ('".implode("','", $names)."')";
 
         return $this->request('query', ['q' => $findQuery], 'GET', false, null, $queryUrl);
     }
@@ -503,7 +503,7 @@ final class SalesforceApi extends CrmApi
      */
     public function getCompaniesById(array $ids, $requiredFieldString)
     {
-        $findQuery = 'select isDeleted, Id, '.$requiredFieldString.' from Account where  Id in (\''.implode("','", $ids).'\')';
+        $findQuery = 'select isDeleted, Id, '.$requiredFieldString." from Account where  Id in ('".implode("','", $ids)."')";
         $queryUrl  = $this->integration->getQueryUrl();
 
         return $this->request('queryAll', ['q' => $findQuery], 'GET', false, null, $queryUrl);

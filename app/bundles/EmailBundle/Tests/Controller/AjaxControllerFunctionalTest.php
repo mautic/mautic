@@ -265,7 +265,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testEmailGetLookupChoiceListAction(): void
     {
-        $emailName = 'It\'s an email';
+        $emailName = "It's an email";
         $email     = new Email();
         $email->setName($emailName);
         $email->setSubject('Email Subject');

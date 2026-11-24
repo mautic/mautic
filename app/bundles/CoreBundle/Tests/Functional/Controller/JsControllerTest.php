@@ -33,7 +33,7 @@ final class JsControllerTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();
         $this->assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', $content);
-        $this->assertStringContainsString('window.gtag(\'config\',\'G-F3825DS9CD\')', $content);
+        $this->assertStringContainsString("window.gtag('config','G-F3825DS9CD')", $content);
         $runtimeReadyPosition    = strpos($content, 'runtimeReady');
         $trackingEnabledPosition = strrpos($content, 'trackingEnabled');
         $this->assertNotFalse($runtimeReadyPosition);

@@ -52,7 +52,7 @@ final class ChannelType extends AbstractType
                 [
                     'label' => 'mautic.channel.message.form.enabled',
                     'attr'  => [
-                        'onchange' => 'Mautic.toggleChannelFormDisplay(this, \''.$channelName.'\')',
+                        'onchange' => "Mautic.toggleChannelFormDisplay(this, '".$channelName."')",
                     ],
                 ]
             );

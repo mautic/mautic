@@ -45,7 +45,7 @@ final class DashboardWidgetPermissionFunctionalTest extends MauticMysqlTestCase
         $html = $this->renderWidgetAsUser($this->withoutViewOther, 'created.leads');
 
         $this->assertStringContainsString(self::OWN_CONTACT, $html, 'The user should still see the contacts they own.');
-        $this->assertStringNotContainsString(self::OTHER_CONTACT, $html, 'Without lead:leads:viewother the widget must not show another user\'s contacts.');
+        $this->assertStringNotContainsString(self::OTHER_CONTACT, $html, "Without lead:leads:viewother the widget must not show another user's contacts.");
     }
 
     public function testCreatedContactsWidgetShowsEveryContactWithViewOther(): void
@@ -60,7 +60,7 @@ final class DashboardWidgetPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $html = $this->renderWidgetAsUser($this->withoutViewOther, 'anonymous.vs.identified.leads');
 
-        $this->assertSame(1, $this->sumChartData($html), 'Without lead:leads:viewother the chart must count only the user\'s own contacts.');
+        $this->assertSame(1, $this->sumChartData($html), "Without lead:leads:viewother the chart must count only the user's own contacts.");
     }
 
     public function testAnonymousVsIdentifiedWidgetCountsEveryContactWithViewOther(): void
@@ -74,8 +74,8 @@ final class DashboardWidgetPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $countries = $this->getMapCountries($this->renderWidgetAsUser($this->withoutViewOther, 'map.of.leads'));
 
-        $this->assertArrayHasKey('DE', $countries, 'The user\'s own contact should still be on the map.');
-        $this->assertArrayNotHasKey('FR', $countries, 'Without lead:leads:viewother the map must not show another user\'s contacts.');
+        $this->assertArrayHasKey('DE', $countries, "The user's own contact should still be on the map.");
+        $this->assertArrayNotHasKey('FR', $countries, "Without lead:leads:viewother the map must not show another user's contacts.");
     }
 
     public function testContactMapWidgetShowsEveryContactWithViewOther(): void

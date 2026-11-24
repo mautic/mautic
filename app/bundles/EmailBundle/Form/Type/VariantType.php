@@ -103,7 +103,7 @@ final class VariantType extends AbstractType
 
             $attr = [
                 'class'    => 'form-control',
-                'onchange' => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
+                'onchange' => "Mautic.getAbTestWinnerForm('email', 'emailform', this);",
             ];
             if (true === $options['is_parent'] && false === $options['is_existing']) {
                 $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';

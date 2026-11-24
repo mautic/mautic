@@ -413,7 +413,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
     public function testPreviewDownloadForHtml(): void
     {
-        $lead  = $this->createLead('O\'Neill');
+        $lead  = $this->createLead("O'Neill");
         $email = $this->createEmail();
         $email->setName('Email name!');
         $this->em->flush();

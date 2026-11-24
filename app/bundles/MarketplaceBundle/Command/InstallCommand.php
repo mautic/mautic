@@ -39,7 +39,7 @@ final class InstallCommand extends Command
     protected function configure(): void
     {
         $this->addArgument('package', InputArgument::REQUIRED, 'The Packagist package to install (e.g. mautic/example-plugin)');
-        $this->addOption('dry-run', null, null, 'Simulate the installation of the package. Doesn\'t actually install it.');
+        $this->addOption('dry-run', null, null, "Simulate the installation of the package. Doesn't actually install it.");
         $this->addOption('user-id', null, InputOption::VALUE_REQUIRED, 'ID of the admin user who will own the installed resource. Required for mautic-resource packages when not run interactively.');
 
         parent::configure();

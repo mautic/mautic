@@ -66,9 +66,9 @@ final class FieldModelFunctionalTest extends MauticMysqlTestCase
         // Let's delete the 'First name' field.
         $fieldModel->deleteEntities($ids);
 
-        $this->assertTrue($schemaHelper->checkColumnExists('email'), 'The table has \'email\' field.');
-        $this->assertFalse($schemaHelper->checkColumnExists('fname'), 'The table does not have the \'fname\' field.');
-        $this->assertFalse($schemaHelper->checkColumnExists('lname'), 'The table does not have the \'lname\' field.');
+        $this->assertTrue($schemaHelper->checkColumnExists('email'), "The table has 'email' field.");
+        $this->assertFalse($schemaHelper->checkColumnExists('fname'), "The table does not have the 'fname' field.");
+        $this->assertFalse($schemaHelper->checkColumnExists('lname'), "The table does not have the 'lname' field.");
     }
 
     /**

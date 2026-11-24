@@ -48,7 +48,7 @@ final class UpdateCompanyNameOnLeadsCommandFunctionalTest extends MauticMysqlTes
 
         $this->assertSame($companyRepository->getEntity($company1->getId())->getName(), $contactRepository->getEntity($contact1->getId())->getCompany(), 'Company name is updated on leads.');
         $this->assertSame($companyRepository->getEntity($company1->getId())->getName(), $contactRepository->getEntity($contact2->getId())->getCompany(), 'Company name is updated on leads.');
-        $this->assertSame($companyRepository->getEntity($company2->getId())->getName(), $contactRepository->getEntity($contact3->getId())->getCompany(), 'Company name is not updated and remains same as it\'s primary company');
+        $this->assertSame($companyRepository->getEntity($company2->getId())->getName(), $contactRepository->getEntity($contact3->getId())->getCompany(), "Company name is not updated and remains same as it's primary company");
 
         $this->updateCompanyName($companyRepository->getEntity($company2->getId()));
 
@@ -57,6 +57,6 @@ final class UpdateCompanyNameOnLeadsCommandFunctionalTest extends MauticMysqlTes
 
         $this->assertSame($companyRepository->getEntity($company2->getId())->getName(), $contactRepository->getEntity($contact3->getId())->getCompany(), 'Company name is updated on leads.');
         $this->assertSame($companyRepository->getEntity($company2->getId())->getName(), $contactRepository->getEntity($contact4->getId())->getCompany(), 'Company name is updated on leads.');
-        $this->assertSame($companyRepository->getEntity($company1->getId())->getName(), $contactRepository->getEntity($contact1->getId())->getCompany(), 'Company name is not updated and remains same as it\'s primary company');
+        $this->assertSame($companyRepository->getEntity($company1->getId())->getName(), $contactRepository->getEntity($contact1->getId())->getCompany(), "Company name is not updated and remains same as it's primary company");
     }
 }

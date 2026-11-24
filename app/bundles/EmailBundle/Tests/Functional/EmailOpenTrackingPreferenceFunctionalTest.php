@@ -33,7 +33,7 @@ final class EmailOpenTrackingPreferenceFunctionalTest extends MauticMysqlTestCas
         $this->assertNotInstanceOf(IpAddress::class, $stat->getIpAddress());
         $this->assertCount(0, $this->getContainer()->get(StatDeviceRepository::class)->findBy(['stat' => $stat]));
         $this->assertSame(0, $this->getReadCount($email));
-        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.70']), 'the contact\'s IP address is not stored');
+        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.70']), "the contact's IP address is not stored");
     }
 
     /**

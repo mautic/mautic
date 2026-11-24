@@ -204,7 +204,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->assertSame($expectedEventsStatistics, $eventsStatistics, 'Events statistics doesn\'t match the actual events in the database.');
+        $this->assertSame($expectedEventsStatistics, $eventsStatistics, "Events statistics doesn't match the actual events in the database.");
     }
 
     public function testIndexActionFiltersCampaignsBySegmentAliasQuickFilter(): void

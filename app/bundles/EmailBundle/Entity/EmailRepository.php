@@ -546,7 +546,7 @@ class EmailRepository extends CommonRepository implements ResettableVariantsInte
                 self::EMAILS_PREFIX,
                 $trTable,
                 self::TRACKABLE_PREFIX,
-                'e.id = tr.channel_id AND tr.channel = \'email\''
+                "e.id = tr.channel_id AND tr.channel = 'email'"
             );
         }
         if (!$this->isJoined($qb, $prTable, self::TRACKABLE_PREFIX, self::REDIRECT_PREFIX)) {
@@ -571,7 +571,7 @@ class EmailRepository extends CommonRepository implements ResettableVariantsInte
                 self::EMAILS_PREFIX,
                 $table,
                 self::DNC_PREFIX,
-                'e.id = dnc.channel_id AND dnc.channel=\'email\''
+                "e.id = dnc.channel_id AND dnc.channel='email'"
             );
         }
     }
