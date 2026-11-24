@@ -32,7 +32,7 @@
                             'viewcontacts': {
                                 'attr': {
                                     'data-toggle': 'ajax',
-                                    'href': path('mautic_contact_index', {'search': listCommand ~ ':' ~ item.alias}),
+                                    'href': path('mautic_contact_index', {'search': listCommand ~ ':' ~ item.alias})|e('html_attr'),
                                 },
                                 'iconClass': 'ri-team-line',
                                 'btnText': 'mautic.lead.list.view_contacts'|trans,
@@ -45,7 +45,7 @@
         <div>
                     {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'lead.list'}) }}
                     {% if securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy) %}
-                        <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+                        <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': item.id})|e('html_attr') }}" data-toggle="ajax">
                           {{ item.name }} ({{ item.alias }})
                         </a>
                     {% else %}
@@ -77,8 +77,8 @@
                 }) }}
     {% endset %}
     {% set countHtml %}
-        <span size="sm" class="label {{ item.needsRebuild() ? 'label-info' : 'label-gray' }} col-count" data-id="{{ item.id }}">
-                    <a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.list'|trans ~ ':' ~ item.alias}) }}"
+        <span size="sm" class="label {{ item.needsRebuild() ? 'label-info' : 'label-gray' }} col-count" data-id="{{ item.id|e('html_attr') }}">
+                    <a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.list'|trans ~ ':' ~ item.alias})|e('html_attr') }}"
                         data-toggle="ajax">{{ (item.needsRebuild() ? 'mautic.lead.list.building' : 'mautic.lead.list.viewleads_count')|trans({'%count%': leadCounts[item.id]}) }}</a>
                 </span>
     {% endset %}
