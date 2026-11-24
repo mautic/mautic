@@ -854,13 +854,26 @@ class MailHelper
 
                 $path = $match;
                 // if the path contains the site url, make it an absolute path, so it can be fetched.
-                if (str_starts_with($match, $this->coreParametersHelper->get('site_url'))) {
-                    $path = str_replace($this->coreParametersHelper->get('site_url'), '', $match);
-                    $path = $this->pathsHelper->getRootPath().$path;
+                $siteUrl = (string) $this->coreParametersHelper->get('site_url');
+                if (str_starts_with($match, $siteUrl)) {
+                    // Drop the query string and fragment (e.g. asset cache busters) and decode %20 etc. to get the file name.
+                    $path = preg_replace('/[?#].*$/s', '', substr($match, strlen($siteUrl)));
+                    $path = $this->pathsHelper->getRootPath().rawurldecode($path);
+                }
+
+                // A null byte (e.g. from %00) makes file_get_contents() throw instead of returning false.
+                if (str_contains($path, "\0")) {
+                    continue;
                 }
 
                 // Ingore the get_contents errors and use the path in the image src instead if it cannot be fetched.
                 if ($imageContent = @file_get_contents($path)) {
+                    // Keep the URL if it isn't an image, embedding it would only add an unexpected attachment.
+                    $contentType = (string) (new \finfo(FILEINFO_MIME_TYPE))->buffer($imageContent);
+                    if (!str_starts_with($contentType, 'image/')) {
+                        continue;
+                    }
+
                     $this->message->embed($imageContent, md5($match));
                     $this->embedImagesReplaces[$match] = 'cid:'.md5($match);
                 }
