@@ -183,8 +183,8 @@ final class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('select')
                 ->willReturnCallback(
-                    function () use ($mock): MockObject {
-                        $this->queryParts['select'][] = func_get_args();
+                    function (...$args) use ($mock): MockObject {
+                        $this->queryParts['select'][] = $args;
 
                         return $mock;
                     }
@@ -193,8 +193,8 @@ final class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('from')
                 ->willReturnCallback(
-                    function () use ($mock): MockObject {
-                        $this->queryParts['from'][] = func_get_args();
+                    function (...$args) use ($mock): MockObject {
+                        $this->queryParts['from'][] = $args;
 
                         return $mock;
                     }
@@ -209,8 +209,8 @@ final class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('where')
                 ->willReturnCallback(
-                    function () use ($mock): MockObject {
-                        $this->queryParts['where'][] = func_get_args();
+                    function (...$args) use ($mock): MockObject {
+                        $this->queryParts['where'][] = $args;
 
                         return $mock;
                     }
@@ -219,8 +219,8 @@ final class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('andWhere')
                 ->willReturnCallback(
-                    function () use ($mock): MockObject {
-                        $this->queryParts['where'][] = func_get_args();
+                    function (...$args) use ($mock): MockObject {
+                        $this->queryParts['where'][] = $args;
 
                         return $mock;
                     }
@@ -229,8 +229,8 @@ final class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('setParameter')
                 ->willReturnCallback(
-                    function () use ($mock): MockObject {
-                        $this->queryParts['parameters'][] = func_get_args();
+                    function (...$args) use ($mock): MockObject {
+                        $this->queryParts['parameters'][] = $args;
 
                         return $mock;
                     }

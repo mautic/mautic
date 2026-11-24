@@ -314,8 +314,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
          */
         $sf->method('getSalesforceObjectsByEmails')
             ->willReturnCallback(
-                function (): array {
-                    $args   = func_get_args();
+                function (...$args): array {
                     $emails = array_column($args[1], 'email');
 
                     return $this->getSalesforceObjects($emails, 0, 1);
@@ -340,8 +339,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
          */
         $sf->method('getSalesforceObjectsByEmails')
             ->willReturnCallback(
-                function (): array {
-                    $args   = func_get_args();
+                function (...$args): array {
                     $emails = array_column($args[1], 'email');
 
                     return $this->getSalesforceObjects($emails, 0, 1);
@@ -437,9 +435,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $sf
             ->method('makeRequest')
             ->willReturnCallback(
-                function () {
-                    $args = func_get_args();
-
+                function (...$args) {
                     // Checking for campaign members should return empty array for testing purposes
                     if (str_contains($args[0], '/query') && str_contains($args[1]['q'], 'CampaignMember')) {
                         return [];
@@ -473,9 +469,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $sf
             ->method('makeRequest')
             ->willReturnCallback(
-                function () {
-                    $args = func_get_args();
-
+                function (...$args) {
                     // Checking for campaign members should return empty array for testing purposes
                     if (str_contains($args[0], '/query') && str_contains($args[1]['q'], 'Account')) {
                         return [];
@@ -572,8 +566,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
          */
         $sf->method('getSalesforceObjectsByEmails')
             ->willReturnCallback(
-                function (): array {
-                    $args   = func_get_args();
+                function (...$args): array {
                     $emails = array_column($args[1], 'email');
 
                     return $this->getSalesforceObjects($emails, 0, 1);
@@ -984,8 +977,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
         $sf->method('makeRequest')
             ->willReturnCallback(
-                function () use ($maxSfContacts, $maxSfLeads, $updateObject) {
-                    $args = func_get_args();
+                function (...$args) use ($maxSfContacts, $maxSfLeads, $updateObject) {
                     // Determine what to return by analyzing the URL and query parameters
                     switch (true) {
                         case str_contains($args[0], '/query'):
@@ -1032,9 +1024,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
         $this->dispatcher->method('dispatch')
             ->willReturnCallback(
-                function () use ($sf, $integration): PluginIntegrationKeyEvent {
-                    $args = func_get_args();
-
+                function (...$args) use ($sf, $integration): PluginIntegrationKeyEvent {
                     return match ($args[0]) {
                         default => new PluginIntegrationKeyEvent($sf, $integration->getApiKeys()),
                     };
@@ -1055,8 +1045,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         $mockRepository->method('findLeadsToUpdate')
             ->willReturnCallback(
-                function () use ($max, $specificObject): array {
-                    $args   = func_get_args();
+                function (...$args) use ($max, $specificObject): array {
                     $object = $args[6];
 
                     // determine whether to return a count or records
@@ -1083,9 +1072,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         $mockRepository->method('findLeadsToCreate')
             ->willReturnCallback(
-                function () use ($max): int|array {
-                    $args = func_get_args();
-
+                function (...$args) use ($max): int|array {
                     if (false === $args[2]) {
                         return $max;
                     }

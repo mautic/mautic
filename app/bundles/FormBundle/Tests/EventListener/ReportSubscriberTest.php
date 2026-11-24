@@ -122,9 +122,7 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
 
         $mockEvent->expects($this->exactly(2))
             ->method('addTable')
-            ->willReturnCallback(function () use ($mockEvent, &$setTables): ReportBuilderEvent {
-                $args = func_get_args();
-
+            ->willReturnCallback(function (...$args) use ($mockEvent, &$setTables): ReportBuilderEvent {
                 $setTables[] = $args;
 
                 return $mockEvent;
@@ -132,9 +130,7 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
 
         $mockEvent->expects($this->exactly(3))
             ->method('addGraph')
-            ->willReturnCallback(function () use ($mockEvent, &$setGraphs): ReportBuilderEvent {
-                $args = func_get_args();
-
+            ->willReturnCallback(function (...$args) use ($mockEvent, &$setGraphs): ReportBuilderEvent {
                 $setGraphs[] = $args;
 
                 return $mockEvent;
