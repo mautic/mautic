@@ -1039,8 +1039,6 @@ $brand-google:          #dd4b39;
     --border-tile: var(--border-tile-02);
 }
 
-// AI presence //
-/// Light themes
 :root,
 :root[theme^="light"],
 :root[theme="solarized-light"] {
@@ -1062,7 +1060,6 @@ $brand-google:          #dd4b39;
     --ai-popover-shadow-outer-02: rgba(0, 0, 0, 0.04);
 }
 
-/// Dark themes
 :root[theme="dark"],
 :root[theme="solarized-dark"],
 :root[theme="dark-freire"] {

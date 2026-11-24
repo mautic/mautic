@@ -16,7 +16,7 @@
         data-bs-container="body"
         data-bs-custom-class="ai-popover"
         data-bs-placement="{{ placement|default('bottom')|e('html_attr') }}"
-        data-bs-html="{{ html is defined and html ? 'true' : 'false' }}"
+        data-bs-html="false"
         data-bs-trigger="{{ trigger|default('focus')|e('html_attr') }}"
         title="{{ title|default('mautic.core.ai.explainability.title')|trans|e('html_attr') }}"
         {% if content is defined and content %}data-bs-content="{{ content|trans|e('html_attr') }}"{% endif %}
