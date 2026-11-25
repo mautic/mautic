@@ -145,6 +145,11 @@ ul.dropdown-menu-form {
   &.btn--icon-only {
     aspect-ratio: 1 / 1;
   }
+
+  // Bootstrap 3 compatibility sets `.show { display: block !important }`, which breaks the label layout of an open toggle
+  &.btn.show {
+    display: inline-flex !important;
+  }
 }
 
 .dropdown-header {
