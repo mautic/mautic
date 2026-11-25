@@ -330,11 +330,9 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
      * @param string $format
      * @param int    $page
      *
-     * @return StreamedResponse|Response
-     *
      * @throws \Exception
      */
-    public function exportResults($format, Report $report, ReportDataResult $reportDataResult, $handle = null, $page = null): \Symfony\Component\HttpFoundation\StreamedResponse|\Symfony\Component\HttpFoundation\Response|null
+    public function exportResults($format, Report $report, ReportDataResult $reportDataResult, $handle = null, $page = null): StreamedResponse|Response|null
     {
         $date = new DateTimeHelper()->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($report->getName(), false, '-');
