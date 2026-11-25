@@ -77,7 +77,7 @@ final class DynamicContentTypeTest extends TestCase
                     $this->assertSame(DynamicContentListType::class, $parameters[1]);
                     $this->assertSame([
                         'label'       => 'mautic.core.form.translation_parent',
-                        'label_attr'  => ['class' => 'control-label'],
+                        'label_attr'  => ['class' => 'form-label'],
                         'attr'        => [
                             'class'   => 'form-control',
                             'tooltip' => 'mautic.core.form.translation_parent.help',

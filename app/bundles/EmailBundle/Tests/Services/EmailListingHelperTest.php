@@ -58,7 +58,9 @@ final class EmailListingHelperTest extends TestCase
                 'unknown'  => ['value'],
             ],
             $listFilters,
-            $filter
+            $filter,
+            'category',
+            []
         );
 
         $this->assertFalse($ignoreListJoin);
@@ -92,7 +94,30 @@ final class EmailListingHelperTest extends TestCase
             'force'  => [],
         ];
 
-        $this->assertTrue($this->createHelper()->applyCurrentFilters(['category' => ['2']], $listFilters, $filter));
+        $this->assertTrue($this->createHelper()->applyCurrentFilters(['category' => ['2']], $listFilters, $filter, 'category', []));
+    }
+
+    public function testTranslatedCategoryPrefixResolvesAlias(): void
+    {
+        $listFilters = [
+            'filters' => [
+                'placeholder' => 'Search',
+                'multiple'    => true,
+                'groups'      => ['mautic.core.filter.categories' => []],
+            ],
+        ];
+        $filter = ['string' => 'subject kategorie:news', 'force' => []];
+
+        $this->assertTrue($this->createHelper()->applyCurrentFilters(
+            ['kategorie' => ['news']],
+            $listFilters,
+            $filter,
+            'kategorie',
+            [['id' => 3, 'alias' => 'news']]
+        ));
+        $this->assertSame('subject', $filter['string']);
+        $this->assertSame(['news'], $listFilters['filters']['groups']['mautic.core.filter.categories']['values']);
+        $this->assertSame([['column' => 'c.id', 'expr' => 'in', 'value' => [3]]], $filter['force']);
     }
 
     public function testStartIsNeverNegative(): void

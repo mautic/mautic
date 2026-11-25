@@ -405,6 +405,14 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
+     * Looking up the visitor while rendering a form would track them, so it is skipped when form submitters are not tracked.
+     */
+    private function tracksVisitors(): bool
+    {
+        return (bool) $this->coreParametersHelper->get('form_track_submitters');
+    }
+
+    /**
      * Generate the form's html.
      *
      * @param bool $persist
@@ -414,7 +422,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         // Use specific template or system-wide default theme
         $theme         = $entity->getTemplate() ?? $this->coreParametersHelper->get('theme');
         $submissions   = null;
-        $lead          = ($this->requestStack->getCurrentRequest()) ? $this->contactTracker->getContact() : null;
+        $lead          = ($this->requestStack->getCurrentRequest() && $this->tracksVisitors()) ? $this->contactTracker->getContact() : null;
         $style         = '';
         $styleToRender = '@MauticForm/Builder/_style.html.twig';
         $formToRender  = '@MauticForm/Builder/form.html.twig';
@@ -612,10 +620,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             ],
         ];
         $ignoreTypes = $this->getCustomComponents()['viewOnlyFields'];
+        $platform    = $this->em->getConnection()->getDatabasePlatform();
         foreach ($fields as $f) {
             if (!in_array($f->getType(), $ignoreTypes)) {
                 $columns[] = [
-                    'name'    => $f->getAlias(),
+                    // Doctrine does not quote the column names in the schema changes by itself
+                    'name'    => $platform->quoteSingleIdentifier((string) $f->getAlias()),
                     'type'    => 'text',
                     'options' => [
                         'notnull' => false,
@@ -779,7 +789,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             return;
         }
 
-        $lead = $this->contactTracker->getContact();
+        $lead = $this->tracksVisitors() ? $this->contactTracker->getContact() : null;
         if (!$lead instanceof Lead) {
             return;
         }

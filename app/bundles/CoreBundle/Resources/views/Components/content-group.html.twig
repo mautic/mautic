@@ -6,10 +6,10 @@
     {% if copy is defined %}
         {% if copy is iterable %}
             {% for item in copy %}
-                <div class="content-block__copy type-body-02 mb-lg">{{ item|trans }}</div>
+                <div class="content-block__copy type-body-02 mb-24">{{ item|trans }}</div>
             {% endfor %}
         {% else %}
-            <div class="content-block__copy type-body-02 mb-lg">{{ copy|trans }}</div>
+            <div class="content-block__copy type-body-02 mb-24">{{ copy|trans }}</div>
         {% endif %}
     {% endif %}
     

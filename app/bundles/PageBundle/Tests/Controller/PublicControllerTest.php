@@ -472,12 +472,15 @@ final class PublicControllerTest extends TestCase
             $security
         );
 
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
+
         $response = $publicController->trackingAction(
             $request,
             $deviceTrackingService,
             $trackingHelper,
             $contactTracker,
-            $this->pageModel
+            $this->pageModel,
+            $this->ipLookupHelper
         );
 
         $json = json_decode($response->getContent(), true);
@@ -522,9 +525,65 @@ final class PublicControllerTest extends TestCase
             $this->createStub(DeviceTrackingServiceInterface::class),
             $this->createStub(TrackingHelper::class),
             $this->createStub(ContactTracker::class),
-            $this->pageModel
+            $this->pageModel,
+            $this->ipLookupHelper
         );
         $this->assertEquals(
+            ['success' => 0],
+            json_decode($response->getContent(), true)
+        );
+    }
+
+    public function testTrackingActionWithoutContact(): void
+    {
+        $security = $this->createMock(CorePermissions::class);
+        $security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->never())
+            ->method('dispatch');
+
+        $deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
+        $deviceTrackingService->expects($this->never())
+            ->method('getTrackedDevice');
+
+        $trackingHelper = $this->createMock(TrackingHelper::class);
+        $trackingHelper->expects($this->never())
+            ->method('getCacheItem');
+
+        $contactTracker = $this->createMock(ContactTracker::class);
+        $contactTracker->expects($this->once())
+            ->method('getContact')
+            ->willReturn(null);
+
+        $this->ipLookupHelper->expects($this->once())
+            ->method('isRequestTrackable')
+            ->willReturn(true);
+
+        $publicController = new PublicController(
+            $this->createStub(ManagerRegistry::class),
+            $this->modelFactory,
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $eventDispatcher,
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
+            new RequestStack(),
+            $security
+        );
+
+        $response = $publicController->trackingAction(
+            $this->request,
+            $deviceTrackingService,
+            $trackingHelper,
+            $contactTracker,
+            $this->pageModel,
+            $this->ipLookupHelper
+        );
+
+        $this->assertSame(
             ['success' => 0],
             json_decode($response->getContent(), true)
         );

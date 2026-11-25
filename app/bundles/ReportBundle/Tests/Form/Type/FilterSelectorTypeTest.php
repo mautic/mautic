@@ -75,7 +75,7 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
                                             'expanded'          => false,
                                             'multiple'          => false,
                                             'label'             => 'mautic.report.report.label.filtercondition',
-                                            'label_attr'        => ['class' => 'control-label filter-condition'],
+                                            'label_attr'        => ['class' => 'form-label filter-condition'],
                                             'placeholder'       => false,
                                             'required'          => false,
                                             'attr'              => [
@@ -91,7 +91,7 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
                                             'allow_add'     => true,
                                             'allow_delete'  => true,
                                             'label'         => 'mautic.report.report.label.filtervalue',
-                                            'label_attr'    => ['class' => 'control-label'],
+                                            'label_attr'    => ['class' => 'form-label'],
                                             'attr'          => ['class' => 'form-control filter-value'],
                                             'required'      => false,
                                         ], $parameters[2]);

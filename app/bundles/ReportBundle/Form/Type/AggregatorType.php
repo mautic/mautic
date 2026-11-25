@@ -36,7 +36,7 @@ final class AggregatorType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => false,
                 'label'       => 'mautic.report.function',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'placeholder' => false,
                 'required'    => false,
                 'attr'        => [
@@ -54,7 +54,7 @@ final class AggregatorType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.report.report.label.filtercolumn',
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'placeholder'       => false,
                 'required'          => false,
                 'attr'              => [

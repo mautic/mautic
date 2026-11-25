@@ -11,13 +11,18 @@ use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadListRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
+
+    private const DYNAMIC_COMMAND = 'is:dynamic';
+    private const STATIC_COMMAND  = 'is:static';
 
     private LeadListRepository $repository;
 
@@ -39,6 +44,48 @@ final class LeadListRepositoryTest extends TestCase
         $this->queryBuilderMock = $this->createMock(QueryBuilder::class);
         $this->expressionMock   = $this->createMock(Expr::class);
         $this->repository       = $this->configureRepository(LeadList::class);
+    }
+
+    #[DataProvider('dbalSearchCommandNegationProvider')]
+    public function testDynamicAndStaticSearchCommandsUseDbalCompatibleNegation(string $command, bool $not, bool $expectNegation): void
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(static fn (string $id): string => match ($id) {
+            'mautic.lead.list.searchcommand.dynamic' => self::DYNAMIC_COMMAND,
+            'mautic.lead.list.searchcommand.static'  => self::STATIC_COMMAND,
+            default                                  => $id,
+        });
+        $this->repository->autowireCommonRepository($translator);
+
+        $queryBuilder = new QueryBuilder($this->connection);
+        $filter       = (object) ['command' => $command, 'string' => '', 'not' => $not, 'strict' => false];
+        $method       = new \ReflectionMethod(LeadListRepository::class, 'addSearchCommandWhereClause');
+
+        [$expression, $parameters] = $method->invoke($this->repository, $queryBuilder, $filter);
+
+        $expression = (string) $expression;
+        if ($expectNegation) {
+            $this->assertStringContainsString('NOT(', $expression);
+        } else {
+            $this->assertStringNotContainsString('NOT(', $expression);
+        }
+        $this->assertStringContainsString('l.filters IS NULL', $expression);
+        $this->assertCount(2, $parameters);
+        $this->assertSame([serialize([]), serialize(null)], array_values($parameters));
+        foreach (array_keys($parameters) as $parameter) {
+            $this->assertStringContainsString(':'.$parameter, $expression);
+        }
+    }
+
+    /**
+     * @return iterable<string, array{string, bool, bool}>
+     */
+    public static function dbalSearchCommandNegationProvider(): iterable
+    {
+        yield 'dynamic segment'                => [self::DYNAMIC_COMMAND, false, true];
+        yield 'negated dynamic segment'        => [self::DYNAMIC_COMMAND, true, false];
+        yield 'static segment'                 => [self::STATIC_COMMAND, false, false];
+        yield 'negated static segment'         => [self::STATIC_COMMAND, true, true];
     }
 
     public function testIsContactInAnySegmentFalse(): void
@@ -166,6 +213,61 @@ final class LeadListRepositoryTest extends TestCase
         $queryResult        = [1, 2];
         $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
         $this->assertFalse($this->repository->isNotContactInAllSegments($contactId, $expectedSegmentIds));
+    }
+
+    /**
+     * @return iterable<string, array{bool, bool}>
+     */
+    public static function preferenceNegationProvider(): iterable
+    {
+        yield 'positive' => [false, true];
+        yield 'negated' => [true, false];
+    }
+
+    #[DataProvider('preferenceNegationProvider')]
+    public function testPreferenceSearchCommandUsesDbalColumnAndParameterValues(bool $not, bool $expected): void
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(static fn (string $id): string => $id);
+        $this->repository->autowireCommonRepository($translator);
+
+        $method = new \ReflectionMethod(LeadListRepository::class, 'addSearchCommandWhereClause');
+        $filter = (object) [
+            'command' => 'mautic.lead.list.searchcommand.ispreference',
+            'string'  => '',
+            'strict'  => true,
+            'not'     => $not,
+        ];
+        $queryBuilder = new QueryBuilder($this->connection);
+        [$expression, $parameters] = $method->invoke($this->repository, $queryBuilder, $filter);
+
+        $queryBuilder->select('l.id')->from('lead_lists', 'l')->where($expression);
+
+        $this->assertStringContainsString('l.is_preference_center', $queryBuilder->getSQL());
+        $this->assertSame([$expected], array_values($parameters));
+    }
+
+    #[DataProvider('preferenceNegationProvider')]
+    public function testPreferenceSearchCommandUsesOrmColumnAndParameterValues(bool $not, bool $expected): void
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(static fn (string $id): string => $id);
+        $this->repository->autowireCommonRepository($translator);
+
+        $method = new \ReflectionMethod(LeadListRepository::class, 'addSearchCommandWhereClause');
+        $this->entityManager->method('getExpressionBuilder')->willReturn(new Expr());
+        $filter = (object) [
+            'command' => 'mautic.lead.list.searchcommand.ispreference',
+            'string'  => '',
+            'strict'  => true,
+            'not'     => $not,
+        ];
+        $queryBuilder = new \Doctrine\ORM\QueryBuilder($this->entityManager);
+        [$expression, $parameters] = $method->invoke($this->repository, $queryBuilder, $filter);
+        $queryBuilder->where($expression);
+
+        $this->assertSame([$expected], array_values($parameters));
+        $this->assertStringContainsString('l.isPreferenceCenter =', $queryBuilder->getDQL());
     }
 
     /**

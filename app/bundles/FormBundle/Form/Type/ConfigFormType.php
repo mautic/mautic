@@ -30,12 +30,23 @@ final class ConfigFormType extends AbstractType
         );
 
         $builder->add(
+            'form_track_submitters',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.form.config.form.form_track_submitters',
+                'attr'  => [
+                    'tooltip' => 'mautic.form.config.form.form_track_submitters.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
             $builder->create(
                 'do_not_submit_emails',
                 TextareaType::class,
                 [
                     'label'      => 'mautic.form.config.form.do_not_submit_email',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.form.config.form.do_not_submit_email.tooltip',
@@ -52,7 +63,7 @@ final class ConfigFormType extends AbstractType
                 TextareaType::class,
                 [
                     'label'      => 'mautic.form.config.form.blocked_free_email_providers',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.form.config.form.blocked_free_email_providers.tooltip',
@@ -68,7 +79,7 @@ final class ConfigFormType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.form.config.form_results_data_sources',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.form.config.form_results_data_sources.tooltip',

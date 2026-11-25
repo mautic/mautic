@@ -67,6 +67,17 @@ final class ConfigTrackingPageType extends AbstractType
         );
 
         $builder->add(
+            'aggregate_analytics',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.page.config.form.aggregate_analytics',
+                'attr'  => [
+                    'tooltip' => 'mautic.page.config.form.aggregate_analytics.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
             'facebook_pixel_id',
             TextType::class,
             [

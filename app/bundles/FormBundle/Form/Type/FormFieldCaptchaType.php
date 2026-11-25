@@ -20,7 +20,7 @@ final class FormFieldCaptchaType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_captcha',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'       => 'form-control',
                     'tooltip'     => 'mautic.form.field.help.captcha',
@@ -35,7 +35,7 @@ final class FormFieldCaptchaType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_placeholder',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]
@@ -46,7 +46,7 @@ final class FormFieldCaptchaType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_captchaerror',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]

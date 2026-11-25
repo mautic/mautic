@@ -1,5 +1,5 @@
 {%- if template is defined %}
-{%- set btnClass = btnClass|default('btn btn-primary bdr-rds-0') %}
+{%- set btnClass = btnClass|default('btn btn-primary rounded-0') %}
     {%- if template is same as 'batchdelete' %}
         {%- set confirmText = confirmText|default('mautic.core.form.delete'|trans) %}
         {%- set iconClass = iconClass|default('ri-delete-bin-line text-danger') %}

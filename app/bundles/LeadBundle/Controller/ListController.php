@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
-use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -28,7 +27,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class ListController extends FormController
 {
-    use EntityContactsTrait;
+    use CategoryListFiltersTrait;
     use QuickFilterSearchTrait;
 
     private LeadListRepository $leadListRepository;
@@ -47,8 +46,6 @@ final class ListController extends FormController
         $this->listModel = $listModel;
         $this->leadListRepository = $leadListRepository;
     }
-
-    public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
 
     public const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
 
@@ -729,15 +726,6 @@ final class ListController extends FormController
         // set the page we came from
         $page = $request->getSession()->get('mautic.segment.page', 1);
 
-        if ('POST' === $request->getMethod() && $request->request->has('includeEvents')) {
-            $filters = [
-                'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
-            ];
-            $request->getSession()->set('mautic.segment.filters', $filters);
-        } else {
-            $filters = [];
-        }
-
         if (null === $list) {
             // set the return URL
             $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
@@ -798,25 +786,47 @@ final class ListController extends FormController
                 'campaignStats'      => $segmentCampaignShare->getCampaignList($list->getId()),
                 'stats'              => $segmentContactsLineChartData,
                 'list'               => $list,
-                'segmentCount'       => $this->leadListRepository->getLeadCount($list->getId()),
-                'activeSegmentCount' => $listModel->getActiveSegmentContactCount($list->getId()),
                 'permissions'        => $this->security->isGranted($permissions, 'RETURN_ARRAY'),
                 'security'           => $this->security,
                 'dateRangeForm'      => $dateRangeForm->createView(),
-                'events'             => [
-                    'filters' => $filters,
-                    'types'   => [
-                        'manually_added'   => $this->translator->trans('mautic.segment.contact.manually.added'),
-                        'manually_removed' => $this->translator->trans('mautic.segment.contact.manually.removed'),
-                        'filter_added'     => $this->translator->trans('mautic.segment.contact.filter.added'),
-                    ],
-                ],
             ],
             'contentTemplate' => '@MauticLead/List/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'list',
             ],
+        ]);
+    }
+
+    public function segmentStatsAction(int $objectId): Response
+    {
+        if (!$this->security->isGranted('lead:leads:viewown')) {
+            $this->throwAccessDenied();
+        }
+
+        $segment = $this->getSegment(
+            $objectId,
+            LeadPermissions::LISTS_VIEW_OWN,
+            LeadPermissions::LISTS_VIEW_OTHER
+        );
+        $statistics = $this->leadListRepository->getSegmentStatistics(
+            $segment->getId(),
+            !empty($segment->getFilters())
+        );
+        $activeSegmentCount = $this->listModel->getActiveSegmentContactCount(
+            $segment->getId(),
+            $statistics['total']
+        );
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'list'                      => $segment,
+                'segmentCount'              => $statistics['total'],
+                'activeSegmentCount'        => $activeSegmentCount,
+                'manuallyAddedSegmentCount' => $statistics['manuallyAdded'],
+                'filterAddedSegmentCount'   => $statistics['filterAdded'],
+            ],
+            'contentTemplate' => '@MauticLead/List/_segment_stats.html.twig',
         ]);
     }
 
@@ -840,71 +850,25 @@ final class ListController extends FormController
 
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
-        $request        = $this->getCurrentRequest();
-        $session        = $request->getSession();
-        $currentFilters = $session->get('mautic.lead.list.list_filters', []);
-        $updatedFilters = $request->get('filters', false);
-
-        $sourceLists = $this->listModel->getSourceLists();
-        $listFilters = [
-            'filters' => [
-                'placeholder' => $this->translator->trans('mautic.lead.list.filter.placeholder'),
-                'multiple'    => true,
-                'groups'      => [
-                    'mautic.lead.list.source.segment.category' => [
-                        'options' => $sourceLists['categories'],
-                        'prefix'  => 'category',
-                    ],
-                ],
-            ],
-        ];
-
-        if ($updatedFilters) {
-            // Filters have been updated
-
-            // Parse the selected values
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr] = explode(':', $updatedFilter);
-
-                    $newFilters[$clmn][] = $fltr;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
-        }
-        $session->set('mautic.lead.list.list_filters', $currentFilters);
-
-        $joinCategories = false;
-        if (!empty($currentFilters)) {
-            $catAliases = $searchFilterTerms = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                $listFilters['filters']['groups']['mautic.lead.list.source.segment.'.$type]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    if ('category' == $type) {
-                        $catAliases[]        = $fltr;
-                        $searchFilterTerms[] = 'category:'.$fltr;
-                    } // else for other group filters
-                }
-            }
-
-            $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $searchFilterTerms);
-            $session->set('mautic.lead.list.filter', $filter['string']);
-
-            if ([] !== $catAliases) {
-                $joinCategories    = true;
-                $filter['force'][] = ['column' => 'cat.alias', 'expr' => 'in', 'value' => array_values(array_unique($catAliases))];
-            }
-        }
+        $request          = $this->getCurrentRequest();
+        $filterForceCount = count($filter['force'] ?? []);
+        $categoryFilters  = $this->applyCategoryListFilter(
+            $request,
+            'mautic.lead.list.list_filters',
+            ['segment', 'lead.list'],
+            'cat.id',
+            $filter,
+            'mautic.lead.list.source.segment.category',
+            'mautic.lead.list.filter.placeholder',
+        );
+        $filter['string'] = $this->stripQuickFilterTokensFromSearch(
+            (string) ($filter['string'] ?? ''),
+            $categoryFilters['searchTerms'],
+        );
+        $joinCategories = count($filter['force'] ?? []) > $filterForceCount;
 
         // Store for customizeViewArguments
-        $this->listFilters = $listFilters;
+        $this->listFilters = $categoryFilters['filters'];
 
         return parent::getIndexItems(
             $start,
@@ -925,52 +889,6 @@ final class ListController extends FormController
         }
 
         return $args;
-    }
-
-    /**
-     * @param int $objectId
-     * @param int $page
-     */
-    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1): Response
-    {
-        $session = $request->getSession();
-        $session->set('mautic.segment.contact.page', $page);
-
-        $manuallyRemoved = 0;
-        $listFilters     = ['manually_removed' => $manuallyRemoved];
-        if ('POST' === $request->getMethod() && $request->request->has('includeEvents')) {
-            $filters = [
-                'includeEvents' => InputHelper::clean($request->query->all()['includeEvents'] ?? $request->request->all()['includeEvents'] ?? []),
-            ];
-            $request->getSession()->set('mautic.segment.filters', $filters);
-        } else {
-            $filters = [];
-        }
-
-        if ([] !== $filters) {
-            if (in_array('manually_added', $filters['includeEvents'])) {
-                $listFilters = array_merge($listFilters, ['manually_added' => 1]);
-            }
-            if (in_array('manually_removed', $filters['includeEvents'])) {
-                $listFilters = array_merge($listFilters, ['manually_removed' => 1]);
-            }
-            if (in_array('filter_added', $filters['includeEvents'])) {
-                $listFilters = array_merge($listFilters, ['manually_added' => 0]);
-            }
-        }
-
-        return $this->generateContactsGrid(
-            $request,
-            $pageHelperFactory,
-            $objectId,
-            $page,
-            LeadPermissions::LISTS_VIEW,
-            'segment',
-            'lead_lists_leads',
-            null,
-            'leadlist_id',
-            $listFilters
-        );
     }
 
     protected function getDefaultOrderDirection(): string

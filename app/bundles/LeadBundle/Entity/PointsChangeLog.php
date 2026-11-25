@@ -200,7 +200,7 @@ class PointsChangeLog
         return $this->lead;
     }
 
-    public function setIpAddress(IpAddress $ipAddress): static
+    public function setIpAddress(?IpAddress $ipAddress): static
     {
         $this->ipAddress = $ipAddress;
 

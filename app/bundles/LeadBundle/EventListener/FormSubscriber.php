@@ -10,6 +10,7 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\ObjectCollectEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\UtmTag;
@@ -35,11 +36,11 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     public function __construct(
         private LeadModel $leadModel,
         private ContactTracker $contactTracker,
-        private IpLookupHelper $ipLookupHelper,
         private LeadFieldRepository $leadFieldRepository,
         private PointGroupModel $groupModel,
         private DoNotContact $doNotContact,
         private FieldModel $leadFieldModel,
+        private IpLookupHelper $ipLookupHelper,
     ) {
     }
 
@@ -167,7 +168,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -177,7 +178,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $pointsChangeLog->setType('form');
         $pointsChangeLog->setEventName($form->getId().':'.$form->getName());
         $pointsChangeLog->setActionName($event->getAction()->getName());
-        $pointsChangeLog->setIpAddress($this->ipLookupHelper->getIpAddress());
+        $pointsChangeLog->setIpAddress($event->getSubmission()->getIpAddress());
         $pointsChangeLog->setDateAdded(new \DateTime());
         $pointsChangeLog->setLead($contact);
 
@@ -211,7 +212,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -234,7 +235,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -251,28 +252,42 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
         $queryReferer = $queryArray = [];
+        $request      = $event->getRequest();
 
-        parse_str($event->getRequest()->server->get('QUERY_STRING'), $queryArray);
-        $refererURL       = $event->getRequest()->server->get('HTTP_REFERER');
-        $refererParsedUrl = parse_url($refererURL);
+        // An untracked submitter keeps only the campaign UTM tags and the page addresses, as the rest of the request can identify them
+        $untracked = $this->ipLookupHelper->isVisitorUntracked();
 
-        if (isset($refererParsedUrl['query'])) {
-            parse_str($refererParsedUrl['query'], $queryReferer);
+        parse_str((string) $request->server->get('QUERY_STRING'), $queryArray);
+        $httpReferer      = $request->server->get('HTTP_REFERER');
+        $refererURL       = $untracked ? $event->getSubmission()->getReferer() : $httpReferer;
+        $refererParsedUrl = parse_url((string) $refererURL);
+
+        // The tags come from the page the form was submitted from, as the submission's referer can be the form's return URL instead
+        parse_str((string) parse_url((string) $httpReferer, PHP_URL_QUERY), $queryReferer);
+
+        $query = $request->query->all();
+        $url   = $request->server->get('REQUEST_URI');
+
+        if ($untracked) {
+            $queryArray   = UtmTag::filterCampaignParameters($queryArray);
+            $queryReferer = UtmTag::filterCampaignParameters($queryReferer);
+            $query        = UtmTag::filterCampaignParameters($query);
+            $url          = explode('?', (string) $url, 2)[0];
         }
 
         $utmValues = new UtmTag();
         $utmValues->setLead($contact);
-        $utmValues->setQuery($event->getRequest()->query->all());
+        $utmValues->setQuery($query);
         $utmValues->setReferer($refererURL);
-        $utmValues->setUrl($event->getRequest()->server->get('REQUEST_URI'));
+        $utmValues->setUrl($url);
         $utmValues->setDateAdded(new \DateTime());
         $utmValues->setRemoteHost($refererParsedUrl['host'] ?? null);
-        $utmValues->setUserAgent($event->getRequest()->server->get('HTTP_USER_AGENT') ?? null);
+        $utmValues->setUserAgent($untracked ? null : $request->server->get('HTTP_USER_AGENT'));
         $utmValues->setUtmCampaign($queryArray['utm_campaign'] ?? $queryReferer['utm_campaign'] ?? null);
         $utmValues->setUtmContent($queryArray['utm_content'] ?? $queryReferer['utm_content'] ?? null);
         $utmValues->setUtmMedium($queryArray['utm_medium'] ?? $queryReferer['utm_medium'] ?? null);
@@ -291,7 +306,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -336,7 +351,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$lead = $this->contactTracker->getContact()) {
+        if (!$lead = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -370,5 +385,17 @@ final readonly class FormSubscriber implements EventSubscriberInterface
 
         $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $processedValues), false);
         $this->leadModel->saveEntity($lead);
+    }
+
+    /**
+     * A kiosk mode submission without contact fields has no contact, so the actions must not fall back to the contact the device cookie points to.
+     */
+    private function getSubmissionContact(SubmissionEvent $event): ?Lead
+    {
+        if (!$event->getSubmission()->getLead()) {
+            return null;
+        }
+
+        return $this->contactTracker->getContact();
     }
 }

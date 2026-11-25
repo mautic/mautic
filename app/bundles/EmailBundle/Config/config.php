@@ -107,6 +107,14 @@ return [
                     'objectType'    => null,
                 ],
             ],
+            'mautic_email_preview_download' => [
+                'path'       => '/email/download/preview/{objectId}/{objectType}/{downloadType}',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::downloadAction',
+                'defaults'   => [
+                    'downloadType'    => null,
+                    'objectType'      => 'real',
+                ],
+            ],
         ],
     ],
     'menu' => [

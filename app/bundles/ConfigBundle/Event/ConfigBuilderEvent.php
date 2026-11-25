@@ -91,11 +91,7 @@ class ConfigBuilderEvent extends Event
             $allBundles = $this->bundleHelper->getMauticBundles(true);
         }
 
-        if (isset($allBundles[$bundle]) && $allBundles[$bundle]['config']['parameters']) {
-            return $allBundles[$bundle]['config']['parameters'];
-        }
-
-        return [];
+        return $allBundles[$bundle]['config']['parameters'] ?? [];
     }
 
     public function addFileFields($fields): static

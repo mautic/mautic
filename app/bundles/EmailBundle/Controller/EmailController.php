@@ -3,10 +3,9 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
-use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
-use Mautic\CoreBundle\Event\SearchHelpEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -34,6 +33,7 @@ use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,7 +44,6 @@ final class EmailController extends FormController
 {
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
-    use QuickFilterSearchTrait;
 
     private LeadRepository $leadRepository;
 
@@ -69,6 +68,10 @@ final class EmailController extends FormController
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
+    private const FILTER_TYPE_LIST     = 'list';
+
+    private const FILTER_TYPE_THEME    = 'theme';
+
     private bool $invalidHtmlError = false;
 
     public function indexAction(
@@ -76,6 +79,7 @@ final class EmailController extends FormController
         EmailModel $model,
         EmailConfig $emailConfig,
         ThemeHelper $themeHelper,
+        CategoryModel $categoryModel,
         EmailColumnsDictionary $emailColumnsDictionary,
         EmailListingHelper $emailListingHelper,
         EmailSearchScopeProvider $emailSearchScopeProvider,
@@ -113,13 +117,21 @@ final class EmailController extends FormController
         $availableLists                                               = $this->listModel->getUserLists();
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
             'options' => array_column($availableLists, 'name', 'alias'),
-            'prefix'  => 'list',
+            'prefix'  => self::FILTER_TYPE_LIST,
         ];
 
         // retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
             'options' => $themeHelper->getInstalledThemes('email'),
-            'prefix'  => 'theme',
+            'prefix'  => self::FILTER_TYPE_THEME,
+        ];
+
+        // retrieve a list of categories
+        $categories                                                        = $categoryModel->getLookupResults('email', '', 0);
+        $categoryFilterPrefix                                              = $this->translator->trans('mautic.core.searchcommand.category');
+        $listFilters['filters']['groups']['mautic.core.filter.categories'] = [
+            'options' => $categories,
+            'prefix'  => $categoryFilterPrefix,
         ];
 
         $currentFilters = $session->get('mautic.email.list_filters', []);
@@ -131,7 +143,8 @@ final class EmailController extends FormController
 
         $session->set('mautic.email.list_filters', $currentFilters);
 
-        $ignoreListJoin = $emailListingHelper->applyCurrentFilters($currentFilters, $listFilters, $filter);
+        $ignoreListJoin = $emailListingHelper->applyCurrentFilters($currentFilters, $listFilters, $filter, $categoryFilterPrefix, $categories);
+        $session->set('mautic.email.filter', $filter['string']);
 
         $orderBy    = $session->get('mautic.email.orderby', 'e.dateModified');
         $orderByDir = $session->get('mautic.email.orderbydir', $this->getDefaultOrderDirection());
@@ -167,14 +180,10 @@ final class EmailController extends FormController
         }
         $session->set('mautic.email.page', $page);
 
-        $searchHelpEvent = new SearchHelpEvent('mautic.email.help.searchcommands', 'email');
-        $this->dispatcher->dispatch($searchHelpEvent);
-
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue'      => $search,
-                    'searchHelp'       => $searchHelpEvent->getHelp(),
+                    'searchValue'      => $filter['string'],
                     'filters'          => $listFilters,
                     'columns'          => $emailColumnsDictionary->getColumns(),
                     'columnHeaderMeta' => $emailColumnsDictionary->getHeaderMeta(),
@@ -313,11 +322,12 @@ final class EmailController extends FormController
             $draftPreviewUrl = null;
             if ($emailConfig->isDraftEnabled() && $email->hasDraft()) {
                 $draftPreviewUrl = $this->generateUrl(
-                    'mautic_email_preview',
+                    'mautic_email_preview_download',
                     [
                         'objectId'   => $email->getId(),
                         'objectType' => 'draft',
-                    ]
+                    ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
                 );
             }
 
@@ -375,8 +385,13 @@ final class EmailController extends FormController
                     'abTestResults'   => $abTestResults,
                     'security'        => $security,
                     'draftPreviewUrl' => $draftPreviewUrl,
-                    'previewUrl'      => $this->generateUrl(
+                    'finalPreviewUrl' => $this->generateUrl(
                         'mautic_email_preview',
+                        ['objectId' => $email->getId()],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ),
+                    'previewUrl'      => $this->generateUrl(
+                        'mautic_email_preview_download',
                         ['objectId' => $email->getId()],
                         UrlGeneratorInterface::ABSOLUTE_URL
                     ),
@@ -798,10 +813,11 @@ final class EmailController extends FormController
         $draftPreviewUrl = '';
         if ($emailConfig->isDraftEnabled() && $entity->hasDraft()) {
             $draftPreviewUrl = $this->generateUrl(
-                'mautic_email_preview',
+                'mautic_email_preview_download',
                 ['objectId'       => $entity->getId(),
                     'objectType'  => 'draft',
-                ]
+                ],
+                UrlGeneratorInterface::ABSOLUTE_URL
             );
         }
 
@@ -826,7 +842,7 @@ final class EmailController extends FormController
                     'draftPreviewUrl'    => $draftPreviewUrl,
                     'invalidHtmlError'   => $this->invalidHtmlError,
                     'previewUrl'         => $this->generateUrl(
-                        'mautic_email_preview',
+                        'mautic_email_preview_download',
                         ['objectId' => $entity->getId()],
                         UrlGeneratorInterface::ABSOLUTE_URL
                     ),
@@ -938,6 +954,8 @@ final class EmailController extends FormController
                             $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
                             $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                         } else {
+                            $entity->setIsClone(false);
+
                             return $this->forward(self::class.'::editAction', [
                                 'objectId'   => $entity->getId(),
                                 'ignorePost' => true,
@@ -1306,7 +1324,7 @@ final class EmailController extends FormController
                 'objectAction' => 'view',
                 'objectId'     => $objectId,
             ];
-            $postActionVars['returnUrl']       = $this->generateUrl('mautic_page_action', $postActionVars['viewParameters']);
+            $postActionVars['returnUrl']       = $this->generateUrl('mautic_email_action', $postActionVars['viewParameters']);
             $postActionVars['contentTemplate'] = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
         } // else don't do anything
 
@@ -1530,6 +1548,91 @@ final class EmailController extends FormController
                 ]
             )
         );
+    }
+
+    public function batchSendExampleAction(Request $request, FakeContactHelper $fakeLeadHelper, LoggerInterface $logger): Response
+    {
+        $page      = $request->getSession()->get('mautic.email.page', 1);
+        $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
+        $flashes   = [];
+        $sent      = 0;
+
+        if ($request->isMethod(Request::METHOD_POST)) {
+            if (!$this->isCsrfTokenValid('mautic_ajax_post', $request->headers->get('X-CSRF-Token'))) {
+                $this->throwAccessDenied();
+            }
+
+            $ids    = json_decode($request->query->getString('ids'), true);
+            $fields = $fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
+            $users  = [[
+                'id'        => $this->user->getId(),
+                'firstname' => $this->user->getFirstName(),
+                'lastname'  => $this->user->getLastName(),
+                'email'     => $this->user->getEmail(),
+            ]];
+
+            $ids = is_array($ids) ? array_filter(
+                $ids,
+                static fn (mixed $id): bool => (is_int($id) || (is_string($id) && ctype_digit($id))) && (int) $id > 0
+            ) : [];
+
+            foreach (array_unique($ids) as $objectId) {
+                $email = $this->emailModel->getEntity($objectId);
+
+                if (!$email instanceof Email) {
+                    $flashes[] = [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.email.error.notfound',
+                        'msgVars' => ['%id%' => $objectId],
+                    ];
+                } elseif (!$this->security->hasEntityAccess(
+                    'email:emails:viewown',
+                    'email:emails:viewother',
+                    $email->getCreatedBy()
+                )) {
+                    $flashes[] = $this->getAccessDeniedFlash();
+                } else {
+                    $email->setSubject(sprintf('%s %s', self::EXAMPLE_EMAIL_SUBJECT_PREFIX, $email->getSubject()));
+
+                    try {
+                        $errors = $this->emailModel->sendSampleEmailToUser($email, $users, $fields, [], [], false);
+                    } catch (\Exception $exception) {
+                        $logger->error('Batch test send failed for email', ['emailId' => $email->getId(), 'exception' => $exception]);
+                        $errors = [$exception->getMessage()];
+                    }
+
+                    if ([] === $errors) {
+                        ++$sent;
+                    } else {
+                        $flashes[] = [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.email.error.batch_test_failed',
+                            'msgVars' => ['%name%' => $email->getName()],
+                        ];
+                    }
+                }
+            }
+        }
+
+        $flashes[] = [
+            'type'    => 'notice',
+            'msg'     => 'mautic.email.notice.batch_test_sent',
+            'msgVars' => [
+                '%count%' => $sent,
+                '%email%' => $this->user->getEmail(),
+            ],
+        ];
+
+        return $this->postActionRedirect([
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
+            'contentTemplate' => self::class.'::indexAction',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_email_index',
+                'mauticContent' => 'email',
+            ],
+            'flashes' => $flashes,
+        ]);
     }
 
     public function scheduleSendAction(CorePermissions $security, EmailModel $model, Request $request, int $objectId): JsonResponse|Response
@@ -1792,6 +1895,10 @@ final class EmailController extends FormController
         $clonedEmail->setVariantReadCount($cloningEmail->getVariantReadCount());
         $clonedEmail->setVariantStartDate($cloningEmail->getVariantStartDate());
         $clonedEmail->setEmailType($cloningEmail->getEmailType());
+        $clonedEmail->setPlainText($cloningEmail->getPlainText());
+        $clonedEmail->setPublishUp($cloningEmail->getPublishUp());
+        $clonedEmail->setPublishDown($cloningEmail->getPublishDown());
+        $clonedEmail->setContinueSending($cloningEmail->getContinueSending());
         $clonedEmail->setDraft($cloningEmail->getDraft());
     }
 

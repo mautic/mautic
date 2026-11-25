@@ -5,6 +5,14 @@ declare(strict_types=1);
 return [
     'routes' => [
         'main' => [
+            // Must be defined before mautic_config_action so configuration pages are not matched as a generic action
+            'mautic_config_edit' => [
+                'path'       => '/config/edit/{activeTabId}',
+                'controller' => 'Mautic\ConfigBundle\Controller\ConfigController::editAction',
+                'defaults'   => [
+                    'activeTabId' => null,
+                ],
+            ],
             'mautic_config_action' => [
                 'path'       => '/config/{objectAction}/{objectId}',
                 'controller' => 'Mautic\ConfigBundle\Controller\ConfigController::executeAction',

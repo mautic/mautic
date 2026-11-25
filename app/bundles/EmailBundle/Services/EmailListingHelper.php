@@ -90,14 +90,11 @@ final readonly class EmailListingHelper
      * @param array<string, list<string>>                                                                             $currentFilters
      * @param array{filters: array{placeholder: string, multiple: bool, groups: array<string, array<string, mixed>>}} $listFilters
      * @param array{string: string, force: array<int, array<string, mixed>>}                                          $filter
+     * @param array<int, array<string, mixed>>                                                                         $categories
      */
-    public function applyCurrentFilters(array $currentFilters, array &$listFilters, array &$filter): bool
+    public function applyCurrentFilters(array $currentFilters, array &$listFilters, array &$filter, string $categoryFilterPrefix, array $categories): bool
     {
         $ignoreListJoin = true;
-
-        if ([] === $currentFilters) {
-            return $ignoreListJoin;
-        }
 
         $listAliases = [];
         $catIds      = [];
@@ -105,6 +102,14 @@ final readonly class EmailListingHelper
         $searchTerms = [];
 
         foreach ($currentFilters as $type => $typeFilters) {
+            foreach ($typeFilters as $typeFilter) {
+                $searchTerms[] = $type.':'.$typeFilter;
+            }
+
+            if ($type === $categoryFilterPrefix) {
+                $type = 'category';
+            }
+
             $groupKey = $this->getListFilterGroupKey($type);
             if (null !== $groupKey) {
                 $listFilters['filters']['groups'][$groupKey]['values'] = $typeFilters;
@@ -119,8 +124,17 @@ final readonly class EmailListingHelper
                         $searchTerms[] = 'list:'.$listAlias;
                         break;
                     case 'category':
-                        $catIds[] = (int) $currentFilter;
-                        $searchTerms[] = 'category:'.$currentFilter;
+                        if (is_numeric($currentFilter)) {
+                            $catIds[] = (int) $currentFilter;
+                            break;
+                        }
+
+                        foreach ($categories as $category) {
+                            if (($category['alias'] ?? null) === $currentFilter) {
+                                $catIds[] = (int) $category['id'];
+                                break;
+                            }
+                        }
                         break;
                     case 'theme':
                         $templates[] = $currentFilter;

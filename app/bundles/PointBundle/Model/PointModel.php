@@ -167,10 +167,11 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
      * @param mixed $eventDetails     passthrough from function triggering action to the callback function
      * @param mixed $typeId           Something unique to the triggering event to prevent  unnecessary duplicate calls
      * @param bool  $allowUserRequest
+     * @param bool  $storeIpAddress   false for visitors Mautic doesn't track
      *
      * @throws \ReflectionException
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, ?Lead $lead = null, $allowUserRequest = false): void
+    public function triggerAction($type, $eventDetails = null, $typeId = null, ?Lead $lead = null, $allowUserRequest = false, bool $storeIpAddress = true): void
     {
         // only trigger actions for not logged Mautic users
         if (!$this->security->isAnonymous() && !$allowUserRequest) {
@@ -193,7 +194,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         if (empty($availablePoints)) {
             return;
         }
-        $ipAddress       = $this->ipLookupHelper->getIpAddress();
+        $ipAddress       = $storeIpAddress ? $this->ipLookupHelper->getIpAddress() : null;
 
         $hasLeadPointChanges = false;
         if (null === $lead) {
