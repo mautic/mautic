@@ -51,6 +51,7 @@ final class ConfigSubscriberTest extends TestCase
         $this->assertSame('abc%%def%%ghi', $monitoredEmail['general']['password']);
         $this->assertSame('%kernel.project_dir%/mail', $monitoredEmail['EmailBundle_bounces']['password']);
     }
+
     public function testRestoredMonitoredEmailPasswordsUsePersistedConfigurationWithoutSnapshot(): void
     {
         $event = new ConfigEvent([
