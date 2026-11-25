@@ -128,8 +128,8 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             $this->assetRepository,
             $this->createStub(DownloadRepository::class),
             $this->createStub(CategoryRepository::class),
-            new AggregateAnalyticsHelper($this->coreParametersHelper),
         );
+        $this->assetModel->autowireAssetModel(new AggregateAnalyticsHelper($this->coreParametersHelper));
     }
 
     /**
@@ -378,7 +378,6 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                 $this->createStub(AssetRepository::class),
                 $this->createStub(DownloadRepository::class),
                 $this->createStub(CategoryRepository::class),
-                new AggregateAnalyticsHelper($this->coreParametersHelper),
             ])
             ->onlyMethods(['getEntity'])
             ->getMock();
