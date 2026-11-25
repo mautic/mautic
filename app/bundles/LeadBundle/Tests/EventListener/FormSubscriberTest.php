@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
@@ -51,7 +52,8 @@ final class FormSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadFieldRepository::class),
             $this->createStub(PointGroupModel::class),
             $this->createStub(DoNotContact::class),
-            $this->createStub(FieldModel::class)
+            $this->createStub(FieldModel::class),
+            $this->createStub(IpLookupHelper::class)
         );
     }
 
