@@ -26,17 +26,21 @@ final class Version20260616075543FunctionalTest extends MauticMysqlTestCase
         $this->em->persist($category);
         $this->em->flush();
 
-        $this->connection->executeStatement("RENAME TABLE `{$tableName}` TO `{$backupTableName}`");
-        $this->connection->executeStatement("CREATE TABLE `{$tableName}` (
-            `id` INT UNSIGNED AUTO_INCREMENT NOT NULL,
-            `category_id` INT UNSIGNED DEFAULT NULL,
-            PRIMARY KEY (`id`)
-        ) ENGINE = InnoDB");
-        $this->connection->insert($tableName, ['category_id' => $category->getId()]);
-        $this->connection->insert($tableName, ['category_id' => 2147483647]);
-        $this->connection->insert($tableName, ['category_id' => null]);
+        $tableWasRenamed = false;
 
         try {
+            // Keep the exact baseline schema so the test harness can reset the database afterward.
+            $this->connection->executeStatement("RENAME TABLE `{$tableName}` TO `{$backupTableName}`");
+            $tableWasRenamed = true;
+            $this->connection->executeStatement("CREATE TABLE `{$tableName}` (
+                `id` INT UNSIGNED AUTO_INCREMENT NOT NULL,
+                `category_id` INT UNSIGNED DEFAULT NULL,
+                PRIMARY KEY (`id`)
+            ) ENGINE = InnoDB");
+            $this->connection->insert($tableName, ['category_id' => $category->getId()]);
+            $this->connection->insert($tableName, ['category_id' => 2147483647]);
+            $this->connection->insert($tableName, ['category_id' => null]);
+
             $schema    = $this->connection->createSchemaManager()->introspectSchema();
             $migration = new Version20260616075543($this->connection, new NullLogger());
             $migration->setPrefix($this->getTablePrefix());
@@ -58,8 +62,10 @@ final class Version20260616075543FunctionalTest extends MauticMysqlTestCase
                     && $this->getTablePrefix().'categories' === $foreignKey->getForeignTableName()
             ));
         } finally {
-            $this->connection->executeStatement("DROP TABLE IF EXISTS `{$tableName}`");
-            $this->connection->executeStatement("RENAME TABLE `{$backupTableName}` TO `{$tableName}`");
+            if ($tableWasRenamed) {
+                $this->connection->executeStatement("DROP TABLE IF EXISTS `{$tableName}`");
+                $this->connection->executeStatement("RENAME TABLE `{$backupTableName}` TO `{$tableName}`");
+            }
         }
     }
 
