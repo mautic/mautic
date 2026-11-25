@@ -102,16 +102,26 @@ final class Version20260120130000 extends AbstractMauticMigration
              \$\$;",
 
             // from_unixtime / unix_timestamp
-            'CREATE OR REPLACE FUNCTION from_unixtime(ts bigint) RETURNS timestamp with time zone LANGUAGE sql STABLE AS $$SELECT to_timestamp(ts);$$',
+            'CREATE OR REPLACE FUNCTION from_unixtime(ts bigint) RETURNS timestamp with time zone LANGUAGE sql IMMUTABLE AS $$SELECT to_timestamp(ts);$$',
             'CREATE OR REPLACE FUNCTION unix_timestamp(ts timestamp with time zone) RETURNS bigint LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(EPOCH FROM ts)::bigint;$$',
-            'CREATE OR REPLACE FUNCTION unix_timestamp() RETURNS bigint LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(EPOCH FROM now())::bigint;$$',
+            'CREATE OR REPLACE FUNCTION unix_timestamp() RETURNS bigint LANGUAGE sql STABLE AS $$SELECT EXTRACT(EPOCH FROM now())::bigint;$$',
 
             // sec_to_time (two overloads)
             "CREATE OR REPLACE FUNCTION sec_to_time(secs integer) RETURNS text LANGUAGE sql IMMUTABLE STRICT AS \$\$SELECT to_char(make_interval(secs => abs(secs)), CASE WHEN secs < 0 THEN '-FMHH24:MI:SS' ELSE 'FMHH24:MI:SS' END);\$\$",
             "CREATE OR REPLACE FUNCTION sec_to_time(secs bigint) RETURNS text LANGUAGE sql IMMUTABLE STRICT AS \$\$SELECT to_char(make_interval(secs => abs(secs)::integer), CASE WHEN secs < 0 THEN '-FMHH24:MI:SS' ELSE 'FMHH24:MI:SS' END);\$\$",
 
             // substring_index, concat_ws, group_concat
-            'CREATE OR REPLACE FUNCTION substring_index(str text, delim text, count integer) RETURNS text LANGUAGE sql IMMUTABLE AS $$SELECT split_part($1, $2, $3);$$',
+            "CREATE OR REPLACE FUNCTION substring_index(str text, delim text, count integer)
+             RETURNS text LANGUAGE sql IMMUTABLE STRICT AS \$\$
+             RETURN CASE
+                WHEN delim = '' OR str = '' OR count = 0 THEN ''
+                WHEN count > 0 THEN array_to_string((string_to_array(str, delim))[1:count], delim)
+                ELSE array_to_string(
+                    (string_to_array(str, delim))[GREATEST(1, array_length(string_to_array(str, delim), 1) + count + 1):],
+                    delim
+                )
+             END;,
+             \$\$;",
             'CREATE OR REPLACE FUNCTION concat_ws(sep text, VARIADIC args text[]) RETURNS text LANGUAGE sql IMMUTABLE AS $$SELECT array_to_string(array_remove(args,NULL),sep);$$',
             "CREATE OR REPLACE FUNCTION group_concat(val text, sep text DEFAULT ',') RETURNS text LANGUAGE sql IMMUTABLE AS \$\$SELECT string_agg(val,sep);\$\$",
 
@@ -200,10 +210,10 @@ final class Version20260120130000 extends AbstractMauticMigration
     {
         $platform = $this->connection->getDatabasePlatform();
 
-        $this->abortIf(
-            !DatabasePlatform::isPostgreSQL($platform),
-            'Migration can only be executed safely on \'postgresql\'.'
-        );
+        // Safety check - only run on PostgreSQL
+        if (!DatabasePlatform::isPostgreSQL($platform)) {
+            return;
+        }
 
         // Drop operators first (reverse order)
         $this->addSql('DROP OPERATOR IF EXISTS <> (integer, boolean);');

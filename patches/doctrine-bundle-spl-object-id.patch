@@ -16,7 +16,7 @@ index 9d007c8efc..5a8f22bc2f 100644
          ClassMetadata $metadata
      ): ObjectRepository {
 -        $repositoryHash = $metadata->getName() . spl_object_hash($entityManager);
-+        $repositoryHash = $metadata->getName() . spl_object_id($entityManager);
++        $repositoryHash = $metadata->getName() . ':' . spl_object_id($entityManager);
          if (isset($this->managedRepositories[$repositoryHash])) {
              /** @psalm-var ObjectRepository<TEntity> */
              return $this->managedRepositories[$repositoryHash];

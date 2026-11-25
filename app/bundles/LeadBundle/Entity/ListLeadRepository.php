@@ -116,6 +116,8 @@ class ListLeadRepository extends CommonRepository
         $deletedRecordCount= 0;
         while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
             $deletedRecordCount += $deletedRows;
+            $conn->executeStatement(DatabasePlatform::getDropTemporaryTableSql($platform, $tempTableName, true));
+            $conn->executeStatement(DatabasePlatform::getCreateTemporaryTableSql($platform, $tempTableName, $selectSql));
         }
 
         return $deletedRecordCount;

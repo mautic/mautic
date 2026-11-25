@@ -261,7 +261,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             break;
                         }
                     }
+
                     $queryBuilder->orderBy($orderCol, $dir);
+
+                    // Only non-aggregate order columns belong in GROUP BY completion.
                     if ($orderCol === $column) {
                         $orderByColumns[] = $orderCol;
                     }

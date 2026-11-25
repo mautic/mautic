@@ -229,8 +229,9 @@ final class InstallCommand extends Command
 
         // Make sure charset is correct for PostgreSQL DB
         if (empty($allParams['charset'])) {
-            $allParams['charset'] = $dbParams['charset'] = ('pdo_pgsql' == $dbParams['driver']) ? 'UTF8' : 'utf8mb4';
+            $dbParams['charset'] = ('pdo_pgsql' == $dbParams['driver']) ? 'UTF8' : 'utf8mb4';
         }
+        $allParams['charset'] = $dbParams['charset'];
 
         $step = (float) $input->getArgument('step');
 

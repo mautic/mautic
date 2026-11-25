@@ -67,7 +67,7 @@ final class DoctrineEventSubscriber
         // 1. Functions
         $functions = [
             "CREATE OR REPLACE FUNCTION date_format(tz timestamp with time zone, fmt text)
-             RETURNS text LANGUAGE plpgsql IMMUTABLE AS \$\$
+             RETURNS text LANGUAGE plpgsql STABLE AS \$\$
              DECLARE
                  f text := fmt;
              BEGIN
@@ -75,8 +75,8 @@ final class DoctrineEventSubscriber
                  f := REPLACE(f, '%Y', 'YYYY');
                  f := REPLACE(f, '%y', 'YY');
                  f := REPLACE(f, '%m', 'MM');
-                 f := REPLACE(f, '%c', 'FMMonth');
-                 f := REPLACE(f, '%M', 'Month');
+                 f := REPLACE(f, '%c', 'FMMM');
+                 f := REPLACE(f, '%M', 'FMMonth');
                  f := REPLACE(f, '%b', 'Mon');
                  f := REPLACE(f, '%e', 'FMDD');
                  f := REPLACE(f, '%d', 'DD');
@@ -91,22 +91,23 @@ final class DoctrineEventSubscriber
                  RETURN TO_CHAR(tz AT TIME ZONE 'UTC', f);
              END;
              \$\$;",
-            'CREATE OR REPLACE FUNCTION convert_tz(dt timestamp with time zone, from_tz text,to_tz text)
-            RETURNS timestamp with time zone LANGUAGE plpgsql IMMUTABLE AS $$
-            DECLARE
-            result timestamptz;
+            "CREATE OR REPLACE FUNCTION convert_tz(dt timestamp with time zone, from_tz text, to_tz text)
+            RETURNS timestamp with time zone LANGUAGE plpgsql STABLE AS \$\$
             BEGIN
-                IF dt IS NULL THEN
+                IF dt IS NULL OR from_tz IS NULL OR to_tz IS NULL THEN
                     RETURN NULL;
                 END IF;
+
                 BEGIN
-                    result := dt AT TIME ZONE from_tz AT TIME ZONE to_tz;
-                EXCEPTION WHEN invalid_parameter_value THEN
+                    -- Works identically for named zones ('America/New_York'),
+                    -- offsets ('+02:00'), or any mix of both:
+                    RETURN (((dt AT TIME ZONE 'UTC') AT TIME ZONE from_tz) AT TIME ZONE to_tz) AT TIME ZONE 'UTC';
+
+                EXCEPTION WHEN invalid_parameter_value OR invalid_text_representation THEN
                     RETURN NULL;
                 END;
-                RETURN result;
-            END;
-            $$',
+            END
+            \$\$",
             'CREATE OR REPLACE FUNCTION ifnull(a anyelement, b anyelement) RETURNS anyelement LANGUAGE sql IMMUTABLE AS $$SELECT coalesce($1,$2);$$',
             'CREATE OR REPLACE FUNCTION isnull(a anyelement, b anyelement) RETURNS anyelement LANGUAGE sql IMMUTABLE AS $$SELECT coalesce($1,$2);$$',
             "CREATE OR REPLACE FUNCTION format(n numeric, decimals int DEFAULT 2) RETURNS text LANGUAGE sql IMMUTABLE AS \$\$SELECT to_char(n, 'FM999,999,999,999,999,990D' || repeat('0', decimals));\$\$",
@@ -132,10 +133,20 @@ final class DoctrineEventSubscriber
              \$\$;",
             'CREATE OR REPLACE FUNCTION from_unixtime(ts bigint) RETURNS timestamp with time zone LANGUAGE sql IMMUTABLE AS $$SELECT to_timestamp(ts);$$',
             'CREATE OR REPLACE FUNCTION unix_timestamp(ts timestamp with time zone) RETURNS bigint LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(EPOCH FROM ts)::bigint;$$',
-            'CREATE OR REPLACE FUNCTION unix_timestamp() RETURNS bigint LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(EPOCH FROM now())::bigint;$$',
+            'CREATE OR REPLACE FUNCTION unix_timestamp() RETURNS bigint LANGUAGE sql STABLE AS $$SELECT EXTRACT(EPOCH FROM now())::bigint;$$',
             "CREATE OR REPLACE FUNCTION sec_to_time(secs integer) RETURNS text LANGUAGE sql IMMUTABLE STRICT AS \$\$SELECT to_char(make_interval(secs => abs(secs)), CASE WHEN secs < 0 THEN '-FMHH24:MI:SS' ELSE 'FMHH24:MI:SS' END);\$\$",
             "CREATE OR REPLACE FUNCTION sec_to_time(secs bigint) RETURNS text LANGUAGE sql IMMUTABLE STRICT AS \$\$SELECT to_char(make_interval(secs => abs(secs)::integer), CASE WHEN secs < 0 THEN '-FMHH24:MI:SS' ELSE 'FMHH24:MI:SS' END);\$\$",
-            'CREATE OR REPLACE FUNCTION substring_index(str text, delim text, count integer) RETURNS text LANGUAGE sql IMMUTABLE AS $$SELECT split_part($1, $2, $3);$$',
+            "CREATE OR REPLACE FUNCTION substring_index(str text, delim text, count integer)
+             RETURNS text LANGUAGE sql IMMUTABLE STRICT AS \$\$
+             RETURN CASE
+                WHEN delim = '' OR str = '' OR count = 0 THEN ''
+                WHEN count > 0 THEN array_to_string((string_to_array(str, delim))[1:count], delim)
+                ELSE array_to_string(
+                    (string_to_array(str, delim))[GREATEST(1, array_length(string_to_array(str, delim), 1) + count + 1):],
+                    delim
+                )
+             END;,
+             \$\$;",
             'CREATE OR REPLACE FUNCTION concat_ws(sep text, VARIADIC args text[]) RETURNS text LANGUAGE sql IMMUTABLE AS $$SELECT array_to_string(array_remove(args,NULL),sep);$$',
             "CREATE OR REPLACE FUNCTION group_concat(val text, sep text DEFAULT ',') RETURNS text LANGUAGE sql IMMUTABLE AS \$\$SELECT string_agg(val,sep);\$\$",
             'CREATE OR REPLACE FUNCTION year(date) RETURNS integer LANGUAGE sql IMMUTABLE AS $$SELECT EXTRACT(YEAR FROM $1)::integer;$$',

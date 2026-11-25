@@ -72,7 +72,7 @@ index 9e6648c..c1bc29e 100644
 +WHERE
 +    %s
 +    AND t.relkind IN ('r', 'm', 'p')
-+    AND i.relkind = 'i'
++    AND i.relkind IN ('i', 'I')
 +ORDER BY
 +    i.relname
 +SQL

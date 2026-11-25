@@ -259,11 +259,11 @@ parameters:
 		-
 			identifier: parameterByRef.type
 			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
-        # dynamic calls are correct at runtime
-        -
-            identifier: method.notFound
-            message: '#Call to an undefined method Mautic\\LeadBundle\\Entity\\LeadField::(getIsIndex|isIsFixed|isIsListable|isIsPubliclyUpdatable|isIsRequired|isIsShortVisible|isIsUniqueIdentifier|isIsVisible)\(\)#'
-            path: app/bundles/LeadBundle/Controller/Api/FieldApiController.php
+		# dynamic calls are correct at runtime
+		-
+			identifier: method.notFound
+			message: '#Call to an undefined method Mautic\\LeadBundle\\Entity\\LeadField::(getIsIndex|isIsFixed|isIsListable|isIsPubliclyUpdatable|isIsRequired|isIsShortVisible|isIsUniqueIdentifier|isIsVisible)\(\)#'
+			path: app/bundles/LeadBundle/Controller/Api/FieldApiController.php
 
 	scanDirectories:
 		# the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
