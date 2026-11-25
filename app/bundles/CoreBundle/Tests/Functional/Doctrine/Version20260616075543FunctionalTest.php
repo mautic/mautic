@@ -26,9 +26,14 @@ final class Version20260616075543FunctionalTest extends MauticMysqlTestCase
         $this->em->persist($category);
         $this->em->flush();
 
-        $tableWasRenamed = false;
+        $foreignKeyWasDropped = false;
+        $tableWasRenamed      = false;
 
         try {
+            // MySQL scopes foreign-key names to the database, so release the baseline name before renaming it.
+            $this->connection->executeStatement("ALTER TABLE `{$tableName}` DROP FOREIGN KEY FK_9894AA2612469DE2");
+            $foreignKeyWasDropped = true;
+
             // Keep the exact baseline schema so the test harness can reset the database afterward.
             $this->connection->executeStatement("RENAME TABLE `{$tableName}` TO `{$backupTableName}`");
             $tableWasRenamed = true;
@@ -65,6 +70,10 @@ final class Version20260616075543FunctionalTest extends MauticMysqlTestCase
             if ($tableWasRenamed) {
                 $this->connection->executeStatement("DROP TABLE IF EXISTS `{$tableName}`");
                 $this->connection->executeStatement("RENAME TABLE `{$backupTableName}` TO `{$tableName}`");
+            }
+
+            if ($foreignKeyWasDropped) {
+                $this->connection->executeStatement("ALTER TABLE `{$tableName}` ADD CONSTRAINT FK_9894AA2612469DE2 FOREIGN KEY (`category_id`) REFERENCES `{$this->getTablePrefix()}categories` (`id`) ON DELETE SET NULL");
             }
         }
     }
