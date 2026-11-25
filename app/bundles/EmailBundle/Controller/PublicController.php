@@ -581,15 +581,7 @@ final class PublicController extends CommonFormController
                 if ($lead) {
                     // Set the lead as current lead
                     $contactTracker->setTrackedContact($lead);
-
-                    if (!$this->translator instanceof LocaleAwareInterface) {
-                        throw new \LogicException(sprintf('$this->translator must be an instance of "%s"', LocaleAwareInterface::class));
-                    }
-
-                    // Set lead lang
-                    if ($lead->getPreferredLocale()) {
-                        $this->translator->setLocale($lead->getPreferredLocale());
-                    }
+                    $this->setContactLocale($lead);
                 }
 
                 return $this->redirectToRoute(
@@ -616,6 +608,31 @@ final class PublicController extends CommonFormController
             }
         }
 
+        return $this->renderThemeMessage(
+            $assetsHelper,
+            $analyticsHelper,
+            $email,
+            $lead,
+            $message,
+            $isCorrectHash ? self::MESSAGE_TYPE_RESUBSCRIBED : ''
+        );
+    }
+
+    private function setContactLocale(?Lead $lead): void
+    {
+        if (!$lead?->getPreferredLocale()) {
+            return;
+        }
+
+        if (!$this->translator instanceof LocaleAwareInterface) {
+            throw new \LogicException(sprintf('$this->translator must be an instance of "%s"', LocaleAwareInterface::class));
+        }
+
+        $this->translator->setLocale($lead->getPreferredLocale());
+    }
+
+    private function renderThemeMessage(AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, Email|false|null $email, Lead|false|null $lead, string $message, string $messageType = ''): Response
+    {
         $template = $this->coreParametersHelper->get('theme');
 
         $theme = $this->themeHelper->getTheme($template);
@@ -643,53 +660,10 @@ final class PublicController extends CommonFormController
             [
                 'message'      => $message,
                 'type'         => 'notice',
-                'message_type' => $isCorrectHash ? self::MESSAGE_TYPE_RESUBSCRIBED : '',
+                'message_type' => $messageType,
                 'email'        => $email,
                 'lead'         => $lead,
                 'template'     => $template,
-            ]
-        ));
-    }
-
-    private function setContactLocale(?Lead $lead): void
-    {
-        if (!$lead?->getPreferredLocale()) {
-            return;
-        }
-
-        if (!$this->translator instanceof LocaleAwareInterface) {
-            throw new \LogicException(sprintf('$this->translator must be an instance of "%s"', LocaleAwareInterface::class));
-        }
-
-        $this->translator->setLocale($lead->getPreferredLocale());
-    }
-
-    private function renderThemeMessage(AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, ?Email $email, ?Lead $lead, string $message): Response
-    {
-        $template = $this->coreParametersHelper->get('theme');
-
-        // Ensure template still exists
-        $theme = $this->themeHelper->getTheme($template);
-        if ($theme->getTheme() !== $template) {
-            $template = $theme->getTheme();
-        }
-
-        $analytics = $analyticsHelper->getCode();
-
-        if (!empty($analytics)) {
-            $assetsHelper->addCustomDeclaration($analytics);
-        }
-
-        $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
-
-        return new Response($this->themeHelper->renderThemeTemplate(
-            $logicalName,
-            [
-                'message'  => $message,
-                'type'     => 'notice',
-                'email'    => $email,
-                'lead'     => $lead,
-                'template' => $template,
             ]
         ));
     }
