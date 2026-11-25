@@ -1024,10 +1024,8 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
         $this->dispatcher->method('dispatch')
             ->willReturnCallback(
-                function (...$args) use ($sf, $integration): PluginIntegrationKeyEvent {
-                    return match ($args[0]) {
-                        default => new PluginIntegrationKeyEvent($sf, $integration->getApiKeys()),
-                    };
+                fn(...$args): PluginIntegrationKeyEvent => match ($args[0]) {
+                    default => new PluginIntegrationKeyEvent($sf, $integration->getApiKeys()),
                 }
             );
 

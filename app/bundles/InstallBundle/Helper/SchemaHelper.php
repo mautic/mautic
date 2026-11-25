@@ -212,10 +212,8 @@ final class SchemaHelper
 
         // backup existing tables
         $backupRestraints = [];
-        $backupSequences = [];
         $backupIndexes = [];
         $backupTables = [];
-        $dropSequences = [];
         $dropTables = [];
 
         // cycle through the first time to drop all the foreign keys
