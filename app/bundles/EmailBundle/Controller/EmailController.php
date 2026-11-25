@@ -63,15 +63,15 @@ final class EmailController extends FormController
         AuditLogModel $auditLogModel,
         EmailModel $emailModel,
         LeadRepository $leadRepository,
-        EmailColumnsDictionary $emailColumnsDictionary,
-        EmailListingHelper $emailListingHelper,
+        ?EmailColumnsDictionary $emailColumnsDictionary = null,
+        ?EmailListingHelper $emailListingHelper = null,
     ): void {
         $this->listModel = $listModel;
         $this->auditLogModel = $auditLogModel;
         $this->emailModel = $emailModel;
         $this->leadRepository = $leadRepository;
-        $this->emailColumnsDictionary = $emailColumnsDictionary;
-        $this->emailListingHelper = $emailListingHelper;
+        $this->emailColumnsDictionary = $emailColumnsDictionary ?? new EmailColumnsDictionary($this->translator, $this->coreParametersHelper);
+        $this->emailListingHelper = $emailListingHelper ?? new EmailListingHelper($this->security, $this->translator);
     }
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
