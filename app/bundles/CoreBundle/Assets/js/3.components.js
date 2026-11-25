@@ -82,7 +82,12 @@
             this.button.addEventListener("keyup", (event) => {
                 if (event.key !== " " && event.key !== "Enter") return;
                 event.preventDefault();
+                const released = this.sources.has("keyboard") && !this.confirmed;
                 this.cancel("keyboard");
+                if (released) this.openDialog();
+            }, options);
+            this.button.addEventListener("click", (event) => {
+                if (event.detail === 0) this.openDialog();
             }, options);
             this.button.addEventListener("blur", () => this.cancel(), options);
             this.button.addEventListener("contextmenu", (event) => event.preventDefault(), options);
@@ -205,8 +210,28 @@
             cancelAnimationFrame(this.frame);
             clearTimeout(this.resetTimer);
         }
+        openDialog() {
+            if (this.confirmed || this.button.disabled || !this.element.isConnected) return;
+            const label = this.idleLabel.textContent.trim();
+            const trigger = mQuery("<a>").attr({
+                "data-confirm-text": label,
+                "data-cancel-text": mauticLang["mautic.core.form.cancel"],
+                "data-confirm-callback": "confirmHoldToConfirm",
+            }).data("hold", this);
+            Mautic.showConfirmation(trigger[0], label);
+        }
+        confirmFromDialog() {
+            if (this.confirmed || this.button.disabled || !this.element.isConnected) return;
+            this.sources.add("dialog");
+            this.complete();
+        }
     }
     register("HoldToConfirmButton", '[data-component="hold-to-confirm"]', (element) => new HoldToConfirmButton(element));
+    window.Mautic = window.Mautic || {};
+    window.Mautic.confirmHoldToConfirm = function (action, dialogTrigger) {
+        Mautic.dismissConfirmation();
+        mQuery(dialogTrigger).data("hold").confirmFromDialog();
+    };
 })();
 
 /**
