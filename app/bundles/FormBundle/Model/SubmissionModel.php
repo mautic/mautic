@@ -47,6 +47,7 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -158,10 +159,9 @@ final class SubmissionModel extends CommonFormModel
         // clean the referer by removing mauticError and mauticMessage
         $referer = InputHelper::url($referer, null, null, null, ['mauticError', 'mauticMessage']);
 
-        // An untracked submitter's referer keeps only the page address, because its query string can carry identifiers
+        // An untracked submitter's referer keeps only the page address and the campaign UTM tags, as the rest of the query string can carry identifiers
         if (!$trackSubmitter) {
-            [$referer] = explode('?', $referer, 2);
-            [$referer] = explode('#', $referer, 2);
+            $referer = $this->stripIdentifiersFromReferer($referer);
         }
 
         $submission->setReferer($referer);
@@ -424,11 +424,14 @@ final class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Kiosk mode never tracks the submitter. Other forms track only trackable requests (no DNT/GPC, bot or prefetch).
+     * Kiosk mode never tracks the submitter, and no form does when tracking submitters is turned off.
+     * Other forms track only trackable requests (no DNT/GPC, bot or prefetch).
      */
     private function shouldTrackSubmitter(Form $form): bool
     {
-        return !$form->isInKioskMode() && $this->ipLookupHelper->isRequestTrackable();
+        return !$form->isInKioskMode()
+            && $this->coreParametersHelper->get('form_track_submitters')
+            && $this->ipLookupHelper->isRequestTrackable();
     }
 
     /**
@@ -1284,5 +1287,19 @@ final class SubmissionModel extends CommonFormModel
         }
 
         return implode(', ', $value);
+    }
+
+    /**
+     * Keeps the page address and the campaign UTM tags Mautic recognises, and drops the other query parameters and the fragment.
+     */
+    private function stripIdentifiersFromReferer(string $referer): string
+    {
+        [$referer] = explode('#', $referer, 2);
+        [$address, $query] = array_pad(explode('?', $referer, 2), 2, '');
+
+        parse_str($query, $parameters);
+        $utmTags = UtmTag::filterCampaignParameters($parameters);
+
+        return [] === $utmTags ? $address : $address.'?'.http_build_query($utmTags);
     }
 }

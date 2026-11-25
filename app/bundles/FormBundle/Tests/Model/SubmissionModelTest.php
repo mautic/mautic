@@ -203,6 +203,9 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $managerRegistry = $this->createStub(ManagerRegistry::class);
         $managerRegistry->method('getManagerForClass')->willReturn($entityManager);
 
+        $coreParametersHelper = $this->createStub(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')->willReturnMap([['form_track_submitters', null, true]]);
+
         $this->submissionModel = new SubmissionModel(
             $this->ipLookupHelper,
             $this->createStub(Environment::class),
@@ -229,7 +232,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->userHelper,
             $this->createStub(Logger::class),
-            $this->createStub(CoreParametersHelper::class),
+            $coreParametersHelper,
             $this->createStub(SubmissionRepository::class), // $submissionRepository
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(StageRepository::class), // $stageRepository
