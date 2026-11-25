@@ -548,6 +548,30 @@ class HitRepository extends CommonRepository
             ->executeStatement();
     }
 
+    public function countDistinctIpsForEmailAndLeadSince(
+        int $emailId,
+        int $leadId,
+        \DateTimeInterface $since,
+        ?\DateTimeInterface $until = null,
+    ): int {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(DISTINCT h.ip_id)')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->where('h.email_id = :emailId')
+            ->andWhere('h.lead_id = :leadId')
+            ->andWhere('h.date_hit >= :since')
+            ->setParameter('emailId', $emailId)
+            ->setParameter('leadId', $leadId)
+            ->setParameter('since', (new DateTimeHelper($since))->toUtcString());
+
+        if (null !== $until) {
+            $q->andWhere('h.date_hit <= :until')
+                ->setParameter('until', (new DateTimeHelper($until))->toUtcString());
+        }
+
+        return (int) $q->executeQuery()->fetchOne();
+    }
+
     public function getLatestHitDateByLead(int $leadId, ?string $trackingId = null): ?\DateTime
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
