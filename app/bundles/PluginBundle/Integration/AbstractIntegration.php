@@ -1647,10 +1647,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param array|string $data        Profile data from integration
      * @param bool|true    $persist     Set to false to not persist lead to the database in this method
-     *
-     * @return Lead
      */
-    public function getMauticLead(array|string $data, $persist = true, ?array $socialCache = null, mixed $identifiers = null)
+    public function getMauticLead(array|string $data, $persist = true, ?array $socialCache = null, mixed $identifiers = null): ?Lead
     {
         if (is_string($data)) {
             // Assume JSON

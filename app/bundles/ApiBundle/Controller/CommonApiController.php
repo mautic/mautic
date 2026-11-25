@@ -380,6 +380,7 @@ class CommonApiController extends FetchCommonApiController
      */
     protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit')
     {
+        return null;
     }
 
     /**

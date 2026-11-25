@@ -193,7 +193,7 @@ final class CampaignApiController extends CommonApiController
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      */
-    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit')
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit'): ?Response
     {
         $method = $this->requestStack->getCurrentRequest()->getMethod();
 
@@ -319,6 +319,7 @@ final class CampaignApiController extends CommonApiController
         if (Request::METHOD_PUT === $method && [] !== $deletedEvents) {
             $this->eventModel->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
         }
+
         return null;
     }
 
