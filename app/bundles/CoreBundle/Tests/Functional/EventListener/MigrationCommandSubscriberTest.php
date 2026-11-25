@@ -137,13 +137,6 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 
     private function executeMigrationCommand(): string
     {
-        if ($this->isPostgresqlPlatform()) {
-            // Doctrine Migrations' TableMetadataStorage::ensureInitialized() is not idempotent on PostgreSQL
-            // — it always tries to add the PK via alterTable(), without first verifying if the constraint is already present.
-            // This is a long-standing limitation in Doctrine Migrations (especially versions 2.x/3.x),
-            // and it's well-known when using PostgreSQL (MySQL forgives duplicate attempts).
-            // $this->connection->executeStatement('DROP TABLE IF EXISTS migrations CASCADE');
-        }
         // intentionally not using AbstractMauticTestCase::testSymfonyCommand() as it does not dispatch 'console.terminate' event
         $params      = ['command' => 'doctrine:migration:migrate', '--allow-no-migration' => true, '--no-interaction' => true];
         $application = new Application(self::getContainer()->get(KernelInterface::class));
