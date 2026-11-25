@@ -32,7 +32,7 @@ final readonly class BuildJsSubscriber
     {
         $dwcUrl = $this->router->generate('mautic_api_dynamicContent_action', ['objectAlias' => 'slotNamePlaceholder'], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $js = <<<JS_WRAP
+        $js = <<<JS
         
            // register the current instance origin for form message allowlisting
             if (!Array.isArray(window.MauticDomains)) {
@@ -127,7 +127,7 @@ MauticJS.documentReady(function() {
 });
 
 MauticJS.beforeFirstEventDelivery(MauticJS.replaceDynamicContent);
-JS_WRAP;
+JS;
         $event->appendJsForScope($js, BuildJsScope::ESSENTIAL, 'Mautic Dynamic Content');
 
         $js = <<<'JS_WRAP'

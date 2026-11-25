@@ -40,7 +40,7 @@ final readonly class BuildJsSubscriber
         $width          = 450;
         $height         = 450;
 
-        $js = <<<JS_WRAP
+        $js = <<<JS
 if (window.MauticJS && window.MauticJS.runtimeReady === true) {
         
         {$this->notificationHelper->getHeaderScript()}
@@ -89,7 +89,7 @@ MauticJS.notification = {
 
 MauticJS.documentReady(MauticJS.notification.init);
 }
-JS_WRAP;
+JS;
 
         $event->appendJsForScope($js, BuildJsScope::TRACKING, 'Mautic Notification JS');
     }
