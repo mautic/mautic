@@ -233,7 +233,7 @@ class UserRepository extends CommonRepository
                     )
                 )
             )
-            ->setParameter('search', "{$search}%");
+                ->setParameter('search', "{$search}%");
         }
 
         if (!empty($permissionLimiter)) {

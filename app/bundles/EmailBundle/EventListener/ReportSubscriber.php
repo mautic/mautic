@@ -607,7 +607,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                         count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed,
                         count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
                     )
-                    ->groupBy('e.id');
+                        ->groupBy('e.id');
 
                     $this->addDNCTableForEmails($queryBuilder);
 
@@ -779,7 +779,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
                 case 'mautic.email.table.most.emails.read.percent':
                     $this->joinEmailsTableIfMissing($queryBuilder, $event);
-                    $queryBuilder->select('e.id, e.subject as title, ROUND(e.read_count * 100.0 / NULLIF(e.sent_count, 0), 0) as ratio')
+                    $queryBuilder->select('e.id, e.subject as title, COALESCE(ROUND(e.read_count * 100.0 / NULLIF(e.sent_count, 0), 0), 0) as ratio')
                         ->groupBy('e.id, e.subject')
                         ->orderBy('ratio', 'DESC');
                     $limit                  = 10;

@@ -1077,7 +1077,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 // Silently convert any non-numeric value to 0
                 // This prevents PostgreSQL "invalid input syntax for type integer" error
                 // while keeping the same behaviour as MySQL (no results for bad input)
-                $filter->string  = is_numeric($string) ? $string : '0';   // use the sanitized value
+                $filter->string  = ctype_digit((string) $string) ? (string) $string : '0';   // digit-only; rejects 1.5 / 1e3 that break PG integer casts
                 $filter->strict  = true;
                 $returnParameter = true;
                 break;
@@ -1509,14 +1509,16 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->where('id = '.$id);
 
         $ph = 0;
-        // Keep operator in same order as was used in Lead::adjustPoints() in order to be congruent with what was calculated in PHP
-        // Again ignoring Aunt Sally here (PEMDAS)
+        // Build a single nested expression so PostgreSQL (and MySQL) accept one assignment
+        // while preserving the exact operator order used by Lead::adjustPoints()
+        $expr = 'points';
         foreach ($changes as $operator => $points) {
-            $qb->set('points', 'points '.$operator.' :points'.$ph)
-                ->setParameter('points'.$ph, $points, \PDO::PARAM_INT);
-
+            $param = 'points'.$ph;
+            $expr = '('.$expr.' '.$operator.' :'.$param.')';
+            $qb->setParameter($param, $points, \PDO::PARAM_INT);
             ++$ph;
         }
+        $qb->set('points', $expr);
 
         try {
             $qb->executeStatement();
@@ -1526,8 +1528,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             if (str_contains($message, 'Deadlock') && $tries <= 3) {
                 ++$tries;
 
-                $this->updateContactPoints($changes, $id, $tries);
+                return $this->updateContactPoints($changes, $id, $tries);
             }
+
+            // Non-deadlock failures must surface; swallowing them loses the point change
+            throw $exception;
         }
 
         // Query new points

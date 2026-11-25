@@ -217,8 +217,8 @@ class IndexSchemaHelper
                     return true;
                 }
                 $columns = $idx->getColumns();
-                asort($columns);
-                asort($indexColumns);
+                sort($columns);
+                sort($indexColumns);
 
                 return $columns === $indexColumns;
             }

@@ -394,7 +394,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url`, COUNT(`ph`.`id`) AS `COUNT ph.id` GROUP BY ph.url ORDER BY ph.id DESC
+            SELECT `ph`.`url`, COUNT(`ph`.`id`) AS `COUNT ph.id` GROUP BY ph.url ORDER BY `COUNT ph.id` DESC
         ')), $query->getSql());
     }
 

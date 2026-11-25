@@ -20,10 +20,9 @@ final class Version20260120130000 extends AbstractMauticMigration
         $platform = $this->connection->getDatabasePlatform();
 
         // Safety check - only run on PostgreSQL
-        $this->skipIf(
-            !DatabasePlatform::isPostgreSQL($platform),
-            'Migration can only be executed safely on \'postgresql\'.'
-        );
+        if (!DatabasePlatform::isPostgreSQL($platform)) {
+            return;
+        }
 
         // === 1. Create / replace functions ===
         $functions = [

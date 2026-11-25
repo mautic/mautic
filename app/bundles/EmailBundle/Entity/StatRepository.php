@@ -425,7 +425,7 @@ class StatRepository extends CommonRepository
             $q->where(
                 $q->expr()->in('s.email_id', ':emailIds')
             )
-            ->setParameter('emailIds', $emailIds, ArrayParameterType::INTEGER);
+                ->setParameter('emailIds', $emailIds, ArrayParameterType::INTEGER);
         }
 
         $q->andWhere('open_count > 0');
@@ -466,7 +466,7 @@ class StatRepository extends CommonRepository
         // Match the Twig template's camelCase access (e.g., item.isFailed now finds "isFailed" key).
         if (!empty($options['basic_select'])) {
             $query->select(
-                's.email_id, s.id, s.date_read as '.$connection->quoteIdentifier('dateRead').', s.date_sent as '.$connection->quoteIdentifier('dateSent').', e.subject, e.name as email_name, s.is_read as '.$connection->quoteIdentifier('isRead').', s.is_failed as '.$connection->quoteIdentifier('isFailed').', ec.subject as storedSubject'
+                's.email_id, s.id, s.date_read as '.$connection->quoteIdentifier('dateRead').', s.date_sent as '.$connection->quoteIdentifier('dateSent').', e.subject, e.name as email_name, s.is_read as '.$connection->quoteIdentifier('isRead').', s.is_failed as '.$connection->quoteIdentifier('isFailed').', ec.subject as '.$connection->quoteIdentifier('storedSubject')
             );
         } else {
             $query->select(
@@ -753,7 +753,7 @@ class StatRepository extends CommonRepository
             "{$leadAlias}.id AS $leadIdCol",
             "COUNT({$statsAlias}.id) AS $sentCountCol",
             "SUM(CASE WHEN {$statsAlias}.is_read = TRUE THEN 1 ELSE 0 END) AS $readCountCol",
-            "SUM(COALESCE({$subQueryAlias}.hits, 0)) AS $clickedThroughCountCol",
+            "SUM(CASE WHEN {$subQueryAlias}.hits IS NULL THEN 0 ELSE 1 END) AS $clickedThroughCountCol",
         )->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
             ->rightJoin(
                 $statsAlias,

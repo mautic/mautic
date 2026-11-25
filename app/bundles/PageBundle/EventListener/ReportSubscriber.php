@@ -31,8 +31,12 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         private HitRepository $hitRepository,
         private TranslatorInterface $translator,
         private DncReportService $dncReportService,
-        private VersionProvider $versionProvider,
+        private ?VersionProvider $versionProvider = null,
     ) {
+        // BC: 7.x plugins may still construct with 4 args
+        if (null === $this->versionProvider) {
+            trigger_error('Page ReportSubscriber: VersionProvider is required; the 4-arg constructor is deprecated.', E_USER_DEPRECATED);
+        }
     }
 
     public static function getSubscribedEvents(): array

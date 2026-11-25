@@ -148,7 +148,7 @@ final class FieldApiController extends CommonApiController
                 'isVisible',
                 'isShortVisible',
                 'isListable',
-                'isPubliclyUpdateable',
+                'isPubliclyUpdatable',
                 'isUniqueIdentifier',
                 'isIndex',
             ];

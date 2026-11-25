@@ -364,7 +364,7 @@ final class DatabasePlatform
         $format = (12 === $timeFormat) ? 'HH12 AM' : 'HH24:00';
         if (self::isPostgreSQL($platform)) {
             // PostgreSQL: convert UTC to local timezone
-            $localTime = "({$column} AT TIME ZONE 'UTC' AT TIME ZONE '{$offset}')";
+            $localTime = "({$column} AT TIME ZONE 'UTC' AT TIME ZONE INTERVAL '{$offset}')";
 
             return "
                 TO_CHAR({$localTime}, '{$format}') || '-' ||

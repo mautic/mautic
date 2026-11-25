@@ -248,8 +248,17 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $orderByColumns[] = $options['order']['column'];
                 } elseif (!empty($options['order'][0][1])) {
                     [$column, $dir] = $options['order'];
-                    $queryBuilder->orderBy($column, $dir);
-                    $orderByColumns[] = $column;
+                    // If the column is only an aggregator argument, order by the aggregate alias
+                    // so the query stays valid under PostgreSQL / ONLY_FULL_GROUP_BY
+                    $orderCol = $column;
+                    foreach ($this->entity->getAggregators() as $agg) {
+                        if (($agg['column'] ?? null) === $column) {
+                            $orderCol = ($agg['function'] ?? '').' '.$column;
+                            break;
+                        }
+                    }
+                    $queryBuilder->orderBy($orderCol, $dir);
+                    $orderByColumns[] = $orderCol;
                 } else {
                     foreach ($options['order'] as $order) {
                         $queryBuilder->orderBy($order);

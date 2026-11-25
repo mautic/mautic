@@ -91,21 +91,12 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $model = self::getContainer()->get(LeadModel::class);
 
         $lead  = $this->createLead();
-        // PostgreSQL strictly forbids multiple assignments to the same column
-        // in one SET clause → throws:
-        // ERROR: multiple assignments to same column "points"
-        // need flush after each change
+        // Single save with multiple operators (must succeed on PostgreSQL via nested expression)
         $lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
-        $model->saveEntity($lead);   // flush #1
-
         $lead->adjustPoints(120, Lead::POINTS_ADD);
-        $model->saveEntity($lead);   // flush #2
-
         $lead->adjustPoints(2, Lead::POINTS_MULTIPLY);
-        $model->saveEntity($lead);   // flush #3
-
         $lead->adjustPoints(4, Lead::POINTS_DIVIDE);
-        $model->saveEntity($lead);  // flush #4
+        $model->saveEntity($lead);
 
         $this->assertEquals(60, $lead->getPoints());
 
