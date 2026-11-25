@@ -1263,10 +1263,15 @@ export default class BuilderService {
   }
 
   mjmlToHtml(mjml) {
-    const converted = MjmlService.mjmlToHtml(mjml);
+    try {
+      const converted = MjmlService.mjmlToHtml(mjml);
 
-    if (converted && 0 === converted.errors.length) {
-      return converted.html;
+      if (converted && 0 === converted.errors.length) {
+        return converted.html;
+      }
+    } catch (error) {
+      console.warn(error.message);
+      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')}\n${error.message}`);
     }
 
     return '';
