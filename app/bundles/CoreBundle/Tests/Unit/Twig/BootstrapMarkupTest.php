@@ -145,6 +145,7 @@ final class BootstrapMarkupTest extends TestCase
         $label = $crawler->filter('button.ai-label__button')->attr('aria-label');
         $this->assertStringContainsString(' Predicted - ', (string) $label);
         $this->assertCount(0, $crawler->filter('button[aria-haspopup]'));
+        $this->assertSame('click focus', $crawler->filter('button.ai-label__button')->attr('data-bs-trigger'));
     }
 
     public function testAiLabelWithAdditionalTextMarksFormWrapper(): void
