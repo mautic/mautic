@@ -34,7 +34,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
 
     public function testEmailListingColumnsCanBeConfigured(): void
     {
-        $this->createEmail();
+        $email = $this->createEmail();
 
         $crawler = $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH);
 
@@ -43,6 +43,8 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
         $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-id'));
         $this->assertCount(0, $crawler->filter('.email-list thead tr th.col-email-category'));
         $this->assertCount(0, $crawler->filter('.email-list thead tr th.col-email-dateModified'));
+        $this->assertCount(1, $crawler->filter(self::EMAIL_VIEW_SELECTOR_PREFIX.$email->getId().'"]'));
+        $this->assertCount(0, $crawler->filter('.email-list .page-list-actions '.self::EMAIL_VIEW_SELECTOR_PREFIX.$email->getId().'"]'));
     }
 
     public function testEmailListingKeepsDetailActionWithoutNameColumn(): void
@@ -53,6 +55,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertCount(0, $crawler->filter('.email-list thead tr th.col-email-name'));
         $this->assertCount(1, $crawler->filter(self::EMAIL_VIEW_SELECTOR_PREFIX.$email->getId().'"]'));
+        $this->assertCount(1, $crawler->filter('.email-list .page-list-actions '.self::EMAIL_VIEW_SELECTOR_PREFIX.$email->getId().'"]'));
     }
 
     public function testEmailListingAppliesAndPersistsListFiltersFromRequest(): void
