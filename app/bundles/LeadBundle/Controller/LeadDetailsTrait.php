@@ -113,9 +113,11 @@ trait LeadDetailsTrait
     /**
      * Makes sure that the event filter array is in the right format.
      *
+     * @param mixed[]|string|false $filters
+     *
      * @throws \InvalidArgumentException if not an array
      */
-    public function sanitizeEventFilter(mixed $filters): array
+    public function sanitizeEventFilter(array|string|false $filters): array
     {
         if (!is_array($filters)) {
             throw new \InvalidArgumentException('filters parameter must be an array');

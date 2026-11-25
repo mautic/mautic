@@ -86,11 +86,12 @@ trait CustomFieldEntityTrait
     /**
      * Add an updated field to persist to the DB and to note changes.
      *
-     * @param string $oldValue
+     * @param \DateTimeInterface|mixed[]|string|int|float|bool|null $value
+     * @param string                                                $oldValue
      *
      * @return $this
      */
-    public function addUpdatedField($alias, mixed $value, $oldValue = null)
+    public function addUpdatedField($alias, \DateTimeInterface|array|string|int|float|bool|null $value, $oldValue = null)
     {
         // Don't allow overriding ID
         if ('id' === $alias) {

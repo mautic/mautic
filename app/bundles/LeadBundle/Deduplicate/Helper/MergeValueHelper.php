@@ -9,11 +9,16 @@ use Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException;
 final class MergeValueHelper
 {
     /**
+     * @param \DateTimeInterface|mixed[]|string|int|float|bool|null $newerValue
+     * @param \DateTimeInterface|mixed[]|string|int|float|bool|null $olderValue
+     * @param \DateTimeInterface|mixed[]|string|int|float|bool|null $currentValue
+     * @param \DateTimeInterface|mixed[]|string|int|float|bool|null $defaultValue
+     *
      * @return mixed
      *
      * @throws ValueNotMergeableException
      */
-    public static function getMergeValue(mixed $newerValue, mixed $olderValue, mixed $currentValue = null, mixed $defaultValue = null, bool $newIsAnonymous = false)
+    public static function getMergeValue(\DateTimeInterface|array|string|int|float|bool|null $newerValue, \DateTimeInterface|array|string|int|float|bool|null $olderValue, \DateTimeInterface|array|string|int|float|bool|null $currentValue = null, \DateTimeInterface|array|string|int|float|bool|null $defaultValue = null, bool $newIsAnonymous = false)
     {
         if ($newerValue === $olderValue) {
             throw new ValueNotMergeableException($newerValue, $olderValue);

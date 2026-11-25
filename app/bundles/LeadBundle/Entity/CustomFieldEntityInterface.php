@@ -24,12 +24,13 @@ interface CustomFieldEntityInterface
     public function getFields();
 
     /**
-     * @param string $alias
-     * @param string $oldValue
+     * @param string                                                $alias
+     * @param \DateTimeInterface|mixed[]|string|int|float|bool|null $value
+     * @param string                                                $oldValue
      *
      * @return mixed
      */
-    public function addUpdatedField($alias, mixed $value, $oldValue = '');
+    public function addUpdatedField($alias, \DateTimeInterface|array|string|int|float|bool|null $value, $oldValue = '');
 
     /**
      * @return mixed
