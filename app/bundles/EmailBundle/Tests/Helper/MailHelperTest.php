@@ -1232,7 +1232,7 @@ final class MailHelperTest extends TestCase
             $message = $transport->getMessage();
             $this->assertInstanceOf(MauticMessage::class, $message);
             $this->assertCount(1, $message->getAttachments(), 'The image must be embedded in every message.');
-            $this->assertStringContainsString('src="cid:'.md5($sampleImagePath).'"', (string) $message->getHtmlBody());
+            $this->assertStringContainsString('src="cid:'.md5($sampleImagePath).'.png"', (string) $message->getHtmlBody());
         }
     }
 
@@ -1320,8 +1320,8 @@ final class MailHelperTest extends TestCase
         $message = $transport->getMessage();
         $body    = (string) $message->getHtmlBody();
         $this->assertCount(2, $message->getAttachments());
-        $this->assertStringContainsString('src="cid:'.md5($encodedUrl).'"', $body);
-        $this->assertStringContainsString('src="cid:'.md5($cacheBusted).'"', $body);
+        $this->assertStringContainsString('src="cid:'.md5($encodedUrl).'.png"', $body);
+        $this->assertStringContainsString('src="cid:'.md5($cacheBusted).'.png"', $body);
     }
 
     public function testLocalUrlsWithNullByteOrNonImageContentAreNotEmbedded(): void
