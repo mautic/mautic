@@ -155,9 +155,9 @@ final class FieldApiController extends CommonApiController
             foreach ($presetBooleanProperties as $presetBooleanProperty) {
                 if (isset($parameters[$presetBooleanProperty])) {
                     $getter = ('isIndex' === $presetBooleanProperty ? 'is' : 'get').ucfirst($presetBooleanProperty);
-                    if (is_null($entity->$getter())) { /** @phpstan-ignore-line get magic method false positive */
+                    if (is_null($entity->$getter())) {
                         $setter = 'set'.ucfirst($presetBooleanProperty);
-                        $entity->$setter($parameters[$presetBooleanProperty]); /** @phpstan-ignore-line set magic method false positive */
+                        $entity->$setter($parameters[$presetBooleanProperty]);
                     }
                 }
             }

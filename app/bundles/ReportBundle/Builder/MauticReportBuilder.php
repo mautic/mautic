@@ -248,17 +248,23 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $orderByColumns[] = $options['order']['column'];
                 } elseif (!empty($options['order'][0][1])) {
                     [$column, $dir] = $options['order'];
-                    // If the column is only an aggregator argument, order by the aggregate alias
-                    // so the query stays valid under PostgreSQL / ONLY_FULL_GROUP_BY
+                    // If the column is only an aggregator argument, order by the
+                    // quoted aggregate alias so the query is valid under
+                    // PostgreSQL / ONLY_FULL_GROUP_BY. Do not push the alias into
+                    // $orderByColumns: the GROUP BY completion would otherwise
+                    // extract "COUNT" as a base column.
                     $orderCol = $column;
                     foreach ($this->entity->getAggregators() as $agg) {
                         if (($agg['column'] ?? null) === $column) {
-                            $orderCol = ($agg['function'] ?? '').' '.$column;
+                            $alias = ($agg['function'] ?? '').' '.$column;
+                            $orderCol = DatabasePlatform::quoteIdentifier($platform, $alias);
                             break;
                         }
                     }
                     $queryBuilder->orderBy($orderCol, $dir);
-                    $orderByColumns[] = $orderCol;
+                    if ($orderCol === $column) {
+                        $orderByColumns[] = $orderCol;
+                    }
                 } else {
                     foreach ($options['order'] as $order) {
                         $queryBuilder->orderBy($order);
