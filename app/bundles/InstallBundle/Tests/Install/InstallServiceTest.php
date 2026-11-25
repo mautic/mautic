@@ -252,6 +252,18 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($messages, $this->installer->saveConfiguration($params, $step, $clearCache));
     }
 
+    public function testFinalConfigStepTurnsOffTrackingFormSubmittersForNewInstalls(): void
+    {
+        $this->configurator->expects($this->once())
+            ->method('mergeParameters')
+            ->willReturnCallback(function (array $params): void {
+                $this->assertSame('https://mautic.example.com', $params['site_url']);
+                $this->assertFalse($params['form_track_submitters']);
+            });
+
+        $this->assertSame([], $this->installer->createFinalConfigStep('https://mautic.example.com'));
+    }
+
     public function testValidateDatabaseParamsWhenNoRequired(): void
     {
         $dbParams = [];
