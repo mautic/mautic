@@ -14,7 +14,7 @@ final class ContactFieldToken
 {
     private string $fieldAlias;
 
-    private ?string $defaultValue = null;
+    private ?string $defaultValue;
 
     /**
      * @throws InvalidContactFieldTokenException
