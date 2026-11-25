@@ -22,21 +22,21 @@ final class EmailStatPersonalisationCleanupTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        if ('testViewInBrowserSaysAnEmailIsNoLongerAvailableAfterItsPersonalisationWasRemovedEvenWhileTheCleanupIsDisabled' !== $this->name()) {
+        if ('testViewIsGoneWhileCleanupIsDisabled' !== $this->name()) {
             $this->configParams['email_stats_compaction_threshold_days'] = 30;
         }
 
         parent::setUp();
     }
 
-    public function testViewInBrowserRendersStoredPersonalisation(): void
+    public function testViewRendersStoredTokens(): void
     {
         $stat = $this->createStat('recent', new \DateTime('-1 day'));
 
         $this->assertViewShows($stat, 'Hi John');
     }
 
-    public function testViewInBrowserRendersPersonalisationStoredInTheLegacyColumn(): void
+    public function testViewRendersLegacyTokens(): void
     {
         $stat = $this->createLegacyStat('legacy', new \DateTime('-29 days'));
 
@@ -45,7 +45,7 @@ final class EmailStatPersonalisationCleanupTest extends MauticMysqlTestCase
         $this->assertViewShows($stat, 'Hi John');
     }
 
-    public function testViewInBrowserOfAnOldEmailWithLegacyPersonalisationSaysItIsNoLongerAvailableAfterTheCleanup(): void
+    public function testViewIsGoneForOldLegacyTokensAfterCleanup(): void
     {
         $stat = $this->createLegacyStat('legacy-old', new \DateTime('-31 days'));
 
@@ -56,7 +56,7 @@ final class EmailStatPersonalisationCleanupTest extends MauticMysqlTestCase
         $this->assertViewIsGone($stat);
     }
 
-    public function testViewInBrowserOfAnEmailWhosePersonalisationWasCleanedUpSaysItIsNoLongerAvailable(): void
+    public function testViewIsGoneAfterCleanup(): void
     {
         $stat = $this->createStat('cleaned', new \DateTime('-31 days'));
         $this->runCleanup(false);
@@ -66,7 +66,7 @@ final class EmailStatPersonalisationCleanupTest extends MauticMysqlTestCase
         $this->assertViewIsGone($stat);
     }
 
-    public function testViewInBrowserOfAnEmailCleanedUpUnderAShorterThresholdSaysItIsNoLongerAvailable(): void
+    public function testViewIsGoneForRecentEmailWithoutDataRow(): void
     {
         $stat = $this->createStat('shorter', new \DateTime('-1 day'));
         $this->connection->delete(MAUTIC_TABLE_PREFIX.StatData::TABLE_NAME, ['stat_id' => $stat->getId()]);
@@ -75,7 +75,7 @@ final class EmailStatPersonalisationCleanupTest extends MauticMysqlTestCase
         $this->assertViewIsGone($stat);
     }
 
-    public function testViewInBrowserSaysAnEmailIsNoLongerAvailableAfterItsPersonalisationWasRemovedEvenWhileTheCleanupIsDisabled(): void
+    public function testViewIsGoneWhileCleanupIsDisabled(): void
     {
         $stat = $this->createStat('disabled', new \DateTime('-100 days'));
         $this->connection->delete(MAUTIC_TABLE_PREFIX.StatData::TABLE_NAME, ['stat_id' => $stat->getId()]);
@@ -84,7 +84,7 @@ final class EmailStatPersonalisationCleanupTest extends MauticMysqlTestCase
         $this->assertViewIsGone($stat);
     }
 
-    public function testViewInBrowserOfAnOldEmailSentWithoutPersonalisationSaysItIsNoLongerAvailableAfterTheCleanup(): void
+    public function testViewIsGoneForOldEmailWithoutTokensAfterCleanup(): void
     {
         $old    = $this->createStat('unpersonalised-old', new \DateTime('-31 days'), false);
         $recent = $this->createStat('unpersonalised-recent', new \DateTime('-29 days'), false);
@@ -95,7 +95,7 @@ final class EmailStatPersonalisationCleanupTest extends MauticMysqlTestCase
         $this->assertViewIsGone($old);
     }
 
-    public function testViewInBrowserOfAnOldEmailStoredWithEmptyPersonalisationSaysItIsNoLongerAvailableAfterTheCleanup(): void
+    public function testViewIsGoneForOldEmailWithEmptyTokensAfterCleanup(): void
     {
         $old    = $this->createStat('empty-old', new \DateTime('-31 days'), false);
         $recent = $this->createStat('empty-recent', new \DateTime('-29 days'), false);
@@ -113,7 +113,7 @@ final class EmailStatPersonalisationCleanupTest extends MauticMysqlTestCase
         $this->assertViewIsGone($old);
     }
 
-    public function testCleanupRemovesStoredPersonalisationOfOldEmailsButKeepsTheirStats(): void
+    public function testCleanupRemovesOldTokensButKeepsStats(): void
     {
         $old    = $this->createStat('old', new \DateTime('-31 days'));
         $recent = $this->createStat('new', new \DateTime('-29 days'));
@@ -128,7 +128,7 @@ final class EmailStatPersonalisationCleanupTest extends MauticMysqlTestCase
         $this->assertSame(['{contactfield=firstname}' => 'John'], $this->em->find(Stat::class, $recent->getId())->getTokens());
     }
 
-    public function testStoredPersonalisationIsLoadedOnlyWhenRead(): void
+    public function testTokensAreLoadedOnlyWhenRead(): void
     {
         $stat = $this->createStat('lazy', new \DateTime());
         $this->em->clear();
