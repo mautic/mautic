@@ -145,6 +145,9 @@
                     'description': item.description
                 }) }}
     {% endset %}
+    {% set categoryHtml %}
+        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
+    {% endset %}
     {% set countHtml %}
         <span size="sm" class="label {{ item.needsRebuild() ? 'label-info' : 'label-gray' }} col-count" data-id="{{ item.id|e('html_attr') }}">
                     <a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.list'|trans ~ ':' ~ item.alias})|e('html_attr') }}"
@@ -158,6 +161,7 @@
         actionsHtml: actionsHtml,
         cells: {
             name: {trustedHtml: nameHtml, sortValue: item.name},
+            category: {trustedHtml: categoryHtml},
             leadcount: {trustedHtml: countHtml},
             dateAdded: item.dateAdded ? {label: dateToDate(item.dateAdded), attr: {title: dateToFullConcat(item.dateAdded)}} : '',
             dateModified: item.dateModified ? {label: dateToDate(item.dateModified), attr: {title: dateToFullConcat(item.dateModified)}} : '',
@@ -171,6 +175,7 @@
 {% set columns = [] %}
 {% for column in [
     {key: 'name', label: 'mautic.core.name', orderBy: 'l.name', className: 'col-leadlist-name'},
+    {key: 'category', label: 'mautic.core.category', orderBy: 'cat.title', className: 'visible-md visible-lg col-leadlist-category'},
     {key: 'leadcount', label: 'mautic.lead.list.thead.leadcount', className: 'visible-md visible-lg col-leadlist-leadcount'},
     {key: 'dateAdded', label: 'mautic.lead.import.label.dateAdded', orderBy: 'l.dateAdded', className: 'visible-md visible-lg col-leadlist-dateAdded'},
     {key: 'dateModified', label: 'mautic.lead.import.label.dateModified', orderBy: 'l.dateModified', className: 'visible-md visible-lg col-leadlist-dateModified'},
