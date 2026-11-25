@@ -418,7 +418,13 @@ export default class BuilderService {
       }
 
       try {
-        return originalRun(...args);
+        const result = originalRun(...args);
+
+        if (false === result && typeof MauticVars !== 'undefined') {
+          MauticVars.formSubmitInProgress = false;
+        }
+
+        return result;
       } catch (error) {
         if (typeof MauticVars !== 'undefined') {
           MauticVars.formSubmitInProgress = false;
