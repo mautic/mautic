@@ -1481,7 +1481,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\LeadBundle\Event\LeadTimelineEvent` | `addEventType()` (`string $eventTypeKey`); `addToCounter()` (`string $eventType`, `array\|int $count`); `isApplicable()` (`string $eventType`); `subtractFromCounter()` (`int $count`) |
     | `Mautic\LeadBundle\Event\PointsChangeEvent` | `__construct()` (`int $old`, `int $new`) |
     | `Mautic\LeadBundle\Helper\CustomFieldHelper` | `fixValueType()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $value`) |
-    | `Mautic\LeadBundle\Helper\CustomFieldValueHelper` | `normalize()` (`array\|string\|int\|float\|bool\|null $value`) |
+    | `Mautic\LeadBundle\Helper\CustomFieldValueHelper` | `normalize()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $value`) |
     | `Mautic\LeadBundle\Model\FieldModel` | `getLookupResults()` (`int $limit`); `reorderFieldsByList()` (`int $start`) |
     | `Mautic\LeadBundle\Model\ImportModel` | `getImportedRowsLineChartData()` (`string $unit`); `isEmptyCsvRow()` (`array $row`); `process()` (`int $limit`) |
     | `Mautic\LeadBundle\Model\LeadModel` | `getLookupResults()` (`string $type`) |

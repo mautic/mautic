@@ -77,12 +77,12 @@ final class CustomFieldValueHelper
     }
 
     /**
-     * @param mixed[]|string|int|float|bool|null $value
-     * @param string|array<int, string>|null     $properties
+     * @param \DateTimeInterface|mixed[]|string|int|float|bool|null $value
+     * @param string|array<int, string>|null                        $properties
      *
      * @return mixed|string
      */
-    public static function normalize(array|string|int|float|bool|null $value, ?string $type, $properties)
+    public static function normalize(\DateTimeInterface|array|string|int|float|bool|null $value, ?string $type, $properties)
     {
         if ('' !== $value && $type && $properties) {
             if (!is_array($properties)) {
