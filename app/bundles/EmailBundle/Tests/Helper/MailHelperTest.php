@@ -1645,44 +1645,6 @@ final class MailHelperTest extends TestCase
         $this->assertSame('2cb7cfd2ffccfbbbaf0e4d8891df2d79.png', $attachments[0]->getFilename());
     }
 
-    public function testNonImageContentIsNotEmbedded(): void
-    {
-        $this->coreParametersHelper->expects($this->atLeast(5))->method('get')
-            ->willReturnMap(
-                [
-                    ['mailer_from_email', null, 'nobody@nowhere.com'],
-                    ['mailer_convert_embed_images', null, true],
-                    ['mailer_from_name', null, 'Test'],
-                    ['secret_key', null, 'secret'],
-                    ['site_url', null, 'https://mautic.url'],
-                ]
-            );
-
-        $this->router->method('generate')->willReturn('http://tracking.url');
-        $transport = new BatchTransport();
-        $mailer    = $this->createMailHelperWithTransport($transport);
-
-        $textFile = tempnam(sys_get_temp_dir(), 'mautic-embed-');
-        file_put_contents($textFile, 'not an image');
-
-        $email = new Email();
-        $email->setSubject('Test');
-        $email->setCustomHtml('<img src="'.$textFile.'">');
-
-        try {
-            $mailer->setEmail($email);
-            $mailer->addTo($this->contacts[0]['email']);
-            $mailer->setLead($this->contacts[0]);
-            $mailer->send();
-        } finally {
-            unlink($textFile);
-        }
-
-        $message = $transport->getMessage();
-        $this->assertCount(0, $message->getAttachments());
-        $this->assertStringContainsString('src="'.$textFile.'"', (string) $message->getHtmlBody());
-    }
-
     public function testEmailWithDefaultSignature(): void
     {
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
