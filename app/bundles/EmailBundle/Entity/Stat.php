@@ -145,7 +145,7 @@ class Stat
      *
      * @var Collection<int, StatData>
      */
-    #[ORM\OneToMany(targetEntity: StatData::class, mappedBy: 'stat', cascade: ['persist'])]
+    #[ORM\OneToMany(targetEntity: StatData::class, mappedBy: 'stat', cascade: ['persist', 'detach'])]
     private Collection $dataCollection;
 
     /**
