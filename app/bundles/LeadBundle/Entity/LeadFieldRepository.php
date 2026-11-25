@@ -216,7 +216,7 @@ final class LeadFieldRepository extends CommonRepository
         if (in_array($field, array_column($this->getFieldAliases('company'), 'alias'))) {
             $this->addCompanyLeftJoin($q);
             $columnAlias = 'company.';
-        } elseif (in_array($field, ['utm_campaign', 'utm_content', 'utm_medium', 'utm_source', 'utm_term'])) {
+        } elseif (in_array($field, ['utm_campaign', 'utm_content', 'utm_medium', 'utm_source', 'utm_term'], true)) {
             $q->join('l', MAUTIC_TABLE_PREFIX.'lead_utmtags', 'u', 'l.id = u.lead_id');
             $columnAlias = 'u.';
         }
