@@ -1232,7 +1232,7 @@ final class MailHelperTest extends TestCase
             $message = $transport->getMessage();
             $this->assertInstanceOf(MauticMessage::class, $message);
             $this->assertCount(1, $message->getAttachments(), 'The image must be embedded in every message.');
-            $this->assertStringContainsString('src="cid:'.md5($sampleImagePath).'"', (string) $message->getHtmlBody());
+            $this->assertStringContainsString('src="cid:'.md5($sampleImagePath).'.png"', (string) $message->getHtmlBody());
         }
     }
 
@@ -1320,8 +1320,8 @@ final class MailHelperTest extends TestCase
         $message = $transport->getMessage();
         $body    = (string) $message->getHtmlBody();
         $this->assertCount(2, $message->getAttachments());
-        $this->assertStringContainsString('src="cid:'.md5($encodedUrl).'"', $body);
-        $this->assertStringContainsString('src="cid:'.md5($cacheBusted).'"', $body);
+        $this->assertStringContainsString('src="cid:'.md5($encodedUrl).'.png"', $body);
+        $this->assertStringContainsString('src="cid:'.md5($cacheBusted).'.png"', $body);
     }
 
     public function testLocalUrlsWithNullByteOrNonImageContentAreNotEmbedded(): void
@@ -1636,8 +1636,13 @@ final class MailHelperTest extends TestCase
         $this->assertSame($trackedHtml, $mailer->getBody());
         $mailer->send(true);
 
-        $this->assertMatchesRegularExpression('#^Text <a href="https://mautic\.com">Mautic</a> <img src="cid:abc" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79"/> <img src="https://mautic\.com/fake\.jpg">\{unsubscribe_url\}<img height="1" width="1" src="/tracking\.gif\?ct=[A-Za-z0-9%]+" alt="" />$#', $mailer->message->getHtmlBody());
+        $this->assertMatchesRegularExpression('#^Text <a href="https://mautic\.com">Mautic</a> <img src="cid:abc" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79\.png" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79\.png"/> <img src="https://mautic\.com/fake\.jpg">\{unsubscribe_url\}<img height="1" width="1" src="/tracking\.gif\?ct=[A-Za-z0-9%]+" alt="" />$#', $mailer->message->getHtmlBody());
         $this->assertSame($trackedHtml, $mailer->getBody());
+
+        $attachments = $mailer->message->getAttachments();
+        $this->assertCount(1, $attachments);
+        $this->assertSame('image/png', $attachments[0]->getContentType());
+        $this->assertSame('2cb7cfd2ffccfbbbaf0e4d8891df2d79.png', $attachments[0]->getFilename());
     }
 
     public function testEmailWithDefaultSignature(): void
