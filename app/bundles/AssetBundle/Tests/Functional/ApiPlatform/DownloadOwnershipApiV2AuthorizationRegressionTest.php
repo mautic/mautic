@@ -144,7 +144,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
 
         self::assertResponseIsSuccessful($response->getContent());
 
-        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $data = json_decode($response->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
 
         $downloads = $data['member'];
         $this->assertCount(1, $downloads, 'Expected exactly 1 download (only the one for the owned asset)');
@@ -222,7 +222,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
 
         self::assertResponseIsSuccessful($response->getContent());
 
-        $page1Data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $page1Data = json_decode($response->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
 
         $this->assertArrayHasKey('member', $page1Data);
         $this->assertArrayHasKey('totalItems', $page1Data);

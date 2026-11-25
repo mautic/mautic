@@ -179,7 +179,7 @@ final class ModeratedCommandTest extends TestCase
         $baseDir  = sys_get_temp_dir().'/mautic_moderated_command_'.uniqid();
         $cacheDir = $baseDir.'/tmp';
         $runDir   = $baseDir.'/run';
-        mkdir($cacheDir, 0755, true);
+        mkdir($cacheDir, 0755, recursive: true);
 
         // Make the run directory non-writable so opening the lock file inside it fails. This
         // mirrors a run directory owned by another user, e.g. one created by a console command

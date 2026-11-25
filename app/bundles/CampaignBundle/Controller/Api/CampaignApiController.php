@@ -97,7 +97,7 @@ final class CampaignApiController extends CommonApiController
             return $response;
         }
 
-        $content = json_decode($response->getContent(), true);
+        $content = json_decode($response->getContent(), associative: true);
 
         if (!isset($content[$this->entityNameMulti]) || empty($content[$this->entityNameMulti])) {
             return $response;
@@ -479,7 +479,7 @@ final class CampaignApiController extends CommonApiController
         }
 
         // Decode request JSON
-        $data = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent(), associative: true);
 
         if (!$data || !isset($data[0][Campaign::ENTITY_NAME])) {
             $files = $request->files->all();

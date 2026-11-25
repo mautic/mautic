@@ -245,7 +245,7 @@ final class OwnerSubscriberTest extends TestCase
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
         ];
 
-        $coreParametersHelper = $this->getMockParametersHelper(true, $parameterMap);
+        $coreParametersHelper = $this->getMockParametersHelper(mailIsOwner: true, parameterMap: $parameterMap);
 
         $coreParametersHelper->expects($this->atLeast(1))->method('get')
             ->willReturnMap(

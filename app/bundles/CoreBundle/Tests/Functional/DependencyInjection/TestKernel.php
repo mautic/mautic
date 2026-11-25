@@ -40,7 +40,7 @@ final class TestKernel extends \AppTestKernel
         // HTMLPurifier warns about its missing cache directory, that is only created by a cache warmer on container compilation
         $htmlPurifierCacheDir = $this->getCacheDir().'/htmlpurifier';
         if (!is_dir($htmlPurifierCacheDir)) {
-            mkdir($htmlPurifierCacheDir, 0777, true);
+            mkdir($htmlPurifierCacheDir, 0777, recursive: true);
         }
     }
 

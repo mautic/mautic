@@ -281,7 +281,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
             [, $translatedSms] = $this->getTranslatedEntity($sms, $contact);
             \assert($translatedSms instanceof Sms);
 
-            $stat    = $this->createStatEntry($translatedSms, $contact, $channel, false, $listId);
+            $stat    = $this->createStatEntry($translatedSms, $contact, $channel, persist: false, listId: $listId);
             $stats[] = $stat;
 
             $smsEvent = new SmsSendEvent($translatedSms->getMessage(), $contact);
@@ -388,7 +388,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
             $source = $source[0];
         }
         $stat->setSource($source);
-        $stat->setTrackingHash(str_replace('.', '', uniqid('', true)));
+        $stat->setTrackingHash(str_replace('.', '', uniqid('', more_entropy: true)));
 
         if ($persist) {
             $this->statRepository->saveEntity($stat);

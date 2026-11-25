@@ -68,7 +68,7 @@ final class EmailTriggerTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_GET, $uri);
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
-        $responseData = json_decode($this->client->getResponse()->getContent(), true);
+        $responseData = json_decode($this->client->getResponse()->getContent(), associative: true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
 
         $form = $crawler->filterXPath('//form[@name="pointtriggerevent"]')->form();

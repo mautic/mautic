@@ -71,7 +71,7 @@ final readonly class ImportEntityDenormalizer
     public function mapKeys(array $data): array
     {
         foreach ($data as $key => $value) {
-            if (!is_string($key) || in_array($key, self::NOT_IMPORTABLE, true)) {
+            if (!is_string($key) || in_array($key, self::NOT_IMPORTABLE, strict: true)) {
                 continue;
             }
 

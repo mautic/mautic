@@ -20,7 +20,7 @@ final class FieldMergerHelperTest extends TestCase
     {
         $fields = $this->getCurrentFieldMappings();
 
-        $integrationObject = $this->getIntegrationObject(true);
+        $integrationObject = $this->getIntegrationObject(removeFirstField: true);
         $fieldMergerHelper = new FieldMergerHelper($integrationObject, $fields);
 
         $updatedFieldMappings = [

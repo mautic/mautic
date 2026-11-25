@@ -27,7 +27,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // Get the form HTML element out of the response, fill it in and submit.
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
         $form->setValues(
@@ -47,8 +47,8 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $responseData = json_decode($response->getContent(), true);
-        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $responseData = json_decode($response->getContent(), associative: true);
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), associative: true), return: true));
 
         $actualEventData = array_filter($responseData['event'], fn ($value): bool => in_array($value, [
             'name',
@@ -91,7 +91,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // Get the form HTML element out of the response, fill it in and submit.
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
         $form->setValues(
@@ -120,8 +120,8 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $responseData = json_decode($response->getContent(), true);
-        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $responseData = json_decode($response->getContent(), associative: true);
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), associative: true), return: true));
 
         $this->assertNotEmpty($responseData['eventId']);
         $this->assertNotEmpty($responseData['event']['id']);
@@ -142,7 +142,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // FILL EDIT FORM
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
         $form->setValues(
@@ -172,8 +172,8 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $formData);
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $responseData = json_decode($response->getContent(), true);
-        $this->assertTrue($responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $responseData = json_decode($response->getContent(), associative: true);
+        $this->assertTrue($responseData['success'], print_r(json_decode($response->getContent(), associative: true), return: true));
 
         $this->assertEquals($eventId, $responseData['eventId']);
         $this->assertEquals($eventId, $responseData['event']['id']);
@@ -194,7 +194,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // Get the form HTML element out of the response, fill it in and submit.
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
         $form->setValues(
@@ -223,8 +223,8 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $responseData = json_decode($response->getContent(), true);
-        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $responseData = json_decode($response->getContent(), associative: true);
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), associative: true), return: true));
         $eventId = $responseData['event']['id'];
 
         // CLONE EVENT
@@ -232,8 +232,8 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest('POST', $uri);
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $responseData = json_decode($response->getContent(), true);
-        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $responseData = json_decode($response->getContent(), associative: true);
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), associative: true), return: true));
         $this->assertSame('campaignEventClone', $responseData['mauticContent']);
         $this->assertSame('Adjust contact points', $responseData['eventName']);
         $this->assertSame('New campaign', $responseData['campaignName']);
@@ -243,8 +243,8 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest('POST', $uri);
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $responseData = json_decode($response->getContent(), true);
-        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $responseData = json_decode($response->getContent(), associative: true);
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), associative: true), return: true));
         $this->assertSame('action', $responseData['eventType']);
         $this->assertSame('campaignEvent', $responseData['mauticContent']);
         $this->assertTrue($responseData['clearCloneStorage']);
@@ -263,7 +263,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // Get the form HTML element out of the response
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
 
@@ -286,7 +286,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        $response = json_decode($response->getContent(), true);
+        $response = json_decode($response->getContent(), associative: true);
         $this->assertSame('You do not have access to the requested area/action.', $response['error']);
     }
 
@@ -305,7 +305,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        $response = json_decode($response->getContent(), true);
+        $response = json_decode($response->getContent(), associative: true);
         $this->assertSame($event1->getId(), $response['eventId']);
         $this->assertSame($event1->getName(), $response['event']['name']);
         $this->assertFalse($response['formSubmitted'], $this->client->getResponse()->getContent());
@@ -334,7 +334,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        $response = json_decode($response->getContent(), true);
+        $response = json_decode($response->getContent(), associative: true);
         $this->assertSame(1, $response['success']);
 
         // Check that the deleted event is in the response
@@ -371,7 +371,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $response = $this->client->getResponse();
-        $response = json_decode($response->getContent(), true);
+        $response = json_decode($response->getContent(), associative: true);
         $this->assertSame(1, $response['success']);
 
         // Check that the deleted event with redirect ID is properly stored
@@ -409,7 +409,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $deleteResponse = $this->client->getResponse();
-        $deleteResponse = json_decode($deleteResponse->getContent(), true);
+        $deleteResponse = json_decode($deleteResponse->getContent(), associative: true);
         $this->assertSame(1, $deleteResponse['success']);
 
         // Now undelete the event, passing the deletedEvents from the previous response
@@ -427,7 +427,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $undeleteResponse = $this->client->getResponse();
-        $undeleteResponse = json_decode($undeleteResponse->getContent(), true);
+        $undeleteResponse = json_decode($undeleteResponse->getContent(), associative: true);
         $this->assertSame(1, $undeleteResponse['success']);
 
         // Verify the event is no longer in the deletedEvents list
@@ -464,7 +464,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $response = $this->client->getResponse();
-        $response = json_decode($response->getContent(), true);
+        $response = json_decode($response->getContent(), associative: true);
         $this->assertSame(1, $response['success']);
 
         // Check that the deleted event with redirect ID is properly stored
@@ -513,7 +513,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         // Persist like CampaignController: JSON round-trip of modifiedEvents into setEvents().
         $eventId       = $event->getId();
         $campaignId    = $campaign->getId();
-        $roundTripped  = json_decode(json_encode($modifiedEvents, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+        $roundTripped  = json_decode(json_encode($modifiedEvents, JSON_THROW_ON_ERROR), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
         $campaignModel = $this->getService(CampaignModel::class);
 
         $this->em->clear();
@@ -536,7 +536,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         unset($asArray['campaign'], $asArray['children'], $asArray['parent'], $asArray['log']);
         $dateHelper = $this->getService(DateHelper::class);
         $dateHelper->toFull($asArray['triggerDate']);
-        $roundTripped2 = json_decode(json_encode([$eventId => $asArray], JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+        $roundTripped2 = json_decode(json_encode([$eventId => $asArray], JSON_THROW_ON_ERROR), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         $campaign = $this->em->find(Campaign::class, $campaignId);
         $this->assertInstanceOf(Campaign::class, $campaign);
@@ -572,7 +572,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest('GET', $uri, ['modifiedEvents' => json_encode($modifiedEvents)]);
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($this->client->getResponse()->getContent(), true);
+        $responseData = json_decode($this->client->getResponse()->getContent(), associative: true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
         $form->setValues(
@@ -597,8 +597,8 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $formData);
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertNotEmpty($responseData['success'], print_r($responseData, true));
+        $responseData = json_decode($this->client->getResponse()->getContent(), associative: true);
+        $this->assertNotEmpty($responseData['success'], print_r($responseData, return: true));
         $this->assertArrayHasKey('modifiedEvents', $responseData);
 
         return $responseData['modifiedEvents'];

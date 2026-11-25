@@ -39,7 +39,7 @@ final class Version20221128145933 extends AbstractMauticMigration
 
         $parameters[ConfigType::SMS_DISABLE_TRACKABLE_URLS] = 1;
         // Write updated config to local.php
-        $result = file_put_contents($confFile, "<?php\n".'$parameters = '.var_export($parameters, true).';');
+        $result = file_put_contents($confFile, "<?php\n".'$parameters = '.var_export($parameters, return: true).';');
 
         if (false === $result) {
             throw new \Exception(sprintf("Couldn't update configuration file with enabled %s", ConfigType::SMS_DISABLE_TRACKABLE_URLS));

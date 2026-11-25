@@ -166,7 +166,7 @@ final class ActionImportExportSubscriber
             }
 
             if (isset($actionData['properties']) && is_string($actionData['properties'])) {
-                $decoded                  = json_decode($actionData['properties'], true);
+                $decoded                  = json_decode($actionData['properties'], associative: true);
                 $actionData['properties'] = is_array($decoded) ? $decoded : [];
             }
 

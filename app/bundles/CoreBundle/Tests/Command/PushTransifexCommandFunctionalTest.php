@@ -39,7 +39,7 @@ final class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
         // The first resource does not exist and must be created
         $handlerStack->append(
             function (RequestInterface $request): Response {
-                $body = json_decode($request->getBody()->__toString(), true);
+                $body = json_decode($request->getBody()->__toString(), associative: true);
                 $this->assertSame('POST', $request->getMethod());
                 $this->assertSame('https://rest.api.transifex.com/resources', $request->getUri()->__toString());
                 $this->assertSame('WebhookBundle flashes', $body['data']['attributes']['name']);
@@ -54,7 +54,7 @@ final class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
         // Starting the upload of content for the first resource
         $handlerStack->append(
             function (RequestInterface $request): Response {
-                $body = json_decode($request->getBody()->__toString(), true);
+                $body = json_decode($request->getBody()->__toString(), associative: true);
                 $this->assertSame('POST', $request->getMethod());
                 $this->assertSame('https://rest.api.transifex.com/resource_strings_async_uploads', $request->getUri()->__toString());
                 $this->assertNotEmpty($body['data']['attributes']['content']);
@@ -66,7 +66,7 @@ final class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
         // Starting the upload of content for the second resource
         $handlerStack->append(
             function (RequestInterface $request): Response {
-                $body = json_decode($request->getBody()->__toString(), true);
+                $body = json_decode($request->getBody()->__toString(), associative: true);
                 $this->assertSame('POST', $request->getMethod());
                 $this->assertSame('https://rest.api.transifex.com/resource_strings_async_uploads', $request->getUri()->__toString());
                 $this->assertNotEmpty($body['data']['attributes']['content']);

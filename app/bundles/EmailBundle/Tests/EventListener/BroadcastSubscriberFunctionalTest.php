@@ -74,7 +74,7 @@ final class BroadcastSubscriberFunctionalTest extends MauticMysqlTestCase
         $abResult      = $this->getResultForEmailName($results, 'AB Parent Functional');
         $regularResult = $this->getResultForEmailName($results, 'Regular Broadcast Functional');
 
-        $this->assertNotNull($abResult, print_r(array_keys($results), true));
+        $this->assertNotNull($abResult, print_r(array_keys($results), return: true));
         $this->assertNotNull($regularResult);
 
         $this->assertSame(2, (int) $abResult['success'] + (int) $abResult['failed']);

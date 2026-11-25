@@ -78,7 +78,7 @@ abstract class AbstractReportSubscriberTestCase extends MauticMysqlTestCase
         // Test API response
         $this->client->request(Request::METHOD_GET, sprintf('/api/reports/%d', $reportId));
         $clientResponse = $this->client->getResponse();
-        $result         = json_decode($clientResponse->getContent(), true);
+        $result         = json_decode($clientResponse->getContent(), associative: true);
 
         // Verify total results count
         $this->assertEquals(count($expectedReport), $result['totalResults']);

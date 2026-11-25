@@ -256,7 +256,7 @@ final class ClientController extends AbstractStandardFormController
                 );
             }
             if ($valid) {
-                return $this->editAction($request, $client->getId(), true);
+                return $this->editAction($request, $client->getId(), ignorePost: true);
             }
         }
 

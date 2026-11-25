@@ -191,7 +191,7 @@ final class ConfigSubscriber
     {
         $valid = true;
 
-        libxml_use_internal_errors(true);
+        libxml_use_internal_errors(use_errors: true);
         $doc = simplexml_load_string($content);
         if (false === $doc) {
             $valid = false;

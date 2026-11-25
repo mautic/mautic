@@ -44,7 +44,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
         $this->assertResponseIsSuccessful();
 
-        $payload = json_decode($this->client->getResponse()->getContent(), true);
+        $payload = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         $this->assertArrayHasKey('projects', $payload);
 
@@ -147,7 +147,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $payload = json_decode($this->client->getResponse()->getContent(), true);
+        $payload = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertArrayHasKey('projects', $payload);
 
         $projectOptions = $payload['projects'];
@@ -176,7 +176,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $payload2        = json_decode($this->client->getResponse()->getContent(), true);
+        $payload2        = json_decode($this->client->getResponse()->getContent(), associative: true);
         $projectOptions2 = $payload2['projects'];
 
         // Verify the malicious project can be selected
@@ -238,7 +238,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $payload = json_decode($this->client->getResponse()->getContent(), true);
+        $payload = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertArrayHasKey('projects', $payload);
 
         $projectOptions = $payload['projects'];
@@ -265,7 +265,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $payload2        = json_decode($this->client->getResponse()->getContent(), true);
+        $payload2        = json_decode($this->client->getResponse()->getContent(), associative: true);
         $projectOptions2 = $payload2['projects'];
 
         // Verify selections are preserved correctly

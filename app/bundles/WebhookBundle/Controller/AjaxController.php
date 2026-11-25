@@ -152,7 +152,7 @@ final class AjaxController extends CommonAjaxController
 
         foreach ($paths as $key => $path) {
             if (file_exists($path)) {
-                $payloads[$key] = json_decode(file_get_contents($path), true);
+                $payloads[$key] = json_decode(file_get_contents($path), associative: true);
             }
         }
 

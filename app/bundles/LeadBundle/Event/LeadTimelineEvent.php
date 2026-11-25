@@ -112,7 +112,7 @@ final class LeadTimelineEvent extends Event
     public function addEvent(array $data): void
     {
         // Drop events of other contacts from subscribers that ignore the leadIds filter
-        if ([] !== $this->leadIds && (empty($data['contactId']) || !in_array((int) $data['contactId'], $this->leadIds, true))) {
+        if ([] !== $this->leadIds && (empty($data['contactId']) || !in_array((int) $data['contactId'], $this->leadIds, strict: true))) {
             return;
         }
 
@@ -546,6 +546,6 @@ final class LeadTimelineEvent extends Event
      */
     private function generateEventId(array $data): string
     {
-        return $data['eventType'].hash('crc32', json_encode($data), false);
+        return $data['eventType'].hash('crc32', json_encode($data), binary: false);
     }
 }

@@ -17,7 +17,7 @@ trait ApiTestUserTrait
     private function createApiUserWithPermissions(array $permissions, string $roleNamePrefix = 'Lead API Role'): User
     {
         $role = new Role();
-        $role->setName($roleNamePrefix.' '.uniqid('', true));
+        $role->setName($roleNamePrefix.' '.uniqid('', more_entropy: true));
         $this->em->persist($role);
         $this->em->flush();
 

@@ -65,7 +65,7 @@ final class ListControllerTest extends MauticMysqlTestCase
     #[DataProvider('packageTypes')]
     public function testTypeFilterCanBeAppliedPaginatedAndReset(string $type, string $fixture, string $label): void
     {
-        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/list_'.$fixture.'.json'), true, 512, JSON_THROW_ON_ERROR);
+        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/list_'.$fixture.'.json'), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
         foreach ($payload['results'] as $index => $package) {
             $this->queuePackageResponse(
                 ['page' => (string) ($index + 1), 'limit' => '1', 'query' => 'newsletter', 'type' => $type],
@@ -116,7 +116,7 @@ final class ListControllerTest extends MauticMysqlTestCase
             );
             $this->client->xmlHttpRequest('GET', '/s/marketplace', ['search' => 'type:mautic-'.$type, 'limit' => 10]);
             $this->assertResponseIsSuccessful();
-            $response = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+            $response = json_decode($this->client->getResponse()->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
             $crawler  = new Crawler($response['newContent']);
             $this->assertPackageRows($crawler, ['Newsletter '.$label.' One', 'Newsletter '.$label.' Two'], [$label, $label]);
             $popover = new Crawler($crawler->filter('button[data-bs-toggle="popover"]')->attr('data-bs-content'));

@@ -419,7 +419,7 @@ final class CampaignController extends AbstractStandardFormController
         $ids            = $request->attributes->all()['ids'] ?? $request->query->all()['ids'] ?? $request->request->all()['ids'] ?? null;
         $date           = new \DateTimeImmutable()->format(DateTimeHelper::FORMAT_DB);
         $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
-        $objectIds      = json_decode($ids, true);
+        $objectIds      = json_decode($ids, associative: true);
 
         if (empty($ids)) {
             $args = [
@@ -550,7 +550,7 @@ final class CampaignController extends AbstractStandardFormController
 
         $sourcesList     = $this->campaignModel->getSourceLists(null, false, true);
         $campaign        = $this->campaignModel->getEntity($objectId);
-        $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, true);
+        $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, isPost: true);
         // Filter out deleted events for the preview (but keep them for action/decision/condition tabs)
         $previewEvents = array_filter($events, fn (array $event): bool => empty($event['deleted']));
 
@@ -714,7 +714,7 @@ final class CampaignController extends AbstractStandardFormController
                 );
             }
             if ($valid && $this->isFormApplied($form)) {
-                return $this->editAction($request, $campaign->getId(), true);
+                return $this->editAction($request, $campaign->getId(), ignorePost: true);
             }
         }
 
@@ -775,7 +775,7 @@ final class CampaignController extends AbstractStandardFormController
      */
     protected function afterEntityClone($campaign, object $oldCampaign): array
     {
-        $tempId   = 'mautic_'.sha1(uniqid(mt_rand(), true));
+        $tempId   = 'mautic_'.sha1(uniqid(mt_rand(), more_entropy: true));
         $objectId = $oldCampaign->getId();
 
         // Get the events that need to be duplicated as well
@@ -863,7 +863,7 @@ final class CampaignController extends AbstractStandardFormController
     {
         if (!$isValid) {
             // Add the canvas settings to the entity to be able to rebuild it
-            $this->afterEntitySave($entity, $form, $action, false);
+            $this->afterEntitySave($entity, $form, $action, persistConnections: false);
         } else {
             $this->sessionId = $entity->getId();
         }
@@ -894,7 +894,7 @@ final class CampaignController extends AbstractStandardFormController
             $this->setCampaignElements($campaignElements, $isClone);
 
             $this->campaignModel->setCanvasSettings($entity, $this->connections, false, $this->modifiedEvents);
-            $this->prepareCampaignSourcesForEdit($sessionId, $this->campaignSources, true);
+            $this->prepareCampaignSourcesForEdit($sessionId, $this->campaignSources, isPost: true);
         } else {
             if (!$isClone) {
                 // clear out existing fields in case the form was refreshed, browser closed, etc
@@ -927,7 +927,7 @@ final class CampaignController extends AbstractStandardFormController
     {
         // sets the global campaignElements
         if (is_string($campaignElements)) {
-            $this->campaignElements = json_decode($campaignElements, true);
+            $this->campaignElements = json_decode($campaignElements, associative: true);
         } else {
             $this->campaignElements = $campaignElements;
         }
@@ -1012,7 +1012,7 @@ final class CampaignController extends AbstractStandardFormController
         if ($objectId) {
             $sessionId = $objectId;
         } elseif ('new' === $action) {
-            $sessionId = 'mautic_'.sha1(uniqid(mt_rand(), true));
+            $sessionId = 'mautic_'.sha1(uniqid(mt_rand(), more_entropy: true));
             if ($this->requestStack->getCurrentRequest()->request->has('campaign')) {
                 $campaign  = $this->requestStack->getCurrentRequest()->request->all()['campaign'] ?? [];
                 $sessionId = $campaign['sessionId'] ?? $sessionId;
@@ -1113,7 +1113,7 @@ final class CampaignController extends AbstractStandardFormController
             return $newFilters;
         }
 
-        $decodedFilters = json_decode($updatedFilters, true);
+        $decodedFilters = json_decode($updatedFilters, associative: true);
 
         if (!is_array($decodedFilters)) {
             return $newFilters;

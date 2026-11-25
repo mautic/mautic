@@ -15,11 +15,11 @@ $formatArgs = function ($args) use (&$formatArgs): string {
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
             } elseif ('boolean' === $item[0]) {
-                $formattedValue = '<em>'.strtolower(var_export($item[1], true)).'</em>';
+                $formattedValue = '<em>'.strtolower(var_export($item[1], return: true)).'</em>';
             } elseif ('resource' === $item[0]) {
                 $formattedValue = '<em>resource</em>';
             } else {
-                $formattedValue = str_replace("\n", '', var_export(htmlspecialchars((string) $item[1]), true));
+                $formattedValue = str_replace("\n", '', var_export(htmlspecialchars((string) $item[1]), return: true));
             }
         } elseif (is_object($item)) {
             $formattedValue = $item::class;

@@ -75,7 +75,7 @@ final readonly class Connection
             throw new ApiException($body, $response->getStatusCode());
         }
 
-        $payload = json_decode($body, true);
+        $payload = json_decode($body, associative: true);
 
         $this->logger->debug('Successful Packagist API response', ['payload' => $payload]);
 

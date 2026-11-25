@@ -589,7 +589,7 @@ final class AssetsHelper
 
     private function escape(string $string): string
     {
-        return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
+        return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', double_encode: false);
     }
 
     /**

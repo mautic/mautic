@@ -84,7 +84,7 @@ final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCa
 
         // Search
         $response = $this->performSearch('/s/ajax?action=globalSearch&global_search=client&tmp=list');
-        $content  = \json_decode($response->getContent(), true);
+        $content  = \json_decode($response->getContent(), associative: true);
         $crawler  = new Crawler($content['newContent'], $this->client->getInternalRequest()->getUri());
         $this->assertSame('Contacts 2', $crawler->filterXPath('//div[@id="globalSearchPanel"]//div[contains(@class, "text-secondary")]')->text());
 
@@ -117,7 +117,7 @@ final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCa
 
         // Search
         $response = $this->performSearch('/s/companies?search=client&tmp=list');
-        $content  = \json_decode($response->getContent(), true);
+        $content  = \json_decode($response->getContent(), associative: true);
         $crawler  = new Crawler($content['newContent'], $this->client->getInternalRequest()->getUri());
 
         $this->assertStringContainsString('ABC', $crawler->html());

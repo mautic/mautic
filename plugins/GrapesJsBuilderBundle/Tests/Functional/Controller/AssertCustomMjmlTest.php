@@ -41,7 +41,7 @@ final class AssertCustomMjmlTest extends MauticMysqlTestCase
         // Get the Email via API and assert customMjml.
         $this->client->request(Request::METHOD_GET, '/api/emails/'.$emailId);
         $this->assertResponseStatusCodeSame(200);
-        $content = json_decode($this->client->getResponse()->getContent(), true);
+        $content = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertNotEmpty($content['email']['grapesjsbuilder']['customMjml']);
     }
 
@@ -60,7 +60,7 @@ final class AssertCustomMjmlTest extends MauticMysqlTestCase
         // Get email & check for both customHtml & customMjml in the response.
         $this->client->request(Request::METHOD_GET, '/api/emails/'.$emailId);
         $this->assertResponseStatusCodeSame(200);
-        $content = json_decode($this->client->getResponse()->getContent(), true);
+        $content = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertNotEmpty($content['email']['customHtml']);
         $this->assertNotEmpty($content['email']['grapesjsbuilder']['customMjml']);
     }
@@ -125,7 +125,7 @@ final class AssertCustomMjmlTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/emails/new', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($emailData));
         $this->assertResponseStatusCodeSame(201);
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), associative: true);
     }
 
     /**

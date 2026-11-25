@@ -101,7 +101,7 @@ final class SlowTest implements Extension
 
         arsort($this->classes);
 
-        fwrite(STDOUT, PHP_EOL.'Slow test classes:'.PHP_EOL.var_export($this->classes, true).PHP_EOL);
+        fwrite(STDOUT, PHP_EOL.'Slow test classes:'.PHP_EOL.var_export($this->classes, return: true).PHP_EOL);
 
         $this->classes = [];
     }

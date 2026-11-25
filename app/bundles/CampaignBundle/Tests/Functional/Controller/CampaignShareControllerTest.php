@@ -148,7 +148,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
 
             $zip = new \ZipArchive();
             $this->assertTrue($zip->open($firstZipPath));
-            $composerJson = json_decode((string) $zip->getFromName('composer.json'), true);
+            $composerJson = json_decode((string) $zip->getFromName('composer.json'), associative: true);
             $zip->close();
             $this->assertStringContainsString('one', strtolower((string) $composerJson['name']));
         } finally {
@@ -211,7 +211,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
         $shareDir = $shareService->getShareDir();
 
         if (!is_dir($shareDir)) {
-            mkdir($shareDir, 0775, true);
+            mkdir($shareDir, 0775, recursive: true);
         }
 
         $token   = bin2hex(random_bytes(16));
@@ -241,7 +241,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
         $shareDir = $shareService->getShareDir();
 
         if (!is_dir($shareDir)) {
-            mkdir($shareDir, 0775, true);
+            mkdir($shareDir, 0775, recursive: true);
         }
 
         $token   = bin2hex(random_bytes(16));
@@ -269,7 +269,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
         $pathsHelper = $this->getService(PathsHelper::class);
         $imageDir    = rtrim($pathsHelper->getImagePath(), '/');
         if (!is_dir($imageDir)) {
-            mkdir($imageDir, 0775, true);
+            mkdir($imageDir, 0775, recursive: true);
         }
         $fileName  = 'share_asset_'.bin2hex(random_bytes(6)).'.png';
         $imagePath = $imageDir.'/'.$fileName;
@@ -399,7 +399,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
         $path = tempnam(sys_get_temp_dir(), 'share_banner_');
         rename($path, $path .= '.png');
         // 1x1 transparent PNG so the File constraint's mime sniffing sees a real image.
-        file_put_contents($path, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', true));
+        file_put_contents($path, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', strict: true));
 
         return $path;
     }

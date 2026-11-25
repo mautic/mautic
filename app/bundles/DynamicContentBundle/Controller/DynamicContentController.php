@@ -196,7 +196,7 @@ final class DynamicContentController extends AbstractFormController
                         $template = 'Mautic\DynamicContentBundle\Controller\DynamicContentController::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $entity->getId(), true);
+                        return $this->editAction($request, $entity->getId(), ignorePost: true);
                     }
                 }
             } else {
@@ -235,7 +235,7 @@ final class DynamicContentController extends AbstractFormController
                 );
             }
             if ($valid) {
-                return $this->editAction($request, $entity->getId(), true);
+                return $this->editAction($request, $entity->getId(), ignorePost: true);
             }
         }
 

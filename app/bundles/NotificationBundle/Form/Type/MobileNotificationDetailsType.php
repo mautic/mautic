@@ -41,7 +41,7 @@ final class MobileNotificationDetailsType extends AbstractType
             return;
         }
 
-        if (in_array('ios', $settings['platforms'], true)) {
+        if (in_array('ios', $settings['platforms'], strict: true)) {
             $builder->add(
                 'ios_subtitle',
                 TextType::class,
@@ -138,7 +138,7 @@ final class MobileNotificationDetailsType extends AbstractType
             );
         }
 
-        if (in_array('android', $settings['platforms'], true)) {
+        if (in_array('android', $settings['platforms'], strict: true)) {
             $builder->add(
                 'android_sound',
                 TextType::class,

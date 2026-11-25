@@ -32,13 +32,13 @@ final class EmailOpenTrackingPreferenceAsyncFunctionalTest extends MauticMysqlTe
     public function testOpenOfAContactWhoTurnedTrackingOffIsNotQueuedOrRecordedAfterTheyTurnItBackOn(): void
     {
         [$contact, $stat] = $this->createSentEmail('queued-off@example.com');
-        $this->setActivityTracking($contact, false);
+        $this->setActivityTracking($contact, allowed: false);
 
         $this->openEmail($stat);
 
         $this->assertCount(0, $this->getHitTransport()->getSent(), 'nothing about the opted-out open is queued');
 
-        $this->setActivityTracking($contact, true);
+        $this->setActivityTracking($contact, allowed: true);
         $this->consumeQueuedHits();
 
         $this->assertOpenNotRecorded($stat);
@@ -54,7 +54,7 @@ final class EmailOpenTrackingPreferenceAsyncFunctionalTest extends MauticMysqlTe
         $this->assertCount(1, $sent, 'the open of a contact who allows tracking is queued');
         $this->assertInstanceOf(EmailHitNotification::class, $sent[0]->getMessage());
 
-        $this->setActivityTracking($contact, false);
+        $this->setActivityTracking($contact, allowed: false);
         $this->consumeQueuedHits();
 
         $this->assertOpenNotRecorded($stat);

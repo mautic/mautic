@@ -46,7 +46,7 @@ final class ClientTest extends TestCase
 
         // Calculate the expected signature the same way as the Client class
         $jsonPayload       = json_encode($payload);
-        $expectedSignature = base64_encode(hash_hmac('sha256', $jsonPayload, $secret, true));
+        $expectedSignature = base64_encode(hash_hmac('sha256', $jsonPayload, $secret, binary: true));
 
         $headers = [
             'Content-Type'      => 'application/json',

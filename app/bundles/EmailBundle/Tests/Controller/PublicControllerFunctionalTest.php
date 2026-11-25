@@ -959,10 +959,10 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $sameNameTwo = $this->createSegment('Same B', 'Same Name', 'same-2');
 
         // Unpublished preference segment (should NOT appear)
-        $unpublishedSegment = $this->createSegment('Draft Segment', 'Draft', 'draft-segment', false);
+        $unpublishedSegment = $this->createSegment('Draft Segment', 'Draft', 'draft-segment', isPublished: false);
 
         // Non-preference segment (should NOT appear)
-        $nonPreferenceSegment = $this->createSegment('Hidden Segment', 'Should Not Appear', 'hidden-segment', true, false);
+        $nonPreferenceSegment = $this->createSegment('Hidden Segment', 'Should Not Appear', 'hidden-segment', isPublished: true, isPreferenceCenter: false);
 
         $this->em->flush();
 

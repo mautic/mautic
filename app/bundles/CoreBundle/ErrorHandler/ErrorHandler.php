@@ -66,7 +66,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     array_unshift($context, $log);
                     $log = 'Array ('.count($log).')';
                 } elseif (!is_string($log)) {
-                    $log = var_export($log, true);
+                    $log = var_export($log, return: true);
                 }
 
                 $debug = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -547,7 +547,7 @@ namespace {
         function prof_flag($str): void
         {
             global $prof_timing, $prof_names;
-            $prof_timing[] = microtime(true);
+            $prof_timing[] = microtime(as_float: true);
             $prof_names[]  = $str;
         }
 

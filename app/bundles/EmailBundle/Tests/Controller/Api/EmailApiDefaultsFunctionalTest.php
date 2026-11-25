@@ -62,7 +62,7 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
-        $response = json_decode($clientResponse->getContent(), true)['email'];
+        $response = json_decode($clientResponse->getContent(), associative: true)['email'];
 
         $this->assertSame('config-source', $response['utmTags']['utmSource']);
         $this->assertSame('config-medium', $response['utmTags']['utmMedium']);
@@ -96,7 +96,7 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
-        $response = json_decode($clientResponse->getContent(), true)['email'];
+        $response = json_decode($clientResponse->getContent(), associative: true)['email'];
 
         $this->assertSame('explicit-source', $response['utmTags']['utmSource']);
         $this->assertSame('explicit-medium', $response['utmTags']['utmMedium']);

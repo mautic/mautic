@@ -52,7 +52,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
         $this->assertResponseIsSuccessful();
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         // Ensure the contact 1 is a campaign 1 member now.
         $this->assertSame(
@@ -74,7 +74,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         // Ensure the contact 1 was removed as a member of campaign 1 member now.
         $this->assertSame([['lead_id' => (string) $contact->getId(), 'manually_added' => '0', 'manually_removed' => '1']], $this->getMembersForCampaign($campaign->getId()));
@@ -176,7 +176,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=Company&limit=1');
 
         $response = $this->client->getResponse();
-        $content  = json_decode($response->getContent(), true);
+        $content  = json_decode($response->getContent(), associative: true);
 
         self::assertResponseIsSuccessful();
         $this->assertIsArray($content);
@@ -186,7 +186,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=Company&limit=1&start=1');
         $response = $this->client->getResponse();
-        $content  = json_decode($response->getContent(), true);
+        $content  = json_decode($response->getContent(), associative: true);
 
         self::assertResponseIsSuccessful();
         $this->assertIsArray($content);
@@ -296,7 +296,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                 ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentD->getId()}"],
                 ['source' => "{$segmentA->getId()}-{$segmentC->getId()}", 'target' => "{$segmentC->getId()}-{$segmentE->getId()}"],
             ],
-        ], json_decode($response->getContent(), true));
+        ], json_decode($response->getContent(), associative: true));
     }
 
     public function testSegmentDependencyTreeWithLoop(): void
@@ -387,7 +387,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
 
         $this->assertSame([
             'levels' => [
@@ -515,7 +515,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
 
-        $data       = json_decode($response->getContent(), true);
+        $data       = json_decode($response->getContent(), associative: true);
         $foundNames = array_column($data, 'value');
 
         $this->assertCount(4, $foundNames);
@@ -563,7 +563,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
 
-        $data       = json_decode($response->getContent(), true);
+        $data       = json_decode($response->getContent(), associative: true);
         $foundNames = array_column($data, 'value');
 
         $this->assertCount(4, $foundNames);
@@ -647,7 +647,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
 
-        $data       = json_decode($response->getContent(), true);
+        $data       = json_decode($response->getContent(), associative: true);
         $foundNames = array_column($data, 'value');
 
         $this->assertCount(2, $foundNames);
@@ -727,7 +727,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
 
-        $data       = json_decode($response->getContent(), true);
+        $data       = json_decode($response->getContent(), associative: true);
         $foundNames = array_column($data, 'value');
 
         $this->assertCount(2, $foundNames);
@@ -812,7 +812,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
@@ -844,7 +844,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
@@ -867,7 +867,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $this->assertSame('Alias cannot be empty', $response['error']);
 
         // User search for filter
@@ -881,7 +881,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $this->assertSame('Admin User', $response[0]['value']);
 
         // Check if filed type is not lookup
@@ -895,7 +895,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $this->assertEmpty($response);
 
         // Check if filed type is lookup
@@ -909,7 +909,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey(0, $response);
     }
 
@@ -930,7 +930,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertSame($category1->getTitle(), $response[0]['text']);
 
@@ -946,7 +946,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertCount(2, $response);
     }
@@ -966,7 +966,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('viewParameters', $response);
         $this->assertStringContainsString('data-model="category.category"', (string) $response['viewParameters']['form']);
     }

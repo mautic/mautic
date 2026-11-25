@@ -63,7 +63,7 @@ final class AjaxController extends CommonAjaxController
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $data   = json_decode($request->getContent(), true);
+        $data   = json_decode($request->getContent(), associative: true);
 
         if (empty($data['vendor']) || empty($data['package'])) {
             return $this->sendJsonResponse([
@@ -136,7 +136,7 @@ final class AjaxController extends CommonAjaxController
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $data   = json_decode($request->getContent(), true);
+        $data   = json_decode($request->getContent(), associative: true);
 
         if (empty($data['vendor']) || empty($data['package'])) {
             return $this->sendJsonResponse([

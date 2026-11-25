@@ -71,7 +71,7 @@ final class CompanyController extends AbstractFormController
 
         if ($request->isMethod('POST')) {
             $data = $request->request->all()['lead_batch_owner'] ?? [];
-            $ids  = json_decode($data['ids'] ?? '', true);
+            $ids  = json_decode($data['ids'] ?? '', associative: true);
             $companies = is_array($ids) ? $this->companyModel->getEntities([
                 'filter' => ['force' => [['column' => 'comp.id', 'expr' => 'in', 'value' => $ids]]],
                 'ignore_paginator' => true,
@@ -310,7 +310,7 @@ final class CompanyController extends AbstractFormController
                 $this->throwAccessDenied();
             }
 
-            $ids = json_decode($request->query->get('ids', '[]'), true);
+            $ids = json_decode($request->query->get('ids', '[]'), associative: true);
 
             if (is_array($ids) && count($ids) <= self::MAX_BATCH_REMOVE_CONTACTS) {
                 $removed = 0;
@@ -436,7 +436,7 @@ final class CompanyController extends AbstractFormController
                         $template       = 'Mautic\LeadBundle\Controller\CompanyController::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $entity->getId(), true);
+                        return $this->editAction($request, $entity->getId(), ignorePost: true);
                     }
                 }
             }
@@ -1024,7 +1024,7 @@ final class CompanyController extends AbstractFormController
     {
         $requestData = $request->request->all();
         $data        = $requestData['lead_batch_find_replace'] ?? $requestData['find_replace'] ?? [];
-        $ids         = json_decode($data['ids'] ?? '[]', true);
+        $ids         = json_decode($data['ids'] ?? '[]', associative: true);
         $fieldAlias  = $data['field'] ?? null;
         $updated     = [];
 

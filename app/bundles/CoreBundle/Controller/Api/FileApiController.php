@@ -65,7 +65,7 @@ final class FileApiController extends CommonApiController
     public function createAction(Request $request, PathsHelper $pathsHelper, $dir): Response
     {
         try {
-            $path = $this->getAbsolutePath($request, $pathsHelper, $dir, true);
+            $path = $this->getAbsolutePath($request, $pathsHelper, $dir, createDir: true);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }

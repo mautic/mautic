@@ -40,7 +40,7 @@ final class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignT
         $this->client->request(Request::METHOD_GET, "/api/contacts/{$contact->getId()}/campaigns");
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        $body = json_decode($clientResponse->getContent(), true);
+        $body = json_decode($clientResponse->getContent(), associative: true);
         $this->assertSame(1, $body['total'], (string) $clientResponse->getContent());
         $this->assertSame($campaign->getId(), $body['campaigns'][$campaign->getId()]['id'], (string) $clientResponse->getContent());
         $this->assertSame($campaign->getName(), $body['campaigns'][$campaign->getId()]['name'], (string) $clientResponse->getContent());
@@ -52,7 +52,7 @@ final class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignT
         $this->client->request(Request::METHOD_GET, "/api/campaigns/{$campaign->getId()}/contacts");
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        $body = json_decode($clientResponse->getContent(), true);
+        $body = json_decode($clientResponse->getContent(), associative: true);
         $this->assertSame(3, (int) $body['total']);
         $this->assertSame($contact->getId(), (int) $body['contacts'][2]['lead_id']);
 

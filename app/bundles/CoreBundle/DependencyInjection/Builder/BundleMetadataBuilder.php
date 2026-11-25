@@ -84,7 +84,7 @@ final class BundleMetadataBuilder
     private function buildPluginMetadata(string $namespace, string $symfonyBundle): array
     {
         $relativePath  = $this->paths['plugins'].'/'.$symfonyBundle;
-        $metadataArray = $this->getMetadata(true, $namespace, $symfonyBundle, $symfonyBundle, $relativePath);
+        $metadataArray = $this->getMetadata(isPlugin: true, namespace: $namespace, symfonyBundle: $symfonyBundle, bundleName: $symfonyBundle, relativePath: $relativePath);
 
         $metadata = new BundleMetadata($metadataArray);
         $this->completMetadata($metadata);
@@ -96,7 +96,7 @@ final class BundleMetadataBuilder
     {
         $bundleName    = str_replace('Mautic', '', $symfonyBundle);
         $relativePath  = $this->paths['bundles'].'/'.$bundleName;
-        $metadataArray = $this->getMetadata(false, $namespace, $symfonyBundle, $bundleName, $relativePath);
+        $metadataArray = $this->getMetadata(isPlugin: false, namespace: $namespace, symfonyBundle: $symfonyBundle, bundleName: $bundleName, relativePath: $relativePath);
 
         $metadata = new BundleMetadata($metadataArray);
         $this->completMetadata($metadata);

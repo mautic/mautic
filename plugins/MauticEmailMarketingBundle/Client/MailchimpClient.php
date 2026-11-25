@@ -141,7 +141,7 @@ readonly class MailchimpClient
         }
 
         // Errors come back as problem details
-        if ($response->getStatusCode() >= 400 && !in_array($data['title'] ?? null, $acceptedErrors, true)) {
+        if ($response->getStatusCode() >= 400 && !in_array($data['title'] ?? null, $acceptedErrors, strict: true)) {
             throw new ApiException((string) ($data['detail'] ?? $data['title'] ?? 'Mailchimp returned HTTP '.$response->getStatusCode().'.'));
         }
 

@@ -59,7 +59,7 @@ final class PublishStateService
     {
         return $this->filterRangesForState(
             $this->generatePublishStateDateRanges($campaign),
-            false
+            published: false
         );
     }
 
@@ -71,7 +71,7 @@ final class PublishStateService
     public function getLastPublishDate(Campaign $campaign): ?\DateTimeInterface
     {
         $eventLogCreatedDateRanges        = $this->generatePublishStateDateRanges($campaign);
-        $publishOnlyStates                = $this->filterRangesForState($eventLogCreatedDateRanges, true);
+        $publishOnlyStates                = $this->filterRangesForState($eventLogCreatedDateRanges, published: true);
 
         if ([] === $publishOnlyStates) {
             return null; // The campaign has never been published

@@ -264,7 +264,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
             if ($val instanceof Project) {
                 // Add project if not already in the list
                 $projectName = $val->getName();
-                if (!in_array($projectName, $this->changes['projects']['new'], true)) {
+                if (!in_array($projectName, $this->changes['projects']['new'], strict: true)) {
                     $this->changes['projects']['new'][] = $projectName;
                 }
             } else {

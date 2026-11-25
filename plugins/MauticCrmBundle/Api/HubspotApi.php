@@ -40,7 +40,7 @@ final class HubspotApi extends CrmApi
         if (isset($request['status']) && 'error' == $request['status']) {
             $message = $request['message'];
             if (isset($request['validationResults'])) {
-                $message .= " \n ".print_r($request['validationResults'], true);
+                $message .= " \n ".print_r($request['validationResults'], return: true);
             }
             if (isset($request['validationResults'][0]['error']) && 'PROPERTY_DOESNT_EXIST' == $request['validationResults'][0]['error']) {
                 $this->createProperty($request['validationResults'][0]['name']);
@@ -51,7 +51,7 @@ final class HubspotApi extends CrmApi
         }
 
         if (isset($request['error']) && 401 == $request['error']['code']) {
-            $response = json_decode($request['error']['message'] ?? null, true);
+            $response = json_decode($request['error']['message'] ?? null, associative: true);
 
             if (isset($response)) {
                 throw new ApiErrorException($response['message'], $request['error']['code']);

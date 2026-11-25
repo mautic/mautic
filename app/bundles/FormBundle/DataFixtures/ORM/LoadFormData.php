@@ -160,7 +160,7 @@ final class LoadFormData extends Fixture implements OrderedFixtureInterface
                         $form = $this->formEntities[$val];
                         $field->setForm($form);
                         $form->addField($count, $field);
-                    } elseif (in_array($col, ['customParameters', 'properties'], true)) {
+                    } elseif (in_array($col, ['customParameters', 'properties'], strict: true)) {
                         $val = Serializer::decode(stripslashes($val));
                         $field->{$setter}($val);
                     } else {

@@ -577,7 +577,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         // remove control characters that will break json_decode from parsing
         $data = preg_replace('/[[:cntrl:]]/', '', $data);
-        if (!$parsed = json_decode($data, true)) {
+        if (!$parsed = json_decode($data, associative: true)) {
             parse_str($data, $parsed);
         }
 
@@ -1655,10 +1655,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         if (is_object($data)) {
             // Convert to array in all levels
-            $data = json_encode(json_decode($data, true));
+            $data = json_encode(json_decode($data, associative: true));
         } elseif (is_string($data)) {
             // Assume JSON
-            $data = json_decode($data, true);
+            $data = json_decode($data, associative: true);
         }
 
         // Match that data with mapped lead fields

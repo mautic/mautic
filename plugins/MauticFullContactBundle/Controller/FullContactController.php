@@ -136,7 +136,7 @@ final class FullContactController extends FormController
             $ids = $data['ids'];
 
             if (!is_array($ids)) {
-                $ids = json_decode($ids, true);
+                $ids = json_decode($ids, associative: true);
             }
 
             if (is_array($ids) && count($ids)) {
@@ -377,7 +377,7 @@ final class FullContactController extends FormController
             $ids = $data['ids'];
 
             if (!is_array($ids)) {
-                $ids = json_decode($ids, true);
+                $ids = json_decode($ids, associative: true);
             }
 
             if (is_array($ids) && count($ids)) {

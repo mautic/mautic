@@ -359,7 +359,7 @@ final class TypeOperatorSubscriber
         $form        = $event->getForm();
         $constraints = [];
 
-        if (in_array($event->getOperator(), [OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP], true)) {
+        if (in_array($event->getOperator(), [OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP], strict: true)) {
             $constraints[] = new DbRegex();
         }
 

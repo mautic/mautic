@@ -174,7 +174,7 @@ final readonly class FormSubscriber
 
         if ($config['copy_lead'] && !empty($leadEmail)) {
             // Send copy to lead
-            $this->setMailer($config, $tokens, [$leadEmail => null], $lead, false);
+            $this->setMailer($config, $tokens, [$leadEmail => null], $lead, internalSend: false);
 
             $this->mailer->send(true);
         }
@@ -361,7 +361,7 @@ final readonly class FormSubscriber
      */
     private function decodeBody(string $raw)
     {
-        if ($json = json_decode($raw, true)) {
+        if ($json = json_decode($raw, associative: true)) {
             return $json;
         }
 

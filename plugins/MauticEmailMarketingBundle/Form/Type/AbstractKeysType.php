@@ -45,7 +45,7 @@ abstract class AbstractKeysType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         foreach ($this->getKeys() as $key => $label) {
-            $isSecret = in_array($key, $this->getSecretKeys(), true);
+            $isSecret = in_array($key, $this->getSecretKeys(), strict: true);
 
             $builder->add(
                 $key,

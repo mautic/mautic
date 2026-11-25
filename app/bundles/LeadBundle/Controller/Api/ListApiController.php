@@ -104,7 +104,7 @@ final class ListApiController extends CommonApiController
         $response   = parent::getEntitiesAction($request, $userHelper);
 
         if ($withCounts && $response instanceof Response && Response::HTTP_OK === $response->getStatusCode()) {
-            $content = json_decode($response->getContent(), true);
+            $content = json_decode($response->getContent(), associative: true);
 
             if (isset($content['lists']) && is_array($content['lists'])) {
                 $segmentIds = array_column($content['lists'], 'id');

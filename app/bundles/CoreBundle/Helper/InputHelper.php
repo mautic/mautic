@@ -405,7 +405,7 @@ final class InputHelper
             // Check for non-ASCII characters
             $hasUnicode = mb_check_encoding($value, 'UTF-8') && preg_match('/[^\x00-\x7F]/', $value);
 
-            $value = self::getFilter(true)->clean($value, $hasUnicode ? 'raw' : 'html');
+            $value = self::getFilter(html: true)->clean($value, $hasUnicode ? 'raw' : 'html');
 
             // After cleaning encode the value
             $value = $hasUnicode ? rawurldecode($value) : $value;
@@ -462,7 +462,7 @@ final class InputHelper
             }
         }
 
-        return self::getFilter(true, true)->clean($value, 'html');
+        return self::getFilter(html: true, strict: true)->clean($value, 'html');
     }
 
     /**
@@ -482,7 +482,7 @@ final class InputHelper
     public static function transliterateFilename(string $filename): string
     {
         $pathInfo = pathinfo($filename);
-        $filename = self::alphanum(self::transliterate($pathInfo['filename']), false, '-');
+        $filename = self::alphanum(self::transliterate($pathInfo['filename']), urldecode: false, convertSpacesTo: '-');
         if (isset($pathInfo['extension'])) {
             $filename .= '.'.$pathInfo['extension'];
         }

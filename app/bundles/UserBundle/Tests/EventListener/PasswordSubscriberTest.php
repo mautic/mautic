@@ -57,7 +57,7 @@ final class PasswordSubscriberTest extends TestCase
     #[DoesNotPerformAssertions]
     public function testThatItDoesntThrowExceptionIfPasswordIsStrong(): void
     {
-        $passwordStrengthBadge = new PasswordStrengthBadge(uniqid('password_strength', true));
+        $passwordStrengthBadge = new PasswordStrengthBadge(uniqid('password_strength', more_entropy: true));
 
         $this->passwordSubscriber->checkPassport(
             new CheckPassportEvent(

@@ -65,7 +65,7 @@ final class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
         // Test API response
         $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
         $clientResponse = $this->client->getResponse();
-        $result         = json_decode($clientResponse->getContent(), true);
+        $result         = json_decode($clientResponse->getContent(), associative: true);
         $this->assertEquals(1, $result['totalResults']);
         $this->assertEquals([
             [

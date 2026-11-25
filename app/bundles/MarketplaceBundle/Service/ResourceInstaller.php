@@ -237,7 +237,7 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
         $scheme = strtolower((string) ($parts['scheme'] ?? ''));
         $host   = (string) ($parts['host'] ?? '');
 
-        if ('' === $host || !\in_array($scheme, $this->debug ? ['http', 'https'] : ['https'], true)) {
+        if ('' === $host || !\in_array($scheme, $this->debug ? ['http', 'https'] : ['https'], strict: true)) {
             throw new \RuntimeException(\sprintf('Refusing to download "%s": expected an absolute https URL.', $url));
         }
 
@@ -375,7 +375,7 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
             return [];
         }
 
-        $data = json_decode(file_get_contents($path), true);
+        $data = json_decode(file_get_contents($path), associative: true);
 
         if (!is_array($data)) {
             return [];

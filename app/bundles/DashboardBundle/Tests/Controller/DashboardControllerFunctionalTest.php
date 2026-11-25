@@ -106,7 +106,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $content = $response->getContent();
         $this->assertJson($content);
 
-        $data = json_decode($content, true);
+        $data = json_decode($content, associative: true);
         $this->assertIsArray($data);
         $this->assertArrayHasKey('success', $data);
         $this->assertSame(1, $data['success']);
@@ -143,7 +143,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $content = $this->client->getResponse()->getContent();
         $this->assertJson($content);
 
-        $data = json_decode($content, true);
+        $data = json_decode($content, associative: true);
         $this->assertIsArray($data);
         $this->assertArrayHasKey('success', $data);
         $this->assertSame(1, $data['success']);
@@ -187,7 +187,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $content = $response->getContent();
         $this->assertJson($content);
 
-        $data = json_decode($content, true);
+        $data = json_decode($content, associative: true);
         $this->assertIsArray($data);
         $this->assertArrayHasKey('success', $data);
         $this->assertSame(1, $data['success']);
@@ -222,7 +222,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/dashboard/widget/{$widget->getId()}");
         $this->assertResponseIsSuccessful();
-        $printResponse = fn (): string => print_r(json_decode($this->client->getResponse()->getContent(), true), true);
+        $printResponse = fn (): string => print_r(json_decode($this->client->getResponse()->getContent(), associative: true), return: true);
         $this->assertStringContainsString('created', $printResponse());
         $this->assertStringContainsString('deleted', $printResponse());
     }

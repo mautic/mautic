@@ -32,22 +32,22 @@ final class PointEventHelperTest extends TestCase
             ],
         ];
 
-        $emailModel = $this->getMockEmail(true, true);
+        $emailModel = $this->getMockEmail(published: true, success: true);
         $helper     = new PointEventHelper($emailModel);
         $result     = $helper->sendEmail($event, $lead);
         $this->assertEquals(true, $result);
 
-        $emailModel = $this->getMockEmail(false, true);
+        $emailModel = $this->getMockEmail(published: false, success: true);
         $helper     = new PointEventHelper($emailModel);
         $result     = $helper->sendEmail($event, $lead);
         $this->assertEquals(false, $result);
 
-        $emailModel = $this->getMockEmail(true, false);
+        $emailModel = $this->getMockEmail(published: true, success: false);
         $helper     = new PointEventHelper($emailModel);
         $result     = $helper->sendEmail($event, $lead);
         $this->assertEquals(false, $result);
 
-        $emailModel = $this->getMockEmail(true, false);
+        $emailModel = $this->getMockEmail(published: true, success: false);
         $helper     = new PointEventHelper($emailModel);
         $result     = $helper->sendEmail($event, new Lead());
         $this->assertEquals(false, $result);

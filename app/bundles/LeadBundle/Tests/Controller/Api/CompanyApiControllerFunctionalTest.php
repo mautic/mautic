@@ -80,7 +80,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
 
         // Assert status codes
         $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0]);
@@ -105,7 +105,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][0]);
         $this->assertEquals($companyId1, $response['companies'][0]['id']);
@@ -126,7 +126,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0]);
         $this->assertNotEquals($companyId1, $response['companies'][0]['id']);
@@ -142,7 +142,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/companies/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $companyId      = $response['company']['id'];
 
         $this->assertEquals($payload['companyname'], $response['company']['fields']['all']['companyname']);
@@ -150,7 +150,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         // Lets try to create the same company
         $this->client->request(Request::METHOD_POST, '/api/companies/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertEquals($companyId, $response['company']['id']);
 
@@ -162,7 +162,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         // Lets try to create the new company because use unique fields with AND operator
         $this->client->request(Request::METHOD_POST, '/api/companies/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertNotEquals($companyId, $response['company']['id']);
     }
@@ -191,7 +191,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame($expectedStatusCode);
 
         if (Response::HTTP_CREATED === $expectedStatusCode) {
-            $responseData = json_decode($response->getContent(), true);
+            $responseData = json_decode($response->getContent(), associative: true);
 
             $this->assertIsArray($responseData);
             $this->assertArrayHasKey('id', $responseData);
@@ -244,7 +244,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/companies/new', $payload);
 
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         foreach ($payload as $alias => $value) {
             $this->assertEquals($value, $response['company']['fields']['all'][$alias]);
@@ -285,7 +285,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/companies/batch/new', $payload);
 
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         // Assert status codes
         $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0]);
@@ -713,7 +713,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $content = $this->client->getResponse()->getContent();
         $this->assertNotFalse($content);
 
-        return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        return json_decode($content, associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
     }
 
     /**

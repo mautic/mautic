@@ -120,7 +120,7 @@ final class WebhookControllerTest extends TestCase
         }
 
         $this->assertNotFalse($leadPayloadJson);
-        $leadPayload = json_decode($leadPayloadJson, true, 512, JSON_THROW_ON_ERROR);
+        $leadPayload = json_decode($leadPayloadJson, associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
         $this->assertIsArray($leadPayload);
 
         $this->assertArrayHasKey(0, $leadPayload);

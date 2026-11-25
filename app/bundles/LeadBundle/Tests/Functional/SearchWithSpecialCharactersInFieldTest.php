@@ -20,7 +20,7 @@ final class SearchWithSpecialCharactersInFieldTest extends AbstractSearchTestCas
 
         // URL-encode the ampersand: R&D becomes R%26D
         $response = $this->performSearch('/s/ajax?action=globalSearch&global_search=R%26D&tmp=list');
-        $content  = \json_decode($response->getContent(), true);
+        $content  = \json_decode($response->getContent(), associative: true);
         $crawler  = new Crawler($content['newContent'], $this->client->getInternalRequest()->getUri());
 
         // Assert that the contact name 'R&D' appears in the search results (html encoded)

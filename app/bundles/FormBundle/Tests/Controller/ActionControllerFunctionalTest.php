@@ -54,7 +54,7 @@ final class ActionControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $content    = $this->client->getResponse()->getContent();
-        $actionHtml = json_decode($content, true)['actionHtml'] ?? null;
+        $actionHtml = json_decode($content, associative: true)['actionHtml'] ?? null;
         $this->assertNotNull($actionHtml, $content);
         $crawler  = new Crawler($actionHtml);
         $editPage = $crawler->filter('.btn-edit')->attr('href');

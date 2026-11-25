@@ -54,7 +54,7 @@ final readonly class TimelineSubscriber
      */
     private function getEventEntry(array $log, string $eventType, string $eventTypeName): array
     {
-        $properties = json_decode($log['properties'], true);
+        $properties = json_decode($log['properties'], associative: true);
 
         return [
             'event'           => $eventType,

@@ -256,7 +256,7 @@ final class ImportController extends AbstractStandardFormController
                     $this->removeImportFile($fullPath);
                     $this->logger->log(LogLevel::INFO, "Import for file {$fullPath} failed with: {$e->getMessage()}.");
 
-                    return $this->newAction($request, true);
+                    return $this->newAction($request, ignorePost: true);
                 }
 
                 break;
@@ -266,7 +266,7 @@ final class ImportController extends AbstractStandardFormController
                 break;
 
             case self::STEP_IMPORT_FROM_CSV:
-                ignore_user_abort(true);
+                ignore_user_abort(enable: true);
 
                 $inProgress = $this->requestStack->getSession()->get('mautic.'.$object.'.import.inprogress', false);
                 $checks     = $this->requestStack->getSession()->get('mautic.'.$object.'.import.progresschecks', 1);
@@ -311,7 +311,7 @@ final class ImportController extends AbstractStandardFormController
                 $reason = isset($form) ? 'the form is empty' : 'the form was canceled';
                 $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was aborted because {$reason}.");
 
-                return $this->newAction($request, true);
+                return $this->newAction($request, ignorePost: true);
             }
 
             $valid = $this->isFormValid($form);
@@ -365,7 +365,7 @@ final class ImportController extends AbstractStandardFormController
                                     $this->requestStack->getSession()->set('mautic.'.$object.'.import.progress', [0, $linecount]);
                                     $this->requestStack->getSession()->set('mautic.'.$object.'.import.original.file', $fileData->getClientOriginalName());
 
-                                    return $this->newAction($request, true);
+                                    return $this->newAction($request, ignorePost: true);
                                 }
                             } catch (FileException $e) {
                                 if (str_contains($e->getMessage(), 'upload_max_filesize')) {
@@ -406,7 +406,7 @@ final class ImportController extends AbstractStandardFormController
                         $this->removeImportFile($fullPath);
                         $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was aborted as there were no matched files found.");
 
-                        return $this->newAction($request, true);
+                        return $this->newAction($request, ignorePost: true);
                     }
 
                     /** @var Import $import */
@@ -447,7 +447,7 @@ final class ImportController extends AbstractStandardFormController
                         return $this->indexAction($request);
                     }
 
-                    return $this->newAction($request, true);
+                    return $this->newAction($request, ignorePost: true);
                 default:
                     // Done or something wrong
 

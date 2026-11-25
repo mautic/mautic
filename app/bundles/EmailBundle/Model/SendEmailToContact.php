@@ -128,7 +128,7 @@ final class SendEmailToContact
 
         if (!$this->emailEntityId) {
             // There was an error configuring the email so auto fail
-            $this->failContact(false, $this->emailEntityErrors);
+            $this->failContact(hasBadEmail: false, errorMessages: $this->emailEntityErrors);
         }
 
         $this->mailer->setTokens($tokens);
@@ -141,7 +141,7 @@ final class SendEmailToContact
             }
         } catch (BatchQueueMaxException) {
             // Queue full so flush then try again
-            $this->flush(false);
+            $this->flush(resetMailer: false);
 
             if (!$this->mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
                 $this->failContact();
@@ -165,7 +165,7 @@ final class SendEmailToContact
         // queue or send the message
         if (!$success) {
             unset($errors['failures']);
-            $this->failContact(false, implode('; ', (array) $errors));
+            $this->failContact(hasBadEmail: false, errorMessages: implode('; ', (array) $errors));
         }
     }
 

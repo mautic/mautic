@@ -41,7 +41,7 @@ final readonly class RemoveDeletedFilesStep implements StepInterface
         $progressBar->setMessage($this->translator->trans('mautic.core.update.remove.deleted.files'));
         $progressBar->advance();
 
-        $deletedFiles = json_decode(file_get_contents($this->appRoot.'/deleted_files.txt'), true);
+        $deletedFiles = json_decode(file_get_contents($this->appRoot.'/deleted_files.txt'), associative: true);
 
         // Before looping over the deleted files, add in our upgrade specific files
         $deletedFiles += ['deleted_files.txt', 'upgrade.php'];

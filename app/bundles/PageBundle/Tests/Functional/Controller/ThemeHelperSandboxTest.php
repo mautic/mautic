@@ -234,7 +234,7 @@ final class ThemeHelperSandboxTest extends MauticMysqlTestCase
         $name = 'sandbox_test_'.uniqid();
         $dir  = $this->themesDir.'/'.$name;
 
-        mkdir($dir.'/html', 0777, true);
+        mkdir($dir.'/html', 0777, recursive: true);
 
         file_put_contents($dir.'/config.json', json_encode([
             'name'     => $name,

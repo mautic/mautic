@@ -49,7 +49,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $typeSafePayload = $this->generateTypeSafePayload($payload);
         $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', $typeSafePayload);
         $clientResponse = $this->client->getResponse();
-        $fieldResponse  = json_decode($clientResponse->getContent(), true);
+        $fieldResponse  = json_decode($clientResponse->getContent(), associative: true);
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED, $clientResponse->getContent());
         $this->assertTrue($fieldResponse['field']['isPublished']);
@@ -86,10 +86,10 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertPatchResponse($payload, $id, $alias);
 
         // Test deleting
-        $this->assertDeleteResponse($payload, $id, $alias, true);
+        $this->assertDeleteResponse($payload, $id, $alias, isBackground: true);
 
         // Test deleting field if used in segment is not allowed.
-        $this->assertDeleteEntityActionFieldUsedInSegment(true);
+        $this->assertDeleteEntityActionFieldUsedInSegment(isBackground: true);
     }
 
     public function testFieldApiEndpointsWithBackgroundProcessingDisabled(): void
@@ -106,10 +106,10 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertPatchResponse($payload, $id, $alias);
 
         // Test deleting
-        $this->assertDeleteResponse($payload, $id, $alias, false);
+        $this->assertDeleteResponse($payload, $id, $alias, isBackground: false);
 
         // Test deleting field if used in segment is not allowed.
-        $this->assertDeleteEntityActionFieldUsedInSegment(false);
+        $this->assertDeleteEntityActionFieldUsedInSegment(isBackground: false);
     }
 
     /**
@@ -131,7 +131,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $typeSafePayload = $this->generateTypeSafePayload($payload);
         $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', $typeSafePayload);
         $clientResponse = $this->client->getResponse();
-        $errorResponse  = json_decode($clientResponse->getContent(), true);
+        $errorResponse  = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertArrayHasKey('errors', $errorResponse);
         self::assertResponseStatusCodeSame($errorResponse['errors'][0]['code']);
@@ -218,7 +218,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId());
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $responseJson = \json_decode($clientResponse->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
 
         $this->assertArrayHasKey('contact', $responseJson);
         $this->assertArrayHasKey('fields', $responseJson['contact']);
@@ -238,7 +238,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             $updatedValues
         );
         $clientResponse = $this->client->getResponse();
-        $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $responseJson   = \json_decode($clientResponse->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
         $this->assertArrayHasKey('contact', $responseJson);
         $this->assertArrayHasKey('fields', $responseJson['contact']);
         $this->assertArrayHasKey('core', $responseJson['contact']['fields']);
@@ -258,7 +258,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             $updatedValues
         );
         $clientResponse = $this->client->getResponse();
-        $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $responseJson   = \json_decode($clientResponse->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
         $this->assertArrayHasKey('contact', $responseJson);
         $this->assertArrayHasKey('fields', $responseJson['contact']);
         $this->assertArrayHasKey('core', $responseJson['contact']['fields']);
@@ -328,7 +328,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId());
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $responseJson = \json_decode($clientResponse->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
 
         $this->assertArrayHasKey('contact', $responseJson);
         $this->assertArrayHasKey('fields', $responseJson['contact']);
@@ -348,7 +348,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             $updatedValues
         );
         $clientResponse = $this->client->getResponse();
-        $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $responseJson   = \json_decode($clientResponse->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
         $this->assertArrayHasKey('contact', $responseJson);
         $this->assertArrayHasKey('fields', $responseJson['contact']);
         $this->assertArrayHasKey('core', $responseJson['contact']['fields']);
@@ -368,7 +368,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             $updatedValues
         );
         $clientResponse = $this->client->getResponse();
-        $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $responseJson   = \json_decode($clientResponse->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
         $this->assertArrayHasKey('contact', $responseJson);
         $this->assertArrayHasKey('fields', $responseJson['contact']);
         $this->assertArrayHasKey('core', $responseJson['contact']['fields']);
@@ -396,7 +396,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $typeSafePayload = $this->generateTypeSafePayload($payload);
         $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', $typeSafePayload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         // should be "accepted" if pushed to the background; otherwise "created"
         $this->assertEquals($expectedStatusCode, $clientResponse->getStatusCode());
@@ -425,7 +425,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         // Test get and that the field was published
         $this->client->request(Request::METHOD_GET, sprintf('/api/fields/contact/%s', $id));
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
 
         // Assert that the fields returned are what is expected and the field is now published
@@ -444,7 +444,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_PATCH, sprintf('/api/fields/contact/%s/edit', $id), $typeSafePayload);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
 
         // Assert that the fields returned are what is expected noting that certain fields should not be editable
         foreach ($payload as $key => $value) {
@@ -468,7 +468,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_DELETE, sprintf('/api/fields/contact/%s/delete', $id));
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
 
         // Assert that the fields returned are what is expected
         foreach ($payload as $key => $value) {

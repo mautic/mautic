@@ -67,7 +67,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testRoleUpdateByApiThroughAdminUserGivesSuccessResponse(): void
     {
         // Create admin role
-        $role = $this->createRole(true);
+        $role = $this->createRole(isAdmin: true);
         // Create admin user
         $user = $this->createUser($role);
         $this->em->flush();
@@ -222,7 +222,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         if (Response::HTTP_CREATED === $expectedStatusCode) {
-            $responseData = json_decode($response->getContent(), true);
+            $responseData = json_decode($response->getContent(), associative: true);
 
             $this->assertIsArray($responseData);
             $this->assertArrayHasKey('id', $responseData);

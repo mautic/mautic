@@ -97,10 +97,10 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $crawler  = $this->client->request(Request::METHOD_GET, "s/company/graph/{$this->company1Id}");
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $body           = json_decode($response->getContent(), true);
+        $body           = json_decode($response->getContent(), associative: true);
         $crawler        = new Crawler($body['newContent']);
         $canvasJson     = trim($crawler->filter('canvas')->html());
-        $canvasData     = json_decode($canvasJson, true);
+        $canvasData     = json_decode($canvasJson, associative: true);
         $datasets       = $canvasData['datasets'] ?? [];
         $engagementData = $datasets[0]['data'] ?? [];
         $totalContacts  = array_sum($engagementData);
@@ -390,7 +390,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertSame('Retail', $companyB->getIndustry());
         $this->assertSame('Services', $companyC->getIndustry());
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('closeModal', $response, 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('2 companies affected', (string) $response['flashes']);
@@ -455,7 +455,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertSame('Retail', $companyF->getIndustry());
         $this->assertSame('Retail', $companyG->getIndustry());
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('closeModal', $response, 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('5 companies affected', (string) $response['flashes']);
@@ -650,7 +650,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
     private function createUserWithLeadPermissions(array $permissions): User
     {
         $role = new Role();
-        $role->setName('Company controller role '.uniqid('', true));
+        $role->setName('Company controller role '.uniqid('', more_entropy: true));
         $this->em->persist($role);
         $this->em->flush();
 

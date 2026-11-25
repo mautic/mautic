@@ -65,7 +65,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
         $this->dispatcher->dispatch($event);
 
         $fieldChanges = $this->fieldChangeRepository->findChangesForObject('unicorn', Lead::class, $contactReal->getId());
-        $this->assertCount(2, $fieldChanges, print_r($fieldChanges, true));
+        $this->assertCount(2, $fieldChanges, print_r($fieldChanges, return: true));
 
         $this->assertSame('unicorn', $fieldChanges[0]['integration']);
         $this->assertSame($contactReal->getId(), (int) $fieldChanges[0]['object_id']);

@@ -37,7 +37,7 @@ final class ImportDateValidationSubscriber
     )]
     public function onImportProcess(ImportProcessEvent $event): void
     {
-        if (!in_array($event->import->getObject(), ['lead', 'company'], true)) {
+        if (!in_array($event->import->getObject(), ['lead', 'company'], strict: true)) {
             return;
         }
         foreach ($this->getDateFields() as $alias => $type) {
@@ -57,7 +57,7 @@ final class ImportDateValidationSubscriber
      */
     private function validateDateTimeField(array $mappedData, array $rowData, string $alias, string $type): void
     {
-        $newAlias = array_search($alias, $mappedData, true);
+        $newAlias = array_search($alias, $mappedData, strict: true);
 
         if (false === $newAlias) {
             return;

@@ -253,7 +253,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
         $content = $this->client->getResponse()->getContent();
         $this->assertIsString($content);
 
-        $decodedContent = json_decode($content, true);
+        $decodedContent = json_decode($content, associative: true);
         $this->assertIsArray($decodedContent);
 
         return $decodedContent;

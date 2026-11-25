@@ -65,7 +65,7 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
             rename($stashedLogDir, $this->logDir);
         } elseif (!is_dir($this->logDir)) {
             // A test removed it and could not put it back; the suite still logs through it.
-            mkdir($this->logDir, 0777, true);
+            mkdir($this->logDir, 0777, recursive: true);
         }
 
         ini_set('memory_limit', $this->defaultMemoryLimit);

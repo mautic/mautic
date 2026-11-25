@@ -137,7 +137,7 @@ final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), (string) $response->getContent());
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
         $campaignId   = $responseData['campaign']['id'];
 
         $this->em->clear();
@@ -203,7 +203,7 @@ final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk(), $response->getContent());
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
 
@@ -229,7 +229,7 @@ final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk(), $response->getContent());
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
         $this->assertSame(1, $responseData['success'], (string) $response->getContent());
 
         return $responseData;

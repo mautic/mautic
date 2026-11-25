@@ -86,7 +86,7 @@ final class LookupHelper
             return;
         }
 
-        $fullcontact = $this->getFullContact(false);
+        $fullcontact = $this->getFullContact(person: false);
         if ($fullcontact instanceof FullContact_Company) {
             if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {

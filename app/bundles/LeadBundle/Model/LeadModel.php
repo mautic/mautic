@@ -279,7 +279,7 @@ class LeadModel extends FormModel
                     $entity->setFields($fields);
 
                     // Add the entity to the array to the right place.
-                    $entities = array_slice($entities, $i, 0, true) + [$entity->getId() => $entity] + $entities;
+                    $entities = array_slice($entities, $i, 0, preserve_keys: true) + [$entity->getId() => $entity] + $entities;
                 }
             }
         }
@@ -294,7 +294,7 @@ class LeadModel extends FormModel
      */
     protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
-        return $this->dispatchLeadEvent($action, $entity, $isNew, false);
+        return $this->dispatchLeadEvent($action, $entity, $isNew, alreadyProcessedInBatch: false);
     }
 
     protected function dispatchBatchEvent(string $action, array $entitiesBatchParams, ?Event $event = null): ?Event

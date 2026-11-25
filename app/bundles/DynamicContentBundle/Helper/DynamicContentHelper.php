@@ -70,7 +70,7 @@ final readonly class DynamicContentHelper
             $leadArray = $this->convertLeadToArray($lead);
         }
 
-        $dwcs = $this->getDwcsBySlotName($slotName, true);
+        $dwcs = $this->getDwcsBySlotName($slotName, publishedOnly: true);
         /** @var DynamicContent $dwc */
         foreach ($dwcs as $dwc) {
             if ($dwc->getIsCampaignBased()) {

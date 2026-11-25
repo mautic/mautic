@@ -137,7 +137,7 @@ final class PrivateAddressChecker
             $host = strtolower($parsedUrl['host']);
 
             // Check if the host is directly in allowed addresses
-            if (in_array($host, $this->allowedPrivateAddresses, true)) {
+            if (in_array($host, $this->allowedPrivateAddresses, strict: true)) {
                 return true;
             }
 
@@ -148,12 +148,12 @@ final class PrivateAddressChecker
 
             // If the host is an IP address, check if it's in allowed addresses
             if (filter_var($host, FILTER_VALIDATE_IP)) {
-                return in_array($host, $this->allowedPrivateAddresses, true);
+                return in_array($host, $this->allowedPrivateAddresses, strict: true);
             }
 
             $ips = $this->resolveHostName($host);
 
-            return array_any($ips, fn (string $ip): bool => in_array($ip, $this->allowedPrivateAddresses, true));
+            return array_any($ips, fn (string $ip): bool => in_array($ip, $this->allowedPrivateAddresses, strict: true));
         } catch (\Exception $e) {
             throw new \InvalidArgumentException('URL validation failed: '.$e->getMessage(), $e->getCode(), $e);
         }

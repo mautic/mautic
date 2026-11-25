@@ -145,7 +145,7 @@ final class ApiMetadataDriver implements DriverInterface
      */
     public function addListProperties(array $properties): static
     {
-        $this->addProperties($properties, true);
+        $this->addProperties($properties, addToListGroup: true);
 
         return $this;
     }

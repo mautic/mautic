@@ -36,7 +36,7 @@ final class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
             'success'     => 1,
             'views'       => 3,
             'uniqueViews' => 2,
-        ], json_decode($response->getContent(), true));
+        ], json_decode($response->getContent(), associative: true));
     }
 
     public function testClickThroughCount(): void
@@ -58,7 +58,7 @@ final class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([
             'success'      => 1,
             'clickThrough' => 2,
-        ], json_decode($response->getContent(), true));
+        ], json_decode($response->getContent(), associative: true));
     }
 
     private function createHit(Lead $lead): Hit

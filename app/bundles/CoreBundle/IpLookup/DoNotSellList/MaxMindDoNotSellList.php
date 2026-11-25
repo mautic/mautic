@@ -31,7 +31,7 @@ final class MaxMindDoNotSellList implements DoNotSellListInterface
 
         $json = file_get_contents($this->listPath);
 
-        if ($data = json_decode($json, true)) {
+        if ($data = json_decode($json, associative: true)) {
             $this->list = $data['exclusions'];
 
             return true;

@@ -651,29 +651,29 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');
 
-        if (in_array(1, $addTagsToContact, true)) {
+        if (in_array(1, $addTagsToContact, strict: true)) {
             $contact->addTag($tag1);
         }
 
-        if (in_array(2, $addTagsToContact, true)) {
+        if (in_array(2, $addTagsToContact, strict: true)) {
             $contact->addTag($tag2);
         }
 
-        if (in_array(3, $addTagsToContact, true)) {
+        if (in_array(3, $addTagsToContact, strict: true)) {
             $contact->addTag($tag3);
         }
 
         $tagSegment = [];
 
-        if (in_array(1, $addTagsToSegment, true)) {
+        if (in_array(1, $addTagsToSegment, strict: true)) {
             $tagSegment[] = $tag1->getId();
         }
 
-        if (in_array(2, $addTagsToSegment, true)) {
+        if (in_array(2, $addTagsToSegment, strict: true)) {
             $tagSegment[] = $tag2->getId();
         }
 
-        if (in_array(3, $addTagsToSegment, true)) {
+        if (in_array(3, $addTagsToSegment, strict: true)) {
             $tagSegment[] = $tag3->getId();
         }
 
@@ -766,15 +766,15 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');
 
         $contactValue = [];
-        if (in_array(1, $addFieldsToContact, true)) {
+        if (in_array(1, $addFieldsToContact, strict: true)) {
             $contactValue[] = 'halusky';
         }
 
-        if (in_array(2, $addFieldsToContact, true)) {
+        if (in_array(2, $addFieldsToContact, strict: true)) {
             $contactValue[] = 'bramborak';
         }
 
-        if (in_array(3, $addFieldsToContact, true)) {
+        if (in_array(3, $addFieldsToContact, strict: true)) {
             $contactValue[] = 'makovec';
         }
 
@@ -784,15 +784,15 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $segmentValue = [];
 
-        if (in_array(1, $addFieldsToSegment, true)) {
+        if (in_array(1, $addFieldsToSegment, strict: true)) {
             $segmentValue[] = 'halusky';
         }
 
-        if (in_array(2, $addFieldsToSegment, true)) {
+        if (in_array(2, $addFieldsToSegment, strict: true)) {
             $segmentValue[] = 'bramborak';
         }
 
-        if (in_array(3, $addFieldsToSegment, true)) {
+        if (in_array(3, $addFieldsToSegment, strict: true)) {
             $segmentValue[] = 'makovec';
         }
 
@@ -890,15 +890,15 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $segmentValue = [];
 
-        if (in_array(1, $addFieldsToSegment, true)) {
+        if (in_array(1, $addFieldsToSegment, strict: true)) {
             $segmentValue[] = 'halusky';
         }
 
-        if (in_array(2, $addFieldsToSegment, true)) {
+        if (in_array(2, $addFieldsToSegment, strict: true)) {
             $segmentValue[] = 'bramborak';
         }
 
-        if (in_array(3, $addFieldsToSegment, true)) {
+        if (in_array(3, $addFieldsToSegment, strict: true)) {
             $segmentValue[] = 'makovec';
         }
 
@@ -998,13 +998,13 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->createPrimaryCompanyForLead($contact, $company);
 
         $segmentValue = [];
-        if (in_array(1, $addFieldsToSegment, true)) {
+        if (in_array(1, $addFieldsToSegment, strict: true)) {
             $segmentValue[] = 'halusky';
         }
-        if (in_array(2, $addFieldsToSegment, true)) {
+        if (in_array(2, $addFieldsToSegment, strict: true)) {
             $segmentValue[] = 'bramborak';
         }
-        if (in_array(3, $addFieldsToSegment, true)) {
+        if (in_array(3, $addFieldsToSegment, strict: true)) {
             $segmentValue[] = 'makovec';
         }
 
@@ -1067,13 +1067,13 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $companyValue = [];
-        if (in_array(1, $addFieldsToCompany, true)) {
+        if (in_array(1, $addFieldsToCompany, strict: true)) {
             $companyValue[] = 'halusky';
         }
-        if (in_array(2, $addFieldsToCompany, true)) {
+        if (in_array(2, $addFieldsToCompany, strict: true)) {
             $companyValue[] = 'bramborak';
         }
-        if (in_array(3, $addFieldsToCompany, true)) {
+        if (in_array(3, $addFieldsToCompany, strict: true)) {
             $companyValue[] = 'makovec';
         }
 
@@ -1090,13 +1090,13 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->createPrimaryCompanyForLead($contact, $company);
 
         $segmentValue = [];
-        if (in_array(1, $addFieldsToSegment, true)) {
+        if (in_array(1, $addFieldsToSegment, strict: true)) {
             $segmentValue[] = 'halusky';
         }
-        if (in_array(2, $addFieldsToSegment, true)) {
+        if (in_array(2, $addFieldsToSegment, strict: true)) {
             $segmentValue[] = 'bramborak';
         }
-        if (in_array(3, $addFieldsToSegment, true)) {
+        if (in_array(3, $addFieldsToSegment, strict: true)) {
             $segmentValue[] = 'makovec';
         }
 
@@ -1143,29 +1143,29 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        if (in_array(1, $addSegmentsToContact, true)) {
+        if (in_array(1, $addSegmentsToContact, strict: true)) {
             $this->createListLead($segmentA, $contact);
         }
 
-        if (in_array(2, $addSegmentsToContact, true)) {
+        if (in_array(2, $addSegmentsToContact, strict: true)) {
             $this->createListLead($segmentB, $contact);
         }
 
-        if (in_array(3, $addSegmentsToContact, true)) {
+        if (in_array(3, $addSegmentsToContact, strict: true)) {
             $this->createListLead($segmentC, $contact);
         }
 
         $filteredSegments = [];
 
-        if (in_array(1, $addSegmentsToSegment, true)) {
+        if (in_array(1, $addSegmentsToSegment, strict: true)) {
             $filteredSegments[] = $segmentA->getId();
         }
 
-        if (in_array(2, $addSegmentsToSegment, true)) {
+        if (in_array(2, $addSegmentsToSegment, strict: true)) {
             $filteredSegments[] = $segmentB->getId();
         }
 
-        if (in_array(3, $addSegmentsToSegment, true)) {
+        if (in_array(3, $addSegmentsToSegment, strict: true)) {
             $filteredSegments[] = $segmentC->getId();
         }
 

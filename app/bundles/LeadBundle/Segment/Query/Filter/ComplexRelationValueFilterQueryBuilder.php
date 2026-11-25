@@ -112,7 +112,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                  */
                 $filterArray      = $filter->contactSegmentFilterCrate->getArray();
                 $originalOperator = $filterArray['operator'];
-                $applyIsNull      = in_array($originalOperator, [OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true);
+                $applyIsNull      = in_array($originalOperator, [OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], strict: true);
                 $applyNot         = OperatorOptions::EXCLUDING_ALL === $originalOperator;
 
                 $operator = 'regexp';
@@ -120,7 +120,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $operator = 'notRegexp';
                 }
 
-                if (in_array($originalOperator, [OperatorOptions::INCLUDING_ALL, OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true)) {
+                if (in_array($originalOperator, [OperatorOptions::INCLUDING_ALL, OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], strict: true)) {
                     $filterGlue = 'and';
                 } else {
                     $filterGlue = 'or';

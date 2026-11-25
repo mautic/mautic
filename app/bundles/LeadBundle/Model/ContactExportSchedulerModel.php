@@ -88,7 +88,7 @@ final class ContactExportSchedulerModel extends AbstractCommonModel
                 [
                     'column' => 'l.id',
                     'expr'   => 'in',
-                    'value'  => json_decode($ids, true, 512, JSON_THROW_ON_ERROR),
+                    'value'  => json_decode($ids, associative: true, depth: 512, flags: JSON_THROW_ON_ERROR),
                 ],
             ];
         } else {
@@ -227,7 +227,7 @@ final class ContactExportSchedulerModel extends AbstractCommonModel
 
     private function exportResultsAs(IteratorExportDataModel $iterator, string $fileType, string $fileName): string
     {
-        if (!in_array($fileType, $this->exportHelper->getSupportedExportTypes(), true)) {
+        if (!in_array($fileType, $this->exportHelper->getSupportedExportTypes(), strict: true)) {
             throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $fileType]));
         }
 

@@ -59,9 +59,9 @@ final class IcontactClientTest extends TestCase
         $client->subscribe(self::KEYS + ['accountId' => '1', 'clientFolderId' => '2'], '7', ['email' => 'john@example.com']);
 
         $this->assertSame('https://app.icontact.com/icp/a/1/c/2/contacts', $responses[0]->getRequestUrl());
-        $this->assertSame([['email' => 'john@example.com', 'status' => 'normal']], json_decode($responses[0]->getRequestOptions()['body'], true));
+        $this->assertSame([['email' => 'john@example.com', 'status' => 'normal']], json_decode($responses[0]->getRequestOptions()['body'], associative: true));
         $this->assertSame('https://app.icontact.com/icp/a/1/c/2/subscriptions', $responses[1]->getRequestUrl());
-        $this->assertSame([['status' => 'normal', 'listId' => '7', 'contactId' => '99']], json_decode($responses[1]->getRequestOptions()['body'], true));
+        $this->assertSame([['status' => 'normal', 'listId' => '7', 'contactId' => '99']], json_decode($responses[1]->getRequestOptions()['body'], associative: true));
     }
 
     public function testErrorsAreReported(): void

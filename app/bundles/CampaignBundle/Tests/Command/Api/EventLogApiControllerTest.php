@@ -119,7 +119,7 @@ final class EventLogApiControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_PUT, '/api/campaigns/events/batch/edit', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertCount(1, $response['events'][$event1->getId()]['contactLog']);
         $this->assertCount(2, $response['events'][$event2->getId()]['contactLog']);

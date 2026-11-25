@@ -254,14 +254,14 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
     private function getPackageDetail(): PackageDetail
     {
-        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), true);
+        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), associative: true);
 
         return PackageDetail::fromArray($payload['package']);
     }
 
     private function getResourcePackageDetail(): PackageDetail
     {
-        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail_resource.json'), true);
+        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail_resource.json'), associative: true);
 
         return PackageDetail::fromArray($payload['package']);
     }

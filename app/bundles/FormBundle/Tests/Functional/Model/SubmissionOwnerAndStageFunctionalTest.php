@@ -84,7 +84,7 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $formId   = $response['form']['id'];
 
         $crawler = $this->client->request(Request::METHOD_GET, "/form/{$formId}");

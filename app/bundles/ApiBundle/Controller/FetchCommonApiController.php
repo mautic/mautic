@@ -470,7 +470,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     protected function getEntityDefaultProperties(object $entity): array
     {
         $class         = $entity::class;
-        $chain         = array_reverse(class_parents($entity), true) + [$class => $class];
+        $chain         = array_reverse(class_parents($entity), preserve_keys: true) + [$class => $class];
         $defaultValues = [];
 
         foreach ($chain as $class) {
@@ -701,7 +701,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         if ($data instanceof Paginator) {
             // Get iterator out of Paginator class so that the entities are properly serialized by the serializer
-            $data = iterator_to_array($data->getIterator(), true);
+            $data = iterator_to_array($data->getIterator(), preserve_keys: true);
         }
 
         $headers['Mautic-Version'] = $this->appVersion->getVersion();

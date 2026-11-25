@@ -201,7 +201,7 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
 
     private function createTempSvgFile(): UploadedFile
     {
-        $fileName = sprintf('test-image-svg-%s.svg', uniqid('', true));
+        $fileName = sprintf('test-image-svg-%s.svg', uniqid('', more_entropy: true));
         $filePath = sys_get_temp_dir().'/'.$fileName;
         $this->createSvgImage($filePath);
         $this->tempFilePaths[] = $filePath;
@@ -294,7 +294,7 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
      */
     private function getJsonResponse(Response $response): array
     {
-        return json_decode($response->getContent(), true);
+        return json_decode($response->getContent(), associative: true);
     }
 
     private function cleanupTempFiles(): void

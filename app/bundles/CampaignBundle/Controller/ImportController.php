@@ -295,7 +295,7 @@ final class ImportController extends AbstractFormController
             // Loop through importActions and clean UUIDs for 'create' actions
             foreach ($fileData as &$group) {
                 foreach ($importActions as $entityType => $entities) {
-                    if (in_array($entityType, [Event::ENTITY_NAME, Field::ENTITY_NAME, Action::ENTITY_NAME], true)) {
+                    if (in_array($entityType, [Event::ENTITY_NAME, Field::ENTITY_NAME, Action::ENTITY_NAME], strict: true)) {
                         continue;
                     }
                     if (!isset($group[$entityType])) {

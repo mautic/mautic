@@ -104,7 +104,7 @@ final class PublicController extends CommonFormController
 
         // This is a transport hint set by mautic-form JS to request messenger-style responses.
         // It must not be used for business/security decisions.
-        return in_array($messenger, [1, '1', true, 'true'], true);
+        return in_array($messenger, [1, '1', true, 'true'], strict: true);
     }
 
     /**
@@ -759,7 +759,7 @@ final class PublicController extends CommonFormController
     )]
     public function lookupCompanyAction(Request $request): JsonResponse
     {
-        $parameters = json_decode($request->getContent(), true);
+        $parameters = json_decode($request->getContent(), associative: true);
         $search     = InputHelper::clean($parameters['search'] ?? '');
         $formId     = (int) ($parameters['formId'] ?? 0);
 

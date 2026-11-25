@@ -51,7 +51,7 @@ final class LeadModelEngagementsLeadIdsFunctionalTest extends MauticMysqlTestCas
         $this->client->request('GET', '/api/contacts/activity', ['filters' => ['includeEvents' => self::TYPES, 'leadIds' => [$included->getId()]]]);
         self::assertResponseIsSuccessful();
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
         $events   = $response['events'];
         $this->assertSame(self::TYPES, array_values(array_intersect(self::TYPES, array_column($events, 'event'))));
         $this->assertCount(count(self::TYPES), $events);

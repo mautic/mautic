@@ -431,7 +431,7 @@ final class InstallServiceTest extends TestCase
     public function testPrepareDirectoriesLeavesAnExistingDirectoryAlone(): void
     {
         $projectDir = $this->createTempProjectDir();
-        mkdir($projectDir.'/var/logs', 0700, true);
+        mkdir($projectDir.'/var/logs', 0700, recursive: true);
         file_put_contents($projectDir.'/var/logs/mautic_prod.php', 'a log line');
 
         $this->stubPaths($projectDir);
@@ -458,7 +458,7 @@ final class InstallServiceTest extends TestCase
     public function testPrepareDirectoriesDoesNotThrowWhenTheParentIsReadOnly(): void
     {
         $projectDir = $this->createTempProjectDir();
-        mkdir($projectDir.'/var', 0700, true);
+        mkdir($projectDir.'/var', 0700, recursive: true);
         chmod($projectDir.'/var', 0500);
 
         if (is_writable($projectDir.'/var')) {
@@ -474,8 +474,8 @@ final class InstallServiceTest extends TestCase
 
     private function createTempProjectDir(): string
     {
-        $this->tempDir = sys_get_temp_dir().'/mautic_install_service_'.uniqid('', true);
-        mkdir($this->tempDir, 0700, true);
+        $this->tempDir = sys_get_temp_dir().'/mautic_install_service_'.uniqid('', more_entropy: true);
+        mkdir($this->tempDir, 0700, recursive: true);
 
         return $this->tempDir;
     }

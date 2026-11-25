@@ -504,7 +504,7 @@ final class LeadSubscriber
     private function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         if ([] !== $event->getLeadIds()) {
-            $this->addTimelineLeadDateEntries($event, $eventTypeKey, $eventTypeName, 'date_identified', 'ri-user-6-fill', -4, true);
+            $this->addTimelineLeadDateEntries($event, $eventTypeKey, $eventTypeName, 'date_identified', 'ri-user-6-fill', -4, featured: true);
 
             return;
         }
@@ -704,7 +704,7 @@ final class LeadSubscriber
             // Add the logs to the event array
             foreach ($imports['results'] as $import) {
                 if (is_string($import['properties'])) {
-                    $import['properties'] = json_decode($import['properties'], true);
+                    $import['properties'] = json_decode($import['properties'], associative: true);
                 }
                 $eventLabel = 'N/A';
                 if (!empty($import['properties']['file'])) {

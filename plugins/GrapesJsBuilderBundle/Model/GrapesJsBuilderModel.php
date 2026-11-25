@@ -136,7 +136,7 @@ final class GrapesJsBuilderModel extends AbstractCommonModel
             return null;
         }
 
-        $decoded = json_decode($editorState, true);
+        $decoded = json_decode($editorState, associative: true);
         if (JSON_ERROR_NONE === json_last_error() && is_array($decoded)) {
             return $decoded;
         }
@@ -154,7 +154,7 @@ final class GrapesJsBuilderModel extends AbstractCommonModel
         if (is_array($content)) {
             $normalizedContent = $content;
         } elseif (is_string($content)) {
-            $decodedContent = json_decode($content, true);
+            $decodedContent = json_decode($content, associative: true);
             if (JSON_ERROR_NONE === json_last_error() && is_array($decodedContent)) {
                 $normalizedContent = $decodedContent;
             }

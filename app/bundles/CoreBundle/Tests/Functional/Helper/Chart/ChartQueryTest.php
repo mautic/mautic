@@ -49,7 +49,7 @@ final class ChartQueryTest extends MauticMysqlTestCase
         $dateTo   = new \DateTime('2023-01-30');
 
         $filter = '{"leadlist_id":{"value":"'.$segment->getId().'","list_column_name":"t.lead_id"},"t.leadlist_id":"'.$segment->getId().'"}';
-        $query  = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, json_decode($filter, true));
+        $query  = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, json_decode($filter, associative: true));
 
         // assume UTC 2023-01-30 23:49:59 is 2023-01-31 00:49:59 in UTC+1, then do not add it to graph
         $this->assertEmpty(array_filter($query->getAddedEventLogStats()));

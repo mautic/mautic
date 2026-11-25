@@ -243,14 +243,14 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                                 'StateType',
                                 'StatusType',
                                 'UniqueidentifierType',
-                            ], true)) {
+                            ], strict: true)) {
                                 continue;
                             }
                             if (in_array($fieldType, [
                                 'DoubleType',
                                 'IntegerType',
                                 'MoneyType',
-                            ], true)) {
+                            ], strict: true)) {
                                 $type = 'int';
                             } elseif ('Boolean' === $fieldType) {
                                 $type = 'boolean';

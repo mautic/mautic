@@ -63,7 +63,7 @@ final class SourceControllerUnitTest extends TestCase
         $response = $controller->newAction($request, 1);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $payload = json_decode((string) $response->getContent(), true);
+        $payload = json_decode((string) $response->getContent(), associative: true);
         $this->assertSame(1, $payload['success']);
         $this->assertSame(['lists' => [12 => true]], $payload['modifiedSources']);
         $this->assertSame('lists', $payload['sourceType']);
@@ -114,7 +114,7 @@ final class SourceControllerUnitTest extends TestCase
         $response = $controller->editAction($request, 1);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $payload = json_decode((string) $response->getContent(), true);
+        $payload = json_decode((string) $response->getContent(), associative: true);
         $this->assertSame(1, $payload['success']);
         $this->assertSame(['lists' => [12 => true, 15 => true]], $payload['modifiedSources']);
         $this->assertSame('lists', $payload['sourceType']);
@@ -138,7 +138,7 @@ final class SourceControllerUnitTest extends TestCase
 
         $response = $controller->deleteAction($request);
 
-        $payload = json_decode((string) $response->getContent(), true);
+        $payload = json_decode((string) $response->getContent(), associative: true);
         $this->assertSame(1, $payload['success']);
         $this->assertSame(1, $payload['deleted']);
         $this->assertSame('lists', $payload['sourceType']);
@@ -159,7 +159,7 @@ final class SourceControllerUnitTest extends TestCase
 
         $response = $controller->deleteAction($request);
 
-        $payload = json_decode((string) $response->getContent(), true);
+        $payload = json_decode((string) $response->getContent(), associative: true);
         $this->assertSame(['success' => 0], $payload);
     }
 

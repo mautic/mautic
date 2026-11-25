@@ -515,7 +515,7 @@ final class MailHelper
                     $this->message->addTo(new Address($email, $contact['name'] ?? ''));
                 }
 
-                $flushed = $this->send(false, true);
+                $flushed = $this->send(dispatchSendEvent: false, isQueueFlush: true);
 
                 // Merge errors
                 if (isset($this->errors['failures'])) {
@@ -1078,7 +1078,7 @@ final class MailHelper
      */
     public function setIdHash(?string $idHash = null, bool $statToBeGenerated = true): void
     {
-        $idHash ??= str_replace('.', '', uniqid('', true));
+        $idHash ??= str_replace('.', '', uniqid('', more_entropy: true));
 
         $this->idHash      = $idHash;
         $this->idHashState = $statToBeGenerated;
@@ -1383,7 +1383,7 @@ final class MailHelper
         $this->subjectInitial ??= $this->subject;
 
         // Reset body, text, subject and tokens, so the latter listeners use the same data as the former ones.
-        $this->setBody($this->bodyInitial['content'], $this->bodyInitial['contentType'], $this->bodyInitial['charset'], true);
+        $this->setBody($this->bodyInitial['content'], $this->bodyInitial['contentType'], $this->bodyInitial['charset'], ignoreTrackingPixel: true);
         $this->setPlainText($this->plainTextInitial);
         $this->setSubject($this->subjectInitial);
         $this->eventTokens = [];
@@ -1796,7 +1796,7 @@ final class MailHelper
         if (array_key_exists('List-Unsubscribe', $headers)) {
             unset($headers['List-Unsubscribe']);
             unset($headers['List-Unsubscribe-Post']);
-            $this->setCustomHeaders($headers, false);
+            $this->setCustomHeaders($headers, merge: false);
         }
     }
 

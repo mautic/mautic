@@ -240,7 +240,7 @@ SQL;
             ],
         ];
 
-        $this->mockGetLeadCount($queryResult, false);
+        $this->mockGetLeadCount($queryResult, addParam: false);
 
         $this->queryBuilderMock->expects($this->once())
             ->method('from')

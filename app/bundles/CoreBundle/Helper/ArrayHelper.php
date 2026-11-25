@@ -41,7 +41,7 @@ final class ArrayHelper
      */
     public static function select(array $keys, array $origin): array
     {
-        return array_filter($origin, fn ($value, $key): bool => in_array($key, $keys, true), ARRAY_FILTER_USE_BOTH);
+        return array_filter($origin, fn ($value, $key): bool => in_array($key, $keys, strict: true), ARRAY_FILTER_USE_BOTH);
     }
 
     /**
@@ -62,7 +62,7 @@ final class ArrayHelper
      */
     public static function sub(array $a1, array $b2): array
     {
-        return self::sumOrSub($a1, $b2, true);
+        return self::sumOrSub($a1, $b2, subtracted: true);
     }
 
     /**

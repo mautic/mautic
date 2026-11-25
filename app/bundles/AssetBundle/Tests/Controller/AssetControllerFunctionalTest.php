@@ -43,7 +43,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->configParams['site_url']                = 'https://site.tld';
         $this->configParams['allowed_extensions']      = ['jpg', 'zip', 'txt'];
 
-        if (in_array($this->name(), ['testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled', 'testCreateAndEditRemoteImageAssetWithQueryString'], true)) {
+        if (in_array($this->name(), ['testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled', 'testCreateAndEditRemoteImageAssetWithQueryString'], strict: true)) {
             $this->configParams['validate_remote_domains'] = true;
             $this->configParams['allowed_remote_domains']  = [
                 'first-allowed.tld',
@@ -103,7 +103,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     public function testCreateNewLocalZipAssetCanBeSaved(): void
     {
-        $tmpId         = uniqid('tmp_', true);
+        $tmpId         = uniqid('tmp_', more_entropy: true);
         $zipName       = 'ticket-15111.zip';
         $assetTitle    = 'Local ZIP asset '.uniqid();
         $tmpUploadFile = tempnam(sys_get_temp_dir(), 'asset_zip_');
@@ -127,7 +127,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         );
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        $uploadResponse = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $uploadResponse = json_decode((string) $this->client->getResponse()->getContent(), associative: true);
         $this->assertIsArray($uploadResponse);
         $this->assertArrayNotHasKey('error', $uploadResponse, (string) $this->client->getResponse()->getContent());
         $this->assertArrayHasKey('tmpFileName', $uploadResponse, (string) $this->client->getResponse()->getContent());
@@ -263,7 +263,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
-        $content = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $content = json_decode($response->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         $this->assertArrayHasKey('message', $content);
         $this->assertSame($translator->trans('mautic.asset.asset.batch_download.error.no_selection', [], 'flashes'), $content['message']);
@@ -284,7 +284,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
-        $content    = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $content    = json_decode((string) $this->client->getResponse()->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
         $translator = $this->getService(Translator::class);
 
         $this->assertSame(
@@ -313,7 +313,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         try {
             self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
-            $content    = json_decode((string) $response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+            $content    = json_decode((string) $response->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
             $translator = $this->getService(Translator::class);
 
             $this->assertSame(
@@ -384,7 +384,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
-        $content    = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $content    = json_decode((string) $this->client->getResponse()->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
         $translator = $this->getService(Translator::class);
 
         $this->assertSame(
@@ -583,7 +583,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
 
         // Decode JSON response
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
 
         // Assert the response contains expected keys
         $this->assertArrayHasKey('tmpFileName', $responseData);

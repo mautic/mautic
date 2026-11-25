@@ -204,7 +204,7 @@ trait MatchFilterForLeadTrait
             }
         }
 
-        return in_array(true, $groups);
+        return in_array(needle: true, haystack: $groups);
     }
 
     /**

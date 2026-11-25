@@ -257,7 +257,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
             ]
         );
         self::assertResponseStatusCodeSame(201, $this->client->getResponse()->getContent());
-        $contacts = json_decode($this->client->getResponse()->getContent(), true);
+        $contacts = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         // Create email with dynamic content variant
         $email          = $this->createEmail();
@@ -396,7 +396,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
     public function testPreviewDownloadPage(): void
     {
-        $email = $this->createEmail(false);
+        $email = $this->createEmail(publicPreview: false);
         $this->em->flush();
 
         $url = sprintf('/email/download/preview/%s', $email->getId());
@@ -432,7 +432,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $lead  = $this->createLead('Test');
         // Create non-admin role
         $permission = ['email:emails' => ['full'], 'lead:leads' => ['viewown', 'create']];
-        $role       = $this->createRole(false, $permission);
+        $role       = $this->createRole(isAdmin: false, permission: $permission);
         // Create permissions for the role
         $this->createPermission('lead:leads', $role, 34);
         $this->createPermission('email:emails', $role, 1024);
@@ -585,7 +585,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
      */
     private function createNonAdminUser(array $leadPermissions, int $leadBitwise): User
     {
-        $role = $this->createRole(false, ['email:emails' => ['full'], 'lead:leads' => $leadPermissions]);
+        $role = $this->createRole(isAdmin: false, permission: ['email:emails' => ['full'], 'lead:leads' => $leadPermissions]);
         $this->createPermission('lead:leads', $role, $leadBitwise);
         $this->createPermission('email:emails', $role, 1024);
         $user = $this->createUser($role);

@@ -46,14 +46,14 @@ final class SegmentOperatorQueryBuilderEvent extends Event
 
     public function operatorIsOneOf(string ...$operators): bool
     {
-        return in_array($this->filter->getOperator(), $operators, true);
+        return in_array($this->filter->getOperator(), $operators, strict: true);
     }
 
     public function addExpression(string|CompositeExpression $expression): void
     {
         $this->queryBuilder->addLogic($expression, $this->filter->getGlue());
 
-        $this->setOperatorHandled(true);
+        $this->setOperatorHandled(wasHandled: true);
     }
 
     /**

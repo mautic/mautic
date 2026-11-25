@@ -74,7 +74,7 @@ trait DashboardWidgetPermissionTrait
 
         $content = (string) $this->client->getResponse()->getContent();
         $this->assertJson($content);
-        $data = json_decode($content, true);
+        $data = json_decode($content, associative: true);
         $this->assertIsArray($data);
         $this->assertArrayHasKey('widgetHtml', $data);
 
@@ -91,7 +91,7 @@ trait DashboardWidgetPermissionTrait
             return 0;
         }
 
-        $chartData = json_decode(html_entity_decode(trim($matches[1])), true);
+        $chartData = json_decode(html_entity_decode(trim($matches[1])), associative: true);
         $this->assertIsArray($chartData);
 
         return (int) array_sum($chartData['datasets'][0]['data']);

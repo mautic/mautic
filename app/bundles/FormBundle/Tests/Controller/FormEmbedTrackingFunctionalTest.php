@@ -108,6 +108,6 @@ final class FormEmbedTrackingFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, (string) $this->client->getResponse()->getContent());
 
-        return (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
+        return (int) json_decode((string) $this->client->getResponse()->getContent(), associative: true)['form']['id'];
     }
 }

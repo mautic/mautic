@@ -16,7 +16,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             '/s/ajax?action=form:getFieldsForObject&mappedObject=company&mappedField=&formId=10'
         );
         $clientResponse = $this->client->getResponse();
-        $payload        = json_decode($clientResponse->getContent(), true);
+        $payload        = json_decode($clientResponse->getContent(), associative: true);
         self::assertResponseIsSuccessful();
 
         // Assert some random fields exist.

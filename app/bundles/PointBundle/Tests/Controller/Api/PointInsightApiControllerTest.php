@@ -30,7 +30,7 @@ final class PointInsightApiControllerTest extends MauticMysqlTestCase
         $createResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
-        $responseData = json_decode($createResponse->getContent(), true);
+        $responseData = json_decode($createResponse->getContent(), associative: true);
         $this->assertArrayHasKey('insight', $responseData);
         $createdData = $responseData['insight'];
         $this->assertArrayHasKey('id', $createdData);
@@ -45,7 +45,7 @@ final class PointInsightApiControllerTest extends MauticMysqlTestCase
         $getAllResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
-        $responseData = json_decode($getAllResponse->getContent(), true);
+        $responseData = json_decode($getAllResponse->getContent(), associative: true);
         $this->assertArrayHasKey('insights', $responseData);
         $this->assertEquals(1, $responseData['total']);
         $allData = $responseData['insights'];
@@ -63,7 +63,7 @@ final class PointInsightApiControllerTest extends MauticMysqlTestCase
         $updateResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
-        $responseData = json_decode($updateResponse->getContent(), true);
+        $responseData = json_decode($updateResponse->getContent(), associative: true);
         $this->assertArrayHasKey('insight', $responseData);
         $updatedData = $responseData['insight'];
         $this->assertEquals(self::UPDATED_NAME, $updatedData['name']);
@@ -72,7 +72,7 @@ final class PointInsightApiControllerTest extends MauticMysqlTestCase
         $deleteResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
-        $responseData = json_decode($deleteResponse->getContent(), true);
+        $responseData = json_decode($deleteResponse->getContent(), associative: true);
         $this->assertArrayHasKey('insight', $responseData);
         $deleteData = $responseData['insight'];
         $this->assertEquals(self::UPDATED_NAME, $deleteData['name']);
@@ -80,7 +80,7 @@ final class PointInsightApiControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/api/points/insights/{$createdData['id']}");
         $getResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-        $responseData = json_decode($getResponse->getContent(), true);
+        $responseData = json_decode($getResponse->getContent(), associative: true);
         $this->assertArrayHasKey('errors', $responseData);
         $this->assertCount(1, $responseData['errors']);
         $this->assertSame(Response::HTTP_NOT_FOUND, $responseData['errors'][0]['code']);

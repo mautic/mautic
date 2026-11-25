@@ -49,7 +49,7 @@ final class EventSchedulerExtendTriggerDateFunctionalTest extends MauticMysqlTes
         $this->em->flush();
 
         // Campaign was republished most recently NOW (this becomes lastPublishDate)
-        $this->createPublishAuditLog($campaign, new \DateTime('now'), true);
+        $this->createPublishAuditLog($campaign, new \DateTime('now'), isPublished: true);
 
         $event = new Event();
         $event->setName('Test Event');
@@ -115,7 +115,7 @@ final class EventSchedulerExtendTriggerDateFunctionalTest extends MauticMysqlTes
         $this->em->flush();
 
         // Campaign was published 3 days ago
-        $this->createPublishAuditLog($campaign, new \DateTime('-3 days'), true);
+        $this->createPublishAuditLog($campaign, new \DateTime('-3 days'), isPublished: true);
 
         $event = new Event();
         $event->setName('Test Event');

@@ -102,7 +102,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         if (!empty($response['errors'][0])) {
             $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
@@ -128,7 +128,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         // Edit PATCH:
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", ['name' => $expectedResponse['newName']]);
         $clientResponse = $this->client->getResponse();
-        $responsePatch  = json_decode($clientResponse->getContent(), true);
+        $responsePatch  = json_decode($clientResponse->getContent(), associative: true);
         $this->assertResponseIsSuccessful();
         $this->assertSame($formId, $responsePatch['form']['id'], 'ID of the created form does not match with the edited one.');
         $this->assertEquals($expectedResponse['newName'], $responsePatch['form']['name']);
@@ -267,7 +267,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $fieldCount = count($payload['fields']);
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertArrayHasKey('id', $response['form'], $clientResponse->getContent());
 
@@ -325,7 +325,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         ++$fieldCount;
 
         $this->assertResponseIsSuccessful($clientResponse->getContent());
@@ -341,7 +341,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload['postAction']  = 'return'; // Must be present for PUT as all empty values are being cleared.
         $this->client->request(Request::METHOD_PUT, "/api/forms/{$formId}/edit", $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertSame($formId, $response['form']['id']);
         $this->assertEquals($payload['name'], $response['form']['name']);
@@ -352,7 +352,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         // Get:
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}");
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertSame($formId, $response['form']['id']);
@@ -420,7 +420,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         // Delete:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertNull($response['form']['id']);
@@ -432,7 +432,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         // Get (ensure that the form is gone):
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}");
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND, $clientResponse->getContent());
         $this->assertSame(Response::HTTP_NOT_FOUND, $response['errors'][0]['code']);
@@ -446,12 +446,12 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/tags/new', $tag1Payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $tag1Id         = $response['tag']['id'];
 
         $this->client->request(Request::METHOD_POST, '/api/tags/new', $tag2Payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $tag2Id         = $response['tag']['id'];
 
         $payload = [
@@ -486,7 +486,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         // Create form with lead.changetags action:
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         if (!empty($response['errors'][0])) {
             $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
@@ -541,7 +541,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $lastValidFormId = $response['form']['id'];
         $this->assertGreaterThan(0, $lastValidFormId);
@@ -550,7 +550,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         // Get the last correctly saved form
         $this->client->request(Request::METHOD_GET, '/api/forms/'.$lastValidFormId);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertIsArray($response['form']);
         $this->assertCount(1, $response);
@@ -579,7 +579,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_PUT, '/api/forms/123/edit', $invalidPayload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $validationMessage = 'Another field is already using this alias: %alias%. Please choose another or leave it blank to have it autogenerated.';
         $expectedMessage   = str_replace('%alias%', substr($longAlias, 0, 25), $validationMessage);
@@ -645,7 +645,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $response       = json_decode($clientResponse->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         if (isset($response['errors'][0])) {
             $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
@@ -675,7 +675,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request(Request::METHOD_PATCH, '/api/forms/'.$formId.'/edit', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $response       = json_decode($clientResponse->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         if (isset($response['errors'][0])) {
             $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);

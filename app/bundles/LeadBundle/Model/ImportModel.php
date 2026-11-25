@@ -166,7 +166,7 @@ class ImportModel extends FormModel
      */
     public function beginImport(Import $import, Progress $progress, int $limit = 0, ?float $start = null): void
     {
-        $start ??= microtime(true);
+        $start ??= microtime(as_float: true);
 
         $this->setGhostImportsAsFailed();
 
@@ -238,7 +238,7 @@ class ImportModel extends FormModel
                         '%created%' => $import->getInsertedCount(),
                         '%updated%' => $import->getUpdatedCount(),
                         '%ignored%' => $import->getIgnoredCount(),
-                        '%time%'    => round(microtime(true) - $start, 2),
+                        '%time%'    => round(microtime(as_float: true) - $start, 2),
                     ]
                 ),
                 'info',

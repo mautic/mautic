@@ -125,7 +125,7 @@ final class LanguageHelper
     {
         $overrideFile = $this->coreParametersHelper->get('language_list_file');
         if (!empty($overrideFile) && is_readable($overrideFile)) {
-            $overrideData = json_decode(file_get_contents($overrideFile), true);
+            $overrideData = json_decode(file_get_contents($overrideFile), associative: true);
             if (isset($overrideData['languages'])) {
                 return $overrideData['languages'];
             }
@@ -138,7 +138,7 @@ final class LanguageHelper
 
         // Check if we have a cache file and try to return cached data if so
         if (!$overrideCache && is_readable($this->cacheFile)) {
-            $cacheData = json_decode(file_get_contents($this->cacheFile), true);
+            $cacheData = json_decode(file_get_contents($this->cacheFile), associative: true);
 
             // If we're within the cache time, return the cached data
             if ($cacheData['checkedTime'] > strtotime('-12 hours')) {
@@ -152,7 +152,7 @@ final class LanguageHelper
                 $this->coreParametersHelper->get('translations_list_url'),
                 [RequestOptions::TIMEOUT => 10]
             );
-            $manifest  = json_decode($data->getBody(), true);
+            $manifest  = json_decode($data->getBody(), associative: true);
             $languages = [];
 
             // translate the manifest (plain array) to a format
@@ -221,7 +221,7 @@ final class LanguageHelper
             ];
         }
 
-        $cacheData     = json_decode(file_get_contents($this->cacheFile), true);
+        $cacheData     = json_decode(file_get_contents($this->cacheFile), associative: true);
         $languageCode  = (string) $languageCode;
         $cacheLanguages = is_array($cacheData['languages'] ?? null) ? $cacheData['languages'] : [];
 
@@ -366,7 +366,7 @@ final class LanguageHelper
                 continue;
             }
 
-            $config                            = json_decode(file_get_contents($configFile), true);
+            $config                            = json_decode(file_get_contents($configFile), associative: true);
             $this->supportedLanguages[$locale] = (!empty($config['name'])) ? $config['name'] : $locale;
         }
     }
@@ -377,7 +377,7 @@ final class LanguageHelper
     public function getLanguageChoices(): array
     {
         // Get the list of available languages
-        $languages   = $this->fetchLanguages(false, false);
+        $languages   = $this->fetchLanguages(overrideCache: false, returnError: false);
         $choices     = [];
 
         foreach ($languages as $code => $langData) {

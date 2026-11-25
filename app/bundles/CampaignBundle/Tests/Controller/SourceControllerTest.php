@@ -48,7 +48,7 @@ final class SourceControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $json = json_decode($response->getContent(), true);
+        $json = json_decode($response->getContent(), associative: true);
         if (is_array($json)) {
             $this->assertArrayHasKey('success', $json, 'Response should contain success key');
             $this->assertArrayHasKey('mauticContent', $json, 'Response should contain mauticContent key');
@@ -75,7 +75,7 @@ final class SourceControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $json = json_decode($response->getContent(), true);
+        $json = json_decode($response->getContent(), associative: true);
         if (is_array($json)) {
             $this->assertArrayHasKey('success', $json, 'Response should contain success key');
             $this->assertJsonResponseEquals('success', 0, $json);
@@ -92,7 +92,7 @@ final class SourceControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $json = json_decode($response->getContent(), true);
+        $json = json_decode($response->getContent(), associative: true);
         if (is_array($json)) {
             $this->assertArrayHasKey('success', $json, 'Response should contain success key');
             $this->assertJsonResponseEquals('success', 0, $json);
@@ -123,7 +123,7 @@ final class SourceControllerTest extends MauticMysqlTestCase
         $responseContent = $clientResponse->getContent();
         $this->assertResponseIsSuccessful($responseContent);
 
-        $html = json_decode($responseContent, true)['newContent'];
+        $html = json_decode($responseContent, associative: true)['newContent'];
         $this->assertStringContainsString("<option value=\"{$form1->getId()}\">test ({$form1->getId()})</option>", (string) $html);
         $this->assertStringContainsString("<option value=\"{$form2->getId()}\">test ({$form2->getId()})</option>", (string) $html);
     }
@@ -136,7 +136,7 @@ final class SourceControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $json = json_decode($response->getContent(), true);
+        $json = json_decode($response->getContent(), associative: true);
         if (!is_array($json)) {
             $this->fail('Response is not valid JSON: '.$response->getContent());
         }
@@ -169,7 +169,7 @@ final class SourceControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $json = json_decode($response->getContent(), true);
+        $json = json_decode($response->getContent(), associative: true);
         if (!is_array($json)) {
             $this->fail('Response is not valid JSON: '.$response->getContent());
         }

@@ -48,7 +48,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
     public function loadChoiceList(?callable $value = null): ChoiceListInterface
     {
-        return new ArrayChoiceList($this->getChoices(null, true));
+        return new ArrayChoiceList($this->getChoices(null, includeNew: true));
     }
 
     /**

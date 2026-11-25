@@ -846,8 +846,8 @@ final class FormModelTest extends TestCase
      */
     private function getTestFormFields(): array
     {
-        $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
-        $fieldSession2         = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), more_entropy: true));
+        $fieldSession2         = 'mautic_'.sha1(uniqid((string) mt_rand(), more_entropy: true));
         $fields                = [];
         $fields[$fieldSession] = [
             'label'        => 'Email',

@@ -354,8 +354,8 @@ final class TrackableModel extends AbstractCommonModel
     protected function extractTrackablesFromHtml(string $html): array
     {
         // Find links using DOM to only find <a> tags
-        $libxmlPreviousState = libxml_use_internal_errors(true);
-        libxml_use_internal_errors(true);
+        $libxmlPreviousState = libxml_use_internal_errors(use_errors: true);
+        libxml_use_internal_errors(use_errors: true);
         $dom = new \DOMDocument();
         $dom->loadHTML('<?xml encoding="UTF-8">'.$html);
         libxml_clear_errors();
@@ -430,7 +430,7 @@ final class TrackableModel extends AbstractCommonModel
         $urlParts = parse_url($url);
 
         // We need to ignore not parsable and invalid urls
-        if (false === $urlParts || !$this->isValidUrl($urlParts, false)) {
+        if (false === $urlParts || !$this->isValidUrl($urlParts, forceScheme: false)) {
             return false;
         }
 
@@ -514,7 +514,7 @@ final class TrackableModel extends AbstractCommonModel
         if ($tokenizedHost) {
             $url = str_ireplace($token, $tokenValue, $tokenizedHost);
 
-            return $this->isValidUrl($url, false);
+            return $this->isValidUrl($url, forceScheme: false);
         }
 
         return $this->isValidUrl($tokenValue);

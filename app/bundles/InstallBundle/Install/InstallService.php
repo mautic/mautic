@@ -306,7 +306,7 @@ final readonly class InstallService
             $schemaHelper->validateDatabaseVersion();
 
             if ($schemaHelper->createDatabase()) {
-                $messages = $this->saveConfiguration($dbParams, $step, true);
+                $messages = $this->saveConfiguration($dbParams, $step, clearCache: true);
                 if ([] === $messages) {
                     return $messages;
                 }
@@ -528,7 +528,7 @@ final readonly class InstallService
             'site_url'   => $siteUrl,
         ];
 
-        return $this->saveConfiguration($finalConfigVars, null, true);
+        return $this->saveConfiguration($finalConfigVars, null, clearCache: true);
     }
 
     /**

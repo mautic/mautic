@@ -60,6 +60,6 @@ final readonly class VariableExpresserHelper implements VariableExpresserHelperI
             );
         }
 
-        throw new \InvalidArgumentException('Variable type for '.var_export($var, true).' not supported');
+        throw new \InvalidArgumentException('Variable type for '.var_export($var, return: true).' not supported');
     }
 }

@@ -109,7 +109,7 @@ trait CategoryListFiltersTrait
         } elseif (!is_string($updatedFilters)) {
             $filters = [];
         } else {
-            $decodedFilters = json_decode($updatedFilters, true);
+            $decodedFilters = json_decode($updatedFilters, associative: true);
             $filters        = [];
 
             if (is_array($decodedFilters)) {

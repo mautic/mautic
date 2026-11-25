@@ -49,7 +49,7 @@ final class SegmentCountCacheHelperTest extends TestCase
     public function testGetSegmentContactCount(): void
     {
         $segmentId = 1;
-        $cacheItem = $this->createCacheItem('segment.'.$segmentId.'.lead', 1, true);
+        $cacheItem = $this->createCacheItem('segment.'.$segmentId.'.lead', 1, isHit: true);
 
         $this->cacheProviderMock
             ->expects($this->once())
@@ -188,7 +188,7 @@ final class SegmentCountCacheHelperTest extends TestCase
     public function testDecrementSegmentContactCount(): void
     {
         $segmentId = 1;
-        $cacheItem = $this->createCacheItem('segment.'.$segmentId.'.lead', 5, true);
+        $cacheItem = $this->createCacheItem('segment.'.$segmentId.'.lead', 5, isHit: true);
 
         $this->cacheProviderMock
             ->method('hasItem')
@@ -218,7 +218,7 @@ final class SegmentCountCacheHelperTest extends TestCase
     public function testDecrementSegmentCountIsNotNegative(): void
     {
         $segmentId = 1;
-        $cacheItem = $this->createCacheItem('segment.'.$segmentId.'.lead', 0, true);
+        $cacheItem = $this->createCacheItem('segment.'.$segmentId.'.lead', 0, isHit: true);
 
         $this->cacheProviderMock
             ->expects($this->exactly(2))

@@ -55,8 +55,8 @@ final class SegmentSubscriberTest extends TestCase
 
     public function testOnSegmentPostSave(): void
     {
-        $this->onSegmentPostSaveMethodCall(false); // update segment log
-        $this->onSegmentPostSaveMethodCall(true); // create segment log
+        $this->onSegmentPostSaveMethodCall(isNew: false); // update segment log
+        $this->onSegmentPostSaveMethodCall(isNew: true); // create segment log
     }
 
     public function testOnSegmentPostDelete(): void

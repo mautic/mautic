@@ -42,7 +42,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
         // Set tracking_id on submission using direct SQL (simulates device tracking which doesn't work in functional tests)
         $submissions = $submissionRepo->findBy(['page' => $pageA]);
         $this->assertCount(1, $submissions);
-        $trackingId = hash('sha1', uniqid((string) random_int(0, mt_getrandmax()), true));
+        $trackingId = hash('sha1', uniqid((string) random_int(0, mt_getrandmax()), more_entropy: true));
 
         $this->connection->executeStatement(
             'UPDATE '.MAUTIC_TABLE_PREFIX.'form_submissions SET tracking_id = ? WHERE id = ?',

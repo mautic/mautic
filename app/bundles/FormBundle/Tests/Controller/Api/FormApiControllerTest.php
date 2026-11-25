@@ -30,7 +30,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame($expectedStatusCode);
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
 
         $this->assertArrayHasKey('form', $responseData);
         $this->assertArrayHasKey('id', $responseData['form']);
@@ -78,7 +78,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
 
         $this->assertArrayHasKey('form', $responseData);
         $this->assertSame($form->getId(), $responseData['form']['id']);
@@ -123,7 +123,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
 
         // The form creation should be rejected due to duplicate aliases
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
 
         // Check for error response - could be either 'error' or 'errors' key depending on API format
         $this->assertTrue(
@@ -196,7 +196,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
         $this->assertCount(1, $responseData['form']['fields']);
         $this->assertSame('Updated Field 1', $responseData['form']['fields'][0]['label']);
     }

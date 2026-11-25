@@ -58,7 +58,7 @@ final class PublicController extends AbstractFormController
                  * Users enumeration - forgot password. Constant response time is 1s.
                  */
                 $desiredTime = 1.0;
-                $startTime   = microtime(true);
+                $startTime   = microtime(as_float: true);
 
                 try {
                     if (null !== $user) {
@@ -70,7 +70,7 @@ final class PublicController extends AbstractFormController
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset.error', [], 'error');
                 }
 
-                $endTime       = microtime(true);
+                $endTime       = microtime(as_float: true);
                 $executionTime = $endTime - $startTime;
 
                 if ($executionTime < $desiredTime) {

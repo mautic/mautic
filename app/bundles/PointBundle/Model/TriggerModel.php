@@ -165,7 +165,7 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
 
                 /** @var Lead $l */
                 foreach ($leads as $l) {
-                    if ($this->triggerEvent($event->convertToArray(), $l, true)) {
+                    if ($this->triggerEvent($event->convertToArray(), $l, force: true)) {
                         $log = new LeadTriggerLog();
                         $log->setIpAddress($ipAddress);
                         $log->setEvent($event);
@@ -403,7 +403,7 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
                     continue;
                 }
 
-                if ($this->triggerEvent($event, $lead, true)) {
+                if ($this->triggerEvent($event, $lead, force: true)) {
                     $log = new LeadTriggerLog();
                     $log->setIpAddress($ipAddress);
                     $log->setEvent($triggerEvent = $this->triggerEventRepository->find($event['id']));

@@ -19,7 +19,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest('GET', $uri);
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
         $form->setValues(
@@ -40,7 +40,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
         $this->assertSame($success, $responseData['success'], (string) $response->getContent());
 
         if ($expectedString) {

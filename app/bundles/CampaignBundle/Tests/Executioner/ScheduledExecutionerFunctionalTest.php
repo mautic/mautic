@@ -308,7 +308,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
 
     public function testSpecificEventsWithUnpublishedCampaign(): void
     {
-        $campaign = $this->createCampaign(false);
+        $campaign = $this->createCampaign(published: false);
         $event    = $this->createEvent($campaign);
         $contact  = $this->createContact();
 

@@ -271,9 +271,9 @@ trait FilterTrait
 
                 if ('select' === $fieldType) {
                     // array_unshift cannot be used because numeric values get lost as keys
-                    $choices     = array_reverse($choices, true);
+                    $choices     = array_reverse($choices, preserve_keys: true);
                     $choices[''] = '';
-                    $choices     = array_reverse($choices, true);
+                    $choices     = array_reverse($choices, preserve_keys: true);
                 }
 
                 $customOptions['choices']                   = $choices;

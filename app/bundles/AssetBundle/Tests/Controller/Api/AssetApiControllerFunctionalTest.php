@@ -46,7 +46,7 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(201, $clientResponse->getContent());
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $this->assertEquals($payload['title'], $response['asset']['title']);
         $this->assertEquals($payload['storageLocation'], $response['asset']['storageLocation']);
         $this->assertStringContainsString('application/pdf', (string) $response['asset']['mime']);
@@ -134,7 +134,7 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(201, $clientResponse->getContent());
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $this->assertEquals($payload['title'], $response['asset']['title']);
         $this->assertEquals($payload['storageLocation'], $response['asset']['storageLocation']);
         $this->assertStringContainsString('text/plain', (string) $response['asset']['mime']);
@@ -185,7 +185,7 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $createResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(201, $createResponse->getContent());
 
-        $createdAsset = json_decode($createResponse->getContent(), true);
+        $createdAsset = json_decode($createResponse->getContent(), associative: true);
         $assetId      = $createdAsset['asset']['id'];
         $this->assertNotEmpty($assetId);
 

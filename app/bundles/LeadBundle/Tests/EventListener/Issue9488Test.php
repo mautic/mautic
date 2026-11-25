@@ -92,7 +92,7 @@ final class Issue9488Test extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $this->contacts);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $response       = json_decode($clientResponse->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());

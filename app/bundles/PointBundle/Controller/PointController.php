@@ -181,7 +181,7 @@ final class PointController extends AbstractFormController
                         $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $entity->getId(), true);
+                        return $this->editAction($request, $entity->getId(), ignorePost: true);
                     }
                 }
             } else {

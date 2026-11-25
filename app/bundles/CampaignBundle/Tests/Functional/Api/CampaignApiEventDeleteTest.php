@@ -52,7 +52,7 @@ final class CampaignApiEventDeleteTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/api/campaigns/{$campaign->getId()}");
         $this->assertResponseIsSuccessful();
 
-        $data   = json_decode($this->client->getResponse()->getContent(), true);
+        $data   = json_decode($this->client->getResponse()->getContent(), associative: true);
         $events = $data['campaign']['events'];
 
         // Step 2: Remove last event with array_pop (exactly like API Library test)

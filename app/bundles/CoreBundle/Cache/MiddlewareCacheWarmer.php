@@ -54,7 +54,7 @@ final class MiddlewareCacheWarmer implements CacheWarmerInterface
         }
 
         if (false === file_exists($cacheDirectory)) {
-            mkdir($cacheDirectory, 0777, true);
+            mkdir($cacheDirectory, 0777, recursive: true);
         }
 
         $data  = [];
@@ -65,7 +65,7 @@ final class MiddlewareCacheWarmer implements CacheWarmerInterface
             $data[] = $middleware->getName();
         }
 
-        $content = sprintf('<?php return %s;', var_export($data, true));
+        $content = sprintf('<?php return %s;', var_export($data, return: true));
 
         file_put_contents($this->cacheFile, $content);
     }

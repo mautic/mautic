@@ -200,7 +200,7 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
     private function createForm(array $payload): array
     {
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
-        $response  = json_decode($this->client->getResponse()->getContent(), true);
+        $response  = json_decode($this->client->getResponse()->getContent(), associative: true);
         $formId    = $response['form']['id'];
         $formAlias = $response['form']['alias'];
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);

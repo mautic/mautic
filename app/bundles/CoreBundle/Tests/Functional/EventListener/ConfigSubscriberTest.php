@@ -132,7 +132,7 @@ final class ConfigSubscriberTest extends MauticMysqlTestCase
         $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         if (!file_exists($newFolder)) {
-            mkdir($newFolder, 0777, true);
+            mkdir($newFolder, 0777, recursive: true);
         }
 
         $crawler = $this->setImagePathRequest('media/newFolder');

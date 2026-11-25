@@ -460,7 +460,7 @@ final class PublicController extends CommonFormController
     ): Response {
         if (null !== $formContent && '' !== $formContent) {
             $viewParams['content'] = $formContent;
-            if (in_array('form', $config['features'], true)) {
+            if (in_array('form', $config['features'], strict: true)) {
                 $contentTemplate = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
             } else {
                 $viewParams['content']       = '';

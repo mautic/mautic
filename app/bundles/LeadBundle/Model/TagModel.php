@@ -257,7 +257,7 @@ class TagModel extends FormModel
             }
 
             if (is_array($value)) {
-                $properties[$key] = in_array($key, self::TAG_PROPERTY_KEYS, true)
+                $properties[$key] = in_array($key, self::TAG_PROPERTY_KEYS, strict: true)
                     ? $this->replaceTagValues($value, $oldValue, $newValue)
                     : $this->replaceTagValuesInConfiguredProperties($value, $oldValue, $newValue);
             }

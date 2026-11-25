@@ -49,7 +49,7 @@ final class LeadListRepository extends CommonRepository
 
     public function getSoftDeletedEntity(int $id): ?LeadList
     {
-        return $this->getSingleEntity($id, false);
+        return $this->getSingleEntity($id, ignoreDeleted: false);
     }
 
     /**

@@ -133,7 +133,7 @@ final class SMimeHelper
                 $decryptedContent = $this->encryptionHelper->decrypt($encryptedContent);
 
                 // Create a temporary file with a unique hash
-                $tempKeyPath = sys_get_temp_dir().'/mautic_smime_'.md5($fromEmail.uniqid('', true)).'.pem';
+                $tempKeyPath = sys_get_temp_dir().'/mautic_smime_'.md5($fromEmail.uniqid('', more_entropy: true)).'.pem';
                 file_put_contents($tempKeyPath, $decryptedContent);
                 chmod($tempKeyPath, 0600); // Secure the temporary file
 

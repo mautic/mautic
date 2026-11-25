@@ -266,7 +266,7 @@ final class UserController extends AbstractFormController
                 ],
             ]);
         } elseif ($valid) {
-            $response = $this->editAction($request, $languageHelper, $samlHelper, $user->getId(), true);
+            $response = $this->editAction($request, $languageHelper, $samlHelper, $user->getId(), ignorePost: true);
         }
 
         return $response;

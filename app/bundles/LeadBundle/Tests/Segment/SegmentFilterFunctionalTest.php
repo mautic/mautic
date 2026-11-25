@@ -112,7 +112,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         // Create:
         $this->client->request(Request::METHOD_POST, '/api/segments/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         if (!empty($response['errors'][0])) {
             $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);

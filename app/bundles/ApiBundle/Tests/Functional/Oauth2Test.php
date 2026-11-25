@@ -131,7 +131,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         );
 
         self::assertResponseIsSuccessful();
-        $payload     = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $payload     = json_decode($this->client->getResponse()->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
         $accessToken = $payload['access_token'];
         $this->assertNotEmpty($accessToken);
 

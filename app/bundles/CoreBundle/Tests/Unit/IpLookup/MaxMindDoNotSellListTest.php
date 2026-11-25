@@ -126,7 +126,7 @@ final class MaxMindDoNotSellListTest extends TestCase
 
         $this->assertSame($this->goodFilePath, $doNotSellList->getListPath());
 
-        $goodData = json_decode($this->goodData, true)['exclusions'];
+        $goodData = json_decode($this->goodData, associative: true)['exclusions'];
         $this->assertEquals($goodData, $doNotSellList->getList());
 
         $this->assertTrue($doNotSellList->valid());

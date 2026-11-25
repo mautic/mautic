@@ -57,7 +57,7 @@ final class MailchimpClientTest extends TestCase
                 'merge_fields'  => ['FNAME' => 'John'],
                 'email_address' => 'john@example.com',
             ],
-            json_decode($response->getRequestOptions()['body'], true)
+            json_decode($response->getRequestOptions()['body'], associative: true)
         );
     }
 

@@ -98,7 +98,7 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         // Assert that emails were sent successfully
         $this->assertEquals(1, $response['success']);

@@ -234,7 +234,7 @@ final class MessageQueueModel extends FormModel
             foreach ($channelMessages as $messageChannelId => $messages) {
                 $event  = new MessageQueueBatchProcessEvent($messages, $messageChannel, $messageChannelId);
                 $ignore = null;
-                $this->dispatchEvent('process_batch_message_queue', $ignore, false, $event);
+                $this->dispatchEvent('process_batch_message_queue', $ignore, isNew: false, event: $event);
             }
         }
         unset($byChannel);
@@ -244,7 +244,7 @@ final class MessageQueueModel extends FormModel
         foreach ($queue as $message) {
             if (!$message->isProcessed()) {
                 $event = new MessageQueueProcessEvent($message);
-                $this->dispatchEvent('process_message_queue', $message, false, $event);
+                $this->dispatchEvent('process_message_queue', $message, isNew: false, event: $event);
             }
 
             if ($message->isSuccess()) {

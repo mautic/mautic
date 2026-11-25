@@ -69,7 +69,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/api/contacts?search=segment:group-a-points-gte1');
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $this->assertSame(1, (int) $response['total']);
         $contactIds = array_column($response['contacts'], 'id');
         $this->assertContains($contactA->getId(), $contactIds);

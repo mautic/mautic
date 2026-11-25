@@ -549,7 +549,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        return $this->finishRebuild($leadList, $leadsProcessed, $batchLimiters, true);
+        return $this->finishRebuild($leadList, $leadsProcessed, $batchLimiters, knownComplete: true);
     }
 
     /**

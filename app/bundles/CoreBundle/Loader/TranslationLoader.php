@@ -81,7 +81,7 @@ final class TranslationLoader extends ArrayLoader implements LoaderInterface
     {
         $iniFile  = $file->getRealpath();
         $content  = file_get_contents($iniFile);
-        $messages = parse_ini_string($content, true);
+        $messages = parse_ini_string($content, process_sections: true);
         if (false === $messages) {
             // The translation file is corrupt
             if ('dev' === MAUTIC_ENV) {

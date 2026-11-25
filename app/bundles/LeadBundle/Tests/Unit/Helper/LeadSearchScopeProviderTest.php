@@ -69,7 +69,7 @@ final class LeadSearchScopeProviderTest extends SearchScopeProviderTestCase
         $this->assertTrue($byCommand['custom_field']['indent'] ?? false);
 
         $commands = array_column($scopes, 'command');
-        $this->assertGreaterThan(array_search('instagram', $commands, true), array_search('custom_field', $commands, true));
-        $this->assertGreaterThan(array_search('segment', $commands, true), array_search('custom_field', $commands, true));
+        $this->assertGreaterThan(array_search('instagram', $commands, strict: true), array_search('custom_field', $commands, strict: true));
+        $this->assertGreaterThan(array_search('segment', $commands, strict: true), array_search('custom_field', $commands, strict: true));
     }
 }

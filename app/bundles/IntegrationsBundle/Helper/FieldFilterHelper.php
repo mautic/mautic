@@ -60,7 +60,7 @@ final class FieldFilterHelper
     {
         $offset = ($page - 1) * $limit;
 
-        return array_slice($fields, $offset, $limit, true);
+        return array_slice($fields, $offset, $limit, preserve_keys: true);
     }
 
     /**

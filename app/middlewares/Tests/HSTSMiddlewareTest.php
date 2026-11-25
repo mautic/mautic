@@ -49,7 +49,7 @@ final class HSTSMiddlewareTest extends AbstractMauticTestCase
 
     public function testHSTSEnabled(): void
     {
-        $this->setHSTS(true);
+        $this->setHSTS(value: true);
         $response = $this->getMiddlewareResponse();
 
         $this->assertTrue($response->headers->has(self::HSTS_KEY), 'Strict-Transport-Security is enabled but is missing from the response headers');
@@ -57,7 +57,7 @@ final class HSTSMiddlewareTest extends AbstractMauticTestCase
 
     public function testHSTSDisabled(): void
     {
-        $this->setHSTS(false);
+        $this->setHSTS(value: false);
         $response = $this->getMiddlewareResponse();
 
         $this->assertFalse($response->headers->has(self::HSTS_KEY), 'Strict-Transport-Security is disabled but is present in response headers');
@@ -66,8 +66,8 @@ final class HSTSMiddlewareTest extends AbstractMauticTestCase
     public function testIncludeSubdomainsEnabled(): void
     {
         $needle = 'includeSubDomains';
-        $this->setHSTS(true);
-        $this->setIncludeDubDomainsValue(true);
+        $this->setHSTS(value: true);
+        $this->setIncludeDubDomainsValue(value: true);
         $response = $this->getMiddlewareResponse();
 
         $this->assertStringContainsString($needle, (string) $response->headers->get(self::HSTS_KEY), 'Option include Subdomains is enabled but is missing from the HSTS value');
@@ -76,8 +76,8 @@ final class HSTSMiddlewareTest extends AbstractMauticTestCase
     public function testIncludeSubdomainsDisabled(): void
     {
         $needle = 'includeSubDomains';
-        $this->setHSTS(true);
-        $this->setIncludeDubDomainsValue(false);
+        $this->setHSTS(value: true);
+        $this->setIncludeDubDomainsValue(value: false);
 
         $response = $this->getMiddlewareResponse();
 
@@ -87,8 +87,8 @@ final class HSTSMiddlewareTest extends AbstractMauticTestCase
     public function testPreloadEnabled(): void
     {
         $needle = 'preload';
-        $this->setHSTS(true);
-        $this->setPreloadValue(true);
+        $this->setHSTS(value: true);
+        $this->setPreloadValue(value: true);
 
         $response = $this->getMiddlewareResponse();
 
@@ -98,8 +98,8 @@ final class HSTSMiddlewareTest extends AbstractMauticTestCase
     public function testPreloadDisabled(): void
     {
         $needle = 'preload';
-        $this->setHSTS(true);
-        $this->setPreloadValue(false);
+        $this->setHSTS(value: true);
+        $this->setPreloadValue(value: false);
 
         $response = $this->getMiddlewareResponse();
 
@@ -111,7 +111,7 @@ final class HSTSMiddlewareTest extends AbstractMauticTestCase
      */
     public function testExpireTime(): void
     {
-        $this->setHSTS(true);
+        $this->setHSTS(value: true);
         $expireTimeValue = 12345;
         $expireTime      = $this->middlewareReflection->getProperty('expireTime');
         $expireTime->setValue($this->middleware, $expireTimeValue);

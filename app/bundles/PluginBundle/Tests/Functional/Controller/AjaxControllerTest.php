@@ -60,7 +60,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
 
-        $data = json_decode($response->getContent(), true);
+        $data = json_decode($response->getContent(), associative: true);
         $this->assertSame(1, $data['success']);
 
         $session = $this->client->getRequest()->getSession();

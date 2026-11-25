@@ -293,7 +293,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
             ]
         );
         self::assertResponseStatusCodeSame(201, $this->client->getResponse()->getContent());
-        $contacts = json_decode($this->client->getResponse()->getContent(), true);
+        $contacts = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
@@ -385,7 +385,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
             ]
         );
         self::assertResponseStatusCodeSame(201, $this->client->getResponse()->getContent());
-        $contacts = json_decode($this->client->getResponse()->getContent(), true);
+        $contacts = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');

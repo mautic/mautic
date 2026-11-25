@@ -240,7 +240,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 $entityToNotDetach = [Integration::class, Plugin::class];
                 $loadedEntities    = $this->em->getUnitOfWork()->getIdentityMap();
                 foreach ($loadedEntities as $name => $loadedEntitySet) {
-                    if (in_array($name, $entityToNotDetach, true)) {
+                    if (in_array($name, $entityToNotDetach, strict: true)) {
                         continue;
                     }
 
@@ -267,10 +267,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     {
         if (is_object($data)) {
             // Convert to array in all levels
-            $data = json_encode(json_decode($data, true));
+            $data = json_encode(json_decode($data, associative: true));
         } elseif (is_string($data)) {
             // Assume JSON
-            $data = json_decode($data, true);
+            $data = json_decode($data, associative: true);
         }
         $config        = $this->mergeConfigToFeatureSettings([]);
         $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
@@ -334,10 +334,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     {
         if (is_object($data)) {
             // Convert to array in all levels
-            $data = json_encode(json_decode($data, true));
+            $data = json_encode(json_decode($data, associative: true));
         } elseif (is_string($data)) {
             // Assume JSON
-            $data = json_decode($data, true);
+            $data = json_decode($data, associative: true);
         }
         $config = $this->mergeConfigToFeatureSettings([]);
         // Match that data with mapped lead fields

@@ -150,7 +150,7 @@ class CampaignSubscriber
 
         foreach ($batches as $batch) {
             $sendNotification = $batch['sendNotification'];
-            $playerIdsChunks  = array_chunk($batch['playerIds'], static::MAX_PLAYER_IDS_PER_REQUEST, true);
+            $playerIdsChunks  = array_chunk($batch['playerIds'], static::MAX_PLAYER_IDS_PER_REQUEST, preserve_keys: true);
 
             foreach ($playerIdsChunks as $playerIdsChunk) {
                 $playerIds = array_keys($playerIdsChunk);

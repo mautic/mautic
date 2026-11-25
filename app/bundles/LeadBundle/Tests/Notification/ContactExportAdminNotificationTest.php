@@ -22,10 +22,10 @@ final class ContactExportAdminNotificationTest extends TestCase
 {
     public function testRequestedNotifiesOtherPublishedAdmins(): void
     {
-        $requestingUser         = $this->createUser(10, 'Requester User', 'requester@example.com', true);
-        $otherAdmin             = $this->createUser(11, 'Admin User', 'admin@example.com', true, true);
-        $sameAdmin              = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
-        $inactiveAdmin          = $this->createUser(12, 'Inactive Admin', 'inactive@example.com', false, true);
+        $requestingUser         = $this->createUser(10, 'Requester User', 'requester@example.com', isPublished: true);
+        $otherAdmin             = $this->createUser(11, 'Admin User', 'admin@example.com', isPublished: true, isAdmin: true);
+        $sameAdmin              = $this->createUser(10, 'Requester User', 'requester@example.com', isPublished: true, isAdmin: true);
+        $inactiveAdmin          = $this->createUser(12, 'Inactive Admin', 'inactive@example.com', isPublished: false, isAdmin: true);
         $contactExportScheduler = new ContactExportScheduler()
             ->setUser($requestingUser)
             ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
@@ -99,11 +99,11 @@ final class ContactExportAdminNotificationTest extends TestCase
 
     public function testCompletedSendsSharedAdminEmailWithoutLink(): void
     {
-        $requestingUser         = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
-        $otherAdmin             = $this->createUser(11, 'Admin User', 'admin@example.com', true, true);
-        $thirdAdmin             = $this->createUser(14, 'Audit Admin', 'audit@example.com', true, true);
-        $sameAdmin              = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
-        $inactiveAdmin          = $this->createUser(12, 'Inactive Admin', 'inactive@example.com', false, true);
+        $requestingUser         = $this->createUser(10, 'Requester User', 'requester@example.com', isPublished: true, isAdmin: true);
+        $otherAdmin             = $this->createUser(11, 'Admin User', 'admin@example.com', isPublished: true, isAdmin: true);
+        $thirdAdmin             = $this->createUser(14, 'Audit Admin', 'audit@example.com', isPublished: true, isAdmin: true);
+        $sameAdmin              = $this->createUser(10, 'Requester User', 'requester@example.com', isPublished: true, isAdmin: true);
+        $inactiveAdmin          = $this->createUser(12, 'Inactive Admin', 'inactive@example.com', isPublished: false, isAdmin: true);
         $contactExportScheduler = new ContactExportScheduler()
             ->setUser($requestingUser)
             ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
@@ -185,7 +185,7 @@ final class ContactExportAdminNotificationTest extends TestCase
 
     public function testDoesNothingWhenDisabled(): void
     {
-        $requestingUser = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
+        $requestingUser = $this->createUser(10, 'Requester User', 'requester@example.com', isPublished: true, isAdmin: true);
 
         $contactExportScheduler = new ContactExportScheduler()
             ->setUser($requestingUser)

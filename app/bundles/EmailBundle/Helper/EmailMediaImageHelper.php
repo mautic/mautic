@@ -128,7 +128,7 @@ final readonly class EmailMediaImageHelper
         }
 
         $document = new \DOMDocument();
-        $previous = libxml_use_internal_errors(true);
+        $previous = libxml_use_internal_errors(use_errors: true);
         // LIBXML_NONET keeps entity resolution off the network.
         $loaded = $document->loadXML($contents, \LIBXML_NONET | \LIBXML_NOERROR | \LIBXML_NOWARNING);
         libxml_clear_errors();
@@ -171,7 +171,7 @@ final readonly class EmailMediaImageHelper
         }
 
         // data: is left alone otherwise — embedding a raster image that way is normal.
-        return \in_array($name, ['href', 'xlink:href', 'src'], true)
+        return \in_array($name, ['href', 'xlink:href', 'src'], strict: true)
             && 1 === preg_match('#^\s*(?:javascript:|data:text/html)#i', (string) $attribute->nodeValue);
     }
 

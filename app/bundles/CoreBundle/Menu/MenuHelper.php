@@ -142,7 +142,7 @@ final class MenuHelper
                 unset($this->orphans[$type][$key]);
             } elseif (isset($items['children'])) {
                 foreach ($items['children'] as $subItems) {
-                    $this->placeOrphans($subItems, false, $depth + 1, $type);
+                    $this->placeOrphans($subItems, appendOrphans: false, depth: $depth + 1, type: $type);
                 }
             }
         }

@@ -75,7 +75,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $formId   = $response['form']['id'];
 
         // Submit the form:
@@ -133,7 +133,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
-        $formId = json_decode($clientResponse->getContent(), true)['form']['id'];
+        $formId = json_decode($clientResponse->getContent(), associative: true)['form']['id'];
 
         $this->client->followRedirects(false);
         $this->client->request(Request::METHOD_POST, "/form/submit?formId={$formId}", [
@@ -249,7 +249,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $formId   = $response['form']['id'];
 
         $this->client->followRedirects(false);
@@ -306,7 +306,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $formId   = $response['form']['id'];
 
         $this->client->request(
@@ -359,7 +359,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $formId   = $response['form']['id'];
 
         // Add conditional state field dependent on the country field:
@@ -458,7 +458,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $formId         = $response['form']['id'];
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
@@ -552,7 +552,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $formId         = $response['form']['id'];
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
@@ -655,7 +655,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $formId         = $response['form']['id'];
 
         // Submit the form:
@@ -696,7 +696,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $formId         = $response['form']['id'];
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
@@ -763,7 +763,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $formId         = $response['form']['id'];
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
@@ -790,7 +790,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
         $this->assertResponseIsSuccessful();
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $submission     = $response['submissions'][0];
 
         $this->assertResponseIsSuccessful();
@@ -935,7 +935,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $formId         = $response['form']['id'];
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
@@ -1062,7 +1062,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Create the form
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $formId         = $response['form']['id'];
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
@@ -1086,7 +1086,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $submissionsData = json_decode($clientResponse->getContent(), true);
+        $submissionsData = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('total', $submissionsData);
         $this->assertArrayHasKey('submissions', $submissionsData);
         $this->assertGreaterThan(0, count($submissionsData['submissions']));
@@ -1118,7 +1118,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/api/contacts/{$contact['id']}/companies");
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $contactCompanies = json_decode($clientResponse->getContent(), true);
+        $contactCompanies = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('total', $contactCompanies);
         $this->assertArrayHasKey('companies', $contactCompanies);
         $this->assertCount(1, $contactCompanies['companies']);
@@ -1264,7 +1264,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'type'  => 'text',
         ]);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('field', $response);
         $contactCustomField = $response['field'];
 
@@ -1292,7 +1292,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Create the form
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $formId         = $response['form']['id'];
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
@@ -1316,7 +1316,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $submissionsData = json_decode($clientResponse->getContent(), true);
+        $submissionsData = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('total', $submissionsData);
         $this->assertArrayHasKey('submissions', $submissionsData);
         $this->assertGreaterThan(0, count($submissionsData['submissions']));
@@ -1338,7 +1338,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/api/contacts/{$submissionContact['id']}");
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $contactResponse = json_decode($clientResponse->getContent(), true);
+        $contactResponse = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('contact', $contactResponse);
         $contact = $contactResponse['contact'];
 
@@ -1475,7 +1475,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Create the form
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
-        $formId         = json_decode($clientResponse->getContent(), true)['form']['id'];
+        $formId         = json_decode($clientResponse->getContent(), associative: true)['form']['id'];
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
@@ -1495,7 +1495,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Verify submission
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
         $clientResponse  = $this->client->getResponse();
-        $submissionsData = json_decode($clientResponse->getContent(), true);
+        $submissionsData = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertResponseIsSuccessful();
         $this->assertArrayHasKey('submissions', $submissionsData);
@@ -1546,7 +1546,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
-        $responseData = json_decode($clientResponse->getContent(), true);
+        $responseData = json_decode($clientResponse->getContent(), associative: true);
         $formId       = $responseData['form']['id'];
 
         $submitPayload = [
@@ -1567,7 +1567,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
         $submissionsResponse = $this->client->getResponse();
-        $submissionsData     = json_decode($submissionsResponse->getContent(), true);
+        $submissionsData     = json_decode($submissionsResponse->getContent(), associative: true);
 
         $this->assertResponseIsSuccessful();
         $this->assertArrayHasKey('submissions', $submissionsData);
@@ -1600,7 +1600,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Ensure no additional submissions were created after hitting the limit.
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
         $finalSubmissionsResponse = $this->client->getResponse();
-        $finalSubmissionsData     = json_decode($finalSubmissionsResponse->getContent(), true);
+        $finalSubmissionsData     = json_decode($finalSubmissionsResponse->getContent(), associative: true);
 
         $this->assertResponseIsSuccessful();
         $this->assertArrayHasKey('submissions', $finalSubmissionsData);
@@ -1656,7 +1656,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $formId         = $response['form']['id'];
         $formAlias      = $response['form']['alias'];
 

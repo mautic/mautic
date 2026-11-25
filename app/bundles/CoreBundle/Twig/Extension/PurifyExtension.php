@@ -11,13 +11,13 @@ final class PurifyExtension
     #[AsTwigFilter(name: 'purify_allow_target_blank', isSafe: ['html'])]
     public function purifyAllowTargetBlank(?string $html): string
     {
-        return $this->createPurifier(true)->purify($html ?? '');
+        return $this->createPurifier(targetBlank: true)->purify($html ?? '');
     }
 
     #[AsTwigFilter(name: 'purify_builder_preview', isSafe: ['html'])]
     public function purifyBuilderPreview(?string $html): string
     {
-        return $this->createPurifier(false, ['form', 'script'])->purify($html ?? '');
+        return $this->createPurifier(targetBlank: false, forbiddenElements: ['form', 'script'])->purify($html ?? '');
     }
 
     /**

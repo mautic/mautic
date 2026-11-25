@@ -70,7 +70,7 @@ final class AssetMapperWebRootPassTest extends TestCase
         );
         file_put_contents(
             $this->projectDir.'/config/local.php',
-            "<?php\n\n\$parameters = ['local_root' => ".var_export($localRoot, true)."];\n"
+            "<?php\n\n\$parameters = ['local_root' => ".var_export($localRoot, return: true)."];\n"
         );
 
         $container = $this->createContainer($applicationDir, '/custom/build/');
@@ -105,7 +105,7 @@ final class AssetMapperWebRootPassTest extends TestCase
     private function createRecommendedProject(): string
     {
         $applicationDir = $this->projectDir.'/docroot';
-        mkdir($applicationDir.'/app/config', 0777, true);
+        mkdir($applicationDir.'/app/config', 0777, recursive: true);
         mkdir($this->projectDir.'/config');
 
         copy(

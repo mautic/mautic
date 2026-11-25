@@ -77,7 +77,7 @@ final class EntityExportEvent extends Event
             $existingIds = array_column($this->entities[$entityName] ?? [], 'id');
 
             foreach ($entityList as $entity) {
-                if (isset($entity['id']) && in_array($entity['id'], $existingIds, true)) {
+                if (isset($entity['id']) && in_array($entity['id'], $existingIds, strict: true)) {
                     continue;
                 }
 

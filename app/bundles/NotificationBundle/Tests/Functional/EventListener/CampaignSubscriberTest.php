@@ -138,7 +138,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
         $campaign  = $this->createCampaign($this->em);
         $leadOne   = $this->createLeadInCampaign($campaign, ['web-1']);
-        $leadTwo   = $this->createLeadInCampaign($campaign, ['mobile-1'], true);
+        $leadTwo   = $this->createLeadInCampaign($campaign, ['mobile-1'], mobile: true);
         $leadThree = $this->createLeadInCampaign($campaign, ['web-2a', 'web-2b']);
         $leadFour  = $this->createLeadInCampaign($campaign, ['web-3']);
         $event     = $this->createCampaignEvent($campaign, $notification, 'notification.send_notification');
@@ -168,10 +168,10 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $campaign  = $this->createCampaign($this->em);
-        $leadOne   = $this->createLeadInCampaign($campaign, ['mobile-1'], true);
+        $leadOne   = $this->createLeadInCampaign($campaign, ['mobile-1'], mobile: true);
         $leadTwo   = $this->createLeadInCampaign($campaign, ['web-1']);
-        $leadThree = $this->createLeadInCampaign($campaign, ['mobile-2a', 'mobile-2b'], true);
-        $leadFour  = $this->createLeadInCampaign($campaign, ['mobile-3a', 'mobile-3b'], true);
+        $leadThree = $this->createLeadInCampaign($campaign, ['mobile-2a', 'mobile-2b'], mobile: true);
+        $leadFour  = $this->createLeadInCampaign($campaign, ['mobile-3a', 'mobile-3b'], mobile: true);
         $event     = $this->createCampaignEvent($campaign, $notification, 'notification.send_mobile_notification');
 
         $this->em->flush();
@@ -210,8 +210,8 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
         $campaign    = $this->createCampaign($this->em);
         $leadOne     = $this->createLeadInCampaign($campaign, ['web-1']);
-        $leadTwo     = $this->createLeadInCampaign($campaign, ['mobile-1'], true);
-        $leadThree   = $this->createLeadInCampaign($campaign, ['mobile-2a', 'mobile-2b'], true);
+        $leadTwo     = $this->createLeadInCampaign($campaign, ['mobile-1'], mobile: true);
+        $leadThree   = $this->createLeadInCampaign($campaign, ['mobile-2a', 'mobile-2b'], mobile: true);
         $leadFour    = $this->createLeadInCampaign($campaign, ['web-2a', 'web-2b']);
         $webEvent    = $this->createCampaignEvent($campaign, $webNotification, 'notification.send_notification');
         $mobileEvent = $this->createCampaignEvent($campaign, $mobileNotification, 'notification.send_mobile_notification');
@@ -238,8 +238,8 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
         $reason = 'Internal server error (500)';
         $this->assertEventLogPassed($webEvent, $leadOne);
-        $this->assertEventLogFailed($mobileEvent, $leadTwo, $reason, true);
-        $this->assertEventLogFailed($mobileEvent, $leadThree, $reason, true);
+        $this->assertEventLogFailed($mobileEvent, $leadTwo, $reason, isScheduled: true);
+        $this->assertEventLogFailed($mobileEvent, $leadThree, $reason, isScheduled: true);
         $this->assertEventLogPassed($webEvent, $leadFour);
     }
 
@@ -290,7 +290,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
         $this->triggerCampaigns();
 
-        $this->assertEventLogFailed($event, $leadOne, 'Bad Request (400)', true);
+        $this->assertEventLogFailed($event, $leadOne, 'Bad Request (400)', isScheduled: true);
         $this->assertEventLogPassed($event, $leadTwo);
     }
 
@@ -374,8 +374,8 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $campaign = $this->createCampaign($this->em);
-        $leadOne  = $this->createLeadInCampaign($campaign, ['mobile-1'], true);
-        $leadTwo  = $this->createLeadInCampaign($campaign, ['mobile-2a', 'mobile-2b'], true);
+        $leadOne  = $this->createLeadInCampaign($campaign, ['mobile-1'], mobile: true);
+        $leadTwo  = $this->createLeadInCampaign($campaign, ['mobile-2a', 'mobile-2b'], mobile: true);
         $event    = $this->createCampaignEvent($campaign, $notification, 'notification.send_mobile_notification');
 
         $this->em->flush();
@@ -419,7 +419,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
         $campaign  = $this->createCampaign($this->em);
         $leadOne   = $this->createLeadInCampaign($campaign, ['web-1']);
-        $leadTwo   = $this->createLeadInCampaign($campaign, ['mobile-1'], true);
+        $leadTwo   = $this->createLeadInCampaign($campaign, ['mobile-1'], mobile: true);
         $leadThree = $this->createLeadInCampaign($campaign, ['web-2a', 'web-2b']);
         $leadFour  = $this->createLeadInCampaign($campaign, ['web-3']);
         $leadFive  = $this->createLeadInCampaign($campaign, ['web-4']);

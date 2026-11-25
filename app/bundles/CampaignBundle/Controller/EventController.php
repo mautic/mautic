@@ -641,10 +641,10 @@ final class EventController extends CommonFormController
     private function setCampaignElements(ParameterBag $request): void
     {
         if ($request->get('modifiedEvents')) {
-            $this->modifiedEvents = json_decode($request->get('modifiedEvents'), true);
+            $this->modifiedEvents = json_decode($request->get('modifiedEvents'), associative: true);
         }
         if ($request->get('deletedEvents')) {
-            $this->deletedEvents = json_decode($request->get('deletedEvents'), true);
+            $this->deletedEvents = json_decode($request->get('deletedEvents'), associative: true);
         }
     }
 }

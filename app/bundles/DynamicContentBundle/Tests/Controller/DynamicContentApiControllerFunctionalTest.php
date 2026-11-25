@@ -63,7 +63,7 @@ final class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCas
 
         self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
-        $responseArray = json_decode($this->client->getResponse()->getContent(), true);
+        $responseArray = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertSame('<some>content</some>', $responseArray['content']);
     }
 

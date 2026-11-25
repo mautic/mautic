@@ -38,7 +38,7 @@ final class ThemeHelper
 
         // get the config
         if (file_exists($this->themePath.'/config.json')) {
-            $this->config = json_decode(file_get_contents($this->themePath.'/config.json'), true);
+            $this->config = json_decode(file_get_contents($this->themePath.'/config.json'), associative: true);
         } else {
             throw new BadConfigurationException($this->theme.' is missing a required config file');
         }

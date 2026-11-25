@@ -101,7 +101,7 @@ final class DynamicContentModel extends FormModel implements AjaxLookupModelInte
             ->setMaxResults(1);
 
         if (!empty($type)) {
-            if (!in_array($typeCondition, ['=', '<>', '!='], true)) {
+            if (!in_array($typeCondition, ['=', '<>', '!='], strict: true)) {
                 throw new \InvalidArgumentException("Invalid operator '{$typeCondition}'");
             }
 

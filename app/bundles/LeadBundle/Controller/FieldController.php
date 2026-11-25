@@ -230,7 +230,7 @@ final class FieldController extends AbstractFormController
                 );
             }
             if ($valid) {
-                return $this->editAction($request, $field->getId(), true);
+                return $this->editAction($request, $field->getId(), ignorePost: true);
             }
             // some bug in Symfony prevents repopulating list options on errors
             $field   = $form->getData();

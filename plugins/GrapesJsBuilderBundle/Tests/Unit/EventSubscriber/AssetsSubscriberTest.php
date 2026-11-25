@@ -227,7 +227,7 @@ final class AssetsSubscriberTest extends TestCase
     private function writeManifest(array|string $content): void
     {
         $data = is_array($content) ? json_encode($content) : $content;
-        mkdir($this->pluginsDir.'/'.self::ASSET_SUBDIR, 0777, true);
+        mkdir($this->pluginsDir.'/'.self::ASSET_SUBDIR, 0777, recursive: true);
         file_put_contents($this->pluginsDir.'/'.self::ASSET_SUBDIR.'/manifest.json', $data);
     }
 

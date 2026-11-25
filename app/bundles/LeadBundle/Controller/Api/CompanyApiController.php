@@ -174,7 +174,7 @@ final class CompanyApiController extends CommonApiController
     {
         $content = $request->getContent();
         if ('' !== $content) {
-            $decoded = json_decode($content, true);
+            $decoded = json_decode($content, associative: true);
             if (is_array($decoded)) {
                 return $decoded;
             }

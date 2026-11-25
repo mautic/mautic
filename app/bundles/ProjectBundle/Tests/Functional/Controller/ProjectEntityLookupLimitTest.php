@@ -52,7 +52,7 @@ final class ProjectEntityLookupLimitTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
 
-        $decoded = json_decode($response->getContent(), true);
+        $decoded = json_decode($response->getContent(), associative: true);
         $this->assertIsArray($decoded, 'Response must be a JSON array.');
 
         $count = count($decoded);

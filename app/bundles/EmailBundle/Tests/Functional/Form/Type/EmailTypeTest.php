@@ -148,7 +148,7 @@ final class EmailTypeTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $this->contacts);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $this->assertSame(Response::HTTP_CREATED, $response['statusCodes'][0], (string) $clientResponse->getContent());

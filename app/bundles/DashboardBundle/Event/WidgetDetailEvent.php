@@ -36,7 +36,7 @@ abstract class WidgetDetailEvent extends CommonEvent
         private Widget $widget,
         private readonly CacheProviderTagAwareInterface $cacheProvider,
     ) {
-        $this->startTime = microtime(true);
+        $this->startTime = microtime(as_float: true);
         $this->setWidget($widget);
     }
 
@@ -161,7 +161,7 @@ abstract class WidgetDetailEvent extends CommonEvent
     {
         $this->templateData = $templateData;
         $this->widget->setTemplateData($templateData);
-        $this->widget->setLoadTime(abs(microtime(true) - $this->startTime));
+        $this->widget->setLoadTime(abs(microtime(as_float: true) - $this->startTime));
 
         $cItem = $this->cacheProvider->getItem($this->getCacheKey());
         if ($this->widget->getCacheTimeout()) {
@@ -258,7 +258,7 @@ abstract class WidgetDetailEvent extends CommonEvent
     {
         $perm = $this->security->isGranted($permissions, 'RETURN_ARRAY');
 
-        return in_array(true, $perm);
+        return in_array(needle: true, haystack: $perm);
     }
 
     /**

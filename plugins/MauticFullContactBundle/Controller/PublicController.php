@@ -71,7 +71,7 @@ final class PublicController extends FormController
             return new Response('ERROR');
         }
 
-        $result           = json_decode($request->request->all()['result'] ?? [], true);
+        $result           = json_decode($request->request->all()['result'] ?? [], associative: true);
         $oid              = $request->request->get('webhookId', '');
         $validatedRequest = $lookupHelper->validateRequest($oid);
 
@@ -209,7 +209,7 @@ final class PublicController extends FormController
                 $data['country'] = $loc['country']['name'];
             }
 
-            $mauticLogger->log('debug', 'SET FIELDS: '.print_r($data, true));
+            $mauticLogger->log('debug', 'SET FIELDS: '.print_r($data, return: true));
 
             // Unset the nonce so that it's not used again
             $socialCache = $lead->getSocialCache();
@@ -363,7 +363,7 @@ final class PublicController extends FormController
                 $data['companyfax'] = $fax['number'];
             }
 
-            $mauticLogger->log('debug', 'SET FIELDS: '.print_r($data, true));
+            $mauticLogger->log('debug', 'SET FIELDS: '.print_r($data, return: true));
 
             // Unset the nonce so that it's not used again
             $socialCache = $company->getSocialCache();

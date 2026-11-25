@@ -94,7 +94,7 @@ final class FilterOperatorSubscriber
                     $properties['no']  => 0,
                     $properties['yes'] => 1,
                 ];
-            } elseif (in_array($type, ['select', 'multiselect'], true)) {
+            } elseif (in_array($type, ['select', 'multiselect'], strict: true)) {
                 $properties['list'] = FormFieldHelper::parseListForChoices($properties['list'] ?? []);
             } else {
                 try {

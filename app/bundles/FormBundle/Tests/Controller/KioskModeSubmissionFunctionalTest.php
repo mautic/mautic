@@ -116,7 +116,7 @@ final class KioskModeSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($segment);
         $this->em->flush();
 
-        $formId = $this->createForm(true, [[
+        $formId = $this->createForm(inKioskMode: true, fields: [[
             'label' => 'Comment',
             'type'  => 'text',
             'alias' => 'comment',
@@ -222,7 +222,7 @@ final class KioskModeSubmissionFunctionalTest extends MauticMysqlTestCase
         ]);
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED, (string) $this->client->getResponse()->getContent());
 
-        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->client->getResponse()->getContent(), associative: true);
         $this->assertSame($inKioskMode, (bool) ($response['form']['inKioskMode'] ?? false));
 
         return (int) $response['form']['id'];

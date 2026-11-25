@@ -30,8 +30,8 @@ final class DateOptionParameters
     ) {
         $this->hasTimePart             = $leadSegmentFilterCrate->hasTimeParts();
         $this->timeframe               = $this->parseTimeFrame($leadSegmentFilterCrate, $relativeDateStrings);
-        $this->requiresBetween         = in_array($leadSegmentFilterCrate->getOperator(), ['=', '!='], true);
-        $this->shouldUseLastDayOfRange = in_array($leadSegmentFilterCrate->getOperator(), ['gt', 'lte'], true);
+        $this->requiresBetween         = in_array($leadSegmentFilterCrate->getOperator(), ['=', '!='], strict: true);
+        $this->shouldUseLastDayOfRange = in_array($leadSegmentFilterCrate->getOperator(), ['gt', 'lte'], strict: true);
 
         $this->setDateTimeHelper($timezoneResolver);
     }
@@ -79,7 +79,7 @@ final class DateOptionParameters
             $leadSegmentFilterCrate->getOperator()
         );
 
-        $key = array_search($filterVal, $relativeDateStrings, true);
+        $key = array_search($filterVal, $relativeDateStrings, strict: true);
 
         if (false === $key) {
             // Time frame does not match any option from $relativeDateStrings, so return original value

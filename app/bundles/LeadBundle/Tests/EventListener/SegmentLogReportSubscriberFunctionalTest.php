@@ -44,7 +44,7 @@ final class SegmentLogReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(200, $clientResponse->getContent());
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $this->assertSame(3, $response['totalResults']);
         $this->assertCount(3, $response['data']);
 

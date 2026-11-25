@@ -85,7 +85,7 @@ final class TriggerBuilderEvent extends Event
         }
 
         foreach ($methods as $m) {
-            if (isset($component[$m]) && !is_callable($component[$m], true)) {
+            if (isset($component[$m]) && !is_callable($component[$m], syntax_only: true)) {
                 throw new InvalidArgumentException($component[$m].' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.');
             }
         }

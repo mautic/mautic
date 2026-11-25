@@ -36,7 +36,7 @@ final class ProjectApiControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/api/projects');
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        $content = json_decode($this->client->getResponse()->getContent(), true);
+        $content = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertCount(2, $content['projects'], 'The bulk GET API should return all projects');
     }
 
@@ -46,7 +46,7 @@ final class ProjectApiControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/api/projects/'.$projectId);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        $content = json_decode($this->client->getResponse()->getContent(), true);
+        $content = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertEquals('Project 1', $content['project']['name']);
         $this->assertEquals('First Project', $content['project']['description']);
         $this->assertCount(1, $content, 'The GET API should return the requested project');

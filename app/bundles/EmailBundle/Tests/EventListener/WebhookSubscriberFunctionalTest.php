@@ -130,7 +130,7 @@ final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $payload = $webhookQueue->getPayload();
         $this->assertJson($payload);
 
-        $payloadData = json_decode($payload, true);
+        $payloadData = json_decode($payload, associative: true);
         $this->assertIsArray($payloadData);
 
         return $payloadData;

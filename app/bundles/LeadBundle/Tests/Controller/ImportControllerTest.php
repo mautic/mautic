@@ -51,7 +51,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
      */
     public function testImportMappingRequiredFieldValidation(): void
     {
-        $this->setPhoneFieldIsRequired(true);
+        $this->setPhoneFieldIsRequired(required: true);
 
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
         $uploadForm = $crawler->selectButton('Upload')->form();
@@ -110,7 +110,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
             'lead:leads'   => ['viewown', 'viewother', 'editown'],
             'lead:imports' => ['view', 'create', 'edit'],
         ];
-        $role = $this->createRole(false, $permission);
+        $role = $this->createRole(isAdmin: false, permission: $permission);
         $this->createPermission('lead:imports', $role, 1024);
         $this->createPermission('lead:leads', $role, 14);
         $user = $this->createUser($role);
@@ -186,7 +186,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $permission = [
             'lead:imports' => ['view', 'create', 'edit'],
         ];
-        $role = $this->createRole(false, $permission);
+        $role = $this->createRole(isAdmin: false, permission: $permission);
         $this->createPermission('lead:imports', $role, 36);
         $user = $this->createUser($role);
         $this->em->flush();
@@ -270,10 +270,10 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
     public function testCancelActionNotifiesImportOwnerWhenAnotherUserCancels(): void
     {
-        $ownerRole = $this->createRole(true);
+        $ownerRole = $this->createRole(isAdmin: true);
         $owner     = $this->createUser($ownerRole, 'person.one', 'person.one@email.com', 'Person', 'One');
 
-        $cancellerRole = $this->createRole(true);
+        $cancellerRole = $this->createRole(isAdmin: true);
         $canceller     = $this->createUser($cancellerRole, 'person.two', 'person.two@email.com', 'Person', 'Two');
 
         $this->em->flush();

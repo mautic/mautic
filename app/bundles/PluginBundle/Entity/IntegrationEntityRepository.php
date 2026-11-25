@@ -402,7 +402,7 @@ final class IntegrationEntityRepository extends CommonRepository
      */
     public function getIntegrationEntityCount($leadId, $integration = null, $integrationEntity = null, $internalEntity = null): int|array
     {
-        return $this->getIntegrationEntityByLead($leadId, $integration, $integrationEntity, $internalEntity, false);
+        return $this->getIntegrationEntityByLead($leadId, $integration, $integrationEntity, $internalEntity, limit: false);
     }
 
     public function getIntegrationEntityByLead($leadId, ?string $integration = null, $integrationEntity = null, $internalEntity = null, int|bool $limit = 100): array|int

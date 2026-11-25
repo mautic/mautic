@@ -351,7 +351,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
         if (isset($data['records']) && 'Activity' !== $object) {
             foreach ($data['records'] as $record) {
-                $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate record '.var_export($record, true));
+                $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate record '.var_export($record, return: true));
                 if (isset($params['progress'])) {
                     /** @var ProgressBar $progress */
                     $progress = $params['progress'];
@@ -484,7 +484,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             unset($data['records']);
-            $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate response '.var_export($data, true));
+            $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate response '.var_export($data, return: true));
 
             unset($data);
             $this->persistIntegrationEntities = [];
@@ -1009,7 +1009,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                         );
 
                         $this->logger->debug('SALESFORCE: Syncing activity for '.count($leadActivity).' contacts ('.implode(', ', array_keys($leadActivity)).')');
-                        $this->logger->debug('SALESFORCE: Syncing activity for '.var_export($sfIds, true));
+                        $this->logger->debug('SALESFORCE: Syncing activity for '.var_export($sfIds, return: true));
 
                         $salesForceLeadData = [];
                         foreach ($salesForceIds as $ids) {
@@ -1540,7 +1540,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
             $request['allOrNone']        = 'false';
             $request['compositeRequest'] = array_values($mauticData);
 
-            $this->logger->debug('SALESFORCE: pushLeadToCampaign '.var_export($request, true));
+            $this->logger->debug('SALESFORCE: pushLeadToCampaign '.var_export($request, return: true));
 
             $result = $this->getApiHelper()->syncMauticToSalesforce($request);
 
@@ -2267,7 +2267,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
             if ([] !== $chunk) {
                 $request['compositeRequest'] = $chunk;
                 $result                      = $apiHelper->syncMauticToSalesforce($request);
-                $this->logger->debug('SALESFORCE: Sync Composite  '.var_export($request, true));
+                $this->logger->debug('SALESFORCE: Sync Composite  '.var_export($request, return: true));
                 $this->processCompositeResponse($result['compositeResponse'], $totalUpdated, $totalCreated, $totalErrored);
             }
         }
@@ -2540,7 +2540,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         $historySF = $this->getDoNotContactHistory($sfObject, $sfFieldString, 'ASC');
 
         if (count($DNCCreatedContacts)) {
-            $this->updateMauticDNC($DNCCreatedContacts, true);
+            $this->updateMauticDNC($DNCCreatedContacts, newDncValue: true);
         }
 
         // if there is no records of when it was modified in SF then just exit

@@ -196,7 +196,7 @@ final class ProjectController extends AbstractFormController
             }
 
             if ($valid) {
-                return $this->editAction($project->getId(), $request, $projectModel, $corePermissions, true);
+                return $this->editAction($project->getId(), $request, $projectModel, $corePermissions, ignorePost: true);
             }
         }
 

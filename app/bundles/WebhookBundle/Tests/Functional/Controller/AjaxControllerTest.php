@@ -28,7 +28,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
-        $content = json_decode($response->getContent(), true);
+        $content = json_decode($response->getContent(), associative: true);
         $this->assertIsArray($content);
         $this->assertArrayHasKey('html', $content);
         $this->assertStringContainsString('has-error', (string) $content['html']);
@@ -52,7 +52,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
-        $content = json_decode($response->getContent(), true);
+        $content = json_decode($response->getContent(), associative: true);
         $this->assertIsArray($content);
         $this->assertArrayHasKey('html', $content);
         $this->assertStringContainsString('has-error', (string) $content['html']);
@@ -76,7 +76,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
-        $content = json_decode($response->getContent(), true);
+        $content = json_decode($response->getContent(), associative: true);
         $this->assertIsArray($content);
         $this->assertArrayHasKey('html', $content);
         $this->assertStringContainsString('has-error', (string) $content['html']);
@@ -101,7 +101,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
-        $content = json_decode($response->getContent(), true);
+        $content = json_decode($response->getContent(), associative: true);
         $this->assertIsArray($content);
         $this->assertArrayHasKey('html', $content);
         $this->assertStringContainsString('has-error', (string) $content['html']);
@@ -142,7 +142,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
-        $content = json_decode($response->getContent(), true);
+        $content = json_decode($response->getContent(), associative: true);
         $this->assertIsArray($content);
         $this->assertArrayHasKey('html', $content);
         $this->assertStringContainsString('has-error', (string) $content['html']);

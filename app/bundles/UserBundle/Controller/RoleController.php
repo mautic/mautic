@@ -215,7 +215,7 @@ final class RoleController extends AbstractFormController
                 ]);
             }
             if ($valid) {
-                return $this->editAction($request, $entity->getId(), true);
+                return $this->editAction($request, $entity->getId(), ignorePost: true);
             }
         }
 
@@ -341,7 +341,7 @@ final class RoleController extends AbstractFormController
         }
 
         if ($valid) {
-            return $this->editAction($request, $entity->getId(), true);
+            return $this->editAction($request, $entity->getId(), ignorePost: true);
         }
 
         return null;

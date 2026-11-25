@@ -82,7 +82,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
     public function testNewActionWithInForm(): void
     {
         $crawler                = $this->client->request(Request::METHOD_GET, 's/categories/category/new');
-        $clientResponse         = json_decode($this->client->getResponse()->getContent(), true);
+        $clientResponse         = json_decode($this->client->getResponse()->getContent(), associative: true);
         $html                   = $clientResponse['newContent'];
         $crawler->addHtmlContent($html);
         $saveButton = $crawler->selectButton('category_form[buttons][save]');
@@ -95,7 +95,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
         $clientResponse = $this->client->getResponse();
-        $body           = json_decode($clientResponse->getContent(), true);
+        $body           = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('categoryId', $body);
         $this->assertArrayHasKey('categoryName', $body);
     }
@@ -110,7 +110,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $crawler        = $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
-        $clientResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $clientResponse = json_decode($this->client->getResponse()->getContent(), associative: true);
         $html           = $clientResponse['newContent'];
         $crawler->addHtmlContent($html);
 
@@ -129,7 +129,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         // OutOfBoundsException "Child \"apply\" does not exist" (HTTP 500) on a valid save.
         $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
-        $body = json_decode($this->client->getResponse()->getContent(), true);
+        $body = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertSame('Category for color edit', $body['categoryName']);
     }
 
@@ -155,7 +155,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
     public function testTypeFieldPersistsAfterValidationFailure(): void
     {
         $crawler                = $this->client->request(Request::METHOD_GET, 's/categories/category/new');
-        $clientResponse         = json_decode($this->client->getResponse()->getContent(), true);
+        $clientResponse         = json_decode($this->client->getResponse()->getContent(), associative: true);
         $html                   = $clientResponse['newContent'];
         $crawler->addHtmlContent($html);
         $saveButton = $crawler->selectButton('category_form[buttons][save]');
@@ -199,7 +199,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $clientResponse     = $this->client->getResponse();
-        $clientResponseBody = json_decode($clientResponse->getContent(), true);
+        $clientResponseBody = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertStringContainsString($expectedErrorMessage, (string) $clientResponseBody['flashes']);
     }
@@ -234,7 +234,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
 
-        $clientResponseBody = json_decode($clientResponse->getContent(), true);
+        $clientResponseBody = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertStringContainsString($expectedErrorMessage, (string) $clientResponseBody['flashes']);
     }
@@ -250,7 +250,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
         $this->assertResponseIsSuccessful();
-        $role = $this->createRole(true);
+        $role = $this->createRole(isAdmin: true);
         $user = $this->createUser($role);
         $this->em->flush();
         $this->client->restart();

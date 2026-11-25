@@ -226,7 +226,7 @@ final class Interval implements ScheduleModeInterface
                 )
             );
 
-            if (in_array(7, $daysOfWeek, true) || in_array('7', $daysOfWeek, true)) {
+            if (in_array(7, $daysOfWeek, strict: true) || in_array('7', $daysOfWeek, strict: true)) {
                 throw new \LogicException('The Mautic accepts only 0-6 as day of week (0 is Sunday).');
             }
 

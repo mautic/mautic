@@ -246,7 +246,7 @@ final class TagController extends AbstractFormController
                 ],
             ]);
         } elseif ($valid) {
-            $response = $this->editAction($request, $tagDependencies, $tag->getId(), true);
+            $response = $this->editAction($request, $tagDependencies, $tag->getId(), ignorePost: true);
         } else {
             $response = null;
         }

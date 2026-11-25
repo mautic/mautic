@@ -153,7 +153,7 @@ final class SearchStringHelper
                 if (' ' !== $string) {
                     $string = trim($string);
                     $type   = ('OR' === $string || 'AND' === $string) ? $string : '';
-                    $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, [] !== $chars);
+                    $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, setFilter: true, type: $type, setUpNext: [] !== $chars);
                 }
                 continue;
             } elseif (in_array($char, $this->needsClosing)) {
@@ -213,7 +213,7 @@ final class SearchStringHelper
                 }
             } elseif ([] === $chars) {
                 $filters->{$baseName}[$keyCount]->command = $command;
-                $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, null, false);
+                $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, setFilter: true, type: null, setUpNext: false);
             }// else keep concocting chars
         }
 

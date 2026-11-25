@@ -153,7 +153,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
         $fixturesDir = __DIR__.'/Fixtures';
         if (!is_dir($fixturesDir)) {
-            mkdir($fixturesDir, 0775, true);
+            mkdir($fixturesDir, 0775, recursive: true);
         }
 
         $fakePath = $fixturesDir.'/fake.zip';
@@ -207,7 +207,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
         $fixturesDir = __DIR__.'/Fixtures';
         if (!is_dir($fixturesDir)) {
-            mkdir($fixturesDir, 0775, true);
+            mkdir($fixturesDir, 0775, recursive: true);
         }
 
         $fakePath = $fixturesDir.'/fake.zip';

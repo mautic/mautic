@@ -17,7 +17,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=page:getBuilderTokens');
         self::assertResponseIsSuccessful();
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertArrayHasKey('tokens', $response);
         $this->assertArrayHasKey('{pagetitle}', $response['tokens']);
         $this->assertArrayHasKey('{langbar}', $response['tokens']);

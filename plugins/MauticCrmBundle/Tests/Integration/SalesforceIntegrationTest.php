@@ -147,8 +147,8 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $stats = $sf->pushLeads();
 
         $this->assertCount(400, $this->getPersistedIntegrationEntities());
-        $this->assertEquals(300, $stats[0], var_export($stats, true)); // update
-        $this->assertEquals(100, $stats[1], var_export($stats, true)); // create
+        $this->assertEquals(300, $stats[0], var_export($stats, return: true)); // update
+        $this->assertEquals(100, $stats[1], var_export($stats, return: true)); // create
     }
 
     public function testThatMultipleSfLeadsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated(): void

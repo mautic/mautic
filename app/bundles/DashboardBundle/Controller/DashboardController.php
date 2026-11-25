@@ -423,7 +423,7 @@ final class DashboardController extends AbstractFormController
             return $this->redirectToRoute('mautic_dashboard_action', ['objectAction' => 'import']);
         }
 
-        $widgets = json_decode(file_get_contents($path), true);
+        $widgets = json_decode(file_get_contents($path), associative: true);
         if (isset($widgets['widgets'])) {
             $widgets = $widgets['widgets'];
         }
@@ -510,7 +510,7 @@ final class DashboardController extends AbstractFormController
                 $dashboard = pathinfo($dashboard, PATHINFO_FILENAME);
                 $config    = json_decode(
                     file_get_contents($directories[$type].'/'.$dirDashboardFiles[$dashId]),
-                    true
+                    associative: true
                 );
 
                 // Check for name, description, etc

@@ -65,7 +65,7 @@ final class AjaxLookupControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $response = $this->client->getResponse();
-        $content  = json_decode($response->getContent(), true);
+        $content  = json_decode($response->getContent(), associative: true);
 
         $this->assertSame(
             [
@@ -109,7 +109,7 @@ final class AjaxLookupControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, self::AJAX_ROUTE, $params);
         $this->assertResponseIsSuccessful();
         $response = $this->client->getResponse();
-        $content  = json_decode($response->getContent(), true);
+        $content  = json_decode($response->getContent(), associative: true);
 
         $this->assertCount(1, $content, 'Should return one group');
         $this->assertCount(1, $content[0]['items'], 'Should return only sms');
@@ -141,7 +141,7 @@ final class AjaxLookupControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $response = $this->client->getResponse();
-        $content  = json_decode($response->getContent(), true);
+        $content  = json_decode($response->getContent(), associative: true);
 
         $this->assertCount(1, $content, 'Should return only Message');
         $this->assertSame('API message 1', $content[0]['text']);

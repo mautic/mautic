@@ -62,7 +62,7 @@ final class EmailActionModelTest extends TestCase
 
         $emails = $this->buildEmailsWithCategory($oldCategory, 3);
         $this->configureRepositoryToReturn($emails);
-        $this->configurePermissionToAllowEdition(true);
+        $this->configurePermissionToAllowEdition(allow: true);
         $this->configureModelToSave($emails);
 
         $this->tryToSetCategory($emails, $newCategory);
@@ -82,7 +82,7 @@ final class EmailActionModelTest extends TestCase
 
         $emails = $this->buildEmailsWithCategory($oldCategory, 5);
         $this->configureRepositoryToReturn($emails);
-        $this->configurePermissionToAllowEdition(false);
+        $this->configurePermissionToAllowEdition(allow: false);
         $this->tryToSetCategory($emails, $newCategory);
 
         foreach ($emails as $email) {

@@ -55,12 +55,12 @@ final class TableSchemaHelper
                 throw new SchemaException('Table is missing required name key.');
             }
 
-            $this->checkTableExists($table['name'], true);
+            $this->checkTableExists($table['name'], throwException: true);
         }
 
         // now add the tables
         foreach ($tables as $table) {
-            $this->addTable($table, false);
+            $this->addTable($table, checkExists: false);
         }
 
         return $this;
@@ -115,7 +115,7 @@ final class TableSchemaHelper
                     throw new SchemaException('A column is missing required name key.');
                 }
 
-                if (!in_array($column['name'], $columnsAdded, true)) {
+                if (!in_array($column['name'], $columnsAdded, strict: true)) {
                     $type       = $column['type'] ?? 'text';
                     $colOptions = $column['options'] ?? [];
 

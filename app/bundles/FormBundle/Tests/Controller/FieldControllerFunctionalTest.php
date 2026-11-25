@@ -22,7 +22,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
             '/s/forms/field/new?type=email&tmpl=field&formId=temporary_form_hash&inBuilder=1'
         );
         $clientResponse = $this->client->getResponse();
-        $payload        = json_decode($clientResponse->getContent(), true);
+        $payload        = json_decode($clientResponse->getContent(), associative: true);
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString('<option value="email" selected="selected">', (string) $payload['newContent']);
     }
@@ -52,7 +52,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $formId         = $response['form']['id'];
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $clientResponse->getContent());
@@ -81,7 +81,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues(), $form->getPhpFiles());
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         $this->assertSame(1, $response['success'] ?? null, (string) $this->client->getResponse()->getContent());
         $this->assertSame(1, $response['closeModal'] ?? null, (string) $this->client->getResponse()->getContent());
@@ -153,7 +153,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $values, $form->getPhpFiles());
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertStringContainsString($expectedHtmlFragment, (string) $response['fieldHtml']);
     }
 

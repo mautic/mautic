@@ -106,7 +106,7 @@ final readonly class UserProvider implements UserProviderInterface
             throw new \InvalidArgumentException('Only new users can be created.');
         }
 
-        return $this->persistUser($user, true, true);
+        return $this->persistUser($user, isNew: true, createOnly: true);
     }
 
     private function persistUser(User $user, bool $isNew, bool $createOnly = false): User

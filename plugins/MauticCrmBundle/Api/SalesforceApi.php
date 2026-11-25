@@ -72,7 +72,7 @@ final class SalesforceApi extends CrmApi
         try {
             $this->analyzeResponse($response, $isRetry);
         } catch (RetryRequestException) {
-            return $this->request($operation, $elementData, $method, true, $object, $queryUrl);
+            return $this->request($operation, $elementData, $method, isRetry: true, object: $object, queryUrl: $queryUrl);
         }
 
         return $response;
@@ -89,7 +89,7 @@ final class SalesforceApi extends CrmApi
             $object = 'Account'; // salesforce object name
         }
 
-        return $this->request('describe', [], 'GET', false, $object);
+        return $this->request('describe', [], 'GET', isRetry: false, object: $object);
     }
 
     /**
@@ -113,7 +113,7 @@ final class SalesforceApi extends CrmApi
             $fields[]    = 'Id';
             $fields      = implode(', ', array_unique($fields));
             $findContact = 'select '.$fields.' from Contact where email = \''.$this->escapeQueryValue($data['Contact']['Email']).'\'';
-            $response    = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
+            $response    = $this->request('query', ['q' => $findContact], 'GET', isRetry: false, object: null, queryUrl: $queryUrl);
 
             if (!empty($response['records'])) {
                 $sfRecords['Contact'] = $response['records'];
@@ -126,7 +126,7 @@ final class SalesforceApi extends CrmApi
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
             $findLead = 'select '.$fields.' from Lead where email = \''.$this->escapeQueryValue($data['Lead']['Email']).'\' and ConvertedContactId = NULL';
-            $response = $this->request('queryAll', ['q' => $findLead], 'GET', false, null, $queryUrl);
+            $response = $this->request('queryAll', ['q' => $findLead], 'GET', isRetry: false, object: null, queryUrl: $queryUrl);
 
             if (!empty($response['records'])) {
                 $sfRecords['Lead'] = $response['records'];
@@ -168,7 +168,7 @@ final class SalesforceApi extends CrmApi
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
             $query    = 'select '.$fields.' from Account where Name = \''.$this->escapeQueryValue($data['company']['Name']).'\''.$appendToQuery;
-            $response = $this->request('queryAll', ['q' => $query], 'GET', false, null, $queryUrl);
+            $response = $this->request('queryAll', ['q' => $query], 'GET', isRetry: false, object: null, queryUrl: $queryUrl);
 
             if (!empty($response['records'])) {
                 $sfRecords['company'] = $response['records'];
@@ -203,8 +203,8 @@ final class SalesforceApi extends CrmApi
      */
     public function createObject(array $data, string $sfObject)
     {
-        $objectData = $this->request('', $data, 'POST', false, $sfObject);
-        $this->integration->getLogger()->debug('SALESFORCE: POST createObject '.$sfObject.' '.var_export($data, true).var_export($objectData, true));
+        $objectData = $this->request('', $data, 'POST', isRetry: false, object: $sfObject);
+        $this->integration->getLogger()->debug('SALESFORCE: POST createObject '.$sfObject.' '.var_export($data, return: true).var_export($objectData, return: true));
 
         if (isset($objectData['id'])) {
             // Salesforce is inconsistent it seems
@@ -221,8 +221,8 @@ final class SalesforceApi extends CrmApi
      */
     public function updateObject(array $data, $sfObject, $sfObjectId)
     {
-        $objectData = $this->request('', $data, 'PATCH', false, $sfObject.'/'.$sfObjectId);
-        $this->integration->getLogger()->debug('SALESFORCE: PATCH updateObject '.$sfObject.' '.var_export($data, true).var_export($objectData, true));
+        $objectData = $this->request('', $data, 'PATCH', isRetry: false, object: $sfObject.'/'.$sfObjectId);
+        $this->integration->getLogger()->debug('SALESFORCE: PATCH updateObject '.$sfObject.' '.var_export($data, return: true).var_export($objectData, return: true));
 
         // Salesforce is inconsistent it seems
         $objectData['Id'] = $objectData['id'] = $sfObjectId;
@@ -241,7 +241,7 @@ final class SalesforceApi extends CrmApi
     {
         $queryUrl = $this->integration->getCompositeUrl();
 
-        return $this->request('composite/', $data, 'POST', false, null, $queryUrl);
+        return $this->request('composite/', $data, 'POST', isRetry: false, object: null, queryUrl: $queryUrl);
     }
 
     /**
@@ -295,7 +295,7 @@ final class SalesforceApi extends CrmApi
                         $request['compositeRequest'] = $chunk;
                         $result                      = $this->syncMauticToSalesforce($request);
                         $results[]                   = $result;
-                        $this->integration->getLogger()->debug('SALESFORCE: Activity response '.var_export($result, true));
+                        $this->integration->getLogger()->debug('SALESFORCE: Activity response '.var_export($result, return: true));
                     }
                 }
 
@@ -325,11 +325,11 @@ final class SalesforceApi extends CrmApi
         }
 
         if (!is_array($query)) {
-            return $this->request('queryAll', ['q' => $query], 'GET', false, null, $queryUrl);
+            return $this->request('queryAll', ['q' => $query], 'GET', isRetry: false, object: null, queryUrl: $queryUrl);
         }
 
         if (!empty($query['nextUrl'])) {
-            return $this->request(null, [], 'GET', false, null, $query['nextUrl']);
+            return $this->request(null, [], 'GET', isRetry: false, object: null, queryUrl: $query['nextUrl']);
         }
 
         $organizationCreatedDate = $this->getOrganizationCreatedDate();
@@ -391,7 +391,7 @@ final class SalesforceApi extends CrmApi
 
         if (!$organizationCreatedDate = $cache->get('organization.created_date')) {
             $queryUrl                = $this->integration->getQueryUrl();
-            $organization            = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', false, null, $queryUrl);
+            $organization            = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', isRetry: false, object: null, queryUrl: $queryUrl);
             $organizationCreatedDate = $organization['records'][0]['CreatedDate'];
             $cache->set('organization.created_date', $organizationCreatedDate);
         }
@@ -409,7 +409,7 @@ final class SalesforceApi extends CrmApi
         $campaignQuery = 'Select Id, Name from Campaign where isDeleted = false';
         $queryUrl      = $this->integration->getQueryUrl();
 
-        return $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
+        return $this->request('query', ['q' => $campaignQuery], 'GET', isRetry: false, object: null, queryUrl: $queryUrl);
     }
 
     /**
@@ -434,7 +434,7 @@ final class SalesforceApi extends CrmApi
             $query .= ' and SystemModStamp >= '.$modifiedSince;
         }
 
-        $results = $this->request(null, ['q' => $query], 'GET', false, null, $queryUrl);
+        $results = $this->request(null, ['q' => $query], 'GET', isRetry: false, object: null, queryUrl: $queryUrl);
 
         $this->requestSettings = $defaultSettings;
 
@@ -452,7 +452,7 @@ final class SalesforceApi extends CrmApi
             $query   = "Select Id, {$idField} from CampaignMember where CampaignId = '".$campaignId
                 ."' and {$idField} in ('".implode("','", $people)."')";
 
-            $foundCampaignMembers = $this->request('query', ['q' => $query], 'GET', false, null, $this->integration->getQueryUrl());
+            $foundCampaignMembers = $this->request('query', ['q' => $query], 'GET', isRetry: false, object: null, queryUrl: $this->integration->getQueryUrl());
             if (!empty($foundCampaignMembers['records'])) {
                 foreach ($foundCampaignMembers['records'] as $member) {
                     $campaignMembers[$member[$idField]] = $member['Id'];
@@ -473,7 +473,7 @@ final class SalesforceApi extends CrmApi
         $campaignQuery = "Select Id, Label from CampaignMemberStatus where isDeleted = false and CampaignId='".$campaignId."'";
         $queryUrl      = $this->integration->getQueryUrl();
 
-        return $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
+        return $this->request('query', ['q' => $campaignQuery], 'GET', isRetry: false, object: null, queryUrl: $queryUrl);
     }
 
     public function getRequestCounter(): int
@@ -495,7 +495,7 @@ final class SalesforceApi extends CrmApi
         $queryUrl  = $this->integration->getQueryUrl();
         $findQuery = 'select Id, '.$requiredFieldString.' from Account where isDeleted = false and Name in (\''.implode("','", $names).'\')';
 
-        return $this->request('query', ['q' => $findQuery], 'GET', false, null, $queryUrl);
+        return $this->request('query', ['q' => $findQuery], 'GET', isRetry: false, object: null, queryUrl: $queryUrl);
     }
 
     /**
@@ -508,7 +508,7 @@ final class SalesforceApi extends CrmApi
         $findQuery = 'select isDeleted, Id, '.$requiredFieldString.' from Account where  Id in (\''.implode("','", $ids).'\')';
         $queryUrl  = $this->integration->getQueryUrl();
 
-        return $this->request('queryAll', ['q' => $findQuery], 'GET', false, null, $queryUrl);
+        return $this->request('queryAll', ['q' => $findQuery], 'GET', isRetry: false, object: null, queryUrl: $queryUrl);
     }
 
     /**
@@ -672,7 +672,7 @@ final class SalesforceApi extends CrmApi
                 unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
 
                 // Disable the use of the HasOptedOutOfEmail field for future requests
-                $this->setOptOutFieldAccessible(false);
+                $this->setOptOutFieldAccessible(optOutFieldAccessible: false);
 
                 // Notify all admins of this error
                 $this->integration->upsertUnreadAdminsNotification(
@@ -702,7 +702,7 @@ final class SalesforceApi extends CrmApi
                 }
             }
 
-            $response = $this->handleQueryAll($baseQuery, $fields, $queryUrl, ++$tries, true);
+            $response = $this->handleQueryAll($baseQuery, $fields, $queryUrl, ++$tries, isRetry: true);
         }
 
         return $response;

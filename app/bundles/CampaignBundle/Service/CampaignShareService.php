@@ -371,7 +371,7 @@ final readonly class CampaignShareService
             return null;
         }
 
-        $meta = json_decode((string) file_get_contents($pendingDir.'/'.$token.'.json'), true);
+        $meta = json_decode((string) file_get_contents($pendingDir.'/'.$token.'.json'), associative: true);
         if (!\is_array($meta) || !\is_string($meta['originalName'] ?? null) || !\is_string($meta['mimeType'] ?? null)) {
             return null;
         }

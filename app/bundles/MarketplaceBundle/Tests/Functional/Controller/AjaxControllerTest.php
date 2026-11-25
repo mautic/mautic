@@ -56,7 +56,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
     public function testInstallPackageAction(): void
     {
         $request    = new Request([], [], [], [], [], [], '{"vendor":"mautic","package":"test-plugin-bundle"}');
-        $controller = $this->generateController(false);
+        $controller = $this->generateController(isPackageInstalled: false);
 
         $this->packageModel->method('getPackageDetail')
             ->willReturn($this->getPluginPackageDetail());
@@ -78,7 +78,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
     public function testRemovePackageAction(): void
     {
         $request    = new Request([], [], [], [], [], [], '{"vendor":"mautic","package":"test-plugin-bundle"}');
-        $controller = $this->generateController(true);
+        $controller = $this->generateController(isPackageInstalled: true);
 
         $this->packageModel->method('getPackageDetail')
             ->willReturn($this->getPluginPackageDetail());
@@ -100,7 +100,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
     public function testInstallResourcePackageAction(): void
     {
         $request    = new Request([], [], [], [], [], [], '{"vendor":"vukovicpredrag","package":"mautic-test-campaign-template"}');
-        $controller = $this->generateController(false);
+        $controller = $this->generateController(isPackageInstalled: false);
 
         $this->packageModel->method('getPackageDetail')
             ->willReturn($this->getResourcePackageDetail());
@@ -127,7 +127,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
     public function testInstallResourcePackageAlreadyInstalled(): void
     {
         $request    = new Request([], [], [], [], [], [], '{"vendor":"vukovicpredrag","package":"mautic-test-campaign-template"}');
-        $controller = $this->generateController(false);
+        $controller = $this->generateController(isPackageInstalled: false);
 
         $this->packageModel->method('getPackageDetail')
             ->willReturn($this->getResourcePackageDetail());
@@ -150,7 +150,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
     public function testRemoveResourcePackageAction(): void
     {
         $request    = new Request([], [], [], [], [], [], '{"vendor":"vukovicpredrag","package":"mautic-test-campaign-template"}');
-        $controller = $this->generateController(false);
+        $controller = $this->generateController(isPackageInstalled: false);
 
         $this->packageModel->method('getPackageDetail')
             ->willReturn($this->getResourcePackageDetail());
@@ -174,7 +174,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
     public function testRemoveResourcePackageNotInstalled(): void
     {
         $request    = new Request([], [], [], [], [], [], '{"vendor":"vukovicpredrag","package":"mautic-test-campaign-template"}');
-        $controller = $this->generateController(false);
+        $controller = $this->generateController(isPackageInstalled: false);
 
         $this->packageModel->method('getPackageDetail')
             ->willReturn($this->getResourcePackageDetail());
@@ -243,14 +243,14 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
     private function getPluginPackageDetail(): PackageDetail
     {
-        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), true);
+        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), associative: true);
 
         return PackageDetail::fromArray($payload['package']);
     }
 
     private function getResourcePackageDetail(): PackageDetail
     {
-        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail_resource.json'), true);
+        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail_resource.json'), associative: true);
 
         return PackageDetail::fromArray($payload['package']);
     }

@@ -138,12 +138,12 @@ final class ContentPreviewSettingsTypeTest extends TestCase
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
-                if (in_array($matcher->numberOfInvocations(), [1, 3], true)) {
+                if (in_array($matcher->numberOfInvocations(), [1, 3], strict: true)) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
                     return 'startTyping';
                 }
-                if (in_array($matcher->numberOfInvocations(), [2, 4], true)) {
+                if (in_array($matcher->numberOfInvocations(), [2, 4], strict: true)) {
                     $this->assertSame('mautic.core.form.nomatches', $parameters[0]);
 
                     return 'nomatches';
@@ -237,12 +237,12 @@ final class ContentPreviewSettingsTypeTest extends TestCase
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
-                if (in_array($matcher->numberOfInvocations(), [1, 3], true)) {
+                if (in_array($matcher->numberOfInvocations(), [1, 3], strict: true)) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
                     return 'startTyping';
                 }
-                if (in_array($matcher->numberOfInvocations(), [2, 4], true)) {
+                if (in_array($matcher->numberOfInvocations(), [2, 4], strict: true)) {
                     $this->assertSame('mautic.core.form.nomatches', $parameters[0]);
 
                     return 'nomatches';
@@ -305,12 +305,12 @@ final class ContentPreviewSettingsTypeTest extends TestCase
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
-                if (in_array($matcher->numberOfInvocations(), [1, 3], true)) {
+                if (in_array($matcher->numberOfInvocations(), [1, 3], strict: true)) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
                     return 'startTyping';
                 }
-                if (in_array($matcher->numberOfInvocations(), [2, 4], true)) {
+                if (in_array($matcher->numberOfInvocations(), [2, 4], strict: true)) {
                     $this->assertSame('mautic.core.form.nomatches', $parameters[0]);
 
                     return 'nomatches';
@@ -425,12 +425,12 @@ final class ContentPreviewSettingsTypeTest extends TestCase
 
                     return 'nomatches';
                 }
-                if (in_array($matcher->numberOfInvocations(), [3, 5], true)) {
+                if (in_array($matcher->numberOfInvocations(), [3, 5], strict: true)) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
                     return 'startTyping';
                 }
-                if (in_array($matcher->numberOfInvocations(), [4, 6], true)) {
+                if (in_array($matcher->numberOfInvocations(), [4, 6], strict: true)) {
                     $this->assertSame('mautic.core.form.nomatches', $parameters[0]);
 
                     return 'nomatches';

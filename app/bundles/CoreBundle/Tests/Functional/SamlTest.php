@@ -59,13 +59,13 @@ final class SamlTest extends MauticMysqlTestCase
         $samlIdField = $configForm['config[userconfig][saml_idp_entity_id]'];
         $this->assertInstanceOf(ChoiceFormField::class, $samlIdField);
         $availableSamlIdOptions = $samlIdField->availableOptionValues();
-        $this->assertCount(2, $availableSamlIdOptions, print_r($availableSamlIdOptions, true));
+        $this->assertCount(2, $availableSamlIdOptions, print_r($availableSamlIdOptions, return: true));
         $samlIdField->setValue($availableSamlIdOptions[1]);
 
         $samlDefaultRoleField = $configForm['config[userconfig][saml_idp_default_role]'];
         $this->assertInstanceOf(ChoiceFormField::class, $samlDefaultRoleField);
         $availableDefaultRoleOptions = $samlDefaultRoleField->availableOptionValues();
-        $this->assertCount(3, $availableDefaultRoleOptions, print_r($availableDefaultRoleOptions, true));
+        $this->assertCount(3, $availableDefaultRoleOptions, print_r($availableDefaultRoleOptions, return: true));
         $samlDefaultRoleField->setValue($availableDefaultRoleOptions[1]);
 
         // Upload the metadata.xml file

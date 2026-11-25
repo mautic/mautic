@@ -20,9 +20,9 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
     public function testPublicSegmentsInContactPreferences(): void
     {
         $user           = $this->getService(UserRepository::class)->findBy([], [], 1)[0];
-        $firstLeadList  = $this->createLeadList($user, 'First', true);
-        $secondLeadList = $this->createLeadList($user, 'Second', false);
-        $thirdLeadList  = $this->createLeadList($user, 'Third', true);
+        $firstLeadList  = $this->createLeadList($user, 'First', isGlobal: true);
+        $secondLeadList = $this->createLeadList($user, 'Second', isGlobal: false);
+        $thirdLeadList  = $this->createLeadList($user, 'Third', isGlobal: true);
         $this->em->flush();
 
         $repo  = $this->getService(LeadListRepository::class);

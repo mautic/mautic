@@ -57,6 +57,6 @@ final class CompanySearchScopeProviderTest extends SearchScopeProviderTestCase
         $this->assertTrue($byCommand['companyindustry']['indent'] ?? false);
 
         $commands = array_column($scopes, 'command');
-        $this->assertGreaterThan(array_search('is:mine', $commands, true), array_search('companyindustry', $commands, true));
+        $this->assertGreaterThan(array_search('is:mine', $commands, strict: true), array_search('companyindustry', $commands, strict: true));
     }
 }

@@ -61,11 +61,11 @@ final class LeadTimelineEventTest extends TestCase
 
         $events = $event->getEvents();
 
-        $id1 = hash('crc32', json_encode($payload[0]), false);
+        $id1 = hash('crc32', json_encode($payload[0]), binary: false);
         $this->assertArrayHasKey('eventId', $events[0]);
         $this->assertEquals('foo'.$id1, $events[0]['eventId']);
 
-        $id2 = hash('crc32', json_encode($payload[1]), false);
+        $id2 = hash('crc32', json_encode($payload[1]), binary: false);
         $this->assertArrayHasKey('eventId', $events[1]);
         $this->assertEquals('bar'.$id2, $events[1]['eventId']);
 

@@ -108,7 +108,7 @@ final readonly class ApiSubscriber
         }
 
         // Ignore if content is not json
-        if (!$data = json_decode($content, true)) {
+        if (!$data = json_decode($content, associative: true)) {
             return;
         }
 

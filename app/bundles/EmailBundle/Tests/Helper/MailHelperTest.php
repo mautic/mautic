@@ -270,7 +270,7 @@ final class MailHelperTest extends TestCase
         $singleMailHelper->queue();
         $singleMailHelper->flushQueue();
         $errors = $singleMailHelper->getErrors();
-        $this->assertArrayNotHasKey('failures', $errors, var_export($errors, true));
+        $this->assertArrayNotHasKey('failures', $errors, var_export($errors, return: true));
 
         $singleMailHelper->reset(false);
         $singleMailHelper->setEmail($email);
@@ -279,7 +279,7 @@ final class MailHelperTest extends TestCase
         $singleMailHelper->queue();
         $singleMailHelper->flushQueue();
         $errors = $singleMailHelper->getErrors();
-        $this->assertArrayNotHasKey('failures', $errors, var_export($errors, true));
+        $this->assertArrayNotHasKey('failures', $errors, var_export($errors, return: true));
     }
 
     public function testQueuedOwnerAsMailer(): void

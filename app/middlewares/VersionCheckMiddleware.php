@@ -31,7 +31,7 @@ final class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMi
 
         $metadata = json_decode(
             file_get_contents(__DIR__.'/../release_metadata.json'),
-            true
+            associative: true
         );
 
         $this->minimumPHPVersion = $metadata['minimum_php_version'];

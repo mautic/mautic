@@ -39,7 +39,7 @@ final class ConstantContactClientTest extends TestCase
                 'lists'           => [['id' => '1']],
                 'email_addresses' => [['email_address' => 'john@example.com']],
             ],
-            json_decode($response->getRequestOptions()['body'], true)
+            json_decode($response->getRequestOptions()['body'], associative: true)
         );
     }
 

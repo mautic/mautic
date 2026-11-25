@@ -73,7 +73,7 @@ final class oAuthHelper
 
         $base_info                  = $this->buildBaseString($url, $method, $signature);
         $composite_key              = $this->getCompositeKey();
-        $headers['oauth_signature'] = base64_encode(hash_hmac('sha1', $base_info, $composite_key, true));
+        $headers['oauth_signature'] = base64_encode(hash_hmac('sha1', $base_info, $composite_key, binary: true));
 
         return [$this->buildAuthorizationHeader($headers), 'Expect:'];
     }
@@ -137,7 +137,7 @@ final class oAuthHelper
     private function buildAuthorizationHeader(array $oauth): string
     {
         $r      = 'Authorization: OAuth ';
-        $values = $this->normalizeParameters($oauth, true, true);
+        $values = $this->normalizeParameters($oauth, encode: true, returnarray: true);
 
         return $r.implode(', ', $values);
     }
@@ -155,7 +155,7 @@ final class oAuthHelper
 
         foreach ($parameters as $k => $v) {
             if (is_array($v)) {
-                $normalized = $this->normalizeParameters($v, $encode, true, $normalized, $k);
+                $normalized = $this->normalizeParameters($v, $encode, returnarray: true, normalized: $normalized, key: $k);
             } else {
                 if ($key) {
                     // Multidimensional array; using foo=baz&foo=bar rather than foo[bar]=baz&foo[baz]=bar as this is

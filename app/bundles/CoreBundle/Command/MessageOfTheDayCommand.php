@@ -118,7 +118,7 @@ final class MessageOfTheDayCommand extends Command
              *     }>
              * } $data
              */
-            $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+            $data = json_decode($json, associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
             throw new MessageOfTheDayException('Could not decode MOTD JSON');
         }

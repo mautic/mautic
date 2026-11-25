@@ -491,7 +491,7 @@ final class ReportController extends AbstractFormController
 
                     if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $entity->getId(), true);
+                        return $this->editAction($request, $entity->getId(), ignorePost: true);
                     }
 
                     $viewParameters = ['objectId' => $entity->getId()];

@@ -22,7 +22,7 @@ final class TrackingPixelHelper
         }
 
         if (ini_get('ignore_user_abort')) {
-            ignore_user_abort(true);
+            ignore_user_abort(enable: true);
         }
 
         // turn off gzip compression

@@ -28,7 +28,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
 
     public function testGetReportSuccessByCorrectAccessIsAdmin(): void
     {
-        $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', [], false, true);
+        $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', [], createBy: false, userIsAdmin: true);
         $this->client->request(Request::METHOD_GET, '/api/reports/'.$reportId);
         $this->assertResponseIsSuccessful();
     }
@@ -49,7 +49,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
 
     public function testReportSuccessViewOwnBySameUser(): void
     {
-        $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', ['report:reports'=>['viewown']], true);
+        $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', ['report:reports'=>['viewown']], createBy: true);
         $this->client->request(Request::METHOD_GET, '/api/reports/'.$reportId);
         $this->assertResponseIsSuccessful();
     }
@@ -78,7 +78,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
 
-        $payload = json_decode($response->getContent(), true);
+        $payload = json_decode($response->getContent(), associative: true);
         $this->assertSame(1, $payload['total']);
         $reportIds = array_map(
             static fn (array $report): int => $report['id'],

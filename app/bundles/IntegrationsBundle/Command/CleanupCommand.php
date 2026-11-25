@@ -31,7 +31,7 @@ final class CleanupCommand extends Command
 
         $numberOfRecordsDeleted = $this->fieldChangeRepository->deleteOrphanLeadChanges();
         $io->success("{$numberOfRecordsDeleted} records deleted.");
-        $io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
+        $io->success('Execution time: '.number_format(microtime(as_float: true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
 
         return Command::SUCCESS;
     }

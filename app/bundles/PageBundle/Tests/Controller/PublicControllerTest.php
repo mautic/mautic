@@ -447,7 +447,7 @@ final class PublicControllerTest extends TestCase
             $this->ipLookupHelper
         );
 
-        $json = json_decode($response->getContent(), true);
+        $json = json_decode($response->getContent(), associative: true);
 
         $this->assertEquals(
             [
@@ -494,7 +494,7 @@ final class PublicControllerTest extends TestCase
         );
         $this->assertEquals(
             ['success' => 0],
-            json_decode($response->getContent(), true)
+            json_decode($response->getContent(), associative: true)
         );
     }
 
@@ -549,7 +549,7 @@ final class PublicControllerTest extends TestCase
 
         $this->assertSame(
             ['success' => 0],
-            json_decode($response->getContent(), true)
+            json_decode($response->getContent(), associative: true)
         );
     }
 }

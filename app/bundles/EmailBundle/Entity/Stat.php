@@ -482,7 +482,7 @@ class Stat
 
     public function addReply(EmailReply $reply): void
     {
-        $this->addChange('replyAdded', false, true);
+        $this->addChange('replyAdded', currentValue: false, newValue: true);
         $this->replies[] = $reply;
     }
 

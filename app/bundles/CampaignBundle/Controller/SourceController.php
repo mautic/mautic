@@ -291,7 +291,7 @@ final class SourceController extends CommonFormController
     private function setCampaignElements(ParameterBag $request): void
     {
         if ($request->get('modifiedSources')) {
-            $this->modifiedSources = json_decode($request->get('modifiedSources'), true);
+            $this->modifiedSources = json_decode($request->get('modifiedSources'), associative: true);
         }
     }
 

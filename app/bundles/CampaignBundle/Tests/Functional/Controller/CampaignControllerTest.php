@@ -233,7 +233,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $responseData = json_decode($response->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         $this->assertStringContainsString($matchingCampaign->getName(), (string) $responseData['newContent']);
         $this->assertStringNotContainsString($nonMatchingCampaign->getName(), (string) $responseData['newContent']);
@@ -267,7 +267,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $responseData = json_decode($response->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         $this->assertStringContainsString($matchingCampaign->getName(), (string) $responseData['newContent']);
         $this->assertStringNotContainsString($nonMatchingCampaign->getName(), (string) $responseData['newContent']);
@@ -282,7 +282,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $url    = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $before->format('Y-m-d'), $after->format('Y-m-d'));
         $this->client->request(Request::METHOD_GET, $url);
         $response = $this->client->getResponse();
-        $body     = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $body     = json_decode($response->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
         $this->client->restart();
 
         return new Crawler($body['actions']);
@@ -404,7 +404,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
         $this->assertJson($responseContent);
 
-        $responseData = json_decode($responseContent, true);
+        $responseData = json_decode($responseContent, associative: true);
 
         $this->assertArrayHasKey('error', $responseData);
         $this->assertStringContainsString('Export file could not be created', (string) $responseData['error']);
@@ -463,7 +463,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
         $this->assertJson($responseContent);
 
-        $responseData = json_decode($responseContent, true);
+        $responseData = json_decode($responseContent, associative: true);
 
         $this->assertArrayHasKey('error', $responseData);
         $this->assertStringContainsString('Export file could not be created', (string) $responseData['error']);

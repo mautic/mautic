@@ -208,7 +208,7 @@ final class StageController extends AbstractFormController
                         $template  = 'Mautic\StageBundle\Controller\StageController::indexAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $entity->getId(), true);
+                        return $this->editAction($request, $entity->getId(), ignorePost: true);
                     }
                 }
             } else {

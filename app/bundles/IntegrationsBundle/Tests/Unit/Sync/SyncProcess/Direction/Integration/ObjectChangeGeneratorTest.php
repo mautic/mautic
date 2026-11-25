@@ -91,7 +91,7 @@ final class ObjectChangeGeneratorTest extends TestCase
         $objectName  = 'Contact';
 
         $mappingManual = $this->getMappingManual($integration, $objectName);
-        $syncReport    = $this->getInternalSyncReport(false);
+        $syncReport    = $this->getInternalSyncReport(includeFirstNameField: false);
 
         $integrationReportObject = new ReportObjectDAO($objectName, 2);
         $integrationReportObject->addField(new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com')));

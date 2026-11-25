@@ -80,82 +80,82 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 
     public function testCampaignCountsBeforeSummarizeCommandWithoutSummaryAndRange(): void
     {
-        $this->getCountAndDetails(false, false, false, ['100%', '100%'], ['2', '2'], ['0', '0']);
+        $this->getCountAndDetails(withPendingAction: false, withActionOfRemovedLead: false, runCommand: false, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['2', '2'], expectedPending: ['0', '0']);
     }
 
     public function testCampaignCountsBeforeSummarizeCommandWithSummaryWithoutRange(): void
     {
-        $this->getCountAndDetails(false, false, false, ['0%', '0%'], ['0', '0'], ['0', '0']);
+        $this->getCountAndDetails(withPendingAction: false, withActionOfRemovedLead: false, runCommand: false, expectedSuccessPercent: ['0%', '0%'], expectedCompleted: ['0', '0'], expectedPending: ['0', '0']);
     }
 
     public function testCampaignCountsBeforeSummarizeCommandWithoutSummaryWithRange(): void
     {
-        $this->getCountAndDetails(false, false, false, ['100%', '100%'], ['2', '2'], ['0', '0']);
+        $this->getCountAndDetails(withPendingAction: false, withActionOfRemovedLead: false, runCommand: false, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['2', '2'], expectedPending: ['0', '0']);
     }
 
     public function testCampaignCountsBeforeSummarizeCommandWithSummaryAndRange(): void
     {
-        $this->getCountAndDetails(false, false, false, ['0%', '0%'], ['0', '0'], ['0', '0']);
+        $this->getCountAndDetails(withPendingAction: false, withActionOfRemovedLead: false, runCommand: false, expectedSuccessPercent: ['0%', '0%'], expectedCompleted: ['0', '0'], expectedPending: ['0', '0']);
     }
 
     public function testCampaignCountsAfterSummarizeCommandWithoutSummaryAndRange(): void
     {
-        $this->getCountAndDetails(false, false, true, ['100%', '100%'], ['2', '2'], ['0', '0']);
+        $this->getCountAndDetails(withPendingAction: false, withActionOfRemovedLead: false, runCommand: true, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['2', '2'], expectedPending: ['0', '0']);
     }
 
     public function testCampaignCountsAfterSummarizeCommandWithSummaryWithoutRange(): void
     {
-        $this->getCountAndDetails(false, false, true, ['100%', '100%'], ['2', '2'], ['0', '0']);
+        $this->getCountAndDetails(withPendingAction: false, withActionOfRemovedLead: false, runCommand: true, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['2', '2'], expectedPending: ['0', '0']);
     }
 
     public function testCampaignCountsAfterSummarizeCommandWithoutSummaryWithRange(): void
     {
-        $this->getCountAndDetails(false, false, true, ['100%', '100%'], ['2', '2'], ['0', '0']);
+        $this->getCountAndDetails(withPendingAction: false, withActionOfRemovedLead: false, runCommand: true, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['2', '2'], expectedPending: ['0', '0']);
     }
 
     public function testCampaignCountsAfterSummarizeCommandWithSummaryAndRange(): void
     {
-        $this->getCountAndDetails(false, false, true, ['100%', '100%'], ['2', '2'], ['0', '0']);
+        $this->getCountAndDetails(withPendingAction: false, withActionOfRemovedLead: false, runCommand: true, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['2', '2'], expectedPending: ['0', '0']);
     }
 
     public function testCampaignPendingCountsWithoutSummaryAndRange(): void
     {
-        $this->getCountAndDetails(true, false, true, ['100%', '100%'], ['3', '2'], ['0', '1']);
+        $this->getCountAndDetails(withPendingAction: true, withActionOfRemovedLead: false, runCommand: true, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['3', '2'], expectedPending: ['0', '1']);
     }
 
     public function testCampaignPendingCountsWithSummaryWithoutRange(): void
     {
-        $this->getCountAndDetails(true, false, true, ['100%', '100%'], ['3', '2'], ['0', '1']);
+        $this->getCountAndDetails(withPendingAction: true, withActionOfRemovedLead: false, runCommand: true, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['3', '2'], expectedPending: ['0', '1']);
     }
 
     public function testCampaignPendingCountsWithoutSummaryWithRange(): void
     {
-        $this->getCountAndDetails(true, false, true, ['100%', '100%'], ['3', '2'], ['0', '1']);
+        $this->getCountAndDetails(withPendingAction: true, withActionOfRemovedLead: false, runCommand: true, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['3', '2'], expectedPending: ['0', '1']);
     }
 
     public function testCampaignPendingCountsWithSummaryAndRange(): void
     {
-        $this->getCountAndDetails(true, false, true, ['100%', '100%'], ['3', '2'], ['0', '1']);
+        $this->getCountAndDetails(withPendingAction: true, withActionOfRemovedLead: false, runCommand: true, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['3', '2'], expectedPending: ['0', '1']);
     }
 
     public function testCampaignRemovedLeadCountsWithSummaryAndRange(): void
     {
-        $this->getCountAndDetails(false, true, true, ['100%', '100%'], ['3', '2'], ['0', '0']);
+        $this->getCountAndDetails(withPendingAction: false, withActionOfRemovedLead: true, runCommand: true, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['3', '2'], expectedPending: ['0', '0']);
     }
 
     public function testCampaignRemovedLeadCountsWithoutSummaryWithRange(): void
     {
-        $this->getCountAndDetails(false, true, true, ['100%', '100%'], ['3', '2'], ['0', '0']);
+        $this->getCountAndDetails(withPendingAction: false, withActionOfRemovedLead: true, runCommand: true, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['3', '2'], expectedPending: ['0', '0']);
     }
 
     public function testCampaignRemovedLeadAndPendingCountsWithSummaryAndRange(): void
     {
-        $this->getCountAndDetails(true, true, true, ['100%', '100%'], ['4', '2'], ['0', '1']);
+        $this->getCountAndDetails(withPendingAction: true, withActionOfRemovedLead: true, runCommand: true, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['4', '2'], expectedPending: ['0', '1']);
     }
 
     public function testCampaignRemovedLeadAndPendingCountsWithoutSummaryWithRange(): void
     {
-        $this->getCountAndDetails(true, true, true, ['100%', '100%'], ['4', '2'], ['0', '1']);
+        $this->getCountAndDetails(withPendingAction: true, withActionOfRemovedLead: true, runCommand: true, expectedSuccessPercent: ['100%', '100%'], expectedCompleted: ['4', '2'], expectedPending: ['0', '1']);
     }
 
     private function getStatTotalContacts(int $campaignId): int
@@ -181,10 +181,10 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $to   = date('Y-m-d', strtotime('-1 month'));
         $this->client->request(Request::METHOD_GET, sprintf('s/campaigns/graph/%d/%s/%s', $campaignId, $from, $to));
         $response      = $this->client->getResponse();
-        $body          = json_decode($response->getContent(), true);
+        $body          = json_decode($response->getContent(), associative: true);
         $crawler       = new Crawler($body['newContent']);
         $canvasJson    = trim($crawler->filter('canvas')->html());
-        $canvasData    = json_decode($canvasJson, true);
+        $canvasData    = json_decode($canvasJson, associative: true);
         $datasets      = $canvasData['datasets'] ?? [];
         $this->client->restart();
 
@@ -216,7 +216,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $url  = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaignId, $from, $to);
         $this->client->request(Request::METHOD_GET, $url);
         $response = $this->client->getResponse();
-        $body     = json_decode($response->getContent(), true);
+        $body     = json_decode($response->getContent(), associative: true);
         $this->client->restart();
 
         return new Crawler($body['actions']);
@@ -375,7 +375,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $this->client->request(Request::METHOD_GET, sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $from, $to));
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        $body     = json_decode($response->getContent(), true);
+        $body     = json_decode($response->getContent(), associative: true);
         $this->assertCount(2, $body);
         self::arrayHasKey('actions');
         $this->assertStringContainsString('100% 2 0 Event A mautic.campaign.type.a 100% 2 0 Event B mautic.campaign.type.b', (string) preg_replace('/\s+/', ' ', strip_tags($body['actions'])));

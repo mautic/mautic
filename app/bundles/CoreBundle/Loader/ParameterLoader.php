@@ -219,7 +219,7 @@ final class ParameterLoader
         // Load from environment
         $envParameters = getenv('MAUTIC_CONFIG_PARAMETERS');
         if ($envParameters) {
-            $compiledParameters = array_merge($compiledParameters, json_decode($envParameters, true));
+            $compiledParameters = array_merge($compiledParameters, json_decode($envParameters, associative: true));
         }
 
         // Hardcode the db_driver to pdo_mysql, as it is currently the only supported driver.
@@ -245,7 +245,7 @@ final class ParameterLoader
     {
         $rootDir         = Path::canonicalize($root);
         $projectDir      = self::getProjectDirByRoot($rootDir);
-        $localConfigFile = self::getLocalConfigFile($root, false);
+        $localConfigFile = self::getLocalConfigFile($root, updateDefaultParameters: false);
 
         if (Path::isBasePath($rootDir, $localConfigFile)) {
             return $rootDir;
@@ -289,7 +289,7 @@ final class ParameterLoader
             return $projectRoot;
         }
 
-        $composerJson = json_decode($composerContent, true);
+        $composerJson = json_decode($composerContent, associative: true);
         if (!is_array($composerJson)) {
             return $projectRoot;
         }

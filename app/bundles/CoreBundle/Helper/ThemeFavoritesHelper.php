@@ -45,7 +45,7 @@ final readonly class ThemeFavoritesHelper
 
     public function isFavorite(string $theme, string $type): bool
     {
-        return in_array($theme, $this->getFavorites($type), true);
+        return in_array($theme, $this->getFavorites($type), strict: true);
     }
 
     /**
@@ -60,7 +60,7 @@ final readonly class ThemeFavoritesHelper
 
         $installedThemes = array_map(strval(...), array_keys($this->themeHelper->getInstalledThemes($type)));
 
-        if (!in_array($theme, $installedThemes, true)) {
+        if (!in_array($theme, $installedThemes, strict: true)) {
             throw new \InvalidArgumentException(sprintf('The theme "%s" is not installed for the type "%s".', $theme, $type));
         }
 
@@ -93,7 +93,7 @@ final readonly class ThemeFavoritesHelper
 
     private function isSupportedType(string $type): bool
     {
-        return in_array($type, self::TYPES, true);
+        return in_array($type, self::TYPES, strict: true);
     }
 
     /**

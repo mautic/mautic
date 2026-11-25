@@ -42,7 +42,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testManualWinnerActionIsAvailableForPublishedStartedVariant(): void
     {
-        [$parent, $variant] = $this->createManualWinnerPagePair(true, true);
+        [$parent, $variant] = $this->createManualWinnerPagePair(variantPublished: true, testStarted: true);
         $router             = $this->getService(RouterInterface::class);
         $winnerUrl          = $router->generate('mautic_page_action', [
             'objectAction' => 'winner',
@@ -75,7 +75,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testManualWinnerActionIsUnavailableForUnpublishedVariant(): void
     {
-        [$parent, $variant] = $this->createManualWinnerPagePair(false, true);
+        [$parent, $variant] = $this->createManualWinnerPagePair(variantPublished: false, testStarted: true);
         $winnerUrl          = $this->getService(RouterInterface::class)->generate('mautic_page_action', [
             'objectAction' => 'winner',
             'objectId'     => $variant->getId(),
@@ -88,7 +88,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testManualWinnerActionIsUnavailableBeforeAbTestStarts(): void
     {
-        [$parent, $variant] = $this->createManualWinnerPagePair(true, false);
+        [$parent, $variant] = $this->createManualWinnerPagePair(variantPublished: true, testStarted: false);
         $winnerUrl          = $this->getService(RouterInterface::class)->generate('mautic_page_action', [
             'objectAction' => 'winner',
             'objectId'     => $variant->getId(),

@@ -34,7 +34,7 @@ final class AssetWidgetDataApiControllerFunctionalTest extends MauticMysqlTestCa
             'Unexpected 404 for widget "'.$type.'". Body: '.$response->getContent()
         );
 
-        $payload = json_decode($response->getContent(), true);
+        $payload = json_decode($response->getContent(), associative: true);
 
         $this->assertIsArray($payload, 'Invalid JSON payload for widget "'.$type.'".');
         $this->assertArrayHasKey('data', $payload, 'Missing data key for widget "'.$type.'".');

@@ -48,7 +48,7 @@ final class MessageApiControllerTest extends MauticMysqlTestCase
 
             $this->client->request($method, $url, Request::METHOD_PATCH === $method ? ['name' => 'Updated message'] : []);
             self::assertResponseIsSuccessful();
-            $payload  = json_decode($this->client->getResponse()->getContent(), true);
+            $payload  = json_decode($this->client->getResponse()->getContent(), associative: true);
             $channels = array_column($payload['message']['channels'], null, 'channel');
 
             $this->assertCount(2, $channels);
@@ -77,12 +77,12 @@ final class MessageApiControllerTest extends MauticMysqlTestCase
 }
 JSON;
 
-        $payloadArray = json_decode($payloadJson, true);
+        $payloadArray = json_decode($payloadJson, associative: true);
 
         $this->client->request(Request::METHOD_POST, '/api/messages/new', $payloadArray);
         $responseJson = $this->client->getResponse()->getContent();
         self::assertResponseStatusCodeSame(201, $responseJson);
-        $this->assertMessagePayload($payloadArray, json_decode($responseJson, true)['message'], $responseJson);
+        $this->assertMessagePayload($payloadArray, json_decode($responseJson, associative: true)['message'], $responseJson);
     }
 
     /**
@@ -113,7 +113,7 @@ JSON;
         self::assertResponseIsSuccessful($responseJson);
         $this->assertMessagePayload(
             ['id' => $message->getId()] + $expectedResponsePayload,
-            json_decode($responseJson, true)['message'],
+            json_decode($responseJson, associative: true)['message'],
             $responseJson
         );
     }
@@ -204,7 +204,7 @@ JSON;
         $this->client->request(Request::METHOD_PATCH, '/api/messages/batch/edit', $patchPayload);
         $responseJson = $this->client->getResponse()->getContent();
         self::assertResponseIsSuccessful($responseJson);
-        $responseArray = json_decode($responseJson, true);
+        $responseArray = json_decode($responseJson, associative: true);
         $this->assertMessagePayload(
             [
                 'id'          => $message1->getId(),

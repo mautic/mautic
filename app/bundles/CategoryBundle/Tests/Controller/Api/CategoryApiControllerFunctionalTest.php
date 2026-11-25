@@ -45,7 +45,7 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
 
         $this->assertIsArray($responseData);
         $this->assertArrayHasKey('member', $responseData);
@@ -112,7 +112,7 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
 
         $this->assertIsArray($responseData);
         $this->assertArrayHasKey('member', $responseData);
@@ -164,7 +164,7 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
 
         $this->assertIsArray($responseData);
         $this->assertArrayHasKey('member', $responseData);

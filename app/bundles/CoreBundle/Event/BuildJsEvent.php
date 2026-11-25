@@ -73,6 +73,6 @@ JS;
 
     public function acceptsScope(BuildJsScope $scope): bool
     {
-        return in_array($scope, $this->acceptedScopes, true);
+        return in_array($scope, $this->acceptedScopes, strict: true);
     }
 }

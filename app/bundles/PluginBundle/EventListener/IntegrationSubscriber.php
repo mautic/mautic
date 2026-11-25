@@ -27,9 +27,9 @@ final readonly class IntegrationSubscriber
     public function onRequest(PluginIntegrationRequestEvent $event): void
     {
         $name     = strtoupper($event->getIntegrationName());
-        $headers  = var_export($event->getHeaders(), true);
-        $params   = var_export($event->getParameters(), true);
-        $settings = var_export($event->getSettings(), true);
+        $headers  = var_export($event->getHeaders(), return: true);
+        $params   = var_export($event->getParameters(), return: true);
+        $settings = var_export($event->getSettings(), return: true);
 
         if (defined('IN_MAUTIC_CONSOLE') && defined('MAUTIC_CONSOLE_VERBOSITY')
             && MAUTIC_CONSOLE_VERBOSITY >= ConsoleOutput::VERBOSITY_VERY_VERBOSE) {
@@ -45,7 +45,7 @@ final readonly class IntegrationSubscriber
             $this->logger->debug("{$name} REQUEST URL: ".$event->getMethod().' '.$event->getUrl());
             if ('' !== $headers) {
                 $hashedHeaders  = oAuthHelper::sanitizeHeaderData($event->getHeaders());
-                $headers        = var_export($hashedHeaders, true);
+                $headers        = var_export($hashedHeaders, return: true);
                 $this->logger->debug("{$name} REQUEST HEADERS: \n".$headers.PHP_EOL);
             }
             if ('' !== $params) {
@@ -63,7 +63,7 @@ final readonly class IntegrationSubscriber
     public function onResponse(PluginIntegrationResponseEvent $event): void
     {
         $response = $event->getResponse();
-        $headers  = var_export($response->getHeaders(), true);
+        $headers  = var_export($response->getHeaders(), return: true);
         $name     = strtoupper($event->getIntegrationName());
         $isJson   = isset($response->getHeaders()['Content-Type']) && preg_grep('/application\/json/', $response->getHeaders()['Content-Type']);
         $json     = $isJson ? str_replace('    ', '  ', json_encode(json_decode($response->getBody()), JSON_PRETTY_PRINT)) : '';

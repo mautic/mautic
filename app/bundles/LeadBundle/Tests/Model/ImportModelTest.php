@@ -264,7 +264,7 @@ final class ImportModelTest extends StandardImportTestHelper
         ];
 
         foreach ($testData as $test) {
-            $this->assertSame($test['res'], $model->isEmptyCsvRow($test['row']), 'Failed on row '.var_export($test['row'], true));
+            $this->assertSame($test['res'], $model->isEmptyCsvRow($test['row']), 'Failed on row '.var_export($test['row'], return: true));
         }
     }
 
@@ -287,7 +287,7 @@ final class ImportModelTest extends StandardImportTestHelper
         ];
 
         foreach ($testData as $test) {
-            $this->assertSame($test['res'], $model->trimArrayValues($test['row']), 'Failed on row '.var_export($test['row'], true));
+            $this->assertSame($test['res'], $model->trimArrayValues($test['row']), 'Failed on row '.var_export($test['row'], return: true));
         }
     }
 
@@ -320,7 +320,7 @@ final class ImportModelTest extends StandardImportTestHelper
 
         foreach ($testData as $test) {
             $res = $model->hasMoreValuesThanColumns($test['row'], $columns);
-            $this->assertSame($test['res'], $res, 'Failed on row '.var_export($test['row'], true));
+            $this->assertSame($test['res'], $res, 'Failed on row '.var_export($test['row'], return: true));
             $this->assertSame($test['mod'], $test['row']);
         }
     }

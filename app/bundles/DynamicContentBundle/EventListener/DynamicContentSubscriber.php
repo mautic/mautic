@@ -207,7 +207,7 @@ final readonly class DynamicContentSubscriber
                 $value = $matches[2];
                 foreach ($result as $token => $replacement) {
                     $encodedToken = str_replace(['{', '}'], ['%7B', '%7D'], $token);
-                    $safe         = htmlspecialchars(strip_tags($replacement), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
+                    $safe         = htmlspecialchars(strip_tags($replacement), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', double_encode: false);
                     $value        = str_ireplace([$encodedToken, $token], $safe, $value);
                 }
 

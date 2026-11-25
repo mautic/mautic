@@ -217,7 +217,7 @@ class ContactSegmentFilter implements \Stringable
 
     public function doesColumnSupportEmptyValue(): bool
     {
-        return !in_array($this->contactSegmentFilterCrate->getType(), ['date', 'datetime'], true);
+        return !in_array($this->contactSegmentFilterCrate->getType(), ['date', 'datetime'], strict: true);
     }
 
     /**

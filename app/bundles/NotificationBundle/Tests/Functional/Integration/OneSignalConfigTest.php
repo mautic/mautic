@@ -24,7 +24,7 @@ final class OneSignalConfigTest extends MauticMysqlTestCase
 
     public function testConfigFormSavesKeysEncryptedAndFeatureSettingsUnderIntegrationKey(): void
     {
-        $this->saveSettings(new Integration(), false, []);
+        $this->saveSettings(new Integration(), isPublished: false, featureSettings: []);
 
         $crawler = $this->client->request('GET', '/s/plugins/config/OneSignal');
         $this->assertResponseIsSuccessful();
@@ -62,7 +62,7 @@ final class OneSignalConfigTest extends MauticMysqlTestCase
     {
         $settings = new Integration();
         $settings->setApiKeys($this->getService(EncryptionService::class)->encrypt(['rest_api_key' => 'rest-key']));
-        $this->saveSettings($settings, true, ['integration' => ['platforms' => ['android']]]);
+        $this->saveSettings($settings, isPublished: true, featureSettings: ['integration' => ['platforms' => ['android']]]);
 
         $integration = $this->getService(OneSignalIntegrationHelper::class)->getPublishedIntegration();
 
@@ -73,7 +73,7 @@ final class OneSignalConfigTest extends MauticMysqlTestCase
 
     public function testHelperIgnoresUnpublishedIntegration(): void
     {
-        $this->saveSettings(new Integration(), false, []);
+        $this->saveSettings(new Integration(), isPublished: false, featureSettings: []);
 
         $helper = $this->getService(OneSignalIntegrationHelper::class);
 
@@ -83,7 +83,7 @@ final class OneSignalConfigTest extends MauticMysqlTestCase
 
     public function testKeysAreRequiredOnlyWhilePublished(): void
     {
-        $this->saveSettings(new Integration(), false, []);
+        $this->saveSettings(new Integration(), isPublished: false, featureSettings: []);
 
         $crawler = $this->client->request('GET', '/s/plugins/config/OneSignal');
         $form    = $crawler->selectButton('Save & Close')->form();
@@ -103,7 +103,7 @@ final class OneSignalConfigTest extends MauticMysqlTestCase
 
     public function testMigrationMovesLegacyFlatFeatureSettings(): void
     {
-        $settings = $this->saveSettings(new Integration(), true, [
+        $settings = $this->saveSettings(new Integration(), isPublished: true, featureSettings: [
             'subdomain_name' => 'acme',
             'platforms'      => ['ios', 'android'],
         ]);

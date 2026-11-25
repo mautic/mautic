@@ -19,7 +19,7 @@ final class ListCommandTest extends AbstractMauticTestCase
         /** @var MockObject&Connection $connection */
         $connection = $this->createMock(Connection::class);
         $connection->method('getPlugins')
-            ->willReturn(json_decode(file_get_contents(__DIR__.'/../../ApiResponse/list.json'), true));
+            ->willReturn(json_decode(file_get_contents(__DIR__.'/../../ApiResponse/list.json'), associative: true));
 
         $pluginCollector = new PluginCollector($connection);
         $command         = new ListCommand($pluginCollector);

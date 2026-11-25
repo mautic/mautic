@@ -20,7 +20,7 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest('GET', $uri);
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($this->client->getResponse()->getContent(), true);
+        $responseData = json_decode($this->client->getResponse()->getContent(), associative: true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
         $form->setValues([
@@ -35,7 +35,7 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $this->assertResponseIsSuccessful();
-        $responseData      = json_decode($this->client->getResponse()->getContent(), true);
+        $responseData      = json_decode($this->client->getResponse()->getContent(), associative: true);
         $modifyTagsEventId = $responseData['eventId'] ?? null;
         $this->assertNotNull($modifyTagsEventId, 'Modify tags event should be created');
         $this->assertSame(1, $responseData['success']);
@@ -45,7 +45,7 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest('GET', $uri);
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($this->client->getResponse()->getContent(), true);
+        $responseData = json_decode($this->client->getResponse()->getContent(), associative: true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
 
@@ -69,7 +69,7 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $this->assertResponseIsSuccessful();
-        $responseData       = json_decode($this->client->getResponse()->getContent(), true);
+        $responseData       = json_decode($this->client->getResponse()->getContent(), associative: true);
         $changeOwnerEventId = $responseData['eventId'] ?? null;
         $this->assertNotNull($changeOwnerEventId, 'Change owner event should be created');
         $this->assertSame(1, $responseData['success']);
@@ -92,7 +92,7 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest('GET', $uri, ['modifiedEvents' => json_encode($modifiedEvents)]);
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($this->client->getResponse()->getContent(), true);
+        $responseData = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertSame($modifyTagsEventId, $responseData['eventId'], 'Should be able to edit the first event');
         $this->assertArrayHasKey('newContent', $responseData, 'Edit form content should be returned');
     }
@@ -114,12 +114,12 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
         $this->editChangeOwnerAction(null);
         $this->assertSame([''], $this->getOwnerSelect()->filter('option[selected]')->each(fn (Crawler $option): string => (string) $option->attr('value')));
 
-        $form = new Crawler(json_decode((string) $this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri())
+        $form = new Crawler(json_decode((string) $this->client->getResponse()->getContent(), associative: true)['newContent'], $this->client->getInternalRequest()->getUri())
             ->filterXPath('//form[@name="campaignevent"]')->form();
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $this->assertResponseIsSuccessful();
-        $responseData = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $responseData = json_decode((string) $this->client->getResponse()->getContent(), associative: true);
         $this->assertEmpty($responseData['success'] ?? null);
         $this->assertStringContainsString('A value is required.', (string) $responseData['newContent']);
     }
@@ -145,7 +145,7 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
 
     private function getOwnerSelect(): Crawler
     {
-        $responseData = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $responseData = json_decode((string) $this->client->getResponse()->getContent(), associative: true);
 
         return new Crawler($responseData['newContent'])->filter('select#campaignevent_properties_owner');
     }

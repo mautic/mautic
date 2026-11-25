@@ -117,7 +117,7 @@ final class SegmentImportExportSubscriber
         }
 
         foreach ($filters as $filter) {
-            if (isset($filter['object']) && in_array($filter['object'], ['lead', 'company'], true)) {
+            if (isset($filter['object']) && in_array($filter['object'], ['lead', 'company'], strict: true)) {
                 foreach ($customFields as $field) {
                     if (isset($filter['field']) && $filter['field'] === $field->getAlias()) {
                         $subEvent = new EntityExportEvent(LeadField::ENTITY_NAME, (int) $field->getId());

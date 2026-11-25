@@ -19,13 +19,13 @@ final class ContactChannelsTypeTest extends AbstractMauticTestCase
 
     public function testPauseDatesAreProperlyConfigured(): void
     {
-        $form = $this->createForm(true);
-        $this->assertOptions($form, 'contact_pause_start_date_email', true);
-        $this->assertOptions($form, 'contact_pause_end_date_email', true);
+        $form = $this->createForm(publicView: true);
+        $this->assertOptions($form, 'contact_pause_start_date_email', hasHtml5: true);
+        $this->assertOptions($form, 'contact_pause_end_date_email', hasHtml5: true);
 
-        $form = $this->createForm(false);
-        $this->assertOptions($form, 'contact_pause_start_date_email', false);
-        $this->assertOptions($form, 'contact_pause_end_date_email', false);
+        $form = $this->createForm(publicView: false);
+        $this->assertOptions($form, 'contact_pause_start_date_email', hasHtml5: false);
+        $this->assertOptions($form, 'contact_pause_end_date_email', hasHtml5: false);
     }
 
     /**

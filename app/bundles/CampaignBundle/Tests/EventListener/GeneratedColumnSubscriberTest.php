@@ -15,7 +15,7 @@ final class GeneratedColumnSubscriberTest extends TestCase
 {
     public function testOnGeneratedColumnsBuildWithMySql(): void
     {
-        $generatedColumns = $this->buildGeneratedColumns(true);
+        $generatedColumns = $this->buildGeneratedColumns(isMySql: true);
         $this->assertCount(5, $generatedColumns);
 
         $generatedColumns = iterator_to_array($generatedColumns);
@@ -33,7 +33,7 @@ final class GeneratedColumnSubscriberTest extends TestCase
 
     public function testOnGeneratedColumnsBuildWithMariaDb(): void
     {
-        $generatedColumns = $this->buildGeneratedColumns(false);
+        $generatedColumns = $this->buildGeneratedColumns(isMySql: false);
         $this->assertCount(0, $generatedColumns);
     }
 

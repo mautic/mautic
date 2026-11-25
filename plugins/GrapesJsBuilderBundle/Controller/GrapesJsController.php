@@ -23,7 +23,7 @@ class GrapesJsController extends CommonController
 
     private function isAuthorizedObjectType(string $objectType): bool
     {
-        return in_array($objectType, self::OBJECT_TYPE, true);
+        return in_array($objectType, self::OBJECT_TYPE, strict: true);
     }
 
     private function getAclPrefix(string $objectType): string
@@ -45,7 +45,7 @@ class GrapesJsController extends CommonController
         }
 
         try {
-            $decoded = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+            $decoded = json_decode($content, associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
             if (is_array($decoded)) {
                 return $decoded;
             }
@@ -95,7 +95,7 @@ class GrapesJsController extends CommonController
         }
 
         try {
-            $decodedEditorState = json_decode($editorState, true, 512, JSON_THROW_ON_ERROR);
+            $decodedEditorState = json_decode($editorState, associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
             return null;
         }

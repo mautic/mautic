@@ -264,7 +264,7 @@ final class LeadFieldRepository extends CommonRepository
         }
         $property = $this->getPropertyByField($field, $q);
         if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
-            $doesSupportEmptyValue            = !in_array($fieldType, ['date', 'datetime'], true);
+            $doesSupportEmptyValue            = !in_array($fieldType, ['date', 'datetime'], strict: true);
             $compositeExpression              = ('empty' === $operatorExpr) ?
                 $q->expr()->or(
                     $q->expr()->isNull($property),

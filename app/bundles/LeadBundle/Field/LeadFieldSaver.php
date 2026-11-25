@@ -36,6 +36,6 @@ final readonly class LeadFieldSaver
     {
         $leadField->setColumnIsNotCreated();
 
-        $this->saveLeadFieldEntity($leadField, true);
+        $this->saveLeadFieldEntity($leadField, isNew: true);
     }
 }

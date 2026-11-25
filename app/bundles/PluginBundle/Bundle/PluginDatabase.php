@@ -51,7 +51,7 @@ final readonly class PluginDatabase
         );
         foreach ($schema->getTables() as $table) {
             $tableName = AssetName::of($table);
-            if (in_array(strtolower($tableName), $existingTables, true)) {
+            if (in_array(strtolower($tableName), $existingTables, strict: true)) {
                 $schema->dropTable($tableName);
             }
         }

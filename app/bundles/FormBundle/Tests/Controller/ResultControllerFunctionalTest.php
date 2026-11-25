@@ -49,7 +49,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $form     = $response['form'];
         $formId   = $form['id'];
         $fieldId  = $form['fields'][0]['id'];
@@ -101,7 +101,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $form     = $response['form'];
         $formId   = $form['id'];
 
@@ -143,7 +143,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $form     = $response['form'];
         $formId   = $form['id'];
         $crawler  = $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}");
@@ -198,7 +198,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
-        return (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
+        return (int) json_decode((string) $this->client->getResponse()->getContent(), associative: true)['form']['id'];
     }
 
     private function createFile(string $filename): void

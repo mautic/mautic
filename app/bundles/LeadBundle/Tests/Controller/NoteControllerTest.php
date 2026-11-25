@@ -236,7 +236,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
     private function createUserAndOwnedContact(array $permissions): array
     {
         $role = new Role();
-        $role->setName('Note Controller Role '.uniqid('', true));
+        $role->setName('Note Controller Role '.uniqid('', more_entropy: true));
         $this->em->persist($role);
         $this->em->flush();
 
@@ -287,7 +287,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
     private function createUserWithPermissions(array $permissions): User
     {
         $role = new Role();
-        $role->setName('Note Role '.uniqid('', true));
+        $role->setName('Note Role '.uniqid('', more_entropy: true));
         $this->em->persist($role);
         $this->em->flush();
 

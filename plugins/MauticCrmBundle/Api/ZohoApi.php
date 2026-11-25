@@ -54,7 +54,7 @@ final class ZohoApi extends CrmApi
     {
         $parameters         = ['data' => $data];
 
-        return $this->request($object, $parameters, 'POST', true);
+        return $this->request($object, $parameters, 'POST', json: true);
     }
 
     /**
@@ -64,7 +64,7 @@ final class ZohoApi extends CrmApi
     {
         $parameters         = ['data' => $data];
 
-        return $this->request($object, $parameters, 'PUT', true);
+        return $this->request($object, $parameters, 'PUT', json: true);
     }
 
     /**
@@ -94,10 +94,10 @@ final class ZohoApi extends CrmApi
                 $params['id'] = $id;
             }
 
-            return $this->request($object, $params, 'GET', false, $settings);
+            return $this->request($object, $params, 'GET', json: false, settings: $settings);
         }
 
-        return $this->request($object, $params, 'GET', false, $settings);
+        return $this->request($object, $params, 'GET', json: false, settings: $settings);
     }
 
     /**
@@ -119,10 +119,10 @@ final class ZohoApi extends CrmApi
         if ($id) {
             $params['id'] = $id;
 
-            return $this->request('Accounts', $params, 'GET', false, $settings);
+            return $this->request('Accounts', $params, 'GET', json: false, settings: $settings);
         }
 
-        return $this->request('Accounts', $params, 'GET', false, $settings);
+        return $this->request('Accounts', $params, 'GET', json: false, settings: $settings);
     }
 
     /**
@@ -134,6 +134,6 @@ final class ZohoApi extends CrmApi
             'criteria' => '('.$searchColumn.':equals:'.$searchValue.')',
         ];
 
-        return $this->request($object.'/search', $parameters, 'GET', false);
+        return $this->request($object.'/search', $parameters, 'GET', json: false);
     }
 }

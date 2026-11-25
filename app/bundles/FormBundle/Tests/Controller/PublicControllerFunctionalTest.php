@@ -92,7 +92,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
                 'companycity'  => 'Boston',
                 'companystate' => 'Massachusetts',
             ],
-        ], json_decode($clientResponse->getContent(), true));
+        ], json_decode($clientResponse->getContent(), associative: true));
     }
 
     /**

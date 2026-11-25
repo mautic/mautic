@@ -98,7 +98,7 @@ final class FormCaptchaHoneypotFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         return (int) $response['form']['id'];
     }

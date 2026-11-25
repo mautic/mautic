@@ -355,7 +355,7 @@ final class EventEntityReferences
         foreach ($filters as $filter) {
             $kind = is_array($filter) ? (self::SEGMENT_FILTER_REFERENCES[$filter['field'] ?? ''] ?? null) : null;
 
-            if (null === $kind || !in_array($kind, $kinds, true)) {
+            if (null === $kind || !in_array($kind, $kinds, strict: true)) {
                 continue;
             }
 
@@ -410,7 +410,7 @@ final class EventEntityReferences
             return is_string($alias) && '' !== $alias ? [$alias] : [];
         }
 
-        if (!in_array($eventType, self::FIELD_KEY_REFERENCES, true)) {
+        if (!in_array($eventType, self::FIELD_KEY_REFERENCES, strict: true)) {
             return [];
         }
 
@@ -443,7 +443,7 @@ final class EventEntityReferences
         if (!empty($event['channel']) && !empty($event['channel_id'])) {
             $channelReference = self::CHANNEL_REFERENCES[$event['channel']] ?? $event['channel'];
 
-            if (in_array($channelReference, $references, true)) {
+            if (in_array($channelReference, $references, strict: true)) {
                 $event['channel_id'] = $idMaps[$channelReference][(int) $event['channel_id']] ?? null;
             }
         }
@@ -464,7 +464,7 @@ final class EventEntityReferences
 
     private function hasFieldReferences(string $eventType): bool
     {
-        return isset(self::FIELD_VALUE_REFERENCES[$eventType]) || in_array($eventType, self::FIELD_KEY_REFERENCES, true);
+        return isset(self::FIELD_VALUE_REFERENCES[$eventType]) || in_array($eventType, self::FIELD_KEY_REFERENCES, strict: true);
     }
 
     /**
@@ -479,7 +479,7 @@ final class EventEntityReferences
         $ids = [];
 
         foreach ($references as $path => $kind) {
-            if (!in_array($kind, $kinds, true)) {
+            if (!in_array($kind, $kinds, strict: true)) {
                 continue;
             }
 
@@ -530,7 +530,7 @@ final class EventEntityReferences
             }
         }
 
-        if (in_array($eventType, self::FIELD_KEY_REFERENCES, true)) {
+        if (in_array($eventType, self::FIELD_KEY_REFERENCES, strict: true)) {
             $renamed = [];
             foreach ($properties as $key => $value) {
                 $renamed[$fieldAliases[$key] ?? $key] = $value;

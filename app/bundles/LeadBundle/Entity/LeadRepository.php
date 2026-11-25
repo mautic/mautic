@@ -826,9 +826,9 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
                 $filterAddedValue     = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added');
                 $filterAddedValueEn   = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added', [], null, 'en_US');
 
-                if (in_array($string, [$manuallyAddedValue, $manuallyAddedValueEn], true)) {
+                if (in_array($string, [$manuallyAddedValue, $manuallyAddedValueEn], strict: true)) {
                     $manuallyAddedParam = 1;
-                } elseif (in_array($string, [$filterAddedValue, $filterAddedValueEn], true)) {
+                } elseif (in_array($string, [$filterAddedValue, $filterAddedValueEn], strict: true)) {
                     $manuallyAddedParam = 0;
                 } else {
                     // Unknown source value, so match nothing.
@@ -1560,7 +1560,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         ];
 
         if ($filters instanceof \stdClass) {
-            if (isset($filters->command, $filters->string) && in_array($filters->command, $listCommands, true)) {
+            if (isset($filters->command, $filters->string) && in_array($filters->command, $listCommands, strict: true)) {
                 if ($filters->not ?? false) {
                     return;
                 }
@@ -1604,13 +1604,13 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         $sourceCount = 0;
 
         foreach ($filters as $filter) {
-            if (in_array($filter->command, $listCommands, true)) {
+            if (in_array($filter->command, $listCommands, strict: true)) {
                 if (!empty($filter->not)) {
                     return false;
                 }
 
                 ++$listCount;
-            } elseif (in_array($filter->command, $sourceCommands, true)) {
+            } elseif (in_array($filter->command, $sourceCommands, strict: true)) {
                 if (!empty($filter->not)) {
                     return false;
                 }

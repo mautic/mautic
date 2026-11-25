@@ -101,7 +101,7 @@ final readonly class PointActionHelper
         }
 
         // return true only if all configured options are true
-        return !in_array(false, $changePoints);
+        return !in_array(needle: false, haystack: $changePoints);
     }
 
     private function getSqlLikePattern(string $url): string

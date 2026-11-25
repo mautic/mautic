@@ -37,7 +37,7 @@ final class AppCallbackController extends CommonController
     )]
     public function indexAction(Request $request): JsonResponse
     {
-        $requestBody = json_decode($request->getContent(), true);
+        $requestBody = json_decode($request->getContent(), associative: true);
 
         $matchData   = [
             'email' => $requestBody['email'],

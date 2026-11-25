@@ -109,7 +109,7 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
         $failedServiceIds = [];
 
         foreach ($serviceIds as $serviceId) {
-            if (in_array($serviceId, self::SKIPPED_SERVICE_IDS, true)) {
+            if (in_array($serviceId, self::SKIPPED_SERVICE_IDS, strict: true)) {
                 continue;
             }
 

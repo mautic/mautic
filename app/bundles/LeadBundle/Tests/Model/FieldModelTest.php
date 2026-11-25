@@ -193,7 +193,7 @@ final class FieldModelTest extends MauticMysqlTestCase
                 $alias = $args[0];
 
                 // Simulate alias and alias_1 are taken, alias_2 is available
-                if (in_array($alias, ['alias', 'alias_1'], true)) {
+                if (in_array($alias, ['alias', 'alias_1'], strict: true)) {
                     return new LeadField();
                 }
 

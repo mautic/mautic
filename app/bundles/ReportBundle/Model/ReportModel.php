@@ -608,9 +608,9 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
                 }
             }
 
-            $queryTime = microtime(true);
+            $queryTime = microtime(as_float: true);
             $data      = $query->executeQuery()->fetchAllAssociative();
-            $queryTime = round((microtime(true) - $queryTime) * 1000);
+            $queryTime = round((microtime(as_float: true) - $queryTime) * 1000);
 
             if ($queryTime >= 1000) {
                 $queryTime *= 1000;
@@ -728,7 +728,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
      */
     private function orderByIsValid(string $orderBy, string $orderByDirection, array $allowedColumns): bool
     {
-        return array_key_exists($orderBy, $allowedColumns) && in_array($orderByDirection, ['ASC', 'DESC', ''], true);
+        return array_key_exists($orderBy, $allowedColumns) && in_array($orderByDirection, ['ASC', 'DESC', ''], strict: true);
     }
 
     /**

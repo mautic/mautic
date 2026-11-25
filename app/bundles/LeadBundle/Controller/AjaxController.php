@@ -138,7 +138,7 @@ final class AjaxController extends CommonAjaxController
 
         $allowedFields = array_keys($this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['object' => 'lead']));
 
-        if ($field && $value && in_array($field, $allowedFields, true)) {
+        if ($field && $value && in_array($field, $allowedFields, strict: true)) {
             $leads                      = $this->leadRepository->getLeadsByFieldValue($field, $value, $ignore);
             $dataArray['existsMessage'] = $this->translator->trans('mautic.lead.exists.by.field').': ';
 
@@ -583,7 +583,7 @@ final class AjaxController extends CommonAjaxController
     public function addLeadTagsAction(Request $request, TagRepository $tagRepository): JsonResponse
     {
         $tags = $request->request->get('tags');
-        $tags = json_decode($tags, true);
+        $tags = json_decode($tags, associative: true);
 
         if (is_array($tags)) {
             $newTags = [];
@@ -760,7 +760,7 @@ final class AjaxController extends CommonAjaxController
 
         $leadList = $model->getEntity($id);
         if (!$leadList) {
-            return new JsonResponse($this->prepareJsonResponse(0, false), Response::HTTP_NOT_FOUND);
+            return new JsonResponse($this->prepareJsonResponse(0, needsRebuild: false), Response::HTTP_NOT_FOUND);
         }
 
         $leadCounts = $model->getSegmentContactCount([$id]);

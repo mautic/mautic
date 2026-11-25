@@ -40,7 +40,7 @@ final readonly class ReportFilterDataTransformer implements DataTransformerInter
                 if (isset($f['condition']) && in_array($f['condition'], ['like', 'notLike', 'startsWith', 'endsWith', 'contains'])) {
                     continue;
                 }
-                if (in_array($type, ['datetime', 'date', DateTimeType::class, DateType::class], true) && RelativeDateHelper::isRelative($f['value'])) {
+                if (in_array($type, ['datetime', 'date', DateTimeType::class, DateType::class], strict: true) && RelativeDateHelper::isRelative($f['value'])) {
                     continue;
                 }
                 $dt         = new DateTimeHelper($f['value'], null, 'utc');

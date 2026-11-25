@@ -358,7 +358,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             foreach ($groupByColumns as $column) {
                 $normalized = $this->normalizeColumnIdentifier($column);
 
-                if ('' === $normalized || in_array($normalized, $normalizedGroupBy, true)) {
+                if ('' === $normalized || in_array($normalized, $normalizedGroupBy, strict: true)) {
                     continue;
                 }
 
@@ -375,7 +375,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $normalized = $this->normalizeColumnIdentifier($baseColumn);
 
                     if ('' === $normalized
-                        || in_array($normalized, $normalizedGroupBy, true)
+                        || in_array($normalized, $normalizedGroupBy, strict: true)
                         || isset($normalizedAggregatorKeys[$normalized])
                     ) {
                         continue;
@@ -493,7 +493,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         $columns = [];
         foreach ($matches[0] as $index => $match) {
-            if (in_array(strtoupper($matches[1][$index]), self::SQL_KEYWORD_TOKENS, true)) {
+            if (in_array(strtoupper($matches[1][$index]), self::SQL_KEYWORD_TOKENS, strict: true)) {
                 continue;
             }
 
@@ -620,21 +620,21 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                 $filterDefinition = $filterDefinitions[$filter['column']] ?? [];
                 $type             = $filterDefinition['type'] ?? null;
-                $isRelativeDate   = in_array($type, ['date', 'datetime', DateType::class, DateTimeType::class], true)
-                    && !in_array($exprFunction, ['like', 'notLike', 'startsWith', 'endsWith', 'contains'], true)
+                $isRelativeDate   = in_array($type, ['date', 'datetime', DateType::class, DateTimeType::class], strict: true)
+                    && !in_array($exprFunction, ['like', 'notLike', 'startsWith', 'endsWith', 'contains'], strict: true)
                     && RelativeDateHelper::isRelative($filter['value']);
                 if ($isRelativeDate) {
                     if (isset($filterDefinition['formula'])) {
                         $filter['column'] = $filterDefinition['formula'];
                     }
                     if (RelativeDateHelper::isAnniversary($filter['value'])) {
-                        if (!in_array($exprFunction, ['empty', 'notEmpty'], true)) {
+                        if (!in_array($exprFunction, ['empty', 'notEmpty'], strict: true)) {
                             $filter['column'] = sprintf("DATE_FORMAT(%s, '%%m-%%d')", $filter['column']);
                             $filter['value']  = RelativeDateHelper::resolveAnniversary($filter['value']);
                         }
                     } else {
-                        $range = RelativeDateHelper::resolveRange($filter['value'], in_array($type, ['date', DateType::class], true));
-                        if (in_array($exprFunction, ['eq', 'neq'], true)) {
+                        $range = RelativeDateHelper::resolveRange($filter['value'], in_array($type, ['date', DateType::class], strict: true));
+                        if (in_array($exprFunction, ['eq', 'neq'], strict: true)) {
                             $startParam = $paramName.'Start';
                             $endParam   = $paramName.'End';
                             $queryBuilder->setParameter($startParam, $range['start']);
@@ -647,8 +647,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             continue;
                         }
 
-                        $filter['value'] = RelativeDateHelper::isCalendarPeriod($filter['value']) || in_array($type, ['date', DateType::class], true)
-                            ? (in_array($exprFunction, ['gt', 'lte'], true) ? $range['end'] : $range['start'])
+                        $filter['value'] = RelativeDateHelper::isCalendarPeriod($filter['value']) || in_array($type, ['date', DateType::class], strict: true)
+                            ? (in_array($exprFunction, ['gt', 'lte'], strict: true) ? $range['end'] : $range['start'])
                             : RelativeDateHelper::resolveInstant($filter['value'], false);
                     }
                 }
@@ -802,7 +802,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         // Handle empty/notEmpty conditions early to avoid unnecessary processing
-        if (in_array($filter['condition'], ['empty', 'notEmpty'], true)) {
+        if (in_array($filter['condition'], ['empty', 'notEmpty'], strict: true)) {
             $operator = 'empty' === $filter['condition'] ? 'NOT IN' : 'IN';
 
             return sprintf(
@@ -871,11 +871,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $type = $filterDefinitions[$filter['column']]['type'] ?? null;
 
-        return !in_array($type, ['date', 'datetime'], true);
+        return !in_array($type, ['date', 'datetime'], strict: true);
     }
 
     private function isEmptyValueSupportedCondition(string $condition): bool
     {
-        return in_array($condition, ['empty', 'notEmpty', 'neq'], true);
+        return in_array($condition, ['empty', 'notEmpty', 'neq'], strict: true);
     }
 }

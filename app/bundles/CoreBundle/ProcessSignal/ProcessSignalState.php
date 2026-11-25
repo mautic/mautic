@@ -32,7 +32,7 @@ final readonly class ProcessSignalState implements \Stringable
         }
 
         try {
-            $data = json_decode($matches[1], true, 512, JSON_THROW_ON_ERROR);
+            $data = json_decode($matches[1], associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
             throw new InvalidStateException($string, $e);
         }

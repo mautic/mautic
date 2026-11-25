@@ -43,7 +43,7 @@ final class FormSearchScopeProvider extends AbstractSearchScopeProvider
 
         return array_values(array_filter(
             $this->formModel->getCommandList(),
-            static fn (string $key): bool => !in_array($key, $excluded, true)
+            static fn (string $key): bool => !in_array($key, $excluded, strict: true)
         ));
     }
 }

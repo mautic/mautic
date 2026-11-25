@@ -31,7 +31,7 @@ final class SortableValueLabelListTypeTest extends TestCase
                     ['label', 'value'],
                 ];
 
-                return in_array($name, $expected[0], true);
+                return in_array($name, $expected[0], strict: true);
             }),
                 TextType::class,
                 $this->callback(function (array $options) use (&$call): bool {

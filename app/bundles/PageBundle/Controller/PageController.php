@@ -449,7 +449,7 @@ final class PageController extends AbstractStandardFormController
                             $template  = 'Mautic\PageBundle\Controller\PageController::viewAction';
                         } else {
                             // return edit view so that all the session stuff is loaded
-                            return $this->editAction($request, $pageConfig, $model, $themeHelper, $entity->getId(), true);
+                            return $this->editAction($request, $pageConfig, $model, $themeHelper, $entity->getId(), ignorePost: true);
                         }
                     } catch (InvalidRenderedHtmlException $e) {
                         $valid = false;

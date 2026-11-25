@@ -147,7 +147,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
             $event = $this->handlePossibleEventRedirection($event, $organizedLogs);
 
             // Validate that the schedule is still appropriate
-            $this->validateSchedule($organizedLogs, $now, true);
+            $this->validateSchedule($organizedLogs, $now, scheduleTogether: true);
 
             // Check that the campaign is published with up/down dates
             if ($event->getCampaign()->isPublished() && !$organizedLogs->isEmpty()) {

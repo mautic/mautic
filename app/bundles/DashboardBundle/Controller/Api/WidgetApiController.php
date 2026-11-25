@@ -88,7 +88,7 @@ final class WidgetApiController extends CommonApiController
     )]
     public function getDataAction(Request $request, string $type): Response
     {
-        $start      = microtime(true);
+        $start      = microtime(as_float: true);
         $timezone   = InputHelper::clean($request->attributes->all()['timezone'] ?? $request->query->all()['timezone'] ?? $request->request->all()['timezone'] ?? null);
         $from       = InputHelper::clean($request->attributes->all()['dateFrom'] ?? $request->query->all()['dateFrom'] ?? $request->request->all()['dateFrom'] ?? null);
         $to         = InputHelper::clean($request->attributes->all()['dateTo'] ?? $request->query->all()['dateTo'] ?? $request->request->all()['dateTo'] ?? null);
@@ -160,7 +160,7 @@ final class WidgetApiController extends CommonApiController
         }
 
         $response['cached']         = $widget->isCached();
-        $response['execution_time'] = microtime(true) - $start;
+        $response['execution_time'] = microtime(as_float: true) - $start;
         $response['success']        = 1;
         $response['data']           = $data;
 

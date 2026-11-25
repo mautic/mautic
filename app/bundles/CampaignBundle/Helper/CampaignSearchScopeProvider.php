@@ -41,7 +41,7 @@ final class CampaignSearchScopeProvider extends AbstractSearchScopeProvider
 
         return array_values(array_filter(
             $this->campaignModel->getCommandList(),
-            static fn (string $key): bool => !in_array($key, $excluded, true)
+            static fn (string $key): bool => !in_array($key, $excluded, strict: true)
         ));
     }
 }

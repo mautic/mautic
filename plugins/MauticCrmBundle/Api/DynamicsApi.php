@@ -49,12 +49,12 @@ final class DynamicsApi extends CrmApi
         /** @var ResponseInterface $response */
         $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
 
-        if ('POST' === $method && (!($response instanceof ResponseInterface) || !in_array($response->getStatusCode(), [200, 204], true))) {
+        if ('POST' === $method && (!($response instanceof ResponseInterface) || !in_array($response->getStatusCode(), [200, 204], strict: true))) {
             throw new ApiErrorException('Dynamics CRM API error: '.json_encode($response->getBody()));
         }
 
         if ('GET' === $method && $response instanceof ResponseInterface) {
-            return json_decode($response->getBody(), true);
+            return json_decode($response->getBody(), associative: true);
         }
 
         return $response;
@@ -138,8 +138,8 @@ final class DynamicsApi extends CrmApi
 
         $returnIds = [];
 
-        $batchId  = substr(str_shuffle(uniqid('b', false)), 0, 6);
-        $changeId = substr(str_shuffle(uniqid('c', false)), 0, 6);
+        $batchId  = substr(str_shuffle(uniqid('b', more_entropy: false)), 0, 6);
+        $changeId = substr(str_shuffle(uniqid('c', more_entropy: false)), 0, 6);
 
         $settings['headers']['Content-Type'] = 'multipart/mixed;boundary=batch_'.$batchId;
         $settings['headers']['Accept']       = 'application/json';
@@ -188,7 +188,7 @@ final class DynamicsApi extends CrmApi
 
     public function updateLeads(array $data, string $object = 'contacts'): array
     {
-        return $this->createLeads($data, $object, true);
+        return $this->createLeads($data, $object, isUpdate: true);
     }
 
     /**

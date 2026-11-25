@@ -265,7 +265,7 @@ final readonly class CampaignImportExportSubscriber
         $idMaps = [Campaign::ENTITY_NAME => $event->getEntityIdMap()];
 
         foreach ($entityData as $entity => $data) {
-            if (in_array($entity, ['dependencies', Campaign::ENTITY_NAME, Email::ENTITY_NAME, Event::ENTITY_NAME, Action::ENTITY_NAME, Field::ENTITY_NAME], true)) {
+            if (in_array($entity, ['dependencies', Campaign::ENTITY_NAME, Email::ENTITY_NAME, Event::ENTITY_NAME, Action::ENTITY_NAME, Field::ENTITY_NAME], strict: true)) {
                 continue;
             }
             $subEvent = new EntityImportEvent($entity, $data, $userId);
@@ -673,7 +673,7 @@ final readonly class CampaignImportExportSubscriber
 
             $properties = $action['properties'] ?? [];
             if (is_string($properties)) {
-                $properties = json_decode($properties, true);
+                $properties = json_decode($properties, associative: true);
             }
             if (!is_array($properties)) {
                 continue;

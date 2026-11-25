@@ -44,7 +44,7 @@ final class ExtremeIpLookup extends AbstractRemoteDataLookup
 
     protected function parseResponse($response): void
     {
-        $data = json_decode($response, true);
+        $data = json_decode($response, associative: true);
 
         if ($data) {
             foreach ($data as $key => $value) {

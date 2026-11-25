@@ -176,7 +176,7 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, (string) $this->client->getResponse()->getContent());
-        $formId = (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
+        $formId = (int) json_decode((string) $this->client->getResponse()->getContent(), associative: true)['form']['id'];
 
         $this->logoutUser();
         $crawler = $this->client->request(Request::METHOD_GET, "/form/{$formId}", [], [], ['HTTP_DNT' => '1']);
@@ -215,7 +215,7 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
             ]],
         ]);
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, (string) $this->client->getResponse()->getContent());
-        $formId = (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
+        $formId = (int) json_decode((string) $this->client->getResponse()->getContent(), associative: true)['form']['id'];
         $this->createCampaignChangingPointsOnSubmit($formId);
 
         $this->logoutUser();
@@ -361,7 +361,7 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, (string) $this->client->getResponse()->getContent());
 
-        return (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
+        return (int) json_decode((string) $this->client->getResponse()->getContent(), associative: true)['form']['id'];
     }
 
     /**

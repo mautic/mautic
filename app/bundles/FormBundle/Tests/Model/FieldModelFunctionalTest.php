@@ -78,7 +78,7 @@ final class FieldModelFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $formModel = $this->getService(FormModel::class);
 

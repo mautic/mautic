@@ -164,7 +164,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
         // Create the form
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $formId         = (int) $response['form']['id'];
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);

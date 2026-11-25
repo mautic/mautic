@@ -58,7 +58,7 @@ final class PluginControllerTest extends MauticMysqlTestCase
         $content = $response->getContent();
         $this->assertJson($content);
 
-        $data = json_decode($content, true);
+        $data = json_decode($content, associative: true);
         $this->assertArrayHasKey('pluginVersion', $data);
         $this->assertSame('1.0', $data['pluginVersion']);
     }

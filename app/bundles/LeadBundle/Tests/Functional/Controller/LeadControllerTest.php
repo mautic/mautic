@@ -92,13 +92,13 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->createContacts();
         $this->setAdminUser();
 
-        $adminRole      = $this->createRole(true, 'Security Admin');
+        $adminRole      = $this->createRole(isAdmin: true, name: 'Security Admin');
         $secondaryAdmin = $this->createUser($adminRole, 'security-admin', 'security.admin@email.com');
         $secondaryAdmin->setFirstName('Security');
         $secondaryAdmin->setLastName('Admin');
         $secondaryAdmin->setIsPublished(true);
 
-        $userRole = $this->createRole(false, 'Regular User');
+        $userRole = $this->createRole(isAdmin: false, name: 'Regular User');
         $user     = $this->createUser($userRole, 'regular-user', 'regular.user@email.com');
         $user->setFirstName('Regular');
         $user->setLastName('User');
@@ -164,7 +164,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->createContacts();
         $this->setAdminUser();
 
-        $adminRole      = $this->createRole(true, 'Security Admin');
+        $adminRole      = $this->createRole(isAdmin: true, name: 'Security Admin');
         $secondaryAdmin = $this->createUser($adminRole, 'security-admin', 'security.admin@email.com');
         $secondaryAdmin->setFirstName('Security');
         $secondaryAdmin->setLastName('Admin');
@@ -172,7 +172,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $thirdAdmin->setFirstName('Audit');
         $thirdAdmin->setLastName('Admin');
 
-        $userRole = $this->createRole(false, 'Regular User');
+        $userRole = $this->createRole(isAdmin: false, name: 'Regular User');
         $user     = $this->createUser($userRole, 'regular-user', 'regular.user@email.com');
         $user->setFirstName('Regular');
         $user->setLastName('User');

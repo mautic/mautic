@@ -52,7 +52,7 @@ abstract class AbstractProjectSearchTestCase extends MauticMysqlTestCase
 
             if ($isApiRequest) {
                 $this->assertJson($content, 'API response should be of type JSON.');
-                $this->assertProjectDataInApiResponse(json_decode($content, true));
+                $this->assertProjectDataInApiResponse(json_decode($content, associative: true));
             }
         }
     }

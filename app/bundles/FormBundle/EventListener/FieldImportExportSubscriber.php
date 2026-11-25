@@ -93,7 +93,7 @@ final readonly class FieldImportExportSubscriber
 
         $data = [];
 
-        if (isset($fieldData['mapped_object']) && isset($fieldData['mapped_field']) && in_array($fieldData['mapped_object'], ['contact', 'company'], true)) {
+        if (isset($fieldData['mapped_object']) && isset($fieldData['mapped_field']) && in_array($fieldData['mapped_object'], ['contact', 'company'], strict: true)) {
             $customFields   = $this->leadFieldModel->getLeadFieldCustomFields();
             foreach ($customFields as $object) {
                 if (isset($fieldData['mapped_field']) && $fieldData['mapped_field'] === $object->getAlias()) {
@@ -140,7 +140,7 @@ final readonly class FieldImportExportSubscriber
             // every one of them into an empty array.
             foreach (['properties', 'validation', 'custom_parameters', 'conditions'] as $jsonField) {
                 if (isset($fieldData[$jsonField]) && is_string($fieldData[$jsonField])) {
-                    $decoded               = json_decode($fieldData[$jsonField], true);
+                    $decoded               = json_decode($fieldData[$jsonField], associative: true);
                     $fieldData[$jsonField] = is_array($decoded) ? $decoded : [];
                 }
             }

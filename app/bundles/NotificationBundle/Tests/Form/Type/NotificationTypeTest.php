@@ -78,7 +78,7 @@ final class NotificationTypeTest extends TypeTestCase
             $errors = $view->children[$fieldName]->vars['errors'];
             $this->assertInstanceOf(FormErrorIterator::class, $errors);
 
-            if (in_array($fieldName, $invalidFields, true)) {
+            if (in_array($fieldName, $invalidFields, strict: true)) {
                 ++$errorCount;
                 $this->assertCount(1, $errors);
                 continue;

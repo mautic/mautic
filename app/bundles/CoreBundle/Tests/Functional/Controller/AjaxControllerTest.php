@@ -65,7 +65,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
             $response = $this->client->getResponse();
             $this->assertResponseIsSuccessful($caseName);
 
-            $content      = \json_decode($response->getContent(), true);
+            $content      = \json_decode($response->getContent(), associative: true);
             $expectedLink = rtrim($expectedLink, '/').'/'.$entity->getId();
 
             $this->assertStringContainsString($expectedLink, (string) $content['newContent'], $caseName);
@@ -168,7 +168,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         ];
 
         // Notification Mobile
-        $notification = $this->createNotification('Notification Mobile', true);
+        $notification = $this->createNotification('Notification Mobile', isMobile: true);
 
         yield 'Search Notification Mobile' => [
             'mobile',
@@ -300,7 +300,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $content = \json_decode($response->getContent(), true);
+        $content = \json_decode($response->getContent(), associative: true);
         $this->assertStringContainsString('s/users/edit/'.$user->getId(), (string) $content['newContent']);
     }
 
@@ -333,7 +333,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $content = \json_decode($response->getContent(), true);
+        $content = \json_decode($response->getContent(), associative: true);
         $this->assertArrayHasKey('newContent', $content);
 
         $this->assertGlobalSearchNotResult($content['newContent']);
@@ -408,7 +408,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $content = \json_decode($response->getContent(), true);
+        $content = \json_decode($response->getContent(), associative: true);
         $this->assertGlobalSearchNotResult($content['newContent']);
 
         $searchString = 'random';
@@ -416,7 +416,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $content = \json_decode($response->getContent(), true);
+        $content = \json_decode($response->getContent(), associative: true);
         $this->assertGlobalSearchNotResult($content['newContent']);
     }
 
@@ -450,7 +450,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $content = \json_decode($response->getContent(), true);
+        $content = \json_decode($response->getContent(), associative: true);
 
         $translator = $this->getService(TranslatorInterface::class);
         $this->assertStringContainsString('s/contacts?search='.$searchString, (string) $content['newContent']);
@@ -464,7 +464,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $content = \json_decode($response->getContent(), true);
+        $content = \json_decode($response->getContent(), associative: true);
 
         $translator = $this->getService(TranslatorInterface::class);
         $this->assertStringContainsString('s/credentials?search='.$searchString, (string) $content['newContent']);
@@ -511,7 +511,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         // Be aware the exception could be in mock handler expectations.
         $this->assertTrue($response->isOk());
 
-        $content = \json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $content = \json_decode($response->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         $this->assertCount(2, $content, $response->getContent());
         $this->assertArrayHasKey('success', $content);
@@ -539,7 +539,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
 
-        $content = \json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $content = \json_decode($response->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         $this->assertCount(2, $content);
         $this->assertArrayHasKey('attribution', $content);

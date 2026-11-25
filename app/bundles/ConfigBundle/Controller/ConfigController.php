@@ -77,14 +77,14 @@ final class ConfigController extends AbstractFormController
         if (null === $activeTabId) {
             // Keep the legacy ?tab= links working, otherwise open the general settings
             $legacyTab  = $request->query->get('tab');
-            $defaultTab = in_array('coreconfig', $tabs, true) ? 'coreconfig' : ($tabs[0] ?? 'coreconfig');
+            $defaultTab = in_array('coreconfig', $tabs, strict: true) ? 'coreconfig' : ($tabs[0] ?? 'coreconfig');
 
             return $this->delegateRedirect($this->generateUrl('mautic_config_edit', [
-                'activeTabId' => in_array($legacyTab, $tabs, true) ? $legacyTab : $defaultTab,
+                'activeTabId' => in_array($legacyTab, $tabs, strict: true) ? $legacyTab : $defaultTab,
             ]));
         }
 
-        if (!in_array($activeTabId, $tabs, true)) {
+        if (!in_array($activeTabId, $tabs, strict: true)) {
             return $this->notFound();
         }
 

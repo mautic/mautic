@@ -452,7 +452,7 @@ final readonly class SearchSubscriber
 
     private function buildMobileSentQuery(LeadBuildSearchEvent $event): void
     {
-        $this->buildNotificationSentQuery($event, true);
+        $this->buildNotificationSentQuery($event, isMobile: true);
     }
 
     private function buildNotificationSentQuery(LeadBuildSearchEvent $event, bool $isMobile = false): void

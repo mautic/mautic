@@ -25,7 +25,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $dynamicContent = $this->createDynamicContent($lead);
         $defaultContent = 'Default web content';
         // Create non public landing page.
-        $page           = $this->createPage($dynamicContent, $defaultContent, true, false);
+        $page           = $this->createPage($dynamicContent, $defaultContent, isPublished: true, publicPreview: false);
 
         $this->em->flush();
         $this->em->clear();
@@ -99,7 +99,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $toggleElem);
 
         // Create landing page with public preview OFF.
-        $page = $this->createPage(null, '', true, false);
+        $page = $this->createPage(null, '', isPublished: true, publicPreview: false);
 
         $this->em->flush();
         $this->em->clear();
@@ -136,7 +136,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('Hello', $crawler->filter('body')->text());
 
         // Create landing page with public preview OFF.
-        $page = $this->createPage(null, '', true, false);
+        $page = $this->createPage(null, '', isPublished: true, publicPreview: false);
 
         $this->em->flush();
         $this->em->clear();
@@ -150,7 +150,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Unauthorized access to requested URL: /page/preview/'.$pageId, $crawler->text());
 
         // Create page with publish OFF.
-        $page = $this->createPage(null, '', false);
+        $page = $this->createPage(null, '', isPublished: false);
 
         $this->em->flush();
         $this->em->clear();
@@ -163,7 +163,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Unauthorized access to requested URL: /page/preview/'.$pageId, $crawler->text());
 
         // Create landing page with publish and public preview OFF.
-        $page = $this->createPage(null, '', false, false);
+        $page = $this->createPage(null, '', isPublished: false, publicPreview: false);
 
         $this->em->flush();
         $this->em->clear();
@@ -187,7 +187,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
     public function testPreviewPageAccess(): void
     {
         // Create non published, non public landing page.
-        $page = $this->createPage(null, '', false, false);
+        $page = $this->createPage(null, '', isPublished: false, publicPreview: false);
 
         $this->em->flush();
         $this->em->clear();

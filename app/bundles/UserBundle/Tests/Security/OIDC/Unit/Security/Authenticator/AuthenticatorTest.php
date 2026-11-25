@@ -33,7 +33,7 @@ final class AuthenticatorTest extends TestCase
 
     public function testSupportsIsFalseWhenDisabled(): void
     {
-        $authenticator = $this->buildAuthenticator(false);
+        $authenticator = $this->buildAuthenticator(isEnabled: false);
         $response      = $authenticator->supports(new Request(['code' => 'code', 'state' => 'state'], [], ['_route' => 'mautic_oidc_check']));
 
         $this->assertFalse($response);

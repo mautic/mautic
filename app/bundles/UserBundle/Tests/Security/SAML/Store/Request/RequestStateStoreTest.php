@@ -57,7 +57,7 @@ final class RequestStateStoreTest extends TestCase
         $check = \Closure::bind(
             static function (CacheItem $actual, TestCase $case) use ($state): void {
                 $case::assertEqualsWithDelta(
-                    (2 * 60) + microtime(true),
+                    (2 * 60) + microtime(as_float: true),
                     $actual->expiry,
                     1
                 );

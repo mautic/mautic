@@ -120,13 +120,13 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
     public function checkSecurity($tags, $filters, $functions): void
     {
         foreach ($filters as $filter) {
-            if (in_array($filter, self::DENIED_FILTERS, true)) {
+            if (in_array($filter, self::DENIED_FILTERS, strict: true)) {
                 throw new SecurityNotAllowedFilterError(sprintf('Filter "%s" is not allowed in theme templates.', $filter), $filter);
             }
         }
 
         foreach ($functions as $function) {
-            if (in_array($function, self::DENIED_FUNCTIONS, true)) {
+            if (in_array($function, self::DENIED_FUNCTIONS, strict: true)) {
                 throw new SecurityNotAllowedFunctionError(sprintf('Function "%s" is not allowed in theme templates.', $function), $function);
             }
         }
@@ -153,12 +153,12 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
         $normalized = strtolower($method);
 
         // Block explicitly denied methods (sensitive data exposure, I/O)
-        if (in_array($normalized, self::DENIED_METHODS, true)) {
+        if (in_array($normalized, self::DENIED_METHODS, strict: true)) {
             throw new SecurityNotAllowedMethodError(sprintf('Calling "%s" on a "%s" object is not allowed in theme templates.', $method, get_debug_type($obj)), $obj::class, $method);
         }
 
         // Allow explicitly permitted methods (form template support)
-        if (in_array($normalized, self::ALLOWED_METHODS, true) && method_exists($obj, $method)) {
+        if (in_array($normalized, self::ALLOWED_METHODS, strict: true) && method_exists($obj, $method)) {
             return;
         }
 

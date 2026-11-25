@@ -49,7 +49,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->assertResponseIsSuccessful();
 
-        $content = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $content = json_decode((string) $this->client->getResponse()->getContent(), associative: true);
         $this->assertIsArray($content);
         $this->assertArrayHasKey('sendToDncStatus', $content);
         $this->assertSame($sendToDnc, $content['sendToDncStatus']);
@@ -74,7 +74,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', ['action' => 'email:getEmailSendToDncStatus']);
         $this->assertResponseIsSuccessful();
 
-        $content = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $content = json_decode((string) $this->client->getResponse()->getContent(), associative: true);
         $this->assertSame([], $content);
     }
 
@@ -135,7 +135,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([
             'success'         => 1,
             'delivered'       => 1,
-        ], json_decode($response->getContent(), true));
+        ], json_decode($response->getContent(), associative: true));
     }
 
     public function testGetDeliveredCountWithTranslations(): void
@@ -190,7 +190,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([
             'success'         => 1,
             'delivered'       => 1,
-        ], json_decode($response->getContent(), true));
+        ], json_decode($response->getContent(), associative: true));
     }
 
     public function testHeatmapAction(): void
@@ -230,7 +230,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=email:heatmap&id={$email->getId()}");
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $content = json_decode($response->getContent(), true);
+        $content = json_decode($response->getContent(), associative: true);
         $this->assertSame('Test html', $content['content']);
         $this->assertSame([
             [
@@ -283,7 +283,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertResponseIsSuccessful();
         $this->assertNotEmpty($response);
@@ -294,7 +294,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=email:getBuilderTokens');
         self::assertResponseIsSuccessful();
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertArrayHasKey('tokens', $response);
         $this->assertArrayHasKey('{contactfield=email}', $response['tokens']);
         $this->assertArrayHasKey('{ownerfield=email}', $response['tokens']);

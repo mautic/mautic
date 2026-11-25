@@ -88,7 +88,7 @@ final class CompanyCustomContentFunctionalTest extends MauticMysqlTestCase
 
     public function testImportMappingFormRendersCustomContentInDefaults(): void
     {
-        $this->csvFile = sys_get_temp_dir().'/'.uniqid('mautic_import_test_', true).'.csv';
+        $this->csvFile = sys_get_temp_dir().'/'.uniqid('mautic_import_test_', more_entropy: true).'.csv';
         file_put_contents($this->csvFile, "companyname,companyemail\nAcme,info@acme.test\n");
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/companies/import/new');

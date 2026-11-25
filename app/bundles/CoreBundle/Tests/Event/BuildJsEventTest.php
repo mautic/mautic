@@ -41,9 +41,9 @@ JS;
         $event->appendJs('compatibility;');
 
         $this->assertSame($expectedJs, $event->getJs());
-        $this->assertSame(in_array(BuildJsScope::RUNTIME, $acceptedScopes, true), $event->acceptsScope(BuildJsScope::RUNTIME));
-        $this->assertSame(in_array(BuildJsScope::ESSENTIAL, $acceptedScopes, true), $event->acceptsScope(BuildJsScope::ESSENTIAL));
-        $this->assertSame(in_array(BuildJsScope::TRACKING, $acceptedScopes, true), $event->acceptsScope(BuildJsScope::TRACKING));
+        $this->assertSame(in_array(BuildJsScope::RUNTIME, $acceptedScopes, strict: true), $event->acceptsScope(BuildJsScope::RUNTIME));
+        $this->assertSame(in_array(BuildJsScope::ESSENTIAL, $acceptedScopes, strict: true), $event->acceptsScope(BuildJsScope::ESSENTIAL));
+        $this->assertSame(in_array(BuildJsScope::TRACKING, $acceptedScopes, strict: true), $event->acceptsScope(BuildJsScope::TRACKING));
     }
 
     public function testLegacyDefaultAcceptsAllScopes(): void

@@ -91,7 +91,7 @@ final class UpdateLeadListsCommand extends ModeratedCommand
         }
 
         if ($enableTimeMeasurement) {
-            $startTime = microtime(true);
+            $startTime = microtime(as_float: true);
         }
 
         if ($id) {
@@ -159,7 +159,7 @@ final class UpdateLeadListsCommand extends ModeratedCommand
         $this->completeRun();
 
         if ($enableTimeMeasurement) {
-            $totalTime = round(microtime(true) - $startTime, 2);
+            $totalTime = round(microtime(as_float: true) - $startTime, 2);
             $output->writeln('<fg=magenta>'.$this->translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime]).'</>'."\n");
         }
 
@@ -244,9 +244,9 @@ final class UpdateLeadListsCommand extends ModeratedCommand
 
         $output->writeln('<info>'.$this->translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $segment->getId()]).'</info>');
         $lastBuiltDateBefore = $segment->getLastBuiltDate();
-        $startTime           = microtime(true);
+        $startTime           = microtime(as_float: true);
         $processed           = $this->listModel->rebuildListLeads($segment, $batch, $max, $output);
-        $rebuildTime         = round(microtime(true) - $startTime, 2);
+        $rebuildTime         = round(microtime(as_float: true) - $startTime, 2);
 
         // ListModel sets lastBuiltDate only when membership work is fully finished
         // (including runs capped by --max-contacts that still drain the queue).

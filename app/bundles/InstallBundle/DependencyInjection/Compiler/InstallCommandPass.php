@@ -15,7 +15,7 @@ final class InstallCommandPass implements CompilerPassInterface
     {
         $args = $_SERVER['argv'] ?? [];
 
-        if (!in_array(InstallCommand::COMMAND, $args, true)) {
+        if (!in_array(InstallCommand::COMMAND, $args, strict: true)) {
             return;
         }
 

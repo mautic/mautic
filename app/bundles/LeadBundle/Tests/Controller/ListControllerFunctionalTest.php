@@ -521,7 +521,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, 's/segments/delete/'.$list1->getId(), [], [], $this->createAjaxHeaders());
 
         $clientResponse     = $this->client->getResponse();
-        $clientResponseBody = json_decode($clientResponse->getContent(), true);
+        $clientResponseBody = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertStringContainsString($expectedErrorMessage, (string) $clientResponseBody['flashes']);
     }
@@ -561,7 +561,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $clientResponseBody = json_decode($clientResponse->getContent(), true);
+        $clientResponseBody = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertStringContainsString($expectedErrorMessage, (string) $clientResponseBody['flashes']);
     }
@@ -622,7 +622,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         return [
-            'content'    => json_decode($clientResponse->getContent(), true),
+            'content'    => json_decode($clientResponse->getContent(), associative: true),
             'statusCode' => $this->client->getResponse()->getStatusCode(),
         ];
     }

@@ -638,7 +638,7 @@ final class LeadController extends AbstractFormController
                         $returnUrl = $this->generateUrl('mautic_contact_action', $viewParameters);
                         $template  = 'Mautic\LeadBundle\Controller\LeadController::viewAction';
                     } else {
-                        return $this->editAction($request, $userHelper, $avatarHelper, $lead->getId(), true);
+                        return $this->editAction($request, $userHelper, $avatarHelper, $lead->getId(), ignorePost: true);
                     }
                 } else {
                     if ($request->attributes->all()['qf'] ?? $request->query->all()['qf'] ?? $request->request->all()['qf'] ?? false) {
@@ -1601,7 +1601,7 @@ final class LeadController extends AbstractFormController
     {
         if ('POST' === $request->getMethod()) {
             $data  = $request->request->all()['lead_batch'] ?? [];
-            $ids   = json_decode($data['ids'], true);
+            $ids   = json_decode($data['ids'], associative: true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -1717,7 +1717,7 @@ final class LeadController extends AbstractFormController
     {
         if (Request::METHOD_POST === $request->getMethod()) {
             $data = $request->request->all()['lead_batch_dnc'] ?? [];
-            $ids  = json_decode($data['ids'], true);
+            $ids  = json_decode($data['ids'], associative: true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -1792,7 +1792,7 @@ final class LeadController extends AbstractFormController
     {
         if ('POST' === $request->getMethod()) {
             $data  = $request->request->all()['lead_batch_stage'] ?? [];
-            $ids   = json_decode($data['ids'], true);
+            $ids   = json_decode($data['ids'], associative: true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -1900,7 +1900,7 @@ final class LeadController extends AbstractFormController
 
         if ('POST' === $request->getMethod()) {
             $data  = $request->request->all()['lead_batch_owner'] ?? [];
-            $ids   = json_decode($data['ids'], true);
+            $ids   = json_decode($data['ids'], associative: true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -2021,7 +2021,7 @@ final class LeadController extends AbstractFormController
     {
         $requestData = $request->request->all();
         $data        = $requestData['lead_batch_find_replace'] ?? $requestData['find_replace'] ?? [];
-        $ids         = json_decode($data['ids'] ?? '[]', true);
+        $ids         = json_decode($data['ids'] ?? '[]', associative: true);
         $fieldAlias  = $data['field'] ?? null;
         $updated     = [];
 
@@ -2216,7 +2216,7 @@ final class LeadController extends AbstractFormController
                 [
                     'column' => 'l.id',
                     'expr'   => 'in',
-                    'value'  => json_decode($ids, true),
+                    'value'  => json_decode($ids, associative: true),
                 ],
             ];
         } else {

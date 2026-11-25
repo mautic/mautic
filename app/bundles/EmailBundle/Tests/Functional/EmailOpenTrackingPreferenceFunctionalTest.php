@@ -22,7 +22,7 @@ final class EmailOpenTrackingPreferenceFunctionalTest extends MauticMysqlTestCas
 {
     public function testOpenIsNotRecordedForAContactWhoTurnedTrackingOff(): void
     {
-        [$email, $stat] = $this->createSentEmail('pixel-off@example.com', false);
+        [$email, $stat] = $this->createSentEmail('pixel-off@example.com', allowsTracking: false);
 
         $this->openEmail($stat, '203.0.113.70');
 

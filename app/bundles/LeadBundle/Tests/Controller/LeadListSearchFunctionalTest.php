@@ -191,7 +191,7 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($leadList);
 
         foreach ($leads as $lead) {
-            $this->addLeadToList($lead, $leadList, in_array($lead, $manuallyAddedLeads, true));
+            $this->addLeadToList($lead, $leadList, in_array($lead, $manuallyAddedLeads, strict: true));
         }
 
         return $leadList;

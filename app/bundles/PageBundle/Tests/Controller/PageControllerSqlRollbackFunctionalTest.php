@@ -26,7 +26,7 @@ final class PageControllerSqlRollbackFunctionalTest extends MauticMysqlTestCase
 
         $redirectUrl  = 'https://mautic.org/';
         $redirect     = new Redirect();
-        $redirectHash = uniqid('', true);
+        $redirectHash = uniqid('', more_entropy: true);
         $redirect->setRedirectId($redirectHash);
         $redirect->setUrl($redirectUrl);
         $this->em->persist($redirect);
@@ -37,7 +37,7 @@ final class PageControllerSqlRollbackFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
 
-        $statHash = uniqid('', true);
+        $statHash = uniqid('', more_entropy: true);
         $stat     = new Stat();
         $stat->setEmail($email);
         $stat->setEmailAddress($lead->getEmail());

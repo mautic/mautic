@@ -20,8 +20,8 @@ final class CompanySubscriberTest extends TestCase
 {
     public function testOnCompanyPostSave(): void
     {
-        $this->onCompanyPostSaveMethodCall(false); // update company log
-        $this->onCompanyPostSaveMethodCall(true); // create company log
+        $this->onCompanyPostSaveMethodCall(isNew: false); // update company log
+        $this->onCompanyPostSaveMethodCall(isNew: true); // create company log
     }
 
     public function testOnCompanyDelete(): void

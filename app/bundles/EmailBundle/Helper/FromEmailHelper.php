@@ -46,7 +46,7 @@ final class FromEmailHelper
 
         // Check for token
         if ($address->isEmailTokenized() || $address->isNameTokenized()) {
-            return $this->getEmailFromToken($address, $contact, true, $email);
+            return $this->getEmailFromToken($address, $contact, asOwner: true, email: $email);
         }
 
         if (!$contact) {
@@ -70,7 +70,7 @@ final class FromEmailHelper
 
         // Check for token
         if ($address->isEmailTokenized() || $address->isNameTokenized()) {
-            return $this->getEmailFromToken($address, $contact, false, $email);
+            return $this->getEmailFromToken($address, $contact, asOwner: false, email: $email);
         }
 
         return $address;

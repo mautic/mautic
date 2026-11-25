@@ -134,7 +134,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $responseData = json_decode($response->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         $this->assertStringContainsString($matchingSegment->getName(), (string) $responseData['newContent']);
         $this->assertStringNotContainsString($nonMatchingSegment->getName(), (string) $responseData['newContent']);

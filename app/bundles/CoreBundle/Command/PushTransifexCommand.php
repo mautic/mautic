@@ -73,7 +73,7 @@ final class PushTransifexCommand extends Command
 
         $resources = $transifex->getConnector(Resources::class);
 
-        $existingResources = json_decode((string) $resources->getAll()->getBody(), true);
+        $existingResources = json_decode((string) $resources->getAll()->getBody(), associative: true);
         $promises          = new \SplQueue();
 
         foreach ($files as $bundle => $stringFiles) {

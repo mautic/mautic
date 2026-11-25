@@ -74,7 +74,7 @@ final readonly class EventRedirectionHelper
 
             return true;
         }
-        if (in_array($id, $visited, true)) {
+        if (in_array($id, $visited, strict: true)) {
             $this->logger->warning('CAMPAIGN: Detected redirection cycle for event ID '.$id);
 
             return true;

@@ -96,7 +96,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/categories/category/new?show_bundle_select=1');
         $clientResponse = $this->client->getResponse();
 
-        $responseContent = json_decode($clientResponse->getContent(), true);
+        $responseContent = json_decode($clientResponse->getContent(), associative: true);
         $crawler         = new Crawler($responseContent['newContent']);
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
@@ -211,7 +211,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             $this->getMembersForCampaign($campaign->getId())
         );
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('3 contacts affected', (string) $response['flashes']);
@@ -252,7 +252,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             $this->getMembersForCampaign($campaign->getId())
         );
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('3 contacts affected', (string) $response['flashes']);
@@ -300,7 +300,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertSame('en', $contactB->getPreferredLocale());
         $this->assertSame('fr_FR', $contactC->getPreferredLocale());
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('2 contacts affected', (string) $response['flashes']);
@@ -369,7 +369,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertSame('en', $contactF->getPreferredLocale());
         $this->assertSame('en', $contactG->getPreferredLocale());
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('5 contacts affected', (string) $response['flashes']);
@@ -566,7 +566,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->client->submit($form, [], $this->createAjaxHeaders());
 
         self::assertResponseIsSuccessful();
-        $response = json_decode((string) $this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+        $response = json_decode((string) $this->client->getResponse()->getContent(), associative: true, flags: JSON_THROW_ON_ERROR);
         $this->assertArrayHasKey('newContent', $response, json_encode($response, JSON_THROW_ON_ERROR));
         $this->assertStringContainsString('lead[buttons][save_and_new]', (string) $response['newContent']);
         $this->assertArrayNotHasKey('closeModal', $response);
@@ -642,7 +642,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/s/contacts/email/{$contact->getId()}");
 
         self::assertResponseIsSuccessful();
-        $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
+        $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), associative: true)['newContent'], $this->client->getInternalRequest()->getUri());
         $form    = $crawler->selectButton('Send')->form();
         $form->setValues(
             [
@@ -693,7 +693,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/s/contacts/email/{$contact->getId()}");
 
         self::assertResponseIsSuccessful();
-        $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
+        $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), associative: true)['newContent'], $this->client->getInternalRequest()->getUri());
         $form    = $crawler->selectButton('Send')->form();
         $form->setValues(
             [
@@ -755,7 +755,7 @@ EMAIL;
         $this->client->request(Request::METHOD_POST, '/s/contacts/batchStages', $payload);
 
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
@@ -787,7 +787,7 @@ EMAIL;
         $this->client->request(Request::METHOD_POST, '/s/contacts/batchStages', $payload);
 
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
@@ -1159,7 +1159,7 @@ EMAIL;
             '/s/contacts/view/1?returnTo=form_results&formId=12&formPage=2'
         );
 
-        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->client->getResponse()->getContent(), associative: true);
 
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('/s/forms/results/12/2', (string) $response['newContent']);
@@ -1191,7 +1191,7 @@ EMAIL;
         $response = $this->client->getResponse();
 
         // Get the form HTML element out of the response, fill it in and submit.
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form         = $crawler->filterXPath('//form[@name="contact_group_points"]')->form();
         $groupAKey    = ContactGroupPointsType::getFieldKey($groupA->getId());
@@ -1263,7 +1263,7 @@ EMAIL;
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/contacts/batchDnc');
         self::assertResponseIsSuccessful();
-        $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
+        $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), associative: true)['newContent'], $this->client->getInternalRequest()->getUri());
         $form    = $crawler->selectButton('Save')->form();
         $form->setValues(
             [

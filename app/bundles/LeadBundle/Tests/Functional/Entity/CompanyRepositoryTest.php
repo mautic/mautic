@@ -173,7 +173,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         return $response['email']['id'];
     }
@@ -197,6 +197,6 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
             'success'          => 1,
             'sentCount'        => 1,
             'failedRecipients' => 0,
-        ], json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR), (string) $clientResponse->getContent());
+        ], json_decode($clientResponse->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR), (string) $clientResponse->getContent());
     }
 }

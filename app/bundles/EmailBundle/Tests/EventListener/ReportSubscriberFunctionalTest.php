@@ -273,7 +273,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
         // -- test API report data
         $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
         $clientResponse = $this->client->getResponse();
-        $result         = json_decode($clientResponse->getContent(), true);
+        $result         = json_decode($clientResponse->getContent(), associative: true);
         $this->assertSame([
             [
                 'e_id'                        => (string) $emails[0]->getId(),
@@ -352,7 +352,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
         $this->em->flush();
 
         $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
-        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $result = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertSame([
             [
                 'e_id'                => (string) $email->getId(),
@@ -415,7 +415,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
         $this->assertResponseIsSuccessful();
 
         $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
-        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $result = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertSame([
             [
                 'e_id'               => (string) $emails[0]->getId(),
@@ -479,7 +479,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
         $this->assertResponseIsSuccessful();
 
         $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
-        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $result = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertSame([
             [
                 'e_id'         => (string) $emails[0]->getId(),

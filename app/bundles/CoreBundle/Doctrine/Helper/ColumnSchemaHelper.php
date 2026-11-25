@@ -45,7 +45,7 @@ final class ColumnSchemaHelper
         $this->tableName = ($addPrefix) ? $this->prefix.$table : $table;
 
         // make sure the table exists
-        $this->checkTableExists($this->tableName, true);
+        $this->checkTableExists($this->tableName, throwException: true);
 
         // use the to schema to get table details so that changes will be calculated
         $this->fromTable = $this->sm->introspectTableByUnquotedName($this->tableName);
@@ -98,12 +98,12 @@ final class ColumnSchemaHelper
                 throw new SchemaException('Column is missing required name key.');
             }
 
-            $this->checkColumnExists($column['name'], true);
+            $this->checkColumnExists($column['name'], throwException: true);
         }
 
         // now add the columns
         foreach ($columns as $column) {
-            $this->addColumn($column, false);
+            $this->addColumn($column, checkExists: false);
         }
     }
 
@@ -126,7 +126,7 @@ final class ColumnSchemaHelper
         }
 
         if ($checkExists) {
-            $this->checkColumnExists($column['name'], true);
+            $this->checkColumnExists($column['name'], throwException: true);
         }
 
         $type    = $column['type'] ?? 'text';

@@ -312,11 +312,11 @@ final readonly class ContactSegmentService
     private function timedFetch(QueryBuilder $qb, ?int $segmentId): array|false
     {
         try {
-            $start = microtime(true);
+            $start = microtime(as_float: true);
 
             $result = $qb->executeQuery()->fetchAssociative();
 
-            $end = microtime(true) - $start;
+            $end = microtime(as_float: true) - $start;
 
             $this->logger->debug('Segment QB: Query took: '.$this->formatPeriod($end).', Result count: '.count($result), ['segmentId' => $segmentId]);
         } catch (Exception $e) {
@@ -341,10 +341,10 @@ final readonly class ContactSegmentService
     private function timedFetchAll(QueryBuilder $qb, ?int $segmentId)
     {
         try {
-            $start  = microtime(true);
+            $start  = microtime(as_float: true);
             $result = $qb->executeQuery()->fetchAllAssociative();
 
-            $end = microtime(true) - $start;
+            $end = microtime(as_float: true) - $start;
 
             $this->logger->debug(
                 'Segment QB: Query took: '.$this->formatPeriod($end).'ms. Result count: '.count($result),

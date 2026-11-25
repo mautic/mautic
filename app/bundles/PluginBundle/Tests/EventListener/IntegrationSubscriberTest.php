@@ -24,7 +24,7 @@ final class IntegrationSubscriberTest extends TestCase
         $event->method('getSettings')->willReturn(['setting' => 'value']);
 
         $authorization = ['Authorization: Bearer [REDACTED]'];
-        $authorization = var_export($authorization, true);
+        $authorization = var_export($authorization, return: true);
 
         $logger  = $this->createMock(LoggerInterface::class);
         $matcher = $this->exactly(4);

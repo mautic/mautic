@@ -141,12 +141,12 @@ final class FlashBagTest extends TestCase
 
     public function testReadStatusRead(): void
     {
-        $this->assertReadStatus(1, true);
+        $this->assertReadStatus(1, isRead: true);
     }
 
     public function testReadStatusUnread(): void
     {
-        $this->assertReadStatus(31, false);
+        $this->assertReadStatus(31, isRead: false);
     }
 
     public function testAddTypeError(): void

@@ -59,7 +59,7 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
 
         self::assertResponseIsSuccessful();
 
-        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $data = json_decode($response->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
 
         $emails = $data['member'];
         $this->assertCount(1, $emails, 'Expected exactly 1 email');
@@ -121,7 +121,7 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
 
         self::assertResponseIsSuccessful();
 
-        $page1Data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $page1Data = json_decode($response->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
 
         $this->assertArrayHasKey('member', $page1Data);
         $this->assertArrayHasKey('totalItems', $page1Data);

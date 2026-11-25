@@ -255,7 +255,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testEditTagWithNoPermission(): void
     {
         // Create a user without tag manager permissions
-        $role = $this->createRole(false);
+        $role = $this->createRole(isAdmin: false);
         $user = $this->createUser($role);
         $this->loginUser($user);
 
@@ -590,7 +590,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $user = new User();
         $user->setFirstName('John');
         $user->setLastName('Doe');
-        $user->setUsername('testuser_'.microtime(true).'_'.bin2hex(random_bytes(8)));
+        $user->setUsername('testuser_'.microtime(as_float: true).'_'.bin2hex(random_bytes(8)));
         $user->setEmail('john.doe@email.com');
         $user->setPassword('password');
         $user->setRole($role);

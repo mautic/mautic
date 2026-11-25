@@ -67,7 +67,7 @@ final class LeadListFilteringEvent extends CommonEvent
     {
         $this->subQuery = $query;
 
-        $this->setFilteringStatus(true);
+        $this->setFilteringStatus(status: true);
     }
 
     public function isFilteringDone(): bool

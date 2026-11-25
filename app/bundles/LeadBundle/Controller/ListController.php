@@ -220,7 +220,7 @@ final class ListController extends AbstractStandardFormController
             $auditLogModel,
             [],
             $this->generateUrl('mautic_segment_action', ['objectAction' => 'new']),
-            false
+            ignorePost: false
         );
     }
 
@@ -379,7 +379,7 @@ final class ListController extends AbstractStandardFormController
                 ]));
             }
             if ($valid) {
-                return $this->editAction($request, $segmentDependencies, $segmentCampaignShare, $segmentModel, $auditLogModel, $segment->getId(), true);
+                return $this->editAction($request, $segmentDependencies, $segmentCampaignShare, $segmentModel, $auditLogModel, $segment->getId(), ignorePost: true);
             }
         }
 

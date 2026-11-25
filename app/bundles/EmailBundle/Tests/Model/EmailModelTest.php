@@ -753,7 +753,7 @@ final class EmailModelTest extends TestCase
             ],
             ['email_type' => MailHelper::EMAIL_TYPE_MARKETING]
         );
-        $this->assertCount(0, $result, print_r($result, true));
+        $this->assertCount(0, $result, print_r($result, return: true));
     }
 
     public function testHitEmailSavesEmailStatAndDeviceStatInTwoTransactions(): void

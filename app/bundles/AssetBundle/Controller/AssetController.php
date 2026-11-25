@@ -381,7 +381,7 @@ final class AssetController extends AbstractStandardFormController
 
                     if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $uploaderHelper, $integrationHelper, $model, $entity->getId(), true);
+                        return $this->editAction($request, $uploaderHelper, $integrationHelper, $model, $entity->getId(), ignorePost: true);
                     }
 
                     $viewParameters = [

@@ -171,7 +171,7 @@ class QueryBuilder extends BaseQueryBuilder
             return $this;
         }
 
-        if (in_array($sqlPartName, ['orderBy', 'groupBy', 'select', 'set'], true)) {
+        if (in_array($sqlPartName, ['orderBy', 'groupBy', 'select', 'set'], strict: true)) {
             foreach ($value as $part) {
                 $this->queryParts[$sqlPartName][] = $part;
             }

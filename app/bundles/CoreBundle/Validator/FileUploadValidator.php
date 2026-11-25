@@ -54,7 +54,7 @@ final readonly class FileUploadValidator
         $extension         = strtolower($extension);
         $allowedExtensions = array_map(strtolower(...), $allowedExtensions);
 
-        if (!in_array($extension, $allowedExtensions, true)) {
+        if (!in_array($extension, $allowedExtensions, strict: true)) {
             $this->throwException($extensionErrorMsg, [
                 '%fileExtension%' => $extension,
                 '%extensions%'    => implode(', ', $allowedExtensions),
@@ -138,7 +138,7 @@ final readonly class FileUploadValidator
     {
         $extensions = $this->getExtensionsByMimeType($mimeType);
 
-        return !$extensions || in_array($extension, $extensions, true);
+        return !$extensions || in_array($extension, $extensions, strict: true);
     }
 
     /**

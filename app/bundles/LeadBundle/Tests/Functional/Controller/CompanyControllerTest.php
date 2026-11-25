@@ -55,7 +55,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $response = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $response = json_decode((string) $this->client->getResponse()->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         $this->assertTrue($response['closeModal']);
         $this->assertArrayHasKey('flashes', $response);

@@ -93,7 +93,7 @@ final class CampaignEventStatsTest extends MauticMysqlTestCase
         $url    = sprintf('/s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $before->format('Y-m-d'), $after->format('Y-m-d'));
         $this->client->request(Request::METHOD_GET, $url);
         $response = $this->client->getResponse();
-        $body     = \json_decode($response->getContent(), true);
+        $body     = \json_decode($response->getContent(), associative: true);
 
         return new Crawler($body['actions']);
     }

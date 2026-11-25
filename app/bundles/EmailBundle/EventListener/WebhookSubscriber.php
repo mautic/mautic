@@ -103,7 +103,7 @@ final readonly class WebhookSubscriber
             return;
         }
 
-        $payload = json_decode($webhookQueue->getPayload(), true);
+        $payload = json_decode($webhookQueue->getPayload(), associative: true);
 
         if (!is_array($payload)) {
             return;

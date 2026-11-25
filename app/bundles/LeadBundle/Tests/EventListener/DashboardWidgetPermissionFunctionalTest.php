@@ -93,7 +93,7 @@ final class DashboardWidgetPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $this->assertSame(1, preg_match('#<div class="vector-map"[^>]*>(.*?)</div>#s', $widgetHtml, $matches));
 
-        $countries = json_decode(html_entity_decode(trim($matches[1])), true);
+        $countries = json_decode(html_entity_decode(trim($matches[1])), associative: true);
         $this->assertIsArray($countries);
 
         return $countries;

@@ -51,7 +51,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         $this->createContacts();
         $this->setAdminUser();
 
-        $adminRole      = $this->createRole(true, 'Security Admin');
+        $adminRole      = $this->createRole(isAdmin: true, name: 'Security Admin');
         $secondaryAdmin = $this->createUser($adminRole, 'security-admin', 'security.admin@email.com');
         $secondaryAdmin->setFirstName('Security');
         $secondaryAdmin->setLastName('Admin');

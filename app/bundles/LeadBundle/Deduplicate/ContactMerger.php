@@ -230,7 +230,7 @@ final readonly class ContactMerger
 
         $newCompanyLeads = [];
         foreach ($loserCompanyLeads as $loserCompanyLead) {
-            if (in_array((int) $loserCompanyLead->getCompany()->getId(), $winnerCompanyIds, true)) {
+            if (in_array((int) $loserCompanyLead->getCompany()->getId(), $winnerCompanyIds, strict: true)) {
                 continue;
             }
 

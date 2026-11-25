@@ -71,7 +71,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
-        $jsonResponse   = json_decode($clientResponse->getContent(), true);
+        $jsonResponse   = json_decode($clientResponse->getContent(), associative: true);
 
         $searchIds = implode(',', [$segmentRead->getId(), $segmentSent->getId()]);
         $this->assertStringContainsString("/s/segments?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
@@ -86,7 +86,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
-        $jsonResponse   = json_decode($clientResponse->getContent(), true);
+        $jsonResponse   = json_decode($clientResponse->getContent(), associative: true);
 
         $searchIds = implode(',', [$campaign->getId()]);
         $this->assertStringContainsString("/s/campaigns?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
@@ -103,7 +103,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
-        $jsonResponse   = json_decode($clientResponse->getContent(), true);
+        $jsonResponse   = json_decode($clientResponse->getContent(), associative: true);
 
         $formId = $formWithEmailSend->getId();
         $this->assertStringNotContainsString("/s/forms?search=ids:{$formId},{$formId}", (string) $jsonResponse['usagesHtml']);
@@ -122,7 +122,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
-        $jsonResponse   = json_decode($clientResponse->getContent(), true);
+        $jsonResponse   = json_decode($clientResponse->getContent(), associative: true);
 
         $searchIds = implode(',', [$formWithEmailSend->getId(), $formWithEmailSendToUser->getId()]);
         $this->assertStringContainsString("/s/forms?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
@@ -138,7 +138,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
-        $jsonResponse   = json_decode($clientResponse->getContent(), true);
+        $jsonResponse   = json_decode($clientResponse->getContent(), associative: true);
 
         $searchIds = implode(',', [$pointActionIsSent->getId(), $pointActionIsOpen->getId()]);
         $this->assertStringContainsString("/s/points?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
@@ -153,7 +153,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
-        $jsonResponse   = json_decode($clientResponse->getContent(), true);
+        $jsonResponse   = json_decode($clientResponse->getContent(), associative: true);
 
         $searchIds = implode(',', [$pointActionIsSent->getId()]);
         $this->assertStringContainsString("/s/points/triggers?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
@@ -169,7 +169,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
-        $jsonResponse   = json_decode($clientResponse->getContent(), true);
+        $jsonResponse   = json_decode($clientResponse->getContent(), associative: true);
 
         $searchIds = implode(',', [$emailReport->getId(), $emailStatsReport->getId()]);
         $this->assertStringContainsString("/s/reports?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);

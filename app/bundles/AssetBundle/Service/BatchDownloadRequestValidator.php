@@ -55,7 +55,7 @@ final readonly class BatchDownloadRequestValidator
         }
 
         try {
-            $ids = json_decode($idsPayload, true, 512, JSON_THROW_ON_ERROR);
+            $ids = json_decode($idsPayload, associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
             throw new BatchDownloadException('mautic.asset.asset.batch_download.error.no_selection');
         }

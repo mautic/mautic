@@ -117,7 +117,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request(Request::METHOD_GET, '/api/contacts?limit=100');
         self::assertResponseIsSuccessful();
 
-        $legacyCollection = json_decode($this->client->getResponse()->getContent(), true);
+        $legacyCollection = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertIsArray($legacyCollection);
         $this->assertArrayHasKey('contacts', $legacyCollection);
         $this->assertIsArray($legacyCollection['contacts']);
@@ -133,7 +133,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request(Request::METHOD_GET, '/api/v2/contacts?page=1');
         self::assertResponseIsSuccessful();
 
-        $v2Collection = json_decode($this->client->getResponse()->getContent(), true);
+        $v2Collection = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertIsArray($v2Collection);
         $this->assertArrayHasKey('member', $v2Collection);
         $this->assertIsArray($v2Collection['member']);
@@ -184,7 +184,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request(Request::METHOD_GET, '/api/v2/contacts?page=1&itemsPerPage=2');
         self::assertResponseIsSuccessful();
 
-        $firstPage = json_decode($this->client->getResponse()->getContent(), true);
+        $firstPage = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertIsArray($firstPage);
         $this->assertArrayHasKey('member', $firstPage);
         $this->assertArrayHasKey('totalItems', $firstPage);
@@ -203,7 +203,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request(Request::METHOD_GET, '/api/v2/contacts?page=2&itemsPerPage=2');
         self::assertResponseIsSuccessful();
 
-        $secondPage = json_decode($this->client->getResponse()->getContent(), true);
+        $secondPage = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertIsArray($secondPage);
         $this->assertArrayHasKey('member', $secondPage);
         $this->assertArrayHasKey('totalItems', $secondPage);
@@ -268,7 +268,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request(Request::METHOD_GET, '/api/contacts?start=0&limit=10');
         self::assertResponseIsSuccessful();
 
-        $legacyCollection = json_decode($this->client->getResponse()->getContent(), true);
+        $legacyCollection = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertIsArray($legacyCollection);
         $this->assertArrayHasKey('contacts', $legacyCollection);
         $this->assertIsArray($legacyCollection['contacts']);
@@ -284,7 +284,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request(Request::METHOD_GET, '/api/v2/contacts?page=1&itemsPerPage=10');
         self::assertResponseIsSuccessful();
 
-        $collection = json_decode($this->client->getResponse()->getContent(), true);
+        $collection = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertIsArray($collection);
         $this->assertArrayHasKey('totalItems', $collection);
         $this->assertArrayHasKey('member', $collection);
@@ -347,7 +347,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();
-        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $data = json_decode($response->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
 
         $this->assertCount(1, $data['member'], 'New owner should see the reassigned contact (owner field takes precedence over createdBy)');
         $this->assertSame($contact->getId(), $data['member'][0]['id']);
@@ -363,7 +363,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();
-        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $data = json_decode($response->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
 
         $this->assertCount(0, $data['member'], 'Original creator should NOT see the contact after reassignment (owner field takes precedence)');
     }

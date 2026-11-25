@@ -134,7 +134,7 @@ final class LeadEmailReadDateSegmentFunctionalTest extends MauticMysqlTestCase
         $stat->setDateRead(clone $dateRead);
         $stat->setIsRead(true);
         $stat->setOpenCount(1);
-        $stat->setTrackingHash(uniqid('hash_', true));
+        $stat->setTrackingHash(uniqid('hash_', more_entropy: true));
         $this->em->persist($stat);
         $this->em->flush();
     }

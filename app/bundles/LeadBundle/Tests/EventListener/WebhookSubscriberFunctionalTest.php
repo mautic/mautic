@@ -55,7 +55,7 @@ final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($webhookQueueRepository->exists($webhook->getId()));
 
         $queueWebhook   = $webhookQueueRepository->getEntity(1);
-        $decodedPayload = json_decode($queueWebhook->getPayload(), true);
+        $decodedPayload = json_decode($queueWebhook->getPayload(), associative: true);
         $this->assertEquals('added', $decodedPayload['action']);
     }
 

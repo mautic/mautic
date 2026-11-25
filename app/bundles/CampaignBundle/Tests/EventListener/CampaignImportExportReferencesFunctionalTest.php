@@ -585,7 +585,7 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         self::getContainer()->get(EventDispatcherInterface::class)->dispatch($event);
 
         // The export is shared as JSON
-        return json_decode((string) json_encode($event->getEntities()), true);
+        return json_decode((string) json_encode($event->getEntities()), associative: true);
     }
 
     /**

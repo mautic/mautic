@@ -65,7 +65,7 @@ final class UntrackedVisitorPixelFunctionalTest extends MauticMysqlTestCase
         $this->client->request($method, $uri, ['page_url' => 'https://example.com/'], [], $server + ['REMOTE_ADDR' => '203.0.113.60']);
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->client->getResponse()->getContent(), associative: true);
         $this->assertNull($response['id'] ?? null, 'the contact is not recognised');
         $this->assertNull($response['sid'] ?? null, 'the device is not recognised');
         $this->assertNull($response['device_id'] ?? null, 'the device is not recognised');
@@ -86,7 +86,7 @@ final class UntrackedVisitorPixelFunctionalTest extends MauticMysqlTestCase
         $this->client->request($method, $uri, ['page_url' => 'https://example.com/'], [], $server + ['REMOTE_ADDR' => '203.0.113.61']);
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->client->getResponse()->getContent(), associative: true);
         $this->assertNull($response['id'] ?? null);
         $this->assertNoTrackingCookieSet();
         $this->assertIpAddressNotStored('203.0.113.61');
@@ -128,7 +128,7 @@ final class UntrackedVisitorPixelFunctionalTest extends MauticMysqlTestCase
         $this->client->request($method, $uri, ['page_url' => 'https://example.com/'], [], ['REMOTE_ADDR' => '203.0.113.63']);
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->client->getResponse()->getContent(), associative: true);
         $this->assertSame($contact->getId(), $response['id']);
         $this->assertNotEmpty($response['device_id']);
     }
@@ -160,7 +160,7 @@ final class UntrackedVisitorPixelFunctionalTest extends MauticMysqlTestCase
         $this->client->request($method, $uri, ['page_url' => 'https://example.com/'], [], $server);
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->client->getResponse()->getContent(), associative: true);
         $this->assertNull($response['id'] ?? null);
         $this->assertNull($response['device_id'] ?? null);
         $this->assertNoTrackingCookieSet();

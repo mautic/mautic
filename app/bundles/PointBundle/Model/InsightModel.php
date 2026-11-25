@@ -87,7 +87,7 @@ final class InsightModel extends CommonFormModel
 
         $hasUpdates = false;
         foreach ($insights as $insight) {
-            if (!in_array($changedGroup->getId(), $insight->getPointGroups(), true)) {
+            if (!in_array($changedGroup->getId(), $insight->getPointGroups(), strict: true)) {
                 continue;
             }
             if ($this->executePointInsight($insight, $contact)) {

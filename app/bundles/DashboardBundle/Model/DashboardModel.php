@@ -115,7 +115,7 @@ final class DashboardModel extends FormModel
             'description' => $this->generateDescription(),
             'widgets'     => array_map(
                 fn ($widget) => $widget->toArray(),
-                $this->getWidgets(true)
+                $this->getWidgets(ignorePaginator: true)
             ),
         ];
     }

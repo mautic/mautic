@@ -175,7 +175,7 @@ final class EmailController extends AbstractStandardFormController
 
         if ($updatedFilters) {
             $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
+            $updatedFilters = json_decode($updatedFilters, associative: true);
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
@@ -613,7 +613,7 @@ final class EmailController extends AbstractStandardFormController
                             $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                         } else {
                             // return edit view so that all the session stuff is loaded
-                            return $this->editAction($request, $assetModel, $corePermissions, $emailConfig, $model, $themeHelper, $entity->getId(), true);
+                            return $this->editAction($request, $assetModel, $corePermissions, $emailConfig, $model, $themeHelper, $entity->getId(), ignorePost: true);
                         }
                     } catch (InvalidRenderedHtmlException $e) {
                         $valid                  = false;

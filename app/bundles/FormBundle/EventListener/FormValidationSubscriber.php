@@ -101,7 +101,7 @@ final readonly class FormValidationSubscriber
         if (!empty($field->getValidation()['blockfreeemail'])) {
             $blockedProviders = $this->coreParametersHelper->get('blocked_free_email_providers') ?? [];
             $domain           = strtolower(substr(strrchr($value, '@'), 1));
-            if ($domain && in_array($domain, $blockedProviders, true)) {
+            if ($domain && in_array($domain, $blockedProviders, strict: true)) {
                 $validationMsg = $field->getValidation()['blockfreeemail_validationmsg'] ?? $this->translator->trans('mautic.form.submission.email.freeproviders.invalid', [], 'validators');
                 $event->failedValidation($validationMsg);
             }

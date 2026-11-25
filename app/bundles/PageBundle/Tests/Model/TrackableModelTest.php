@@ -141,8 +141,8 @@ final class TrackableModelTest extends TestCase
         if (null !== $useMap) {
             $emailContent = $this->generateContent($url, 'html', $useMap);
         } else {
-            $emailContent = $this->generateContent($url, 'html', true)
-                .$this->generateContent($url, 'html', false);
+            $emailContent = $this->generateContent($url, 'html', useMap: true)
+                .$this->generateContent($url, 'html', useMap: false);
         }
 
         [$content, $trackables] = $model->parseContentForTrackables(
@@ -179,8 +179,8 @@ final class TrackableModelTest extends TestCase
         if (null !== $useMap) {
             $emailContent = $this->generateContent($url, 'html', $useMap);
         } else {
-            $emailContent = $this->generateContent($url, 'html', true)
-                .$this->generateContent($url, 'html', false);
+            $emailContent = $this->generateContent($url, 'html', useMap: true)
+                .$this->generateContent($url, 'html', useMap: false);
         }
 
         [$content, $trackables] = $model->parseContentForTrackables(
@@ -217,8 +217,8 @@ final class TrackableModelTest extends TestCase
         if (null !== $useMap) {
             $emailContent = $this->generateContent($url, 'html', $useMap);
         } else {
-            $emailContent = $this->generateContent($url, 'html', true)
-                .$this->generateContent($url, 'html', false);
+            $emailContent = $this->generateContent($url, 'html', useMap: true)
+                .$this->generateContent($url, 'html', useMap: false);
         }
 
         [$content, $trackables] = $model->parseContentForTrackables(
@@ -466,8 +466,8 @@ final class TrackableModelTest extends TestCase
         if (null !== $useMap) {
             $emailContent = $this->generateContent($url, 'html', $useMap);
         } else {
-            $emailContent = $this->generateContent($url, 'html', true)
-                .$this->generateContent($url, 'html', false);
+            $emailContent = $this->generateContent($url, 'html', useMap: true)
+                .$this->generateContent($url, 'html', useMap: false);
         }
 
         [$content, $trackables] = $model->parseContentForTrackables(
@@ -501,8 +501,8 @@ final class TrackableModelTest extends TestCase
         if (null !== $useMap) {
             $emailContent = $this->generateContent($urls, 'html', $useMap);
         } else {
-            $emailContent = $this->generateContent($urls, 'html', true)
-                .$this->generateContent($urls, 'html', false);
+            $emailContent = $this->generateContent($urls, 'html', useMap: true)
+                .$this->generateContent($urls, 'html', useMap: false);
         }
 
         [$content, $trackables] = $model->parseContentForTrackables(

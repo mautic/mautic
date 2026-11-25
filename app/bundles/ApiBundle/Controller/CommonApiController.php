@@ -112,7 +112,7 @@ class CommonApiController extends FetchCommonApiController
         }
 
         if ([] !== $errors) {
-            $content           = json_decode($response->getContent(), true);
+            $content           = json_decode($response->getContent(), associative: true);
             $content['errors'] = $errors;
             $response->setContent(json_encode($content));
         }

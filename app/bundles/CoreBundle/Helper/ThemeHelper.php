@@ -213,7 +213,7 @@ final class ThemeHelper implements ThemeHelperInterface
             throw new FileNotFoundException($theme.' not found!');
         }
 
-        if (in_array($theme, $this->defaultThemes, true)) {
+        if (in_array($theme, $this->defaultThemes, strict: true)) {
             $this->addToHidden($theme);
 
             return;
@@ -231,7 +231,7 @@ final class ThemeHelper implements ThemeHelperInterface
         $configJsonPath = "{$themePath}/config.json";
 
         if ($this->filesystem->exists($configJsonPath)) {
-            $config = json_decode($this->filesystem->readFile($configJsonPath), true);
+            $config = json_decode($this->filesystem->readFile($configJsonPath), associative: true);
         } else {
             throw new FileNotFoundException("File {$configJsonPath} was not found and so the theme config cannot be updated with new name of {$newName}");
         }
@@ -373,7 +373,7 @@ final class ThemeHelper implements ThemeHelperInterface
             }
 
             if ('config.json' === basename($entry)) {
-                $config = json_decode($zipper->getFromName($entry), true);
+                $config = json_decode($zipper->getFromName($entry), associative: true);
             }
         }
 
@@ -395,7 +395,7 @@ final class ThemeHelper implements ThemeHelperInterface
             }
 
             foreach ($missingFiles as $missingFile) {
-                if (in_array($archivePrefix.'/'.$missingFile, $zipEntries, true)) {
+                if (in_array($archivePrefix.'/'.$missingFile, $zipEntries, strict: true)) {
                     $foundRequiredFiles[] = $missingFile;
                 }
             }
@@ -406,7 +406,7 @@ final class ThemeHelper implements ThemeHelperInterface
             }
         }
 
-        if (!is_dir($themePath) && !mkdir($themePath, 0755, true) && !is_dir($themePath)) {
+        if (!is_dir($themePath) && !mkdir($themePath, 0755, recursive: true) && !is_dir($themePath)) {
             $zipper->close();
             throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
         }
@@ -425,7 +425,7 @@ final class ThemeHelper implements ThemeHelperInterface
             }
 
             if (str_ends_with($file, '/')) {
-                if (!is_dir($destination) && !mkdir($destination, 0755, true) && !is_dir($destination)) {
+                if (!is_dir($destination) && !mkdir($destination, 0755, recursive: true) && !is_dir($destination)) {
                     $zipper->close();
                     throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
                 }
@@ -440,7 +440,7 @@ final class ThemeHelper implements ThemeHelperInterface
             }
 
             $destinationDir = dirname($destination);
-            if (!is_dir($destinationDir) && !mkdir($destinationDir, 0755, true) && !is_dir($destinationDir)) {
+            if (!is_dir($destinationDir) && !mkdir($destinationDir, 0755, recursive: true) && !is_dir($destinationDir)) {
                 fclose($stream);
                 $zipper->close();
                 throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
@@ -492,7 +492,7 @@ final class ThemeHelper implements ThemeHelperInterface
 
         $trimmed = rtrim($normalized, '/');
 
-        return '' !== $trimmed && in_array('..', explode('/', $trimmed), true);
+        return '' !== $trimmed && in_array('..', explode('/', $trimmed), strict: true);
     }
 
     /**
@@ -547,7 +547,7 @@ final class ThemeHelper implements ThemeHelperInterface
         }
 
         foreach ($requiredFiles as $requiredFile) {
-            if (!in_array($prefix.'/'.$requiredFile, $zipEntries, true)) {
+            if (!in_array($prefix.'/'.$requiredFile, $zipEntries, strict: true)) {
                 return null;
             }
         }
@@ -683,7 +683,7 @@ final class ThemeHelper implements ThemeHelperInterface
         }
 
         // Find any theme as a fallback
-        $themes = $this->getInstalledThemes('all', true);
+        $themes = $this->getInstalledThemes('all', extended: true);
 
         foreach ($themes as $theme) {
             // Already handled the default
@@ -719,7 +719,7 @@ final class ThemeHelper implements ThemeHelperInterface
                 continue;
             }
 
-            $config = json_decode($this->filesystem->readFile($theme->getRealPath().'/config.json'), true);
+            $config = json_decode($this->filesystem->readFile($theme->getRealPath().'/config.json'), associative: true);
 
             if (!$this->shouldLoadTheme($config, $specificFeature)) {
                 continue;
@@ -830,11 +830,11 @@ final class ThemeHelper implements ThemeHelperInterface
     {
         $themeName = $theme->getBasename();
 
-        if (!in_array($themeName, $this->defaultThemes, true)) {
+        if (!in_array($themeName, $this->defaultThemes, strict: true)) {
             return [];
         }
 
-        return ['hidden' => in_array($themeName, $this->getHiddenThemes(), true)];
+        return ['hidden' => in_array($themeName, $this->getHiddenThemes(), strict: true)];
     }
 
     /**
@@ -842,14 +842,14 @@ final class ThemeHelper implements ThemeHelperInterface
      */
     public function toggleVisibility(string $themeName): void
     {
-        if (!in_array($themeName, $this->defaultThemes, true)) {
+        if (!in_array($themeName, $this->defaultThemes, strict: true)) {
             return;
         }
 
         $hidden       = $this->createHiddenTxtIfNotExists();
         $hiddenThemes = array_values(array_filter(array_unique(explode('|', $this->filesystem->readFile($hidden)))));
 
-        if (in_array($themeName, $hiddenThemes, true)) {
+        if (in_array($themeName, $hiddenThemes, strict: true)) {
             $this->removeFromHidden($themeName, $hiddenThemes);
         } else {
             $this->addToHidden($themeName);
@@ -889,7 +889,7 @@ final class ThemeHelper implements ThemeHelperInterface
     private function removeFromHidden(string $themeName, array $hiddenThemes): void
     {
         $hidden      = $this->createHiddenTxtIfNotExists();
-        $keyToRemove = array_search($themeName, $hiddenThemes, true);
+        $keyToRemove = array_search($themeName, $hiddenThemes, strict: true);
 
         if (false !== $keyToRemove) {
             unset($hiddenThemes[$keyToRemove]);

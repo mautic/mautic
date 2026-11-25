@@ -32,7 +32,7 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
         $this->assertResponseIsSuccessful();
 
         // Get the form HTML element out of the response, fill it in and submit.
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
         $form->setValues(
@@ -54,8 +54,8 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $responseData = json_decode($response->getContent(), true);
-        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $responseData = json_decode($response->getContent(), associative: true);
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), associative: true), return: true));
     }
 
     /**

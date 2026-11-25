@@ -347,7 +347,7 @@ final class SubmissionModelTest extends TestCase
     {
         $reflection            = new \ReflectionClass(SubmissionModel::class);
         $method                = $reflection->getMethod('normalizeValue');
-        $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), more_entropy: true));
         $fields                = [];
         $fields[$fieldSession] = [
             'label'        => 'Email',
@@ -394,7 +394,7 @@ final class SubmissionModelTest extends TestCase
      */
     private function getTestFormFields(): array
     {
-        $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), more_entropy: true));
         $fields                = [];
         $fields[$fieldSession] = [
             'label'        => 'Email',

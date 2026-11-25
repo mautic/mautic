@@ -54,7 +54,7 @@ class ImportCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $start    = microtime(true);
+        $start    = microtime(as_float: true);
         $progress = new Progress($output);
         $id       = (int) $input->getOption('id');
         $limit    = (int) $input->getOption('limit');
@@ -143,7 +143,7 @@ class ImportCommand extends Command
                 '%created%' => $import->getInsertedCount(),
                 '%updated%' => $import->getUpdatedCount(),
                 '%ignored%' => $import->getIgnoredCount(),
-                '%time%'    => round(microtime(true) - $start, 2),
+                '%time%'    => round(microtime(as_float: true) - $start, 2),
             ]
         ).'</info>');
 
@@ -173,7 +173,7 @@ class ImportCommand extends Command
                     '%created%' => $import->getInsertedCount(),
                     '%updated%' => $import->getUpdatedCount(),
                     '%ignored%' => $import->getIgnoredCount(),
-                    '%time%'    => round(microtime(true) - $start, 2),
+                    '%time%'    => round(microtime(as_float: true) - $start, 2),
                 ]
             ),
             $type,

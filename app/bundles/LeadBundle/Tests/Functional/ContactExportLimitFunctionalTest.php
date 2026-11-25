@@ -42,7 +42,7 @@ final class ContactExportLimitFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         // Decode the JSON response
-        $responseData = json_decode($clientResponse->getContent(), true);
+        $responseData = json_decode($clientResponse->getContent(), associative: true);
 
         // Assert the response structure and content
         $this->assertStringContainsString('Export limit exceeded', (string) $responseData['message']);

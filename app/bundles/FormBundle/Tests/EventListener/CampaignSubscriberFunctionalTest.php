@@ -68,7 +68,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $formId   = $response['form']['id'];
 
         // Submitting the form.
@@ -131,7 +131,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             'fields'   => [['label' => 'Email', 'alias' => 'email', 'type' => 'email', 'leadField' => 'email']],
         ]);
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
-        $formId = json_decode($this->client->getResponse()->getContent(), true)['form']['id'];
+        $formId = json_decode($this->client->getResponse()->getContent(), associative: true)['form']['id'];
 
         $contact = new Lead();
         $contact->setEmail('testing@field.gone');

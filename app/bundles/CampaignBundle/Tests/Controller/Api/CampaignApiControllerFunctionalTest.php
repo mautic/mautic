@@ -244,7 +244,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, 'api/campaigns/new', $payload);
         $clientResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(201, $clientResponse->getContent());
-        $response   = json_decode($clientResponse->getContent(), true);
+        $response   = json_decode($clientResponse->getContent(), associative: true);
         $campaignId = $response['campaign']['id'];
         $this->assertGreaterThan(0, $campaignId);
         $this->assertEquals($payload['name'], $response['campaign']['name']);
@@ -302,7 +302,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/api/campaigns?search=ids:{$response['campaign']['id']}");
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful($clientResponse->getContent());
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $this->assertEquals($payload['name'], $response['campaigns'][$campaignId]['name'], $clientResponse->getContent());
         $this->assertEquals($payload['description'], $response['campaigns'][$campaignId]['description'], $clientResponse->getContent());
         $this->assertEquals($payload['events'][0]['name'], $response['campaigns'][$campaignId]['events'][0]['name'], $clientResponse->getContent());
@@ -359,7 +359,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(200, (string) $clientResponse->getStatusCode());
 
         // Decode the response content
-        $responseData = json_decode($clientResponse->getContent(), true);
+        $responseData = json_decode($clientResponse->getContent(), associative: true);
 
         // Ensure the response contains campaign data
         $this->assertNotEmpty($responseData);
@@ -440,7 +440,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Success check
         $this->assertResponseStatusCodeSame(201, 'Expected status code 201 for successful import.');
-        $responseData = json_decode($clientResponse->getContent(), true);
+        $responseData = json_decode($clientResponse->getContent(), associative: true);
         $this->assertIsArray($responseData);
         $this->assertContains('Import successful: Imported campaigns are switched off by default.', $responseData);
     }
@@ -460,7 +460,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], [], [], json_encode($payload));
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
-        $this->assertStringContainsString('review_field LONGTEXT, ADD review_extra', (string) json_decode($this->client->getResponse()->getContent(), true)['error']);
+        $this->assertStringContainsString('review_field LONGTEXT, ADD review_extra', (string) json_decode($this->client->getResponse()->getContent(), associative: true)['error']);
         $this->assertSame($campaigns, $this->getContainer()->get(CampaignRepository::class)->count([]));
         $this->assertSame($forms, $this->getContainer()->get(FormRepository::class)->count([]));
     }
@@ -507,7 +507,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         $this->assertResponseStatusCodeSame(201);
-        $decoded = json_decode($response->getContent(), true);
+        $decoded = json_decode($response->getContent(), associative: true);
         $this->assertContains('Import successful: Imported campaigns are switched off by default.', $decoded);
     }
 
@@ -569,7 +569,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $getResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful($getResponse->getContent());
 
-        $campaignData = json_decode($getResponse->getContent(), true)['campaign'];
+        $campaignData = json_decode($getResponse->getContent(), associative: true)['campaign'];
         $this->assertIsString($campaignData['publishUp']);
 
         $this->client->request(Request::METHOD_PATCH, sprintf('/api/campaigns/%d/edit', $campaign->getId()), [

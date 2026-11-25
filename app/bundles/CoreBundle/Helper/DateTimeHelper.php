@@ -315,7 +315,7 @@ final class DateTimeHelper
     public function getTextDate(?\DateInterval $interval = null): string|false
     {
         if (null == $interval) {
-            $interval = $this->getDiff('now', null, true);
+            $interval = $this->getDiff('now', null, resetTime: true);
         }
 
         $diffDays = (int) $interval->format('%R%a');
@@ -358,7 +358,7 @@ final class DateTimeHelper
     {
         $possibleUnits   = ['s', 'i', 'H', 'd', 'W', 'm', 'Y'];
 
-        if (!in_array($unit, $possibleUnits, true)) {
+        if (!in_array($unit, $possibleUnits, strict: true)) {
             $possibleUnitsString = implode(', ', $possibleUnits);
             throw new \InvalidArgumentException("Unit '{$unit}' is not supported. Use one of these: {$possibleUnitsString}");
         }

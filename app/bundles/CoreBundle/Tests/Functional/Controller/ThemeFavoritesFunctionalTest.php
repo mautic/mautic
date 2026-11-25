@@ -25,20 +25,20 @@ final class ThemeFavoritesFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->requestForm($formUrl);
         $this->assertThemeIsInSection($crawler, 'others');
-        $this->assertFavoritesPlaceholderIsVisible($crawler, true);
+        $this->assertFavoritesPlaceholderIsVisible($crawler, visible: true);
 
-        $this->assertSame(['success' => 1, 'favorite' => true], $this->setThemeFavorite(self::THEME, $type, true));
+        $this->assertSame(['success' => 1, 'favorite' => true], $this->setThemeFavorite(self::THEME, $type, favorite: true));
 
         $crawler = $this->requestForm($formUrl);
         $this->assertThemeIsInSection($crawler, 'favorites');
-        $this->assertFavoritesPlaceholderIsVisible($crawler, false);
+        $this->assertFavoritesPlaceholderIsVisible($crawler, visible: false);
         $this->assertCount(1, $crawler->filter('[data-theme-section="favorites"] [data-theme-favorite="'.self::THEME.'"] i.ri-star-fill'));
 
-        $this->assertSame(['success' => 1, 'favorite' => false], $this->setThemeFavorite(self::THEME, $type, false));
+        $this->assertSame(['success' => 1, 'favorite' => false], $this->setThemeFavorite(self::THEME, $type, favorite: false));
 
         $crawler = $this->requestForm($formUrl);
         $this->assertThemeIsInSection($crawler, 'others');
-        $this->assertFavoritesPlaceholderIsVisible($crawler, true);
+        $this->assertFavoritesPlaceholderIsVisible($crawler, visible: true);
         $this->assertCount(1, $crawler->filter('[data-theme-section="others"] [data-theme-favorite="'.self::THEME.'"] i.ri-star-line'));
     }
 
@@ -53,7 +53,7 @@ final class ThemeFavoritesFunctionalTest extends MauticMysqlTestCase
 
     public function testFavoritesAreStoredPerType(): void
     {
-        $this->assertSame(['success' => 1, 'favorite' => true], $this->setThemeFavorite(self::THEME, 'email', true));
+        $this->assertSame(['success' => 1, 'favorite' => true], $this->setThemeFavorite(self::THEME, 'email', favorite: true));
 
         $this->assertThemeIsInSection($this->requestForm('/s/emails/new'), 'favorites');
         $this->assertThemeIsInSection($this->requestForm('/s/pages/new'), 'others');
@@ -61,7 +61,7 @@ final class ThemeFavoritesFunctionalTest extends MauticMysqlTestCase
 
     public function testFavoritesAreStoredPerUser(): void
     {
-        $this->assertSame(['success' => 1, 'favorite' => true], $this->setThemeFavorite(self::THEME, 'email', true));
+        $this->assertSame(['success' => 1, 'favorite' => true], $this->setThemeFavorite(self::THEME, 'email', favorite: true));
 
         $user = $this->createUser('second.admin@mautic-test.com', 'second-admin', 'Second', 'Admin', $this->createRole('Second admin', true));
         $this->em->flush();
@@ -69,7 +69,7 @@ final class ThemeFavoritesFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->requestForm('/s/emails/new');
         $this->assertThemeIsInSection($crawler, 'others');
-        $this->assertFavoritesPlaceholderIsVisible($crawler, true);
+        $this->assertFavoritesPlaceholderIsVisible($crawler, visible: true);
     }
 
     #[DataProvider('dataForInvalidFavorites')]
@@ -84,7 +84,7 @@ final class ThemeFavoritesFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode(), (string) $response->getContent());
-        $this->assertSame(['success' => 0], json_decode((string) $response->getContent(), true, 512, JSON_THROW_ON_ERROR));
+        $this->assertSame(['success' => 0], json_decode((string) $response->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR));
         $this->assertSame([], $this->getStoredFavorites());
     }
 
@@ -123,7 +123,7 @@ final class ThemeFavoritesFunctionalTest extends MauticMysqlTestCase
         );
         $this->assertResponseIsSuccessful();
 
-        return json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        return json_decode((string) $this->client->getResponse()->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
     }
 
     private function requestForm(string $formUrl): Crawler
@@ -148,7 +148,7 @@ final class ThemeFavoritesFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $placeholder);
 
         $classes = explode(' ', (string) $placeholder->attr('class'));
-        $this->assertSame($visible, !in_array('hide', $classes, true));
+        $this->assertSame($visible, !in_array('hide', $classes, strict: true));
     }
 
     /**

@@ -45,7 +45,7 @@ final class UserApiTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/api/v2/users/{$userId}");
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($this->client->getResponse()->getContent(), true);
+        $responseData = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         // Assert password is not in the response
         $this->assertArrayNotHasKey('password', $responseData);
@@ -63,7 +63,7 @@ final class UserApiTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/api/v2/users');
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($this->client->getResponse()->getContent(), true);
+        $responseData = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         // ApiPlatform uses 'member' for collection items
         $this->assertArrayHasKey('member', $responseData);

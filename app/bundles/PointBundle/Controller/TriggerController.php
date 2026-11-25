@@ -259,7 +259,7 @@ final class TriggerController extends AbstractFormController
                             $this->clearSessionComponents($request, $sessionId);
 
                             // return edit view so that all the session stuff is loaded
-                            return $this->editAction($request, $entity->getId(), true);
+                            return $this->editAction($request, $entity->getId(), ignorePost: true);
                         }
                     }
                 }

@@ -655,7 +655,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $hit = new Hit();
         $hit->setDateHit(new \DateTime());
         $hit->setCode(200);
-        $hit->setTrackingId(hash('sha1', uniqid('mt_rand()', true)));
+        $hit->setTrackingId(hash('sha1', uniqid('mt_rand()', more_entropy: true)));
         $hit->setIpAddress(new IpAddress('127.0.0.1'));
         $hit->setPage($page);
 

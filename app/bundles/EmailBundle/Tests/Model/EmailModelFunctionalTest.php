@@ -621,7 +621,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $segment  = $this->createSegment();
         $this->addContactsToSegment([$contact], $segment);
         $email   = $this->createEmail($segment);
-        $stat    = $this->emulateEmailStat($contact, $email, false);
+        $stat    = $this->emulateEmailStat($contact, $email, isRead: false);
         $stat->setDateSent(new \DateTime('2026-05-02 06:31:32'));
         $this->em->flush();
 
@@ -634,7 +634,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
     {
         $contact = $this->createContact();
         $email   = $this->createTemplateEmail();
-        $stat    = $this->emulateEmailStat($contact, $email, false);
+        $stat    = $this->emulateEmailStat($contact, $email, isRead: false);
         $stat->setDateSent(new \DateTime('2026-03-13 19:01:54'));
         $this->em->flush();
 

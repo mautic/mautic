@@ -37,7 +37,7 @@ final class OwnershipScopedSecurityMetadataTest extends MauticMysqlTestCase
         $violations = [];
 
         foreach ($nameFactory->create() as $resourceClass) {
-            if (in_array($resourceClass, $knownNoOwnerClasses, true)) {
+            if (in_array($resourceClass, $knownNoOwnerClasses, strict: true)) {
                 continue;
             }
 

@@ -87,7 +87,7 @@ final class PushContactTest extends MauticMysqlTestCase
         $this->assertSame('https://us7.api.mailchimp.com/3.0/lists/list-1/members', $this->requests[0]['url']);
         $this->assertContains('Authorization: Basic '.base64_encode('mautic:'.self::API_KEY), $this->requests[0]['options']['normalized_headers']['authorization']);
 
-        $body = json_decode((string) $this->requests[0]['options']['body'], true);
+        $body = json_decode((string) $this->requests[0]['options']['body'], associative: true);
         $this->assertSame('john@example.com', $body['email_address']);
         $this->assertSame('pending', $body['status']);
         $this->assertSame(['FNAME' => 'John'], $body['merge_fields']);
@@ -137,7 +137,7 @@ final class PushContactTest extends MauticMysqlTestCase
         ]);
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->client->getResponse()->getContent(), associative: true);
         $this->assertSame(1, $response['success']);
         $this->assertStringContainsString('name="campaignevent[properties][config][list_settings][list]"', (string) $response['html']);
         $this->assertStringContainsString('<option value="list-1" selected="selected">Newsletter</option>', (string) $response['html']);
@@ -155,7 +155,7 @@ final class PushContactTest extends MauticMysqlTestCase
         ]);
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->client->getResponse()->getContent(), associative: true);
         $this->assertSame(0, $response['success']);
         $this->assertArrayNotHasKey('html', $response);
     }

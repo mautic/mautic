@@ -39,7 +39,7 @@ final class RouteMapTest extends TestCase
 
         $this->assertFileExists(self::FIXTURE, 'Route map fixture is missing. Generate it with UPDATE_ROUTE_MAP=1.');
         /** @var array<string, array<string, mixed>> $expected */
-        $expected = json_decode((string) file_get_contents(self::FIXTURE), true, 512, JSON_THROW_ON_ERROR);
+        $expected = json_decode((string) file_get_contents(self::FIXTURE), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         $removed = [];
         $changed = [];

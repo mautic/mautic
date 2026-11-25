@@ -99,10 +99,10 @@ final class ValidEmailLinksValidator extends ConstraintValidator
 
         $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
 
-        if (in_array($scheme, ['http', 'https', 'ftp', 'ftps'], true)) {
+        if (in_array($scheme, ['http', 'https', 'ftp', 'ftps'], strict: true)) {
             return UrlHelper::isValidUrl($url);
         }
 
-        return in_array($scheme, ['mailto', 'tel', 'sms'], true);
+        return in_array($scheme, ['mailto', 'tel', 'sms'], strict: true);
     }
 }

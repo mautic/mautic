@@ -113,7 +113,7 @@ final class FieldTemplateTest extends MauticMysqlTestCase
             'text' => $this->unsafeStoredMarkup(),
         ]);
 
-        $html = $this->renderFreeHtmlField($field, true);
+        $html = $this->renderFreeHtmlField($field, inBuilder: true);
 
         $this->assertStringContainsString('<p>Keep this content.</p>', $html);
         $this->assertStringNotContainsString('<form', strtolower($html));
@@ -131,7 +131,7 @@ final class FieldTemplateTest extends MauticMysqlTestCase
         $field->setOrder(1);
         $field->setProperties(['text' => $this->unsafeStoredMarkup()]);
 
-        $html = $this->renderFreeTextField($field, true);
+        $html = $this->renderFreeTextField($field, inBuilder: true);
 
         $this->assertStringContainsString('<p>Keep this content.</p>', $html);
         $this->assertStringNotContainsString('<form', strtolower($html));

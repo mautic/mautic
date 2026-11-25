@@ -359,7 +359,7 @@ final class DynamicContentType extends AbstractType
                     array_keys($customFields[0]),
                     ['date_added', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'tags', 'leadlist']
                 ),
-                true
+                strict: true
             ),
             ARRAY_FILTER_USE_KEY
         );

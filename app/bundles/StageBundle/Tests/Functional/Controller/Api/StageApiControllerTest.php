@@ -28,7 +28,7 @@ final class StageApiControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertSame(1, $response['success']);
     }
 
@@ -41,7 +41,7 @@ final class StageApiControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
         $this->assertSame(1, $response['success']);
     }
 

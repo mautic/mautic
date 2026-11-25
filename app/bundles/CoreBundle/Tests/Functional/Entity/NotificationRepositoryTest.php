@@ -17,11 +17,11 @@ final class NotificationRepositoryTest extends MauticMysqlTestCase
         $this->createNotification(1, 'dup2', new \DateTime('-1 day +5 seconds'));
         $this->em->flush();
 
-        $this->assertDuplicate(true, 2, 'dup1', new \DateTime('-1 day'));
-        $this->assertDuplicate(true, 2, 'dup1', new \DateTime('-25 hour'));
-        $this->assertDuplicate(false, 2, 'dup1', new \DateTime('-12 hour'));
-        $this->assertDuplicate(true, 1, 'dup2', new \DateTime('-1 day'));
-        $this->assertDuplicate(false, 1, 'dup1', new \DateTime('-1 day'));
+        $this->assertDuplicate(expectedIsDuplicate: true, userId: 2, deduplicate: 'dup1', from: new \DateTime('-1 day'));
+        $this->assertDuplicate(expectedIsDuplicate: true, userId: 2, deduplicate: 'dup1', from: new \DateTime('-25 hour'));
+        $this->assertDuplicate(expectedIsDuplicate: false, userId: 2, deduplicate: 'dup1', from: new \DateTime('-12 hour'));
+        $this->assertDuplicate(expectedIsDuplicate: true, userId: 1, deduplicate: 'dup2', from: new \DateTime('-1 day'));
+        $this->assertDuplicate(expectedIsDuplicate: false, userId: 1, deduplicate: 'dup1', from: new \DateTime('-1 day'));
     }
 
     private function assertDuplicate(bool $expectedIsDuplicate, int $userId, string $deduplicate, \DateTime $from): void

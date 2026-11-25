@@ -57,7 +57,7 @@ abstract class AbstractCompanyRelationValueFilterQueryBuilder extends ComplexRel
 
     protected function shouldAllowMissingCompany(string $filterOperator): bool
     {
-        return in_array($filterOperator, ['empty', 'neq', 'notLike', 'notBetween', 'notIn', '!multiselect', OperatorOptions::EXCLUDING_ALL], true);
+        return in_array($filterOperator, ['empty', 'neq', 'notLike', 'notBetween', 'notIn', '!multiselect', OperatorOptions::EXCLUDING_ALL], strict: true);
     }
 
     protected function requiresPrimaryCompany(): bool
@@ -174,10 +174,10 @@ abstract class AbstractCompanyRelationValueFilterQueryBuilder extends ComplexRel
     {
         $filterArray      = $filter->contactSegmentFilterCrate->getArray();
         $originalOperator = $filterArray['operator'];
-        $applyIsNull      = in_array($originalOperator, [OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true);
+        $applyIsNull      = in_array($originalOperator, [OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], strict: true);
         $applyNot         = OperatorOptions::EXCLUDING_ALL === $originalOperator;
         $operator         = OperatorOptions::EXCLUDING_ANY === $originalOperator ? 'notRegexp' : 'regexp';
-        $filterGlue       = in_array($originalOperator, [OperatorOptions::INCLUDING_ALL, OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true) ? 'and' : 'or';
+        $filterGlue       = in_array($originalOperator, [OperatorOptions::INCLUDING_ALL, OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], strict: true) ? 'and' : 'or';
 
         $expressions = [];
         foreach ((array) $filterParametersHolder as $parameter) {

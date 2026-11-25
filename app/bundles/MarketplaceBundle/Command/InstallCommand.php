@@ -65,7 +65,7 @@ final class InstallCommand extends Command
             return $this->installResource($packageName, $dryRun, $input, $output);
         }
 
-        if (!in_array($type, ['mautic-plugin', 'mautic-theme'], true)) {
+        if (!in_array($type, ['mautic-plugin', 'mautic-theme'], strict: true)) {
             throw new \Exception('Unsupported package type: '.$type);
         }
 
@@ -156,6 +156,6 @@ final class InstallCommand extends Command
         $io       = new SymfonyStyle($input, $output);
         $selected = $io->choice('Select the admin user who will own this resource', $choices);
 
-        return (int) array_search($selected, $choices, true);
+        return (int) array_search($selected, $choices, strict: true);
     }
 }

@@ -1194,7 +1194,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
     private function updateContactInZoho(Mapper $mapper, string $object, int|float &$counter, int &$errorCounter): void
     {
         $response     = $this->getApiHelper()->updateLead($mapper->getArray(), $object);
-        $failed       = $this->consumeResponse($response, $object, false, $mapper);
+        $failed       = $this->consumeResponse($response, $object, createIntegrationEntity: false, mapper: $mapper);
         $counter -= $failed;
         $errorCounter += $failed;
     }
@@ -1202,7 +1202,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
     private function createContactInZoho(Mapper $mapper, string $object, int|float &$counter, int &$errorCounter): void
     {
         $response     = $this->getApiHelper()->createLead($mapper->getArray(), $object);
-        $failed       = $this->consumeResponse($response, $object, true, $mapper);
+        $failed       = $this->consumeResponse($response, $object, createIntegrationEntity: true, mapper: $mapper);
         $counter -= $failed;
         $errorCounter += $failed;
     }

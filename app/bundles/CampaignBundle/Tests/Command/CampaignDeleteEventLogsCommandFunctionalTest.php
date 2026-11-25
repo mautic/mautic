@@ -19,7 +19,7 @@ final class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTest
 {
     public function testWithEventIds(): void
     {
-        $exitCode = $this->createDataAndRunCommand(false);
+        $exitCode = $this->createDataAndRunCommand(usingCampaign: false);
         $this->assertSame(0, $exitCode);
 
         $campaign = $this->getService(CampaignRepository::class)->findAll();
@@ -31,7 +31,7 @@ final class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTest
 
     public function testWithCampaignId(): void
     {
-        $exitCode = $this->createDataAndRunCommand(true);
+        $exitCode = $this->createDataAndRunCommand(usingCampaign: true);
 
         $this->assertSame(0, $exitCode);
 

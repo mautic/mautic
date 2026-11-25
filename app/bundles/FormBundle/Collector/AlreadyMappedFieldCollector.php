@@ -25,13 +25,13 @@ final readonly class AlreadyMappedFieldCollector implements AlreadyMappedFieldCo
     {
         $cacheItem = $this->cacheProvider->getItem($this->buildCacheKey($formId, $object));
 
-        return json_decode($cacheItem->get() ?? '[]', true);
+        return json_decode($cacheItem->get() ?? '[]', associative: true);
     }
 
     public function addField(string $formId, string $object, string $fieldKey): void
     {
         $this->fetchAndSave($formId, $object, function (array $fields) use ($fieldKey): array {
-            if (!in_array($fieldKey, $fields, true)) {
+            if (!in_array($fieldKey, $fields, strict: true)) {
                 $fields[] = $fieldKey;
             }
 
@@ -42,7 +42,7 @@ final readonly class AlreadyMappedFieldCollector implements AlreadyMappedFieldCo
     public function removeField(string $formId, string $object, string $fieldKey): void
     {
         $this->fetchAndSave($formId, $object, function (array $fields) use ($fieldKey): array {
-            $cacheKey = array_search($fieldKey, $fields, true);
+            $cacheKey = array_search($fieldKey, $fields, strict: true);
 
             if (false !== $cacheKey) {
                 unset($fields[$cacheKey]);
@@ -63,7 +63,7 @@ final readonly class AlreadyMappedFieldCollector implements AlreadyMappedFieldCo
     private function fetchAndSave(string $formId, string $object, callable $callback): void
     {
         $cacheItem = $this->cacheProvider->getItem($this->buildCacheKey($formId, $object));
-        $fields    = json_decode($cacheItem->get() ?? '[]', true);
+        $fields    = json_decode($cacheItem->get() ?? '[]', associative: true);
         $cacheItem->set(json_encode($callback($fields)));
         $cacheItem->expiresAfter(self::EXPIRATION_IN_SECONDS);
         $cacheItem->tag($this->buildCacheTag($formId));

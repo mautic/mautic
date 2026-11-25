@@ -35,7 +35,7 @@ final class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMidd
         }
 
         if (isset($_SERVER['MAUTIC_CUSTOM_DEV_HOSTS'])) {
-            $localIps         = json_decode($_SERVER['MAUTIC_CUSTOM_DEV_HOSTS'], true);
+            $localIps         = json_decode($_SERVER['MAUTIC_CUSTOM_DEV_HOSTS'], associative: true);
             $this->allowedIps = array_merge($this->allowedIps, $localIps);
         }
     }

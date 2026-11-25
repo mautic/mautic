@@ -148,7 +148,7 @@ final class ArchiveBuilder
         $finalName = $filename;
         $index     = 1;
 
-        while (in_array(mb_strtolower($finalName), $usedNames, true)) {
+        while (in_array(mb_strtolower($finalName), $usedNames, strict: true)) {
             $finalName = $this->generateUniqueName($filename, $index);
             ++$index;
         }

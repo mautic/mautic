@@ -162,13 +162,13 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
     {
         $form = $this->createForm();
 
-        $emailField = $this->createFormField($form, 'Email', 'email', true, true, 'email', 'contact');
+        $emailField = $this->createFormField($form, 'Email', 'email', isAutoFill: true, isReadOnly: true, mappedField: 'email', mappedObject: 'contact');
         $form->addField(1, $emailField);
 
-        $firstNameField =  $this->createFormField($form, 'First name', 'text', true, true, 'firstname', 'contact');
+        $firstNameField =  $this->createFormField($form, 'First name', 'text', isAutoFill: true, isReadOnly: true, mappedField: 'firstname', mappedObject: 'contact');
         $form->addField(2, $firstNameField);
 
-        $lastNameField = $this->createFormField($form, 'Last name', 'text', false, true, 'lastname', 'contact');
+        $lastNameField = $this->createFormField($form, 'Last name', 'text', isAutoFill: false, isReadOnly: true, mappedField: 'lastname', mappedObject: 'contact');
         $form->addField(3, $lastNameField);
 
         $submitButton = $this->createFormField($form, 'Submit', 'button');

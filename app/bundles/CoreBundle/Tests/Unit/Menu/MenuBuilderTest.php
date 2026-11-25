@@ -45,7 +45,7 @@ final class MenuBuilderTest extends TestCase
 
     public function testMainMenuKeepsUriOnlyItems(): void
     {
-        $menuName = uniqid('uriOnlyItems', false);
+        $menuName = uniqid('uriOnlyItems', more_entropy: false);
 
         $this->dispatcher
             ->expects($this->once())

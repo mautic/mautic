@@ -547,7 +547,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         foreach ($this->stages as $key => $stage) {
             $this->client->request(Request::METHOD_POST, '/api/stages/new', $stage);
             $clientResponse = $this->client->getResponse();
-            $response       = json_decode($clientResponse->getContent(), true);
+            $response       = json_decode($clientResponse->getContent(), associative: true);
 
             $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
 

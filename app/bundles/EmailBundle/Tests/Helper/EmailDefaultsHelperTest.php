@@ -57,7 +57,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
     public function testResolvePreferenceCenterReturnsExplicitPreferenceCenter(): void
     {
-        $existingPage = $this->createPreferenceCenterPage(true);
+        $existingPage = $this->createPreferenceCenterPage(published: true);
 
         $email = new Email();
         $email->setPreferenceCenter($existingPage);
@@ -141,7 +141,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
     public function testResolvePreferenceCenterReturnsConfiguredDefaultForEmailsWithoutExplicitPreferenceCenter(): void
     {
-        $page = $this->createPreferenceCenterPage(true);
+        $page = $this->createPreferenceCenterPage(published: true);
 
         $this->coreParametersHelper->expects($this->once())->method('get')->with('email_default_preference_center_id')->willReturn(42);
 
@@ -170,7 +170,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
     public function testResolvePreferenceCenterReturnsNullForUnpublishedDefault(): void
     {
-        $page = $this->createPreferenceCenterPage(false);
+        $page = $this->createPreferenceCenterPage(published: false);
 
         $this->coreParametersHelper->expects($this->once())->method('get')->with('email_default_preference_center_id')->willReturn(42);
 
@@ -185,7 +185,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
     public function testResolvePreferenceCenterReturnsNullForPublishedNonPreferenceCenterDefault(): void
     {
-        $page = $this->createPreferenceCenterPage(true, false);
+        $page = $this->createPreferenceCenterPage(published: true, isPreferenceCenter: false);
 
         $this->coreParametersHelper->expects($this->once())->method('get')->with('email_default_preference_center_id')->willReturn(42);
 

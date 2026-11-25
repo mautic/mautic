@@ -24,7 +24,7 @@ final readonly class Client
     public function post($url, array $payload, ?string $secret = null): ResponseInterface
     {
         $jsonPayload = json_encode($payload);
-        $signature   = null === $secret ? null : base64_encode(hash_hmac('sha256', $jsonPayload, $secret, true));
+        $signature   = null === $secret ? null : base64_encode(hash_hmac('sha256', $jsonPayload, $secret, binary: true));
         $headers     = [
             'Content-Type'      => 'application/json',
             'X-Origin-Base-URL' => $this->coreParametersHelper->get('site_url'),

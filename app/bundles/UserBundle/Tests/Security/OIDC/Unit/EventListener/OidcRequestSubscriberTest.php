@@ -33,7 +33,7 @@ final class OidcRequestSubscriberTest extends TestCase
 
     public function testOnKernelRequestRedirectsFromOpenIdLoginRequiredWhenDisabled(): void
     {
-        $settings     = $this->createSettings(false, true);
+        $settings     = $this->createSettings(enabled: false, required: true);
         $tokenStorage = $this->createStub(TokenStorageInterface::class);
         $logger       = $this->createStub(LoggerInterface::class);
         $router       = $this->getUrlGenerator();
@@ -45,7 +45,7 @@ final class OidcRequestSubscriberTest extends TestCase
 
     public function testOnKernelRequestRedirectsFromOpenIdLoginRequiredWhenLoggedInWIthOpenId(): void
     {
-        $settings     = $this->createSettings(true, true);
+        $settings     = $this->createSettings(enabled: true, required: true);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $logger       = $this->createStub(LoggerInterface::class);
         $router       = $this->getUrlGenerator();
@@ -62,7 +62,7 @@ final class OidcRequestSubscriberTest extends TestCase
 
     public function testOnKernelRequestRedirectsFromOpenIdLoginRequiredWhenLoggedInWIthForm(): void
     {
-        $settings     = $this->createSettings(true, false);
+        $settings     = $this->createSettings(enabled: true, required: false);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $logger       = $this->createStub(LoggerInterface::class);
         $router       = $this->getUrlGenerator();
@@ -79,7 +79,7 @@ final class OidcRequestSubscriberTest extends TestCase
 
     public function testOnKernelRequestDoesNotRedirectFromSecuredAreaIfOpenIdIsNotRequired(): void
     {
-        $settings     = $this->createSettings(true, false);
+        $settings     = $this->createSettings(enabled: true, required: false);
         $tokenStorage = $this->createStub(TokenStorageInterface::class);
         $logger       = $this->createStub(LoggerInterface::class);
         $router       = $this->createStub(UrlGeneratorInterface::class);
@@ -91,7 +91,7 @@ final class OidcRequestSubscriberTest extends TestCase
 
     public function testOnKernelRequestDoesNotRedirectFromSecuredAreaIfOpenIdIsNotEnabled(): void
     {
-        $settings     = $this->createSettings(false, true);
+        $settings     = $this->createSettings(enabled: false, required: true);
         $tokenStorage = $this->createStub(TokenStorageInterface::class);
         $logger       = $this->createStub(LoggerInterface::class);
         $router       = $this->createStub(UrlGeneratorInterface::class);
@@ -103,7 +103,7 @@ final class OidcRequestSubscriberTest extends TestCase
 
     public function testOnKernelRequestRedirectFromSecuredAreaIfNotLoggedInWithOpenId(): void
     {
-        $settings     = $this->createSettings(true, true);
+        $settings     = $this->createSettings(enabled: true, required: true);
         $tokenStorage = $this->createStub(TokenStorageInterface::class);
         $logger       = $this->createStub(LoggerInterface::class);
         $router       = $this->getUrlGenerator();
@@ -115,7 +115,7 @@ final class OidcRequestSubscriberTest extends TestCase
 
     public function testOnKernelRequestDontRedirectFromLoginIfNotLoggedInWithOpenId(): void
     {
-        $settings     = $this->createSettings(true, true);
+        $settings     = $this->createSettings(enabled: true, required: true);
         $tokenStorage = $this->createStub(TokenStorageInterface::class);
         $logger       = $this->createStub(LoggerInterface::class);
         $router       = $this->createStub(UrlGeneratorInterface::class);
@@ -127,7 +127,7 @@ final class OidcRequestSubscriberTest extends TestCase
 
     public function testOnKernelRequestRedirectFromLoginIfLoggedInWithOpenId(): void
     {
-        $settings     = $this->createSettings(true, true);
+        $settings     = $this->createSettings(enabled: true, required: true);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $logger       = $this->createStub(LoggerInterface::class);
         $router       = $this->getUrlGenerator();

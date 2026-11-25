@@ -189,7 +189,7 @@ class PathsHelper
             case 'temporary':
             case 'tmp':
                 if (!file_exists($this->temporaryDir)) {
-                    mkdir($this->temporaryDir, 0777, true);
+                    mkdir($this->temporaryDir, 0777, recursive: true);
                 }
 
                 return $this->temporaryDir;
@@ -213,7 +213,7 @@ class PathsHelper
                 $userPath .= '/'.$this->user->getId();
 
                 if (!file_exists($userPath)) {
-                    mkdir($userPath, 0777, true);
+                    mkdir($userPath, 0777, recursive: true);
                 }
 
                 return $userPath;
@@ -243,7 +243,7 @@ class PathsHelper
         // for recommended-project installations where webroot is a subdirectory.
         // Other paths resolve from the project root as before.
         $webrootRelativePaths = ['themes', 'media', 'plugins', 'assets', 'images', 'translations'];
-        if (in_array($name, $webrootRelativePaths, true)) {
+        if (in_array($name, $webrootRelativePaths, strict: true)) {
             $rootPath = $this->localRoot;
         } else {
             $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];

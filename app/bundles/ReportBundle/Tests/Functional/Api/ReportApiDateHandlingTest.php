@@ -71,7 +71,7 @@ final class ReportApiDateHandlingTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
 
         // Verify report structure
         $this->assertArrayHasKey('report', $responseData);
@@ -124,7 +124,7 @@ final class ReportApiDateHandlingTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
 
         // The submission at 14:30 UTC should be included in the range 10:00-16:00 NY time (14:00-20:00 UTC)
         $this->assertEquals(1, $responseData['totalResults'], 'Should include submission within timezone-converted range');
@@ -145,7 +145,7 @@ final class ReportApiDateHandlingTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), associative: true);
 
         // 1 submission should be included in the results as we consider dateFrom time as 00:00:00 and dateTo time as 23:59:59 UTC if not set.
         $this->assertEquals(1, $responseData['totalResults'], 'Should include submission within timezone-converted range');

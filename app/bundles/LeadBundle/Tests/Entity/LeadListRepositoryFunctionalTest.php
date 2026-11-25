@@ -19,7 +19,7 @@ final class LeadListRepositoryFunctionalTest extends MauticMysqlTestCase
         $segmentB = $this->createSegment('B');
         $segmentC = $this->createSegment('C');
         $this->createSegmentMember($segmentA, $lead);
-        $this->createSegmentMember($segmentB, $lead, true);
+        $this->createSegmentMember($segmentB, $lead, isManuallyRemoved: true);
 
         $leadListRepository = $this->getService(LeadListRepository::class);
 
@@ -43,9 +43,9 @@ final class LeadListRepositoryFunctionalTest extends MauticMysqlTestCase
         $filterAddedLead = $this->createLead('filter@example.com');
         $removedLead = $this->createLead('removed@example.com');
 
-        $this->createSegmentMember($segment, $manuallyAddedLead, false, true);
+        $this->createSegmentMember($segment, $manuallyAddedLead, isManuallyRemoved: false, isManuallyAdded: true);
         $this->createSegmentMember($segment, $filterAddedLead);
-        $this->createSegmentMember($segment, $removedLead, true, true);
+        $this->createSegmentMember($segment, $removedLead, isManuallyRemoved: true, isManuallyAdded: true);
 
         $repository = self::getContainer()->get(LeadListRepository::class);
 

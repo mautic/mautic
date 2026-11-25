@@ -82,7 +82,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         $content      = $this->client->getResponse()->getContent();
         $crawler      = new Crawler($content);
         $daysJson     = $crawler->filter('canvas')->text(null, false);
-        $daysData     = json_decode(html_entity_decode($daysJson), true);
+        $daysData     = json_decode(html_entity_decode($daysJson), associative: true);
         $daysDatasets = $daysData['datasets'];
         $this->assertIsArray($daysDatasets);
         $this->assertCount(3, $daysDatasets);  // Assuming there are 3 datasets: Email sent, Email read, Email clicked
@@ -110,7 +110,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         $content   = $this->client->getResponse()->getContent();
         $crawler   = new Crawler($content);
         $hourJson  = $crawler->filter('canvas')->text(null, false);
-        $hoursData = json_decode(html_entity_decode($hourJson), true);
+        $hoursData = json_decode(html_entity_decode($hourJson), associative: true);
 
         $hoursDatasets = $hoursData['datasets'];
         $this->assertIsArray($hoursDatasets);
@@ -331,6 +331,6 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful($clientResponse->getContent());
 
-        return json_decode($clientResponse->getContent(), true);
+        return json_decode($clientResponse->getContent(), associative: true);
     }
 }

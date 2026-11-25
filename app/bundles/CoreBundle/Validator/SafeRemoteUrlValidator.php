@@ -48,7 +48,7 @@ final class SafeRemoteUrlValidator extends ConstraintValidator
             $allowedDomains[] = $siteDomain;
         }
 
-        return in_array($domain, $allowedDomains, true);
+        return in_array($domain, $allowedDomains, strict: true);
     }
 
     private function parseDomain(string $url): string

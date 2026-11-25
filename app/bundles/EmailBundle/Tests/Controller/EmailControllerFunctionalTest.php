@@ -63,7 +63,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['mailer_custom_headers']  = ['x-global-custom-header' => 'value123'];
 
         // Debug enables the profiler, needed only by tests reading the db collector.
-        if (in_array($this->name(), ['testProfileEmailDetailPageForUnsentEmail', 'testProfileEmailDetailPageForSentEmail', 'testEmailDetailsPageShouldNotHavePendingCount'], true)) {
+        if (in_array($this->name(), ['testProfileEmailDetailPageForUnsentEmail', 'testProfileEmailDetailPageForSentEmail', 'testEmailDetailsPageShouldNotHavePendingCount'], strict: true)) {
             $this->clientOptions = ['debug' => true];
         }
 
@@ -132,7 +132,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $response = json_decode($clientResponse->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         $this->assertStringContainsString($matchingEmail->getName(), (string) $response['newContent']);
         $this->assertStringNotContainsString($nonMatchingEmail->getName(), (string) $response['newContent']);
@@ -169,7 +169,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $response = json_decode($clientResponse->getContent(), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 
         $this->assertStringContainsString($matchingEmail->getName(), (string) $response['newContent']);
         $this->assertStringNotContainsString($nonMatchingThemeEmail->getName(), (string) $response['newContent']);
@@ -263,7 +263,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
             fn (array $query): bool => "SELECT l.id, dnc.reason FROM {$prefix}lead_donotcontact dnc LEFT JOIN {$prefix}leads l ON l.id = dnc.lead_id WHERE (dnc.channel = ?) AND (l.id IN (?))" === $query['sql']
         );
 
-        $this->assertCount(1, $dncQueries, 'DNC query not found. '.var_export(array_map(fn (array $query) => $query['sql'], $queries['default']), true));
+        $this->assertCount(1, $dncQueries, 'DNC query not found. '.var_export(array_map(fn (array $query) => $query['sql'], $queries['default']), return: true));
     }
 
     public function testEmailDetailPageForDisabledSendButton(): void
@@ -570,7 +570,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
 
-        $this->sendBatchEmail($email, 2, 10, true);
+        $this->sendBatchEmail($email, 2, 10, setCsrf: true);
 
         /** @var MauticMessage[] $messages */
         $messages   = self::getMailerMessages();
@@ -835,7 +835,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testManualWinnerActionIsAvailableForPublishedStartedVariant(): void
     {
-        [$parent, $variant] = $this->createManualWinnerEmailPair(true, true);
+        [$parent, $variant] = $this->createManualWinnerEmailPair(variantPublished: true, testStarted: true);
         $router             = $this->getService(RouterInterface::class);
         $winnerUrl          = $router->generate('mautic_email_action', [
             'objectAction' => 'winner',
@@ -868,7 +868,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testManualWinnerActionIsUnavailableForUnpublishedVariant(): void
     {
-        [$parent, $variant] = $this->createManualWinnerEmailPair(false, true);
+        [$parent, $variant] = $this->createManualWinnerEmailPair(variantPublished: false, testStarted: true);
         $winnerUrl          = $this->getService(RouterInterface::class)->generate('mautic_email_action', [
             'objectAction' => 'winner',
             'objectId'     => $variant->getId(),
@@ -881,7 +881,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testManualWinnerActionIsUnavailableBeforeAbTestStarts(): void
     {
-        [$parent, $variant] = $this->createManualWinnerEmailPair(true, false);
+        [$parent, $variant] = $this->createManualWinnerEmailPair(variantPublished: true, testStarted: false);
         $winnerUrl          = $this->getService(RouterInterface::class)->generate('mautic_email_action', [
             'objectAction' => 'winner',
             'objectId'     => $variant->getId(),
@@ -1257,7 +1257,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertSame(1, $response['success']);
         $this->assertNotEmpty($response['subject']);

@@ -38,7 +38,7 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
         $content  = $response->getContent();
         $this->assertJson($content);
 
-        $data = json_decode($content, true);
+        $data = json_decode($content, associative: true);
 
         $crawler = new Crawler($data['widgetHtml']);
 

@@ -68,7 +68,7 @@ final readonly class FileManager
 
     private function getUploadDir(): string
     {
-        return $this->getGrapesJsImagesPath(true);
+        return $this->getGrapesJsImagesPath(fullPath: true);
     }
 
     public function getFullUrl(string $fileName, string $separator = '/'): string
@@ -78,7 +78,7 @@ final readonly class FileManager
 
         return $url
             .$separator
-            .$this->getGrapesJsImagesPath(false, $separator)
+            .$this->getGrapesJsImagesPath(fullPath: false, separator: $separator)
             .$fileName;
     }
 
@@ -206,7 +206,7 @@ final readonly class FileManager
         $svgContent = @file_get_contents($filePath);
         if ($svgContent) {
             // Suppress XML warnings and enable internal error handling
-            $previousErrors = libxml_use_internal_errors(true);
+            $previousErrors = libxml_use_internal_errors(use_errors: true);
 
             // Parse SVG with network access disabled to mitigate XXE/SSRF risks
             $svg = simplexml_load_string($svgContent, 'SimpleXMLElement', LIBXML_NONET);

@@ -469,7 +469,7 @@ class Asset extends FormEntity implements UuidInterface
                 $this->setTitle($this->file->getClientOriginalName());
             }
 
-            $filename  = sha1(uniqid((string) mt_rand(), true));
+            $filename  = sha1(uniqid((string) mt_rand(), more_entropy: true));
             $extension = $this->getFile()->guessExtension();
 
             if (empty($extension)) {

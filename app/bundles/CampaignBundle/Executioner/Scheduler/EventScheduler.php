@@ -96,7 +96,7 @@ class EventScheduler
         $event  = $logs->first()->getEvent();
         $config = $this->collector->getEventConfig($event);
 
-        $this->dispatchBatchScheduledEvent($config, $event, $logs, true);
+        $this->dispatchBatchScheduledEvent($config, $event, $logs, isReschedule: true);
     }
 
     /**
@@ -121,7 +121,7 @@ class EventScheduler
         $event  = $logs->first()->getEvent();
         $config = $this->collector->getEventConfig($event);
 
-        $this->dispatchBatchScheduledEvent($config, $event, $logs, true);
+        $this->dispatchBatchScheduledEvent($config, $event, $logs, isReschedule: true);
     }
 
     /**

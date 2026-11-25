@@ -89,7 +89,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->loginUser($this->getService(UserRepository::class)->findOneBy(['username' => 'admin']));
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%d', $response['id']));
         $this->assertResponseIsSuccessful();

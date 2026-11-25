@@ -46,7 +46,7 @@ final class CampaignSubscriberTest extends TestCase
         $pendingEvent = $this->createPendingEvent(['integration' => 'Foo', 'config' => ['list_settings' => ['list' => 'a1']]]);
         $contact      = $pendingEvent->getPending()->first()->getLead();
 
-        $integration = $this->createPublishedIntegration(true);
+        $integration = $this->createPublishedIntegration(isPublished: true);
         $this->assertInstanceOf(Lead::class, $contact);
         $integration->expects($this->once())
             ->method('pushContact')
@@ -63,7 +63,7 @@ final class CampaignSubscriberTest extends TestCase
     {
         $pendingEvent = $this->createPendingEvent(['integration' => 'Foo']);
 
-        $integration = $this->createPublishedIntegration(true);
+        $integration = $this->createPublishedIntegration(isPublished: true);
         $integration->expects($this->once())
             ->method('pushContact')
             ->with($this->isInstanceOf(Lead::class), [])
@@ -81,7 +81,7 @@ final class CampaignSubscriberTest extends TestCase
     {
         $pendingEvent = $this->createPendingEvent(['integration' => 'Foo']);
 
-        $integration = $this->createPublishedIntegration(false);
+        $integration = $this->createPublishedIntegration(isPublished: false);
         $integration->expects($this->never())->method('pushContact');
 
         $subscriber = $this->createSubscriber($integration);

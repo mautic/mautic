@@ -175,7 +175,7 @@ class NotificationModel extends FormModel
 
                 $updateData = $this->updateHelper->fetchData();
             } elseif (file_exists($cacheFile)) {
-                $updateData = json_decode(file_get_contents($cacheFile), true);
+                $updateData = json_decode(file_get_contents($cacheFile), associative: true);
             }
 
             // If the version key is set, we have an update

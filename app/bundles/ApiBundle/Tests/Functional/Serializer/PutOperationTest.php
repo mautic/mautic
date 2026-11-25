@@ -37,7 +37,7 @@ final class PutOperationTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $responseData = json_decode($this->client->getResponse()->getContent(), true);
+        $responseData = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         $this->assertArrayHasKey('id', $responseData);
         $this->assertSame($projectId, $responseData['id']);
@@ -81,7 +81,7 @@ final class PutOperationTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         // The key assertion: ID should remain the same (global fix working)
         $this->assertSame($originalId, $response['id'], 'PUT should update the existing page, not create a new one');
@@ -125,7 +125,7 @@ final class PutOperationTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         // The key assertion: ID should remain the same (not creating a new entity)
         $this->assertSame($originalId, $response['id'], 'PUT should update the existing entity, not create a new one');
@@ -188,7 +188,7 @@ final class PutOperationTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         $this->assertIsInt($response['id']);
         $this->assertSame('New Project', $response['name']);
@@ -237,7 +237,7 @@ final class PutOperationTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         // Verify the response shows the field was replaced (cleared)
         $this->assertSame($originalId, $response['id'], 'Should update existing project, not create new one');

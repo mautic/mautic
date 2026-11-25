@@ -36,7 +36,7 @@ final class WebhookModelTest extends MauticMysqlTestCase
         foreach ($queueArray as $queuedEvent) {
             $this->assertSame($counter, $queuedEvent->getId());
 
-            $payload = json_decode($queuedEvent->getPayload(), true);
+            $payload = json_decode($queuedEvent->getPayload(), associative: true);
             $this->assertSame($counter, $payload['spoof']);
 
             ++$counter;
@@ -56,7 +56,7 @@ final class WebhookModelTest extends MauticMysqlTestCase
         foreach ($queueArray as $queuedEvent) {
             $this->assertSame($counter, $queuedEvent->getId());
 
-            $payload = json_decode($queuedEvent->getPayload(), true);
+            $payload = json_decode($queuedEvent->getPayload(), associative: true);
             $this->assertSame($counter, $payload['spoof']);
 
             --$counter;

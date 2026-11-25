@@ -31,7 +31,7 @@ final class ResultsPaginator
     public function setResults(array $results): static
     {
         if (!isset($results['records'])) {
-            throw new ApiErrorException(var_export($results, true));
+            throw new ApiErrorException(var_export($results, return: true));
         }
 
         $this->results      = $results;
@@ -60,7 +60,7 @@ final class ResultsPaginator
         if ($this->recordCount < $this->totalRecords) {
             // Something has gone wrong so try a few more times before giving up
             if ($this->retryCount <= 5) {
-                $this->logger->debug("SALESFORCE: Processed less than total but didn't get a nextRecordsUrl in the response: ".var_export($this->results, true));
+                $this->logger->debug("SALESFORCE: Processed less than total but didn't get a nextRecordsUrl in the response: ".var_export($this->results, return: true));
 
                 usleep(500);
                 ++$this->retryCount;
@@ -70,7 +70,7 @@ final class ResultsPaginator
             }
 
             // Throw an exception cause something isn't right
-            throw new ApiErrorException("Expected to process {$this->totalRecords} but only processed {$this->recordCount}: ".var_export($this->results, true));
+            throw new ApiErrorException("Expected to process {$this->totalRecords} but only processed {$this->recordCount}: ".var_export($this->results, return: true));
         }
 
         $this->nextRecordsUrl = null;

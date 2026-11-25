@@ -123,7 +123,7 @@ final class SyncCommand extends Command
             return Command::FAILURE;
         }
 
-        $io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
+        $io->success('Execution time: '.number_format(microtime(as_float: true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
 
         return Command::SUCCESS;
     }

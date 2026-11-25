@@ -110,7 +110,7 @@ final class LanguageHelperTest extends TestCase
 
         $this->assertFileExists($langFile);
 
-        $written = json_decode(file_get_contents($langFile), true);
+        $written = json_decode(file_get_contents($langFile), associative: true);
         $this->assertEquals($languages['languages'][0], $written['languages']['es']);
 
         @unlink($langFile);

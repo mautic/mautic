@@ -333,7 +333,7 @@ final class MobileNotificationController extends AbstractFormController
                         $template  = 'Mautic\NotificationBundle\Controller\MobileNotificationController::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $oneSignalIntegrationHelper, $entity->getId(), true);
+                        return $this->editAction($request, $oneSignalIntegrationHelper, $entity->getId(), ignorePost: true);
                     }
                 }
             } else {

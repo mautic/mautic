@@ -265,7 +265,7 @@ final class IpLookupHelper
 
         // Skip prefetch requests (browser prefetching links)
         $purpose = $request->headers->get('Purpose') ?? $request->headers->get('Sec-Purpose');
-        if ($purpose && in_array(strtolower($purpose), ['prefetch', 'prerender'], true)) {
+        if ($purpose && in_array(strtolower($purpose), ['prefetch', 'prerender'], strict: true)) {
             return false;
         }
 

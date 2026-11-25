@@ -75,7 +75,7 @@ final readonly class ReleaseParser
             }
 
             $contents = $response->getBody()->getContents();
-            $metadata = json_decode($contents, true);
+            $metadata = json_decode($contents, associative: true);
             if (!$metadata || !isset($metadata['version'])) {
                 // The contents do not match what is expected
                 throw new MetadataNotFoundException();

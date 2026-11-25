@@ -186,7 +186,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, json_encode($languageHelper->getLanguageChoices()));
         $form     = $response['form'];
 
@@ -303,7 +303,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $content    = $this->client->getResponse()->getContent();
-        $actionHtml = json_decode($content, true)['actionHtml'] ?? null;
+        $actionHtml = json_decode($content, associative: true)['actionHtml'] ?? null;
         $this->assertNotNull($actionHtml, $content);
         $crawler  = new Crawler($actionHtml);
         $editPage = $crawler->filter('.btn-edit')->attr('href');
@@ -366,7 +366,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $content    = $this->client->getResponse()->getContent();
-        $actionHtml = json_decode($content, true)['actionHtml'] ?? null;
+        $actionHtml = json_decode($content, associative: true)['actionHtml'] ?? null;
         $this->assertNotNull($actionHtml, $content);
         $crawler  = new Crawler($actionHtml);
         $editPage = $crawler->filter('.btn-edit')->attr('href');

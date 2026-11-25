@@ -33,7 +33,7 @@ final class AvatarHelper
             throw new FileNotFoundException();
         }
 
-        $avatarDir = $this->getAvatarPath(true);
+        $avatarDir = $this->getAvatarPath(absolute: true);
 
         if (!file_exists($avatarDir)) {
             mkdir($avatarDir);
@@ -58,7 +58,7 @@ final class AvatarHelper
         $leadEmail  = $lead->getEmail();
 
         if ('custom' == $preferred) {
-            $avatarPath = $this->getAvatarPath(true).'/avatar'.$lead->getId();
+            $avatarPath = $this->getAvatarPath(absolute: true).'/avatar'.$lead->getId();
             if (file_exists($avatarPath) && $fmtime = filemtime($avatarPath)) {
                 // Append file modified time to ensure the latest is used by browser
                 $img = $this->assetsHelper->getUrl(

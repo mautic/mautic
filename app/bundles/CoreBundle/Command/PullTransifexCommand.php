@@ -92,7 +92,7 @@ final class PullTransifexCommand extends Command
 
                 try {
                     $response      = $statistics->getLanguageStats($resource);
-                    $languageStats = json_decode((string) $response->getBody(), true);
+                    $languageStats = json_decode((string) $response->getBody(), associative: true);
 
                     foreach ($languageStats['data'] as $stats) {
                         $language = ltrim($stats['relationships']['language']['data']['id'], 'l:');

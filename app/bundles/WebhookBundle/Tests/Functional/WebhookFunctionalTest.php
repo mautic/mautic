@@ -255,7 +255,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $contacts);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $response       = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
@@ -276,7 +276,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
             $handlerStack->append(
                 function (RequestInterface $request) use (&$sendRequestCounter): GuzzleResponse {
                     $this->assertSame('/post', $request->getUri()->getPath());
-                    $jsonPayload = json_decode($request->getBody()->getContents(), true);
+                    $jsonPayload = json_decode($request->getBody()->getContents(), associative: true);
                     $this->assertNotEmpty($request->getHeader('Webhook-Signature'));
 
                     ++$sendRequestCounter;
@@ -294,7 +294,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
             $handlerStack->append(
                 function (RequestInterface $request) use (&$sendRequestCounter): GuzzleResponse {
                     $this->assertSame('/post', $request->getUri()->getPath());
-                    $jsonPayload = json_decode($request->getBody()->getContents(), true);
+                    $jsonPayload = json_decode($request->getBody()->getContents(), associative: true);
                     $this->assertNotEmpty($request->getHeader('Webhook-Signature'));
 
                     ++$sendRequestCounter;

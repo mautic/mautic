@@ -37,7 +37,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/api/campaigns?withContactCounts='.$withContactCounts);
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $response = json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), associative: true);
         $this->assertArrayHasKey('campaigns', $response);
         $this->assertArrayHasKey($campaign->getId(), $response['campaigns']);
         if ('true' === $withContactCounts) {

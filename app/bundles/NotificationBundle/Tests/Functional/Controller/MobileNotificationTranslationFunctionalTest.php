@@ -173,7 +173,7 @@ final class MobileNotificationTranslationFunctionalTest extends MauticMysqlTestC
 
     private function createAndPersistNotification(string $name, string $message, string $locale = 'en'): Notification
     {
-        $notification = $this->createANotification($name, $message, true, $locale);
+        $notification = $this->createANotification($name, $message, isPublished: true, locale: $locale);
         $this->em->persist($notification);
         $this->em->flush();
 

@@ -61,7 +61,7 @@ final class WidgetTypeListEvent extends CommonEvent
         }
         $perm = $this->security->isGranted($permissions, 'RETURN_ARRAY');
 
-        return !in_array(false, $perm);
+        return !in_array(needle: false, haystack: $perm);
     }
 
     /**

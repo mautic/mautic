@@ -14,7 +14,7 @@ final class JsonListParser implements ListParserInterface
             throw new FormatNotSupportedException();
         }
 
-        $parsedList = json_decode($list, true);
+        $parsedList = json_decode($list, associative: true);
         if (!is_array($parsedList)) {
             throw new FormatNotSupportedException();
         }

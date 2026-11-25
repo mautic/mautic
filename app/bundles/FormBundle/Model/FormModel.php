@@ -924,7 +924,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     private function extractScriptTag(string $html): array
     {
-        libxml_use_internal_errors(true);
+        libxml_use_internal_errors(use_errors: true);
         $dom = new \DOMDocument();
         $this->loadHTML($dom, $html);
         $items = $dom->getElementsByTagName('script');
@@ -942,7 +942,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     private function removeScriptTag(string $html): string
     {
-        libxml_use_internal_errors(true);
+        libxml_use_internal_errors(use_errors: true);
         $dom = new \DOMDocument();
         $this->loadHTML($dom, '<div>'.$html.'</div>');
         $items = $dom->getElementsByTagName('script');
@@ -970,7 +970,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     private function generateJsScript(string $html): string
     {
-        libxml_use_internal_errors(true);
+        libxml_use_internal_errors(use_errors: true);
         $dom = new \DOMDocument();
         $this->loadHTML($dom, '<div>'.$html.'</div>');
         $items = $dom->getElementsByTagName('script');

@@ -38,7 +38,7 @@ final class ImportUrlValidationSubscriber
     )]
     public function onImportProcess(ImportProcessEvent $event): void
     {
-        if (!in_array($event->import->getObject(), ['lead', 'company'], true)) {
+        if (!in_array($event->import->getObject(), ['lead', 'company'], strict: true)) {
             return;
         }
 
@@ -68,7 +68,7 @@ final class ImportUrlValidationSubscriber
         string $alias,
         string $type,
     ): void {
-        $new_alias = array_search($alias, $mappedData, true);
+        $new_alias = array_search($alias, $mappedData, strict: true);
 
         if (false === $new_alias) {
             return;
@@ -80,7 +80,7 @@ final class ImportUrlValidationSubscriber
             return;
         }
 
-        if (in_array($type, ['url', 'website'], true)) {
+        if (in_array($type, ['url', 'website'], strict: true)) {
             $lower = strtolower($value);
 
             if (str_starts_with($lower, 'data:')) {

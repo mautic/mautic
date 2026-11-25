@@ -143,7 +143,7 @@ class PeakInteractionTimer
 
     private function isDayAndTimeOptimal(\DateTime $dateTime): bool
     {
-        return in_array((int) $dateTime->format(self::DAY_FORMAT), $this->bestDays, true) && $this->isTimeOptimal($dateTime);
+        return in_array((int) $dateTime->format(self::DAY_FORMAT), $this->bestDays, strict: true) && $this->isTimeOptimal($dateTime);
     }
 
     private function getAdjustedDateTime(\DateTime $dateTime): \DateTime
@@ -160,7 +160,7 @@ class PeakInteractionTimer
     {
         $optimalDateTime = $this->getAdjustedDateTime($dateTime);
 
-        while (!in_array((int) $optimalDateTime->format(self::DAY_FORMAT), $this->bestDays, true)) {
+        while (!in_array((int) $optimalDateTime->format(self::DAY_FORMAT), $this->bestDays, strict: true)) {
             $optimalDateTime->modify('+1 day');
         }
 

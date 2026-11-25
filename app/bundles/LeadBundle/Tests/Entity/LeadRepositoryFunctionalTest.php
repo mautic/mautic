@@ -169,7 +169,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', $payload);
         $this->assertResponseIsSuccessful();
-        $contentArray = json_decode($this->client->getResponse()->getContent(), true);
+        $contentArray = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         $this->assertCount($expectedCount, $contentArray['items']);
     }
@@ -184,7 +184,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $contentArray = json_decode($this->client->getResponse()->getContent(), true);
+        $contentArray = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         $this->assertSame([], $contentArray['items']);
     }

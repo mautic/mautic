@@ -41,7 +41,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
     #[DataProvider('invalidDetailedDescriptions')]
     public function testInvalidDetailedDescriptionFallsBackToBaseDescription(mixed $description): void
     {
-        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), true, 512, JSON_THROW_ON_ERROR);
+        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
         foreach ($payload['package']['versions'] as &$version) {
             $version['extra']['detailed_description'] = $description;
             $version['extra']['expected_outcomes'] = ['unexpected' => 'Invalid outcomes'];
@@ -71,7 +71,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
 
     public function testRichPackageMetadataAndMarkdown(): void
     {
-        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), true, 512, JSON_THROW_ON_ERROR);
+        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
         foreach ($payload['package']['versions'] as &$version) {
             $version['extra'] = [
                 'display_name' => 'Campaign example',

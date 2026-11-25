@@ -292,10 +292,10 @@ final class ReportGeneratorEvent extends AbstractReportEvent
         $columns = $this->getReport()->getSelectAndAggregatorAndOrderAndGroupByColumns();
 
         if (is_array($column)) {
-            return array_any($column, fn ($checkMe): bool => in_array($checkMe, $columns, true));
+            return array_any($column, fn ($checkMe): bool => in_array($checkMe, $columns, strict: true));
         }
 
-        return in_array($column, $columns, true);
+        return in_array($column, $columns, strict: true);
     }
 
     /**

@@ -55,8 +55,8 @@ final class AjaxController extends CommonAjaxController
             $this->throwAccessDenied();
         }
 
-        $existingProjectIds = json_decode($request->request->get('existingProjectIds'), true);
-        $newProjectNames    = json_decode($request->request->get('newProjectNames'), true);
+        $existingProjectIds = json_decode($request->request->get('existingProjectIds'), associative: true);
+        $newProjectNames    = json_decode($request->request->get('newProjectNames'), associative: true);
 
         if ($corePermissions->isGranted(ProjectPermissions::CAN_CREATE)) {
             foreach ($newProjectNames as $projectName) {

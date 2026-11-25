@@ -22,11 +22,11 @@ final class CompanyLeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $leadC    = $this->createLead('Company C');
         $leadD    = $this->createLead('Company D');
 
-        $this->createCompanyLeadRelation($companyA, $leadA, true);
+        $this->createCompanyLeadRelation($companyA, $leadA, isPrimary: true);
         $this->createCompanyLeadRelation($companyA, $leadD);
-        $this->createCompanyLeadRelation($companyB, $leadB, true);
+        $this->createCompanyLeadRelation($companyB, $leadB, isPrimary: true);
         $this->createCompanyLeadRelation($companyB, $leadA);
-        $this->createCompanyLeadRelation($companyC, $leadC, true);
+        $this->createCompanyLeadRelation($companyC, $leadC, isPrimary: true);
         $this->createCompanyLeadRelation($companyC, $leadA);
         $this->createCompanyLeadRelation($companyC, $leadB);
 

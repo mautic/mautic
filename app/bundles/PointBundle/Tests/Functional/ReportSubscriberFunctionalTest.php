@@ -50,7 +50,7 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         // -- test API report data
         $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
         $clientResponse = $this->client->getResponse();
-        $result         = json_decode($clientResponse->getContent(), true);
+        $result         = json_decode($clientResponse->getContent(), associative: true);
         $this->assertSame([
             [
                 'type'        => 'test type',
@@ -124,7 +124,7 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         // -- test API report data
         $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
         $clientResponse = $this->client->getResponse();
-        $result         = json_decode($clientResponse->getContent(), true);
+        $result         = json_decode($clientResponse->getContent(), associative: true);
 
         $this->assertSame([
             [

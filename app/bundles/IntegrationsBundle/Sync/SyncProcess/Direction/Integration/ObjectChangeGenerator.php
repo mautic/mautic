@@ -141,7 +141,7 @@ final readonly class ObjectChangeGenerator
                 $integrationObject->getObject(),
                 $fieldState,
                 $fieldMappingDAO->getIntegrationField(),
-                var_export($newValue->getNormalizedValue(), true)
+                var_export($newValue->getNormalizedValue(), return: true)
             ),
             self::class.':'.__FUNCTION__
         );

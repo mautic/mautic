@@ -84,7 +84,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, '/s/ajax', $payload, [], $this->createAjaxHeaders());
         $this->assertResponseIsSuccessful();
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), associative: true);
 
         if (null !== $email) {
             $this->assertSame($email->getSendToDnc() ? 'Yes' : 'No', $response['sendToDncText']);

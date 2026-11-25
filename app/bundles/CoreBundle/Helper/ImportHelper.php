@@ -145,7 +145,7 @@ final readonly class ImportHelper
             if (!str_ends_with($filename, '/')) {
                 // Create directory if needed
                 $dirPath = dirname($sourcePath);
-                if (!is_dir($dirPath) && !mkdir($dirPath, 0755, true) && !is_dir($dirPath)) {
+                if (!is_dir($dirPath) && !mkdir($dirPath, 0755, recursive: true) && !is_dir($dirPath)) {
                     $zip->close();
                     throw new \RuntimeException(sprintf('Failed to create directory: %s', $dirPath));
                 }
@@ -200,7 +200,7 @@ final readonly class ImportHelper
                 fclose($fp);
             } else {
                 // Create directory
-                if (!is_dir($sourcePath) && !mkdir($sourcePath, 0755, true) && !is_dir($sourcePath)) {
+                if (!is_dir($sourcePath) && !mkdir($sourcePath, 0755, recursive: true) && !is_dir($sourcePath)) {
                     $zip->close();
                     throw new \RuntimeException(sprintf('Failed to create directory: %s', $sourcePath));
                 }
@@ -219,12 +219,12 @@ final readonly class ImportHelper
 
             if (str_starts_with($normalizedFilename, 'assets/')) {
                 if (is_dir($sourcePath)) {
-                    if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
+                    if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, recursive: true) && !is_dir($destinationPath)) {
                         throw new \RuntimeException(sprintf('Failed to create directory: %s', $destinationPath));
                     }
                 } else {
                     $dirPath = dirname($destinationPath);
-                    if (!is_dir($dirPath) && !mkdir($dirPath, 0755, true) && !is_dir($dirPath)) {
+                    if (!is_dir($dirPath) && !mkdir($dirPath, 0755, recursive: true) && !is_dir($dirPath)) {
                         throw new \RuntimeException(sprintf('Failed to create directory: %s', $dirPath));
                     }
                     if (!copy($sourcePath, $destinationPath)) {
@@ -247,7 +247,7 @@ final readonly class ImportHelper
             throw new \RuntimeException('Failed to read JSON file contents.');
         }
 
-        $jsonData = json_decode($fileContents, true);
+        $jsonData = json_decode($fileContents, associative: true);
         if (JSON_ERROR_NONE !== json_last_error()) {
             unlink($jsonFilePath);
             throw new \RuntimeException('Invalid JSON: '.json_last_error_msg());
@@ -266,14 +266,14 @@ final readonly class ImportHelper
         $extensions          = array_slice(explode('.', $basename), 1);
         $hasBlockedExtension = [] !== array_filter(
             $extensions,
-            static fn (string $candidate): bool => in_array($candidate, self::BLOCKED_ASSET_EXTENSIONS, true)
+            static fn (string $candidate): bool => in_array($candidate, self::BLOCKED_ASSET_EXTENSIONS, strict: true)
                 || 1 === preg_match('/^(?:php|pcgi|pchi)\d*$/', $candidate),
         );
 
         if (str_starts_with($basename, '.')
-            || in_array($basename, self::BLOCKED_ASSET_FILENAMES, true)
+            || in_array($basename, self::BLOCKED_ASSET_FILENAMES, strict: true)
             || $hasBlockedExtension
-            || !in_array($extension, $allowedExtensions, true)
+            || !in_array($extension, $allowedExtensions, strict: true)
         ) {
             $zip->close();
             throw new \RuntimeException('Unsafe asset file detected in ZIP: '.$filename);

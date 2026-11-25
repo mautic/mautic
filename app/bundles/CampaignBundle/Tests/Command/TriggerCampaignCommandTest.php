@@ -735,11 +735,11 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->em->detach($campaign);
         $this->em->detach($campaignRepo);
 
-        $tStart = microtime(true);
+        $tStart = microtime(as_float: true);
 
         $this->testSymfonyCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
 
-        $tDiff = microtime(true) - $tStart;
+        $tDiff = microtime(as_float: true) - $tStart;
 
         $this->assertLessThan(10, $tDiff, 'The campaign rebuild takes more than 10 seconds, probably an infinite loop.');
     }

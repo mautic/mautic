@@ -38,7 +38,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_CONFLICT, $response->getStatusCode());
 
-        $data  = json_decode($response->getContent(), true);
+        $data  = json_decode($response->getContent(), associative: true);
         $error = $data['errors'][0];
 
         $this->assertEquals(Response::HTTP_CONFLICT, $error['code']);
@@ -74,7 +74,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
 
-        $data = json_decode($response->getContent(), true);
+        $data = json_decode($response->getContent(), associative: true);
         $this->assertEquals('Updated Firstname', $data['contact']['fields']['core']['firstname']['normalizedValue']);
     }
 
@@ -105,7 +105,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
 
-        $data = json_decode($response->getContent(), true);
+        $data = json_decode($response->getContent(), associative: true);
 
         $this->assertArrayHasKey('errors', $data);
 

@@ -42,7 +42,7 @@ final class Version20260709103000 extends AbstractMauticMigration
 
         $parameters['form_field_autofill'] = true;
 
-        $result = file_put_contents($configFile, "<?php\n".'$parameters = '.var_export($parameters, true).';');
+        $result = file_put_contents($configFile, "<?php\n".'$parameters = '.var_export($parameters, return: true).';');
         if (false === $result) {
             throw new \RuntimeException('Could not update the local config file with form_field_autofill parameter.');
         }

@@ -184,7 +184,7 @@ final class ObjectChangeGenerator
                 'Integration to Mautic; syncing %s %s with a value of %s',
                 $internalFieldState,
                 $fieldMappingDAO->getInternalField(),
-                var_export($newValue->getNormalizedValue(), true)
+                var_export($newValue->getNormalizedValue(), return: true)
             ),
             self::class.':'.__FUNCTION__
         );
@@ -223,7 +223,7 @@ final class ObjectChangeGenerator
                     $internalObject->getObject(),
                     $fieldState,
                     $fieldMappingDAO->getInternalField(),
-                    var_export($newValue->getNormalizedValue(), true)
+                    var_export($newValue->getNormalizedValue(), return: true)
                 ),
                 self::class.':'.__FUNCTION__
             );
@@ -317,7 +317,7 @@ final class ObjectChangeGenerator
                 $winningChangeRequest->getObject(),
                 $fieldState,
                 $fieldMappingDAO->getInternalField(),
-                var_export($newValue->getNormalizedValue(), true),
+                var_export($newValue->getNormalizedValue(), return: true),
                 $judgeMode
             ),
             self::class.':'.__FUNCTION__

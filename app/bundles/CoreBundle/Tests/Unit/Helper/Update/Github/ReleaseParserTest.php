@@ -144,6 +144,6 @@ final class ReleaseParserTest extends TestCase
      */
     private function getReleases(): array
     {
-        return json_decode(file_get_contents(__DIR__.'/json/releases.json'), true);
+        return json_decode(file_get_contents(__DIR__.'/json/releases.json'), associative: true);
     }
 }

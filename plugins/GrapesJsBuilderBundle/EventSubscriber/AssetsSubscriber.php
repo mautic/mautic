@@ -69,7 +69,7 @@ final readonly class AssetsSubscriber
             return null;
         }
 
-        $manifest = json_decode((string) file_get_contents($manifestPath), true);
+        $manifest = json_decode((string) file_get_contents($manifestPath), associative: true);
 
         if (!is_array($manifest) || !isset($manifest[$logicalName])) {
             return null;

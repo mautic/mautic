@@ -95,7 +95,7 @@ final class ContactSegmentFilterCrate
 
     public function isCompanyType(): bool
     {
-        return in_array($this->object, [self::COMPANY_OBJECT, self::COMPANY_ALL_OBJECT], true);
+        return in_array($this->object, [self::COMPANY_OBJECT, self::COMPANY_ALL_OBJECT], strict: true);
     }
 
     public function isBehaviorsType(): bool
@@ -117,7 +117,7 @@ final class ContactSegmentFilterCrate
             OperatorOptions::NOT_REGEXP,
         ];
 
-        if (!in_array($this->operator, $excludeTypecastOperators, true)) {
+        if (!in_array($this->operator, $excludeTypecastOperators, strict: true)) {
             switch ($this->type) {
                 case 'number':
                     return (float) $this->filter;

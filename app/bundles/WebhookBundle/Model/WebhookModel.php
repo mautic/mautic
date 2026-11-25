@@ -273,7 +273,7 @@ final class WebhookModel extends FormModel
      */
     public function processWebhooks(array|Paginator $webhooks): void
     {
-        $this->startTime = microtime(true);
+        $this->startTime = microtime(as_float: true);
 
         foreach ($webhooks as $webhook) {
             $this->processWebhook($webhook);
@@ -290,7 +290,7 @@ final class WebhookModel extends FormModel
             return false;
         }
 
-        $start            = microtime(true);
+        $start            = microtime(as_float: true);
         $logged           = false;
 
         try {
@@ -316,7 +316,7 @@ final class WebhookModel extends FormModel
                 $responseBody = null; // Save null value to database
             }
 
-            $this->addLog($webhook, $responseStatusCode, microtime(true) - $start, $responseBody);
+            $this->addLog($webhook, $responseStatusCode, microtime(as_float: true) - $start, $responseBody);
             $logged = true;
 
             // throw an error exception if we don't get a 200 back
@@ -345,7 +345,7 @@ final class WebhookModel extends FormModel
 
             if (!$logged) {
                 // log that the request failed to display it to the user
-                $this->addLog($webhook, 'N/A', microtime(true) - $start, $message);
+                $this->addLog($webhook, 'N/A', microtime(as_float: true) - $start, $message);
             }
 
             return false;
@@ -474,7 +474,7 @@ final class WebhookModel extends FormModel
             // create new array level for each unique event type
             $payload[$type] ??= [];
 
-            $queuePayload              = json_decode($queueItem->getPayload(), true);
+            $queuePayload              = json_decode($queueItem->getPayload(), associative: true);
             $queuePayload['timestamp'] = $queueItem->getDateAdded()->format('c');
 
             // its important to decode the payload form the DB as we re-encode it with the
@@ -637,7 +637,7 @@ final class WebhookModel extends FormModel
 
     private function isProcessingExpired(): bool
     {
-        $currentTime = microtime(true);
+        $currentTime = microtime(as_float: true);
         $runTime     = $currentTime - $this->startTime;
 
         return $runTime >= $this->webhookTimeLimit;

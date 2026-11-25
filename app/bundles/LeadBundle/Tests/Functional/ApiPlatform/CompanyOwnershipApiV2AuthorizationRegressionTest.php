@@ -58,7 +58,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
 
         self::assertResponseIsSuccessful();
 
-        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $data = json_decode($response->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
 
         $companies = $data['member'];
         $this->assertCount(1, $companies, 'Expected exactly 1 company');
@@ -120,7 +120,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
 
         self::assertResponseIsSuccessful();
 
-        $page1Data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $page1Data = json_decode($response->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
 
         $this->assertArrayHasKey('member', $page1Data);
         $this->assertArrayHasKey('totalItems', $page1Data);
@@ -179,7 +179,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();
-        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $data = json_decode($response->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
 
         $this->assertCount(1, $data['member'], 'New owner should see the reassigned company (owner field takes precedence over createdBy)');
         $this->assertSame($company->getId(), $data['member'][0]['id']);
@@ -195,7 +195,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();
-        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $data = json_decode($response->getContent(), associative: true, depth: 512, flags: \JSON_THROW_ON_ERROR);
 
         $this->assertCount(0, $data['member'], 'Original creator should NOT see the company after reassignment (owner field takes precedence)');
     }

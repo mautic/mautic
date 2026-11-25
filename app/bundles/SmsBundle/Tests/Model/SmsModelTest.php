@@ -139,7 +139,7 @@ final class SmsModelTest extends TestCase
 
     public function testSendMMSTest(): void
     {
-        $this->sendMessage(true);
+        $this->sendMessage(isMMS: true);
     }
 
     private function sendMessage(bool $isMMS = false): void

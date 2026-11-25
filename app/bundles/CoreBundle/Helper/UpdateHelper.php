@@ -264,7 +264,7 @@ final class UpdateHelper
     private function checkCachedUpdateData(string $cacheFile, string $updateStability): array
     {
         // Check if we have a cache file and try to return cached data if so
-        $update = json_decode(file_get_contents($cacheFile), true);
+        $update = json_decode(file_get_contents($cacheFile), associative: true);
 
         if (!empty($update['metadata'])) {
             $update['metadata'] = new Metadata($update['metadata']);
@@ -306,7 +306,7 @@ final class UpdateHelper
             throw new CouldNotFetchLatestVersionException();
         }
 
-        $releases = json_decode($response->getBody()->getContents(), true);
+        $releases = json_decode($response->getBody()->getContents(), associative: true);
         if (empty($releases)) {
             $this->logger->error(sprintf('UPDATE CHECK FAILED: response body for %s is not json', $updateUrl));
 
