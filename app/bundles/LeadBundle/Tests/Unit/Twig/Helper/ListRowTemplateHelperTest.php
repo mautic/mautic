@@ -11,46 +11,52 @@ use Twig\Loader\FilesystemLoader;
 
 final class ListRowTemplateHelperTest extends TestCase
 {
-    private const VIEWS_DIR = __DIR__.'/../../../../Resources/views';
+    private const TEMPLATE_PATH = 'List/_list_row.html.twig';
 
-    private string $themeDir;
+    private string $root;
 
     protected function setUp(): void
     {
-        $this->themeDir = sys_get_temp_dir().'/list-row-override-'.bin2hex(random_bytes(6));
+        $this->root = sys_get_temp_dir().'/list-row-override-'.bin2hex(random_bytes(6));
+        $this->writeTemplate('default');
+        $this->writeTemplate('theme');
     }
 
     protected function tearDown(): void
     {
-        $file = $this->themeDir.'/List/_list_row.html.twig';
-        if (is_file($file)) {
-            unlink($file);
+        foreach (['default', 'theme'] as $directory) {
+            @unlink($this->root.'/'.$directory.'/'.self::TEMPLATE_PATH);
+            @rmdir($this->root.'/'.$directory.'/List');
+            @rmdir($this->root.'/'.$directory);
         }
-        if (is_dir($this->themeDir.'/List')) {
-            rmdir($this->themeDir.'/List');
-        }
-        if (is_dir($this->themeDir)) {
-            rmdir($this->themeDir);
-        }
+        @rmdir($this->root);
     }
 
     public function testDefaultRowTemplateIsNotReportedAsOverridden(): void
     {
         $loader = new FilesystemLoader();
-        $loader->addPath(self::VIEWS_DIR, 'MauticLead');
+        $loader->addPath($this->root.'/default', 'MauticLead');
 
-        $this->assertFalse((new ListRowTemplateHelper(new Environment($loader)))->isOverridden());
+        $this->assertFalse($this->helper($loader)->isOverridden());
     }
 
     public function testThemeRowTemplateIsReportedAsOverridden(): void
     {
-        mkdir($this->themeDir.'/List', 0777, true);
-        file_put_contents($this->themeDir.'/List/_list_row.html.twig', '<tr></tr>');
-
         $loader = new FilesystemLoader();
-        $loader->addPath(self::VIEWS_DIR, 'MauticLead');
-        $loader->prependPath($this->themeDir, 'MauticLead');
+        $loader->addPath($this->root.'/default', 'MauticLead');
+        $loader->prependPath($this->root.'/theme', 'MauticLead');
 
-        $this->assertTrue((new ListRowTemplateHelper(new Environment($loader)))->isOverridden());
+        $this->assertTrue($this->helper($loader)->isOverridden());
+    }
+
+    private function helper(FilesystemLoader $loader): ListRowTemplateHelper
+    {
+        return new ListRowTemplateHelper(new Environment($loader), $this->root.'/default/'.self::TEMPLATE_PATH);
+    }
+
+    private function writeTemplate(string $directory): void
+    {
+        mkdir($this->root.'/'.$directory.'/List', 0777, true);
+        file_put_contents($this->root.'/'.$directory.'/'.self::TEMPLATE_PATH, '<tr></tr>');
     }
 }

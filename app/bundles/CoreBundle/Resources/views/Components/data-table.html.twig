@@ -216,14 +216,14 @@
                         </tr>
                         {% if isExpandable and row.expansion is defined %}
                             <tr class="data-table__expanded-row" id="{{ baseId|e('html_attr') }}-expanded-{{ rowId|e('html_attr') }}" data-child-row{{ isExpanded ? '' : ' hidden' }}>
-                                <td colspan="{{ columnCount }}">
+                                <td colspan="{{ columnCount|e('html_attr') }}">
                                     <div class="data-table__expansion">{{ row.expansion|purify }}</div>
                                 </td>
                             </tr>
                         {% endif %}
                     {% endfor %}
                     <tr class="data-table__empty-row"{{ rows is empty ? '' : ' hidden' }}>
-                        <td colspan="{{ max(columnCount, 1) }}">{{ (emptyMessage|default('mautic.core.data_table.empty'))|trans }}</td>
+                        <td colspan="{{ max(columnCount, 1)|e('html_attr') }}">{{ (emptyMessage|default('mautic.core.data_table.empty'))|trans }}</td>
                     </tr>
                 {% endif %}
             </tbody>
