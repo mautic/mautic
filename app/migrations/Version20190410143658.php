@@ -45,17 +45,11 @@ final class Version20190410143658 extends AbstractMauticMigration
         return $this->generatePropertyName($tableName, 'idx', ['lead_id']);
     }
 
-    /**
-     * @return string
-     */
     private function getNewIndexName(): string
     {
         return "{$this->prefix}leadid_reason_channel";
     }
 
-    /**
-     * @return string
-     */
     private function getTableName(): string
     {
         return "{$this->prefix}lead_donotcontact";

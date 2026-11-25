@@ -6,9 +6,6 @@ use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 
 abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
 {
-    /**
-     * @return string
-     */
     public function getAttribution(): string
     {
         return '<a href="https://www.maxmind.com/en/geoip2-precision-services" target="_blank">MaxMind Precision Services</a> is a pay per query lookup service that offers solutions with multiple levels of accuracy and details.';
@@ -25,9 +22,6 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
         return ['Authorization' => 'Basic '.base64_encode($this->auth)];
     }
 
-    /**
-     * @return string
-     */
     protected function getUrl(): string
     {
         $url = 'https://geoip.maxmind.com/geoip/v2.1/';

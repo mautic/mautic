@@ -10,9 +10,6 @@ use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionAbstract;
 
 abstract class DateDayAbstract extends DateOptionAbstract
 {
-    /**
-     * @return string
-     */
     protected function getModifierForBetweenRange(): string
     {
         return '+1 day';
