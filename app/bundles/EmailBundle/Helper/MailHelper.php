@@ -568,7 +568,8 @@ class MailHelper
                 }
                 $this->setReplyToForQueueMessage(
                     $email,
-                    ($email && $email->getUseOwnerAsMailer()) ? $metadatum['from']->getEmail() : null
+                    ($email && $email->getUseOwnerAsMailer()) ? $metadatum['from']->getEmail() : null,
+                    $metadatum['from']->getEmail(),
                 );
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
@@ -2052,7 +2053,7 @@ class MailHelper
         $this->setMessageReplyTo($this->getReplyTo());
     }
 
-    private function setReplyToForQueueMessage(?Email $emailToSend, ?string $ownerEmailFromBatch = null): void
+    private function setReplyToForQueueMessage(?Email $emailToSend, ?string $ownerEmailFromBatch = null, ?string $fromEmailFromBatch = null): void
     {
         // 1. Set the reply to address from the email "reply-to" setting if set.
         if ($emailToSend && null !== $emailToSend->getReplyToAddress()) {
@@ -2069,7 +2070,21 @@ class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set and global reply-to is not configured.
-        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+        $fromAddress = $emailToSend?->getFromAddress();
+        if ($emailToSend && null !== $fromAddress && (new AddressDTO($fromAddress))->isEmailTokenized()) {
+            $replyTo = $this->getReplyTo();
+            if ((new AddressDTO($replyTo))->isEmailTokenized()) {
+                if ($fromEmailFromBatch && !(new AddressDTO($fromEmailFromBatch))->isEmailTokenized()) {
+                    $this->setMessageReplyTo($fromEmailFromBatch);
+                }
+            } else {
+                $this->setMessageReplyTo($replyTo);
+            }
+
+            return;
+        }
+
+        if ($emailToSend && null !== $fromAddress && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
             return;
