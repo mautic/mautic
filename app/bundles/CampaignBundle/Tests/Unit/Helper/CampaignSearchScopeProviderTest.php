@@ -20,12 +20,16 @@ final class CampaignSearchScopeProviderTest extends SearchScopeProviderTestCase
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.core.searchcommand.ismine' => 'is:mine',
+                'mautic.campaign.campaign.searchcommand.source.segment' => 'source:segment',
+                'mautic.campaign.campaign.searchcommand.source.form' => 'source:form',
                 default => $key,
             });
 
         $campaignModel->method('getCommandList')
             ->willReturn([
                 'mautic.core.searchcommand.ismine',
+                'mautic.campaign.campaign.searchcommand.source.segment',
+                'mautic.campaign.campaign.searchcommand.source.form',
             ]);
 
         return new CampaignSearchScopeProvider($campaignModel, $translator);
@@ -34,5 +38,13 @@ final class CampaignSearchScopeProviderTest extends SearchScopeProviderTestCase
     protected function expectedDynamicCommands(): array
     {
         return ['is:mine'];
+    }
+
+    public function testGetScopesExcludesQuickFilterSourceCommands(): void
+    {
+        $commands = array_column($this->getScopes(), 'command');
+
+        $this->assertNotContains('source:segment', $commands);
+        $this->assertNotContains('source:form', $commands);
     }
 }
