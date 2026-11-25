@@ -108,7 +108,7 @@ abstract class CommonStatsSubscriber
      * @param class-string[] $repoNames
      * @param array<string, string> $permissions
      */
-    protected function addRestrictedRepostories(array $repoNames, array $permissions): static
+    protected function addRestrictedRepostories(array $repoNames, array $permissions)
     {
         foreach ($repoNames as $repoName) {
             $repository                      = $this->entityManager->getRepository($repoName);
