@@ -41,11 +41,6 @@
             "target": "git@github.com:mautic/plugin-gmail.git"
         },
         {
-            "name": "MauticOutlookBundle",
-            "directory": "plugins/MauticOutlookBundle",
-            "target": "git@github.com:mautic/plugin-outlook.git"
-        },
-        {
             "name": "MauticTagManagerBundle",
             "directory": "plugins/MauticTagManagerBundle",
             "target": "git@github.com:mautic/plugin-tagmanager.git"

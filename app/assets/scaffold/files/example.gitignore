@@ -114,7 +114,6 @@ phpstan.neon.dist
 !/plugins/MauticFocusBundle
 !/plugins/MauticFullContactBundle
 !/plugins/MauticGmailBundle
-!/plugins/MauticOutlookBundle
 !/plugins/MauticZapierBundle
 !/plugins/MauticTagManagerBundle
 !/plugins/index.html
