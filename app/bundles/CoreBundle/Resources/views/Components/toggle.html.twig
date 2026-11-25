@@ -7,7 +7,7 @@
 {% set labelOff = labelOff|default('mautic.core.form.no') %}
 {% set valueOn = valueOn is defined ? valueOn : '1' %}
 {% set valueOff = valueOff is defined ? valueOff : '0' %}
-{% set checked = checked|default(false) %}
+{% set checked = checked is defined ? checked : false %}
 {% set size = size|default(null) %}
 {% set disabled = disabled|default(false) %}
 {% set readonly = readonly|default(false) %}
@@ -30,7 +30,7 @@
                id="{{ id|escape('html_attr') }}_{{ choice_value|escape('html_attr') }}"
                name="{{ name|escape('html_attr') }}"
                value="{{ choice_value|escape('html_attr') }}"
-               {% if (checked and choice_value == valueOn) or (not checked and choice_value == valueOff) %}checked{% endif %}
+               {% if checked is not null and ((checked and choice_value == valueOn) or (not checked and choice_value == valueOff)) %}checked{% endif %}
                style="display: none;"
                {% if disabled %}disabled{% endif %}
                {% if readonly %}readonly{% endif %}
@@ -52,7 +52,7 @@
            {% if label %}aria-labelledby="{{ id|escape('html_attr') }}_label_text"{% elseif labelledby %}aria-labelledby="{{ labelledby|escape('html_attr') }}"{% elseif ariaLabel %}aria-label="{{ ariaLabel|trans|escape('html_attr') }}"{% endif %}
            {% if disabled %}aria-disabled="true"{% endif %}
            {% if readonly %}aria-readonly="true"{% endif %}
-           aria-checked="{{ checked ? 'true' : 'false' }}">
+           {% if checked is not null %}aria-checked="{{ checked ? 'true' : 'false' }}"{% endif %}>
         {% if label %}
             <span id="{{ id|escape('html_attr') }}_label_text" class="toggle__label-text{{ hideLabel ? ' visually-hidden' : '' }}">{{ label|trans }}</span>
         {% endif %}
@@ -62,7 +62,7 @@
                     <path d="M2.2 2.7L5 0 6 1 2.2 5 0 2.7 1 1.5z"></path>
                 </svg>
             </div>
-            <span class="toggle__text" aria-hidden="true">{{ (checked ? labelOn : labelOff)|trans }}</span>
+            <span class="toggle__text" aria-hidden="true">{{ checked is null ? '' : (checked ? labelOn : labelOff)|trans }}</span>
         </div>
     </label>
 </div>

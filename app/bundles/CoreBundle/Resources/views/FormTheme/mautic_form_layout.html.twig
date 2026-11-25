@@ -583,7 +583,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
         'labelOff': no_choice.label,
         'valueOn': yes_choice.value,
         'valueOff': no_choice.value,
-        'checked': value == yes_choice.value,
+        'checked': value is null or value == '' ? null : value == yes_choice.value,
         'size': size,
         'disabled': attr.disabled|default(false),
         'readonly': attr.readonly|default(false),
