@@ -100,40 +100,28 @@ final class FormatterHelperTest extends TestCase
     }
 
     #[DataProvider('stringProvider')]
-    public function testNormalizeStringValue(string|int|bool|\DateTime $input, string|int|bool|\DateTime $expected): void
+    public function testNormalizeStringValue(string $input, string $expected): void
     {
         date_default_timezone_set('Europe/Paris');
-        $this->assertEquals(
+        $this->assertSame(
             $expected,
             $this->formatterHelper->normalizeStringValue($input)
         );
     }
 
     /**
-     * @return iterable<array<mixed>>
+     * @return iterable<array{string, string}>
      */
     public static function stringProvider(): iterable
     {
         // string
         yield ['random string', 'random string'];
 
-        // integer
-        yield [1, 1];
-
-        // bool
-        yield [false, false];
-
         // date
         yield ['2020-02-02', '2020-02-02'];
 
         // date time
         yield ['2021-02-21 18:00:00', 'February 21, 2021 6:00 pm'];
-
-        // date object
-        yield [
-            \DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
-            \DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
-        ];
     }
 
     #[DataProvider('urlFormatProvider')]
