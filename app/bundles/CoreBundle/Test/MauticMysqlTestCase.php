@@ -280,7 +280,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         $process = Process::fromShellCommandline($command);
         if ($this->isPostgresqlPlatform() && !empty($password)) {
-            $process->setEnv(array_merge($process->getEnv() ?: [], ['PGPASSWORD' => $password]));
+            $process->setEnv(array_merge($process->getEnv(), ['PGPASSWORD' => $password]));
         }
         $process->run();
 

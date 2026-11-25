@@ -163,44 +163,19 @@ class IndexSchemaHelper
         $this->addedIndexes   = [];
     }
 
-    /**
-     * Create the replacement index under a temporary name, then drop the old
-     * index and rename. The old index is only removed after the new one is in
-     * place, so a failed create leaves the existing index untouched.
-     */
     private function replaceIndex(Index $index, \Doctrine\DBAL\Platforms\AbstractPlatform $platform): void
     {
-        $tempName = $index->getName().'_new';
-        $temp     = new Index($tempName, $index->getColumns(), $index->isUnique(), $index->isPrimary(), $index->getFlags());
+        $oldIndex = $this->table->getIndex($index->getName());
 
-        $createTemp = $platform->getCreateIndexSQL($temp, $this->table);
-        $dropOld    = $platform->getDropIndexSQL($index, $this->table);
-        $dropTemp   = $platform->getDropIndexSQL($temp, $this->table);
-        $createFinal = $platform->getCreateIndexSQL($index, $this->table);
-
-        $isPg = DatabasePlatform::isPostgreSQL($platform);
-
-        if ($isPg) {
-            $this->db->beginTransaction();
-        }
+        $this->db->executeStatement($platform->getDropIndexSQL($index, $this->table));
 
         try {
-            $this->db->executeStatement($createTemp);
-            $this->db->executeStatement($dropOld);
-            $this->db->executeStatement($dropTemp);
-            $this->db->executeStatement($createFinal);
-            if ($isPg) {
-                $this->db->commit();
-            }
+            $this->db->executeStatement($platform->getCreateIndexSQL($index, $this->table));
         } catch (\Throwable $e) {
-            if ($isPg && $this->db->isTransactionActive()) {
-                $this->db->rollBack();
-            } else {
-                // MySQL: best-effort cleanup of the temp index if it was created.
-                try {
-                    $this->db->executeStatement($dropTemp);
-                } catch (\Throwable) {
-                }
+            // Restore the previous index so a failed create does not leave it dropped.
+            try {
+                $this->db->executeStatement($platform->getCreateIndexSQL($oldIndex, $this->table));
+            } catch (\Throwable) {
             }
             throw $e;
         }

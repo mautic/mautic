@@ -685,7 +685,7 @@ class LeadRepository extends CommonRepository
         $advanceSql = DatabasePlatform::getDeleteProcessedBatchFromTempTableSql(
             $platform,
             $tempTableName,
-            self::LOG_DELETE_BATCH_SIZE
+            self::DELETE_BATCH_SIZE
         );
         while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
             $deletedRecordCount += $deletedRows;
