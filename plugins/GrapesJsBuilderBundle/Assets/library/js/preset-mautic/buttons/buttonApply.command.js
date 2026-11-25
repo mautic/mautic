@@ -34,7 +34,6 @@ export default class ButtonApplyCommand {
         }
 
         ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode);
-        editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
       } else {
         let html = ContentService.getEditorHtmlContent(editor);
 
@@ -45,6 +44,8 @@ export default class ButtonApplyCommand {
         ButtonCloseCommands.returnContentToTextarea(editor, html);
       }
 
+      // Restore editable components before postForm snapshots the editor state.
+      editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
       ButtonApplyCommand.postForm(editor, sender);
       return true;
     } finally {
