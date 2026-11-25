@@ -801,10 +801,10 @@ final class ZohoIntegration extends CrmAbstractIntegration
         $fieldsToUpdateInZoho  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields            = array_unique(array_values($config['leadFields']));
         $totalUpdated          = $totalCreated = $totalErrors = 0;
-        if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
+        if ($key = array_search('mauticContactTimelineLink', $leadFields, true)) {
             unset($leadFields[$key]);
         }
-        if ($key = array_search('mauticContactIsContactableByEmail', $leadFields)) {
+        if ($key = array_search('mauticContactIsContactableByEmail', $leadFields, true)) {
             unset($leadFields[$key]);
         }
         if ([] === $leadFields) {

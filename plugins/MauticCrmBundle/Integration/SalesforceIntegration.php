@@ -3016,7 +3016,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
             // mark as deleleted
             foreach ($resultsById['records'] as $sfId => $record) {
                 if (isset($record['IsDeleted']) && 1 == $record['IsDeleted']) {
-                    if ($foundKey = array_search($record['Id'], $searchForIds)) {
+                    if ($foundKey = array_search($record['Id'], $searchForIds, true)) {
                         $integrationEntity = $this->em->getReference(IntegrationEntity::class, $checkIdsInSF[$foundKey]['id']);
                         $integrationEntity->setInternalEntity('company-deleted');
                         $this->persistIntegrationEntities[] = $integrationEntity;

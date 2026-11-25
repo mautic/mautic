@@ -725,10 +725,10 @@ final class DynamicsIntegration extends CrmAbstractIntegration
         $leadFields            = array_unique(array_values($config['leadFields'] ?? []));
         $totalUpdated          = $totalCreated          = $totalErrors          = 0;
 
-        if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
+        if ($key = array_search('mauticContactTimelineLink', $leadFields, true)) {
             unset($leadFields[$key]);
         }
-        if ($key = array_search('mauticContactIsContactableByEmail', $leadFields)) {
+        if ($key = array_search('mauticContactIsContactableByEmail', $leadFields, true)) {
             unset($leadFields[$key]);
         }
 
