@@ -22,8 +22,15 @@ final class SegmentDependencyTreeFactory
     public function __construct(
         private readonly RouterInterface $router,
         private readonly LeadListRepository $leadListRepository,
-        private readonly CorePermissions $corePermissions,
+        private readonly ?CorePermissions $corePermissions = null,
     ) {
+        if (null === $corePermissions) {
+            trigger_deprecation(
+                'mautic/mautic',
+                '7.2',
+                'Passing SegmentDependencyTreeFactory without CorePermissions is deprecated and will be removed in 8.0.'
+            );
+        }
     }
 
     public function buildTree(LeadList $segment, ?NodeInterface $rootNode = null): NodeInterface
@@ -80,7 +87,7 @@ final class SegmentDependencyTreeFactory
 
         return array_values(array_filter(
             $this->leadListRepository->findBy(['id' => $childSegmentIds]),
-            fn (LeadList $childSegment): bool => $this->corePermissions->hasEntityAccess(
+            fn (LeadList $childSegment): bool => null === $this->corePermissions || $this->corePermissions->hasEntityAccess(
                 LeadPermissions::LISTS_VIEW_OWN,
                 LeadPermissions::LISTS_VIEW_OTHER,
                 $childSegment->getCreatedBy()
