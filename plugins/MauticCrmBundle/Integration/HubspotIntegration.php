@@ -427,18 +427,15 @@ final class HubspotIntegration extends CrmAbstractIntegration
     /**
      * Create or update existing Mautic lead from the integration's profile data.
      *
-     * @param mixed       $data        Profile data from integration
-     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
-     * @param string|null $object
+     * @param array|string $data        Profile data from integration
+     * @param bool|true    $persist     Set to false to not persist lead to the database in this method
+     * @param string|null  $object
      *
      * @return Lead
      */
-    public function getMauticLead(mixed $data, $persist = true, ?array $socialCache = null, mixed $identifiers = null, $object = null)
+    public function getMauticLead(array|string $data, $persist = true, ?array $socialCache = null, mixed $identifiers = null, $object = null)
     {
-        if (is_object($data)) {
-            // Convert to array in all levels
-            $data = json_encode(json_decode($data, true));
-        } elseif (is_string($data)) {
+        if (is_string($data)) {
             // Assume JSON
             $data = json_decode($data, true);
         }

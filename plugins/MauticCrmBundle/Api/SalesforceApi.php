@@ -417,7 +417,7 @@ final class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function getCampaignMembers($campaignId, mixed $modifiedSince = null, $queryUrl = null)
+    public function getCampaignMembers($campaignId, ?string $modifiedSince = null, $queryUrl = null)
     {
         $defaultSettings = $this->requestSettings;
 

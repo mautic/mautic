@@ -323,18 +323,15 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * Create or update existing Mautic lead from the integration's profile data.
      *
-     * @param mixed       $data        Profile data from integration
-     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
-     * @param string|null $object
+     * @param array|string $data        Profile data from integration
+     * @param bool|true    $persist     Set to false to not persist lead to the database in this method
+     * @param string|null  $object
      *
      * @return Lead|null
      */
-    public function getMauticLead(mixed $data, $persist = true, ?array $socialCache = null, mixed $identifiers = null, $object = null)
+    public function getMauticLead(array|string $data, $persist = true, ?array $socialCache = null, mixed $identifiers = null, $object = null)
     {
-        if (is_object($data)) {
-            // Convert to array in all levels
-            $data = json_encode(json_decode($data, true));
-        } elseif (is_string($data)) {
+        if (is_string($data)) {
             // Assume JSON
             $data = json_decode($data, true);
         }
@@ -610,7 +607,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @return mixed
      */
-    protected function limitString(mixed $value, string $fieldType = '')
+    protected function limitString(array|string|int|float|bool|null $value, string $fieldType = '')
     {
         // We must not convert boolean values to string, otherwise "false" will be converted to an empty string.
         // "False" has to be converted to 0 instead.
