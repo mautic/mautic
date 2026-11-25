@@ -329,7 +329,7 @@ final class SalesforceApi extends CrmApi
         }
 
         if (!empty($query['nextUrl'])) {
-            return $this->request(null, [], 'GET', isRetry: false, object: null, queryUrl: $query['nextUrl']);
+            return $this->request(operation: null, elementData: [], method: 'GET', isRetry: false, object: null, queryUrl: $query['nextUrl']);
         }
 
         $organizationCreatedDate = $this->getOrganizationCreatedDate();
@@ -434,7 +434,7 @@ final class SalesforceApi extends CrmApi
             $query .= ' and SystemModStamp >= '.$modifiedSince;
         }
 
-        $results = $this->request(null, ['q' => $query], 'GET', isRetry: false, object: null, queryUrl: $queryUrl);
+        $results = $this->request(operation: null, elementData: ['q' => $query], method: 'GET', isRetry: false, object: null, queryUrl: $queryUrl);
 
         $this->requestSettings = $defaultSettings;
 
@@ -661,7 +661,7 @@ final class SalesforceApi extends CrmApi
         }
         try {
             $leadsQuery = sprintf($baseQuery, implode(', ', $fields));
-            $response   = $this->request('queryAll', ['q' => $leadsQuery], 'GET', $isRetry, null, $queryUrl);
+            $response   = $this->request('queryAll', ['q' => $leadsQuery], 'GET', $isRetry, object: null, queryUrl: $queryUrl);
         } catch (ApiErrorException $e) {
             [$missingField, $entityType] = $this->parseMissingField($e->getMessage());
             if (!$missingField) {

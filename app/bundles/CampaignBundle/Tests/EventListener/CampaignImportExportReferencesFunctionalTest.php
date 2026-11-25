@@ -141,9 +141,9 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $this->assertReference([$otherCampaign->getId()], $events['campaign.addremovelead'], 'addTo');
         $this->assertReference(['this'], $events['campaign.addremovelead'], 'removeFrom');
         // Users cannot be identified on another instance, and the company with the old ID does not exist
-        $this->assertReference(null, $events['lead.changeowner'], 'owner');
+        $this->assertReference(expected: null, event: $events['lead.changeowner'], property: 'owner');
         $this->assertReference([], $events['lead.owner'], 'owner');
-        $this->assertReference(null, $events['lead.addtocompany'], 'company');
+        $this->assertReference(expected: null, event: $events['lead.addtocompany'], property: 'company');
     }
 
     /**

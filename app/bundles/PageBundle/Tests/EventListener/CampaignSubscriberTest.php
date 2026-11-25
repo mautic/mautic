@@ -34,7 +34,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerDecisionMatchesPlainTextUrlFilter(): void
     {
         $event = $this->createDecisionEvent(
-            $this->createHit('https://example.com/product/1234', null),
+            $this->createHit('https://example.com/product/1234', referer: null),
             ['url' => 'product/123']
         );
 
@@ -58,7 +58,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerDecisionReturnsFalseWhenUrlDoesNotMatch(): void
     {
         $event = $this->createDecisionEvent(
-            $this->createHit('https://example.com/product/1234', null),
+            $this->createHit('https://example.com/product/1234', referer: null),
             ['url' => 'does-not-match']
         );
 
@@ -70,7 +70,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerDecisionMatchesCommaSeparatedUrlFilters(): void
     {
         $event = $this->createDecisionEvent(
-            $this->createHit('https://example.com/product/1234', null),
+            $this->createHit('https://example.com/product/1234', referer: null),
             ['url' => 'alpha,product/123,omega']
         );
 

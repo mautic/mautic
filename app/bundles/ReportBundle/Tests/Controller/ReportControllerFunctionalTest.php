@@ -34,7 +34,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
     {
         $page = $this->createPage('test page 1');
         $this->createHit($page);
-        $this->createHit(null);
+        $this->createHit(page: null);
 
         $query = $this->em->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
@@ -53,7 +53,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
     {
         $page = $this->createPage('test page 1');
         $this->createHit($page);
-        $this->createHit(null);
+        $this->createHit(page: null);
 
         $report = $this->createReport('Report Most Visited Pages', 'page.hits', [
             'mautic.page.table.most.visited.unique',

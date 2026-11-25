@@ -24,7 +24,7 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
     {
         $segment  = $this->createSegment();
         $category = $this->createCategory('Newsletter');
-        $parent   = $this->createEmail('Email EN', 'en', $segment, null, $category);
+        $parent   = $this->createEmail('Email EN', 'en', $segment, translationParent: null, category: $category);
         $this->createEmail('Email PT', 'pt_PT', $segment, $parent, $category);
         $this->em->clear();
 
@@ -45,15 +45,15 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
         // as a duplicate when the emails are flushed.
         $contacts = [
             $this->createContact('en-locale@example.com', 'en'),
-            $this->createContact('no-locale-1@example.com', null),
+            $this->createContact('no-locale-1@example.com', preferredLocale: null),
             $this->createContact('pt-locale@example.com', 'pt_PT'),
-            $this->createContact('no-locale-2@example.com', null),
+            $this->createContact('no-locale-2@example.com', preferredLocale: null),
         ];
         $segment = $this->createSegment();
         $this->addContactsToSegment($contacts, $segment);
 
         $category = $this->createCategory('Newsletter');
-        $parent   = $this->createEmail('Email EN', 'en', $segment, null, $category);
+        $parent   = $this->createEmail('Email EN', 'en', $segment, translationParent: null, category: $category);
         $child    = $this->createEmail('Email PT', 'pt_PT', $segment, $parent, $category);
         $this->em->clear();
 
@@ -110,10 +110,10 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
 
         $category = $this->createCategory('Newsletter');
         // Processed first: a translated email whose children stay managed after it is detached.
-        $translatedParent = $this->createEmail('Email EN', 'en', $segment, null, $category);
+        $translatedParent = $this->createEmail('Email EN', 'en', $segment, translationParent: null, category: $category);
         $this->createEmail('Email PT', 'pt_PT', $segment, $translatedParent, $category);
         // Processed afterwards: its auto-unpublish triggers the flush that walks the leftovers.
-        $secondEmail = $this->createEmail('Email Second', 'en', $segment, null, $category);
+        $secondEmail = $this->createEmail('Email Second', 'en', $segment, translationParent: null, category: $category);
         $this->em->clear();
 
         // First run drains both broadcasts, so neither is unpublished yet.

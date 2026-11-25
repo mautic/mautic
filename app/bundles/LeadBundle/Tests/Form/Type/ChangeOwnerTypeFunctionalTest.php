@@ -111,7 +111,7 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(0, $this->getOwnerSelect()->filter('option[value=""]'));
 
         // An imported action has no owner, as users cannot be identified on another instance
-        $this->editChangeOwnerAction(null);
+        $this->editChangeOwnerAction(owner: null);
         $this->assertSame([''], $this->getOwnerSelect()->filter('option[selected]')->each(fn (Crawler $option): string => (string) $option->attr('value')));
 
         $form = new Crawler(json_decode((string) $this->client->getResponse()->getContent(), associative: true)['newContent'], $this->client->getInternalRequest()->getUri())

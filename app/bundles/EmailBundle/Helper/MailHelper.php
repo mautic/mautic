@@ -1177,7 +1177,7 @@ final class MailHelper
             ]);
         }
 
-        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
+        $this->setBody($customHtml, 'text/html', charset: null, ignoreTrackingPixel: $ignoreTrackingPixel);
 
         // Reset attachments
         $this->assets = $this->attachedAssets = [];

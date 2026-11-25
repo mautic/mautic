@@ -42,7 +42,7 @@ final class BulkNotificationTest extends TestCase
         $this->assertCount(3, $this->notificationModelFake->notifications ?? []);
         $this->assertNotification($data1, $this->notificationModelFake->notifications[0] ?? [], $deduplicateDateTimeFrom);
         $this->assertNotification($data2, $this->notificationModelFake->notifications[1] ?? [], $deduplicateDateTimeFrom);
-        $this->assertNotification($data4, $this->notificationModelFake->notifications[2] ?? [], null);
+        $this->assertNotification($data4, $this->notificationModelFake->notifications[2] ?? [], deduplicateDateTimeFrom: null);
     }
 
     /**

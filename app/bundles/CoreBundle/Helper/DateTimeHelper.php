@@ -315,7 +315,7 @@ final class DateTimeHelper
     public function getTextDate(?\DateInterval $interval = null): string|false
     {
         if (null == $interval) {
-            $interval = $this->getDiff('now', null, resetTime: true);
+            $interval = $this->getDiff('now', format: null, resetTime: true);
         }
 
         $diffDays = (int) $interval->format('%R%a');

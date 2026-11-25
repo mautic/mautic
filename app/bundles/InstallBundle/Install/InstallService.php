@@ -528,7 +528,7 @@ final readonly class InstallService
             'site_url'   => $siteUrl,
         ];
 
-        return $this->saveConfiguration($finalConfigVars, null, clearCache: true);
+        return $this->saveConfiguration($finalConfigVars, step: null, clearCache: true);
     }
 
     /**

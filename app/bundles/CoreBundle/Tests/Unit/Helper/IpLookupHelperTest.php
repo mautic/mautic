@@ -199,7 +199,7 @@ final class IpLookupHelperTest extends TestCase
         $repository = $this->createMock(IpAddressRepository::class);
         $repository->expects($this->never())->method('saveEntity');
 
-        $this->assertFalse($this->getIpHelper($request, null, $repository)->isRequestTrackable());
+        $this->assertFalse($this->getIpHelper($request, mockCoreParametersHelper: null, mockRepository: $repository)->isRequestTrackable());
     }
 
     #[TestDox('Check that a request from an IP on the do-not-track list is not trackable and the IP address is not saved')]

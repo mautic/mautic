@@ -49,7 +49,7 @@ final class MessageApiControllerTest extends MauticMysqlTestCase
             $this->client->request($method, $url, Request::METHOD_PATCH === $method ? ['name' => 'Updated message'] : []);
             self::assertResponseIsSuccessful();
             $payload  = json_decode($this->client->getResponse()->getContent(), associative: true);
-            $channels = array_column($payload['message']['channels'], null, 'channel');
+            $channels = array_column($payload['message']['channels'], column_key: null, index_key: 'channel');
 
             $this->assertCount(2, $channels);
             $this->assertSame(123, $channels['tweet']['channelId']);

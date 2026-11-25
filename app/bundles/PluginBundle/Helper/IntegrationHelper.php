@@ -499,7 +499,7 @@ final class IntegrationHelper
         static $shareBtns = [];
 
         if (empty($shareBtns)) {
-            $socialIntegrations = $this->getIntegrationObjects(null, ['share_button'], alphabetical: true);
+            $socialIntegrations = $this->getIntegrationObjects(specificIntegrations: null, withFeatures: ['share_button'], alphabetical: true);
 
             /**
              * @var string              $integration

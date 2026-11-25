@@ -36,10 +36,10 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $event2   = $this->createEvent($campaign, 'Event 2');
         $contact  = $this->createContact();
 
-        $log1 = $this->createScheduledLog($event1, $contact, null, 1);
-        $log2 = $this->createScheduledLog($event1, $contact, null, 2);
-        $log3 = $this->createScheduledLog($event2, $contact, null, 3);
-        $log4 = $this->createScheduledLog($event2, $contact, null, 4);
+        $log1 = $this->createScheduledLog($event1, $contact, triggerDate: null, rotation: 1);
+        $log2 = $this->createScheduledLog($event1, $contact, triggerDate: null, rotation: 2);
+        $log3 = $this->createScheduledLog($event2, $contact, triggerDate: null, rotation: 3);
+        $log4 = $this->createScheduledLog($event2, $contact, triggerDate: null, rotation: 4);
 
         $this->em->persist($campaign);
         $this->em->persist($event1);
@@ -65,10 +65,10 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $event2   = $this->createEvent($campaign, 'Event 2');
         $contact  = $this->createContact();
 
-        $log1 = $this->createScheduledLog($event1, $contact, null, 5);
-        $log2 = $this->createScheduledLog($event1, $contact, null, 6);
-        $log3 = $this->createScheduledLog($event2, $contact, null, 7);
-        $log4 = $this->createScheduledLog($event2, $contact, null, 8);
+        $log1 = $this->createScheduledLog($event1, $contact, triggerDate: null, rotation: 5);
+        $log2 = $this->createScheduledLog($event1, $contact, triggerDate: null, rotation: 6);
+        $log3 = $this->createScheduledLog($event2, $contact, triggerDate: null, rotation: 7);
+        $log4 = $this->createScheduledLog($event2, $contact, triggerDate: null, rotation: 8);
 
         $this->em->persist($campaign);
         $this->em->persist($event1);
@@ -93,8 +93,8 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $event    = $this->createEvent($campaign);
         $contact  = $this->createContact();
 
-        $log1 = $this->createScheduledLog($event, $contact, null, 9);
-        $log2 = $this->createScheduledLog($event, $contact, null, 10);
+        $log1 = $this->createScheduledLog($event, $contact, triggerDate: null, rotation: 9);
+        $log2 = $this->createScheduledLog($event, $contact, triggerDate: null, rotation: 10);
 
         $this->em->persist($campaign);
         $this->em->persist($event);
@@ -189,11 +189,11 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $deletedEvent->setRedirectEvent($redirectTargetEvent);
 
         // Create an existing log for the redirect target event to test rotation calculation
-        $existingLogForTarget = $this->createScheduledLog($redirectTargetEvent, $contact, null, 1);
+        $existingLogForTarget = $this->createScheduledLog($redirectTargetEvent, $contact, triggerDate: null, rotation: 1);
 
         // Create scheduled logs for the deleted event
-        $log1 = $this->createScheduledLog($deletedEvent, $contact, null, 1);
-        $log2 = $this->createScheduledLog($deletedEvent, $contact, null, 2);
+        $log1 = $this->createScheduledLog($deletedEvent, $contact, triggerDate: null, rotation: 1);
+        $log2 = $this->createScheduledLog($deletedEvent, $contact, triggerDate: null, rotation: 2);
 
         $campaignLead = $this->createCampaignLead($contact, $campaign, 2);
 
@@ -312,8 +312,8 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $event    = $this->createEvent($campaign);
         $contact  = $this->createContact();
 
-        $log1 = $this->createScheduledLog($event, $contact, null, 19);
-        $log2 = $this->createScheduledLog($event, $contact, null, 20);
+        $log1 = $this->createScheduledLog($event, $contact, triggerDate: null, rotation: 19);
+        $log2 = $this->createScheduledLog($event, $contact, triggerDate: null, rotation: 20);
 
         $this->em->persist($campaign);
         $this->em->persist($event);
@@ -334,7 +334,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $event    = $this->createEvent($campaign, 'Normal Event');
         $contact  = $this->createContact();
 
-        $log = $this->createScheduledLog($event, $contact, null, 21);
+        $log = $this->createScheduledLog($event, $contact, triggerDate: null, rotation: 21);
 
         $this->em->persist($campaign);
         $this->em->persist($event);
@@ -453,7 +453,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $campaignMember->setRotation(0);
 
         // Create a scheduled log for the original (deleted) event
-        $log = $this->createScheduledLog($originalEvent, $contact, null, 1);
+        $log = $this->createScheduledLog($originalEvent, $contact, triggerDate: null, rotation: 1);
 
         $this->em->persist($campaign);
         $this->em->persist($originalEvent);

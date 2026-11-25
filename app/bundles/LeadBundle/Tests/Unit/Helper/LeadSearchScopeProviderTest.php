@@ -63,7 +63,7 @@ final class LeadSearchScopeProviderTest extends SearchScopeProviderTestCase
     {
         $scopes = $this->getScopes();
 
-        $byCommand = array_column($scopes, null, 'command');
+        $byCommand = array_column($scopes, column_key: null, index_key: 'command');
 
         $this->assertFalse($byCommand['instagram']['indent'] ?? false);
         $this->assertTrue($byCommand['custom_field']['indent'] ?? false);

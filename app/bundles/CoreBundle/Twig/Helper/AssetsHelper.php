@@ -98,7 +98,7 @@ final class AssetsHelper
             $path = $assetsPath.DIRECTORY_SEPARATOR.$path;
         }
 
-        return $this->getUrl($path, null, null, $absolute);
+        return $this->getUrl($path, packageName: null, version: null, absolute: $absolute);
     }
 
     /**

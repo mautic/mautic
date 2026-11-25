@@ -244,7 +244,7 @@ final class ContactTracker
         // Don't save leads from non-trackable requests (IP, bot, privacy signal, prefetch checks)
         // or visitors a form submission doesn't track, and don't look up their IP either, since the lookup saves new addresses
         if (!$this->isVisitorTrackable()) {
-            return $this->createNewContact(null, persist: false);
+            return $this->createNewContact(ip: null, persist: false);
         }
 
         $ip = $this->ipLookupHelper->getIpAddress();

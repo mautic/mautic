@@ -26,7 +26,7 @@ final class EmailListTypeFunctionalTest extends MauticMysqlTestCase
     {
         $parentEmail = $this->createEmail(self::PARENT_EMAIL);
         $this->createEmail(self::VARIANT_EMAIL, $parentEmail);
-        $this->createEmail(self::TRANSLATION_EMAIL, null, $parentEmail);
+        $this->createEmail(self::TRANSLATION_EMAIL, variantParent: null, translationParent: $parentEmail);
 
         $this->em->clear();
 

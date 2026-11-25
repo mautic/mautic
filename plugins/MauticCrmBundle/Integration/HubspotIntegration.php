@@ -397,7 +397,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
 
                 foreach ($results['results'] as $company) {
                     if (isset($company['properties'])) {
-                        $companyData = $this->amendLeadDataBeforeMauticPopulate($company, null);
+                        $companyData = $this->amendLeadDataBeforeMauticPopulate($company, object: null);
                         $company     = $this->getMauticCompany($companyData);
                         if ($id) {
                             return $company;

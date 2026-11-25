@@ -74,7 +74,7 @@ final class TimelineEventTemplateTest extends TestCase
     {
         $dateSent = new \DateTime('2026-09-08 10:00:00');
 
-        $html = $this->render('sent', $dateSent, null, $dateSent);
+        $html = $this->render('sent', $dateSent, dateRead: null, timestamp: $dateSent);
 
         $this->assertStringNotContainsString('mautic.email.timeline.event.not.read', $html);
     }
@@ -108,7 +108,7 @@ final class TimelineEventTemplateTest extends TestCase
     {
         $dateSent = new \DateTime('2026-09-08 10:00:00');
 
-        $html = $this->render('read', $dateSent, null, $dateSent);
+        $html = $this->render('read', $dateSent, dateRead: null, timestamp: $dateSent);
 
         $this->assertStringContainsString('mautic.email.timeline.event.not.read', $html);
     }
@@ -117,7 +117,7 @@ final class TimelineEventTemplateTest extends TestCase
     {
         $dateSent = new \DateTime('2026-09-08 10:00:00');
 
-        $html = $this->render('failed', $dateSent, null, $dateSent, isFailed: true);
+        $html = $this->render('failed', $dateSent, dateRead: null, timestamp: $dateSent, isFailed: true);
 
         $this->assertStringContainsString('mautic.email.timeline.event.failed', $html);
         $this->assertStringNotContainsString('mautic.email.timeline.event.not.read', $html);

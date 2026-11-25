@@ -200,8 +200,8 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
                 'email' => 'contact.stage.id@test.com',
                 'stage' => self::STAGE_NAME_TOKEN,
             ],
-            null,
-            self::STAGE_NAME
+            expectedOwnerUsername: null,
+            expectedStageName: self::STAGE_NAME
         );
 
         yield 'owner by email and stage' => self::generateTestCase(

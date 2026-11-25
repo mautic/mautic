@@ -46,7 +46,7 @@ final class TestKernel extends \AppTestKernel
 
     private function currentExceptionHandler(): ?callable
     {
-        $exceptionHandler = set_exception_handler(null);
+        $exceptionHandler = set_exception_handler(callback: null);
         restore_exception_handler();
 
         return $exceptionHandler;

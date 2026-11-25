@@ -60,7 +60,7 @@ final class UploadValidator extends ConstraintValidator
 
         $this->validateExtensionAndMimeType($asset->getExtension(), $asset->loadFile())
             && $this->validateExtensionAndMimeType($this->parseExtension($asset->getTempName()), $asset->loadFile(true))
-            && $this->validateExtensionAndMimeType($this->parseExtension($asset->getOriginalFileName()), null);
+            && $this->validateExtensionAndMimeType($this->parseExtension($asset->getOriginalFileName()), file: null);
     }
 
     private function validateRemote(Asset $asset): void

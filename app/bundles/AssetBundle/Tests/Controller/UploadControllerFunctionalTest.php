@@ -101,7 +101,7 @@ final class UploadControllerFunctionalTest extends MauticMysqlTestCase
         $filePath = $this->createSourcePath($extension);
         file_put_contents($filePath, 'dummy content');
 
-        $this->upload($this->createUploadedFile($filePath, null));
+        $this->upload($this->createUploadedFile($filePath, mimeType: null));
 
         $content    = $this->client->getResponse()->getContent();
         $extensions = implode(', ', $this->configParams['allowed_extensions']);

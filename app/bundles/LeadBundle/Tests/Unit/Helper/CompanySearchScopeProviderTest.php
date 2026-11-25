@@ -52,7 +52,7 @@ final class CompanySearchScopeProviderTest extends SearchScopeProviderTestCase
     {
         $scopes = $this->getScopes();
 
-        $byCommand = array_column($scopes, null, 'command');
+        $byCommand = array_column($scopes, column_key: null, index_key: 'command');
 
         $this->assertTrue($byCommand['companyindustry']['indent'] ?? false);
 

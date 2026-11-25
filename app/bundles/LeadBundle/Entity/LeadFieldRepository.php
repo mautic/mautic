@@ -90,7 +90,7 @@ final class LeadFieldRepository extends CommonRepository
                 ->addOrderBy('f.field_order', 'asc');
             $results = $fq->executeQuery()->fetchAllAssociative();
 
-            $this->fields = array_column($results, null, 'alias');
+            $this->fields = array_column($results, column_key: null, index_key: 'alias');
         }
 
         return $this->fields;

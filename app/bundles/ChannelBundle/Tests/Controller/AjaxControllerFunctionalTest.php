@@ -28,13 +28,13 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testGetMarketingMessageSendToDncStatusWithoutEmailAction(): void
     {
-        $channel = $this->createChannel(null);
+        $channel = $this->createChannel(email: null);
         $message = $this->createMessage($channel);
 
         $this->em->flush();
         $this->em->clear();
 
-        $this->assertAjaxResponse($message, null);
+        $this->assertAjaxResponse($message, email: null);
     }
 
     public static function sendToDncProvider(): \Generator

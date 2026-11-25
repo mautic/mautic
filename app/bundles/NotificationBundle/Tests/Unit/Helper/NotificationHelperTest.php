@@ -51,7 +51,7 @@ final class NotificationHelperTest extends TestCase
 
     public function testNoScriptWithoutPublishedIntegration(): void
     {
-        $helper = $this->createHelper(null, 'http://customer.example/page');
+        $helper = $this->createHelper(publishedIntegration: null, referer: 'http://customer.example/page');
 
         $this->assertNull($helper->getHeaderScript());
         $this->assertNull($helper->getScript());

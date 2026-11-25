@@ -93,7 +93,7 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects($this->never())->method('getRepository');
 
-        $model = $this->getModel($requestStack, $emailModel, $entityManager, null, $emailRepository);
+        $model = $this->getModel($requestStack, $emailModel, $entityManager, grapesJsBuilderRepository: null, emailRepository: $emailRepository);
 
         $model->addOrEditEntity(new Email());
     }

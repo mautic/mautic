@@ -57,9 +57,9 @@ final class DownloadRepositoryFunctionalTest extends MauticMysqlTestCase
         $email->setVariantSentCount(25);
         $this->em->persist($email);
 
-        $this->createDownload('2026-03-20 11:00:00', 200, 'email-track-in', null, null, $email);
-        $this->createDownload('2026-02-20 11:00:00', 200, 'email-track-old', null, null, $email);
-        $this->createDownload('2026-03-21 11:00:00', 500, 'email-track-wrong-code', null, null, $email);
+        $this->createDownload('2026-03-20 11:00:00', 200, 'email-track-in', source: null, sourceId: null, email: $email);
+        $this->createDownload('2026-02-20 11:00:00', 200, 'email-track-old', source: null, sourceId: null, email: $email);
+        $this->createDownload('2026-03-21 11:00:00', 500, 'email-track-wrong-code', source: null, sourceId: null, email: $email);
 
         $this->em->flush();
 

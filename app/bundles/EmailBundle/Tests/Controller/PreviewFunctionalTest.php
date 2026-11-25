@@ -499,7 +499,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $user           = $this->createNonAdminUser(['viewown', 'create'], 34);
         $otherCompany   = $this->createPreviewCompany('Other Company', $admin);
         $ownCompany     = $this->createPreviewCompany('Own Company', $user);
-        $createdCompany = $this->createPreviewCompany('Created Company', null, $user);
+        $createdCompany = $this->createPreviewCompany('Created Company', owner: null, createdBy: $user);
 
         $contactCompany = $this->createCompany('Contact Company', 'hello@contact.tld');
         $contactCompany->setOwner($admin);

@@ -50,7 +50,7 @@ final class CustomFieldHelper
      */
     public static function fieldValueTransfomer(array $field, $value, ?DateTimeHelper $dateTimeHelper = null): mixed
     {
-        return self::fieldValueTransformer($field, $value, null, $dateTimeHelper);
+        return self::fieldValueTransformer($field, $value, operator: null, dateTimeHelper: $dateTimeHelper);
     }
 
     /**
@@ -108,7 +108,7 @@ final class CustomFieldHelper
     {
         foreach ($values as $alias => &$value) {
             if (!empty($fields[$alias]) && is_array($fields[$alias])) {
-                $value = self::fieldValueTransformer($fields[$alias], $value, null, $dateTimeHelper);
+                $value = self::fieldValueTransformer($fields[$alias], $value, operator: null, dateTimeHelper: $dateTimeHelper);
             }
         }
 

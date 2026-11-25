@@ -130,7 +130,7 @@ final class KioskModeSubmissionFunctionalTest extends MauticMysqlTestCase
         $trackedContact = $this->createTrackedVisitor();
         $contactCount   = $this->getContainer()->get(LeadRepository::class)->count([]);
 
-        $this->submitForm($formId, null, '203.0.113.8', ['mauticform[comment]' => 'Hello']);
+        $this->submitForm($formId, email: null, remoteAddress: '203.0.113.8', values: ['mauticform[comment]' => 'Hello']);
 
         $this->em->clear();
         $submissions = $this->getContainer()->get(SubmissionRepository::class)->findBy(['form' => $formId]);

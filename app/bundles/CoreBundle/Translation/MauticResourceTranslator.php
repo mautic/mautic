@@ -81,7 +81,7 @@ final class MauticResourceTranslator implements TranslatorInterface, TranslatorB
      */
     public function getCatalogues(): array
     {
-        $this->register(null);
+        $this->register(locale: null);
 
         return $this->translator->getCatalogues();
     }
@@ -91,7 +91,7 @@ final class MauticResourceTranslator implements TranslatorInterface, TranslatorB
      */
     public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
-        $this->register(null);
+        $this->register(locale: null);
 
         // Symfony also builds catalogues for configured locales and their fallbacks.
         // Register every resource before any of those catalogues is cached.

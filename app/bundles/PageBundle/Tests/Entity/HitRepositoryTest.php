@@ -42,8 +42,8 @@ final class HitRepositoryTest extends MauticMysqlTestCase
         $this->assertHitDate($dateOne, $leadOne, 'one-first');
         $this->assertHitDate($dateThree, $leadOne, 'one-second');
         $this->assertHitDate($dateFive, $leadTwo, 'two-first');
-        $this->assertHitDate($dateThree, $leadOne, null);
-        $this->assertHitDate($dateFive, $leadTwo, null);
+        $this->assertHitDate($dateThree, $leadOne, trackingId: null);
+        $this->assertHitDate($dateFive, $leadTwo, trackingId: null);
 
         $this->assertNotInstanceOf(\DateTime::class, $this->hitRepository->getLatestHitDateByLead($leadOne->getId(), 'two-first'));
         $this->assertNotInstanceOf(\DateTime::class, $this->hitRepository->getLatestHitDateByLead($leadTwo->getId(), 'one-second'));

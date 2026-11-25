@@ -21,7 +21,7 @@ final class StageSearchFunctionalTest extends MauticMysqlTestCase
         $firstStageSearch = 'stage_id%3A'.$firstStage->getId();
         $firstContact     = $this->createContact('first-stage-contact@example.test', $firstStage);
         $secondContact    = $this->createContact('second-stage-contact@example.test', $secondStage);
-        $noStageContact   = $this->createContact('no-stage-contact@example.test', null);
+        $noStageContact   = $this->createContact('no-stage-contact@example.test', stage: null);
         $this->em->flush();
         $this->em->clear();
 

@@ -397,7 +397,7 @@ final class UserModel extends FormModel implements GlobalSearchInterface
 
         $invite = $this->userInviteRepository->findOneByTokenSelector($inviteToken['selector']);
         if (null === $invite) {
-            $this->logInvalidInvite('token selector was not found', null, $inviteToken['selector']);
+            $this->logInvalidInvite('token selector was not found', invite: null, selector: $inviteToken['selector']);
 
             return null;
         }

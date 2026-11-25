@@ -399,7 +399,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                     (isset($result['total_count']) && $result['total_count'] > $params['offset'])   // Sugar 6
                     || (!isset($result['total_count']) && $params['offset'] > -1)) {            // Sugar 7
                     $result = null;
-                    $executed += $this->getCompanies($params, null, $executed);
+                    $executed += $this->getCompanies($params, query: null, executed: $executed);
                 }
 
                 return $executed;
@@ -535,7 +535,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                         || (!isset($result['total_count']) && $params['offset'] > -1)) {            // Sugar 7
                         $params['object'] = $object;
                         $recursed = null;
-                        $executed += $this->getLeads($params, null, $recursed, [], $object);
+                        $executed += $this->getLeads($params, query: null, executed: $recursed, result: [], object: $object);
                     }
                 }
 

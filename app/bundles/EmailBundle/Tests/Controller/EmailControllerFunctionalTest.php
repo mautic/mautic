@@ -1776,8 +1776,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
             'list',
             'blank',
             'Manual winner parent html',
-            null,
-            [
+            segment: null,
+            varientSetting: [
                 'enableAbTest'    => true,
                 'totalWeight'     => 100,
                 'winnerCriteria'  => 'email.openrate',
@@ -1793,8 +1793,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
             'list',
             'blank',
             'Manual winner variant html',
-            null,
-            [
+            segment: null,
+            varientSetting: [
                 'weight'         => 50,
                 'winnerCriteria' => 'email.openrate',
             ]

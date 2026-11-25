@@ -102,7 +102,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testUnsubscribeFormActionWithoutTheme(): void
     {
-        $form = $this->getForm(null);
+        $form = $this->getForm(formTemplate: null);
         $stat = $this->getStat($form);
         $this->em->flush();
 
@@ -117,7 +117,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->logoutUser();
         $lead                 = $this->createLead();
         $preferenceCenterPage = $this->getPreferencesCenterLandingPage();
-        $stat                 = $this->getStat(null, $lead, $preferenceCenterPage);
+        $stat                 = $this->getStat(form: null, lead: $lead, preferenceCenter: $preferenceCenterPage);
 
         $this->em->flush();
 
@@ -132,7 +132,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     public function testContactPreferencesSaveMessage(): void
     {
         $lead = $this->createLead();
-        $stat = $this->getStat(null, $lead);
+        $stat = $this->getStat(form: null, lead: $lead);
         $this->em->flush();
 
         $crawler = $this->client->request(Request::METHOD_GET, $this->buildUnsubscribeUrl($stat));
@@ -203,7 +203,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     public function testOneClickUnsubscribeAction(): void
     {
         $lead = $this->createLead();
-        $stat = $this->getStat(null, $lead);
+        $stat = $this->getStat(form: null, lead: $lead);
         $this->em->flush();
         $this->client->request(Request::METHOD_POST, $this->buildUnsubscribeUrl($stat), [
             'List-Unsubscribe' => 'One-Click',
@@ -217,7 +217,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     public function testOneClickUnsubscribeWithWrongSecretHashIsForbidden(): void
     {
         $lead = $this->createLead();
-        $stat = $this->getStat(null, $lead);
+        $stat = $this->getStat(form: null, lead: $lead);
         $this->em->flush();
         $this->client->request(Request::METHOD_POST, "/email/unsubscribe/{$stat->getTrackingHash()}/{$stat->getEmailAddress()}/wronghash", [
             'List-Unsubscribe' => 'One-Click',
@@ -230,7 +230,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     public function testHeadRequestWithNoShowContactPreferences(): void
     {
         $lead = $this->createLead();
-        $stat = $this->getStat(null, $lead);
+        $stat = $this->getStat(form: null, lead: $lead);
         $this->em->flush();
         $this->client->request(Request::METHOD_HEAD, $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
@@ -243,7 +243,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->logoutUser();
         $lead              = $this->createLead();
         $preferencesCenter = $this->createCustomPreferencesPage('{segmentlist}{saveprefsbutton}');
-        $stat              = $this->getStat(null, $lead, $preferencesCenter);
+        $stat              = $this->getStat(form: null, lead: $lead, preferenceCenter: $preferencesCenter);
         $this->em->flush();
         $crawler = $this->client->request(Request::METHOD_GET, $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
@@ -256,7 +256,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->logoutUser();
         $lead              = $this->createLead();
         $preferencesCenter = $this->createCustomPreferencesPage('{segmentlist}{saveprefsbutton}');
-        $stat              = $this->getStat(null, $lead, $preferencesCenter);
+        $stat              = $this->getStat(form: null, lead: $lead, preferenceCenter: $preferencesCenter);
         $this->em->flush();
         $crawler = $this->client->request(Request::METHOD_GET, $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
@@ -282,7 +282,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $lead = $this->createLead();
         $page = $this->createPage();
 
-        $stat = $this->getStat(null, $lead, $page);
+        $stat = $this->getStat(form: null, lead: $lead, preferenceCenter: $page);
         $this->em->flush();
 
         $crawler = $this->client->request(Request::METHOD_GET, $this->buildUnsubscribeUrl($stat));
@@ -350,7 +350,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $lead = $this->createLead($contactLocale);
         $page = $this->createPage($pageLocale);
 
-        $stat = $this->getStat(null, $lead, $page);
+        $stat = $this->getStat(form: null, lead: $lead, preferenceCenter: $page);
         $this->em->flush();
 
         $crawler = $this->client->request(Request::METHOD_GET, $this->buildUnsubscribeUrl($stat));
@@ -741,7 +741,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testUnsubscribeLinkWithoutEmailAndSecretHashReturnsNotFound(): void
     {
-        $stat = $this->getStat(null, $this->createLead());
+        $stat = $this->getStat(form: null, lead: $this->createLead());
         $this->em->flush();
 
         $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
@@ -885,7 +885,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     {
         // Create a lead and email stat
         $lead = $this->createLead();
-        $stat = $this->getStat(null, $lead);
+        $stat = $this->getStat(form: null, lead: $lead);
         $this->em->flush();
 
         // Get the unsubscribe page
@@ -926,7 +926,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $page = $this->createCustomPreferencesPage('<html lang=""><body>{successmessage}<br/>{saveprefsbutton}</body></html>');
 
-        $stat = $this->getStat(null, $lead, $page);
+        $stat = $this->getStat(form: null, lead: $lead, preferenceCenter: $page);
         $this->em->flush();
         $this->em->clear();
 
@@ -948,7 +948,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     public function testContactPreferencesFormRenderOnUnsubscribePage(): void
     {
         $lead = $this->createLead();
-        $stat = $this->getStat(null, $lead);
+        $stat = $this->getStat(form: null, lead: $lead);
 
         // Preference-center segments - unique public names
         $segmentOne = $this->createSegment('Segment First', 'Segment 2', 'segment-1');
