@@ -13,6 +13,7 @@ use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -49,6 +50,8 @@ final class EmailForwardFunctionalTest extends MauticMysqlTestCase
         $this->configParams['disable_trackable_urls']       = false;
         $this->configParams['mailer_append_tracking_pixel'] = true;
         $this->configParams['forward_text']                 = str_contains($this->name(), 'ConfiguredForwardText') ? self::CONFIGURED_FORWARD_TEXT : null;
+        $this->configParams['forward_mail_subject']         = str_contains($this->name(), 'ForwardMessageOfItsLanguage') ? ['de' => 'WG: |SUBJECT|', 'pt' => 'Enc: |SUBJECT|'] : [];
+        $this->configParams['forward_mail_body']            = str_contains($this->name(), 'ForwardMessageOfItsLanguage') ? ['DE' => 'Schau mal: |URL|', 'pt' => 'Veja este e-mail'] : [];
 
         parent::setUp();
     }
@@ -86,6 +89,40 @@ final class EmailForwardFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame('Share with a colleague', $link->text());
         $this->assertStringStartsWith('mailto:?subject=', $link->attr('href'));
+    }
+
+    /**
+     * @return iterable<string, array{string, string|null, string|null}>
+     */
+    public static function forwardMessageLanguageProvider(): iterable
+    {
+        yield 'the language of the email, whatever the case of its code' => ['de', 'WG: Hello friend', 'Schau mal: '];
+        yield 'the base language for a regional one, with the link added to a text without it' => ['pt_BR', 'Enc: Hello friend', "Veja este e-mail\n"];
+        yield 'the translation for a language without a text' => ['fr', null, null];
+    }
+
+    #[DataProvider('forwardMessageLanguageProvider')]
+    public function testSentEmailUsesTheForwardMessageOfItsLanguage(string $language, ?string $expectedSubject, ?string $expectedBodyStart): void
+    {
+        $email = $this->createEmail('Hello {contactfield=firstname|friend}');
+        $email->setLanguage($language);
+        $this->em->flush();
+
+        $mailto = html_entity_decode($this->filterHtml($this->sendTo($this->createRecipient(), $email), '#forward')->attr('href'));
+        parse_str((string) parse_url($mailto, PHP_URL_QUERY), $query);
+
+        $body       = (string) $query['body'];
+        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $this->assertSame($expectedSubject ?? $translator->trans('mautic.email.forward.mail.subject', ['%subject%' => 'Hello friend'], null, $language), $query['subject']);
+        $this->assertStringEndsWith($this->getCopyPath($email), $body);
+        if (null === $expectedBodyStart) {
+            $this->assertStringStartsWith(strstr($translator->trans('mautic.email.forward.mail.body', [], null, $language), '%link%', true), $body);
+
+            return;
+        }
+
+        $this->assertStringStartsWith($expectedBodyStart, $body);
+        $this->assertStringStartsWith('http', substr($body, strlen($expectedBodyStart)), 'The link follows the text.');
     }
 
     public function testCopyCarriesNothingPointingAtARecipient(): void

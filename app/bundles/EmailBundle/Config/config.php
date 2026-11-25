@@ -154,6 +154,8 @@ return [
         'unsubscribe_text'                                                  => null,
         'webview_text'                                                      => null,
         'forward_text'                                                      => null,
+        'forward_mail_subject'                                              => [],
+        'forward_mail_body'                                                 => [],
         'unsubscribe_message'                                               => null,
         'resubscribe_message'                                               => null,
         'email_default_preference_center_id'                                => null,

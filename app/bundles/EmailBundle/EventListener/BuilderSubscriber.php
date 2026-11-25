@@ -285,8 +285,46 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $defaults = TokenHelper::findLeadTokenDefaults($subject);
         $subject  = str_replace(array_keys($defaults), $defaults, $subject);
 
-        return 'mailto:?subject='.rawurlencode($this->translator->trans('mautic.email.forward.mail.subject', ['%subject%' => $subject]))
-            .'&body='.rawurlencode($this->translator->trans('mautic.email.forward.mail.body', ['%link%' => $copyUrl]));
+        $locale  = $email->getLanguage() ?: (string) $this->coreParametersHelper->get('locale');
+        $subject = $this->getForwardMailText('forward_mail_subject', '|SUBJECT|', $subject, $locale)
+            ?? $this->translator->trans('mautic.email.forward.mail.subject', ['%subject%' => $subject], null, $locale);
+        $body    = $this->getForwardMailText('forward_mail_body', '|URL|', $copyUrl, $locale)
+            ?? $this->translator->trans('mautic.email.forward.mail.body', ['%link%' => $copyUrl], null, $locale);
+
+        return 'mailto:?subject='.rawurlencode($subject).'&body='.rawurlencode($body);
+    }
+
+    /**
+     * The text set in the configuration for the language of the email, or for its base language, so `pt` also
+     * covers `pt_BR`. Null when none is set, and the translation is used instead. The link is the point of the
+     * message, so a text without its placeholder gets the link at the end.
+     */
+    private function getForwardMailText(string $parameter, string $placeholder, string $value, string $locale): ?string
+    {
+        $texts = [];
+        foreach ((array) $this->coreParametersHelper->get($parameter, []) as $language => $text) {
+            $text = trim(html_entity_decode(strip_tags((string) $text), ENT_QUOTES | ENT_HTML5));
+            if ('' !== $text) {
+                $texts[$this->normalizeLocale((string) $language)] = $text;
+            }
+        }
+
+        $locale = $this->normalizeLocale($locale);
+        $text   = $texts[$locale] ?? $texts[explode('_', $locale)[0]] ?? null;
+        if (null === $text) {
+            return null;
+        }
+
+        if ('|URL|' === $placeholder && !str_contains($text, $placeholder)) {
+            $text .= "\n".$placeholder;
+        }
+
+        return str_replace($placeholder, $value, $text);
+    }
+
+    private function normalizeLocale(string $locale): string
+    {
+        return str_replace('-', '_', strtolower(trim($locale)));
     }
 
     /**

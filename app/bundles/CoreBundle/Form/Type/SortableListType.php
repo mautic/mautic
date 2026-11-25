@@ -42,7 +42,7 @@ final class SortableListType extends AbstractType
                 [
                     'label'          => false,
                     'entry_type'     => ($options['with_labels']) ? SortableValueLabelListType::class : $options['entry_type'],
-                    'entry_options'  => [
+                    'entry_options'  => $options['entry_extra_options'] + [
                         'label'          => false,
                         'required'       => false,
                         'attr'           => [
@@ -88,6 +88,8 @@ final class SortableListType extends AbstractType
                 // Stores as [label => value] array instead of [list => [[label => the label, value => the value], ...]]
                 'key_value_pairs'     => false,
                 'option_constraint'   => [],
+                // Passed to each entry, e.g. the placeholders of a label and value pair
+                'entry_extra_options' => [],
             ]
         );
 

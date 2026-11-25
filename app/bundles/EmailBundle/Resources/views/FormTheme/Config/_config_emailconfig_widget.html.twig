@@ -85,6 +85,8 @@
             <div class="row">
                 {{ _self.row_if_exists(fields, 'webview_text') }}
                 {{ _self.row_if_exists(fields, 'forward_text') }}
+                {{ _self.row_if_exists(fields, 'forward_mail_subject') }}
+                {{ _self.row_if_exists(fields, 'forward_mail_body') }}
                 {{ _self.row_if_exists(fields, 'default_signature_text') }}
                 {{ _self.row_if_exists(fields, 'mailer_append_tracking_pixel') }}
                 {{ _self.row_if_exists(fields, 'mailer_convert_embed_images') }}
