@@ -8,9 +8,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 final class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
-    public const PRIORITY = 10;
-
-    private readonly \Symfony\Component\HttpKernel\HttpKernelInterface $app;
+    public const int PRIORITY = 10;
 
     /**
      * @var string
@@ -22,10 +20,10 @@ final class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMi
      */
     private $maximumPHPVersion;
 
-    public function __construct(HttpKernelInterface $app)
+    public function __construct(
+        private readonly HttpKernelInterface $app
+    )
     {
-        $this->app = $app;
-
         $metadata = json_decode(
             file_get_contents(__DIR__.'/../release_metadata.json'),
             true
@@ -44,18 +42,18 @@ final class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMi
     {
         // Are we running the minimum version?
         if (version_compare(PHP_VERSION, $this->minimumPHPVersion, 'lt')) {
-            return new Response('Your server does not meet the minimum PHP requirements. Mautic requires PHP version '.$this->minimumPHPVersion.' while your server has '.PHP_VERSION.'. Please contact your host to update your PHP installation.', 500);
+            return new Response('Your server does not meet the minimum PHP requirements. Mautic requires PHP version '.$this->minimumPHPVersion.' while your server has '.PHP_VERSION.'. Please contact your host to update your PHP installation.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         // Are we running a version newer than what Mautic supports?
         if (version_compare(PHP_VERSION, $this->maximumPHPVersion, 'gt')) {
-            return new Response('Mautic does not support PHP version '.PHP_VERSION.' at this time. To use Mautic, you will need to downgrade to an earlier version.', 500);
+            return new Response('Mautic does not support PHP version '.PHP_VERSION.' at this time. To use Mautic, you will need to downgrade to an earlier version.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->app->handle($request, $type, $catch);
     }
 
-    public function getPriority()
+    public function getPriority(): int
     {
         return self::PRIORITY;
     }
