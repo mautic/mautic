@@ -70,7 +70,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% endfor %}
 {% set params = {
     options: options,
-    label: label is not empty ? label : name|replace({'_': ' '})|capitalize,
+    label: label is defined and label is not empty ? label : name|replace({'_': ' '})|capitalize,
     translation_domain: translation_domain,
     label_translation_parameters: label_translation_parameters,
     value: form.vars.value,
