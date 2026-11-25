@@ -4838,8 +4838,8 @@ parameters:
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:getMauticLead\(\) should return Mautic\\LeadBundle\\Entity\\Lead but empty return statement found\.$#'
-			identifier: return.empty
+			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:getMauticLead\(\) should return Mautic\\LeadBundle\\Entity\\Lead but returns null\.$#'
+			identifier: return.type
 			count: 2
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
@@ -5114,8 +5114,8 @@ parameters:
 			path: app/bundles/ReportBundle/Model/ReportModel.php
 
 		-
-			message: '#^Method Mautic\\ReportBundle\\Model\\ReportModel\:\:exportResults\(\) should return Symfony\\Component\\HttpFoundation\\Response but empty return statement found\.$#'
-			identifier: return.empty
+			message: '#^Method Mautic\\ReportBundle\\Model\\ReportModel\:\:exportResults\(\) should return Symfony\\Component\\HttpFoundation\\Response but returns null\.$#'
+			identifier: return.type
 			count: 1
 			path: app/bundles/ReportBundle/Model/ReportModel.php
 
@@ -6080,8 +6080,8 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:getMauticLead\(\) should return Mautic\\LeadBundle\\Entity\\Lead but empty return statement found\.$#'
-			identifier: return.empty
+			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:getMauticLead\(\) should return Mautic\\LeadBundle\\Entity\\Lead but returns null\.$#'
+			identifier: return.type
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
 
