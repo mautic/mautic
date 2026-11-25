@@ -26,7 +26,7 @@ export default class ButtonApplyCommand {
         const mjmlCode = MjmlService.getEditorMjmlContent(editor);
 
         if (!htmlCode || !mjmlCode) {
-          return;
+          return false;
         }
 
         if (mauticEditorFonts) {
@@ -44,12 +44,15 @@ export default class ButtonApplyCommand {
         ButtonCloseCommands.returnContentToTextarea(editor, html);
       }
 
-      ButtonApplyCommand.postForm(editor, sender);
     } finally {
       // Tokens are captured in the textarea; always restore human-readable
       // content on the canvas, including failed MJML conversion.
       editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
     }
+
+    ButtonApplyCommand.postForm(editor, sender);
+
+    return true;
 
   }
 
