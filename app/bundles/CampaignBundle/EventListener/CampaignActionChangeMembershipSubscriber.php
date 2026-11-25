@@ -111,7 +111,7 @@ final readonly class CampaignActionChangeMembershipSubscriber
     {
         // Check for the keyword "this"
         $includeExecutingCampaign = false;
-        $key                      = array_search('this', $campaigns);
+        $key                      = array_search('this', $campaigns, true);
         if (false !== $key) {
             $includeExecutingCampaign = true;
             // Remove it from the list of IDs

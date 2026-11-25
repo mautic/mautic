@@ -160,7 +160,7 @@ final class SearchStringHelper
                 // arrived at a character that has a closing partner and thus needs to be parsed as a group
 
                 // find the closing match
-                $key = array_search($char, $this->needsClosing);
+                $key = array_search($char, $this->needsClosing, true);
 
                 $openingCount = 1;
                 $closingCount = 1;

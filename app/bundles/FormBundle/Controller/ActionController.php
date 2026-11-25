@@ -220,7 +220,7 @@ final class ActionController extends CommonFormController
                                 $session->set('mautic.formactions.submits', $submits);
                             } elseif ('submit' != $formAction['properties']['type'] && in_array($keyId, $submits)) {
                                 // button type updated to something other than submit
-                                $key = array_search($keyId, $submits);
+                                $key = array_search($keyId, $submits, true);
                                 unset($submits[$key]);
                                 $session->set('mautic.formactions.submits', $submits);
                             }
@@ -313,7 +313,7 @@ final class ActionController extends CommonFormController
                 $submits    = $session->get('mautic.formactions.submits', []);
                 $properties = $formAction['properties'];
                 if ('submit' == $properties['type'] && in_array($objectId, $submits)) {
-                    $key = array_search($objectId, $submits);
+                    $key = array_search($objectId, $submits, true);
                     unset($submits[$key]);
                     $session->set('mautic.formactions.submits', $submits);
                 }
