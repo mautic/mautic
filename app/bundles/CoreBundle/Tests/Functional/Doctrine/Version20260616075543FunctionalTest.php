@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\Doctrine;
 
-use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\Migrations\Version20260616075543;
@@ -16,7 +16,8 @@ final class Version20260616075543FunctionalTest extends MauticMysqlTestCase
 
     public function testRepairsOrphanedCategoryReferencesBeforeAddingForeignKey(): void
     {
-        $tableName = $this->getTablePrefix().'point_insights';
+        $tableName       = $this->getTablePrefix().'point_insights';
+        $backupTableName = $tableName.'_migration_test_backup';
 
         $category = new Category();
         $category->setTitle('Migration test category');
@@ -25,7 +26,7 @@ final class Version20260616075543FunctionalTest extends MauticMysqlTestCase
         $this->em->persist($category);
         $this->em->flush();
 
-        $this->connection->executeStatement("DROP TABLE IF EXISTS `{$tableName}`");
+        $this->connection->executeStatement("RENAME TABLE `{$tableName}` TO `{$backupTableName}`");
         $this->connection->executeStatement("CREATE TABLE `{$tableName}` (
             `id` INT UNSIGNED AUTO_INCREMENT NOT NULL,
             `category_id` INT UNSIGNED DEFAULT NULL,
@@ -51,13 +52,14 @@ final class Version20260616075543FunctionalTest extends MauticMysqlTestCase
             $this->assertNull($rows[2]['category_id']);
 
             $foreignKeys = $this->connection->createSchemaManager()->listTableForeignKeys($tableName);
-            $this->assertTrue(array_filter(
+            $this->assertNotEmpty(array_filter(
                 $foreignKeys,
-                fn ($foreignKey): bool => ['category_id'] === $foreignKey->getLocalColumns()
+                fn (ForeignKeyConstraint $foreignKey): bool => ['category_id'] === $foreignKey->getLocalColumns()
                     && $this->getTablePrefix().'categories' === $foreignKey->getForeignTableName()
-            ) !== []);
+            ));
         } finally {
             $this->connection->executeStatement("DROP TABLE IF EXISTS `{$tableName}`");
+            $this->connection->executeStatement("RENAME TABLE `{$backupTableName}` TO `{$tableName}`");
         }
     }
 
