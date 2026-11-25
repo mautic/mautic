@@ -89,11 +89,11 @@ final class LeadListRepositoryFunctionalTest extends MauticMysqlTestCase
         $repository = self::getContainer()->get(LeadListRepository::class);
 
         $this->assertSame(
-            ['total' => 2, 'manuallyAdded' => 1, 'filterAdded' => 1],
+            ['total' => 2, 'manuallyAdded' => 1, 'filterAdded' => 1, 'manuallyRemoved' => 1],
             $repository->getSegmentStatistics($segment->getId(), true)
         );
         $this->assertSame(
-            ['total' => 2, 'manuallyAdded' => 1, 'filterAdded' => null],
+            ['total' => 2, 'manuallyAdded' => 1, 'filterAdded' => null, 'manuallyRemoved' => 1],
             $repository->getSegmentStatistics($segment->getId(), false)
         );
     }
