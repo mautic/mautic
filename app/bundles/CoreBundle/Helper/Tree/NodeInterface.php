@@ -25,10 +25,10 @@ interface NodeInterface extends \RecursiveIterator
      */
     public function getChildrenArray(): array;
 
-    public function addParam(string $key, mixed $value): void;
+    public function addParam(string $key, ?string $value): void;
 
     /**
      * @return mixed
      */
-    public function getParam(string $key, mixed $default = null);
+    public function getParam(string $key, ?string $default = null);
 }

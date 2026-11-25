@@ -1743,7 +1743,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\ChannelBundle\Entity\Message`: `setName(?string $name)`, `setDescription(?string $description)`
     - `Mautic\ChannelBundle\Entity\MessageQueue`: `setAttempts(int $attempts)`, `setChannel(string $channel)`, `setMaxAttempts(int $maxAttempts)`, `setPriority(int $priority)`, `setStatus(string $status)`
     - `Mautic\CoreBundle\Entity\AuditLog`: `setUserId(int $userId)`, `setObject(string $object)`, `setAction(string $action)`, `setIpAddress(string $ipAddress)`, `setBundle(string $bundle)`, `setUserName(string $userName)`
-    - `Mautic\CoreBundle\Entity\FormEntity`: `setCreatedBy(User|int|null $createdBy)`
+    - `Mautic\CoreBundle\Entity\FormEntity`: `setCreatedBy(User|int|null $createdBy)`, `setCreatedByUser(?string $createdByUser)`
     - `Mautic\CoreBundle\Entity\Notification`: `setType(?string $type)`, `setMessage(?string $message)`, `setIsRead(?bool $isRead)`
     - `Mautic\DashboardBundle\Entity\Widget`: `setWidth(int $width)`, `setHeight(int $height)`, `setOrdering(?int $ordering)`, `setTemplate(?string $template)`, `setErrorMessage(string $errorMessage)`, `setCached(bool $cached)`
     - `Mautic\DynamicContentBundle\Entity\DynamicContent`: `setContent(?string $content)`, `setIsCampaignBased(bool $isCampaignBased)`, `setSlotName(?string $slotName)`
@@ -1874,6 +1874,14 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\LeadBundle\Entity\Lead::setColor()` types `$color` as `string`. Passing `null` now throws; pass a color string. `getColor()` now declares a `?string` return type, so a subclass overriding it must declare `?string` (or `string`).
     - `Mautic\NotificationBundle\Event\NotificationSendEvent::__construct()` and `setHeading()` type `$heading` as `?string`, and `getHeading()` now declares a `?string` return type.
     - `Mautic\PluginBundle\Entity\Integration::setName()` types `$name` as `string`. Passing `null` now throws; pass the integration name.
+    - `Mautic\CoreBundle\Model\FormModel::unlockEntity()` types `$extra` as `array|string|false|null`.
+    - `Mautic\CoreBundle\ErrorHandler\ErrorHandler::setMainLogger()` types `$mainLogger` as `Psr\Log\LoggerInterface`.
+    - `Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList()`, `parseListForChoices()` and `parseBooleanList()` type `$list` as `array|string|int|float|bool|null`. Passing an object now throws.
+    - `Mautic\CoreBundle\Helper\ListParser\ListParserInterface::parse()` and its implementations type `$list` as `array|string|int|float|bool|null`. A custom implementation must declare the same type, or leave `$list` untyped.
+    - `Mautic\CoreBundle\Twig\Helper\FormatterHelper::_()` types `$val` as `array|string|int|float|bool|\DateTimeInterface|null` and `Mautic\CoreBundle\Twig\Extension\FormatterExtension::_()` (Twig function `format()`) as `array|string|int|float|bool|null`. `FormatterHelper::normalizeStringValue()` types `$string` as `string`.
+    - `Mautic\CoreBundle\Helper\Tree\NodeInterface::addParam()` and `getParam()` type `$value` and `$default` as `?string`, as does `Mautic\CoreBundle\Helper\Tree\IntNode`. A custom implementation must declare the same type, or leave it untyped.
+    - `Mautic\CoreBundle\Twig\Helper\DateHelper::toText()` and `Mautic\CoreBundle\Twig\Extension\DateExtension::toText()` (Twig function `dateToText()`) type `$datetime` as `string|int|\DateTimeInterface|null`. `false` and `[]` used to return `''` and now throw; pass `null` instead.
+    - `Mautic\CoreBundle\Event\AbstractTokenReplacementEvent::__construct()` types `$passthrough` as `?Mautic\EmailBundle\Entity\Email`, which also types the promoted `protected $passthrough` property. Property types are invariant, so a subclass that redeclares the property must declare it as `protected ?Email $passthrough`.
 
 ### Native parameter and return types for plugin extension points
 

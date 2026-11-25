@@ -19,7 +19,7 @@ final readonly class FormatterExtension
      * Format a string.
      */
     #[AsTwigFunction(name: 'format', isSafe: ['all'])]
-    public function _(mixed $val, string $type = 'html', bool $textOnly = false, int $round = 1): string
+    public function _(array|string|int|float|bool|null $val, string $type = 'html', bool $textOnly = false, int $round = 1): string
     {
         return (string) $this->formatterHelper->_($val, $type, $textOnly, $round);
     }

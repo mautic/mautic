@@ -792,7 +792,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     private function createLead(User $user): Lead
     {
         $lead = new Lead();
-        $lead->setCreatedByUser($user);
+        $lead->setCreatedByUser($user->getName());
 
         $this->em->persist($lead);
         $this->em->flush();

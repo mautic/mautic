@@ -184,7 +184,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         $report->setColumns($coulmns);
         if (!empty($createBy)) {
             $report->setCreatedBy($createBy);
-            $report->setCreatedByUser($createBy);
+            $report->setCreatedByUser((string) $createBy);
         }
 
         $this->getService(ReportModel::class)->saveEntity($report);

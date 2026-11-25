@@ -348,7 +348,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $this;
         }
 
-        public function setMainLogger(mixed $mainLogger): static
+        // @phpstan-ignore mautic.noServiceInMethodParameter (static singleton created before the container, no constructor injection)
+        public function setMainLogger(LoggerInterface $mainLogger): static
         {
             $this->mainLogger = $mainLogger;
 

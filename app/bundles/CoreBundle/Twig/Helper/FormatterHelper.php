@@ -21,7 +21,7 @@ final readonly class FormatterHelper
      *
      * @return string
      */
-    public function _(mixed $val, string $type = 'html', bool $textOnly = false, int $round = 1)
+    public function _(array|string|int|float|bool|\DateTimeInterface|null $val, string $type = 'html', bool $textOnly = false, int $round = 1)
     {
         if (empty($val) && 'bool' !== $type && 'float' !== $type) {
             return $val;
@@ -153,7 +153,7 @@ final readonly class FormatterHelper
     /**
      * Takes a string and returns a normalized representation of it.
      */
-    public function normalizeStringValue(mixed $string): string
+    public function normalizeStringValue(string $string): string
     {
         $stringIsDate = \DateTime::createFromFormat('Y-m-d H:i:s', $string, new \DateTimeZone('UTC'));
 

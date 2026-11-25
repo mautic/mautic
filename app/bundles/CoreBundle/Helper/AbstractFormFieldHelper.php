@@ -81,10 +81,8 @@ abstract class AbstractFormFieldHelper
 
     /**
      * Format a string into an array.
-     *
-     * @param mixed $list List to parse
      */
-    public static function parseList(mixed $list): array
+    public static function parseList(array|string|int|float|bool|null $list): array
     {
         return static::parseChoiceList(
             self::parseListsWithParsers(
@@ -104,7 +102,7 @@ abstract class AbstractFormFieldHelper
      *
      * @return mixed[]
      */
-    public static function parseListForChoices(mixed $list): array
+    public static function parseListForChoices(array|string|int|float|bool|null $list): array
     {
         return static::parseChoiceList(
             self::parseListsWithParsers(
@@ -123,7 +121,7 @@ abstract class AbstractFormFieldHelper
     /**
      * @return mixed[]
      */
-    public static function parseBooleanList(mixed $list): array
+    public static function parseBooleanList(array|string|int|float|bool|null $list): array
     {
         return static::parseChoiceList(
             self::parseListsWithParsers(
@@ -235,7 +233,7 @@ abstract class AbstractFormFieldHelper
      *
      * @return mixed[]
      */
-    private static function parseListsWithParsers(mixed $list, array $parsers): array
+    private static function parseListsWithParsers(array|string|int|float|bool|null $list, array $parsers): array
     {
         foreach ($parsers as $parser) {
             try {

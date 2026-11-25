@@ -11,5 +11,5 @@ interface ListParserInterface
     /**
      * @throws FormatNotSupportedException
      */
-    public function parse(mixed $list): array;
+    public function parse(array|string|int|float|bool|null $list): array;
 }
