@@ -858,13 +858,20 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 break;
             case $this->translator->trans(self::SOURCE_SEARCH_COMMAND):
             case $this->translator->trans(self::SOURCE_SEARCH_COMMAND, [], null, 'en_US'):
-                $manuallyAddedValue   = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added');
-                $manuallyAddedValueEn = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added', [], null, 'en_US');
-                $filterAddedValue     = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added');
-                $filterAddedValueEn   = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added', [], null, 'en_US');
+                $manuallyAddedValue     = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added');
+                $manuallyAddedValueEn   = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added', [], null, 'en_US');
+                $manuallyRemovedValue   = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_removed');
+                $manuallyRemovedValueEn = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_removed', [], null, 'en_US');
+                $filterAddedValue       = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added');
+                $filterAddedValueEn     = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added', [], null, 'en_US');
+
+                $manuallyRemoved = false;
 
                 if (in_array($string, [$manuallyAddedValue, $manuallyAddedValueEn], true)) {
                     $manuallyAddedParam = 1;
+                } elseif (in_array($string, [$manuallyRemovedValue, $manuallyRemovedValueEn], true)) {
+                    $manuallyAddedParam = null;
+                    $manuallyRemoved    = true;
                 } elseif (in_array($string, [$filterAddedValue, $filterAddedValueEn], true)) {
                     $manuallyAddedParam = 0;
                 } else {
@@ -887,15 +894,18 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     ->where(
                         $q->expr()->and(
                             $q->expr()->eq('l.id', 'lls.lead_id'),
-                            $q->expr()->eq('lls.manually_removed', 0),
-                            $q->expr()->eq('lls.manually_added', ":$unique"),
+                            $q->expr()->eq('lls.manually_removed', $manuallyRemoved ? 1 : 0),
                             $q->expr()->in('lls.leadlist_id', ":lls_seg_$unique")
                         )
                     );
 
+                if (!$manuallyRemoved) {
+                    $sq->andWhere($q->expr()->eq('lls.manually_added', ":$unique"));
+                    $q->setParameter($unique, $manuallyAddedParam, 'integer');
+                }
+
                 $filter->strict = true;
                 $q->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
-                $q->setParameter($unique, $manuallyAddedParam, 'integer');
                 $q->setParameter("lls_seg_$unique", $activeSegmentIds, ArrayParameterType::INTEGER);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):

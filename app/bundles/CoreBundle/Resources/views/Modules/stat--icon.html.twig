@@ -1,6 +1,7 @@
-<div class="lead-stats row-no-gutters gap-12 flex-xl-nowrap mb-12">
+{% set segmentGrid = segmentGrid|default(false) %}
+<div class="{% if segmentGrid %}grid grid-cols-{{ max(stats|length, 4) }} gap-1{% else %}lead-stats row-no-gutters gap-12 flex-xl-nowrap{% endif %} mb-12">
     {% for stat in stats %}
-    <div class="col-xs-12 col-lg-3">
+    <div{% if not segmentGrid %} class="col-xs-12 col-lg-3"{% endif %}>
         {% set tileContent %}
             <div class="d-flex flex-column justify-content-between {% if stats|length == 4 %}ar-2-1{% endif %} flex-grow-1">
                 <span class="text-secondary mb-24 ellipsis">
