@@ -15,6 +15,141 @@ final class ContactManagementCest
         $I->login('admin', 'Maut1cR0cks!');
     }
 
+    public function sortingPreservesExistingQueryParameters(AcceptanceTester $I): void
+    {
+        try {
+            $this->assertSortRequests($I);
+        } finally {
+            // Discard both the contact filter and sort order before the next scenario logs in.
+            $I->amOnPage('/s/logout');
+        }
+    }
+
+    private function assertSortRequests(AcceptanceTester $I): void
+    {
+        foreach (['sort+query@example.com', 'sort&query@example.com'] as $email) {
+            $I->haveInDatabase('test_leads', [
+                'email'           => $email,
+                'firstname'       => 'Sort',
+                'lastname'        => 'Query',
+                'is_published'    => 1,
+                'points'          => 0,
+                'date_identified' => '2026-01-01 00:00:00',
+            ]);
+        }
+
+        foreach ([
+            '',
+            '?search=',
+            '?search=sort%2Bquery%40example.com',
+            '?search=sort%26query%40example.com&category=3',
+            'clearBeforeSort' => '?search=sort%2Bquery%40example.com',
+        ] as $scenario => $query) {
+            $I->amOnPage(ContactPage::$URL.$query);
+            $I->waitForJS('return typeof Mautic !== "undefined" && typeof Mautic.reorderTableData === "function";', AcceptanceTester::TIMEOUT);
+
+            $I->executeJS(<<<'JS'
+window.tableSortRequest = null;
+mQuery(document).on('ajaxComplete.tableSortQuery', function (event, xhr, settings) {
+    var url = new URL(settings.url, window.location.href);
+    if (url.searchParams.get('orderby') !== 'l.lastname, l.firstname, l.company, l.email') {
+        return;
+    }
+    window.tableSortRequest = {
+        search: url.searchParams.get('search'),
+        category: url.searchParams.get('category'),
+        tmpl: url.searchParams.get('tmpl'),
+        name: url.searchParams.get('name'),
+        orderby: url.searchParams.get('orderby'),
+        method: settings.type,
+        status: xhr.status
+    };
+    mQuery(document).off('ajaxComplete.tableSortQuery');
+});
+JS);
+            $I->waitForElementClickable('#leadTable .col-lead-name a.table-sort', AcceptanceTester::TIMEOUT);
+            if ('clearBeforeSort' === $scenario) {
+                // Hold the search request until both real WebDriver clicks have completed.
+                $I->executeJS(<<<'JS'
+window.releaseTableSearch = null;
+mQuery.ajaxPrefilter(function (options) {
+    if (window.releaseTableSearch !== null || options.type !== 'GET' || options.url.indexOf('/s/contacts') === -1) {
+        return;
+    }
+    const createXhr = options.xhr;
+    options.xhr = function () {
+        const xhr = createXhr();
+        const send = xhr.send;
+        xhr.send = function (body) {
+            window.releaseTableSearch = function () {
+                send.call(xhr, body);
+            };
+        };
+        return xhr;
+    };
+});
+JS);
+                $clearButton = "button[data-livesearch-parent='list-search']";
+                $I->waitForElementClickable($clearButton, AcceptanceTester::TIMEOUT);
+                $I->click($clearButton);
+                $I->waitForJS('return typeof window.releaseTableSearch === "function";', AcceptanceTester::TIMEOUT);
+                $I->waitForElementClickable('#leadTable .col-lead-name a.table-sort', AcceptanceTester::TIMEOUT);
+                $I->click('#leadTable .col-lead-name a.table-sort');
+                $I->assertNull($I->executeJS('return window.tableSortRequest;'));
+                $I->executeJS('window.releaseTableSearch();');
+            } else {
+                $I->click('#leadTable .col-lead-name a.table-sort');
+            }
+            $I->waitForJS('return window.tableSortRequest !== null;', AcceptanceTester::TIMEOUT);
+            $request = $I->executeJS('return window.tableSortRequest;');
+
+            parse_str('clearBeforeSort' === $scenario ? '' : ltrim($query, '?'), $expected);
+            $I->assertSame($expected['search'] ?? null, $request['search']);
+            $I->assertSame($expected['category'] ?? null, $request['category']);
+            $I->assertSame('list', $request['tmpl']);
+            $I->assertSame('lead', $request['name']);
+            $I->assertSame('l.lastname, l.firstname, l.company, l.email', $request['orderby']);
+            $I->assertSame('POST', $request['method']);
+            $I->assertSame(200, $request['status']);
+        }
+    }
+
+    public function sortingSurvivesRejectedSearches(AcceptanceTester $I): void
+    {
+        $I->amOnPage(ContactPage::$URL);
+        $I->executeJS(<<<'JS'
+window.queuedSortResult = null;
+const originalLoad = Mautic.loadContent;
+const originalSearch = Mautic.liveSearchXhr;
+const requests = [];
+const first = mQuery.Deferred();
+const replacement = mQuery.Deferred();
+first.listTarget = replacement.listTarget = '.page-list';
+Mautic.loadContent = function (route) {
+    requests.push(route);
+};
+Mautic.liveSearchXhr = first;
+Mautic.reorderTableData('lead', 'l.lastname', 'list', '.page-list');
+first.reject(null, 'searchCompleted');
+Mautic.liveSearchXhr = replacement;
+setTimeout(function () {
+    const whilePending = requests.length;
+    replacement.reject(null, 'error');
+    delete Mautic.liveSearchXhr;
+    setTimeout(function () {
+        Mautic.loadContent = originalLoad;
+        Mautic.liveSearchXhr = originalSearch;
+        window.queuedSortResult = {whilePending, requests};
+    }, 20);
+}, 20);
+JS);
+        $I->waitForJS('return window.queuedSortResult !== null;', AcceptanceTester::TIMEOUT);
+        $result = $I->executeJS('return window.queuedSortResult;');
+        $I->assertSame(0, $result['whilePending']);
+        $I->assertCount(1, $result['requests']);
+        $I->assertStringContainsString('orderby=l.lastname', $result['requests'][0]);
+    }
+
     public function createContactFromQuickAdd(
         AcceptanceTester $I,
         ContactStep $contact,
