@@ -28,9 +28,8 @@ trait CustomFieldRepositoryTrait
 
     /**
      * @param string $object
-     * @param array  $args
      */
-    public function getEntitiesWithCustomFields($object, $args, $resultsCallback = null)
+    public function getEntitiesWithCustomFields($object, array $args, $resultsCallback = null)
     {
         $skipOrdering           = $args['skipOrdering'] ?? false;
         [$fields, $fixedFields] = $this->getCustomFieldList($object);

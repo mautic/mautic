@@ -66,7 +66,7 @@ final class ContactExportLimitFunctionalTest extends MauticMysqlTestCase
         $this->loadFixtures([LoadLeadData::class]);
 
         $contactModel = self::getContainer()->get(LeadModel::class);
-        Assert::assertInstanceOf(LeadModel::class, $contactModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $ids = [];
         for ($i = 0; $i < 2; ++$i) {
             $contact = new Lead();
