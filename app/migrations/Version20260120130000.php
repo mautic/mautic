@@ -113,14 +113,14 @@ final class Version20260120130000 extends AbstractMauticMigration
             // substring_index, concat_ws, group_concat
             "CREATE OR REPLACE FUNCTION substring_index(str text, delim text, count integer)
              RETURNS text LANGUAGE sql IMMUTABLE STRICT AS \$\$
-             RETURN CASE
+             SELECT CASE
                 WHEN delim = '' OR str = '' OR count = 0 THEN ''
                 WHEN count > 0 THEN array_to_string((string_to_array(str, delim))[1:count], delim)
                 ELSE array_to_string(
                     (string_to_array(str, delim))[GREATEST(1, array_length(string_to_array(str, delim), 1) + count + 1):],
                     delim
                 )
-             END;,
+             END
              \$\$;",
             'CREATE OR REPLACE FUNCTION concat_ws(sep text, VARIADIC args text[]) RETURNS text LANGUAGE sql IMMUTABLE AS $$SELECT array_to_string(array_remove(args,NULL),sep);$$',
             "CREATE OR REPLACE FUNCTION group_concat(val text, sep text DEFAULT ',') RETURNS text LANGUAGE sql IMMUTABLE AS \$\$SELECT string_agg(val,sep);\$\$",
