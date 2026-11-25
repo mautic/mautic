@@ -44,6 +44,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Asset>
@@ -54,6 +55,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      * @var int
      */
     protected $maxAssetSize;
+
+    private AggregateAnalyticsHelper $aggregateAnalyticsHelper;
 
     public function __construct(
         protected LeadModel $leadModel,
@@ -76,11 +79,16 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         private readonly AssetRepository $assetRepository,
         private readonly DownloadRepository $downloadRepository,
         private readonly CategoryRepository $categoryRepository,
-        private readonly AggregateAnalyticsHelper $aggregateAnalyticsHelper,
     ) {
-        $this->maxAssetSize = $coreParametersHelper->get('max_size');
+        $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
+    }
+
+    #[Required]
+    public function autowireAssetModel(AggregateAnalyticsHelper $aggregateAnalyticsHelper): void
+    {
+        $this->aggregateAnalyticsHelper = $aggregateAnalyticsHelper;
     }
 
     public function saveEntity($entity, $unlock = true): void
