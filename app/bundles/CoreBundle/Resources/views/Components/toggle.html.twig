@@ -52,7 +52,7 @@
            {% if label %}aria-labelledby="{{ id|escape('html_attr') }}_label_text"{% elseif labelledby %}aria-labelledby="{{ labelledby|escape('html_attr') }}"{% elseif ariaLabel %}aria-label="{{ ariaLabel|trans|escape('html_attr') }}"{% endif %}
            {% if disabled %}aria-disabled="true"{% endif %}
            {% if readonly %}aria-readonly="true"{% endif %}
-           {% if checked is not null %}aria-checked="{{ checked ? 'true' : 'false' }}"{% endif %}>
+           aria-checked="{{ checked ? 'true' : 'false' }}">
         {% if label %}
             <span id="{{ id|escape('html_attr') }}_label_text" class="toggle__label-text{{ hideLabel ? ' visually-hidden' : '' }}">{{ label|trans }}</span>
         {% endif %}

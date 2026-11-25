@@ -65,7 +65,7 @@ final class FormThemeCheckboxTest extends TestCase
 
         $unset = $this->renderYesNo($twig, null);
         $this->assertCount(0, $unset->filter('input[type="radio"]:checked'));
-        $this->assertNull($unset->filter('label.toggle__label')->attr('aria-checked'));
+        $this->assertSame('false', $unset->filter('label.toggle__label')->attr('aria-checked'));
         $this->assertSame('', $unset->filter('.toggle__text')->text());
 
         $no = $this->renderYesNo($twig, 0);
