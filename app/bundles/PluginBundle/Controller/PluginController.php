@@ -440,7 +440,7 @@ final class PluginController extends AbstractFormController
             [
                 'returnUrl'       => $this->generateUrl('mautic_plugin_index', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'Mautic\PluginBundle\Controller\PluginController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'plugin',

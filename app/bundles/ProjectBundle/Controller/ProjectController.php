@@ -29,7 +29,7 @@ final class ProjectController extends AbstractFormController
 
     private const string LINK_ID_INDEX  = '#'.self::ROUTE_INDEX;
 
-    private const string TEMPLATE_INDEX = 'Mautic\ProjectBundle\Controller\ProjectController::indexAction';
+    private const string TEMPLATE_INDEX = self::class.'::indexAction';
 
     private const string TEMPLATE_FORM  = '@MauticProject/Project/form.html.twig';
 
@@ -320,7 +320,7 @@ final class ProjectController extends AbstractFormController
         if ($objectId) {
             $returnUrl       = $this->generateUrl(self::ROUTE_ACTION, ['objectAction' => 'view', 'objectId' => $objectId]);
             $viewParameters  = ['objectAction' => 'view', 'objectId' => $objectId];
-            $contentTemplate = 'Mautic\ProjectBundle\Controller\ProjectController::viewAction';
+            $contentTemplate = self::class.'::viewAction';
         } else {
             $page            = $request->getSession()->get('mautic.project.page', 1);
             $returnUrl       = $this->generateUrl(self::ROUTE_INDEX, ['page' => $page]);
@@ -552,7 +552,7 @@ final class ProjectController extends AbstractFormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['objectAction' => 'view', 'objectId' => $projectId],
-                'contentTemplate' => 'Mautic\ProjectBundle\Controller\ProjectController::viewAction',
+                'contentTemplate' => self::class.'::viewAction',
                 'passthroughVars' => [
                     'closeModal' => 1,
                     'route'      => false,
@@ -591,7 +591,7 @@ final class ProjectController extends AbstractFormController
             $postActionVars = [
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['objectAction' => 'view', 'objectId' => $projectId],
-                'contentTemplate' => 'Mautic\ProjectBundle\Controller\ProjectController::viewAction',
+                'contentTemplate' => self::class.'::viewAction',
                 'passthroughVars' => [
                     'closeModal' => 1,
                     'route'      => false,
@@ -691,7 +691,7 @@ final class ProjectController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['objectAction' => 'view', 'objectId' => $projectId],
-            'contentTemplate' => 'Mautic\ProjectBundle\Controller\ProjectController::viewAction',
+            'contentTemplate' => self::class.'::viewAction',
             'passthroughVars' => [
                 'activeLink'    => self::LINK_ID_INDEX,
                 'mauticContent' => 'project',

@@ -176,7 +176,7 @@ final class CompanyController extends AbstractFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'company',
@@ -285,7 +285,7 @@ final class CompanyController extends AbstractFormController
                 'objectAction' => 'view',
                 'objectId'     => $companyId,
             ],
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::viewAction',
+            'contentTemplate' => self::class.'::viewAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
@@ -397,7 +397,7 @@ final class CompanyController extends AbstractFormController
 
         $viewParameters = ['page' => $page];
         $returnUrl      = $this->generateUrl('mautic_company_index', $viewParameters);
-        $template       = 'Mautic\LeadBundle\Controller\CompanyController::indexAction';
+        $template       = self::class.'::indexAction';
 
         // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
@@ -433,7 +433,7 @@ final class CompanyController extends AbstractFormController
                     if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $viewParameters = ['objectAction' => 'view', 'objectId' => $entity->getId()];
                         $returnUrl      = $this->generateUrl('mautic_company_action', $viewParameters);
-                        $template       = 'Mautic\LeadBundle\Controller\CompanyController::viewAction';
+                        $template       = self::class.'::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
                         return $this->editAction($request, $entity->getId(), true);
@@ -520,7 +520,7 @@ final class CompanyController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParameters,
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
@@ -603,7 +603,7 @@ final class CompanyController extends AbstractFormController
                     if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $viewParameters = ['objectAction' => 'view', 'objectId' => $objectId];
                         $returnUrl      = $this->generateUrl('mautic_company_action', $viewParameters);
-                        $template       = 'Mautic\LeadBundle\Controller\CompanyController::viewAction';
+                        $template       = self::class.'::viewAction';
                     }
                 }
             } else {
@@ -612,7 +612,7 @@ final class CompanyController extends AbstractFormController
 
                 $viewParameters = ['objectAction' => 'view', 'objectId' => $objectId];
                 $returnUrl      = $this->generateUrl('mautic_company_action', $viewParameters);
-                $template       = 'Mautic\LeadBundle\Controller\CompanyController::viewAction';
+                $template       = self::class.'::viewAction';
             }
 
             $passthrough = [
@@ -696,7 +696,7 @@ final class CompanyController extends AbstractFormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
@@ -882,7 +882,7 @@ final class CompanyController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
@@ -938,7 +938,7 @@ final class CompanyController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
@@ -1188,7 +1188,7 @@ final class CompanyController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
@@ -1286,7 +1286,7 @@ final class CompanyController extends AbstractFormController
                 [
                     'returnUrl'       => $this->generateUrl('mautic_company_action', $viewParameters),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::viewAction',
+                    'contentTemplate' => self::class.'::viewAction',
                     'passthroughVars' => [
                         'closeModal' => 1,
                     ],

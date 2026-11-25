@@ -124,7 +124,7 @@ final class RoleController extends AbstractFormController
                     'page' => $lastPage,
                     'tmpl' => $tmpl,
                 ],
-                'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_role_index',
                     'mauticContent' => 'role',
@@ -207,7 +207,7 @@ final class RoleController extends AbstractFormController
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_role_index',
                         'mauticContent' => 'role',
@@ -388,7 +388,7 @@ final class RoleController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_role_index',
                 'mauticContent' => 'role',
@@ -539,7 +539,7 @@ final class RoleController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_role_index',
                 'success'       => $success,
@@ -598,7 +598,7 @@ final class RoleController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_role_index',
                 'mauticContent' => 'role',

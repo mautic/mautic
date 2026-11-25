@@ -128,7 +128,7 @@ final class SmsController extends AbstractStandardFormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'Mautic\SmsBundle\Controller\SmsController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_sms_index',
                     'mauticContent' => 'sms',
@@ -176,7 +176,7 @@ final class SmsController extends AbstractStandardFormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'Mautic\SmsBundle\Controller\SmsController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_sms_index',
                     'mauticContent' => 'sms',
@@ -238,7 +238,7 @@ final class SmsController extends AbstractStandardFormController
                 'security'    => $this->security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
-                    'Mautic\SmsBundle\Controller\SmsController::contactsAction',
+                    self::class.'::contactsAction',
                     [
                         'objectId'   => $sms->getId(),
                         'page'       => $request->getSession()->get('mautic.sms.contact.page', 1),
@@ -323,7 +323,7 @@ final class SmsController extends AbstractStandardFormController
                             'objectId'     => $entity->getId(),
                         ];
                         $returnUrl = $this->generateUrl('mautic_sms_action', $viewParameters);
-                        $template  = 'Mautic\SmsBundle\Controller\SmsController::viewAction';
+                        $template  = self::class.'::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
                         return $this->editAction($request, $entity->getId(), true);
@@ -332,7 +332,7 @@ final class SmsController extends AbstractStandardFormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_sms_index', $viewParameters);
-                $template       = 'Mautic\SmsBundle\Controller\SmsController::indexAction';
+                $template       = self::class.'::indexAction';
                 // clear any modified content
                 $session->remove('mautic.sms.'.$entity->getId().'.content');
             }
@@ -403,7 +403,7 @@ final class SmsController extends AbstractStandardFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\SmsBundle\Controller\SmsController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_sms_index',
                 'mauticContent' => 'sms',
@@ -487,7 +487,7 @@ final class SmsController extends AbstractStandardFormController
                 'mauticContent' => 'sms',
             ];
 
-            $template = 'Mautic\SmsBundle\Controller\SmsController::viewAction';
+            $template = self::class.'::viewAction';
 
             // Check to see if this is a popup
             if (isset($form['updateSelect'])) {
@@ -586,7 +586,7 @@ final class SmsController extends AbstractStandardFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\SmsBundle\Controller\SmsController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_sms_index',
                 'mauticContent' => 'sms',
@@ -645,7 +645,7 @@ final class SmsController extends AbstractStandardFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\SmsBundle\Controller\SmsController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_sms_index',
                 'mauticContent' => 'sms',

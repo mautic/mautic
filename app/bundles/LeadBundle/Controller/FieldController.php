@@ -108,7 +108,7 @@ final class FieldController extends AbstractFormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contactfield_index',
                     'mauticContent' => 'leadfield',
@@ -221,7 +221,7 @@ final class FieldController extends AbstractFormController
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
-                        'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
+                        'contentTemplate' => self::class.'::indexAction',
                         'passthroughVars' => [
                             'activeLink'    => '#mautic_contactfield_index',
                             'mauticContent' => 'leadfield',
@@ -270,7 +270,7 @@ final class FieldController extends AbstractFormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'leadfield',
@@ -350,7 +350,7 @@ final class FieldController extends AbstractFormController
                         $postActionVars,
                         [
                         'viewParameters'  => ['objectId' => $field->getId()],
-                        'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
+                        'contentTemplate' => self::class.'::indexAction',
                     ]
                     )
                 );
@@ -430,7 +430,7 @@ final class FieldController extends AbstractFormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'lead',
@@ -494,7 +494,7 @@ final class FieldController extends AbstractFormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'lead',

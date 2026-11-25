@@ -672,7 +672,7 @@ final class CampaignController extends AbstractStandardFormController
 
                         $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
                         $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
-                        $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
+                        $template       = self::class.'::viewAction';
                     }
                 }
 
@@ -680,7 +680,7 @@ final class CampaignController extends AbstractStandardFormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
-                $template       = 'Mautic\CampaignBundle\Controller\CampaignController::indexAction';
+                $template       = self::class.'::indexAction';
             }
 
             $passthrough = [

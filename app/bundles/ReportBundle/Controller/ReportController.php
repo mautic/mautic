@@ -116,7 +116,7 @@ final class ReportController extends AbstractFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_report_index',
                         'mauticContent' => 'report',
@@ -186,7 +186,7 @@ final class ReportController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_report_index',
                 'mauticContent' => 'report',
@@ -242,7 +242,7 @@ final class ReportController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_report_index',
                 'mauticContent' => 'report',
@@ -319,7 +319,7 @@ final class ReportController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_report_index',
                 'mauticContent' => 'report',
@@ -388,7 +388,7 @@ final class ReportController extends AbstractFormController
                         ]
                     );
                     $viewParams = ['objectId' => $entity->getId()];
-                    $template   = 'Mautic\ReportBundle\Controller\ReportController::viewAction';
+                    $template   = self::class.'::viewAction';
                 } else {
                     // reset old columns
                     $entity->setColumns($oldColumns);
@@ -400,7 +400,7 @@ final class ReportController extends AbstractFormController
 
                 $returnUrl  = $this->generateUrl('mautic_report_index', ['page' => $page]);
                 $viewParams = ['report' => $page];
-                $template   = 'Mautic\ReportBundle\Controller\ReportController::indexAction';
+                $template   = self::class.'::indexAction';
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -496,12 +496,12 @@ final class ReportController extends AbstractFormController
 
                     $viewParameters = ['objectId' => $entity->getId()];
                     $returnUrl      = $this->generateUrl('mautic_report_view', $viewParameters);
-                    $template       = 'Mautic\ReportBundle\Controller\ReportController::viewAction';
+                    $template       = self::class.'::viewAction';
                 }
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_report_index', $viewParameters);
-                $template       = 'Mautic\ReportBundle\Controller\ReportController::indexAction';
+                $template       = self::class.'::indexAction';
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -562,7 +562,7 @@ final class ReportController extends AbstractFormController
                 [
                     'returnUrl'       => $this->generateUrl('mautic_report_index', ['page' => $page]),
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_report_index',
                         'mauticContent' => 'report',
@@ -798,7 +798,7 @@ final class ReportController extends AbstractFormController
                 [
                     'returnUrl'       => $this->generateUrl('mautic_report_index', ['page' => $page]),
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_report_index',
                         'mauticContent' => 'report',

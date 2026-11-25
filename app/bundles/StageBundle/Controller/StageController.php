@@ -107,7 +107,7 @@ final class StageController extends AbstractFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'Mautic\StageBundle\Controller\StageController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_stage_index',
                         'mauticContent' => 'stage',
@@ -205,7 +205,7 @@ final class StageController extends AbstractFormController
 
                     if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_stage_index', $viewParameters);
-                        $template  = 'Mautic\StageBundle\Controller\StageController::indexAction';
+                        $template  = self::class.'::indexAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
                         return $this->editAction($request, $entity->getId(), true);
@@ -213,7 +213,7 @@ final class StageController extends AbstractFormController
                 }
             } else {
                 $returnUrl = $this->generateUrl('mautic_stage_index', $viewParameters);
-                $template  = 'Mautic\StageBundle\Controller\StageController::indexAction';
+                $template  = self::class.'::indexAction';
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -283,7 +283,7 @@ final class StageController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParameters,
-            'contentTemplate' => 'Mautic\StageBundle\Controller\StageController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_stage_index',
                 'mauticContent' => 'stage',
@@ -352,7 +352,7 @@ final class StageController extends AbstractFormController
 
                     if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_stage_index', $viewParameters);
-                        $template  = 'Mautic\StageBundle\Controller\StageController::indexAction';
+                        $template  = self::class.'::indexAction';
                     }
                 }
             } else {
@@ -360,7 +360,7 @@ final class StageController extends AbstractFormController
                 $this->stageModel->unlockEntity($entity);
 
                 $returnUrl = $this->generateUrl('mautic_stage_index', $viewParameters);
-                $template  = 'Mautic\StageBundle\Controller\StageController::indexAction';
+                $template  = self::class.'::indexAction';
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -513,7 +513,7 @@ final class StageController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\StageBundle\Controller\StageController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_stage_index',
                 'mauticContent' => 'stage',
@@ -570,7 +570,7 @@ final class StageController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\StageBundle\Controller\StageController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_stage_index',
                 'mauticContent' => 'stage',
