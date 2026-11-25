@@ -28,7 +28,7 @@ class StatData
 
     public function __construct(
         #[ORM\Id]
-        #[ORM\ManyToOne(targetEntity: Stat::class, inversedBy: 'dataCollection')]
+        #[ORM\OneToOne(targetEntity: Stat::class, inversedBy: 'data')]
         #[ORM\JoinColumn(name: 'stat_id', nullable: false, onDelete: 'CASCADE')]
         private readonly Stat $stat,
     ) {

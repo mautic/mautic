@@ -26,9 +26,10 @@ final class StatRepository extends CommonRepository
     public function getEmailStatus(string $trackingHash): ?Stat
     {
         $q = $this->createQueryBuilder('s');
-        $q->select('s')
+        $q->select('s', 'd')
             ->leftJoin('s.lead', 'l')
             ->leftJoin('s.email', 'e')
+            ->leftJoin('s.data', 'd')
             ->where(
                 $q->expr()->eq('s.trackingHash', ':hash')
             )
@@ -625,6 +626,8 @@ final class StatRepository extends CommonRepository
     public function findContactEmailStats($leadId, $emailId): array
     {
         return $this->createQueryBuilder('s')
+            ->addSelect('d')
+            ->leftJoin('s.data', 'd')
             ->where('IDENTITY(s.lead) = :leadId AND IDENTITY(s.email) =  :emailId')
             ->setParameter('leadId', (int) $leadId)
             ->setParameter('emailId', (int) $emailId)

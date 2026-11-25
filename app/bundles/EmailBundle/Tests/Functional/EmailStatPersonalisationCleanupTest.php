@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Functional;
 
-use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatData;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -128,17 +128,15 @@ final class EmailStatPersonalisationCleanupTest extends MauticMysqlTestCase
         $this->assertSame(['{contactfield=firstname}' => 'John'], $this->em->find(Stat::class, $recent->getId())->getTokens());
     }
 
-    public function testTokensAreLoadedOnlyWhenRead(): void
+    public function testTokensAreLoadedWithTheStat(): void
     {
-        $stat = $this->createStat('lazy', new \DateTime());
+        $this->createStat('eager', new \DateTime());
         $this->em->clear();
 
-        $loaded = $this->em->find(Stat::class, $stat->getId());
+        $loaded = self::getContainer()->get(StatRepository::class)->getEmailStatus('eager');
         $this->assertInstanceOf(Stat::class, $loaded);
-        $rows   = new \ReflectionProperty(Stat::class, 'dataCollection')->getValue($loaded);
 
-        $this->assertInstanceOf(PersistentCollection::class, $rows);
-        $this->assertFalse($rows->isInitialized());
+        $this->assertInstanceOf(StatData::class, new \ReflectionProperty(Stat::class, 'data')->getValue($loaded));
         $this->assertSame(['{contactfield=firstname}' => 'John'], $loaded->getTokens());
     }
 

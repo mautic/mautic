@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Entity;
 
-use Doctrine\Common\Collections\Collection;
 use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatData;
@@ -157,11 +156,7 @@ final class StatTest extends TestCase
 
     private function getDataRow(Stat $stat): StatData
     {
-        $data = new \ReflectionProperty(Stat::class, 'dataCollection');
-        $rows = $data->getValue($stat);
-        $this->assertInstanceOf(Collection::class, $rows);
-        $this->assertCount(1, $rows);
-        $row = $rows->first();
+        $row = new \ReflectionProperty(Stat::class, 'data')->getValue($stat);
         $this->assertInstanceOf(StatData::class, $row);
 
         return $row;

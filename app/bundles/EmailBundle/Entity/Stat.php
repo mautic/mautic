@@ -140,13 +140,9 @@ class Stat
     #[ORM\OneToMany(targetEntity: EmailReply::class, mappedBy: 'stat', cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private $replies;
 
-    /**
-     * Holds at most one row; a to-many so that it loads lazily, as an inverse to-one cannot.
-     *
-     * @var Collection<int, StatData>
-     */
-    #[ORM\OneToMany(targetEntity: StatData::class, mappedBy: 'stat', cascade: ['persist', 'detach'])]
-    private Collection $dataCollection;
+    // An inverse to-one cannot load lazily, so it is joined into the stat's own query
+    #[ORM\OneToOne(targetEntity: StatData::class, mappedBy: 'stat', cascade: ['persist', 'detach'], fetch: 'EAGER')]
+    private ?StatData $data = null;
 
     /**
      * @var array<string,mixed[]>
@@ -155,8 +151,7 @@ class Stat
 
     public function __construct()
     {
-        $this->replies        = new ArrayCollection();
-        $this->dataCollection = new ArrayCollection();
+        $this->replies = new ArrayCollection();
     }
 
     /**
@@ -212,9 +207,8 @@ class Stat
         $this->dateSent = $dateSent;
 
         // The data row's date_sent must match the stat's
-        $data = $this->dataCollection->first();
-        if ($data instanceof StatData && $dateSent) {
-            $data->setDateSent($dateSent);
+        if ($this->data && $dateSent) {
+            $this->data->setDateSent($dateSent);
         }
     }
 
@@ -410,11 +404,9 @@ class Stat
     public function getTokens(): array
     {
         // Tokens may be held in the legacy column, the data row, or both
-        $data = $this->dataCollection->first();
-
         return array_merge(
             is_array($this->tokens) ? $this->tokens : [],
-            $data instanceof StatData ? $data->getTokens() : [],
+            $this->data?->getTokens() ?? [],
         );
     }
 
@@ -423,13 +415,8 @@ class Stat
      */
     public function setTokens(array $tokens): void
     {
-        $data = $this->dataCollection->first();
-        if (!$data instanceof StatData) {
-            $data = new StatData($this);
-            $this->dataCollection->add($data);
-        }
-
-        $data->setTokens($tokens);
+        $this->data ??= new StatData($this);
+        $this->data->setTokens($tokens);
         $this->tokens = null;
     }
 
@@ -438,7 +425,7 @@ class Stat
      */
     public function hasStoredTokens(): bool
     {
-        return null !== $this->tokens || !$this->dataCollection->isEmpty();
+        return null !== $this->tokens || null !== $this->data;
     }
 
     /**
