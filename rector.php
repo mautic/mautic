@@ -79,11 +79,6 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Doctrine/Type/ArrayType.php',
         ],
 
-        // streamed response above
-        Rector\CodeQuality\Rector\ClassMethod\ExplicitReturnNullRector::class => [
-            __DIR__.'/app/bundles/ReportBundle/Model/ReportModel.php',
-        ],
-
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [
             __DIR__.'/app/bundles/PageBundle/Controller/AjaxController.php',
             __DIR__.'/app/bundles/EmailBundle/Controller/AjaxController.php',
