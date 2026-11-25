@@ -123,8 +123,18 @@ $ai-label-inline-sizes: (
 .ai-label__button--with-content {
     border-color: var(--border-inverse);
     inline-size: auto;
+    max-inline-size: 7rem;
+    overflow: hidden;
     padding-block: .125rem;
     padding-inline: .5rem;
+
+    .ai-label__text,
+    .ai-label__additional-text {
+        overflow: hidden;
+        min-inline-size: 0;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 
     .ai-label__additional-text {
         padding-inline-start: .25rem;

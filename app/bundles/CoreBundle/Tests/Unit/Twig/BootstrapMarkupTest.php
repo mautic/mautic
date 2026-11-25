@@ -127,10 +127,23 @@ final class BootstrapMarkupTest extends TestCase
     public function testSelectableTagAiLabelIsPartOfButtonName(): void
     {
         $crawler = new Crawler($this->twig->render('Helper/_tag.html.twig', [
-            'tags' => [['label' => 'Draft', 'type' => 'selectable', 'aiLabel' => true]],
+            'tags' => [['label' => 'Draft', 'type' => 'selectable', 'aiLabel' => ['additionalText' => 'Predicted']]],
         ]));
 
-        $this->assertStringStartsWith('Draft ', $crawler->filter('button[aria-pressed="false"]')->attr('aria-label'));
+        $label = $crawler->filter('button[aria-pressed="false"]')->attr('aria-label');
+        $this->assertStringStartsWith('Draft ', $label);
+        $this->assertStringEndsWith(' Predicted', $label);
+    }
+
+    public function testInteractiveAiLabelAccessibleNameIncludesVisibleText(): void
+    {
+        $crawler = new Crawler($this->twig->render('Components/ai-label.html.twig', [
+            'additionalText' => 'Predicted',
+        ]));
+
+        $label = $crawler->filter('button.ai-label__button')->attr('aria-label');
+        $this->assertStringContainsString(' Predicted - ', (string) $label);
+        $this->assertCount(0, $crawler->filter('button[aria-haspopup]'));
     }
 
     public function testAiLabelWithAdditionalTextMarksFormWrapper(): void
