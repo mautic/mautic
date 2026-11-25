@@ -48,7 +48,8 @@
 
     {# Wrapper element switching logic #}
     {% set wrapper_tag = attributes.href is defined ? 'a' : 'div' %}
-    <{{ wrapper_tag }} id="{{ id }}" class="{{ classes|join(' ') }}" aria-label="{{ translated_label|striptags }}" size="{{ size }}"
+    {% set wrapper_aria_label = translated_label|striptags ~ (ai_label ? ' ' ~ ai_label_name : '') %}
+    <{{ wrapper_tag }} id="{{ id }}" class="{{ classes|join(' ') }}" aria-label="{{ wrapper_aria_label|e('html_attr') }}" size="{{ size }}"
         {% if wrapper_tag == 'a' %} href="{{ attributes.href }}" {% endif %}
         {% for attr_key, attr_value in other_attributes %}
             {{ attr_key }}="{{ attr_value }}"

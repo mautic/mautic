@@ -107,11 +107,12 @@ final class BootstrapMarkupTest extends TestCase
     public function testLinkedTagAiLabelStaysStaticInsideAnchor(): void
     {
         $crawler = new Crawler($this->twig->render('Helper/_tag.html.twig', [
-            'tags' => [['label' => 'Draft', 'aiLabel' => ['static' => false], 'attributes' => ['href' => '/example']]],
+            'tags' => [['label' => 'Draft', 'aiLabel' => ['static' => false, 'additionalText' => 'Predicted'], 'attributes' => ['href' => '/example']]],
         ]));
 
         $this->assertCount(1, $crawler->filter('a .ai-label'));
         $this->assertCount(0, $crawler->filter('a button'));
+        $this->assertStringEndsWith(' Predicted', $crawler->filter('a')->attr('aria-label'));
     }
 
     public function testAiLabelClassNameIsEscapedAsOneClassList(): void
