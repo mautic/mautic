@@ -514,9 +514,12 @@ class InstallService
     public function createFinalConfigStep(string $siteUrl): array
     {
         // Merge final things into the config, wipe the container, and we're done!
+        // New installs don't track form submitters, so forms set no cookie before consent.
+        // Existing installs keep the default and track them as before.
         $finalConfigVars = [
-            'secret_key' => EncryptionHelper::generateKey(),
-            'site_url'   => $siteUrl,
+            'secret_key'            => EncryptionHelper::generateKey(),
+            'site_url'              => $siteUrl,
+            'form_track_submitters' => false,
         ];
 
         return $this->saveConfiguration($finalConfigVars, null, true);
