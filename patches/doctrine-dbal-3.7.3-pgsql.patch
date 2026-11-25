@@ -180,11 +180,11 @@ index 13fde63..39a4a8a 100644
 +        $conditions = $this->buildQueryConditions($tableName);
 +        // Only real tables / partitioned tables / materialized views; indexes only.
 +        $conditions[] = "c.relkind IN ('r', 'p', 'm')";
-+        $conditions[] = "ic.relkind = 'i'";
- 
++        $conditions[] = "ic.relkind IN ('i', 'I')";
+
 -        $sql .= ' WHERE ' . implode(' AND ', $conditions) . ')';
 +        $sql .= ' WHERE ' . implode(' AND ', $conditions);
 +        $sql .= ' ORDER BY keys.ord';
- 
+
          return $this->_conn->executeQuery($sql);
      }

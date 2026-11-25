@@ -227,8 +227,8 @@ final class InstallCommand extends Command
             $allParams['site_url'] = $siteUrl;
         }
 
-        // Make sure charset is correct for PostgreSQL DB
-        if (empty($allParams['charset'])) {
+        // Apply the charset default when the effective DB charset is empty.
+        if (empty($dbParams['charset'])) {
             $dbParams['charset'] = ('pdo_pgsql' == $dbParams['driver']) ? 'UTF8' : 'utf8mb4';
         }
         $allParams['charset'] = $dbParams['charset'];

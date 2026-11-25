@@ -151,8 +151,9 @@ final class PageControllerTest extends MauticMysqlTestCase
         $objectCol = $this->connection->quoteIdentifier('object');
         $leadIdCol = $this->connection->quoteIdentifier('lead_id');
 
+        $idCol = $this->connection->quoteIdentifier('id');
         $eventLogsAfterFirstVisit = $this->connection->fetchAllAssociative("
-          SELECT $leadIdCol, $actionCol
+          SELECT $idCol, $leadIdCol, $actionCol
           FROM $eventLogsTable
           WHERE $leadIdCol = :leadId
           AND $bundleCol = 'page' AND $objectCol = 'page';", ['leadId' => $leadId]
@@ -162,7 +163,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
         $this->assertResponseIsSuccessful();
         $eventLogsAfterSecondVisit = $this->connection->fetchAllAssociative("
-          SELECT $leadIdCol, $actionCol
+          SELECT $idCol, $leadIdCol, $actionCol
           FROM $eventLogsTable
           WHERE $leadIdCol = :leadId
           AND $bundleCol = 'page' AND $objectCol = 'page';", ['leadId' => $leadId]

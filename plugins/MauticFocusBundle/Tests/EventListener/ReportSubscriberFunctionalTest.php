@@ -50,13 +50,17 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         // Remove the row-number column (#)
         $table = array_map(static fn (array $row): array => array_slice($row, 1), $table);
 
-        // Order-independent assertion (safe for PostgreSQL + MySQL)
-        $this->assertEqualsCanonicalizing([
+        // Sort only the outer row list. Nested arrays keep column order so
+        // hits and unique_hits cannot swap and still pass.
+        $expected = [
             ['FocusItem1', 'doesAbc', 'link', 'modal', 'click', '1', '1', self::EXAMPLE_URL_1],
             ['FocusItem1', 'doesAbc', 'link', 'modal', 'view', '3', '2', self::EXAMPLE_URL_1],
             ['FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '1', '1', self::EXAMPLE_URL_2],
             ['FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', '1', self::EXAMPLE_URL_2],
-        ], $table);
+        ];
+        sort($expected);
+        sort($table);
+        $this->assertSame($expected, $table);
     }
 
     public function testGenerateFocusItemReportFocusLeadsColumns(): void

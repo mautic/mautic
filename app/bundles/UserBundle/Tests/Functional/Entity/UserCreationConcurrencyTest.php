@@ -61,12 +61,14 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
             } catch (OidcException $exception) {
                 $this->assertNull($second->getId());
                 $previous = $exception->getPrevious();
-                $this->assertInstanceOf(\Throwable::class, $previous, 'Expected a lock-timeout or constraint previous exception');
-                // MySQL: LockWaitTimeoutException; PostgreSQL: often plain DriverException (55P03).
+                $this->assertInstanceOf(\Throwable::class, $previous, 'Expected a lock-timeout previous exception');
+                // MySQL: LockWaitTimeoutException. PostgreSQL: DriverException with SQLSTATE 55P03 only.
+                $isPgLockTimeout = $previous instanceof DBALException
+                    && method_exists($previous, 'getSQLState')
+                    && '55P03' === $previous->getSQLState();
                 $this->assertTrue(
-                    $previous instanceof LockWaitTimeoutException
-                    || $previous instanceof DBALException,
-                    'Previous exception must be a DBAL lock/driver exception, got: '.$previous::class
+                    $previous instanceof LockWaitTimeoutException || $isPgLockTimeout,
+                    'Previous exception must be a lock-timeout (LockWaitTimeoutException or SQLSTATE 55P03), got: '.$previous::class
                 );
             }
 
