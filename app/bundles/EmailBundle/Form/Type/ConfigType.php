@@ -18,6 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -610,6 +611,23 @@ final class ConfigType extends AbstractType
                 ],
                 'data'       => $options['data']['validate_unsubscribe_emails'] ?? true,
                 'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'email_stats_compaction_threshold_days',
+            NumberType::class,
+            [
+                'scale'       => 0,
+                'label'       => 'mautic.email.config.email.stats.compaction.threshold',
+                'label_attr'  => ['class' => 'form-label'],
+                'required'    => false,
+                'empty_data'  => '0',
+                'constraints' => [new GreaterThanOrEqual(0)],
+                'attr'        => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.email.stats.compaction.threshold.tooltip',
+                ],
             ]
         );
     }

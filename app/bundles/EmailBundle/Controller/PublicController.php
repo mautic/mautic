@@ -16,6 +16,7 @@ use Mautic\EmailBundle\Form\Type\EmailPreviewOptionsType;
 use Mautic\EmailBundle\Form\Type\ValidateEmailType;
 use Mautic\EmailBundle\Helper\EmailAddressLinkMatcher;
 use Mautic\EmailBundle\Helper\EmailConfig;
+use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Mautic\EmailBundle\Helper\EmailPreviewHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
@@ -97,30 +98,42 @@ final class PublicController extends CommonFormController
         path: '/email/view/{idHash}',
         name: 'mautic_email_webview',
     )]
-    public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, string $idHash): Response
+    public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, EmailConfigInterface $emailConfig, string $idHash): Response
     {
         $stat = $this->emailModel->getEmailStatus($idHash);
 
         if ($stat instanceof Stat) {
+            // Stored personalisation is absent only once the cleanup has deleted it, and showing that is not a read
+            if ($emailConfig->getStatsCompactionThresholdDays() > 0 && !$stat->hasStoredTokens()) {
+                $this->setContactLocale($stat->getLead());
+                $response = $this->renderThemeMessage(
+                    $assetsHelper,
+                    $analyticsHelper,
+                    $stat->getEmail(),
+                    $stat->getLead(),
+                    $this->translator->trans('mautic.email.view_in_browser.no_longer_available')
+                );
+                $response->setStatusCode(Response::HTTP_GONE);
+                $response->headers->set('Cache-Control', 'no-store');
+
+                return $response;
+            }
+
             if ($this->security->isAnonymous()) {
                 $this->emailModel->hitEmail($stat, $request, true);
             }
 
             $tokens = $stat->getTokens();
-            if (is_array($tokens)) {
-                // Override tracking_pixel so as to not cause a double hit
-                $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
-            }
+            // Override tracking_pixel so as to not cause a double hit
+            $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
 
             if ($copy = $stat->getStoredCopy()) {
                 $subject = $copy->getSubject();
                 $content = $copy->getBody();
 
                 // Replace tokens
-                if (is_array($tokens)) {
-                    $content = str_ireplace(array_keys($tokens), $tokens, $content);
-                    $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
-                }
+                $content = str_ireplace(array_keys($tokens), $tokens, $content);
+                $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
             } else {
                 $subject = '';
                 $content = '';
@@ -635,6 +648,49 @@ final class PublicController extends CommonFormController
                 'email'        => $email,
                 'lead'         => $lead,
                 'template'     => $template,
+            ]
+        ));
+    }
+
+    private function setContactLocale(?Lead $lead): void
+    {
+        if (!$lead?->getPreferredLocale()) {
+            return;
+        }
+
+        if (!$this->translator instanceof LocaleAwareInterface) {
+            throw new \LogicException(sprintf('$this->translator must be an instance of "%s"', LocaleAwareInterface::class));
+        }
+
+        $this->translator->setLocale($lead->getPreferredLocale());
+    }
+
+    private function renderThemeMessage(AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, ?Email $email, ?Lead $lead, string $message): Response
+    {
+        $template = $this->coreParametersHelper->get('theme');
+
+        // Ensure template still exists
+        $theme = $this->themeHelper->getTheme($template);
+        if ($theme->getTheme() !== $template) {
+            $template = $theme->getTheme();
+        }
+
+        $analytics = $analyticsHelper->getCode();
+
+        if (!empty($analytics)) {
+            $assetsHelper->addCustomDeclaration($analytics);
+        }
+
+        $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
+
+        return new Response($this->themeHelper->renderThemeTemplate(
+            $logicalName,
+            [
+                'message'  => $message,
+                'type'     => 'notice',
+                'email'    => $email,
+                'lead'     => $lead,
+                'template' => $template,
             ]
         ));
     }

@@ -17,4 +17,9 @@ final readonly class EmailConfig implements EmailConfigInterface
     {
         return (bool) $this->coreParametersHelper->get('email_draft_enabled', false);
     }
+
+    public function getStatsCompactionThresholdDays(): int
+    {
+        return max(0, (int) $this->coreParametersHelper->get('email_stats_compaction_threshold_days', 0));
+    }
 }

@@ -108,7 +108,9 @@ class Stat
     private $sourceId;
 
     /**
-     * @var array
+     * Legacy token storage: setTokens() leaves it null and the cleanup sets it to null.
+     *
+     * @var array<string, mixed>|null
      */
     #[ORM\Column(type: 'array', nullable: true)]
     private $tokens = [];
@@ -139,13 +141,22 @@ class Stat
     private $replies;
 
     /**
+     * Holds at most one row; a to-many so that it loads lazily, as an inverse to-one cannot.
+     *
+     * @var Collection<int, StatData>
+     */
+    #[ORM\OneToMany(targetEntity: StatData::class, mappedBy: 'stat', cascade: ['persist'])]
+    private Collection $dataCollection;
+
+    /**
      * @var array<string,mixed[]>
      */
     private array $changes = [];
 
     public function __construct()
     {
-        $this->replies = new ArrayCollection();
+        $this->replies        = new ArrayCollection();
+        $this->dataCollection = new ArrayCollection();
     }
 
     /**
@@ -199,6 +210,12 @@ class Stat
         $dateSent = $this->toDateTime($dateSent);
         $this->addChange('dateSent', $this->dateSent, $dateSent);
         $this->dateSent = $dateSent;
+
+        // The data row's date_sent must match the stat's
+        $data = $this->dataCollection->first();
+        if ($data instanceof StatData && $dateSent) {
+            $data->setDateSent($dateSent);
+        }
     }
 
     public function getEmail(): ?Email
@@ -387,14 +404,41 @@ class Stat
         $this->sourceId = (int) $sourceId;
     }
 
-    public function getTokens(): ?array
+    /**
+     * @return array<string, mixed>
+     */
+    public function getTokens(): array
     {
-        return $this->tokens;
+        // Tokens may be held in the legacy column, the data row, or both
+        $data = $this->dataCollection->first();
+
+        return array_merge(
+            is_array($this->tokens) ? $this->tokens : [],
+            $data instanceof StatData ? $data->getTokens() : [],
+        );
     }
 
+    /**
+     * @param array<string, mixed> $tokens
+     */
     public function setTokens(array $tokens): void
     {
-        $this->tokens = $tokens;
+        $data = $this->dataCollection->first();
+        if (!$data instanceof StatData) {
+            $data = new StatData($this);
+            $this->dataCollection->add($data);
+        }
+
+        $data->setTokens($tokens);
+        $this->tokens = null;
+    }
+
+    /**
+     * Whether tokens are stored for this stat, in either the legacy column or the data row.
+     */
+    public function hasStoredTokens(): bool
+    {
+        return null !== $this->tokens || !$this->dataCollection->isEmpty();
     }
 
     /**
