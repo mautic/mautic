@@ -164,4 +164,27 @@ final class BootstrapMarkupTest extends TestCase
         $this->assertCount(0, $unlocked->filter('input.btn-check:disabled'));
         $this->assertCount(0, $unlocked->filter('input.btn-check[tabindex="-1"]'));
     }
+
+    public function testSegmentedControlComponentRendersSizeEqualWidthDurationAndIcons(): void
+    {
+        $html = $this->twig->render('@MauticCore/Components/segmented-control.html.twig', [
+            'id'         => 'mode',
+            'name'       => 'mode',
+            'size'       => 'lg',
+            'equalWidth' => true,
+            'duration'   => '0.2',
+            'value'      => 'b',
+            'options'    => [
+                ['value' => 'a', 'label' => 'A', 'icon' => 'ri-star-line', 'translation_domain' => false],
+                ['value' => 'b', 'label' => 'B', 'translation_domain' => false],
+            ],
+        ]);
+        $crawler = new Crawler($html);
+
+        $this->assertCount(1, $crawler->filter('.segmented-control.segmented-control--lg.segmented-control--equal'));
+        $this->assertStringContainsString('--segmented-control-duration: 0.2s', $html);
+        $this->assertCount(1, $crawler->filter('label.btn > i.ri-star-line'));
+        $this->assertCount(1, $crawler->filter('input.btn-check[value="b"]:checked'));
+        $this->assertCount(0, $crawler->filter('input.btn-check[value="a"]:checked'));
+    }
 }
