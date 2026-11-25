@@ -22,10 +22,8 @@ final class CustomFieldHelper
      * Fixes value type for specific field types.
      *
      * @param \DateTimeInterface|mixed[]|string|int|float|bool|null $value
-     *
-     * @return mixed
      */
-    public static function fixValueType(string $type, \DateTimeInterface|array|string|int|float|bool|null $value)
+    public static function fixValueType(string $type, \DateTimeInterface|array|string|int|float|bool|null $value): \DateTimeInterface|string|int|float|bool|array|null
     {
         if (null === $value) {
             // do not transform null values

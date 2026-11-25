@@ -14,11 +14,9 @@ final class MergeValueHelper
      * @param \DateTimeInterface|mixed[]|string|int|float|bool|null $currentValue
      * @param \DateTimeInterface|mixed[]|string|int|float|bool|null $defaultValue
      *
-     * @return mixed
-     *
      * @throws ValueNotMergeableException
      */
-    public static function getMergeValue(\DateTimeInterface|array|string|int|float|bool|null $newerValue, \DateTimeInterface|array|string|int|float|bool|null $olderValue, \DateTimeInterface|array|string|int|float|bool|null $currentValue = null, \DateTimeInterface|array|string|int|float|bool|null $defaultValue = null, bool $newIsAnonymous = false)
+    public static function getMergeValue(\DateTimeInterface|array|string|int|float|bool|null $newerValue, \DateTimeInterface|array|string|int|float|bool|null $olderValue, \DateTimeInterface|array|string|int|float|bool|null $currentValue = null, \DateTimeInterface|array|string|int|float|bool|null $defaultValue = null, bool $newIsAnonymous = false): \DateTimeInterface|string|int|float|bool|array|null
     {
         if ($newerValue === $olderValue) {
             throw new ValueNotMergeableException($newerValue, $olderValue);

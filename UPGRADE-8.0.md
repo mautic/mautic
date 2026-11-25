@@ -1466,8 +1466,8 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException` | `__construct()` (`string $object`) |
     | `Mautic\IntegrationsBundle\Sync\Logger\DebugLogger` | `log()` (`string $integration`, `string $message`) |
     | `Mautic\LeadBundle\Controller\LeadDetailsTrait` | `sanitizeEventFilter()` (`array\|string\|false $filters`) |
-    | `Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException` | `__construct()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $newerValue`, `\DateTimeInterface\|array\|string\|int\|float\|bool\|null $olderValue`) |
-    | `Mautic\LeadBundle\Deduplicate\Helper\MergeValueHelper` | `getMergeValue()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $newerValue`, `\DateTimeInterface\|array\|string\|int\|float\|bool\|null $olderValue`, `\DateTimeInterface\|array\|string\|int\|float\|bool\|null $currentValue`, `\DateTimeInterface\|array\|string\|int\|float\|bool\|null $defaultValue`) |
+    | `Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException` | `__construct()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $newerValue`, `\DateTimeInterface\|array\|string\|int\|float\|bool\|null $olderValue`); `getNewerValue()` and `getOlderValue()` now return `\DateTimeInterface\|array\|string\|int\|float\|bool\|null` |
+    | `Mautic\LeadBundle\Deduplicate\Helper\MergeValueHelper` | `getMergeValue()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $newerValue`, `\DateTimeInterface\|array\|string\|int\|float\|bool\|null $olderValue`, `\DateTimeInterface\|array\|string\|int\|float\|bool\|null $currentValue`, `\DateTimeInterface\|array\|string\|int\|float\|bool\|null $defaultValue`), now returns `\DateTimeInterface\|array\|string\|int\|float\|bool\|null` |
     | `Mautic\LeadBundle\Entity\CompanyRepository` | `getAjaxSimpleList()` (`string $valueColumn`); `getCompanies()` (`string $id`) |
     | `Mautic\LeadBundle\Entity\CustomFieldEntityInterface` (and `CustomFieldEntityTrait` used by `Lead` and `Company`) | `addUpdatedField()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $value`); implementations without a type for `$value` stay compatible |
     | `Mautic\LeadBundle\Entity\DoNotContactRepository` | `getChannelList()` (`?string $channel`); `getCount()` (`?string $channel`, `?int $reason`) |
@@ -1480,7 +1480,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent` | `addChoice()` (`string $object`, `string $choiceKey`) |
     | `Mautic\LeadBundle\Event\LeadTimelineEvent` | `addEventType()` (`string $eventTypeKey`); `addToCounter()` (`string $eventType`, `array\|int $count`); `isApplicable()` (`string $eventType`); `subtractFromCounter()` (`int $count`) |
     | `Mautic\LeadBundle\Event\PointsChangeEvent` | `__construct()` (`int $old`, `int $new`) |
-    | `Mautic\LeadBundle\Helper\CustomFieldHelper` | `fixValueType()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $value`) |
+    | `Mautic\LeadBundle\Helper\CustomFieldHelper` | `fixValueType()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $value`), now returns `\DateTimeInterface\|array\|string\|int\|float\|bool\|null` |
     | `Mautic\LeadBundle\Helper\CustomFieldValueHelper` | `normalize()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $value`) |
     | `Mautic\LeadBundle\Model\FieldModel` | `getLookupResults()` (`int $limit`); `reorderFieldsByList()` (`int $start`) |
     | `Mautic\LeadBundle\Model\ImportModel` | `getImportedRowsLineChartData()` (`string $unit`); `isEmptyCsvRow()` (`array $row`); `process()` (`int $limit`) |

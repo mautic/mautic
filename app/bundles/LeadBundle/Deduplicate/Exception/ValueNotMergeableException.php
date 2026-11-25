@@ -17,18 +17,12 @@ final class ValueNotMergeableException extends \Exception
         parent::__construct();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getNewerValue()
+    public function getNewerValue(): \DateTimeInterface|string|int|float|bool|array|null
     {
         return $this->newerValue;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getOlderValue()
+    public function getOlderValue(): \DateTimeInterface|string|int|float|bool|array|null
     {
         return $this->olderValue;
     }
