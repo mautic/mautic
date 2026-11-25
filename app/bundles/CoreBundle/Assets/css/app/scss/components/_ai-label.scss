@@ -142,7 +142,8 @@ $ai-label-inline-sizes: (
 .form-field-ai {
     position: relative;
 
-    > .form-control {
+    > .form-control,
+    > .form-control-plaintext {
         padding-inline-end: var(--spacing-08);
     }
 
@@ -161,9 +162,18 @@ $ai-label-inline-sizes: (
 
 @each $name, $size in $ai-label-sizes {
     .form-field-ai--#{$name} > .form-control,
-    .form-fluid .form-field-ai--#{$name} > .form-control {
+    .form-fluid .form-field-ai--#{$name} > .form-control,
+    .form-field-ai--#{$name} > .form-control-plaintext,
+    .form-fluid .form-field-ai--#{$name} > .form-control-plaintext {
         padding-inline-end: calc(nth($size, 1) + var(--spacing-05));
     }
+}
+
+.form-field-ai--with-content > .form-control,
+.form-fluid .form-field-ai--with-content > .form-control,
+.form-field-ai--with-content > .form-control-plaintext,
+.form-fluid .form-field-ai--with-content > .form-control-plaintext {
+    padding-inline-end: 8rem;
 }
 
 .form-control--ai {

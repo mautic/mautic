@@ -54,7 +54,7 @@
         {{ common_label_html }}
     {% endif %}
 
-    {% if aiLabel %}<div class="form-field-ai{{ aiLabel is iterable and aiLabel.size is defined ? ' form-field-ai--' ~ aiLabel.size|e('html_attr') : '' }}">{% endif %}
+    {% if aiLabel %}<div class="form-field-ai{{ aiLabel is iterable and aiLabel.size is defined ? ' form-field-ai--' ~ aiLabel.size|e('html_attr') : '' }}{{ aiLabel is iterable and aiLabel.additionalText is defined and aiLabel.additionalText ? ' form-field-ai--with-content' : '' }}">{% endif %}
     {% if type == 'textarea' %}
         <textarea
             class="{{ input_class|trim }}"

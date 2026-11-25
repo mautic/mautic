@@ -8,7 +8,7 @@
 {% if additionalText %}{% set classes = classes|merge(['ai-label__button--with-content']) %}{% endif %}
 {% set accessible_label = (aria_label is defined and aria_label ? aria_label : label)|trans ~ (additionalText ? ' ' ~ additionalText|trans : '') %}
 {% set text_markup %}<span class="ai-label__text">{{ label|trans }}</span>{% if additionalText %}<span class="ai-label__additional-text">{{ additionalText|trans }}</span>{% endif %}{% endset %}
-<span class="ai-label{{ className is defined and className ? ' ' ~ className|e('html_attr') : '' }}">
+<span class="{{ ('ai-label' ~ (className is defined and className ? ' ' ~ className : ''))|e('html_attr') }}">
     {% if static is defined and static %}
     <span class="{{ classes|join(' ')|e('html_attr') }}" role="img" aria-label="{{ accessible_label|e('html_attr') }}">{{ text_markup }}</span>
     {% else %}

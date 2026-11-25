@@ -113,4 +113,47 @@ final class BootstrapMarkupTest extends TestCase
         $this->assertCount(1, $crawler->filter('a .ai-label'));
         $this->assertCount(0, $crawler->filter('a button'));
     }
+
+    public function testAiLabelClassNameIsEscapedAsOneClassList(): void
+    {
+        $crawler = new Crawler($this->twig->render('Components/ai-label.html.twig', [
+            'static'    => true,
+            'className' => 'mt-4 mr-4',
+        ]));
+
+        $this->assertCount(1, $crawler->filter('span.ai-label.mt-4.mr-4'));
+    }
+
+    public function testSelectableTagAiLabelIsPartOfButtonName(): void
+    {
+        $crawler = new Crawler($this->twig->render('Helper/_tag.html.twig', [
+            'tags' => [['label' => 'Draft', 'type' => 'selectable', 'aiLabel' => true]],
+        ]));
+
+        $this->assertStringStartsWith('Draft ', $crawler->filter('button[aria-pressed="false"]')->attr('aria-label'));
+    }
+
+    public function testAiLabelWithAdditionalTextMarksFormWrapper(): void
+    {
+        $crawler = new Crawler($this->twig->render('Components/form-control.html.twig', [
+            'name'    => 'predicted',
+            'label'   => 'Predicted',
+            'aiLabel' => ['size' => 'lg', 'additionalText' => 'Predicted'],
+        ]));
+
+        $this->assertCount(1, $crawler->filter('div.form-field-ai.form-field-ai--lg.form-field-ai--with-content'));
+    }
+
+    public function testPlaintextFormControlKeepsAiLabelWrapper(): void
+    {
+        $crawler = new Crawler($this->twig->render('Components/form-control.html.twig', [
+            'name'      => 'predicted',
+            'label'     => 'Predicted',
+            'plaintext' => true,
+            'value'     => 'value',
+            'aiLabel'   => true,
+        ]));
+
+        $this->assertCount(1, $crawler->filter('div.form-field-ai > input.form-control-plaintext'));
+    }
 }
