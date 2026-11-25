@@ -211,7 +211,9 @@
             clearTimeout(this.resetTimer);
         }
         openDialog() {
-            if (this.confirmed || this.button.disabled || !this.element.isConnected) return;
+            if (this.dialogPending || this.confirmed || this.button.disabled || !this.element.isConnected) return;
+            this.cancel();
+            this.dialogPending = true;
             const label = this.idleLabel.textContent.trim();
             const trigger = mQuery("<a>").attr({
                 "data-confirm-text": label,
@@ -219,11 +221,16 @@
                 "data-confirm-callback": "confirmHoldToConfirm",
             }).data("hold", this);
             Mautic.showConfirmation(trigger[0], label);
+            mQuery(".confirmation-modal").one("hidden.bs.modal", () => {
+                this.dialogPending = false;
+            });
         }
         confirmFromDialog() {
+            this.dialogPending = false;
             if (this.confirmed || this.button.disabled || !this.element.isConnected) return;
             this.sources.add("dialog");
             this.complete();
+            this.sources.delete("dialog");
         }
     }
     register("HoldToConfirmButton", '[data-component="hold-to-confirm"]', (element) => new HoldToConfirmButton(element));
