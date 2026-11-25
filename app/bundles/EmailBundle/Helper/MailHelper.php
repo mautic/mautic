@@ -470,8 +470,9 @@ class MailHelper
             foreach ($this->queuedRecipients as $email => $name) {
                 $from        = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $this->email);
                 $fromAddress = $from->getEmail();
-                // Use composite key (email + name) to ensure contacts with same email but different from names are grouped separately
-                $metadataKey = $fromAddress.'|'.($from->getName() ?? '');
+                $ownerEmail  = $this->fromEmailHelper->getLastOwnerEmail();
+                // Use composite key (email + name + ownerEmail) so owned and ownerless contacts sharing a from address get distinct reply-to batches
+                $metadataKey = $fromAddress.'|'.($from->getName() ?? '')."\0".$ownerEmail;
                 $tokens      = $this->getTokens();
 
                 $tokens['{signature}'] = '';
@@ -482,8 +483,9 @@ class MailHelper
 
                 if (!isset($this->metadata[$metadataKey])) {
                     $this->metadata[$metadataKey] = [
-                        'from'     => $from,
-                        'contacts' => [],
+                        'from'       => $from,
+                        'ownerEmail' => $ownerEmail,
+                        'contacts'   => [],
                     ];
                 }
 
@@ -568,7 +570,7 @@ class MailHelper
                 }
                 $this->setReplyToForQueueMessage(
                     $email,
-                    ($email && $email->getUseOwnerAsMailer()) ? $metadatum['from']->getEmail() : null
+                    ($email && $email->getUseOwnerAsMailer()) ? $metadatum['ownerEmail'] : null
                 );
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
