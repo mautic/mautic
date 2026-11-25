@@ -40,6 +40,7 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
+use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -874,8 +875,11 @@ class MailHelper
                         continue;
                     }
 
-                    $this->message->embed($imageContent, md5($match));
-                    $this->embedImagesReplaces[$match] = 'cid:'.md5($match);
+                    $extension = MimeTypes::getDefault()->getExtensions($contentType)[0] ?? null;
+                    $name      = md5($match).($extension ? '.'.$extension : '');
+
+                    $this->message->embed($imageContent, $name, $contentType);
+                    $this->embedImagesReplaces[$match] = 'cid:'.$name;
                 }
             }
             $content = strtr($content, $this->embedImagesReplaces);
