@@ -160,7 +160,8 @@ $ai-label-inline-sizes: (
 }
 
 @each $name, $size in $ai-label-sizes {
-    .form-field-ai--#{$name} > .form-control {
+    .form-field-ai--#{$name} > .form-control,
+    .form-fluid .form-field-ai--#{$name} > .form-control {
         padding-inline-end: calc(nth($size, 1) + var(--spacing-05));
     }
 }

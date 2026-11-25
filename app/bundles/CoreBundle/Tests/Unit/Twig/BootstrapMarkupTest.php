@@ -90,6 +90,7 @@ final class BootstrapMarkupTest extends TestCase
 
         $this->assertCount(1, $crawler->filter('.ai-label span.ai-label__additional-text'));
         $this->assertSame('Predicted', $crawler->filter('.ai-label__additional-text')->text());
+        $this->assertStringEndsWith('Predicted', $crawler->filter('[role="img"]')->attr('aria-label'));
         $this->assertCount(0, $crawler->filter('button'));
     }
 
