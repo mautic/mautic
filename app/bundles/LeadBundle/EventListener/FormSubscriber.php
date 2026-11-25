@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
 use Mautic\FormBundle\Event\FieldCollectEvent;
@@ -39,6 +40,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         private PointGroupModel $groupModel,
         private DoNotContact $doNotContact,
         private FieldModel $leadFieldModel,
+        private IpLookupHelper $ipLookupHelper,
     ) {
     }
 
@@ -255,23 +257,37 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
 
         $queryReferer = $queryArray = [];
+        $request      = $event->getRequest();
 
-        parse_str($event->getRequest()->server->get('QUERY_STRING'), $queryArray);
-        $refererURL       = $event->getRequest()->server->get('HTTP_REFERER');
-        $refererParsedUrl = parse_url($refererURL);
+        // An untracked submitter keeps only the campaign UTM tags and the page addresses, as the rest of the request can identify them
+        $untracked = $this->ipLookupHelper->isVisitorUntracked();
 
-        if (isset($refererParsedUrl['query'])) {
-            parse_str($refererParsedUrl['query'], $queryReferer);
+        parse_str((string) $request->server->get('QUERY_STRING'), $queryArray);
+        $httpReferer      = $request->server->get('HTTP_REFERER');
+        $refererURL       = $untracked ? $event->getSubmission()->getReferer() : $httpReferer;
+        $refererParsedUrl = parse_url((string) $refererURL);
+
+        // The tags come from the page the form was submitted from, as the submission's referer can be the form's return URL instead
+        parse_str((string) parse_url((string) $httpReferer, PHP_URL_QUERY), $queryReferer);
+
+        $query = $request->query->all();
+        $url   = $request->server->get('REQUEST_URI');
+
+        if ($untracked) {
+            $queryArray   = UtmTag::filterCampaignParameters($queryArray);
+            $queryReferer = UtmTag::filterCampaignParameters($queryReferer);
+            $query        = UtmTag::filterCampaignParameters($query);
+            $url          = explode('?', (string) $url, 2)[0];
         }
 
         $utmValues = new UtmTag();
         $utmValues->setLead($contact);
-        $utmValues->setQuery($event->getRequest()->query->all());
+        $utmValues->setQuery($query);
         $utmValues->setReferer($refererURL);
-        $utmValues->setUrl($event->getRequest()->server->get('REQUEST_URI'));
+        $utmValues->setUrl($url);
         $utmValues->setDateAdded(new \DateTime());
         $utmValues->setRemoteHost($refererParsedUrl['host'] ?? null);
-        $utmValues->setUserAgent($event->getRequest()->server->get('HTTP_USER_AGENT') ?? null);
+        $utmValues->setUserAgent($untracked ? null : $request->server->get('HTTP_USER_AGENT'));
         $utmValues->setUtmCampaign($queryArray['utm_campaign'] ?? $queryReferer['utm_campaign'] ?? null);
         $utmValues->setUtmContent($queryArray['utm_content'] ?? $queryReferer['utm_content'] ?? null);
         $utmValues->setUtmMedium($queryArray['utm_medium'] ?? $queryReferer['utm_medium'] ?? null);
