@@ -6,14 +6,12 @@ namespace Mautic\EmailBundle\Services;
 
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class EmailListingHelper
 {
     public function __construct(
         private CorePermissions $security,
-        private ListModel $leadListModel,
         private TranslatorInterface $translator,
     ) {
     }
@@ -40,9 +38,11 @@ final readonly class EmailListingHelper
     }
 
     /**
+     * @param array<int, array<string, mixed>> $availableLists
+     *
      * @return array{filters: array{placeholder: string, multiple: bool, groups: array<string, array<string, mixed>>}}
      */
-    public function getListFilters(ThemeHelper $themeHelper): array
+    public function getListFilters(ThemeHelper $themeHelper, array $availableLists): array
     {
         return [
             'filters' => [
@@ -50,7 +50,7 @@ final readonly class EmailListingHelper
                 'multiple'    => true,
                 'groups'      => [
                     'mautic.core.filter.lists' => [
-                        'options' => $this->leadListModel->getUserLists(),
+                        'options' => array_column($availableLists, 'name', 'alias'),
                         'prefix'  => 'list',
                     ],
                     'mautic.core.filter.themes' => [
@@ -90,9 +90,10 @@ final readonly class EmailListingHelper
      * @param array<string, list<string>>                                                                             $currentFilters
      * @param array{filters: array{placeholder: string, multiple: bool, groups: array<string, array<string, mixed>>}} $listFilters
      * @param array{string: string, force: array<int, array<string, mixed>>}                                          $filter
-     * @param array<int, array<string, mixed>>                                                                         $categories
+     * @param array<int, array<string, mixed>>                                                                        $categories
+     * @param array<int, array<string, mixed>>                                                                        $availableLists
      */
-    public function applyCurrentFilters(array $currentFilters, array &$listFilters, array &$filter, string $categoryFilterPrefix, array $categories): bool
+    public function applyCurrentFilters(array $currentFilters, array &$listFilters, array &$filter, string $categoryFilterPrefix, array $categories, array $availableLists): bool
     {
         $ignoreListJoin = true;
 
@@ -100,6 +101,8 @@ final readonly class EmailListingHelper
         $catIds      = [];
         $templates   = [];
         $searchTerms = [];
+        $listAliasLookup = array_column($availableLists, 'alias', 'id');
+        $listAliasesByValue = array_column($availableLists, 'alias');
 
         foreach ($currentFilters as $type => $typeFilters) {
             foreach ($typeFilters as $typeFilter) {
@@ -118,7 +121,7 @@ final readonly class EmailListingHelper
             foreach ($typeFilters as $currentFilter) {
                 switch ($type) {
                     case 'list':
-                        $listAlias     = $this->getListAlias($currentFilter);
+                        $listAlias     = $this->getListAlias($currentFilter, $listAliasLookup, $listAliasesByValue);
                         $listAliases[] = $listAlias;
                         $searchTerms[] = 'list:'.$currentFilter;
                         $searchTerms[] = 'list:'.$listAlias;
@@ -185,11 +188,17 @@ final readonly class EmailListingHelper
         };
     }
 
-    private function getListAlias(string $listFilter): string
+    /**
+     * @param array<int, string> $listAliasLookup
+     * @param list<string>       $listAliasesByValue
+     */
+    private function getListAlias(string $listFilter, array $listAliasLookup, array $listAliasesByValue): string
     {
-        $listAliasLookup = array_column($this->leadListModel->getUserLists(), 'alias', 'id');
+        if (in_array($listFilter, $listAliasesByValue, true)) {
+            return $listFilter;
+        }
 
-        return $listAliasLookup[(int) $listFilter] ?? $listFilter;
+        return ctype_digit($listFilter) ? ($listAliasLookup[(int) $listFilter] ?? $listFilter) : $listFilter;
     }
 
     /**

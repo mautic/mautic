@@ -416,12 +416,11 @@ final class ConfigType extends AbstractType
         );
 
         $buildEmailColumnsField = static function (FormInterface $form, array $currentColumns, array $extraOptions = []): void {
-            $order        = [];
             $orderColumns = [];
             if ([] !== $currentColumns) {
                 $orderColumns = array_values($currentColumns);
-                $order        = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
             }
+            $order = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
 
             $options = [
                 'label'       => 'mautic.config.tab.columns',

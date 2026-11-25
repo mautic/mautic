@@ -53,40 +53,38 @@ final class EmailController extends FormController
 
     private AuditLogModel $auditLogModel;
 
+    private EmailColumnsDictionary $emailColumnsDictionary;
+
+    private EmailListingHelper $emailListingHelper;
+
     #[Required]
     public function autowireEmailController(
         ListModel $listModel,
         AuditLogModel $auditLogModel,
         EmailModel $emailModel,
         LeadRepository $leadRepository,
+        EmailColumnsDictionary $emailColumnsDictionary,
+        EmailListingHelper $emailListingHelper,
     ): void {
         $this->listModel = $listModel;
         $this->auditLogModel = $auditLogModel;
         $this->emailModel = $emailModel;
         $this->leadRepository = $leadRepository;
+        $this->emailColumnsDictionary = $emailColumnsDictionary;
+        $this->emailListingHelper = $emailListingHelper;
     }
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
-    private const FILTER_TYPE_LIST     = 'list';
-
-    private const FILTER_TYPE_THEME    = 'theme';
-
     private bool $invalidHtmlError = false;
 
-    public function indexAction(
-        Request $request,
-        EmailModel $model,
-        EmailConfig $emailConfig,
-        ThemeHelper $themeHelper,
-        CategoryModel $categoryModel,
-        EmailColumnsDictionary $emailColumnsDictionary,
-        EmailListingHelper $emailListingHelper,
-        EmailSearchScopeProvider $emailSearchScopeProvider,
-        int $page = 1,
-    ): JsonResponse|Response {
+    /**
+     * @param int $page
+     */
+    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, CategoryModel $categoryModel, EmailSearchScopeProvider $emailSearchScopeProvider, $page = 1): Response
+    {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
-        $permissions    = $emailListingHelper->getEmailPermissions();
+        $permissions    = $this->emailListingHelper->getEmailPermissions();
 
         if (!$permissions['email:emails:viewown'] && !$permissions['email:emails:viewother']) {
             $this->throwAccessDenied();
@@ -94,12 +92,13 @@ final class EmailController extends FormController
 
         $this->setListFilters();
 
-        $session     = $request->getSession();
-        $listFilters = $emailListingHelper->getListFilters($themeHelper);
+        $session        = $request->getSession();
+        $availableLists = $this->listModel->getUserLists();
+        $listFilters    = $this->emailListingHelper->getListFilters($themeHelper, $availableLists);
 
         // set limits
         $limit = $session->get('mautic.email.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $start = $emailListingHelper->getStart($page, $limit);
+        $start = $this->emailListingHelper->getStart($page, $limit);
 
         $search = $request->get('search', $session->get('mautic.email.filter', ''));
         $session->set('mautic.email.filter', $search);
@@ -114,18 +113,6 @@ final class EmailController extends FormController
             $filter['force'][] =
                 ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
-        $availableLists                                               = $this->listModel->getUserLists();
-        $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
-            'options' => array_column($availableLists, 'name', 'alias'),
-            'prefix'  => self::FILTER_TYPE_LIST,
-        ];
-
-        // retrieve a list of themes
-        $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
-            'options' => $themeHelper->getInstalledThemes('email'),
-            'prefix'  => self::FILTER_TYPE_THEME,
-        ];
-
         // retrieve a list of categories
         $categories                                                        = $categoryModel->getLookupResults('email', '', 0);
         $categoryFilterPrefix                                              = $this->translator->trans('mautic.core.searchcommand.category');
@@ -138,12 +125,12 @@ final class EmailController extends FormController
         $updatedFilters = $request->get('filters', false);
 
         if ($updatedFilters) {
-            $currentFilters = $emailListingHelper->getUpdatedFilters($updatedFilters);
+            $currentFilters = $this->emailListingHelper->getUpdatedFilters($updatedFilters);
         }
 
         $session->set('mautic.email.list_filters', $currentFilters);
 
-        $ignoreListJoin = $emailListingHelper->applyCurrentFilters($currentFilters, $listFilters, $filter, $categoryFilterPrefix, $categories);
+        $ignoreListJoin = $this->emailListingHelper->applyCurrentFilters($currentFilters, $listFilters, $filter, $categoryFilterPrefix, $categories, $availableLists);
         $session->set('mautic.email.filter', $filter['string']);
 
         $orderBy    = $session->get('mautic.email.orderby', 'e.dateModified');
@@ -161,7 +148,7 @@ final class EmailController extends FormController
         );
 
         $count    = count($emails);
-        $lastPage = $emailListingHelper->getLastPageIfCurrentPageIsOutOfBounds($count, $start, $limit);
+        $lastPage = $this->emailListingHelper->getLastPageIfCurrentPageIsOutOfBounds($count, $start, $limit);
         if (null !== $lastPage) {
             $session->set('mautic.email.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $lastPage]);
@@ -185,8 +172,8 @@ final class EmailController extends FormController
                 'viewParameters' => [
                     'searchValue'      => $filter['string'],
                     'filters'          => $listFilters,
-                    'columns'          => $emailColumnsDictionary->getColumns(),
-                    'columnHeaderMeta' => $emailColumnsDictionary->getHeaderMeta(),
+                    'columns'          => $this->emailColumnsDictionary->getColumns(),
+                    'columnHeaderMeta' => $this->emailColumnsDictionary->getHeaderMeta(),
                     'items'            => $emails,
                     'totalItems'       => $count,
                     'page'             => $page,

@@ -6,7 +6,6 @@ namespace Mautic\EmailBundle\Tests\Services;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Services\EmailListingHelper;
-use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -48,9 +47,7 @@ final class EmailListingHelperTest extends TestCase
             'force'  => [],
         ];
 
-        $ignoreListJoin = $this->createHelper([
-            ['id' => 1, 'alias' => 'customers'],
-        ])->applyCurrentFilters(
+        $ignoreListJoin = $this->createHelper()->applyCurrentFilters(
             [
                 'list'     => ['1'],
                 'category' => ['2'],
@@ -60,7 +57,8 @@ final class EmailListingHelperTest extends TestCase
             $listFilters,
             $filter,
             'category',
-            []
+            [],
+            [['id' => 1, 'alias' => 'customers']]
         );
 
         $this->assertFalse($ignoreListJoin);
@@ -94,7 +92,7 @@ final class EmailListingHelperTest extends TestCase
             'force'  => [],
         ];
 
-        $this->assertTrue($this->createHelper()->applyCurrentFilters(['category' => ['2']], $listFilters, $filter, 'category', []));
+        $this->assertTrue($this->createHelper()->applyCurrentFilters(['category' => ['2']], $listFilters, $filter, 'category', [], []));
     }
 
     public function testTranslatedCategoryPrefixResolvesAlias(): void
@@ -113,7 +111,8 @@ final class EmailListingHelperTest extends TestCase
             $listFilters,
             $filter,
             'kategorie',
-            [['id' => 3, 'alias' => 'news']]
+            [['id' => 3, 'alias' => 'news']],
+            []
         ));
         $this->assertSame('subject', $filter['string']);
         $this->assertSame(['news'], $listFilters['filters']['groups']['mautic.core.filter.categories']['values']);
@@ -139,20 +138,30 @@ final class EmailListingHelperTest extends TestCase
         $this->assertSame(2, $helper->getLastPageIfCurrentPageIsOutOfBounds(2, 2, 1));
     }
 
-    /**
-     * @param array<int, array{id: int, alias: string}> $lists
-     */
-    private function createHelper(array $lists = []): EmailListingHelper
+    public function testSegmentAliasBeginningWithDigitsIsNotResolvedAsId(): void
     {
-        $leadListModel = $this->createMock(ListModel::class);
-        $leadListModel->method('getUserLists')->willReturn($lists);
+        $listFilters = ['filters' => ['placeholder' => 'Search', 'multiple' => true, 'groups' => ['mautic.core.filter.lists' => []]]];
+        $filter      = ['string' => 'list:12news', 'force' => []];
 
+        $this->createHelper()->applyCurrentFilters(
+            ['list' => ['12news']],
+            $listFilters,
+            $filter,
+            'category',
+            [],
+            [['id' => 12, 'alias' => 'customers'], ['id' => 13, 'alias' => '12news']]
+        );
+
+        $this->assertSame([['column' => 'l.alias', 'expr' => 'in', 'value' => ['12news']]], $filter['force']);
+    }
+
+    private function createHelper(): EmailListingHelper
+    {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
 
         return new EmailListingHelper(
             $this->createStub(CorePermissions::class),
-            $leadListModel,
             $translator
         );
     }

@@ -50,6 +50,19 @@
 
 {% set customButtons = ('list' == type) ? [sendButton, sendExampleButton, previewButton] : [sendExampleButton, previewButton] %}
 
+{% if 'name' not in columns|keys %}
+    {% set viewButton = {
+        'attr': {
+            'class': 'btn btn-ghost btn-sm btn-nospin',
+            'href': path('mautic_email_action', {'objectAction': 'view', 'objectId': item.getId()}),
+            'data-toggle': 'ajax',
+        },
+        'iconClass': 'ri-eye-line',
+        'btnText': 'mautic.core.permissions.view'|trans,
+    } %}
+    {% set customButtons = [viewButton]|merge(customButtons) %}
+{% endif %}
+
 {{- include('@MauticCore/Helper/list_actions.html.twig', {
     'item': item,
     'templateButtons': {

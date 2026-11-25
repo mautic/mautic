@@ -25,6 +25,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
         $this->configParams['email_columns'] = match ($this->name()) {
             'testEmailListingFallsBackToDefaultColumnsWhenConfiguredColumnsAreEmpty'   => [],
             'testEmailListingFallsBackToDefaultColumnsWhenConfiguredColumnsAreInvalid' => ['does_not_exist'],
+            'testEmailListingKeepsDetailActionWithoutNameColumn'                      => ['id'],
             default                                                                    => ['name', 'id'],
         };
 
@@ -42,6 +43,16 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
         $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-id'));
         $this->assertCount(0, $crawler->filter('.email-list thead tr th.col-email-category'));
         $this->assertCount(0, $crawler->filter('.email-list thead tr th.col-email-dateModified'));
+    }
+
+    public function testEmailListingKeepsDetailActionWithoutNameColumn(): void
+    {
+        $email   = $this->createEmail();
+        $crawler = $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(0, $crawler->filter('.email-list thead tr th.col-email-name'));
+        $this->assertCount(1, $crawler->filter(self::EMAIL_VIEW_SELECTOR_PREFIX.$email->getId().'"]'));
     }
 
     public function testEmailListingAppliesAndPersistsListFiltersFromRequest(): void

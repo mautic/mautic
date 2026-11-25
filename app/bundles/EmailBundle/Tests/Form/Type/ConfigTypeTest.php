@@ -140,4 +140,12 @@ final class ConfigTypeTest extends TypeTestCase
         $this->assertSame('spring-promo', $data['email_default_utm_campaign']);
         $this->assertSame('header-link', $data['email_default_utm_content']);
     }
+
+    public function testEmptyEmailColumnsKeepStringOrderAttribute(): void
+    {
+        $form = $this->factory->create(ConfigType::class, []);
+        $form->submit(['email_columns' => []]);
+
+        $this->assertSame('[]', $form->get('email_columns')->getConfig()->getOption('attr')['data-order']);
+    }
 }
