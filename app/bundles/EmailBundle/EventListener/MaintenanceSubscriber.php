@@ -25,6 +25,11 @@ final readonly class MaintenanceSubscriber
      */
     private const string SERIALIZED_NULL = 'N;';
 
+    /**
+     * ArrayType's value for an empty array, which marks a stat sent without personalisation and must stay distinguishable from a removed one.
+     */
+    private const string SERIALIZED_EMPTY_ARRAY = 'a:0:{}';
+
     public function __construct(
         private Connection $db,
         private TranslatorInterface $translator,
@@ -124,9 +129,10 @@ final readonly class MaintenanceSubscriber
             ->where($qb->expr()->lte('es.id', ':lastOldId'))
             ->andWhere($qb->expr()->lte('es.date_sent', ':date'))
             ->andWhere($qb->expr()->isNotNull('es.tokens'))
-            ->andWhere($qb->expr()->neq('es.tokens', ':serializedNull'))
+            ->andWhere($qb->expr()->notIn('es.tokens', [':serializedNull', ':serializedEmptyArray']))
             ->setParameter('lastOldId', $lastOldId)
             ->setParameter('date', $threshold)
-            ->setParameter('serializedNull', self::SERIALIZED_NULL);
+            ->setParameter('serializedNull', self::SERIALIZED_NULL)
+            ->setParameter('serializedEmptyArray', self::SERIALIZED_EMPTY_ARRAY);
     }
 }

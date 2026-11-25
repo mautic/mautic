@@ -22,7 +22,7 @@ final class EmailStatPersonalisationCleanupTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        if ('testViewInBrowserRendersAnEmailWithoutStoredPersonalisationWhileTheCleanupIsDisabled' !== $this->name()) {
+        if ('testViewInBrowserSaysAnEmailIsNoLongerAvailableAfterItsPersonalisationWasRemovedEvenWhileTheCleanupIsDisabled' !== $this->name()) {
             $this->configParams['email_stats_compaction_threshold_days'] = 30;
         }
 
@@ -75,10 +75,20 @@ final class EmailStatPersonalisationCleanupTest extends MauticMysqlTestCase
         $this->assertViewIsGone($stat);
     }
 
-    public function testViewInBrowserRendersAnEmailWithoutStoredPersonalisationWhileTheCleanupIsDisabled(): void
+    public function testViewInBrowserSaysAnEmailIsNoLongerAvailableAfterItsPersonalisationWasRemovedEvenWhileTheCleanupIsDisabled(): void
     {
         $stat = $this->createStat('disabled', new \DateTime('-100 days'));
         $this->connection->delete(MAUTIC_TABLE_PREFIX.StatData::TABLE_NAME, ['stat_id' => $stat->getId()]);
+
+        $this->logoutUser();
+        $this->assertViewIsGone($stat);
+    }
+
+    public function testViewInBrowserRendersAnEmailSentWithoutPersonalisation(): void
+    {
+        $stat = $this->createStat('unpersonalised', new \DateTime('-100 days'), false);
+
+        $this->runCleanup(false);
 
         $this->assertViewShows($stat, 'Hi {contactfield=firstname}');
     }

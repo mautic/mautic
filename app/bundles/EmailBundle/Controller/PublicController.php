@@ -16,7 +16,6 @@ use Mautic\EmailBundle\Form\Type\EmailPreviewOptionsType;
 use Mautic\EmailBundle\Form\Type\ValidateEmailType;
 use Mautic\EmailBundle\Helper\EmailAddressLinkMatcher;
 use Mautic\EmailBundle\Helper\EmailConfig;
-use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Mautic\EmailBundle\Helper\EmailPreviewHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
@@ -98,13 +97,13 @@ final class PublicController extends CommonFormController
         path: '/email/view/{idHash}',
         name: 'mautic_email_webview',
     )]
-    public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, EmailConfigInterface $emailConfig, string $idHash): Response
+    public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, string $idHash): Response
     {
         $stat = $this->emailModel->getEmailStatus($idHash);
 
         if ($stat instanceof Stat) {
-            // Stored personalisation is absent only once the cleanup has deleted it, and showing that is not a read
-            if ($emailConfig->getStatsCompactionThresholdDays() > 0 && !$stat->hasStoredTokens()) {
+            // Stored personalisation is absent only once the cleanup has removed it, and showing that is not a read
+            if (!$stat->hasStoredTokens()) {
                 $this->setContactLocale($stat->getLead());
                 $response = $this->renderThemeMessage(
                     $assetsHelper,
