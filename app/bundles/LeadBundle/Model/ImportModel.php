@@ -454,11 +454,11 @@ class ImportModel extends FormModel
     /**
      * Decide whether the CSV row is empty.
      *
-     * @param mixed $row
+     * @param mixed[] $row
      */
-    public function isEmptyCsvRow($row): bool
+    public function isEmptyCsvRow(array $row): bool
     {
-        if (!is_array($row) || [] === $row) {
+        if ([] === $row) {
             return true;
         }
 
