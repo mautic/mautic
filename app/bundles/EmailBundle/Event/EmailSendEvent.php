@@ -43,7 +43,7 @@ class EmailSendEvent extends CommonEvent
      */
     private $internalSend = false;
 
-    private bool $forwardedCopy = false;
+    private readonly bool $forwardedCopy;
 
     private array $textHeaders = [];
 

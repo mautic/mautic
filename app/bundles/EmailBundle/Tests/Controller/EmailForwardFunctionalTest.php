@@ -67,7 +67,7 @@ final class EmailForwardFunctionalTest extends MauticMysqlTestCase
         $translator = self::getContainer()->get(TranslatorInterface::class);
         // The subject greets nobody by name
         $this->assertSame($translator->trans('mautic.email.forward.mail.subject', ['%subject%' => 'Hello friend']), $query['subject']);
-        $this->assertStringContainsString($this->getCopyPath($email), $query['body']);
+        $this->assertStringContainsString($this->getCopyPath($email), (string) $query['body']);
         $this->assertStringNotContainsString(self::TRACKING_HASH, $mailto, 'The message must not carry the link of the recipient who forwards it.');
         $this->assertStringNotContainsString(self::RECIPIENT_FIRSTNAME, $mailto);
         $this->assertStringNotContainsString(self::RECIPIENT_EMAIL, $mailto);
@@ -168,6 +168,7 @@ final class EmailForwardFunctionalTest extends MauticMysqlTestCase
     public function testCopyIsNotAvailableWithoutTheRightSignature(): void
     {
         $email = $this->createSentEmail()->getEmail();
+        $this->assertInstanceOf(Email::class, $email);
 
         $this->client->request(Request::METHOD_GET, '/email/forward/'.$email->getId().'/'.str_repeat('0', 64));
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
@@ -189,6 +190,7 @@ final class EmailForwardFunctionalTest extends MauticMysqlTestCase
     public function testCopyIsNotAvailableForAnUnpublishedEmail(): void
     {
         $email = $this->createSentEmail()->getEmail();
+        $this->assertInstanceOf(Email::class, $email);
         $email->setIsPublished(false);
         $this->em->flush();
 
