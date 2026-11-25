@@ -11,11 +11,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ConfigSubscriber implements EventSubscriberInterface
 {
+    private CoreParametersHelper $coreParametersHelper;
+
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
     ) {
-        // Keep the legacy constructor signature for third-party plugins.
-        unset($coreParametersHelper);
+        // Keep the legacy constructor signature for third-party plugins while
+        // retaining the helper for events without an original form snapshot.
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public static function getSubscribedEvents(): array
@@ -41,8 +44,13 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
     {
         $data = $event->getConfig('emailconfig');
 
-        // Get the original form data so that passwords aren't lost
-        $monitoredEmail = $event->getOriginalNormData()['emailconfig']['parameters']['monitored_email'] ?? [];
+        // Get the original form data so that passwords aren't lost. Some
+        // third-party producers dispatch CONFIG_PRE_SAVE without a snapshot;
+        // in that case use the persisted configuration instead.
+        $originalNormData = $event->getOriginalNormData();
+        $monitoredEmail   = null === $originalNormData
+            ? $this->coreParametersHelper->get('monitored_email', [])
+            : ($originalNormData['emailconfig']['parameters']['monitored_email'] ?? []);
         if (isset($data['monitored_email'])) {
             foreach ($data['monitored_email'] as $key => $monitor) {
                 if (empty($monitor['password']) && !empty($monitoredEmail[$key]['password'])) {
