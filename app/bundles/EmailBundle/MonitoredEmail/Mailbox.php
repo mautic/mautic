@@ -769,6 +769,7 @@ final class Mailbox
          *     to?: list<ImapAddress>,
          *     cc?: list<ImapAddress>,
          *     reply_to?: list<ImapAddress>,
+         *     in_reply_to?: string,
          *     return_path?: list<ImapAddress>,
          *     references?: string
          * } $headObject
