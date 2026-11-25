@@ -811,7 +811,14 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame((string) $email, $emailField->attr('value'));
         $this->assertSame('readonly', $emailField->attr('readonly'));
 
+        $this->client->followRedirects(false);
         $this->client->submit($crawler->selectButton('Verify email')->form());
+
+        $this->assertResponseRedirects();
+        $this->assertNull($this->client->getRequest()->getSession()->get('mautic.email.validation_grant'));
+
+        $this->client->followRedirects(true);
+        $this->client->followRedirect();
 
         $this->assertStringContainsString('has been re-subscribed', strip_tags((string) $this->client->getResponse()->getContent()));
         $this->assertCount(0, $dncRepository->findBy(['lead' => $lead->getId()]));
