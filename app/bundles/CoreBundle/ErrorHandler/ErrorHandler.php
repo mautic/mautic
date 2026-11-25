@@ -35,10 +35,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private $logger;
 
-        /**
-         * @var LoggerInterface
-         */
-        private $mainLogger;
+        private ?LoggerInterface $mainLogger = null;
 
         private static string $root;
 

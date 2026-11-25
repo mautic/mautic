@@ -103,7 +103,7 @@ final class FormatterHelperTest extends TestCase
     public function testNormalizeStringValue(string $input, string $expected): void
     {
         date_default_timezone_set('Europe/Paris');
-        $this->assertEquals(
+        $this->assertSame(
             $expected,
             $this->formatterHelper->normalizeStringValue($input)
         );
