@@ -82,14 +82,14 @@ final class MaintenanceSubscriberTest extends TestCase
 
         $dryRun = new MaintenanceEvent(0, true, false);
         $this->createSubscriber(10)->onDataCleanup($dryRun);
-        $this->assertSame(1, $dryRun->getStats()['mautic.maintenance.email_stats_tokens']);
+        $this->assertSame(2, $dryRun->getStats()['mautic.maintenance.email_stats_tokens']);
 
         $event = new MaintenanceEvent(0, false, false);
         $this->createSubscriber(10)->onDataCleanup($event);
 
-        $this->assertSame(1, $event->getStats()['mautic.maintenance.email_stats_tokens']);
+        $this->assertSame(2, $event->getStats()['mautic.maintenance.email_stats_tokens']);
         $tokens = $this->db->fetchAllKeyValue('SELECT id, tokens FROM '.MAUTIC_TABLE_PREFIX.'email_stats ORDER BY id');
-        $this->assertSame([1 => null, 2 => 'N;', 3 => null, 4 => serialize(['{a}' => 'b']), 5 => 'a:0:{}'], $tokens);
+        $this->assertSame([1 => null, 2 => 'N;', 3 => null, 4 => serialize(['{a}' => 'b']), 5 => null], $tokens);
     }
 
     private function createSubscriber(int $thresholdDays): MaintenanceSubscriber
