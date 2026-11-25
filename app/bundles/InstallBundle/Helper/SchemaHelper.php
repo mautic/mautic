@@ -150,15 +150,16 @@ final class SchemaHelper
         }
 
         // Add Doctrine-managed OAuth tables which are missing from metadata
+        $prefix = $this->dbParams['table_prefix'] ?? '';
         $doctrineDirectTables = [
-            'oauth2_accesstokens',
-            'oauth2_authcodes',
-            'oauth2_clients',
-            'oauth2_refreshtokens',
+            $prefix.'oauth2_accesstokens',
+            $prefix.'oauth2_authcodes',
+            $prefix.'oauth2_clients',
+            $prefix.'oauth2_refreshtokens',
         ];
         foreach ($doctrineDirectTables as $table) {
             if (!isset($mauticTables[$table])) {
-                $mauticTables[$table] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $table);
+                $mauticTables[$table] = $this->generateBackupName($prefix, $backupPrefix, $table);
             }
         }
 

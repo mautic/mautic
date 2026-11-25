@@ -307,8 +307,8 @@ class LeadEventLogRepository extends CommonRepository
         );
 
         $q->where($expr)
-          ->setParameter('false', false, 'boolean')
-          ->groupBy($groupBy);
+            ->setParameter('false', false, 'boolean')
+            ->groupBy($groupBy);
 
         if ($dateFrom && $dateTo) {
             $q->andWhere('o.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
@@ -729,9 +729,16 @@ class LeadEventLogRepository extends CommonRepository
             self::LOG_DELETE_BATCH_SIZE
         );
 
-        $deletedRecordCount= 0;
+        $deletedRecordCount = 0;
+        $advanceSql = DatabasePlatform::getDeleteProcessedBatchFromTempTableSql(
+            $platform,
+            $tempTableName,
+            self::LOG_DELETE_BATCH_SIZE
+        );
         while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
             $deletedRecordCount += $deletedRows;
+            // Remove the batch just processed so the next pass selects the next IDs.
+            $conn->executeStatement($advanceSql);
         }
 
         return $deletedRecordCount;

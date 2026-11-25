@@ -305,6 +305,8 @@ class CompanyLeadRepository extends CommonRepository
                         )
                     )
                 )
+                ->where($deleteQb->expr()->eq('is_primary', ':isPrimary'))
+                ->setParameter('isPrimary', false, ParameterType::BOOLEAN)
                 ->executeStatement();
         }
     }

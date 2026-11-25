@@ -12,7 +12,7 @@ final class Version20230506112314 extends PreUpAssertionMigration
     protected const TABLE_NAME = 'lead_donotcontact';
     protected const INDEX_NAME = 'dnc_date_added';
 
-    protected function preUpAssertions(): void
+    public function preUpAssertions(): void
     {
         $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
         $indexName = $this->getPrefixedIndexName();

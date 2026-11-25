@@ -140,27 +140,69 @@ class IndexSchemaHelper
     {
         $platform = $this->db->getDatabasePlatform();
 
-        $sql = [];
+        // Replacements: create the new index under a temporary name first.
+        // Only drop the old index after the new one exists. If the create
+        // fails (PostgreSQL btree entry too large, or any other error), the
+        // existing index is still in place. PostgreSQL DDL is transactional,
+        // so the swap is wrapped in a transaction there. MySQL commits each
+        // DDL statement; the temp-name order is what protects the old index.
         foreach ($this->changedIndexes as $index) {
-            $sql[] = $platform->getDropIndexSQL($index, $this->table);
-            $sql[] = $platform->getCreateIndexSQL($index, $this->table);
+            $this->replaceIndex($index, $platform);
         }
 
         foreach ($this->dropIndexes as $index) {
-            $sql[] = $platform->getDropIndexSQL($index, $this->table);
+            $this->db->executeStatement($platform->getDropIndexSQL($index, $this->table));
         }
 
         foreach ($this->addedIndexes as $index) {
-            $sql[] = $platform->getCreateIndexSQL($index, $this->table);
+            $this->db->executeStatement($platform->getCreateIndexSQL($index, $this->table));
         }
 
-        if (count($sql)) {
-            foreach ($sql as $query) {
-                $this->db->executeStatement($query);
+        $this->changedIndexes = [];
+        $this->dropIndexes    = [];
+        $this->addedIndexes   = [];
+    }
+
+    /**
+     * Create the replacement index under a temporary name, then drop the old
+     * index and rename. The old index is only removed after the new one is in
+     * place, so a failed create leaves the existing index untouched.
+     */
+    private function replaceIndex(Index $index, \Doctrine\DBAL\Platforms\AbstractPlatform $platform): void
+    {
+        $tempName = $index->getName().'_new';
+        $temp     = new Index($tempName, $index->getColumns(), $index->isUnique(), $index->isPrimary(), $index->getFlags());
+
+        $createTemp = $platform->getCreateIndexSQL($temp, $this->table);
+        $dropOld    = $platform->getDropIndexSQL($index, $this->table);
+        $dropTemp   = $platform->getDropIndexSQL($temp, $this->table);
+        $createFinal = $platform->getCreateIndexSQL($index, $this->table);
+
+        $isPg = DatabasePlatform::isPostgreSQL($platform);
+
+        if ($isPg) {
+            $this->db->beginTransaction();
+        }
+
+        try {
+            $this->db->executeStatement($createTemp);
+            $this->db->executeStatement($dropOld);
+            $this->db->executeStatement($dropTemp);
+            $this->db->executeStatement($createFinal);
+            if ($isPg) {
+                $this->db->commit();
             }
-            $this->changedIndexes = [];
-            $this->dropIndexes    = [];
-            $this->addedIndexes   = [];
+        } catch (\Throwable $e) {
+            if ($isPg && $this->db->isTransactionActive()) {
+                $this->db->rollBack();
+            } else {
+                // MySQL: best-effort cleanup of the temp index if it was created.
+                try {
+                    $this->db->executeStatement($dropTemp);
+                } catch (\Throwable) {
+                }
+            }
+            throw $e;
         }
     }
 

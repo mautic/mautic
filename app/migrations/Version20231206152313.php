@@ -47,6 +47,17 @@ final class Version20231206152313 extends PreUpAssertionMigration
             fn (Schema $schema) => $this->indexExists($tableName, $this->getIsReadIndexName()),
             sprintf('Index %s already exists', $this->getIsReadIndexName())
         );
+
+        // Skip only after the legacy indexes are gone. A partial run that
+        // added the composites and stopped before postUp() must still finish.
+        $this->skipAssertion(
+            fn (Schema $schema) => !$this->indexExists($tableName, $this->getOldLeadIndexName()),
+            sprintf('Index %s is already removed', $this->getOldLeadIndexName())
+        );
+        $this->skipAssertion(
+            fn (Schema $schema) => !$this->indexExists($tableName, $this->getOldEmailIndexName()),
+            sprintf('Index %s is already removed', $this->getOldEmailIndexName())
+        );
     }
 
     public function up(Schema $schema): void

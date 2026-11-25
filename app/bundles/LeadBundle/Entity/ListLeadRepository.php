@@ -113,11 +113,16 @@ class ListLeadRepository extends CommonRepository
             self::DELETE_BATCH_SIZE
         );
 
-        $deletedRecordCount= 0;
+        $deletedRecordCount = 0;
+        $advanceSql = DatabasePlatform::getDeleteProcessedBatchFromTempTableSql(
+            $platform,
+            $tempTableName,
+            self::DELETE_BATCH_SIZE
+        );
         while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
             $deletedRecordCount += $deletedRows;
-            $conn->executeStatement(DatabasePlatform::getDropTemporaryTableSql($platform, $tempTableName, true));
-            $conn->executeStatement(DatabasePlatform::getCreateTemporaryTableSql($platform, $tempTableName, $selectSql));
+            // Advance the candidate set instead of rebuilding the temp table.
+            $conn->executeStatement($advanceSql);
         }
 
         return $deletedRecordCount;

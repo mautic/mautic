@@ -625,22 +625,22 @@ class LeadRepository extends CommonRepository
             "{$leadAlias}.country",
             'count(id) AS contacts'
         )
-        ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', $leadCampaignAlias)
-        ->leftJoin(
-            $leadCampaignAlias,
-            MAUTIC_TABLE_PREFIX.'leads',
-            $leadAlias,
-            "{$leadAlias}.id = {$leadCampaignAlias}.lead_id"
-        )
-        ->andWhere("{$leadCampaignAlias}.campaign_id = :campaign")
-        ->andWhere("{$leadCampaignAlias}.manually_removed = :false")
-        ->andWhere("{$leadCampaignAlias}.date_added BETWEEN :dateFrom AND :dateTo")
-        ->groupBy("{$leadAlias}.country")
-        ->orderBy("{$leadAlias}.country", 'ASC')
-        ->setParameter('campaign', $campaign->getId())
-        ->setParameter('false', false, 'boolean')
-        ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))
-        ->setParameter('dateTo', $dateToObject->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', $leadCampaignAlias)
+            ->leftJoin(
+                $leadCampaignAlias,
+                MAUTIC_TABLE_PREFIX.'leads',
+                $leadAlias,
+                "{$leadAlias}.id = {$leadCampaignAlias}.lead_id"
+            )
+            ->andWhere("{$leadCampaignAlias}.campaign_id = :campaign")
+            ->andWhere("{$leadCampaignAlias}.manually_removed = :false")
+            ->andWhere("{$leadCampaignAlias}.date_added BETWEEN :dateFrom AND :dateTo")
+            ->groupBy("{$leadAlias}.country")
+            ->orderBy("{$leadAlias}.country", 'ASC')
+            ->setParameter('campaign', $campaign->getId())
+            ->setParameter('false', false, 'boolean')
+            ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))
+            ->setParameter('dateTo', $dateToObject->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
 
         return $queryBuilder->executeQuery()->fetchAllAssociative();
     }
@@ -681,9 +681,16 @@ class LeadRepository extends CommonRepository
             self::DELETE_BATCH_SIZE
         );
 
-        $deletedRecordCount= 0;
+        $deletedRecordCount = 0;
+        $advanceSql = DatabasePlatform::getDeleteProcessedBatchFromTempTableSql(
+            $platform,
+            $tempTableName,
+            self::LOG_DELETE_BATCH_SIZE
+        );
         while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
             $deletedRecordCount += $deletedRows;
+            // Remove the batch just processed so the next pass selects the next IDs.
+            $conn->executeStatement($advanceSql);
         }
 
         return $deletedRecordCount;

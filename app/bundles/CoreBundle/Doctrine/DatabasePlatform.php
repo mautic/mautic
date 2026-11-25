@@ -516,8 +516,9 @@ final class DatabasePlatform
     /**
      * Returns date difference in seconds expression (used for read delay, time-between events, etc.).
      *
-     * PostgreSQL: EXTRACT(EPOCH FROM (date1 - date2))
+     * PostgreSQL: EXTRACT(EPOCH FROM (date2 - date1))
      * MySQL:      TIMESTAMPDIFF(SECOND, date1, date2)
+     * Both return a positive value when date2 is after date1.
      */
     public static function getDateDiffInSeconds(
         ?AbstractPlatform $platform,
@@ -525,7 +526,7 @@ final class DatabasePlatform
         string $dateColumn2,
     ): string {
         if (self::isPostgreSQL($platform)) {
-            return "EXTRACT(EPOCH FROM ({$dateColumn1} - {$dateColumn2}))";
+            return "EXTRACT(EPOCH FROM ({$dateColumn2} - {$dateColumn1}))";
         }
 
         return "TIMESTAMPDIFF(SECOND, {$dateColumn1}, {$dateColumn2})";
@@ -808,10 +809,32 @@ final class DatabasePlatform
             // Detect best conflict target (prefer non-PK unique constraint)
             $conflictTarget = self::getUpsertConflictTarget($connection, $metadata, $idColumn);
 
-            // Always RETURNING to get both the (generated or existing) id and insert detection
-            $sql = "INSERT INTO {$tableName} ($columnList) VALUES ($setList) "
-                ."ON CONFLICT ($conflictTarget) DO UPDATE SET $updateList "
-                ."RETURNING {$idColumn}, (xmax = 0) AS is_new";
+            // Keep the matched row's primary key. processIdentifierForUpsert adds
+            // id to the update list when the entity has an explicit ID. If the
+            // conflict target is a unique key other than the PK, that assignment
+            // would change the matched row's ID (or fail if the new ID exists).
+            // Drop the PK assignment so the matched row keeps its ID. RETURNING
+            // still hands that ID back to the entity.
+            if ($conflictTarget !== $idColumn) {
+                $update = array_values(array_filter(
+                    $update,
+                    static fn (string $assignment): bool => !str_starts_with($assignment, $idColumn.' ')
+                        && !str_starts_with($assignment, '"'.$idColumn.'" ')
+                ));
+                $updateList = implode(', ', $update);
+            }
+
+            if ('' === $updateList) {
+                // Nothing to update. Use DO NOTHING so a pure-key conflict is a no-op
+                // instead of an invalid DO UPDATE with an empty SET.
+                $sql = "INSERT INTO {$tableName} ($columnList) VALUES ($setList) "
+                    ."ON CONFLICT ($conflictTarget) DO NOTHING "
+                    ."RETURNING {$idColumn}, (xmax = 0) AS is_new";
+            } else {
+                $sql = "INSERT INTO {$tableName} ($columnList) VALUES ($setList) "
+                    ."ON CONFLICT ($conflictTarget) DO UPDATE SET $updateList "
+                    ."RETURNING {$idColumn}, (xmax = 0) AS is_new";
+            }
 
             $result = $connection->fetchAssociative($sql, $values, $types);
 
@@ -915,6 +938,33 @@ final class DatabasePlatform
             $subSelect,
             $usingClause
         );
+    }
+
+    /**
+     * Deletes the first $batchSize rows from a temporary candidate table.
+     *
+     * Call this after each successful delete from the real table so the next
+     * SELECT ... LIMIT from the temp table returns the next batch. Without it
+     * every pass re-selects the same IDs, deletes zero rows, and the loop stops
+     * while later candidates remain.
+     *
+     * PostgreSQL has no DELETE ... LIMIT, so the batch is addressed by ctid.
+     * MySQL supports DELETE ... LIMIT directly.
+     */
+    public static function getDeleteProcessedBatchFromTempTableSql(
+        ?AbstractPlatform $platform,
+        string $tempTableName,
+        int $batchSize,
+    ): string {
+        if (self::isPostgreSQL($platform)) {
+            return sprintf(
+                'DELETE FROM %1$s WHERE ctid IN (SELECT ctid FROM %1$s LIMIT %2$d)',
+                $tempTableName,
+                $batchSize
+            );
+        }
+
+        return sprintf('DELETE FROM %s LIMIT %d', $tempTableName, $batchSize);
     }
 
     /**
@@ -1241,7 +1291,7 @@ final class DatabasePlatform
         }
 
         $unique = array_values(array_unique($identifiers));
-        sort($unique); // stable order avoids deadlocks between sessions
+        sort($unique, SORT_STRING); // string comparison; SORT_REGULAR equates "01" and "1"
 
         foreach ($unique as $identifier) {
             $connection->executeStatement(

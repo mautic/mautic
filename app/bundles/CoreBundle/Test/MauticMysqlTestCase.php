@@ -262,11 +262,12 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                 escapeshellarg($file)
             );
         } elseif ($this->isPostgresqlPlatform()) {
-            // Use psql for PostgreSQL
-            $password    = $connectionParams['password'] ?? '';
-            $passwordCmd = $password ? "export PGPASSWORD={$password};" : '';
-            $command     = $passwordCmd.sprintf(
-                'psql -h %s -p %s -U %s -d %s -f %s',
+            // Use psql for PostgreSQL. Password goes through the process env so
+            // shell metacharacters are not expanded. ON_ERROR_STOP makes psql
+            // exit non-zero on the first SQL error.
+            $password = $connectionParams['password'] ?? '';
+            $command  = sprintf(
+                'psql -v ON_ERROR_STOP=1 -h %s -p %s -U %s -d %s -f %s',
                 escapeshellarg($connectionParams['host']),
                 escapeshellarg((string) ($connectionParams['port'] ?? 5432)),
                 escapeshellarg($connectionParams['user']),
@@ -278,6 +279,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
 
         $process = Process::fromShellCommandline($command);
+        if ($this->isPostgresqlPlatform() && !empty($password)) {
+            $process->setEnv(array_merge($process->getEnv() ?: [], ['PGPASSWORD' => $password]));
+        }
         $process->run();
 
         if (!$process->isSuccessful()) {

@@ -124,6 +124,13 @@ final class DoctrineStep implements StepInterface
      */
     public function update(StepInterface $data): array
     {
+        // Resolve a missing or default-MySQL charset from the selected driver.
+        // Do not depend on the JavaScript onchange handler. Preserve an
+        // explicit non-default value.
+        if ('pdo_pgsql' === ($data->driver ?? null) && (empty($data->charset) || 'utf8mb4' === $data->charset)) {
+            $data->charset = 'UTF8';
+        }
+
         $parameters = [];
 
         foreach ($data as $key => $value) {
