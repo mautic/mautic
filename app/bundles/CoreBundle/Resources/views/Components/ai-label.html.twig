@@ -6,12 +6,13 @@
 {% if inline %}{% set classes = classes|merge(['ai-label__button--inline']) %}{% endif %}
 {% if static is defined and static %}{% set classes = classes|merge(['ai-label__button--static']) %}{% endif %}
 {% if additionalText %}{% set classes = classes|merge(['ai-label__button--with-content']) %}{% endif %}
+{% set text_markup %}<span class="ai-label__text">{{ label|trans }}</span>{% if additionalText %}<span class="ai-label__additional-text">{{ additionalText|trans }}</span>{% endif %}{% endset %}
 <span class="ai-label{{ className is defined and className ? ' ' ~ className : '' }}">
     {% if static is defined and static %}
-    <span class="{{ classes|join(' ') }}" role="img" aria-label="{{ 'mautic.core.ai.label'|trans }}"><span class="ai-label__text">{{ label|trans }}</span></span>
+    <span class="{{ classes|join(' ')|e('html_attr') }}" role="img" aria-label="{{ 'mautic.core.ai.label'|trans|e('html_attr') }}">{{ text_markup }}</span>
     {% else %}
     <button type="button"
-        class="{{ classes|join(' ') }}"
+        class="{{ classes|join(' ')|e('html_attr') }}"
         data-bs-toggle="popover"
         data-bs-container="body"
         data-bs-custom-class="ai-popover"
@@ -23,8 +24,7 @@
         aria-haspopup="true"
         aria-label="{{ aria_label|default('mautic.core.ai.explainability')|trans|e('html_attr') }}"
     >
-        <span class="ai-label__text">{{ label|trans }}</span>
-        {% if additionalText %}<span class="ai-label__additional-text">{{ additionalText|trans }}</span>{% endif %}
+        {{ text_markup }}
     </button>
     {% endif %}
 </span>

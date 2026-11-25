@@ -122,6 +122,7 @@ $ai-label-inline-sizes: (
 
 .ai-label__button--with-content {
     border-color: var(--border-inverse);
+    inline-size: auto;
     padding-block: .125rem;
     padding-inline: .5rem;
 
@@ -155,6 +156,12 @@ $ai-label-inline-sizes: (
     > textarea.form-control ~ .ai-label {
         inset-block-start: var(--spacing-03);
         transform: none;
+    }
+}
+
+@each $name, $size in $ai-label-sizes {
+    .form-field-ai--#{$name} > .form-control {
+        padding-inline-end: calc(nth($size, 1) + var(--spacing-05));
     }
 }
 

@@ -26,6 +26,7 @@ final class BootstrapMarkupTest extends TestCase
     protected function setUp(): void
     {
         $loader = new FilesystemLoader(__DIR__.'/../../../Resources/views');
+        $loader->addPath(__DIR__.'/../../../Resources/views', 'MauticCore');
         $loader->addPath(dirname((new \ReflectionClass(FormExtension::class))->getFileName(), 2).'/Resources/views/Form');
         $this->twig = new Environment($loader, ['autoescape' => 'html']);
         $this->twig->addExtension(new TranslationExtension());
@@ -78,5 +79,37 @@ final class BootstrapMarkupTest extends TestCase
         $html = $this->twig->createTemplate('{{ form_widget(form) }}')->render(['form' => $form->createView()]);
 
         $this->assertCount(2, (new Crawler($html))->filter('input.btn-check:disabled + label.btn'));
+    }
+
+    public function testStaticAiLabelKeepsAdditionalText(): void
+    {
+        $crawler = new Crawler($this->twig->render('Components/ai-label.html.twig', [
+            'static'         => true,
+            'additionalText' => 'Predicted',
+        ]));
+
+        $this->assertCount(1, $crawler->filter('.ai-label span.ai-label__additional-text'));
+        $this->assertSame('Predicted', $crawler->filter('.ai-label__additional-text')->text());
+        $this->assertCount(0, $crawler->filter('button'));
+    }
+
+    public function testSelectableTagRendersStaticAiLabelWithoutNestedButton(): void
+    {
+        $crawler = new Crawler($this->twig->render('Helper/_tag.html.twig', [
+            'tags' => [['label' => 'Draft', 'type' => 'selectable', 'aiLabel' => true]],
+        ]));
+
+        $this->assertCount(1, $crawler->filter('button .ai-label'));
+        $this->assertCount(0, $crawler->filter('button button'));
+    }
+
+    public function testLinkedTagAiLabelStaysStaticInsideAnchor(): void
+    {
+        $crawler = new Crawler($this->twig->render('Helper/_tag.html.twig', [
+            'tags' => [['label' => 'Draft', 'aiLabel' => ['static' => false], 'attributes' => ['href' => '/example']]],
+        ]));
+
+        $this->assertCount(1, $crawler->filter('a .ai-label'));
+        $this->assertCount(0, $crawler->filter('a button'));
     }
 }
