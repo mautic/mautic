@@ -567,7 +567,7 @@ final class TagController extends AbstractFormController
         return [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPlugin\\MauticTagManagerBundle\\Controller\\TagController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'mauticContent' => 'tagmanager',
@@ -610,7 +610,7 @@ final class TagController extends AbstractFormController
         return $this->postActionRedirect([
             'returnUrl'       => $this->generateUrl('mautic_tagmanager_action', $viewParameters),
             'viewParameters'  => $viewParameters,
-            'contentTemplate' => 'MauticPlugin\\MauticTagManagerBundle\\Controller\\TagController::viewAction',
+            'contentTemplate' => self::class.'::viewAction',
             'passthroughVars' => [
                 'closeModal' => 1,
             ],
@@ -662,7 +662,7 @@ final class TagController extends AbstractFormController
         return $this->postActionRedirect([
             'returnUrl'       => $this->generateUrl('mautic_tagmanager_action', $viewParameters),
             'viewParameters'  => $viewParameters,
-            'contentTemplate' => 'MauticPlugin\\MauticTagManagerBundle\\Controller\\TagController::viewAction',
+            'contentTemplate' => self::class.'::viewAction',
             'passthroughVars' => [
                 'closeModal' => 1,
             ],

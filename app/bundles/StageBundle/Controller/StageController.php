@@ -442,7 +442,7 @@ final class StageController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\\StageBundle\\Controller\\StageController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_stage_index',
                 'mauticContent' => 'stage',
@@ -691,7 +691,7 @@ final class StageController extends AbstractFormController
         return $this->postActionRedirect([
             'returnUrl'       => $this->generateUrl('mautic_stage_index', $viewParameters),
             'viewParameters'  => $viewParameters,
-            'contentTemplate' => 'Mautic\\StageBundle\\Controller\\StageController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'closeModal'    => 1,
                 'activeLink'    => '#mautic_stage_index',
