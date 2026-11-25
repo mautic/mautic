@@ -95,6 +95,24 @@ final class EmailStatPersonalisationCleanupTest extends MauticMysqlTestCase
         $this->assertViewIsGone($old);
     }
 
+    public function testViewInBrowserOfAnOldEmailStoredWithEmptyPersonalisationSaysItIsNoLongerAvailableAfterTheCleanup(): void
+    {
+        $old    = $this->createStat('empty-old', new \DateTime('-31 days'), false);
+        $recent = $this->createStat('empty-recent', new \DateTime('-29 days'), false);
+        $old->setTokens([]);
+        $recent->setTokens([]);
+        // Stat uses explicit change tracking, so changed stats must be persisted again
+        $this->em->persist($old);
+        $this->em->persist($recent);
+        $this->em->flush();
+        $this->assertSame(2, $this->countDataRows());
+
+        $this->runCleanup(false);
+
+        $this->assertViewShows($recent, 'Hi {contactfield=firstname}');
+        $this->assertViewIsGone($old);
+    }
+
     public function testCleanupRemovesStoredPersonalisationOfOldEmailsButKeepsTheirStats(): void
     {
         $old    = $this->createStat('old', new \DateTime('-31 days'));
