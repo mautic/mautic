@@ -11,7 +11,7 @@ final class CampaignChosenTooltipCest
         $I->amOnPage('/s/login');
         $I->waitForJS("return window.Mautic && typeof window.Mautic.campaignBuilderUpdateEventListTooltips === 'function';", \AcceptanceTester::TIMEOUT);
 
-        /** @var array{animation: bool|null, tooltipElements: int, trackedTooltips: int} $setup */
+        /** @var array{animation: bool|null, tooltipElements: int, trackedTooltips: int, disposed: bool, tipRemoved: bool} $setup */
         $setup = $I->executeJS(<<<'JS'
 const $fixture = mQuery('<div id="campaign-tooltip-regression-fixture"></div>').appendTo(document.body);
 const $select = mQuery(
@@ -29,11 +29,10 @@ Mautic.campaignBuilderUpdateEventListTooltips($select.attr('id'), false);
 
 const tooltips = $select.data('tooltips');
 const $tooltip = tooltips[0];
-const tooltip = $tooltip.data('bs.tooltip');
-const originalHide = tooltip.hide;
+const tooltip = bootstrap.Tooltip.getInstance($tooltip[0]);
+const animation = tooltip ? tooltip._config.animation : null;
 
 window.campaignTooltipRegressionError = null;
-window.campaignTooltipRegressionTeardownState = {scheduled: 0, completed: 0};
 window.campaignTooltipRegressionErrorHandler = function(event) {
     window.campaignTooltipRegressionError = event.error instanceof Error
         ? event.error.message
@@ -42,38 +41,20 @@ window.campaignTooltipRegressionErrorHandler = function(event) {
 };
 window.addEventListener('error', window.campaignTooltipRegressionErrorHandler);
 
-tooltip.hide = function(callback) {
-    const state = window.campaignTooltipRegressionTeardownState;
-    state.scheduled++;
-
-    return originalHide.call(this, function() {
-        try {
-            if (typeof callback === 'function') {
-                callback();
-            }
-        } finally {
-            state.completed++;
-        }
-    });
-};
-
-$tooltip.tooltip('show');
+tooltip.show();
+const tip = tooltip.tip;
 $select.data('tooltips', [$tooltip, $tooltip]);
 Mautic.campaignBuilderUpdateEventListTooltips($select.attr('id'), true);
 
 return {
-    animation: tooltip ? tooltip.options.animation : null,
+    animation,
     tooltipElements: $tooltip.length,
     trackedTooltips: $select.data('tooltips').length,
+    disposed: null === bootstrap.Tooltip.getInstance($tooltip[0]),
+    tipRemoved: null !== tip && !tip.isConnected,
 };
 JS
         );
-
-        $I->waitForJS(<<<'JS'
-const state = window.campaignTooltipRegressionTeardownState;
-
-return state && state.scheduled > 0 && state.completed === state.scheduled;
-JS, \AcceptanceTester::TIMEOUT);
 
         /** @var string|null $error */
         $error = $I->executeJS(<<<'JS'
@@ -81,7 +62,6 @@ const error = window.campaignTooltipRegressionError;
 window.removeEventListener('error', window.campaignTooltipRegressionErrorHandler);
 delete window.campaignTooltipRegressionError;
 delete window.campaignTooltipRegressionErrorHandler;
-delete window.campaignTooltipRegressionTeardownState;
 mQuery('#campaign-tooltip-regression-fixture').remove();
 
 return error;
@@ -91,6 +71,8 @@ JS
         $I->assertSame(1, $setup['tooltipElements']);
         $I->assertFalse($setup['animation']);
         $I->assertSame(0, $setup['trackedTooltips']);
+        $I->assertTrue($setup['disposed']);
+        $I->assertTrue($setup['tipRemoved']);
         $I->assertNull($error);
     }
 }
