@@ -30,7 +30,8 @@ without a contact, and the submitted values stay in the form results tables (for
 This command deletes these submissions, their form results records and their uploaded files, for all forms.
 
 Submissions without this record are not deleted: submissions that never had a contact, submissions of contacts
-that were deleted before Mautic recorded deleted contacts, and submissions of contacts that mautic:maintenance:cleanup deleted.
+that were deleted before Mautic recorded deleted contacts, and submissions of contacts that mautic:maintenance:cleanup
+deleted without --gdpr.
 
 <comment>This also applies to mautic:maintenance:cleanup --gdpr: the submissions of the contacts that it deletes are kept.</comment>
 

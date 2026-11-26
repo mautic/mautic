@@ -110,6 +110,16 @@ final class LeadEvents
     public const LEAD_POST_DELETE = 'mautic.lead_post_delete';
 
     /**
+     * The mautic.lead_pre_cleanup_delete event is dispatched before mautic:maintenance:cleanup deletes a batch of contacts with SQL.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ContactPreCleanupDeleteEvent instance.
+     *
+     * @var string
+     */
+    public const LEAD_PRE_CLEANUP_DELETE = 'mautic.lead_pre_cleanup_delete';
+
+    /**
      * The mautic.lead_pre_merge event is dispatched before two leads are merged.
      *
      * The event listener receives a

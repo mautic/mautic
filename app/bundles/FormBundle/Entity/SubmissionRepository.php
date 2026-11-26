@@ -601,13 +601,20 @@ class SubmissionRepository extends CommonRepository
             ->executeStatement();
     }
 
-    public function recordDeletedContact(int $contactId): void
+    /**
+     * @param int[] $contactIds
+     */
+    public function recordDeletedContacts(array $contactIds): void
     {
+        if ([] === $contactIds) {
+            return;
+        }
+
         $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'form_submissions')
-            ->set('deleted_lead_id', ':contactId')
-            ->where('lead_id = :contactId')
-            ->setParameter('contactId', $contactId)
+            ->set('deleted_lead_id', 'lead_id')
+            ->where('lead_id IN (:contactIds)')
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER)
             ->executeStatement();
     }
 

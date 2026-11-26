@@ -5,7 +5,10 @@ namespace Mautic\LeadBundle\EventListener;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
+use Mautic\LeadBundle\Event\ContactPreCleanupDeleteEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class MaintenanceSubscriber implements EventSubscriberInterface
@@ -13,6 +16,7 @@ final readonly class MaintenanceSubscriber implements EventSubscriberInterface
     public function __construct(
         private Connection $db,
         private TranslatorInterface $translator,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -68,6 +72,11 @@ final readonly class MaintenanceSubscriber implements EventSubscriberInterface
                 if (0 === count($leadsIds)) {
                     break;
                 }
+
+                $this->dispatcher->dispatch(
+                    new ContactPreCleanupDeleteEvent(array_map(intval(...), $leadsIds), $event->isGdpr()),
+                    LeadEvents::LEAD_PRE_CLEANUP_DELETE
+                );
                 foreach ($leadsIds as $leadId) {
                     $rows += $qb2->delete(MAUTIC_TABLE_PREFIX.'leads')
                       ->where(

@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\EventListener;
 
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\LeadBundle\Event\ContactPreCleanupDeleteEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -29,7 +30,8 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
             LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
-            LeadEvents::LEAD_PRE_DELETE      => ['onLeadPreDelete', 0],
+            LeadEvents::LEAD_PRE_DELETE         => ['onLeadPreDelete', 0],
+            LeadEvents::LEAD_PRE_CLEANUP_DELETE => ['onLeadPreCleanupDelete', 0],
         ];
     }
 
@@ -95,6 +97,17 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
      */
     public function onLeadPreDelete(LeadEvent $event): void
     {
-        $this->submissionRepository->recordDeletedContact($event->getLead()->getId());
+        $this->submissionRepository->recordDeletedContacts([$event->getLead()->getId()]);
+    }
+
+    /**
+     * Only the GDPR cleanup deletes identified contacts. The regular cleanup deletes anonymous visitors,
+     * and their answers, for example to a survey, are kept.
+     */
+    public function onLeadPreCleanupDelete(ContactPreCleanupDeleteEvent $event): void
+    {
+        if ($event->isGdpr()) {
+            $this->submissionRepository->recordDeletedContacts($event->getContactIds());
+        }
     }
 }

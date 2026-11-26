@@ -258,6 +258,42 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $this->assertSame(['Historical'], $this->getResultsNames($form));
     }
 
+    public function testSubmissionsOfContactsDeletedByTheGdprCleanupAreDeleted(): void
+    {
+        $form    = $this->createFormViaApi($this->getPayLoad());
+        $contact = $this->createInactiveContact('-4 years', '-4 years');
+        $this->createTrackedSubmission($form, $contact, 'Inactive');
+        $contactId = $contact->getId();
+
+        $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--gdpr' => 1, '--no-interaction' => true]);
+
+        $this->assertSame(1, $this->countSubmissionsWithoutContact());
+        $this->assertSame(1, $this->countSubmissionsOfRecordedContact($contactId));
+
+        $this->em->clear();
+        $commandTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME);
+
+        $this->assertStringContainsString('Deleted 1 form submissions of deleted contacts', $commandTester->getDisplay());
+        $this->assertSame([], $this->getResultsNames($form));
+    }
+
+    public function testSubmissionsOfAnonymousContactsDeletedByTheRegularCleanupAreKept(): void
+    {
+        $form    = $this->createFormViaApi($this->getPayLoad());
+        $visitor = $this->createInactiveContact('-1 year');
+        $this->createTrackedSubmission($form, $visitor, 'Anonymous answer');
+
+        $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--days-old' => 180, '--no-interaction' => true]);
+
+        $this->assertSame(1, $this->countSubmissionsWithoutContact());
+
+        $this->em->clear();
+        $commandTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME);
+
+        $this->assertStringContainsString('Deleted 0 form submissions of deleted contacts', $commandTester->getDisplay());
+        $this->assertSame(['Anonymous answer'], $this->getResultsNames($form));
+    }
+
     public function testSubmissionsOfAMergedContactAreNotDeleted(): void
     {
         $form   = $this->createFormViaApi($this->getPayLoad());
@@ -385,6 +421,22 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
     {
         $contact = new Lead();
         $contact->setEmail($email);
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        return $contact;
+    }
+
+    private function createInactiveContact(string $lastActive, ?string $dateIdentified = null): Lead
+    {
+        $contact = new Lead();
+        $contact->setLastActive(new \DateTime($lastActive));
+
+        if (null !== $dateIdentified) {
+            $contact->setEmail('inactive@example.com');
+            $contact->setDateIdentified(new \DateTime($dateIdentified));
+        }
+
         $this->em->persist($contact);
         $this->em->flush();
 
