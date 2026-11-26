@@ -406,6 +406,8 @@ final class InputHelperTest extends TestCase
         yield 'option is not set' => [[], 'id', null];
         yield 'number' => [['--id' => '12'], 'id', 12];
         yield 'number with spaces' => [['--id' => ' 12 '], 'id', 12];
+        yield 'number with leading zeros' => [['--id' => '007'], 'id', 7];
+        yield 'largest integer' => [['--id' => (string) PHP_INT_MAX], 'id', PHP_INT_MAX];
         yield 'default value' => [[], 'limit', 1000];
     }
 
@@ -428,6 +430,7 @@ final class InputHelperTest extends TestCase
         yield 'decimal number' => ['1.5'];
         yield 'text' => ['abc'];
         yield 'comma-separated list' => ['3,7'];
+        yield 'number above the largest integer' => ['9223372036854775808'];
         yield 'empty string' => [''];
     }
 

@@ -625,11 +625,13 @@ final class InputHelper
     private static function toPositiveInteger(mixed $value, string $optionName): int
     {
         $number = is_int($value) || is_string($value) ? trim((string) $value) : '';
+        $digits = ltrim($number, '0');
 
-        if (!ctype_digit($number) || 0 === (int) $number) {
+        // PHP turns a number above PHP_INT_MAX into PHP_INT_MAX, so such a number is rejected
+        if (!ctype_digit($number) || '' === $digits || (string) (int) $digits !== $digits) {
             throw new InvalidOptionException(sprintf('The "--%s" option must be a positive integer, "%s" given.', $optionName, is_scalar($value) ? $value : get_debug_type($value)));
         }
 
-        return (int) $number;
+        return (int) $digits;
     }
 }
