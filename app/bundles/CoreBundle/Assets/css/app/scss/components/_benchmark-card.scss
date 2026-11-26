@@ -1,0 +1,149 @@
+.benchmark-card {
+  --benchmark-text: var(--text-primary);
+  --benchmark-muted: var(--text-secondary);
+  --benchmark-border: var(--border-subtle);
+  --benchmark-track: var(--layer-accent);
+  --benchmark-primary: var(--background-inverse);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 16px;
+  border-block: 1px solid var(--benchmark-border);
+  color: var(--benchmark-text);
+  font-size: 14px;
+  line-height: 20px;
+  text-align: left;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    margin-bottom: -20px;
+  }
+
+  &__heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    color: var(--benchmark-text);
+  }
+
+  &__title {
+    margin: 0;
+  }
+
+  &__heading i {
+    color: var(--benchmark-muted);
+    font-size: 16px;
+    line-height: 16px;
+  }
+
+  &__summary {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: -8px;
+  }
+
+  &__figure {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__caption {
+    margin: 0;
+    color: var(--benchmark-muted);
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  &__value {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__average {
+    width: 50%;
+  }
+
+  &__meter {
+    height: 8px;
+    border-radius: 9999px;
+    background-color: var(--benchmark-track);
+    overflow: hidden;
+  }
+
+  &__meter-fill {
+    display: block;
+    height: 100%;
+    border-radius: 9999px;
+    background-color: var(--benchmark-primary);
+  }
+
+  &__meta {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0 0;
+    color: var(--benchmark-muted);
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  &__dot {
+    flex: none;
+    box-sizing: border-box;
+    width: 13px;
+    height: 13px;
+    border: 2px solid var(--partition-color);
+    border-radius: 50%;
+    background: none;
+  }
+
+  &__name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__number {
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .partition-bar__track {
+    gap: 0;
+    overflow: hidden;
+    border-radius: 100px;
+  }
+
+  .partition-bar__segment {
+    min-width: 4px;
+    border-radius: 0;
+  }
+}

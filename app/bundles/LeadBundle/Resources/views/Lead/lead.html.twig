@@ -416,36 +416,30 @@
                     </div>
                 </div>
             {% endif %}
-            <div class="mt-12 points-panel text-center">
-                <h1 style="{% if lead.color is not empty %}font-color:{{ lead.color }} !important;{% endif %}">
-                    {{ 'mautic.lead.points.count'|trans({'%count%': lead.points}) }}
-                </h1>
-                <hr/>
+            <div class="mt-12 mb-12 points-panel">
+                {% set groupItems = [] %}
+                {% for pointGroup in pointGroups %}
+                    {% set groupValue = 0 %}
+                    {% for groupScore in lead.groupScores %}
+                        {% if groupScore.group.id == pointGroup.id %}
+                            {% set groupValue = groupScore.score %}
+                        {% endif %}
+                    {% endfor %}
+                    {% set groupItems = groupItems|merge([{'label': pointGroup.name, 'value': groupValue}]) %}
+                {% endfor %}
+                {{ include('@MauticCore/Components/benchmark-card.html.twig', {
+                    'title': 'mautic.lead.points'|trans,
+                    'value': lead.points,
+                    'valueCaption': 'mautic.lead.points.contact_total_caption'|trans,
+                    'activeLabel': 'mautic.lead.points.active_groups'|trans,
+                    'listTitle': 'mautic.lead.groups.panel.title'|trans,
+                    'distributionTitle': 'mautic.lead.points.distribution'|trans,
+                    'items': groupItems,
+                }) }}
                 {% if lead.stage %}
-                    {{ lead.stage.name|purify }}<hr>
+                    <p class="text-center mt-12 mb-0">{{ lead.stage.name|purify }}</p>
                 {% endif %}
             </div>
-
-            {% if lead.groupScores is not empty %}
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        {{ 'mautic.lead.groups.panel.title'|trans }}
-                    </div>
-                </div>
-
-                <div class="panel-body pt-12 group-points-panel">
-                    {% for groupScore in lead.groupScores %}
-                        <div class="row">
-                            <h6 class="fw-semibold col-md-6">
-                                {{ groupScore.group.name }}
-                            </h6>
-                            <p class="text-secondary col-md-6">
-                                {{ 'mautic.lead.points.count'|trans({'%count%': groupScore.score}) }}
-                            </p>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
 
             {% if doNotContact %}
                 {{ include('@MauticLead/Lead/_dnc_large.html.twig', {'doNotContact': doNotContact}) }}

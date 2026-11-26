@@ -59,6 +59,8 @@
 @import 'app/scss/components/toolbar';
 @import 'app/scss/components/contained-list';
 @import 'app/scss/components/uishell';
+@import 'app/scss/components/partition-bar';
+@import 'app/scss/components/benchmark-card';
 
 @font-face {
     font-display: swap;
@@ -90,6 +92,22 @@
     font-style: italic;
     font-weight: 400;
     src: url('fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-italic.woff2') format('woff2');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: normal;
+    font-weight: 500;
+    src: url('fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-500.woff2') format('woff2');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: italic;
+    font-weight: 500;
+    src: url('fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-500italic.woff2') format('woff2');
 }
 
 @font-face {
