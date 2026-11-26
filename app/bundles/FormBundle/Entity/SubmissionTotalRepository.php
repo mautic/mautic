@@ -65,8 +65,9 @@ final class SubmissionTotalRepository extends CommonRepository
             'form_id, hour, total',
             'VALUES (:formId, :hour, 1)',
             'form_id, hour',
-            ['total' => 'total + :new_total'],
-            [':new_total' => 'total'],
+            ['total' => ':old_total + 1'],   // increment pattern: existing + 1
+            [],                              // no new-value placeholders needed
+            [':old_total' => 'total'],       // existing-value placeholder, caller-chosen token
         );
 
         $connection->executeStatement($sql, [

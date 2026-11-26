@@ -605,54 +605,80 @@ final class DatabasePlatform
      * PostgreSQL uses the EXCLUDED table, MySQL/MariaDB uses the VALUES() function.
      *
      * @param string                $column
-     *                                                    Target column (the LHS of the assignment)
+     *                                                    Target column (LHS of the assignment)
      * @param string|null           $expressionTemplate
-     *                                                    Optional custom SET expression. When null (default) the column is simply
-     *                                                    replaced by its new value — i.e. "col = EXCLUDED.col" / "col = VALUES(col)".
+     *                                                    Optional custom SET expression. When null (default), or when equal to
+     *                                                    $column (legacy keyed-array convention ['col' => 'col']), the column is
+     *                                                    simply replaced: "col = EXCLUDED.col" / "col = VALUES(col)".
      * @param array<string, string> $newValuePlaceholders
-     *                                                    Map of DBAL-style named-parameter tokens to column names, e.g.
-     *                                                    [':new_total' => 'total', ':new_a' => 'a', ':new_b' => 'b'].
-     *                                                    Each token must match DBAL's named-parameter format: ":name" where
-     *                                                    name matches [a-zA-Z_][a-zA-Z0-9_]*. Any number of placeholders is
-     *                                                    allowed, and the same column may appear under several tokens.
+     *                                                    Map of DBAL-style ":name" tokens to columns whose NEW value is referenced.
+     *                                                    Token → EXCLUDED.col (PostgreSQL) / VALUES(col) (MySQL/MariaDB).
+     *                                                    Any number of placeholders; same column may appear under several tokens.
+     * @param array<string, string> $oldValuePlaceholders
+     *                                                    Map of DBAL-style ":name" tokens to columns whose EXISTING value is
+     *                                                    referenced. Token → <tableName>.col (PostgreSQL) / col (MySQL/MariaDB).
+     *                                                    Required on PostgreSQL whenever a template refers to the current row,
+     *                                                    because an unqualified column reference is ambiguous inside
+     *                                                    ON CONFLICT … DO UPDATE.
+     * @param string|null           $tableName
+     *                                                    Target table name, used only to qualify old-value references on
+     *                                                    PostgreSQL. Ignored on MySQL/MariaDB.
      *
-     *   A placeholder ends where its parameter name ends — the next character
-     *   must NOT be [a-zA-Z0-9_]. This guarantees that ":new" does not match
-     *   inside ":new_total", exactly as DBAL parses named parameters.
+     * Placeholders use DBAL named-parameter syntax (":name", name matching
+     * [a-zA-Z_][a-zA-Z0-9_]*), and a token ends where its name ends — ":new"
+     * cannot match inside ":new_total".
      */
     public static function getUpsertUpdateExpression(
         AbstractPlatform $platform,
+        string $tableName,
         string $column,
         ?string $expressionTemplate = null,
         array $newValuePlaceholders = [],
+        array $oldValuePlaceholders = [],
     ): string {
-        $newValueRef = static function (string $refColumn) use ($platform): string {
-            return self::isPostgreSQL($platform)
-                ? "EXCLUDED.{$refColumn}"
-                : "VALUES({$refColumn})";
+        $isPg = self::isPostgreSQL($platform);
+
+        $newValueRef = static fn (string $refColumn): string => $isPg ? "EXCLUDED.{$refColumn}" : "VALUES({$refColumn})";
+
+        $oldValueRef = static function (string $refColumn) use ($isPg, $tableName): string {
+            if (!$isPg) {
+                return $refColumn;                  // MySQL/MariaDB: unqualified is fine
+            }
+            if (null === $tableName || '' === $tableName) {
+                throw new \InvalidArgumentException('Table name is required to qualify old-value placeholders on PostgreSQL.');
+            }
+
+            return "{$tableName}.{$refColumn}";    // PostgreSQL: disambiguate
         };
 
-        // Backward-compatible: no template, or template that is just the column
-        // name (the legacy keyed-array convention ['col' => 'col']) → simple
-        // replacement. Never emit an unqualified "col = col" expression.
+        // Legacy behaviour: simple replacement. Never emit an unqualified "col = col".
         if (null === $expressionTemplate || $expressionTemplate === $column) {
             return "{$column} = ".$newValueRef($column);
         }
 
+        $replacements = [];
+        foreach ($newValuePlaceholders as $token => $refColumn) {
+            $replacements[$token] = $newValueRef($refColumn);
+        }
+        foreach ($oldValuePlaceholders as $token => $refColumn) {
+            $replacements[$token] = $oldValueRef($refColumn);
+        }
+
         $expression = $expressionTemplate;
+        if ([] !== $replacements) {
+            $tokens = array_keys($replacements);
+            usort($tokens, static fn (string $a, string $b): int => strlen($b) <=> strlen($a));
 
-        if ([] !== $newValuePlaceholders) {
-            $placeholders = array_keys($newValuePlaceholders);
-            usort($placeholders, static fn (string $a, string $b): int => strlen($b) <=> strlen($a));
-
-            foreach ($placeholders as $placeholder) {
-                if (!preg_match('/^:[a-zA-Z_][a-zA-Z0-9_]*$/', $placeholder)) {
-                    throw new \InvalidArgumentException(sprintf('Placeholder "%s" is not a valid DBAL-style named parameter (expected ":name" where name matches [a-zA-Z_][a-zA-Z0-9_]*).', $placeholder));
+            foreach ($tokens as $token) {
+                if (!preg_match('/^:[a-zA-Z_][a-zA-Z0-9_]*$/', $token)) {
+                    throw new \InvalidArgumentException(sprintf('Placeholder "%s" is not a valid DBAL-style named parameter (expected ":name" where name matches [a-zA-Z_][a-zA-Z0-9_]*).', $token));
                 }
-
-                $replacement = $newValueRef($newValuePlaceholders[$placeholder]);
-                $pattern     = '/'.preg_quote($placeholder, '/').'(?![a-zA-Z0-9_])/';
-                $expression  = preg_replace_callback($pattern, static fn (): string => $replacement, $expression);
+                $pattern    = '/'.preg_quote($token, '/').'(?![a-zA-Z0-9_])/';
+                $expression = preg_replace_callback(
+                    $pattern,
+                    static fn (): string => $replacements[$token],
+                    $expression
+                );
             }
         }
 
@@ -681,11 +707,10 @@ final class DatabasePlatform
         if (self::isPostgreSQL($platform)) {
             $setClauses = [];
             foreach ($updateColumns as $col) {
-                $setClauses[] = self::getUpsertUpdateExpression($platform, $col);
+                $setClauses[] = self::getUpsertUpdateExpression($platform, $tableName, $col);
             }
 
-            return "
-                INSERT INTO {$tableName} ({$columnList})
+            return "INSERT INTO {$tableName} ({$columnList})
                 {$selectSql}
                 ON CONFLICT ({$conflictOn})
                 DO UPDATE SET ".implode(', ', $setClauses);
@@ -728,17 +753,16 @@ final class DatabasePlatform
     /**
      * Returns platform-specific complex upsert (INSERT ... ON CONFLICT / ON DUPLICATE KEY) SQL.
      *
-     * @param string                    $innerSql
-     *                                                        Either a subquery ("SELECT ...") or a direct "VALUES (...)" clause.
-     * @param string                    $conflictOn
-     *                                                        Columns that form the unique constraint (used by PostgreSQL ON CONFLICT)
-     * @param array<int|string, string> $updateSet
-     *                                                        - Numeric keys: ['col1', 'col2'] → simple replacement (legacy, unchanged).
-     *                                                        - String keys:  ['col' => 'expression template'] → custom SET expression.
-     *                                                        The template may reference any number of DBAL-style named-parameter
-     *                                                        placeholders (":new", ":new_total", …) supplied in $newValuePlaceholders.
-     * @param array<string, string>     $newValuePlaceholders
-     *                                                        Map of ":name" tokens to column names. See getUpsertUpdateExpression().
+     * @param array<int|string, string|null> $updateSet
+     *                                                             - Numeric keys: ['col1', 'col2'] → simple replacement (legacy, unchanged).
+     *                                                             - String keys:  ['col' => 'expression template'] → custom SET expression.
+     *                                                             A value equal to the column name, or null, is treated as a plain
+     *                                                             replacement (legacy keyed-array convention).
+     * @param array<string, string>          $newValuePlaceholders
+     *                                                             Map of ":name" tokens → columns whose NEW value is referenced
+     * @param array<string, string>          $oldValuePlaceholders
+     *                                                             Map of ":name" tokens → columns whose EXISTING value is referenced.
+     *                                                             Requires $tableName on PostgreSQL (used for qualification).
      */
     public static function getComplexUpsertStatement(
         ?AbstractPlatform $platform,
@@ -748,19 +772,22 @@ final class DatabasePlatform
         string $conflictOn,
         array $updateSet,
         array $newValuePlaceholders = [],
+        array $oldValuePlaceholders = [],
     ): string {
         $setClauses = [];
         foreach ($updateSet as $key => $value) {
             if (is_int($key)) {
-                // Legacy numeric list: ['col1', 'col2']
-                $setClauses[] = self::getUpsertUpdateExpression($platform, $value);
+                $setClauses[] = self::getUpsertUpdateExpression($platform, $tableName, $value);
                 continue;
             }
-
-            // String-keyed entry: ['col' => template-or-null].
-            // If $value is null or equals the column, getUpsertUpdateExpression()
-            // falls back to simple replacement, preserving the legacy behaviour.
-            $setClauses[] = self::getUpsertUpdateExpression($platform, $key, $value, $newValuePlaceholders);
+            $setClauses[] = self::getUpsertUpdateExpression(
+                $platform,
+                $tableName,
+                $key,
+                $value,
+                $newValuePlaceholders,
+                $oldValuePlaceholders
+            );
         }
         $setClause = implode(',', $setClauses);
 
