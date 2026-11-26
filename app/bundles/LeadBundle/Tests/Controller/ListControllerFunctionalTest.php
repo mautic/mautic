@@ -738,7 +738,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $crawler->filterXPath("//*[@id='leadListTable']//thead//th[3][contains(@class, 'col-leadlist-category')]"));
 
         $texts = [];
-        foreach ($crawler->filterXPath("//*[@id='leadListTable']//tbody//tr") as $row) {
+        foreach ($crawler->filterXPath("//section[@id='leadListTable']//tbody/tr[@data-parent-row]") as $row) {
             $rowCrawler = new Crawler($row);
             $texts[trim($rowCrawler->filterXPath('.//td[2]//a')->text())] = $rowCrawler->filterXPath('.//td[3]')->text();
         }
