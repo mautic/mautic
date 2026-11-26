@@ -17,7 +17,7 @@ final class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMidd
     private array $allowedIps = ['127.0.0.1', 'fe80::1', '::1'];
 
     public function __construct(
-        private HttpKernelInterface $app
+        private readonly HttpKernelInterface $app
     )
     {
         $parameters = $this->getConfig();

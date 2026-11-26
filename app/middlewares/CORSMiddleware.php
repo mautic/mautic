@@ -22,12 +22,12 @@ final class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
 
     private bool $requestOriginIsValid = false;
 
-    private bool $restrictCORSDomains;
+    private readonly bool $restrictCORSDomains;
 
-    private array $validCORSDomains;
+    private readonly array $validCORSDomains;
 
     public function __construct(
-        private HttpKernelInterface $app
+        private readonly HttpKernelInterface $app
     )
     {
         $this->config              = $this->getConfig();

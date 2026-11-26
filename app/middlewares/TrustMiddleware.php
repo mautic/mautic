@@ -13,7 +13,7 @@ final class TrustMiddleware implements HttpKernelInterface, PrioritizedMiddlewar
     public const int PRIORITY = 0;
 
     public function __construct(
-        private HttpKernelInterface $app
+        private readonly HttpKernelInterface $app
     )
     {
     }
