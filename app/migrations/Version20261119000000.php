@@ -22,29 +22,42 @@ final class Version20261119000000 extends PreUpAssertionMigration
             fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName())->hasColumn(self::COLUMN_NAME),
             "Table {$this->getPrefixedTableName()} already has the '".self::COLUMN_NAME."' column"
         );
+
+        $this->skipAssertion(
+            fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName())->hasIndex($this->getIndexName()),
+            "Table {$this->getPrefixedTableName()} already has the '{$this->getIndexName()}' index"
+        );
     }
 
     public function up(Schema $schema): void
     {
-        $this->addSql(sprintf(
-            'ALTER TABLE %s ADD %s BIGINT UNSIGNED DEFAULT NULL, ADD INDEX %s (%s)',
-            $this->getPrefixedTableName(),
-            self::COLUMN_NAME,
-            $this->prefix.self::INDEX_NAME,
-            self::COLUMN_NAME
-        ));
+        $tableName = $this->getPrefixedTableName();
+        $table     = $schema->getTable($tableName);
+
+        if (!$table->hasColumn(self::COLUMN_NAME)) {
+            $this->addSql("ALTER TABLE {$tableName} ADD ".self::COLUMN_NAME.' BIGINT UNSIGNED DEFAULT NULL');
+        }
+
+        if (!$table->hasIndex($this->getIndexName())) {
+            $this->addSql("CREATE INDEX {$this->getIndexName()} ON {$tableName} (".self::COLUMN_NAME.')');
+        }
     }
 
     public function down(Schema $schema): void
     {
         $table = $schema->getTable($this->getPrefixedTableName());
 
-        if ($table->hasIndex($this->prefix.self::INDEX_NAME)) {
-            $table->dropIndex($this->prefix.self::INDEX_NAME);
+        if ($table->hasIndex($this->getIndexName())) {
+            $table->dropIndex($this->getIndexName());
         }
 
         if ($table->hasColumn(self::COLUMN_NAME)) {
             $table->dropColumn(self::COLUMN_NAME);
         }
+    }
+
+    private function getIndexName(): string
+    {
+        return $this->prefix.self::INDEX_NAME;
     }
 }
