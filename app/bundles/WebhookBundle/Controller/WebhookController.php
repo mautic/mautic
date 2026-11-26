@@ -83,16 +83,11 @@ final class WebhookController extends AbstractStandardFormController
     }
 
     /**
-     * @param mixed   $start
-     * @param mixed   $limit
-     * @param mixed   $filter
-     * @param mixed   $orderBy
-     * @param mixed   $orderByDir
      * @param mixed[] $args
      *
      * @return array{0: int, 1: array<int, mixed>}
      */
-    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
+    protected function getIndexItems(mixed $start, mixed $limit, mixed $filter, mixed $orderBy, mixed $orderByDir, array $args = []): array
     {
         $request           = $this->getCurrentRequest();
         $categoryFilters   = $this->applyCategoryListFilter($request, 'mautic.'.$this->getSessionBase().'.list_filters', 'Webhook', 'cat.id', $filter);

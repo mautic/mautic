@@ -1645,18 +1645,14 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Create or update existing Mautic lead from the integration's profile data.
      *
-     * @param mixed      $data        Profile data from integration
-     * @param bool|true  $persist     Set to false to not persist lead to the database in this method
-     * @param mixed|null $identifiers
+     * @param array|string $data        Profile data from integration
+     * @param bool|true    $persist     Set to false to not persist lead to the database in this method
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, ?array $socialCache = null, $identifiers = null)
+    public function getMauticLead(array|string $data, $persist = true, ?array $socialCache = null, mixed $identifiers = null)
     {
-        if (is_object($data)) {
-            // Convert to array in all levels
-            $data = json_encode(json_decode($data, true));
-        } elseif (is_string($data)) {
+        if (is_string($data)) {
             // Assume JSON
             $data = json_decode($data, true);
         }
@@ -2274,7 +2270,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * @return mixed
      */
-    public function prepareFieldsForSync($fields, $keys, $object = null)
+    public function prepareFieldsForSync($fields, $keys, array|string|null $object = null)
     {
         return $fields;
     }

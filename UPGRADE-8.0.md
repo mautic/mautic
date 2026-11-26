@@ -1959,6 +1959,11 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\CampaignBundle\Entity\ChannelInterface::setChannel()`, `Mautic\CampaignBundle\Entity\Event::setChannel()` and `Mautic\CampaignBundle\Entity\LeadEventLog::setChannel()` type `$channel` as `?string`. A custom implementation must declare the same type, or leave `$channel` untyped.
     - `Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface::encodeVariable()` and `Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::encodeVariable()` type `$var` as `\DateTime|string|int|float|bool|null`. Any other value already threw and now hits a `TypeError` instead. A custom implementation must declare the same type, or leave `$var` untyped.
     - `Mautic\ConfigBundle\Mapper\Helper\ConfigHelper::bindNestedConfigValues()` types `$defaults` as `array|string|int|float|bool|null`. Passing an object now throws.
+    - `Mautic\PointBundle\Model\PointModel::triggerAction()` types `$typeId` as `string|int|null`.
+    - `MauticPlugin\MauticCrmBundle\Api\SalesforceApi::getCampaignMembers()` types `$modifiedSince` as `?string`.
+    - `Mautic\PluginBundle\Integration\AbstractIntegration::getMauticLead()` and its overrides in `MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration` and `MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration` type `$data` as `array|string`. Passing an object now throws; pass an array or a JSON string.
+    - `MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration::limitString()` types `$value` as `array|string|int|float|bool|null`.
+    - `Mautic\PluginBundle\Integration\AbstractIntegration::prepareFieldsForSync()` and its overrides in `MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration`, `MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration` and `MauticPlugin\MauticCrmBundle\Integration\ZohoIntegration` type `$object` as `array|string|null`. An override that leaves `$object` untyped stays compatible.
 
 ### Native parameter and return types for plugin extension points
 

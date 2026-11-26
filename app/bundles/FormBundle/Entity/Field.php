@@ -276,10 +276,7 @@ class Field implements UuidInterface
             ->build();
     }
 
-    /**
-     * @param mixed $val
-     */
-    private function isChanged(string $prop, $val): void
+    private function isChanged(string $prop, array|string|int|bool|null $val): void
     {
         if ($this->{$prop} != $val) {
             $this->changes[$prop] = [$this->{$prop}, $val];

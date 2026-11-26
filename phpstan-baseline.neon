@@ -4898,12 +4898,6 @@ parameters:
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:prepareFieldsForSync\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:prepareRequest\(\) has parameter \$authType with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4912,12 +4906,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:prepareResponseForExtraction\(\) has parameter \$data with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
-			message: '#^Parameter \#1 \$json of function json_decode expects string, object given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
@@ -6004,7 +5992,7 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$json of function json_decode expects string, object given\.$#'
 			identifier: argument.type
-			count: 2
+			count: 1
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
 		-
@@ -6100,12 +6088,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:getMauticLead\(\) should return Mautic\\LeadBundle\\Entity\\Lead but empty return statement found\.$#'
 			identifier: return.empty
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Parameter \#1 \$json of function json_decode expects string, object given\.$#'
-			identifier: argument.type
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
 

@@ -413,13 +413,11 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param mixed $modifiedSince
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function getCampaignMembers($campaignId, $modifiedSince = null, $queryUrl = null)
+    public function getCampaignMembers($campaignId, ?string $modifiedSince = null, $queryUrl = null)
     {
         $defaultSettings = $this->requestSettings;
 
@@ -512,12 +510,10 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param mixed $response
-     *
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function analyzeResponse($response, bool $isRetry): void
+    private function analyzeResponse(mixed $response, bool $isRetry): void
     {
         if (is_array($response)) {
             if (!empty($response['errors'])) {
