@@ -19,6 +19,17 @@ Variables
 {{ 'mautic.lead.import.leads'|trans({'%object%': objectName|trans}) }}
 {% endblock %}
 
+{% block actions %}
+  {% if not complete %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+        'routeBase': 'import',
+        'langVar': 'lead.import',
+        'templateButtons': {'close': true},
+        'closeUrl': path(indexRoute, indexRouteParams),
+    }) -}}
+  {% endif %}
+{% endblock %}
+
 {% block content %}
 {% set object = app.request.attributes.all()['object'] ?? app.request.query.all()['object'] ?? app.request.request.all()['object'] ?? 'contacts' %}
 {% set objectName = objectName|trans %}
