@@ -2815,6 +2815,11 @@ document.addEventListener('click', (event) => {
     wrapper.querySelector('.search-expandable__field input').focus();
 });
 
+/**
+ * @deprecated since 7.3, will be removed in Mautic 8. The search field's clear button now updates itself.
+ */
+Mautic.updateLiveSearchButton = function () {};
+
 const clearSearchField = (clear, field) => {
     if (field.disabled || field.readOnly) return;
 
