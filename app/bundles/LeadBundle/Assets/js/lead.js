@@ -1701,7 +1701,11 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
 Mautic.listOnLoad = function(container, response) {
     Mautic.loadAndProcessPageContent('#segment-stats');
 
-    mQuery('a#campaign-share-tab').on('shown.bs.tab', Mautic.loadCampaignShare);
+    const campaignShareTab = mQuery('a#campaign-share-tab');
+    campaignShareTab.on('shown.bs.tab', Mautic.loadCampaignShare);
+    if (campaignShareTab.hasClass('active')) {
+        Mautic.loadCampaignShare();
+    }
 
     const segmentDependenciesTab = mQuery('a#segment-dependencies');
     let segmentDependenciesLoaded = false;
