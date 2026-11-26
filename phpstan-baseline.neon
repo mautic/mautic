@@ -145,12 +145,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Entity/Campaign.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\ChannelInterface\:\:setChannel\(\) has parameter \$channel with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/ChannelInterface.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\ChannelInterface\:\:setChannelId\(\) has parameter \$id with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
