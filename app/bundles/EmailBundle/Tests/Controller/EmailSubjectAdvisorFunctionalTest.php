@@ -36,6 +36,11 @@ final class EmailSubjectAdvisorFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
         $control = $crawler->filter('[data-subject-advisor]');
         $this->assertCount(1, $control);
+        $this->assertCount(1, $control->filter('label[for="emailform_subject"]'));
+        $this->assertSame('emailform[subject]', $control->filter('input#emailform_subject')->attr('name'));
+        $this->assertCount(1, $control->filter('.ai-label.d-none .ai-label__button--mini[type="button"]'));
+        $this->assertCount(1, $control->filter('[data-subject-revert].d-none button[type="button"]'));
+        $this->assertCount(1, $control->filter('[data-subject-preview][hidden]'));
 
         $reply = new MockResponse('{"choices":[{"message":{"role":"assistant","content":"{\"suggestion\":\"Conheça a coleção de verão\"}"},"finish_reason":"stop"}]}');
         self::getContainer()->get(MockHttpClient::class)->setResponseFactory([$reply]);

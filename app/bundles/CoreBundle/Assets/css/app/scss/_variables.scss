@@ -1036,6 +1036,30 @@ $footer-bg:                                 transparent;
     --border-tile: var(--border-tile-02);
 }
 
+:root,
+:root[theme^="light"],
+:root[theme="solarized-light"] {
+    --ai-aura-start-sm: rgba(69, 137, 255, 0.16);
+    --ai-aura-end: rgba(255, 255, 255, 0);
+    --ai-border-end: #78a9ff;
+    --ai-border-strong: #4589ff;
+    --ai-popover-background: #ffffff;
+    --ai-popover-shadow-outer-01: rgba(0, 67, 206, 0.06);
+    --ai-popover-shadow-outer-02: rgba(0, 0, 0, 0.04);
+}
+
+:root[theme="dark"],
+:root[theme="solarized-dark"],
+:root[theme="dark-freire"] {
+    --ai-aura-start-sm: rgba(69, 137, 255, 0.16);
+    --ai-aura-end: rgba(0, 0, 0, 0);
+    --ai-border-end: #4589ff;
+    --ai-border-strong: #78a9ff;
+    --ai-popover-background: #161616;
+    --ai-popover-shadow-outer-01: rgba(0, 0, 0, 0.12);
+    --ai-popover-shadow-outer-02: rgba(0, 0, 0, 0.08);
+}
+
 :root {
 // Motion //
 
