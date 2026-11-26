@@ -2,11 +2,11 @@
 
 namespace Mautic\PointBundle\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
-use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
-use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\PointBundle\Entity\LeadPointLogRepository;
@@ -41,13 +41,17 @@ final readonly class LeadSubscriber
      * Handle point triggers for new leads (including 0 point triggers).
      */
     #[AsEventListener(
-        event: LeadPostSaveEvent::class,
         priority: -1
     )]
-    public function onLeadSave(LeadEvent $event): void
+    public function onLeadSave(EntityPostSave $event): void
     {
+        $lead = $event->getEntity();
+        if (!$lead instanceof Lead) {
+            return;
+        }
+
         if ($event->isNew()) {
-            $this->triggerModel->triggerEvents($event->getLead());
+            $this->triggerModel->triggerEvents($lead);
         }
     }
 

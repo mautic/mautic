@@ -3,6 +3,8 @@
 namespace Mautic\LeadBundle\Tracker;
 
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -10,8 +12,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadGetCurrentEvent;
-use Mautic\LeadBundle\Event\LeadPostSaveEvent;
-use Mautic\LeadBundle\Event\LeadPreSaveEvent;
 use Mautic\LeadBundle\Model\DefaultValueTrait;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServiceInterface;
@@ -280,12 +280,12 @@ final class ContactTracker
 
         if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
             // Dispatch events for new lead to write create log, ip address change, etc
-            $this->dispatcher->dispatch(new LeadPreSaveEvent($lead, true));
+            $this->dispatcher->dispatch(new EntityPreSave($lead, true));
             $this->setEntityDefaultValues($lead);
             $this->leadRepository->saveEntity($lead);
             $this->hydrateCustomFieldData($lead);
 
-            $this->dispatcher->dispatch(new LeadPostSaveEvent($lead, true));
+            $this->dispatcher->dispatch(new EntityPostSave($lead, true));
 
             $this->logger->debug("CONTACT: New lead created with ID# {$lead->getId()}.");
         }

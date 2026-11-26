@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Event\InternalCompanyFieldChangesEvent;
@@ -19,7 +21,6 @@ use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInte
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\CompanyEvent;
-use Mautic\LeadBundle\Event\LeadEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -86,7 +87,7 @@ final class LeadSubscriberTest extends TestCase
         $this->syncIntegrationsHelper->expects($this->never())
             ->method('hasObjectSyncEnabled');
 
-        $this->subscriber->onLeadPostSave(new LeadEvent($lead));
+        $this->subscriber->onLeadPostSave(new EntityPostSave($lead));
     }
 
     public function testOnLeadPostSaveLeadObjectSyncNotEnabled(): void
@@ -99,7 +100,7 @@ final class LeadSubscriberTest extends TestCase
             ->with(Contact::NAME)
             ->willReturn(false);
 
-        $this->subscriber->onLeadPostSave(new LeadEvent($lead));
+        $this->subscriber->onLeadPostSave(new EntityPostSave($lead));
     }
 
     public function testOnLeadPostSaveNoAction(): void
@@ -113,7 +114,7 @@ final class LeadSubscriberTest extends TestCase
             ->with(Contact::NAME)
             ->willReturn(true);
 
-        $this->subscriber->onLeadPostSave(new LeadEvent($lead));
+        $this->subscriber->onLeadPostSave(new EntityPostSave($lead));
     }
 
     /**
@@ -149,7 +150,7 @@ final class LeadSubscriberTest extends TestCase
             ->with(InternalContactFieldChangesEvent::class)
             ->willReturn(true);
 
-        $this->subscriber->onLeadPostSave(new LeadEvent($lead));
+        $this->subscriber->onLeadPostSave(new EntityPostSave($lead));
     }
 
     /**
@@ -184,7 +185,7 @@ final class LeadSubscriberTest extends TestCase
             ->with(InternalContactFieldChangesEvent::class)
             ->willReturn(true);
 
-        $this->subscriber->onLeadPostSave(new LeadEvent($lead));
+        $this->subscriber->onLeadPostSave(new EntityPostSave($lead));
     }
 
     /**
@@ -218,7 +219,7 @@ final class LeadSubscriberTest extends TestCase
             ->with(InternalContactFieldChangesEvent::class)
             ->willReturn(true);
 
-        $this->subscriber->onLeadPostSave(new LeadEvent($lead));
+        $this->subscriber->onLeadPostSave(new EntityPostSave($lead));
     }
 
     public function testOnLeadPostDelete(): void
@@ -236,7 +237,7 @@ final class LeadSubscriberTest extends TestCase
             ->method('deleteEntitiesForObject')
             ->with($deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
 
-        $this->subscriber->onLeadPostDelete(new LeadEvent($lead));
+        $this->subscriber->onLeadPostDelete(new EntityPostDelete($lead));
     }
 
     public function testOnLeadPostDeleteForAnonymousLeads(): void
@@ -251,7 +252,7 @@ final class LeadSubscriberTest extends TestCase
         $this->objectMappingRepository->expects($this->never())
             ->method('deleteEntitiesForObject');
 
-        $this->subscriber->onLeadPostDelete(new LeadEvent($lead));
+        $this->subscriber->onLeadPostDelete(new EntityPostDelete($lead));
     }
 
     public function testOnCompanyPostSaveSyncNotEnabled(): void

@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
+use Mautic\CoreBundle\Event\AbstractEntityEvent;
 use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class SaveBatchLeadsEvent extends Event
 {
     public function __construct(
         /**
-         * @var LeadEvent[]
+         * @var AbstractEntityEvent[]
          */
         private readonly array $leadsEvents,
     ) {
     }
 
     /**
-     * @return LeadEvent[]
+     * @return AbstractEntityEvent[]
      */
     public function getLeadsEvents(): array
     {

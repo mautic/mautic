@@ -15,6 +15,8 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -58,13 +60,8 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
 use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
-use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadPostBatchSaveEvent;
-use Mautic\LeadBundle\Event\LeadPostDeleteEvent;
-use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadPreBatchSaveEvent;
-use Mautic\LeadBundle\Event\LeadPreDeleteEvent;
-use Mautic\LeadBundle\Event\LeadPreSaveEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Field\FieldList;
@@ -287,16 +284,6 @@ class LeadModel extends FormModel
         return $entities;
     }
 
-    /**
-     * @param Lead $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        return $this->dispatchLeadEvent($action, $entity, $isNew, false);
-    }
-
     protected function dispatchBatchEvent(string $action, array $entitiesBatchParams, ?Event $event = null): ?Event
     {
         if (count($entitiesBatchParams) < 1) {
@@ -308,10 +295,10 @@ class LeadModel extends FormModel
             }
         }
 
-        $eventClass = match ($action) {
-            'pre_batch_save'  => LeadPreBatchSaveEvent::class,
-            'post_batch_save' => LeadPostBatchSaveEvent::class,
-            default           => null,
+        [$eventClass, $entityEventClass] = match ($action) {
+            'pre_batch_save'  => [LeadPreBatchSaveEvent::class, EntityPreSave::class],
+            'post_batch_save' => [LeadPostBatchSaveEvent::class, EntityPostSave::class],
+            default           => [null, null],
         };
 
         if (null === $eventClass || !$this->dispatcher->hasListeners($eventClass)) {
@@ -320,33 +307,10 @@ class LeadModel extends FormModel
 
         $leadEvents = [];
         foreach ($entitiesBatchParams as $entityParam) {
-            $leadEvents[] = $entityParam['event'] ?: new LeadEvent($entityParam['entity'], $entityParam['isNew']);
+            $leadEvents[] = $entityParam['event'] ?: new $entityEventClass($entityParam['entity'], $entityParam['isNew']);
         }
 
         $event = new $eventClass($leadEvents);
-        $this->dispatcher->dispatch($event);
-
-        return $event;
-    }
-
-    /**
-     * @throws MethodNotAllowedHttpException
-     */
-    private function dispatchLeadEvent(string $action, Lead $entity, bool $isNew, bool $alreadyProcessedInBatch): ?LeadEvent
-    {
-        $event = match ($action) {
-            'pre_save'    => new LeadPreSaveEvent($entity, $isNew),
-            'post_save'   => new LeadPostSaveEvent($entity, $isNew),
-            'pre_delete'  => new LeadPreDeleteEvent($entity, $isNew),
-            'post_delete' => new LeadPostDeleteEvent($entity, $isNew),
-            default       => null,
-        };
-
-        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
-            return null;
-        }
-
-        $event->setAlreadyProcessedInBatch($alreadyProcessedInBatch);
         $this->dispatcher->dispatch($event);
 
         return $event;

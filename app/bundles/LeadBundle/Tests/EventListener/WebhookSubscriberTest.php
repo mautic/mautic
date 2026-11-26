@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -13,7 +14,6 @@ use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\CompanyPostDeleteEvent;
 use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
-use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\LeadEvents;
@@ -57,7 +57,7 @@ final class WebhookSubscriberTest extends TestCase
         $lead = new Lead();
         $lead->setEmail('hello@hello.com');
         $lead->setDateIdentified(new \DateTime());
-        $event = new LeadPostSaveEvent($lead, true);
+        $event = new EntityPostSave($lead, true);
         $this->dispatcher->dispatch($event);
     }
 
@@ -79,7 +79,7 @@ final class WebhookSubscriberTest extends TestCase
         $lead->setEmail('hello@hello.com');
         // remove date identified so it'll simulate a simple update
         $lead->resetChanges();
-        $event = new LeadPostSaveEvent($lead, false);
+        $event = new EntityPostSave($lead, false);
         $this->dispatcher->dispatch($event);
     }
 
@@ -95,7 +95,7 @@ final class WebhookSubscriberTest extends TestCase
         AttributeEventListenerRegistrar::register($this->dispatcher, $webhookSubscriber);
 
         $lead  = new Lead();
-        $event = new LeadPostSaveEvent($lead, false);
+        $event = new EntityPostSave($lead, false);
         $this->dispatcher->dispatch($event);
     }
 
@@ -114,7 +114,7 @@ final class WebhookSubscriberTest extends TestCase
         $lead  = new Lead();
         $lead->setEmail('test@test.com');
         $lead->setChanges([]);
-        $event = new LeadPostSaveEvent($lead, false);
+        $event = new EntityPostSave($lead, false);
         $this->dispatcher->dispatch($event);
     }
 

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
-use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadIdentifiedEvent;
 use Mautic\LeadBundle\Event\LeadUtmTagsEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
@@ -24,7 +24,7 @@ final class LeadChangeEventDispatcherTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcher::class);
 
         $lead  = new Lead();
-        $event = new LeadEvent($lead);
+        $event = new EntityPostSave($lead);
 
         $dispatcher->expects($this->once())
             ->method('dispatch')
@@ -41,7 +41,7 @@ final class LeadChangeEventDispatcherTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcher::class);
 
         $lead        = new Lead();
-        $event       = new LeadEvent($lead);
+        $event       = new EntityPostSave($lead);
         $pointsEvent = new PointsChangeEvent($lead, 10, 20);
         $dispatcher->expects($this->once())
             ->method('dispatch')
@@ -60,7 +60,7 @@ final class LeadChangeEventDispatcherTest extends TestCase
         $lead           = new Lead();
         $lead->imported = true;
 
-        $event = new LeadEvent($lead);
+        $event = new EntityPostSave($lead);
 
         $dispatcher->expects($this->never())
             ->method('dispatch');
@@ -76,7 +76,7 @@ final class LeadChangeEventDispatcherTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcher::class);
 
         $lead  = new Lead();
-        $event = new LeadEvent($lead);
+        $event = new EntityPostSave($lead);
 
         $dispatcher->expects($this->never())
             ->method('dispatch');
@@ -92,7 +92,7 @@ final class LeadChangeEventDispatcherTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcher::class);
 
         $lead        = new Lead();
-        $event       = new LeadEvent($lead);
+        $event       = new EntityPostSave($lead);
         $pointsEvent = new PointsChangeEvent($lead, 10, 0);
         $dispatcher->expects($this->once())
             ->method('dispatch')
@@ -109,7 +109,7 @@ final class LeadChangeEventDispatcherTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcher::class);
 
         $lead  = new Lead();
-        $event = new LeadEvent($lead, true);
+        $event = new EntityPostSave($lead, true);
         $dispatcher->expects($this->never())
             ->method('dispatch');
 
@@ -124,7 +124,7 @@ final class LeadChangeEventDispatcherTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcher::class);
 
         $lead         = new Lead();
-        $event        = new LeadEvent($lead);
+        $event        = new EntityPostSave($lead);
         $changes      = ['utmtags' => ['foo', 'bar']];
         $utmTagsEvent = new LeadUtmTagsEvent($lead, $changes['utmtags']);
         $dispatcher->expects($this->once())
@@ -144,7 +144,7 @@ final class LeadChangeEventDispatcherTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcher::class);
 
         $lead    = new Lead();
-        $event   = new LeadEvent($lead);
+        $event   = new EntityPostSave($lead);
         $changes = ['dnc_channel_status' => ['email' => ['old_reason' => DoNotContact::IS_CONTACTABLE, 'reason' => DoNotContact::UNSUBSCRIBED]]];
 
         $dncEvent = new ChannelSubscriptionChange($lead, 'email', DoNotContact::IS_CONTACTABLE, DoNotContact::UNSUBSCRIBED);

@@ -6,6 +6,7 @@ use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Event\EntityPostDelete;
 use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreDelete;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -28,11 +29,7 @@ use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\Event\FieldPostDeleteEvent;
 use Mautic\LeadBundle\Event\FieldPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
-use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\Event\LeadPostDeleteEvent;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
-use Mautic\LeadBundle\Event\LeadPostSaveEvent;
-use Mautic\LeadBundle\Event\LeadPreDeleteEvent;
 use Mautic\LeadBundle\Event\LeadPreMergeEvent;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
@@ -96,12 +93,13 @@ final class LeadSubscriber
     /**
      * Add a lead entry to the audit log.
      */
-    #[AsEventListener(
-        event: LeadPostSaveEvent::class,
-    )]
-    public function onLeadPostSave(LeadEvent $event): void
+    #[AsEventListener]
+    public function onLeadPostSave(EntityPostSave $event): void
     {
-        $lead = $event->getLead();
+        $lead = $event->getEntity();
+        if (!$lead instanceof Lead) {
+            return;
+        }
 
         if (!$details = $event->getChanges()) {
             return;
@@ -176,13 +174,15 @@ final class LeadSubscriber
     /**
      * Add a lead delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: LeadPostDeleteEvent::class,
-    )]
-    public function onLeadDelete(LeadEvent $event): void
+    #[AsEventListener]
+    public function onLeadDelete(EntityPostDelete $event): void
     {
-        $lead = $event->getLead();
-        $log  = [
+        $lead = $event->getEntity();
+        if (!$lead instanceof Lead) {
+            return;
+        }
+
+        $log = [
             'bundle'    => 'lead',
             'object'    => 'lead',
             'objectId'  => $lead->deletedId,
@@ -196,15 +196,18 @@ final class LeadSubscriber
     /**
      * Find lead linked segment ids to update post delete.
      */
-    #[AsEventListener(
-        event: LeadPreDeleteEvent::class,
-    )]
-    public function onLeadPreDelete(LeadEvent $event): void
+    #[AsEventListener]
+    public function onLeadPreDelete(EntityPreDelete $event): void
     {
+        $lead = $event->getEntity();
+        if (!$lead instanceof Lead) {
+            return;
+        }
+
         if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
             return;
         }
-        $leadId     = $event->getLead()->getId();
+        $leadId     = $lead->getId();
         $segmentIds = $this->leadListRepository->getLeadSegmentIds($leadId);
 
         foreach ($segmentIds as $segmentId) {

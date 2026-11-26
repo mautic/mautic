@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\EventListener;
 
 use DateTime;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
@@ -23,8 +25,6 @@ use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\Event\CompanyPostDeleteEvent;
 use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
-use Mautic\LeadBundle\Event\LeadPostDeleteEvent;
-use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -43,12 +43,14 @@ final readonly class LeadSubscriber
      * @throws IntegrationNotFoundException
      * @throws ObjectNotFoundException
      */
-    #[AsEventListener(
-        event: LeadPostSaveEvent::class,
-    )]
-    public function onLeadPostSave(Events\LeadEvent $event): void
+    #[AsEventListener]
+    public function onLeadPostSave(EntityPostSave $event): void
     {
-        $lead = $event->getLead();
+        $lead = $event->getEntity();
+        if (!$lead instanceof Lead) {
+            return;
+        }
+
         if ($lead->isAnonymous()) {
             // Do not track visitor changes
             return;
@@ -94,17 +96,21 @@ final readonly class LeadSubscriber
     }
 
     #[AsEventListener(
-        event: LeadPostDeleteEvent::class,
         priority: 255
     )]
-    public function onLeadPostDelete(Events\LeadEvent $event): void
+    public function onLeadPostDelete(EntityPostDelete $event): void
     {
-        if ($event->getLead()->isAnonymous()) {
+        $lead = $event->getEntity();
+        if (!$lead instanceof Lead) {
             return;
         }
 
-        $this->fieldChangeRepo->deleteEntitiesForObject((int) $event->getLead()->deletedId, Lead::class);
-        $this->objectMappingRepository->deleteEntitiesForObject((int) $event->getLead()->deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
+        if ($lead->isAnonymous()) {
+            return;
+        }
+
+        $this->fieldChangeRepo->deleteEntitiesForObject((int) $lead->deletedId, Lead::class);
+        $this->objectMappingRepository->deleteEntitiesForObject((int) $lead->deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
     }
 
     /**

@@ -10,8 +10,8 @@ namespace Mautic\LeadBundle;
 final class LeadEvents
 {
     /**
-     * Webhook event type identifier, the event itself is dispatched as
-     * Mautic\LeadBundle\Event\LeadPostSaveEvent.
+     * Webhook event type identifier, the entity save itself is dispatched as
+     * Mautic\CoreBundle\Event\EntityPostSave.
      */
     public const string LEAD_POST_SAVE = 'mautic.lead_post_save';
 
@@ -50,8 +50,8 @@ final class LeadEvents
     public const string LEAD_CATEGORY_CHANGE = 'mautic.lead_category_change';
 
     /**
-     * Webhook event type identifier, the event itself is dispatched as
-     * Mautic\LeadBundle\Event\LeadPostDeleteEvent.
+     * Webhook event type identifier, the entity delete itself is dispatched as
+     * Mautic\CoreBundle\Event\EntityPostDelete.
      */
     public const string LEAD_POST_DELETE = 'mautic.lead_post_delete';
 
