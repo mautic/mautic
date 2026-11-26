@@ -2868,7 +2868,10 @@ document.addEventListener('focusout', (event) => {
     const input = event.target.closest('.search-expandable__field input');
     if (!input || input.value !== '') return;
 
-    collapseSearchExpandable(input.closest('[data-search-expandable]'));
+    const wrapper = input.closest('[data-search-expandable]');
+    if (wrapper.contains(event.relatedTarget)) return;
+
+    collapseSearchExpandable(wrapper);
 });
 
 document.addEventListener('click', (event) => {
