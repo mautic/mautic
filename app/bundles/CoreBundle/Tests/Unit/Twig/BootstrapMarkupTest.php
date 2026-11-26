@@ -179,6 +179,7 @@ final class BootstrapMarkupTest extends TestCase
         $this->assertCount(1, $crawler->filter('input[readonly][data-show-on]'));
         $this->assertSame('{"enabled":"checked"}', $crawler->filter('input')->attr('data-show-on'));
         $this->assertCount(2, $crawler->filter('button:disabled'));
+        $this->assertCount(2, $crawler->filter('.quantity-stepper__button.btn.btn-ghost.btn--icon-only.btn-nospin'));
         $this->assertStringContainsString('<span>%</span>', $html);
         $this->assertCount(0, $crawler->filter('input[size], input[digits], input[postaddon_text]'));
     }

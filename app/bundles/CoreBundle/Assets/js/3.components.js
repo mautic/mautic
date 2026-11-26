@@ -121,6 +121,7 @@ Mautic.initQuantitySteppers = function () {
         root.querySelectorAll('[data-quantity-step]').forEach((button) => {
             const blocked = Number(button.dataset.quantityStep) < 0 ? current <= min : current >= max;
             button.setAttribute('aria-disabled', blocked ? 'true' : 'false');
+            button.classList.toggle('disabled', blocked);
         });
     }
 
