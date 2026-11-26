@@ -130,7 +130,7 @@ final class ImportController extends FormController
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
         $fullPath    = $this->getFullCsvPath($object);
-        $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.lead.import.id'));
+        $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.'.$object.'.import.id'));
 
         if ($import && $import->getId()) {
             $import->setStatus($import::STOPPED)
@@ -159,9 +159,9 @@ final class ImportController extends FormController
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
         $fullPath    = $this->getFullCsvPath($object);
-        $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.lead.import.id'));
+        $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.'.$object.'.import.id'));
 
-        if ($import) {
+        if ($import && $import->getId()) {
             $import->setStatus($import::QUEUED);
             $this->importModel->saveEntity($import);
         }
