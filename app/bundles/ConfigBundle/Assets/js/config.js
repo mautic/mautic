@@ -85,37 +85,92 @@ Mautic.initAiSettings = (container) => {
     const list = settings.querySelector('[data-ai-provider-list]');
     const add = settings.querySelector('[data-ai-add-provider]');
     const template = settings.querySelector('[data-ai-provider-template]');
-    const assignments = settings.querySelectorAll('[data-ai-provider-select]');
-    const rows = () => [...list.querySelectorAll('[data-ai-provider-row]')];
+    const empty = settings.querySelector('[data-ai-provider-empty]');
+    const cloud = settings.querySelector('[data-ai-cloud]');
+    const assignments = [...settings.querySelectorAll('.ai-settings__assignment')].map((card) => ({
+        provider: card.querySelector('[data-ai-provider-select]'),
+        model: card.querySelector('[data-ai-model]'),
+        warning: card.querySelector('[data-ai-cloud-warning]'),
+    }));
+    const rows = () => [...list.children];
     let nextId = Math.max(-1, ...rows().map((row) => Number(row.dataset.aiProviderRow))) + 1;
 
+    const refreshStatus = () => {
+        const selected = assignments.map(({provider}) => provider.value);
+        rows().forEach((row) => {
+            row.querySelector('[data-ai-remove-impact]').hidden = !selected.includes(row.dataset.aiProviderRow);
+        });
+        assignments.forEach(({provider, warning}) => {
+            warning.hidden = cloud.checked || provider.selectedOptions[0]?.dataset.location !== 'cloud';
+        });
+    };
+
     const refreshAssignments = () => {
-        const providers = rows().flatMap((row) => {
-            const name = row.querySelector('[data-ai-provider-name]').value.trim();
+        const providers = rows().map((row) => {
+            const name = row.querySelector('[data-ai-provider-name]').value.trim() || settings.dataset.newProvider;
             const location = row.querySelector('[data-ai-provider-location]');
-            return name && location.value ? [[row.dataset.aiProviderRow, `${name} (${location.selectedOptions[0].text})`]] : [];
+            return {id: row.dataset.aiProviderRow, name, location};
         });
 
-        assignments.forEach((select) => {
-            const selected = select.value;
-            select.length = 1;
-            providers.forEach(([id, label]) => select.add(new Option(label, id)));
-            select.value = providers.some(([id]) => selected === id) ? selected : '';
-            mQuery(select).trigger('chosen:updated');
+        assignments.forEach(({provider}) => {
+            const selected = provider.value;
+            provider.length = 1;
+            providers.forEach(({id, name, location}) => {
+                if (!location.value && id !== selected) {
+                    return;
+                }
+                const label = location.value ? `${name} (${location.selectedOptions[0].text})` : name;
+                const option = new Option(label, id);
+                option.dataset.location = location.value;
+                provider.add(option);
+            });
+            provider.value = selected;
         });
+        empty.hidden = providers.length > 0;
+        refreshStatus();
+    };
+
+    const syncProvider = (event) => {
+        const row = event.target.closest('[data-ai-provider-row]');
+        if (event.target.matches('[data-ai-provider-name]')) {
+            row.querySelector('[data-ai-provider-title]').textContent = event.target.value.trim() || settings.dataset.newProvider;
+            refreshAssignments();
+        } else if (event.target.matches('[data-ai-provider-location]')) {
+            row.querySelectorAll('[data-ai-location-tag]').forEach((tag) => {
+                tag.hidden = tag.dataset.aiLocationTag !== event.target.value;
+            });
+            refreshAssignments();
+        } else if (event.target.matches('[data-ai-provider-endpoint]')) {
+            row.querySelector('[data-ai-provider-address]').textContent = event.target.value.trim() || settings.dataset.noEndpoint;
+        }
     };
 
     add.addEventListener('click', () => {
         list.insertAdjacentHTML('beforeend', template.innerHTML.replaceAll('__ai_provider__', String(nextId++)));
         const row = list.lastElementChild;
-        Mautic.activateChosenSelect(row.querySelector('[data-ai-provider-location]'));
+        row.open = true;
+        empty.hidden = true;
         row.querySelector('[data-ai-provider-name]').focus();
-        list.dispatchEvent(new Event('change', {bubbles: true}));
     });
 
-    mQuery(list)
-        .on('input.aiSettings', '[data-ai-provider-name]', refreshAssignments)
-        .on('change.aiSettings', '[data-ai-provider-location]', refreshAssignments);
+    list.addEventListener('input', (event) => {
+        if (!event.target.matches('[data-ai-provider-location]')) {
+            syncProvider(event);
+        }
+    });
+    list.addEventListener('change', (event) => {
+        if (event.target.matches('[data-ai-provider-location]')) {
+            syncProvider(event);
+        }
+    });
+    list.addEventListener('invalid', (event) => {
+        event.target.closest('[data-ai-provider-row]').open = true;
+    }, true);
+    settings.addEventListener('change', (event) => {
+        if (event.target.matches('[data-ai-provider-select], [data-ai-cloud]')) {
+            refreshStatus();
+        }
+    });
     list.addEventListener('click', (event) => {
         const remove = event.target.closest('[data-ai-remove-provider]');
         if (!remove) {
@@ -123,11 +178,17 @@ Mautic.initAiSettings = (container) => {
         }
         const row = remove.closest('[data-ai-provider-row]');
         const next = row.nextElementSibling || row.previousElementSibling;
+        assignments.forEach(({provider, model}) => {
+            if (provider.value === row.dataset.aiProviderRow) {
+                provider.value = '';
+                model.value = '';
+            }
+        });
         row.remove();
         refreshAssignments();
-        (next?.querySelector('[data-ai-remove-provider]') ?? add).focus();
-        list.dispatchEvent(new Event('change', {bubbles: true}));
+        (next?.querySelector('summary') ?? add).focus();
     });
+    refreshAssignments();
 };
 
 Mautic.showAnonymizeWarningMessage = function(anonymize_ip) {
