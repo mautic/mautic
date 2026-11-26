@@ -1,0 +1,50 @@
+{% macro provider(row) %}
+    <div class="panel panel-default mb-16" data-ai-provider-row="{{ row.vars.name|e('html_attr') }}">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-8">{{ form_row(row.name) }}</div>
+                <div class="col-sm-4">{{ form_row(row.location) }}</div>
+            </div>
+            {{ form_row(row.endpoint) }}
+            {{ form_row(row.api_key) }}
+            {% if row.api_key.vars.data is not empty and not row.vars.submitted %}
+                <p>{{ 'mautic.core.ai.api_key.saved'|trans }}</p>
+            {% endif %}
+            {{ form_row(row.remove_key) }}
+            <button type="button" class="btn btn-ghost" data-ai-remove-provider>{{ 'mautic.core.ai.remove_provider'|trans }}</button>
+        </div>
+    </div>
+{% endmacro %}
+
+{% block _config_aiconfig_widget %}
+    <div class="p-16" data-ai-settings>
+        <h4 class="fw-semibold mb-8">{{ 'mautic.core.ai.providers'|trans }}</h4>
+        <p>{{ 'mautic.core.ai.providers.help'|trans }}</p>
+        {{ form_errors(form.ai_providers) }}
+        <div data-ai-provider-list>
+            {% for row in form.ai_providers %}
+                {{ _self.provider(row) }}
+            {% endfor %}
+        </div>
+        <template data-ai-provider-template>{{ _self.provider(form.ai_providers.vars.prototype) }}</template>
+        {% do form.ai_providers.setRendered() %}
+        <button type="button" class="btn btn-secondary mb-24" data-ai-add-provider>{{ 'mautic.core.ai.add_provider'|trans }}</button>
+        <div class="panel panel-default mb-24">
+            <div class="panel-body">
+                {{ form_row(form.ai_allow_cloud, {attr: {'aria-describedby': 'ai-cloud-help'}}) }}
+                <p id="ai-cloud-help" class="text-muted">{{ 'mautic.core.ai.allow_cloud.help'|trans }}</p>
+            </div>
+        </div>
+        <h4 class="fw-semibold mb-8">{{ 'mautic.core.ai.assignments'|trans }}</h4>
+        <p>{{ 'mautic.core.ai.assignments.help'|trans }}</p>
+        {% for workload in ['routine', 'complex'] %}
+            <fieldset class="mb-16">
+                <legend class="fs-16 fw-semibold">{{ ('mautic.core.ai.workload.' ~ workload)|trans }}</legend>
+                <div class="row">
+                    <div class="col-sm-6">{{ form_row(attribute(form, 'ai_' ~ workload ~ '_provider')) }}</div>
+                    <div class="col-sm-6">{{ form_row(attribute(form, 'ai_' ~ workload ~ '_model')) }}</div>
+                </div>
+            </fieldset>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -28,7 +28,7 @@ final readonly class OpenAiCompatibleProvider implements ModelProviderInterface
         #[\SensitiveParameter]
         ?string $apiKey = null,
     ) {
-        $this->validateEndpoint($baseUrl, null !== $apiKey);
+        self::validateEndpoint($baseUrl, $location, null !== $apiKey);
 
         $this->platform = Factory::createPlatform(
             $baseUrl,
@@ -98,7 +98,7 @@ final readonly class OpenAiCompatibleProvider implements ModelProviderInterface
         return array_values($vectors[0]->getData());
     }
 
-    private function validateEndpoint(string $baseUrl, bool $usesCredentials): void
+    public static function validateEndpoint(string $baseUrl, ProviderLocation $location, bool $usesCredentials): void
     {
         $parts = parse_url($baseUrl);
         if (false === filter_var($baseUrl, \FILTER_VALIDATE_URL) || false === $parts || !isset($parts['host'])
@@ -107,7 +107,7 @@ final readonly class OpenAiCompatibleProvider implements ModelProviderInterface
         }
 
         $scheme = strtolower($parts['scheme'] ?? '');
-        if ('https' !== $scheme && ('http' !== $scheme || ProviderLocation::Local !== $this->location || $usesCredentials)) {
+        if ('https' !== $scheme && ('http' !== $scheme || ProviderLocation::Local !== $location || $usesCredentials)) {
             throw new \InvalidArgumentException('AI providers require HTTPS except for local endpoints without credentials.');
         }
     }
