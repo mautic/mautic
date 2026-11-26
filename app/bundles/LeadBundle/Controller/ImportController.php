@@ -322,7 +322,10 @@ final class ImportController extends FormController
 
                                 $fileData->move($importDir, $fileName);
 
-                                $file = new \SplFileObject($fullPath);
+                                $file = fopen($fullPath, 'r');
+                                if (false === $file) {
+                                    throw new \RuntimeException("Cannot open {$fullPath}.");
+                                }
 
                                 $config = $form->getData();
                                 unset($config['file']);
@@ -339,11 +342,19 @@ final class ImportController extends FormController
                                 $this->requestStack->getSession()->set('mautic.'.$object.'.import.config', $config);
 
                                 // Get the headers for matching
-                                $headers = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+                                $headers = fgetcsv($file, null, $config['delimiter'], $config['enclosure'], $config['escape']);
 
-                                // Get the number of lines so we can track progress
-                                $file->seek(PHP_INT_MAX);
-                                $linecount = $file->key();
+                                // Get the number of lines so we can track progress. This counts the line breaks in the
+                                // whole file, which is the index SplFileObject::key() returned after seeking to the end
+                                // before PHP 8.6 and what ImportModel::process() compares the last imported line with.
+                                rewind($file);
+                                $linecount = 0;
+                                while (false !== ($line = fgets($file))) {
+                                    if (str_ends_with($line, "\n")) {
+                                        ++$linecount;
+                                    }
+                                }
+                                fclose($file);
 
                                 if (!empty($headers) && is_array($headers)) {
                                     $headers = CsvHelper::sanitizeHeaders($headers);

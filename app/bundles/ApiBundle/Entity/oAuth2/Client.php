@@ -53,7 +53,10 @@ class Client extends BaseClient
 
     public function __construct()
     {
-        parent::__construct();
+        // The parent constructor only sets these two tokens, but its generator converts 32 random bytes
+        // through base_convert(), which keeps just float precision of them.
+        $this->setRandomId(bin2hex(random_bytes(32)));
+        $this->setSecret(bin2hex(random_bytes(32)));
 
         $this->allowedGrantTypes = [
             OAuth2::GRANT_TYPE_AUTH_CODE,

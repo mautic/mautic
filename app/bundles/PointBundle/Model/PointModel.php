@@ -261,7 +261,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
                     }
                 }
 
-                $pointsChange = $reflection->invokeArgs($object, $pass);
+                $pointsChange = $reflection->invokeArgs($reflection->isStatic() ? null : $object, $pass);
 
                 if ($pointsChange) {
                     $delta = $action->getDelta();

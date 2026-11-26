@@ -105,6 +105,40 @@ final class ImportControllerTest extends MauticMysqlTestCase
         );
     }
 
+    public function testLimitedImportOfFileEndingWithNewlineResumesUntilAllRowsAreImported(): void
+    {
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
+        $uploadForm = $crawler->selectButton('Upload')->form();
+        $file       = new UploadedFile(__DIR__.'/../Fixtures/contacts-ending-with-newline.csv', 'contacts-ending-with-newline.csv', 'text/csv');
+
+        $uploadForm['lead_import[file]']->setValue((string) $file);
+
+        $crawler     = $this->client->submit($uploadForm);
+        $mappingForm = $crawler->selectButton('Import')->form();
+        $crawler     = $this->client->submit($mappingForm);
+
+        $this->assertStringContainsString('Import process was successfully created.', $crawler->html());
+
+        /** @var ImportRepository $importRepository */
+        $importRepository = $this->em->getRepository(Import::class);
+
+        $this->testSymfonyCommand(ImportCommand::COMMAND_NAME, ['--limit' => 1]);
+        $this->em->clear();
+
+        $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts-ending-with-newline.csv']);
+        $this->assertInstanceOf(Import::class, $importEntity);
+        $this->assertSame(Import::DELAYED, $importEntity->getStatus(), 'The import must wait for the next run while a row is left.');
+        $this->assertSame(1, $importEntity->getInsertedCount());
+
+        $this->testSymfonyCommand(ImportCommand::COMMAND_NAME, ['--limit' => 1]);
+        $this->em->clear();
+
+        $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts-ending-with-newline.csv']);
+        $this->assertInstanceOf(Import::class, $importEntity);
+        $this->assertSame(Import::IMPORTED, $importEntity->getStatus());
+        $this->assertSame(2, $importEntity->getInsertedCount());
+    }
+
     public function testContactPermissionsAreFollowedDuringImport(): void
     {
         $filename   = 'import-contact-permissions.csv';

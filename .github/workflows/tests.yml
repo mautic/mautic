@@ -26,9 +26,9 @@ jobs:
             db-types: 'mysql:8.4'
           - php-versions: '8.2'
             db-types: 'mariadb:10.11'
-          - php-versions: '8.5'
+          - php-versions: '8.6'
             db-types: 'mysql:9.2'
-          - php-versions: '8.5'
+          - php-versions: '8.6'
             db-types: 'mariadb:11.4'
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}

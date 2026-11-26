@@ -209,7 +209,7 @@ class LegacyEventDispatcher
                 }
             }
 
-            return $reflection->invokeArgs($this, $pass);
+            return $reflection->invokeArgs($reflection->isStatic() ? null : $this, $pass);
         } catch (\ReflectionException) {
             return false;
         }
