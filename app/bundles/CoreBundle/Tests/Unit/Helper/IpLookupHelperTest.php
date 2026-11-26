@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use DeviceDetector\DeviceDetector;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -83,6 +85,125 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $ip      = $this->getIpHelper($request)->getIpAddress();
 
         $this->assertEquals('73.77.245.53', $ip->getIpAddress());
+    }
+
+    #[TestDox('Check that a supplied request is used without a current request stack entry')]
+    public function testClientIpIsReturnedFromSuppliedRequest(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.54']);
+        $ip      = $this->getIpHelper()->getIpAddressForRequest($request);
+
+        $this->assertEquals('73.77.245.54', $ip->getIpAddress());
+    }
+
+    #[TestDox('Check that email tracking can skip generic device-detector bot classification')]
+    public function testEmailTrackingCanSkipDeviceDetectorBotClassification(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.55']);
+        $request->headers->set('User-Agent', 'Mozilla/5.0 (via ggpht.com GoogleImageProxy)');
+
+        $this->deviceDetector->expects($this->never())->method('parse');
+
+        $this->assertTrue($this->getIpHelper()->isRequestTrackableForRequest($request, false));
+    }
+
+    #[TestDox('Check that email tracking still rejects ordinary device-detector bots')]
+    public function testEmailTrackingCanUseDeviceDetectorBotClassification(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.55']);
+        $request->headers->set('User-Agent', 'KnownBot/1.0');
+
+        $this->deviceDetector->expects($this->once())->method('parse');
+        $this->deviceDetector->method('isBot')->willReturn(true);
+
+        $this->assertFalse($this->getIpHelper()->isRequestTrackableForRequest($request));
+    }
+
+    #[TestDox('Check that bot classification happens before remote IP enrichment')]
+    public function testBotsAreRejectedBeforeIpDetailsLookup(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.58']);
+        $request->headers->set('User-Agent', 'KnownBot/1.0');
+
+        $ipLookup = $this->createMock(AbstractLookup::class);
+        $ipLookup->expects($this->never())->method('getDetails');
+        $this->deviceDetector->method('isBot')->willReturn(true);
+
+        $helper = $this->getIpHelper(
+            request: $request,
+            mockIpLookup: $ipLookup,
+        );
+
+        $this->assertFalse($helper->isRequestTrackableForRequest($request));
+    }
+
+    #[TestDox('Device-detector bots are rejected before remote IP enrichment')]
+    public function testDeviceDetectorBotsAreRejectedBeforeIpDetailsLookup(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.59']);
+        $request->headers->set('User-Agent', 'Crawler/1.0');
+
+        $ipLookup = $this->createMock(AbstractLookup::class);
+        $ipLookup->expects($this->never())->method('getDetails');
+        $this->deviceDetector->method('isBot')->willReturn(true);
+
+        $helper = $this->getIpHelper(
+            request: $request,
+            mockIpLookup: $ipLookup,
+        );
+
+        $this->assertFalse($helper->isRequestTrackableForRequest($request));
+    }
+
+    #[TestDox('Check that the user-agent-dependent IP cache is reset between worker messages')]
+    public function testResetClearsUserAgentDependentIpCache(): void
+    {
+        $this->deviceDetector
+            ->method('isBot')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $helper  = $this->getIpHelper();
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.56']);
+        $request->headers->set('User-Agent', 'Mozilla/5.0');
+
+        $this->assertFalse($helper->isRequestTrackableForRequest($request));
+
+        $helper->reset();
+
+        $this->assertTrue($helper->isRequestTrackableForRequest($request));
+    }
+
+    #[TestDox('Keep User-Agent classification separate from the persisted IP entity in either lookup order')]
+    public function testRequestTrackabilityIsIndependentOfLookupOrder(): void
+    {
+        $persistedIp = new IpAddress('73.77.245.57');
+        $repository  = $this->createMock(IpAddressRepository::class);
+        $repository
+            ->method('__call')
+            ->with('findOneByIpAddress')
+            ->willReturn($persistedIp);
+
+        $botDetector    = $this->createMock(DeviceDetector::class);
+        $normalDetector = $this->createMock(DeviceDetector::class);
+        $botDetector->method('isBot')->willReturn(true);
+        $normalDetector->method('isBot')->willReturn(false);
+
+        $helper = $this->getIpHelper(
+            mockRepository: $repository,
+            deviceDetectorFactoryCallback: fn (string $userAgent): DeviceDetector => str_contains($userAgent, 'KnownBot') ? $botDetector : $normalDetector,
+        );
+        $botRequest = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.57']);
+        $botRequest->headers->set('User-Agent', 'KnownBot/1.0');
+        $normalRequest = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.57']);
+        $normalRequest->headers->set('User-Agent', 'Mozilla/5.0');
+
+        $this->assertFalse($helper->isRequestTrackableForRequest($botRequest));
+        $this->assertTrue($helper->isRequestTrackableForRequest($normalRequest));
+
+        $helper->reset();
+
+        $this->assertTrue($helper->isRequestTrackableForRequest($normalRequest));
+        $this->assertFalse($helper->isRequestTrackableForRequest($botRequest));
     }
 
     #[TestDox('Check that a local IP is returned for internal IPs')]
@@ -183,19 +304,26 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    private function getIpHelper(?Request $request = null, ?CoreParametersHelper $mockCoreParametersHelper = null): IpLookupHelper
-    {
+    private function getIpHelper(
+        ?Request $request = null,
+        ?CoreParametersHelper $mockCoreParametersHelper = null,
+        ?IpAddressRepository $mockRepository = null,
+        ?callable $deviceDetectorFactoryCallback = null,
+        ?AbstractLookup $mockIpLookup = null,
+    ): IpLookupHelper {
         $requestStack = new RequestStack();
 
         if ($request) {
             $requestStack->push($request);
         }
 
-        $mockRepository = $this->createMock(IpAddressRepository::class);
-        $mockRepository
-            ->method('__call')
-            ->with('findOneByIpAddress')
-            ->willReturn(null);
+        if (null === $mockRepository) {
+            $mockRepository = $this->createMock(IpAddressRepository::class);
+            $mockRepository
+                ->method('__call')
+                ->with('findOneByIpAddress')
+                ->willReturn(null);
+        }
 
         if (null === $mockCoreParametersHelper) {
             $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -207,10 +335,10 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->deviceDetectorFactory
             ->method('create')
             ->willReturnCallback(
-                fn (): \PHPUnit\Framework\MockObject\MockObject => $this->deviceDetector
+                $deviceDetectorFactoryCallback ?? fn (): \PHPUnit\Framework\MockObject\MockObject => $this->deviceDetector
             );
 
-        $helper = new IpLookupHelper($requestStack, $mockRepository, $mockCoreParametersHelper, $this->deviceDetectorFactory);
+        $helper = new IpLookupHelper($requestStack, $mockRepository, $mockCoreParametersHelper, $this->deviceDetectorFactory, $mockIpLookup);
         $helper->reset();
 
         return $helper;
