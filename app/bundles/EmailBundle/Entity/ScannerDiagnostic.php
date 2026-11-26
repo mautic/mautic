@@ -16,22 +16,13 @@ use Mautic\PageBundle\Entity\Redirect;
 class ScannerDiagnostic
 {
     public const TABLE_NAME = 'email_scanner_diagnostics';
-
     public const EVENT_HONEYPOT = 'honeypot';
-
     public const EVENT_CLICK = 'click';
-
     public const EVENT_OPEN = 'open';
-
     public const INDEX_EMAIL_SEND_DATE = 'scanner_diag_email_send_date';
-
     public const INDEX_DATE_ADDED = 'scanner_diag_date_added';
-
     private ?string $id = null;
 
-    /**
-     * @param array<string, string> $headers
-     */
     public function __construct(
         private readonly \DateTimeImmutable $dateAdded,
         private readonly string $eventType,
@@ -156,9 +147,6 @@ class ScannerDiagnostic
         return $this->userAgent;
     }
 
-    /**
-     * @return array<string, string>
-     */
     public function getHeaders(): array
     {
         return $this->headers;

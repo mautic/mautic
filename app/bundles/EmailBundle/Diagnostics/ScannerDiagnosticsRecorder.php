@@ -12,13 +12,14 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Entity\ScannerDiagnostic;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\ContactTrackingPreferenceHelper;
 use Mautic\PageBundle\Entity\Redirect;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class ScannerDiagnosticsRecorder
 {
-   
     public const HEADER_ALLOW_LIST = [
         'Accept',
         'Accept-Language',
@@ -54,6 +55,7 @@ class ScannerDiagnosticsRecorder
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly IpLookupHelper $ipLookupHelper,
         private readonly BotRatioHelper $botRatioHelper,
+        private readonly ContactTrackingPreferenceHelper $trackingPreferenceHelper,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -85,11 +87,16 @@ class ScannerDiagnosticsRecorder
             throw new \InvalidArgumentException(sprintf('Unknown event type "%s"', $eventType));
         }
 
-
         if (!$this->ipLookupHelper->isRequestTrackable()
             || $this->ipLookupHelper->isVisitorUntracked()
             || $this->coreParametersHelper->get('anonymize_ip')
         ) {
+            return;
+        }
+
+        // A contact who turned activity tracking off is left out, as they are from open and click tracking
+        $contact = $stat?->getLead();
+        if ($contact instanceof Lead && !$this->trackingPreferenceHelper->allowsActivityTracking($contact)) {
             return;
         }
 
@@ -128,6 +135,7 @@ class ScannerDiagnosticsRecorder
     private function getSendKey(?Stat $stat): ?string
     {
         $trackingHash = $stat?->getTrackingHash();
+
         return null === $trackingHash || '' === $trackingHash ? null : $this->hash('send', $trackingHash);
     }
 
@@ -149,7 +157,6 @@ class ScannerDiagnosticsRecorder
         return inet_ntop($prefix).'/'.$bits;
     }
 
- 
     private function getHeaders(Request $request): array
     {
         $headers = [];

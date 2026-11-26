@@ -6,6 +6,11 @@ namespace Mautic\EmailBundle\Tests\Diagnostics;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Persisters\Entity\EntityPersister;
+use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -14,6 +19,10 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\ScannerDiagnostic;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\TrackingPreference;
+use Mautic\LeadBundle\Entity\TrackingPreferenceRepository;
+use Mautic\LeadBundle\Helper\ContactTrackingPreferenceHelper;
 use Mautic\PageBundle\Entity\Redirect;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -31,7 +40,10 @@ final class ScannerDiagnosticsRecorderTest extends TestCase
     private LoggerInterface&MockObject $logger;
     private array $parameters;
     private ?array $inserted = null;
+
+    private ?TrackingPreference $trackingPreference = null;
     private string $ip = self::IP;
+
     protected function setUp(): void
     {
         $this->connection     = $this->createMock(Connection::class);
@@ -200,6 +212,40 @@ final class ScannerDiagnosticsRecorderTest extends TestCase
         $this->createRecorder()->record(ScannerDiagnostic::EVENT_CLICK, $this->createRequest(), $this->createStat());
 
         $this->assertNull($this->inserted);
+    }
+
+    public function testAContactWhoTurnedTrackingOffIsNotRecorded(): void
+    {
+        $contact                  = new Lead();
+        $this->trackingPreference = new TrackingPreference($contact, TrackingPreference::PURPOSE_ACTIVITY, false);
+        $stat                     = $this->createStat();
+        $stat->setLead($contact);
+
+        $this->createRecorder()->record(ScannerDiagnostic::EVENT_HONEYPOT, $this->createRequest(), $stat);
+
+        $this->assertNull($this->inserted);
+    }
+
+    public function testAContactWhoAllowedTrackingIsRecorded(): void
+    {
+        $contact                  = new Lead();
+        $this->trackingPreference = new TrackingPreference($contact, TrackingPreference::PURPOSE_ACTIVITY, true);
+        $stat                     = $this->createStat();
+        $stat->setLead($contact);
+
+        $this->createRecorder()->record(ScannerDiagnostic::EVENT_HONEYPOT, $this->createRequest(), $stat);
+
+        $this->assertSame(ScannerDiagnostic::EVENT_HONEYPOT, $this->getInserted()[1]['event_type']);
+    }
+
+    public function testAContactWhoNeverChoseIsRecorded(): void
+    {
+        $stat = $this->createStat();
+        $stat->setLead(new Lead());
+
+        $this->createRecorder()->record(ScannerDiagnostic::EVENT_HONEYPOT, $this->createRequest(), $stat);
+
+        $this->assertSame(ScannerDiagnostic::EVENT_HONEYPOT, $this->getInserted()[1]['event_type']);
     }
 
     public function testAHitWithoutAStatHasNoEmailSendOrBotRatio(): void
@@ -389,8 +435,30 @@ final class ScannerDiagnosticsRecorderTest extends TestCase
             $coreParametersHelper,
             $this->ipLookupHelper,
             $this->botRatioHelper,
+            $this->createTrackingPreferenceHelper(),
             $this->logger,
         );
+    }
+
+    /**
+     * The helper is final, so it is built for real on top of a persister that returns the contact's stored choice.
+     */
+    private function createTrackingPreferenceHelper(): ContactTrackingPreferenceHelper
+    {
+        $persister = $this->createStub(EntityPersister::class);
+        $persister->method('load')->willReturn($this->trackingPreference);
+
+        $unitOfWork = $this->createStub(UnitOfWork::class);
+        $unitOfWork->method('getEntityPersister')->willReturn($persister);
+
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $entityManager->method('getClassMetadata')->willReturn(new ClassMetadata(TrackingPreference::class));
+        $entityManager->method('getUnitOfWork')->willReturn($unitOfWork);
+
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturn($entityManager);
+
+        return new ContactTrackingPreferenceHelper(new TrackingPreferenceRepository($managerRegistry), $this->createStub(EntityManagerInterface::class));
     }
 
     private function createRequest(array $server = []): Request
@@ -435,6 +503,7 @@ final class ScannerDiagnosticsRecorderTest extends TestCase
     private function getInserted(): array
     {
         $this->assertNotNull($this->inserted, 'Nothing was recorded');
+
         return $this->inserted;
     }
 }

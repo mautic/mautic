@@ -8,8 +8,10 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\EmailBundle\Diagnostics\ScannerDiagnosticsRecorder;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\ScannerDiagnostic;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Form\Type\EmailPreviewOptionsType;
@@ -154,6 +156,27 @@ final class PublicController extends CommonFormController
         }
 
         return TrackingPixelHelper::getResponse($request);
+    }
+
+    /**
+     * The target of the hidden honeypot link. People can't see or click it, so a request here is a link scanner
+     * following every link. It is only recorded for diagnostics: it is no open or click, and it creates or
+     * identifies no contact and sets no cookie.
+     */
+    public function scannerCheckAction(Request $request, ScannerDiagnosticsRecorder $recorder, string $idHash): Response
+    {
+        // An unknown hash gets the same answer, but isn't recorded, so random requests can't fill the table
+        $stat = $recorder->isEnabled() ? $this->emailModel->getEmailStatus($idHash) : null;
+
+        if ($stat instanceof Stat) {
+            $recorder->record(ScannerDiagnostic::EVENT_HONEYPOT, $request, $stat);
+        }
+
+        $response = new Response();
+        $response->headers->set('Cache-Control', 'no-store');
+        $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+
+        return $response;
     }
 
     public function validateEmailAction(Request $request, string $action, string $secretHash, string $idHash): Response

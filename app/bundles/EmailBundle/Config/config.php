@@ -73,6 +73,10 @@ return [
                 'path'       => '/email/{idHash}.gif',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::trackingImageAction',
             ],
+            'mautic_email_scanner_check' => [
+                'path'       => '/email/check/{idHash}',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::scannerCheckAction',
+            ],
             'mautic_email_webview' => [
                 'path'       => '/email/view/{idHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::indexAction',
