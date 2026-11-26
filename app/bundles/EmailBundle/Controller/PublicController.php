@@ -1049,7 +1049,7 @@ final class PublicController extends CommonFormController
     {
         $model->setDoNotContactLead($lead, $this->translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
-        return $this->getUnsubscribeText($urlEmail, $idHash);
+        return $this->getUnsubscribeText($urlEmail, $idHash, $lead->getPreferredLocale());
     }
 
     private function getUnsubscribeText(string $email, string $idHash, ?string $locale = null): string
