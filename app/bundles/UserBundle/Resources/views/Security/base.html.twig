@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="UTF-8" />
-    <title>{% block pageTitle %}Mautic{% endblock %}</title>
+    <title>{% block pageTitle %}{{ 'mautic.core.product_name'|trans }}{% endblock %}</title>
     <meta name="robots" content="noindex, nofollow" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="icon" type="image/x-icon" href="{{ getOverridableUrl('images/favicon.ico') }}" />
