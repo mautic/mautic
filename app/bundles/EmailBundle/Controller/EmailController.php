@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Ai\AiGateway;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
@@ -17,6 +18,7 @@ use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\EmailBundle\Ai\EmailSubjectAdvisor;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
 use Mautic\EmailBundle\Event\ManualWinnerEvent;
@@ -53,17 +55,21 @@ final class EmailController extends AbstractStandardFormController
 
     private AuditLogModel $auditLogModel;
 
+    private AiGateway $aiGateway;
+
     #[Required]
     public function autowireEmailController(
         ListModel $listModel,
         AuditLogModel $auditLogModel,
         EmailModel $emailModel,
         LeadRepository $leadRepository,
+        AiGateway $aiGateway,
     ): void {
         $this->listModel = $listModel;
         $this->auditLogModel = $auditLogModel;
         $this->emailModel = $emailModel;
         $this->leadRepository = $leadRepository;
+        $this->aiGateway = $aiGateway;
     }
 
     public const string EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
@@ -942,6 +948,7 @@ final class EmailController extends AbstractStandardFormController
                     'attachmentSize'     => $attachmentSize,
                     'permissions'        => $permissions,
                     'draftPreviewUrl'    => $draftPreviewUrl,
+                    'subjectAdvisorAvailable' => $this->aiGateway->isAvailable(EmailSubjectAdvisor::ID),
                     'invalidHtmlError'   => $this->invalidHtmlError,
                     'previewUrl'         => $this->generateUrl(
                         'mautic_email_preview_download',

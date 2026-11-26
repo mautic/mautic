@@ -40,6 +40,23 @@ final readonly class AiGateway
         $this->features = $registered;
     }
 
+    public function isAvailable(string $featureId): bool
+    {
+        $feature = $this->features[$featureId] ?? null;
+        if (null === $feature) {
+            return false;
+        }
+
+        try {
+            $this->authorize($feature);
+            $this->resolveModel($feature);
+
+            return true;
+        } catch (AiGatewayException) {
+            return false;
+        }
+    }
+
     /**
      * The caller must check access to the source records before supplying context.
      *
@@ -60,7 +77,7 @@ final readonly class AiGateway
 
             $this->authorize($feature);
             [$instructions, $prompt, $schema] = $this->prepareInput($feature, $context);
-            $model = $this->models->resolve($feature->workload());
+            $model = $this->resolveModel($feature);
             try {
                 $reply = $model->provider->chat($model->name, $instructions, $prompt);
             } catch (\RuntimeException|\TypeError) {
@@ -100,11 +117,30 @@ final readonly class AiGateway
     private function authorize(AiFeatureInterface $feature): void
     {
         $permission = $feature->permission();
-        if ($this->permissions->isAnonymous() || (null === $permission
-            ? !$this->permissions->isAdmin()
-            : (!$this->permissions->checkPermissionExists($permission) || !$this->permissions->isGranted($permission)))) {
-            throw new AiGatewayException('The current user cannot use this AI feature.', AiGatewayException::ACCESS_DENIED);
+        if (!$this->permissions->isAnonymous()) {
+            if (null === $permission && $this->permissions->isAdmin()) {
+                return;
+            }
+
+            foreach ((array) $permission as $candidate) {
+                if ($this->permissions->checkPermissionExists($candidate) && $this->permissions->isGranted($candidate)) {
+                    return;
+                }
+            }
         }
+
+        throw new AiGatewayException('The current user cannot use this AI feature.', AiGatewayException::ACCESS_DENIED);
+    }
+
+    private function resolveModel(AiFeatureInterface $feature): ConfiguredModel
+    {
+        $model    = $this->models->resolve($feature->workload());
+        $location = $feature->requiredProviderLocation();
+        if (null !== $location && $model->provider->location() !== $location) {
+            throw new AiGatewayException('The assigned AI provider is not allowed for this feature.', AiGatewayException::PROVIDER_LOCATION_DENIED, $model->providerId, $model->name);
+        }
+
+        return $model;
     }
 
     /**

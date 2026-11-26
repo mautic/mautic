@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Ai\AiTextResult;
 use Mautic\CoreBundle\Ai\ConfiguredModel;
 use Mautic\CoreBundle\Ai\ModelProviderInterface;
 use Mautic\CoreBundle\Ai\ModelWorkload;
+use Mautic\CoreBundle\Ai\ProviderLocation;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -43,6 +44,20 @@ final class AiGatewayTest extends TestCase
         ]);
 
         $this->assertSame('Campaign summary', $result->suggestion);
+    }
+
+    public function testLocalOnlyFeatureDoesNotCallTheAssignedCloudProvider(): void
+    {
+        $provider = $this->createMock(ModelProviderInterface::class);
+        $provider->method('location')->willReturn(ProviderLocation::Cloud);
+        $provider->expects($this->never())->method('chat');
+        $models = $this->createStub(AiModelResolverInterface::class);
+        $models->method('resolve')->willReturn(new ConfiguredModel($provider, 'cloud-model', []));
+        $gateway = new AiGateway($this->permissions(), $models, $this->createStub(AuditLogModel::class), [$this->feature(ProviderLocation::Local)]);
+
+        $this->assertFalse($gateway->isAvailable(self::FEATURE));
+        $this->expectExceptionCode(AiGatewayException::PROVIDER_LOCATION_DENIED);
+        $gateway->request(self::FEATURE, ['draft' => 'Campaign draft']);
     }
 
     #[DataProvider('blockedRequests')]
@@ -133,12 +148,13 @@ final class AiGatewayTest extends TestCase
         return $permissions;
     }
 
-    private function feature(): AiFeatureInterface
+    private function feature(?ProviderLocation $requiredLocation = null): AiFeatureInterface
     {
         $feature = $this->createStub(AiFeatureInterface::class);
         $feature->method('id')->willReturn(self::FEATURE);
         $feature->method('permission')->willReturn(self::PERMISSION);
         $feature->method('workload')->willReturn(ModelWorkload::Complex);
+        $feature->method('requiredProviderLocation')->willReturn($requiredLocation);
         $feature->method('allowedContextFields')->willReturn(['draft', 'count']);
         $feature->method('instructions')->willReturn('Suggest a shorter draft.');
         $feature->method('responseSchema')->willReturn([

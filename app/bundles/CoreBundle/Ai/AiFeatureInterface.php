@@ -17,11 +17,13 @@ interface AiFeatureInterface
     public function id(): string;
 
     /**
-     * @return string|null A Mautic permission, or null for administrators only
+     * @return string|non-empty-list<string>|null A Mautic permission, any one of the listed permissions, or null for administrators only
      */
-    public function permission(): ?string;
+    public function permission(): string|array|null;
 
     public function workload(): ModelWorkload;
+
+    public function requiredProviderLocation(): ?ProviderLocation;
 
     /**
      * @return list<string> Top-level scalar fields the feature may send to the model

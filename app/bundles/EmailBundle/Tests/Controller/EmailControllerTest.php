@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Ai\AiGateway;
+use Mautic\CoreBundle\Ai\AiModelResolverInterface;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -127,7 +129,8 @@ final class EmailControllerTest extends TestCase
             $this->createStub(ListModel::class),
             $this->createStub(AuditLogModel::class),
             $this->modelMock,
-            $this->createStub(LeadRepository::class)
+            $this->createStub(LeadRepository::class),
+            new AiGateway($this->corePermissionsMock, $this->createStub(AiModelResolverInterface::class), $this->createStub(AuditLogModel::class), []),
         );
 
         $this->sessionMock->method('getFlashBag')->willReturn($this->createStub(FlashBagInterface::class));

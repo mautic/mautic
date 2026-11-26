@@ -32,6 +32,11 @@ final readonly class ConnectionTestFeature implements AiFeatureInterface
         return $this->workload;
     }
 
+    public function requiredProviderLocation(): ?ProviderLocation
+    {
+        return null;
+    }
+
     public function allowedContextFields(): array
     {
         return [];

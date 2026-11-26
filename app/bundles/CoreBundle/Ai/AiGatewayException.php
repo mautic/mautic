@@ -28,6 +28,8 @@ final class AiGatewayException extends \RuntimeException
 
     public const int INVALID_RESPONSE = 8;
 
+    public const int PROVIDER_LOCATION_DENIED = 9;
+
     public function __construct(
         string $message,
         int $code,

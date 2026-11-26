@@ -1,0 +1,26 @@
+<div class="mb-16" data-subject-advisor
+     data-subject-id="{{ subjectId|e('html_attr') }}"
+     data-url="{{ path('mautic_email_subject_suggestion', {id: id})|e('html_attr') }}"
+     data-csrf="{{ csrf_token('mautic_ajax_post')|e('html_attr') }}"
+     data-pending="{{ 'mautic.email.subject_advisor.pending'|trans|e('html_attr') }}"
+     data-failure="{{ 'mautic.email.subject_advisor.failed'|trans|e('html_attr') }}">
+    <p id="email-subject-advisor-help" class="small mb-8">{{ 'mautic.email.subject_advisor.help'|trans }}</p>
+    {% include '@MauticCore/Helper/button.html.twig' with {buttons: [{
+        id: 'email-subject-suggest',
+        label: 'mautic.email.subject_advisor.suggest',
+        variant: 'tertiary',
+        size: 'sm',
+        icon: 'ri-sparkling-line',
+        attributes: {type: 'button', 'class': 'btn-nospin', 'data-subject-suggest': '', 'aria-describedby': 'email-subject-advisor-help'}
+    }]} only %}
+    <div class="mt-8 text-break" role="status" aria-live="polite" data-subject-status></div>
+    <div class="mt-8" data-subject-actions hidden>
+        {% include '@MauticCore/Helper/button.html.twig' with {buttons: [{
+            id: 'email-subject-use',
+            label: 'mautic.email.subject_advisor.use',
+            variant: 'tertiary',
+            size: 'sm',
+            attributes: {type: 'button', 'class': 'btn-nospin', 'data-subject-use': ''}
+        }]} only %}
+    </div>
+</div>
