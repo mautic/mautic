@@ -2816,6 +2816,8 @@ document.addEventListener('click', (event) => {
 });
 
 const clearSearchField = (clear, field) => {
+    if (field.disabled || field.readOnly) return;
+
     const isLiveSearch = field.dataset.toggle === 'livesearch';
     if (isLiveSearch) {
         MauticVars.lastSearchStr = '';
