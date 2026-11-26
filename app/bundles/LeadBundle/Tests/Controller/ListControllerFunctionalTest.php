@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -702,6 +703,60 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(0, $filterIconCount);
     }
 
+    public function testSegmentListShowsCategoryAfterName(): void
+    {
+        $categories = [
+            [
+                'title'         => 'Zebra',
+                'alias'         => 'zebra',
+                'segment_name'  => 'Zebra Segment',
+                'segment_alias' => 'zebra-segment',
+            ],
+            [
+                'title'         => 'Alpha',
+                'alias'         => 'alpha',
+                'segment_name'  => 'Alpha Segment',
+                'segment_alias' => 'alpha-segment',
+            ],
+        ];
+
+        foreach ($categories as $categoryData) {
+            $category = new Category();
+            $category->setTitle($categoryData['title']);
+            $category->setAlias($categoryData['alias']);
+            $category->setBundle('segment');
+            $this->em->persist($category);
+
+            $categorised = (new LeadList())->setCategory($category);
+            $this->saveSegment($categoryData['segment_name'], $categoryData['segment_alias'], [], $categorised);
+        }
+
+        $this->saveSegment('Uncategorised', 'uncategorised', []);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+
+        $this->assertCount(1, $crawler->filterXPath("//table[@id='leadListTable']//thead//th[3][contains(@class, 'col-leadlist-category')]"));
+
+        $texts = [];
+        foreach ($crawler->filterXPath("//table[@id='leadListTable']//tbody//tr") as $row) {
+            $rowCrawler = new Crawler($row);
+            $texts[trim($rowCrawler->filterXPath('.//td[2]//a')->text())] = $rowCrawler->filterXPath('.//td[3]')->text();
+        }
+
+        $this->assertStringContainsString('Zebra', $texts['Zebra Segment (zebra-segment)']);
+        $this->assertStringContainsString('Alpha', $texts['Alpha Segment (alpha-segment)']);
+        $this->assertSame($this->translator->trans('mautic.core.form.uncategorized'), trim($texts['Uncategorised (uncategorised)']));
+
+        foreach ([
+            'ASC'  => ['Uncategorised', 'Alpha Segment', 'Zebra Segment'],
+            'DESC' => ['Zebra Segment', 'Alpha Segment', 'Uncategorised'],
+        ] as $direction => $expected) {
+            $crawler = $this->client->request(Request::METHOD_GET, '/s/segments?orderby=cat.title&orderbydir='.$direction);
+            $names   = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr/td[2]//a")->each(static fn (Crawler $a): string => trim(explode(' (', $a->text())[0]));
+            $this->assertSame($expected, $names, $direction);
+        }
+    }
+
     public function testUnpublishedSegmentDoesNotShowRebuildingLabel(): void
     {
         // Create a segment that would normally show "Building" label
@@ -926,6 +981,32 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('2', (string) $html);
         $this->assertStringContainsString('Active contacts', (string) $html);
         $this->assertStringContainsString('1', (string) $html);
+    }
+
+    public function testManuallyRemovedContactsStatLinksToSourceSearch(): void
+    {
+        $segment = $this->saveSegment('removed-test', 'removed-test');
+        $contact = new Lead();
+        $contact->setFirstname('Removed');
+        $this->em->persist($contact);
+        $this->em->flush();
+        $segmentContact = new ListLead();
+        $segmentContact->setList($segment);
+        $segmentContact->setLead($contact);
+        $segmentContact->setDateAdded(new \DateTime());
+        $segmentContact->setManuallyAdded(false);
+        $segmentContact->setManuallyRemoved(true);
+        $this->em->persist($segmentContact);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/segmentStats/'.$segment->getId());
+        $this->assertResponseIsSuccessful();
+
+        $card = $crawler->filter('a.tile--clickable[href*="segment_source:manually_removed"]');
+        $this->assertCount(1, $card);
+        $this->assertStringContainsString('Manually removed contacts', $card->text());
+        $this->assertStringContainsString('segment:removed-test', urldecode((string) $card->attr('href')));
+        $this->assertStringContainsString('1', $card->text());
     }
 
     /**

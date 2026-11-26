@@ -13,7 +13,7 @@ final readonly class AssetGenerationHelper
         'mousetrap/mousetrap.js', // Needed for keyboard shortcuts
         'jquery/dist/jquery.js', // Needed for everything. It's the underlying framework.
         '../vendor/twbs/bootstrap/dist/js/bootstrap.bundle.js', // Needed for the UI components like modal boxes.
-        'jquery-form/src/jquery.form.js', // Needed for ajax forms with file attachments.
+        'jquery-form/dist/jquery.form.js', // Needed for ajax forms with file attachments.
         'moment/min/moment.min.js', // Needed for date/time formatting.
         'jquery.caret/dist/jquery.caret.js', // Needed for the text editor Twitter-like mentions (tokens).
         'jquery.cookie/jquery.cookie.js', // A simple, lightweight jQuery plugin for reading, writing and deleting cookies.

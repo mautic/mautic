@@ -10,6 +10,11 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class UtmTag
 {
     /**
+     * The campaign parameters Mautic stores as UTM tags.
+     */
+    public const CAMPAIGN_PARAMETERS = ['utm_campaign', 'utm_source', 'utm_medium', 'utm_content', 'utm_term'];
+
+    /**
      * @var int
      */
     private $id;
@@ -335,6 +340,25 @@ class UtmTag
         $this->utmTerm = $utmTerm;
 
         return $this;
+    }
+
+    /**
+     * Keeps only the campaign parameters with a single text value, so other query parameters cannot pass as UTM tags.
+     *
+     * @param array<mixed> $parameters
+     *
+     * @return array<string, string>
+     */
+    public static function filterCampaignParameters(array $parameters): array
+    {
+        $campaignParameters = [];
+        foreach (self::CAMPAIGN_PARAMETERS as $name) {
+            if (isset($parameters[$name]) && is_string($parameters[$name])) {
+                $campaignParameters[$name] = $parameters[$name];
+            }
+        }
+
+        return $campaignParameters;
     }
 
     public function hasUtmTags(): bool

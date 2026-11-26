@@ -190,13 +190,12 @@ Mautic.emailSendOnUnload = function () {
 };
 
 Mautic.sendEmailBatch = function () {
-    var data = 'id=' + mQuery('.progress-bar-send').data('email') + '&pending=' + mQuery('.progress-bar-send').attr('aria-valuemax') + '&batchlimit=' + mQuery('.progress-bar-send').data('batchlimit');
+    const progressContainer = mQuery('.email-send-progress');
+    const data = 'id=' + progressContainer.data('email') + '&pending=' + progressContainer.data('pending') + '&batchlimit=' + progressContainer.data('batchlimit');
     Mautic.sendEmailBatchXhr = Mautic.ajaxActionRequest('email:sendBatch', data, function (response) {
         if (response.progress) {
             if (response.progress[0] > 0) {
-                mQuery('.imported-count').html(response.progress[0]);
-                mQuery('.progress-bar-send').attr('aria-valuenow', response.progress[0]).css('width', response.percent + '%');
-                mQuery('.progress-bar-send span.visually-hidden').html(response.percent + '%');
+                Mautic.updateProgressBar(progressContainer, response.progress[0], response.percent, response.progress[1]);
             }
 
             if (response.progress[0] >= response.progress[1]) {
@@ -397,7 +396,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     }
 
     tabHolder.find('i').first().removeClass('ri-loader-3-line ri-spin').addClass('ri-add-line text-success');
-    newTab.find('a').tab('show');
+    newTab.find('a').each((index, element) => bootstrap.Tab.getOrCreateInstance(element).show());
 
     firstInput.focus();
 
@@ -464,7 +463,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
 
     Mautic.initRemoveEvents(removeButton, mQuery);
 
-    newTab.find('a').tab('show');
+    newTab.find('a').each((index, element) => bootstrap.Tab.getOrCreateInstance(element).show());
 
     return filterContainerId;
 };
@@ -606,9 +605,9 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
             tabLink.remove();
             // if tabContainer is for variants, show the first one, if it is the DEC vertical list, show the second one
             if (tabContainer.hasClass('tabs-left') || $this.hasClass('remove-filter')) {
-                tabContainer.find('li').first().next().find('a').tab('show');
+                tabContainer.find('li').first().next().find('a').each((index, element) => bootstrap.Tab.getOrCreateInstance(element).show());
             } else {
-                tabContainer.find('li').first().find('a').tab('show');
+                tabContainer.find('li').first().find('a').each((index, element) => bootstrap.Tab.getOrCreateInstance(element).show());
             }
 
             Mautic.updateDynamicContentDropdown();
