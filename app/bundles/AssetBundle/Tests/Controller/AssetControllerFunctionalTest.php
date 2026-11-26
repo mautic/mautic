@@ -13,6 +13,8 @@ use Mautic\AssetBundle\Tests\RemoteFileServerTrait;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
+use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
@@ -20,6 +22,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -62,6 +65,80 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     {
         $parameters['_token'] = $this->getCsrfToken(BatchDownloadRequestValidator::CSRF_TOKEN_ID);
         $this->client->request(Request::METHOD_POST, self::BATCH_DOWNLOAD_PATH, $parameters);
+    }
+
+    public static function cloudProviderPublishedStateProvider(): iterable
+    {
+        yield 'unpublished cloud provider hides remote browse' => [false, 0];
+        yield 'published cloud provider shows remote browse'   => [true, 1];
+    }
+
+    #[DataProvider('cloudProviderPublishedStateProvider')]
+    public function testNewAssetRemoteBrowseFollowsCloudProviderPublishedState(bool $isPublished, int $expectedCount): void
+    {
+        $this->createCloudStorageIntegration($isPublished);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/assets/new');
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $crawler->filter('#asset_storageLocation_1'));
+        $this->assertCount($expectedCount, $crawler->filter('#remote-button a'));
+    }
+
+    #[DataProvider('cloudProviderPublishedStateProvider')]
+    public function testEditAssetRemoteBrowseFollowsCloudProviderPublishedState(bool $isPublished, int $expectedCount): void
+    {
+        $asset = $this->createAsset(['title' => 'Local asset for remote browse']);
+        $this->createCloudStorageIntegration($isPublished);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/assets/edit/'.$asset->getId());
+        $this->assertResponseIsSuccessful();
+        $this->assertCount($expectedCount, $crawler->filter('#remote-button a'));
+    }
+
+    #[DataProvider('cloudProviderPublishedStateProvider')]
+    public function testRemoteBrowseModalListsCloudProviderFollowingPublishedState(bool $isPublished, int $expectedCount): void
+    {
+        $this->createCloudStorageIntegration($isPublished);
+
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/assets/remote?tmpl=modal');
+        $this->assertResponseIsSuccessful();
+        $responseData = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $crawler      = new Crawler($responseData['newContent']);
+        $this->assertCount($expectedCount, $crawler->filter('#tabAmazonS3'));
+    }
+
+    public function testFetchRemoteFilesRejectsUnpublishedCloudProvider(): void
+    {
+        $this->createCloudStorageIntegration(false);
+
+        $this->client->xmlHttpRequest(
+            Request::METHOD_POST,
+            '/s/ajax',
+            ['action' => 'asset:fetchRemoteFiles', 'provider' => 'AmazonS3', 'path' => ''],
+            [],
+            $this->createAjaxHeaders()
+        );
+        $this->assertResponseIsSuccessful();
+        $responseData = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $this->assertSame(0, $responseData['success']);
+        $this->assertArrayNotHasKey('message', $responseData);
+    }
+
+    private function createCloudStorageIntegration(bool $isPublished): void
+    {
+        $plugin = new Plugin();
+        $plugin->setName('Cloud Storage');
+        $plugin->setBundle('MauticCloudStorageBundle');
+        $this->em->persist($plugin);
+
+        $integration = new Integration();
+        $integration->setName('AmazonS3');
+        $integration->setIsPublished($isPublished);
+        $integration->setPlugin($plugin);
+        $integration->setSupportedFeatures(['cloud_storage']);
+        $this->em->persist($integration);
+
+        $this->em->flush();
     }
 
     public function testCreateAndEditRemoteImageAssetWithQueryString(): void

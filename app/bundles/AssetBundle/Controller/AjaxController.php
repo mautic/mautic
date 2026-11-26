@@ -50,8 +50,13 @@ final class AjaxController extends CommonAjaxController
             return $this->sendJsonResponse(['success' => 0]);
         }
 
+        $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage'], false, null, true);
+        if (!isset($integrations[$provider])) {
+            return $this->sendJsonResponse(['success' => 0]);
+        }
+
         /** @var AbstractIntegration $integration */
-        $integration = $integrationHelper->getIntegrationObject($provider);
+        $integration = $integrations[$provider];
 
         $event = new RemoteAssetBrowseEvent($integration);
         $this->dispatcher->dispatch($event);

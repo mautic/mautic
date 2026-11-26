@@ -411,7 +411,7 @@ final class AssetController extends AbstractStandardFormController
         }
 
         // Check for integrations to cloud providers
-        $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
+        $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage'], false, null, true);
 
         return $this->delegateView([
             'viewParameters' => [
@@ -573,7 +573,7 @@ final class AssetController extends AbstractStandardFormController
         }
 
         // Check for integrations to cloud providers
-        $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
+        $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage'], false, null, true);
 
         return $this->delegateView([
             'viewParameters' => [
@@ -816,7 +816,7 @@ final class AssetController extends AbstractStandardFormController
     public function remoteAction(Request $request, IntegrationHelper $integrationHelper): Response
     {
         // Check for integrations to cloud providers
-        $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
+        $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage'], false, null, true);
 
         $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
 
