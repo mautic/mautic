@@ -31,14 +31,14 @@ final class SeriesPieChartTest extends TestCase
         $this->chart->setTotalCount(100);
         $label = $this->chart->buildFullLabel('Test Label', 25);
 
-        $this->assertEquals('Test Label; 25x, 25%', $label);
+        $this->assertSame('Test Label; 25x, 25%', $label);
     }
 
     public function testBuildFullLabelWithoutTotalCount(): void
     {
         $label = $this->chart->buildFullLabel('Test Label', 25);
 
-        $this->assertEquals('Test Label', $label);
+        $this->assertSame('Test Label', $label);
     }
 
     public function testRender(): void

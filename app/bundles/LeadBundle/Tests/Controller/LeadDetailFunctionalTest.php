@@ -149,7 +149,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', sprintf('/s/contacts/view/%d', $lead->getId()));
 
         // The rendered custom-field value cell (the audit-trail table echoes the raw payload escaped, so scope to the field).
-        $labelCell    = $crawler->filter('td span.fw-b')->reduce(fn (Crawler $node): bool => 'HTML Bio' === trim($node->text()));
+        $labelCell    = $crawler->filter('td span.fw-bold')->reduce(fn (Crawler $node): bool => 'HTML Bio' === trim($node->text()));
         $fieldContent = $labelCell->count()
             ? $labelCell->closest('td')->nextAll()->first()->html()
             : '';

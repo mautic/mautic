@@ -64,7 +64,8 @@ final class CampaignEventStatsTest extends MauticMysqlTestCase
         $eventsStatistics         = $this->getEventsStatistics($campaign);
         $this->assertSame($expectedEventsStatistics, $eventsStatistics);
 
-        sleep(5);
+        // expire cached stats instead of waiting for campaign_event_cache_ttl
+        $this->em->getConnection()->getConfiguration()->getResultCache()?->clear();
 
         $eventsStatistics         = $this->getEventsStatistics($campaign);
 

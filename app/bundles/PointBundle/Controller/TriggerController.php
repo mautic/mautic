@@ -96,7 +96,7 @@ final class TriggerController extends AbstractFormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_pointtrigger_index',
                     'mauticContent' => 'pointTrigger',
@@ -153,7 +153,7 @@ final class TriggerController extends AbstractFormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_pointtrigger_index',
                     'mauticContent' => 'pointTrigger',
@@ -268,7 +268,7 @@ final class TriggerController extends AbstractFormController
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_pointtrigger_index', $viewParameters);
-                $template       = 'Mautic\PointBundle\Controller\TriggerController::indexAction';
+                $template       = self::class.'::indexAction';
 
                 // clear temporary fields
                 $this->clearSessionComponents($request, $sessionId);
@@ -336,7 +336,7 @@ final class TriggerController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
@@ -417,7 +417,7 @@ final class TriggerController extends AbstractFormController
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_pointtrigger_index', $viewParameters);
-                $template       = 'Mautic\PointBundle\Controller\TriggerController::indexAction';
+                $template       = self::class.'::indexAction';
 
                 // remove fields from session
                 $this->clearSessionComponents($request, $objectId);
@@ -530,7 +530,7 @@ final class TriggerController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
@@ -584,7 +584,7 @@ final class TriggerController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',

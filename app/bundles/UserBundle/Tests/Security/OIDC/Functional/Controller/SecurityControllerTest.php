@@ -14,6 +14,8 @@ use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Security\OIDC\Settings;
 use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use Mautic\UserBundle\Tests\Security\OIDC\Double\Service\Client;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
@@ -69,7 +71,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $this->em->flush();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
+    #[DataProvider('enabledParametersProvider')]
     public function testRequireLoginActionWhenNotLoggedIn(ParametersBuilder $parametersBuilder): void
     {
         // When OIDC is enabled, unauthenticated users are redirected to OIDC provider
@@ -91,7 +93,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $this->assertStringEndsWith(self::MAUTIC_LOGIN_PATH, $crawler->getUri());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
+    #[DataProvider('enabledParametersProvider')]
     public function testRequireLoginActionWhenLoggedInUsingForm(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
@@ -108,7 +110,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
+    #[DataProvider('enabledParametersProvider')]
     public function testRequireLoginActionWhenLoggedInUsingOpenId(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
@@ -138,7 +140,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
+    #[DataProvider('enabledParametersProvider')]
     public function testLoginCheckActionWhenNotLoggedIn(ParametersBuilder $parametersBuilder): void
     {
         // Set authenticate response to prevent redirect loop when accessing protected endpoint
@@ -151,7 +153,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(404);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
+    #[DataProvider('enabledParametersProvider')]
     public function testLoginCheckActionWhenLoggedInUsingForm(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
@@ -171,7 +173,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
+    #[DataProvider('enabledParametersProvider')]
     public function testLoginCheckActionWhenLoggedInUsingOpenId(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
@@ -201,7 +203,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
+    #[DataProvider('enabledParametersProvider')]
     public function testLoginActionWhenNotLoggedIn(ParametersBuilder $parametersBuilder): void
     {
         // Configure the test double to return a redirect
@@ -213,7 +215,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
+    #[DataProvider('enabledParametersProvider')]
     public function testLoginActionWhenLoggedInUsingForm(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
@@ -235,7 +237,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
+    #[DataProvider('enabledParametersProvider')]
     public function testLoginActionWhenLoggedInUsingOpenId(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
@@ -246,7 +248,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
+    #[DataProvider('enabledParametersProvider')]
     public function testLoginActionLinksUser(ParametersBuilder $parametersBuilder): void
     {
         $userRepo      = $this->getService(UserRepository::class);
@@ -285,7 +287,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(OidcSubjectId::class, $subjectId);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
+    #[DataProvider('enabledParametersProvider')]
     public function testLoginActionCreatesUser(ParametersBuilder $parametersBuilder): void
     {
         $userRepo      = $this->getService(UserRepository::class);
@@ -390,7 +392,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $session->save();
 
         // Set session cookie so it persists across requests
-        $cookie = new \Symfony\Component\BrowserKit\Cookie($session->getName(), $session->getId());
+        $cookie = new Cookie($session->getName(), $session->getId());
         $this->client->getCookieJar()->set($cookie);
 
         // Also set token storage for immediate use
@@ -419,7 +421,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $session->save();
 
         // Set session cookie so it persists across requests
-        $cookie = new \Symfony\Component\BrowserKit\Cookie($session->getName(), $session->getId());
+        $cookie = new Cookie($session->getName(), $session->getId());
         $this->client->getCookieJar()->set($cookie);
 
         // Also set token storage for immediate use

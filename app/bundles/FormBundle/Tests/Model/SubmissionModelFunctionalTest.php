@@ -91,7 +91,7 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(1, $this->countLeadRowsById($existingContactId));
         $this->assertSame(0, $this->countLeadRowsById($anonymousContactId));
 
-        $contact = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->find($existingContactId);
+        $contact = $this->getContainer()->get(LeadRepository::class)->find($existingContactId);
         $this->assertInstanceOf(Lead::class, $contact);
         $this->assertSame('existing.winner@example.com', $contact->getEmail());
         $this->assertSame('Updated', $contact->getFirstname());

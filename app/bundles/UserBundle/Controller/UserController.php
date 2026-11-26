@@ -120,7 +120,7 @@ final class UserController extends AbstractFormController
                     'page' => $lastPage,
                     'tmpl' => $tmpl,
                 ],
-                'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_user_index',
                     'mauticContent' => 'user',
@@ -259,7 +259,7 @@ final class UserController extends AbstractFormController
             $response = $this->postActionRedirect([
                 'returnUrl'       => $this->generateUrl('mautic_user_index'),
                 'viewParameters'  => ['page' => $request->getSession()->get('mautic.user.page', 1), 'isSamlUser' => false],
-                'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_user_index',
                     'mauticContent' => 'user',
@@ -367,7 +367,7 @@ final class UserController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'mauticContent' => 'user',
@@ -494,7 +494,7 @@ final class UserController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'route'         => $returnUrl,
@@ -555,7 +555,7 @@ final class UserController extends AbstractFormController
         if (null === $user) {
             return $this->postActionRedirect([
                 'returnUrl'       => $this->generateUrl('mautic_dashboard_index'),
-                'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::contactAction',
+                'contentTemplate' => self::class.'::contactAction',
                 'flashes'         => [
                     [
                         'type'    => 'error',
@@ -670,7 +670,7 @@ final class UserController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'mauticContent' => 'user',

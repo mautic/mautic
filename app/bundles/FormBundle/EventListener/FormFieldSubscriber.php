@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\FormBundle\Event\FormFieldEvent;
-use Mautic\FormBundle\FormEvents;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
@@ -17,11 +17,14 @@ final readonly class FormFieldSubscriber
     }
 
     #[AsEventListener(
-        event: FormEvents::FIELD_POST_DELETE,
+        event: EntityPostDelete::class,
     )]
-    public function onFieldPostDelete(FormFieldEvent $event): void
+    public function onFieldPostDelete(EntityPostDelete $event): void
     {
-        $field = $event->getField();
+        $field = $event->getEntity();
+        if (!$field instanceof Field) {
+            return;
+        }
 
         if (null !== $field->deletedId) {
             $this->fieldModel->removeFieldColumn($field);

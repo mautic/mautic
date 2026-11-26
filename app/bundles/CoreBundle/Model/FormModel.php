@@ -5,7 +5,12 @@ namespace Mautic\CoreBundle\Model;
 use Doctrine\ORM\UnitOfWork;
 use Mautic\CoreBundle\Doctrine\ReservedWords;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
+use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreDelete;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Event\EntityTogglePublishEvent;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
@@ -91,10 +96,10 @@ class FormModel extends AbstractCommonModel
     /**
      * Unlock an entity that prevents multiple people from editing.
      *
-     * @param TEntity $entity
-     * @param mixed  $extra  Can be used by model to determine what to unlock
+     * @param TEntity                     $entity
+     * @param mixed[]|string|false|null $extra  Can be used by model to determine what to unlock
      */
-    public function unlockEntity(object $entity, $extra = null): void
+    public function unlockEntity(object $entity, array|string|false|null $extra = null): void
     {
         // unlock the row if applicable
         if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId()) {
@@ -385,9 +390,31 @@ class FormModel extends AbstractCommonModel
      *
      * @param TEntity $entity
      */
-    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $entityEvent = null): ?Event
     {
-        // ...
+        $eventClass = match ($action) {
+            'pre_save'    => EntityPreSave::class,
+            'post_save'   => EntityPostSave::class,
+            'pre_delete'  => EntityPreDelete::class,
+            'post_delete' => EntityPostDelete::class,
+            default       => null,
+        };
+
+        if (null === $eventClass) {
+            return null;
+        }
+
+        if (!$this->dispatcher->hasListeners($eventClass)) {
+            return null;
+        }
+
+        $event = new $eventClass($entity, $isNew);
+
+        if ($entityEvent instanceof CommonEvent) {
+            $event->inheritStateFrom($entityEvent);
+        }
+
+        $this->dispatcher->dispatch($event);
 
         return $event;
     }

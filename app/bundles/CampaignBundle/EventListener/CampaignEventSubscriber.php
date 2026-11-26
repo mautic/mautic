@@ -9,9 +9,9 @@ use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\TransactionRequiredException;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\CampaignBundle\Event\CampaignPreSaveEvent;
 use Mautic\CampaignBundle\Event\EventPreview;
 use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
@@ -20,6 +20,7 @@ use Mautic\CampaignBundle\Event\NotifyOfUnpublishEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignAlreadyUnpublishedException;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignVersionMismatchedException;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -46,12 +47,14 @@ final readonly class CampaignEventSubscriber
      * Reset all campaign event failed_count's
      * to 0 when the campaign is published.
      */
-    #[AsEventListener(
-        event: CampaignPreSaveEvent::class,
-    )]
-    public function onCampaignPreSave(CampaignPreSaveEvent $event): void
+    #[AsEventListener]
+    public function onCampaignPreSave(EntityPreSave $event): void
     {
-        $campaign = $event->getCampaign();
+        $campaign = $event->getEntity();
+        if (!$campaign instanceof Campaign) {
+            return;
+        }
+
         $changes  = $campaign->getChanges();
 
         // isPublished set to true for new / edit

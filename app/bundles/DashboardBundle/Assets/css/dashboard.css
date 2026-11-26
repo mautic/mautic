@@ -4,9 +4,7 @@ body:has(.s-dashboard) {
     --field-hover: var(--field-hover-02);
 }
 
-.input-group-addon label {
-    margin-bottom: 0px;
-}
+.input-group-addon label { margin-bottom: 0px; }
 .vector-map {
 	height: 350px;
     color: transparent;
@@ -20,18 +18,7 @@ body:has(.s-dashboard) {
     border: 1px dashed #4e5d9d;
     flex-grow: 0;
 }
-.dashboard-widgets.cards {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -webkit-flex-wrap: wrap;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
-    padding: 10px;
-}
+.dashboard-widgets.cards { padding: 10px; }
 .dashboard-widgets .tile {
     --layer: var(--background);
     margin: 5px;
@@ -108,32 +95,22 @@ body:has(.s-dashboard) {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.dashboard-widgets .tile table {
-    table-layout: fixed;
-}
+.dashboard-widgets .tile table { table-layout: fixed; }
 .dashboard-widgets .tile table td {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.dashboard-widgets .tile table td:last-child {
-    width: 30px;
-}
+.dashboard-widgets .tile table td:last-child { width: 30px; }
 
 .dashboard-widgets .card-body:has(> .chart-wrapper),
 .dashboard-widgets .card-body > .chart-wrapper {
     min-height: 0;
 }
-.dashboard-widgets .card-body > .chart-wrapper {
-    flex-grow: 1;
-}
+.dashboard-widgets .card-body > .chart-wrapper { flex-grow: 1; }
 .dashboard-widgets .card-body > .chart-wrapper > div,
 .dashboard-widgets .chart-fit-container {
     height: 100%;
-}
-
-.chart-wrapper {
-    position: relative;
 }
 .chart-wrapper .legend {
     background: #000;
@@ -147,9 +124,7 @@ body:has(.s-dashboard) {
     color: #fff;
     -webkit-transition: all 0.3s ease-in-out;
 }
-.chart-wrapper:hover .legend {
-    opacity: 0.8;
-}
+.chart-wrapper:hover .legend { opacity: 0.8; }
 .chart-wrapper .legend ul {
     list-style: none;
     margin: 0;
@@ -170,13 +145,7 @@ body:has(.s-dashboard) {
 }
 
 @media (max-width: 700px) {
-    .dashboard-widgets .widget {
-        width: 100% !important;
-    }
+    .dashboard-widgets .widget { width: 100% !important; }
 }
 
-#dashboard-widgets .spinner {
-    text-align: center;
-    line-height: 250px;
-    font-size: 24px;
-}
+#dashboard-widgets .spinner { line-height: 250px; }

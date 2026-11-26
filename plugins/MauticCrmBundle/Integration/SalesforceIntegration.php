@@ -3016,7 +3016,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
             // mark as deleleted
             foreach ($resultsById['records'] as $sfId => $record) {
                 if (isset($record['IsDeleted']) && 1 == $record['IsDeleted']) {
-                    if ($foundKey = array_search($record['Id'], $searchForIds)) {
+                    if ($foundKey = array_search($record['Id'], $searchForIds, true)) {
                         $integrationEntity = $this->em->getReference(IntegrationEntity::class, $checkIdsInSF[$foundKey]['id']);
                         $integrationEntity->setInternalEntity('company-deleted');
                         $this->persistIntegrationEntities[] = $integrationEntity;
@@ -3055,7 +3055,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param Lead $lead
      */
-    public function getLeadDoNotContactByDate($channel, $matchedFields, $object, $lead, $sfData, $params = [])
+    public function getLeadDoNotContactByDate($channel, $matchedFields, $object, $lead, $sfData, array $params = [])
     {
         if (isset($matchedFields['mauticContactIsContactableByEmail']) && $this->updateDncByDate()) {
             $matchedFields['internal_entity_id']    = $lead->getId();

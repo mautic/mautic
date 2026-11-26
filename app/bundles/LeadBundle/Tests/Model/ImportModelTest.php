@@ -242,10 +242,6 @@ final class ImportModelTest extends StandardImportTestHelper
         $model    = $this->initImportModel();
         $testData = [
             [
-                'row' => '',
-                'res' => true,
-            ],
-            [
                 'row' => [],
                 'res' => true,
             ],

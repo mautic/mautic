@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\ImportCommand;
 use Mautic\LeadBundle\Entity\Company;
@@ -33,8 +34,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportControllerTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     private const string IMPORT_CANCELED_MESSAGE = 'Import canceled for file test.csv';
 
     public function testImportWithoutFile(): void
@@ -304,6 +303,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         );
     }
 
+    #[ResetDatabase]
     public function testImportWithSkipIfExistsFlagTrue(): void
     {
         $this->createBooleanField();

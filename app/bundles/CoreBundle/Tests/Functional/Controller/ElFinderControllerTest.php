@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -39,7 +40,7 @@ final class ElFinderControllerTest extends MauticMysqlTestCase
     #[DataProvider('dataUrls')]
     public function testElfinderWithInsufficientPermissionsForNonAdmin(string $url): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'sales']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'sales']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 

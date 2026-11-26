@@ -12,8 +12,6 @@ use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 
 final class GroupScoreRepositoryFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     private GroupContactScoreRepository $repository;
 
     protected function setUp(): void

@@ -119,9 +119,6 @@ final class EmailStatOptions extends FetchOptions
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getUnit(): ?string
     {
         return $this->unit;

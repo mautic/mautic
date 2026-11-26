@@ -10,7 +10,6 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Console\Exception\RuntimeException;
 
 final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
@@ -134,8 +133,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->createCampaignLead($campaign, $contact7);
         $this->createCampaignLead($campaign, $contact8);
 
-        sleep(1); // wait 1 second so that compare timestamp
-
         $rootEmail = $this->createEvent('Welcome Email', $campaign, 'email.send', 'action', ['email' => '1']);
 
         $conditionEvent = $this->createEvent('Check Contact Field Value Condition', $campaign, 'lead.field_value', 'condition', [
@@ -231,8 +228,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
 
         $this->em->flush();
 
-        sleep(1);
-
         $output = $this->executeCommand(
             [
                 'campaign-id'   => $campaignId,
@@ -280,7 +275,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
     /**
      * Test executing the command with a linear campaign with manually removed contacts.
      */
-    #[RunInSeparateProcess]
     public function testCampaignWithManuallyRemovedContacts(): void
     {
         $campaign = $this->createCampaign('Campaign with Manually Removed Contacts');
@@ -376,7 +370,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
     /**
      * Test executing the command with a linear campaign with deleted Events.
      */
-    #[RunInSeparateProcess]
     public function testCampaignWithDeletedEvents(): void
     {
         $campaign = $this->createCampaign('Campaign with Deleted Events');
@@ -490,8 +483,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->createCampaignLead($campaign, $contactStuck);
         $this->createCampaignLead($campaign, $contactCompleted);
 
-        sleep(1);
-
         $rootAction = $this->createEvent('Root Action', $campaign, 'email.send', 'action');
 
         $conditionEvent = $this->createEvent('Stuck Condition', $campaign, 'lead.field_value', 'condition', [
@@ -517,7 +508,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->em->persist($yesPathAction);
         $this->em->persist($noPathAction);
 
-        sleep(1);
         // contactStuck: root executed + condition log at version=1 (stuck mid-execution, non_action_path_taken=0)
         $this->createEventLog($contactStuck, $rootAction, $campaign, 1);
         $this->createEventLog($contactStuck, $conditionEvent, $campaign, 1);
@@ -529,8 +519,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->markEventLogAsCompleted($completedLog);
 
         $this->em->flush();
-
-        sleep(1);
 
         $output = $this->executeCommand([
             'campaign-id' => $campaignId,
@@ -632,8 +620,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->createCampaignLead($campaign, $contactStuck);
         $this->createCampaignLead($campaign, $contactCompleted);
 
-        sleep(1);
-
         $rootAction = $this->createEvent('Root Action For Decision', $campaign, 'email.send', 'action');
 
         $decisionEvent = $this->createEvent('Stuck Decision', $campaign, 'asset.download', 'decision', []);
@@ -666,8 +652,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->markEventLogAsCompleted($completedLog);
 
         $this->em->flush();
-
-        sleep(1);
 
         $output = $this->executeCommand([
             'campaign-id' => $campaignId,
@@ -844,8 +828,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $contact = $this->createLead('Deep Hierarchy Contact');
         $this->createCampaignLead($campaign, $contact);
 
-        sleep(1);
-
         // Create 5-level deep hierarchy
         $level1 = $this->createEvent('Level 1', $campaign, 'email.send', 'action');
         $level2 = $this->createEvent('Level 2', $campaign, 'lead.changepoints', 'action', ['points' => 5]);
@@ -868,8 +850,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->createEventLog($contact, $level1, $campaign, 1);
 
         $this->em->flush();
-
-        sleep(1);
 
         $output = $this->executeCommand([
             'campaign-id' => $campaignId,
@@ -906,8 +886,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->createCampaignLead($campaign, $contact1);
         $this->createCampaignLead($campaign, $contact2);
 
-        sleep(1);
-
         $rootEvent = $this->createEvent('Root', $campaign, 'email.send', 'action');
 
         // Create 3 sibling children
@@ -928,8 +906,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->createEventLog($contact2, $rootEvent, $campaign, 1);
 
         $this->em->flush();
-
-        sleep(1);
 
         $output = $this->executeCommand([
             'campaign-id' => $campaignId,
@@ -957,8 +933,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $contact = $this->createLead('Future Scheduled Contact');
         $this->createCampaignLead($campaign, $contact);
 
-        sleep(1);
-
         $rootEvent  = $this->createEvent('Root Event', $campaign, 'email.send', 'action');
         $childEvent = $this->createEvent('Child Event', $campaign, 'lead.changepoints', 'action', ['points' => 10]);
         $childEvent->setParent($rootEvent);
@@ -971,8 +945,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $scheduledLog->setTriggerDate(new \DateTime()->modify('+1 day'));
 
         $this->em->flush();
-
-        sleep(1);
 
         $output = $this->executeCommand([
             'campaign-id' => $campaignId,
@@ -1000,8 +972,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $contact = $this->createLead('Past Scheduled Contact');
         $this->createCampaignLead($campaign, $contact);
 
-        sleep(1);
-
         $rootEvent  = $this->createEvent('Root Event', $campaign, 'email.send', 'action');
         $childEvent = $this->createEvent('Child Event', $campaign, 'lead.changepoints', 'action', ['points' => 10]);
         $childEvent->setParent($rootEvent);
@@ -1013,8 +983,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $scheduledLog->setTriggerDate(new \DateTime()->modify('-1 day'));
 
         $this->em->flush();
-
-        sleep(1);
 
         $output = $this->executeCommand([
             'campaign-id' => $campaignId,
@@ -1049,8 +1017,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->createCampaignLead($campaign1, $contact1);
         $this->createCampaignLead($campaign2, $contact2);
 
-        sleep(1);
-
         $event1 = $this->createEvent('Event 1', $campaign1, 'email.send', 'action');
         $child1 = $this->createEvent('Child 1', $campaign1, 'lead.changepoints', 'action', ['points' => 5]);
         $child1->setParent($event1);
@@ -1066,8 +1032,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->createEventLog($contact2, $event2, $campaign2, 1);
 
         $this->em->flush();
-
-        sleep(1);
 
         // Process only campaign 1
         $output = $this->executeCommand([
@@ -1108,8 +1072,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $campaignLead2 = $this->createCampaignLead($campaign, $contact2);
         $campaignLead2->setManuallyRemoved(true);
 
-        sleep(1);
-
         $event = $this->createEvent('Event', $campaign, 'email.send', 'action');
         $child = $this->createEvent('Child', $campaign, 'lead.changepoints', 'action', ['points' => 5]);
         $child->setParent($event);
@@ -1119,8 +1081,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->createEventLog($contact2, $event, $campaign, 1);
 
         $this->em->flush();
-
-        sleep(1);
 
         $output = $this->executeCommand([
             'campaign-id' => $campaignId,
@@ -1152,8 +1112,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->createCampaignLead($campaign, $contact1);
         $this->createCampaignLead($campaign, $contact2);
         $this->createCampaignLead($campaign, $contact3);
-
-        sleep(1);
 
         $rootEvent = $this->createEvent('Root', $campaign, 'email.send', 'action');
 
@@ -1192,8 +1150,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
 
         $this->em->flush();
 
-        sleep(1);
-
         $output = $this->executeCommand([
             'campaign-id' => $campaignId,
             '--dry-run'   => true,
@@ -1222,8 +1178,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $contact = $this->createLead('No Path Contact');
         $this->createCampaignLead($campaign, $contact);
 
-        sleep(1);
-
         $root = $this->createEvent('Root', $campaign, 'email.send', 'action');
 
         $cond = $this->createEvent('Condition', $campaign, 'lead.field_value', 'condition');
@@ -1248,8 +1202,6 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->markEventLogAsCompleted($condLog);
 
         $this->em->flush();
-
-        sleep(1);
 
         $output = $this->executeCommand([
             'campaign-id' => $campaignId,

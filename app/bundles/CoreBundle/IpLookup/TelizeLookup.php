@@ -41,7 +41,7 @@ final class TelizeLookup extends AbstractRemoteDataLookup
      *
      * @param mixed $response Response from the service
      */
-    protected function parseResponse($response): void
+    protected function parseResponse(mixed $response): void
     {
         $data = json_decode($response);
 

@@ -7,6 +7,8 @@ namespace Mautic\FormBundle\Tests\Model;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPreDelete;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -82,10 +84,10 @@ final class DeleteFormTest extends TestCase
         $dispatcher->expects($matcher)
             ->method('hasListeners')->willReturnCallback(function (...$parameters) use ($matcher): false {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('mautic.form_pre_delete', $parameters[0]);
+                    $this->assertSame(EntityPreDelete::class, $parameters[0]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('mautic.form_post_delete', $parameters[0]);
+                    $this->assertSame(EntityPostDelete::class, $parameters[0]);
                 }
 
                 return false;

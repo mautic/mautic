@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
@@ -20,13 +21,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AllowMockObjectsWithoutExpectations]
 final class SalesforceApiTest extends TestCase
 {
-    #[TestDox('Test that a locked record request is retried up to 3 times')]
-    public function testRecordLockedErrorIsRetriedThreeTimes(): void
+    #[TestDox('Test that a locked record request is retried and fails when the record stays locked')]
+    public function testRecordLockedErrorIsRetriedThenFails(): void
     {
         $integration = $this->createMock(SalesforceIntegration::class);
         $message     = 'unable to obtain exclusive access to this record or 1 records: 70137000000Ugy3AAC';
 
-        $integration->expects($this->exactly(3))
+        $integration->expects($this->exactly(2))
             ->method('makeRequest')
             ->willReturn(
                 [
@@ -37,7 +38,7 @@ final class SalesforceApiTest extends TestCase
                 ]
             );
 
-        $api = new SalesforceApi($integration);
+        $api = $this->createApiWithoutLockRetrySleep($integration);
 
         try {
             $api->request('/test');
@@ -48,45 +49,8 @@ final class SalesforceApiTest extends TestCase
         }
     }
 
-    #[TestDox('Test that a locked record request is retried up to 3 times with last one being successful so no exception should be thrown')]
-    public function testRecordLockedErrorIsRetriedThreeTimesWithLastOneSuccessful(): void
-    {
-        $integration = $this->createMock(SalesforceIntegration::class);
-        $message     = 'unable to obtain exclusive access to this record or 1 records: 70137000000Ugy3AAC';
-
-        $integration->expects($this->exactly(3))
-            ->method('makeRequest')
-            ->willReturnOnConsecutiveCalls(
-                [
-                    [
-                        'errorCode' => 'UNABLE_TO_LOCK_ROW',
-                        'message'   => $message,
-                    ],
-                ],
-                [
-                    [
-                        'errorCode' => 'UNABLE_TO_LOCK_ROW',
-                        'message'   => $message,
-                    ],
-                ],
-                [
-                    [
-                        'success' => true,
-                    ],
-                ]
-            );
-
-        $api = new SalesforceApi($integration);
-
-        try {
-            $api->request('/test');
-        } catch (ApiErrorException) {
-            $this->fail('ApiErrorException thrown');
-        }
-    }
-
-    #[TestDox('Test that a locked record request is retried 2 times with 3rd being successful')]
-    public function testRecordLockedErrorIsRetriedTwoTimesWithThirdSuccess(): void
+    #[TestDox('Test that a locked record request is retried with the retry being successful')]
+    public function testRecordLockedErrorIsRetriedWithSuccess(): void
     {
         $integration = $this->createMock(SalesforceIntegration::class);
         $message     = 'unable to obtain exclusive access to this record or 1 records: 70137000000Ugy3AAC';
@@ -102,12 +66,12 @@ final class SalesforceApiTest extends TestCase
                 ],
                 [
                     [
-                        ['success' => true],
+                        'success' => true,
                     ],
                 ]
             );
 
-        $api = new SalesforceApi($integration);
+        $api = $this->createApiWithoutLockRetrySleep($integration);
 
         try {
             $api->request('/test');
@@ -523,5 +487,17 @@ final class SalesforceApiTest extends TestCase
         $this->assertEquals('2019-05-22 19:36:30', $api->getOrganizationCreatedDate());
 
         $api->getLeads($params, 'Lead');
+    }
+
+    /**
+     * Retry once with sleep(0) - the default 3 retries would sleep 3s + 6s.
+     */
+    private function createApiWithoutLockRetrySleep(SalesforceIntegration $integration): SalesforceApi
+    {
+        $api = new SalesforceApi($integration);
+        ReflectionHelper::setValue($api, 'maxLockRetries', 1);
+        ReflectionHelper::setValue($api, 'requestCounter', 0);
+
+        return $api;
     }
 }

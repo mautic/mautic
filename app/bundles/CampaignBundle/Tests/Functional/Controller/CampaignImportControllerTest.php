@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Helper\ImportHelper;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
@@ -18,8 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 #[AllowMockObjectsWithoutExpectations]
 final class CampaignImportControllerTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     public function testNewAction(): void
     {
         $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
@@ -197,6 +196,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
 
+    #[ResetDatabase]
     public function testProgressActionImportValidData(): void
     {
         $user = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);

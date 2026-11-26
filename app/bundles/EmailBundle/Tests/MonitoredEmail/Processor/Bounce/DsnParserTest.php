@@ -34,7 +34,7 @@ final class DsnParserTest extends TestCase
 
         $this->assertEquals($expectedEmail, $bounce->getContactEmail());
         $this->assertEquals($expectedCategory, $bounce->getRuleCategory());
-        $this->assertEquals($expectedType, $bounce->getType());
+        $this->assertSame($expectedType, $bounce->getType());
         $this->assertSame($expectedFinal, $bounce->isFinal());
         if (null !== $expectedRuleNumber) {
             $this->assertEquals($expectedRuleNumber, $bounce->getRuleNumber());

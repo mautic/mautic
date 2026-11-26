@@ -14,8 +14,6 @@ final class UpdateCompanyNameOnLeadsCommandFunctionalTest extends MauticMysqlTes
 {
     use TestEntityCreationTrait;
 
-    protected $useCleanupRollback = false;
-
     public function testUpdateCompanies(): void
     {
         $companyRepository = $this->getService(CompanyRepository::class);

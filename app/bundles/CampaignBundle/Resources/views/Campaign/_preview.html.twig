@@ -8,12 +8,12 @@
     - canvasSettings
 #}
 <div id="campaign-builder" class="builder campaign-builder preview">
-    <div class="builder-content">
-        <div id="CampaignCanvas">
-            <div id="CampaignEvent_newsource{% if campaignSources is not empty %}_hide{% endif %}" class="text-center list-campaign-source list-campaign-leadsource">
-                <div class="campaign-event-content">
+    <div class="builder-content end-0 bottom-0 h-auto w-auto overflow-visible">
+        <div id="CampaignCanvas" class="position-relative">
+            <div id="CampaignEvent_newsource{% if campaignSources is not empty %}_hide{% endif %}" class="text-center position-absolute list-campaign-source list-campaign-leadsource">
+                <div class="campaign-event-content position-relative">
                     <div>
-                        <span class="campaign-event-name ellipsis">
+                        <span class="campaign-event-name d-inline-block align-middle text-truncate">
                             <i class="me-12 ri-team-line"></i> {{'mautic.campaign.add_new_source'|trans }}
                         </span>
                     </div>

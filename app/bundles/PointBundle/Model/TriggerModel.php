@@ -24,13 +24,11 @@ use Mautic\PointBundle\Entity\TriggerRepository;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Form\Type\TriggerType;
-use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends CommonFormModel<Trigger>
@@ -190,47 +188,6 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
         }
 
         return parent::getEntity($id);
-    }
-
-    /**
-     * @param Trigger $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Trigger) {
-            throw new MethodNotAllowedHttpException(['Trigger']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = PointEvents::TRIGGER_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = PointEvents::TRIGGER_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = PointEvents::TRIGGER_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = PointEvents::TRIGGER_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new Events\TriggerEvent($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
     }
 
     public function setEvents(Trigger $entity, array $sessionEvents): void

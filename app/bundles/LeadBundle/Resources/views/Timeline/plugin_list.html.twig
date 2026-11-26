@@ -189,7 +189,7 @@
                   </span>
               </div>
               {% if event.leadEmail is defined %}
-                  <span class="timeline-lead ellipsis"><a href="mailto:{{ event.leadEmail }}" title="{{ event.leadEmail }}" target="_new">{{ event.leadName }}</a></span>
+                  <span class="timeline-lead text-truncate d-block"><a href="mailto:{{ event.leadEmail }}" title="{{ event.leadEmail }}" target="_new">{{ event.leadName }}</a></span>
                   <span class="timeline-timestamp">{{ dateToText(event.timestamp) }} on {{ event.timestamp|date('Y-m-d H:i:s') }}</span>
               {% endif %}
               <br/>
@@ -198,7 +198,7 @@
               <br/>
 
               {% if eventLabel != event.eventType %}
-                  <span class="timeline-name ellipsis">{{ eventLabel }}</span>
+                  <span class="timeline-name text-truncate d-block">{{ eventLabel }}</span>
               {% endif %}
 
               {% if details is not empty %}

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
@@ -15,8 +16,6 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use PHPUnit\Framework\Attributes\PreserveGlobalState;
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,8 +26,6 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
     use CreateTestEntitiesTrait;
 
     private const string PREHEADER_TEXT = 'Preheader text';
-
-    protected $useCleanupRollback = false;
 
     public function testPreviewPage(): void
     {
@@ -215,6 +212,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertPageContent($url, 'Default content - not in segment or wrong country', self::PREHEADER_TEXT);
     }
 
+    #[ResetDatabase]
     public function testPreviewEmailForDynamicContentVariantsWithCustomField(): void
     {
         // Create custom field
@@ -466,8 +464,6 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString(sprintf('Contact emails is %s', $lead->getEmail()), $this->getIframeContent($crawler));
     }
 
-    #[PreserveGlobalState(false)]
-    #[RunInSeparateProcess]
     public function testPreviewEmailForCompanyHidesCompanyFromAnonymousVisitor(): void
     {
         $company = $this->createPreviewCompany('Secret Company');
@@ -495,11 +491,9 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('Secret Company', (string) $response->getContent());
     }
 
-    #[PreserveGlobalState(false)]
-    #[RunInSeparateProcess]
     public function testPreviewEmailForUnauthorizedCompany(): void
     {
-        $admin = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $admin = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $admin);
 
         $user           = $this->createNonAdminUser(['viewown', 'create'], 34);
@@ -551,11 +545,9 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('Other Company', (string) $response->getContent());
     }
 
-    #[PreserveGlobalState(false)]
-    #[RunInSeparateProcess]
     public function testPreviewEmailForCompanyOfOtherUserWithViewOtherPermission(): void
     {
-        $admin = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $admin = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $admin);
 
         $user    = $this->createNonAdminUser(['viewother'], 4);

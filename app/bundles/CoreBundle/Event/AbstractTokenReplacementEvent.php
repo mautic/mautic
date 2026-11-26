@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\DynamicContentBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 
 abstract class AbstractTokenReplacementEvent extends CommonEvent
@@ -24,14 +25,11 @@ abstract class AbstractTokenReplacementEvent extends CommonEvent
 
     private ?Stat $stat = null;
 
-    /**
-     * @param mixed $passthrough
-     */
     public function __construct(
         array|string|null|Lead $content,
         protected Lead|array|null $lead = null,
         protected array $clickthrough = [],
-        protected $passthrough = null,
+        protected ?Email $passthrough = null,
         private readonly bool $internalSend = false,
     ) {
         if ($content instanceof CommonEntity) {

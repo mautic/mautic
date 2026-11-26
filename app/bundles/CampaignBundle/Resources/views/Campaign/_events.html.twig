@@ -10,8 +10,8 @@
         {% set percentLabel = ('danger' == typeClass) ? 'mautic.report.campaign.no.percent' : 'mautic.report.campaign.yes.percent' %}
         {% set percentProp  = ('danger' == typeClass) ? 'noPercent' : 'yesPercent' %}
         <li class="list-group-item">
-            <div class="progress-bar progress-bar-{{ typeClass }}" style="width:{{ event.yesPercent }}%; left: 0;"></div>
-            <div class="progress-bar progress-bar-danger" style="width:{{ event['noPercent'] }}%; left: {{ event['yesPercent'] }}%"></div>
+            <div class="progress-bar position-absolute top-0 progress-bar-{{ typeClass|e('html_attr') }}" style="width:{{ event.yesPercent|e('html_attr') }}%; left: 0;"></div>
+            <div class="progress-bar position-absolute top-0 progress-bar-danger" style="width:{{ event['noPercent']|e('html_attr') }}%; left: {{ event['yesPercent']|e('html_attr') }}%"></div>
             <div class="box-layout">
                 <div class="visible-sm visible-md visible-lg col-stats">
                     <span class="mt-5 label label-{{ typeClass }}" data-bs-toggle="tooltip" title="{{ percentLabel|trans }}">
@@ -30,7 +30,7 @@
                 </span>
                 </div>
                     <div class="col-md-5 align-middle">
-                    <h5 class="fw-sb text-interactive mb-5">
+                    <h5 class="fw-semibold text-interactive mb-5">
                         {{ event.name }}
                         {% if event.eventType is defined and 'action' != event.eventType %}
                           <small class="text-secondary">{{ event.percent }}%</small>
@@ -39,10 +39,10 @@
                         <span class="label label-danger">{{ 'mautic.campaign.deleted'|trans }}</span>
                         {% endif %}
                     </h5>
-                    <h6 class="text-white dark-sm">{{ event.description }}</h6>
+                    <h6 class="text-secondary">{{ event.description }}</h6>
                 </div>
                 <div class="col-md-3 align-middle text-end">
-                    <em class="text-white dark-sm">{{ ('mautic.campaign.'~event.type)|trans }}</em>
+                    <em class="text-secondary">{{ ('mautic.campaign.'~event.type)|trans }}</em>
                 </div>
             </div>
         </li>

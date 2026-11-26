@@ -8,11 +8,12 @@ use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('sendToDncProvider')]
+    #[DataProvider('sendToDncProvider')]
     public function testGetMarketingMessageSendToDncStatusAction(bool $sendToDnc): void
     {
         $email   = $this->createEmail($sendToDnc);

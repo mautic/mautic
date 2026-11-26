@@ -62,7 +62,7 @@
       <div class="col-md-12">
           <h2>{{ 'mautic.dashboard.widgets.preview'|trans }}</h2>
       </div>
-      <div id="dashboard-widgets" class="dashboard-widgets cards">
+      <div id="dashboard-widgets" class="dashboard-widgets cards d-flex flex-wrap">
           {% for widget in widgets %}
               <div class="card-flex widget" data-widget-id="{{ widget.id }}" style="width: {{ widget.width|default('100') }}%; height: {{ widget.height|default('300') }}px;">
                   {{ include('@MauticDashboard/Widget/detail.html.twig', {widget}) }}

@@ -36,11 +36,10 @@ $hr-border:                   $gray-lighter !default;
 
 @import "bootstrap-mautic-custom-variables";
 
-$utilities: map-merge($utilities, (
-  "color": map-merge(map-get($utilities, "color"), (
-    "values": map-remove(map-get(map-get($utilities, "color"), "values"), "primary", "success", "info", "warning", "danger", "muted", "white")
-  ))
-));
+$blockquote-small-color:      $gray-light !default;
+$blockquote-font-size:        ($font-size-base * 1.25);
+$blockquote-border-color:     $gray-lighter !default;
+$page-header-border-color:    $gray-lighter !default;
 
 @mixin opacity($opacity) {
   $opacity-ie: ($opacity * 100);
@@ -139,12 +138,6 @@ $utilities: map-merge($utilities, (
   -webkit-animation: $animation;
        -o-animation: $animation;
           animation: $animation;
-}
-
-@mixin backface-visibility($visibility) {
-  -webkit-backface-visibility: $visibility;
-     -moz-backface-visibility: $visibility;
-          backface-visibility: $visibility;
 }
 
 @mixin box-shadow($shadow...) {
@@ -2886,30 +2879,6 @@ tbody.collapse.in { display: table-row-group; }
   }
 }
 
-.navbar-brand {
-  float: left;
-  height: $navbar-height;
-  padding: $navbar-padding-vertical $navbar-padding-horizontal;
-  font-size: $font-size-large;
-  line-height: $line-height-computed;
-
-  &:hover,
-  &:focus {
-    text-decoration: none;
-  }
-
-  > img {
-    display: block;
-  }
-
-  @media (min-width: $grid-float-breakpoint) {
-    .navbar > .container &,
-    .navbar > .container-fluid & {
-      margin-left: -$navbar-padding-horizontal;
-    }
-  }
-}
-
 .navbar-toggle {
   position: relative;
   float: right;
@@ -3194,56 +3163,6 @@ a.badge {
     color: $badge-link-hover-color;
     text-decoration: none;
     cursor: pointer;
-  }
-}
-
-.jumbotron {
-  padding-top: $jumbotron-padding;
-  padding-bottom: $jumbotron-padding;
-  margin-bottom: $jumbotron-padding;
-  color: $jumbotron-color;
-  background-color: $jumbotron-bg;
-
-  h1,
-  .h1 {
-    color: $jumbotron-heading-color;
-  }
-
-  p {
-    margin-bottom: ($jumbotron-padding * 0.5);
-    font-size: $jumbotron-font-size;
-    font-weight: 200;
-  }
-
-  > hr {
-    border-top-color: darken($jumbotron-bg, 10%);
-  }
-
-  .container &,
-  .container-fluid & {
-    padding-right: ($grid-gutter-width * 0.5);
-    padding-left: ($grid-gutter-width * 0.5);
-    border-radius: $border-radius-large;
-  }
-
-  .container {
-    max-width: 100%;
-  }
-
-  @media screen and (min-width: $screen-sm-min) {
-    padding-top: ($jumbotron-padding * 1.6);
-    padding-bottom: ($jumbotron-padding * 1.6);
-
-    .container &,
-    .container-fluid & {
-      padding-right: ($jumbotron-padding * 2);
-      padding-left: ($jumbotron-padding * 2);
-    }
-
-    h1,
-    .h1 {
-      font-size: $jumbotron-heading-font-size;
-    }
   }
 }
 
@@ -4172,87 +4091,6 @@ button.btn-close {
   padding: 9px 14px;
 }
 
-.carousel {
-  position: relative;
-}
-
-.carousel-inner {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-
-  > .item {
-    position: relative;
-    display: none;
-    @include transition(.6s ease-in-out left);
-
-    > img,
-    > a > img {
-      @include img-responsive;
-      line-height: 1;
-    }
-
-    @media all and (transform-3d), (-webkit-transform-3d) {
-      @include transition-transform(0.6s ease-in-out);
-      @include backface-visibility(hidden);
-      @include perspective(1000px);
-
-      &.next,
-      &.active.right {
-        @include translate3d(100%, 0, 0);
-        left: 0;
-      }
-      &.prev,
-      &.active.left {
-        @include translate3d(-100%, 0, 0);
-        left: 0;
-      }
-      &.next.left,
-      &.prev.right,
-      &.active {
-        @include translate3d(0, 0, 0);
-        left: 0;
-      }
-    }
-  }
-
-  > .active,
-  > .next,
-  > .prev {
-    display: block;
-  }
-
-  > .active {
-    left: 0;
-  }
-
-  > .next,
-  > .prev {
-    position: absolute;
-    top: 0;
-    width: 100%;
-  }
-
-  > .next {
-    left: 100%;
-  }
-  > .prev {
-    left: -100%;
-  }
-  > .next.left,
-  > .prev.right {
-    left: 0;
-  }
-
-  > .active.left {
-    left: -100%;
-  }
-  > .active.right {
-    left: 100%;
-  }
-
-}
-
 @media screen and (min-width: $screen-sm-min) {
 
   .carousel-control {
@@ -4355,8 +4193,6 @@ button.btn-close {
 @media (min-width: $screen-lg-min) {
   @include responsive-invisibility('.hidden-lg');
 }
-
-@include responsive-invisibility('.visible-print');
 
 @media print {
   @include responsive-visibility('.visible-print');
@@ -4537,11 +4373,6 @@ input:disabled:not(.form-control) {
 
 .navbar > .container-fluid {
   display: block;
-}
-
-.navbar-brand {
-  margin-right: 0;
-  white-space: normal;
 }
 
 .navbar-collapse {

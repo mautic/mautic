@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\EmailBundle\Event\EmailEvent;
-use Mautic\EmailBundle\Event\EmailPreSaveEvent;
+use Mautic\CoreBundle\Event\EntityPreSave;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
@@ -16,12 +16,13 @@ final readonly class EmailDefaultsSubscriber
     ) {
     }
 
-    #[AsEventListener(
-        event: EmailPreSaveEvent::class,
-    )]
-    public function onEmailPreSave(EmailEvent $event): void
+    #[AsEventListener]
+    public function onEmailPreSave(EntityPreSave $event): void
     {
-        $email = $event->getEmail();
+        $email = $event->getEntity();
+        if (!$email instanceof Email) {
+            return;
+        }
 
         if (!$event->isNew() || $email->getIsClone()) {
             return;

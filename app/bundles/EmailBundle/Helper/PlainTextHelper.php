@@ -322,7 +322,7 @@ final class PlainTextHelper
         }
 
         if ('table' == $linkMethod) {
-            if (false === ($index = array_search($url, $this->linkList))) {
+            if (false === ($index = array_search($url, $this->linkList, true))) {
                 $index            = count($this->linkList);
                 $this->linkList[] = $url;
             }

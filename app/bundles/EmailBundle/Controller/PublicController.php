@@ -175,7 +175,7 @@ final class PublicController extends CommonFormController
     )]
     public function validateEmailAction(Request $request, string $action, string $secretHash, string $idHash): Response
     {
-        if (!in_array($action, ['unsubscribe', 'resubscribe'])) {
+        if (!in_array($action, ['unsubscribe', 'resubscribe'], true)) {
             return $this->notFound();
         }
 

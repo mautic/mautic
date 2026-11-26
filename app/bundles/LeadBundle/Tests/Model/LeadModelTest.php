@@ -31,6 +31,7 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadPostBatchSaveEvent;
@@ -870,6 +871,64 @@ final class LeadModelTest extends TestCase
                 'shouldValidate'       => false,
                 'shouldThrowException' => false,
             ],
+        ];
+    }
+
+    #[DataProvider('xssTagPayloadsProvider')]
+    public function testModifyTagsSanitizesXssPayload(string $payload, ?string $expectedSanitized): void
+    {
+        $lead = new Lead();
+
+        $this->leadModel->modifyTags($lead, $payload, null, false);
+
+        $tagNames = array_map(fn (Tag $tag): ?string => $tag->getTag(), $lead->getTags()->getValues());
+        $this->assertSame(null === $expectedSanitized ? [] : [$expectedSanitized], $tagNames);
+    }
+
+    /**
+     * @return \Iterator<string, array{string, string|null}>
+     */
+    public static function xssTagPayloadsProvider(): \Iterator
+    {
+        yield 'Basic script tag' => [
+            '<script>alert(1)</script>',
+            'alert(1)',
+        ];
+        yield 'Script tag with attributes' => [
+            '<script src="http://example.com/evil.js"></script>',
+            null,
+        ];
+        yield 'Encoded script tag' => [
+            '&#60;script&#62;alert(1)&#60;/script&#62;',
+            'alert(1)',
+        ];
+        yield 'On-event handler' => [
+            '<img src="x" onerror="alert(1)">',
+            null,
+        ];
+        yield 'JavaScript protocol in URL' => [
+            '<a href="javascript:alert(1)">Click me</a>',
+            'Click me',
+        ];
+        yield 'SVG with embedded script' => [
+            '<svg><script>alert(1)</script></svg>',
+            'alert(1)',
+        ];
+        yield 'CSS expression' => [
+            '<div style="background:url(javascript:alert(1))">',
+            null,
+        ];
+        yield 'Malformed tag' => [
+            '<img """><script>alert("XSS")</script>"<',
+            'alert("XSS")"',
+        ];
+        yield 'Malformed tag2' => [
+            '<IMG SRC="jav&#x09;ascript:alert(\'XSS\');">',
+            null,
+        ];
+        yield 'Unicode escape' => [
+            '<script>\u0061lert(1)</script>',
+            '\u0061lert(1)',
         ];
     }
 

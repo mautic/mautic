@@ -47,36 +47,4 @@ final class ChannelEvents
      * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
      */
     public const string ON_CAMPAIGN_BATCH_ACTION = 'mautic.channel.on_campaign_batch_action';
-
-    /**
-     * The mautic.message_pre_save event is dispatched right before a form is persisted.
-     *
-     * The event listener receives a
-     * Mautic\ChannelEvent\Event\MessageEvent instance.
-     */
-    public const string MESSAGE_PRE_SAVE = 'mautic.message_pre_save';
-
-    /**
-     * The mautic.message_post_save event is dispatched right after a form is persisted.
-     *
-     * The event listener receives a
-     * Mautic\ChannelEvent\Event\MessageEvent instance.
-     */
-    public const string MESSAGE_POST_SAVE = 'mautic.message_post_save';
-
-    /**
-     * The mautic.message_pre_delete event is dispatched before a form is deleted.
-     *
-     * The event listener receives a
-     * Mautic\ChannelEvent\Event\MessageEvent instance.
-     */
-    public const string MESSAGE_PRE_DELETE = 'mautic.message_pre_delete';
-
-    /**
-     * The mautic.message_post_delete event is dispatched after a form is deleted.
-     *
-     * The event listener receives a
-     * Mautic\ChannelEvent\Event\MessageEvent instance.
-     */
-    public const string MESSAGE_POST_DELETE = 'mautic.message_post_delete';
 }

@@ -14,7 +14,7 @@ final class NotificationSendEvent extends CommonEvent
      */
     public function __construct(
         private $message,
-        private $heading,
+        private ?string $heading,
         private readonly Lead $lead,
     ) {
     }
@@ -35,18 +35,12 @@ final class NotificationSendEvent extends CommonEvent
         $this->message = $message;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getHeading()
+    public function getHeading(): ?string
     {
         return $this->heading;
     }
 
-    /**
-     * @param mixed $heading
-     */
-    public function setHeading($heading): static
+    public function setHeading(?string $heading): static
     {
         $this->heading = $heading;
 

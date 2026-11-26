@@ -7,7 +7,6 @@ namespace Mautic\ConfigBundle\Tests\Event;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -38,7 +37,6 @@ final class ConfigBuilderEventTest extends TestCase
         $this->assertTrue($result);
     }
 
-    #[RunInSeparateProcess]
     public function testGetParametersFromConfigHandlesIncompleteBundleMetadata(): void
     {
         $bundleHelper = $this->createMock(BundleHelper::class);

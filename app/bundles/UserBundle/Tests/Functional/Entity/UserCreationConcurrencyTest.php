@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Exception\OidcException;
@@ -22,8 +23,8 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
 
     public function testConcurrentRegistrationWaitsAndThenRejectsTheDuplicate(): void
     {
-        $repository = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class);
-        $role = $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class)->findOneBy([]);
+        $repository = $this->getContainer()->get(UserRepository::class);
+        $role = $this->getContainer()->get(RoleRepository::class)->findOneBy([]);
         $this->assertInstanceOf(Role::class, $role);
         $first = $this->newUser($role, 'shared@example.com', 'first@example.com');
 
@@ -70,8 +71,8 @@ final class UserCreationConcurrencyTest extends MauticMysqlTestCase
     #[DataProvider('collidingIdentities')]
     public function testRejectsExistingIdentityBeforeInserting(string $username, string $email): void
     {
-        $repository = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class);
-        $role = $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class)->findOneBy([]);
+        $repository = $this->getContainer()->get(UserRepository::class);
+        $role = $this->getContainer()->get(RoleRepository::class)->findOneBy([]);
         $this->assertInstanceOf(Role::class, $role);
         $repository->saveNewUser($this->newUser($role, 'first-login@example.com', 'first@example.com'));
         $initialCount = $repository->count([]);

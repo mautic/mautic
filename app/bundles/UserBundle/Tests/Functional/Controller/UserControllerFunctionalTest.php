@@ -161,7 +161,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('neverLoggedInSearchProvider')]
     public function testNeverLoggedInQuickFilterShowsUsersWithoutLastLogin(string $query): void
     {
-        $admin = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $admin = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $admin);
         $adminRole = $admin->getRole();
         $this->assertInstanceOf(Role::class, $adminRole);

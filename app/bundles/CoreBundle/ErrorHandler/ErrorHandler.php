@@ -35,10 +35,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private $logger;
 
-        /**
-         * @var LoggerInterface
-         */
-        private $mainLogger;
+        private ?LoggerInterface $mainLogger = null;
 
         private static string $root;
 
@@ -48,10 +45,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed               $log
          * @param string|array<mixed> $context
          */
-        public static function logDebugEntry($log, $context = 'null', bool $backtrace = false): void
+        public static function logDebugEntry(mixed $log, $context = 'null', bool $backtrace = false): void
         {
             if ($debugLogger = self::$handler->getDebugLogger()) {
                 if (!is_array($context)) {
@@ -349,10 +345,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $this;
         }
 
-        /**
-         * @param mixed $mainLogger
-         */
-        public function setMainLogger($mainLogger): static
+        // @phpstan-ignore mautic.noServiceInMethodParameter (static singleton created before the container, no constructor injection)
+        public function setMainLogger(LoggerInterface $mainLogger): static
         {
             $this->mainLogger = $mainLogger;
 

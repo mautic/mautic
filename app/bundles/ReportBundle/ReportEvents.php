@@ -10,34 +10,6 @@ namespace Mautic\ReportBundle;
 final class ReportEvents
 {
     /**
-     * The mautic.report_pre_save event is dispatched right before a report is persisted.
-     *
-     * The event listener receives a Mautic\ReportBundle\Event\ReportEvent instance.
-     */
-    public const string REPORT_PRE_SAVE = 'mautic.report_pre_save';
-
-    /**
-     * The mautic.report_post_save event is dispatched right after a report is persisted.
-     *
-     * The event listener receives a Mautic\ReportBundle\Event\ReportEvent instance.
-     */
-    public const string REPORT_POST_SAVE = 'mautic.report_post_save';
-
-    /**
-     * The mautic.report_pre_delete event is dispatched prior to when a report is deleted.
-     *
-     * The event listener receives a Mautic\ReportBundle\Event\ReportEvent instance.
-     */
-    public const string REPORT_PRE_DELETE = 'mautic.report_pre_delete';
-
-    /**
-     * The mautic.report_post_delete event is dispatched after a report is deleted.
-     *
-     * The event listener receives a Mautic\ReportBundle\Event\ReportEvent instance.
-     */
-    public const string REPORT_POST_DELETE = 'mautic.report_post_delete';
-
-    /**
      * The mautic.report_on_build event is dispatched before displaying the report builder form to allow
      * bundles to specify report sources and columns.
      *

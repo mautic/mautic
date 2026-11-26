@@ -2,10 +2,10 @@
     <div class="panel">
         <div class="panel-body box-layout">
             <div class="col-xs-8 align-middle">
-                <h5 class="text-white dark-md fw-sb mb-5">{{ graph.name|trans }}</h5>
+                <h5 class="text-secondary fw-semibold mb-5">{{ graph.name|trans }}</h5>
             </div>
             <div class="col-xs-4 align-top text-end">
-                <h3 class="text-white dark-sm"><span class="fa {{ graph.iconClass|default('') }}"></span></h3>
+                <h3 class="text-secondary"><span class="fa {{ graph.iconClass|default('') }}"></span></h3>
             </div>
         </div>
         {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': graph, 'chartType': 'line', 'chartHeight': 300}) }}

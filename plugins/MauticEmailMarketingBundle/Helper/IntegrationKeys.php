@@ -10,10 +10,10 @@ use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 /**
  * Decrypted API keys of an integration, for the services that cannot depend on IntegrationsHelper themselves.
  */
-class IntegrationKeys
+readonly class IntegrationKeys
 {
     public function __construct(
-        private readonly IntegrationsHelper $integrationsHelper,
+        private IntegrationsHelper $integrationsHelper,
     ) {
     }
 

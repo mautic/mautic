@@ -30,10 +30,9 @@ final readonly class GravatarHelper
 
     /**
      * @param string $email
-     * @param string $size
      * @param string $default
      */
-    public function getImage($email, $size = '250', $default = null): string
+    public function getImage($email, string $size = '250', $default = null): string
     {
         // Gravatar is off unless enabled in the Privacy Centre, so no email hashes are sent to gravatar.com by default
         if (!$this->enabled) {

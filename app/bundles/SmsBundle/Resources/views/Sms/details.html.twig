@@ -108,7 +108,7 @@
                                 {{- include('@MauticCore/Helper/details.html.twig', {'entity' : sms}) -}}
                                 {% if sms.getSmsType() == 'list' %}
                                     <tr>
-                                        <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.lead.lists'|trans }}</span></td>
+                                        <td width="20%"><span class="fw-bold textTitle">{{ 'mautic.lead.lead.lists'|trans }}</span></td>
                                         <td>
                                             {% set segments = sms.getLists %}
                                             {% set segmentNames = segments.toArray|map(segment => segment.getName) %}
@@ -150,7 +150,7 @@
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-md-3 align-middle">
-                                    <h5 class="text-white dark-md fw-sb mb-5">
+                                    <h5 class="text-secondary fw-semibold mb-5">
                                         <span class="ri-line-chart-fill"></span>
                                         {{ 'mautic.core.stats'|trans }}
                                     </h5>

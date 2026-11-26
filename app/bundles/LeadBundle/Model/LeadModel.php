@@ -587,7 +587,7 @@ class LeadModel extends FormModel
                                 && in_array($field['alias'], $socialFeatureSettings[$service]['leadFields'])
                             ) {
                                 // check to see if the data is available
-                                $key = array_search($field['alias'], $socialFeatureSettings[$service]['leadFields']);
+                                $key = array_search($field['alias'], $socialFeatureSettings[$service]['leadFields'], true);
                                 if (isset($details['profile'][$key])) {
                                     // Found!!
                                     $field['value'] = $details['profile'][$key];

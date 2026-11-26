@@ -33,11 +33,11 @@
             'g+i' : 'mautic.keyboard.back',
             'Del / ⌘+⌫' : 'mautic.keyboard.delete',
             } } %}
-            <h4 class="fw-sb">
+            <h4 class="fw-semibold">
               {{ "mautic.keyboard.section.global" | trans }}
             </h4>
             {% for section, shortcut_list in shortcuts %}
-            <h5 class="mb-5 mt-16 fw-sb">
+            <h5 class="mb-5 mt-16 fw-semibold">
               {{ ('mautic.keyboard.section.' ~ section)|trans }}
             </h5>
             <table class="shortcut-table bsv-xs">

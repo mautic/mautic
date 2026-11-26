@@ -6,13 +6,13 @@ namespace Mautic\UserBundle\Tests\Security\OIDC\Functional;
 
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\OidcSubjectId;
 use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use Mautic\UserBundle\Event\PreSaveUserEvent;
 use Mautic\UserBundle\Security\OIDC\Settings;
 use Mautic\UserBundle\Security\Provider\UserProvider;
 use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
@@ -71,8 +71,11 @@ final class OidcRegistrationSecurityTest extends MauticMysqlTestCase
     public function testRegistrationCreatesAndAuthenticatesSeparateUser(?string $preferredUsername, string $expectedUsername): void
     {
         $userCount = $this->getService(UserRepository::class)->count([]);
-        $this->client->getContainer()->get(EventDispatcherInterface::class)->addListener(PreSaveUserEvent::class, static function (PreSaveUserEvent $event): void {
-            $event->getUser()->setTimezone('Europe/Prague');
+        $this->client->getContainer()->get(EventDispatcherInterface::class)->addListener(EntityPreSave::class, static function (EntityPreSave $event): void {
+            $user = $event->getEntity();
+            if ($user instanceof User) {
+                $user->setTimezone('Europe/Prague');
+            }
         });
 
         $this->register('new@example.com', $preferredUsername);

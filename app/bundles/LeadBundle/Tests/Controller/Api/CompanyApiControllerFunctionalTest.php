@@ -10,6 +10,8 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
+use Mautic\LeadBundle\Entity\CompanyChangeLogRepository;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -21,6 +23,7 @@ use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
@@ -594,7 +597,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $company      = $this->createNamedCompany('Batch Co E', 'batch-co-e@example.com');
         $this->em->flush();
 
-        $salesUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => self::SALES_USER]);
+        $salesUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => self::SALES_USER]);
         $this->assertInstanceOf(User::class, $salesUser);
         $this->setLeadPermissions($salesUser, ['editown']);
 
@@ -616,7 +619,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testBatchAddContactsGlobalForbiddenWithoutEditPermission(): void
     {
-        $salesUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => self::SALES_USER]);
+        $salesUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => self::SALES_USER]);
         $this->assertInstanceOf(User::class, $salesUser);
         $this->setLeadPermissions($salesUser, ['viewown', 'viewother']);
 
@@ -722,7 +725,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $contact = $this->leadModel->getEntity($contactId);
         $this->assertInstanceOf(Lead::class, $contact);
 
-        return $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyChangeLogRepository::class)->findBy(
+        return $this->getContainer()->get(CompanyChangeLogRepository::class)->findBy(
             ['lead' => $contact],
             ['dateAdded' => 'ASC']
         );
@@ -735,7 +738,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(Lead::class, $contact);
         $this->assertInstanceOf(Company::class, $company);
 
-        return null !== $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyLeadRepository::class)->findOneBy([
+        return null !== $this->getContainer()->get(CompanyLeadRepository::class)->findOneBy([
             'lead'    => $contact,
             'company' => $company,
         ]);

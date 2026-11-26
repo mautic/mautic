@@ -2,11 +2,13 @@
 
 namespace Mautic\CategoryBundle\EventListener;
 
-use Mautic\CategoryBundle\CategoryEvents;
-use Mautic\CategoryBundle\Event\CategoryEvent;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Event\CategoryTypeEntityEvent;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreDelete;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -47,11 +49,14 @@ final readonly class CategorySubscriber
      * Add an entry to the audit log.
      */
     #[AsEventListener(
-        event: CategoryEvents::CATEGORY_POST_SAVE,
+        event: EntityPostSave::class,
     )]
-    public function onCategoryPostSave(CategoryEvent $event): void
+    public function onCategoryPostSave(EntityPostSave $event): void
     {
-        $category = $event->getCategory();
+        $category = $event->getEntity();
+        if (!$category instanceof Category) {
+            return;
+        }
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'category',
@@ -69,12 +74,15 @@ final readonly class CategorySubscriber
      * Add a delete entry to the audit log.
      */
     #[AsEventListener(
-        event: CategoryEvents::CATEGORY_POST_DELETE,
+        event: EntityPostDelete::class,
     )]
-    public function onCategoryDelete(CategoryEvent $event): void
+    public function onCategoryDelete(EntityPostDelete $event): void
     {
-        $category = $event->getCategory();
-        $log      = [
+        $category = $event->getEntity();
+        if (!$category instanceof Category) {
+            return;
+        }
+        $log = [
             'bundle'    => 'category',
             'object'    => 'category',
             'objectId'  => $category->deletedId,
@@ -86,16 +94,20 @@ final readonly class CategorySubscriber
     }
 
     #[AsEventListener(
-        event: CategoryEvents::CATEGORY_PRE_DELETE,
+        event: EntityPreDelete::class,
     )]
-    public function onCategoryPreDelete(CategoryEvent $event): void
+    public function onCategoryPreDelete(EntityPreDelete $event): void
     {
-        if ($usage = $this->categoryModel->getUsage($event->getCategory())) {
+        $category = $event->getEntity();
+        if (!$category instanceof Category) {
+            return;
+        }
+        if ($usage = $this->categoryModel->getUsage($category)) {
             $message = $this->translator->trans(
                 'mautic.category.is_in_use.delete',
                 [
                     '%entities%'     => implode(', ', array_map(fn (array $entity): string => $this->translator->trans($entity['label']).' Id: '.$entity['id'], $usage)),
-                    '%categoryName%' => $event->getCategory()->getTitle(),
+                    '%categoryName%' => $category->getTitle(),
                 ],
                 'validators'
             );

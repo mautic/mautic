@@ -515,7 +515,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     public function getSimpleLookupResults(string $type, array|string $filter = '', int $limit = 10, int $start = 0, ?string $exclude = ''): array
     {
         $valueColumn = 'id';
-        if (!in_array($type, ['companyfield', 'lead.company'])) {
+        if (!in_array($type, ['companyfield', 'lead.company'], true)) {
             return [];
         }
         if ('lead.company' === $type) {

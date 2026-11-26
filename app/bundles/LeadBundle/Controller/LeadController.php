@@ -258,7 +258,7 @@ final class LeadController extends AbstractFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'lead',
@@ -402,7 +402,7 @@ final class LeadController extends AbstractFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'contact',
@@ -629,14 +629,14 @@ final class LeadController extends AbstractFormController
 
                         $viewParameters = ['page' => $page];
                         $returnUrl      = $this->generateUrl('mautic_contact_index', $viewParameters);
-                        $template       = 'Mautic\LeadBundle\Controller\LeadController::indexAction';
+                        $template       = self::class.'::indexAction';
                     } elseif ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $viewParameters = [
                             'objectAction' => 'view',
                             'objectId'     => $lead->getId(),
                         ];
                         $returnUrl = $this->generateUrl('mautic_contact_action', $viewParameters);
-                        $template  = 'Mautic\LeadBundle\Controller\LeadController::viewAction';
+                        $template  = self::class.'::viewAction';
                     } else {
                         return $this->editAction($request, $userHelper, $avatarHelper, $lead->getId(), true);
                     }
@@ -655,7 +655,7 @@ final class LeadController extends AbstractFormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_contact_index', $viewParameters);
-                $template       = 'Mautic\LeadBundle\Controller\LeadController::indexAction';
+                $template       = self::class.'::indexAction';
             }
 
             if ($cancelled || $valid) { // cancelled or success
@@ -761,7 +761,7 @@ final class LeadController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead',
@@ -889,7 +889,7 @@ final class LeadController extends AbstractFormController
                         [
                             'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::viewAction',
+                            'contentTemplate' => self::class.'::viewAction',
                         ]
                     )
                 );
@@ -961,7 +961,7 @@ final class LeadController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead',
@@ -1091,7 +1091,7 @@ final class LeadController extends AbstractFormController
                     [
                         'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
                         'viewParameters'  => $viewParameters,
-                        'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::viewAction',
+                        'contentTemplate' => self::class.'::viewAction',
                         'passthroughVars' => [
                             'closeModal' => 1,
                         ],
@@ -1171,7 +1171,7 @@ final class LeadController extends AbstractFormController
                         'objectAction' => 'view',
                     ]),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::viewAction',
+                    'contentTemplate' => self::class.'::viewAction',
                     'passthroughVars' => [
                         'closeModal' => 1,
                     ],
@@ -1219,7 +1219,7 @@ final class LeadController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead',
@@ -1281,7 +1281,7 @@ final class LeadController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead',
@@ -1409,10 +1409,7 @@ final class LeadController extends AbstractFormController
         );
     }
 
-    /**
-     * @param int $objectId
-     */
-    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, EmailModel $emailModel, $objectId = 0): JsonResponse|Response
+    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, EmailModel $emailModel, int|string $objectId = 0): JsonResponse|Response
     {
         $valid = $cancelled = false;
 
@@ -1572,7 +1569,7 @@ final class LeadController extends AbstractFormController
                 [
                     'returnUrl'       => $this->generateUrl($route, $viewParameters),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::'.$func.'Action',
+                    'contentTemplate' => self::class.'::'.$func.'Action',
                     'passthroughVars' => [
                         'mauticContent' => 'lead',
                         'closeModal'    => 1,
@@ -2489,7 +2486,7 @@ final class LeadController extends AbstractFormController
                                 'objectId'     => $lead->getId(),
                                 'objectAction' => 'view',
                             ],
-                            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::viewAction',
+                            'contentTemplate' => self::class.'::viewAction',
                             'passthroughVars' => [
                                 'closeModal' => 1,
                             ],

@@ -96,13 +96,9 @@ final class HitRepository extends CommonRepository
     /**
      * Get an array of hits via an email clickthrough.
      */
-    public function getEmailClickthroughHitCount($emailIds, ?\DateTimeInterface $fromDate = null, int $code = 200, ?\DateTime $toDate = null): array
+    public function getEmailClickthroughHitCount(array $emailIds, ?\DateTimeInterface $fromDate = null, int $code = 200, ?\DateTime $toDate = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
-        if (!is_array($emailIds)) {
-            $emailIds = [$emailIds];
-        }
 
         $q->select('count(distinct(h.tracking_id)) as hit_count, h.email_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')

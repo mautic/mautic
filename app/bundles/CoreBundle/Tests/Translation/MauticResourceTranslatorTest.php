@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Translation;
 
 use Mautic\CoreBundle\DependencyInjection\Compiler\TranslationLoaderPass;
 use Mautic\CoreBundle\Translation\MauticResourceTranslator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\Container;
@@ -22,7 +23,7 @@ final class MauticResourceTranslatorTest extends TestCase
      * @param array<string, list<string>> $resourceFiles
      * @param list<string>                $fallbackLocales
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('warmupLocalesProvider')]
+    #[DataProvider('warmupLocalesProvider')]
     public function testWarmupCachesMauticTranslations(array $enabledLocales, array $resourceFiles, array $fallbackLocales): void
     {
         $cacheDir = sys_get_temp_dir().'/mautic-translation-warmup-'.bin2hex(random_bytes(8));

@@ -554,7 +554,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var CompanyRepository $companyRepository */
-        $companyRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyRepository::class);
+        $companyRepository = $this->getContainer()->get(CompanyRepository::class);
         $companyRepository->saveEntities($companies);
         $this->em->clear();
 
@@ -576,7 +576,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     public function testCompanyListActionSuggestionsByNonAdminUser(): void
     {
         /** @var UserRepository $userRepository */
-        $userRepository = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class);
+        $userRepository = $this->getContainer()->get(UserRepository::class);
 
         $adminUser = $userRepository->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $adminUser);
@@ -592,7 +592,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var CompanyRepository $companyRepository */
-        $companyRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyRepository::class);
+        $companyRepository = $this->getContainer()->get(CompanyRepository::class);
         $companyRepository->saveEntities($companies);
         $this->em->clear();
 
@@ -602,7 +602,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $role->setRawPermissions(['lead:leads' => ['viewown']]);
 
         /** @var RoleRepository $roleRepository */
-        $roleRepository = $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class);
+        $roleRepository = $this->getContainer()->get(RoleRepository::class);
         $roleRepository->saveEntity($role);
 
         // Create a non admin user with view own contacts permission.

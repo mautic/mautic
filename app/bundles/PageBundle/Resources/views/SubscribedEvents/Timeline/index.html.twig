@@ -24,22 +24,22 @@
 
       {% if event.extra.hit.device is defined and event.extra.hit.device is not empty %}
           <dt>{{ 'mautic.core.timeline.device.name'|trans }}</dt>
-          <dd class="ellipsis">{{ inputClean(event.extra.hit.device) }}</dd>
+          <dd class="text-truncate d-block">{{ inputClean(event.extra.hit.device) }}</dd>
       {% endif %}
 
       {% if event.extra.hit.deviceOsName is defined and event.extra.hit.deviceOsName is not empty %}
           <dt>{{ 'mautic.core.timeline.device.os'|trans }}</dt>
-          <dd class="ellipsis">{{ inputClean(event.extra.hit.deviceOsName) }}</dd>
+          <dd class="text-truncate d-block">{{ inputClean(event.extra.hit.deviceOsName) }}</dd>
       {% endif %}
 
       {% if event.extra.hit.deviceBrand is defined and event.extra.hit.deviceBrand is not empty %}
           <dt>{{ 'mautic.core.timeline.device.brand'|trans }}</dt>
-          <dd class="ellipsis">{{ inputClean(event.extra.hit.deviceBrand) }}</dd>
+          <dd class="text-truncate d-block">{{ inputClean(event.extra.hit.deviceBrand) }}</dd>
       {% endif %}
 
       {% if event.extra.hit.deviceModel is defined and event.extra.hit.deviceModel is not empty %}
           <dt>{{ 'mautic.core.timeline.device.model'|trans }}</dt>
-          <dd class="ellipsis">{{ inputClean(event.extra.hit.deviceModel) }}</dd>
+          <dd class="text-truncate d-block">{{ inputClean(event.extra.hit.deviceModel) }}</dd>
       {% endif %}
 
       {% if event.extra.hit.sourceName is defined and event.extra.hit.sourceName is not empty %}
@@ -54,7 +54,7 @@
 
           {% if event.extra.hit.clientInfo is defined and event.extra.hit.clientInfo is not empty and event.extra.hit.clientInfo is iterable %}
               <dt>{{ 'mautic.core.timeline.device.client.info'|trans }}</dt>
-              <dd class="ellipsis">
+              <dd class="text-truncate d-block">
                   {% for clientInfo in event.extra.hit.clientInfo %}
                       {{ inputClean(clientInfo) }}
                   {% endfor %}
@@ -71,13 +71,13 @@
                         {% set counter = counter + 1 %}
                         {% set k2 = k|replace({'_': ' '})|title %}
                         <dt>{{ k2 }}:</dt>
-                        <dd class="ellipsis">{{ v2 }}</dd>
+                        <dd class="text-truncate d-block">{{ v2 }}</dd>
                     {% endfor %}
                 {% else %}
                     {% set counter = counter + 1 %}
                     {% set k = k|replace({'_': ' '})|title %}
                     <dt>{{ k }}</dt>
-                    <dd class="ellipsis">{{ v }}</dd>
+                    <dd class="text-truncate d-block">{{ v }}</dd>
                 {% endif %}
 
                 {% if showMore is not defined and counter > 5 %}

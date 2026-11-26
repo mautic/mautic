@@ -63,7 +63,7 @@ final class DoNotContactFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var DoNotContactRepository $dncRepo */
-        $dncRepo = $this->getContainer()->get(\Mautic\LeadBundle\Entity\DoNotContactRepository::class);
+        $dncRepo = $this->getContainer()->get(DoNotContactRepository::class);
 
         $this->assertSame(1, $dncRepo->getCount('email', null, null, $segment->getId()));
     }

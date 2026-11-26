@@ -15,10 +15,7 @@ final class LeadListAccessValidator extends ConstraintValidator
     ) {
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function validate($value, Constraint $constraint): void
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof LeadListAccess) {
             throw new UnexpectedTypeException($constraint, LeadListAccess::class);

@@ -6,6 +6,7 @@ namespace Mautic\ProjectBundle\Tests\Functional\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
+use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -41,7 +42,7 @@ final class ProjectApiControllerTest extends MauticMysqlTestCase
 
     public function testGetProject(): void
     {
-        $projectId = $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findOneBy(['name' => 'Project 1'])->getId();
+        $projectId = $this->getContainer()->get(ProjectRepository::class)->findOneBy(['name' => 'Project 1'])->getId();
         $this->client->request(Request::METHOD_GET, '/api/projects/'.$projectId);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -58,20 +59,20 @@ final class ProjectApiControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
-        $this->assertCount(3, $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findAll());
-        $this->assertInstanceOf(Project::class, $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findOneBy(['name' => 'Project 3']));
+        $this->assertCount(3, $this->getContainer()->get(ProjectRepository::class)->findAll());
+        $this->assertInstanceOf(Project::class, $this->getContainer()->get(ProjectRepository::class)->findOneBy(['name' => 'Project 3']));
     }
 
     public function testUpdateProject(): void
     {
-        $projectId = $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findOneBy(['name' => 'Project 1'])->getId();
+        $projectId = $this->getContainer()->get(ProjectRepository::class)->findOneBy(['name' => 'Project 1'])->getId();
 
         $payload = ['description' => 'Updated First Project'];
         $this->client->request(Request::METHOD_PATCH, '/api/projects/'.$projectId.'/edit', $payload);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $updatedProject = $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->find($projectId);
+        $updatedProject = $this->getContainer()->get(ProjectRepository::class)->find($projectId);
         $this->assertInstanceOf(Project::class, $updatedProject);
 
         $this->assertSame('Project 1', $updatedProject->getName());
@@ -80,20 +81,20 @@ final class ProjectApiControllerTest extends MauticMysqlTestCase
 
     public function testDeleteProject(): void
     {
-        $projectId = $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findOneBy(['name' => 'Project 1'])->getId();
+        $projectId = $this->getContainer()->get(ProjectRepository::class)->findOneBy(['name' => 'Project 1'])->getId();
 
         $this->client->request(Request::METHOD_DELETE, '/api/projects/'.$projectId.'/delete');
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $this->assertCount(1, $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findAll());
-        $this->assertNotInstanceOf(Project::class, $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->find($projectId));
+        $this->assertCount(1, $this->getContainer()->get(ProjectRepository::class)->findAll());
+        $this->assertNotInstanceOf(Project::class, $this->getContainer()->get(ProjectRepository::class)->find($projectId));
     }
 
     public function testBulkDeleteProjects(): void
     {
-        $project1Id = $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findOneBy(['name' => 'Project 1'])->getId();
-        $project2Id = $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findOneBy(['name' => 'Project 2'])->getId();
+        $project1Id = $this->getContainer()->get(ProjectRepository::class)->findOneBy(['name' => 'Project 1'])->getId();
+        $project2Id = $this->getContainer()->get(ProjectRepository::class)->findOneBy(['name' => 'Project 2'])->getId();
 
         $payload = [$project1Id, $project2Id];
 
@@ -101,6 +102,6 @@ final class ProjectApiControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $this->assertCount(0, $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findAll());
+        $this->assertCount(0, $this->getContainer()->get(ProjectRepository::class)->findAll());
     }
 }

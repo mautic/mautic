@@ -10,12 +10,12 @@ use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
-use Mautic\AssetBundle\Event\AssetPostSaveEvent;
-use Mautic\AssetBundle\Event\AssetPreSaveEvent;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -138,11 +138,11 @@ final class AssetModelTest extends TestCase
         $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
             ->willReturnCallback(static function (object $event) use (&$postSaveChanges): object {
-                if ($event instanceof AssetPreSaveEvent) {
+                if ($event instanceof EntityPreSave) {
                     $event->getChanges();
                 }
 
-                if ($event instanceof AssetPostSaveEvent) {
+                if ($event instanceof EntityPostSave) {
                     $postSaveChanges = $event->getChanges();
                 }
 

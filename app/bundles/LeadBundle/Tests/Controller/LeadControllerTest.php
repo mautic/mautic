@@ -34,6 +34,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -569,7 +570,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('newContent', $response, json_encode($response, JSON_THROW_ON_ERROR));
         $this->assertStringContainsString('lead[buttons][save_and_new]', (string) $response['newContent']);
         $this->assertArrayNotHasKey('closeModal', $response);
-        $this->assertInstanceOf(Lead::class, $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findOneBy(['email' => $email]));
+        $this->assertInstanceOf(Lead::class, $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => $email]));
     }
 
     public function testAddContactsErrorMessage(): void
@@ -664,7 +665,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertMatchesRegularExpression('#Your email is <b>contact@an\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]*" alt="" \/>#', $email->getHtmlBody());
         $this->assertSame('Your email is contact@an.email', $email->getTextBody());
         $this->assertCount(1, $email->getFrom());
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
+        $this->assertInstanceOf(User::class, $user);
         $this->assertSame($user->getName(), $email->getFrom()[0]->getName());
         $this->assertSame($user->getEmail(), $email->getFrom()[0]->getAddress());
         $this->assertCount(1, $email->getTo());
@@ -720,7 +721,7 @@ EMAIL;
 
         $this->assertSame($expectedText, $email->getTextBody());
         $this->assertCount(1, $email->getFrom());
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
+        $this->assertInstanceOf(User::class, $user);
         $this->assertSame($user->getName(), $email->getFrom()[0]->getName());
         $this->assertSame($user->getEmail(), $email->getFrom()[0]->getAddress());
         $this->assertCount(1, $email->getTo());

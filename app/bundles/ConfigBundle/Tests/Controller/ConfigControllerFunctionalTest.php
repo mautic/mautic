@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ConfigBundle\Tests\Controller;
 
 use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -20,8 +21,6 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     private const string SUBDOMAIN_URL = 'subdomain_url.com';
 
     private string $prefix;
-
-    protected $useCleanupRollback = false;
 
     protected function setUp(): void
     {
@@ -217,6 +216,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         return str_replace('%', '%%', $value);
     }
 
+    #[ResetDatabase]
     public function testConfigNotFoundPageConfiguration(): void
     {
         // insert published record

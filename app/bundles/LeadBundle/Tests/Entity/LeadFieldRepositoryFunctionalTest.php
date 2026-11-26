@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -12,8 +13,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback     = false;
-
     private const string ADMINISTRATOR_VALUE = "administrator's";
 
     public function testCompareValueEqualsOperator(): void
@@ -133,6 +132,7 @@ final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($repository->compareValue($lead->getId(), 'country', ['United Kingdom'], 'notIn'));
     }
 
+    #[ResetDatabase]
     public function testCompareValueInOperatorWithMultiselectField(): void
     {
         $field = new LeadField();
@@ -174,6 +174,7 @@ final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($repository->compareValue($lead->getId(), 'colors', ['red', 'yellow'], 'in'));
     }
 
+    #[ResetDatabase]
     public function testCompareValueInOperatorWithSpecialCharacters(): void
     {
         $field = new LeadField();
@@ -218,6 +219,7 @@ final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($repository->compareValue($lead2->getId(), 'job_title', ['manager&supervisor'], 'in'));
     }
 
+    #[ResetDatabase]
     public function testExcludeUnpublishedField(): void
     {
         $field = new LeadField();

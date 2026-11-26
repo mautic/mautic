@@ -7,27 +7,22 @@ namespace Mautic\LeadBundle\Deduplicate\Exception;
 final class ValueNotMergeableException extends \Exception
 {
     /**
-     * @param mixed $newerValue
+     * @param \DateTimeInterface|mixed[]|string|int|float|bool|null $newerValue
+     * @param \DateTimeInterface|mixed[]|string|int|float|bool|null $olderValue
      */
     public function __construct(
-        private $newerValue,
-        private readonly mixed $olderValue,
+        private readonly \DateTimeInterface|array|string|int|float|bool|null $newerValue,
+        private readonly \DateTimeInterface|array|string|int|float|bool|null $olderValue,
     ) {
         parent::__construct();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getNewerValue()
+    public function getNewerValue(): \DateTimeInterface|string|int|float|bool|array|null
     {
         return $this->newerValue;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getOlderValue()
+    public function getOlderValue(): \DateTimeInterface|string|int|float|bool|array|null
     {
         return $this->olderValue;
     }

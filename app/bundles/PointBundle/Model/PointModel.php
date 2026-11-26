@@ -20,17 +20,14 @@ use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Entity\PointRepository;
 use Mautic\PointBundle\Event\PointActionEvent;
 use Mautic\PointBundle\Event\PointBuilderEvent;
-use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\Form\Type\PointType;
 use Mautic\PointBundle\Helper\EventHelper;
-use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -109,47 +106,6 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
     }
 
     /**
-     * @param Point $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Point) {
-            throw new MethodNotAllowedHttpException(['Point']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = PointEvents::POINT_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = PointEvents::POINT_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = PointEvents::POINT_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = PointEvents::POINT_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new PointEvent($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
-    }
-
-    /**
      * Gets array of custom actions from bundles subscribed PointEvents::POINT_ON_BUILD.
      *
      * @return array{actions: array<string, mixed>, list: array<int, string>, choices: array<string, string>}
@@ -172,13 +128,13 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
     /**
      * Triggers a specific point change.
      *
-     * @param mixed $eventDetails   passthrough from function triggering action to the callback function
-     * @param mixed $typeId         Something unique to the triggering event to prevent  unnecessary duplicate calls
-     * @param bool  $storeIpAddress false for visitors Mautic doesn't track
+     * @param ?object $eventDetails   passthrough from function triggering action to the callback function
+     * @param mixed   $typeId         Something unique to the triggering event to prevent  unnecessary duplicate calls
+     * @param bool    $storeIpAddress false for visitors Mautic doesn't track
      *
      * @throws \ReflectionException
      */
-    public function triggerAction(string $type, $eventDetails = null, $typeId = null, ?Lead $lead = null, bool $allowUserRequest = false, bool $storeIpAddress = true): void
+    public function triggerAction(string $type, ?object $eventDetails = null, $typeId = null, ?Lead $lead = null, bool $allowUserRequest = false, bool $storeIpAddress = true): void
     {
         // only trigger actions for not logged Mautic users
         if (!$this->security->isAnonymous() && !$allowUserRequest) {

@@ -10,6 +10,7 @@ return RectorConfig::configure()
     ->withPaths([
         __DIR__.'/app/bundles',
         __DIR__.'/plugins',
+        __DIR__.'/app/middlewares',
         // __DIR__.'/utils',
     ])
     ->withPreparedSets(
@@ -41,11 +42,9 @@ return RectorConfig::configure()
         '*/Fixture/*',
         '*/Source/*',
 
-        // form event subscribers register on the Form dispatcher via addEventSubscriber(), which needs EventSubscriberInterface;
         // SecurityController listens on kernel.request but a controller cannot expose a public non-action method;
         // DashboardSubscriber base defines listener methods that subclasses override, and method attributes do not inherit to an override
         Rector\Symfony\CodeQuality\Rector\Class_\EventSubscriberToAttributeRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Form/EventListener',
             __DIR__.'/app/bundles/UserBundle/Controller/SecurityController.php',
             __DIR__.'/app/bundles/DashboardBundle/EventListener/DashboardSubscriber.php',
         ],
@@ -56,9 +55,9 @@ return RectorConfig::configure()
         // prefer implicit compare on object|null
         Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector::class,
 
-        // adds dead "return false" after self::fail(); fixed upstream in rector-phpunit #801, drop after next tag
-        Rector\PHPUnit\CodeQuality\Rector\MethodCall\WillReturnCallbackFallbackToReturnFalseRector::class => [
-            __DIR__.'/app/bundles/UserBundle/Tests/EventListener/ApiUserSubscriberTest.php',
+        // removes empty #[AsEventListener] methods from anonymous listener classes used as test input
+        Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Test/AttributeEventListenerRegistrarTest.php',
         ],
 
         // Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,

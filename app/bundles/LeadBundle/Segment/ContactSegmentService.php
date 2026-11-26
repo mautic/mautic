@@ -154,7 +154,7 @@ final readonly class ContactSegmentService
 
         // We are removing it because we will have to add it later
         // to make sure it's the first column in the query
-        $key = array_search($leadsTableAlias.'.id', $select);
+        $key = array_search($leadsTableAlias.'.id', $select, true);
         if (false !== $key) {
             unset($select[$key]);
         }
