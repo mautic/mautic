@@ -73,7 +73,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .toggle__switch::before {
+    .toggle__switch::before,
+    .toggle__switch--dragging::before {
         transition: none;
     }
 }

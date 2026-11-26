@@ -659,7 +659,8 @@ Mautic.initTactileToggles = function() {
             return;
         }
 
-        const {switchEl, label, wasChecked, moved, x, max} = drag,
+        const {switchEl, label, wasChecked, x, max} = drag,
+            moved = drag.moved && event.type !== 'pointercancel',
             nowChecked = moved ? x > max / 2 : wasChecked;
 
         drag = null;
@@ -680,7 +681,7 @@ Mautic.initTactileToggles = function() {
         const switchEl = event.target.closest?.('.toggle__switch');
         const $toggle = switchEl && mQuery(switchEl).closest('.toggle');
 
-        if (!switchEl || event.button !== 0 || $toggle.hasClass('toggle--disabled') || $toggle.hasClass('toggle--readonly')) {
+        if (!switchEl || drag || event.button !== 0 || $toggle.hasClass('toggle--disabled') || $toggle.hasClass('toggle--readonly')) {
             return;
         }
 
