@@ -400,8 +400,8 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $configForm       = $configSaveButton->form();
         $configForm->setValues(
             [
-                'config[coreconfig][locale]'   => 'en_US',
-                'config[coreconfig][site_url]' => 'https://mautic-cloud.local', // required
+                'config[coreconfig][locale]'          => 'en_US',
+                'config[coreconfig][site_url]'        => 'https://mautic-cloud.local', // required
             ]
         );
         $this->client->submit($configForm);

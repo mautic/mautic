@@ -6,7 +6,6 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
-use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -26,6 +25,8 @@ use Mautic\EmailBundle\Form\Type\ScheduleSendType;
 use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\EmailSearchScopeProvider;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Services\EmailColumnsDictionary;
+use Mautic\EmailBundle\Services\EmailListingHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
@@ -43,7 +44,6 @@ final class EmailController extends FormController
 {
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
-    use QuickFilterSearchTrait;
 
     private LeadRepository $leadRepository;
 
@@ -53,26 +53,28 @@ final class EmailController extends FormController
 
     private AuditLogModel $auditLogModel;
 
+    private EmailColumnsDictionary $emailColumnsDictionary;
+
+    private EmailListingHelper $emailListingHelper;
+
     #[Required]
     public function autowireEmailController(
         ListModel $listModel,
         AuditLogModel $auditLogModel,
         EmailModel $emailModel,
         LeadRepository $leadRepository,
+        ?EmailColumnsDictionary $emailColumnsDictionary = null,
+        ?EmailListingHelper $emailListingHelper = null,
     ): void {
         $this->listModel = $listModel;
         $this->auditLogModel = $auditLogModel;
         $this->emailModel = $emailModel;
         $this->leadRepository = $leadRepository;
+        $this->emailColumnsDictionary = $emailColumnsDictionary ?? new EmailColumnsDictionary($this->translator, $this->coreParametersHelper);
+        $this->emailListingHelper = $emailListingHelper ?? new EmailListingHelper($this->security, $this->translator);
     }
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
-
-    private const FILTER_TYPE_CATEGORY = 'category';
-
-    private const FILTER_TYPE_LIST     = 'list';
-
-    private const FILTER_TYPE_THEME    = 'theme';
 
     private bool $invalidHtmlError = false;
 
@@ -82,21 +84,7 @@ final class EmailController extends FormController
     public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, CategoryModel $categoryModel, EmailSearchScopeProvider $emailSearchScopeProvider, $page = 1): Response
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
-        // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'email:emails:viewown',
-                'email:emails:viewother',
-                'email:emails:create',
-                'email:emails:editown',
-                'email:emails:editother',
-                'email:emails:deleteown',
-                'email:emails:deleteother',
-                'email:emails:publishown',
-                'email:emails:publishother',
-            ],
-            'RETURN_ARRAY'
-        );
+        $permissions    = $this->emailListingHelper->getEmailPermissions();
 
         if (!$permissions['email:emails:viewown'] && !$permissions['email:emails:viewother']) {
             $this->throwAccessDenied();
@@ -104,24 +92,13 @@ final class EmailController extends FormController
 
         $this->setListFilters();
 
-        $session = $request->getSession();
-
-        $listFilters = [
-            'filters' => [
-                'placeholder' => $this->translator->trans('mautic.email.filter.placeholder'),
-                'multiple'    => true,
-            ],
-        ];
-
-        // Reset available groups
-        $listFilters['filters']['groups'] = [];
+        $session        = $request->getSession();
+        $availableLists = $this->listModel->getUserLists();
+        $listFilters    = $this->emailListingHelper->getListFilters($themeHelper, $availableLists);
 
         // set limits
         $limit = $session->get('mautic.email.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        $start = $this->emailListingHelper->getStart($page, $limit);
 
         $search = $request->get('search', $session->get('mautic.email.filter', ''));
         $session->set('mautic.email.filter', $search);
@@ -136,17 +113,6 @@ final class EmailController extends FormController
             $filter['force'][] =
                 ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
-        $availableLists                                               = $this->listModel->getUserLists();
-        $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
-            'options' => array_column($availableLists, 'name', 'alias'),
-            'prefix'  => self::FILTER_TYPE_LIST,
-        ];
-        // retrieve a list of themes
-        $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
-            'options' => $themeHelper->getInstalledThemes('email'),
-            'prefix'  => self::FILTER_TYPE_THEME,
-        ];
-
         // retrieve a list of categories
         $categories                                                        = $categoryModel->getLookupResults('email', '', 0);
         $categoryFilterPrefix                                              = $this->translator->trans('mautic.core.searchcommand.category');
@@ -157,84 +123,15 @@ final class EmailController extends FormController
 
         $currentFilters = $session->get('mautic.email.list_filters', []);
         $updatedFilters = $request->get('filters', false);
-        $ignoreListJoin = true;
 
         if ($updatedFilters) {
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    [$column, $flt]        = explode(':', $updatedFilter);
-                    $newFilters[$column][] = $flt;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
+            $currentFilters = $this->emailListingHelper->getUpdatedFilters($updatedFilters);
         }
+
         $session->set('mautic.email.list_filters', $currentFilters);
 
-        $searchFilterTerms = [];
-        foreach ($currentFilters as $type => $typeFilters) {
-            foreach ($typeFilters as $typeFilter) {
-                $searchFilterTerms[] = $type.':'.$typeFilter;
-            }
-        }
-        $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) $filter['string'], $searchFilterTerms);
+        $ignoreListJoin = $this->emailListingHelper->applyCurrentFilters($currentFilters, $listFilters, $filter, $categoryFilterPrefix, $categories, $availableLists);
         $session->set('mautic.email.filter', $filter['string']);
-
-        if (!empty($currentFilters)) {
-            $listAliases = $catIds = $templates = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                if ($type === $categoryFilterPrefix) {
-                    $type = self::FILTER_TYPE_CATEGORY;
-                }
-
-                $key = match ($type) {
-                    self::FILTER_TYPE_LIST     => 'lists',
-                    self::FILTER_TYPE_CATEGORY => 'categories',
-                    self::FILTER_TYPE_THEME    => 'themes',
-                    default                    => $type,
-                };
-
-                $listFilters['filters']['groups']['mautic.core.filter.'.$key]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    if (self::FILTER_TYPE_LIST === $type) {
-                        $listAliases[] = $fltr;
-                    } elseif (self::FILTER_TYPE_CATEGORY === $type) {
-                        if (is_numeric($fltr)) {
-                            $catIds[] = (int) $fltr;
-                            continue;
-                        }
-
-                        foreach ($categories as $category) {
-                            if (($category['alias'] ?? null) === $fltr) {
-                                $catIds[] = (int) $category['id'];
-                                break;
-                            }
-                        }
-                    } elseif (self::FILTER_TYPE_THEME === $type) {
-                        $templates[] = $fltr;
-                    }
-                }
-            }
-
-            if ([] !== $listAliases) {
-                $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => $listAliases];
-                $ignoreListJoin    = false;
-            }
-
-            if ([] !== $catIds) {
-                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
-            }
-
-            if ([] !== $templates) {
-                $filter['force'][] = ['column' => 'e.template', 'expr' => 'in', 'value' => $templates];
-            }
-        }
 
         $orderBy    = $session->get('mautic.email.orderby', 'e.dateModified');
         $orderByDir = $session->get('mautic.email.orderbydir', $this->getDefaultOrderDirection());
@@ -250,15 +147,9 @@ final class EmailController extends FormController
             ]
         );
 
-        $count = count($emails);
-        if ($count && $count < ($start + 1)) {
-            // the number of entities are now less then the current page so redirect to the last page
-            if (1 === $count) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (floor($count / $limit)) ?: 1;
-            }
-
+        $count    = count($emails);
+        $lastPage = $this->emailListingHelper->getLastPageIfCurrentPageIsOutOfBounds($count, $start, $limit);
+        if (null !== $lastPage) {
             $session->set('mautic.email.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $lastPage]);
 
@@ -279,17 +170,19 @@ final class EmailController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue'    => $search,
-                    'filters'        => $listFilters,
-                    'items'          => $emails,
-                    'totalItems'     => $count,
-                    'page'           => $page,
-                    'limit'          => $limit,
-                    'tmpl'           => $request->get('tmpl', 'index'),
-                    'permissions'    => $permissions,
-                    'model'          => $model,
-                    'isDraftEnabled' => $isDraftEnabled,
-                    'searchScopes'   => $emailSearchScopeProvider->getScopes(),
+                    'searchValue'      => $filter['string'],
+                    'filters'          => $listFilters,
+                    'columns'          => $this->emailColumnsDictionary->getColumns(),
+                    'columnHeaderMeta' => $this->emailColumnsDictionary->getHeaderMeta(),
+                    'items'            => $emails,
+                    'totalItems'       => $count,
+                    'page'             => $page,
+                    'limit'            => $limit,
+                    'tmpl'             => $request->get('tmpl', 'index'),
+                    'permissions'      => $permissions,
+                    'model'            => $model,
+                    'isDraftEnabled'   => $isDraftEnabled,
+                    'searchScopes'     => $emailSearchScopeProvider->getScopes(),
                 ],
                 'contentTemplate' => '@MauticEmail/Email/list.html.twig',
                 'passthroughVars' => [

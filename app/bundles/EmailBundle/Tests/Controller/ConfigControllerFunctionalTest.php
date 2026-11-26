@@ -11,6 +11,39 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
+    public function testEmailColumnsArePreselectedByDefault(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/emailconfig');
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('config[buttons][save]')->form();
+
+        $this->assertSame(
+            ['name', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'],
+            $form['config[emailconfig][email_columns]']->getValue()
+        );
+    }
+
+    public function testEmailColumnsSaveSubmittedOrder(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/emailconfig');
+        $this->assertResponseIsSuccessful();
+
+        $form   = $crawler->selectButton('config[buttons][save]')->form();
+        $values = $form->getPhpValues();
+
+        $values['config']['emailconfig']['email_columns'] = ['name', 'subject', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'];
+
+        $this->client->request($form->getMethod(), $form->getUri(), $values);
+        $this->assertResponseIsSuccessful();
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertSame(
+            ['name', 'subject', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'],
+            $configParameters['email_columns']
+        );
+    }
+
     public function testValuesAreEscapedProperly(): void
     {
         $data = [
@@ -41,7 +74,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $values['config']['emailconfig']['mailer_dsn']['options']['list']['0']['value']  = $data['type'];
 
         $this->client->request($form->getMethod(), $form->getUri(), $values);
-        self::assertResponseIsSuccessful();
+        $this->assertResponseIsSuccessful();
 
         // check the DSN is escaped properly in the config file (both using double percent signs and URL encoded)
         $configParameters = $this->getConfigParameters();
@@ -85,7 +118,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // check if there is the given validation error
         $crawler = $this->client->submit($form);
-        self::assertResponseIsSuccessful();
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString($expectedMessage, $crawler->text());
     }
 
