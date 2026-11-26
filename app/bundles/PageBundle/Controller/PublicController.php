@@ -618,19 +618,16 @@ final class PublicController extends AbstractFormController
 
         // A device is found by the device ID the browser holds, never by a contact ID, which anyone could guess.
         // The cookie and the copies the script kept on the site can differ, so the script sends its own, separated by commas,
-        // and all of them are forgotten.
+        // and all of them are forgotten. The script holds two at most, one in the site's cookie and one in localStorage.
         // Other devices of the contact stay as they are, consent was only withdrawn in this browser.
         $deviceIds = array_unique(array_filter(
-            [$cookieHelper->getCookie('mautic_device_id'), ...explode(',', (string) $request->request->get('mautic_device_id'))],
+            [$cookieHelper->getCookie('mautic_device_id'), ...array_slice(explode(',', (string) $request->request->get('mautic_device_id')), 0, 2)],
             static fn (mixed $deviceId): bool => is_string($deviceId) && '' !== $deviceId
         ));
 
-        foreach ($deviceIds as $deviceId) {
-            $device = $leadDeviceRepository->getByTrackingId($deviceId);
-            if (null !== $device) {
-                $device->setTrackingId(null);
-                $entityManager->persist($device);
-            }
+        foreach ([] === $deviceIds ? [] : $leadDeviceRepository->findBy(['trackingId' => $deviceIds]) as $device) {
+            $device->setTrackingId(null);
+            $entityManager->persist($device);
         }
 
         $entityManager->flush();

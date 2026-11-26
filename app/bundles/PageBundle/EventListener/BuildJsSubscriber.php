@@ -249,6 +249,9 @@ JS;
             }
         };
 
+        // A tracking request that failed earlier must not keep this one from being sent
+        m.CORSRequestsAllowed = true;
+
         m.makeCORSRequest('POST', m.trackingConsentWithdrawalUrl, deviceIds.length ? {'mautic_device_id': deviceIds.join(',')} : {},
             function(response) {
                 if (!response || 1 !== response.success) {
@@ -359,7 +362,7 @@ JS;
         MauticJS.mtcEventSet=false;
         document.addEventListener('mauticPageEventDelivered', function(e) {
             var detail   = e.detail;
-            if (!MauticJS.mtcEventSet && detail.response && detail.response.events) {
+            if (MauticJS.trackingEnabled && !MauticJS.mtcEventSet && detail.response && detail.response.events) {
                 MauticJS.setTrackedEvents(detail.response.events);
             }
       });
