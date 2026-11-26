@@ -12,23 +12,14 @@ final class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMidd
 {
     use ConfigAwareTrait;
 
-    public const PRIORITY = 20;
+    public const int PRIORITY = 20;
 
-    /**
-     * @var HttpKernelInterface
-     */
-    private $app;
+    private array $allowedIps = ['127.0.0.1', 'fe80::1', '::1'];
 
-    /**
-     * @var array
-     */
-    private $allowedIps;
-
-    public function __construct(HttpKernelInterface $app)
+    public function __construct(
+        private readonly HttpKernelInterface $app
+    )
     {
-        $this->app        = $app;
-        $this->allowedIps = ['127.0.0.1', 'fe80::1', '::1'];
-
         $parameters = $this->getConfig();
         if (array_key_exists('dev_hosts', $parameters) && is_array($parameters['dev_hosts'])) {
             $this->allowedIps = array_merge($this->allowedIps, $parameters['dev_hosts']);
@@ -52,10 +43,10 @@ final class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMidd
             return $this->app->handle($request, $type, $catch);
         }
 
-        return new Response('You are not allowed to access this file.', 403);
+        return new Response('You are not allowed to access this file.', Response::HTTP_FORBIDDEN);
     }
 
-    public function getPriority()
+    public function getPriority(): int
     {
         return self::PRIORITY;
     }

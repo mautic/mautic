@@ -10,7 +10,7 @@ final class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
 {
     use ConfigAwareTrait;
 
-    public const PRIORITY = 1000;
+    public const int PRIORITY = 1000;
 
     private array $corsHeaders = [
         'Access-Control-Allow-Origin'      => '*',
@@ -22,24 +22,14 @@ final class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
 
     private bool $requestOriginIsValid = false;
 
-    /**
-     * @var bool
-     */
-    private $restrictCORSDomains = true;
+    private readonly bool $restrictCORSDomains;
 
-    /**
-     * @var array
-     */
-    private $validCORSDomains = [];
+    private readonly array $validCORSDomains;
 
-    /**
-     * @var HttpKernelInterface
-     */
-    private $app;
-
-    public function __construct(HttpKernelInterface $app)
+    public function __construct(
+        private readonly HttpKernelInterface $app
+    )
     {
-        $this->app                 = $app;
         $this->config              = $this->getConfig();
         $this->restrictCORSDomains = array_key_exists('cors_restrict_domains', $this->config) ? (bool) $this->config['cors_restrict_domains'] : true;
         $this->validCORSDomains    = array_key_exists('cors_valid_domains', $this->config) ? (array) $this->config['cors_valid_domains'] : [];
@@ -82,10 +72,8 @@ final class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
     /**
      * Get the value for the Access-Control-Allow-Origin header
      * based on the Request and local configuration options.
-     *
-     * @return string|null
      */
-    private function getAllowOriginHeaderValue(Request $request)
+    private function getAllowOriginHeaderValue(Request $request): ?string
     {
         $origin = $request->headers->get('Origin');
 
@@ -97,7 +85,7 @@ final class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
         }
 
         // Check the domains using shell wildcard patterns
-        $validCorsDomainFilter = function ($validCorsDomain) use ($origin) {
+        $validCorsDomainFilter = function ($validCorsDomain) use ($origin): ?bool {
             if (null === $origin) {
                 return null;
             }
@@ -117,7 +105,7 @@ final class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
         return null;
     }
 
-    public function getPriority()
+    public function getPriority(): int
     {
         return self::PRIORITY;
     }

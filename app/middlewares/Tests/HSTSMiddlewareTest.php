@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class HSTSMiddlewareTest extends AbstractMauticTestCase
 {
-    public const HSTS_KEY = 'strict-transport-security';
+    public const string HSTS_KEY = 'strict-transport-security';
 
     private \ReflectionProperty $addHSTS;
 

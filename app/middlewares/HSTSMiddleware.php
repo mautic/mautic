@@ -12,7 +12,7 @@ final class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
 {
     use ConfigAwareTrait;
 
-    public const PRIORITY = 900;
+    public const int PRIORITY = 900;
 
     private bool $enableHSTS;
 
@@ -22,11 +22,10 @@ final class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
 
     private int $expireTime;
 
-    private readonly HttpKernelInterface $app;
-
-    public function __construct(HttpKernelInterface $app)
+    public function __construct(
+        private readonly HttpKernelInterface $app
+    )
     {
-        $this->app               = $app;
         $this->config            = $this->getConfig();
         $this->enableHSTS        = array_key_exists('headers_sts', $this->config) && (bool) $this->config['headers_sts'];
         $this->includeDubDomains = array_key_exists('headers_sts_subdomains', $this->config) && (bool) $this->config['headers_sts_subdomains'];

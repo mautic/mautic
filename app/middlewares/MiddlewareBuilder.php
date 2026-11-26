@@ -6,16 +6,15 @@ use Mautic\CoreBundle\Cache\MiddlewareCacheWarmer;
 
 final readonly class MiddlewareBuilder
 {
-    private \AppKernel $app;
-
     private string $cacheFile;
 
     private \SplPriorityQueue $specs;
 
-    public function __construct(\AppKernel $app)
+    public function __construct(
+        private \AppKernel $app
+    )
     {
-        $this->app       = $app;
-        $this->cacheFile = sprintf('%s/middlewares.cache.php', $app->getCacheDir());
+        $this->cacheFile = sprintf('%s/middlewares.cache.php', $this->app->getCacheDir());
         $this->specs     = new \SplPriorityQueue();
     }
 
@@ -72,7 +71,7 @@ final readonly class MiddlewareBuilder
             $priority   = $reflection->getConstant('PRIORITY');
 
             $this->specs->insert($reflection, $priority);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             /* If there's an error getting the kernel class, it's
              * an invalid middleware. If it's invalid, don't push
              * it to the stack

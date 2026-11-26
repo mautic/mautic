@@ -16,32 +16,19 @@ use Symfony\Component\HttpKernel\TerminableInterface;
  * @see https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21StackMiddleware%21StackedHttpKernel.php/class/StackedHttpKernel/11.x
  * @see \Drupal\Core\DependencyInjection\Compiler\StackedKernelPass
  */
-final class StackedHttpKernel implements HttpKernelInterface, TerminableInterface
+final readonly class StackedHttpKernel implements HttpKernelInterface, TerminableInterface
 {
-    /**
-     * The decorated kernel.
-     *
-     * @var HttpKernelInterface
-     */
-    private $kernel;
-
-    /**
-     * A set of middlewares that are wrapped around this kernel.
-     *
-     * @var array
-     */
-    private $middlewares;
-
     /**
      * Constructs a stacked HTTP kernel.
      *
      * @param HttpKernelInterface $kernel      The decorated kernel
      * @param array               $middlewares An array of previous middleware services
      */
-    public function __construct(HttpKernelInterface $kernel, array $middlewares)
+    public function __construct(
+        private HttpKernelInterface $kernel,
+        private array $middlewares
+    )
     {
-        $this->kernel      = $kernel;
-        $this->middlewares = $middlewares;
     }
 
     public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
