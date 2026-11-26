@@ -135,6 +135,27 @@ final class ContactLastActiveUpdatedEventFunctionalTest extends MauticMysqlTestC
         );
     }
 
+    public function testSavingContactWithPendingChangeAfterRepositoryUpdateKeepsNewerStoredValue(): void
+    {
+        $contact    = $this->createContact(new \DateTime('2026-01-01 10:00:00', new \DateTimeZone('UTC')));
+        $lastActive = new \DateTime('2026-02-01 12:00:00', new \DateTimeZone('UTC'));
+
+        $contact->setLastActive(clone $lastActive);
+        self::getContainer()->get(LeadRepository::class)->updateLastActive($contact->getId(), $lastActive);
+        $this->em->getConnection()->executeStatement(
+            'UPDATE '.MAUTIC_TABLE_PREFIX."leads SET last_active = '2026-02-01 12:05:00' WHERE id = ?",
+            [$contact->getId()]
+        );
+        $contact->setFirstname('Changed');
+        self::getContainer()->get(LeadModel::class)->saveEntity($contact);
+
+        $this->assertCount(1, $this->events);
+        $this->assertSame(
+            '2026-02-01 12:05:00',
+            $this->em->getConnection()->fetchOne('SELECT last_active FROM '.MAUTIC_TABLE_PREFIX.'leads WHERE id = ?', [$contact->getId()])
+        );
+    }
+
     public function testSavingContactWithChangedLastActiveDispatchesEvent(): void
     {
         $contact = $this->createContact(null);

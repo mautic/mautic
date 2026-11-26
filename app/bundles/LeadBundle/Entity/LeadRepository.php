@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -1181,10 +1182,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $dt         = new DateTimeHelper($lastActiveDate ?? '');
         $lastActive = $dt->toUtcString();
 
-        $dispatchEvent      = $this->dispatcher?->hasListeners(ContactLastActiveUpdatedEvent::class) ?? false;
-        $previousLastActive = $dispatchEvent ? $this->getLastActive($leadId) : null;
-
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $connection = $this->getEntityManager()->getConnection();
+        $qb         = $connection->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')
             ->set('last_active', ':lastActive')
             ->where('id = :id')
@@ -1192,13 +1191,19 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->setParameter('lastActive', $lastActive)
             ->setParameter('id', $leadId);
 
-        if ($dispatchEvent) {
-            // Skip the update if another request changed the value after it was read, that request reports the activity.
-            $qb->andWhere('last_active <=> :previous')
-                ->setParameter('previous', $previousLastActive?->format('Y-m-d H:i:s'));
-        }
+        $dispatchEvent      = $this->dispatcher?->hasListeners(ContactLastActiveUpdatedEvent::class) ?? false;
+        $previousLastActive = null;
 
-        $affectedRows = $qb->executeStatement();
+        if ($dispatchEvent) {
+            // Lock the row until the update, so concurrent requests read the value their update replaces.
+            $affectedRows = $connection->transactional(function () use ($connection, $qb, $leadId, &$previousLastActive): int {
+                $previousLastActive = $this->getLastActiveForUpdate($connection, $leadId);
+
+                return $qb->executeStatement();
+            });
+        } else {
+            $affectedRows = $qb->executeStatement();
+        }
 
         // Keep an already loaded entity in sync without recording a change, so a later save compares against the stored value.
         $unitOfWork = $this->getEntityManager()->getUnitOfWork();
@@ -1210,6 +1215,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             if (isset($changes['dateLastActive'])) {
                 // A pending change keeps its new value, but is compared against the stored one.
                 $changes['dateLastActive'][0] = $stored;
+
+                $pending = $lead->getLastActive();
+                if ($pending instanceof \DateTimeInterface && $pending->getTimestamp() === $stored->getTimestamp()) {
+                    // The pending value is already stored, a later flush must not write it again over a newer value.
+                    $unitOfWork->setOriginalEntityProperty(spl_object_id($lead), 'lastActive', $pending);
+                }
             } else {
                 $lead->setLastActive($stored);
                 // Doctrine must not see this as a change, otherwise a later flush could overwrite a newer value.
@@ -1224,15 +1235,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
     }
 
-    private function getLastActive(string|int $leadId): ?\DateTimeImmutable
+    private function getLastActiveForUpdate(Connection $connection, string|int $leadId): ?\DateTimeImmutable
     {
-        $lastActive = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('l.last_active')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->where('l.id = :id')
-            ->setParameter('id', $leadId)
-            ->executeQuery()
-            ->fetchOne();
+        $lastActive = $connection->fetchOne(
+            'SELECT last_active FROM '.MAUTIC_TABLE_PREFIX.'leads WHERE id = ? FOR UPDATE',
+            [$leadId]
+        );
 
         return $lastActive ? new \DateTimeImmutable($lastActive, new \DateTimeZone('UTC')) : null;
     }

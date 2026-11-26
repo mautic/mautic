@@ -217,20 +217,27 @@ final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->repository->updateLastActive(1);
     }
 
-    public function testUpdateLastActiveDispatchesNoEventWhenValueChangedConcurrently(): void
+    public function testUpdateLastActiveWithListenerLocksRowAndKeepsUpdate(): void
     {
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->method('hasListeners')->willReturn(true);
-        $dispatcher->expects($this->never())->method('dispatch');
+        $dispatcher->expects($this->once())->method('dispatch');
         $this->repository->setDispatcher($dispatcher);
 
         $this->connection->method('createQueryBuilder')
             ->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
-        $this->result->method('fetchOne')->willReturn('2026-01-01 10:00:00');
-
-        // Another request wrote a new value after the SELECT, so only an update without a check of the read value succeeds.
-        $this->connection->method('executeStatement')
-            ->willReturnCallback(fn (string $sql): int => str_contains($sql, 'last_active <=> :previous') ? 0 : 1);
+        $this->connection->expects($this->once())
+            ->method('transactional')
+            ->willReturnCallback(fn (\Closure $func): mixed => $func($this->connection));
+        $this->connection->expects($this->once())
+            ->method('fetchOne')
+            ->with($this->stringContains('FOR UPDATE'))
+            ->willReturn('2026-01-01 10:00:00');
+        // A listener must not change what is persisted, so the update is the same as without one.
+        $this->connection->expects($this->once())
+            ->method('executeStatement')
+            ->with($this->logicalNot($this->stringContains(':previous')))
+            ->willReturn(1);
 
         $unitOfWork = $this->createMock(UnitOfWork::class);
         $unitOfWork->method('tryGetById')->willReturn(false);
