@@ -34,6 +34,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
@@ -103,6 +104,11 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $leadRepositoryMock;
 
     /**
+     * @var MockObject&TagRepository
+     */
+    private MockObject $tagRepositoryMock;
+
+    /**
      * @var MockObject&CompanyLeadRepository
      */
     private MockObject $companyLeadRepositoryMock;
@@ -151,6 +157,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->coreParametersHelperMock         = $this->createMock(CoreParametersHelper::class);
         $this->emailValidatorMock               = $this->createMock(EmailValidator::class);
         $this->leadRepositoryMock               = $this->createMock(LeadRepository::class);
+        $this->tagRepositoryMock                = $this->createMock(TagRepository::class);
         $this->companyLeadRepositoryMock        = $this->createMock(CompanyLeadRepository::class);
         $this->stagesChangeLogRepositoryMock    = $this->createMock(StagesChangeLogRepository::class);
         $this->stageRepositoryMock              = $this->createMock(StageRepository::class);
@@ -184,7 +191,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             $this->userHelperMock,
             $this->createStub(LoggerInterface::class),
             $this->leadRepositoryMock,
-            $this->createStub(TagRepository::class), // $tagRepository
+            $this->tagRepositoryMock,
             $this->createStub(PointsChangeLogRepository::class), // $pointsChangeLogRepository
             $this->createStub(UtmTagRepository::class), // $utmTagRepository
             $this->createStub(LeadDeviceRepository::class), // $leadDeviceRepository
@@ -206,6 +213,34 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->setSecurity($this->leadModel);
 
         $this->companyModelMock->method('getCompanyLeadRepository')->willReturn($this->companyLeadRepositoryMock);
+    }
+
+    public function testModifyTagsReattachesExistingDetachedTagAcrossImportBatches(): void
+    {
+        $firstLead   = new Lead();
+        $secondLead  = new Lead();
+        $detachedTag = new Tag('import-tag');
+        $firstManagedTag  = new Tag('import-tag');
+        $secondManagedTag = new Tag('import-tag');
+
+        ReflectionHelper::setValue($detachedTag, 'id', 123);
+        ReflectionHelper::setValue($firstManagedTag, 'id', 123);
+        ReflectionHelper::setValue($secondManagedTag, 'id', 123);
+
+        $this->tagRepositoryMock->expects($this->exactly(2))
+            ->method('getTagsByName')
+            ->with(['import-tag'])->willReturn(['import-tag' => $detachedTag]);
+        $this->entityManagerMock->expects($this->exactly(2))
+            ->method('getReference')
+            ->with(Tag::class, 123)
+            ->willReturnOnConsecutiveCalls($firstManagedTag, $secondManagedTag);
+
+        // The same tag can be returned detached again when the importer starts
+        // the next batch after clearing the EntityManager.
+        $this->assertTrue($this->leadModel->modifyTags($firstLead, ['import-tag'], null, false));
+        $this->assertTrue($this->leadModel->modifyTags($secondLead, ['import-tag'], null, false));
+        $this->assertTrue($firstLead->getTags()->contains($firstManagedTag));
+        $this->assertTrue($secondLead->getTags()->contains($secondManagedTag));
     }
 
     public function testIpLookupDoesNotAddCompanyIfConfiguredSo(): void
