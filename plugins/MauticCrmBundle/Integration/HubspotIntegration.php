@@ -457,7 +457,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
                     $stage->setName($stageName);
                     $stages             = [$stageName => $stage];
                 }
-                if (!$lead->getStage() && $lead->getStage() != $stage) {
+                if (!$lead->getStage()) {
                     $lead->setStage($stage);
 
                     // add a contact stage change log

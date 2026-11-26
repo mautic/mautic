@@ -4838,12 +4838,6 @@ parameters:
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:getMauticLead\(\) should return Mautic\\LeadBundle\\Entity\\Lead but returns null\.$#'
-			identifier: return.type
-			count: 2
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:getPublicActivity\(\) has parameter \$identifier with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -6070,12 +6064,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:getLeads\(\) has parameter \$query with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:getMauticLead\(\) should return Mautic\\LeadBundle\\Entity\\Lead but returns null\.$#'
-			identifier: return.type
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
 
