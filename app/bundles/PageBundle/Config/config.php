@@ -38,6 +38,11 @@ return [
                 'path'       => '/mtc',
                 'controller' => 'Mautic\PageBundle\Controller\PublicController::getContactIdAction',
             ],
+            'mautic_page_tracker_withdraw' => [
+                'path'       => '/mtc/withdraw',
+                'controller' => 'Mautic\PageBundle\Controller\PublicController::withdrawTrackingConsentAction',
+                'method'     => 'POST',
+            ],
             'mautic_url_redirect' => [
                 'path'       => '/r/{redirectId}',
                 'controller' => 'Mautic\PageBundle\Controller\PublicController::redirectAction',

@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
@@ -15,6 +16,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -602,6 +604,51 @@ final class PublicController extends AbstractFormController
         }
 
         return new JsonResponse($data);
+    }
+
+    /**
+     * Called by the tracking script when a visitor withdraws tracking consent in a consent tool: Mautic expires its
+     * tracking cookies and forgets the device of this browser, so its old device ID no longer leads back to the contact.
+     */
+    public function withdrawTrackingConsentAction(Request $request, LeadDeviceRepository $leadDeviceRepository, DeviceTrackingServiceInterface $deviceTrackingService, CookieHelper $cookieHelper, EntityManagerInterface $entityManager): JsonResponse
+    {
+        if (!$this->security->isAnonymous()) {
+            return new JsonResponse(['success' => 0]);
+        }
+
+        // A device is found by the device ID the browser holds, never by a contact ID, which anyone could guess.
+        // The cookie and the copy the script kept in localStorage can differ, so both are forgotten.
+        // Other devices of the contact stay as they are, consent was only withdrawn in this browser.
+        $deviceIds = array_unique(array_filter(
+            [$cookieHelper->getCookie('mautic_device_id'), $request->request->get('mautic_device_id')],
+            static fn (mixed $deviceId): bool => is_string($deviceId) && '' !== $deviceId
+        ));
+
+        foreach ($deviceIds as $deviceId) {
+            $device = $leadDeviceRepository->getByTrackingId($deviceId);
+            if (null !== $device) {
+                $device->setTrackingId(null);
+                $entityManager->persist($device);
+            }
+        }
+
+        $entityManager->flush();
+        $deviceTrackingService->reset();
+
+        $cookies = ['mautic_device_id', 'mtc_id', 'mautic_referer_id', 'mautic_session_id'];
+
+        // Contacts tracked before 2.13.0 also have a cookie named after their session ID that holds the contact ID
+        $sessionId = $cookieHelper->getCookie('mautic_session_id');
+        if (is_string($sessionId) && '' !== $sessionId) {
+            $cookies[] = $sessionId;
+        }
+
+        foreach ($cookies as $name) {
+            // SameSite=None like when they were written, so the browser also takes the expiry from a request sent by another site
+            $cookieHelper->deleteCookie($name, sameSite: Cookie::SAMESITE_NONE);
+        }
+
+        return new JsonResponse(['success' => 1]);
     }
 
     /**
