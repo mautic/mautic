@@ -21,13 +21,6 @@ final class ChannelEvents
     public const string CHANNEL_BROADCAST = 'mautic.channel_broadcast';
 
     /**
-     * The mautic.message_queued event is dispatched to save a message to the queue.
-     *
-     * The event listener receives a Mautic\ChannelBundle\Event\MessageQueueEvent instance.
-     */
-    public const string MESSAGE_QUEUED = 'mautic.message_queued';
-
-    /**
      * The mautic.process_message_queue event is dispatched to be processed by a listener.
      *
      * The event listener receives a Mautic\ChannelBundle\Event\MessageQueueProcessEvent instance.
