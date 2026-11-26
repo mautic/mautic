@@ -71,7 +71,7 @@
   }
 
   &__meter {
-    height: 8px;
+    height: var(--spacing-03);
     border-radius: 9999px;
     background-color: var(--benchmark-track);
     overflow: hidden;
@@ -143,7 +143,7 @@
   }
 
   .partition-bar__segment {
-    min-width: 4px;
+    min-width: var(--spacing-02);
     border-radius: 0;
   }
 }

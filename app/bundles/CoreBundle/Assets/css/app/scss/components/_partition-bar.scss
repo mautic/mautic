@@ -11,7 +11,7 @@
 .partition-bar {
   &__track {
     display: flex;
-    gap: 4px;
+    gap: var(--spacing-02);
   }
 
   &__cell {
@@ -28,8 +28,8 @@
   &__segment {
     display: block;
     flex-basis: 0;
-    min-width: 8px;
-    height: 8px;
+    min-width: var(--spacing-03);
+    height: var(--spacing-03);
     border-radius: 100px;
     background-color: var(--partition-color);
     animation: partition-bar-grow calc(var(--duration-expressive) * 2) var(--easing-standard-expressive) backwards;
