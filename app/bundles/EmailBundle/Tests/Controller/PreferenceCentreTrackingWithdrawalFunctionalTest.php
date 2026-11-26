@@ -90,6 +90,20 @@ final class PreferenceCentreTrackingWithdrawalFunctionalTest extends MauticMysql
         $this->assertSame([], array_intersect([self::TRACKING_ID, self::OTHER_DEVICE], $this->getTrackingIds($contact)));
 
         $this->assertNotSame($contact->getId(), $this->getContactIdRecognisedBy([], true));
+
+        // The contact is tracked again from the next page that identifies them, under a new device ID
+        $this->client->getCookieJar()->clear();
+        $this->client->request(Request::METHOD_GET, $this->buildPreferenceCentreUrl($stat));
+        $this->assertResponseIsSuccessful();
+
+        $cookie = $this->findResponseCookie('mautic_device_id');
+        $this->assertInstanceOf(ResponseCookie::class, $cookie);
+        $this->assertFalse($cookie->isCleared());
+        $this->assertNotContains($cookie->getValue(), [self::TRACKING_ID, self::OTHER_DEVICE]);
+
+        $device = $this->em->getRepository(LeadDevice::class)->findOneBy(['trackingId' => $cookie->getValue()]);
+        $this->assertInstanceOf(LeadDevice::class, $device);
+        $this->assertSame($contact->getId(), $device->getLead()->getId());
     }
 
     public function testAContactWhoKeepsTrackingOnIsStillRecognised(): void
@@ -144,8 +158,7 @@ final class PreferenceCentreTrackingWithdrawalFunctionalTest extends MauticMysql
      */
     private function submitTrackingChoice(Stat $stat, string $choice): ?string
     {
-        $hash    = self::getContainer()->get(MailHashHelper::class)->getEmailHash((string) $stat->getEmailAddress());
-        $crawler = $this->client->request(Request::METHOD_GET, "/email/unsubscribe/{$stat->getTrackingHash()}/{$stat->getEmailAddress()}/{$hash}");
+        $crawler = $this->client->request(Request::METHOD_GET, $this->buildPreferenceCentreUrl($stat));
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->filter('form')->form();
@@ -168,6 +181,13 @@ final class PreferenceCentreTrackingWithdrawalFunctionalTest extends MauticMysql
             static fn (LeadDevice $device): ?string => $device->getTrackingId(),
             $this->em->getRepository(LeadDevice::class)->findBy(['lead' => $contact->getId()])
         );
+    }
+
+    private function buildPreferenceCentreUrl(Stat $stat): string
+    {
+        $hash = self::getContainer()->get(MailHashHelper::class)->getEmailHash((string) $stat->getEmailAddress());
+
+        return "/email/unsubscribe/{$stat->getTrackingHash()}/{$stat->getEmailAddress()}/{$hash}";
     }
 
     /**
