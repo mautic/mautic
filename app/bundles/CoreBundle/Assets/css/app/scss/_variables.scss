@@ -63,11 +63,6 @@ $content-bg:                                #f8f8f8;
 $footer-height:                             46px;
 $footer-bg:                                 transparent;
 
-
-$brand-facebook:        #3b5998;
-$brand-twitter:         #55acee;
-$brand-google:          #dd4b39;
-
 // Themes
 /// Light theme
 :root,
@@ -318,7 +313,7 @@ $brand-google:          #dd4b39;
     --text-on-color: #fdf6e3;
     --text-on-color-disabled: #eee8d580;
     --text-helper: #839496;
-    --text-error: #dc322f;
+    --text-error: #c62828;
     --text-inverse: #fdf6e3;
     --text-disabled: #002b3680;
 
@@ -678,7 +673,7 @@ $brand-google:          #dd4b39;
     --text-on-color: #002b36;
     --text-on-color-disabled: #586e75;
     --text-helper: #839496;
-    --text-error: #dc322f;
+    --text-error: #ff8389;
     --text-inverse: #002b36;
     --text-disabled: #586e75;
 
@@ -855,7 +850,7 @@ $brand-google:          #dd4b39;
     --text-on-color: #1C1C2E;
     --text-on-color-disabled: #A0A0B080;
     --text-helper: #8D93A6;
-    --text-error: #FF6B6B;
+    --text-error: #FF8389;
     --text-inverse: #1C1C2E;
     --text-disabled: #A0A0B080;
 

@@ -36,11 +36,10 @@ $hr-border:                   $gray-lighter !default;
 
 @import "bootstrap-mautic-custom-variables";
 
-$utilities: map-merge($utilities, (
-  "color": map-merge(map-get($utilities, "color"), (
-    "values": map-remove(map-get(map-get($utilities, "color"), "values"), "primary", "success", "info", "warning", "danger", "muted", "white")
-  ))
-));
+$blockquote-small-color:      $gray-light !default;
+$blockquote-font-size:        ($font-size-base * 1.25);
+$blockquote-border-color:     $gray-lighter !default;
+$page-header-border-color:    $gray-lighter !default;
 
 @mixin opacity($opacity) {
   $opacity-ie: ($opacity * 100);

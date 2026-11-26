@@ -85,7 +85,7 @@
                         <table class="table table-hover mb-0">
                             <tbody>
                             <tr>
-                                <td width="20%"><span class="fw-b textTitle">
+                                <td width="20%"><span class="fw-bold textTitle">
                                     {{ 'mautic.campaignconfig.campaign_republish_behavior'|trans }}
                                 </td>
                                 <td>
@@ -93,7 +93,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td width="20%"><span class="fw-b textTitle">
+                                <td width="20%"><span class="fw-bold textTitle">
                                     {{ 'mautic.campaign.last.publish.date'|trans }}
                                     <span data-bs-toggle="tooltip"  title="{{ 'mautic.campaign.last.publish.date.tooltip'|trans }}">
                                         <i class="ri-question-line"></i>
@@ -107,7 +107,7 @@
                             {% for sourceType, typeNames in sources %}
                               {% if typeNames is not empty %}
                                 <tr>
-                                    <td width="20%"><span class="fw-b textTitle">
+                                    <td width="20%"><span class="fw-bold textTitle">
                                       {{ ('mautic.campaign.leadsource.'~sourceType)|trans }}
                                     </td>
                                     <td>
@@ -187,7 +187,7 @@
             <div class="stats-menu__content tab-content p-16 mb-24 shd-sm">
                 <div class="tab-pane active border-0" id="stats-container">
                     <div id="campaign-graph-div" data-target-url="{{ path('mautic_campaign_graph', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
-                        <div class="spinner text-center fs-24"><i class="fa fa-spin fa-spinner"></i></div>
+                        <div class="spinner text-center fs-22"><i class="fa fa-spin fa-spinner"></i></div>
                         <div class="clearfix"></div>
                     </div>
                 </div>
@@ -269,22 +269,22 @@
                     <div class="clearfix"></div>
                 </div>
                 <div class="tab-pane fade in border-0" id="decisions-container">
-                    <div class="spinner text-center fs-24"><i class="fa fa-spin fa-spinner"></i></div>
+                    <div class="spinner text-center fs-22"><i class="fa fa-spin fa-spinner"></i></div>
                     <div class="clearfix"></div>
                 </div>
                 <div class="tab-pane fade in border-0" id="actions-container">
-                    <div class="spinner text-center fs-24"><i class="fa fa-spin fa-spinner"></i></div>
+                    <div class="spinner text-center fs-22"><i class="fa fa-spin fa-spinner"></i></div>
                     <div class="clearfix"></div>
                 </div>
                 <div class="tab-pane fade in border-0" id="conditions-container">
-                    <div class="spinner text-center fs-24"><i class="fa fa-spin fa-spinner"></i></div>
+                    <div class="spinner text-center fs-22"><i class="fa fa-spin fa-spinner"></i></div>
                     <div class="clearfix"></div>
                 </div>
             <!--/ #events-container -->
             <div class="tab-pane fade in border-0 page-list"
                  id="leads-container"
                  data-target-url="{{ path('mautic_campaign_contacts', {'objectId': campaign.id, 'page': app.session.get('mautic.campaign.contact.page', 1)}) }}">
-                <div class="spinner text-center fs-24"><i class="ri-loader-3-line ri-spin"></i></div>
+                <div class="spinner text-center fs-22"><i class="ri-loader-3-line ri-spin"></i></div>
                 <div class="clearfix"></div>
             </div>
             {{ customContent('tabs.content', _context) }}

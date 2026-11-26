@@ -89,7 +89,7 @@
       <div id="dashboard-widgets" class="dashboard-widgets cards d-flex flex-wrap">
           {% for widget in widgets %}
               <div class="card-flex widget" data-widget-id="{{ widget.id }}" style="width: {{ widget.width|default(100) }}%; height: {{ widget.height|default(300) }}px">
-                  <div class="spinner text-center fs-24"><i class="ri-loader-3-line ri-spin"></i></div>
+                  <div class="spinner text-center"><i class="ri-loader-3-line ri-spin ri-xl"></i></div>
                   {{ include('@MauticDashboard/Dashboard/widget.html.twig', {'widget': widget}) }}
               </div>
           {% endfor %}

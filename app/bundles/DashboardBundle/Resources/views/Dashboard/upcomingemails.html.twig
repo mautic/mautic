@@ -4,12 +4,12 @@
             <li class="media border-bottom wrapper-sm">
                 <div class="box-layout">
                     <div class="col-md-9 align-middle">
-                        <h5 class="fw-sb text-primary mt-0 mb-12">
+                        <h5 class="fw-semibold text-primary mt-0 mb-12">
                             <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': email.campaign_id}) }}" data-toggle="ajax">
                                 {{ email.campaign_name }}
                             </a>
                         </h5>
-                        <span class="text-white dark-sm">
+                        <span class="text-secondary">
                             {{ email.event_name }}
                             {{'mautic.core.send.email.to'|trans|lower}}
                             {% include '@MauticCore/Helper/button.html.twig' with {

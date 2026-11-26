@@ -18,7 +18,7 @@
                         alt="" width="65px">
                 </div>
                 <div class="media-body">
-                    <h3 class="fw-sb">{{ me.getName() }}</h3>
+                    <h3 class="fw-semibold">{{ me.getName() }}</h3>
                     <span class="text-secondary">{{ me.getPosition() }}</span>
                 </div>
             </div>
@@ -60,7 +60,7 @@
                 <div class="tab-pane fade show active rounded-0 border-0" id="profile">
                     {{ form_start(userForm) }}
                     <div class="row p-16 border-bottom">
-                        <h4 class="fw-sb">{{ 'mautic.user.account.header.details'|trans }}</h4>
+                        <h4 class="fw-semibold">{{ 'mautic.user.account.header.details'|trans }}</h4>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -108,7 +108,7 @@
                 {% if permissions.apiAccess is defined and permissions.apiAccess %}
                 <div class="tab-pane fade rounded-0 border-0" id="clients">
                     <div class="row p-16 border-bottom">
-                        <h4 class="fw-sb">{{ 'mautic.user.account.header.authorizedclients'|trans }}</h4>
+                        <h4 class="fw-semibold">{{ 'mautic.user.account.header.authorizedclients'|trans }}</h4>
                     </div>
                     <div class="row">
                         {{ authorizedClients|raw }}
@@ -118,7 +118,7 @@
 
                 <div class="tab-pane fade rounded-0 border-0" id="appearance">
                     <div class="row p-16 border-bottom">
-                        <h4 class="fw-sb">{{ 'mautic.user.account.appearance'|trans }}</h4>
+                        <h4 class="fw-semibold">{{ 'mautic.user.account.appearance'|trans }}</h4>
                     </div>
                     <div class="row">
                         <div class="col-xs-12 mb-24">
@@ -174,7 +174,7 @@
 
                 <div class="tab-pane fade rounded-0 border-0" id="accessibility">
                     <div class="row p-16 border-bottom">
-                        <h4 class="fw-sb">{{ 'mautic.user.account.accessibility'|trans }}</h4>
+                        <h4 class="fw-semibold">{{ 'mautic.user.account.accessibility'|trans }}</h4>
                     </div>
                     <div class="row">
                         <div class="col-xs-12 mb-24">
@@ -187,7 +187,7 @@
                                         data-attribute-toggle="reduce-motion" data-attribute-value="false" checked>
                                     <label for="transitions-enabled">
                                         <strong>{{ 'mautic.user.account.accessibility.enabled'|trans }}</strong>
-                                        <div class="text-help">{{ 'mautic.user.account.accessibility.transitions_enabled_description'|trans }}
+                                        <div class="text-helper type-helper-text-01">{{ 'mautic.user.account.accessibility.transitions_enabled_description'|trans }}
                                         </div>
                                     </label>
                                 </div>
@@ -196,7 +196,7 @@
                                         data-attribute-toggle="reduce-motion" data-attribute-value="true">
                                     <label for="transitions-disabled">
                                         <strong>{{ 'mautic.user.account.accessibility.disabled'|trans }}</strong>
-                                        <div class="text-help">{{ 'mautic.user.account.accessibility.transitions_disabled_description'|trans }}</div>
+                                        <div class="text-helper type-helper-text-01">{{ 'mautic.user.account.accessibility.transitions_disabled_description'|trans }}</div>
                                     </label>
                                 </div>
                             </div>
@@ -210,7 +210,7 @@
                                         data-attribute-toggle="contrast-borders" data-attribute-value="false" checked>
                                     <label for="borders-disabled">
                                         <strong>{{ 'mautic.user.account.accessibility.disabled'|trans }}</strong>
-                                        <div class="text-help">{{ 'mautic.user.account.accessibility.borders_disabled_description'|trans }}
+                                        <div class="text-helper type-helper-text-01">{{ 'mautic.user.account.accessibility.borders_disabled_description'|trans }}
                                         </div>
                                     </label>
                                 </div>
@@ -219,7 +219,7 @@
                                         data-attribute-toggle="contrast-borders" data-attribute-value="true">
                                     <label for="borders-enabled">
                                         <strong>{{ 'mautic.user.account.accessibility.enabled'|trans }}</strong>
-                                        <div class="text-help">{{ 'mautic.user.account.accessibility.borders_enabled_description'|trans }}
+                                        <div class="text-helper type-helper-text-01">{{ 'mautic.user.account.accessibility.borders_enabled_description'|trans }}
                                         </div>
                                     </label>
                                 </div>
@@ -234,7 +234,7 @@
                                         data-attribute-value="false" checked>
                                     <label for="transparency-normal">
                                         <strong>{{ 'mautic.user.account.accessibility.normal'|trans }}</strong>
-                                        <div class="text-help">{{ 'mautic.user.account.accessibility.transparency_normal_description'|trans }}
+                                        <div class="text-helper type-helper-text-01">{{ 'mautic.user.account.accessibility.transparency_normal_description'|trans }}
                                         </div>
                                     </label>
                                 </div>
@@ -244,7 +244,7 @@
                                         data-attribute-value="true">
                                     <label for="transparency-reduced">
                                         <strong>{{ 'mautic.user.account.accessibility.reduced'|trans }}</strong>
-                                        <div class="text-help">{{ 'mautic.user.account.accessibility.transparency_reduced_description'|trans }}</div>
+                                        <div class="text-helper type-helper-text-01">{{ 'mautic.user.account.accessibility.transparency_reduced_description'|trans }}</div>
                                     </label>
                                 </div>
                             </div>
@@ -259,7 +259,7 @@
                                         data-attribute-toggle="enable-underlines" data-attribute-value="false" checked>
                                     <label for="underlines-disabled">
                                         <strong>{{ 'mautic.user.account.accessibility.disabled'|trans }}</strong>
-                                        <div class="text-help">{{ 'mautic.user.account.accessibility.underlines_disabled_description'|trans }}
+                                        <div class="text-helper type-helper-text-01">{{ 'mautic.user.account.accessibility.underlines_disabled_description'|trans }}
                                         </div>
                                     </label>
                                 </div>
@@ -268,7 +268,7 @@
                                         data-attribute-toggle="enable-underlines" data-attribute-value="true">
                                     <label for="underlines-enabled">
                                         <strong>{{ 'mautic.user.account.accessibility.enabled'|trans }}</strong>
-                                        <div class="text-help">{{ 'mautic.user.account.accessibility.underlines_enabled_description'|trans }}
+                                        <div class="text-helper type-helper-text-01">{{ 'mautic.user.account.accessibility.underlines_enabled_description'|trans }}
                                         </div>
                                     </label>
                                 </div>
