@@ -148,7 +148,7 @@ final class ResultController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'Mautic\FormBundle\Controller\ResultController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'formresult',
@@ -395,7 +395,7 @@ final class ResultController extends CommonFormController
             [
                 'returnUrl'       => $this->generateUrl('mautic_form_results', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'Mautic\FormBundle\Controller\ResultController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'mauticContent' => 'formresult',
                 ],

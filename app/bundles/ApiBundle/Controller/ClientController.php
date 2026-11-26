@@ -83,7 +83,7 @@ final class ClientController extends AbstractStandardFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_client_index',
                         'mauticContent' => 'client',
@@ -247,7 +247,7 @@ final class ClientController extends AbstractStandardFormController
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
-                        'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
+                        'contentTemplate' => self::class.'::indexAction',
                         'passthroughVars' => [
                             'activeLink'    => '#mautic_client_index',
                             'mauticContent' => 'client',
@@ -292,7 +292,7 @@ final class ClientController extends AbstractStandardFormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_client_index',
                 'mauticContent' => 'client',
@@ -396,7 +396,7 @@ final class ClientController extends AbstractStandardFormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_client_index',
                 'success'       => $success,
