@@ -142,7 +142,7 @@ final class SummaryRepository extends CommonRepository
 
             // Build inner aggregation query with consistent integer types in CASE branches
             $innerSql = 'SELECT '.implode(', ', $selects).
-                'FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel
+                ' FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel
                 LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl
                     ON mclefl.log_id = mclel.id
                    AND mclefl.date_added BETWEEN '.$dateFromExpr.' AND '.$dateToExpr.'
