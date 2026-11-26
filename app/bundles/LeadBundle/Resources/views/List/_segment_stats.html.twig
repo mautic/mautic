@@ -29,4 +29,11 @@
         'tooltip': 'mautic.lead.segments.filter.added.contacts.tooltip'|trans
     }]) %}
 {% endif %}
-{{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': segmentCards}) }}
+{% set segmentCards = segmentCards|merge([{
+    'title': 'mautic.lead.segments.manually.removed.contacts'|trans,
+    'value': manuallyRemovedSegmentCount,
+    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias ~ ' ' ~ ('mautic.lead.lead.searchcommand.source'|trans) ~ ':' ~ ('mautic.lead.lead.searchcommand.source.manually_removed'|trans)}),
+    'icon': 'ri-user-unfollow-line',
+    'tooltip': 'mautic.lead.segments.manually.removed.contacts.tooltip'|trans
+}]) %}
+{{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': segmentCards, 'segmentGrid': true}) }}
