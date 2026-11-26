@@ -162,6 +162,9 @@ final class CheckboxComponentTest extends TestCase
 
         $this->assertStringContainsString('checkbox-chips', $output);
         $this->assertStringContainsString('form-check--chip', $output);
+        $this->assertStringContainsString('form-check-chip__check', $output);
+        $this->assertStringContainsString('aria-hidden="true"', $output);
+        $this->assertStringNotContainsString('form-check-chip__check', $this->render(['items' => [['label' => 'Plain', 'value' => '1']]]));
         $this->assertStringNotContainsString('form-check--chip', $this->render(['items' => [['label' => 'Plain', 'value' => '1']]]));
     }
 

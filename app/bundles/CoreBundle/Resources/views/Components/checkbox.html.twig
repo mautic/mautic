@@ -59,6 +59,9 @@
                     {% endif %}
                 {% endfor %}
             >
+            {% if chip %}
+                <svg class="form-check-chip__check" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4 10.5l4 4 8-8" /></svg>
+            {% endif %}
             {% if item_label is not same as('') %}
             <label class="form-check-label" for="{{ item_id|escape('html_attr') }}"{% for label_key, label_value in item.labelAttributes|default({}) %} {{ label_key|escape('html_attr') }}="{{ label_value|escape('html_attr') }}"{% endfor %}>
                 {% set item_text = item_label|trans(item.label_translation_parameters|default({}), item.translation_domain is defined ? item.translation_domain : null) %}

@@ -30,17 +30,61 @@
         border-radius: 0;
         background-color: transparent;
 
+        &::after {
+            content: none;
+        }
+
         &:checked {
             border-color: var(--text-inverse);
             background-color: var(--text-inverse);
             background-image: none;
-            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2.5' d='M3.5 10.5l4.5 4.5 8.5-10'/%3E%3C/svg%3E"), linear-gradient(#000, #000);
-            mask-position: center;
-            mask-repeat: no-repeat;
-            mask-size: 100%, 100%;
-            mask-origin: border-box;
-            mask-clip: border-box;
-            mask-composite: exclude;
+            mask: none;
+
+            &::after {
+                content: none;
+            }
+        }
+    }
+
+    .form-check-chip__check {
+        position: absolute;
+        inset-inline-start: 1rem;
+        top: 50%;
+        inline-size: 1.125rem;
+        block-size: 1.125rem;
+        transform: translateY(-50%);
+        overflow: visible;
+        pointer-events: none;
+
+        path {
+            fill: none;
+            stroke: var(--text-primary);
+            stroke-dasharray: 18;
+            stroke-dashoffset: 18;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 2.25;
+        }
+    }
+
+    .form-check-input:checked + .form-check-chip__check path {
+        animation: checkbox-chip-draw 480ms cubic-bezier(.4, 0, .2, 1) both;
+    }
+
+    .form-check-input:not(:checked) + .form-check-chip__check path {
+        transition: stroke-dashoffset 140ms ease-in;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .form-check-input:checked + .form-check-chip__check path {
+            animation: none;
+            stroke-dashoffset: 0;
+        }
+    }
+
+    @keyframes checkbox-chip-draw {
+        to {
+            stroke-dashoffset: 0;
         }
     }
 
