@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\SegmentedControlType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Symfony\Component\Form\AbstractType;
@@ -46,19 +47,10 @@ final class ContactChannelsType extends AbstractType
         if (!$options['public_view'] || $showContactPreferredChannels) {
             $builder->add(
                 'preferred_channel',
-                ChoiceType::class,
+                SegmentedControlType::class,
                 [
-                    'choices'           => $options['channels'],
-                    'expanded'          => false,
-                    'multiple'          => false,
-                    'label'             => 'mautic.lead.list.frequency.preferred.channel',
-                    'label_attr'        => ['class' => 'form-label'],
-                    'placeholder'       => false,
-                    'required'          => false,
-                    'attr'              => [
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.lead.list.frequency.preferred.channel',
-                    ],
+                    'choices' => $options['channels'],
+                    'label'   => 'mautic.lead.list.frequency.preferred.channel',
                 ]
             );
         }

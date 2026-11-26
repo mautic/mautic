@@ -342,6 +342,11 @@ Mautic.switchFormFieldState = function (formName) {
             return (condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'));
         }
 
+        const selectedRadio = mQuery('#' + fieldId).find(':radio:checked');
+        if (selectedRadio.length) {
+            return checkValueCondition(selectedRadio.val(), condition);
+        }
+
         return checkValueCondition(mQuery('#' + fieldId).val(), condition);
     }
 
