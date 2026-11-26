@@ -97,6 +97,40 @@ final class ContactManagementCest
         $I->click(ContactPage::$cancelButton);
     }
 
+    public function cancelEditContactShowsCloseUntilChangedAndAsksBeforeDiscarding(
+        AcceptanceTester $I,
+        ContactStep $contact,
+    ): void {
+        $I->amOnPage(ContactPage::$URL);
+
+        $contactName = $contact->grabContactNameFromList(1);
+        $contact->selectOptionFromDropDown(1, 1);
+        $I->waitForElementVisible(ContactPage::$editForm, AcceptanceTester::TIMEOUT);
+        $I->see("Edit {$contactName}");
+
+        // An untouched form offers Close
+        $I->waitForText('Close', AcceptanceTester::TIMEOUT, ContactPage::$cancelButton);
+
+        // Changing a field switches the button to Cancel
+        $I->fillField(ContactPage::$firstNameField, 'UnsavedFirstName');
+        $I->waitForText('Cancel', AcceptanceTester::TIMEOUT, ContactPage::$cancelButton);
+
+        // Cancel with unsaved changes asks first, and Cancel in the dialog keeps the edits
+        $I->click(ContactPage::$cancelButton);
+        $I->waitForElementVisible('.confirmation-modal', AcceptanceTester::TIMEOUT);
+        $I->see('You have unsaved changes. Discard them?', '.confirmation-modal .modal-title');
+        $I->click("//div[contains(@class, 'confirmation-modal')]//button[normalize-space()='Cancel']");
+        $I->waitForElementNotVisible('.confirmation-modal', AcceptanceTester::TIMEOUT);
+        $I->seeInField(ContactPage::$firstNameField, 'UnsavedFirstName');
+
+        // Discard in the dialog leaves the form without saving
+        $I->click(ContactPage::$cancelButton);
+        $I->waitForElementVisible('.confirmation-modal', AcceptanceTester::TIMEOUT);
+        $I->click('.confirmation-modal #confirm');
+        $I->waitForElementNotVisible(ContactPage::$firstNameField, AcceptanceTester::TIMEOUT);
+        $I->dontSeeInDatabase('test_leads', ['firstname' => 'UnsavedFirstName']);
+    }
+
     public function editContactFromProfile(
         AcceptanceTester $I,
         ContactStep $contact,
