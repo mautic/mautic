@@ -19,10 +19,19 @@ final readonly class PluginDatabase
     public function __construct(
         private EntityManagerInterface $em,
         private Connection $connection,
-        #[Autowire(env: 'MAUTIC_TABLE_PREFIX')]
+        // The prefix may live only in config/local.php. This container parameter is populated
+        // from it, while the MAUTIC_TABLE_PREFIX environment variable is not.
+        #[Autowire(param: 'mautic.db_table_prefix')]
         ?string $mauticDbPrefix,
     ) {
-        $this->mauticDbPrefix = $mauticDbPrefix ?? '';
+        if (null === $mauticDbPrefix || '' === $mauticDbPrefix) {
+            // Installations that set only the MAUTIC_TABLE_PREFIX environment variable are not
+            // covered by the container parameter. Mirror DoctrineEventsSubscriber and fall back
+            // to the constant, which AppKernel defines from the environment or config/local.php.
+            $mauticDbPrefix = defined('MAUTIC_TABLE_PREFIX') ? (string) MAUTIC_TABLE_PREFIX : '';
+        }
+
+        $this->mauticDbPrefix = $mauticDbPrefix;
     }
 
     /**
