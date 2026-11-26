@@ -19,10 +19,10 @@ final readonly class PluginDatabase
     public function __construct(
         private EntityManagerInterface $em,
         private Connection $connection,
-        #[Autowire(env: 'MAUTIC_TABLE_PREFIX')]
+        #[Autowire(param: 'mautic.db_table_prefix')]
         ?string $mauticDbPrefix,
     ) {
-        $this->mauticDbPrefix = $mauticDbPrefix ?? '';
+        $this->mauticDbPrefix = $mauticDbPrefix ?: (string) MAUTIC_TABLE_PREFIX;
     }
 
     /**
