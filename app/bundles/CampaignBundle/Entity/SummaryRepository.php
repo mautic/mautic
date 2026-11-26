@@ -141,7 +141,8 @@ final class SummaryRepository extends CommonRepository
                 // prepend ID COLUMN value as COLUMN
                 array_unshift($selects, array_map(
                     fn ($value, $key) => "{$value} AS {$key}",
-                    $idValues
+                    $idValues,
+                    array_keys($idValues)
                 ));
             }
 
