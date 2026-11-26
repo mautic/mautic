@@ -10,9 +10,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
-use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -30,7 +28,6 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class ListController extends FormController
 {
     use CategoryListFiltersTrait;
-    use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
     private LeadListRepository $leadListRepository;
@@ -49,8 +46,6 @@ final class ListController extends FormController
         $this->listModel = $listModel;
         $this->leadListRepository = $leadListRepository;
     }
-
-    public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
 
     public const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
 
@@ -731,15 +726,6 @@ final class ListController extends FormController
         // set the page we came from
         $page = $request->getSession()->get('mautic.segment.page', 1);
 
-        if ('POST' === $request->getMethod() && $request->request->has('includeEvents')) {
-            $filters = [
-                'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
-            ];
-            $request->getSession()->set('mautic.segment.filters', $filters);
-        } else {
-            $filters = [];
-        }
-
         if (null === $list) {
             // set the return URL
             $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
@@ -803,14 +789,6 @@ final class ListController extends FormController
                 'permissions'        => $this->security->isGranted($permissions, 'RETURN_ARRAY'),
                 'security'           => $this->security,
                 'dateRangeForm'      => $dateRangeForm->createView(),
-                'events'             => [
-                    'filters' => $filters,
-                    'types'   => [
-                        'manually_added'   => $this->translator->trans('mautic.segment.contact.manually.added'),
-                        'manually_removed' => $this->translator->trans('mautic.segment.contact.manually.removed'),
-                        'filter_added'     => $this->translator->trans('mautic.segment.contact.filter.added'),
-                    ],
-                ],
             ],
             'contentTemplate' => '@MauticLead/List/details.html.twig',
             'passthroughVars' => [
@@ -842,11 +820,12 @@ final class ListController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'list'                      => $segment,
-                'segmentCount'              => $statistics['total'],
-                'activeSegmentCount'        => $activeSegmentCount,
-                'manuallyAddedSegmentCount' => $statistics['manuallyAdded'],
-                'filterAddedSegmentCount'   => $statistics['filterAdded'],
+                'list'                        => $segment,
+                'segmentCount'                => $statistics['total'],
+                'activeSegmentCount'          => $activeSegmentCount,
+                'manuallyAddedSegmentCount'   => $statistics['manuallyAdded'],
+                'filterAddedSegmentCount'     => $statistics['filterAdded'],
+                'manuallyRemovedSegmentCount' => $statistics['manuallyRemoved'],
             ],
             'contentTemplate' => '@MauticLead/List/_segment_stats.html.twig',
         ]);
@@ -911,52 +890,6 @@ final class ListController extends FormController
         }
 
         return $args;
-    }
-
-    /**
-     * @param int $objectId
-     * @param int $page
-     */
-    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1): Response
-    {
-        $session = $request->getSession();
-        $session->set('mautic.segment.contact.page', $page);
-
-        $manuallyRemoved = 0;
-        $listFilters     = ['manually_removed' => $manuallyRemoved];
-        if ('POST' === $request->getMethod() && $request->request->has('includeEvents')) {
-            $filters = [
-                'includeEvents' => InputHelper::clean($request->query->all()['includeEvents'] ?? $request->request->all()['includeEvents'] ?? []),
-            ];
-            $request->getSession()->set('mautic.segment.filters', $filters);
-        } else {
-            $filters = [];
-        }
-
-        if ([] !== $filters) {
-            if (in_array('manually_added', $filters['includeEvents'])) {
-                $listFilters = array_merge($listFilters, ['manually_added' => 1]);
-            }
-            if (in_array('manually_removed', $filters['includeEvents'])) {
-                $listFilters = array_merge($listFilters, ['manually_removed' => 1]);
-            }
-            if (in_array('filter_added', $filters['includeEvents'])) {
-                $listFilters = array_merge($listFilters, ['manually_added' => 0]);
-            }
-        }
-
-        return $this->generateContactsGrid(
-            $request,
-            $pageHelperFactory,
-            $objectId,
-            $page,
-            LeadPermissions::LISTS_VIEW,
-            'segment',
-            'lead_lists_leads',
-            null,
-            'leadlist_id',
-            $listFilters
-        );
     }
 
     protected function getDefaultOrderDirection(): string

@@ -49,6 +49,19 @@ class LeadListRepository extends CommonRepository
      */
     protected $companyTableSchema;
 
+    public function getEntities(array $args = [])
+    {
+        if (!isset($args['qb'])) {
+            $q = $this->getEntityManager()->createQueryBuilder();
+            $q->select($this->getTableAlias().', cat')
+                ->from(LeadList::class, $this->getTableAlias(), $this->getTableAlias().'.id')
+                ->leftJoin($this->getTableAlias().'.category', 'cat');
+            $args['qb'] = $q;
+        }
+
+        return parent::getEntities($args);
+    }
+
     private function getSingleEntity(int $id, bool $ignoreDeleted = true): ?LeadList
     {
         try {
@@ -328,7 +341,7 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @return array{total: int, manuallyAdded: int, filterAdded: int|null}
+     * @return array{total: int, manuallyAdded: int, filterAdded: int|null, manuallyRemoved: int}
      */
     public function getSegmentStatistics(int $listId, bool $includeFilterAdded): array
     {
@@ -353,10 +366,24 @@ class LeadListRepository extends CommonRepository
             ->executeQuery()
             ->fetchAssociative() ?: [];
 
+        $removedQueryBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $manuallyRemoved     = (int) $removedQueryBuilder
+            ->select('COUNT(l.lead_id)')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
+            ->where(
+                $removedQueryBuilder->expr()->eq('l.leadlist_id', ':listId'),
+                $removedQueryBuilder->expr()->eq('l.manually_removed', ':true')
+            )
+            ->setParameter('listId', $listId)
+            ->setParameter('true', true, 'boolean')
+            ->executeQuery()
+            ->fetchOne();
+
         return [
-            'total'         => (int) ($stats['total_count'] ?? 0),
-            'manuallyAdded' => (int) ($stats['manually_added_count'] ?? 0),
-            'filterAdded'   => $includeFilterAdded ? (int) ($stats['filter_added_count'] ?? 0) : null,
+            'total'           => (int) ($stats['total_count'] ?? 0),
+            'manuallyAdded'   => (int) ($stats['manually_added_count'] ?? 0),
+            'filterAdded'     => $includeFilterAdded ? (int) ($stats['filter_added_count'] ?? 0) : null,
+            'manuallyRemoved' => $manuallyRemoved,
         ];
     }
 
@@ -469,12 +496,31 @@ class LeadListRepository extends CommonRepository
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
+        $forceParameters = [];
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('l.isGlobal', ":{$unique}");
                 $forceParameters = [$unique => true];
+                break;
+            case $this->translator->trans('mautic.lead.list.searchcommand.dynamic'):
+            case $this->translator->trans('mautic.lead.list.searchcommand.dynamic', [], null, 'en_US'):
+                [$staticExpr, $forceParameters] = $this->getStaticSegmentExpression($q);
+                $expr                           = ($filter->not) ? $staticExpr : $this->negateExpression($q, $staticExpr);
+                break;
+            case $this->translator->trans('mautic.lead.list.searchcommand.static'):
+            case $this->translator->trans('mautic.lead.list.searchcommand.static', [], null, 'en_US'):
+                [$expr, $forceParameters] = $this->getStaticSegmentExpression($q);
+                if ($filter->not) {
+                    $expr = $this->negateExpression($q, $expr);
+                }
+                break;
+            case $this->translator->trans('mautic.lead.list.searchcommand.ispreference'):
+            case $this->translator->trans('mautic.lead.list.searchcommand.ispreference', [], null, 'en_US'):
+                $column          = $q instanceof \Doctrine\ORM\QueryBuilder ? 'l.isPreferenceCenter' : 'l.is_preference_center';
+                $expr            = $q->expr()->eq($column, ":$unique");
+                $forceParameters = [$unique => !$filter->not];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
@@ -512,6 +558,49 @@ class LeadListRepository extends CommonRepository
         ];
     }
 
+    private function negateExpression(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, mixed $expr): object|string
+    {
+        if ($q instanceof \Doctrine\ORM\QueryBuilder) {
+            return $q->expr()->not($expr);
+        }
+
+        return sprintf('NOT(%s)', (string) $expr);
+    }
+
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
+     *
+     * @return array{mixed, array<string, string>}
+     */
+    private function getStaticSegmentExpression($q): array
+    {
+        $column         = sprintf('%s.filters', $this->getTableAlias());
+        $emptyParameter = $this->generateRandomParameterName();
+        $nullParameter  = $this->generateRandomParameterName();
+
+        if ($q instanceof \Doctrine\ORM\QueryBuilder) {
+            $expr = $q->expr()->orX(
+                $q->expr()->isNull($column),
+                $q->expr()->eq($column, ":$emptyParameter"),
+                $q->expr()->eq($column, ":$nullParameter")
+            );
+        } else {
+            $expr = $q->expr()->or(
+                $q->expr()->isNull($column),
+                $q->expr()->eq($column, ":$emptyParameter"),
+                $q->expr()->eq($column, ":$nullParameter")
+            );
+        }
+
+        return [
+            $expr,
+            [
+                $emptyParameter => serialize([]),
+                $nullParameter  => serialize(null),
+            ],
+        ];
+    }
+
     /**
      * @return string[]
      */
@@ -519,6 +608,9 @@ class LeadListRepository extends CommonRepository
     {
         $commands = [
             'mautic.lead.list.searchcommand.isglobal',
+            'mautic.lead.list.searchcommand.dynamic',
+            'mautic.lead.list.searchcommand.static',
+            'mautic.lead.list.searchcommand.ispreference',
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.name',
