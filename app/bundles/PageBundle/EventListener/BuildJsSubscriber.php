@@ -25,6 +25,7 @@ final readonly class BuildJsSubscriber implements EventSubscriberInterface
                 // onBuildJs must always needs to be last to ensure setup before delivering the event
                 ['onBuildJs', -255],
                 ['onBuildJsForTrackingEvent', 256],
+                ['onBuildJsForConsentWithdrawal', 0],
             ],
         ];
     }
@@ -74,6 +75,11 @@ final readonly class BuildJsSubscriber implements EventSubscriberInterface
     }
 
     m.deliverPageEvent = function(event, params) {
+        if (!m.trackingEnabled) {
+            // Tracking consent was withdrawn on this page
+            return;
+        }
+
         if (!m.firstDeliveryMade && params['counter'] > 0) {
             // Wait for the first delivery to complete so that the tracking information is set
             setTimeout(function () {
@@ -191,6 +197,71 @@ final readonly class BuildJsSubscriber implements EventSubscriberInterface
 JS;
 
         $event->appendJsForScope($js, BuildJsScope::TRACKING, 'Mautic Tracking Pixel');
+    }
+
+    /**
+     * Part of the tracking script, so the essential script keeps knowing nothing about identifiers.
+     */
+    public function onBuildJsForConsentWithdrawal(BuildJsEvent $event): void
+    {
+        if (!$event->acceptsScope(BuildJsScope::TRACKING)) {
+            return;
+        }
+
+        $withdrawUrl = $this->router->generate('mautic_page_tracker_withdraw', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $scheme      = parse_url($withdrawUrl, PHP_URL_SCHEME);
+        $withdrawUrl = str_replace(['http://', 'https://'], '', $withdrawUrl);
+
+        $js = <<<JS
+(function(m, l, d) {
+    if (!m || m.runtimeReady !== true) {
+        return;
+    }
+
+    m.trackingConsentWithdrawalUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$withdrawUrl}';
+
+    /**
+     * Forgets this browser: stops tracking on the page, removes the identifiers the tracking script stored on this site
+     * and asks Mautic to expire its own cookies and stop recognising the device.
+     * The optional callback receives true once Mautic confirmed it.
+     */
+    m.withdrawTrackingConsent = function(callback) {
+        var cookie   = d.cookie.match(/(?:^|; )mautic_device_id=([^;]*)/);
+        var deviceId = cookie ? cookie[1] : null;
+
+        m.trackingEnabled = false;
+
+        try {
+            deviceId = localStorage.getItem('mautic_device_id') || deviceId;
+            localStorage.removeItem('mtc_id');
+            localStorage.removeItem('mautic_device_id');
+        } catch (e) {
+            // localStorage isn't available, so there is nothing stored in it
+        }
+
+        ['mtc_id', 'mautic_device_id'].forEach(function(name) {
+            d.cookie = name + '=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure';
+        });
+
+        var done = function(success) {
+            if (typeof callback === 'function') {
+                callback(success);
+            }
+        };
+
+        m.makeCORSRequest('POST', m.trackingConsentWithdrawalUrl, deviceId ? {'mautic_device_id': deviceId} : {},
+            function() {
+                done(true);
+            },
+            function() {
+                done(false);
+            }
+        );
+    };
+})(window.MauticJS, location, document);
+JS;
+
+        $event->appendJsForScope($js, BuildJsScope::TRACKING, 'Mautic Tracking Consent Withdrawal');
     }
 
     public function onBuildJsForTrackingEvent(BuildJsEvent $event): void

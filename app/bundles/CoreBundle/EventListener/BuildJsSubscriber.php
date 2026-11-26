@@ -254,7 +254,7 @@ MauticJS.appendTrackedContact = function(data) {
 };
 
 MauticJS.getTrackedContact = function () {
-    if (MauticJS.mtcSet) {
+    if (MauticJS.mtcSet || !MauticJS.trackingEnabled) {
         // Already set
         return;
     }
@@ -265,7 +265,8 @@ MauticJS.getTrackedContact = function () {
 };
 
 MauticJS.setTrackedContact = function(response) {
-    if (response.id) {
+    // Nothing is stored once tracking consent was withdrawn on this page
+    if (response.id && MauticJS.trackingEnabled) {
         MauticJS.setCookie('mtc_id', response.id);
         MauticJS.setCookie('mautic_device_id', response.device_id);
         MauticJS.mtcSet = true;
