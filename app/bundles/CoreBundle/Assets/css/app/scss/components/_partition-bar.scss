@@ -1,6 +1,6 @@
 @keyframes partition-bar-grow {
-  from { clip-path: inset(0 100% 0 0 round 100px); }
-  to { clip-path: inset(0 0 0 0 round 100px); }
+  from { clip-path: inset(0 100% 0 0 round var(--partition-bar-radius)); }
+  to { clip-path: inset(0 0 0 0 round var(--partition-bar-radius)); }
 }
 
 @keyframes partition-bar-fade {
@@ -9,9 +9,12 @@
 }
 
 .partition-bar {
+  --partition-bar-radius: 100px;
+  --partition-bar-dot-size: 10px;
+
   &__track {
     display: flex;
-    gap: 4px;
+    gap: var(--spacing-02);
   }
 
   &__cell {
@@ -28,9 +31,9 @@
   &__segment {
     display: block;
     flex-basis: 0;
-    min-width: 8px;
-    height: 8px;
-    border-radius: 100px;
+    min-width: var(--spacing-03);
+    height: var(--spacing-03);
+    border-radius: var(--partition-bar-radius);
     background-color: var(--partition-color);
     animation: partition-bar-grow calc(var(--duration-expressive) * 2) var(--easing-standard-expressive) backwards;
     transition: opacity var(--duration-productive) var(--easing-standard-productive);
@@ -123,8 +126,8 @@
   &__dot {
     background-color: var(--partition-color);
     flex: none;
-    width: 10px;
-    height: 10px;
+    width: var(--partition-bar-dot-size);
+    height: var(--partition-bar-dot-size);
     margin-right: var(--spacing-01);
     border-radius: 50%;
   }
