@@ -139,4 +139,12 @@
     font-variant-numeric: tabular-nums;
     font-weight: var(--heading-compact-01-font-weight);
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__segment,
+    &__caption,
+    &__legend {
+      animation: none;
+    }
+  }
 }

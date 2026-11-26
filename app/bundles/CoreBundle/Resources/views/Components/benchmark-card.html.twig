@@ -1,6 +1,7 @@
 {% set items = items|sort((a, b) => b.value <=> a.value) %}
 {% set positive = items|filter(item => item.value > 0) %}
-{% set activePercent = items is not empty ? positive|length / items|length * 100 : 0 %}
+{% set withPoints = items|filter(item => item.value != 0) %}
+{% set activePercent = items is not empty ? withPoints|length / items|length * 100 : 0 %}
 <div class="benchmark-card">
     <div class="benchmark-card__header">
         <h3 class="benchmark-card__title type-heading-01">{{ title }}</h3>
@@ -11,7 +12,7 @@
             {% if valueCaption|default %}<p class="benchmark-card__caption">{{ valueCaption }}</p>{% endif %}
         </div>
         {% if items is not empty %}
-        {% set activeText = activeLabel|replace({'%active%': positive|length, '%total%': items|length}) %}
+        {% set activeText = activeLabel|replace({'%active%': withPoints|length, '%total%': items|length}) %}
         <div class="benchmark-card__average">
             <div class="benchmark-card__meter" role="img" aria-label="{{ activeText|e('html_attr') }}">
                 <span class="benchmark-card__meter-fill" style="width: {{ activePercent|round|e('html_attr') }}%"></span>
