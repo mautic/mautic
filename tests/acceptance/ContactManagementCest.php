@@ -66,8 +66,8 @@ final class ContactManagementCest
         // Scroll back to the top of the page
         $I->executeJS('window.scrollTo(0, 0);');
 
-        // Click the actual form save button to ensure submit persists.
-        $I->executeJS("document.querySelector('button[name=\"lead[buttons][save]\"]').click();");
+        $I->waitForElementClickable(ContactPage::$saveAndCloseButton, AcceptanceTester::TIMEOUT);
+        $I->click(ContactPage::$saveAndCloseButton);
 
         // Confirm the contact is created
         $I->waitForElementVisible('.page-header-title .span-block', AcceptanceTester::TIMEOUT);
