@@ -283,7 +283,7 @@ final class RestrictionHelperTest extends TypeTestCase
                     new NumberType(),
                     new FormButtonsType(),
                     new ButtonGroupType(),
-                    new EmailConfigType($translator),
+                    new EmailConfigType($translator, $coreParametersHelper),
                     new DsnType($dsnTransformerFactory, $coreParametersHelper),
                     new PreferenceCenterListType($pageModelMock, $this->createStub(CorePermissions::class)),
                     new ConfigMonitoredEmailType($dispatcher),
