@@ -11,6 +11,8 @@ use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Form\FormRenderer;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Forms;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -78,5 +80,39 @@ final class BootstrapMarkupTest extends TestCase
         $html = $this->twig->createTemplate('{{ form_widget(form) }}')->render(['form' => $form->createView()]);
 
         $this->assertCount(2, (new Crawler($html))->filter('input.btn-check:disabled + label.btn'));
+    }
+
+    public function testFieldSliderRendersNativeRangeInputWithSuffix(): void
+    {
+        $form = Forms::createFormFactory()->createNamedBuilder('variant', FormType::class)
+            ->add('weight', IntegerType::class, [
+                'block_prefix' => 'field_slider',
+                'attr'         => ['min' => 0, 'max' => 100, 'postaddon_text' => '%'],
+            ])
+            ->getForm();
+        $form->get('weight')->setData(30);
+        $html    = $this->twig->createTemplate('{{ form_widget(form.weight) }}')->render(['form' => $form->createView()]);
+        $crawler = new Crawler($html);
+        $input   = $crawler->filter('.field-slider input[type="range"].field-slider__input');
+
+        $this->assertCount(1, $input);
+        $this->assertCount(1, $crawler->filter('.field-slider input'));
+        $this->assertSame('variant[weight]', $input->attr('name'));
+        $this->assertSame('variant_weight', $input->attr('id'));
+        $this->assertSame('30', $input->attr('value'));
+        $this->assertSame('0', $input->attr('min'));
+        $this->assertSame('100', $input->attr('max'));
+        $this->assertSame('variant_weight', $crawler->filter('output.field-slider__value')->attr('for'));
+        $this->assertSame('30%', trim($crawler->filter('output.field-slider__value')->text()));
+    }
+
+    public function testFieldSliderStartsAtMinimumWithoutValue(): void
+    {
+        $form = Forms::createFormFactory()->createNamedBuilder('variant', FormType::class)
+            ->add('weight', IntegerType::class, ['block_prefix' => 'field_slider', 'attr' => ['min' => 0, 'max' => 100]])
+            ->getForm();
+        $html = $this->twig->createTemplate('{{ form_widget(form.weight) }}')->render(['form' => $form->createView()]);
+
+        $this->assertSame('0', (new Crawler($html))->filter('input[type="range"]')->attr('value'));
     }
 }
