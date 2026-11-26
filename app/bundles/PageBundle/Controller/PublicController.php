@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
+use Mautic\LeadBundle\Helper\ContactTrackingPreferenceHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
@@ -41,6 +42,15 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class PublicController extends AbstractFormController
 {
+    /**
+     * What the tracking script gets back for a visitor it must not recognise again.
+     */
+    private const NO_IDENTIFIERS = [
+        'id'        => null,
+        'sid'       => null,
+        'device_id' => null,
+    ];
+
     /**
      * @param string $slug
      *
@@ -404,6 +414,7 @@ final class PublicController extends AbstractFormController
         ContactTracker $contactTracker,
         PageModel $model,
         IpLookupHelper $ipLookupHelper,
+        ContactTrackingPreferenceHelper $contactTrackingPreferenceHelper,
     ): JsonResponse {
         $notSuccessResponse = new JsonResponse(
             [
@@ -423,19 +434,17 @@ final class PublicController extends AbstractFormController
 
         // A visitor Mautic doesn't track isn't looked up, and gets nothing back that would let the script recognise them again
         if (!$ipLookupHelper->isRequestTrackable()) {
-            return new JsonResponse(
-                [
-                    'id'        => null,
-                    'sid'       => null,
-                    'device_id' => null,
-                    'events'    => [],
-                ]
-            );
+            return new JsonResponse(self::NO_IDENTIFIERS + ['events' => []]);
         }
 
         $lead = $contactTracker->getContact();
         if (null === $lead) {
             return $notSuccessResponse;
+        }
+
+        // Neither does a contact who turned tracking off, even when a link identified them
+        if (!$contactTrackingPreferenceHelper->allowsActivityTracking($lead)) {
+            return new JsonResponse(self::NO_IDENTIFIERS + ['events' => []]);
         }
 
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
@@ -580,18 +589,19 @@ final class PublicController extends AbstractFormController
     /**
      * Get the ID of the currently tracked Contact.
      */
-    public function getContactIdAction(DeviceTrackingServiceInterface $trackedDeviceService, ContactTracker $contactTracker, IpLookupHelper $ipLookupHelper): JsonResponse
+    public function getContactIdAction(DeviceTrackingServiceInterface $trackedDeviceService, ContactTracker $contactTracker, IpLookupHelper $ipLookupHelper, ContactTrackingPreferenceHelper $contactTrackingPreferenceHelper): JsonResponse
     {
         $data = [];
         if ($this->security->isAnonymous() && !$ipLookupHelper->isRequestTrackable()) {
             // A visitor Mautic doesn't track isn't looked up, and gets nothing back that would let the script recognise them again
-            $data = [
-                'id'        => null,
-                'sid'       => null,
-                'device_id' => null,
-            ];
+            $data = self::NO_IDENTIFIERS;
         } elseif ($this->security->isAnonymous()) {
-            $lead          = $contactTracker->getContact();
+            $lead = $contactTracker->getContact();
+            if ($lead && !$contactTrackingPreferenceHelper->allowsActivityTracking($lead)) {
+                // Neither does a contact who turned tracking off
+                return new JsonResponse(self::NO_IDENTIFIERS);
+            }
+
             $trackedDevice = $trackedDeviceService->getTrackedDevice();
             $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
             $data          = [

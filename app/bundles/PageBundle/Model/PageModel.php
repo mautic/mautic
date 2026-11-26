@@ -34,6 +34,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
+use Mautic\LeadBundle\Helper\ContactTrackingPreferenceHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -125,6 +126,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         private readonly RedirectRepository $redirectRepository,
         private readonly TrackableRepository $trackableRepository,
         private readonly LeadRepository $leadRepository,
+        private readonly ContactTrackingPreferenceHelper $contactTrackingPreferenceHelper,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
 
@@ -479,7 +481,10 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $this->em->persist($hit);
         $this->em->flush();
 
-        if ($hit->getId()) {
+        if (!$this->contactTrackingPreferenceHelper->allowsActivityTracking($lead)) {
+            // A contact who turned tracking off keeps no hit ID, which would link their next page view to an earlier one
+            $this->cookieHelper->deleteCookie('mautic_referer_id', sameSite: Cookie::SAMESITE_NONE);
+        } elseif ($hit->getId()) {
             $this->cookieHelper->setCookie(
                 name: 'mautic_referer_id',
                 value: $hit->getId(),
