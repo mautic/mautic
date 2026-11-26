@@ -101,6 +101,11 @@ final class StageController extends AbstractFormController
 
         $pageHelper->rememberPage($page);
 
+        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        [$funnelStages, $funnelCounts] = $permissions['lead:leads:viewother'] && 'index' === $tmpl
+            ? $this->stageModel->getPublishedEntitiesWithContactCounts()
+            : [[], []];
+
         // get the list of actions
         $actions = $this->stageModel->getStageActions();
 
@@ -112,11 +117,13 @@ final class StageController extends AbstractFormController
                     'filters'       => $categoryFilters['filters'],
                     'items'         => $stageEntities,
                     'contactCounts' => $contactCounts,
+                    'funnelStages'  => $funnelStages,
+                    'funnelCounts'  => $funnelCounts,
                     'actions'       => $actions['actions'],
                     'page'          => $page,
                     'limit'         => $limit,
                     'permissions'   => $permissions,
-                    'tmpl'          => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'          => $tmpl,
                     'totalItems'    => $count,
                 ],
                 'contentTemplate' => '@MauticStage/Stage/list.html.twig',
