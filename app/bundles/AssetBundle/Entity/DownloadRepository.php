@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @extends CommonRepository<Download>
@@ -17,7 +18,8 @@ class DownloadRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * Determine if the download is a unique download.
+     * Determine if the download is a unique download. A denied or missing file was not downloaded,
+     * so an earlier attempt like that doesn't make the next download a repeated one.
      */
     public function isUniqueDownload($assetId, $trackingId): bool
     {
@@ -30,7 +32,8 @@ class DownloadRepository extends CommonRepository
         $q2->where(
             $q2->expr()->and(
                 $q2->expr()->eq('d.tracking_id', ':id'),
-                $q2->expr()->eq('d.asset_id', (int) $assetId)
+                $q2->expr()->eq('d.asset_id', (int) $assetId),
+                $q2->expr()->lt('d.code', Response::HTTP_BAD_REQUEST)
             )
         );
 

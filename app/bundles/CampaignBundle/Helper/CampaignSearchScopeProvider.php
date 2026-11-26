@@ -37,6 +37,8 @@ final class CampaignSearchScopeProvider extends AbstractSearchScopeProvider
         $excluded = [
             'mautic.campaign.campaign.searchcommand.isexpired',
             'mautic.campaign.campaign.searchcommand.ispending',
+            'mautic.campaign.campaign.searchcommand.source.segment',
+            'mautic.campaign.campaign.searchcommand.source.form',
         ];
 
         return array_values(array_filter(
