@@ -60,26 +60,19 @@ class LeadListRepository extends CommonRepository
             $args['qb'] = $q;
         }
 
-        $results = parent::getEntities($args);
-
         // Segment list sorts by category title. Uncategorised rows have a NULL title.
-        // MySQL puts those NULLs first in ASC and last in DESC; PostgreSQL does the opposite.
-        // TODO: this is workaround - find a better way for this issue.
-        $orderBy = isset($args['orderBy']) && is_string($args['orderBy']) ? strtolower(trim($args['orderBy'])) : '';
-        $dir     = strtoupper(trim((string) ($args['orderByDir'] ?? '')));
-        if (
-            in_array($orderBy, ['cat.title', 'category.title'], true)
-            && in_array($dir, ['ASC', 'DESC'], true)
-        ) {
-            $results = DatabasePlatform::normalizeNullOrder(
-                $results,
-                static fn ($entity) => $entity->getCategory()?->getTitle(),
-                $dir,
-                $this->getEntityManager()->getConnection()->getDatabasePlatform()
-            );
-        }
+        // MySQL sorts NULLs first for ASC and last for DESC; PostgreSQL does the
+        // opposite. Normalise this in SQL (portable across platforms) before the
+        // parent runs the query, because pagination applies LIMIT/OFFSET with the
+        // current ordering — reordering after fetching would only reorder the
+        // current page.
+        DatabasePlatform::normalizeNullOrder(
+            $args,
+            $this->getEntityManager()->getConnection(),
+            ['cat.title', 'category.title']
+        );
 
-        return $results;
+        return parent::getEntities($args);
     }
 
     private function getSingleEntity(int $id, bool $ignoreDeleted = true): ?LeadList

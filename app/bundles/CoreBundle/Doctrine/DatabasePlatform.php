@@ -1308,47 +1308,73 @@ final class DatabasePlatform
     }
 
     /**
-     * Moves NULL values in an already-fetched result so ordering matches MySQL.
+     * Rewrites ORDER BY so NULL values sort the same as MySQL
+     * (ASC → NULLs first, DESC → NULLs last) on platforms that disagree
+     * (e.g. PostgreSQL).
      *
-     * MySQL: ASC → NULLs first, DESC → NULLs last.
-     * On PostgreSQL the opposite is the default, so after the query we partition
-     * the result and place NULLs on the correct side. Relative order of non-NULL
-     * rows is preserved. No-op on every other platform.
+     * Must be called BEFORE the query executes: the parent repository
+     * paginates (LIMIT/OFFSET), so reordering after fetching is too late —
+     * the page boundaries would already be wrong.
      *
-     * Keys are preserved.
+     * A CASE expression is used because NULLS FIRST/LAST is not portable
+     * (MySQL doesn't support it).
      *
-     * @param array<array-key, mixed> $results
-     * @param callable(mixed): mixed  $valueExtractor Returns the sort value; null means NULL
+     * No-op when:
+     *   - $connection is null (e.g. some unit tests),
+     *   - the platform is not PostgreSQL,
+     *   - no columns are supplied,
+     *   - the current `orderBy` is not covered by $columns.
+     *
+     * When applied, `orderBy`/`orderByDir` are removed from $args so the
+     * parent repository does not re-add the platform-divergent ORDER BY.
+     *
+     * @param array<string, mixed>               $args    passed by reference
+     * @param array<string, string>|list<string> $columns
+     *                                                    Either ['cat.title' => 'ASC', ...] (explicit direction) or
+     *                                                    ['cat.title', 'category.title']     (direction from $args['orderByDir']).
      */
-    public static function normalizeNullOrder(array $results, callable $valueExtractor, string $direction, AbstractPlatform $platform): array
-    {
-        if (!self::isPostgreSQL($platform) || [] === $results) {
-            return $results;
+    public static function normalizeNullOrder(
+        array &$args,
+        ?Connection $connection,
+        array $columns,
+    ): void {
+        if (null === $connection || [] === $columns || !isset($args['qb'])) {
+            return;
         }
 
-        $direction = strtoupper(trim($direction));
+        if (!self::isPostgreSQL($connection->getDatabasePlatform())) {
+            return;
+        }
+
+        $orderBy = isset($args['orderBy']) && is_string($args['orderBy'])
+            ? trim($args['orderBy'])
+            : '';
+        if ('' === $orderBy) {
+            return;
+        }
+
+        if (array_key_exists($orderBy, $columns)) {
+            // Map form: column => direction
+            $direction = strtoupper(trim((string) $columns[$orderBy]));
+        } elseif (in_array($orderBy, $columns, true)) {
+            // List form: direction from $args
+            $direction = strtoupper(trim((string) ($args['orderByDir'] ?? '')));
+        } else {
+            // Not covered by the caller's columns.
+            return;
+        }
+
         if (!in_array($direction, ['ASC', 'DESC'], true)) {
-            return $results;
+            return;
         }
 
-        $nulls    = [];
-        $nonNulls = [];
-        foreach ($results as $key => $item) {
-            if (null === $valueExtractor($item)) {
-                $nulls[$key] = $item;
-            } else {
-                $nonNulls[$key] = $item;
-            }
-        }
+        $args['qb']->addOrderBy(
+            sprintf('CASE WHEN %s IS NULL THEN 0 ELSE 1 END', $orderBy),
+            'ASC' === $direction ? 'ASC' : 'DESC'
+        );
+        $args['qb']->addOrderBy($orderBy, $direction);
 
-        $ordered = [];
-        foreach (('ASC' === $direction ? [$nulls, $nonNulls] : [$nonNulls, $nulls]) as $part) {
-            foreach ($part as $key => $item) {
-                $ordered[$key] = $item;
-            }
-        }
-
-        return $ordered;
+        unset($args['orderBy'], $args['orderByDir']);
     }
 
     /**
