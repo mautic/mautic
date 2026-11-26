@@ -111,7 +111,13 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     {
         $this->createCloudStorageIntegration(false);
 
-        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', ['action' => 'asset:fetchRemoteFiles', 'provider' => 'AmazonS3', 'path' => '']);
+        $this->client->xmlHttpRequest(
+            Request::METHOD_POST,
+            '/s/ajax',
+            ['action' => 'asset:fetchRemoteFiles', 'provider' => 'AmazonS3', 'path' => ''],
+            [],
+            $this->createAjaxHeaders()
+        );
         $this->assertResponseIsSuccessful();
         $responseData = json_decode((string) $this->client->getResponse()->getContent(), true);
         $this->assertSame(0, $responseData['success']);
