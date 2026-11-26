@@ -2,6 +2,8 @@
 
 namespace Mautic\EmailBundle\Helper;
 
+use Mautic\EmailBundle\Diagnostics\ScannerHoneypotLink;
+
 final class PlainTextHelper
 {
     public const ENCODING = 'UTF-8';
@@ -230,7 +232,7 @@ final class PlainTextHelper
     {
         $this->linkList = [];
 
-        $text = trim(stripslashes($this->html));
+        $text = trim(stripslashes(ScannerHoneypotLink::removeFrom($this->html)));
 
         $this->converter($text);
 

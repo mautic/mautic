@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\EmailBundle\Diagnostics\ScannerDiagnosticsRecorder;
+use Mautic\EmailBundle\Diagnostics\ScannerHoneypotLink;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\ScannerDiagnostic;
@@ -108,7 +109,8 @@ final class PublicController extends CommonFormController
 
             if ($copy = $stat->getStoredCopy()) {
                 $subject = $copy->getSubject();
-                $content = $copy->getBody();
+                // The honeypot link is for the sent email only, so it isn't shown in the web view
+                $content = ScannerHoneypotLink::removeFrom((string) $copy->getBody());
 
                 // Replace tokens
                 if (is_array($tokens)) {
@@ -158,14 +160,9 @@ final class PublicController extends CommonFormController
         return TrackingPixelHelper::getResponse($request);
     }
 
-    /**
-     * The target of the hidden honeypot link. People can't see or click it, so a request here is a link scanner
-     * following every link. It is only recorded for diagnostics: it is no open or click, and it creates or
-     * identifies no contact and sets no cookie.
-     */
     public function scannerCheckAction(Request $request, ScannerDiagnosticsRecorder $recorder, string $idHash): Response
     {
-        // An unknown hash gets the same answer, but isn't recorded, so random requests can't fill the table
+    
         $stat = $recorder->isEnabled() ? $this->emailModel->getEmailStatus($idHash) : null;
 
         if ($stat instanceof Stat) {
@@ -201,7 +198,6 @@ final class PublicController extends CommonFormController
 
         $contentTemplate = $this->themeHelper->checkForTwigTemplate('@themes/'.$themeName.'/html/email-validation.html.twig');
 
-        // Use the same theme that was found above.
         if (preg_match('#^@themes/([^/]+)/#', $contentTemplate, $matches)) {
             $themeName = $matches[1];
         }

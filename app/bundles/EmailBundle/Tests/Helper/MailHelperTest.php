@@ -1286,6 +1286,152 @@ final class MailHelperTest extends TestCase
         $this->assertSame('<img src="cid:abcdefg"><img height="1" width="1" src="{tracking_pixel}" alt="" />', $body);
     }
 
+    public function testScannerHoneypotLinkIsAddedToTheHtmlAndResolvedPerRecipient(): void
+    {
+        $transport = new BatchTransport();
+        $mailer    = $this->createScannerHoneypotMailer($transport, true);
+
+        $mailer->setEmail($this->createScannerHoneypotEmail());
+        $mailer->setIdHash('IDHASH');
+
+        // The message has no send hash yet when the body is set, so the link holds a token.
+        $this->assertMatchesRegularExpression('#<a href="\{scanner_honeypot_url\}"[^>]*></a></body>#', (string) $mailer->getBody());
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+        }
+
+        $mailer->send();
+
+        $this->assertStringContainsString('<a href="{scanner_honeypot_url}"', (string) $transport->getMessage()?->getHtmlBody());
+
+        foreach ($transport->getMessage()?->getMetadata() ?? [] as $metadata) {
+            $this->assertSame('https://mautic.url/email/check/IDHASH', $metadata['tokens']['{scanner_honeypot_url}']);
+        }
+    }
+
+    public function testScannerHoneypotLinkIsReplacedWhenTheTokensAreReplacedOnSend(): void
+    {
+        $mailer = $this->createScannerHoneypotMailer(new SmtpTransport(), true);
+
+        $mailer->setEmail($this->createScannerHoneypotEmail());
+        $mailer->setIdHash('IDHASH');
+        $mailer->addTo($this->contacts[0]['email']);
+        $mailer->setLead($this->contacts[0]);
+        $mailer->send();
+
+        $html = (string) $mailer->message->getHtmlBody();
+
+        $this->assertStringContainsString('<a href="https://mautic.url/email/check/IDHASH" aria-hidden="true"', $html);
+        $this->assertStringNotContainsString('{scanner_honeypot_url}', $html);
+    }
+
+    public function testScannerHoneypotLinkIsNotAddedWhenDiagnosticsIsDisabled(): void
+    {
+        $transport = new BatchTransport();
+        $mailer    = $this->createScannerHoneypotMailer($transport, false);
+
+        $mailer->setEmail($this->createScannerHoneypotEmail());
+        $mailer->setIdHash('IDHASH');
+        $mailer->addTo($this->contacts[0]['email']);
+        $mailer->setLead($this->contacts[0]);
+
+        $this->assertStringNotContainsString('scanner_honeypot', (string) $mailer->getBody());
+
+        $mailer->send();
+
+        $this->assertStringNotContainsString('scanner_honeypot', (string) $transport->getMessage()?->getHtmlBody());
+        $this->assertArrayNotHasKey('{scanner_honeypot_url}', $transport->getMessage()?->getMetadata()[$this->contacts[0]['email']]['tokens'] ?? []);
+    }
+
+    public function testScannerHoneypotLinkIsNotAddedToSystemEmails(): void
+    {
+        $mailer = $this->createScannerHoneypotMailer(new SmtpTransport(), true);
+
+        $mailer->setBody('<html><body><p>Reset your password</p></body></html>');
+        $mailer->setSubject('Password reset');
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $this->assertStringNotContainsString('scanner_honeypot', (string) $mailer->getBody());
+
+        $mailer->send();
+
+        $this->assertStringNotContainsString('scanner_honeypot', (string) $mailer->message->getHtmlBody());
+    }
+
+    public function testScannerHoneypotLinkIsLeftOutOfAMessageWithoutASendHash(): void
+    {
+        $mailer = $this->createScannerHoneypotMailer(new SmtpTransport(), true);
+
+        $mailer->setEmail($this->createScannerHoneypotEmail());
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $this->assertStringContainsString('{scanner_honeypot_url}', (string) $mailer->getBody());
+
+        $mailer->send();
+
+        $html = (string) $mailer->message->getHtmlBody();
+
+        $this->assertStringNotContainsString('scanner_honeypot_url', $html);
+        $this->assertStringNotContainsString('aria-hidden', $html);
+        $this->assertStringContainsString('<p>Hello</p>', $html);
+    }
+
+    public function testScannerHoneypotLinkIsNotAddedToTestSends(): void
+    {
+        $mailer = $this->createScannerHoneypotMailer(new SmtpTransport(), true);
+
+        $mailer->setEmail($this->createScannerHoneypotEmail(), true, [], true);
+
+        $this->assertStringNotContainsString('scanner_honeypot', (string) $mailer->getBody());
+        $this->assertStringNotContainsString('{tracking_pixel}', (string) $mailer->getBody());
+    }
+
+    public function testScannerHoneypotLinkIsNotAddedToThePlainTextBody(): void
+    {
+        $mailer = $this->createScannerHoneypotMailer(new SmtpTransport(), true);
+
+        $mailer->setBody('Hello', 'text/plain');
+        $this->assertStringNotContainsString('scanner_honeypot', (string) $mailer->getBody());
+
+        $mailer->setEmail($this->createScannerHoneypotEmail());
+        $mailer->setBody('Hello', 'text/plain');
+        $this->assertStringNotContainsString('scanner_honeypot', (string) $mailer->getBody());
+    }
+
+    private function createScannerHoneypotMailer(object $transport, bool $diagnosticsEnabled): MailHelper
+    {
+        $this->stubCoreParameters([
+            'mailer_from_email'                 => 'nobody@nowhere.com',
+            'mailer_from_name'                  => 'Test',
+            'mailer_append_tracking_pixel'      => true,
+            'mailer_address_length_limit'       => 320,
+            'secret_key'                        => 'secret',
+            'site_url'                          => 'https://mautic.url',
+            'email_scanner_diagnostics_enabled' => $diagnosticsEnabled,
+        ]);
+
+        $this->router->method('generate')->willReturnCallback(
+            fn (string $route, array $parameters = []): string => 'mautic_email_scanner_check' === $route
+                ? 'https://mautic.url/email/check/'.$parameters['idHash']
+                : 'https://mautic.url/'.$route
+        );
+
+        return $this->createMailHelperWithTransport($transport);
+    }
+
+    private function createScannerHoneypotEmail(): Email
+    {
+        $email = new Email();
+        $email->setUseOwnerAsMailer(false);
+        $email->setFromName('Test');
+        $email->setSubject('Test');
+        $email->setCustomHtml('<html><body><p>Hello</p></body></html>');
+
+        return $email;
+    }
+
     public function testAddToWithLongAddress(): void
     {
         $params = [
