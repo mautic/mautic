@@ -1005,8 +1005,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         if ($returnParameter) {
-            $string              = ($filter->strict) ? $filter->string : "{$filter->string}%";
-            $parameters[$unique] = $string;
+            $string              = \addcslashes($filter->string, '\\_%');
+            $parameters[$unique] = ($filter->strict) ? $string : "{$string}%";
         }
 
         return [
