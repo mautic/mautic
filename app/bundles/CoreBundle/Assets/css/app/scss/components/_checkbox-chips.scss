@@ -56,6 +56,11 @@
             inset: 0;
             border-radius: inherit;
         }
+
+        a {
+            position: relative;
+            z-index: 1;
+        }
     }
 
     &:hover {
