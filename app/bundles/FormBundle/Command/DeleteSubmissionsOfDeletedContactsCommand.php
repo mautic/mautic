@@ -33,8 +33,6 @@ Submissions without this record are not deleted: submissions that never had a co
 that were deleted before Mautic recorded deleted contacts, and submissions of contacts that mautic:maintenance:cleanup
 deleted without --gdpr.
 
-<comment>This also applies to mautic:maintenance:cleanup --gdpr: the submissions of the contacts that it deletes are kept.</comment>
-
 <info>php %command.full_name%</info>
 
 Count the submissions of deleted contacts for each form. Nothing is deleted:
