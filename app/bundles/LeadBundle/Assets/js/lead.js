@@ -135,11 +135,11 @@ Mautic.leadOnLoad = function (container, response) {
 
     let leadMap;
 
-    mQuery(document).off('shown.bs.tab.leadMap').on('shown.bs.tab.leadMap', '[data-bs-target="#place-container"], a#load-lead-map', () => {
+    mQuery(document).off('shown.bs.tab.leadMap').on('shown.bs.tab.leadMap', '[data-bs-target="#place-container"], #load-lead-map', () => {
         leadMap = Mautic.initMap('#place-container', 'markers');
     });
 
-    mQuery('[data-bs-toggle="tab"]').not('[data-bs-target="#place-container"], a#load-lead-map').on('shown.bs.tab', function (e) {
+    mQuery('[data-bs-toggle="tab"]').not('[data-bs-target="#place-container"], #load-lead-map').on('shown.bs.tab', function (e) {
         if (leadMap) {
             leadMap.destroyMap();
             leadMap = undefined;
@@ -1710,7 +1710,7 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
 Mautic.listOnLoad = function(container, response) {
     Mautic.loadAndProcessPageContent('#segment-stats');
 
-    const campaignShareTab = mQuery('a#campaign-share-tab');
+    const campaignShareTab = mQuery('#campaign-share-tab');
     campaignShareTab.on('shown.bs.tab', Mautic.loadCampaignShare);
     if (campaignShareTab.hasClass('active')) {
         Mautic.loadCampaignShare();
