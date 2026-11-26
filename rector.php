@@ -74,6 +74,11 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/ApiBundle/Entity/oAuth2/Client.php',
         ],
 
+        // a return type on the public getIpAddressFromRequest() would break plugins that override it
+        Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Helper/IpLookupHelper.php',
+        ],
+
         // handle next
         Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
         Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector::class,
