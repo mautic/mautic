@@ -100,6 +100,30 @@ final class AbTestSettingsServiceTest extends TestCase
         $this->assertSame(45, $settings['variants'][1]['weight']);
     }
 
+    public function testGetAbTestSettingsRoundedWeightsStayWithinTotal(): void
+    {
+        $service = new AbTestSettingsService();
+        $parent  = $this->getMockBuilder(Email::class)->onlyMethods(['getId'])->getMock();
+        $parent->method('getId')->willReturn(1);
+        $parent->setVariantSettings(['totalWeight' => 10]);
+        $parent->setIsPublished(true);
+
+        foreach ([2 => 35, 3 => 35, 4 => 30] as $id => $weight) {
+            $variant = $this->getMockBuilder(Email::class)->onlyMethods(['getId'])->getMock();
+            $variant->method('getId')->willReturn($id);
+            $variant->setIsPublished(true);
+            $variant->setVariantParent($parent);
+            $variant->setVariantSettings(['weight' => $weight]);
+            $parent->addVariantChild($variant);
+        }
+
+        $settings = $service->getAbTestSettings($parent);
+
+        $this->assertFalse($settings['configurationError']);
+        $this->assertSame(0, $settings['variants'][1]['weight']);
+        $this->assertSame(10, array_sum(array_column($settings['variants'], 'weight')));
+    }
+
     /**
      * Tests that in case of wrong configuration the service is returning configuration error.
      */
