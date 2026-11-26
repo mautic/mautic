@@ -619,6 +619,24 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
+     * @param int[] $contactIds
+     */
+    public function removeDeletedContactRecords(array $contactIds): void
+    {
+        if ([] === $contactIds) {
+            return;
+        }
+
+        $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'form_submissions')
+            ->set('deleted_lead_id', 'NULL')
+            ->where('lead_id IN (:contactIds)')
+            ->andWhere('deleted_lead_id IS NOT NULL')
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER)
+            ->executeStatement();
+    }
+
+    /**
      * @param int[] $excludedFormIds
      *
      * @return array<int, int> Form ID => number of submissions

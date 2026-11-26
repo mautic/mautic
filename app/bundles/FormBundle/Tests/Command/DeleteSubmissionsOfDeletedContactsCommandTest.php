@@ -294,6 +294,25 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $this->assertSame(['Anonymous answer'], $this->getResultsNames($form));
     }
 
+    public function testRecordOfAFailedDeletionIsRemovedByTheRegularCleanup(): void
+    {
+        $form    = $this->createFormViaApi($this->getPayLoad());
+        $visitor = $this->createInactiveContact('-1 year');
+        $this->createTrackedSubmission($form, $visitor, 'Anonymous answer');
+
+        // A record that a failed GDPR cleanup left: the visitor still exists.
+        self::getContainer()->get(SubmissionRepository::class)->recordDeletedContacts([$visitor->getId()]);
+
+        $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--days-old' => 180, '--no-interaction' => true]);
+        $this->assertSame(1, $this->countSubmissionsWithoutContact());
+
+        $this->em->clear();
+        $commandTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME);
+
+        $this->assertStringContainsString('Deleted 0 form submissions of deleted contacts', $commandTester->getDisplay());
+        $this->assertSame(['Anonymous answer'], $this->getResultsNames($form));
+    }
+
     public function testSubmissionsOfAMergedContactAreNotDeleted(): void
     {
         $form   = $this->createFormViaApi($this->getPayLoad());

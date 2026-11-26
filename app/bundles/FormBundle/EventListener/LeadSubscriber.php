@@ -101,13 +101,18 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Only the GDPR cleanup deletes identified contacts. The regular cleanup deletes anonymous visitors,
-     * and their answers, for example to a survey, are kept.
+     * Only the GDPR cleanup deletes identified contacts, so only this cleanup records the contacts.
+     * The regular cleanup deletes anonymous visitors, and their answers, for example to a survey, are kept.
+     * It also removes a record that an earlier failed deletion left, so that this record cannot delete these answers.
      */
     public function onLeadPreCleanupDelete(ContactPreCleanupDeleteEvent $event): void
     {
         if ($event->isGdpr()) {
             $this->submissionRepository->recordDeletedContacts($event->getContactIds());
+
+            return;
         }
+
+        $this->submissionRepository->removeDeletedContactRecords($event->getContactIds());
     }
 }
