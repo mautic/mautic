@@ -120,32 +120,33 @@ final class SummaryRepository extends CommonRepository
             $dateFromExpr      = $dateTriggeredExpr;
             $dateToExpr        = DatabasePlatform::applyTypeIfStrict($platform, $quotedTo, 'timestamp');
 
-            // Build inner aggregation query with consistent integer types in CASE branches
-            $innerSql = '
-                SELECT
-                    '.$idHandling['idSelect'].'
-                    mclel.campaign_id AS campaign_id,
-                    mclel.event_id AS event_id,
-                    '.$dateTriggeredExpr.' AS date_triggered,
-                    SUM(CASE WHEN mclel.is_scheduled = 1 AND mclel.trigger_date > NOW() THEN 1 ELSE 0 END) AS scheduled_count,
-                    SUM(CASE WHEN mclel.is_scheduled = 1 AND mclel.trigger_date > NOW() THEN 0
-                             ELSE CASE WHEN mclel.non_action_path_taken = TRUE THEN 1 ELSE 0 END END) AS non_action_path_taken_count,
-                    SUM(CASE WHEN (mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken = TRUE THEN 0
-                             ELSE CASE WHEN mclefl.log_id IS NOT NULL THEN 1 ELSE 0 END END) AS failed_count,
-                    SUM(CASE WHEN (mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken = TRUE OR mclefl.log_id IS NOT NULL THEN 0
-                             ELSE 1 END) AS triggered_count,
-                    SUM(CASE WHEN EXISTS (
-                        SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_leads mcl
-                        WHERE mcl.campaign_id = mclel.campaign_id AND mcl.lead_id = mclel.lead_id
-                    ) AND mclel.is_scheduled = 0
+            $selects = [
+                'mclel.campaign_id AS campaign_id',
+                'mclel.event_id AS event_id',
+                $dateTriggeredExpr.' AS date_triggered',
+                'SUM(CASE WHEN mclel.is_scheduled = 1 AND mclel.trigger_date > NOW() THEN 1 ELSE 0 END) AS scheduled_count',
+                'SUM(CASE WHEN mclel.is_scheduled = 1 AND mclel.trigger_date > NOW() THEN 0 ELSE CASE WHEN mclel.non_action_path_taken = TRUE THEN 1 ELSE 0 END END) AS non_action_path_taken_count',
+                'SUM(CASE WHEN (mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken = TRUE THEN 0 ELSE CASE WHEN mclefl.log_id IS NOT NULL THEN 1 ELSE 0 END END) AS failed_count',
+                'SUM(CASE WHEN (mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken = TRUE OR mclefl.log_id IS NOT NULL THEN 0 ELSE 1 END) AS triggered_count',
+                'SUM(CASE WHEN EXISTS (
+                    SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_leads mcl
+                            WHERE mcl.campaign_id = mclel.campaign_id AND mcl.lead_id = mclel.lead_id
+                        ) AND mclel.is_scheduled = 0
                     AND mclel.date_triggered IS NOT NULL
-                    AND mclefl.log_id IS NULL THEN 1 ELSE 0 END) AS log_counts_processed
-                FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel
+                    AND mclefl.log_id IS NULL THEN 1 ELSE 0 END) AS log_counts_processed',
+            ];
+
+            if (!empty($idHandling['idSelect'])) {
+                array_unshift($selects, $idHandling['idSelect']);
+            }
+
+            // Build inner aggregation query with consistent integer types in CASE branches
+            $innerSql = 'SELECT '.implode(', ', $selects).
+                'FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel
                 LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl
                     ON mclefl.log_id = mclel.id
                    AND mclefl.date_added BETWEEN '.$dateFromExpr.' AND '.$dateToExpr.'
-                WHERE mclel.date_triggered BETWEEN '.$dateFromExpr.' AND '.$dateToExpr.'
-            ';
+                WHERE mclel.date_triggered BETWEEN '.$dateFromExpr.' AND '.$dateToExpr;
 
             if (null !== $campaignId) {
                 $innerSql .= ' AND mclel.campaign_id = '.$campaignId;
@@ -175,7 +176,7 @@ final class SummaryRepository extends CommonRepository
             }
 
             // Build upsert using centralized helper
-            $sql = DatabasePlatform::getSummarizeUpsertStatement(
+            $sql = DatabasePlatform::getComplexUpsertStatement(
                 $platform,
                 MAUTIC_TABLE_PREFIX.'campaign_summary',
                 implode(', ', $columns),

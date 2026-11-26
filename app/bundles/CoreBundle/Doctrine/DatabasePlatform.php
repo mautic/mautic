@@ -630,7 +630,7 @@ final class DatabasePlatform
      */
     public static function getUpsertUpdateExpression(
         AbstractPlatform $platform,
-        string $tableName,
+        ?string $tableName,
         string $column,
         ?string $expressionTemplate = null,
         array $newValuePlaceholders = [],
@@ -1349,7 +1349,7 @@ final class DatabasePlatform
 
             return [
                 'idColumn' => $idColumn,
-                'idSelect' => "NEXTVAL('{$sequenceName}') AS {$idColumn}, ",
+                'idSelect' => "NEXTVAL('{$sequenceName}') AS {$idColumn}",
             ];
         }
 

@@ -23,48 +23,40 @@ final class SubmissionTotalRepository extends CommonRepository
 
         $connection = $this->getEntityManager()->getConnection();
 
-        // Build a single atomic upsert that inserts "1" into the total column for the
-        // current (form_id, hour) bucket, or — when a row for that bucket already
-        // exists — increments the existing total by 1 instead of overwriting it.
-        //
-        // $updateSet            ['total' => 'total + :new_total']
-        //                       Custom SET expression: "total = total + <new value>".
-        //                       A plain replacement ('total' => null or ['total'])
-        //                       would overwrite the counter, so the increment form
-        //                       must be used here.
-        //
-        // $newValuePlaceholders [':new_total' => 'total']
-        //                       Replaces the ":new_total" token with the platform
-        //                       specific reference to the new row's "total" value.
-        //                       The ":name" token format matches DBAL named parameters,
-        //                       so it cannot accidentally match ":new_total_foo", etc.
-        //
-        // $innerSql             'VALUES (:formId, :hour, 1)'
-        //                       Direct VALUES source → produces a single-statement
-        //                       INSERT...ON CONFLICT / INSERT...ON DUPLICATE KEY.
-        //                       (A "SELECT ..." source would take the summarize
-        //                       subquery branch instead.)
-        //
-        // Generated SQL — one statement, atomic on both platforms:
-        //
-        //   PostgreSQL:
-        //     INSERT INTO {prefix}form_submission_totals (form_id, hour, total)
-        //     VALUES (:formId, :hour, 1)
-        //     ON CONFLICT (form_id, hour)
-        //     DO UPDATE SET total = total + EXCLUDED.total
-        //
-        //   MariaDB / MySQL:
-        //     INSERT INTO {prefix}form_submission_totals (form_id, hour, total)
-        //     VALUES (:formId, :hour, 1)
-        //     ON DUPLICATE KEY UPDATE total = total + VALUES(total)
-        //
-        // Semantics are identical: insert 1 on first hit, increment by 1 on conflict.
+        // Get ID handling for PostgreSQL (nextval) vs MySQL (auto_increment)
+        $idHandling = DatabasePlatform::getInsertIdHandling(
+            $connection->getDatabasePlatform(),
+            MAUTIC_TABLE_PREFIX.SubmissionTotal::TABLE_NAME,
+            $this->getEntityManager()->getClassMetadata(SubmissionTotal::class)
+        );
+
+        $columns = [
+            'form_id', 'hour', 'total',
+        ];
+
+        // Add id column if exists
+        if (!empty($idHandling['idColumn'])) {
+            array_unshift($columns, $idHandling['idColumn']);
+        }
+
+        $values = [
+            ':formId', ':hour', '1',
+        ];
+
+        if (!empty($idHandling['idSelect'])) {
+            array_unshift($values, $idHandling['idSelect']);
+        }
+
+        $conflictOn = [
+            'form_id', 'hour',
+        ];
+
         $sql = DatabasePlatform::getComplexUpsertStatement(
             $connection->getDatabasePlatform(),
             MAUTIC_TABLE_PREFIX.SubmissionTotal::TABLE_NAME,
-            'form_id, hour, total',
-            'VALUES (:formId, :hour, 1)',
-            'form_id, hour',
+            implode(', ', $columns),
+            'VALUES ('.implode(', ', $values).')',
+            implode(', ', $conflictOn),
             ['total' => ':old_total + 1'],   // increment pattern: existing + 1
             [],                              // no new-value placeholders needed
             [':old_total' => 'total'],       // existing-value placeholder, caller-chosen token
