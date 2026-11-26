@@ -555,6 +555,17 @@ input[type="checkbox"] {
   100% { clip-path: inset(0); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  input[type="checkbox"] {
+    transition: none;
+
+    &:checked:after {
+      animation: none;
+      clip-path: inset(0);
+    }
+  }
+}
+
 // time input (3 select boxes hh:mm:ss)
 .time-input {
   select {
