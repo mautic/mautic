@@ -32,6 +32,8 @@ This command deletes these submissions, their form results records and their upl
 Submissions without this record are not deleted: submissions that never had a contact, submissions of contacts
 that were deleted before Mautic recorded deleted contacts, and submissions of contacts that mautic:maintenance:cleanup deleted.
 
+<comment>This also applies to mautic:maintenance:cleanup --gdpr: the submissions of the contacts that it deletes are kept.</comment>
+
 <info>php %command.full_name%</info>
 
 Count the submissions of deleted contacts for each form. Nothing is deleted:
