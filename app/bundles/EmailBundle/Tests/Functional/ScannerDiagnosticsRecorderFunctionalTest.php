@@ -100,7 +100,6 @@ final class ScannerDiagnosticsRecorderFunctionalTest extends MauticMysqlTestCase
         yield 'Prefetch' => [['HTTP_USER_AGENT' => self::BROWSER_USER_AGENT, 'HTTP_SEC_PURPOSE' => 'prefetch']];
     }
 
-    
     #[DataProvider('untrackedRequestProvider')]
     public function testARequestMauticDoesNotTrackIsNotStored(array $server): void
     {
@@ -145,6 +144,7 @@ final class ScannerDiagnosticsRecorderFunctionalTest extends MauticMysqlTestCase
         }
 
         self::getContainer()->get(RequestStack::class)->push($request);
+
         return $request;
     }
 
@@ -178,11 +178,11 @@ final class ScannerDiagnosticsRecorderFunctionalTest extends MauticMysqlTestCase
         return $redirect;
     }
 
-
     private function fetchOnlyRow(): array
     {
         $rows = $this->connection->fetchAllAssociative('SELECT * FROM '.MAUTIC_TABLE_PREFIX.ScannerDiagnostic::TABLE_NAME);
         $this->assertCount(1, $rows);
+
         return $rows[0];
     }
 
