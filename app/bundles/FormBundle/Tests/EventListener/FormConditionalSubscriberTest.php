@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\EventListener\FormConditionalSubscriber;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
@@ -45,15 +45,13 @@ final class FormConditionalSubscriberTest extends TestCase
     {
         $parentField = new Field();
         $childField  = new Field();
-        $parentId    = 'new_parent_id';
-        $childId     = 'new_child_id';
         $form        = new Form();
 
-        ReflectionHelper::setEntityId($parentField, $parentId);
-        $parentField->setSessionId($parentId);
-        ReflectionHelper::setEntityId($childField, $childId);
-        $childField->setSessionId($childId);
-        $childField->setParent($parentId);
+        ReflectionHelper::setEntityId($parentField, 123);
+        $parentField->setSessionId('new_parent_id');
+        ReflectionHelper::setEntityId($childField, 456);
+        $childField->setSessionId('new_child_id');
+        $childField->setParent('new_parent_id');
 
         $form->addField(0, $parentField);
         $form->addField(1, $childField);
@@ -65,7 +63,9 @@ final class FormConditionalSubscriberTest extends TestCase
         $this->formModel->expects($this->never())
             ->method('deleteFields');
 
-        $this->subscriber->onFormPostSave(new FormEvent($form, true));
+        $this->subscriber->onFormPostSave(new EntityPostSave($form, true));
+
+        $this->assertSame('123', $childField->getParent());
     }
 
     /**
@@ -91,6 +91,6 @@ final class FormConditionalSubscriberTest extends TestCase
             ->method('deleteFields')
             ->with($form, [$childId]);
 
-        $this->subscriber->onFormPostSave(new FormEvent($form, true));
+        $this->subscriber->onFormPostSave(new EntityPostSave($form, true));
     }
 }

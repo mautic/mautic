@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Unit\EventSubscriber;
 
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\PageBundle\Entity\Page;
-use Mautic\PageBundle\Event\PageEvent;
 use MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\PageSubscriber;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
@@ -38,7 +38,8 @@ final class PageSubscriberTest extends TestCase
         $this->config->expects($this->once())->method('isPublished')->willReturn(false);
         $this->model->expects($this->never())->method('addOrEditPageEntity');
 
-        $this->subscriber->onPagePostSave(new PageEvent(new Page()));
+        $page = new Page();
+        $this->subscriber->onPagePostSave(new EntityPostSave($page));
     }
 
     public function testOnPagePostSaveCallsModelWhenPluginPublished(): void
@@ -50,6 +51,6 @@ final class PageSubscriberTest extends TestCase
             ->method('addOrEditPageEntity')
             ->with($page);
 
-        $this->subscriber->onPagePostSave(new PageEvent($page));
+        $this->subscriber->onPagePostSave(new EntityPostSave($page));
     }
 }

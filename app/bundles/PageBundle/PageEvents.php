@@ -24,34 +24,6 @@ final class PageEvents
     public const string PAGE_ON_HIT = 'mautic.page_on_hit';
 
     /**
-     * The mautic.page_pre_save event is thrown right before a page is persisted.
-     *
-     * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
-     */
-    public const string PAGE_PRE_SAVE = 'mautic.page_pre_save';
-
-    /**
-     * The mautic.page_post_save event is thrown right after a page is persisted.
-     *
-     * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
-     */
-    public const string PAGE_POST_SAVE = 'mautic.page_post_save';
-
-    /**
-     * The mautic.page_pre_delete event is thrown prior to when a page is deleted.
-     *
-     * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
-     */
-    public const string PAGE_PRE_DELETE = 'mautic.page_pre_delete';
-
-    /**
-     * The mautic.page_post_delete event is thrown after a page is deleted.
-     *
-     * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
-     */
-    public const string PAGE_POST_DELETE = 'mautic.page_post_delete';
-
-    /**
      * The mautic.redirect_do_not_track event is thrown when converting email links to trackables/redirectables in order to compile of list of tokens/URLs
      * to ignore.
      *
