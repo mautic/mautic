@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Mautic\ApiBundle\Tests\Functional\Controller;
 
 use Mautic\ApiBundle\Entity\oAuth2\Client;
+use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
+use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +29,26 @@ final class ClientControllerTest extends MauticMysqlTestCase
         // Test pagination with varying limits
         $this->requestCredentialsPage(5);
         $this->assertPaginationDetails(2);
+    }
+
+    public function testDeleteActionLogsTheDeletedClientId(): void
+    {
+        $client = new Client();
+        $client->setName('client to delete');
+        $client->setRedirectUris(['https://example.com/delete']);
+        $this->em->persist($client);
+        $this->em->flush();
+        $clientId = $client->getId();
+        $this->em->clear();
+
+        $this->client->request(Request::METHOD_POST, '/s/credentials/delete/'.$clientId);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertNull($this->getContainer()->get(ClientRepository::class)->find($clientId));
+
+        $auditLog = $this->getContainer()->get(AuditLogRepository::class)->findOneBy(['bundle' => 'api', 'object' => 'client', 'action' => 'delete']);
+        $this->assertInstanceOf(AuditLog::class, $auditLog);
+        $this->assertSame($clientId, $auditLog->getObjectId());
     }
 
     private function createApiClients(): void
