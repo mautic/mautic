@@ -51,6 +51,8 @@ class Client extends BaseClient
 
     protected ?Role $role = null;
 
+    public ?int $deletedId = null;
+
     public function __construct()
     {
         parent::__construct();
