@@ -89,7 +89,8 @@ Mautic.initFieldSliders = function () {
         const ctx = canvas.getContext('2d');
         const gap = (width - padding * 2) / (ticks - 1);
         const middle = height / 2;
-        const position = slider.shown;
+        const rtl = style.direction === 'rtl';
+        const position = rtl ? ticks - 1 - slider.shown : slider.shown;
 
         ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
         ctx.clearRect(0, 0, width, height);
@@ -102,12 +103,15 @@ Mautic.initFieldSliders = function () {
             const eased = closeness * closeness * (3 - 2 * closeness);
             const length = baseLength + (peakLength - baseLength) * eased;
             const angle = -Math.sign(distance) * lean * eased * Math.PI / 180;
-            const active = i <= position;
+            const active = rtl ? i >= position : i <= position;
+            const activeDistance = rtl ? ticks - 1 - i : i;
+            const activeRange = rtl ? ticks - 1 - position : position;
+            const activeProgress = activeRange ? activeDistance / activeRange : 1;
 
             ctx.save();
             ctx.translate(padding + i * gap, middle);
             ctx.rotate(angle);
-            ctx.globalAlpha = active ? 0.3 + 0.7 * (position ? i / position : 1) : 1;
+            ctx.globalAlpha = active ? 0.3 + 0.7 * activeProgress : 1;
             ctx.strokeStyle = active ? style.accentColor : style.color;
             ctx.beginPath();
             ctx.moveTo(0, -length / 2);
