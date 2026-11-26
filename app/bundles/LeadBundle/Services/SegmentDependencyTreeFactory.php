@@ -79,13 +79,14 @@ final class SegmentDependencyTreeFactory
         }
 
         // findBy does not guarantee any specific order
-        $segments = $this->leadListRepository
-            ->createQueryBuilder('s')
-            ->where('s.id IN (:ids)')
-            ->setParameter('ids', $childSegmentIds)
-            ->orderBy('s.id', 'ASC')
-            ->getQuery()
-            ->getResult();
+        $segments = $this->leadListRepository->findBy([
+            'id' => $childSegmentIds,
+        ]);
+
+        usort(
+            $segments,
+            static fn (LeadList $a, LeadList $b): int => $a->getId() <=> $b->getId()
+        );
 
         return array_values(array_filter(
             $segments,
