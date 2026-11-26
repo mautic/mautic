@@ -617,10 +617,11 @@ final class PublicController extends AbstractFormController
         }
 
         // A device is found by the device ID the browser holds, never by a contact ID, which anyone could guess.
-        // The cookie and the copy the script kept in localStorage can differ, so both are forgotten.
+        // The cookie and the copies the script kept on the site can differ, so the script sends its own, separated by commas,
+        // and all of them are forgotten.
         // Other devices of the contact stay as they are, consent was only withdrawn in this browser.
         $deviceIds = array_unique(array_filter(
-            [$cookieHelper->getCookie('mautic_device_id'), $request->request->get('mautic_device_id')],
+            [$cookieHelper->getCookie('mautic_device_id'), ...explode(',', (string) $request->request->get('mautic_device_id'))],
             static fn (mixed $deviceId): bool => is_string($deviceId) && '' !== $deviceId
         ));
 

@@ -32,6 +32,7 @@ final class TrackingConsentWithdrawalFunctionalTest extends MauticMysqlTestCase
         yield 'in the cookie' => [self::BROWSER_DEVICE, null, [self::BROWSER_DEVICE]];
         yield 'in localStorage, sent by the tracking script' => [null, self::STORED_COPY, [self::STORED_COPY]];
         yield 'a different one in each' => [self::BROWSER_DEVICE, self::STORED_COPY, [self::BROWSER_DEVICE, self::STORED_COPY]];
+        yield 'two different ones on the site, sent by the tracking script' => [null, self::BROWSER_DEVICE.','.self::STORED_COPY, [self::BROWSER_DEVICE, self::STORED_COPY]];
         yield 'nowhere' => [null, null, []];
     }
 

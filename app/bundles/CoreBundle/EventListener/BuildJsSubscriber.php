@@ -244,6 +244,11 @@ MauticJS.trackingEnabled = true;
 MauticJS.requestWithCredentials = true;
 MauticJS.mtcSet = false;
 MauticJS.appendTrackedContact = function(data) {
+    if (!MauticJS.trackingEnabled) {
+        // Tracking consent was withdrawn on this page, so no identifier is read or sent any more
+        return data;
+    }
+
     if (window.localStorage) {
         if (mtcId  = localStorage.getItem('mtc_id')) {
             data['mautic_device_id'] = localStorage.getItem('mautic_device_id');
