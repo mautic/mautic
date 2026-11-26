@@ -37,6 +37,7 @@
 @import 'app/scss/components/image';
 @import 'app/scss/components/table';
 @import 'app/scss/components/progress-bars';
+@import 'app/scss/components/gauge';
 @import 'app/scss/components/panels';
 @import 'app/scss/components/box';
 @import 'app/scss/components/switch';
@@ -123,4 +124,28 @@
     font-style: italic;
     font-weight: 700;
     src: url('fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-700italic.woff2') format('woff2');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'IBM Plex Sans';
+    font-style: normal;
+    font-weight: 300;
+    src: url('fonts/ibm-plex-sans-latin-300.woff2') format('woff2');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'IBM Plex Sans';
+    font-style: normal;
+    font-weight: 400;
+    src: url('fonts/ibm-plex-sans-latin-400.woff2') format('woff2');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'IBM Plex Sans';
+    font-style: normal;
+    font-weight: 600;
+    src: url('fonts/ibm-plex-sans-latin-600.woff2') format('woff2');
 }
