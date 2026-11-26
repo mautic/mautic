@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Event\CampaignPostDeleteEvent;
-use Mautic\CampaignBundle\Event\CampaignPostSaveEvent;
 use Mautic\CampaignBundle\EventListener\CampaignSubscriber;
 use Mautic\CampaignBundle\Service\CampaignAuditService;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -53,7 +53,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignPostSaveNothingHappened(): void
     {
         $campaign            = new Campaign();
-        $event               = new CampaignPostSaveEvent($campaign);
+        $event               = new EntityPostSave($campaign);
 
         $this->auditLogModel->expects($this->never())
             ->method('writeToLog');
@@ -71,7 +71,7 @@ final class CampaignSubscriberTest extends TestCase
         $campaign = new Campaign();
         $campaign->setPublishDown($dateTime);
 
-        $event = new CampaignPostSaveEvent($campaign);
+        $event = new EntityPostSave($campaign);
 
         $this->ipLookupHelper->expects($this->once())
             ->method('getIpAddressFromRequest')
@@ -110,7 +110,7 @@ final class CampaignSubscriberTest extends TestCase
         $campaign->setPublishUp($dateTime);
         $campaign->setName($campaignName);
 
-        $event = new CampaignPostSaveEvent($campaign);
+        $event = new EntityPostSave($campaign);
 
         $this->campaignAuditService->expects($this->once())
             ->method('addWarningForUnpublishedEmails')
@@ -155,7 +155,7 @@ final class CampaignSubscriberTest extends TestCase
         $campaign->deletedId = $deletedId;
         $campaign->setName($campaignName);
 
-        $event = new CampaignPostDeleteEvent($campaign);
+        $event = new EntityPostDelete($campaign);
 
         $this->ipLookupHelper->expects($this->once())
             ->method('getIpAddressFromRequest')

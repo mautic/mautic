@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\EventListener;
 
-use Mautic\AssetBundle\Event\AssetPostDeleteEvent;
-use Mautic\AssetBundle\Event\AssetPostSaveEvent;
+use Mautic\AssetBundle\Entity\Asset;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -21,12 +22,14 @@ final readonly class AssetSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[AsEventListener(
-        event: AssetPostSaveEvent::class,
-    )]
-    public function onAssetPostSave(AssetPostSaveEvent $event): void
+    #[AsEventListener]
+    public function onAssetPostSave(EntityPostSave $event): void
     {
-        $asset = $event->getAsset();
+        $asset = $event->getEntity();
+        if (!$asset instanceof Asset) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'asset',
@@ -43,13 +46,15 @@ final readonly class AssetSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: AssetPostDeleteEvent::class,
-    )]
-    public function onAssetDelete(AssetPostDeleteEvent $event): void
+    #[AsEventListener]
+    public function onAssetDelete(EntityPostDelete $event): void
     {
-        $asset = $event->getAsset();
-        $log   = [
+        $asset = $event->getEntity();
+        if (!$asset instanceof Asset) {
+            return;
+        }
+
+        $log = [
             'bundle'    => 'asset',
             'object'    => 'asset',
             'objectId'  => $asset->deletedId,
