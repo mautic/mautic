@@ -145,12 +145,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Entity/Campaign.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\ChannelInterface\:\:setChannel\(\) has parameter \$channel with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/ChannelInterface.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\ChannelInterface\:\:setChannelId\(\) has parameter \$id with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -1699,12 +1693,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Entity/StatRepository.php
 
 		-
-			message: '#^Unable to resolve the template type T in call to function array_values$#'
-			identifier: argument.templateType
-			count: 1
-			path: app/bundles/DynamicContentBundle/EventListener/DynamicContentSubscriber.php
-
-		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Form\\Type\\DwcEntryFiltersType\:\:buildFiltersForm\(\) has parameter \$currentListId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2137,19 +2125,7 @@ parameters:
 			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:getParameters\(\) has parameter \$partStructure with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:initMailPart\(\) has parameter \$partNum with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:initMailPart\(\) has parameter \$partStructure with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
@@ -4051,12 +4027,6 @@ parameters:
 			path: app/bundles/NotificationBundle/Entity/StatRepository.php
 
 		-
-			message: '#^Unable to resolve the template type T in call to function array_values$#'
-			identifier: argument.templateType
-			count: 1
-			path: app/bundles/NotificationBundle/EventListener/NotificationSubscriber.php
-
-		-
 			message: '#^Method Mautic\\NotificationBundle\\Model\\NotificationModel\:\:getNotificationStatByLeadId\(\) has parameter \$leadId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -5280,12 +5250,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/SmsBundle/Entity/StatRepository.php
-
-		-
-			message: '#^Unable to resolve the template type T in call to function array_values$#'
-			identifier: argument.templateType
-			count: 1
-			path: app/bundles/SmsBundle/EventListener/SmsSubscriber.php
 
 		-
 			message: '#^Method Mautic\\SmsBundle\\Helper\\SmsHelper\:\:unsubscribe\(\) has parameter \$number with no type specified\.$#'

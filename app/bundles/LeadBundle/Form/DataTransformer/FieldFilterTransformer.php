@@ -65,7 +65,7 @@ final class FieldFilterTransformer implements DataTransformerInterface
                 }
 
                 if (in_array(strtolower($filter), $this->defaultStrings)) {
-                    $rawFilters[$key]['properties']['filter'] = $this->translator->trans(array_search(strtolower($filter), $this->defaultStrings));
+                    $rawFilters[$key]['properties']['filter'] = $this->translator->trans(array_search(strtolower($filter), $this->defaultStrings, true));
 
                     continue;
                 }
@@ -112,7 +112,7 @@ final class FieldFilterTransformer implements DataTransformerInterface
                 }
 
                 if (in_array($filter, $this->relativeDateStrings)) {
-                    $translationKey                         = array_search($filter, $this->relativeDate->getRelativeDateStrings());
+                    $translationKey                         = array_search($filter, $this->relativeDate->getRelativeDateStrings(), true);
                     $rawFilters[$k]['properties']['filter'] = $this->defaultStrings[$translationKey];
 
                     continue;

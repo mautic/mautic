@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Test;
 
 use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
@@ -24,6 +25,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      *     1. A query that alters a DB schema causes an open transaction being committed immediately.
      *     2. Full-text search does not see uncommitted changes.
      *
+     * To turn it off for a single test, add #[ResetDatabase] to the test method.
+     *
      * @var bool
      */
     protected $useCleanupRollback = true;
@@ -38,6 +41,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         ];
 
         $this->setUpInvoked = true;
+
+        if ([] !== new \ReflectionMethod($this, $this->name())->getAttributes(ResetDatabase::class)) {
+            $this->useCleanupRollback = false;
+        }
 
         parent::setUp();
         $this->backupLocalConfig();
@@ -215,7 +222,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function resetDatabase(): void
     {
-        $this->applySqlFromFile($this->getSqlFilePath('reset_db'));
+        // run on the open connection to avoid spawning a mysql process per test
+        $this->connection->executeStatement((string) file_get_contents($this->getSqlFilePath('reset_db')));
+        // the reset file switches autocommit off for speed, restore it for this connection
+        $this->connection->executeStatement('SET autocommit=1');
     }
 
     /**

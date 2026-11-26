@@ -27,14 +27,13 @@ final readonly class DecisionExecutioner implements EventInterface
     }
 
     /**
-     * @param mixed       $passthrough
      * @param string|null $channel
      * @param int|null    $channelId
      *
      * @throws CannotProcessEventException
      * @throws DecisionNotApplicableException
      */
-    public function evaluateForContact(DecisionAccessor $config, Event $event, Lead $contact, $passthrough = null, $channel = null, $channelId = null): void
+    public function evaluateForContact(DecisionAccessor $config, Event $event, Lead $contact, mixed $passthrough = null, $channel = null, $channelId = null): void
     {
         if (Event::TYPE_DECISION !== $event->getEventType()) {
             throw new CannotProcessEventException('Cannot process event ID '.$event->getId().' as a decision.');

@@ -3,6 +3,8 @@
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -10,9 +12,7 @@ use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
-use Mautic\SmsBundle\Event\SmsEvent;
-use Mautic\SmsBundle\Event\SmsPostDeleteEvent;
-use Mautic\SmsBundle\Event\SmsPostSaveEvent;
+use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Helper\SmsHelper;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -32,12 +32,14 @@ final readonly class SmsSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[AsEventListener(
-        event: SmsPostSaveEvent::class,
-    )]
-    public function onPostSave(SmsEvent $event): void
+    #[AsEventListener]
+    public function onPostSave(EntityPostSave $event): void
     {
-        $entity = $event->getSms();
+        $entity = $event->getEntity();
+        if (!$entity instanceof Sms) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'   => 'sms',
@@ -53,13 +55,15 @@ final readonly class SmsSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: SmsPostDeleteEvent::class,
-    )]
-    public function onDelete(SmsEvent $event): void
+    #[AsEventListener]
+    public function onDelete(EntityPostDelete $event): void
     {
-        $entity = $event->getSms();
-        $log    = [
+        $entity = $event->getEntity();
+        if (!$entity instanceof Sms) {
+            return;
+        }
+
+        $log = [
             'bundle'   => 'sms',
             'object'   => 'sms',
             'objectId' => $entity->deletedId,

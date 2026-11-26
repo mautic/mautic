@@ -26,10 +26,10 @@ final class GeoipsLookup extends AbstractRemoteDataLookup
 
     protected function parseResponse($response): void
     {
-        $data = json_decode($response);
+        $data = json_decode($response, true);
 
-        if ($data && !empty($data->response->location)) {
-            foreach ($data->response->location as $key => $value) {
+        if (is_array($data) && !empty($data['response']['location'])) {
+            foreach ($data['response']['location'] as $key => $value) {
                 switch ($key) {
                     case 'city_name':
                         $key = 'city';

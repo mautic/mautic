@@ -216,7 +216,7 @@ final class LeadFieldRepository extends CommonRepository
         if (in_array($field, array_column($this->getFieldAliases('company'), 'alias'))) {
             $this->addCompanyLeftJoin($q);
             $columnAlias = 'company.';
-        } elseif (in_array($field, ['utm_campaign', 'utm_content', 'utm_medium', 'utm_source', 'utm_term'])) {
+        } elseif (in_array($field, ['utm_campaign', 'utm_content', 'utm_medium', 'utm_source', 'utm_term'], true)) {
             $q->join('l', MAUTIC_TABLE_PREFIX.'lead_utmtags', 'u', 'l.id = u.lead_id');
             $columnAlias = 'u.';
         }
@@ -227,12 +227,12 @@ final class LeadFieldRepository extends CommonRepository
     /**
      * Compare a form result value with defined value for defined lead.
      *
-     * @param int    $lead         ID
-     * @param string $field        alias
-     * @param mixed  $value        to compare with
-     * @param string $operatorExpr for WHERE clause
+     * @param int                                $lead         ID
+     * @param string                             $field        alias
+     * @param mixed[]|string|int|float|bool|null $value        to compare with
+     * @param string                             $operatorExpr for WHERE clause
      */
-    public function compareValue($lead, string $field, $value, $operatorExpr, ?string $fieldType = null): bool
+    public function compareValue($lead, string $field, array|string|int|float|bool|null $value, $operatorExpr, ?string $fieldType = null): bool
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id')

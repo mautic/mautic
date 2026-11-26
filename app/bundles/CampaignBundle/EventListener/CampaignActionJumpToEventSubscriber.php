@@ -4,11 +4,11 @@ namespace Mautic\CampaignBundle\EventListener;
 
 use DateTime;
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignPostSaveEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -115,12 +116,15 @@ final readonly class CampaignActionJumpToEventSubscriber
      * target for the jump.
      */
     #[AsEventListener(
-        event: CampaignPostSaveEvent::class,
         priority: 1
     )]
-    public function processCampaignEventsAfterSave(CampaignPostSaveEvent $campaignEvent): void
+    public function processCampaignEventsAfterSave(EntityPostSave $campaignEvent): void
     {
-        $campaign = $campaignEvent->getCampaign();
+        $campaign = $campaignEvent->getEntity();
+        if (!$campaign instanceof Campaign) {
+            return;
+        }
+
         $events   = $campaign->getEvents();
         $toSave   = [];
 

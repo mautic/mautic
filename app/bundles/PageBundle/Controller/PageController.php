@@ -159,7 +159,7 @@ final class PageController extends AbstractStandardFormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_page_index',
                     'mauticContent' => 'page',
@@ -212,7 +212,7 @@ final class PageController extends AbstractStandardFormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_page_index',
                     'mauticContent' => 'page',
@@ -446,7 +446,7 @@ final class PageController extends AbstractStandardFormController
                                 'objectId'     => $entity->getId(),
                             ];
                             $returnUrl = $this->generateUrl('mautic_page_action', $viewParameters);
-                            $template  = 'Mautic\PageBundle\Controller\PageController::viewAction';
+                            $template  = self::class.'::viewAction';
                         } else {
                             // return edit view so that all the session stuff is loaded
                             return $this->editAction($request, $pageConfig, $model, $themeHelper, $entity->getId(), true);
@@ -459,7 +459,7 @@ final class PageController extends AbstractStandardFormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_page_index', $viewParameters);
-                $template       = 'Mautic\PageBundle\Controller\PageController::indexAction';
+                $template       = self::class.'::indexAction';
                 // clear any modified content
                 $session->remove('mautic.pagebuilder.'.$entity->getSessionId().'.content');
             }
@@ -528,7 +528,7 @@ final class PageController extends AbstractStandardFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -625,7 +625,7 @@ final class PageController extends AbstractStandardFormController
                     array_merge($postActionVars, [
                         'returnUrl'       => $this->generateUrl('mautic_page_action', $viewParameters),
                         'viewParameters'  => $viewParameters,
-                        'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::viewAction',
+                        'contentTemplate' => self::class.'::viewAction',
                     ])
                 );
             }
@@ -757,7 +757,7 @@ final class PageController extends AbstractStandardFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -814,7 +814,7 @@ final class PageController extends AbstractStandardFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -966,7 +966,7 @@ final class PageController extends AbstractStandardFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -1008,7 +1008,7 @@ final class PageController extends AbstractStandardFormController
                 'objectId'     => $objectId,
             ];
             $postActionVars['returnUrl']       = $this->generateUrl('mautic_page_action', $postActionVars['viewParameters']);
-            $postActionVars['contentTemplate'] = 'Mautic\PageBundle\Controller\PageController::viewAction';
+            $postActionVars['contentTemplate'] = self::class.'::viewAction';
         } // else don't do anything
 
         return $this->postActionRedirect(
@@ -1042,7 +1042,7 @@ final class PageController extends AbstractStandardFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $pageListPage],
-                    'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_page_index',
                         'mauticContent' => 'page',
@@ -1116,7 +1116,7 @@ final class PageController extends AbstractStandardFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::resultsAction',
+                    'contentTemplate' => self::class.'::resultsAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_page_index',
                         'mauticContent' => 'pageresult',
@@ -1183,7 +1183,7 @@ final class PageController extends AbstractStandardFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $pageListPage],
-                    'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_page_index',
                         'mauticContent' => 'page',

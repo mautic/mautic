@@ -136,23 +136,23 @@
                             ) -}}
                             <tr>
                                 <td width="20%">
-                                <span class="fw-b textTitle">
+                                <span class="fw-bold textTitle">
                                 {% trans %}mautic.asset.asset.size{% endtrans %}
                                 </span>
                                 </td>
                                 <td>{{ activeAsset.getSize() }}</td>
                             </tr>
                             <tr>
-                                <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.asset.asset.url{% endtrans %}</span></td>
+                                <td width="20%"><span class="fw-bold textTitle">{% trans %}mautic.asset.asset.url{% endtrans %}</span></td>
                                 <td>{{ assetDownloadUrl }}</td>
                             </tr>
                             <tr>
-                                <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.asset.filename.original{% endtrans %}</span></td>
+                                <td width="20%"><span class="fw-bold textTitle">{% trans %}mautic.asset.filename.original{% endtrans %}</span></td>
                                 <td>{{ activeAsset.getOriginalFilename() }}</td>
                             </tr>
                             <tr>
                                 {% set location = activeAsset.getStorageLocation() %}
-                                <td width="20%"><span class="fw-b textTitle">{{ ('mautic.asset.filename.' ~ location)|trans }}</span></td>
+                                <td width="20%"><span class="fw-bold textTitle">{{ ('mautic.asset.filename.' ~ location)|trans }}</span></td>
                                 <td>{{ ('local' == location) ? activeAsset.getPath() : activeAsset.getRemotePath() }}</td>
                             </tr>
                             </tbody>
@@ -196,7 +196,7 @@
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-md-4 align-middle">
-                                    <h5 class="text-white dark-md fw-sb mb-5">
+                                    <h5 class="text-secondary fw-semibold mb-5">
                                         <span class="ri-download-line"></span>
                                         {% trans %}mautic.asset.graph.line.downloads{% endtrans %}
                                     </h5>

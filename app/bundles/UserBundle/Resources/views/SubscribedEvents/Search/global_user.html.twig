@@ -9,7 +9,7 @@
     </span>
     <div class="d-flex flex-column">
         <div>
-            <a class="fw-sb me-4" href="{{ url('mautic_user_action', {'objectAction' : 'edit', 'objectId' : item.getId()}) }}">
+            <a class="fw-semibold me-4" href="{{ url('mautic_user_action', {'objectAction' : 'edit', 'objectId' : item.getId()}) }}">
                 {{ item.getName() }}
             </a>
             {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {

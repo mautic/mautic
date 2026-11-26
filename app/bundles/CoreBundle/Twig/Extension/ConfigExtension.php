@@ -15,12 +15,10 @@ final readonly class ConfigExtension
     }
 
     /**
-     * @param mixed $default
-     *
      * @return mixed
      */
     #[AsTwigFunction(name: 'configGetParameter')]
-    public function get(string $name, $default = null)
+    public function get(string $name, mixed $default = null)
     {
         return $this->configHelper->get($name, $default);
     }

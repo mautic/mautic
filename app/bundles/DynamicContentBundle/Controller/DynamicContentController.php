@@ -193,7 +193,7 @@ final class DynamicContentController extends AbstractFormController
                             'objectId'     => $entity->getId(),
                         ];
                         $retUrl   = $this->generateUrl('mautic_dynamicContent_action', $viewParameters);
-                        $template = 'Mautic\DynamicContentBundle\Controller\DynamicContentController::viewAction';
+                        $template = self::class.'::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
                         return $this->editAction($request, $entity->getId(), true);
@@ -202,7 +202,7 @@ final class DynamicContentController extends AbstractFormController
             } else {
                 $viewParameters = ['page' => $page];
                 $retUrl         = $this->generateUrl('mautic_dynamicContent_index', $viewParameters);
-                $template       = 'Mautic\DynamicContentBundle\Controller\DynamicContentController::indexAction';
+                $template       = self::class.'::indexAction';
             }
 
             $passthrough = [
@@ -264,7 +264,7 @@ final class DynamicContentController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $retUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\DynamicContentBundle\Controller\DynamicContentController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_dynamicContent_index',
                 'mauticContent' => 'dynamicContent',
@@ -376,7 +376,7 @@ final class DynamicContentController extends AbstractFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'Mautic\DynamicContentBundle\Controller\DynamicContentController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_dynamicContent_index',
                         'mauticContent' => 'dynamicContent',
@@ -476,7 +476,7 @@ final class DynamicContentController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\DynamicContentBundle\Controller\DynamicContentController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_dynamicContent_index',
                 'mauticContent' => 'dynamicContent',
@@ -533,7 +533,7 @@ final class DynamicContentController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\DynamicContentBundle\Controller\DynamicContentController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_dynamicContent_index',
                 'mauticContent' => 'dynamicContent',

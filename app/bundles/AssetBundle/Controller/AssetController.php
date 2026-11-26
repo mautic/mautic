@@ -136,7 +136,7 @@ final class AssetController extends AbstractStandardFormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['asset' => $lastPage],
-                'contentTemplate' => 'Mautic\AssetBundle\Controller\AssetController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_asset_index',
                     'mauticContent' => 'asset',
@@ -198,7 +198,7 @@ final class AssetController extends AbstractStandardFormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'Mautic\AssetBundle\Controller\AssetController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_asset_index',
                     'mauticContent' => 'asset',
@@ -389,12 +389,12 @@ final class AssetController extends AbstractStandardFormController
                         'objectId'     => $entity->getId(),
                     ];
                     $returnUrl = $this->generateUrl('mautic_asset_action', $viewParameters);
-                    $template  = 'Mautic\AssetBundle\Controller\AssetController::viewAction';
+                    $template  = self::class.'::viewAction';
                 }
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_asset_index', $viewParameters);
-                $template       = 'Mautic\AssetBundle\Controller\AssetController::indexAction';
+                $template       = self::class.'::indexAction';
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -474,7 +474,7 @@ final class AssetController extends AbstractStandardFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\AssetBundle\Controller\AssetController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_asset_index',
                 'mauticContent' => 'asset',
@@ -545,7 +545,7 @@ final class AssetController extends AbstractStandardFormController
                         'objectId'     => $entity->getId(),
                     ]);
                     $viewParams = ['objectId' => $entity->getId()];
-                    $template   = 'Mautic\AssetBundle\Controller\AssetController::viewAction';
+                    $template   = self::class.'::viewAction';
                 }
             } else {
                 // clear any modified content
@@ -555,7 +555,7 @@ final class AssetController extends AbstractStandardFormController
 
                 $returnUrl  = $this->generateUrl('mautic_asset_index', ['page' => $page]);
                 $viewParams = ['page' => $page];
-                $template   = 'Mautic\AssetBundle\Controller\AssetController::indexAction';
+                $template   = self::class.'::indexAction';
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -645,7 +645,7 @@ final class AssetController extends AbstractStandardFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\AssetBundle\Controller\AssetController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_asset_index',
                 'mauticContent' => 'asset',
@@ -750,7 +750,7 @@ final class AssetController extends AbstractStandardFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\AssetBundle\Controller\AssetController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_asset_index',
                 'mauticContent' => 'asset',

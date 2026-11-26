@@ -95,6 +95,40 @@ $utilities: map-merge($utilities, (
     ))
   ))
 ));
+$utilities: map-merge($utilities, (
+  "color": map-merge(map-get($utilities, "color"), (
+    "values": map-merge(map-get(map-get($utilities, "color"), "values"), (
+      "primary": var(--text-primary),
+      "secondary": var(--text-secondary),
+      "muted": var(--text-secondary),
+      "info": var(--support-info),
+      "success": $brand-success,
+      "warning": $brand-warning,
+      "danger": var(--text-error),
+      "interactive": var(--interactive),
+      "placeholder": var(--text-placeholder),
+      "disabled": var(--text-disabled),
+      "helper": var(--text-helper)
+    ))
+  )),
+  "font-size": map-merge(map-get($utilities, "font-size"), (
+    "rfs": false,
+    "values": (
+      10: 10px,
+      12: 12px,
+      14: 14px,
+      16: 16px,
+      18: 18px,
+      20: 20px,
+      22: 22px,
+      30: 30px,
+      40: 40px,
+      42: 42px,
+      46: 46px,
+      "b-e": var(--typography-body-expressive)
+    )
+  ))
+));
 
 $utilities: map-merge($utilities, (
   "width": map-merge(map-get($utilities, "width"), (

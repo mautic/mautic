@@ -105,7 +105,7 @@
                                         {% for field in fields[group] %}
                                             {% if field.value is not empty %}
                                                 <tr>
-                                                    <td width="20%"><span class="fw-b">{{ field.label }}</span></td>
+                                                    <td width="20%"><span class="fw-bold">{{ field.label }}</span></td>
                                                     <td>
                                                         {% if 'core' == group and 'country' == field.alias and flag is defined %}
                                                           <img class="me-12" src="{{ flag }}" alt="" style="max-height: 24px;"/>
@@ -154,12 +154,12 @@
                     <div class="panel">
                         <div class="panel-body box-layout">
                             <div class="col-xs-8 align-middle">
-                                <h5 class="text-white dark-md fw-sb mb-5">
+                                <h5 class="text-secondary fw-semibold mb-5">
                                     {{ 'mautic.lead.field.header.engagements'|trans }}
                                 </h5>
                             </div>
                             <div class="col-xs-4 align-top text-end">
-                                <h3 class="text-white dark-sm"><span class="ri-eye-line"></span></h3>
+                                <h3 class="text-secondary"><span class="ri-eye-line"></span></h3>
                             </div>
                         </div>
                         <div id="company_contact_engagement" data-target-url="{{ path('mautic_company_graph', {'objectId': company.id}) }}">
@@ -227,11 +227,11 @@
             </div>
             <div class="panel-body pt-12">
                 {% if company.owner %}
-                  <h6 class="fw-sb">{{ 'mautic.lead.company.field.owner'|trans }}</h6>
+                  <h6 class="fw-semibold">{{ 'mautic.lead.company.field.owner'|trans }}</h6>
                   <p class="text-secondary">{{ company.owner.name }}</p>
                 {% endif %}
 
-                <h6 class="fw-sb">{{ 'mautic.lead.field.address'|trans }}</h6>
+                <h6 class="fw-semibold">{{ 'mautic.lead.field.address'|trans }}</h6>
                 <address class="text-secondary">
                     {% if company.address1 is not empty %}
                         {{ company.address1 }}<br>
@@ -243,11 +243,11 @@
                     <br>
                 </address>
 
-                <h6 class="fw-sb">{{ 'mautic.core.type.email'|trans }}</h6>
+                <h6 class="fw-semibold">{{ 'mautic.core.type.email'|trans }}</h6>
                 <p class="text-secondary">{{ company.email }}</p>
 
                 {% if company.phone is not empty %}
-                  <h6 class="fw-sb">{{ 'mautic.company.phone'|trans }}</h6>
+                  <h6 class="fw-semibold">{{ 'mautic.company.phone'|trans }}</h6>
                   <p class="text-secondary">{{ company.phone }}</p>
                 {% endif %}
             </div>

@@ -188,7 +188,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         }
 
         $args = $this->options['lookup_arguments'] ?? [];
-        if ($dataPlaceholder = array_search('$data', $args)) {
+        if ($dataPlaceholder = array_search('$data', $args, true)) {
             $args[$dataPlaceholder] = $data;
         }
 

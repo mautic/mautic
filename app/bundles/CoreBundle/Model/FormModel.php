@@ -96,10 +96,10 @@ class FormModel extends AbstractCommonModel
     /**
      * Unlock an entity that prevents multiple people from editing.
      *
-     * @param TEntity $entity
-     * @param mixed  $extra  Can be used by model to determine what to unlock
+     * @param TEntity                     $entity
+     * @param mixed[]|string|false|null $extra  Can be used by model to determine what to unlock
      */
-    public function unlockEntity(object $entity, $extra = null): void
+    public function unlockEntity(object $entity, array|string|false|null $extra = null): void
     {
         // unlock the row if applicable
         if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId()) {

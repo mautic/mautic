@@ -30,7 +30,7 @@
                 </span>
                 </div>
                     <div class="col-md-5 align-middle">
-                    <h5 class="fw-sb text-interactive mb-5">
+                    <h5 class="fw-semibold text-interactive mb-5">
                         {{ event.name }}
                         {% if event.eventType is defined and 'action' != event.eventType %}
                           <small class="text-secondary">{{ event.percent }}%</small>
@@ -39,10 +39,10 @@
                         <span class="label label-danger">{{ 'mautic.campaign.deleted'|trans }}</span>
                         {% endif %}
                     </h5>
-                    <h6 class="text-white dark-sm">{{ event.description }}</h6>
+                    <h6 class="text-secondary">{{ event.description }}</h6>
                 </div>
                 <div class="col-md-3 align-middle text-end">
-                    <em class="text-white dark-sm">{{ ('mautic.campaign.'~event.type)|trans }}</em>
+                    <em class="text-secondary">{{ ('mautic.campaign.'~event.type)|trans }}</em>
                 </div>
             </div>
         </li>

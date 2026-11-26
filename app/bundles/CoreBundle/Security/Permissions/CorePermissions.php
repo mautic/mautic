@@ -373,11 +373,11 @@ class CorePermissions implements ResetInterface
         if (0 === $ownerId) {
             return (bool) $other;
         }
-        if ($own && (int) $this->userHelper->getUser()->getId() === (int) $ownerId) {
+        if ($own && (int) $this->userHelper->getUser()->getId() === $ownerId) {
             return true;
         }
 
-        return $other && (int) $this->userHelper->getUser()->getId() !== (int) $ownerId;
+        return $other && (int) $this->userHelper->getUser()->getId() !== $ownerId;
     }
 
     /**

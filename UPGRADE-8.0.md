@@ -90,14 +90,14 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     |---|---|
     | `CAMPAIGN_ON_LEADCHANGE` | `CampaignSingleLeadChangeEvent` |
     | `LEAD_CAMPAIGN_BATCH_CHANGE` | `CampaignBatchLeadChangeEvent` |
-- Constants `CAMPAIGN_PRE_SAVE`, `CAMPAIGN_POST_SAVE`, `CAMPAIGN_PRE_DELETE` and `CAMPAIGN_POST_DELETE` removed from `Mautic\CampaignBundle\CampaignEvents`. These lifecycle events are now dispatched by their own event class (all under `Mautic\CampaignBundle\Event`), each extending `CampaignEvent` so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `CampaignPostSaveEvent::class => 'onCampaignPostSave'`.
+- Constants `CAMPAIGN_PRE_SAVE`, `CAMPAIGN_POST_SAVE`, `CAMPAIGN_PRE_DELETE` and `CAMPAIGN_POST_DELETE` removed from `Mautic\CampaignBundle\CampaignEvents`. Campaign save and delete now run through the default `FormModel::dispatchEvent()`, which emits the generic `Mautic\CoreBundle\Event` events. Subscribe to the generic event and guard the entity type, e.g. `EntityPostSave::class => 'onCampaignPostSave'` with an early `if (!$event->getEntity() instanceof Campaign) { return; }`.
 
     | Removed `CampaignEvents` constant | New event class |
     |---|---|
-    | `CAMPAIGN_PRE_SAVE` | `CampaignPreSaveEvent` |
-    | `CAMPAIGN_POST_SAVE` | `CampaignPostSaveEvent` |
-    | `CAMPAIGN_PRE_DELETE` | `CampaignPreDeleteEvent` |
-    | `CAMPAIGN_POST_DELETE` | `CampaignPostDeleteEvent` |
+    | `CAMPAIGN_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof Campaign`) |
+    | `CAMPAIGN_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof Campaign`) |
+    | `CAMPAIGN_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof Campaign`) |
+    | `CAMPAIGN_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof Campaign`) |
 - Constant `CONFIG_ON_GENERATE` removed from `Mautic\ConfigBundle\ConfigEvents`. The config-generate event is now dispatched by the event object alone (Symfony 4.3+), so its name is the event class. Subscribe to `Mautic\ConfigBundle\Event\ConfigBuilderEvent::class` instead of the constant, e.g. `ConfigBuilderEvent::class => 'onConfigGenerate'`. The `CONFIG_PRE_SAVE` and `CONFIG_POST_SAVE` constants were also removed - see the `ConfigEvents` entry below.
 - Class `Mautic\IntegrationsBundle\IntegrationEvents` removed entirely, along with its constants `INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES`, `INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES`, `INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD`, `INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD`, `INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC` and `INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION`. These events are now dispatched by their own event class (all under `Mautic\IntegrationsBundle\Event`). `InternalContactEvent`, `InternalCompanyEvent` and `CompletedSyncIterationEvent` each used to be dispatched under two different constants; they are now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `InternalContactFieldChangesEvent::class => 'onContactFieldChanges'`.
 
@@ -136,17 +136,17 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `USER_AUTHENTICATION_CONTENT` | `AuthenticationContentEvent` |
     | `USER_PASSWORD_STRENGTH_VALIDATION` | `PasswordStrengthValidateEvent` |
 - Class `Mautic\UserBundle\Event\AuthenticationEvent` is now `abstract` and can no longer be instantiated directly. Dispatch `PreAuthenticationEvent` or `FormAuthenticationEvent` instead.
-- Constants `SMS_PRE_SAVE`, `SMS_POST_SAVE`, `SMS_PRE_DELETE`, `SMS_POST_DELETE` and `ON_REPLY` removed from `Mautic\SmsBundle\SmsEvents`. These events are now dispatched by their own event class (all under `Mautic\SmsBundle\Event`). The lifecycle events used to share one `SmsEvent` object; `SmsEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `SmsPostSaveEvent::class => 'onPostSave'`.
+- Constants `SMS_PRE_SAVE`, `SMS_POST_SAVE`, `SMS_PRE_DELETE`, `SMS_POST_DELETE` and `ON_REPLY` removed from `Mautic\SmsBundle\SmsEvents`. Sms save and delete now run through the default `FormModel::dispatchEvent()`, which emits the generic `Mautic\CoreBundle\Event` events; subscribe to the generic event and guard the entity type, e.g. `EntityPostSave::class => 'onPostSave'` with an early `if (!$event->getEntity() instanceof Sms) { return; }`. `ON_REPLY` is now dispatched by its own event class under `Mautic\SmsBundle\Event`.
 
     | Removed `SmsEvents` constant | New event class |
     |---|---|
-    | `SMS_PRE_SAVE` | `SmsPreSaveEvent` |
-    | `SMS_POST_SAVE` | `SmsPostSaveEvent` |
-    | `SMS_PRE_DELETE` | `SmsPreDeleteEvent` |
-    | `SMS_POST_DELETE` | `SmsPostDeleteEvent` |
+    | `SMS_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof Sms`) |
+    | `SMS_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof Sms`) |
+    | `SMS_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof Sms`) |
+    | `SMS_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof Sms`) |
     | `ON_REPLY` | `ReplyEvent` |
 - Unused constants `ON_CAMPAIGN_TRIGGER_ACTION`, `ON_SMS_TOKENS_BUILD`, `DNC_FILTER_CONTACTS_ON_SEND`, `QUEUE_FILTER_CONTACTS_ON_SEND` and `FILTER_CONTACTS_ON_SEND` removed from `Mautic\SmsBundle\SmsEvents`; they had no dispatcher or listener.
-- Constants removed from `Mautic\LeadBundle\LeadEvents`, these events are now dispatched by their own event class (all under `Mautic\LeadBundle\Event`). Subscribe to the event class instead of the constant, e.g. `LeadPostMergeEvent::class => 'onLeadMerge'`. Lifecycle events that used to share one event object now get a dedicated subclass of the former shared class (`CompanyEvent`, `TagEvent`, `LeadNoteEvent`, `LeadDeviceEvent`, `ImportEvent`, `LeadFieldEvent`, `LeadListEvent`, `LeadMergeEvent`, `CompanyMergeEvent`, `TagMergeEvent`, `SaveBatchLeadsEvent` and `ContactExportSchedulerEvent` are now `abstract`, instantiate one of the subclasses instead; `LeadEvent` and `ListChangeEvent` are no longer `final`), so listener type hints keep working; pre and post events are now separate objects.
+- Constants removed from `Mautic\LeadBundle\LeadEvents`, these events are now dispatched by their own event class (all under `Mautic\LeadBundle\Event`). Subscribe to the event class instead of the constant, e.g. `LeadPostMergeEvent::class => 'onLeadMerge'`. Lifecycle events that used to share one event object now get a dedicated subclass of the former shared class (`CompanyEvent`, `TagEvent`, `LeadDeviceEvent`, `ImportEvent`, `LeadFieldEvent`, `LeadListEvent`, `LeadMergeEvent`, `CompanyMergeEvent`, `TagMergeEvent`, `SaveBatchLeadsEvent` and `ContactExportSchedulerEvent` are now `abstract`, instantiate one of the subclasses instead; `LeadEvent` and `ListChangeEvent` are no longer `final`), so listener type hints keep working; pre and post events are now separate objects. `ImportEvent` only covers `IMPORT_BATCH_PROCESSED` now: import and note lifecycle listeners must type-hint the generic `Mautic\CoreBundle\Event` event and check `instanceof Import` / `instanceof LeadNote`.
 
     | Removed `LeadEvents` constant | New event class |
     |---|---|
@@ -169,14 +169,14 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `FIELD_POST_SAVE` | `FieldPostSaveEvent` |
     | `FIELD_PRE_DELETE` | `FieldPreDeleteEvent` |
     | `FIELD_POST_DELETE` | `FieldPostDeleteEvent` |
-    | `NOTE_PRE_SAVE` | `NotePreSaveEvent` |
-    | `NOTE_POST_SAVE` | `NotePostSaveEvent` |
-    | `NOTE_PRE_DELETE` | `NotePreDeleteEvent` |
-    | `NOTE_POST_DELETE` | `NotePostDeleteEvent` |
-    | `IMPORT_PRE_SAVE` | `ImportPreSaveEvent` |
-    | `IMPORT_POST_SAVE` | `ImportPostSaveEvent` |
-    | `IMPORT_PRE_DELETE` | `ImportPreDeleteEvent` |
-    | `IMPORT_POST_DELETE` | `ImportPostDeleteEvent` |
+    | `NOTE_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof LeadNote`) |
+    | `NOTE_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof LeadNote`) |
+    | `NOTE_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof LeadNote`) |
+    | `NOTE_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof LeadNote`) |
+    | `IMPORT_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof Import`) |
+    | `IMPORT_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof Import`) |
+    | `IMPORT_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof Import`) |
+    | `IMPORT_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof Import`) |
     | `IMPORT_BATCH_PROCESSED` | `ImportBatchProcessedEvent` |
     | `DEVICE_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof LeadDevice`) |
     | `DEVICE_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof LeadDevice`) |
@@ -521,7 +521,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Protected methods `Mautic\CoreBundle\Model\FormModel::dispatchEventFromBatch()` and `Mautic\LeadBundle\Model\LeadModel::dispatchEventFromBatch()` removed; `dispatchEvent()` now covers both the single and batch save paths. The only behavioral difference was `LeadEvent::setAlreadyProcessedInBatch()`, whose value is read nowhere, so during batch saves `LeadEvent::isAlreadyProcessedInBatch()` now returns `false` instead of `true`.
 - Deprecated method `Mautic\CoreBundle\Entity\CommonRepository::getPublishedByDateExpression()` removed. Use `getPublishedByDateOrmExpression()` for a `Doctrine\ORM\QueryBuilder` or `getPublishedByDateDbalExpression()` for a `Doctrine\DBAL\Query\QueryBuilder`; both take the same arguments.
 - Deprecated property `leadField` removed from `Mautic\FormBundle\Entity\Field` together with `getLeadField()` and `setLeadField()`. Use `mappedObject` and `mappedField` (`getMappedObject()`/`getMappedField()`) instead. The `lead_field` column is dropped from the `form_fields` table by a migration, which first copies any value not yet present in `mapped_field` (and the matching `mapped_object`). API impact: form fields in `/api/forms` responses no longer include `leadField`, and a `leadField` sent in a request is ignored - send `mappedObject` (`contact` or `company`) and `mappedField` instead. Custom form field templates must read `field.mappedField` instead of `field.leadField`.
-- Per-entity lifecycle event classes removed in favor of four generic events in `Mautic\CoreBundle\Event`: `EntityPreSave`, `EntityPostSave`, `EntityPreDelete`, `EntityPostDelete` (all extending `AbstractEntityEvent`). The default `Mautic\CoreBundle\Model\FormModel::dispatchEvent()` dispatches these, so an entity whose model relies on that default no longer needs its own event class or `dispatchEvent()` override. Models that still override `dispatchEvent()` with their own event class (for example `Mautic\FormBundle\Model\FormModel`, `Mautic\PageBundle\Model\PageModel`, `Mautic\LeadBundle\Model\LeadModel`, `Mautic\LeadBundle\Model\CompanyModel`, `Mautic\AssetBundle\Model\AssetModel`, `Mautic\CampaignBundle\Model\CampaignModel` and other bundle models whose subscribers were not migrated) keep dispatching only their own legacy event, so the generic events do not fire for those entities. Subscribe to the generic event and check the entity instance inside the listener:
+- Per-entity lifecycle event classes removed in favor of four generic events in `Mautic\CoreBundle\Event`: `EntityPreSave`, `EntityPostSave`, `EntityPreDelete`, `EntityPostDelete` (all extending `AbstractEntityEvent`). The default `Mautic\CoreBundle\Model\FormModel::dispatchEvent()` dispatches these, so an entity whose model relies on that default no longer needs its own event class or `dispatchEvent()` override. Models that still override `dispatchEvent()` with their own event class (for example `Mautic\FormBundle\Model\FormModel`, `Mautic\PageBundle\Model\PageModel`, `Mautic\LeadBundle\Model\LeadModel`, `Mautic\LeadBundle\Model\CompanyModel` and other bundle models whose subscribers were not migrated) keep dispatching only their own legacy event, so the generic events do not fire for those entities. Subscribe to the generic event and check the entity instance inside the listener:
 
     ```php
     use Mautic\CoreBundle\Event\EntityPostSave;
@@ -573,6 +573,33 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\WebhookBundle\Event\WebhookPostSaveEvent` | `EntityPostSave` (check `instanceof Webhook`) |
     | `Mautic\WebhookBundle\Event\WebhookPreDeleteEvent` | `EntityPreDelete` (check `instanceof Webhook`) |
     | `Mautic\WebhookBundle\Event\WebhookPostDeleteEvent` | `EntityPostDelete` (check `instanceof Webhook`) |
+    | `Mautic\AssetBundle\Event\AssetPreSaveEvent` | `EntityPreSave` (check `instanceof Asset`) |
+    | `Mautic\AssetBundle\Event\AssetPostSaveEvent` | `EntityPostSave` (check `instanceof Asset`) |
+    | `Mautic\AssetBundle\Event\AssetPreDeleteEvent` | `EntityPreDelete` (check `instanceof Asset`) |
+    | `Mautic\AssetBundle\Event\AssetPostDeleteEvent` | `EntityPostDelete` (check `instanceof Asset`) |
+    | `Mautic\AssetBundle\Event\AssetEvent` | generic entity events above |
+    | `Mautic\SmsBundle\Event\SmsPreSaveEvent` | `EntityPreSave` (check `instanceof Sms`) |
+    | `Mautic\SmsBundle\Event\SmsPostSaveEvent` | `EntityPostSave` (check `instanceof Sms`) |
+    | `Mautic\SmsBundle\Event\SmsPreDeleteEvent` | `EntityPreDelete` (check `instanceof Sms`) |
+    | `Mautic\SmsBundle\Event\SmsPostDeleteEvent` | `EntityPostDelete` (check `instanceof Sms`) |
+    | `Mautic\SmsBundle\Event\SmsEvent` | generic entity events above |
+    | `Mautic\LeadBundle\Event\ImportPreSaveEvent` | `EntityPreSave` (check `instanceof Import`) |
+    | `Mautic\LeadBundle\Event\ImportPostSaveEvent` | `EntityPostSave` (check `instanceof Import`) |
+    | `Mautic\LeadBundle\Event\ImportPreDeleteEvent` | `EntityPreDelete` (check `instanceof Import`) |
+    | `Mautic\LeadBundle\Event\ImportPostDeleteEvent` | `EntityPostDelete` (check `instanceof Import`) |
+    | `Mautic\LeadBundle\Event\NotePreSaveEvent` | `EntityPreSave` (check `instanceof LeadNote`) |
+    | `Mautic\LeadBundle\Event\NotePostSaveEvent` | `EntityPostSave` (check `instanceof LeadNote`) |
+    | `Mautic\LeadBundle\Event\NotePreDeleteEvent` | `EntityPreDelete` (check `instanceof LeadNote`) |
+    | `Mautic\LeadBundle\Event\NotePostDeleteEvent` | `EntityPostDelete` (check `instanceof LeadNote`) |
+    | `Mautic\LeadBundle\Event\LeadNoteEvent` | generic entity events above |
+    | `Mautic\CampaignBundle\Event\CampaignPreSaveEvent` | `EntityPreSave` (check `instanceof Campaign`) |
+    | `Mautic\CampaignBundle\Event\CampaignPostSaveEvent` | `EntityPostSave` (check `instanceof Campaign`) |
+    | `Mautic\CampaignBundle\Event\CampaignPreDeleteEvent` | `EntityPreDelete` (check `instanceof Campaign`) |
+    | `Mautic\CampaignBundle\Event\CampaignPostDeleteEvent` | `EntityPostDelete` (check `instanceof Campaign`) |
+
+    `Mautic\LeadBundle\Event\ImportEvent` and `Mautic\CampaignBundle\Event\CampaignEvent` are kept (still used by `ImportBatchProcessedEvent` and `CampaignImportExportSubscriber` respectively); only their four lifecycle subclasses are removed. `ImportModel::dispatchEvent()` keeps a slim override for its non-lifecycle `batch_processed` action and delegates the four lifecycle actions to the parent.
+
+    The entity setters `Mautic\AssetBundle\Event\AssetEvent::setAsset()`, `Mautic\SmsBundle\Event\SmsEvent::setSms()` and `Mautic\LeadBundle\Event\LeadNoteEvent::setLeadNote()` have no replacement: `AbstractEntityEvent` only exposes `getEntity()`, so a `pre_save` listener must modify the entity in place instead of swapping it.
 
     Constants `NOTIFICATION_PRE_SAVE`, `NOTIFICATION_POST_SAVE`, `NOTIFICATION_PRE_DELETE` and `NOTIFICATION_POST_DELETE` were removed from `Mautic\NotificationBundle\NotificationEvents`; subscribe to the generic event classes instead.
 
@@ -618,6 +645,27 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     Mautic sets `--bs-border-color` to `--border-subtle`, so Bootstrap border utilities keep Mautic's border colour. A custom theme that replaces `--border-subtle` must also set `--bs-border-color` to keep the same appearance.
 
     `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
+
+- Custom typography classes removed in favour of Bootstrap 5 utilities. The `.text-success`, `.text-warning`, `.text-danger` colours and the remaining `.fs-*` sizes now come from the Bootstrap `$utilities` maps in `_bootstrap.scss`, so those class names still work. `.text-danger` now uses the theme error text colour (`--text-error`) instead of a fixed red, and links with `.text-danger`, `.text-success`, `.text-warning` or `.text-white` no longer darken on hover.
+    | Removed class | Replacement |
+    |---|---|
+    | `.fw-b` | `.fw-bold` |
+    | `.fw-sb` | `.fw-semibold` |
+    | `.fw-n` | `.fw-normal` |
+    | `.fw-t` | `.fw-light` |
+    | `.tt-u` | `.text-uppercase` |
+    | `.ellipsis` | `.text-truncate` + `.d-block` |
+    | `.text-help` | `.text-helper` + `.type-helper-text-01` |
+    | `.text-white.dark-*` | `.text-secondary`. The colour is not identical: the old classes darkened white. |
+    | `.text-twitter`, `.text-facebook`, `.text-google` | No replacement. The `$brand-twitter`, `$brand-facebook` and `$brand-google` SCSS variables were removed too. |
+    | `.container-fluid.container-xs`, `.container-fluid.container-sm`, `.container-fluid.container-md`, `.container-fluid.container-lg` | Bootstrap `.px-*` utilities. Only the Mautic padding override of 5, 10, 15 and 20px inside the content body was removed; Bootstrap's own `.container-sm`, `.container-md` and `.container-lg` still exist. The spacing scale has no 10, 15 or 20px, so pick the closest step. |
+    | `.fs-1`, `.fs-2`, `.fs-3`, `.fs-4`, `.fs-5`, `.fs-6`, `.fs-8`, `.fs-11`, `.fs-24`, `.fs-26`, `.fs-28`, `.fs-32`, `.fs-34`, `.fs-36`, `.fs-38`, `.fs-44`, `.fs-48`, `.fs-50`, `.fs-52`, `.fs-54`, `.fs-56`, `.fs-base`, `.fs-b-p`, `.fs-u-e`, `.fs-u-p` | No replacement. Remaining sizes: `.fs-10`, `.fs-12`, `.fs-14`, `.fs-16`, `.fs-18`, `.fs-20`, `.fs-22`, `.fs-30`, `.fs-40`, `.fs-42`, `.fs-46` and `.fs-b-e`. |
+
+    The `.light-xs`, `.dark-xs`, `.dark-sm`, `.dark-md` and `.dark-lg` modifiers of `.text-white`, `.text-success`, `.text-warning` and `.text-danger`, and the `text-emphasis-variants` SCSS mixin, were removed.
+
+    The Mautic `.page-header` rules in `_type.scss` (15px padding, top margin, no bottom border), their `.container` and `.container-xs` to `.container-lg` negative-margin resets, the `.content-only .page-header` override and the `.blockquote-reverse` rule were removed. The Bootstrap 3 compatibility stylesheet still defines `.page-header` (bottom margin and 1px bottom border) and `.blockquote-reverse` (right padding and 5px right border), so those now apply. Add your own spacing classes where the old page header spacing is needed.
+
+    The `$blockquote-small-color`, `$blockquote-font-size`, `$blockquote-border-color` and `$page-header-border-color` SCSS variables were removed from `_bootstrap-mautic-custom-variables.scss`. The compatibility stylesheet now supplies `!default` fallbacks, with fixed grey values instead of the theme tokens `var(--text-secondary)` and `var(--border-no-color)`.
 
 - Custom background colour classes removed. Bootstrap's `.bg-*` utilities now apply, with the Carbon colours for `.bg-primary`, `.bg-success`, `.bg-info`, `.bg-warning` and `.bg-danger`. The removed classes also forced the text colour, so add a text utility where the text must stay readable. The `bg-color` SCSS mixin and `app/bundles/CoreBundle/Assets/css/app/scss/components/_colors.scss` (with its `@import` in `app/bundles/CoreBundle/Assets/css/app.scss`) were removed.
     | Removed class | Bootstrap 5 replacement |
@@ -791,7 +839,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
      }
     ```
 
-- AssetBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\AssetBundle\AssetEvents` string constants. This covers `ASSET_ON_LOAD` (`AssetLoadEvent`), `ASSET_ON_REMOTE_BROWSE` (`RemoteAssetBrowseEvent`) and the CRUD group `ASSET_PRE_SAVE` (`AssetPreSaveEvent`), `ASSET_POST_SAVE` (`AssetPostSaveEvent`), `ASSET_PRE_DELETE` (`AssetPreDeleteEvent`), `ASSET_POST_DELETE` (`AssetPostDeleteEvent`). The CRUD group previously reused one `AssetEvent` object under four names; each action now dispatches its own `AssetEvent` subclass, so `AssetEvent` is no longer `final`. The dead `ASSET_ON_UPLOAD` constant (never dispatched or listened to) has been removed. Update any subscriber or listener that keys on a converted constant to key on the event class instead:
+- AssetBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\AssetBundle\AssetEvents` string constants. This covers `ASSET_ON_LOAD` (`AssetLoadEvent`) and `ASSET_ON_REMOTE_BROWSE` (`RemoteAssetBrowseEvent`). The CRUD group `ASSET_PRE_SAVE`, `ASSET_POST_SAVE`, `ASSET_PRE_DELETE` and `ASSET_POST_DELETE` now dispatches the generic `Mautic\CoreBundle\Event` events `EntityPreSave`, `EntityPostSave`, `EntityPreDelete` and `EntityPostDelete` (check `instanceof Asset`); `AssetEvent` was removed. The dead `ASSET_ON_UPLOAD` constant (never dispatched or listened to) has been removed. Update any subscriber or listener that keys on a converted constant to key on the event class instead:
 
     ```diff
      public static function getSubscribedEvents(): array
@@ -916,7 +964,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
      }
     ```
 
-    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, SmsEvents::SMS_ON_SEND)` becomes `$dispatcher->dispatch($event)`. The `Mautic\SmsBundle\SmsEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class stay unchanged: the `SMS_PRE_SAVE` / `SMS_POST_SAVE` / `SMS_PRE_DELETE` / `SMS_POST_DELETE` group (`SmsEvent`) and the `ON_REPLY` / `ON_CAMPAIGN_REPLY` pair (`ReplyEvent`). The webhook-type identifiers `TOKEN_REPLACEMENT` (shared `CoreBundle` event) and the campaign trigger constants also stay as strings.
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, SmsEvents::SMS_ON_SEND)` becomes `$dispatcher->dispatch($event)`. The remaining `Mautic\SmsBundle\SmsEvents` constants are kept for backwards compatibility. The `SMS_PRE_SAVE`, `SMS_POST_SAVE`, `SMS_PRE_DELETE`, `SMS_POST_DELETE` and `ON_REPLY` constants are removed (see the `SmsEvents` table above); the lifecycle group now dispatches the generic `Mautic\CoreBundle\Event` entity events (check `instanceof Sms`). `ON_CAMPAIGN_REPLY` stays unchanged. The webhook-type identifiers `TOKEN_REPLACEMENT` (shared `CoreBundle` event) and the campaign trigger constants also stay as strings.
 
     Full mapping of the converted constants to their event class (all in the `Mautic\SmsBundle\Event` namespace):
 
@@ -1465,20 +1513,25 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO` | `__construct()` (`string $type`) |
     | `Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException` | `__construct()` (`string $object`) |
     | `Mautic\IntegrationsBundle\Sync\Logger\DebugLogger` | `log()` (`string $integration`, `string $message`) |
-    | `Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException` | `__construct()` (`mixed $olderValue`) |
+    | `Mautic\LeadBundle\Controller\LeadDetailsTrait` | `sanitizeEventFilter()` (`array\|string\|false $filters`) |
+    | `Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException` | `__construct()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $newerValue`, `\DateTimeInterface\|array\|string\|int\|float\|bool\|null $olderValue`); `getNewerValue()` and `getOlderValue()` now return `\DateTimeInterface\|array\|string\|int\|float\|bool\|null` |
+    | `Mautic\LeadBundle\Deduplicate\Helper\MergeValueHelper` | `getMergeValue()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $newerValue`, `\DateTimeInterface\|array\|string\|int\|float\|bool\|null $olderValue`, `\DateTimeInterface\|array\|string\|int\|float\|bool\|null $currentValue`, `\DateTimeInterface\|array\|string\|int\|float\|bool\|null $defaultValue`), now returns `\DateTimeInterface\|array\|string\|int\|float\|bool\|null` |
     | `Mautic\LeadBundle\Entity\CompanyRepository` | `getAjaxSimpleList()` (`string $valueColumn`); `getCompanies()` (`string $id`) |
+    | `Mautic\LeadBundle\Entity\CustomFieldEntityInterface` (and `CustomFieldEntityTrait` used by `Lead` and `Company`) | `addUpdatedField()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $value`); implementations without a type for `$value` stay compatible |
     | `Mautic\LeadBundle\Entity\DoNotContactRepository` | `getChannelList()` (`?string $channel`); `getCount()` (`?string $channel`, `?int $reason`) |
     | `Mautic\LeadBundle\Entity\FrequencyRuleRepository` | `getAppliedFrequencyRules()` (`string $channel`, `?string $defaultFrequencyNumber`, `?string $defaultFrequencyTime`) |
     | `Mautic\LeadBundle\Entity\LeadEventLogRepository` | `getEvents()` (`?string $bundle`, `?string $object`); `getFailedRows()` (`string $bundle`, `string $object`); `getSpecificRows()` (`string $action`, `string $bundle`, `string $object`) |
-    | `Mautic\LeadBundle\Entity\LeadFieldRepository` | `compareValue()` (`string $field`); `getAliases()` (`?string $object`) |
+    | `Mautic\LeadBundle\Entity\LeadFieldRepository` | `compareValue()` (`string $field`, `array\|string\|int\|float\|bool\|null $value`); `getAliases()` (`?string $object`) |
     | `Mautic\LeadBundle\Entity\LeadRepository` | `getLeadsByFieldValue()` (`string $field`); `updateContactPoints()` (`int $tries`); `updateLastActive()` (`?int $leadId`) |
     | `Mautic\LeadBundle\Event\ChannelSubscriptionChange` | `__construct()` (`string $channel`) |
     | `Mautic\LeadBundle\Event\LeadBuildSearchEvent` | `__construct()` (`string $string`, `string $command`); `setString()` (`string $string`); `getString()` and `getCommand()` now return `string` and the `protected` properties are typed, so subclasses must declare matching types |
     | `Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent` | `addChoice()` (`string $object`, `string $choiceKey`) |
     | `Mautic\LeadBundle\Event\LeadTimelineEvent` | `addEventType()` (`string $eventTypeKey`); `addToCounter()` (`string $eventType`, `array\|int $count`); `isApplicable()` (`string $eventType`); `subtractFromCounter()` (`int $count`) |
     | `Mautic\LeadBundle\Event\PointsChangeEvent` | `__construct()` (`int $old`, `int $new`) |
+    | `Mautic\LeadBundle\Helper\CustomFieldHelper` | `fixValueType()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $value`), now returns `\DateTimeInterface\|array\|string\|int\|float\|bool\|null` |
+    | `Mautic\LeadBundle\Helper\CustomFieldValueHelper` | `normalize()` (`\DateTimeInterface\|array\|string\|int\|float\|bool\|null $value`) |
     | `Mautic\LeadBundle\Model\FieldModel` | `getLookupResults()` (`int $limit`); `reorderFieldsByList()` (`int $start`) |
-    | `Mautic\LeadBundle\Model\ImportModel` | `getImportedRowsLineChartData()` (`string $unit`); `process()` (`int $limit`) |
+    | `Mautic\LeadBundle\Model\ImportModel` | `getImportedRowsLineChartData()` (`string $unit`); `isEmptyCsvRow()` (`array $row`); `process()` (`int $limit`) |
     | `Mautic\LeadBundle\Model\LeadModel` | `getLookupResults()` (`string $type`) |
     | `Mautic\LeadBundle\Model\ListModel` | `addLead()` (`int $searchListLead`); `getSegmentsWithDependenciesOnSegment()` (`string $returnProperty`) |
     | `Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault` | `__construct()` (`?string $originalValue`) |
@@ -1743,7 +1796,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\ChannelBundle\Entity\Message`: `setName(?string $name)`, `setDescription(?string $description)`
     - `Mautic\ChannelBundle\Entity\MessageQueue`: `setAttempts(int $attempts)`, `setChannel(string $channel)`, `setMaxAttempts(int $maxAttempts)`, `setPriority(int $priority)`, `setStatus(string $status)`
     - `Mautic\CoreBundle\Entity\AuditLog`: `setUserId(int $userId)`, `setObject(string $object)`, `setAction(string $action)`, `setIpAddress(string $ipAddress)`, `setBundle(string $bundle)`, `setUserName(string $userName)`
-    - `Mautic\CoreBundle\Entity\FormEntity`: `setCreatedBy(User|int|null $createdBy)`
+    - `Mautic\CoreBundle\Entity\FormEntity`: `setCreatedBy(User|int|null $createdBy)`, `setCreatedByUser(?string $createdByUser)`
     - `Mautic\CoreBundle\Entity\Notification`: `setType(?string $type)`, `setMessage(?string $message)`, `setIsRead(?bool $isRead)`
     - `Mautic\DashboardBundle\Entity\Widget`: `setWidth(int $width)`, `setHeight(int $height)`, `setOrdering(?int $ordering)`, `setTemplate(?string $template)`, `setErrorMessage(string $errorMessage)`, `setCached(bool $cached)`
     - `Mautic\DynamicContentBundle\Entity\DynamicContent`: `setContent(?string $content)`, `setIsCampaignBased(bool $isCampaignBased)`, `setSlotName(?string $slotName)`
@@ -1758,7 +1811,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\LeadBundle\Entity\Company`: `setScore(?int $score)`, `setName(?string $name)`, `setEmail(?string $email)`, `setAddress1(?string $address1)`, `setAddress2(?string $address2)`, `setPhone(?string $phone)`, `setCity(?string $city)`, `setState(?string $state)`, `setZipcode(?string $zipcode)`, `setCountry(?string $country)`, `setWebsite(?string $website)`, `setIndustry(?string $industry)`, `setDescription(?string $description)`
     - `Mautic\LeadBundle\Entity\DoNotContact`: `setReason(int $reason)`, `setChannel(string $channel)`
     - `Mautic\LeadBundle\Entity\FrequencyRule`: `setFrequencyNumber(int|string|null $frequencyNumber)`, `setFrequencyTime(?string $frequencyTime)`, `setChannel(string $channel)`
-    - `Mautic\LeadBundle\Entity\Import`: `setDir(string $dir)`, `setStatus(int $status)`, `setStatusInfo(string $info)`
+    - `Mautic\LeadBundle\Entity\Import`: `setDefault(string $key, array|int|bool|null $value)`, `setDir(string $dir)`, `setStatus(int $status)`, `setStatusInfo(string $info)`
     - `Mautic\LeadBundle\Entity\Lead`: `setId(int $id)`, `adjustPoints(int $points, string $operator)`, `setPoints(?int $points)`, `stageChangeLogEntry(?string $name)`, `addCompanyChangeLogEntry(?string $type, ?string $name)`, `setNewlyCreated(bool $newlyCreated)`, `setPreferredProfileImage(?string $source)`, `setTitle(?string $title)`, `setFirstname(?string $firstname)`, `setLastname(?string $lastname)`, `setPhone(?string $phone)`, `setMobile(?string $mobile)`, `setAddress1(?string $address1)`, `setAddress2(?string $address2)`, `setCity(?string $city)`, `setState(?string $state)`, `setZipcode(?string $zipcode)`, `setTimezone(?string $timezone)`, `setCountry(?string $country)`, `setEmail(?string $email)`, `setPrimaryCompany(?array $primaryCompany)`
     - `Mautic\LeadBundle\Entity\LeadCategory`: `setManuallyRemoved(bool $manuallyRemoved)`
     - `Mautic\LeadBundle\Entity\LeadDevice`: `setClientInfo(array|string|null $clientInfo)`, `setDeviceBrand(?string $brand)`, `setDeviceOsName(string $deviceOsName)`, `setTrackingId(string $trackingId)`
@@ -1874,6 +1927,17 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\LeadBundle\Entity\Lead::setColor()` types `$color` as `string`. Passing `null` now throws; pass a color string. `getColor()` now declares a `?string` return type, so a subclass overriding it must declare `?string` (or `string`).
     - `Mautic\NotificationBundle\Event\NotificationSendEvent::__construct()` and `setHeading()` type `$heading` as `?string`, and `getHeading()` now declares a `?string` return type.
     - `Mautic\PluginBundle\Entity\Integration::setName()` types `$name` as `string`. Passing `null` now throws; pass the integration name.
+    - `Mautic\CoreBundle\Model\FormModel::unlockEntity()` types `$extra` as `array|string|false|null`.
+    - `Mautic\CoreBundle\ErrorHandler\ErrorHandler::setMainLogger()` types `$mainLogger` as `Psr\Log\LoggerInterface`.
+    - `Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList()`, `parseListForChoices()` and `parseBooleanList()` type `$list` as `array|string|int|float|bool|null`. Passing an object now throws.
+    - `Mautic\CoreBundle\Helper\ListParser\ListParserInterface::parse()` and its implementations type `$list` as `array|string|int|float|bool|null`. A custom implementation must declare the same type, or leave `$list` untyped.
+    - `Mautic\CoreBundle\Twig\Helper\FormatterHelper::_()` types `$val` as `array|string|int|float|bool|\DateTimeInterface|null` and `Mautic\CoreBundle\Twig\Extension\FormatterExtension::_()` (Twig function `format()`) as `array|string|int|float|bool|null`. `FormatterHelper::normalizeStringValue()` types `$string` as `string`.
+    - `Mautic\CoreBundle\Helper\Tree\NodeInterface::addParam()` and `getParam()` type `$value` and `$default` as `?string`, as does `Mautic\CoreBundle\Helper\Tree\IntNode`. A custom implementation must declare the same type, or leave it untyped.
+    - `Mautic\CoreBundle\Twig\Helper\DateHelper::toText()` and `Mautic\CoreBundle\Twig\Extension\DateExtension::toText()` (Twig function `dateToText()`) type `$datetime` as `string|int|\DateTimeInterface|null`. `[]` used to return `''` and now throws. `false` used to return `''` too; it now throws for callers with `declare(strict_types=1)` and is coerced to `0` for non-strict callers. Pass `null` instead.
+    - `Mautic\CoreBundle\Event\AbstractTokenReplacementEvent::__construct()` types `$passthrough` as `?Mautic\EmailBundle\Entity\Email`, which also types the promoted `protected $passthrough` property. Property types are invariant, so a subclass that redeclares the property must declare it as `protected ?Email $passthrough`.
+    - `Mautic\CampaignBundle\Entity\ChannelInterface::setChannel()`, `Mautic\CampaignBundle\Entity\Event::setChannel()` and `Mautic\CampaignBundle\Entity\LeadEventLog::setChannel()` type `$channel` as `?string`. A custom implementation must declare the same type, or leave `$channel` untyped.
+    - `Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface::encodeVariable()` and `Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::encodeVariable()` type `$var` as `\DateTime|string|int|float|bool|null`. Any other value already threw and now hits a `TypeError` instead. A custom implementation must declare the same type, or leave `$var` untyped.
+    - `Mautic\ConfigBundle\Mapper\Helper\ConfigHelper::bindNestedConfigValues()` types `$defaults` as `array|string|int|float|bool|null`. Passing an object now throws.
 
 ### Native parameter and return types for plugin extension points
 

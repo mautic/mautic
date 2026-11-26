@@ -10,11 +10,9 @@ final class ArrayHelper
     /**
      * If the $key exists in the $origin array then it will return its value.
      *
-     * @param mixed $defaultValue
-     *
      * @return mixed
      */
-    public static function getValue(int|string $key, array $origin, $defaultValue = null)
+    public static function getValue(int|string $key, array $origin, mixed $defaultValue = null)
     {
         return array_key_exists($key, $origin) ? $origin[$key] : $defaultValue;
     }
@@ -23,11 +21,9 @@ final class ArrayHelper
      * If the $key exists in the $origin array then it will return its value
      * and unsets the $key from the $array.
      *
-     * @param mixed $defaultValue
-     *
      * @return mixed
      */
-    public static function pickValue(int|string $key, array &$origin, $defaultValue = null)
+    public static function pickValue(int|string $key, array &$origin, mixed $defaultValue = null)
     {
         $value = self::getValue($key, $origin, $defaultValue);
 

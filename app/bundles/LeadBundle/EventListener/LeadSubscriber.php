@@ -4,6 +4,8 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -16,6 +18,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Entity\LeadNoteRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
@@ -31,8 +34,6 @@ use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadPreDeleteEvent;
 use Mautic\LeadBundle\Event\LeadPreMergeEvent;
-use Mautic\LeadBundle\Event\NotePostDeleteEvent;
-use Mautic\LeadBundle\Event\NotePostSaveEvent;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
@@ -256,12 +257,14 @@ final class LeadSubscriber
     /**
      * Add a note entry to the audit log.
      */
-    #[AsEventListener(
-        event: NotePostSaveEvent::class,
-    )]
-    public function onNotePostSave(Events\LeadNoteEvent $event): void
+    #[AsEventListener]
+    public function onNotePostSave(EntityPostSave $event): void
     {
-        $note = $event->getNote();
+        $note = $event->getEntity();
+        if (!$note instanceof LeadNote) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'lead',
@@ -278,13 +281,15 @@ final class LeadSubscriber
     /**
      * Add a note delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: NotePostDeleteEvent::class,
-    )]
-    public function onNoteDelete(Events\LeadNoteEvent $event): void
+    #[AsEventListener]
+    public function onNoteDelete(EntityPostDelete $event): void
     {
-        $note = $event->getNote();
-        $log  = [
+        $note = $event->getEntity();
+        if (!$note instanceof LeadNote) {
+            return;
+        }
+
+        $log = [
             'bundle'    => 'lead',
             'object'    => 'note',
             'objectId'  => $note->deletedId,

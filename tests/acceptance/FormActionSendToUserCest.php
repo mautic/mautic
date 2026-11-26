@@ -45,7 +45,7 @@ final class FormActionSendToUserCest
         $I->assertEquals(1, substr_count($message, '<strong>Email Address</strong>: {formfield=email_address}'));
 
         // Insert token manually and verify again
-        $I->click("//div[@id='formFieldTokens']//a[contains(text(), 'First Name')]");
+        $I->click("//div[@id='formFieldTokens']//button[contains(text(), 'First Name')]");
         $I->wait(1);
 
         $message = $I->grabValueFrom('#formaction_properties_message');

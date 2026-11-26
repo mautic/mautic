@@ -646,10 +646,9 @@ class Import extends FormEntity
     /**
      * Set a default value to the defaults array.
      *
-     * @param string $key
-     * @param mixed  $value
+     * @param mixed[]|int|bool|null $value
      */
-    public function setDefault($key, $value): static
+    public function setDefault(string $key, array|int|bool|null $value): static
     {
         return $this->mergeToProperties([
             'defaults' => array_merge($this->getDefaults(), [$key => $value]),

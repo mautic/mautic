@@ -8,10 +8,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
 final class ValueNormalizer implements ValueNormalizerInterface
 {
-    /**
-     * @param mixed $value
-     */
-    public function normalizeForMautic(string $type, $value): NormalizedValueDAO
+    public function normalizeForMautic(string $type, mixed $value): NormalizedValueDAO
     {
         switch ($type) {
             case NormalizedValueDAO::STRING_TYPE:

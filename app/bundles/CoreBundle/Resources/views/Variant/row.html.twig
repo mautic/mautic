@@ -72,7 +72,7 @@
                             } %}
                         </div>
                     {% endif %}
-                    <h5 class="fw-sb text-interactive">
+                    <h5 class="fw-semibold text-interactive">
                         <a href="{{ actionUrl }}" data-toggle="ajax">
                             {{ attribute(variant, nameGetter) }}
                         </a>
@@ -89,13 +89,13 @@
                         {% endif %}
                     </h5>
                     {% if method_exists(variant, 'getAlias') %}
-                        <span class="text-white dark-sm">{{ variant.alias }}</span>
+                        <span class="text-secondary">{{ variant.alias }}</span>
                     {% endif %}
                 </div>
             </div>
         </div>
         <div class="col-md-4 align-top text-end">
-            <em class="text-white dark-sm">
+            <em class="text-secondary">
                 {% if true == variants['configurationError'] %}
                     <div class="text-danger" data-toggle="label label-danger" title="{{ 'mautic.core.variant.misconfiguration'|trans }}">
                         <div><span class="badge">{{ weight }}%</span></div>
