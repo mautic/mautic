@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Ai;
 
 use Symfony\AI\Platform\Message\Message;
 use Symfony\AI\Platform\Message\MessageBag;
+use Symfony\AI\Platform\Model;
 use Symfony\AI\Platform\PlatformInterface;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 
@@ -21,12 +22,13 @@ final readonly class SymfonyTextGenerator
     }
 
     /**
-     * @param non-empty-string $model
+     * @param non-empty-string|Model $model
+     * @param array<string, mixed>   $options
      */
-    public function generate(string $model, string $instructions, string $prompt): string
+    public function generate(string|Model $model, #[\SensitiveParameter] string $instructions, #[\SensitiveParameter] string $prompt, array $options = []): string
     {
         $messages = new MessageBag(Message::forSystem($instructions), Message::ofUser($prompt));
 
-        return $this->platform->invoke($model, $messages)->asText();
+        return $this->platform->invoke($model, $messages, $options)->asText();
     }
 }
