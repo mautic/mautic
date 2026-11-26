@@ -97,7 +97,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             ['pt_BR' => '<a href="|URL|">Descadastrar</a>', 'es' => '<a href="|URL|">Darse de baja</a>'],
             $this->getConfigParameters()['unsubscribe_text_translations']
         );
-        $this->assertNull($this->getConfigParameters()['unsubscribe_text'] ?? null);
+        $this->assertSame('<a href="|URL|">Descadastrar</a>', $this->getConfigParameters()['unsubscribe_text'] ?? null);
         $this->assertSame(['en_US' => "Best regards,\n|FROM_NAME|"], $this->getConfigParameters()['default_signature_text_translations']);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/emailconfig');
