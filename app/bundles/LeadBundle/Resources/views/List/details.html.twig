@@ -205,15 +205,20 @@
                         </thead>
                         <tbody>
                         {% for stat in campaignStats %}
-                            <tr>
+                            <tr data-campaign-id="{{ stat.id|e('html_attr') }}"{% if stat.share is not null %} data-share="{{ stat.share|e('html_attr') }}"{% endif %}>
                                 <td>
                                     <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': stat.id}) }}" data-toggle="ajax">
                                         {{- stat.name -}}
                                     </a>
                                 </td>
-                                <td width="20%">
-                                    <span class="campaign-share-stat" data-value="{{ stat.id }}"
-                                          id="campaign-share-stat-{{ stat.id }}">{{ stat.share }}</span> %
+                                <td width="30%">
+                                    {% include '@MauticCore/Components/gauge.html.twig' with {
+                                        label: 'mautic.lead.campaign.share.label'|trans({'%name%': stat.name}),
+                                        type: 'full',
+                                        size: 'xs',
+                                        id: 'campaign-share-'~stat.id,
+                                        value: stat.share
+                                    } %}
                                 </td>
                             </tr>
                         {% endfor %}
