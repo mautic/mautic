@@ -13,6 +13,7 @@ use Mautic\CampaignBundle\EventListener\CampaignActionChangeMembershipSubscriber
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\EventListener\AssetsSubscriber;
 use Mautic\CoreBundle\EventListener\ConfigPrivacySubscriber;
 use Mautic\CoreBundle\EventListener\ConfigThemeSubscriber;
@@ -35,6 +36,7 @@ use Mautic\EmailBundle\EventListener\WebhookSubscriber;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\EventListener\FormValidationSubscriber;
 use Mautic\IntegrationsBundle\EventListener\ControllerSubscriber;
+use Mautic\IntegrationsBundle\EventListener\LeadSubscriber;
 use Mautic\LeadBundle\EventListener\CampaignActionDeleteContactSubscriber;
 use Mautic\LeadBundle\EventListener\CampaignActionDNCSubscriber;
 use Mautic\LeadBundle\EventListener\OwnerSubscriber;
@@ -44,6 +46,7 @@ use Mautic\LeadBundle\EventListener\ReportUtmTagSubscriber;
 use Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber;
 use Mautic\LeadBundle\EventListener\SegmentReportSubscriber;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber;
 use Mautic\SmsBundle\EventListener\CampaignReplySubscriber;
 use Mautic\SmsBundle\EventListener\CampaignSendSubscriber;
 use Mautic\UserBundle\Controller\SecurityController;
@@ -205,6 +208,24 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             FormValidationSubscriber::class,
             \Mautic\LeadBundle\EventListener\FormSubscriber::class,
             \Mautic\PluginBundle\EventListener\FormSubscriber::class,
+        ],
+        EntityPostSave::class => [
+            \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\PageSubscriber::class,
+            FocusSubscriber::class,
+            \Mautic\CategoryBundle\EventListener\CategorySubscriber::class,
+            \Mautic\ChannelBundle\EventListener\MessageSubscriber::class,
+            \Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber::class,
+            \Mautic\FormBundle\EventListener\FormConditionalSubscriber::class,
+            \Mautic\FormBundle\EventListener\FormSubscriber::class,
+            LeadSubscriber::class,
+            \Mautic\LeadBundle\EventListener\LeadSubscriber::class,
+            \Mautic\LeadBundle\EventListener\WebhookSubscriber::class,
+            \Mautic\PageBundle\EventListener\PageSubscriber::class,
+            \Mautic\PluginBundle\EventListener\LeadSubscriber::class,
+            \Mautic\PointBundle\EventListener\LeadSubscriber::class,
+            \Mautic\ReportBundle\EventListener\ReportSubscriber::class,
+            ReportSchedulerSubscriber::class,
+            \Mautic\UserBundle\EventListener\UserSubscriber::class,
         ],
     ];
 
