@@ -786,7 +786,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->channel;
     }
 
-    public function setChannel(mixed $channel): void
+    public function setChannel(?string $channel): void
     {
         $this->isChanged('channel', $channel);
         $this->channel = $channel;

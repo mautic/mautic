@@ -11,5 +11,5 @@ interface VariableExpresserHelperInterface
 {
     public function decodeVariable(EncodedValueDAO $EncodedValueDAO): NormalizedValueDAO;
 
-    public function encodeVariable(mixed $var): EncodedValueDAO;
+    public function encodeVariable(\DateTime|string|int|float|bool|null $var): EncodedValueDAO;
 }

@@ -1908,6 +1908,9 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     - `Mautic\CoreBundle\Helper\Tree\NodeInterface::addParam()` and `getParam()` type `$value` and `$default` as `?string`, as does `Mautic\CoreBundle\Helper\Tree\IntNode`. A custom implementation must declare the same type, or leave it untyped.
     - `Mautic\CoreBundle\Twig\Helper\DateHelper::toText()` and `Mautic\CoreBundle\Twig\Extension\DateExtension::toText()` (Twig function `dateToText()`) type `$datetime` as `string|int|\DateTimeInterface|null`. `[]` used to return `''` and now throws. `false` used to return `''` too; it now throws for callers with `declare(strict_types=1)` and is coerced to `0` for non-strict callers. Pass `null` instead.
     - `Mautic\CoreBundle\Event\AbstractTokenReplacementEvent::__construct()` types `$passthrough` as `?Mautic\EmailBundle\Entity\Email`, which also types the promoted `protected $passthrough` property. Property types are invariant, so a subclass that redeclares the property must declare it as `protected ?Email $passthrough`.
+    - `Mautic\CampaignBundle\Entity\ChannelInterface::setChannel()` and `Mautic\CampaignBundle\Entity\Event::setChannel()` type `$channel` as `?string`. A custom implementation must declare the same type, or leave `$channel` untyped.
+    - `Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface::encodeVariable()` and `Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::encodeVariable()` type `$var` as `\DateTime|string|int|float|bool|null`. Any other value already threw and now hits a `TypeError` instead. A custom implementation must declare the same type, or leave `$var` untyped.
+    - `Mautic\ConfigBundle\Mapper\Helper\ConfigHelper::bindNestedConfigValues()` types `$defaults` as `array|string|int|float|bool|null`. Passing an object now throws.
 
 ### Native parameter and return types for plugin extension points
 

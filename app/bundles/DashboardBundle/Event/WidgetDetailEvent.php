@@ -272,11 +272,9 @@ abstract class WidgetDetailEvent extends CommonEvent
     /**
      * We need to cast DateTime objects to strings to use them in the cache key.
      *
-     * @param mixed|null $value
-     *
      * @throws CouldNotFormatDateTimeException
      */
-    private function castDateTimeToString(mixed $value): string
+    private function castDateTimeToString(\DateTimeInterface|string|int|float|bool $value): string
     {
         if ($value instanceof \DateTimeInterface) {
             // We use RFC 2822 format because it includes timezone
