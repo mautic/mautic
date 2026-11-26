@@ -137,6 +137,18 @@ final class SummaryRepository extends CommonRepository
                     AND mclefl.log_id IS NULL THEN 1 ELSE 0 END) AS log_counts_processed',
             ];
 
+            // Columns for INSERT
+            $columns = [
+                'campaign_id',
+                'event_id',
+                'date_triggered',
+                'scheduled_count',
+                'non_action_path_taken_count',
+                'failed_count',
+                'triggered_count',
+                'log_counts_processed',
+            ];
+
             if ([] !== $idValues) {
                 // prepend ID COLUMN value as COLUMN
                 array_unshift($selects, ...array_map(
@@ -144,6 +156,8 @@ final class SummaryRepository extends CommonRepository
                     $idValues,
                     array_keys($idValues)
                 ));
+
+                array_unshift($columns, ...array_keys($idValues));
             }
 
             // Build inner aggregation query with consistent integer types in CASE branches
@@ -163,23 +177,6 @@ final class SummaryRepository extends CommonRepository
             }
 
             $innerSql .= ' GROUP BY mclel.campaign_id, mclel.event_id';
-
-            // Columns for INSERT
-            $columns = [
-                'campaign_id',
-                'event_id',
-                'date_triggered',
-                'scheduled_count',
-                'non_action_path_taken_count',
-                'failed_count',
-                'triggered_count',
-                'log_counts_processed',
-            ];
-
-            // Add id column if exists
-            if ([] !== $idValues) {
-                array_unshift($columns, array_keys($idValues));
-            }
 
             // Build upsert using centralized helper
             $sql = DatabasePlatform::getComplexUpsertStatement(
