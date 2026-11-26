@@ -208,10 +208,10 @@ trait MatchFilterForLeadTrait
     }
 
     /**
-     * @param mixed $leadVal
-     * @param mixed $filterVal
+     * @param mixed[]|string|int|float|bool|null $leadVal
+     * @param mixed[]|string|int|float|bool|null $filterVal
      */
-    private function checkLeadValueIsInFilter($leadVal, $filterVal, bool $defaultFlag): bool
+    private function checkLeadValueIsInFilter(array|string|int|float|bool|null $leadVal, array|string|int|float|bool|null $filterVal, bool $defaultFlag): bool
     {
         $leadVal    = !is_array($leadVal) ? [$leadVal] : $leadVal;
         $filterVal  = !is_array($filterVal) ? [$filterVal] : $filterVal;
@@ -228,10 +228,10 @@ trait MatchFilterForLeadTrait
     }
 
     /**
-     * @param mixed $leadVal
-     * @param mixed $filterVal
+     * @param mixed[]|string|int|float|bool|null $leadVal
+     * @param mixed[]|string|int|float|bool|null $filterVal
      */
-    private function checkAllLeadValuesAreInFilter($leadVal, $filterVal, bool $defaultFlag): bool
+    private function checkAllLeadValuesAreInFilter(array|string|int|float|bool|null $leadVal, array|string|int|float|bool|null $filterVal, bool $defaultFlag): bool
     {
         $leadVal       = !is_array($leadVal) ? [$leadVal] : $leadVal;
         $filterVal     = !is_array($filterVal) ? [$filterVal] : $filterVal;

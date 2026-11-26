@@ -98,7 +98,7 @@ final readonly class EmailPreviewHelper
     }
 
     /**
-     * @return array<mixed> $contact
+     * @return array<mixed>
      */
     public function getContactEntity(int $contactId): array
     {
@@ -112,7 +112,7 @@ final readonly class EmailPreviewHelper
     }
 
     /**
-     * @return array<mixed> $compmany
+     * @return array<mixed>
      */
     public function getCompanyEntity(int $companyId): array
     {

@@ -8,11 +8,11 @@ use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\NotificationBundle\Integration\OneSignalIntegration;
 
-class OneSignalIntegrationHelper
+readonly class OneSignalIntegrationHelper
 {
     public function __construct(
-        private readonly OneSignalIntegration $integration,
-        private readonly IntegrationsHelper $integrationsHelper,
+        private OneSignalIntegration $integration,
+        private IntegrationsHelper $integrationsHelper,
     ) {
     }
 

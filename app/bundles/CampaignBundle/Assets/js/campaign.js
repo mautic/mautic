@@ -2299,7 +2299,7 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
 
             });
 
-        mQuery('#CampaignEventPanel').removeClass('hide');
+        mQuery('#CampaignEventPanel').removeClass('d-none').addClass('d-flex');
         mQuery('#CampaignEventPanelGroups').removeClass('hide');
         mQuery('#CampaignEventPanelLists').addClass('hide');
 
@@ -2320,7 +2320,7 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
 
         mQuery('#CampaignEventPanelGroups').addClass('hide');
         mQuery('#CampaignEventPanelLists').removeClass('hide');
-        mQuery('#CampaignEventPanel').removeClass('hide');
+        mQuery('#CampaignEventPanel').removeClass('d-none').addClass('d-flex');
 
         if (groups.length === 1) {
             setTimeout(function () {
@@ -2831,7 +2831,7 @@ Mautic.clearCampaignEventClone = function() {
 }
 
 Mautic.hideCampaignEventPanel = function() {
-    mQuery('#CampaignEventPanel').addClass('hide');
+    mQuery('#CampaignEventPanel').removeClass('d-flex').addClass('d-none');
 }
 
 Mautic.getCampaignBuilderHtmlElements = function() {
@@ -2912,7 +2912,7 @@ Mautic.previewCampaignEventDetails = function() {
     });
 
     const renderEventDetails = function($el, data) {
-        const $dl = mQuery('<dl class="dl-horizontal campaign-event-details-dl"/>');
+        const $dl = mQuery('<dl class="dl-horizontal mb-0"/>');
 
         Object.entries(data).forEach(([key, stat]) => {
             const translationKey = 'mautic.campaign.event.' + key;

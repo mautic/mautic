@@ -16,8 +16,6 @@ final class DeleteCompanyLeadsFunctionalTest extends MauticMysqlTestCase
 {
     use TestEntityCreationTrait;
 
-    protected $useCleanupRollback = false;
-
     public function testDeleteCompanies(): void
     {
         $companyLeadRepository = $this->getService(CompanyLeadRepository::class);

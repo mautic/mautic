@@ -16,8 +16,6 @@ use Mautic\UserBundle\Entity\User;
  */
 final class UserTypeOidcFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     protected function setUp(): void
     {
         $this->configParams['open_id_is_enabled'] = 1;

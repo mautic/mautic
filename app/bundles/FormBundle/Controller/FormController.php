@@ -149,7 +149,7 @@ class FormController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_form_index',
                         'mauticContent' => 'form',
@@ -204,7 +204,7 @@ class FormController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_form_index',
                         'mauticContent' => 'form',
@@ -401,7 +401,7 @@ class FormController extends CommonFormController
                                     'objectId'     => $entity->getId(),
                                 ];
                                 $returnUrl = $this->generateUrl('mautic_form_action', $viewParameters);
-                                $template  = 'Mautic\FormBundle\Controller\FormController::viewAction';
+                                $template  = self::class.'::viewAction';
                             } else {
                                 // return edit view so that all the session stuff is loaded
                                 return $this->editAction($request, $entity->getId(), true);
@@ -428,7 +428,7 @@ class FormController extends CommonFormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_form_index', $viewParameters);
-                $template       = 'Mautic\FormBundle\Controller\FormController::indexAction';
+                $template       = self::class.'::indexAction';
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -544,7 +544,7 @@ class FormController extends CommonFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_form_index',
                 'mauticContent' => 'form',
@@ -663,7 +663,7 @@ class FormController extends CommonFormController
                                     'objectId'     => $entity->getId(),
                                 ];
                                 $returnUrl = $this->generateUrl('mautic_form_action', $viewParameters);
-                                $template  = 'Mautic\FormBundle\Controller\FormController::viewAction';
+                                $template  = self::class.'::viewAction';
                             }
                         } catch (ValidationException $ex) {
                             $form->addError(
@@ -681,7 +681,7 @@ class FormController extends CommonFormController
 
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_form_index', $viewParameters);
-                $template       = 'Mautic\FormBundle\Controller\FormController::indexAction';
+                $template       = self::class.'::indexAction';
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -1001,7 +1001,7 @@ class FormController extends CommonFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_form_index',
                 'mauticContent' => 'form',
@@ -1063,7 +1063,7 @@ class FormController extends CommonFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_form_index',
                 'mauticContent' => 'form',
@@ -1146,7 +1146,7 @@ class FormController extends CommonFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_form_index',
                 'mauticContent' => 'form',

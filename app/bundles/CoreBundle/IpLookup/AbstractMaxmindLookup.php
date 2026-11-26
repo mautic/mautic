@@ -44,6 +44,17 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
 
     protected function parseResponse($response): void
     {
+        /**
+         * @var object{
+         *     error?: string,
+         *     postal?: object{code: string},
+         *     country?: object{names: object{en: string}},
+         *     city?: object{names: object{en: string}},
+         *     subdivisions?: list<object{names: object{en: string}}>,
+         *     location?: object{latitude?: float, longitude?: float, time_zone?: string},
+         *     traits?: object{isp?: string, organization?: string}
+         * }|null $data
+         */
         $data = json_decode($response);
 
         if ($data) {
@@ -69,16 +80,30 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
                     }
                 }
 
-                $this->latitude  = $data->location->latitude;
-                $this->longitude = $data->location->longitude;
-                $this->timezone  = $data->location->time_zone;
-
-                if (isset($data->traits->isp)) {
-                    $this->isp = $data->traits->isp;
+                $this->latitude  = '';
+                $this->longitude = '';
+                $this->timezone  = '';
+                if (isset($data->location)) {
+                    $location = $data->location;
+                    if (isset($location->latitude)) {
+                        $this->latitude = $location->latitude;
+                    }
+                    if (isset($location->longitude)) {
+                        $this->longitude = $location->longitude;
+                    }
+                    if (isset($location->time_zone)) {
+                        $this->timezone = $location->time_zone;
+                    }
                 }
 
-                if (isset($data->traits->organization)) {
-                    $this->organization = $data->traits->organization;
+                if (isset($data->traits)) {
+                    $traits = $data->traits;
+                    if (isset($traits->isp)) {
+                        $this->isp = $traits->isp;
+                    }
+                    if (isset($traits->organization)) {
+                        $this->organization = $traits->organization;
+                    }
                 }
             } elseif (null !== $this->logger) {
                 $this->logger->warning('IP LOOKUP: '.$data->error);

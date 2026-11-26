@@ -15,13 +15,10 @@ final class DecisionEvent extends \Symfony\Contracts\EventDispatcher\Event
 
     private bool $applicable = false;
 
-    /**
-     * @param mixed $passthrough
-     */
     public function __construct(
         private readonly AbstractEventAccessor $eventConfig,
         private readonly LeadEventLog $eventLog,
-        private $passthrough = null,
+        private mixed $passthrough = null,
     ) {
     }
 

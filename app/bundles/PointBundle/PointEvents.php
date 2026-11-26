@@ -10,34 +10,6 @@ namespace Mautic\PointBundle;
 final class PointEvents
 {
     /**
-     * The mautic.point_pre_save event is thrown right before a form is persisted.
-     *
-     * The event listener receives a Mautic\PointBundle\Event\PointEvent instance.
-     */
-    public const string POINT_PRE_SAVE = 'mautic.point_pre_save';
-
-    /**
-     * The mautic.point_post_save event is thrown right after a form is persisted.
-     *
-     * The event listener receives a Mautic\PointBundle\Event\PointEvent instance.
-     */
-    public const string POINT_POST_SAVE = 'mautic.point_post_save';
-
-    /**
-     * The mautic.point_pre_delete event is thrown before a form is deleted.
-     *
-     * The event listener receives a Mautic\PointBundle\Event\PointEvent instance.
-     */
-    public const string POINT_PRE_DELETE = 'mautic.point_pre_delete';
-
-    /**
-     * The mautic.point_post_delete event is thrown after a form is deleted.
-     *
-     * The event listener receives a Mautic\PointBundle\Event\PointEvent instance.
-     */
-    public const string POINT_POST_DELETE = 'mautic.point_post_delete';
-
-    /**
      * The mautic.point_on_build event is thrown before displaying the point builder form to allow adding of custom actions.
      *
      * The event listener receives a Mautic\PointBundle\Event\PointBuilderEvent instance.
@@ -50,34 +22,6 @@ final class PointEvents
      * The event listener receives a Mautic\PointBundle\Event\PointActionEvent instance.
      */
     public const string POINT_ON_ACTION = 'mautic.point_on_action';
-
-    /**
-     * The mautic.point_pre_save event is thrown right before a form is persisted.
-     *
-     * The event listener receives a Mautic\PointBundle\Event\TriggerEvent instance.
-     */
-    public const string TRIGGER_PRE_SAVE = 'mautic.trigger_pre_save';
-
-    /**
-     * The mautic.trigger_post_save event is thrown right after a form is persisted.
-     *
-     * The event listener receives a Mautic\PointBundle\Event\TriggerEvent instance.
-     */
-    public const string TRIGGER_POST_SAVE = 'mautic.trigger_post_save';
-
-    /**
-     * The mautic.trigger_pre_delete event is thrown before a form is deleted.
-     *
-     * The event listener receives a Mautic\PointBundle\Event\TriggerEvent instance.
-     */
-    public const string TRIGGER_PRE_DELETE = 'mautic.trigger_pre_delete';
-
-    /**
-     * The mautic.trigger_post_delete event is thrown after a form is deleted.
-     *
-     * The event listener receives a Mautic\PointBundle\Event\TriggerEvent instance.
-     */
-    public const string TRIGGER_POST_DELETE = 'mautic.trigger_post_delete';
 
     /**
      * The mautic.trigger_on_build event is thrown before displaying the trigger builder form to allow adding of custom actions.

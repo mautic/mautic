@@ -689,6 +689,46 @@ TEXT;
         $this->assertSame(str_replace('{contactfield=website}', $token, $plainText), $content[1]);
     }
 
+    #[DataProvider('provideHrefWithSurroundingWhitespace')]
+    #[TestDox('Test that href with spaces and newlines around the URL is replaced by a trackable token')]
+    public function testHrefWithSurroundingWhitespaceIsReplaced(string $html, string $quote): void
+    {
+        $model = $this->getModel();
+
+        [$content, $trackables] = $model->parseContentForTrackables($html, [], 'email', 1);
+
+        $this->assertCount(1, $trackables);
+        $token = array_key_first($trackables);
+        /** @var non-empty-array<string, Trackable> $trackables */
+        $this->assertSame('https://mautic.org', $trackables[$token]->getRedirect()->getUrl());
+        $this->assertSame('Ahoy <i>{contactfield=email}</i><a href='.$quote.$token.$quote.'>Mautic</a>', $content);
+    }
+
+    /**
+     * @return \Generator<string, array{string, string}>
+     */
+    public static function provideHrefWithSurroundingWhitespace(): \Generator
+    {
+        $variantQuotes   = ['single quote' => "'", 'double quote' => '"'];
+        $variantSpaces   = ['no space' => '$', 'start space' => ' $', 'end space' => '$ ', 'both spaces' => ' $ '];
+        $variantNewlines = ['no newlines' => '$', 'start \r\n' => "\r\n$", 'end \r\n' => "$\r\n", 'both \r\n' => "\r\n$\r\n", 'start \n' => "\n$", 'end \n' => "$\n", 'both \n' => "\n$\n"];
+
+        foreach ($variantQuotes as $quotesName => $variantQuote) {
+            foreach ($variantSpaces as $spaceName => $variantSpace) {
+                foreach ($variantNewlines as $newLineName => $variantNewline) {
+                    $href = $variantQuote
+                        .str_replace('$', str_replace('$', 'https://mautic.org', $variantSpace), $variantNewline)
+                        .$variantQuote;
+
+                    yield $quotesName.', '.$spaceName.', '.$newLineName => [
+                        'Ahoy <i>{contactfield=email}</i><a href='.$href.'>Mautic</a>',
+                        $variantQuote,
+                    ];
+                }
+            }
+        }
+    }
+
     /**
      * @param array<int, string>        $doNotTrack
      * @param array<string|int, string> $urlFieldsForPlaintext

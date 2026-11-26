@@ -63,7 +63,7 @@ final class DynamicContentControllerTest extends MauticMysqlTestCase
         $model                  = $this->getService(DynamicContentModel::class);
         $dynamicContent         = $model->getEntity($this->dwc->getId());
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertInstanceOf(\Mautic\DynamicContentBundle\Entity\DynamicContent::class, $dynamicContent);
+        $this->assertInstanceOf(DynamicContent::class, $dynamicContent);
         $this->assertContains((string) $tag1->getId(), $dynamicContent->getFilters()[0]['filter']);
     }
 

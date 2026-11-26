@@ -43,7 +43,7 @@ final class IpRestrictMiddlewareTest extends TestCase
         $middleware = new IpRestrictMiddleware($httpKernel);
         $response   = $middleware->handle($inputRequest);
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
     }
 
     public function testWorkflowWithDisallowedIp(): void
@@ -64,7 +64,7 @@ final class IpRestrictMiddlewareTest extends TestCase
         $middleware = new IpRestrictMiddleware($httpKernel);
         $response   = $middleware->handle($inputRequest);
 
-        $this->assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode(), (string) $response->getContent());
         $this->assertFalse($httpKernel->handleWasCalled);
     }
 
@@ -87,7 +87,7 @@ final class IpRestrictMiddlewareTest extends TestCase
         $middleware = new IpRestrictMiddleware($httpKernel);
         $response   = $middleware->handle($inputRequest);
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
 
         // Set the original value back.
         $_SERVER['MAUTIC_CUSTOM_DEV_HOSTS'] = $originalDevHostsValue;

@@ -14,7 +14,7 @@
           <label class="form-label">{{ 'mautic.form.action.sendemail.dragfield'|trans }}</label>
           <div id="formFieldTokens" class="list-group field-tokens" style="max-height: 250px; overflow-y: auto;">
               {% for token, field in formFields %}
-                <a class="list-group-item ellipsis" onclick="Mautic.insertHtmlInEditor(mQuery('#formaction_properties_message'), '<strong>{{ field }}</strong>: {{ token }}');">{{ field }}</a>
+                <button type="button" class="list-group-item list-group-item-action text-truncate d-block" onclick="Mautic.insertHtmlInEditor(mQuery('#formaction_properties_message'), '<strong>{{ field|e('html')|e('js') }}</strong>: {{ token|e('html')|e('js') }}');">{{ field }}</button>
               {% endfor %}
           </div>
       </div>

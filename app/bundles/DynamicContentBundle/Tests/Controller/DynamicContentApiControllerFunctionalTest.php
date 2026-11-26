@@ -11,14 +11,15 @@ use Mautic\DynamicContentBundle\Entity\DynamicContentLeadData;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[PreserveGlobalState(false)]
-#[RunTestsInSeparateProcesses]
 final class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    // the /dwc endpoint defines the global MAUTIC_NON_TRACKABLE_REQUEST constant
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testDwcGetEndpointForNoSlotNorContact(): void
     {
         $this->client->request(Request::METHOD_GET, '/dwc/slot-a');
@@ -26,6 +27,8 @@ final class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCas
         self::assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT, $this->client->getResponse()->getContent());
     }
 
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testDwcGetEndpointForASlotAndContact(): void
     {
         $contact = new Lead();

@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Mailer;
 
@@ -56,7 +57,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     {
         $unowned = $this->createCompany('Unowned company');
         $owned   = $this->createCompany('Owned company');
-        $owner   = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $owner   = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $owner);
         $owned->setOwner($owner);
         $this->em->persist($owned);

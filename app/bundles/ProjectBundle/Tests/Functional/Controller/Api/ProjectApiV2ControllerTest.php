@@ -6,6 +6,7 @@ namespace Mautic\ProjectBundle\Tests\Functional\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
+use Mautic\ProjectBundle\Entity\ProjectRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -192,7 +193,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
 
-        $deletedProject = $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->find($projectId);
+        $deletedProject = $this->getContainer()->get(ProjectRepository::class)->find($projectId);
         $this->assertNotInstanceOf(Project::class, $deletedProject, 'Project should be deleted from database');
 
         $this->assertCount(1, $this->getAllProjects());
@@ -272,7 +273,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
 
     private function getProjectByName(string $name): ?Project
     {
-        $project = $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findOneBy(['name' => $name]);
+        $project = $this->getContainer()->get(ProjectRepository::class)->findOneBy(['name' => $name]);
 
         if (null !== $project) {
             $this->assertInstanceOf(Project::class, $project);
@@ -286,7 +287,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
      */
     private function getAllProjects(): array
     {
-        $projects = $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findAll();
+        $projects = $this->getContainer()->get(ProjectRepository::class)->findAll();
 
         $this->assertContainsOnlyInstancesOf(Project::class, $projects);
 

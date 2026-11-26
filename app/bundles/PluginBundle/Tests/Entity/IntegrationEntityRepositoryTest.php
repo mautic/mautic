@@ -161,11 +161,7 @@ final class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    /**
-     * @param mixed $integrationEntityId
-     * @param mixed $internalEntityId
-     */
-    protected function createIntegrationEntity($integrationEntityId, $internalEntityId): void
+    protected function createIntegrationEntity(int $integrationEntityId, int $internalEntityId): void
     {
         $date = new \DateTime();
 

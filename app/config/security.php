@@ -1,6 +1,11 @@
 <?php
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+
+/** @var ContainerBuilder $container */
+/** @var PhpFileLoader $loader */
 
 /** @var array<string, array<string, mixed>> $firewalls */
 $firewalls = [

@@ -10,16 +10,12 @@ final class TrustMiddleware implements HttpKernelInterface, PrioritizedMiddlewar
 {
     use ConfigAwareTrait;
 
-    public const PRIORITY = 0;
+    public const int PRIORITY = 0;
 
-    /**
-     * @var HttpKernelInterface
-     */
-    private $app;
-
-    public function __construct(HttpKernelInterface $app)
+    public function __construct(
+        private readonly HttpKernelInterface $app
+    )
     {
-        $this->app = $app;
     }
 
     public function getPriority(): int

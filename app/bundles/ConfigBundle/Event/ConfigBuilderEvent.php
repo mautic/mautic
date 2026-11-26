@@ -27,6 +27,11 @@ final class ConfigBuilderEvent extends Event
      */
     private array $encodedFields = [];
 
+    /**
+     * @var mixed[]
+     */
+    private array $allBundles = [];
+
     public function __construct(
         private readonly BundleHelper $bundleHelper,
     ) {
@@ -87,13 +92,11 @@ final class ConfigBuilderEvent extends Event
      */
     public function getParametersFromConfig(string $bundle): array
     {
-        static $allBundles;
-
-        if (empty($allBundles)) {
-            $allBundles = $this->bundleHelper->getMauticBundles(true);
+        if ([] === $this->allBundles) {
+            $this->allBundles = $this->bundleHelper->getMauticBundles(true);
         }
 
-        return $allBundles[$bundle]['config']['parameters'] ?? [];
+        return $this->allBundles[$bundle]['config']['parameters'] ?? [];
     }
 
     public function addFileFields($fields): static

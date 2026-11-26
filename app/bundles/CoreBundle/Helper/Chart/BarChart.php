@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Helper\Chart;
 
 final class BarChart extends AbstractChart implements ChartInterface
@@ -29,9 +31,8 @@ final class BarChart extends AbstractChart implements ChartInterface
      * Define a dataset by name and data. Method will add the rest.
      *
      * @param string $label
-     * @param int    $order
      */
-    public function setDataset($label, array $data, $order = null): static
+    public function setDataset($label, array $data, ?int $order = null): static
     {
         $datasetId = count($this->datasets);
 
@@ -50,11 +51,9 @@ final class BarChart extends AbstractChart implements ChartInterface
     /**
      * Generate unique color for the dataset.
      *
-     * @param int $datasetId
-     *
      * @return array<string, string|bool>
      */
-    public function generateColors($datasetId): array
+    public function generateColors(int $datasetId): array
     {
         $color = $this->configureColorHelper($datasetId);
 

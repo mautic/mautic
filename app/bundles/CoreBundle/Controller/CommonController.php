@@ -127,7 +127,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return Response A Response instance
      */
-    protected function forwardWithPost($controller, array $request = [], array $path = [], array $query = []): Response
+    protected function forwardWithPost(string $controller, array $request = [], array $path = [], array $query = []): Response
     {
         $path['_controller'] = $controller;
         $subRequest          = $this->requestStack->getCurrentRequest()->duplicate($query, $request, $path);
@@ -599,10 +599,8 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @param string       $message
      * @param array<mixed> $messageVars
-     * @param string|null  $level
-     * @param string|null  $domain
      */
-    protected function addFlashMessage($message, array $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', ?bool $addNotification = false): void
+    protected function addFlashMessage($message, array $messageVars = [], string $level = FlashBag::LEVEL_NOTICE, string|false|null $domain = 'flashes', ?bool $addNotification = false): void
     {
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }

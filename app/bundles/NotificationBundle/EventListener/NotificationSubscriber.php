@@ -3,11 +3,13 @@
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\NotificationBundle\Event\NotificationEvent;
+use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
@@ -27,12 +29,14 @@ final readonly class NotificationSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[AsEventListener(
-        event: NotificationEvents::NOTIFICATION_POST_SAVE,
-    )]
-    public function onPostSave(NotificationEvent $event): void
+    #[AsEventListener]
+    public function onPostSave(EntityPostSave $event): void
     {
-        $entity = $event->getNotification();
+        $entity = $event->getEntity();
+        if (!$entity instanceof Notification) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'   => 'notification',
@@ -48,13 +52,15 @@ final readonly class NotificationSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: NotificationEvents::NOTIFICATION_POST_DELETE,
-    )]
-    public function onDelete(NotificationEvent $event): void
+    #[AsEventListener]
+    public function onDelete(EntityPostDelete $event): void
     {
-        $entity = $event->getNotification();
-        $log    = [
+        $entity = $event->getEntity();
+        if (!$entity instanceof Notification) {
+            return;
+        }
+
+        $log = [
             'bundle'   => 'notification',
             'object'   => 'notification',
             'objectId' => $entity->deletedId,

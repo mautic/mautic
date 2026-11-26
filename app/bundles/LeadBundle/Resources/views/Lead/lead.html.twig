@@ -188,7 +188,7 @@
                                             {% if field.value is not empty %}
                                                 {%  set no_result = false %}
                                                 <tr>
-                                                    <td width="20%"><span class="fw-b textTitle">{{ field.label|purify }}</span></td>
+                                                    <td width="20%"><span class="fw-bold textTitle">{{ field.label|purify }}</span></td>
                                                     <td>
                                                         {% if 'core' == group and 'country' == field.alias and flag is not empty %}
                                                             <img class="me-12" src="{{ flag }}" alt="" style="max-height: 24px;"/>
@@ -259,10 +259,10 @@
                             <div class="panel">
                                 <div class="panel-body box-layout">
                                     <div class="col-xs-8 align-middle">
-                                        <h5 class="text-white dark-md fw-sb mb-5">{{ 'mautic.lead.field.header.engagements'|trans }}</h5>
+                                        <h5 class="text-secondary fw-semibold mb-5">{{ 'mautic.lead.field.header.engagements'|trans }}</h5>
                                     </div>
                                     <div class="col-xs-4 align-top text-end">
-                                        <h3 class="text-white dark-sm"><span class="ri-eye-line"></span></h3>
+                                        <h3 class="text-secondary"><span class="ri-eye-line"></span></h3>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column pt-0 ps-15 pb-16 pe-15 min-h-256">
@@ -436,7 +436,7 @@
                 <div class="panel-body pt-12 group-points-panel">
                     {% for groupScore in lead.groupScores %}
                         <div class="row">
-                            <h6 class="fw-sb col-md-6">
+                            <h6 class="fw-semibold col-md-6">
                                 {{ groupScore.group.name }}
                             </h6>
                             <p class="text-secondary col-md-6">
@@ -460,11 +460,11 @@
             </div>
             <div class="panel-body pt-12">
             {% if lead.owner %}
-                <h6 class="fw-sb">{{ 'mautic.lead.lead.field.owner'|trans }}</h6>
+                <h6 class="fw-semibold">{{ 'mautic.lead.lead.field.owner'|trans }}</h6>
                 <p class="text-secondary">{{ lead.owner.name|purify }}</p>
             {% endif %}
 
-                <h6 class="fw-sb">
+                <h6 class="fw-semibold">
                     {{ 'mautic.lead.field.address'|trans }}
                 </h6>
                 <address class="text-secondary">
@@ -475,16 +475,16 @@
                     <br>
                 </address>
 
-                <h6 class="fw-sb">{{ 'mautic.core.type.email'|trans }}</h6>
+                <h6 class="fw-semibold">{{ 'mautic.core.type.email'|trans }}</h6>
                 <p class="text-secondary">{{ fields.core.email.value|purify }}</p>
 
                 {% if fields.core.phone is defined %}
-                    <h6 class="fw-sb">{{ 'mautic.lead.field.type.tel.home'|trans }}</h6>
+                    <h6 class="fw-semibold">{{ 'mautic.lead.field.type.tel.home'|trans }}</h6>
                     <p class="text-secondary">{{ fields.core.phone.value|purify }}</p>
                 {% endif %}
 
                 {% if fields.core.mobile is defined %}
-                    <h6 class="fw-sb">{{ 'mautic.lead.field.type.tel.mobile'|trans }}</h6>
+                    <h6 class="fw-semibold">{{ 'mautic.lead.field.type.tel.mobile'|trans }}</h6>
                     <p class="text-secondary mb-0">{{ fields.core.mobile.value|purify }}</p>
                 {% endif %}
             </div>
@@ -544,7 +544,7 @@
             
             {% set tagHeader %}
                 <div class="d-flex justify-content-between">
-                    <span class="fw-b ellipsis mb-16">{{ 'mautic.lead.tags'|trans }}</span>
+                    <span class="fw-bold text-truncate d-block mb-16">{{ 'mautic.lead.tags'|trans }}</span>
                     <i class="ri-hashtag" aria-hidden="true"></i>
                 </div>
             {% endset %}
@@ -611,7 +611,7 @@
 
             {% set companyHeader %}
                 <div class="d-flex justify-content-between">
-                    <span class="fw-b ellipsis mb-16">{{ 'mautic.lead.lead.companies'|trans }}</span>
+                    <span class="fw-bold text-truncate d-block mb-16">{{ 'mautic.lead.lead.companies'|trans }}</span>
                     <i class="ri-building-line" aria-hidden="true"></i>
                 </div>
             {% endset %}
@@ -670,7 +670,7 @@
                 {% if segments|length <= 8 %}
                     {% set content %}
                         <div class="d-flex justify-content-between">
-                            <span class="fw-b ellipsis mb-16">{{ 'mautic.lead.lead.lists'|trans }}</span>
+                            <span class="fw-bold text-truncate d-block mb-16">{{ 'mautic.lead.lead.lists'|trans }}</span>
                             <i class="ri-pie-chart-line" aria-hidden="true"></i>
                         </div>
                         <div class="d-flex flex-wrap gap-5">
@@ -692,7 +692,7 @@
                 {% else %}
                     {% set aboveContent %}
                         <div class="d-flex justify-content-between">
-                            <span class="fw-b ellipsis mb-16">{{ 'mautic.lead.lead.lists'|trans }}</span>
+                            <span class="fw-bold text-truncate d-block mb-16">{{ 'mautic.lead.lead.lists'|trans }}</span>
                             <i class="ri-pie-chart-line" aria-hidden="true"></i>
                         </div>
                         <div class="d-flex flex-wrap gap-5">
@@ -735,7 +735,7 @@
             {% else %}
                 {% set content %}
                 <div class="d-flex justify-content-between">
-                    <span class="fw-b ellipsis mb-16">{{ 'mautic.lead.lead.lists'|trans }}</span>
+                    <span class="fw-bold text-truncate d-block mb-16">{{ 'mautic.lead.lead.lists'|trans }}</span>
                     <i class="ri-pie-chart-line" aria-hidden="true"></i>
                 </div>
                 <p class="text-helper">{{ 'mautic.lead.lead.lists.no_results'|trans }}</p>

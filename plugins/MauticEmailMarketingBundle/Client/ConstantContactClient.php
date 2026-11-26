@@ -11,12 +11,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * Constant Contact API v2.
  */
-class ConstantContactClient
+readonly class ConstantContactClient
 {
     private const string VERSION = 'v2';
 
     public function __construct(
-        private readonly HttpClientInterface $httpClient,
+        private HttpClientInterface $httpClient,
     ) {
     }
 

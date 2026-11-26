@@ -86,7 +86,10 @@ final readonly class TrackingHelper
         return (array) $cacheValue;
     }
 
-    public function displayInitCode($service): mixed
+    /**
+     * @param 'facebook_pixel'|'google_analytics' $service
+     */
+    public function displayInitCode(string $service): mixed
     {
         $pixelId = $this->coreParametersHelper->get($service.'_id');
 

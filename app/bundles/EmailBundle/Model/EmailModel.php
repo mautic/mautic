@@ -14,7 +14,6 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
-use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -43,10 +42,6 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
-use Mautic\EmailBundle\Event\EmailPostDeleteEvent;
-use Mautic\EmailBundle\Event\EmailPostSaveEvent;
-use Mautic\EmailBundle\Event\EmailPreDeleteEvent;
-use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
@@ -85,7 +80,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends FormModel<Email>
@@ -364,47 +358,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         return $entities;
-    }
-
-    /**
-     * @param Email $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Email) {
-            throw new MethodNotAllowedHttpException(['Email']);
-        }
-
-        $eventClass = match ($action) {
-            'pre_save'          => EmailPreSaveEvent::class,
-            'post_save'         => EmailPostSaveEvent::class,
-            'pre_delete'        => EmailPreDeleteEvent::class,
-            'post_delete'       => EmailPostDeleteEvent::class,
-            default             => null,
-        };
-
-        if (null === $eventClass) {
-            return null;
-        }
-
-        if ($this->dispatcher->hasListeners($eventClass)) {
-            if (!$event instanceof $eventClass) {
-                $previousEvent = $event;
-                $event         = new $eventClass($entity, $isNew);
-
-                if ($previousEvent instanceof CommonEvent) {
-                    $event->inheritStateFrom($previousEvent);
-                }
-            }
-
-            $this->dispatcher->dispatch($event);
-
-            return $event;
-        }
-
-        return null;
     }
 
     /**
@@ -983,7 +936,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get the number of leads this email will be sent to.
      *
-     * @param mixed $listId          Leads for a specific lead list
+     * @param ?int  $listId          Leads for a specific lead list
      * @param bool  $countOnly       If true, return count otherwise array of leads
      * @param int   $limit           Max number of leads to retrieve
      * @param bool  $includeVariants If false, emails sent to a variant will not be included
@@ -994,7 +947,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getPendingLeads(
         Email $email,
-        $listId = null,
+        ?int $listId = null,
         bool $countOnly = false,
         $limit = null,
         bool $includeVariants = true,

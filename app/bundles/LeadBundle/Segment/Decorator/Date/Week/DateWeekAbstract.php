@@ -18,7 +18,7 @@ abstract class DateWeekAbstract extends DateOptionAbstract
         return '+1 week';
     }
 
-    protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
+    protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper): array
     {
         $dateFormat = $this->dateOptionParameters->hasTimePart() ? 'Y-m-d H:i:s' : 'Y-m-d';
         $startWith  = $dateTimeHelper->toLocalString($dateFormat);

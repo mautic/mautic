@@ -133,7 +133,7 @@ final class MobileNotificationController extends AbstractFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_mobile_notification_index',
                         'mauticContent' => 'mobile_notification',
@@ -184,7 +184,7 @@ final class MobileNotificationController extends AbstractFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_mobile_notification_index',
                         'mauticContent' => 'mobile_notification',
@@ -246,7 +246,7 @@ final class MobileNotificationController extends AbstractFormController
                 'security'    => $this->security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
-                    'Mautic\NotificationBundle\Controller\MobileNotificationController::contactsAction',
+                    self::class.'::contactsAction',
                     [
                         'objectId'   => $notification->getId(),
                         'page'       => $request->getSession()->get('mautic.mobile_notification.contact.page', 1),
@@ -330,7 +330,7 @@ final class MobileNotificationController extends AbstractFormController
                             'objectId'     => $entity->getId(),
                         ];
                         $returnUrl = $this->generateUrl('mautic_mobile_notification_action', $viewParameters);
-                        $template  = 'Mautic\NotificationBundle\Controller\MobileNotificationController::viewAction';
+                        $template  = self::class.'::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
                         return $this->editAction($request, $oneSignalIntegrationHelper, $entity->getId(), true);
@@ -339,7 +339,7 @@ final class MobileNotificationController extends AbstractFormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_mobile_notification_index', $viewParameters);
-                $template       = 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction';
+                $template       = self::class.'::indexAction';
                 // clear any modified content
                 $session->remove('mautic.mobile_notification.'.$entity->getId().'.content');
             }
@@ -413,7 +413,7 @@ final class MobileNotificationController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_mobile_notification_index',
                 'mauticContent' => 'mobile_notification',
@@ -489,7 +489,7 @@ final class MobileNotificationController extends AbstractFormController
                 $this->notificationModel->unlockEntity($entity);
             }
 
-            $template    = 'Mautic\NotificationBundle\Controller\MobileNotificationController::viewAction';
+            $template    = self::class.'::viewAction';
             $passthrough = [
                 'activeLink'    => 'mautic_mobile_notification_index',
                 'mauticContent' => 'mobile_notification',
@@ -595,7 +595,7 @@ final class MobileNotificationController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_mobile_notification_index',
                 'mauticContent' => 'mobile_notification',
@@ -656,7 +656,7 @@ final class MobileNotificationController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_mobile_notification_index',
                 'mauticContent' => 'mobile_notification',

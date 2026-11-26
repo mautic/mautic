@@ -25,12 +25,12 @@
 
 {% if variant == 'interactive' %}
     {% if isPreviewable %}
-    <h5 class="fw-sb mb-5">{{ 'mautic.asset.asset.preview'|trans }}</h5>
+    <h5 class="fw-semibold mb-5">{{ 'mautic.asset.asset.preview'|trans }}</h5>
 
-    <div class="asset-preview">
+    <div class="asset-preview h-100 position-relative w-100">
         {% if activeAsset.isImage() %}
         <div class="asset-preview--image">
-            <div class="asset-preview__label">
+            <div class="asset-preview__label position-absolute">
                 {% include '@MauticCore/Helper/_tag.html.twig' with {
                     tags: [
                         {
@@ -44,7 +44,7 @@
             {{ _self.renderPreviewContent(activeAsset, assetDownloadUrl) }}
         </div>
         {% elseif 'pdf' == activeAsset.getFileType()|lower %}
-            <div class="asset-preview__label">
+            <div class="asset-preview__label position-absolute">
                 {% include '@MauticCore/Helper/_tag.html.twig' with {
                     tags: [
                         {

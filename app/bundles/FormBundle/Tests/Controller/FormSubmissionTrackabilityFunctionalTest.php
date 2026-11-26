@@ -7,14 +7,22 @@ namespace Mautic\FormBundle\Tests\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\PointBundle\Entity\LeadPointLog;
+use Mautic\PointBundle\Entity\LeadPointLogRepository;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
+use Mautic\PointBundle\Entity\LeadTriggerLogRepository;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
@@ -77,7 +85,7 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectTracking, $cookieJar->get('mtc_id') instanceof Cookie);
 
         $this->em->clear();
-        $submissions = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class)->findBy(['form' => $formId]);
+        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findBy(['form' => $formId]);
         $this->assertCount(1, $submissions);
         $submission = $submissions[0];
 
@@ -91,29 +99,29 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $contact = $submission->getLead();
         $this->assertSame('visitor@example.com', $contact?->getEmail());
         $this->assertSame($expectTracking, !$contact->getIpAddresses()->isEmpty());
-        $this->assertSame($expectTracking, [] !== $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadDeviceRepository::class)->findBy(['lead' => $contact]));
+        $this->assertSame($expectTracking, [] !== $this->getContainer()->get(LeadDeviceRepository::class)->findBy(['lead' => $contact]));
 
         // The visitor's IP address is not saved anywhere, not even on its own
-        $this->assertSame($expectTracking, $this->getContainer()->get(\Mautic\CoreBundle\Entity\IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.9']) instanceof IpAddress);
+        $this->assertSame($expectTracking, $this->getContainer()->get(IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.9']) instanceof IpAddress);
 
         // The visitor still gets the points, the points log just has no IP
         $this->assertSame(5, $contact->getPoints());
-        $pointsChangeLog = $this->getContainer()->get(\Mautic\LeadBundle\Entity\PointsChangeLogRepository::class)->findOneBy(['lead' => $contact]);
+        $pointsChangeLog = $this->getContainer()->get(PointsChangeLogRepository::class)->findOneBy(['lead' => $contact]);
         $this->assertInstanceOf(PointsChangeLog::class, $pointsChangeLog);
         $this->assertSame($expectTracking, null !== $pointsChangeLog->getIpAddress());
-        $pointLog = $this->getContainer()->get(\Mautic\PointBundle\Entity\LeadPointLogRepository::class)->findOneBy(['lead' => $contact]);
+        $pointLog = $this->getContainer()->get(LeadPointLogRepository::class)->findOneBy(['lead' => $contact]);
         $this->assertInstanceOf(LeadPointLog::class, $pointLog);
         $this->assertSame($expectTracking, null !== $pointLog->getIpAddress());
 
         // The point trigger fired for the new contact keeps no IP either
-        $triggerLog = $this->getContainer()->get(\Mautic\PointBundle\Entity\LeadTriggerLogRepository::class)->findOneBy(['lead' => $contact]);
+        $triggerLog = $this->getContainer()->get(LeadTriggerLogRepository::class)->findOneBy(['lead' => $contact]);
         $this->assertInstanceOf(LeadTriggerLog::class, $triggerLog);
         $this->assertSame($expectTracking, null !== $triggerLog->getIpAddress());
 
         // Neither do the audit log entries for the contact and the company the submission created
         $auditLogs = array_merge(
-            $this->getContainer()->get(\Mautic\CoreBundle\Entity\AuditLogRepository::class)->findBy(['object' => 'lead', 'objectId' => $contact->getId()]),
-            $this->getContainer()->get(\Mautic\CoreBundle\Entity\AuditLogRepository::class)->findBy(['object' => 'company'])
+            $this->getContainer()->get(AuditLogRepository::class)->findBy(['object' => 'lead', 'objectId' => $contact->getId()]),
+            $this->getContainer()->get(AuditLogRepository::class)->findBy(['object' => 'company'])
         );
         $this->assertCount(2, array_unique(array_map(static fn (AuditLog $log): string => $log->getObject(), $auditLogs)));
         foreach ($auditLogs as $auditLog) {
@@ -132,11 +140,11 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $this->assertNotInstanceOf(Cookie::class, $this->client->getCookieJar()->get('mautic_device_id'));
 
         $this->em->clear();
-        $submission = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class)->findOneBy(['form' => $formId]);
+        $submission = $this->getContainer()->get(SubmissionRepository::class)->findOneBy(['form' => $formId]);
         $this->assertInstanceOf(Submission::class, $submission);
         $this->assertNotInstanceOf(IpAddress::class, $submission->getIpAddress());
         $this->assertNotInstanceOf(Lead::class, $submission->getLead());
-        $this->assertSame([], $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findAll());
+        $this->assertSame([], $this->getContainer()->get(LeadRepository::class)->findAll());
     }
 
     public function testUntrackedVisitorCanSubmitFormWithFieldsHiddenByProgressiveProfiling(): void
@@ -181,7 +189,7 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->em->clear();
-        $submission = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class)->findOneBy(['form' => $formId]);
+        $submission = $this->getContainer()->get(SubmissionRepository::class)->findOneBy(['form' => $formId]);
         $this->assertInstanceOf(Submission::class, $submission);
         $this->assertSame('visitor@example.com', $submission->getLead()?->getEmail());
     }
@@ -214,16 +222,16 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $this->submitForm($formId, ['mauticform[email]' => 'visitor@example.com'], ['HTTP_DNT' => '1', 'REMOTE_ADDR' => '203.0.113.9']);
 
         $this->em->clear();
-        $contact = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findOneBy(['email' => 'visitor@example.com']);
+        $contact = $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => 'visitor@example.com']);
         $this->assertInstanceOf(Lead::class, $contact);
         $this->assertSame(7, $contact->getPoints());
 
-        $pointsChangeLogs = $this->getContainer()->get(\Mautic\LeadBundle\Entity\PointsChangeLogRepository::class)->findBy(['lead' => $contact]);
+        $pointsChangeLogs = $this->getContainer()->get(PointsChangeLogRepository::class)->findBy(['lead' => $contact]);
         $this->assertEqualsCanonicalizing(['campaign', 'form'], array_map(static fn (PointsChangeLog $log): string => $log->getType(), $pointsChangeLogs));
         foreach ($pointsChangeLogs as $pointsChangeLog) {
             $this->assertNotInstanceOf(IpAddress::class, $pointsChangeLog->getIpAddress(), $pointsChangeLog->getType());
         }
-        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(\Mautic\CoreBundle\Entity\IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.9']));
+        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.9']));
     }
 
     /**

@@ -38,12 +38,16 @@ final class FieldPaginationController extends CommonController
 
         // Find the integration
         try {
-            $integrationObject        = $integrationsHelper->getIntegration($integration);
-            \assert($integrationObject instanceof ConfigFormSyncInterface);
-            $integrationConfiguration = $integrationObject->getIntegrationConfiguration();
+            $integrationObject = $integrationsHelper->getIntegration($integration);
         } catch (IntegrationNotFoundException) {
             return $this->notFound();
         }
+
+        if (!$integrationObject instanceof ConfigFormSyncInterface) {
+            return $this->notFound();
+        }
+
+        $integrationConfiguration = $integrationObject->getIntegrationConfiguration();
 
         $keyword         = $request->attributes->all()['keyword'] ?? $request->query->all()['keyword'] ?? $request->request->all()['keyword'] ?? null;
         $featureSettings = $integrationConfiguration->getFeatureSettings();

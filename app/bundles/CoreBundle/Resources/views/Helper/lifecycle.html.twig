@@ -13,7 +13,7 @@
 #}
 {% for key, chartData in chartItems %}
   <div style="float: left; width: {{ width }}%; " class="pt-sd pe-16 pb-16 ps-16">
-    <div class="chart-wrapper">
+    <div class="chart-wrapper position-relative">
       <div>
         <div class="chart-legend float-xl-start"><h4>{{ columnName[key] }}</h4></div>
         <div class="clearfix"></div>
@@ -28,7 +28,7 @@
       </div>
     </div>
     {% if stages[key] %}
-      <div class="chart-wrapper">
+      <div class="chart-wrapper position-relative">
         <div>
           <div class="chart-legend pt-sd pe-16 pb-16 ps-16"><h5>{{ 'mautic.lead.lifecycle.graph.stage.cycle'|trans }}</h5></div>
           <div class="clearfix"></div>
@@ -40,7 +40,7 @@
       </div>
     {% endif %}
     {% if devices[key] %}
-        <div class="chart-wrapper">
+        <div class="chart-wrapper position-relative">
             <div>
                 <div class="chart-legend pt-sd pe-16 pb-16 ps-16"><h5>{{ 'mautic.lead.lifecycle.graph.device.granularity'|trans }}</h5></div>
                 <div class="clearfix"></div>

@@ -5,16 +5,22 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\PointBundle\Entity\LeadPointLog;
+use Mautic\PointBundle\Entity\LeadPointLogRepository;
 use Mautic\PointBundle\Entity\Point;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\BrowserKit\Cookie;
@@ -43,7 +49,7 @@ final class KioskModeSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->submitForm($formId, 'kiosk@example.com');
 
         $this->em->clear();
-        $submissions = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class)->findBy(['form' => $formId]);
+        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findBy(['form' => $formId]);
         $this->assertCount(1, $submissions);
         $submission = $submissions[0];
 
@@ -62,18 +68,18 @@ final class KioskModeSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->submitForm($formId, 'kiosk@example.com', '203.0.113.7');
 
         $this->em->clear();
-        $ipAddress = $this->getContainer()->get(\Mautic\CoreBundle\Entity\IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.7']);
+        $ipAddress = $this->getContainer()->get(IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.7']);
         $this->assertSame($expectTracking, null !== $ipAddress);
 
-        $contact = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findOneBy(['email' => 'kiosk@example.com']);
+        $contact = $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => 'kiosk@example.com']);
         $this->assertInstanceOf(Lead::class, $contact);
         $this->assertSame(5, $contact->getPoints());
 
-        $pointsChangeLog = $this->getContainer()->get(\Mautic\LeadBundle\Entity\PointsChangeLogRepository::class)->findOneBy(['lead' => $contact]);
+        $pointsChangeLog = $this->getContainer()->get(PointsChangeLogRepository::class)->findOneBy(['lead' => $contact]);
         $this->assertInstanceOf(PointsChangeLog::class, $pointsChangeLog);
         $this->assertSame($expectTracking, null !== $pointsChangeLog->getIpAddress());
 
-        $pointLog = $this->getContainer()->get(\Mautic\PointBundle\Entity\LeadPointLogRepository::class)->findOneBy(['lead' => $contact]);
+        $pointLog = $this->getContainer()->get(LeadPointLogRepository::class)->findOneBy(['lead' => $contact]);
         $this->assertInstanceOf(LeadPointLog::class, $pointLog);
         $this->assertSame($expectTracking, null !== $pointLog->getIpAddress());
     }
@@ -88,14 +94,14 @@ final class KioskModeSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->submitForm($formId, 'kiosk@example.com', '203.0.113.8');
 
         $this->em->clear();
-        $contact = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findOneBy(['email' => 'kiosk@example.com']);
+        $contact = $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => 'kiosk@example.com']);
         $this->assertInstanceOf(Lead::class, $contact);
         $this->assertSame(3, $contact->getPoints());
 
-        $pointsChangeLog = $this->getContainer()->get(\Mautic\LeadBundle\Entity\PointsChangeLogRepository::class)->findOneBy(['lead' => $contact, 'type' => 'form']);
+        $pointsChangeLog = $this->getContainer()->get(PointsChangeLogRepository::class)->findOneBy(['lead' => $contact, 'type' => 'form']);
         $this->assertInstanceOf(PointsChangeLog::class, $pointsChangeLog);
         $this->assertSame($expectTracking, null !== $pointsChangeLog->getIpAddress());
-        $this->assertSame($expectTracking, null !== $this->getContainer()->get(\Mautic\CoreBundle\Entity\IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.8']));
+        $this->assertSame($expectTracking, null !== $this->getContainer()->get(IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.8']));
     }
 
     /**
@@ -122,24 +128,24 @@ final class KioskModeSubmissionFunctionalTest extends MauticMysqlTestCase
             'lead.updatelead'   => ['lastname' => 'Updated'],
         ]);
         $trackedContact = $this->createTrackedVisitor();
-        $contactCount   = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->count([]);
+        $contactCount   = $this->getContainer()->get(LeadRepository::class)->count([]);
 
         $this->submitForm($formId, null, '203.0.113.8', ['mauticform[comment]' => 'Hello']);
 
         $this->em->clear();
-        $submissions = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class)->findBy(['form' => $formId]);
+        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findBy(['form' => $formId]);
         $this->assertCount(1, $submissions);
         $this->assertNotInstanceOf(Lead::class, $submissions[0]->getLead());
-        $this->assertSame($contactCount, $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->count([]));
+        $this->assertSame($contactCount, $this->getContainer()->get(LeadRepository::class)->count([]));
 
-        $trackedContact = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->find($trackedContact->getId());
+        $trackedContact = $this->getContainer()->get(LeadRepository::class)->find($trackedContact->getId());
         $this->assertInstanceOf(Lead::class, $trackedContact);
         $this->assertSame(0, $trackedContact->getPoints());
         $this->assertCount(0, $trackedContact->getTags());
         $this->assertNull($trackedContact->getLastname());
-        $this->assertNotInstanceOf(ListLead::class, $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findOneBy(['lead' => $trackedContact, 'list' => $segment->getId()]));
-        $this->assertNotInstanceOf(PointsChangeLog::class, $this->getContainer()->get(\Mautic\LeadBundle\Entity\PointsChangeLogRepository::class)->findOneBy(['lead' => $trackedContact]));
-        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(\Mautic\CoreBundle\Entity\IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.8']));
+        $this->assertNotInstanceOf(ListLead::class, $this->getContainer()->get(ListLeadRepository::class)->findOneBy(['lead' => $trackedContact, 'list' => $segment->getId()]));
+        $this->assertNotInstanceOf(PointsChangeLog::class, $this->getContainer()->get(PointsChangeLogRepository::class)->findOneBy(['lead' => $trackedContact]));
+        $this->assertNotInstanceOf(IpAddress::class, $this->getContainer()->get(IpAddressRepository::class)->findOneBy(['ipAddress' => '203.0.113.8']));
     }
 
     private function createTrackedVisitor(): Lead

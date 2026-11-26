@@ -77,9 +77,9 @@ final class ColorHelper
     /**
      * Returns array of [R, G, B] of current state with alpha.
      *
-     * @param float $alpha (0 - 1)
+     * @param float|int $alpha (0 - 1)
      */
-    public function toRgba($alpha = 1): string
+    public function toRgba(float|int $alpha = 1): string
     {
         return sprintf('rgba(%d,%d,%d,%g)', $this->red, $this->green, $this->blue, (float) $alpha);
     }

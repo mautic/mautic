@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Test\Event;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\TestCase;
 
@@ -12,7 +13,7 @@ final class TokenReplacementEventTest extends TestCase
 {
     public function testGetPassthrough(): void
     {
-        $passthrough = ['passthrough'];
+        $passthrough = new Email();
         $event       = new TokenReplacementEvent('', null, [], $passthrough);
         $this->assertSame($passthrough, $event->getPassthrough());
     }

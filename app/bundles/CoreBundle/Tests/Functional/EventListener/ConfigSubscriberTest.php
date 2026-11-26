@@ -11,8 +11,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 final class ConfigSubscriberTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     protected function setUp(): void
     {
         $this->configParams['config_allowed_parameters'] = [

@@ -51,11 +51,10 @@ abstract class CommonEntity implements \Stringable
 
     /**
      * @param string $prop
-     * @param mixed  $val
      *
      * @return void
      */
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, mixed $val)
     {
         $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
         $current = $this->{$getter}();
@@ -102,7 +101,7 @@ abstract class CommonEntity implements \Stringable
         }
     }
 
-    protected function addChange($key, $value)
+    protected function addChange($key, array $value)
     {
         if (isset($this->changes[$key]) && is_array($this->changes[$key]) && [0, 1] !== array_keys($this->changes[$key])) {
             $this->changes[$key] = array_merge($this->changes[$key], $value);

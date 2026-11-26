@@ -234,10 +234,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Used to populate trigger color.
-     *
-     * @var string
      */
-    private $color;
+    private ?string $color = null;
 
     private ?LeadManipulator $manipulator = null;
 
@@ -312,7 +310,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     private int $previousId = 0;
 
-    private $primaryCompany;
+    private ?array $primaryCompany = null;
 
     /**
      * Used to determine order of preferred channels.
@@ -407,10 +405,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param string     $prop
-     * @param mixed      $val
-     * @param mixed|null $oldValue
      */
-    protected function isChanged($prop, $val, $oldValue = null): void
+    protected function isChanged($prop, mixed $val, mixed $oldValue = null): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $oldValue ?? $this->{$getter}();
@@ -993,7 +989,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->internal;
     }
 
-    public function setSocialCache($cache): void
+    public function setSocialCache(array $cache): void
     {
         $this->socialCache = $cache;
     }
@@ -1006,18 +1002,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->socialCache;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getColor()
+    public function getColor(): ?string
     {
         return $this->color;
     }
 
-    /**
-     * @param mixed $color
-     */
-    public function setColor($color): void
+    public function setColor(string $color): void
     {
         $this->color = $color;
     }
@@ -1280,18 +1270,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         }
     }
 
-    /**
-     * @return mixed
-     */
-    public function getPrimaryCompany()
+    public function getPrimaryCompany(): ?array
     {
         return $this->primaryCompany;
     }
 
-    /**
-     * @param mixed $primaryCompany
-     */
-    public function setPrimaryCompany($primaryCompany): static
+    public function setPrimaryCompany(?array $primaryCompany): static
     {
         $this->primaryCompany = $primaryCompany;
 

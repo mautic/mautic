@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Command\ContactScheduledExportCommand;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\ContactExportSchedulerRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -317,7 +318,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
     public function testBatchOwnersCanRemoveOwner(): void
     {
         $this->setAdminUser();
-        $owner = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $owner = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $owner);
         $contact = new Lead();
         $contact->setFirstname('Owned')->setEmail('owned@example.com')->setOwner($owner);
@@ -332,7 +333,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $this->em->clear();
-        $updatedContact = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->find($contact->getId());
+        $updatedContact = $this->getContainer()->get(LeadRepository::class)->find($contact->getId());
         $this->assertInstanceOf(Lead::class, $updatedContact);
         $this->assertNotInstanceOf(User::class, $updatedContact->getOwner());
     }

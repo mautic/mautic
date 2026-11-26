@@ -9,7 +9,7 @@
         <span class="gsearch--results-profile__img gsearch--results-profile__img--sm img-wrapper"><img src="{{ gravatarGetImage(fields.core.email.value|default(''), '100') }}" /></span>
     </span>
     <a class="flex-grow-1" href="{{ url('mautic_contact_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
-        <span class="fw-sb">{{ item.primaryIdentifier(true) }}</span>
+        <span class="fw-semibold">{{ item.primaryIdentifier(true) }}</span>
         <span size="sm" class="float-end" data-bs-toggle="tooltip" data-bs-placement="left" title="{{ 'mautic.lead.lead.pointscount'|trans }}">
             {% if item.color is not empty %}
             <i class="ri-circle-fill" style="color:{{ item.color }};"></i>

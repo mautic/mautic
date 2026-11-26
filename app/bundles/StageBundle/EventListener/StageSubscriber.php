@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\StageBundle\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\StageBundle\Event as Events;
-use Mautic\StageBundle\StageEvents;
+use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class StageSubscriber
@@ -21,12 +22,14 @@ final readonly class StageSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[AsEventListener(
-        event: StageEvents::STAGE_POST_SAVE,
-    )]
-    public function onStagePostSave(Events\StageEvent $event): void
+    #[AsEventListener]
+    public function onStagePostSave(EntityPostSave $event): void
     {
-        $stage = $event->getStage();
+        $stage = $event->getEntity();
+        if (!$stage instanceof Stage) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'stage',
@@ -43,13 +46,15 @@ final readonly class StageSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: StageEvents::STAGE_POST_DELETE,
-    )]
-    public function onStageDelete(Events\StageEvent $event): void
+    #[AsEventListener]
+    public function onStageDelete(EntityPostDelete $event): void
     {
-        $stage = $event->getStage();
-        $log   = [
+        $stage = $event->getEntity();
+        if (!$stage instanceof Stage) {
+            return;
+        }
+
+        $log = [
             'bundle'    => 'stage',
             'object'    => 'stage',
             'objectId'  => $stage->deletedId,

@@ -3,6 +3,8 @@
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -12,9 +14,8 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
-use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Event\FocusTokenReplacementEvent;
-use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -68,16 +69,20 @@ final readonly class FocusSubscriber
      * Add an entry to the audit log.
      */
     #[AsEventListener(
-        event: FocusEvents::POST_SAVE,
+        event: EntityPostSave::class,
     )]
-    public function onFocusPostSave(FocusEvent $event): void
+    public function onFocusPostSave(EntityPostSave $event): void
     {
-        $entity = $event->getFocus();
+        $focus = $event->getEntity();
+        if (!$focus instanceof Focus) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'focus',
                 'object'    => 'focus',
-                'objectId'  => $entity->getId(),
+                'objectId'  => $focus->getId(),
                 'action'    => ($event->isNew()) ? 'create' : 'update',
                 'details'   => $details,
                 'ipAddress' => $this->ipHelper->getIpAddressFromRequest(),
@@ -90,17 +95,21 @@ final readonly class FocusSubscriber
      * Add a delete entry to the audit log.
      */
     #[AsEventListener(
-        event: FocusEvents::POST_DELETE,
+        event: EntityPostDelete::class,
     )]
-    public function onFocusDelete(FocusEvent $event): void
+    public function onFocusDelete(EntityPostDelete $event): void
     {
-        $entity = $event->getFocus();
-        $log    = [
+        $focus = $event->getEntity();
+        if (!$focus instanceof Focus) {
+            return;
+        }
+
+        $log = [
             'bundle'    => 'focus',
             'object'    => 'focus',
-            'objectId'  => $entity->deletedId,
+            'objectId'  => $focus->deletedId,
             'action'    => 'delete',
-            'details'   => ['name' => $entity->getName()],
+            'details'   => ['name' => $focus->getName()],
             'ipAddress' => $this->ipHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);

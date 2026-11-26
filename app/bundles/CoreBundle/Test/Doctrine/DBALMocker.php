@@ -21,7 +21,7 @@ final class DBALMocker
 
     private ?MockObject $mockQueryBuilder = null;
 
-    private $queryResponse;
+    private ?array $queryResponse = null;
 
     /**
      * @var array<string, mixed[]>
@@ -38,7 +38,7 @@ final class DBALMocker
     ) {
     }
 
-    public function setQueryResponse($queryResponse): void
+    public function setQueryResponse(array $queryResponse): void
     {
         $this->queryResponse = $queryResponse;
     }

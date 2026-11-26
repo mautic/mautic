@@ -222,7 +222,7 @@ final class ProfileController extends AbstractFormController
                     return $this->postActionRedirect(
                         [
                             'returnUrl'       => $returnUrl,
-                            'contentTemplate' => 'Mautic\UserBundle\Controller\ProfileController::indexAction',
+                            'contentTemplate' => self::class.'::indexAction',
                             'passthroughVars' => [
                                 'mauticContent' => 'user',
                             ],

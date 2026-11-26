@@ -154,7 +154,7 @@ final class ListController extends AbstractStandardFormController
                     'page' => $lastPage,
                     'tmpl' => $tmpl,
                 ],
-                'contentTemplate' => 'Mautic\LeadBundle\Controller\ListController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_segment_index',
                     'mauticContent' => 'leadlist',
@@ -371,7 +371,7 @@ final class ListController extends AbstractStandardFormController
                 return $this->postActionRedirect(array_merge($postActionVars, [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'Mautic\LeadBundle\Controller\ListController::indexAction',
+                    'contentTemplate' => self::class.'::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_segment_index',
                         'mauticContent' => 'leadlist',
@@ -487,13 +487,13 @@ final class ListController extends AbstractStandardFormController
         if ($objectId) {
             $returnUrl       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId'=> $objectId]);
             $viewParameters  = ['objectAction' => 'view', 'objectId'=> $objectId];
-            $contentTemplate = 'Mautic\LeadBundle\Controller\ListController::viewAction';
+            $contentTemplate = self::class.'::viewAction';
         } else {
             // set the page we came from
             $page            = $request->getSession()->get('mautic.segment.page', 1);
             $returnUrl       = $this->generateUrl('mautic_segment_index', ['page' => $page]);
             $viewParameters  = ['page' => $page];
-            $contentTemplate = 'Mautic\LeadBundle\Controller\ListController::indexAction';
+            $contentTemplate = self::class.'::indexAction';
         }
 
         return [
@@ -520,7 +520,7 @@ final class ListController extends AbstractStandardFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\ListController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'lead',
@@ -586,7 +586,7 @@ final class ListController extends AbstractStandardFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'Mautic\LeadBundle\Controller\ListController::indexAction',
+            'contentTemplate' => self::class.'::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'lead',
@@ -772,7 +772,7 @@ final class ListController extends AbstractStandardFormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'Mautic\LeadBundle\Controller\ListController::indexAction',
+                'contentTemplate' => self::class.'::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_segment_index',
                     'mauticContent' => 'list',

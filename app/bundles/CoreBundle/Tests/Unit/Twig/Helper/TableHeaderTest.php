@@ -80,7 +80,7 @@ final class TableHeaderTest extends TestCase
             'tooltip'    => 'SortMe',
         ]);
 
-        $this->assertStringContainsString('class="fw-b" data-bs-toggle="tooltip"', $html);
+        $this->assertStringContainsString('class="fw-bold" data-bs-toggle="tooltip"', $html);
         $this->assertStringContainsString('data-bs-title="SortMe"', $html);
     }
 

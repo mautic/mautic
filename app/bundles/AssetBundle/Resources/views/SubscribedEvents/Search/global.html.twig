@@ -5,7 +5,7 @@
 {% else %}
 <a class="gsearch--results-common" href="{{ url('mautic_asset_action', {'objectAction' : 'view', 'objectId' : item.getId()}) }}" data-toggle="ajax">
         <i class="{{ item.getIconClass() }} gsearch--results-common__icon me-3"></i>
-        <span class="fw-sb">{{ item.getTitle()|escape }}</span>
+        <span class="fw-semibold">{{ item.getTitle()|escape }}</span>
         <span class="ms-4 me-4">#{{ item.getId() }}</span>
         {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
             'entity': item,

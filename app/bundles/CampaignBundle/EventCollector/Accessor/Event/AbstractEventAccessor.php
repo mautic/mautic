@@ -96,11 +96,9 @@ abstract class AbstractEventAccessor
     }
 
     /**
-     * @param mixed  $default
-     *
      * @return mixed
      */
-    protected function getProperty(string $property, $default = null)
+    protected function getProperty(string $property, ?array $default = null)
     {
         return $this->config[$property] ?? $default;
     }
