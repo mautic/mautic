@@ -151,4 +151,37 @@ final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
         $emailLogs = $email->getLogsByPriority(2);
         $this->assertCount(0, $emailLogs);
     }
+
+    public function testRulesForChannelsNotInTheMessageDoNotShiftMessageChannels(): void
+    {
+        $lead = $this->createMock(Lead::class);
+        $lead->expects($this->once())
+            ->method('getChannelRules')
+            ->willReturn(
+                [
+                    'sms' => [
+                        'dnc' => DoNotContact::MANUAL,
+                    ],
+                ]
+            );
+
+        $log = $this->createMock(LeadEventLog::class);
+        $log->method('getLead')
+            ->willReturn($lead);
+        $log->method('getId')
+            ->willReturn(1);
+
+        $builder = new PreferenceBuilder(
+            new ArrayCollection([$log]),
+            new Event(),
+            ['email' => []],
+            new NullLogger()
+        );
+
+        $preferences = $builder->getChannelPreferences();
+
+        $this->assertArrayHasKey('email', $preferences);
+        $this->assertArrayNotHasKey('sms', $preferences);
+        $this->assertCount(1, $preferences['email']->getLogsByPriority(1));
+    }
 }
