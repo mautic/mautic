@@ -89,7 +89,7 @@ mQuery.ajaxPrefilter(function (options) {
     };
 });
 JS);
-                $clearButton = "button[data-livesearch-parent='list-search']";
+                $clearButton = ContactPage::$clearSearch;
                 $I->waitForElementClickable($clearButton, AcceptanceTester::TIMEOUT);
                 $I->click($clearButton);
                 $I->waitForJS('return typeof window.releaseTableSearch === "function";', AcceptanceTester::TIMEOUT);
