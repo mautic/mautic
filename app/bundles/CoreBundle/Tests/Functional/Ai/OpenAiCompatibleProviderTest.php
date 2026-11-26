@@ -32,7 +32,7 @@ final class OpenAiCompatibleProviderTest extends TestCase
         $client     = new MockHttpClient([$chat, $structured, $embedding]);
         $provider  = new OpenAiCompatibleProvider($location, $baseUrl, $client, $apiKey);
 
-        $this->assertSame('Campaign summary', $provider->chat(self::TEXT_MODEL, self::INSTRUCTIONS, self::PROMPT));
+        $this->assertSame('Campaign summary', $provider->chat(self::TEXT_MODEL, self::INSTRUCTIONS, self::PROMPT)->text);
         $this->assertSame('Campaign summary', $provider->structured(self::TEXT_MODEL, self::INSTRUCTIONS, self::PROMPT, self::SCHEMA)->title);
         $this->assertSame([0.25, -0.5], $provider->embed(self::EMBEDDING_MODEL, self::PROMPT));
 

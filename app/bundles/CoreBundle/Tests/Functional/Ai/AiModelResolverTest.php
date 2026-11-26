@@ -35,7 +35,7 @@ final class AiModelResolverTest extends TestCase
         $resolver = $this->resolver($client, $allowCloud);
         $model = $resolver->resolve($workload);
 
-        $this->assertSame('Suggestion', $model->provider->chat($model->name, 'Answer briefly.', 'Synthetic prompt'));
+        $this->assertSame('Suggestion', $model->provider->chat($model->name, 'Answer briefly.', 'Synthetic prompt')->text);
         $this->assertSame($endpoint.'/chat/completions', $response->getRequestUrl());
         $options = $response->getRequestOptions();
         $this->assertSame($modelId, json_decode((string) $options['body'], true, flags: \JSON_THROW_ON_ERROR)['model']);

@@ -16,7 +16,10 @@ interface AiFeatureInterface
 
     public function id(): string;
 
-    public function permission(): string;
+    /**
+     * @return string|null A Mautic permission, or null for administrators only
+     */
+    public function permission(): ?string;
 
     public function workload(): ModelWorkload;
 

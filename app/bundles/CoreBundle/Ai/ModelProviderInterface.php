@@ -14,7 +14,7 @@ interface ModelProviderInterface
     /**
      * @param non-empty-string $model
      */
-    public function chat(string $model, string $instructions, string $prompt): string;
+    public function chat(string $model, string $instructions, string $prompt): AiTextResult;
 
     /**
      * Returns a decoded JSON object. The consumer must validate it against its schema before use.

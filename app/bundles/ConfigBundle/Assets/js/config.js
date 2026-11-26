@@ -82,6 +82,30 @@ Mautic.initAiSettings = (container) => {
     }
     settings.dataset.initialized = 'true';
 
+    settings.querySelectorAll('[data-ai-connection-test]').forEach((button) => {
+        const status = button.parentElement.querySelector('[data-ai-connection-result]');
+        button.addEventListener('click', async () => {
+            if (button.getAttribute('aria-disabled') === 'true') {
+                return;
+            }
+            button.setAttribute('aria-disabled', 'true');
+            status.textContent = button.dataset.pendingMessage;
+            try {
+                const response = await fetch(button.dataset.aiConnectionTest, {
+                    method: 'POST',
+                    headers: {'X-CSRF-Token': button.dataset.csrfToken, 'Accept': 'application/json'},
+                    redirect: 'error',
+                });
+                const result = await response.json();
+                status.textContent = result.message || button.dataset.errorMessage;
+            } catch {
+                status.textContent = button.dataset.errorMessage;
+            } finally {
+                button.removeAttribute('aria-disabled');
+            }
+        });
+    });
+
     const list = settings.querySelector('[data-ai-provider-list]');
     const add = settings.querySelector('[data-ai-add-provider]');
     const template = settings.querySelector('[data-ai-provider-template]');

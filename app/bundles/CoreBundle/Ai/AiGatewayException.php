@@ -27,4 +27,14 @@ final class AiGatewayException extends \RuntimeException
     public const int INVALID_CONTEXT = 7;
 
     public const int INVALID_RESPONSE = 8;
+
+    public function __construct(
+        string $message,
+        int $code,
+        public readonly ?int $providerId = null,
+        public readonly ?string $model = null
+    )
+    {
+        parent::__construct($message, $code);
+    }
 }

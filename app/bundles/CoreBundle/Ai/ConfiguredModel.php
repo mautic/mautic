@@ -22,6 +22,7 @@ final readonly class ConfiguredModel
         public string $name,
         private array $capabilities,
         public ?int $contextWindow = null,
+        public ?int $providerId = null,
     ) {
     }
 

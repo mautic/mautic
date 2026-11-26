@@ -8,9 +8,11 @@ use Mautic\CoreBundle\Ai\AiFeatureInterface;
 use Mautic\CoreBundle\Ai\AiGateway;
 use Mautic\CoreBundle\Ai\AiGatewayException;
 use Mautic\CoreBundle\Ai\AiModelResolverInterface;
+use Mautic\CoreBundle\Ai\AiTextResult;
 use Mautic\CoreBundle\Ai\ConfiguredModel;
 use Mautic\CoreBundle\Ai\ModelProviderInterface;
 use Mautic\CoreBundle\Ai\ModelWorkload;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +33,7 @@ final class AiGatewayTest extends TestCase
             'Suggest a shorter draft.'."\n\nReturn only a JSON object matching this schema:\n"
             .'{"type":"object","properties":{"suggestion":{"type":"string"}},"required":["suggestion"],"additionalProperties":false}',
             '{"draft":"Campaign draft","count":0}',
-        )->willReturn('{"suggestion":"Campaign summary"}');
+        )->willReturn(new AiTextResult('{"suggestion":"Campaign summary"}'));
 
         $result = $this->gateway($provider)->request(self::FEATURE, [
             'draft' => 'Campaign draft',
@@ -49,7 +51,7 @@ final class AiGatewayTest extends TestCase
         $models = $this->createMock(AiModelResolverInterface::class);
         $models->expects($this->never())->method('resolve');
         $permissions = $this->permissions($anonymous, $permissionExists, $granted);
-        $gateway = new AiGateway($permissions, $models, [$this->feature()]);
+        $gateway = new AiGateway($permissions, $models, $this->createStub(AuditLogModel::class), [$this->feature()]);
 
         $this->expectException(AiGatewayException::class);
         $this->expectExceptionCode($code);
@@ -73,7 +75,7 @@ final class AiGatewayTest extends TestCase
     public function testInvalidResponsesAreNotReturned(string $response): void
     {
         $provider = $this->createMock(ModelProviderInterface::class);
-        $provider->expects($this->once())->method('chat')->willReturn($response);
+        $provider->expects($this->once())->method('chat')->willReturn(new AiTextResult($response));
 
         $this->expectException(AiGatewayException::class);
         $this->expectExceptionCode(AiGatewayException::INVALID_RESPONSE);
@@ -110,7 +112,7 @@ final class AiGatewayTest extends TestCase
     public function testDuplicateFeatureIdsAreRejected(): void
     {
         $this->expectException(\LogicException::class);
-        new AiGateway($this->permissions(), $this->createStub(AiModelResolverInterface::class), [$this->feature(), $this->feature()]);
+        new AiGateway($this->permissions(), $this->createStub(AiModelResolverInterface::class), $this->createStub(AuditLogModel::class), [$this->feature(), $this->feature()]);
     }
 
     private function gateway(ModelProviderInterface $provider): AiGateway
@@ -118,7 +120,7 @@ final class AiGatewayTest extends TestCase
         $models = $this->createMock(AiModelResolverInterface::class);
         $models->expects($this->once())->method('resolve')->with(ModelWorkload::Complex)->willReturn(new ConfiguredModel($provider, self::MODEL, []));
 
-        return new AiGateway($this->permissions(), $models, [$this->feature()]);
+        return new AiGateway($this->permissions(), $models, $this->createStub(AuditLogModel::class), [$this->feature()]);
     }
 
     private function permissions(bool $anonymous = false, bool $exists = true, bool $granted = true): CorePermissions

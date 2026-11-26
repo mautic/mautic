@@ -47,10 +47,10 @@ final readonly class OpenAiCompatibleProvider implements ModelProviderInterface
     /**
      * @param non-empty-string $model
      */
-    public function chat(string $model, #[\SensitiveParameter] string $instructions, #[\SensitiveParameter] string $prompt): string
+    public function chat(string $model, #[\SensitiveParameter] string $instructions, #[\SensitiveParameter] string $prompt): AiTextResult
     {
         try {
-            return new SymfonyTextGenerator($this->platform)->generate(new CompletionsModel($model), $instructions, $prompt);
+            return new SymfonyTextGenerator($this->platform)->generateResult(new CompletionsModel($model), $instructions, $prompt);
         } catch (PlatformException|HttpException) {
             throw new \RuntimeException('The AI provider could not complete the chat request.');
         }
