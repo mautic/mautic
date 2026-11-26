@@ -516,7 +516,6 @@ input[type="checkbox"] {
   display: flex;
   justify-content: center;
   position: relative;
-  will-change: transform;
   transition: transform 300ms cubic-bezier(.34, 1.56, .64, 1), background-color 200ms ease, border-color 200ms ease;
   @include outline-noff();
 
@@ -558,6 +557,10 @@ input[type="checkbox"] {
 @media (prefers-reduced-motion: reduce) {
   input[type="checkbox"] {
     transition: none;
+
+    &:after {
+      transition: none;
+    }
 
     &:checked:after {
       animation: none;

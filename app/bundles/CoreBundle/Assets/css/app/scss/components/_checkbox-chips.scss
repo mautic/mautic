@@ -76,6 +76,12 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
+        transition: none;
+
+        .form-check-chip__check path {
+            transition: none;
+        }
+
         .form-check-input:checked + .form-check-chip__check path {
             animation: none;
             stroke-dashoffset: 0;
