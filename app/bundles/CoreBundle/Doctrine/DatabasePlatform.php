@@ -602,17 +602,68 @@ final class DatabasePlatform
     /**
      * Returns the platform-specific UPDATE expression for upsert.
      *
-     * PostgreSQL uses EXCLUDED table, MySQL uses VALUES() function.
+     * PostgreSQL uses the EXCLUDED table, MySQL/MariaDB uses the VALUES() function.
+     *
+     * @param string                $column
+     *                                                    Target column (the LHS of the assignment)
+     * @param string|null           $expressionTemplate
+     *                                                    Optional custom SET expression. When null (default) the column is simply
+     *                                                    replaced by its new value — i.e. "col = EXCLUDED.col" / "col = VALUES(col)".
+     * @param array<string, string> $newValuePlaceholders
+     *                                                    Map of DBAL-style named-parameter tokens to column names, e.g.
+     *                                                    [':new_total' => 'total', ':new_a' => 'a', ':new_b' => 'b'].
+     *                                                    Each token must match DBAL's named-parameter format: ":name" where
+     *                                                    name matches [a-zA-Z_][a-zA-Z0-9_]*. Any number of placeholders is
+     *                                                    allowed, and the same column may appear under several tokens.
+     *
+     *   A placeholder ends where its parameter name ends — the next character
+     *   must NOT be [a-zA-Z0-9_]. This guarantees that ":new" does not match
+     *   inside ":new_total", exactly as DBAL parses named parameters.
      */
     public static function getUpsertUpdateExpression(
         AbstractPlatform $platform,
         string $column,
+        ?string $expressionTemplate = null,
+        array $newValuePlaceholders = [],
     ): string {
-        if (self::isPostgreSQL($platform)) {
-            return "{$column} = EXCLUDED.{$column}";
+        $newValueRef = static function (string $refColumn) use ($platform): string {
+            return self::isPostgreSQL($platform)
+                ? "EXCLUDED.{$refColumn}"
+                : "VALUES({$refColumn})";
+        };
+
+        if (null === $expressionTemplate) {
+            // Backward-compatible behaviour: simple replacement.
+            return "{$column} = ".$newValueRef($column);
         }
 
-        return "{$column} = VALUES({$column})";
+        $expression = $expressionTemplate;
+
+        if ([] !== $newValuePlaceholders) {
+            // Longest placeholder first — ordering becomes irrelevant.
+            $placeholders = array_keys($newValuePlaceholders);
+            usort($placeholders, static fn (string $a, string $b): int => strlen($b) <=> strlen($a));
+
+            foreach ($placeholders as $placeholder) {
+                if (!preg_match('/^:[a-zA-Z_][a-zA-Z0-9_]*$/', $placeholder)) {
+                    throw new \InvalidArgumentException(sprintf('Placeholder "%s" is not a valid DBAL-style named parameter (expected ":name" where name matches [a-zA-Z_][a-zA-Z0-9_]*).', $placeholder));
+                }
+
+                $replacement = $newValueRef($newValuePlaceholders[$placeholder]);
+
+                // Boundary rule = DBAL's named-parameter parser:
+                //   match the token only when the following char ends the name.
+                //   (?![a-zA-Z0-9_]) → ":new" not matched in ":new_total" / ":new2".
+                $pattern = '/'.preg_quote($placeholder, '/').'(?![a-zA-Z0-9_])/';
+                $expression = preg_replace_callback(
+                    $pattern,
+                    static fn (): string => $replacement,
+                    $expression
+                );
+            }
+        }
+
+        return "{$column} = {$expression}";
     }
 
     /**
@@ -648,9 +699,7 @@ final class DatabasePlatform
         }
 
         // MySQL: REPLACE INTO
-        return "
-            REPLACE INTO {$tableName} ({$columnList})
-            {$selectSql}";
+        return "REPLACE INTO {$tableName} ({$columnList}) {$selectSql}";
     }
 
     /**
@@ -661,6 +710,9 @@ final class DatabasePlatform
      * @param string        $innerSql   Subquery that provides the data
      * @param string        $conflictOn Columns that form the unique constraint (for Postgres ON CONFLICT)
      * @param array<string> $updateSet  Columns to update on conflict (without table prefix)
+     *
+     * @deprecated The method is deprecated and will be removed in Mautic 7.3.
+     * Use the `getComplexUpsertStatement()` method instead.
      */
     public static function getSummarizeUpsertStatement(
         ?AbstractPlatform $platform,
@@ -670,27 +722,66 @@ final class DatabasePlatform
         string $conflictOn,
         array $updateSet,
     ): string {
+        return self::getComplexUpsertStatement(
+            $platform,
+            $tableName,
+            $columns,
+            $innerSql,
+            $conflictOn,
+            $updateSet
+        );
+    }
+
+    /**
+     * Returns platform-specific complex upsert (INSERT ... ON CONFLICT / ON DUPLICATE KEY) SQL.
+     *
+     * @param string                    $innerSql
+     *                                                        Either a subquery ("SELECT ...") or a direct "VALUES (...)" clause.
+     * @param string                    $conflictOn
+     *                                                        Columns that form the unique constraint (used by PostgreSQL ON CONFLICT)
+     * @param array<int|string, string> $updateSet
+     *                                                        - Numeric keys: ['col1', 'col2'] → simple replacement (legacy, unchanged).
+     *                                                        - String keys:  ['col' => 'expression template'] → custom SET expression.
+     *                                                        The template may reference any number of DBAL-style named-parameter
+     *                                                        placeholders (":new", ":new_total", …) supplied in $newValuePlaceholders.
+     * @param array<string, string>     $newValuePlaceholders
+     *                                                        Map of ":name" tokens to column names. See getUpsertUpdateExpression().
+     */
+    public static function getComplexUpsertStatement(
+        ?AbstractPlatform $platform,
+        string $tableName,
+        string $columns,
+        string $innerSql,
+        string $conflictOn,
+        array $updateSet,
+        array $newValuePlaceholders = [],
+    ): string {
         $setClauses = [];
-        foreach ($updateSet as $col) {
-            $setClauses[] = self::getUpsertUpdateExpression($platform, $col);
+        foreach ($updateSet as $key => $value) {
+            $setClauses[] = is_int($key)
+                ? self::getUpsertUpdateExpression($platform, $value)
+                : self::getUpsertUpdateExpression($platform, $key, $value, $newValuePlaceholders);
+        }
+        $setClause = implode(',', $setClauses);
+
+        if (str_starts_with(strtoupper(ltrim($innerSql)), 'VALUES')) {
+            if (self::isPostgreSQL($platform)) {
+                return "INSERT INTO {$tableName} ({$columns}) {$innerSql} ON CONFLICT ({$conflictOn}) DO UPDATE SET {$setClause}";
+            }
+
+            return "INSERT INTO {$tableName} ({$columns}) {$innerSql} ON DUPLICATE KEY UPDATE {$setClause}";
         }
 
         if (self::isPostgreSQL($platform)) {
-            return "
-                INSERT INTO {$tableName} ({$columns})
-                SELECT * FROM ({$innerSql}) AS tmp
-                ON CONFLICT ({$conflictOn})
-                DO UPDATE SET
-                    ".implode(',', $setClauses).'
-            ';
+            return "INSERT INTO {$tableName} ({$columns})
+            SELECT * FROM ({$innerSql}) AS tmp
+            ON CONFLICT ({$conflictOn})
+            DO UPDATE SET ".$setClause;
         }
 
-        return "
-            INSERT INTO {$tableName} ({$columns})
-            SELECT {$columns} FROM ({$innerSql}) AS tmp
-            ON DUPLICATE KEY UPDATE
-                ".implode(',', $setClauses).'
-        ';
+        return "INSERT INTO {$tableName} ({$columns})
+        SELECT {$columns} FROM ({$innerSql}) AS tmp
+        ON DUPLICATE KEY UPDATE ".$setClause;
     }
 
     /**
