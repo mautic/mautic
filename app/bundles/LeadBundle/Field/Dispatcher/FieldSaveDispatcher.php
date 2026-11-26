@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field\Dispatcher;
 
+use Mautic\CoreBundle\Event\AbstractEntityEvent;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Event\FieldPostSaveEvent;
-use Mautic\LeadBundle\Event\FieldPreSaveEvent;
-use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Exception\NoListenerException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -21,30 +21,34 @@ final readonly class FieldSaveDispatcher
     /**
      * @throws NoListenerException
      */
-    public function dispatchPreSaveEvent(LeadField $entity, bool $isNew): LeadFieldEvent
+    public function dispatchPreSaveEvent(LeadField $entity, bool $isNew): EntityPreSave
     {
-        return $this->dispatchEvent(new FieldPreSaveEvent($entity, $isNew));
+        $event = new EntityPreSave($entity, $isNew);
+        $this->dispatchEvent($event);
+
+        return $event;
     }
 
     /**
      * @throws NoListenerException
      */
-    public function dispatchPostSaveEvent(LeadField $entity, bool $isNew): LeadFieldEvent
+    public function dispatchPostSaveEvent(LeadField $entity, bool $isNew): EntityPostSave
     {
-        return $this->dispatchEvent(new FieldPostSaveEvent($entity, $isNew));
+        $event = new EntityPostSave($entity, $isNew);
+        $this->dispatchEvent($event);
+
+        return $event;
     }
 
     /**
      * @throws NoListenerException
      */
-    public function dispatchEvent(LeadFieldEvent $event): LeadFieldEvent
+    private function dispatchEvent(AbstractEntityEvent $event): void
     {
         if (!$this->dispatcher->hasListeners($event::class)) {
             throw new NoListenerException('There is no Listener for '.$event::class.' event');
         }
 
         $this->dispatcher->dispatch($event);
-
-        return $event;
     }
 }

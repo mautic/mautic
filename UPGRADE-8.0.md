@@ -165,10 +165,10 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `LIST_PRE_DELETE` | `ListPreDeleteEvent` |
     | `ON_LIST_DELETE` | `ListDeleteEvent` |
     | `LIST_POST_DELETE` | `ListPostDeleteEvent` |
-    | `FIELD_PRE_SAVE` | `FieldPreSaveEvent` |
-    | `FIELD_POST_SAVE` | `FieldPostSaveEvent` |
-    | `FIELD_PRE_DELETE` | `FieldPreDeleteEvent` |
-    | `FIELD_POST_DELETE` | `FieldPostDeleteEvent` |
+    | `FIELD_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof LeadField`) |
+    | `FIELD_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof LeadField`) |
+    | `FIELD_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof LeadField`) |
+    | `FIELD_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof LeadField`) |
     | `NOTE_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof LeadNote`) |
     | `NOTE_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof LeadNote`) |
     | `NOTE_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof LeadNote`) |
@@ -205,7 +205,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `POST_CONTACT_EXPORT_SEND_EMAIL` | `ContactExportEmailSentEvent` |
 
 - Events behind `LeadEvents::LEAD_POST_SAVE`, `LEAD_POST_DELETE`, `LEAD_POINTS_CHANGE`, `LEAD_COMPANY_CHANGE`, `LEAD_LIST_CHANGE`, `COMPANY_POST_SAVE` and `COMPANY_POST_DELETE` are now dispatched as `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof Lead`), `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof Lead`), `PointsChangeEvent`, `LeadChangeCompanyEvent`, `ListChangeEvent`, `CompanyPostSaveEvent`, `CompanyPostDeleteEvent`. The constants stay, as they are still used as webhook event type identifiers, but listeners must key on the event class.
-- `Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher::dispatchEvent()` now takes the `LeadFieldEvent` to dispatch instead of an event name, entity and `isNew` flag.
+- `Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher::dispatchEvent()` is now private. Use `dispatchPreSaveEvent()` or `dispatchPostSaveEvent()` instead.
 - Constants `USER_PRE_SAVE`, `USER_POST_SAVE`, `USER_PRE_DELETE`, `USER_POST_DELETE`, `ROLE_PRE_SAVE`, `ROLE_POST_SAVE`, `ROLE_PRE_DELETE` and `ROLE_POST_DELETE` removed from `Mautic\UserBundle\UserEvents`. User and role save and delete now run through their model's default `dispatchEvent()`, which emits the generic `Mautic\CoreBundle\Event` events `EntityPreSave`, `EntityPostSave`, `EntityPreDelete` and `EntityPostDelete`. Subscribe to the generic event and guard the entity type, e.g. `EntityPostSave::class => 'onPostSave'` with an early `if (!$event->getEntity() instanceof User) { return; }`. `Mautic\UserBundle\Security\Provider\UserProvider` dispatches the same `EntityPreSave` / `EntityPostSave` events when it auto-provisions a user during SSO login. All eight dedicated User/Role lifecycle event classes (including `PreSaveUserEvent` and `PostSaveUserEvent`) and the `UserEvent` and `RoleEvent` bases were removed.
 - Method `setEntityManager()` and the `protected $em` property removed from `Mautic\CoreBundle\Event\CommonEvent`. The entity manager was set on the event by every model but never read. `Mautic\LeadBundle\Event\LeadListFilteringEvent` was the only reader; it now holds its own `$em` property (unchanged constructor and `getEntityManager()`). Remove any `$event->setEntityManager(...)` calls.
 - Legacy `services` config group removed from bundle `Config/config.php` handling. `Mautic\CoreBundle\DependencyInjection\Builder\Metadata\ConfigMetadata` no longer reads a `services` array from `Config/config.php`. Register services as Symfony services in each bundle's `Config/services.php` instead.
@@ -731,6 +731,16 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\LeadBundle\Event\LeadPostDeleteEvent` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof Lead`) |
 
     `Mautic\LeadBundle\Event\LeadEvent` is kept as the base of `LeadIdentifiedEvent`. `LeadPreBatchSaveEvent` and `LeadPostBatchSaveEvent` are kept too, but `SaveBatchLeadsEvent::getLeadsEvents()` now returns `Mautic\CoreBundle\Event\AbstractEntityEvent[]` instead of `LeadEvent[]` - use `getEntity()` instead of `getLead()`. `Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::dispatchEvents()` now takes an `EntityPostSave` instead of a `LeadEvent`.
+
+- Custom field (`Mautic\LeadBundle\Entity\LeadField`) lifecycle events moved to the generic entity events. `Mautic\LeadBundle\Model\FieldModel` no longer overrides `dispatchEvent()` and no longer takes a `FieldSaveDispatcher` in its constructor. `Mautic\LeadBundle\Field\LeadFieldSaver` and `LeadFieldDeleter` dispatch the same generic events, so `FieldSaveDispatcher::dispatchPreSaveEvent()` / `dispatchPostSaveEvent()` now return `EntityPreSave` / `EntityPostSave` and `FieldDeleteDispatcher::dispatchPostDeleteEvent()` returns `EntityPostDelete`. Subscribe to the generic event and check `instanceof LeadField` - `Mautic\FormBundle\Entity\Field` goes through the same generic events:
+
+    | Removed event class | Replacement |
+    |---|---|
+    | `Mautic\LeadBundle\Event\FieldPreSaveEvent` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof LeadField`) |
+    | `Mautic\LeadBundle\Event\FieldPostSaveEvent` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof LeadField`) |
+    | `Mautic\LeadBundle\Event\FieldPreDeleteEvent` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof LeadField`) |
+    | `Mautic\LeadBundle\Event\FieldPostDeleteEvent` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof LeadField`) |
+    | `Mautic\LeadBundle\Event\LeadFieldEvent` | generic entity events above; `getField()` becomes `getEntity()` and `setField()` has no replacement |
 
 ## Changed code
 

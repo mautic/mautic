@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Entity\LeadNoteRepository;
@@ -26,8 +27,6 @@ use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event as Events;
-use Mautic\LeadBundle\Event\FieldPostDeleteEvent;
-use Mautic\LeadBundle\Event\FieldPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadPreMergeEvent;
@@ -218,12 +217,14 @@ final class LeadSubscriber
     /**
      * Add a field entry to the audit log.
      */
-    #[AsEventListener(
-        event: FieldPostSaveEvent::class,
-    )]
-    public function onFieldPostSave(Events\LeadFieldEvent $event): void
+    #[AsEventListener]
+    public function onFieldPostSave(EntityPostSave $event): void
     {
-        $field = $event->getField();
+        $field = $event->getEntity();
+        if (!$field instanceof LeadField) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'lead',
@@ -240,13 +241,15 @@ final class LeadSubscriber
     /**
      * Add a field delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: FieldPostDeleteEvent::class,
-    )]
-    public function onFieldDelete(Events\LeadFieldEvent $event): void
+    #[AsEventListener]
+    public function onFieldDelete(EntityPostDelete $event): void
     {
-        $field = $event->getField();
-        $log   = [
+        $field = $event->getEntity();
+        if (!$field instanceof LeadField) {
+            return;
+        }
+
+        $log = [
             'bundle'    => 'lead',
             'object'    => 'field',
             'objectId'  => $field->deletedId,

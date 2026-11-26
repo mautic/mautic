@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field\EventListener;
 
-use Mautic\LeadBundle\Event\FieldPreDeleteEvent;
-use Mautic\LeadBundle\Event\LeadFieldEvent;
+use Mautic\CoreBundle\Event\EntityPreDelete;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
@@ -23,12 +23,14 @@ final readonly class LeadFieldSubscriber
     /**
      * Check if Custom field is used in any segment before delete operation.
      */
-    #[AsEventListener(
-        event: FieldPreDeleteEvent::class,
-    )]
-    public function onFieldPreDelete(LeadFieldEvent $event): void
+    #[AsEventListener]
+    public function onFieldPreDelete(EntityPreDelete $event): void
     {
-        $field    = $event->getField();
+        $field = $event->getEntity();
+        if (!$field instanceof LeadField) {
+            return;
+        }
+
         $segments = $this->fieldModel->getFieldSegments($field);
 
         if (count($segments)) {

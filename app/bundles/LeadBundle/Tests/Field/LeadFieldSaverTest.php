@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field;
 
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
-use Mautic\LeadBundle\Event\FieldPostSaveEvent;
-use Mautic\LeadBundle\Event\FieldPreSaveEvent;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use PHPUnit\Framework\TestCase;
@@ -26,12 +26,12 @@ final class LeadFieldSaverTest extends TestCase
         $fieldSaveDispatcher->expects($this->once())
             ->method('dispatchPreSaveEvent')
             ->with($leadField, true)
-            ->willReturn(new FieldPreSaveEvent($leadField));
+            ->willReturn(new EntityPreSave($leadField));
 
         $fieldSaveDispatcher->expects($this->once())
             ->method('dispatchPostSaveEvent')
             ->with($leadField, true)
-            ->willReturn(new FieldPostSaveEvent($leadField));
+            ->willReturn(new EntityPostSave($leadField));
 
         $leadFieldSaver->saveLeadFieldEntity($leadField, true);
     }
@@ -48,12 +48,12 @@ final class LeadFieldSaverTest extends TestCase
         $fieldSaveDispatcher->expects($this->once())
             ->method('dispatchPreSaveEvent')
             ->with($leadField, true)
-            ->willReturn(new FieldPreSaveEvent($leadField));
+            ->willReturn(new EntityPreSave($leadField));
 
         $fieldSaveDispatcher->expects($this->once())
             ->method('dispatchPostSaveEvent')
             ->with($leadField, true)
-            ->willReturn(new FieldPostSaveEvent($leadField));
+            ->willReturn(new EntityPostSave($leadField));
 
         $leadFieldSaver->saveLeadFieldEntityWithoutColumnCreated($leadField);
 

@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field\Dispatcher;
 
+use Mautic\CoreBundle\Event\EntityPostDelete;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Event\FieldPostDeleteEvent;
-use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Exception\NoListenerException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -20,20 +19,13 @@ final readonly class FieldDeleteDispatcher
     /**
      * @throws NoListenerException
      */
-    public function dispatchPostDeleteEvent(LeadField $entity): LeadFieldEvent
+    public function dispatchPostDeleteEvent(LeadField $entity): EntityPostDelete
     {
-        return $this->dispatchEvent(new FieldPostDeleteEvent($entity));
-    }
-
-    /**
-     * @throws NoListenerException
-     */
-    private function dispatchEvent(LeadFieldEvent $event): LeadFieldEvent
-    {
-        if (!$this->dispatcher->hasListeners($event::class)) {
+        if (!$this->dispatcher->hasListeners(EntityPostDelete::class)) {
             throw new NoListenerException('There is no Listener for this event');
         }
 
+        $event = new EntityPostDelete($entity);
         $this->dispatcher->dispatch($event);
 
         return $event;
