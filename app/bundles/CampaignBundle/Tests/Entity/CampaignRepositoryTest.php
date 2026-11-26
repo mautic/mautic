@@ -31,9 +31,11 @@ final class CampaignRepositoryTest extends TestCase
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
-            'mautic.campaign.campaign.searchcommand.isexpired' => 'is:expired',
-            'mautic.campaign.campaign.searchcommand.ispending' => 'is:pending',
-            default                                            => $id,
+            'mautic.campaign.campaign.searchcommand.isexpired'         => 'is:expired',
+            'mautic.campaign.campaign.searchcommand.ispending'         => 'is:pending',
+            'mautic.campaign.campaign.searchcommand.source.form'       => 'source:form',
+            'mautic.campaign.campaign.searchcommand.source.segment'    => 'source:segment',
+            default                                                    => $id,
         });
 
         $this->repository->autowireCommonRepository($translator);
@@ -65,11 +67,38 @@ final class CampaignRepositoryTest extends TestCase
         $this->assertSame(['par1' => true], $params);
     }
 
-    public function testGetSearchCommandsContainsExpirationFilters(): void
+    #[DataProvider('dbalSourceCommandDataProvider')]
+    public function testAddSearchCommandWhereClauseBuildsSourceFiltersWithDbalQueryBuilder(string $command, bool $not, string $expected): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => $command, 'string' => '', 'not' => $not, 'strict' => false];
+
+        $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
+
+        $this->assertSame(sprintf($expected, MAUTIC_TABLE_PREFIX), (string) $expr);
+        $this->assertSame([], $params);
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: bool, 2: string}>
+     */
+    public static function dbalSourceCommandDataProvider(): iterable
+    {
+        yield ['source:segment', false, 'EXISTS(SELECT 1 FROM %1$scampaign_leadlist_xref cl WHERE cl.campaign_id = c.id)'];
+        yield ['source:segment', true, 'NOT EXISTS(SELECT 1 FROM %1$scampaign_leadlist_xref cl WHERE cl.campaign_id = c.id)'];
+        yield ['source:form', false, 'EXISTS(SELECT 1 FROM %1$scampaign_form_xref cf WHERE cf.campaign_id = c.id)'];
+        yield ['source:form', true, 'NOT EXISTS(SELECT 1 FROM %1$scampaign_form_xref cf WHERE cf.campaign_id = c.id)'];
+    }
+
+    public function testGetSearchCommandsContainsCampaignFilters(): void
     {
         $commands = $this->repository->getSearchCommands();
         $this->assertContains('mautic.campaign.campaign.searchcommand.isexpired', $commands);
         $this->assertContains('mautic.campaign.campaign.searchcommand.ispending', $commands);
+        $this->assertContains('mautic.campaign.campaign.searchcommand.source.segment', $commands);
+        $this->assertContains('mautic.campaign.campaign.searchcommand.source.form', $commands);
     }
 
     #[DataProvider('ormSearchCommandDataProvider')]
@@ -95,5 +124,32 @@ final class CampaignRepositoryTest extends TestCase
     {
         yield ['is:expired', 'c.publishDown < CURRENT_TIMESTAMP()'];
         yield ['is:pending', 'c.publishUp > CURRENT_TIMESTAMP()'];
+    }
+
+    #[DataProvider('ormSourceCommandDataProvider')]
+    public function testAddSearchCommandWhereClauseBuildsSourceFiltersWithOrmQueryBuilder(string $command, bool $not, string $expected): void
+    {
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->method('getExpressionBuilder')->willReturn(new Expr());
+        $qb            = new OrmQueryBuilder($entityManager);
+        $filter        = (object) ['command' => $command, 'string' => '', 'not' => $not, 'strict' => false];
+
+        $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
+
+        $this->assertSame($expected, (string) $expr);
+        $this->assertSame([], $params);
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: bool, 2: string}>
+     */
+    public static function ormSourceCommandDataProvider(): iterable
+    {
+        yield ['source:segment', false, 'c.lists IS NOT EMPTY'];
+        yield ['source:segment', true, 'c.lists IS EMPTY'];
+        yield ['source:form', false, 'c.forms IS NOT EMPTY'];
+        yield ['source:form', true, 'c.forms IS EMPTY'];
     }
 }
