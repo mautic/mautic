@@ -1318,45 +1318,16 @@ final class DatabasePlatform
     public static function getInsertIdValues(
         ?AbstractPlatform $platform,
         string $tableName,
-        string $idColumn = 'id',
-    ): array {
-        if (self::isPostgreSQL($platform)) {
-            $sequence = $tableName.'_'.$idColumn.'_seq';
-
-            return [$idColumn => "NEXTVAL('{$sequence}')"];
-        }
-
-        return [];
-    }
-
-    /**
-     * Returns platform-specific ID column and SELECT part for INSERT when using direct SQL.
-     *
-     * PostgreSQL needs explicit nextval() because Doctrine does not auto-handle sequences in raw SQL.
-     * MySQL uses auto_increment (no id column in INSERT).
-     *
-     * @return array<string, string>
-     */
-    public static function getInsertIdHandling(
-        ?AbstractPlatform $platform,
-        string $tableName,
         ?ClassMetadata $metadata = null,
         string $idColumn = 'id',
     ): array {
         if (self::isPostgreSQL($platform)) {
-            // Get sequence name from metadata (or fallback to Doctrine default)
             $sequenceName = $metadata ? $metadata->getSequenceName($platform) : $tableName.'_'.$idColumn.'_seq';
 
-            return [
-                'idColumn' => $idColumn,
-                'idSelect' => "NEXTVAL('{$sequenceName}') AS {$idColumn}",
-            ];
+            return [$idColumn => "NEXTVAL('{$sequenceName}')"];
         }
 
-        return [
-            'idColumn' => '',
-            'idSelect' => '',
-        ];
+        return [];
     }
 
     /**

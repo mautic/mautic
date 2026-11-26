@@ -24,7 +24,7 @@ final class SubmissionTotalRepository extends CommonRepository
         $connection = $this->getEntityManager()->getConnection();
 
         // Get ID handling for PostgreSQL (nextval) vs MySQL (auto_increment)
-        $idHandling = DatabasePlatform::getInsertIdHandling(
+        $idValues = DatabasePlatform::getInsertIdValues(
             $connection->getDatabasePlatform(),
             MAUTIC_TABLE_PREFIX.SubmissionTotal::TABLE_NAME,
             $this->getEntityManager()->getClassMetadata(SubmissionTotal::class)
@@ -35,16 +35,16 @@ final class SubmissionTotalRepository extends CommonRepository
         ];
 
         // Add id column if exists
-        if (!empty($idHandling['idColumn'])) {
-            array_unshift($columns, $idHandling['idColumn']);
+        if (!empty($idValues)) {
+            array_unshift($columns, array_keys($idValues));
         }
 
         $values = [
             ':formId', ':hour', '1',
         ];
 
-        if (!empty($idHandling['idSelect'])) {
-            array_unshift($values, $idHandling['idSelect']);
+        if (!empty($idValues)) {
+            array_unshift($values, array_values($idValues));
         }
 
         $conflictOn = [

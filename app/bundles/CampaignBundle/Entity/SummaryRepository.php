@@ -98,13 +98,14 @@ final class SummaryRepository extends CommonRepository
         $numberOfIntervals            = ceil(($dateToTsActual - $dateFromStartWithZeroMinutes) / $intervalInSeconds);
 
         $connection = $this->getEntityManager()->getConnection();
+        $metadata   = $this->getEntityManager()->getClassMetadata(Summary::class);
         $platform   = $connection->getDatabasePlatform();
 
         // Get ID handling for PostgreSQL (nextval) vs MySQL (auto_increment)
-        $idHandling = DatabasePlatform::getInsertIdHandling(
+        $idValues = DatabasePlatform::getInsertIdValues(
             $platform,
             MAUTIC_TABLE_PREFIX.'campaign_summary',
-            $this->getEntityManager()->getClassMetadata(Summary::class)
+            $metadata
         );
 
         for ($interval = 0; $interval < $numberOfIntervals; ++$interval) {
@@ -136,8 +137,12 @@ final class SummaryRepository extends CommonRepository
                     AND mclefl.log_id IS NULL THEN 1 ELSE 0 END) AS log_counts_processed',
             ];
 
-            if (!empty($idHandling['idSelect'])) {
-                array_unshift($selects, $idHandling['idSelect']);
+            if (!empty($idValues)) {
+                // prepend ID COLUMN value as COLUMN
+                array_unshift($selects, array_map(
+                    fn ($value, $key) => "{$value} AS {$key}",
+                    $idValues
+                ));
             }
 
             // Build inner aggregation query with consistent integer types in CASE branches
@@ -171,8 +176,8 @@ final class SummaryRepository extends CommonRepository
             ];
 
             // Add id column if exists
-            if (!empty($idHandling['idColumn'])) {
-                array_unshift($columns, $idHandling['idColumn']);
+            if (!empty($idValues)) {
+                array_unshift($columns, array_keys($idValues));
             }
 
             // Build upsert using centralized helper

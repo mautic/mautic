@@ -109,8 +109,13 @@ class ObjectMappingRepository extends CommonRepository
 
         $createdAt = $createdAt ?: new \DateTimeImmutable();
         $qb        = $connection->createQueryBuilder();
+        $metadata  = $this->getEntityManager()->getClassMetadata(ObjectMapping::class);
 
-        $idValues = DatabasePlatform::getInsertIdValues($platform, $table);
+        $idValues = DatabasePlatform::getInsertIdValues(
+            $platform,
+            $table,
+            $metadata
+        );
 
         $values = $idValues + [
             'integration'             => ':integration',
