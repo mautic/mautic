@@ -17,6 +17,8 @@ use Psr\Log\NullLogger;
 
 final class IntervalTest extends \PHPUnit\Framework\TestCase
 {
+    private const TEST_DATETIME = '2021-11-08 17:00:00';
+
     /**
      * @param array<int> $restrictedDays
      */
@@ -290,8 +292,8 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateExecutionDateTimeWhenIsContactSpecificExecutionDateRequiredIsTrue(): void
     {
-        $expectedDateTime    = new \DateTime('now');
-        $compareFromDateTime = new \DateTime('now');
+        $expectedDateTime    = new \DateTime(self::TEST_DATETIME, new \DateTimeZone('UTC'));
+        $compareFromDateTime = clone $expectedDateTime;
 
         $event = $this->createMock(Event::class);
         $event->method('getId')
@@ -303,7 +305,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $event->method('getTriggerInterval')
             ->willReturn(1);
         $event->method('getTriggerHour')
-            ->willReturn(new \DateTime('now'));
+            ->willReturn(clone $expectedDateTime);
         $event->method('getTriggerRestrictedDaysOfWeek')
             ->willReturn([]);
         $lead = $this->createMock(Lead::class);
@@ -313,7 +315,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $log->method('getEvent')
             ->willReturn($event);
         $log->method('getDateTriggered')
-            ->willReturn(new \DateTime('now'));
+            ->willReturn(clone $expectedDateTime);
         $log->method('getLead')
             ->willReturn($lead);
 
@@ -325,8 +327,8 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateExecutionDateTimeWhenIsContactSpecificExecutionDateRequiredIsFalse(): void
     {
-        $expectedDateTime    = new \DateTime('now');
-        $compareFromDateTime = new \DateTime('now');
+        $expectedDateTime    = new \DateTime(self::TEST_DATETIME, new \DateTimeZone('UTC'));
+        $compareFromDateTime = clone $expectedDateTime;
 
         $event = $this->createMock(Event::class);
         $event->method('getId')
@@ -338,7 +340,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $event->method('getTriggerInterval')
             ->willReturn(0);
         $event->method('getTriggerHour')
-            ->willReturn(new \DateTime('now'));
+            ->willReturn(clone $expectedDateTime);
         $event->method('getTriggerRestrictedDaysOfWeek')
             ->willReturn([]);
 
@@ -350,7 +352,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $log->method('getEvent')
             ->willReturn($event);
         $log->method('getDateTriggered')
-            ->willReturn(new \DateTime('now'));
+            ->willReturn(clone $expectedDateTime);
         $log->method('getLead')
             ->willReturn($lead);
 
@@ -526,8 +528,8 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateExecutionDateTimeWhenForExactHour(): void
     {
-        $expectedDateTime    = new \DateTime('now');
-        $compareFromDateTime = new \DateTime('now');
+        $expectedDateTime    = new \DateTime(self::TEST_DATETIME, new \DateTimeZone('UTC'));
+        $compareFromDateTime = clone $expectedDateTime;
 
         $event = $this->createMock(Event::class);
         $event->method('getId')
@@ -539,7 +541,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $event->method('getTriggerInterval')
             ->willReturn(0);
         $event->method('getTriggerHour')
-            ->willReturn(new \DateTime('now'));
+            ->willReturn(clone $expectedDateTime);
         $event->method('getTriggerRestrictedDaysOfWeek')
             ->willReturn([]);
 
@@ -551,7 +553,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $log->method('getEvent')
             ->willReturn($event);
         $log->method('getDateTriggered')
-            ->willReturn(new \DateTime('now'));
+            ->willReturn(clone $expectedDateTime);
         $log->method('getLead')
             ->willReturn($lead);
 

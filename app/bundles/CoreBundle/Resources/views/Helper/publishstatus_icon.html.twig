@@ -42,6 +42,12 @@
 {%- elseif status is same as 'ready_to_send' %}
   {%- set icon = 'ri-toggle-fill text-success' %}
   {%- set text = 'mautic.core.form.ready_to_send'|trans %}
+{%- elseif status is same as 'sending' %}
+  {%- set icon = 'ri-send-plane-line text-info' %}
+  {%- set text = 'mautic.core.form.sending'|trans %}
+{%- elseif status is same as 'sent' %}
+  {%- set icon = 'ri-checkbox-circle-line text-info' %}
+  {%- set text = 'mautic.core.form.sent'|trans %}
 {%- endif %}
 
 {%- if true is same as status %}

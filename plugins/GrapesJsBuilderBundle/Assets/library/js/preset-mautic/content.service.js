@@ -99,8 +99,11 @@ export default class ContentService {
       throw new Error('No Html Document');
     }
 
-    // @todo add the lang parameter. E.g. <html lang="de-DE">
-    return `${ContentService.serializeDoctype(contentDocument.doctype)}<html>${
+    // Keep attributes generated on the document root, including lang, dir and xmlns:o.
+    const htmlElement = contentDocument.documentElement.cloneNode(false);
+    const htmlOpenTag = htmlElement.outerHTML.replace(/<\/html>$/, '');
+
+    return `${ContentService.serializeDoctype(contentDocument.doctype)}${htmlOpenTag}${
       contentDocument.head.outerHTML
     }${contentDocument.body.outerHTML}</html>`;
   }
