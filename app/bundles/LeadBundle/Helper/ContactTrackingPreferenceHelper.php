@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TrackingPreference;
 use Mautic\LeadBundle\Entity\TrackingPreferenceRepository;
+use Mautic\LeadBundle\Event\TrackingPreferenceChangeEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Reads and stores whether a contact lets Mautic record their activity on their profile.
@@ -17,6 +19,7 @@ final readonly class ContactTrackingPreferenceHelper
     public function __construct(
         private TrackingPreferenceRepository $trackingPreferenceRepository,
         private EntityManagerInterface $entityManager,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -25,6 +28,11 @@ final readonly class ContactTrackingPreferenceHelper
      */
     public function allowsActivityTracking(Lead $contact): bool
     {
+        // A contact that isn't saved yet has no stored choice to look up
+        if (null === $contact->getId()) {
+            return true;
+        }
+
         $preference = $this->trackingPreferenceRepository->findOneByContactAndPurpose($contact, TrackingPreference::PURPOSE_ACTIVITY);
 
         return null === $preference || $preference->isAllowed();
@@ -42,5 +50,10 @@ final readonly class ContactTrackingPreferenceHelper
 
         $this->entityManager->persist($preference);
         $this->entityManager->flush();
+
+        $this->dispatcher->dispatch(
+            new TrackingPreferenceChangeEvent($contact, TrackingPreference::PURPOSE_ACTIVITY, $allowed, $source),
+            TrackingPreferenceChangeEvent::TRACKING_PREFERENCE_CHANGE
+        );
     }
 }
