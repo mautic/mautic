@@ -20,7 +20,6 @@ final readonly class ConfiguredModel
     public function __construct(
         public ModelProviderInterface $provider,
         public string $name,
-        public ModelTier $tier,
         private array $capabilities,
         public ?int $contextWindow = null,
     ) {
