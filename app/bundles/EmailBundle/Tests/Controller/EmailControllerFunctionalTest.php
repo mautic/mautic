@@ -649,6 +649,27 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals('Test html', $secondEmail->getCustomHtml());
     }
 
+    public function testEmailVariantWeightIsVisibleAndEditable(): void
+    {
+        $segment = $this->createSegment('Variant weight segment', 'variant-weight-segment');
+        $parent  = $this->createEmail('Variant weight parent', 'Variant weight parent subject', 'list', 'blank', 'Parent html', $segment);
+        $variant = $this->createEmail('Variant weight child', 'Variant weight child subject', 'list', 'blank', 'Child html', $segment);
+        $variant->setVariantParent($parent);
+        $variant->setVariantSettings(['weight' => 30, 'winnerCriteria' => 'email.openrate']);
+        $parent->addVariantChild($variant);
+        $this->em->persist($parent);
+        $this->em->persist($variant);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$variant->getId());
+        $this->assertResponseIsSuccessful();
+
+        $weight = $crawler->filter('input[type="range"][name="emailform[variantSettings][weight]"]');
+        $this->assertCount(1, $weight);
+        $this->assertSame('30', $weight->attr('value'));
+        $this->assertSame('Traffic Weight', trim($crawler->filter('label[for="'.$weight->attr('id').'"]')->text()));
+    }
+
     public function testCloneWithTranslationsAndVariantsAction(): void
     {
         $segment = $this->createSegment('Segment C', 'segment-C');

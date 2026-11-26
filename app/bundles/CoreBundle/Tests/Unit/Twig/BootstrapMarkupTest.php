@@ -107,6 +107,24 @@ final class BootstrapMarkupTest extends TestCase
         $this->assertSame('30%', trim($crawler->filter('output.field-slider__value')->text()));
     }
 
+    public function testFieldSliderRetainsReadonlyValueWithoutAllowingChanges(): void
+    {
+        $form = Forms::createFormFactory()->createNamedBuilder('variant', FormType::class)
+            ->add('weight', IntegerType::class, [
+                'block_prefix' => 'field_slider',
+                'attr'         => ['min' => 0, 'max' => 100, 'readonly' => true],
+            ])
+            ->getForm();
+        $form->get('weight')->setData(30);
+        $crawler = new Crawler($this->twig->createTemplate('{{ form_widget(form.weight) }}')->render(['form' => $form->createView()]));
+
+        $this->assertSame('disabled', $crawler->filter('input[type="range"]')->attr('disabled'));
+        $this->assertSame('30', $crawler->filter('input[type="range"]')->attr('value'));
+        $this->assertSame('variant[weight]', $crawler->filter('input[type="hidden"]')->attr('name'));
+        $this->assertSame('30', $crawler->filter('input[type="hidden"]')->attr('value'));
+        $this->assertNull($crawler->filter('input[type="range"]')->attr('name'));
+    }
+
     public function testFieldSliderStartsAtMinimumWithoutValue(): void
     {
         $form = Forms::createFormFactory()->createNamedBuilder('variant', FormType::class)
