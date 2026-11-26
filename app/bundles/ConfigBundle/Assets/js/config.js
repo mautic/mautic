@@ -101,22 +101,21 @@ Mautic.initAiSettings = (container) => {
             select.length = 1;
             providers.forEach(([id, label]) => select.add(new Option(label, id)));
             select.value = providers.some(([id]) => selected === id) ? selected : '';
+            mQuery(select).trigger('chosen:updated');
         });
     };
 
     add.addEventListener('click', () => {
         list.insertAdjacentHTML('beforeend', template.innerHTML.replaceAll('__ai_provider__', String(nextId++)));
-        list.lastElementChild.querySelector('[data-ai-provider-name]').focus();
+        const row = list.lastElementChild;
+        Mautic.activateChosenSelect(row.querySelector('[data-ai-provider-location]'));
+        row.querySelector('[data-ai-provider-name]').focus();
         list.dispatchEvent(new Event('change', {bubbles: true}));
     });
 
-    const refreshOnEdit = (event) => {
-        if (event.target.matches('[data-ai-provider-name], [data-ai-provider-location]')) {
-            refreshAssignments();
-        }
-    };
-    list.addEventListener('input', refreshOnEdit, true);
-    list.addEventListener('change', refreshOnEdit, true);
+    mQuery(list)
+        .on('input.aiSettings', '[data-ai-provider-name]', refreshAssignments)
+        .on('change.aiSettings', '[data-ai-provider-location]', refreshAssignments);
     list.addEventListener('click', (event) => {
         const remove = event.target.closest('[data-ai-remove-provider]');
         if (!remove) {
