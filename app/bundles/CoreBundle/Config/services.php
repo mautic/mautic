@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use GuzzleHttp\Client;
 use Knp\Menu\MenuItem;
+use Mautic\CoreBundle\Ai\AiModelResolver;
+use Mautic\CoreBundle\Ai\AiModelResolverInterface;
 use Mautic\CoreBundle\Cache\MiddlewareCacheWarmer;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\ExceptionController;
@@ -123,6 +125,8 @@ return function (ContainerConfigurator $configurator): void {
         ->args([param('mautic.ip_lookup_service'), param('mautic.ip_lookup_auth'), param('mautic.ip_lookup_config'), service('mautic.http.client')]);
     $services->set(HttpClientInterface::class)
         ->factory(HttpClient::create(...));
+    $services->set(AiModelResolver::class)->private();
+    $services->alias(AiModelResolverInterface::class, AiModelResolver::class)->private();
     $services->set(TranslationLoader::class)->tag('translation.loader', ['alias' => 'mautic']);
     $services->set(ThemeHelper::class)
         ->call('setDefaultTheme', [param('mautic.theme')]);

@@ -6362,7 +6362,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "aaa43bf63920cf30151543d0d807703a8f6ebc9c"
+                "reference": "64b793843a24d6e0d13817da45f975b3a6cea978"
             },
             "require": {
                 "api-platform/core": "^4.3.0",
@@ -6411,6 +6411,7 @@
                 "matomo/device-detector": "^6.5.0",
                 "matthiasmullie/minify": "^1.3",
                 "oneup/uploader-bundle": "^5.1",
+                "opis/json-schema": "2.6.2",
                 "php": "~8.4",
                 "php-http/guzzle7-adapter": "^1.0",
                 "phpoffice/phpspreadsheet": "^5.0.0",
