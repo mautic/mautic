@@ -64,6 +64,10 @@ parameters:
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	ignoreErrors:
+		# SegmentDependencyTreeFactory keeps its two-argument public constructor on 7.x; the optional service is removed in 8.0.
+		-
+			identifier: mautic.noNullableServiceInConstructor
+			path: app/bundles/LeadBundle/Services/SegmentDependencyTreeFactory.php
 		# ReportGenerator keeps a nullable form factory for its lazy build flow
 		-
 			identifier: mautic.noNullableServiceInConstructor
