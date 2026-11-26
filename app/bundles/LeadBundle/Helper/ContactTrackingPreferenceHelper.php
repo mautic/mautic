@@ -29,7 +29,7 @@ final readonly class ContactTrackingPreferenceHelper
     public function allowsActivityTracking(Lead $contact): bool
     {
         // A contact that isn't saved yet has no stored choice to look up
-        if (null === $contact->getId()) {
+        if (!$contact->getId()) {
             return true;
         }
 
