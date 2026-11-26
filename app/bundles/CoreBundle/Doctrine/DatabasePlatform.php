@@ -1308,6 +1308,50 @@ final class DatabasePlatform
     }
 
     /**
+     * Moves NULL values in an already-fetched result so ordering matches MySQL.
+     *
+     * MySQL: ASC → NULLs first, DESC → NULLs last.
+     * On PostgreSQL the opposite is the default, so after the query we partition
+     * the result and place NULLs on the correct side. Relative order of non-NULL
+     * rows is preserved. No-op on every other platform.
+     *
+     * Keys are preserved.
+     *
+     * @param array<array-key, mixed> $results
+     * @param callable(mixed): mixed  $valueExtractor Returns the sort value; null means NULL
+     */
+    public static function normalizeNullOrder(array $results, callable $valueExtractor, string $direction, AbstractPlatform $platform): array
+    {
+        if (!self::isPostgreSQL($platform) || [] === $results) {
+            return $results;
+        }
+
+        $direction = strtoupper(trim($direction));
+        if (!in_array($direction, ['ASC', 'DESC'], true)) {
+            return $results;
+        }
+
+        $nulls    = [];
+        $nonNulls = [];
+        foreach ($results as $key => $item) {
+            if (null === $valueExtractor($item)) {
+                $nulls[$key] = $item;
+            } else {
+                $nonNulls[$key] = $item;
+            }
+        }
+
+        $ordered = [];
+        foreach (('ASC' === $direction ? [$nulls, $nonNulls] : [$nonNulls, $nulls]) as $part) {
+            foreach ($part as $key => $item) {
+                $ordered[$key] = $item;
+            }
+        }
+
+        return $ordered;
+    }
+
+    /**
      * Returns ID handling for raw INSERT when Doctrine cannot auto-generate the ID.
      *
      * MySQL:      no ID column in INSERT (auto_increment)
