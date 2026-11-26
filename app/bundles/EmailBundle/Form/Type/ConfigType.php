@@ -139,8 +139,9 @@ final class ConfigType extends AbstractType
         foreach ($defaults as $key => [$defaultMessage, $defaultParameters]) {
             $translations = $options['data'][$key.LocalizedConfigTextHelper::SUFFIX] ?? [];
             if (!is_array($translations) || [] === $translations) {
-                $legacyText   = $options['data'][$key] ?? null;
-                $translations = [$systemLocale => $legacyText ?: $this->translator->trans($defaultMessage, $defaultParameters)];
+                $legacyText    = $options['data'][$key] ?? null;
+                $hasLegacyText = null !== $legacyText && '' !== $legacyText;
+                $translations  = [$systemLocale => $hasLegacyText ? $legacyText : $this->translator->trans($defaultMessage, $defaultParameters, null, $systemLocale)];
             }
 
             $builder->add(

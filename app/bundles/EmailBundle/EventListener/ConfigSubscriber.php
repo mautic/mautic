@@ -65,7 +65,7 @@ final readonly class ConfigSubscriber
 
         foreach (LocalizedConfigTextHelper::KEYS as $key) {
             if (array_key_exists($key.LocalizedConfigTextHelper::SUFFIX, $data)) {
-                $data[$key] = null;
+                $data[$key] = LocalizedConfigTextHelper::baseText($data[$key.LocalizedConfigTextHelper::SUFFIX], (string) $this->coreParametersHelper->get('locale'));
             }
         }
 

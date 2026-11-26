@@ -36,6 +36,27 @@ final class LocalizedConfigTextHelper
         return (string) $coreParametersHelper->get($key);
     }
 
+    public static function baseText(mixed $translations, string $systemLocale): string
+    {
+        if (!is_array($translations)) {
+            return '';
+        }
+
+        foreach (array_unique(array_filter([$systemLocale, self::language($systemLocale)])) as $candidate) {
+            if (isset($translations[$candidate]) && is_string($translations[$candidate]) && '' !== trim($translations[$candidate])) {
+                return $translations[$candidate];
+            }
+        }
+
+        foreach ($translations as $value) {
+            if (is_string($value) && '' !== trim($value)) {
+                return $value;
+            }
+        }
+
+        return '';
+    }
+
     private static function language(?string $locale): ?string
     {
         return $locale ? explode('_', $locale)[0] : null;
