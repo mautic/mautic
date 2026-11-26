@@ -19,6 +19,7 @@ final class Version20211209022550 extends AbstractMauticMigration
         $roleModel = $this->container->get(RoleModel::class);
 
         // Build custom query to force OBJECT hydration
+        /*
         $qb = $roleModel->getRepository()->createQueryBuilder('r');
 
         // Get all non admin roles (use queryBuilder to force OBJECT hydration on PostgreSQL)
@@ -27,6 +28,20 @@ final class Version20211209022550 extends AbstractMauticMigration
             ->orderBy('r.id', 'ASC')
             ->getQuery()
             ->getResult();
+        */
+        $roles = $roleModel->getEntities([
+            'orderBy'    => 'r.id',
+            'orderByDir' => 'ASC',
+            'filter'     => [
+                'where' => [
+                    [
+                        'col'  => 'r.isAdmin',
+                        'expr' => 'eq',
+                        'val'  => 0,
+                    ],
+                ],
+            ],
+        ]);
 
         foreach ($roles as $roleResult) {
             // RoleRepository adds a scalar user count to this query, so Doctrine
