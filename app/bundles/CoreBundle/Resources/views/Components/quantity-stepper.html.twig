@@ -12,17 +12,17 @@
 {% set reservedDigits = max([digits|default(0), minLength, maxLength, (value ~ '')|length, 2]) %}
 {% set labelText = labelText|default(null) %}
 {% set wrapperClass = wrapperClass|default(null) %}
-<div{% if wrapperClass %} class="{{ wrapperClass }}"{% endif %}>
+<div{% if wrapperClass %} class="{{ wrapperClass|e('html_attr') }}"{% endif %}>
     {% if labelText %}
-    <label for="{{ id }}" class="form-label type-label-01">{{ labelText|trans }}</label>
+    <label for="{{ id|e('html_attr') }}" class="form-label type-label-01">{{ labelText|trans }}</label>
     {% endif %}
-    <div class="quantity-stepper quantity-stepper--{{ size }}" role="group" aria-label="{{ (ariaLabel|default('mautic.core.quantity_stepper.label'))|trans|e('html_attr') }}" data-quantity-stepper data-min-message="{{ 'mautic.core.quantity_stepper.min'|trans|e('html_attr') }}" data-max-message="{{ 'mautic.core.quantity_stepper.max'|trans|e('html_attr') }}">
+    <div class="quantity-stepper quantity-stepper--{{ size|e('html_attr') }}" role="group" aria-label="{{ (ariaLabel|default('mautic.core.quantity_stepper.label'))|trans|e('html_attr') }}" data-quantity-stepper data-min-message="{{ 'mautic.core.quantity_stepper.min'|trans|e('html_attr') }}" data-max-message="{{ 'mautic.core.quantity_stepper.max'|trans|e('html_attr') }}">
         <button type="button" class="quantity-stepper__button" data-quantity-step="-1" tabindex="-1" aria-label="{{ decreaseLabel|default('mautic.core.quantity_stepper.decrease')|trans|e('html_attr') }}"{{ disabled ? ' disabled' }}>
             <i class="ri-subtract-line" aria-hidden="true"></i>
         </button>
-        <span class="quantity-stepper__field" style="--quantity-stepper-digits: {{ reservedDigits }}">
+        <span class="quantity-stepper__field" style="--quantity-stepper-digits: {{ reservedDigits|e('html_attr') }}">
             {% block quantity_stepper_input %}
-            <input type="number" id="{{ id }}" name="{{ name|default('quantity') }}" class="quantity-stepper__value" value="{{ value }}"{% if min is not null %} min="{{ min }}"{% endif %}{% if max is not null %} max="{{ max }}"{% endif %} step="{{ step }}" inputmode="numeric" autocomplete="off"{{ disabled ? ' disabled' }}{{ required|default(false) ? ' required' }}>
+            <input type="number" id="{{ id|e('html_attr') }}" name="{{ name|default('quantity')|e('html_attr') }}" class="quantity-stepper__value" value="{{ value|e('html_attr') }}"{% if min is not null %} min="{{ min|e('html_attr') }}"{% endif %}{% if max is not null %} max="{{ max|e('html_attr') }}"{% endif %} step="{{ step|e('html_attr') }}" inputmode="numeric" autocomplete="off"{{ disabled ? ' disabled' }}{{ required|default(false) ? ' required' }}>
             {% endblock %}
             <span class="quantity-stepper__display" aria-hidden="true"><span class="quantity-stepper__digit">{{ value }}</span></span>
         </span>

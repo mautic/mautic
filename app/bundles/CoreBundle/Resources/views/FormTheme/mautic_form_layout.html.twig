@@ -315,7 +315,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     ariaLabel: label ? label : null
 } %}
     {% block quantity_stepper_input %}
-        <input type="number" {{ inputAttributes|raw }} value="{{ value }}">
+        <input type="number" {{ inputAttributes|raw }} value="{{ value|e('html_attr') }}">
     {% endblock %}
 {% endembed %}
 {% if suffix %}<span>{{ suffix|trans({}, translation_domain) }}</span></div>{% endif %}
