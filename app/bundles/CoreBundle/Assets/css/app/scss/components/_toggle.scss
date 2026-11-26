@@ -18,7 +18,13 @@
 
 .toggle__switch {
     --switch-size: 40px;
+    --knob-size: calc(var(--switch-size) - 21px);
+    --travel: 17px;
+    --squish: 0px;
+    --knob-x: 0px;
+    --dir: 1;
     position: relative;
+    touch-action: pan-y;
     border-radius: var(--switch-size);
     background-color: var(--toggle-off, #8d8d8d);
     block-size: calc(var(--switch-size) - 17px);
@@ -31,13 +37,13 @@
     position: absolute;
     border-radius: 50%;
     background-color: var(--icon-on-color, #ffffff);
-    block-size: calc(var(--switch-size) - 21px);
+    block-size: var(--knob-size);
     content: "";
-    inline-size: calc(var(--switch-size) - 21px);
+    inline-size: calc(var(--knob-size) + var(--squish));
+    transform: translateX(calc(var(--knob-x) * var(--dir)));
     inset-block-start: 2px;
     inset-inline-start: 2px;
-    transition: -webkit-transform var(--duration-expressive) cubic-bezier(.54, 1.85, .5, 1);
-    transition: transform var(--duration-expressive) cubic-bezier(.54, 1.85, .5, 1);
+    transition: transform var(--duration-expressive) cubic-bezier(.54, 1.85, .5, 1), inline-size var(--duration-expressive) cubic-bezier(.54, 1.85, .5, 1);
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
 }
 
@@ -50,9 +56,26 @@
     background-color: var(--support-success, #24a148);
 }
 
-.toggle__switch--checked::before {
-    -webkit-transform: translateX(17px);
-    transform: translateX(17px)
+.toggle__switch--checked {
+    --knob-x: var(--travel);
+}
+
+.toggle__switch--pressed {
+    --squish: 6px;
+}
+
+.toggle__switch--pressed.toggle__switch--checked {
+    --knob-x: calc(var(--travel) - var(--squish));
+}
+
+.toggle__switch--dragging::before {
+    transition: inline-size var(--duration-expressive) cubic-bezier(.54, 1.85, .5, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .toggle__switch::before {
+        transition: none;
+    }
 }
 
 .toggle__text {
@@ -156,14 +179,8 @@
     }
 }
 
-[dir=rtl] .toggle__switch--checked::before {
-    -webkit-transform: translateX(-17px);
-    transform: translateX(-17px)
-}
-
-[dir=rtl] .toggle__appearance--sm .toggle__switch--checked::before {
-    -webkit-transform: translateX(-1em);
-    transform: translateX(-1em)
+[dir=rtl] .toggle__switch {
+    --dir: -1;
 }
 
 .toggle__label-text {
