@@ -13,7 +13,7 @@
         {% if items is not empty %}
         {% set activeText = activeLabel|replace({'%active%': positive|length, '%total%': items|length}) %}
         <div class="benchmark-card__average">
-            <div class="benchmark-card__meter" role="img" aria-label="{{ activeText }}">
+            <div class="benchmark-card__meter" role="img" aria-label="{{ activeText|e('html_attr') }}">
                 <span class="benchmark-card__meter-fill" style="width: {{ activePercent|round|e('html_attr') }}%"></span>
             </div>
             <p class="benchmark-card__meta"><span>{{ activeText }}</span></p>
@@ -27,7 +27,7 @@
             {% for item in items %}
                 <li class="benchmark-card__row">
                     <span class="benchmark-card__dot partition-bar__segment--{{ ((loop.index0 % 6) + 1)|e('html_attr') }}" aria-hidden="true"></span>
-                    <span class="benchmark-card__name type-label-01" title="{{ item.label }}">{{ item.label }}</span>
+                    <span class="benchmark-card__name type-label-01" title="{{ item.label|e('html_attr') }}">{{ item.label }}</span>
                     <span class="benchmark-card__number">{{ item.value|number_format }}</span>
                 </li>
             {% endfor %}
