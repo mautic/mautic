@@ -446,6 +446,10 @@ class CommonApiController extends FetchCommonApiController
             $this->detachEntity($entity);
         }
 
+        if (isset($errors[$key])) {
+            unset($entities[$key]);
+        }
+
         $this->inBatchMode = false;
     }
 
@@ -560,7 +564,9 @@ class CommonApiController extends FetchCommonApiController
             $this->setCategory($entity, $categoryId);
             $preSaveError = $this->preSaveEntity($entity, $form, $submitParams, $action);
 
-            if ($preSaveError instanceof Response) {
+            if ($preSaveError instanceof Response
+                || (is_array($preSaveError) && isset($preSaveError['code'], $preSaveError['message']))
+            ) {
                 return $preSaveError;
             }
 
