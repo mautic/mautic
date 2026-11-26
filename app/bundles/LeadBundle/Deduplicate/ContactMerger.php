@@ -17,9 +17,13 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactMerger
 {
+    private TranslatorInterface $translator;
+
     /**
      * @var Lead
      */
@@ -40,6 +44,12 @@ class ContactMerger
     ) {
     }
 
+    #[Required]
+    public function setTranslator(TranslatorInterface $translator): void
+    {
+        $this->translator = $translator;
+    }
+
     /**
      * @throws SameContactException
      */
@@ -49,6 +59,13 @@ class ContactMerger
             throw new SameContactException();
         }
 
+        return $this->repo->wrapInTransaction(
+            fn (): Lead => $this->performMerge($winner, $loser)
+        );
+    }
+
+    private function performMerge(Lead $winner, Lead $loser): Lead
+    {
         $this->logger->debug('CONTACT: ID# '.$loser->getId().' will be merged into ID# '.$winner->getId());
 
         // Dispatch pre merge event
@@ -61,6 +78,7 @@ class ContactMerger
             ->mergeIpAddressHistory($winner, $loser)
             ->mergeFieldData($winner, $loser)
             ->mergeOwners($winner, $loser)
+            ->mergeStages($winner, $loser)
             ->mergePoints($winner, $loser)
             ->mergeTags($winner, $loser)
             ->mergeCompanies($winner, $loser);
@@ -183,6 +201,28 @@ class ContactMerger
             $winner->setOwner($newOwner);
 
             $this->logger->debug("CONTACT: New owner of {$winner->getId()} is {$newOwner->getId()}");
+        }
+
+        return $this;
+    }
+
+    /**
+     * Keep the winner's stage, or inherit the loser's stage if none is assigned.
+     */
+    public function mergeStages(Lead $winner, Lead $loser): static
+    {
+        $loserStage = $loser->getStage();
+
+        if (null === $winner->getStage() && null !== $loserStage) {
+            $mergeAction = isset($this->translator)
+                ? $this->translator->trans('mautic.lead.event.merge')
+                : 'Contact merged';
+
+            $this->leadModel->addToStage(
+                $winner,
+                $loserStage,
+                $mergeAction
+            );
         }
 
         return $this;
