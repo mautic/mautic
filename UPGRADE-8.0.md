@@ -159,12 +159,12 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `LEAD_PRE_BATCH_SAVE` | `LeadPreBatchSaveEvent` |
     | `LEAD_POST_BATCH_SAVE` | `LeadPostBatchSaveEvent` |
     | `CURRENT_LEAD_CHANGED` | `LeadChangeEvent` |
-    | `LIST_PRE_SAVE` | `ListPreSaveEvent` |
-    | `LIST_POST_SAVE` | `ListPostSaveEvent` |
+    | `LIST_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof LeadList`) |
+    | `LIST_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof LeadList`) |
     | `LIST_PRE_UNPUBLISH` | `ListPreUnpublishEvent` |
-    | `LIST_PRE_DELETE` | `ListPreDeleteEvent` |
+    | `LIST_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof LeadList`) |
     | `ON_LIST_DELETE` | `ListDeleteEvent` |
-    | `LIST_POST_DELETE` | `ListPostDeleteEvent` |
+    | `LIST_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof LeadList`) |
     | `FIELD_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof LeadField`) |
     | `FIELD_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof LeadField`) |
     | `FIELD_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof LeadField`) |
@@ -592,12 +592,16 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\LeadBundle\Event\NotePreDeleteEvent` | `EntityPreDelete` (check `instanceof LeadNote`) |
     | `Mautic\LeadBundle\Event\NotePostDeleteEvent` | `EntityPostDelete` (check `instanceof LeadNote`) |
     | `Mautic\LeadBundle\Event\LeadNoteEvent` | generic entity events above |
+    | `Mautic\LeadBundle\Event\ListPreSaveEvent` | `EntityPreSave` (check `instanceof LeadList`) |
+    | `Mautic\LeadBundle\Event\ListPostSaveEvent` | `EntityPostSave` (check `instanceof LeadList`) |
+    | `Mautic\LeadBundle\Event\ListPreDeleteEvent` | `EntityPreDelete` (check `instanceof LeadList`) |
+    | `Mautic\LeadBundle\Event\ListPostDeleteEvent` | `EntityPostDelete` (check `instanceof LeadList`) |
     | `Mautic\CampaignBundle\Event\CampaignPreSaveEvent` | `EntityPreSave` (check `instanceof Campaign`) |
     | `Mautic\CampaignBundle\Event\CampaignPostSaveEvent` | `EntityPostSave` (check `instanceof Campaign`) |
     | `Mautic\CampaignBundle\Event\CampaignPreDeleteEvent` | `EntityPreDelete` (check `instanceof Campaign`) |
     | `Mautic\CampaignBundle\Event\CampaignPostDeleteEvent` | `EntityPostDelete` (check `instanceof Campaign`) |
 
-    `Mautic\LeadBundle\Event\ImportEvent` and `Mautic\CampaignBundle\Event\CampaignEvent` are kept (still used by `ImportBatchProcessedEvent` and `CampaignImportExportSubscriber` respectively); only their four lifecycle subclasses are removed. `ImportModel::dispatchEvent()` keeps a slim override for its non-lifecycle `batch_processed` action and delegates the four lifecycle actions to the parent.
+    `Mautic\LeadBundle\Event\ImportEvent` and `Mautic\CampaignBundle\Event\CampaignEvent` are kept (still used by `ImportBatchProcessedEvent` and `CampaignImportExportSubscriber` respectively); only their four lifecycle subclasses are removed. `ImportModel::dispatchEvent()` keeps a slim override for its non-lifecycle `batch_processed` action and delegates the four lifecycle actions to the parent. `Mautic\LeadBundle\Event\LeadListEvent` is kept as well (still used by `ListPreUnpublishEvent` and `ListDeleteEvent`, which have no generic equivalent); `ListModel::dispatchEvent()` keeps a slim override for its `pre_unpublish` and `on_list_delete` actions and delegates the four lifecycle actions to the parent.
 
     The entity setters `Mautic\AssetBundle\Event\AssetEvent::setAsset()`, `Mautic\SmsBundle\Event\SmsEvent::setSms()` and `Mautic\LeadBundle\Event\LeadNoteEvent::setLeadNote()` have no replacement: `AbstractEntityEvent` only exposes `getEntity()`, so a `pre_save` listener must modify the entity in place instead of swapping it.
 

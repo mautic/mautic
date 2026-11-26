@@ -34,11 +34,7 @@ use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListBatchChangeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\ListDeleteEvent;
-use Mautic\LeadBundle\Event\ListPostDeleteEvent;
-use Mautic\LeadBundle\Event\ListPostSaveEvent;
-use Mautic\LeadBundle\Event\ListPreDeleteEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
-use Mautic\LeadBundle\Event\ListPreSaveEvent;
 use Mautic\LeadBundle\Event\ListPreUnpublishEvent;
 use Mautic\LeadBundle\Form\Type\ListType;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
@@ -259,21 +255,19 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
+        if ('pre_unpublish' !== $action && 'on_list_delete' !== $action) {
+            return parent::dispatchEvent($action, $entity, $isNew, $event);
+        }
+
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
         }
 
-        $event = match ($action) {
-            'pre_save'       => new ListPreSaveEvent($entity, $isNew),
-            'post_save'      => new ListPostSaveEvent($entity, $isNew),
-            'pre_delete'     => new ListPreDeleteEvent($entity, $isNew),
-            'post_delete'    => new ListPostDeleteEvent($entity, $isNew),
-            'pre_unpublish'  => new ListPreUnpublishEvent($entity, $isNew),
-            'on_list_delete' => new ListDeleteEvent($entity, $isNew),
-            default          => null,
-        };
+        $event = 'pre_unpublish' === $action
+            ? new ListPreUnpublishEvent($entity, $isNew)
+            : new ListDeleteEvent($entity, $isNew);
 
-        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+        if (!$this->dispatcher->hasListeners($event::class)) {
             return null;
         }
 

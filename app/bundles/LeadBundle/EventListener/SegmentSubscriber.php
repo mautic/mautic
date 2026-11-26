@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreDelete;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\Event\ListDeleteEvent;
-use Mautic\LeadBundle\Event\ListPostDeleteEvent;
-use Mautic\LeadBundle\Event\ListPostSaveEvent;
-use Mautic\LeadBundle\Event\ListPreDeleteEvent;
 use Mautic\LeadBundle\Event\ListPreUnpublishEvent;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
@@ -38,11 +39,15 @@ final readonly class SegmentSubscriber
      * Add a segment entry to the audit log.
      */
     #[AsEventListener(
-        event: ListPostSaveEvent::class,
+        event: EntityPostSave::class,
     )]
-    public function onSegmentPostSave(SegmentEvent $event): void
+    public function onSegmentPostSave(EntityPostSave $event): void
     {
-        $segment = $event->getList();
+        $segment = $event->getEntity();
+        if (!$segment instanceof LeadList) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'lead',
@@ -78,7 +83,7 @@ final readonly class SegmentSubscriber
             throw new RecordCanNotUnpublishException($message);
         }
 
-        if ($this->validateSegmentsUsedInCampaigns($event, 'unpublish')) {
+        if ($this->segmentUsedInCampaignsValidator->validate($leadList, 'unpublish')) {
             throw new RecordCanNotUnpublishException($this->segmentUsedInCampaignsValidator->getErrorMessage());
         }
     }
@@ -87,11 +92,15 @@ final readonly class SegmentSubscriber
      * @throws DeleteEntityDependencyException
      */
     #[AsEventListener(
-        event: ListPreDeleteEvent::class,
+        event: EntityPreDelete::class,
     )]
-    public function onSegmentPreDelete(SegmentEvent $event): void
+    public function onSegmentPreDelete(EntityPreDelete $event): void
     {
-        $leadList = $event->getList();
+        $leadList = $event->getEntity();
+        if (!$leadList instanceof LeadList) {
+            return;
+        }
+
         $lists    = $this->listModel->getSegmentsWithDependenciesOnSegment($leadList->getId());
 
         if (count($lists)) {
@@ -106,7 +115,7 @@ final readonly class SegmentSubscriber
             $event->addDependencyError($message);
         }
 
-        if ($this->validateSegmentsUsedInCampaigns($event, 'delete')) {
+        if ($this->segmentUsedInCampaignsValidator->validate($leadList, 'delete')) {
             $event->addDependencyError($this->segmentUsedInCampaignsValidator->getErrorMessage());
         }
     }
@@ -130,11 +139,15 @@ final readonly class SegmentSubscriber
      * Add a segment delete entry to the audit log.
      */
     #[AsEventListener(
-        event: ListPostDeleteEvent::class,
+        event: EntityPostDelete::class,
     )]
-    public function onSegmentPostDelete(SegmentEvent $event): void
+    public function onSegmentPostDelete(EntityPostDelete $event): void
     {
-        $segment = $event->getList();
+        $segment = $event->getEntity();
+        if (!$segment instanceof LeadList) {
+            return;
+        }
+
         $log     = [
             'bundle'    => 'lead',
             'object'    => 'segment',
@@ -147,16 +160,15 @@ final readonly class SegmentSubscriber
     }
 
     #[AsEventListener(
-        event: ListPostDeleteEvent::class,
+        event: EntityPostDelete::class,
     )]
-    public function clearSegmentCountCache(SegmentEvent $event): void
+    public function clearSegmentCountCache(EntityPostDelete $event): void
     {
-        $segment = $event->getList();
-        $this->segmentCountCacheHelper->deleteSegmentContactCount($segment->deletedId);
-    }
+        $segment = $event->getEntity();
+        if (!$segment instanceof LeadList) {
+            return;
+        }
 
-    private function validateSegmentsUsedInCampaigns(SegmentEvent $event, string $action): bool
-    {
-        return $this->segmentUsedInCampaignsValidator->validate($event->getList(), $action);
+        $this->segmentCountCacheHelper->deleteSegmentContactCount($segment->deletedId);
     }
 }
