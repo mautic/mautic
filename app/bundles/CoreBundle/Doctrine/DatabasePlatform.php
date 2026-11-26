@@ -632,15 +632,16 @@ final class DatabasePlatform
                 : "VALUES({$refColumn})";
         };
 
-        if (null === $expressionTemplate) {
-            // Backward-compatible behaviour: simple replacement.
+        // Backward-compatible: no template, or template that is just the column
+        // name (the legacy keyed-array convention ['col' => 'col']) → simple
+        // replacement. Never emit an unqualified "col = col" expression.
+        if (null === $expressionTemplate || $expressionTemplate === $column) {
             return "{$column} = ".$newValueRef($column);
         }
 
         $expression = $expressionTemplate;
 
         if ([] !== $newValuePlaceholders) {
-            // Longest placeholder first — ordering becomes irrelevant.
             $placeholders = array_keys($newValuePlaceholders);
             usort($placeholders, static fn (string $a, string $b): int => strlen($b) <=> strlen($a));
 
@@ -650,16 +651,8 @@ final class DatabasePlatform
                 }
 
                 $replacement = $newValueRef($newValuePlaceholders[$placeholder]);
-
-                // Boundary rule = DBAL's named-parameter parser:
-                //   match the token only when the following char ends the name.
-                //   (?![a-zA-Z0-9_]) → ":new" not matched in ":new_total" / ":new2".
-                $pattern = '/'.preg_quote($placeholder, '/').'(?![a-zA-Z0-9_])/';
-                $expression = preg_replace_callback(
-                    $pattern,
-                    static fn (): string => $replacement,
-                    $expression
-                );
+                $pattern     = '/'.preg_quote($placeholder, '/').'(?![a-zA-Z0-9_])/';
+                $expression  = preg_replace_callback($pattern, static fn (): string => $replacement, $expression);
             }
         }
 
@@ -758,9 +751,16 @@ final class DatabasePlatform
     ): string {
         $setClauses = [];
         foreach ($updateSet as $key => $value) {
-            $setClauses[] = is_int($key)
-                ? self::getUpsertUpdateExpression($platform, $value)
-                : self::getUpsertUpdateExpression($platform, $key, $value, $newValuePlaceholders);
+            if (is_int($key)) {
+                // Legacy numeric list: ['col1', 'col2']
+                $setClauses[] = self::getUpsertUpdateExpression($platform, $value);
+                continue;
+            }
+
+            // String-keyed entry: ['col' => template-or-null].
+            // If $value is null or equals the column, getUpsertUpdateExpression()
+            // falls back to simple replacement, preserving the legacy behaviour.
+            $setClauses[] = self::getUpsertUpdateExpression($platform, $key, $value, $newValuePlaceholders);
         }
         $setClause = implode(',', $setClauses);
 
