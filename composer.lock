@@ -6654,7 +6654,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "82b82e1180b8385494e86a4f2b1e692d2d2ca7e8"
+                "reference": "c88540eaedeee1c7319a3db1c1e8b0275b8d205a"
             },
             "require": {
                 "api-platform/core": "^4.1.0",
@@ -6756,7 +6756,8 @@
                 "wikimedia/less.php": "^5.5"
             },
             "conflict": {
-                "psr/simple-cache": ">=3.0.0"
+                "psr/simple-cache": ">=3.0.0",
+                "symfony/error-handler": "<7.4.19"
             },
             "type": "mautic-core",
             "extra": {
@@ -10531,16 +10532,16 @@
         },
         {
             "name": "symfony/error-handler",
-            "version": "v7.4.17",
+            "version": "v7.4.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/error-handler.git",
-                "reference": "8373921e231e190a88e2ad526951bbaa791576fa"
+                "reference": "545852cfe9c4979c82389155b4d8d05f8864e4f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/error-handler/zipball/8373921e231e190a88e2ad526951bbaa791576fa",
-                "reference": "8373921e231e190a88e2ad526951bbaa791576fa",
+                "url": "https://api.github.com/repos/symfony/error-handler/zipball/545852cfe9c4979c82389155b4d8d05f8864e4f1",
+                "reference": "545852cfe9c4979c82389155b4d8d05f8864e4f1",
                 "shasum": ""
             },
             "require": {
@@ -10589,7 +10590,7 @@
             "description": "Provides tools to manage errors and ease debugging PHP code",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/error-handler/tree/v7.4.17"
+                "source": "https://github.com/symfony/error-handler/tree/v7.4.22"
             },
             "funding": [
                 {
@@ -10609,7 +10610,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-08-21T17:40:08+00:00"
+            "time": "2026-10-25T14:40:16+00:00"
         },
         {
             "name": "symfony/event-dispatcher",

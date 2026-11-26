@@ -19,6 +19,8 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public const USER_EDIT_PATH = '/s/users/edit/';
 
+    private const HISTORICAL_ACTOR = 'Historical actor';
+
     protected function setUp(): void
     {
         $this->configParams += [
@@ -34,6 +36,35 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('GET', self::USER_EDIT_PATH.$user->getId());
         $this->assertResponseIsSuccessful();
+    }
+
+    public function testEditPageWithCreatedRoleActivity(): void
+    {
+        $role = new Role();
+        $role->setName('Created activity role');
+        $role->setDescription('Created activity role description');
+        $this->em->persist($role);
+
+        $actor = $this->userSetter($role);
+        $this->em->persist($actor);
+        $this->em->flush();
+
+        $log = $this->auditLogSetter(
+            $actor->getId(),
+            self::HISTORICAL_ACTOR,
+            'user',
+            'role',
+            $role->getId(),
+            'create',
+            ['name' => ['', $role->getName()]],
+        );
+        $this->em->persist($log);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/s/users/edit/'.$actor->getId());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString($role->getName(), $crawler->filter('.media-list-feed')->text());
     }
 
     #[DataProvider('unmatchedActivityProvider')]
@@ -57,7 +88,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($actor);
         $this->em->flush();
 
-        $log = $this->auditLogSetter($actor->getId(), 'Historical actor', 'user', $object, 999999, $action, [
+        $log = $this->auditLogSetter($actor->getId(), self::HISTORICAL_ACTOR, 'user', $object, 999999, $action, [
             'email'    => ['', 'deleted@example.com'],
             // Older records may lack a usable username as well as a current target.
             'username' => ['', ''],
@@ -73,7 +104,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $activity = $crawler->filter('.media-list-feed li.media');
         $this->assertCount(1, $activity);
         $this->assertCount(1, $activity->filter('a'));
-        $this->assertSame('Historical actor', $activity->filter('a')->text());
+        $this->assertSame(self::HISTORICAL_ACTOR, $activity->filter('a')->text());
         $this->assertSame('/s/users/edit/'.$actor->getId(), $activity->filter('a')->attr('href'));
     }
 
