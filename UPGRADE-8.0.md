@@ -90,14 +90,14 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     |---|---|
     | `CAMPAIGN_ON_LEADCHANGE` | `CampaignSingleLeadChangeEvent` |
     | `LEAD_CAMPAIGN_BATCH_CHANGE` | `CampaignBatchLeadChangeEvent` |
-- Constants `CAMPAIGN_PRE_SAVE`, `CAMPAIGN_POST_SAVE`, `CAMPAIGN_PRE_DELETE` and `CAMPAIGN_POST_DELETE` removed from `Mautic\CampaignBundle\CampaignEvents`. These lifecycle events are now dispatched by their own event class (all under `Mautic\CampaignBundle\Event`), each extending `CampaignEvent` so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `CampaignPostSaveEvent::class => 'onCampaignPostSave'`.
+- Constants `CAMPAIGN_PRE_SAVE`, `CAMPAIGN_POST_SAVE`, `CAMPAIGN_PRE_DELETE` and `CAMPAIGN_POST_DELETE` removed from `Mautic\CampaignBundle\CampaignEvents`. Campaign save and delete now run through the default `FormModel::dispatchEvent()`, which emits the generic `Mautic\CoreBundle\Event` events. Subscribe to the generic event and guard the entity type, e.g. `EntityPostSave::class => 'onCampaignPostSave'` with an early `if (!$event->getEntity() instanceof Campaign) { return; }`.
 
     | Removed `CampaignEvents` constant | New event class |
     |---|---|
-    | `CAMPAIGN_PRE_SAVE` | `CampaignPreSaveEvent` |
-    | `CAMPAIGN_POST_SAVE` | `CampaignPostSaveEvent` |
-    | `CAMPAIGN_PRE_DELETE` | `CampaignPreDeleteEvent` |
-    | `CAMPAIGN_POST_DELETE` | `CampaignPostDeleteEvent` |
+    | `CAMPAIGN_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof Campaign`) |
+    | `CAMPAIGN_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof Campaign`) |
+    | `CAMPAIGN_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof Campaign`) |
+    | `CAMPAIGN_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof Campaign`) |
 - Constant `CONFIG_ON_GENERATE` removed from `Mautic\ConfigBundle\ConfigEvents`. The config-generate event is now dispatched by the event object alone (Symfony 4.3+), so its name is the event class. Subscribe to `Mautic\ConfigBundle\Event\ConfigBuilderEvent::class` instead of the constant, e.g. `ConfigBuilderEvent::class => 'onConfigGenerate'`. The `CONFIG_PRE_SAVE` and `CONFIG_POST_SAVE` constants were also removed - see the `ConfigEvents` entry below.
 - Class `Mautic\IntegrationsBundle\IntegrationEvents` removed entirely, along with its constants `INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES`, `INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES`, `INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD`, `INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD`, `INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC` and `INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION`. These events are now dispatched by their own event class (all under `Mautic\IntegrationsBundle\Event`). `InternalContactEvent`, `InternalCompanyEvent` and `CompletedSyncIterationEvent` each used to be dispatched under two different constants; they are now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `InternalContactFieldChangesEvent::class => 'onContactFieldChanges'`.
 
@@ -136,17 +136,17 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `USER_AUTHENTICATION_CONTENT` | `AuthenticationContentEvent` |
     | `USER_PASSWORD_STRENGTH_VALIDATION` | `PasswordStrengthValidateEvent` |
 - Class `Mautic\UserBundle\Event\AuthenticationEvent` is now `abstract` and can no longer be instantiated directly. Dispatch `PreAuthenticationEvent` or `FormAuthenticationEvent` instead.
-- Constants `SMS_PRE_SAVE`, `SMS_POST_SAVE`, `SMS_PRE_DELETE`, `SMS_POST_DELETE` and `ON_REPLY` removed from `Mautic\SmsBundle\SmsEvents`. These events are now dispatched by their own event class (all under `Mautic\SmsBundle\Event`). The lifecycle events used to share one `SmsEvent` object; `SmsEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `SmsPostSaveEvent::class => 'onPostSave'`.
+- Constants `SMS_PRE_SAVE`, `SMS_POST_SAVE`, `SMS_PRE_DELETE`, `SMS_POST_DELETE` and `ON_REPLY` removed from `Mautic\SmsBundle\SmsEvents`. Sms save and delete now run through the default `FormModel::dispatchEvent()`, which emits the generic `Mautic\CoreBundle\Event` events; subscribe to the generic event and guard the entity type, e.g. `EntityPostSave::class => 'onPostSave'` with an early `if (!$event->getEntity() instanceof Sms) { return; }`. `ON_REPLY` is now dispatched by its own event class under `Mautic\SmsBundle\Event`.
 
     | Removed `SmsEvents` constant | New event class |
     |---|---|
-    | `SMS_PRE_SAVE` | `SmsPreSaveEvent` |
-    | `SMS_POST_SAVE` | `SmsPostSaveEvent` |
-    | `SMS_PRE_DELETE` | `SmsPreDeleteEvent` |
-    | `SMS_POST_DELETE` | `SmsPostDeleteEvent` |
+    | `SMS_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof Sms`) |
+    | `SMS_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof Sms`) |
+    | `SMS_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof Sms`) |
+    | `SMS_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof Sms`) |
     | `ON_REPLY` | `ReplyEvent` |
 - Unused constants `ON_CAMPAIGN_TRIGGER_ACTION`, `ON_SMS_TOKENS_BUILD`, `DNC_FILTER_CONTACTS_ON_SEND`, `QUEUE_FILTER_CONTACTS_ON_SEND` and `FILTER_CONTACTS_ON_SEND` removed from `Mautic\SmsBundle\SmsEvents`; they had no dispatcher or listener.
-- Constants removed from `Mautic\LeadBundle\LeadEvents`, these events are now dispatched by their own event class (all under `Mautic\LeadBundle\Event`). Subscribe to the event class instead of the constant, e.g. `LeadPostMergeEvent::class => 'onLeadMerge'`. Lifecycle events that used to share one event object now get a dedicated subclass of the former shared class (`CompanyEvent`, `TagEvent`, `LeadNoteEvent`, `LeadDeviceEvent`, `ImportEvent`, `LeadFieldEvent`, `LeadListEvent`, `LeadMergeEvent`, `CompanyMergeEvent`, `TagMergeEvent`, `SaveBatchLeadsEvent` and `ContactExportSchedulerEvent` are now `abstract`, instantiate one of the subclasses instead; `LeadEvent` and `ListChangeEvent` are no longer `final`), so listener type hints keep working; pre and post events are now separate objects.
+- Constants removed from `Mautic\LeadBundle\LeadEvents`, these events are now dispatched by their own event class (all under `Mautic\LeadBundle\Event`). Subscribe to the event class instead of the constant, e.g. `LeadPostMergeEvent::class => 'onLeadMerge'`. Lifecycle events that used to share one event object now get a dedicated subclass of the former shared class (`CompanyEvent`, `TagEvent`, `LeadDeviceEvent`, `ImportEvent`, `LeadFieldEvent`, `LeadListEvent`, `LeadMergeEvent`, `CompanyMergeEvent`, `TagMergeEvent`, `SaveBatchLeadsEvent` and `ContactExportSchedulerEvent` are now `abstract`, instantiate one of the subclasses instead; `LeadEvent` and `ListChangeEvent` are no longer `final`), so listener type hints keep working; pre and post events are now separate objects.
 
     | Removed `LeadEvents` constant | New event class |
     |---|---|
@@ -169,14 +169,14 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `FIELD_POST_SAVE` | `FieldPostSaveEvent` |
     | `FIELD_PRE_DELETE` | `FieldPreDeleteEvent` |
     | `FIELD_POST_DELETE` | `FieldPostDeleteEvent` |
-    | `NOTE_PRE_SAVE` | `NotePreSaveEvent` |
-    | `NOTE_POST_SAVE` | `NotePostSaveEvent` |
-    | `NOTE_PRE_DELETE` | `NotePreDeleteEvent` |
-    | `NOTE_POST_DELETE` | `NotePostDeleteEvent` |
-    | `IMPORT_PRE_SAVE` | `ImportPreSaveEvent` |
-    | `IMPORT_POST_SAVE` | `ImportPostSaveEvent` |
-    | `IMPORT_PRE_DELETE` | `ImportPreDeleteEvent` |
-    | `IMPORT_POST_DELETE` | `ImportPostDeleteEvent` |
+    | `NOTE_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof LeadNote`) |
+    | `NOTE_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof LeadNote`) |
+    | `NOTE_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof LeadNote`) |
+    | `NOTE_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof LeadNote`) |
+    | `IMPORT_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof Import`) |
+    | `IMPORT_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof Import`) |
+    | `IMPORT_PRE_DELETE` | `Mautic\CoreBundle\Event\EntityPreDelete` (check `instanceof Import`) |
+    | `IMPORT_POST_DELETE` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof Import`) |
     | `IMPORT_BATCH_PROCESSED` | `ImportBatchProcessedEvent` |
     | `DEVICE_PRE_SAVE` | `Mautic\CoreBundle\Event\EntityPreSave` (check `instanceof LeadDevice`) |
     | `DEVICE_POST_SAVE` | `Mautic\CoreBundle\Event\EntityPostSave` (check `instanceof LeadDevice`) |
@@ -599,6 +599,8 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
     `Mautic\LeadBundle\Event\ImportEvent` and `Mautic\CampaignBundle\Event\CampaignEvent` are kept (still used by `ImportBatchProcessedEvent` and `CampaignImportExportSubscriber` respectively); only their four lifecycle subclasses are removed. `ImportModel::dispatchEvent()` keeps a slim override for its non-lifecycle `batch_processed` action and delegates the four lifecycle actions to the parent.
 
+    The entity setters `AssetEvent::setAsset()`, `SmsEvent::setSms()` and `LeadNoteEvent::setLeadNote()` have no replacement: `AbstractEntityEvent` only exposes `getEntity()`, so a `pre_save` listener must modify the entity in place instead of swapping it.
+
     Constants `NOTIFICATION_PRE_SAVE`, `NOTIFICATION_POST_SAVE`, `NOTIFICATION_PRE_DELETE` and `NOTIFICATION_POST_DELETE` were removed from `Mautic\NotificationBundle\NotificationEvents`; subscribe to the generic event classes instead.
 
 - Responsive float and text-alignment classes now use Bootstrap 5's mobile-first breakpoint names: `md` starts at 768px, `lg` at 992px and `xl` at 1200px. The old `xs` float classes apply only below 768px, so pair the base float class with `float-md-none`.
@@ -837,7 +839,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
      }
     ```
 
-- AssetBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\AssetBundle\AssetEvents` string constants. This covers `ASSET_ON_LOAD` (`AssetLoadEvent`), `ASSET_ON_REMOTE_BROWSE` (`RemoteAssetBrowseEvent`) and the CRUD group `ASSET_PRE_SAVE` (`AssetPreSaveEvent`), `ASSET_POST_SAVE` (`AssetPostSaveEvent`), `ASSET_PRE_DELETE` (`AssetPreDeleteEvent`), `ASSET_POST_DELETE` (`AssetPostDeleteEvent`). The CRUD group previously reused one `AssetEvent` object under four names; each action now dispatches its own `AssetEvent` subclass, so `AssetEvent` is no longer `final`. The dead `ASSET_ON_UPLOAD` constant (never dispatched or listened to) has been removed. Update any subscriber or listener that keys on a converted constant to key on the event class instead:
+- AssetBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\AssetBundle\AssetEvents` string constants. This covers `ASSET_ON_LOAD` (`AssetLoadEvent`) and `ASSET_ON_REMOTE_BROWSE` (`RemoteAssetBrowseEvent`). The CRUD group `ASSET_PRE_SAVE`, `ASSET_POST_SAVE`, `ASSET_PRE_DELETE` and `ASSET_POST_DELETE` now dispatches the generic `Mautic\CoreBundle\Event` events `EntityPreSave`, `EntityPostSave`, `EntityPreDelete` and `EntityPostDelete` (check `instanceof Asset`); `AssetEvent` was removed. The dead `ASSET_ON_UPLOAD` constant (never dispatched or listened to) has been removed. Update any subscriber or listener that keys on a converted constant to key on the event class instead:
 
     ```diff
      public static function getSubscribedEvents(): array
@@ -962,7 +964,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
      }
     ```
 
-    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, SmsEvents::SMS_ON_SEND)` becomes `$dispatcher->dispatch($event)`. The `Mautic\SmsBundle\SmsEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class stay unchanged: the `SMS_PRE_SAVE` / `SMS_POST_SAVE` / `SMS_PRE_DELETE` / `SMS_POST_DELETE` group (`SmsEvent`) and the `ON_REPLY` / `ON_CAMPAIGN_REPLY` pair (`ReplyEvent`). The webhook-type identifiers `TOKEN_REPLACEMENT` (shared `CoreBundle` event) and the campaign trigger constants also stay as strings.
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, SmsEvents::SMS_ON_SEND)` becomes `$dispatcher->dispatch($event)`. The `Mautic\SmsBundle\SmsEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class stay unchanged: the `ON_REPLY` / `ON_CAMPAIGN_REPLY` pair (`ReplyEvent`). The `SMS_PRE_SAVE` / `SMS_POST_SAVE` / `SMS_PRE_DELETE` / `SMS_POST_DELETE` group now dispatches the generic `Mautic\CoreBundle\Event` entity events (check `instanceof Sms`). The webhook-type identifiers `TOKEN_REPLACEMENT` (shared `CoreBundle` event) and the campaign trigger constants also stay as strings.
 
     Full mapping of the converted constants to their event class (all in the `Mautic\SmsBundle\Event` namespace):
 
