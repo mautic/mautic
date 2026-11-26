@@ -6,28 +6,28 @@
   --benchmark-primary: var(--background-inverse);
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  padding: 16px;
+  gap: calc(var(--spacing-06) + var(--spacing-02));
+  padding: var(--spacing-05);
   border-block: 1px solid var(--benchmark-border);
   color: var(--benchmark-text);
-  font-size: 14px;
-  line-height: 20px;
+  font-size: var(--body-01-font-size);
+  line-height: var(--body-01-line-height);
   text-align: left;
 
   &__header {
     display: flex;
     align-items: center;
-    margin-bottom: -20px;
+    margin-bottom: calc(-1 * (var(--spacing-05) + var(--spacing-02)));
   }
 
   &__heading {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacing-03);
     margin: 0;
-    font-size: 14px;
+    font-size: var(--body-01-font-size);
     font-weight: 500;
-    line-height: 20px;
+    line-height: var(--body-01-line-height);
     color: var(--benchmark-text);
   }
 
@@ -45,8 +45,8 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 16px;
-    margin-bottom: -8px;
+    gap: var(--spacing-05);
+    margin-bottom: calc(-1 * var(--spacing-03));
   }
 
   &__figure {
@@ -57,8 +57,8 @@
   &__caption {
     margin: 0;
     color: var(--benchmark-muted);
-    font-size: 12px;
-    line-height: 16px;
+    font-size: var(--label-01-font-size);
+    line-height: var(--label-01-line-height);
   }
 
   &__value {
@@ -87,30 +87,30 @@
   &__meta {
     display: flex;
     justify-content: space-between;
-    margin: 8px 0 0;
+    margin: var(--spacing-03) 0 0;
     color: var(--benchmark-muted);
-    font-size: 12px;
-    line-height: 16px;
+    font-size: var(--label-01-font-size);
+    line-height: var(--label-01-line-height);
   }
 
   &__section {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--spacing-04);
   }
 
   &__list {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--spacing-02);
   }
 
   &__row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    line-height: 20px;
+    gap: var(--spacing-03);
+    font-size: var(--body-01-font-size);
+    line-height: var(--body-01-line-height);
   }
 
   &__dot {
