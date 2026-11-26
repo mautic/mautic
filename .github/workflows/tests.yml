@@ -169,8 +169,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install', 'composer lock check']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer lock check']
         php-versions: ['8.1']
+        include:
+          # Fresh installs resolve the newest secure dependencies, which require PHP 8.2+
+          - commands: 'composer install'
+            php-versions: '8.3'
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
