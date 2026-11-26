@@ -365,6 +365,55 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
         $this->assertSame(['Locked'], $this->getResultsNames($form));
     }
 
+    public function testKeptSubmissionNoLongerRefersToItsDeletedFiles(): void
+    {
+        $form = $this->createFormViaApi($this->getPayLoad(['fields' => [
+            ['label' => 'Name', 'type' => 'text', 'alias' => 'name'],
+            ['label' => 'Document', 'type' => 'file', 'alias' => 'document', 'properties' => ['allowed_file_size' => 1, 'allowed_file_extensions' => ['pdf']]],
+            ['label' => 'Photo', 'type' => 'file', 'alias' => 'photo', 'properties' => ['allowed_file_size' => 1, 'allowed_file_extensions' => ['pdf']]],
+            ['label' => 'Submit', 'type' => 'button'],
+        ]]));
+        $deletedContact = $this->createContact('deleted@example.com');
+        $lockedFile     = $this->createUploadedFile($form, 'document', 'locked.pdf');
+        $photoFile      = $this->createUploadedFile($form, 'photo', 'photo.pdf');
+        $this->createTrackedSubmission($form, $deletedContact, 'Partly deleted', ['document' => 'locked.pdf', 'photo' => 'photo.pdf']);
+        $this->deleteContactViaApi($deletedContact);
+
+        // A file uploader that cannot delete the locked file.
+        $fileUploader = $this->createStub(FileUploader::class);
+        $fileUploader->method('delete')->willReturnCallback(static function (string $path): void {
+            if (!str_contains($path, 'locked')) {
+                unlink($path);
+            }
+        });
+        $command = new DeleteSubmissionsOfDeletedContactsCommand(
+            self::getContainer()->get(FormRepository::class),
+            self::getContainer()->get(SubmissionRepository::class),
+            self::getContainer()->get(FormUploader::class),
+            $fileUploader,
+            self::getContainer()->get(TranslatorInterface::class),
+            new NullLogger()
+        );
+
+        $this->em->clear();
+        $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME, [], $command);
+
+        $this->assertFileExists($lockedFile);
+        $this->assertFileDoesNotExist($photoFile);
+        $this->assertSame(
+            [['document' => 'locked.pdf', 'photo' => null]],
+            $this->connection->fetchAllAssociative('SELECT document, photo FROM '.$this->getResultsTable($form))
+        );
+
+        // A later upload of another contact gets the free file name. The next run must not delete it.
+        $laterUpload = $this->createUploadedFile($form, 'photo', 'photo.pdf');
+        $commandTester = $this->testSymfonyCommand(DeleteSubmissionsOfDeletedContactsCommand::COMMAND_NAME);
+
+        $this->assertStringContainsString('Deleted 1 form submissions of deleted contacts', $commandTester->getDisplay());
+        $this->assertFileDoesNotExist($lockedFile);
+        $this->assertFileExists($laterUpload);
+    }
+
     public function testAllBatchesAreDeleted(): void
     {
         $form           = $this->createFormViaApi($this->getPayLoad());
@@ -545,8 +594,14 @@ final class DeleteSubmissionsOfDeletedContactsCommandTest extends MauticMysqlTes
      */
     private function getResultsNames(array $form): array
     {
-        $table = self::getContainer()->get(SubmissionRepository::class)->getResultsTableName($form['id'], $form['alias']);
+        return $this->connection->fetchFirstColumn('SELECT name FROM '.$this->getResultsTable($form).' ORDER BY submission_id');
+    }
 
-        return $this->connection->fetchFirstColumn("SELECT name FROM {$table} ORDER BY submission_id");
+    /**
+     * @param array<string, mixed> $form
+     */
+    private function getResultsTable(array $form): string
+    {
+        return self::getContainer()->get(SubmissionRepository::class)->getResultsTableName($form['id'], $form['alias']);
     }
 }

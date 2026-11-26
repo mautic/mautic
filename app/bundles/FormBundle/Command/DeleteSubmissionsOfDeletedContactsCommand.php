@@ -216,6 +216,7 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
     /**
      * Deletes the uploaded files of the submissions, as FormUploader::deleteUploadedFiles() does for a single submission.
      * A submission whose file could not be deleted is kept, so that the next run still knows the file.
+     * The reference to each deleted file is cleared at once, because a later upload can get the same file name.
      *
      * @param array<string, Field> $fileFields
      * @param int[]                $submissionIds
@@ -226,6 +227,7 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
     {
         $fileNames    = $this->submissionRepository->getUploadedFileNames($form, array_keys($fileFields), $submissionIds);
         $deletableIds = [];
+        $deletedFiles = [];
 
         foreach ($submissionIds as $submissionId) {
             $filesDeleted = true;
@@ -243,12 +245,20 @@ final class DeleteSubmissionsOfDeletedContactsCommand extends Command
                 if (file_exists($filePath)) {
                     $filesDeleted = false;
                     $this->logger->error('The uploaded file of a form submission of a deleted contact could not be deleted.', ['submissionId' => $submissionId, 'filePath' => $filePath]);
+
+                    continue;
                 }
+
+                $deletedFiles[$alias][] = $submissionId;
             }
 
             if ($filesDeleted) {
                 $deletableIds[] = $submissionId;
             }
+        }
+
+        foreach ($deletedFiles as $alias => $submissionIdsOfDeletedFiles) {
+            $this->submissionRepository->clearUploadedFileNames($form, $alias, $submissionIdsOfDeletedFiles);
         }
 
         return $deletableIds;

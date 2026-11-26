@@ -725,6 +725,25 @@ class SubmissionRepository extends CommonRepository
     /**
      * @param int[] $submissionIds
      */
+    public function clearUploadedFileNames(Form $form, string $fieldAlias, array $submissionIds): void
+    {
+        if ([] === $submissionIds) {
+            return;
+        }
+
+        $connection = $this->getEntityManager()->getConnection();
+
+        $connection->createQueryBuilder()
+            ->update($this->getResultsTableName($form->getId(), $form->getAlias()))
+            ->set($connection->getDatabasePlatform()->quoteIdentifier($fieldAlias), 'NULL')
+            ->where('submission_id IN (:submissionIds)')
+            ->setParameter('submissionIds', $submissionIds, ArrayParameterType::INTEGER)
+            ->executeStatement();
+    }
+
+    /**
+     * @param int[] $submissionIds
+     */
     public function deleteSubmissionsOfDeletedContacts(Form $form, array $submissionIds, bool $resultsTableExists): int
     {
         if ([] === $submissionIds) {
