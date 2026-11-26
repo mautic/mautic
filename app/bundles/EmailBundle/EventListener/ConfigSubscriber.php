@@ -63,9 +63,12 @@ final readonly class ConfigSubscriber
             }
         }
 
+        $submittedLocale = $event->getConfig('coreconfig')['locale'] ?? null;
+        $locale          = is_string($submittedLocale) && '' !== $submittedLocale ? $submittedLocale : (string) $this->coreParametersHelper->get('locale');
+
         foreach (LocalizedConfigTextHelper::KEYS as $key) {
             if (array_key_exists($key.LocalizedConfigTextHelper::SUFFIX, $data)) {
-                $data[$key] = LocalizedConfigTextHelper::baseText($data[$key.LocalizedConfigTextHelper::SUFFIX], (string) $this->coreParametersHelper->get('locale'));
+                $data[$key] = LocalizedConfigTextHelper::baseText($data[$key.LocalizedConfigTextHelper::SUFFIX], $locale);
             }
         }
 
