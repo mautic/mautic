@@ -24,14 +24,14 @@
     } only %}
 {% endset %}
 {% set clear %}
-    <button type="button" class="form-field-clear" aria-label="{{ clear_label }}" title="{{ clear_label }}"{{ hasValue ? '' : ' hidden' }}{{ (disabled|default(false) or readonly|default(false)) ? ' disabled' : '' }}>
+    <button type="button" class="form-field-clear" aria-label="{{ clear_label|e('html_attr') }}" title="{{ clear_label|e('html_attr') }}"{{ hasValue ? '' : ' hidden' }}{{ (disabled|default(false) or readonly|default(false)) ? ' disabled' : '' }}>
         <i class="ri-close-line" aria-hidden="true"></i>
     </button>
 {% endset %}
 {% if variant == 'fluid' %}
-<div class="form-fluid form-fluid--search{{ wrapperClass ? ' ' ~ wrapperClass : '' }}" role="search" aria-labelledby="{{ label_id }}">
+<div class="form-fluid form-fluid--search{{ (wrapperClass ? ' ' ~ wrapperClass : '')|e('html_attr') }}" role="search" aria-labelledby="{{ label_id|e('html_attr') }}">
     <div class="form-fluid__label text-helper">
-        <label id="{{ label_id }}" for="{{ id }}" class="form-label type-label-01 mb-0">{{ labelText|trans }}</label>
+        <label id="{{ label_id|e('html_attr') }}" for="{{ id|e('html_attr') }}" class="form-label type-label-01 mb-0">{{ labelText|trans }}</label>
     </div>
     <div class="form-field-with-action">
         {{ control|raw }}
@@ -40,20 +40,20 @@
     </div>
 </div>
 {% elseif variant == 'expandable' %}
-<div class="search-expandable{{ wrapperClass ? ' ' ~ wrapperClass : '' }}" role="search" aria-label="{{ labelText|trans }}" data-search-expandable data-size="{{ size }}">
-    <button type="button" class="btn btn-ghost btn--icon-only btn-nospin search-expandable__toggle" aria-expanded="false" aria-controls="{{ id }}" aria-label="{{ labelText|trans }}" title="{{ labelText|trans }}">
+<div class="search-expandable{{ (wrapperClass ? ' ' ~ wrapperClass : '')|e('html_attr') }}" role="search" aria-label="{{ labelText|trans|e('html_attr') }}" data-search-expandable data-size="{{ size|e('html_attr') }}">
+    <button type="button" class="btn btn-ghost btn--icon-only btn-nospin search-expandable__toggle" aria-expanded="false" aria-controls="{{ id|e('html_attr') }}" aria-label="{{ labelText|trans|e('html_attr') }}" title="{{ labelText|trans|e('html_attr') }}">
         <i class="ri-search-line" aria-hidden="true"></i>
     </button>
     <div class="search-expandable__field form-field-with-action flex-grow-1" hidden>
-        <label for="{{ id }}" class="visually-hidden">{{ labelText|trans }}</label>
+        <label for="{{ id|e('html_attr') }}" class="visually-hidden">{{ labelText|trans }}</label>
         {{ control|raw }}
         <i class="ri-search-line form-field-icon form-field-icon--start" aria-hidden="true"></i>
         {{ clear|raw }}
     </div>
 </div>
 {% else %}
-<div class="form-field-with-action{{ wrapperClass ? ' ' ~ wrapperClass : '' }}" role="search" aria-labelledby="{{ label_id }}" data-size="{{ size }}">
-    <label id="{{ label_id }}" for="{{ id }}" class="visually-hidden">{{ labelText|trans }}</label>
+<div class="form-field-with-action{{ (wrapperClass ? ' ' ~ wrapperClass : '')|e('html_attr') }}" role="search" aria-labelledby="{{ label_id|e('html_attr') }}" data-size="{{ size|e('html_attr') }}">
+    <label id="{{ label_id|e('html_attr') }}" for="{{ id|e('html_attr') }}" class="visually-hidden">{{ labelText|trans }}</label>
     {{ control|raw }}
     <i class="ri-search-line form-field-icon form-field-icon--start" aria-hidden="true"></i>
     {{ clear|raw }}

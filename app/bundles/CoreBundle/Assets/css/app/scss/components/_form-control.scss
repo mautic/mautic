@@ -55,7 +55,7 @@
 }
 
 .form-field-with-action .form-control {
-    padding-right: 40px;
+    padding-right: var(--spacing-08);
 }
 
 .form-field-with-action[data-size='xs'], .search-expandable[data-size='xs'] { --search-height: var(--spacing-06); }
@@ -91,16 +91,16 @@
     top: 50%;
     right: var(--spacing-04);
     transform: translateY(-50%);
-    width: 16px;
-    font-size: 16px;
-    line-height: 16px;
+    width: var(--spacing-05);
+    font-size: var(--body-compact-02-font-size);
+    line-height: var(--spacing-05);
     color: var(--text-helper);
     pointer-events: none;
 }
 
 .form-field-icon--start {
     right: auto;
-    left: calc((var(--search-height, #{$input-height-base}) - 16px) / 2);
+    left: calc((var(--search-height, #{$input-height-base}) - var(--spacing-05)) / 2);
 }
 
 .form-field-with-action:has(> .form-field-icon--start) .form-control {
@@ -149,14 +149,14 @@
     right: 0;
     width: var(--search-height, #{$input-height-base});
     height: var(--search-height, #{$input-height-base});
-    font-size: 16px;
-    line-height: 16px;
+    font-size: var(--body-compact-02-font-size);
+    line-height: var(--spacing-05);
     isolation: isolate;
 
     &::before {
         content: '';
         position: absolute;
-        inset: 2px;
+        inset: var(--spacing-01);
         z-index: -1;
         pointer-events: none;
     }
@@ -166,8 +166,8 @@
     }
 
     &:focus-visible {
-        outline: 2px var(--outline-style) var(--focus);
-        outline-offset: -2px;
+        outline: var(--spacing-01) var(--outline-style) var(--focus);
+        outline-offset: calc(-1 * var(--spacing-01));
     }
 }
 
