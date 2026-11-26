@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
+use Mautic\EmailBundle\Helper\LocalizedConfigTextHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -166,7 +167,8 @@ final class BuilderSubscriber
             $unsubscribeHash = $this->mailHash->getEmailHash($toEmail);
         }
 
-        $unsubscribeText = $this->coreParametersHelper->get('unsubscribe_text');
+        $locale          = $email instanceof Email ? $email->getLanguage() : null;
+        $unsubscribeText = LocalizedConfigTextHelper::get($this->coreParametersHelper, 'unsubscribe_text', $locale);
         if (!$unsubscribeText) {
             $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
         }
@@ -187,7 +189,7 @@ final class BuilderSubscriber
         $event->addToken('{dnc_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe_all', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
         $event->addToken('{resubscribe_url}', $resubscribeUrl);
 
-        $webviewText = $this->coreParametersHelper->get('webview_text');
+        $webviewText = LocalizedConfigTextHelper::get($this->coreParametersHelper, 'webview_text', $locale);
         if (!$webviewText) {
             $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
         }
@@ -202,7 +204,7 @@ final class BuilderSubscriber
             $event->addToken('{webview_url}', $webviewLink);
         }
 
-        $signatureText = (string) $this->coreParametersHelper->get('default_signature_text');
+        $signatureText = LocalizedConfigTextHelper::get($this->coreParametersHelper, 'default_signature_text', $locale);
 
         // In owner-mailer mode, use the owner's signature for display/send generation.
         if ($email instanceof Email && $email->getUseOwnerAsMailer() && is_array($lead)) {

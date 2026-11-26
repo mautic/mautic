@@ -7,14 +7,16 @@ namespace Mautic\EmailBundle\Form\Type;
 use Mautic\ConfigBundle\Form\Type\DsnType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\SortableListType;
+use Mautic\CoreBundle\Form\Type\SortableLocaleValueListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\EmailBundle\Helper\LocalizedConfigTextHelper;
 use Mautic\EmailBundle\Validator\Dsn;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
@@ -30,6 +32,7 @@ final class ConfigType extends AbstractType
 
     public function __construct(
         private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -40,101 +43,15 @@ final class ConfigType extends AbstractType
                 [
                     'mailer_from_email'      => 'email',
                     'mailer_return_path'     => 'email',
-                    'default_signature_text' => 'html',
-                    'unsubscribe_text'       => 'html',
-                    'unsubscribe_message'    => 'html',
-                    'resubscribe_message'    => 'html',
-                    'webview_text'           => 'html',
+                    'unsubscribe_text_translations'       => 'html',
+                    'webview_text_translations'           => 'html',
+                    'unsubscribe_message_translations'    => 'html',
+                    'resubscribe_message_translations'    => 'html',
+                    'default_signature_text_translations' => 'html',
                     // Encode special chars to keep congruent with Email entity custom headers
                     'mailer_custom_headers'  => 'clean',
                 ]
             )
-        );
-
-        $builder->add(
-            'unsubscribe_text',
-            TextareaType::class,
-            [
-                'label'      => 'mautic.email.config.unsubscribe_text',
-                'label_attr' => ['class' => 'form-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.unsubscribe_text.tooltip',
-                ],
-                'required'   => false,
-                'data'       => (array_key_exists('unsubscribe_text', $options['data']) && !empty($options['data']['unsubscribe_text']))
-                    ? $options['data']['unsubscribe_text']
-                    : $this->translator->trans(
-                        'mautic.email.unsubscribe.text',
-                        ['%link%' => '|URL|']
-                    ),
-            ]
-        );
-
-        $builder->add(
-            'webview_text',
-            TextareaType::class,
-            [
-                'label'      => 'mautic.email.config.webview_text',
-                'label_attr' => ['class' => 'form-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.webview_text.tooltip',
-                ],
-                'required'   => false,
-                'data'       => (array_key_exists('webview_text', $options['data']) && !empty($options['data']['webview_text']))
-                    ? $options['data']['webview_text']
-                    : $this->translator->trans(
-                        'mautic.email.webview.text',
-                        ['%link%' => '|URL|']
-                    ),
-            ]
-        );
-
-        $builder->add(
-            'unsubscribe_message',
-            TextareaType::class,
-            [
-                'label'      => 'mautic.email.config.unsubscribe_message',
-                'label_attr' => ['class' => 'form-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.unsubscribe_message.tooltip',
-                ],
-                'required'   => false,
-                'data'       => (array_key_exists('unsubscribe_message', $options['data']) && !empty($options['data']['unsubscribe_message']))
-                    ? $options['data']['unsubscribe_message']
-                    : $this->translator->trans(
-                        'mautic.email.unsubscribed.success',
-                        [
-                            '%resubscribeUrl%' => '|URL|',
-                            '%email%'          => '|EMAIL|',
-                        ]
-                    ),
-            ]
-        );
-
-        $builder->add(
-            'resubscribe_message',
-            TextareaType::class,
-            [
-                'label'      => 'mautic.email.config.resubscribe_message',
-                'label_attr' => ['class' => 'form-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.resubscribe_message.tooltip',
-                ],
-                'required'   => false,
-                'data'       => (array_key_exists('resubscribe_message', $options['data']) && !empty($options['data']['resubscribe_message']))
-                    ? $options['data']['resubscribe_message']
-                    : $this->translator->trans(
-                        'mautic.email.resubscribed.success',
-                        [
-                            '%unsubscribeUrl%' => '|URL|',
-                            '%email%'          => '|EMAIL|',
-                        ]
-                    ),
-            ]
         );
 
         $builder->add(
@@ -210,27 +127,41 @@ final class ConfigType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'default_signature_text',
-            TextareaType::class,
-            [
-                'label'      => 'mautic.email.config.default_signature_text',
-                'label_attr' => ['class' => 'form-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.default_signature_text.tooltip',
-                ],
-                'required'   => false,
-                'data'       => (!empty($options['data']['default_signature_text']))
-                    ? $options['data']['default_signature_text']
-                    : $this->translator->trans(
-                        'mautic.email.default.signature',
-                        [
-                            '%from_name%' => '|FROM_NAME|',
-                        ]
-                    ),
-            ]
-        );
+        $systemLocale = (string) $this->coreParametersHelper->get('locale');
+        $defaults     = [
+            'unsubscribe_text'       => ['mautic.email.unsubscribe.text', ['%link%' => '|URL|']],
+            'webview_text'           => ['mautic.email.webview.text', ['%link%' => '|URL|']],
+            'unsubscribe_message'    => ['mautic.email.unsubscribed.success', ['%resubscribeUrl%' => '|URL|', '%email%' => '|EMAIL|']],
+            'resubscribe_message'    => ['mautic.email.resubscribed.success', ['%unsubscribeUrl%' => '|URL|', '%email%' => '|EMAIL|']],
+            'default_signature_text' => ['mautic.email.default.signature', ['%from_name%' => '|FROM_NAME|']],
+        ];
+
+        foreach ($defaults as $key => [$defaultMessage, $defaultParameters]) {
+            $translations = $options['data'][$key.LocalizedConfigTextHelper::SUFFIX] ?? [];
+            if (!is_array($translations) || [] === $translations) {
+                $legacyText   = $options['data'][$key] ?? null;
+                $translations = [$systemLocale => $legacyText ?: $this->translator->trans($defaultMessage, $defaultParameters)];
+            }
+
+            $builder->add(
+                $key.LocalizedConfigTextHelper::SUFFIX,
+                SortableListType::class,
+                [
+                    'label'            => 'mautic.email.config.'.$key,
+                    'label_attr'       => ['class' => 'form-label'],
+                    'attr'             => [
+                        'tooltip' => 'mautic.email.config.'.$key.'.tooltip',
+                    ],
+                    'required'         => false,
+                    'option_required'  => false,
+                    'option_notblank'  => false,
+                    'entry_type'       => SortableLocaleValueListType::class,
+                    'key_value_pairs'  => true,
+                    'add_value_button' => 'mautic.email.config.translations.add',
+                    'data'             => $translations,
+                ]
+            );
+        }
 
         $builder->add(
             'mailer_from_name',

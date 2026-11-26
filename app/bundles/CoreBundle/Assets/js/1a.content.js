@@ -2384,7 +2384,7 @@ Mautic.activateSortable = function(el) {
         containment: '#' + prefix + '_list',
         stop: function (i) {
             var order = 0;
-            mQuery('#' + prefix + '_list div.list-sortable div.input-group input').each(function () {
+            mQuery('#' + prefix + '_list div.list-sortable div.input-group').find('input, select, textarea').each(function () {
                 var name = mQuery(this).attr('name');
                 if (mQuery(this).hasClass('sortable-label')) {
                     name = name.replace(/(\[list\]\[[0-9]+\]\[label\])$/g, '') + '[list][' + order + '][label]';

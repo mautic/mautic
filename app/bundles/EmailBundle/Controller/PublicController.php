@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Helper\EmailAddressLinkMatcher;
 use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Mautic\EmailBundle\Helper\EmailPreviewHelper;
+use Mautic\EmailBundle\Helper\LocalizedConfigTextHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -555,7 +556,7 @@ final class PublicController extends CommonFormController
                 if ($isCorrectHash) {
                     $email = $lead = false;
                     $model->removeDoNotContact($urlEmail);
-                    $message = $this->buildResubscribeSuccessMessage($urlEmail, $secretHash, $idHash);
+                    $message = $this->buildResubscribeSuccessMessage($urlEmail, $secretHash, $idHash, $stat->getEmail()?->getLanguage());
                 } else {
                     $email   = false;
                     $lead    = false;
@@ -1041,7 +1042,7 @@ final class PublicController extends CommonFormController
     {
         $model->setDoNotContact($stat, $this->translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
-        return $this->getUnsubscribeText($stat->getEmailAddress(), $idHash);
+        return $this->getUnsubscribeText($stat->getEmailAddress(), $idHash, $stat->getEmail()?->getLanguage());
     }
 
     private function getUnsubscribeMessageLead(string $idHash, EmailModel $model, Lead $lead, string $urlEmail): string
@@ -1051,9 +1052,9 @@ final class PublicController extends CommonFormController
         return $this->getUnsubscribeText($urlEmail, $idHash);
     }
 
-    private function getUnsubscribeText(string $email, string $idHash): string
+    private function getUnsubscribeText(string $email, string $idHash, ?string $locale = null): string
     {
-        $message = $this->coreParametersHelper->get('unsubscribe_message');
+        $message = LocalizedConfigTextHelper::get($this->coreParametersHelper, 'unsubscribe_message', $locale);
         if (!$message) {
             $message = $this->translator->trans(
                 'mautic.email.unsubscribed.success',
@@ -1084,9 +1085,9 @@ final class PublicController extends CommonFormController
         );
     }
 
-    private function buildResubscribeSuccessMessage(string $emailAddress, string $unsubscribeHash, string $idHash): string
+    private function buildResubscribeSuccessMessage(string $emailAddress, string $unsubscribeHash, string $idHash, ?string $locale = null): string
     {
-        $message = $this->coreParametersHelper->get('resubscribe_message');
+        $message = LocalizedConfigTextHelper::get($this->coreParametersHelper, 'resubscribe_message', $locale);
 
         if (!$message) {
             $message = $this->translator->trans(

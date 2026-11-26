@@ -1229,7 +1229,7 @@ final class MailHelper
             - if 'Disable unsubscribe link in header' setting is true in email configuration
         */
 
-        $unsubscribeBodyText = $this->coreParametersHelper->get('unsubscribe_text') ?? '';
+        $unsubscribeBodyText = LocalizedConfigTextHelper::get($this->coreParametersHelper, 'unsubscribe_text', $this->email?->getLanguage());
         if (!$this->email
             || $this->email->getSendToDnc()
             || $this->coreParametersHelper->get('disable_unsubscribe_link_header')

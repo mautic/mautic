@@ -382,10 +382,10 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     <div>
         <div class="row">
             <div class="col-xs-6 me-0 pe-0 border-end-0">
-            {{ form_widget(form.label, {'attr': {'class': 'form-control sortable-label', 'placeholder': form.label.vars.label}}) }}
+            {{ form_widget(form.label, {'attr': {'class': (form.label.vars.attr.class ?? 'form-control') ~ ' sortable-label', 'placeholder': form.label.vars.label, 'aria-label': form.label.vars.label|trans}}) }}
             </div>
             <div class="col-xs-6 ms-0 ps-0">
-            {{ form_widget(form.value, {'attr': {'class': 'form-control sortable-value', 'placeholder': form.value.vars.label}}) }}
+            {{ form_widget(form.value, {'attr': (form.value.vars.attr|merge({'class': 'form-control sortable-value', 'placeholder': form.value.vars.label, 'aria-label': form.value.vars.label|trans}))}) }}
             </div>
         </div>
     </div>

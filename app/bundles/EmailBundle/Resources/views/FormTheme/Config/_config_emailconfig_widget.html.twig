@@ -83,8 +83,8 @@
     <div class="panel panel-default mb-16">
         <div class="panel-body">
             <div class="row">
-                {{ _self.row_if_exists(fields, 'webview_text') }}
-                {{ _self.row_if_exists(fields, 'default_signature_text') }}
+                {{ _self.row_if_exists(fields, 'webview_text_translations') }}
+                {{ _self.row_if_exists(fields, 'default_signature_text_translations') }}
                 {{ _self.row_if_exists(fields, 'mailer_append_tracking_pixel') }}
                 {{ _self.row_if_exists(fields, 'mailer_convert_embed_images') }}
                 {{ _self.row_if_exists(fields, 'disable_trackable_urls') }}
@@ -105,9 +105,9 @@
     <div class="panel panel-default mb-16">
         <div class="panel-body">
             <div class="row">
-                {{ _self.row_if_exists(fields, 'unsubscribe_text') }}
-                {{ _self.row_if_exists(fields, 'unsubscribe_message') }}
-                {{ _self.row_if_exists(fields, 'resubscribe_message') }}
+                {{ _self.row_if_exists(fields, 'unsubscribe_text_translations') }}
+                {{ _self.row_if_exists(fields, 'unsubscribe_message_translations') }}
+                {{ _self.row_if_exists(fields, 'resubscribe_message_translations') }}
                 {{ _self.row_if_exists(fields, 'email_default_preference_center_id') }}
                 {{ _self.row_if_exists(fields, 'validate_unsubscribe_emails') }}
                 {{ _self.row_if_exists(fields, 'show_contact_preferences') }}
