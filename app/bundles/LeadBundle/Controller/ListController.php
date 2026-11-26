@@ -820,11 +820,12 @@ final class ListController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'list'                      => $segment,
-                'segmentCount'              => $statistics['total'],
-                'activeSegmentCount'        => $activeSegmentCount,
-                'manuallyAddedSegmentCount' => $statistics['manuallyAdded'],
-                'filterAddedSegmentCount'   => $statistics['filterAdded'],
+                'list'                        => $segment,
+                'segmentCount'                => $statistics['total'],
+                'activeSegmentCount'          => $activeSegmentCount,
+                'manuallyAddedSegmentCount'   => $statistics['manuallyAdded'],
+                'filterAddedSegmentCount'     => $statistics['filterAdded'],
+                'manuallyRemovedSegmentCount' => $statistics['manuallyRemoved'],
             ],
             'contentTemplate' => '@MauticLead/List/_segment_stats.html.twig',
         ]);

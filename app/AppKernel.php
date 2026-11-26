@@ -157,12 +157,24 @@ class AppKernel extends Kernel
 
         // dynamically register Mautic Plugin Bundles
         $searchPath = $this->getApplicationDir().'/plugins';
-        $finder     = new Symfony\Component\Finder\Finder();
-        $finder->files()
-            ->followLinks()
-            ->depth('1')
-            ->in($searchPath)
-            ->name('*Bundle.php');
+        $finder = [];
+        if (!is_readable($searchPath)) {
+            error_log(sprintf('Mautic plugin directory "%s" is not readable; skipping plugin discovery.', $searchPath));
+        } else {
+            foreach (new DirectoryIterator($searchPath) as $directory) {
+                if ($directory->isDir() && !$directory->isReadable()) {
+                    error_log(sprintf('Mautic plugin directory "%s" is not readable; skipping it.', $directory->getPathname()));
+                }
+            }
+
+            $finder = new Symfony\Component\Finder\Finder();
+            $finder->files()
+                ->followLinks()
+                ->depth('1')
+                ->in($searchPath)
+                ->ignoreUnreadableDirs()
+                ->name('*Bundle.php');
+        }
 
         foreach ($finder as $file) {
             $dirname  = basename($file->getRelativePath());
