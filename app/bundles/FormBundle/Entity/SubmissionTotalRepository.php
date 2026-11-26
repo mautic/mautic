@@ -22,41 +22,35 @@ final class SubmissionTotalRepository extends CommonRepository
         $hour = $hour->setTime((int) $hour->format('H'), 0);
 
         $connection = $this->getEntityManager()->getConnection();
+        $metadata   = $this->getEntityManager()->getClassMetadata(SubmissionTotal::class);
 
         // Get ID handling for PostgreSQL (nextval) vs MySQL (auto_increment)
         $idValues = DatabasePlatform::getInsertIdValues(
             $connection->getDatabasePlatform(),
             MAUTIC_TABLE_PREFIX.SubmissionTotal::TABLE_NAME,
-            $this->getEntityManager()->getClassMetadata(SubmissionTotal::class)
+            $metadata
         );
 
         $columns = [
             'form_id', 'hour', 'total',
         ];
 
-        // Add id column if exists
-        if (!empty($idValues)) {
-            array_unshift($columns, array_keys($idValues));
-        }
-
         $values = [
             ':formId', ':hour', '1',
         ];
 
-        if (!empty($idValues)) {
-            array_unshift($values, array_values($idValues));
+        // Add id column if exists
+        if ([] !== $idValues) {
+            array_unshift($columns, ...array_keys($idValues));
+            array_unshift($values, ...array_values($idValues));
         }
-
-        $conflictOn = [
-            'form_id', 'hour',
-        ];
 
         $sql = DatabasePlatform::getComplexUpsertStatement(
             $connection->getDatabasePlatform(),
             MAUTIC_TABLE_PREFIX.SubmissionTotal::TABLE_NAME,
             implode(', ', $columns),
             'VALUES ('.implode(', ', $values).')',
-            implode(', ', $conflictOn),
+            'form_id, hour',
             ['total' => ':old_total + 1'],   // increment pattern: existing + 1
             [],                              // no new-value placeholders needed
             [':old_total' => 'total'],       // existing-value placeholder, caller-chosen token

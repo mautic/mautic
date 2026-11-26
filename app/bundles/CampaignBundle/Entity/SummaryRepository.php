@@ -137,9 +137,9 @@ final class SummaryRepository extends CommonRepository
                     AND mclefl.log_id IS NULL THEN 1 ELSE 0 END) AS log_counts_processed',
             ];
 
-            if (!empty($idValues)) {
+            if ([] !== $idValues) {
                 // prepend ID COLUMN value as COLUMN
-                array_unshift($selects, array_map(
+                array_unshift($selects, ...array_map(
                     fn ($value, $key) => "{$value} AS {$key}",
                     $idValues,
                     array_keys($idValues)
@@ -151,7 +151,7 @@ final class SummaryRepository extends CommonRepository
                 ' FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel
                 LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl
                     ON mclefl.log_id = mclel.id
-                   AND mclefl.date_added BETWEEN '.$dateFromExpr.' AND '.$dateToExpr.'
+                    AND mclefl.date_added BETWEEN '.$dateFromExpr.' AND '.$dateToExpr.'
                 WHERE mclel.date_triggered BETWEEN '.$dateFromExpr.' AND '.$dateToExpr;
 
             if (null !== $campaignId) {
@@ -177,7 +177,7 @@ final class SummaryRepository extends CommonRepository
             ];
 
             // Add id column if exists
-            if (!empty($idValues)) {
+            if ([] !== $idValues) {
                 array_unshift($columns, array_keys($idValues));
             }
 
