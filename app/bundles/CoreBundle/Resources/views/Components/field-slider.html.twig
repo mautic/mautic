@@ -1,0 +1,20 @@
+{% set id = id|default(name|default('slider')|replace({'[': '-', ']': '', ' ': '-', '.': '-'})) %}
+{% set min = min|default(0) %}
+{% set max = max|default(100) %}
+{% set step = step|default(1) %}
+{% set value = value is defined and value is not same as('') and value is not null ? value : min %}
+{% set suffix = suffix|default(null) %}
+{% set ticks = ticks|default(41) %}
+{% set lean = lean|default(30) %}
+{% set reach = reach|default(4) %}
+{% set disabled = disabled|default(false) %}
+{% set wrapperClass = wrapperClass|default(null) %}
+<div class="field-slider{{ disabled ? ' field-slider--disabled' }}{{ wrapperClass ? ' ' ~ wrapperClass|e('html_attr') }}" data-field-slider data-ticks="{{ ticks|e('html_attr') }}" data-lean="{{ lean|e('html_attr') }}" data-reach="{{ reach|e('html_attr') }}">
+    <span class="field-slider__track">
+        <canvas class="field-slider__canvas" aria-hidden="true"></canvas>
+        {% block field_slider_input %}
+        <input type="range" id="{{ id|e('html_attr') }}" name="{{ name|default('slider')|e('html_attr') }}" class="field-slider__input" value="{{ value|e('html_attr') }}" min="{{ min|e('html_attr') }}" max="{{ max|e('html_attr') }}" step="{{ step|e('html_attr') }}" data-field-slider-suffix="{{ suffix|default('')|e('html_attr') }}"{{ disabled ? ' disabled' }}>
+        {% endblock %}
+    </span>
+    <output class="field-slider__value" for="{{ id|e('html_attr') }}" aria-hidden="true"><span data-field-slider-number>{{ value }}</span>{% if suffix %}<span class="field-slider__suffix">{{ suffix }}</span>{% endif %}</output>
+</div>
