@@ -2865,11 +2865,11 @@ document.addEventListener('keydown', (event) => {
 });
 
 document.addEventListener('focusout', (event) => {
-    const input = event.target.closest('.search-expandable__field input');
-    if (!input || input.value !== '') return;
+    const field = event.target.closest('.search-expandable__field');
+    if (!field) return;
 
-    const wrapper = input.closest('[data-search-expandable]');
-    if (wrapper.contains(event.relatedTarget)) return;
+    const wrapper = field.closest('[data-search-expandable]');
+    if (wrapper.contains(event.relatedTarget) || field.querySelector('input').value !== '') return;
 
     collapseSearchExpandable(wrapper);
 });
