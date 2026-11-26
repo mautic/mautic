@@ -48,12 +48,15 @@ final readonly class ContactTrackingPreferenceHelper
             $preference->change($allowed, $source);
         }
 
-        $this->entityManager->persist($preference);
-        $this->entityManager->flush();
+        // One transaction, so a choice is never stored without what its listeners do, like forgetting the tracking identifiers
+        $this->entityManager->wrapInTransaction(function () use ($preference, $contact, $allowed, $source): void {
+            $this->entityManager->persist($preference);
+            $this->entityManager->flush();
 
-        $this->dispatcher->dispatch(
-            new TrackingPreferenceChangeEvent($contact, TrackingPreference::PURPOSE_ACTIVITY, $allowed, $source),
-            TrackingPreferenceChangeEvent::TRACKING_PREFERENCE_CHANGE
-        );
+            $this->dispatcher->dispatch(
+                new TrackingPreferenceChangeEvent($contact, TrackingPreference::PURPOSE_ACTIVITY, $allowed, $source),
+                TrackingPreferenceChangeEvent::TRACKING_PREFERENCE_CHANGE
+            );
+        });
     }
 }
