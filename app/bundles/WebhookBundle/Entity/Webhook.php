@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -46,7 +47,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
         'swagger_definition_name' => 'Write',
     ]
 )]
-class Webhook extends FormEntity implements SkipModifiedInterface
+class Webhook extends FormEntity implements SkipModifiedInterface, IdentifierInterface
 {
     public const int LOGS_DISPLAY_LIMIT = 100;
 
