@@ -11,12 +11,10 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\Event\PageEditSubmitEvent;
-use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Model\PageDraftModel;
 use Mautic\PageBundle\Model\PageModel;
 use ReflectionObject;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final readonly class PageSubscriber
 {
@@ -181,16 +179,6 @@ final readonly class PageSubscriber
         if ($event->isApplyDraft()) {
             $this->pageDraftModel->deleteDraft($editedPage);
             $editedPage->setDraft(null);
-        }
-    }
-
-    public function deletePageDraft(PageEvent $event): void
-    {
-        try {
-            $this->pageDraftModel->deleteDraft($event->getPage());
-        } catch (NotFoundHttpException) {
-            // No associated draft found for deletion. We have nothing to do here. Return.
-            return;
         }
     }
 
