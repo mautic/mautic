@@ -12,7 +12,9 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 
 final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
 {
@@ -204,5 +206,50 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($leadEventLog);
 
         return $leadEventLog;
+    }
+
+    public function testGetEntitiesFiltersCampaignsBySourceSearchCommands(): void
+    {
+        $segment = new LeadList();
+        $segment->setName('Source segment');
+        $segment->setPublicName('Source segment');
+        $segment->setAlias('source-segment');
+        $this->em->persist($segment);
+
+        $form = new Form();
+        $form->setName('Source form');
+        $form->setAlias('source-form');
+        $this->em->persist($form);
+
+        $segmentCampaign = $this->createCampaign();
+        $segmentCampaign->addList($segment);
+        $formCampaign = $this->createCampaign();
+        $formCampaign->addForm($form);
+        $plainCampaign = $this->createCampaign();
+        $this->em->flush();
+
+        $campaignIds = [$segmentCampaign->getId(), $formCampaign->getId(), $plainCampaign->getId()];
+
+        $this->assertEqualsCanonicalizing([$segmentCampaign->getId()], $this->getMatchingCampaignIds('source:segment', $campaignIds));
+        $this->assertEqualsCanonicalizing([$formCampaign->getId(), $plainCampaign->getId()], $this->getMatchingCampaignIds('!source:segment', $campaignIds));
+        $this->assertEqualsCanonicalizing([$formCampaign->getId()], $this->getMatchingCampaignIds('source:form', $campaignIds));
+        $this->assertEqualsCanonicalizing([$segmentCampaign->getId(), $plainCampaign->getId()], $this->getMatchingCampaignIds('!source:form', $campaignIds));
+    }
+
+    /**
+     * @param int[] $campaignIds
+     *
+     * @return int[]
+     */
+    private function getMatchingCampaignIds(string $search, array $campaignIds): array
+    {
+        $campaigns = $this->repository->getEntities([
+            'filter'           => ['string' => $search],
+            'ignore_paginator' => true,
+        ]);
+
+        $matchingIds = array_map(static fn (Campaign $campaign): int => $campaign->getId(), $campaigns);
+
+        return array_values(array_intersect($matchingIds, $campaignIds));
     }
 }
