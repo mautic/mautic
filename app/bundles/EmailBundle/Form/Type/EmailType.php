@@ -409,16 +409,25 @@ final class EmailType extends AbstractType
             ]
         );
 
-        $variantSettingsModifier = function (FormEvent $event, bool $isParent, bool $isExisting = false): void {
+        $getDefaultWeight = static function (?Email $email): int {
+            $parent = $email?->getVariantParent();
+
+            return $parent instanceof Email
+                ? (int) floor(100 / (count($parent->getVariantChildren()) + 1))
+                : VariantType::DEFAULT_WEIGHT;
+        };
+
+        $variantSettingsModifier = function (FormEvent $event, bool $isParent, bool $isExisting = false, int $defaultWeight = VariantType::DEFAULT_WEIGHT, array $settings = []): void {
             $event->getForm()->add(
                 'variantSettings',
                 VariantType::class,
                 [
-                    'label'       => 'mautic.core.ab_test.form.abtest_settings',
-                    'required'    => false,
-                    'is_parent'   => $isParent,
-                    'is_existing' => $isExisting,
-                    'data'        => $event->getData() instanceof Email ? $event->getData()->getVariantSettings() : [],
+                    'label'          => 'mautic.core.ab_test.form.abtest_settings',
+                    'required'       => false,
+                    'is_parent'      => $isParent,
+                    'is_existing'    => $isExisting,
+                    'data'           => $settings,
+                    'default_weight' => $defaultWeight,
                 ]
             );
         };
@@ -426,20 +435,20 @@ final class EmailType extends AbstractType
         // Building the form
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($variantSettingsModifier): void {
+            function (FormEvent $event) use ($variantSettingsModifier, $getDefaultWeight): void {
                 /** @var Email $emailEntity */
                 $emailEntity     = $event->getData();
                 $variantChildren = $emailEntity->getVariantChildren();
                 $isParent        = $variantChildren && count($variantChildren) > 0 || $event->getData()->isNew();
                 $isExisting      = $event->getData()->getId() > 0;
-                $variantSettingsModifier($event, $isParent, $isExisting);
+                $variantSettingsModifier($event, $isParent, $isExisting, $getDefaultWeight($emailEntity), $emailEntity->getVariantSettings());
             }
         );
 
         // After submit
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($variantSettingsModifier): void {
+            function (FormEvent $event) use ($variantSettingsModifier, $getDefaultWeight): void {
                 $data = $event->getData();
 
                 /** @var Email $emailEntity */
@@ -447,7 +456,7 @@ final class EmailType extends AbstractType
                 $variantChildren = $emailEntity->getVariantChildren();
                 $isParent        = $variantChildren && count($variantChildren) > 0;
 
-                $variantSettingsModifier($event, $isParent);
+                $variantSettingsModifier($event, $isParent, false, $getDefaultWeight($emailEntity), $data['variantSettings'] ?? []);
 
                 $emailType = $data['emailType'] ?? null;
 

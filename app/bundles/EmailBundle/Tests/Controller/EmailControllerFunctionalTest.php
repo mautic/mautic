@@ -655,7 +655,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $parent  = $this->createEmail('Variant weight parent', 'Variant weight parent subject', 'list', 'blank', 'Parent html', $segment);
         $variant = $this->createEmail('Variant weight child', 'Variant weight child subject', 'list', 'blank', 'Child html', $segment);
         $variant->setVariantParent($parent);
-        $variant->setVariantSettings(['weight' => 30, 'winnerCriteria' => 'email.openrate']);
+        $variant->setVariantSettings(['winnerCriteria' => 'email.openrate']);
         $parent->addVariantChild($variant);
         $this->em->persist($parent);
         $this->em->persist($variant);
@@ -666,8 +666,16 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $weight = $crawler->filter('input[type="range"][name="emailform[variantSettings][weight]"]');
         $this->assertCount(1, $weight);
-        $this->assertSame('30', $weight->attr('value'));
+        $this->assertSame('50', $weight->attr('value'));
         $this->assertSame('Traffic Weight', trim($crawler->filter('label[for="'.$weight->attr('id').'"]')->text()));
+
+        $form = $crawler->selectButton('Save & Close')->form();
+        $this->client->submit($form);
+        $this->em->clear();
+
+        $savedVariant = $this->em->getRepository(Email::class)->find($variant->getId());
+        $this->assertInstanceOf(Email::class, $savedVariant);
+        $this->assertSame(50, $savedVariant->getVariantSettings()['weight']);
     }
 
     public function testCloneWithTranslationsAndVariantsAction(): void

@@ -55,6 +55,7 @@ final class VariantType extends AbstractType
                 'min'            => 0,
                 'max'            => 100,
             ],
+            'data'        => $options['data']['weight'] ?? $options['default_weight'],
             'constraints' => [new Assert\Range(min: 0, max: 100)],
         ]);
 
@@ -169,6 +170,7 @@ final class VariantType extends AbstractType
             'is_parent'         => true,
             'is_existing'       => false,
             'add_buttons'       => false,
+            'default_weight'    => self::DEFAULT_WEIGHT,
             'validation_groups' => function (Form $form): array {
                 $data = $form->getData();
 

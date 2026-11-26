@@ -75,6 +75,31 @@ final class AbTestSettingsServiceTest extends TestCase
         $this->assertFalse($abTestSettings['configurationError']);
     }
 
+    public function testGetAbTestSettingsPreservesExplicitWeightsAndDefaultsMissingWeights(): void
+    {
+        $service = new AbTestSettingsService();
+        $parent  = $this->getMockBuilder(Email::class)->onlyMethods(['getId'])->getMock();
+        $parent->method('getId')->willReturn(1);
+        $parent->setVariantSettings(['totalWeight' => 100]);
+        $parent->setIsPublished(true);
+
+        foreach ([2 => ['weight' => 30], 3 => ['weight' => 0], 4 => []] as $id => $settings) {
+            $variant = $this->getMockBuilder(Email::class)->onlyMethods(['getId'])->getMock();
+            $variant->method('getId')->willReturn($id);
+            $variant->setIsPublished(true);
+            $variant->setVariantParent($parent);
+            $variant->setVariantSettings($settings);
+            $parent->addVariantChild($variant);
+        }
+
+        $settings = $service->getAbTestSettings($parent);
+
+        $this->assertSame(30, $settings['variants'][2]['weight']);
+        $this->assertSame(0, $settings['variants'][3]['weight']);
+        $this->assertSame(25, $settings['variants'][4]['weight']);
+        $this->assertSame(45, $settings['variants'][1]['weight']);
+    }
+
     /**
      * Tests that in case of wrong configuration the service is returning configuration error.
      */
