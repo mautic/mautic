@@ -356,10 +356,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->channel;
     }
 
-    /**
-     * @param string $channel
-     */
-    public function setChannel($channel): void
+    public function setChannel(?string $channel): void
     {
         $this->channel = $channel;
     }
