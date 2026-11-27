@@ -104,9 +104,7 @@ class ConfigEvent extends CommonEvent
     public function setError(string $message, array $messageVars = [], ?string $key = null, ?string $field = null): static
     {
         if (!empty($key) && !empty($field)) {
-            if (!isset($this->errors[$key])) {
-                $this->fieldErrors[$key] = [];
-            }
+            $this->fieldErrors[$key] ??= [];
 
             $this->fieldErrors[$key][$field] = [
                 $message,
