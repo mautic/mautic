@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Controller;
 
+use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
@@ -16,6 +17,7 @@ use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
@@ -501,13 +503,14 @@ final class PublicController extends AbstractFormController
             $url = UrlHelper::appendQueryToUrl($url, http_build_query($query));
         }
 
-        // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
-        // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
-        $ipAddress = $ipLookupHelper->getIpAddress();
+        // A request isn't trackable when it came from a configured "do not track" IP or user agent, which keeps
+        // simulated clicks from 3rd party services such as URL shorteners out, or carries a privacy signal.
+        // The visitor is only looked up when trackable, since the lookup stores their IP address.
+        $isRequestTrackable = $ipLookupHelper->isRequestTrackable();
 
         $isHitTrackable = false;
         if (null !== $ct && '' !== $ct) {
-            if ($ipAddress->isTrackable()) {
+            if ($isRequestTrackable) {
                 // Search replace lead fields in the URL
                 try {
                     $lead           = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
@@ -535,6 +538,9 @@ final class PublicController extends AbstractFormController
                     $this->dispatcher->dispatch($urlEvent);
                     $url = $urlEvent->getContent();
                 }
+            } else {
+                // No contact data goes into a URL for another site, so contact tokens fall back to their default or to nothing
+                $url = TokenHelper::findLeadTokens($url, ['id' => null], true);
             }
 
             if (str_contains($url, $this->generateUrl('mautic_asset_download'))) {
@@ -543,6 +549,18 @@ final class PublicController extends AbstractFormController
                 } else {
                     $url .= '?ct='.$ct;
                 }
+            }
+        }
+
+        // A click from a message is still counted, with nothing that links it to the visitor. A clickthrough
+        // that doesn't decode counts as no clickthrough.
+        $clickthrough = $isRequestTrackable ? [] : $this->decodeClickthrough($ct);
+        if ([] !== $clickthrough) {
+            try {
+                $pageModel->countUntrackedClick($redirect, $clickthrough);
+            } catch (DBALException $e) {
+                // A count that couldn't be written mustn't keep the visitor from the link
+                $logger->error('Could not count an untracked click: '.$e->getMessage(), ['exception' => $e]);
             }
         }
 
@@ -556,6 +574,22 @@ final class PublicController extends AbstractFormController
         $response->headers->setCookie(new Cookie('Blocked-Tracking', (string) !$isHitTrackable, strtotime('now + 15 seconds')));
 
         return $response;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function decodeClickthrough(mixed $ct): array
+    {
+        if (!is_string($ct) || '' === $ct) {
+            return [];
+        }
+
+        try {
+            return ClickthroughHelper::decodeArrayFromUrl($ct);
+        } catch (InvalidDecodedStringException) {
+            return [];
+        }
     }
 
     /**
