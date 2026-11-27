@@ -55,7 +55,7 @@ final class DynamicFiltersType extends AbstractType
                     'required' => false,
                 ];
 
-                if (!empty($filter['value'])) {
+                if (!empty($filter['value']) && !is_array($filter['value'])) {
                     $args['attr']['placeholder'] = $filter['value'];
                 } elseif (!empty($definition['defaultValue'])) {
                     $args['attr']['placeholder'] = $definition['defaultValue'];
