@@ -692,7 +692,7 @@ class ThemeHelper implements ThemeHelperInterface
 
             $fallbackTemplate = '@themes/'.$theme['key'].'/'.$templatePath;
 
-            if ($this->twig->getLoader()->exists($template)) {
+            if ($this->twig->getLoader()->exists($fallbackTemplate)) {
                 return $fallbackTemplate;
             }
         }

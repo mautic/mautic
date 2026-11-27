@@ -311,20 +311,11 @@ final class ThemeHelperTest extends TestCase
 
     public function testThemeFallbackToNextBestIfTemplateIsMissingForBothRequestedAndDefaultThemes(): void
     {
-        $this->twig->expects($this->exactly(3))
-            ->method('getLoader')
-            ->willReturn($this->loader);
+        $fallbackTemplate = '@themes/cards/html/message.html.twig';
+        $loader           = new ArrayLoader([$fallbackTemplate => 'Fallback message']);
 
-        $this->loader->expects($this->exactly(3))
-            ->method('exists')
-            ->willReturnOnConsecutiveCalls(
-                // twig does not exist
-                false,
-                // default theme twig does not exist
-                false,
-                // next theme exists
-                true
-            );
+        $this->twig->method('getLoader')
+            ->willReturn($loader);
 
         $this->pathsHelper->method('getSystemPath')
             ->willReturnCallback(
@@ -338,12 +329,10 @@ final class ThemeHelperTest extends TestCase
                 }
             );
 
-        $this->themeHelper->setDefaultTheme('nature');
+        $this->themeHelper->setDefaultTheme('blank');
 
-        $template = $this->themeHelper->checkForTwigTemplate('@themes/goldstar/page.html.twig');
-        $this->assertNotSame('@themes/nature/page.html.twig', $template);
-        $this->assertNotSame('@themes/goldstar/page.html.twig', $template);
-        $this->assertStringContainsString('/page.html.twig', $template);
+        $template = $this->themeHelper->checkForTwigTemplate('@themes/goldstar/html/message.html.twig');
+        $this->assertSame($fallbackTemplate, $template);
     }
 
     public function testCopyWithNoNewDirName(): void
