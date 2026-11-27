@@ -55,6 +55,30 @@ final class BootstrapMarkupTest extends TestCase
         $this->assertCount(0, $crawler->filter('[data-toggle], .tab-pane.in'));
     }
 
+    public function testTabsHelperIgnoresRemovedVerticalLayoutOptions(): void
+    {
+        $context = [
+            'tabs' => [
+                ['id' => 'first', 'name' => 'First', 'content' => 'first content', 'active' => true],
+            ],
+            'button' => [
+                'id' => 'add-tab',
+                'icon' => 'ri-add-line',
+                'text' => 'Add tab',
+                'attr' => '',
+                'extra' => '',
+            ],
+        ];
+        $defaultHtml = $this->twig->render('Helper/tabs.html.twig', $context);
+        $html = $this->twig->render('Helper/tabs.html.twig', $context + ['vertical' => 'left', 'verticalTabColWidth' => 4]);
+        $crawler = new Crawler($html);
+
+        $this->assertSame($defaultHtml, $html);
+        $this->assertCount(1, $crawler->filter('.nav-tabs.tabs-horizontal'));
+        $this->assertCount(1, $crawler->filter('.tab-button'));
+        $this->assertSame('first', $crawler->filter('.tab-pane.active.show')->attr('id'));
+    }
+
     public function testButtonGroupUsesSiblingInputsAndLabelsWithoutJavascript(): void
     {
         $form = Forms::createFormFactory()->createNamed('direction', ButtonGroupType::class, 'outgoing', [
