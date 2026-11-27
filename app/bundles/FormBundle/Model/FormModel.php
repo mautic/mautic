@@ -134,7 +134,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $existingFields = $entity->getFields()->toArray();
         $formName       = $entity->generateFormName();
         foreach ($sessionFields as $key => $properties) {
-            $isNew = (!empty($properties['id']) && isset($existingFields[$properties['id']])) ? false : true;
+            $isNew = empty($properties['id']) || !isset($existingFields[$properties['id']]);
             $field = !$isNew ? $existingFields[$properties['id']] : new Field();
 
             if (!$isNew) {
@@ -219,7 +219,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         foreach ($sessionActions as $properties) {
-            $isNew  = (!empty($properties['id']) && isset($existingActions[$properties['id']])) ? false : true;
+            $isNew  = empty($properties['id']) || !isset($existingActions[$properties['id']]);
             $action = !$isNew ? $existingActions[$properties['id']] : new Action();
 
             foreach ($properties as $f => $v) {

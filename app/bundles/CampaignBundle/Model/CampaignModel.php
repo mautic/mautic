@@ -168,7 +168,7 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
         $hierarchy      = [];
 
         foreach ($sessionEvents as $properties) {
-            $isNew = (!empty($properties['id']) && isset($existingEvents[$properties['id']])) ? false : true;
+            $isNew = empty($properties['id']) || !isset($existingEvents[$properties['id']]);
             $event = !$isNew ? $existingEvents[$properties['id']] : new Event(new \DateTime());
 
             foreach ($properties as $f => $v) {
