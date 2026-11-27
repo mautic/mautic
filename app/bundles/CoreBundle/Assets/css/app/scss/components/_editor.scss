@@ -30,6 +30,12 @@
 .ck-editor__editable:not(.ck-editor__nested-editable) {
 	min-height: 200px;
 }
+
+.ck.ck-content.ck-editor__editable {
+	color: var(--text-primary);
+	caret-color: var(--text-primary);
+}
+
 .ck.ck-balloon-panel.ck-balloon-panel_caret_se.ck-balloon-panel_visible {
 	z-index: 99999 !important;
 }
