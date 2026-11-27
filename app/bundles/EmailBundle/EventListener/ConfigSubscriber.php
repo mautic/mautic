@@ -9,6 +9,7 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\ConfigType;
+use Mautic\EmailBundle\Helper\LocalizedConfigTextHelper;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ConfigSubscriber
@@ -59,6 +60,15 @@ final readonly class ConfigSubscriber
                         $data['monitored_email'][$key]['port']              = '993';
                     }
                 }
+            }
+        }
+
+        $submittedLocale = $event->getConfig('coreconfig')['locale'] ?? null;
+        $locale          = is_string($submittedLocale) && '' !== $submittedLocale ? $submittedLocale : (string) $this->coreParametersHelper->get('locale');
+
+        foreach (LocalizedConfigTextHelper::KEYS as $key) {
+            if (array_key_exists($key.LocalizedConfigTextHelper::SUFFIX, $data)) {
+                $data[$key] = LocalizedConfigTextHelper::baseText($data[$key.LocalizedConfigTextHelper::SUFFIX], $locale);
             }
         }
 

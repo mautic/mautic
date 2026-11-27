@@ -94,7 +94,10 @@ final class BuilderSubscriberTest extends TestCase
 
         $unsubscribeTokenizedText = '<a href="|URL|">Unsubscribe</a> {contactfield=companyname} {contactfield=lastname}';
 
-        $this->coreParametersHelper->expects($this->exactly(8))->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->atLeast(11))->method('get')->willReturnMap([
+            ['unsubscribe_text_translations', null, []],
+            ['webview_text_translations', null, []],
+            ['default_signature_text_translations', null, []],
             ['unsubscribe_text', null, $unsubscribeTokenizedText],
             ['validate_unsubscribe_emails', null, true],
             ['webview_text', null, 'Just a text'],
@@ -134,7 +137,7 @@ final class BuilderSubscriberTest extends TestCase
     {
         $this->emailModel->method('buildUrl')->willReturn('https://some.url');
         $this->translator->method('trans')->willReturn('some translation');
-        $this->coreParametersHelper->method('get')->willReturnCallback(function ($key): string|false {
+        $this->coreParametersHelper->method('get')->willReturnCallback(function (string $key): string|false {
             if ('locale' === $key) {
                 return 'default_locale';
             }
@@ -230,41 +233,19 @@ final class BuilderSubscriberTest extends TestCase
         $event = new EmailSendEvent(null, $args);
 
         $unsubscribeTokenizedText = '{contactfield=companyname} {contactfield=lastname}';
-        $matcher                  = $this->exactly(6);
-
-        $this->coreParametersHelper->expects($matcher)
-            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher, $unsubscribeTokenizedText) {
-                if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('unsubscribe_text', $parameters[0]);
-
-                    return $unsubscribeTokenizedText;
-                }
-                if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('validate_unsubscribe_emails', $parameters[0]);
-
-                    return false;
-                }
-                if (3 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('webview_text', $parameters[0]);
-
-                    return 'Just a text';
-                }
-                if (4 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('default_signature_text', $parameters[0]);
-
-                    return 'Signature';
-                }
-                if (5 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('mailer_from_name', $parameters[0]);
-
-                    return 'jan.kozak@acquia.com';
-                }
-                if (6 === $matcher->numberOfInvocations()) {
-                    $this->assertSame('brand_name', $parameters[0]);
-
-                    return 'ACME';
-                }
-            });
+        $responses = [
+            'unsubscribe_text_translations'       => [],
+            'unsubscribe_text'                    => $unsubscribeTokenizedText,
+            'validate_unsubscribe_emails'         => false,
+            'webview_text_translations'           => [],
+            'webview_text'                        => 'Just a text',
+            'default_signature_text_translations' => [],
+            'default_signature_text'              => 'Signature',
+            'mailer_from_name'                    => 'jan.kozak@acquia.com',
+            'brand_name'                          => 'ACME',
+        ];
+        $this->coreParametersHelper->method('get')
+            ->willReturnCallback(fn (string $key): mixed => $responses[$key] ?? null);
         $this->emailModel->method('buildUrl')->willReturn('https://some.url');
         $this->translator->method('trans')->willReturn('some translation');
 
@@ -301,25 +282,20 @@ final class BuilderSubscriberTest extends TestCase
 
         $unsubscribeTokenizedText = '<a href="|URL|">Unsubscribe</a> {contactfield=companyname} {contactfield=lastname}';
 
-        $callCount         = 0;
-        $expectedKeys      = ['secret_key', 'unsubscribe_text', 'validate_unsubscribe_emails', 'webview_text', 'default_signature_text', 'mailer_from_name', 'brand_name'];
-        $expectedResponses = [
-            'secret',
-            $unsubscribeTokenizedText,
-            true,
-            'Just a text',
-            'Signature',
-            'jan.kozak@acquia.com',
-            'ACME',
+        $responses = [
+            'secret_key'                          => 'secret',
+            'unsubscribe_text_translations'       => [],
+            'unsubscribe_text'                    => $unsubscribeTokenizedText,
+            'validate_unsubscribe_emails'         => true,
+            'webview_text_translations'           => [],
+            'webview_text'                        => 'Just a text',
+            'default_signature_text_translations' => [],
+            'default_signature_text'              => 'Signature',
+            'mailer_from_name'                    => 'jan.kozak@acquia.com',
+            'brand_name'                          => 'ACME',
         ];
         $this->coreParametersHelper->method('get')
-            ->willReturnCallback(function ($key) use (&$callCount, $expectedKeys, $expectedResponses): string|bool|null {
-                if ($callCount < count($expectedKeys)) {
-                    $this->assertSame($expectedKeys[$callCount], $key);
-                }
-
-                return $expectedResponses[$callCount++] ?? null;
-            });
+            ->willReturnCallback(fn (string $key): mixed => $responses[$key] ?? null);
 
         $emailHash = hash_hmac('sha256', 'lukas.sykora@acquia.com', 'secret');
         $this->emailModel->method('buildUrl')
@@ -339,6 +315,35 @@ final class BuilderSubscriberTest extends TestCase
             '<a href="/email/validate/unsubscribe/'.$emailHash.'/hash">Unsubscribe</a> '.$company->getName().' '.$lead->getLastname(),
             $event->getTokens()['{unsubscribe_text}']
         );
+    }
+
+    public function testLocalizedTextsMatchEmailLanguageOnEmailGenerate(): void
+    {
+        $email = new Email();
+        $email->setLanguage('pt_BR');
+
+        $event = new EmailSendEvent(null, ['email' => $email, 'lead' => ['id' => 1, 'email' => 'contact@example.com'], 'idHash' => 'hash']);
+
+        $this->coreParametersHelper->method('get')->willReturnCallback(fn (string $key): mixed => match ($key) {
+            'unsubscribe_text'                    => 'Unsubscribe |URL|',
+            'unsubscribe_text_translations'       => ['pt_BR' => 'Descadastrar |URL|', 'es' => 'Darse de baja |URL|'],
+            'webview_text'                        => 'View online |URL|',
+            'webview_text_translations'           => ['pt' => 'Ver online |URL|'],
+            'default_signature_text'              => 'Best regards, |FROM_NAME|',
+            'default_signature_text_translations' => ['es' => 'Saludos, |FROM_NAME|', 'pt_BR' => ''],
+            'mailer_from_name'                    => 'Team',
+            'locale'                              => 'es',
+            'secret_key'                          => 'secret',
+            default                               => null,
+        });
+        $this->emailModel->method('buildUrl')->willReturn('/url');
+
+        $this->builderSubscriber->onEmailGenerate($event);
+
+        $tokens = $event->getTokens();
+        $this->assertSame('Descadastrar /url', $tokens['{unsubscribe_text}']);
+        $this->assertSame('Ver online /url', $tokens['{webview_text}']);
+        $this->assertSame('Saludos, Team', $tokens['{signature}']);
     }
 
     public function testUnsubscribeUrlsAreDirectWhenValidationDisabled(): void

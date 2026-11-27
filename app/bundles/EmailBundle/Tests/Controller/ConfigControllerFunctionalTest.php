@@ -69,6 +69,45 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($data['type'], $form['config[emailconfig][mailer_dsn][options][list][0][value]']->getValue());
     }
 
+    public function testTranslationsAreSavedPerLanguage(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/emailconfig');
+        self::assertResponseIsSuccessful();
+
+        $form   = $crawler->selectButton('config[buttons][save]')->form();
+        $values = $form->getPhpValues();
+
+        $currentList = $values['config']['emailconfig']['unsubscribe_text_translations']['list'];
+        $this->assertCount(1, $currentList);
+        $this->assertSame('en_US', $currentList[0]['label']);
+        $this->assertStringContainsString('Unsubscribe</a>', (string) $currentList[0]['value']);
+
+        $values['config']['emailconfig']['unsubscribe_text_translations']['list'] = [
+            ['label' => 'pt_BR', 'value' => '<a href="|URL|">Descadastrar</a>'],
+            ['label' => 'es', 'value' => '<a href="|URL|">Darse de baja</a>'],
+        ];
+        $values['config']['emailconfig']['default_signature_text_translations']['list'] = [
+            ['label' => 'en_US', 'value' => "Best regards,\n|FROM_NAME|"],
+        ];
+
+        $this->client->request($form->getMethod(), $form->getUri(), $values);
+        self::assertResponseIsSuccessful();
+
+        $this->assertSame(
+            ['pt_BR' => '<a href="|URL|">Descadastrar</a>', 'es' => '<a href="|URL|">Darse de baja</a>'],
+            $this->getConfigParameters()['unsubscribe_text_translations']
+        );
+        $this->assertSame('<a href="|URL|">Descadastrar</a>', $this->getConfigParameters()['unsubscribe_text'] ?? null);
+        $this->assertSame(['en_US' => "Best regards,\n|FROM_NAME|"], $this->getConfigParameters()['default_signature_text_translations']);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/emailconfig');
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('config[buttons][save]')->form();
+        $this->assertSame('es', $form['config[emailconfig][unsubscribe_text_translations][list][1][label]']->getValue());
+        $this->assertSame('<a href="|URL|">Darse de baja</a>', $form['config[emailconfig][unsubscribe_text_translations][list][1][value]']->getValue());
+    }
+
     /**
      * @param array<string, string> $data
      */

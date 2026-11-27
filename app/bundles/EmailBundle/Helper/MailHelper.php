@@ -43,6 +43,7 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 final class MailHelper
@@ -196,6 +197,7 @@ final class MailHelper
         private readonly SMimeHelper $sMimeHelper,
         private readonly EmailStatModel $emailStatModel,
         private readonly CopyRepository $copyRepository,
+        private readonly ?TranslatorInterface $translator = null,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -1229,7 +1231,10 @@ final class MailHelper
             - if 'Disable unsubscribe link in header' setting is true in email configuration
         */
 
-        $unsubscribeBodyText = $this->coreParametersHelper->get('unsubscribe_text') ?? '';
+        $unsubscribeBodyText = LocalizedConfigTextHelper::get($this->coreParametersHelper, 'unsubscribe_text', $this->email?->getLanguage());
+        if (!$unsubscribeBodyText && $this->translator) {
+            $unsubscribeBodyText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
+        }
         if (!$this->email
             || $this->email->getSendToDnc()
             || $this->coreParametersHelper->get('disable_unsubscribe_link_header')

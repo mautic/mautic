@@ -70,7 +70,7 @@ final class ConfigTypeTest extends TypeTestCase
             $this->createStub(CoreParametersHelper::class),
         );
 
-        $configType                     = new ConfigType($translator);
+        $configType                     = new ConfigType($translator, $this->createStub(CoreParametersHelper::class));
         $preferenceCenterList           = new PreferenceCenterListType($pageModelMock, $permsMock);
         $configMonitoredEmail           = new ConfigMonitoredEmailType(new EventDispatcher());
         $configMonitoredMailboxes       = new ConfigMonitoredMailboxesType($this->createStub(Mailbox::class));
