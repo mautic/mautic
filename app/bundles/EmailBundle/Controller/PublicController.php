@@ -97,30 +97,42 @@ final class PublicController extends CommonFormController
         path: '/email/view/{idHash}',
         name: 'mautic_email_webview',
     )]
-    public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, string $idHash): Response
+    public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, string $idHash): Response
     {
         $stat = $this->emailModel->getEmailStatus($idHash);
 
         if ($stat instanceof Stat) {
+            // Stored personalisation is absent only once the cleanup has removed it, and showing that is not a read
+            if (!$stat->hasStoredTokens()) {
+                $this->setContactLocale($stat->getLead());
+                $response = $this->renderThemeMessage(
+                    $assetsHelper,
+                    $analyticsHelper,
+                    $stat->getEmail(),
+                    $stat->getLead(),
+                    $this->translator->trans('mautic.email.view_in_browser.no_longer_available')
+                );
+                $response->setStatusCode(Response::HTTP_GONE);
+                $response->headers->set('Cache-Control', 'no-store');
+
+                return $response;
+            }
+
             if ($this->security->isAnonymous()) {
                 $this->emailModel->hitEmail($stat, $request, true);
             }
 
             $tokens = $stat->getTokens();
-            if (is_array($tokens)) {
-                // Override tracking_pixel so as to not cause a double hit
-                $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
-            }
+            // Override tracking_pixel so as to not cause a double hit
+            $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
 
             if ($copy = $stat->getStoredCopy()) {
                 $subject = $copy->getSubject();
                 $content = $copy->getBody();
 
                 // Replace tokens
-                if (is_array($tokens)) {
-                    $content = str_ireplace(array_keys($tokens), $tokens, $content);
-                    $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
-                }
+                $content = str_ireplace(array_keys($tokens), $tokens, $content);
+                $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
             } else {
                 $subject = '';
                 $content = '';
@@ -569,15 +581,7 @@ final class PublicController extends CommonFormController
                 if ($lead) {
                     // Set the lead as current lead
                     $contactTracker->setTrackedContact($lead);
-
-                    if (!$this->translator instanceof LocaleAwareInterface) {
-                        throw new \LogicException(sprintf('$this->translator must be an instance of "%s"', LocaleAwareInterface::class));
-                    }
-
-                    // Set lead lang
-                    if ($lead->getPreferredLocale()) {
-                        $this->translator->setLocale($lead->getPreferredLocale());
-                    }
+                    $this->setContactLocale($lead);
                 }
 
                 return $this->redirectToRoute(
@@ -604,6 +608,31 @@ final class PublicController extends CommonFormController
             }
         }
 
+        return $this->renderThemeMessage(
+            $assetsHelper,
+            $analyticsHelper,
+            $email,
+            $lead,
+            $message,
+            $isCorrectHash ? self::MESSAGE_TYPE_RESUBSCRIBED : ''
+        );
+    }
+
+    private function setContactLocale(?Lead $lead): void
+    {
+        if (!$lead?->getPreferredLocale()) {
+            return;
+        }
+
+        if (!$this->translator instanceof LocaleAwareInterface) {
+            throw new \LogicException(sprintf('$this->translator must be an instance of "%s"', LocaleAwareInterface::class));
+        }
+
+        $this->translator->setLocale($lead->getPreferredLocale());
+    }
+
+    private function renderThemeMessage(AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, Email|false|null $email, Lead|false|null $lead, string $message, string $messageType = ''): Response
+    {
         $template = $this->coreParametersHelper->get('theme');
 
         $theme = $this->themeHelper->getTheme($template);
@@ -631,7 +660,7 @@ final class PublicController extends CommonFormController
             [
                 'message'      => $message,
                 'type'         => 'notice',
-                'message_type' => $isCorrectHash ? self::MESSAGE_TYPE_RESUBSCRIBED : '',
+                'message_type' => $messageType,
                 'email'        => $email,
                 'lead'         => $lead,
                 'template'     => $template,

@@ -108,7 +108,9 @@ class Stat
     private $sourceId;
 
     /**
-     * @var array
+     * Legacy token storage: setTokens() leaves it null and the cleanup sets it to null.
+     *
+     * @var array<string, mixed>|null
      */
     #[ORM\Column(type: 'array', nullable: true)]
     private $tokens = [];
@@ -137,6 +139,10 @@ class Stat
      */
     #[ORM\OneToMany(targetEntity: EmailReply::class, mappedBy: 'stat', cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private $replies;
+
+    // An inverse to-one cannot load lazily, so it is joined into the stat's own query
+    #[ORM\OneToOne(targetEntity: StatData::class, mappedBy: 'stat', cascade: ['persist', 'detach'], fetch: 'EAGER')]
+    private ?StatData $data = null;
 
     /**
      * @var array<string,mixed[]>
@@ -199,6 +205,11 @@ class Stat
         $dateSent = $this->toDateTime($dateSent);
         $this->addChange('dateSent', $this->dateSent, $dateSent);
         $this->dateSent = $dateSent;
+
+        // The data row's date_sent must match the stat's
+        if ($this->data && $dateSent) {
+            $this->data->setDateSent($dateSent);
+        }
     }
 
     public function getEmail(): ?Email
@@ -387,14 +398,34 @@ class Stat
         $this->sourceId = (int) $sourceId;
     }
 
-    public function getTokens(): ?array
+    /**
+     * @return array<string, mixed>
+     */
+    public function getTokens(): array
     {
-        return $this->tokens;
+        // Tokens may be held in the legacy column, the data row, or both
+        return array_merge(
+            is_array($this->tokens) ? $this->tokens : [],
+            $this->data?->getTokens() ?? [],
+        );
     }
 
+    /**
+     * @param array<string, mixed> $tokens
+     */
     public function setTokens(array $tokens): void
     {
-        $this->tokens = $tokens;
+        $this->data ??= new StatData($this);
+        $this->data->setTokens($tokens);
+        $this->tokens = null;
+    }
+
+    /**
+     * Whether tokens are stored for this stat, in either the legacy column or the data row.
+     */
+    public function hasStoredTokens(): bool
+    {
+        return null !== $this->tokens || null !== $this->data;
     }
 
     /**

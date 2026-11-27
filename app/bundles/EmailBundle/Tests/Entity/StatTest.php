@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Entity;
 
 use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatData;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -105,5 +106,75 @@ final class StatTest extends TestCase
         $this->assertInstanceOf(\DateTime::class, $stat->getChanges()['dateRead'][1]);
         $this->assertNull($stat->getChanges()['dateSent'][0]);
         $this->assertInstanceOf(\DateTime::class, $stat->getChanges()['dateSent'][1]);
+    }
+
+    public function testTokensAreStoredInTheDataRowDatedWithTheSendDate(): void
+    {
+        $dateSent = new \DateTime('2026-01-02 03:04:05');
+        $stat     = new Stat();
+        $stat->setTokens(['{contactfield=firstname}' => 'John']);
+        $stat->setDateSent($dateSent);
+
+        $this->assertSame(['{contactfield=firstname}' => 'John'], $stat->getTokens());
+        $this->assertSame(['{contactfield=firstname}' => 'John'], $this->getDataRow($stat)->getTokens());
+        $this->assertEquals($dateSent, $this->getDataRow($stat)->getDateSent());
+        $this->assertNull($this->getLegacyTokens($stat));
+    }
+
+    public function testTokensInTheLegacyColumnAreReturned(): void
+    {
+        $stat = new Stat();
+        $this->setLegacyTokens($stat, ['{legacy}' => 'old']);
+
+        $this->assertSame(['{legacy}' => 'old'], $stat->getTokens());
+    }
+
+    public function testSettingTokensReplacesTokensInTheLegacyColumn(): void
+    {
+        $stat = new Stat();
+        $this->setLegacyTokens($stat, ['{legacy}' => 'old']);
+        $stat->setTokens(['{new}' => 'value']);
+
+        $this->assertSame(['{new}' => 'value'], $stat->getTokens());
+    }
+
+    public function testStoredTokensAreReportedWhileEitherStorageHoldsThem(): void
+    {
+        $legacy = new Stat();
+        $this->setLegacyTokens($legacy, []);
+        $this->assertTrue($legacy->hasStoredTokens());
+
+        $stored = new Stat();
+        $stored->setTokens([]);
+        $this->assertTrue($stored->hasStoredTokens());
+
+        $removed = new Stat();
+        $this->setLegacyTokens($removed, null);
+        $this->assertFalse($removed->hasStoredTokens());
+        $this->assertSame([], $removed->getTokens());
+    }
+
+    private function getDataRow(Stat $stat): StatData
+    {
+        $row = new \ReflectionProperty(Stat::class, 'data')->getValue($stat);
+        $this->assertInstanceOf(StatData::class, $row);
+
+        return $row;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function getLegacyTokens(Stat $stat): ?array
+    {
+        return new \ReflectionProperty(Stat::class, 'tokens')->getValue($stat);
+    }
+
+    /**
+     * @param array<string, mixed>|null $tokens
+     */
+    private function setLegacyTokens(Stat $stat, ?array $tokens): void
+    {
+        new \ReflectionProperty(Stat::class, 'tokens')->setValue($stat, $tokens);
     }
 }
