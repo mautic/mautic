@@ -44,6 +44,16 @@ final class Version20261117155532 extends PreUpAssertionMigration
     }
 
     /**
+     * Drops the index without locking the table.
+     *
+     * @param Schema $schema the current database schema
+     */
+    public function down(Schema $schema): void
+    {
+        $this->addSql("ALTER TABLE {$this->getPrefixedTableName()} DROP INDEX {$this->getIndexName()}, ALGORITHM=INPLACE, LOCK=NONE");
+    }
+
+    /**
      * Tells whether the table has an index whose first column is redirect_id.
      *
      * @param Schema $schema the current database schema
