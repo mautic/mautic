@@ -10,6 +10,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -33,7 +34,6 @@ use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
-use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadPostBatchSaveEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Field\FieldList;
@@ -664,9 +664,9 @@ final class LeadModelTest extends TestCase
             }
         };
 
-        $leadEvent1 =  new LeadEvent($leadsParams[0]['entity'], $leadsParams[0]['isNew']);
+        $leadEvent1 =  new EntityPostSave($leadsParams[0]['entity'], $leadsParams[0]['isNew']);
 
-        $leadEvent2 =  new LeadEvent($leadsParams[1]['entity'], $leadsParams[1]['isNew']);
+        $leadEvent2 =  new EntityPostSave($leadsParams[1]['entity'], $leadsParams[1]['isNew']);
 
         $event = new LeadPostBatchSaveEvent([
             $leadEvent1,

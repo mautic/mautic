@@ -21,13 +21,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Event\FieldPostDeleteEvent;
-use Mautic\LeadBundle\Event\FieldPostSaveEvent;
-use Mautic\LeadBundle\Event\FieldPreDeleteEvent;
-use Mautic\LeadBundle\Event\FieldPreSaveEvent;
-use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
-use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
@@ -40,7 +34,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends FormModel<LeadField>
@@ -487,7 +480,6 @@ class FieldModel extends FormModel
         private readonly ColumnSchemaHelper $columnSchemaHelper,
         private readonly ListModel $leadListModel,
         private readonly CustomFieldColumn $customFieldColumn,
-        private readonly FieldSaveDispatcher $fieldSaveDispatcher,
         private readonly LeadFieldRepository $leadFieldRepository,
         private readonly LeadFieldSaver $leadFieldSaver,
         private readonly LeadFieldDeleter $leadFieldDeleter,
@@ -846,36 +838,6 @@ class FieldModel extends FormModel
         }
 
         return $result[1];
-    }
-
-    /**
-     * @param LeadField $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof LeadField) {
-            throw new MethodNotAllowedHttpException(['LeadField']);
-        }
-
-        $event = match ($action) {
-            'pre_save'    => new FieldPreSaveEvent($entity, $isNew),
-            'post_save'   => new FieldPostSaveEvent($entity, $isNew),
-            'pre_delete'  => new FieldPreDeleteEvent($entity, $isNew),
-            'post_delete' => new FieldPostDeleteEvent($entity, $isNew),
-            default       => null,
-        };
-
-        if (null === $event) {
-            return null;
-        }
-
-        try {
-            return $this->fieldSaveDispatcher->dispatchEvent($event);
-        } catch (NoListenerException) {
-            return null;
-        }
     }
 
     /**

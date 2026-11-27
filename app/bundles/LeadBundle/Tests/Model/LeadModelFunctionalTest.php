@@ -10,13 +10,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\Mapping\MappingException;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -33,7 +32,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     {
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = $this->getService(EventDispatcherInterface::class);
-        $eventDispatcher->addListener(LeadPostSaveEvent::class, $this->addPointsListener(...));
+        $eventDispatcher->addListener(EntityPostSave::class, $this->addPointsListener(...));
 
         $model = $this->getService(LeadModel::class);
         /** @var EntityManager $em */
@@ -58,8 +57,13 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     /**
      * Simulate a PointModel::triggerAction.
      */
-    public function addPointsListener(LeadEvent $event): void
+    public function addPointsListener(EntityPostSave $event): void
     {
+        $lead = $event->getEntity();
+        if (!$lead instanceof Lead) {
+            return;
+        }
+
         // Prevent a loop
         if ($this->pointsAdded) {
             return;
@@ -67,7 +71,6 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
 
         $this->pointsAdded = true;
 
-        $lead = $event->getLead();
         $lead->adjustPoints(10);
 
         $model = $this->getService(LeadModel::class);

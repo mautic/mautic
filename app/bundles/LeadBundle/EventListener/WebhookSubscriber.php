@@ -2,15 +2,15 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\CompanyPostDeleteEvent;
 use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
-use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\Event\LeadPostDeleteEvent;
-use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\Event\ListBatchChangeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
@@ -119,12 +119,14 @@ final readonly class WebhookSubscriber
         );
     }
 
-    #[AsEventListener(
-        event: LeadPostSaveEvent::class,
-    )]
-    public function onLeadNewUpdate(LeadEvent $event): void
+    #[AsEventListener]
+    public function onLeadNewUpdate(EntityPostSave $event): void
     {
-        $lead = $event->getLead();
+        $lead = $event->getEntity();
+        if (!$lead instanceof Lead) {
+            return;
+        }
+
         if ($lead->isAnonymous()) {
             // Ignore this contact
             return;
@@ -140,7 +142,7 @@ final readonly class WebhookSubscriber
             // Consider this a new contact if it was just identified, otherwise consider it updated
             !empty($changes['dateIdentified']) ? LeadEvents::LEAD_POST_SAVE.'_new' : LeadEvents::LEAD_POST_SAVE.'_update',
             [
-                'contact' => $event->getLead(),
+                'contact' => $lead,
             ],
             [
                 'leadDetails',
@@ -178,12 +180,14 @@ final readonly class WebhookSubscriber
         );
     }
 
-    #[AsEventListener(
-        event: LeadPostDeleteEvent::class,
-    )]
-    public function onLeadDelete(LeadEvent $event): void
+    #[AsEventListener]
+    public function onLeadDelete(EntityPostDelete $event): void
     {
-        $lead = $event->getLead();
+        $lead = $event->getEntity();
+        if (!$lead instanceof Lead) {
+            return;
+        }
+
         $this->webhookModel->queueWebhooksByType(
             LeadEvents::LEAD_POST_DELETE,
             [

@@ -2,12 +2,12 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreDelete;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\CompanyPreDeleteEvent;
-use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\Event\LeadPostSaveEvent;
-use Mautic\LeadBundle\Event\LeadPreDeleteEvent;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
@@ -23,12 +23,14 @@ final readonly class LeadSubscriber
     ) {
     }
 
-    #[AsEventListener(
-        event: LeadPreDeleteEvent::class,
-    )]
-    public function onLeadDelete(LeadEvent $event): bool
+    #[AsEventListener]
+    public function onLeadDelete(EntityPreDelete $event): bool
     {
-        $lead = $event->getLead();
+        $lead = $event->getEntity();
+        if (!$lead instanceof Lead) {
+            return false;
+        }
+
         $this->integrationEntityRepository->findLeadsToDelete('lead%', $lead->getId());
 
         return false;
@@ -49,12 +51,14 @@ final readonly class LeadSubscriber
     /*
      * Change lead event
      */
-    #[AsEventListener(
-        event: LeadPostSaveEvent::class,
-    )]
-    public function onLeadSave(LeadEvent $event): void
+    #[AsEventListener]
+    public function onLeadSave(EntityPostSave $event): void
     {
-        $lead = $event->getLead();
+        $lead = $event->getEntity();
+        if (!$lead instanceof Lead) {
+            return;
+        }
+
         if ($this->isAnyIntegrationEnabled()) {
             $this->integrationEntityRepository->updateErrorLeads('lead-error', $lead->getId());
         }

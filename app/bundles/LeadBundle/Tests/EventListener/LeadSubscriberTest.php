@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\AuditLogRepository;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -21,7 +22,6 @@ use Mautic\LeadBundle\Entity\LeadNoteRepository;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
-use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
@@ -144,7 +144,7 @@ final class LeadSubscriberTest extends TestCase
             $this->createStub(AuditLogRepository::class),
         );
 
-        $subscriber->onLeadPostSave(new LeadEvent($lead));
+        $subscriber->onLeadPostSave(new EntityPostSave($lead));
 
         $this->assertEmpty($lead->getChanges()); // changes were reset after they were processed.
     }
@@ -356,12 +356,12 @@ final class LeadSubscriberTest extends TestCase
             true
         );
 
-        $subscriber->onLeadPostSave(new LeadEvent($lead));
-        $subscriber->onLeadPostSave(new LeadEvent($lead));
-        $subscriber->onLeadPostSave(new LeadEvent($lead2));
-        $subscriber->onLeadPostSave(new LeadEvent($lead2));
-        $subscriber->onLeadPostSave(new LeadEvent($lead3));
-        $subscriber->onLeadPostSave(new LeadEvent($lead3));
+        $subscriber->onLeadPostSave(new EntityPostSave($lead));
+        $subscriber->onLeadPostSave(new EntityPostSave($lead));
+        $subscriber->onLeadPostSave(new EntityPostSave($lead2));
+        $subscriber->onLeadPostSave(new EntityPostSave($lead2));
+        $subscriber->onLeadPostSave(new EntityPostSave($lead3));
+        $subscriber->onLeadPostSave(new EntityPostSave($lead3));
     }
 
     public function testManipulatorLogged(): void
@@ -426,6 +426,6 @@ final class LeadSubscriberTest extends TestCase
             true
         );
 
-        $subscriber->onLeadPostSave(new LeadEvent($lead));
+        $subscriber->onLeadPostSave(new EntityPostSave($lead));
     }
 }

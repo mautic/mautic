@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event as Events;
@@ -18,27 +19,32 @@ final class LeadChangeEventDispatcher
     ) {
     }
 
-    public function dispatchEvents(Events\LeadEvent $event, array $changes): void
+    public function dispatchEvents(EntityPostSave $event, array $changes): void
     {
-        $this->lead    = $event->getLead();
+        $lead = $event->getEntity();
+        if (!$lead instanceof Lead) {
+            return;
+        }
+
+        $this->lead    = $lead;
         $this->changes = $changes;
 
-        $this->dispatchDateIdentifiedEvent($event);
-        $this->dispatchPointChangeEvent($event);
+        $this->dispatchDateIdentifiedEvent($event->isNew(), $event->getChanges());
+        $this->dispatchPointChangeEvent($event->isNew());
         $this->dispatchUtmTagsChangeEvent();
         $this->dispatchDncChangeEvent();
     }
 
-    private function dispatchDateIdentifiedEvent(Events\LeadEvent $event): void
+    private function dispatchDateIdentifiedEvent(bool $isNew, array|bool $eventChanges): void
     {
         if (!isset($this->changes['dateIdentified'])) {
             return;
         }
 
-        $this->dispatcher->dispatch(new Events\LeadIdentifiedEvent($this->lead, $event->isNew(), $event->getChanges()));
+        $this->dispatcher->dispatch(new Events\LeadIdentifiedEvent($this->lead, $isNew, $eventChanges));
     }
 
-    private function dispatchPointChangeEvent(Events\LeadEvent $event): void
+    private function dispatchPointChangeEvent(bool $isNew): void
     {
         if (!isset($this->changes['points'])) {
             return;
@@ -52,7 +58,7 @@ final class LeadChangeEventDispatcher
             return;
         }
 
-        if ($event->isNew()) {
+        if ($isNew) {
             return;
         }
 

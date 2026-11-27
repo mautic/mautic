@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
-use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -205,7 +204,6 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(ColumnSchemaHelper::class),
             $this->createStub(ListModel::class),
             $this->createStub(CustomFieldColumn::class),
-            $this->createStub(FieldSaveDispatcher::class),
             $repoMock,
             $this->createStub(LeadFieldSaver::class),
             $this->createStub(LeadFieldDeleter::class),
@@ -231,7 +229,6 @@ final class FieldModelTest extends MauticMysqlTestCase
         $columnSchemaHelper         = $this->createStub(ColumnSchemaHelper::class);
         $leadListModel              = $this->createMock(ListModel::class);
         $customFieldColumn          = $this->createStub(CustomFieldColumn::class);
-        $fieldSaveDispatcher        = $this->createStub(FieldSaveDispatcher::class);
         $leadFieldRepository        = $this->createStub(LeadFieldRepository::class);
         $leadFieldSaver             = $this->createStub(LeadFieldSaver::class);
         $leadFieldDeleter           = $this->createStub(LeadFieldDeleter::class);
@@ -244,7 +241,6 @@ final class FieldModelTest extends MauticMysqlTestCase
             $columnSchemaHelper,
             $leadListModel,
             $customFieldColumn,
-            $fieldSaveDispatcher,
             $leadFieldRepository,
             $leadFieldSaver,
             $leadFieldDeleter,

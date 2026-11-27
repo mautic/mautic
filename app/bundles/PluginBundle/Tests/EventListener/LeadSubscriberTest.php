@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
@@ -46,7 +46,8 @@ final class LeadSubscriberTest extends TestCase
         $this->integrationEntityRepository->expects($this->never())
             ->method('updateErrorLeads');
 
-        $this->subscriber->onLeadSave(new LeadEvent(new Lead()));
+        $lead = new Lead();
+        $this->subscriber->onLeadSave(new EntityPostSave($lead));
     }
 
     public function testOnLeadSaveWithActiveIntegration(): void
@@ -63,6 +64,7 @@ final class LeadSubscriberTest extends TestCase
         $this->integrationEntityRepository->expects($this->once())
             ->method('updateErrorLeads');
 
-        $this->subscriber->onLeadSave(new LeadEvent(new Lead()));
+        $lead = new Lead();
+        $this->subscriber->onLeadSave(new EntityPostSave($lead));
     }
 }

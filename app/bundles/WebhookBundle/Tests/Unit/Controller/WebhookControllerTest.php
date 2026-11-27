@@ -22,7 +22,6 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Controller\AjaxController;
@@ -192,7 +191,7 @@ final class WebhookControllerTest extends TestCase
         $lead->setEmail('contact@example.com');
         $lead->setChanges($changes);
 
-        $event = new LeadEvent($lead, $isNew);
+        $event = new EntityPostSave($lead, $isNew);
 
         $guzzleBody = $this->createMock(StreamInterface::class);
         $guzzleBody->expects($this->once())->method('getContents')->willReturn('whatever');
