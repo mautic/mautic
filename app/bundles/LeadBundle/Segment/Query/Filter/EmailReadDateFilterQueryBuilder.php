@@ -8,11 +8,11 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-final class EmailReadDateFilterQueryBuilder implements FilterQueryBuilderInterface
+final readonly class EmailReadDateFilterQueryBuilder implements FilterQueryBuilderInterface
 {
     public function __construct(
-        private readonly ForeignValueFilterQueryBuilder $foreignValueBuilder,
-        private readonly ForeignFuncFilterQueryBuilder $foreignFuncBuilder,
+        private ForeignValueFilterQueryBuilder $foreignValueBuilder,
+        private ForeignFuncFilterQueryBuilder $foreignFuncBuilder,
     ) {
     }
 

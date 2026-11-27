@@ -79,7 +79,7 @@ final class LeadEmailReadDateSegmentFunctionalTest extends MauticMysqlTestCase
         $segment = $this->createSegmentWithFilter($operator, self::CUTOFF);
 
         $segmentService = self::getContainer()->get(ContactSegmentService::class);
-        $sql            = $segmentService->getNewLeadListLeadsQueryBuilder($segment, [])->getSQL();
+        $sql            = (string) $segmentService->getNewLeadListLeadsQueryBuilder($segment, [])->getSQL();
         if ($expectRecentOnly) {
             $this->assertStringContainsString('IN (SELECT', $sql);
             $this->assertStringContainsString('.lead_id IS NOT NULL', $sql);
