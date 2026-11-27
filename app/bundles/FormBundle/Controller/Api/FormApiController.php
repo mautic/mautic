@@ -137,8 +137,7 @@ final class FormApiController extends CommonApiController
 
         if (empty($alias)) {
             // Set clean alias to prevent SQL errors
-            $alias = $this->model->cleanAlias($entity->getName(), '', 10);
-            $entity->setAlias($alias);
+            $entity->setAlias($this->model->generateUniqueAlias($entity->getName()));
         }
 
         // Set timestamps
