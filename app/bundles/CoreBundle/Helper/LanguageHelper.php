@@ -179,7 +179,7 @@ class LanguageHelper
             $this->logger->error(
                 sprintf(
                     'An unexpected %1$s code was returned while attempting to fetch the language.  The message received was: %2$s',
-                    $data->code,
+                    $data->getStatusCode(),
                     (string) $data->getBody()
                 )
             );
