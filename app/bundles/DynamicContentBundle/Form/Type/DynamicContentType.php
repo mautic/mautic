@@ -36,28 +36,17 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @extends AbstractType<DynamicContent>
  */
 final class DynamicContentType extends AbstractType
 {
-    /**
-     * @var mixed[]
-     */
-    private array $fieldChoices;
-
-    /**
-     * @var mixed[]
-     */
-    private readonly array $countryChoices;
-
-    /**
-     * @var mixed[]
-     */
-    private readonly array $regionChoices;
-
+    private $em;
+    private FieldFilterTransformer $fieldFilterTransformer;
+    private $fieldChoices;
+    private $countryChoices;
+    private $regionChoices;
     private $timezoneChoices;
 
     /**
@@ -88,7 +77,7 @@ final class DynamicContentType extends AbstractType
     public function __construct(
         private readonly EntityManagerInterface $em,
         ListModel $listModel,
-        private readonly TranslatorInterface $translator,
+        private readonly FieldFilterTransformer $fieldFilterTransformer,
         LeadModel $leadModel,
         private TypeList $typeList,
         private readonly RelativeDate $relativeDate,
@@ -114,6 +103,8 @@ final class DynamicContentType extends AbstractType
             array_keys(OperatingSystem::getAvailableOperatingSystemFamilies()),
             array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())
         );
+
+        $this->fieldFilterTransformer->setContext('dwc');
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -285,7 +276,7 @@ final class DynamicContentType extends AbstractType
                     'allow_add'      => true,
                     'allow_delete'   => true,
                 ]
-            )->addModelTransformer($filterModalTransformer)
+            )->addModelTransformer($this->fieldFilterTransformer)
         );
 
         if (!empty($options['action'])) {

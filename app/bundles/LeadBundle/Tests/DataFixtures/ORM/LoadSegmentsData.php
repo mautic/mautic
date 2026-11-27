@@ -1100,6 +1100,74 @@ final class LoadSegmentsData extends AbstractFixture implements OrderedFixtureIn
                 ],
                 'populate' => true,
             ],
+            [ // ID 64
+                'name'    => 'Include segment membership with or',
+                'alias'   => 'segment-test-include-static-segment-with-or',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'country',
+                        'operator' => '=',
+                        'filter'   => 'United Kingdom',
+                        'display'  => '',
+                    ],
+                    [
+                        'glue'     => 'or',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist_static',
+                        'operator' => 'in',
+                        'filter'   => [8],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 65
+                'name'    => 'segment with absolute date type filter',
+                'alias'   => 'segment-test-with-absolute-date-type',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'lead',
+                        'type'     => 'date',
+                        'field'    => 'date_added',
+                        'operator' => 'gt',
+                        'filter'   => [
+                            'dateTypeMode'             => 'absolute',
+                            'absoluteDate'             => '-1 day',
+                            'relativeDateInterval'     => '',
+                            'relativeDateIntervalUnit' => '',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 66
+                'name'    => 'segment with relative date type filter',
+                'alias'   => 'segment-test-with-relative-date-type',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'lead',
+                        'type'     => 'date',
+                        'field'    => 'date_added',
+                        'operator' => 'gt',
+                        'filter'   => [
+                            'dateTypeMode'             => 'relative',
+                            'absoluteDate'             => '',
+                            'relativeDateInterval'     => '-1',
+                            'relativeDateIntervalUnit' => 'day',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {

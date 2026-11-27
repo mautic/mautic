@@ -8,13 +8,16 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\RelativeDate;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * @implements DataTransformerInterface<mixed, array<mixed>|mixed>
  */
 final class FieldFilterTransformer implements DataTransformerInterface
+class FieldFilterTransformer implements DataTransformerInterface, ServiceSubscriberInterface
 {
     /**
      * @var string[]
@@ -30,6 +33,7 @@ final class FieldFilterTransformer implements DataTransformerInterface
         private readonly TranslatorInterface $translator,
         private readonly RelativeDate $relativeDate,
         private readonly array $default = [],
+        private ContainerInterface $serviceLocator
     ) {
         $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
         foreach ($this->relativeDateStrings as &$string) {
@@ -38,99 +42,69 @@ final class FieldFilterTransformer implements DataTransformerInterface
         }
     }
 
-    /**
-     * From DB format to form format.
-     */
-    public function transform(mixed $rawFilters): mixed
+    public function setContext(string $context): void
     {
-        if (!is_array($rawFilters)) {
-            return [];
-        }
+        $this->context = $context;
+    }
 
-        foreach ($rawFilters as $key => $filter) {
-            if ([] !== $this->default) {
-                $rawFilters[$key] = array_merge($this->default, $rawFilters[$key]);
-            }
-            $operator = $filter['operator'] ?? '';
-            $filterType = $filter['type'];
-            if ('datetime' === $filterType || 'date' === $filterType) {
-                if (in_array($operator, [OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT])) {
-                    continue;
-                }
+    public function getContext(): string
+    {
+        return $this->context;
+    }
 
-                $bcFilter = $filter['filter'] ?? '';
-                $filter   = $filter['properties']['filter'] ?? $bcFilter;
-                if (empty($filter) || in_array($filter, $this->relativeDateStrings) || stristr($filter[0], '-') || stristr($filter[0], '+')) {
-                    continue;
-                }
+    public static function getSubscribedServices(): array
+    {
+        return [
+            'date'     => FieldFilter\FieldFilterDateTransformer::class,
+            'datetime' => FieldFilter\FieldFilterDateTimeTransformer::class,
+        ];
+    }
 
-                if (in_array(strtolower($filter), $this->defaultStrings)) {
-                    $rawFilters[$key]['properties']['filter'] = $this->translator->trans(array_search(strtolower($filter), $this->defaultStrings));
+    public function transform($value)
+    {
+        return $this->doTransform($value, fn (DataTransformerInterface $transformer, array $filter) => $transformer->transform($filter));
+    }
 
-                    continue;
-                }
-
-                if (!$this->isValidAbsoluteDate($filter, $filterType)) {
-                    continue;
-                }
-
-                $dateFormat = 'datetime' === $filterType ? 'Y-m-d H:i' : 'Y-m-d';
-
-                $dt = new DateTimeHelper($filter, $dateFormat);
-
-                $rawFilters[$key]['properties']['filter'] = $dt->toLocalString();
-            }
-        }
-
-        return $rawFilters;
+    public function reverseTransform($value)
+    {
+        return $this->doTransform($value, fn (DataTransformerInterface $transformer, array $filter) => $transformer->reverseTransform($filter));
     }
 
     /**
+     * @param mixed[]                                              $value
+     * @param callable(DataTransformerInterface, mixed[]): mixed[] $transform
+     *
+     * @return mixed[]
      * Form format to database format.
      */
-    public function reverseTransform(mixed $rawFilters): mixed
+    private function doTransform($value, callable $transform)
     {
-        if (!is_array($rawFilters)) {
+        if (!is_array($value)) {
             return [];
         }
 
-        $rawFilters = array_values($rawFilters);
+        $value = array_values($value);
 
-        foreach ($rawFilters as $k => $f) {
-            $operator = $f['operator'] ?? '';
+        foreach ($value as $key => $filter) {
+            $type = $filter['type'] ?? null;
 
-            if ('datetime' == $f['type'] || 'date' === $f['type']) {
-                if (in_array($operator, [OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT])) {
-                    continue;
+            if (!$type) {
+                continue;
+            }
+
+            if ($this->serviceLocator->has($type)) {
+                $transformer = $this->serviceLocator->get($type);
+                \assert($transformer instanceof DataTransformerInterface);
+
+                if (method_exists($transformer, 'setContext')) {
+                    $transformer->setContext($this->context);
                 }
 
-                $bcFilter = $f['filter'] ?? '';
-                $filter   = $f['properties']['filter'] ?? $bcFilter;
-                $filter   = strtolower($filter);
-                if (empty($filter) || stristr($filter[0], '-') || stristr($filter[0], '+')) {
-                    continue;
-                }
-
-                if (in_array($filter, $this->relativeDateStrings)) {
-                    $translationKey                         = array_search($filter, $this->relativeDate->getRelativeDateStrings());
-                    $rawFilters[$k]['properties']['filter'] = $this->defaultStrings[$translationKey];
-
-                    continue;
-                }
-
-                if (!$this->isValidAbsoluteDate($filter, $f['type'])) {
-                    continue;
-                }
-
-                $dateFormat = 'datetime' === $f['type'] ? 'Y-m-d H:i' : 'Y-m-d';
-
-                $dt = new DateTimeHelper($filter, $dateFormat, 'local');
-
-                $rawFilters[$k]['properties']['filter'] = $dt->toUtcString();
+                $value[$key] = $transform($transformer, $filter);
             }
         }
 
-        return $rawFilters;
+        return $value;
     }
 
     private function isValidAbsoluteDate(string $value, string $type): bool
