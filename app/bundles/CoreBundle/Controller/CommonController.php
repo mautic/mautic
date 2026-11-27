@@ -643,7 +643,7 @@ class CommonController extends AbstractController implements MauticController
 
         if ($request->query->has('filterby')) {
             $filter  = InputHelper::clean($request->query->get('filterby'), true);
-            $value   = InputHelper::clean($request->query->get('value'), true);
+            $value   = InputHelper::clean($request->query->all()['value'] ?? '', true);
             $filters = $session->get("{$name}.filters", []);
 
             if ('' == $value) {
