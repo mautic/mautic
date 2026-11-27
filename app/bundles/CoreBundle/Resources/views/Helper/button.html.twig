@@ -66,7 +66,7 @@
                 <i class="{{ button.icon }}" aria-hidden="true" focusable="false" {{ icon_attributes|raw }}></i>
             {% endif %}
             {% if button.label is defined and not (button.icon_only is defined and button.icon_only) %}
-                <span>{{ button.label|trans }}</span>
+                <span{% if button.label_class is defined %} class="{{ button.label_class }}"{% endif %}>{{ button.label|trans }}</span>
             {% endif %}
         </a>
     {% else %}
@@ -76,7 +76,7 @@
                 <i class="{{ button.icon }}" aria-hidden="true" focusable="false" {{ icon_attributes|raw }}></i>
             {% endif %}
             {% if button.label is defined and not (button.icon_only is defined and button.icon_only) %}
-                <span>{{ button.label|trans }}</span>
+                <span{% if button.label_class is defined %} class="{{ button.label_class }}"{% endif %}>{{ button.label|trans }}</span>
             {% endif %}
         </button>
     {% endif %}
