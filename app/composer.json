@@ -68,6 +68,7 @@
     "predis/predis": "^3.0",
     "ramsey/uuid": "^4.7",
     "simshaun/recurr": "^5.0",
+    "symfony/ai-platform": "0.15.0",
     "symfony/asset": "~8.1.0",
     "symfony/asset-mapper": "~8.1.0",
     "symfony/cache": "~8.1.0",
