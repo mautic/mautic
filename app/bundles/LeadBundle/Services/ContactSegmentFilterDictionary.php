@@ -8,6 +8,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\EmailReadDateFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder;
@@ -103,13 +104,14 @@ class ContactSegmentFilterDictionary
             'field'               => 'id',
         ];
         $this->filters['lead_email_read_date']          = [
-            'type'                => ForeignFuncFilterQueryBuilder::getServiceId(),
+            'type'                => EmailReadDateFilterQueryBuilder::getServiceId(),
             'foreign_table'       => 'email_stats',
             'foreign_table_field' => 'lead_id',
             'table'               => 'leads',
             'table_field'         => 'id',
             'func'                => 'max',
             'field'               => 'date_read',
+            'where'               => 'email_stats.lead_id IS NOT NULL',
         ];
         $this->filters['lead_email_sent_date']          = [
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),

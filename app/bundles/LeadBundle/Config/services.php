@@ -189,6 +189,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder::class, 'mautic.lead.query.builder.foreign.value');
     $services->set('mautic.lead.query.builder.foreign.func', Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder::class);
     $services->alias(Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder::class, 'mautic.lead.query.builder.foreign.func');
+    $services->set(Mautic\LeadBundle\Segment\Query\Filter\EmailReadDateFilterQueryBuilder::class);
     $services->set('mautic.lead.query.builder.special.dnc', Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder::class);
     $services->alias(Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder::class, 'mautic.lead.query.builder.special.dnc');
     $services->set('mautic.lead.query.builder.special.integration', Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder::class);
