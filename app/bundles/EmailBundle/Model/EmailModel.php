@@ -1136,7 +1136,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         foreach ($lists as $list) {
-            if (!$batch && null !== $limit && $limit <= 0) {
+            if (null !== $limit && $limit <= 0) {
                 // Hit the max for this batch
                 break;
             }
