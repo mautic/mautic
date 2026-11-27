@@ -4,6 +4,8 @@ namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Psr7\Query;
 use Joomla\Filter\InputFilter;
+use Symfony\Component\Console\Exception\InvalidOptionException;
+use Symfony\Component\Console\Input\InputInterface;
 
 final class InputHelper
 {
@@ -588,5 +590,46 @@ final class InputHelper
         $allowed = implode('', array_map(fn (string $tag): string => "<{$tag}>", $allowedTags));
 
         return strip_tags($input, $allowed);
+    }
+
+    /**
+     * Returns the value of a command option as a positive integer, or null if the option has no value.
+     *
+     * @throws InvalidOptionException If the value is not a positive integer
+     */
+    public static function positiveIntegerOption(InputInterface $input, string $name): ?int
+    {
+        $value = $input->getOption($name);
+
+        return null === $value ? null : self::toPositiveInteger($value, $name);
+    }
+
+    /**
+     * Returns the values of a command option with InputOption::VALUE_IS_ARRAY as positive integers.
+     *
+     * @return int[]
+     *
+     * @throws InvalidOptionException If a value is not a positive integer
+     */
+    public static function positiveIntegerArrayOption(InputInterface $input, string $name): array
+    {
+        return array_map(
+            static fn (mixed $value): int => self::toPositiveInteger($value, $name),
+            array_values((array) $input->getOption($name))
+        );
+    }
+
+    /**
+     * @throws InvalidOptionException
+     */
+    private static function toPositiveInteger(mixed $value, string $optionName): int
+    {
+        $number = is_int($value) || is_string($value) ? trim((string) $value) : '';
+
+        if (!ctype_digit($number) || 0 === (int) $number) {
+            throw new InvalidOptionException(sprintf('The "--%s" option must be a positive integer, "%s" given.', $optionName, is_scalar($value) ? $value : get_debug_type($value)));
+        }
+
+        return (int) $number;
     }
 }
