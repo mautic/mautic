@@ -112,8 +112,10 @@ mQuery( document ).ready(function() {
 
     // Try to keep alive the session.
     setInterval(function() {
-        if (window.location.pathname.startsWith('/s/') && window.location.pathname !== '/s/login') {
-            mQuery.get('/s/keep-alive')
+        var authenticatedUrl = mauticBaseUrl + 's/';
+        var authenticatedPath = new URL(authenticatedUrl, window.location.href).pathname;
+        if (window.location.pathname.startsWith(authenticatedPath) && window.location.pathname !== authenticatedPath + 'login') {
+            mQuery.get(window.location.origin + authenticatedPath + 'keep-alive')
                 .fail(function(errorThrown) {
                     console.error('Error with keep-alive:', errorThrown);
                 });
