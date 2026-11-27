@@ -243,6 +243,28 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * A one-click unsubscribe whose email stat is gone and whose signature does not match the address is not found and writes nothing.
+     */
+    public function testOneClickUnsubscribeWithDeletedStatAndWrongHashIsNotFound(): void
+    {
+        $contact = new Lead();
+        $contact->setEmail('one.click@mautic.tld');
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_POST, '/email/unsubscribe/deleted-stat-hash/one.click@mautic.tld/'.$this->getEmailHash('other@mautic.tld'), [
+            'List-Unsubscribe' => 'One-Click',
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+
+        $this->assertCount(0, $dncRepository->findBy(['lead' => $contact->getId()]));
+    }
+
+    /**
      * Signs an email address the way unsubscribe links are signed.
      *
      * @param string $email the email address
