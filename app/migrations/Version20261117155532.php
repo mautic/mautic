@@ -13,13 +13,13 @@ final class Version20261117155532 extends PreUpAssertionMigration
     private const INDEX_NAME = 'redirect_id_search';
 
     /**
-     * Skips the migration when the index already exists.
+     * Skips the migration when an index that starts with redirect_id already exists.
      */
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            fn (Schema $schema): bool => $schema->getTable($this->getPrefixedTableName())->hasIndex($this->getIndexName()),
-            'Index '.$this->getIndexName().' already exists'
+            fn (Schema $schema): bool => $this->hasRedirectIdIndex($schema),
+            'An index on '.self::TABLE_NAME.'.redirect_id already exists'
         );
     }
 
@@ -41,6 +41,24 @@ final class Version20261117155532 extends PreUpAssertionMigration
     public function up(Schema $schema): void
     {
         $this->addSql("ALTER TABLE {$this->getPrefixedTableName()} ADD INDEX {$this->getIndexName()} (redirect_id), ALGORITHM=INPLACE, LOCK=NONE");
+    }
+
+    /**
+     * Tells whether the table has an index whose first column is redirect_id.
+     *
+     * @param Schema $schema the current database schema
+     *
+     * @return bool true when such an index exists
+     */
+    private function hasRedirectIdIndex(Schema $schema): bool
+    {
+        foreach ($schema->getTable($this->getPrefixedTableName())->getIndexes() as $index) {
+            if ('redirect_id' === ($index->getColumns()[0] ?? null)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
