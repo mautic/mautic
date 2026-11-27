@@ -1,6 +1,7 @@
 type: php
 docroot: ""
-php_version: "8.5"
+php_version: "8.6"
+ddev_version_constraint: ">= v1.25.6"
 webserver_type: apache-fpm
 timezone: UTC
 database:
