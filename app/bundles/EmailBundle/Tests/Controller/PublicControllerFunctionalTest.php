@@ -759,6 +759,53 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Confirm your email address', strip_tags($crawler->html()));
     }
 
+    #[DataProvider('validateEmailFormLocaleProvider')]
+    public function testValidateEmailFormUsesContactLocale(?string $contactLocale, string $expectedHeader): void
+    {
+        $translationsDir = __DIR__.'/../../Translations/fr';
+        $translationFile = $translationsDir.'/messages.ini';
+        $dirExisted      = is_dir($translationsDir);
+
+        try {
+            if (!$dirExisted) {
+                mkdir($translationsDir, 0777, true);
+            }
+            copy(__DIR__.'/../Fixtures/translations/messages.fr.ini', $translationFile);
+
+            $lead = $this->createLead($contactLocale);
+            // Save through the repository so preferred_locale is stored as a contact field value.
+            $this->em->getRepository(Lead::class)->saveEntity($lead);
+            $stat = $this->getStat(null, $lead);
+            $this->em->flush();
+            // Drop the in-memory contact so the request has to load the locale from the database.
+            $this->em->clear();
+
+            $crawler = $this->client->request(
+                Request::METHOD_GET,
+                '/email/validate/unsubscribe/'.$this->getSecretHash('john@doe.email').'/'.$stat->getTrackingHash()
+            );
+
+            $this->assertResponseIsSuccessful();
+            $this->assertStringContainsString($expectedHeader, strip_tags($crawler->html()));
+        } finally {
+            if (is_file($translationFile)) {
+                unlink($translationFile);
+            }
+            if (!$dirExisted && is_dir($translationsDir)) {
+                rmdir($translationsDir);
+            }
+        }
+    }
+
+    /**
+     * @return iterable<string, array{?string, string}>
+     */
+    public static function validateEmailFormLocaleProvider(): iterable
+    {
+        yield 'contact with a locale' => ['fr', 'Confirmez votre adresse e-mail'];
+        yield 'contact without a locale' => [null, 'Confirm your email address'];
+    }
+
     public function testValidateEmailFormRedirectsToUnsubscribeWithValidEmail(): void
     {
         $stat       = $this->getStat();

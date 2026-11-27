@@ -165,6 +165,15 @@ final class PublicController extends CommonFormController
         $stat      = $this->emailModel->getEmailStatus($idHash);
         $themeName = null;
 
+        if ($stat && $lead = $stat->getLead()) {
+            // The contact from the stat has no custom field values loaded, so the preferred locale needs them first.
+            $lead->setFields($this->leadRepository->getFieldValues((int) $lead->getId()));
+
+            if ($locale = $lead->getPreferredLocale()) {
+                $this->translator->setLocale($locale);
+            }
+        }
+
         if ($stat && $email = $stat->getEmail()) {
             $themeName = $email->getTemplate();
             if ('mautic_code_mode' === $themeName) {
