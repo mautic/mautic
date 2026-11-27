@@ -41,6 +41,7 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
+use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -521,8 +522,9 @@ class MailHelper
 
                 break;
             case self::QUEUE_FULL_RESET:
-                $this->message        = $this->getMessageInstance();
-                $this->attachedAssets = [];
+                $this->message             = $this->getMessageInstance();
+                $this->attachedAssets      = [];
+                $this->embedImagesReplaces = [];
                 $this->clearErrors();
                 break;
             case self::QUEUE_RETURN_ERRORS:
@@ -646,6 +648,7 @@ class MailHelper
             $this->email               = null;
             $this->copies              = [];
             $this->message             = $this->getMessageInstance();
+            $this->embedImagesReplaces = [];
             $this->subject             = '';
             $this->subjectInitial      = null;
             $this->plainText           = '';
@@ -864,15 +867,31 @@ class MailHelper
 
                 $path = $match;
                 // if the path contains the site url, make it an absolute path, so it can be fetched.
-                if (str_starts_with($match, $this->coreParametersHelper->get('site_url'))) {
-                    $path = str_replace($this->coreParametersHelper->get('site_url'), '', $match);
-                    $path = $this->pathsHelper->getRootPath().$path;
+                $siteUrl = (string) $this->coreParametersHelper->get('site_url');
+                if (str_starts_with($match, $siteUrl)) {
+                    // Drop the query string and fragment (e.g. asset cache busters) and decode %20 etc. to get the file name.
+                    $path = preg_replace('/[?#].*$/s', '', substr($match, strlen($siteUrl)));
+                    $path = $this->pathsHelper->getRootPath().rawurldecode($path);
+                }
+
+                // A null byte (e.g. from %00) makes file_get_contents() throw instead of returning false.
+                if (str_contains($path, "\0")) {
+                    continue;
                 }
 
                 // Ingore the get_contents errors and use the path in the image src instead if it cannot be fetched.
                 if ($imageContent = @file_get_contents($path)) {
-                    $this->message->embed($imageContent, md5($match));
-                    $this->embedImagesReplaces[$match] = 'cid:'.md5($match);
+                    // Keep the URL if it isn't an image, embedding it would only add an unexpected attachment.
+                    $contentType = (string) (new \finfo(FILEINFO_MIME_TYPE))->buffer($imageContent);
+                    if (!str_starts_with($contentType, 'image/')) {
+                        continue;
+                    }
+
+                    $extension = MimeTypes::getDefault()->getExtensions($contentType)[0] ?? null;
+                    $name      = md5($match).($extension ? '.'.$extension : '');
+
+                    $this->message->embed($imageContent, $name, $contentType);
+                    $this->embedImagesReplaces[$match] = 'cid:'.$name;
                 }
             }
             $content = strtr($content, $this->embedImagesReplaces);
