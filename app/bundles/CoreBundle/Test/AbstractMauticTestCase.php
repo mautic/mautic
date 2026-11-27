@@ -102,13 +102,27 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     protected function setUp(): void
     {
+        $t = StepProfiler::now();
         $this->setUpSymfony($this->configParams);
+        StepProfiler::add($this->profilePrefix().' setUpSymfony', $t);
+
+        $t = StepProfiler::now();
         $this->databaseTool = $this->getService(DatabaseToolCollection::class)->get();
+        StepProfiler::add($this->profilePrefix().' databaseTool', $t);
+    }
+
+    private static bool $profileBooted = false;
+
+    private function profilePrefix(): string
+    {
+        return $this instanceof MauticMysqlTestCase ? 'abstract(mysql)' : 'abstract(non-mysql)';
     }
 
     protected function tearDown(): void
     {
+        $t = StepProfiler::now();
         parent::tearDown();
+        StepProfiler::add($this->profilePrefix().' WebTestCase::tearDown', $t);
 
         // The kernel boot registers an exception handler that is not removed on shutdown.
         // PHPUnit 11.5 fails the test if a leaked handler remains on the stack.
@@ -121,14 +135,23 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function setUpSymfony(array $defaultConfigOptions = []): void
     {
+        $t = StepProfiler::now();
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
         EnvLoader::load();
+        StepProfiler::add($this->profilePrefix().' setUpSymfony: EnvLoader::load', $t);
 
+        $t = StepProfiler::now();
         self::ensureKernelShutdown();
+        StepProfiler::add($this->profilePrefix().' setUpSymfony: ensureKernelShutdown', $t);
+
+        $t = StepProfiler::now();
         $this->client = static::createClient($this->clientOptions, $this->authenticateApi ? $this->clientServer : []);
+        StepProfiler::add($this->profilePrefix().' setUpSymfony: createClient (kernel boot)'.(self::$profileBooted ? '' : ' FIRST - container compile'), $t);
+        self::$profileBooted = true;
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
+        $t = StepProfiler::now();
         $this->em = $this->getService(ManagerRegistry::class)->getManager();
         $this->connection = $this->em->getConnection();
         $this->router     = $this->getService(RouterInterface::class);
@@ -136,6 +159,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $secure           = 0 === strcasecmp($scheme, 'https');
 
         $this->client->setServerParameter('HTTPS', (string) $secure);
+        StepProfiler::add($this->profilePrefix().' setUpSymfony: em/router services', $t);
     }
 
     /**
