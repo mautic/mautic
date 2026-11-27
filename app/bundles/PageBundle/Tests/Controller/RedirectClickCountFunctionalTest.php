@@ -28,6 +28,7 @@ final class RedirectClickCountFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['aggregate_analytics'] = !str_contains($this->name(), 'AggregateAnalyticsOff');
+        $this->configParams['track_link_clicks']   = !str_contains($this->name(), 'LinkTrackingOff');
 
         parent::setUp();
     }
@@ -70,6 +71,40 @@ final class RedirectClickCountFunctionalTest extends MauticMysqlTestCase
         // Contact tokens in the URL are still replaced for a tracked contact
         $this->assertStringNotContainsStringIgnoringCase('contactfield', urldecode($target));
         $this->assertCount(1, $this->em->getRepository(Hit::class)->findBy(['redirect' => $redirect->getId()]));
+    }
+
+    public function testClickIsCountedWithoutLinkingItToTheContactWhileLinkTrackingOff(): void
+    {
+        [$redirect, $contact] = $this->createLink();
+
+        $target = $this->click($redirect, $contact, ['REMOTE_ADDR' => '203.0.113.42']);
+
+        // No contact data is put into the link, tokens fall back to their default or to nothing
+        $this->assertSame('https://example.com/offer?who=&name=there', urldecode($target));
+        $this->assertSame([1, 0], $this->getRedirectCounts($redirect));
+        $this->assertSame([1, 0], $this->getTrackableCounts($redirect));
+        $this->assertCount(0, $this->em->getRepository(Hit::class)->findBy(['redirect' => $redirect->getId()]));
+        $this->assertNotInstanceOf(IpAddress::class, $this->em->getRepository(IpAddress::class)->findOneBy(['ipAddress' => '203.0.113.42']), 'the visitor\'s IP address is not stored');
+        $cookies = array_map(static fn (\Symfony\Component\HttpFoundation\Cookie $cookie): string => $cookie->getName(), $this->client->getResponse()->headers->getCookies());
+        $this->assertSame([], array_intersect(['mautic_device_id', 'mtc_id', 'mautic_referer_id'], $cookies));
+    }
+
+    public function testTheLinkedPageMayStillTrackTheVisitorWhileLinkTrackingOff(): void
+    {
+        [$redirect, $contact] = $this->createLink();
+
+        $this->click($redirect, $contact, ['REMOTE_ADDR' => '203.0.113.42']);
+
+        $this->assertSame('', $this->getBlockedTrackingCookieValue(), 'only the click goes untracked, not the visitor');
+    }
+
+    public function testTheLinkedPageIsToldNotToTrackAnUntrackableVisitorWhileLinkTrackingOff(): void
+    {
+        [$redirect, $contact] = $this->createLink();
+
+        $this->click($redirect, $contact, ['REMOTE_ADDR' => '203.0.113.42', 'HTTP_DNT' => '1']);
+
+        $this->assertSame('1', $this->getBlockedTrackingCookieValue());
     }
 
     public function testTrackedClickIsCounted(): void
@@ -203,6 +238,17 @@ final class RedirectClickCountFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND, 'the link works either way');
 
         return (string) $this->client->getResponse()->headers->get('Location');
+    }
+
+    private function getBlockedTrackingCookieValue(): string
+    {
+        foreach ($this->client->getResponse()->headers->getCookies() as $cookie) {
+            if ('Blocked-Tracking' === $cookie->getName()) {
+                return (string) $cookie->getValue();
+            }
+        }
+
+        $this->fail('every redirect sets the Blocked-Tracking cookie');
     }
 
     /**
