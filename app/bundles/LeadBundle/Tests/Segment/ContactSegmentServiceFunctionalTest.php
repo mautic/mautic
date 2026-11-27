@@ -218,7 +218,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             [
                 'glue'     => 'and',
                 'type'     => 'text',
-                'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+                'object'   => ContactSegmentFilterCrate::COMPANY_OBJECT,
                 'field'    => 'companycity',
                 'operator' => '=',
                 'filter'   => 'Codexville',
@@ -233,7 +233,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             [
                 'glue'     => 'and',
                 'type'     => 'text',
-                'object'   => ContactSegmentFilterCrate::COMPANY_OBJECT,
+                'object'   => ContactSegmentFilterCrate::COMPANY_PRIMARY_OBJECT,
                 'field'    => 'companycity',
                 'operator' => '=',
                 'filter'   => 'Codexville',
@@ -245,7 +245,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $this->assertNotContains($lead->getId(), $primaryLeadIds);
     }
 
-    public function testCompanyAllNegativeOperatorsExcludeContactsWithoutCompanies(): void
+    public function testAssociatedCompanyNegativeOperatorsExcludeContactsWithoutCompanies(): void
     {
         $leadWithCompany              = $this->findLeadByReference('lead-1');
         $leadWithCompanyMatchingValue = $this->findLeadByReference('lead-0');
@@ -255,7 +255,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             [
                 'glue'     => 'and',
                 'type'     => 'text',
-                'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+                'object'   => ContactSegmentFilterCrate::COMPANY_OBJECT,
                 'field'    => 'companycity',
                 'operator' => 'notLike',
                 'filter'   => 'Boston',

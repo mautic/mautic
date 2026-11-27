@@ -211,7 +211,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
                 'id' => 'mautic.lead.import.label.id',
                 'some fields',
             ],
-            'mautic.lead.company' => [
+            'mautic.lead.company_primary' => [
                 'some fields',
             ],
             'mautic.lead.special_fields' => [

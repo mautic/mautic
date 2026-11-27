@@ -104,4 +104,45 @@ final class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertCount(6, $contactSegmentFilters);
     }
+
+    public function testAssociatedAndPrimaryCompanyFiltersAreNotGroupedTogether(): void
+    {
+        $tableSchemaColumnsCache = $this->createStub(TableSchemaColumnsCache::class);
+        $container               = $this->createMock(Container::class);
+        $decoratorFactory        = $this->createMock(DecoratorFactory::class);
+        $filterDecorator         = $this->createMock(FilterDecoratorInterface::class);
+        $filterQueryBuilder      = $this->createStub(FilterQueryBuilderInterface::class);
+
+        $decoratorFactory->expects($this->exactly(2))
+            ->method('getDecoratorForFilter')
+            ->willReturn($filterDecorator);
+        $filterDecorator->expects($this->exactly(2))
+            ->method('getQueryType')
+            ->willReturn('MyQueryTypeId');
+        $container->expects($this->exactly(2))
+            ->method('get')
+            ->with('MyQueryTypeId')
+            ->willReturn($filterQueryBuilder);
+
+        $factory = new ContactSegmentFilterFactory($tableSchemaColumnsCache, $container, $decoratorFactory, $this->createStub(EventDispatcherInterface::class));
+        $leadList = new LeadList();
+        $leadList->setFilters([
+            [
+                'glue'     => 'or',
+                'object'   => 'company_primary',
+                'field'    => 'companycountry',
+                'operator' => '=',
+                'filter'   => 'Germany',
+            ],
+            [
+                'glue'     => 'or',
+                'object'   => 'company',
+                'field'    => 'companycountry',
+                'operator' => '=',
+                'filter'   => 'France',
+            ],
+        ]);
+
+        $this->assertCount(2, $factory->getSegmentFilters($leadList));
+    }
 }

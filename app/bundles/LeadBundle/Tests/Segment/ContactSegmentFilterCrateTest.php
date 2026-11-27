@@ -123,17 +123,17 @@ final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(ContactSegmentFilterCrate::COMPANY_OBJECT, $contactSegmentFilterCrate->getObject());
     }
 
-    public function testCompanyAllTypeFilter(): void
+    public function testPrimaryCompanyTypeFilter(): void
     {
         $filter = [
-            'object' => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+            'object' => ContactSegmentFilterCrate::COMPANY_PRIMARY_OBJECT,
         ];
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
         $this->assertFalse($contactSegmentFilterCrate->isContactType());
         $this->assertTrue($contactSegmentFilterCrate->isCompanyType());
-        $this->assertSame(ContactSegmentFilterCrate::COMPANY_ALL_OBJECT, $contactSegmentFilterCrate->getObject());
+        $this->assertSame(ContactSegmentFilterCrate::COMPANY_PRIMARY_OBJECT, $contactSegmentFilterCrate->getObject());
     }
 
     public function testMultiselectFilter(): void
