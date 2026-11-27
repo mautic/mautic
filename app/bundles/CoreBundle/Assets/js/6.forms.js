@@ -38,6 +38,229 @@ Mautic.renameFormElements = function(container, oldIdPrefix, oldNamePrefix, newI
     });
 };
 
+Mautic.formChangeTrackers = {};
+
+/**
+ * Serializes the user-editable state of a form so two snapshots can be compared.
+ *
+ * @param {HTMLFormElement} form
+ * @returns {string}
+ */
+Mautic.getFormSnapshot = function (form) {
+    const entries = [];
+
+    const formData = new FormData(form);
+    form.querySelectorAll('.button-clicked').forEach(function (hidden) {
+        formData.delete(hidden.name);
+    });
+
+    formData.forEach(function (value, name) {
+        if (name === '_token' || /\[_token\]$/.test(name)) {
+            return;
+        }
+
+        const fileEntry = value instanceof File && value.size > 0
+            ? {name: value.name, size: value.size, lastModified: value.lastModified}
+            : value instanceof File ? {name: value.name, size: value.size} : value;
+        entries.push([name, fileEntry]);
+    });
+
+    if (typeof ckEditors !== 'undefined') {
+        ckEditors.forEach(function (editor, textarea) {
+            if (form.contains(textarea) && typeof editor.getData === 'function') {
+                entries.push([textarea.name, editor.getData()]);
+            }
+        });
+    }
+
+    return JSON.stringify(entries);
+};
+
+/**
+ * Shows "Close" on the cancel buttons of a form until its fields change, and asks
+ * for confirmation before cancelling a form with unsaved changes.
+ *
+ * @param {string} formName
+ */
+Mautic.initializeFormChangeTracking = function (formName) {
+    if (Mautic.formChangeTrackers[formName]) {
+        Mautic.formChangeTrackers[formName].abort();
+        delete Mautic.formChangeTrackers[formName];
+    }
+
+    const form = document.querySelector('form[name="' + CSS.escape(formName) + '"]');
+    const cancelButtons = form ? form.querySelectorAll('button.btn-cancel[id]') : [];
+    if (!cancelButtons.length) {
+        return;
+    }
+
+    const controller = new AbortController();
+    const signal = controller.signal;
+    Mautic.formChangeTrackers[formName] = controller;
+
+    const cancelIds = Array.from(cancelButtons, function (button) {
+        return button.id;
+    });
+    const cancelLabels = {};
+    cancelButtons.forEach(function (button) {
+        cancelLabels[button.id] = button.textContent.trim();
+    });
+
+    let baseline = Mautic.getFormSnapshot(form);
+    let interacted = false;
+    let userEdited = false;
+    let dirty = false;
+    let discardConfirmed = false;
+    let discarded = false;
+
+    const findButtons = function (id) {
+        return mQuery(document.getElementById(id)).add('[id^="' + id + '_toolbar"]');
+    };
+
+    const renderLabels = function () {
+        cancelIds.forEach(function (id) {
+            const label = dirty ? cancelLabels[id] : mauticLang['mautic.core.form.close'];
+
+            findButtons(id).each(function () {
+                const textNode = Array.from(this.childNodes).reverse().find(function (node) {
+                    return node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '';
+                });
+
+                if (textNode) {
+                    textNode.textContent = ' ' + label;
+                }
+            });
+        });
+    };
+
+    const refresh = function () {
+        if (!form.isConnected) {
+            controller.abort();
+            return false;
+        }
+
+        const changed = Mautic.getFormSnapshot(form) !== baseline;
+        if (changed !== dirty) {
+            dirty = changed;
+            renderLabels();
+        }
+
+        return dirty;
+    };
+
+    const settleBaseline = function () {
+        if (!userEdited && form.isConnected) {
+            baseline = Mautic.getFormSnapshot(form);
+            dirty = false;
+            renderLabels();
+        }
+    };
+
+    renderLabels();
+
+    const loadedEvent = 'mautic:onPageLoad:after.formchange' + formName;
+    mQuery(document).one(loadedEvent, function () {
+        window.setTimeout(settleBaseline, 0);
+    });
+    signal.addEventListener('abort', function () {
+        mQuery(document).off(loadedEvent);
+    });
+
+    ['pointerdown', 'keydown'].forEach(function (type) {
+        document.addEventListener(type, function () {
+            if (!form.isConnected) {
+                controller.abort();
+
+                return;
+            }
+
+            interacted = true;
+            settleBaseline();
+        }, {capture: true, signal: signal});
+    });
+
+    mQuery(form).on('input.formchange change.formchange', function () {
+        interacted = true;
+
+        if (refresh()) {
+            userEdited = true;
+        }
+    });
+    signal.addEventListener('abort', function () {
+        mQuery(form).off('.formchange');
+    });
+
+    const observer = new MutationObserver(function () {
+        if (interacted) {
+            if (refresh()) {
+                userEdited = true;
+            }
+        } else {
+            settleBaseline();
+        }
+    });
+    observer.observe(form, {childList: true, subtree: true});
+    signal.addEventListener('abort', function () {
+        observer.disconnect();
+    });
+
+    cancelButtons.forEach(function (button) {
+        mQuery(button).on('click.formchange', function (event) {
+            if (discardConfirmed || !refresh()) {
+                discardConfirmed = false;
+
+                return;
+            }
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (mQuery('.confirmation-modal').length) {
+                return;
+            }
+
+            discarded = false;
+            const dialogTrigger = mQuery('<a>')
+                .attr({
+                    'data-confirm-text': mauticLang['mautic.core.form.discard'],
+                    'data-cancel-text': mauticLang['mautic.core.form.cancel'],
+                    'data-confirm-callback': 'confirmFormDiscard',
+                })
+                .data('discard', function () {
+                    discarded = true;
+                    discardConfirmed = true;
+                    button.click();
+                });
+
+            Mautic.showConfirmation(dialogTrigger[0], mauticLang['mautic.core.form.discard_changes']);
+
+            mQuery('.confirmation-modal').one('hidden.bs.modal', function () {
+                if (discarded) {
+                    return;
+                }
+
+                mQuery('.toolbar-form-buttons button').prop('disabled', false);
+                Mautic.stopIconSpinPostEvent();
+            });
+        });
+    });
+
+    signal.addEventListener('abort', function () {
+        mQuery(cancelButtons).off('click.formchange');
+    });
+};
+
+/**
+ * Confirmation callback: proceeds with the cancel the user confirmed discarding.
+ *
+ * @param {string} action
+ * @param {HTMLElement} dialogTrigger
+ */
+Mautic.confirmFormDiscard = function (action, dialogTrigger) {
+    Mautic.dismissConfirmation();
+    mQuery(dialogTrigger).data('discard')();
+};
+
 /**
  * Prepares form for ajax submission
  *
@@ -45,6 +268,7 @@ Mautic.renameFormElements = function(container, oldIdPrefix, oldNamePrefix, newI
  */
 Mautic.ajaxifyForm = function (formName) {
     Mautic.initializeFormFieldStateSwitcher(formName);
+    Mautic.initializeFormChangeTracking(formName);
 
     // Prevent enter from submitting form and instead jump to next line
     var form = 'form[name="' + formName + '"]';
