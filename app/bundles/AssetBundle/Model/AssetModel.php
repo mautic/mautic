@@ -137,8 +137,9 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         // Denied (401) or missing (404) files weren't downloaded, so they don't count as downloads
         $countsAsDownload = $code < Response::HTTP_BAD_REQUEST;
 
-        // Check if request is trackable (includes IP, bot, privacy signal, and prefetch checks)
-        if (!$this->ipLookupHelper->isRequestTrackable()) {
+        // The asset tracks downloads and the request is trackable (includes IP, bot, privacy signal, and prefetch checks).
+        // The asset goes first, since the trackability check looks up and stores the visitor's IP address.
+        if (!$asset->getTrackDownloads() || !$this->ipLookupHelper->isRequestTrackable()) {
             // Still counted, but with nothing that links it to the visitor. Without an identifier it can't count as unique.
             // Bots, excluded IP addresses and prefetches aren't counted, privacy signals are.
             if ($countsAsDownload && empty($systemEntry) && $this->ipLookupHelper->isRequestCountable()) {
@@ -364,6 +365,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     {
         if (null === $id) {
             $entity = new Asset();
+            // A new asset starts from the global setting, and keeps its own value after that
+            $entity->setTrackDownloads((bool) $this->coreParametersHelper->get('track_asset_downloads', true));
         } else {
             $entity = parent::getEntity($id);
         }
