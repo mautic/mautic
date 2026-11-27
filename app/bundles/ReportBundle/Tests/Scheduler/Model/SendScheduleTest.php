@@ -99,7 +99,7 @@ final class SendScheduleTest extends \PHPUnit\Framework\TestCase
 
         $this->mailHelperMock->expects($this->once())
             ->method('send')
-            ->with(true);
+            ->with(false);
 
         $this->sendSchedule->send($this->scheduler, '/path/to/report.csv');
     }
@@ -160,7 +160,7 @@ final class SendScheduleTest extends \PHPUnit\Framework\TestCase
 
         $this->mailHelperMock->expects($this->once())
             ->method('send')
-            ->with(true);
+            ->with(false);
 
         $this->sendSchedule->send($this->scheduler, '/path/to/report.csv');
     }
@@ -218,7 +218,7 @@ final class SendScheduleTest extends \PHPUnit\Framework\TestCase
 
         $this->mailHelperMock->expects($this->once())
             ->method('send')
-            ->with(true);
+            ->with(false);
 
         $this->sendSchedule->send($this->scheduler, 'path-to-a-file');
     }

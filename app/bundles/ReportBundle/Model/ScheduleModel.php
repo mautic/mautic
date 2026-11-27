@@ -20,9 +20,6 @@ class ScheduleModel
     ) {
     }
 
-    /**
-     * Avoid the default AbstractCommonModel::getRepository() as it caches it to a static property.
-     */
     public function getRepository(): SchedulerRepository
     {
         return $this->schedulerRepository;
@@ -31,14 +28,20 @@ class ScheduleModel
     /**
      * @return Scheduler[]
      */
-    public function getScheduledReportsForExport(ExportOption $exportOption)
+    public function getScheduledReportsForExport(ExportOption $exportOption): array
     {
         return $this->schedulerRepository->getScheduledReportsForExport($exportOption);
     }
 
-    public function reportWasScheduled(Report $report): void
+    public function saveEntity(Scheduler $scheduler): void
     {
-        $this->schedulerPlanner->computeScheduler($report);
+        $this->entityManager->persist($scheduler);
+        $this->entityManager->flush();
+    }
+
+    public function reportWasScheduled(Report $report, bool $scheduleNextDownloadJob = true): void
+    {
+        $this->schedulerPlanner->computeScheduler($report, $scheduleNextDownloadJob);
     }
 
     public function turnOffScheduler(Report $report): void

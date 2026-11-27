@@ -48,7 +48,8 @@ final class ScheduleModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->schedulerRepository->expects($this->once())
             ->method('getScheduledReportsForExport')
-            ->with($this->createStub(ExportOption::class));
+            ->with($this->createStub(ExportOption::class))
+            ->willReturn([]);
 
         $this->scheduleModel->getScheduledReportsForExport($this->createStub(ExportOption::class));
     }
