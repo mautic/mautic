@@ -73,6 +73,10 @@ return [
                 'path'       => '/email/{idHash}.gif',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::trackingImageAction',
             ],
+            'mautic_email_scanner_check' => [
+                'path'       => '/email/check/{idHash}',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::scannerCheckAction',
+            ],
             'mautic_email_webview' => [
                 'path'       => '/email/view/{idHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::indexAction',
@@ -219,6 +223,7 @@ return [
             'LinkedInBot/1.0 (compatible; Mozilla/5.0; Jakarta Commons-HttpClient/3.1 +http://www.linkedin.com)',
         ],
         'bot_helper_blocked_ip_addresses'                                   => [],
+        'email_scanner_diagnostics_enabled'                                 => false,
         'smime_signing_enabled'                                             => false,
         'smime_certificates_path'                                           => '%kernel.project_dir%/var/smime_certificates',
     ],

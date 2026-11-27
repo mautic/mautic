@@ -8,8 +8,11 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\EmailBundle\Diagnostics\ScannerDiagnosticsRecorder;
+use Mautic\EmailBundle\Diagnostics\ScannerHoneypotLink;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\ScannerDiagnostic;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Form\Type\EmailPreviewOptionsType;
@@ -106,7 +109,8 @@ final class PublicController extends CommonFormController
 
             if ($copy = $stat->getStoredCopy()) {
                 $subject = $copy->getSubject();
-                $content = $copy->getBody();
+                // The honeypot link is for the sent email only, so it isn't shown in the web view
+                $content = ScannerHoneypotLink::removeFrom((string) $copy->getBody());
 
                 // Replace tokens
                 if (is_array($tokens)) {
@@ -139,10 +143,19 @@ final class PublicController extends CommonFormController
         Request $request,
         MessageBusInterface $messageBus,
         LoggerInterface $logger,
+        ScannerDiagnosticsRecorder $recorder,
         string $idHash,
     ): Response {
         if (!$this->emailModel->allowsOpenTracking($idHash)) {
             return TrackingPixelHelper::getResponse($request);
+        }
+
+        if ($recorder->isEnabled()) {
+            $stat = $this->emailModel->getEmailStatus($idHash);
+
+            if ($stat instanceof Stat) {
+                $recorder->record(ScannerDiagnostic::EVENT_OPEN, $request, $stat);
+            }
         }
 
         try {
@@ -154,6 +167,21 @@ final class PublicController extends CommonFormController
         }
 
         return TrackingPixelHelper::getResponse($request);
+    }
+
+    public function scannerCheckAction(Request $request, ScannerDiagnosticsRecorder $recorder, string $idHash): Response
+    {
+        $stat = $recorder->isEnabled() ? $this->emailModel->getEmailStatus($idHash) : null;
+
+        if ($stat instanceof Stat) {
+            $recorder->record(ScannerDiagnostic::EVENT_HONEYPOT, $request, $stat);
+        }
+
+        $response = new Response();
+        $response->headers->set('Cache-Control', 'no-store');
+        $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+
+        return $response;
     }
 
     public function validateEmailAction(Request $request, string $action, string $secretHash, string $idHash): Response
@@ -178,7 +206,6 @@ final class PublicController extends CommonFormController
 
         $contentTemplate = $this->themeHelper->checkForTwigTemplate('@themes/'.$themeName.'/html/email-validation.html.twig');
 
-        // Use the same theme that was found above.
         if (preg_match('#^@themes/([^/]+)/#', $contentTemplate, $matches)) {
             $themeName = $matches[1];
         }

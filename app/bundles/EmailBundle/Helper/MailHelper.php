@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\EmailBundle\Diagnostics\ScannerHoneypotLink;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\CopyRepository;
@@ -351,7 +352,13 @@ class MailHelper
             // Only set body if not empty or if plain text is empty - this ensures an empty HTML body does not show for
             // messages only with plain text
             if (!empty($this->body['content']) || empty($this->plainText)) {
-                $this->message->html($this->body['content'], $this->body['charset'] ?? 'utf-8');
+                $html = $this->body['content'];
+
+                if (is_string($html) && !$isQueueFlush && !$this->isScannerHoneypotActive()) {
+                    $html = ScannerHoneypotLink::removeFrom($html);
+                }
+
+                $this->message->html($html, $this->body['charset'] ?? 'utf-8');
             }
             $this->setMessagePlainText();
 
@@ -818,6 +825,11 @@ class MailHelper
         if (!$ignoreTrackingPixel && $this->coreParametersHelper->get('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
+
+            if ('text/html' === $contentType && null !== $this->email && $this->coreParametersHelper->get('email_scanner_diagnostics_enabled')) {
+                $trackingImg .= ScannerHoneypotLink::getHtml();
+            }
+
             if (str_contains((string) $content, '</body>')) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
@@ -1454,7 +1466,24 @@ class MailHelper
             $tokens['{tracking_pixel}'] = self::getBlankPixel();
         }
 
+        if ($this->isScannerHoneypotActive()) {
+            $tokens[ScannerHoneypotLink::URL_TOKEN] = $this->router->generate(
+                'mautic_email_scanner_check',
+                [
+                    'idHash' => $this->idHash,
+                ],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+        }
+
         return $tokens;
+    }
+
+    private function isScannerHoneypotActive(): bool
+    {
+        return $this->appendTrackingPixel
+            && null !== $this->idHash
+            && (bool) $this->coreParametersHelper->get('email_scanner_diagnostics_enabled');
     }
 
     /**
