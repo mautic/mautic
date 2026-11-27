@@ -801,6 +801,14 @@ final class PublicController extends CommonFormController
         return array_merge($showParamsBasedOnConfiguration, $showParamsBasedOnContent);
     }
 
+    /**
+     * Handles an RFC 8058 one-click unsubscribe.
+     *
+     * @param EmailModel $model the email model that adds the Do Not Contact entry
+     * @param Stat|null  $stat  the email stat of the link, null when it is gone
+     *
+     * @return Response the unsubscribed text, or 404 when the stat is gone
+     */
     private function oneClickUnsubscribe(EmailModel $model, ?Stat $stat): Response
     {
         if (!$stat) {
@@ -809,7 +817,6 @@ final class PublicController extends CommonFormController
             return new Response($statsNotFount, Response::HTTP_NOT_FOUND);
         }
 
-        // RFC 8058 One-Click unsubscribe
         $unsubscribeComment = $this->translator->trans('mautic.email.dnc.unsubscribed');
         $model->setDoNotContact($stat, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
 
