@@ -95,8 +95,10 @@ Mautic.initConfigUnsavedChangesGuard = function(container) {
 
     // A page that failed validation was not saved, so its submitted values are unsaved too
     const failedValidation = form.find('.has-error').length > 0;
-    const initialState = form.serialize();
-    const hasUnsavedChanges = () => failedValidation || form.serialize() !== initialState;
+    // serialize() skips file inputs, so add their selected file names to the state
+    const formState = () => form.serialize() + form.find('input[type="file"]').map((index, input) => input.value).get().join();
+    const initialState = formState();
+    const hasUnsavedChanges = () => failedValidation || formState() !== initialState;
 
     Mautic.configLeaveGuard = function(event) {
         const link = event.target.closest('a[data-toggle="ajax"]');
