@@ -1,0 +1,57 @@
+<div class="row form-group" data-subject-advisor
+     data-subject-id="{{ subject.vars.id|e('html_attr') }}"
+     data-url="{{ path('mautic_email_subject_suggestion', {id: id})|e('html_attr') }}"
+     data-csrf="{{ csrf_token('mautic_ajax_post')|e('html_attr') }}"
+     data-pending="{{ 'mautic.email.subject_advisor.pending'|trans|e('html_attr') }}"
+     data-failure="{{ 'mautic.email.subject_advisor.failed'|trans|e('html_attr') }}"
+     data-ready="{{ 'mautic.email.subject_advisor.ready'|trans|e('html_attr') }}"
+     data-applied="{{ 'mautic.email.subject_advisor.applied'|trans|e('html_attr') }}"
+     data-restored="{{ 'mautic.email.subject_advisor.restored'|trans|e('html_attr') }}">
+    <div class="col-xs-12{{ subject.vars.errors|length ? ' has-error' : '' }}">
+        {{ form_label(subject) }}
+        <div data-subject-field>
+            {{ form_widget(subject) }}
+            {% include '@MauticCore/Components/ai-label.html.twig' with {
+                size: 'mini',
+                className: 'd-none',
+                trigger: 'click',
+                aria_label: 'mautic.email.subject_advisor.explain',
+                content: 'mautic.email.subject_advisor.source'
+            } only %}
+            <span class="ai-label d-none" data-subject-revert>
+                <button class="btn btn-ghost btn-sm btn--icon-only btn-nospin" type="button" title="{{ 'mautic.email.subject_advisor.revert'|trans }}" aria-label="{{ 'mautic.email.subject_advisor.revert'|trans }}">
+                    <i class="ri-arrow-go-back-line" aria-hidden="true"></i>
+                </button>
+            </span>
+        </div>
+        {{ form_errors(subject) }}
+        {{ form_help(subject) }}
+        <p id="email-subject-advisor-help" class="small mt-8 mb-4">{{ 'mautic.email.subject_advisor.help'|trans }}</p>
+        {% include '@MauticCore/Helper/button.html.twig' with {buttons: [{
+            id: 'email-subject-suggest',
+            label: 'mautic.email.subject_advisor.suggest',
+            variant: 'tertiary',
+            size: 'sm',
+            icon: 'ri-sparkling-line',
+            attributes: {type: 'button', 'class': 'btn-nospin', 'data-subject-suggest': '', 'aria-describedby': 'email-subject-advisor-help'}
+        }]} only %}
+        <div class="small" role="status" data-subject-status></div>
+        <div class="mt-8" data-subject-preview hidden>
+            <p class="mb-4"><strong>{{ 'mautic.email.subject_advisor.suggestion'|trans }}</strong></p>
+            <p class="text-break mb-8" id="email-subject-suggestion" data-subject-suggestion></p>
+            {% include '@MauticCore/Helper/button.html.twig' with {buttons: [{
+                id: 'email-subject-use',
+                label: 'mautic.email.subject_advisor.use',
+                variant: 'tertiary',
+                size: 'sm',
+                attributes: {type: 'button', 'class': 'btn-nospin', 'data-subject-use': '', 'aria-describedby': 'email-subject-suggestion'}
+            }, {
+                id: 'email-subject-dismiss',
+                label: 'mautic.email.subject_advisor.dismiss',
+                variant: 'ghost',
+                size: 'sm',
+                attributes: {type: 'button', 'class': 'btn-nospin', 'data-subject-dismiss': ''}
+            }]} only %}
+        </div>
+    </div>
+</div>

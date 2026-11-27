@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 use GuzzleHttp\Client;
 use Knp\Menu\MenuItem;
+use Mautic\CoreBundle\Ai\AiModelResolver;
+use Mautic\CoreBundle\Ai\AiModelResolverInterface;
+use Mautic\CoreBundle\Ai\ConnectionTestFeature;
+use Mautic\CoreBundle\Ai\ModelWorkload;
 use Mautic\CoreBundle\Cache\MiddlewareCacheWarmer;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\ExceptionController;
@@ -87,6 +91,7 @@ return function (ContainerConfigurator $configurator): void {
 
     $excludes = [
         'Doctrine',
+        'Ai/ConnectionTestFeature.php',
         'Model/IteratorExportDataModel.php',
         'Form/EventListener/FormExitSubscriber.php',
         'Release',
@@ -123,6 +128,13 @@ return function (ContainerConfigurator $configurator): void {
         ->args([param('mautic.ip_lookup_service'), param('mautic.ip_lookup_auth'), param('mautic.ip_lookup_config'), service('mautic.http.client')]);
     $services->set(HttpClientInterface::class)
         ->factory(HttpClient::create(...));
+    $services->set(AiModelResolver::class)->private();
+    $services->alias(AiModelResolverInterface::class, AiModelResolver::class)->private();
+    foreach (ModelWorkload::cases() as $workload) {
+        $services->set('mautic.ai.'.ConnectionTestFeature::idFor($workload), ConnectionTestFeature::class)
+            ->arg('$workload', $workload)
+            ->private();
+    }
     $services->set(TranslationLoader::class)->tag('translation.loader', ['alias' => 'mautic']);
     $services->set(ThemeHelper::class)
         ->call('setDefaultTheme', [param('mautic.theme')]);

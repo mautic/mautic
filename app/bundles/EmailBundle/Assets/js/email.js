@@ -100,6 +100,130 @@ Mautic.emailOnLoad = function (container, response) {
     }
 
     Mautic.initMailerIsOwnerGlobalCheck();
+    Mautic.initEmailSubjectAdvisor();
+};
+
+Mautic.initEmailSubjectAdvisor = function () {
+    const advisor = document.querySelector('[data-subject-advisor]');
+    if (!advisor || advisor.dataset.initialized) {
+        return;
+    }
+
+    const subject = document.getElementById(advisor.dataset.subjectId);
+    const field = advisor.querySelector('[data-subject-field]');
+    const label = field.querySelector('.ai-label');
+    const explain = label.querySelector('button');
+    const revert = field.querySelector('[data-subject-revert]');
+    const suggest = advisor.querySelector('[data-subject-suggest]');
+    const status = advisor.querySelector('[data-subject-status]');
+    const preview = advisor.querySelector('[data-subject-preview]');
+    const previewText = preview.querySelector('[data-subject-suggestion]');
+    let accepted = null;
+    let showingAccepted = false;
+    let draftVersion = 0;
+    advisor.dataset.initialized = 'true';
+
+    const closeExplanation = () => window.bootstrap.Popover.getInstance(explain)?.hide();
+    explain.setAttribute('aria-expanded', 'false');
+    explain.addEventListener('inserted.bs.popover', () => {
+        explain.setAttribute('aria-controls', explain.getAttribute('aria-describedby'));
+        explain.setAttribute('aria-expanded', 'true');
+    });
+    explain.addEventListener('hidden.bs.popover', () => {
+        explain.removeAttribute('aria-controls');
+        explain.setAttribute('aria-expanded', 'false');
+    });
+    explain.addEventListener('blur', closeExplanation);
+    explain.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && explain.getAttribute('aria-expanded') === 'true') {
+            closeExplanation();
+            event.stopPropagation();
+        }
+    });
+
+    const showPresence = (active) => {
+        showingAccepted = active;
+        const canRestore = accepted !== null && !active;
+        field.classList.toggle('form-field-ai', active || canRestore);
+        field.classList.toggle('form-field-ai--sm', canRestore);
+        subject.classList.toggle('form-control--ai', active);
+        label.classList.toggle('d-none', !active);
+        revert.classList.toggle('d-none', !canRestore);
+        if (!active) {
+            closeExplanation();
+        }
+    };
+    const announce = (message, visible = true) => {
+        status.classList.toggle('visually-hidden', !visible);
+        status.textContent = message;
+    };
+    const clearPreview = () => {
+        preview.hidden = true;
+        previewText.textContent = '';
+        status.textContent = '';
+    };
+    subject.addEventListener('input', () => {
+        ++draftVersion;
+        clearPreview();
+        if (showingAccepted && subject.value !== accepted) {
+            showPresence(false);
+        }
+    });
+    const apply = (message) => {
+        subject.value = accepted;
+        subject.dispatchEvent(new Event('input', {bubbles: true}));
+        subject.dispatchEvent(new Event('change', {bubbles: true}));
+        showPresence(true);
+        subject.focus();
+        announce(message, false);
+    };
+
+    suggest.addEventListener('click', async () => {
+        clearPreview();
+        const draft = subject.value;
+        const version = draftVersion;
+        suggest.disabled = true;
+        announce(advisor.dataset.pending);
+        try {
+            const response = await fetch(advisor.dataset.url, {
+                method: 'POST',
+                headers: {'X-CSRF-Token': advisor.dataset.csrf, 'X-Requested-With': 'XMLHttpRequest'},
+                body: new URLSearchParams({subject: draft}),
+            });
+            const result = await response.json();
+            if (draftVersion !== version || subject.value !== draft || !advisor.isConnected) {
+                return;
+            }
+            if (!response.ok || typeof result.suggestion !== 'string' || !result.suggestion) {
+                announce(result.message || advisor.dataset.failure);
+                return;
+            }
+            previewText.textContent = result.suggestion;
+            preview.hidden = false;
+            announce(advisor.dataset.ready, false);
+        } catch {
+            if (draftVersion === version && subject.value === draft) {
+                announce(advisor.dataset.failure);
+            }
+        } finally {
+            suggest.disabled = false;
+        }
+    });
+    preview.querySelector('[data-subject-use]').addEventListener('click', () => {
+        if (!preview.hidden) {
+            accepted = previewText.textContent;
+            apply(advisor.dataset.applied);
+        }
+    });
+    preview.querySelector('[data-subject-dismiss]').addEventListener('click', () => {
+        clearPreview();
+        suggest.focus();
+    });
+    revert.querySelector('button').addEventListener('click', () => {
+        if (accepted !== null) {
+            apply(advisor.dataset.restored);
+        }
+    });
 };
 
 Mautic.emailOnUnload = function(id) {

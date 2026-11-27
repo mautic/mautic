@@ -65,6 +65,7 @@ Mautic.configOnLoad = function(container) {
         });
     });
 
+    Mautic.initAiSettings(container);
     Mautic.initConfigUnsavedChangesGuard(container);
 };
 

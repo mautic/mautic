@@ -194,7 +194,11 @@
         </div>
         <div class="col-md-3 height-auto border-start">
             <div class="pe-24 ps-24 pt-16 pb-16">
-                {{ form_row(form.subject) }}
+                {% if subjectAdvisorAvailable|default(false) %}
+                    {% include '@MauticEmail/Email/_subject_advisor.html.twig' with {id: email.id, subject: form.subject} only %}
+                {% else %}
+                    {{ form_row(form.subject) }}
+                {% endif %}
                 {{ form_row(form.name) }}
                 {{ form_row(form.preheaderText) }}
                 {% if isVariant %}

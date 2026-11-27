@@ -51,7 +51,7 @@ final class ConfigChangeLogger
             throw new \RuntimeException('Set original normalized data at first');
         }
 
-        $originalData = $this->normalizeData($this->originalNormData);
+        $originalData = $this->filterData($this->normalizeData($this->originalNormData));
         $postData     = $this->filterData($this->normalizeData($postNormData));
 
         $diff = [];
@@ -106,6 +106,10 @@ final class ConfigChangeLogger
      */
     private function filterData(array $data): array
     {
+        foreach ($data['ai_providers'] ?? [] as $id => $provider) {
+            unset($data['ai_providers'][$id]['api_key'], $data['ai_providers'][$id]['remove_key']);
+        }
+
         $keys = $this->filterKeys;
 
         return array_filter(
