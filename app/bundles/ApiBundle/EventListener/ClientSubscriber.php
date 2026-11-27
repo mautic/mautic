@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\EventListener;
 
-use Mautic\ApiBundle\Event as Events;
-use Mautic\ApiBundle\Event\ClientPostDeleteEvent;
-use Mautic\ApiBundle\Event\ClientPostSaveEvent;
+use Mautic\ApiBundle\Entity\oAuth2\Client;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -22,12 +22,14 @@ final readonly class ClientSubscriber
     /**
      * Add a client change entry to the audit log.
      */
-    #[AsEventListener(
-        event: ClientPostSaveEvent::class,
-    )]
-    public function onClientPostSave(Events\ClientEvent $event): void
+    #[AsEventListener]
+    public function onClientPostSave(EntityPostSave $event): void
     {
-        $client = $event->getClient();
+        $client = $event->getEntity();
+        if (!$client instanceof Client) {
+            return;
+        }
+
         if (!$details = $event->getChanges()) {
             return;
         }
@@ -46,13 +48,15 @@ final readonly class ClientSubscriber
     /**
      * Add a role delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: ClientPostDeleteEvent::class,
-    )]
-    public function onClientDelete(Events\ClientEvent $event): void
+    #[AsEventListener]
+    public function onClientDelete(EntityPostDelete $event): void
     {
-        $client = $event->getClient();
-        $log    = [
+        $client = $event->getEntity();
+        if (!$client instanceof Client) {
+            return;
+        }
+
+        $log = [
             'bundle'    => 'api',
             'object'    => 'client',
             'objectId'  => $client->deletedId,

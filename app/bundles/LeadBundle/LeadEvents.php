@@ -165,14 +165,14 @@ final class LeadEvents
     public const string ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.lead.on_campaign_trigger_condition';
 
     /**
-     * Webhook event type identifier, the event itself is dispatched as
-     * Mautic\LeadBundle\Event\CompanyPostSaveEvent.
+     * Webhook event type identifier, the entity save itself is dispatched as
+     * Mautic\CoreBundle\Event\EntityPostSave.
      */
     public const string COMPANY_POST_SAVE = 'mautic.company_post_save';
 
     /**
-     * Webhook event type identifier, the event itself is dispatched as
-     * Mautic\LeadBundle\Event\CompanyPostDeleteEvent.
+     * Webhook event type identifier, the entity delete itself is dispatched as
+     * Mautic\CoreBundle\Event\EntityPostDelete.
      */
     public const string COMPANY_POST_DELETE = 'mautic.company_post_delete';
 

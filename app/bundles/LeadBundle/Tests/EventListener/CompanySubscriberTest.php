@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
-use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\EventListener\CompanySubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
 use PHPUnit\Framework\TestCase;
@@ -66,9 +67,9 @@ final class CompanySubscriberTest extends TestCase
         $company->deletedId = $companyId;
         $company->setName($companyName);
 
-        $event = $this->createMock(CompanyEvent::class);
+        $event = $this->createMock(EntityPostDelete::class);
         $event->expects($this->once())
-            ->method('getCompany')
+            ->method('getEntity')
             ->willReturn($company);
 
         $subscriber->onCompanyDelete($event);
@@ -113,9 +114,9 @@ final class CompanySubscriberTest extends TestCase
         $company = new Company();
         ReflectionHelper::setEntityId($company, $companyId);
 
-        $event = $this->createMock(CompanyEvent::class);
+        $event = $this->createMock(EntityPostSave::class);
         $event->expects($this->once())
-            ->method('getCompany')
+            ->method('getEntity')
             ->willReturn($company);
         $event->expects($this->once())
             ->method('getChanges')

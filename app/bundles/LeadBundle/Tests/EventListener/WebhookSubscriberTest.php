@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostDelete;
 use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
 use Mautic\LeadBundle\Entity\Company;
@@ -11,8 +12,6 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
-use Mautic\LeadBundle\Event\CompanyPostDeleteEvent;
-use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\EventListener\WebhookSubscriber;
@@ -197,8 +196,8 @@ final class WebhookSubscriberTest extends TestCase
 
         $company = new Company();
         $company->setName('company');
-        $dispatcher->dispatch(new CompanyPostSaveEvent($company));
-        $dispatcher->dispatch(new CompanyPostDeleteEvent($company));
+        $dispatcher->dispatch(new EntityPostSave($company));
+        $dispatcher->dispatch(new EntityPostDelete($company));
     }
 
     public function testOnSegmentChangeWithArrayContact(): void
