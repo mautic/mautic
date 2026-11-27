@@ -76,6 +76,22 @@ final class PageRedirectsRedirectIdIndexMigrationTest extends TestCase
     }
 
     /**
+     * Checks that down() drops the index without locking the table.
+     */
+    public function testDownDropsTheIndex(): void
+    {
+        $migration = $this->createMigration();
+        $schema    = $this->createSchema('', ['redirect_id'], 'redirect_id_search');
+
+        $migration->down($schema);
+
+        $this->assertSame(
+            'ALTER TABLE page_redirects DROP INDEX redirect_id_search, ALGORITHM=INPLACE, LOCK=NONE',
+            $migration->getSql()[0]->getStatement()
+        );
+    }
+
+    /**
      * Builds a page_redirects table with an optional extra index.
      *
      * @param string   $prefix       the table prefix
