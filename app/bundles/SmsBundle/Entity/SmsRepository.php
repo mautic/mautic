@@ -79,8 +79,11 @@ class SmsRepository extends CommonRepository
                 )
             )
             ->setParameter('smsId', $smsId)
-            // Order by ID so we can query by greater than X contact ID when batching
-            ->orderBy('lll.lead_id');
+            // Order by ID so we can query by greater than X contact ID when batching.
+            // Must be l.id and not lll.lead_id (equivalent thanks to the join condition)
+            // so that consumers selecting DISTINCT l.id stay compatible with MySQL's
+            // ONLY_FULL_GROUP_BY, which rejects ordering by a column outside the select list.
+            ->orderBy('l.id');
 
         return $q;
     }
