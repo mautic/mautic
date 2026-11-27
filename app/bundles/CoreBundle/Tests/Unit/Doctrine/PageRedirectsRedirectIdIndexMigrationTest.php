@@ -63,6 +63,19 @@ final class PageRedirectsRedirectIdIndexMigrationTest extends TestCase
     }
 
     /**
+     * Checks that the migration is skipped when another index already starts with redirect_id.
+     */
+    public function testSkipsWhenAnotherIndexStartsWithRedirectId(): void
+    {
+        $migration = $this->createMigration();
+        $schema    = $this->createSchema('', ['redirect_id', 'hits'], 'custom_redirect_lookup');
+
+        $this->expectException(SkipMigration::class);
+
+        $migration->preUp($schema);
+    }
+
+    /**
      * Builds a page_redirects table with an optional extra index.
      *
      * @param string   $prefix       the table prefix
