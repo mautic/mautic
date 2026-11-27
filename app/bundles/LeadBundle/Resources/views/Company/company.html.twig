@@ -24,7 +24,7 @@
         'langVar'         : 'company',
         'customButtons'   : [],
         'templateButtons' : {
-            'close' : securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], company.permissionUser),
+            'close' : securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], company.permissionUser, permissions['lead:leads:viewsamerole']|default(false)),
         },
         'targetLabel'     : 'mautic.lead.lead.companies'|trans
     }
@@ -33,9 +33,9 @@
 {% endblock %}
 
 {% block actions %}
-{% set canEdit     = securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], company.permissionUser) %}
-{% set canMerge    = securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], company.permissionUser) %}
-{% set canDownload = securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], company.permissionUser) %}
+{% set canEdit     = securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], company.permissionUser, permissions['lead:leads:editsamerole']|default(false)) %}
+{% set canMerge    = securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], company.permissionUser, permissions['lead:leads:deletesamerole']|default(false)) %}
+{% set canDownload = securityHasEntityAccess(permissions['lead:leads:viewown'], permissions['lead:leads:viewother'], company.permissionUser, permissions['lead:leads:viewsamerole']|default(false)) %}
 {% set buttons     = [] %}
 
 {% if canMerge and canEdit %}
@@ -69,7 +69,7 @@
         'customButtons': buttons,
         'templateButtons': {
             'edit': canEdit,
-            'delete': securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], company.permissionUser),
+            'delete': securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], company.permissionUser, permissions['lead:leads:deletesamerole']|default(false)),
         },
   }) }}
 {% endblock %}

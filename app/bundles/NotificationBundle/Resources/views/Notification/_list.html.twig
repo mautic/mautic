@@ -53,8 +53,8 @@
                         {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                 'item': item,
                                 'templateButtons': {
-                                    'edit': securityHasEntityAccess(permissions['notification:notifications:editown'], permissions['notification:notifications:editother'], item.createdBy),
-                                    'delete': securityHasEntityAccess(permissions['notification:notifications:deleteown'], permissions['notification:notifications:deleteother'], item.createdBy),
+                                    'edit': securityHasEntityAccess(permissions['notification:notifications:editown'], permissions['notification:notifications:editother'], item.createdBy, permissions['notification:notifications:editsamerole']|default(false)),
+                                    'delete': securityHasEntityAccess(permissions['notification:notifications:deleteown'], permissions['notification:notifications:deleteother'], item.createdBy, permissions['notification:notifications:deletesamerole']|default(false)),
                                 },
                                 'routeBase': 'notification',
                                 'customButtons': [

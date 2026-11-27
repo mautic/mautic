@@ -145,7 +145,8 @@
                                                 securityHasEntityAccess(
                                                     permissions[permissionBase ~ ':editown'],
                                                     permissions[permissionBase ~ ':editother'],
-                                                    item.getCreatedBy()
+                                                    item.getCreatedBy(),
+                                                    permissions[permissionBase ~ ':editsamerole']|default(false)
                                                 )
                                                 :
                                                 permissions[permissionBase ~ ':edit'],
@@ -155,7 +156,8 @@
                                                 securityHasEntityAccess(
                                                     permissions[permissionBase ~ ':deleteown'],
                                                     permissions[permissionBase ~ ':deleteother'],
-                                                    item.getCreatedBy()
+                                                    item.getCreatedBy(),
+                                                    permissions[permissionBase ~ ':deletesamerole']|default(false)
                                                 )
                                                 :
                                                 permissions[permissionBase ~ ':delete'],

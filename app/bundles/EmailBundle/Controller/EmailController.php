@@ -68,6 +68,9 @@ final class EmailController extends FormController
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
+    private const PERMISSION_VIEW_OWN   = 'email:emails:viewown';
+
+    private const PERMISSION_VIEW_OTHER = 'email:emails:viewother';
     private const FILTER_TYPE_CATEGORY = 'category';
 
     private const FILTER_TYPE_LIST     = 'list';
@@ -83,22 +86,10 @@ final class EmailController extends FormController
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
         // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'email:emails:viewown',
-                'email:emails:viewother',
-                'email:emails:create',
-                'email:emails:editown',
-                'email:emails:editother',
-                'email:emails:deleteown',
-                'email:emails:deleteother',
-                'email:emails:publishown',
-                'email:emails:publishother',
-            ],
-            'RETURN_ARRAY'
-        );
+        $permissionBase = 'email:emails';
+        $permissions    = $this->getStandardPermissions($permissionBase);
 
-        if (!$permissions['email:emails:viewown'] && !$permissions['email:emails:viewother']) {
+        if (!$this->hasStandardViewPermission($permissions, $permissionBase)) {
             $this->throwAccessDenied();
         }
 
@@ -132,10 +123,8 @@ final class EmailController extends FormController
                 ['column' => 'e.variantParent,e.translationParent', 'expr' => 'isNull'],
             ],
         ];
-        if (!$permissions['email:emails:viewother']) {
-            $filter['force'][] =
-                ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
-        }
+        $this->addStandardRoleBasedFilter($filter, $permissions, $permissionBase, 'e.createdBy');
+
         $availableLists                                               = $this->listModel->getUserLists();
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
             'options' => array_column($availableLists, 'name', 'alias'),
@@ -343,8 +332,8 @@ final class EmailController extends FormController
             );
         }
         if (!$this->security->hasEntityAccess(
-            'email:emails:viewown',
-            'email:emails:viewother',
+            self::PERMISSION_VIEW_OWN,
+            self::PERMISSION_VIEW_OTHER,
             $email->getCreatedBy()
         )
         ) {
@@ -462,13 +451,16 @@ final class EmailController extends FormController
                     'translations'       => $translations,
                     'permissions'        => $security->isGranted(
                         [
-                            'email:emails:viewown',
-                            'email:emails:viewother',
+                            self::PERMISSION_VIEW_OWN,
+                            self::PERMISSION_VIEW_OTHER,
+                            'email:emails:viewsamerole',
                             'email:emails:create',
                             'email:emails:editown',
                             'email:emails:editother',
+                            'email:emails:editsamerole',
                             'email:emails:deleteown',
                             'email:emails:deleteother',
+                            'email:emails:deletesamerole',
                             'email:emails:publishown',
                             'email:emails:publishother',
                             'lead:lists:viewown',
@@ -998,8 +990,8 @@ final class EmailController extends FormController
         }
         if (!$this->security->isGranted('email:emails:create')
             || !$this->security->hasEntityAccess(
-                'email:emails:viewown',
-                'email:emails:viewother',
+                self::PERMISSION_VIEW_OWN,
+                self::PERMISSION_VIEW_OTHER,
                 $emailEntity->getCreatedBy()
             )
         ) {
@@ -1292,8 +1284,8 @@ final class EmailController extends FormController
             $entity = $this->emailModel->getEntity($objectId);
             if (null == $entity
                 || !$this->security->hasEntityAccess(
-                    'email:emails:viewown',
-                    'email:emails:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     $entity->getCreatedBy()
                 )
             ) {
@@ -1336,8 +1328,8 @@ final class EmailController extends FormController
 
             if ($parent || !$this->security->isGranted('email:emails:create')
                 || !$this->security->hasEntityAccess(
-                    'email:emails:viewown',
-                    'email:emails:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     $entity->getCreatedBy()
                 )
             ) {
@@ -1494,8 +1486,8 @@ final class EmailController extends FormController
 
         if ('template' == $entity->getEmailType()
             || !$this->security->hasEntityAccess(
-                'email:emails:viewown',
-                'email:emails:viewother',
+                self::PERMISSION_VIEW_OWN,
+                self::PERMISSION_VIEW_OTHER,
                 $entity->getCreatedBy()
             )
         ) {
@@ -1607,8 +1599,8 @@ final class EmailController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    'email:emails:viewown',
-                    'email:emails:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     $entity->getCreatedBy()
                 )
                 ) {
@@ -1826,8 +1818,8 @@ final class EmailController extends FormController
         // not found or not allowed
         if (null === $entity
             || (!$this->security->hasEntityAccess(
-                'email:emails:viewown',
-                'email:emails:viewother',
+                self::PERMISSION_VIEW_OWN,
+                self::PERMISSION_VIEW_OTHER,
                 $entity->getCreatedBy()
             ))
         ) {

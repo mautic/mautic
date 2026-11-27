@@ -76,7 +76,7 @@ return [
             'items' => [
                 'mautic.notification.notifications' => [
                     'route'  => 'mautic_notification_index',
-                    'access' => ['notification:notifications:viewown', 'notification:notifications:viewother'],
+                    'access' => ['notification:notifications:viewown', 'notification:notifications:viewsamerole', 'notification:notifications:viewother'],
                     'checks' => [
                         'integration' => [
                             'OneSignal' => [
@@ -89,7 +89,7 @@ return [
                 ],
                 'mautic.notification.mobile_notifications' => [
                     'route'  => 'mautic_mobile_notification_index',
-                    'access' => ['notification:mobile_notifications:viewown', 'notification:mobile_notifications:viewother'],
+                    'access' => ['notification:mobile_notifications:viewown', 'notification:mobile_notifications:viewsamerole', 'notification:mobile_notifications:viewother'],
                     'checks' => [
                         'integration' => [
                             'OneSignal' => [

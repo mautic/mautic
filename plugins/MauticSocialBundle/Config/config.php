@@ -63,7 +63,7 @@ return [
             ],
             'mautic.social.tweets' => [
                 'route'    => 'mautic_tweet_index',
-                'access'   => ['mauticSocial:tweets:viewown', 'mauticSocial:tweets:viewother'],
+                'access'   => ['mauticSocial:tweets:viewown', 'mauticSocial:tweets:viewsamerole', 'mauticSocial:tweets:viewother'],
                 'parent'   => 'mautic.core.channels',
                 'priority' => 80,
                 'checks'   => [

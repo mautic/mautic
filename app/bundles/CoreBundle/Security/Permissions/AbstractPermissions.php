@@ -143,7 +143,7 @@ abstract class AbstractPermissions
      */
     protected function getSynonym($name, $level)
     {
-        if (in_array($level, ['viewown', 'viewother'])) {
+        if (in_array($level, ['viewown', 'viewsamerole', 'viewother'])) {
             if (isset($this->permissions[$name]['view'])) {
                 $level = 'view';
             }
@@ -151,7 +151,7 @@ abstract class AbstractPermissions
             if (isset($this->permissions[$name]['viewown'])) {
                 $level = 'viewown';
             }
-        } elseif (in_array($level, ['editown', 'editother'])) {
+        } elseif (in_array($level, ['editown', 'editsamerole', 'editother'])) {
             if (isset($this->permissions[$name]['edit'])) {
                 $level = 'edit';
             }
@@ -159,7 +159,7 @@ abstract class AbstractPermissions
             if (isset($this->permissions[$name]['editown'])) {
                 $level = 'editown';
             }
-        } elseif (in_array($level, ['deleteown', 'deleteother'])) {
+        } elseif (in_array($level, ['deleteown', 'deletesamerole', 'deleteother'])) {
             if (isset($this->permissions[$name]['delete'])) {
                 $level = 'delete';
             }
@@ -167,7 +167,7 @@ abstract class AbstractPermissions
             if (isset($this->permissions[$name]['deleteown'])) {
                 $level = 'deleteown';
             }
-        } elseif (in_array($level, ['publishown', 'publishother'])) {
+        } elseif (in_array($level, ['publishown', 'publishsamerole', 'publishother'])) {
             if (isset($this->permissions[$name]['publish'])) {
                 $level = 'publish';
             }
@@ -224,11 +224,19 @@ abstract class AbstractPermissions
                     case 'publish':
                         $required = ['viewother', 'viewown'];
                         break;
+                    case 'editsamerole':
+                    case 'publishsamerole':
+                        $required = ['viewsamerole', 'viewown'];
+                        break;
                     case 'deleteother':
                     case 'delete':
                         $required = ['editother', 'viewother', 'viewown'];
                         break;
+                    case 'deletesamerole':
+                        $required = ['editsamerole', 'viewsamerole', 'viewown'];
+                        break;
                     case 'viewother':
+                    case 'viewsamerole':
                     case 'editown':
                     case 'deleteown':
                     case 'publishown':
@@ -243,7 +251,7 @@ abstract class AbstractPermissions
                     }
                 }
             }
-            $hasViewAccess = (!$hasViewAccess && (in_array('view', $perms) || in_array('viewown', $perms)));
+            $hasViewAccess = (!$hasViewAccess && (in_array('view', $perms) || in_array('viewown', $perms) || in_array('viewsamerole', $perms)));
         }
 
         // check categories for view permissions and add it if the user has view access to the other permissions
@@ -460,18 +468,22 @@ abstract class AbstractPermissions
 
         foreach ($permissionNames as $p) {
             $this->permissions[$p] = [
-                'viewown'     => 2,
-                'viewother'   => 4,
-                'editown'     => 8,
-                'editother'   => 16,
-                'create'      => 32,
-                'deleteown'   => 64,
-                'deleteother' => 128,
-                'full'        => 1024,
+                'viewown'        => 2,
+                'viewother'      => 4,
+                'editown'        => 8,
+                'editother'      => 16,
+                'create'         => 32,
+                'deleteown'      => 64,
+                'deleteother'    => 128,
+                'full'           => 1024,
+                'viewsamerole'   => 2048,
+                'editsamerole'   => 4096,
+                'deletesamerole' => 8192,
             ];
             if ($includePublish) {
-                $this->permissions[$p]['publishown']   = 256;
-                $this->permissions[$p]['publishother'] = 512;
+                $this->permissions[$p]['publishown']      = 256;
+                $this->permissions[$p]['publishother']    = 512;
+                $this->permissions[$p]['publishsamerole'] = 16384;
             }
         }
     }
@@ -489,19 +501,23 @@ abstract class AbstractPermissions
     protected function addExtendedFormFields($bundle, $level, &$builder, $data, $includePublish = true)
     {
         $choices = [
-            'mautic.core.permissions.viewown'     => 'viewown',
-            'mautic.core.permissions.viewother'   => 'viewother',
-            'mautic.core.permissions.editown'     => 'editown',
-            'mautic.core.permissions.editother'   => 'editother',
-            'mautic.core.permissions.create'      => 'create',
-            'mautic.core.permissions.deleteown'   => 'deleteown',
-            'mautic.core.permissions.deleteother' => 'deleteother',
-            'mautic.core.permissions.full'        => 'full',
+            'mautic.core.permissions.viewown'       => 'viewown',
+            'mautic.core.permissions.viewsamerole'  => 'viewsamerole',
+            'mautic.core.permissions.viewother'     => 'viewother',
+            'mautic.core.permissions.editown'       => 'editown',
+            'mautic.core.permissions.editsamerole'  => 'editsamerole',
+            'mautic.core.permissions.editother'     => 'editother',
+            'mautic.core.permissions.create'        => 'create',
+            'mautic.core.permissions.deleteown'     => 'deleteown',
+            'mautic.core.permissions.deletesamerole'=> 'deletesamerole',
+            'mautic.core.permissions.deleteother'   => 'deleteother',
+            'mautic.core.permissions.full'          => 'full',
         ];
 
         if ($includePublish) {
-            $choices['mautic.core.permissions.publishown']   = 'publishown';
-            $choices['mautic.core.permissions.publishother'] = 'publishother';
+            $choices['mautic.core.permissions.publishown']      = 'publishown';
+            $choices['mautic.core.permissions.publishsamerole'] = 'publishsamerole';
+            $choices['mautic.core.permissions.publishother']    = 'publishother';
         }
 
         $builder->add(

@@ -55,9 +55,9 @@
                         {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                 'item': item,
                                 'templateButtons': {
-                                    'edit': securityHasEntityAccess(permissions['focus:items:editown'], permissions['focus:items:editother'], item.createdBy),
+                                    'edit': securityHasEntityAccess(permissions['focus:items:editown'], permissions['focus:items:editother'], item.createdBy, permissions['focus:items:editsamerole']|default(false)),
                                     'clone': permissions['focus:items:create'],
-                                    'delete': securityHasEntityAccess(permissions['focus:items:deleteown'], permissions['focus:items:deleteother'], item.createdBy),
+                                    'delete': securityHasEntityAccess(permissions['focus:items:deleteown'], permissions['focus:items:deleteother'], item.createdBy, permissions['focus:items:deletesamerole']|default(false)),
                                 },
                                 'routeBase': 'focus',
                         }) }}
