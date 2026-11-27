@@ -115,6 +115,74 @@ final class PageModelTest extends PageTestAbstract
     }
 
     /**
+     * Regression test for PR #15985: a byte that is not valid standalone UTF-8
+     * (e.g. \xAD, a raw "soft hyphen" pasted from Word content) must not survive
+     * cleanQuery(), because $query is persisted to the page_hits.query column - a
+     * Doctrine "array"-typed column serialized via serialize() with no UTF-8
+     * validation of its own. If an invalid byte reaches that INSERT, MySQL rejects
+     * it under STRICT_TRANS_TABLES with "SQLSTATE 1366 Incorrect string value".
+     * The `ct` case covers the clickthrough payload, which getHitQuery() decodes
+     * into a nested array before cleanQuery() runs.
+     *
+     * @param array<string, mixed> $query
+     * @param array<int, string>   $path  nested keys to the string leaf under test
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideInvalidUtf8QueryPayloads')]
+    public function testCleanQueryStripsInvalidUtf8Bytes(array $query, array $path): void
+    {
+        $pageModel           = $this->getPageModel();
+        $pageModelReflection = new \ReflectionClass($pageModel::class);
+        $cleanQueryMethod    = $pageModelReflection->getMethod('cleanQuery');
+        $result              = $cleanQueryMethod->invokeArgs($pageModel, [$query]);
+
+        $value = $result;
+        foreach ($path as $segment) {
+            $this->assertIsArray($value, sprintf('Expected an array at query path up to "%s"', $segment));
+            $this->assertArrayHasKey($segment, $value, sprintf('Missing expected key "%s"', $segment));
+            $value = $value[$segment];
+        }
+
+        $this->assertIsString($value);
+        $this->assertTrue(
+            mb_check_encoding($value, 'UTF-8'),
+            sprintf(
+                'Value at query path [%s] is not valid UTF-8 (bytes: %s) - an invalid byte here '.
+                'will crash the page_hits.query INSERT under STRICT_TRANS_TABLES (SQLSTATE 1366).',
+                implode('.', $path),
+                bin2hex($value)
+            )
+        );
+    }
+
+    /**
+     * @return iterable<string, array{0: array<string, mixed>, 1: array<int, string>}>
+     */
+    public static function provideInvalidUtf8QueryPayloads(): iterable
+    {
+        // \xAD is a lone "soft hyphen" byte: >0x7F so not plain ASCII, and not a valid
+        // UTF-8 lead/continuation byte on its own, so mb_check_encoding() rejects it.
+        $invalidUtf8 = "before\xADafter";
+
+        yield 'invalid byte in a top-level string param' => [
+            [
+                'page_title' => $invalidUtf8,
+                'page_url'   => 'https://example.com/page',
+            ],
+            ['page_title'],
+        ];
+
+        yield 'invalid byte nested inside the ct clickthrough array param' => [
+            [
+                'page_title' => 'Testpage',
+                'ct'         => [
+                    'source' => $invalidUtf8,
+                ],
+            ],
+            ['ct', 'source'],
+        ];
+    }
+
+    /**
      * Test getHitQuery when the hit is a Request
      * (e.g. POST Ajax or Landingpage hit).
      */
