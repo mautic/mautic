@@ -92,6 +92,19 @@ final class PageRedirectsRedirectIdIndexMigrationTest extends TestCase
     }
 
     /**
+     * Checks that down() does nothing when the index is not there.
+     */
+    public function testDownDoesNothingWithoutTheIndex(): void
+    {
+        $migration = $this->createMigration();
+        $schema    = $this->createSchema('', ['redirect_id'], 'custom_redirect_lookup');
+
+        $migration->down($schema);
+
+        $this->assertSame([], $migration->getSql());
+    }
+
+    /**
      * Builds a page_redirects table with an optional extra index.
      *
      * @param string   $prefix       the table prefix
