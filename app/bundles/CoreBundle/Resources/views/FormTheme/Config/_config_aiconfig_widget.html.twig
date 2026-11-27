@@ -1,0 +1,138 @@
+{% macro field(field, attr = {}) %}
+    {% set attr = field.vars.help ? attr|merge({'aria-describedby': field.vars.id ~ '_help'}) : attr %}
+    <div class="form-group{% if field.vars.errors|length %} has-error{% endif %}">
+        {{ form_label(field) }}
+        {{ form_widget(field, {attr: attr}) }}
+        {{ form_help(field) }}
+        {{ form_errors(field) }}
+    </div>
+{% endmacro %}
+
+{% macro provider(row) %}
+    {% set location = row.location.vars.value %}
+    {% set hasErrors = formContainsErrors(row) %}
+    {% set hasKey = row.api_key.vars.data is not empty and not row.vars.submitted %}
+    <details class="ai-settings__provider" data-ai-provider-row="{{ row.vars.name }}"{% if hasErrors %} open{% endif %}>
+        <summary class="ai-settings__summary">
+            <i class="ri-server-line ai-settings__provider-icon" aria-hidden="true"></i>
+            <span class="ai-settings__identity">
+                <span class="type-heading-01" data-ai-provider-title>{{ row.name.vars.value|default('mautic.core.ai.new_provider'|trans) }}</span>
+                <span class="type-label-01 ai-settings__endpoint" data-ai-provider-address>{{ row.endpoint.vars.value|default('mautic.core.ai.no_endpoint'|trans) }}</span>
+            </span>
+            {% for deployment in ['local', 'cloud'] %}
+                <span class="label label-{{ deployment == 'cloud' ? 'blue' : 'gray' }}" data-ai-location-tag="{{ deployment }}"{% if location != deployment %} hidden{% endif %}>
+                    {{ ('mautic.core.ai.location.' ~ deployment)|trans }}
+                </span>
+            {% endfor %}
+            {% if hasErrors %}<i class="ri-error-warning-line text-danger" aria-label="{{ 'mautic.config.form.has_errors'|trans }}" role="img"></i>{% endif %}
+            <i class="ri-arrow-down-s-line ai-settings__chevron" aria-hidden="true"></i>
+        </summary>
+        <div class="ai-settings__editor">
+            {{ form_errors(row) }}
+            <div class="row">
+                <div class="col-sm-7">{{ _self.field(row.name) }}</div>
+                <div class="col-sm-5">{{ _self.field(row.location) }}</div>
+            </div>
+            {{ _self.field(row.endpoint, {'data-ai-provider-endpoint': ''}) }}
+            <fieldset class="ai-settings__credentials">
+                <legend class="type-heading-01 mb-8">{{ 'mautic.core.ai.credentials'|trans }}</legend>
+                {% if hasKey %}
+                    <p class="type-label-01 mb-8"><i class="ri-lock-line" aria-hidden="true"></i> {{ 'mautic.core.ai.api_key.saved'|trans }}</p>
+                {% endif %}
+                {{ _self.field(row.api_key) }}
+                <div class="form-check{% if row.remove_key.vars.errors|length %} has-error{% endif %}"{% if not hasKey and not row.vars.submitted %} hidden{% endif %}>
+                    {{ form_widget(row.remove_key, {attr: {class: 'form-check-input'}}) }}
+                    {{ form_label(row.remove_key, null, {label_attr: {class: 'form-check-label'}}) }}
+                    {{ form_errors(row.remove_key) }}
+                </div>
+            </fieldset>
+            <div class="ai-settings__row-footer">
+                <span class="type-label-01" data-ai-remove-impact hidden>{{ 'mautic.core.ai.remove_impact'|trans }}</span>
+                <button type="button" class="btn btn-ghost btn-nospin" data-ai-remove-provider>
+                    {{ 'mautic.core.ai.remove_provider'|trans }} <i class="ri-delete-bin-line" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </details>
+{% endmacro %}
+
+{% block _config_aiconfig_widget %}
+    <div class="ai-settings no-chosen" data-ai-settings data-new-provider="{{ 'mautic.core.ai.new_provider'|trans }}" data-no-endpoint="{{ 'mautic.core.ai.no_endpoint'|trans }}">
+        {% set cloudPolicy %}
+            <i class="ri-shield-keyhole-line ai-settings__policy-icon" aria-hidden="true"></i>
+            <div>
+                <h3 class="type-heading-01 mb-4">{{ 'mautic.core.ai.data_policy'|trans }}</h3>
+                <p class="mb-0" id="ai-cloud-help">{{ 'mautic.core.ai.allow_cloud.help'|trans }}</p>
+            </div>
+            <div class="form-check form-switch mb-0">
+                {{ form_widget(form.ai_allow_cloud, {attr: {class: 'form-check-input', role: 'switch', 'aria-describedby': 'ai-cloud-help', 'data-ai-cloud': ''}}) }}
+                {{ form_label(form.ai_allow_cloud, null, {label_attr: {class: 'form-check-label'}}) }}
+                {{ form_errors(form.ai_allow_cloud) }}
+            </div>
+        {% endset %}
+        {% include '@MauticCore/Components/tile.html.twig' with {content: cloudPolicy, className: 'ai-settings__policy'} only %}
+
+        <section aria-labelledby="ai-providers-heading">
+            <div class="ai-settings__section-header">
+                <div>
+                    <h3 id="ai-providers-heading" class="type-heading-03 mb-4">{{ 'mautic.core.ai.providers'|trans }}</h3>
+                    <p class="mb-0">{{ 'mautic.core.ai.providers.help'|trans }}</p>
+                </div>
+                <button type="button" class="btn btn-tertiary btn-nospin" data-ai-add-provider>
+                    {{ 'mautic.core.ai.add_provider'|trans }} <i class="ri-add-line" aria-hidden="true"></i>
+                </button>
+            </div>
+            {{ form_errors(form.ai_providers) }}
+            <div class="ai-settings__empty" data-ai-provider-empty{% if form.ai_providers|length %} hidden{% endif %}>
+                <i class="ri-server-line ri-lg" aria-hidden="true"></i>
+                <div>
+                    <p class="type-heading-01 mb-4">{{ 'mautic.core.ai.empty_title'|trans }}</p>
+                    <p class="mb-0">{{ 'mautic.core.ai.empty_help'|trans }}</p>
+                </div>
+            </div>
+            <div data-ai-provider-list>
+                {% for row in form.ai_providers %}
+                    {{ _self.provider(row) }}
+                {% endfor %}
+            </div>
+            <template data-ai-provider-template>{{ _self.provider(form.ai_providers.vars.prototype) }}</template>
+            {% do form.ai_providers.setRendered() %}
+        </section>
+
+        <section aria-labelledby="ai-assignments-heading">
+            <div class="ai-settings__section-header">
+                <div>
+                    <h3 id="ai-assignments-heading" class="type-heading-03 mb-4">{{ 'mautic.core.ai.assignments'|trans }}</h3>
+                    <p class="mb-0">{{ 'mautic.core.ai.assignments.help'|trans }}</p>
+                </div>
+            </div>
+            <p class="type-label-01 mb-16">{{ 'mautic.core.ai.connection_test.help'|trans }}</p>
+            <div class="ai-settings__assignments">
+                {% for workload, icon in {routine: 'ri-repeat-line', complex: 'ri-node-tree'} %}
+                    {% set assignment %}
+                        <fieldset>
+                            <legend class="type-heading-02 mb-4"><i class="{{ icon }}" aria-hidden="true"></i> {{ ('mautic.core.ai.workload.' ~ workload)|trans }}</legend>
+                            <p class="type-label-01 mb-16">{{ ('mautic.core.ai.workload.' ~ workload ~ '.help')|trans }}</p>
+                            {{ _self.field(attribute(form, 'ai_' ~ workload ~ '_provider')) }}
+                            {{ _self.field(attribute(form, 'ai_' ~ workload ~ '_model')) }}
+                            <p class="type-label-01 mb-0" data-ai-cloud-warning role="status" hidden>
+                                <i class="ri-error-warning-line" aria-hidden="true"></i> {{ 'mautic.core.ai.cloud_assignment_warning'|trans }}
+                            </p>
+                            <div class="mt-16">
+                                <button type="button" class="btn btn-tertiary btn-sm btn-nospin"
+                                        data-ai-connection-test="{{ path('mautic_ai_connection_test', {workload: workload}) }}"
+                                        data-csrf-token="{{ securityGetCsrfToken('mautic_ai_connection_test') }}"
+                                        data-pending-message="{{ 'mautic.core.ai.connection_test.pending'|trans }}"
+                                        data-error-message="{{ 'mautic.core.ai.connection_test.failed'|trans }}">
+                                    {{ 'mautic.core.ai.connection_test.button'|trans }} <i class="ri-plug-line" aria-hidden="true"></i>
+                                </button>
+                                <p class="type-label-01 mb-0" role="status" data-ai-connection-result></p>
+                            </div>
+                        </fieldset>
+                    {% endset %}
+                    {% include '@MauticCore/Components/tile.html.twig' with {content: assignment, className: 'ai-settings__assignment'} only %}
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+{% endblock %}
