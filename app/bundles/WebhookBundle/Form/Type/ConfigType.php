@@ -4,6 +4,7 @@ namespace Mautic\WebhookBundle\Form\Type;
 
 use Doctrine\Common\Collections\Order;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
+use Mautic\CoreBundle\Form\Type\SegmentedControlType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -36,14 +37,13 @@ final class ConfigType extends AbstractType
             ],
         ]);
 
-        $builder->add('events_orderby_dir', ChoiceType::class, [
+        $builder->add('events_orderby_dir', SegmentedControlType::class, [
             'choices' => [
                 'mautic.webhook.config.event.orderby.chronological'         => Order::Ascending->value,
                 'mautic.webhook.config.event.orderby.reverse.chronological' => Order::Descending->value,
             ],
             'label' => 'mautic.webhook.config.event.orderby',
             'attr'  => [
-                'class'   => 'form-control',
                 'tooltip' => 'mautic.webhook.config.event.orderby.tooltip',
             ],
             'required'          => false,

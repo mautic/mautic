@@ -1,0 +1,153 @@
+.segmented-control {
+    --segmented-control-padding: calc(var(--spacing-01) * 1.5);
+    --segmented-control-height: 36px;
+    --segmented-control-radius: 25px;
+    --segmented-control-surface: var(--layer-02);
+    --segmented-control-duration: 350ms;
+    --segmented-control-x: 0px;
+    --segmented-control-width: 0px;
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: stretch;
+    inline-size: fit-content;
+    block-size: var(--segmented-control-height);
+    padding: var(--segmented-control-padding);
+    border-radius: var(--segmented-control-radius);
+    background-color: var(--layer-01);
+    font-size: var(--body-compact-01-font-size);
+    box-shadow: none;
+    user-select: none;
+
+    > .btn {
+        display: flex;
+        align-self: stretch;
+        align-items: center;
+        justify-content: center;
+        gap: calc(var(--spacing-02) + var(--spacing-01));
+        block-size: auto;
+        min-block-size: 0;
+        margin: 0;
+        padding: 0 calc(var(--spacing-04) + var(--spacing-01));
+        border: 0;
+        border-radius: calc(var(--segmented-control-radius) - var(--segmented-control-padding)) !important;
+        background: transparent;
+        box-shadow: none;
+        color: var(--text-secondary);
+        font-size: inherit;
+        font-weight: 500;
+        line-height: 1;
+        white-space: nowrap;
+        transition: color var(--duration-productive) var(--easing-standard-productive);
+
+        &:hover {
+            color: var(--text-primary);
+        }
+    }
+
+    > .btn-check:checked + .btn {
+        color: var(--text-primary);
+    }
+
+    > .btn-check:disabled + .btn {
+        opacity: 0.4;
+        cursor: default;
+    }
+
+    > .btn-check:focus-visible + .btn {
+        outline: 2px solid var(--focus);
+        outline-offset: -2px;
+    }
+
+    &:not(.is-initialized) > .btn-check:checked + .btn {
+        background-color: var(--segmented-control-surface);
+    }
+
+    &--sm {
+        --segmented-control-padding: var(--spacing-01);
+        --segmented-control-height: 32px;
+        font-size: var(--typography-body-productive);
+
+        > .btn {
+            padding: 0 var(--spacing-04);
+        }
+    }
+
+    &--lg {
+        --segmented-control-padding: var(--spacing-02);
+        --segmented-control-height: 44px;
+        font-size: var(--typography-body-expressive);
+
+        > .btn {
+            gap: var(--spacing-03);
+            padding: 0 var(--spacing-05);
+        }
+    }
+
+    &--equal {
+        display: inline-grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+
+        > .btn {
+            inline-size: 100%;
+        }
+    }
+
+    &--draggable {
+        touch-action: pan-y;
+    }
+
+    &--locked {
+        pointer-events: none;
+    }
+
+    &[data-segmented-control-dragging] {
+        cursor: grabbing;
+
+        > .btn {
+            color: var(--text-secondary);
+        }
+
+        > [data-segmented-control-preview] {
+            color: var(--text-primary);
+        }
+    }
+}
+
+.segmented-control__indicator {
+    position: absolute;
+    z-index: -1;
+    inset-block: var(--segmented-control-padding);
+    left: 0;
+    inline-size: var(--segmented-control-width);
+    border-radius: calc(var(--segmented-control-radius) - var(--segmented-control-padding));
+    background-color: var(--segmented-control-surface);
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    translate: var(--segmented-control-x);
+
+    [data-segmented-control-dragging] > & {
+        translate: var(--segmented-control-drag-x, var(--segmented-control-x));
+        inline-size: var(--segmented-control-drag-width, var(--segmented-control-width));
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .segmented-control:active > &,
+        [data-segmented-control-dragging] > & {
+            scale: 0.95;
+        }
+    }
+
+    .is-initialized > & {
+        opacity: 1;
+        transition:
+            translate var(--segmented-control-duration) var(--easing-standard-expressive),
+            inline-size var(--segmented-control-duration) var(--easing-standard-expressive),
+            scale var(--duration-productive) var(--easing-standard-productive);
+
+        @media (prefers-reduced-motion: reduce) {
+            transition: none;
+        }
+    }
+}

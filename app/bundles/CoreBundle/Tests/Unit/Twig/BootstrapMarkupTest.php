@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Twig;
 
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\CoreBundle\Form\Type\SegmentedControlType;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
@@ -26,6 +27,7 @@ final class BootstrapMarkupTest extends TestCase
     protected function setUp(): void
     {
         $loader = new FilesystemLoader(__DIR__.'/../../../Resources/views');
+        $loader->addPath(__DIR__.'/../../../Resources/views', 'MauticCore');
         $loader->addPath(dirname((new \ReflectionClass(FormExtension::class))->getFileName(), 2).'/Resources/views/Form');
         $this->twig = new Environment($loader, ['autoescape' => 'html']);
         $this->twig->addExtension(new TranslationExtension());
@@ -69,6 +71,62 @@ final class BootstrapMarkupTest extends TestCase
         $this->assertCount(0, $crawler->filter('[data-toggle="buttons"], label input'));
     }
 
+    public function testSegmentedControlSelectsOnlyTheExactChoiceValue(): void
+    {
+        $formFactory = Forms::createFormFactoryBuilder()
+            ->addType(new ButtonGroupType())
+            ->addType(new SegmentedControlType())
+            ->getFormFactory();
+        $form = $formFactory->createNamed('mode', SegmentedControlType::class, '0', [
+            'label'                    => 'Mode',
+            'choices'                  => ['Zero' => '0', 'Double zero' => '00'],
+            'choice_translation_domain' => false,
+        ]);
+        $html = $this->twig->createTemplate('{{ form_widget(form) }}')->render(['form' => $form->createView()]);
+        $checkedChoices = (new Crawler($html))->filter('input.btn-check:checked');
+
+        $this->assertCount(1, $checkedChoices);
+        $this->assertSame('0', $checkedChoices->attr('value'));
+    }
+
+    public function testSegmentedControlPassesChoiceAttributesToInputs(): void
+    {
+        $formFactory = Forms::createFormFactoryBuilder()
+            ->addType(new ButtonGroupType())
+            ->addType(new SegmentedControlType())
+            ->getFormFactory();
+        $form = $formFactory->createNamed('mode', SegmentedControlType::class, 'a', [
+            'choices'                   => ['A' => 'a', 'B' => 'b'],
+            'choice_attr'               => ['B' => ['data-test' => 'choice-b', 'class' => 'custom-choice']],
+            'choice_translation_domain' => false,
+        ]);
+        $html = $this->twig->createTemplate('{{ form_widget(form) }}')->render(['form' => $form->createView()]);
+
+        $crawler = new Crawler($html);
+
+        $this->assertSame('choice-b', $crawler->filter('input[value="b"]')->attr('data-test'));
+        $this->assertSame('btn-check custom-choice', $crawler->filter('input[value="b"]')->attr('class'));
+        $this->assertNull($crawler->filter('input[value="a"]')->attr('data-test'));
+    }
+
+    public function testSegmentedControlForwardsCallerClassToGroup(): void
+    {
+        $formFactory = Forms::createFormFactoryBuilder()
+            ->addType(new ButtonGroupType())
+            ->addType(new SegmentedControlType())
+            ->getFormFactory();
+        $form = $formFactory->createNamed('mode', SegmentedControlType::class, 'a', [
+            'choices'                   => ['A' => 'a', 'B' => 'b'],
+            'attr'                      => ['class' => 'caller-class'],
+            'choice_translation_domain' => false,
+        ]);
+        $html = $this->twig->createTemplate('{{ form_widget(form) }}')->render(['form' => $form->createView()]);
+        $crawler = new Crawler($html);
+
+        $this->assertCount(1, $crawler->filter('.segmented-control.caller-class'));
+        $this->assertCount(0, $crawler->filter('input.caller-class'));
+    }
+
     public function testDisabledButtonGroupRetainsDisabledInputs(): void
     {
         $form = Forms::createFormFactory()->createNamed('direction', ButtonGroupType::class, 'outgoing', [
@@ -78,5 +136,55 @@ final class BootstrapMarkupTest extends TestCase
         $html = $this->twig->createTemplate('{{ form_widget(form) }}')->render(['form' => $form->createView()]);
 
         $this->assertCount(2, (new Crawler($html))->filter('input.btn-check:disabled + label.btn'));
+    }
+
+    public function testSegmentedControlGetsLockedClassWhenReadonly(): void
+    {
+        $formFactory = Forms::createFormFactoryBuilder()
+            ->addType(new ButtonGroupType())
+            ->addType(new SegmentedControlType())
+            ->getFormFactory();
+        $options = ['choice_translation_domain' => false, 'choices' => ['A' => 'a', 'B' => 'b']];
+        $render = fn (array $formOptions): Crawler => new Crawler(
+            $this->twig->createTemplate('{{ form_widget(form) }}')->render([
+                'form' => $formFactory->createNamed('mode', SegmentedControlType::class, 'a', $formOptions + $options)->createView(),
+            ])
+        );
+
+        $locked = $render(['attr' => ['readonly' => 'readonly']]);
+        $this->assertCount(1, $locked->filter('.segmented-control.segmented-control--locked'));
+        $this->assertCount(0, $locked->filter('input.btn-check:disabled'));
+        $this->assertCount(2, $locked->filter('input.btn-check[tabindex="-1"]'));
+
+        $disabled = $render(['attr' => ['disabled' => 'disabled']]);
+        $this->assertCount(2, $disabled->filter('input.btn-check:disabled'));
+
+        $unlocked = $render([]);
+        $this->assertCount(0, $unlocked->filter('.segmented-control--locked'));
+        $this->assertCount(0, $unlocked->filter('input.btn-check:disabled'));
+        $this->assertCount(0, $unlocked->filter('input.btn-check[tabindex="-1"]'));
+    }
+
+    public function testSegmentedControlComponentRendersSizeEqualWidthDurationAndIcons(): void
+    {
+        $html = $this->twig->render('@MauticCore/Components/segmented-control.html.twig', [
+            'id'         => 'mode',
+            'name'       => 'mode',
+            'size'       => 'lg',
+            'equalWidth' => true,
+            'duration'   => '0.2',
+            'value'      => 'b',
+            'options'    => [
+                ['value' => 'a', 'label' => 'A', 'icon' => 'ri-star-line', 'translation_domain' => false],
+                ['value' => 'b', 'label' => 'B', 'translation_domain' => false],
+            ],
+        ]);
+        $crawler = new Crawler($html);
+
+        $this->assertCount(1, $crawler->filter('.segmented-control.segmented-control--lg.segmented-control--equal'));
+        $this->assertStringContainsString('--segmented-control-duration: 0.2s', $html);
+        $this->assertCount(1, $crawler->filter('label.btn > i.ri-star-line'));
+        $this->assertCount(1, $crawler->filter('input.btn-check[value="b"]:checked'));
+        $this->assertCount(0, $crawler->filter('input.btn-check[value="a"]:checked'));
     }
 }
