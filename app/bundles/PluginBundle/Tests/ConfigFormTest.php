@@ -79,7 +79,6 @@ final class ConfigFormTest extends KernelTestCase
 
         $expected                = [];
         $expected['Connectwise'] = $this->getOauthData('', ['clientId' => $connectWiseHeader['appcookie']]);
-        $expected['Twilio']      = $this->getOauthData('');
         $expected['Vtiger']      = $this->getOauthData('sessionName');
         $expected['Dynamics']    = $this->getOauthData('access_token');
         $expected['Salesforce']  = $this->getOauthData('access_token');

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Integration\Twilio;
 
-use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\SmsBundle\Integration\TwilioIntegration;
 use Twilio\Exceptions\ConfigurationException;
 
 final class Configuration
@@ -25,7 +27,8 @@ final class Configuration
     private $authToken;
 
     public function __construct(
-        private readonly IntegrationHelper $integrationHelper,
+        private readonly TwilioIntegration $integration,
+        private readonly IntegrationsHelper $integrationsHelper,
     ) {
     }
 
@@ -74,18 +77,23 @@ final class Configuration
             return;
         }
 
-        $integration = $this->integrationHelper->getIntegrationObject('Twilio');
-
-        if (!$integration || !$integration->getIntegrationSettings()->getIsPublished()) {
+        try {
+            // loads the settings and decrypts the API keys
+            $settings = $this->integrationsHelper->getIntegrationConfiguration($this->integration);
+        } catch (IntegrationNotFoundException) {
             throw new ConfigurationException();
         }
 
-        $this->messagingServiceSid = $integration->getIntegrationSettings()->getFeatureSettings()['messaging_service_sid'];
+        if (!$settings->getIsPublished()) {
+            throw new ConfigurationException();
+        }
+
+        $this->messagingServiceSid = $this->integration->getIntegrationFeatureSettings()['messaging_service_sid'] ?? null;
         if (empty($this->messagingServiceSid)) {
             throw new ConfigurationException();
         }
 
-        $keys = $integration->getDecryptedApiKeys();
+        $keys = $settings->getApiKeys();
         if (empty($keys['username']) || empty($keys['password'])) {
             throw new ConfigurationException();
         }
