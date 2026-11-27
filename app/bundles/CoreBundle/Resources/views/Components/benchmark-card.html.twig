@@ -1,0 +1,43 @@
+{% set items = items|sort((a, b) => b.value <=> a.value) %}
+{% set positive = items|filter(item => item.value > 0) %}
+{% set activePercent = items is not empty ? positive|length / items|length * 100 : 0 %}
+<div class="benchmark-card">
+    <div class="benchmark-card__header">
+        <h3 class="benchmark-card__title type-heading-01">{{ title }}</h3>
+    </div>
+    <div class="benchmark-card__summary">
+        <div class="benchmark-card__figure">
+            <p class="benchmark-card__value type-heading-06">{{ value|number_format }}</p>
+            {% if valueCaption|default %}<p class="benchmark-card__caption">{{ valueCaption }}</p>{% endif %}
+        </div>
+        {% if items is not empty %}
+        {% set activeText = activeLabel|replace({'%active%': positive|length, '%total%': items|length}) %}
+        <div class="benchmark-card__average">
+            <div class="benchmark-card__meter" role="img" aria-label="{{ activeText|e('html_attr') }}">
+                <span class="benchmark-card__meter-fill" style="width: {{ activePercent|round|e('html_attr') }}%"></span>
+            </div>
+            <p class="benchmark-card__meta"><span>{{ activeText }}</span></p>
+        </div>
+        {% endif %}
+    </div>
+    {% if items is not empty %}
+    <div class="benchmark-card__section">
+        <h3 class="benchmark-card__heading">{{ listTitle }}</h3>
+        <ul class="benchmark-card__list list-unstyled mb-0">
+            {% for item in items %}
+                <li class="benchmark-card__row">
+                    <span class="benchmark-card__dot partition-bar__segment--{{ ((loop.index0 % 6) + 1)|e('html_attr') }}" aria-hidden="true"></span>
+                    <span class="benchmark-card__name type-label-01" title="{{ item.label|e('html_attr') }}">{{ item.label }}</span>
+                    <span class="benchmark-card__number">{{ item.value|number_format }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% if positive is not empty %}
+    <div class="benchmark-card__section">
+        <h3 class="benchmark-card__heading"><i class="ri-bar-chart-horizontal-line" aria-hidden="true"></i>{{ distributionTitle }}</h3>
+        {{ include('@MauticCore/Components/partition-bar.html.twig', {'items': items, 'variant': 'linked'}) }}
+    </div>
+    {% endif %}
+</div>

@@ -1,0 +1,150 @@
+@keyframes partition-bar-grow {
+  from { clip-path: inset(0 100% 0 0 round 100px); }
+  to { clip-path: inset(0 0 0 0 round 100px); }
+}
+
+@keyframes partition-bar-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.partition-bar {
+  &__track {
+    display: flex;
+    gap: var(--spacing-02);
+  }
+
+  &__cell {
+    @include outline-noff();
+    display: flex;
+    justify-content: flex-start;
+    color: inherit;
+    text-decoration: none;
+    flex-basis: 0;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__segment {
+    display: block;
+    flex-basis: 0;
+    min-width: var(--spacing-03);
+    height: var(--spacing-03);
+    border-radius: 100px;
+    background-color: var(--partition-color);
+    animation: partition-bar-grow calc(var(--duration-expressive) * 2) var(--easing-standard-expressive) backwards;
+    transition: opacity var(--duration-productive) var(--easing-standard-productive);
+
+    .partition-bar__cell > & {
+      flex: none;
+      width: 100%;
+    }
+
+    &--1 { --partition-color: var(--interactive); }
+    &--2 { --partition-color: var(--support-success); }
+    &--3 { --partition-color: var(--support-warning); }
+    &--4 { --partition-color: var(--support-error); }
+    &--5 { --partition-color: var(--text-secondary); }
+    &--6 { --partition-color: var(--text-helper); }
+  }
+
+  a.partition-bar__segment {
+    @include outline-noff();
+  }
+
+  &__caption,
+  &__legend {
+    animation: partition-bar-fade var(--duration-expressive) var(--easing-standard-expressive) backwards;
+    animation-delay: calc(var(--duration-productive) * 4);
+  }
+
+  @for $i from 1 through 8 {
+    &__track > &__segment:nth-child(#{$i}),
+    &__cell:nth-child(#{$i}) > &__segment {
+      animation-delay: calc(var(--duration-productive) * #{$i - 1});
+    }
+  }
+
+  &__track:has(a.partition-bar__segment:is(:hover, :focus-visible)) &__segment:not(:is(:hover, :focus-visible)),
+  &__track:has(.partition-bar__cell:is(:hover, :focus-visible)) &__cell:not(:is(:hover, :focus-visible)) &__segment {
+    opacity: .4;
+  }
+
+  @for $i from 1 through 8 {
+    &--legend:has(&__legend li:nth-child(#{$i}) &__legend-item:is(:hover, :focus-visible)) &__track > &__segment:not(:nth-child(#{$i})) {
+      opacity: .4;
+    }
+  }
+
+  &__caption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: var(--spacing-03);
+    text-align: center;
+  }
+
+  &__name {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-primary);
+    font-weight: var(--heading-compact-01-font-weight);
+  }
+
+  &__value {
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  a.partition-bar__cell:hover .partition-bar__name {
+    text-decoration: underline;
+  }
+
+  &__legend {
+    margin-top: var(--spacing-04);
+  }
+
+  &__legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-02);
+    padding: var(--spacing-02) 0;
+    color: var(--text-secondary);
+    text-decoration: none;
+    @include outline-noff();
+
+    &:hover .partition-bar__legend-label {
+      text-decoration: underline;
+    }
+  }
+
+  &__dot {
+    background-color: var(--partition-color);
+    flex: none;
+    width: 10px;
+    height: 10px;
+    margin-right: var(--spacing-01);
+    border-radius: 50%;
+  }
+
+  &__legend-label {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__legend-value {
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--heading-compact-01-font-weight);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__segment,
+    &__caption,
+    &__legend {
+      animation: none;
+    }
+  }
+}
