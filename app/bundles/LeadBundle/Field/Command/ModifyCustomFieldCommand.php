@@ -40,15 +40,19 @@ final class ModifyCustomFieldCommand extends Command
     {
         $csvPath = $input->getArgument('csv-path');
 
-        try {
-            $inputCsv = new \SplFileObject($csvPath);
-        } catch (\RuntimeException|\LogicException $e) {
-            $output->writeln(sprintf('<error>Could not open file "%s" because of error "%s".</error>', $csvPath, $e->getMessage()));
+        $inputCsv = @fopen($csvPath, 'r');
+        if (false === $inputCsv) {
+            $error = error_get_last()['message'] ?? 'unknown error';
+            $output->writeln(sprintf('<error>Could not open file "%s" because of error "%s".</error>', $csvPath, $error));
 
             return Command::FAILURE;
         }
 
-        $fieldData = $this->convertCsvToArray($inputCsv);
+        try {
+            $fieldData = $this->convertCsvToArray($inputCsv);
+        } finally {
+            fclose($inputCsv);
+        }
 
         $fieldsNeedsToBeUpdated = [];
         foreach ($fieldData as $field) {
@@ -84,9 +88,11 @@ final class ModifyCustomFieldCommand extends Command
     }
 
     /**
+     * @param resource $inputCsv
+     *
      * @return mixed[]
      */
-    private function convertCsvToArray(\SplFileObject $inputCsv): array
+    private function convertCsvToArray($inputCsv): array
     {
         // \SplFileObject::READ_CSV is deprecated
         $inputCsv->setFlags(\SplFileObject::SKIP_EMPTY | \SplFileObject::DROP_NEW_LINE);
@@ -94,10 +100,17 @@ final class ModifyCustomFieldCommand extends Command
         $keys           = [];
         $data           = [];
 
-        // fgetcsv reads complete records, including quoted fields that contain
-        // newlines. Iterating physical lines and calling str_getcsv splits those.
-        $inputCsv->setCsvControl(escape: '\\');
-        while (false !== ($row = $inputCsv->fgetcsv(escape: '\\'))) {
+        /*
+         * Use the procedural fgetcsv() instead of SplFileObject::fgetcsv():
+         * the SplFileObject CSV methods are deprecated since PHP 8.6, while
+         * the procedural functions are not.
+         *
+         * fgetcsv() reads complete records, including quoted fields that
+         * contain newlines. Iterating physical lines and calling str_getcsv()
+         * splits those records.
+         *
+         */
+        while (false !== ($row = fgetcsv($inputCsv, escape: '\\'))) {
             // Treat a single null value (blank line) as no row
             if ([null] === $row || [false] === $row) {
                 continue;
