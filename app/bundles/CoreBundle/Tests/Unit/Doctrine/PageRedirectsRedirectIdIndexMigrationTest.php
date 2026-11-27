@@ -16,9 +16,9 @@ use Psr\Log\NullLogger;
 final class PageRedirectsRedirectIdIndexMigrationTest extends TestCase
 {
     /**
-     * Checks that the index is added when it is missing.
+     * Checks that the index is added without locking the table when it is missing.
      */
-    public function testAddsIndexWhenItIsMissing(): void
+    public function testAddsIndexWithoutLockingTheTable(): void
     {
         $migration = $this->createMigration();
         $schema    = $this->createSchema();
@@ -27,7 +27,7 @@ final class PageRedirectsRedirectIdIndexMigrationTest extends TestCase
         $migration->up($schema);
 
         $this->assertSame(
-            'ALTER TABLE page_redirects ADD INDEX redirect_id_search (redirect_id)',
+            'ALTER TABLE page_redirects ADD INDEX redirect_id_search (redirect_id), ALGORITHM=INPLACE, LOCK=NONE',
             $migration->getSql()[0]->getStatement()
         );
     }
