@@ -5,12 +5,14 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
+use Mautic\LeadBundle\Event\ContactLastActiveUpdatedEvent;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -109,6 +111,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $this->triggerModel = $triggerModel;
     }
 
+    #[Required]
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
@@ -1186,10 +1189,70 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             return;
         }
 
-        $dt     = new DateTimeHelper($lastActiveDate ?? '');
-        $fields = ['last_active' => $dt->toUtcString()];
+        $dt         = new DateTimeHelper($lastActiveDate ?? '');
+        $lastActive = $dt->toUtcString();
 
-        $this->getEntityManager()->getConnection()->update(MAUTIC_TABLE_PREFIX.'leads', $fields, ['id' => $leadId]);
+        $connection = $this->getEntityManager()->getConnection();
+        $qb         = $connection->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'leads')
+            ->set('last_active', ':lastActive')
+            ->where('id = :id')
+            ->andWhere('last_active IS NULL OR last_active <> :lastActive')
+            ->setParameter('lastActive', $lastActive)
+            ->setParameter('id', $leadId);
+
+        $dispatchEvent      = $this->dispatcher?->hasListeners(ContactLastActiveUpdatedEvent::class) ?? false;
+        $previousLastActive = null;
+
+        if ($dispatchEvent) {
+            // Lock the row until the update, so concurrent requests read the value their update replaces.
+            $affectedRows = $connection->transactional(function () use ($connection, $qb, $leadId, &$previousLastActive): int {
+                $previousLastActive = $this->getLastActiveForUpdate($connection, $leadId);
+
+                return $qb->executeStatement();
+            });
+        } else {
+            $affectedRows = $qb->executeStatement();
+        }
+
+        // Keep an already loaded entity in sync without recording a change, so a later save compares against the stored value.
+        $unitOfWork = $this->getEntityManager()->getUnitOfWork();
+        $lead       = $unitOfWork->tryGetById($leadId, Lead::class);
+        if ($lead instanceof Lead) {
+            $stored  = new \DateTime($lastActive, new \DateTimeZone('UTC'));
+            $changes = $lead->getChanges();
+
+            if (isset($changes['dateLastActive'])) {
+                // A pending change keeps its new value, but is compared against the stored one.
+                $changes['dateLastActive'][0] = $stored;
+
+                $pending = $lead->getLastActive();
+                if ($pending instanceof \DateTimeInterface && $pending->getTimestamp() === $stored->getTimestamp()) {
+                    // The pending value is already stored, a later flush must not write it again over a newer value.
+                    $unitOfWork->setOriginalEntityProperty(spl_object_id($lead), 'lastActive', $pending);
+                }
+            } else {
+                $lead->setLastActive($stored);
+                // Doctrine must not see this as a change, otherwise a later flush could overwrite a newer value.
+                $unitOfWork->setOriginalEntityProperty(spl_object_id($lead), 'lastActive', $stored);
+            }
+
+            $lead->setChanges($changes);
+        }
+
+        if ($dispatchEvent && $affectedRows > 0) {
+            $this->dispatcher->dispatch(new ContactLastActiveUpdatedEvent((int) $leadId, $dt->getUtcDateTime(), $previousLastActive));
+        }
+    }
+
+    private function getLastActiveForUpdate(Connection $connection, string|int $leadId): ?\DateTimeImmutable
+    {
+        $lastActive = $connection->fetchOne(
+            'SELECT last_active FROM '.MAUTIC_TABLE_PREFIX.'leads WHERE id = ? FOR UPDATE',
+            [$leadId]
+        );
+
+        return $lastActive ? new \DateTimeImmutable($lastActive, new \DateTimeZone('UTC')) : null;
     }
 
     /**

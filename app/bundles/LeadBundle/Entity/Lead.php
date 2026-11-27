@@ -1309,7 +1309,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function setLastActive($lastActive): void
     {
-        $this->changes['dateLastActive'] = [$this->lastActive, $lastActive];
+        // Keep the first previous value, so the pair holds the last saved value.
+        $previous                        = isset($this->changes['dateLastActive']) ? $this->changes['dateLastActive'][0] : $this->lastActive;
+        $this->changes['dateLastActive'] = [$previous, $lastActive];
         $this->lastActive                = $lastActive;
     }
 

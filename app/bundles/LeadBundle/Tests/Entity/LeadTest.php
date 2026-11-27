@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class LeadTest extends TestCase
@@ -247,6 +248,29 @@ final class LeadTest extends TestCase
 
         $this->assertEquals(null, $data['boolean']);
         $this->assertEquals(null, $data['number']);
+    }
+
+    #[DataProvider('repeatedLastActiveProvider')]
+    public function testRepeatedSetLastActiveKeepsSavedPreviousValue(?\DateTime $saved, string $second): void
+    {
+        $lead = new Lead();
+        $lead->setLastActive($saved);
+        $lead->resetChanges();
+
+        $lead->setLastActive(new \DateTime('2026-02-01 12:00:00'));
+        $lead->setLastActive(new \DateTime($second));
+
+        $this->assertSame($saved, $lead->getChanges()['dateLastActive'][0]);
+    }
+
+    /**
+     * @return iterable<string, array{?\DateTime, string}>
+     */
+    public static function repeatedLastActiveProvider(): iterable
+    {
+        yield 'different second value' => [new \DateTime('2026-01-01 10:00:00'), '2026-03-01 08:00:00'];
+        yield 'same second value' => [new \DateTime('2026-01-01 10:00:00'), '2026-02-01 12:00:00'];
+        yield 'never active before' => [null, '2026-03-01 08:00:00'];
     }
 
     public function testAttributionDateIsAdded(): void
