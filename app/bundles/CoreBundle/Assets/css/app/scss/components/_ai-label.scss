@@ -1,0 +1,257 @@
+$ai-label-sizes: (
+    mini: (16px, 9px),
+    2xs: (20px, 12px),
+    xs: (24px, 12px),
+    sm: (32px, 16px),
+    md: (40px, 16px),
+    lg: (48px, 16px),
+    xl: (64px, 20px)
+);
+
+$ai-label-inline-sizes: (
+    sm: (16px, 12px),
+    md: (18px, 14px),
+    lg: (22px, 16px)
+);
+
+.ai-label {
+    display: inline-flex;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.ai-label__button {
+    @include outline();
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-inverse);
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-primary);
+    font-weight: 600;
+    line-height: 1;
+    padding: 0;
+    transition: var(--transition-all-productive);
+
+    &:hover {
+        background: var(--border-inverse);
+        color: var(--text-inverse);
+    }
+
+    &:focus-visible {
+        border-color: var(--focus);
+        box-shadow: inset 0 0 0 1px var(--focus);
+    }
+
+    @each $name, $size in $ai-label-sizes {
+        &--#{$name} {
+            block-size: nth($size, 1);
+            inline-size: nth($size, 1);
+            font-size: nth($size, 2);
+        }
+    }
+
+    &--mini::after,
+    &--2xs::after {
+        position: absolute;
+        display: block;
+        block-size: 24px;
+        content: "";
+        inline-size: 24px;
+    }
+}
+
+.ai-label__button--inline {
+    border-color: transparent;
+    border-radius: 1px;
+    block-size: auto;
+    inline-size: auto;
+    font-size: .875rem;
+    padding-inline: .25rem;
+
+    &:hover {
+        border-color: var(--icon-secondary);
+        background: transparent;
+        color: var(--text-secondary);
+    }
+
+    &:focus-visible {
+        box-shadow: none;
+    }
+
+    .ai-label__text {
+        position: relative;
+        padding-inline-start: .5rem;
+
+        &::before {
+            position: absolute;
+            display: inline-block;
+            background: var(--icon-primary);
+            block-size: .25rem;
+            content: "";
+            inline-size: .25rem;
+            inset-block-start: 50%;
+            inset-inline-start: 0;
+            transform: translateY(-50%);
+            transition: var(--transition-all-productive);
+        }
+    }
+
+    &:hover .ai-label__text::before {
+        background: var(--icon-secondary);
+    }
+
+    @each $name, $size in $ai-label-inline-sizes {
+        &.ai-label__button--#{$name} {
+            block-size: nth($size, 1);
+            font-size: nth($size, 2);
+        }
+    }
+
+    &.ai-label__button--lg .ai-label__text {
+        padding-inline-start: .75rem;
+
+        &::before {
+            block-size: .5rem;
+            inline-size: .5rem;
+        }
+    }
+}
+
+.ai-label__button--with-content {
+    border-color: var(--border-inverse);
+    inline-size: auto;
+    max-inline-size: 7rem;
+    overflow: hidden;
+    padding-block: .125rem;
+    padding-inline: .5rem;
+
+    .ai-label__text,
+    .ai-label__additional-text {
+        overflow: hidden;
+        min-inline-size: 0;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .ai-label__additional-text {
+        padding-inline-start: .25rem;
+        font-weight: 400;
+    }
+}
+
+.ai-popover {
+    --bs-popover-bg: var(--ai-popover-background);
+    --bs-popover-border-color: var(--ai-border-end);
+    --bs-popover-arrow-border: var(--ai-border-end);
+    box-shadow: 0 4px 8px var(--ai-popover-shadow-outer-01), 0 0 2px var(--ai-popover-shadow-outer-02);
+}
+
+.form-field-ai {
+    position: relative;
+
+    > .form-control,
+    > .form-control-plaintext {
+        padding-inline-end: var(--spacing-08);
+    }
+
+    > .ai-label {
+        position: absolute;
+        inset-block-start: 50%;
+        inset-inline-end: var(--spacing-05);
+        transform: translateY(-50%);
+    }
+
+    > textarea.form-control ~ .ai-label {
+        inset-block-start: var(--spacing-03);
+        transform: none;
+    }
+}
+
+@each $name, $size in $ai-label-sizes {
+    .form-field-ai--#{$name} > .form-control,
+    .form-fluid .form-field-ai--#{$name} > .form-control,
+    .form-field-ai--#{$name} > .form-control-plaintext,
+    .form-fluid .form-field-ai--#{$name} > .form-control-plaintext {
+        padding-inline-end: calc(nth($size, 1) + var(--spacing-05));
+    }
+}
+
+.form-field-ai--with-content > .form-control,
+.form-fluid .form-field-ai--with-content > .form-control,
+.form-field-ai--with-content > .form-control-plaintext,
+.form-fluid .form-field-ai--with-content > .form-control-plaintext {
+    padding-inline-end: 8rem;
+}
+
+.form-control--ai {
+    border-block-end-color: var(--ai-border-strong);
+    background-image: linear-gradient(0deg, var(--ai-aura-start-sm) 0%, 15%, var(--ai-aura-end) 50%, transparent 100%);
+}
+
+.form-fluid .form-control.form-control--ai {
+    border-block-end-color: var(--ai-border-strong);
+}
+
+.form-label-ai,
+.form-check-group-ai__legend {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-03);
+}
+
+.tile--ai {
+    @include ai-popover-gradient(default, 0, var(--layer));
+    border: 1px solid transparent;
+    box-shadow: inset 0 -80px 70px -65px var(--ai-inner-shadow), 0 4px 8px 0 var(--ai-drop-shadow);
+
+    &.tile--clickable,
+    &.tile--expandable {
+        outline: 0;
+
+        &:hover {
+            @include ai-popover-gradient(hover, 0, var(--layer));
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--focus);
+            outline-offset: -1px;
+        }
+    }
+
+    > .ai-label,
+    > div > .ai-label {
+        position: absolute;
+        inset-block-start: var(--spacing-05);
+        inset-inline-end: var(--spacing-05);
+    }
+}
+
+.modal--ai .modal-content {
+    @include ai-popover-gradient(default, 0, var(--layer));
+    border: 1px solid transparent;
+    box-shadow: inset 0 -80px 70px -65px var(--ai-inner-shadow), 0 24px 40px -24px var(--ai-drop-shadow);
+
+    .modal-header > .ai-label {
+        position: absolute;
+        inset-block-start: var(--spacing-05);
+        inset-inline-end: var(--spacing-10);
+    }
+}
+
+.ai-label__button--static {
+    pointer-events: none;
+}
+
+.label--ai {
+    @include ai-popover-gradient(default, 0, var(--layer));
+    border: 1px solid transparent;
+    color: var(--text-primary);
+}
+
+th > .ai-label,
+td > .ai-label {
+    margin-inline: var(--spacing-02);
+}

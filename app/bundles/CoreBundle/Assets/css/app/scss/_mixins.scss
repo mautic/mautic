@@ -307,3 +307,22 @@
     }
   }
 }
+
+
+@mixin ai-popover-gradient($type: default, $offset: 0, $background: var(--layer)) {
+  $start: if($offset == 0, 0%, calc(0% + #{$offset}));
+
+  @if $type == hover {
+    background:
+      linear-gradient(to top, var(--ai-aura-hover-start) $start, 15%, var(--ai-aura-hover-end) 50%) padding-box,
+      linear-gradient(to top, var(--ai-aura-hover-background), var(--ai-aura-hover-background)) padding-box,
+      linear-gradient(to bottom, var(--ai-border-start), var(--ai-border-end)) border-box,
+      linear-gradient(to top, var(--ai-aura-hover-background), var(--ai-aura-hover-background)) border-box;
+  } @else {
+    background:
+      linear-gradient(to top, $background $start, var(--ai-aura-start) $start, 15%, var(--ai-aura-end) 50%) padding-box,
+      linear-gradient(to top, $background, $background) padding-box,
+      linear-gradient(to bottom, var(--ai-border-start), var(--ai-border-end)) border-box,
+      linear-gradient(to top, $background, $background) border-box;
+  }
+}

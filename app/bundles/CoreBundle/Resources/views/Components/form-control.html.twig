@@ -18,6 +18,7 @@
 {% set input_class = plaintext ? 'form-control-plaintext' : 'form-control' %}
 {% set describedby = describedby|default([]) %}
 {% set attributes = attributes|default({}) %}
+{% set aiLabel = aiLabel|default(false) %}
 {% set common_label_html %}
     {% if label %}
     <label for="{{ id }}" class="form-label type-label-01">
@@ -31,6 +32,10 @@
 
 {% if size in ['sm', 'lg'] %}
     {% set input_class = input_class ~ ' ' ~ (plaintext ? '' : 'form-control-' ~ size) %}
+{% endif %}
+
+{% if aiLabel %}
+    {% set input_class = input_class ~ ' form-control--ai' %}
 {% endif %}
 
 {% if attributes.class is defined %}
@@ -49,6 +54,7 @@
         {{ common_label_html }}
     {% endif %}
 
+    {% if aiLabel %}<div class="form-field-ai{{ aiLabel is iterable and aiLabel.size is defined ? ' form-field-ai--' ~ aiLabel.size|e('html_attr') : '' }}{{ aiLabel is iterable and aiLabel.additionalText is defined and aiLabel.additionalText ? ' form-field-ai--with-content' : '' }}">{% endif %}
     {% if type == 'textarea' %}
         <textarea
             class="{{ input_class|trim }}"
@@ -84,6 +90,10 @@
                 {% endif %}
             {% endfor %}
         >
+    {% endif %}
+    {% if aiLabel %}
+        {% include '@MauticCore/Components/ai-label.html.twig' with (aiLabel is iterable ? aiLabel : {}) only %}
+        </div>
     {% endif %}
 
     {% if labelPosition == 'bottom' %}

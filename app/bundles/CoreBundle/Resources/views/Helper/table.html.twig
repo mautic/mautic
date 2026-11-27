@@ -5,7 +5,10 @@
         <thead>
             <tr>
                 {% for headItem in headItems %}
-                    <th>{{ headItem|trans }}</th>
+                    <th>
+                        {% if headItem.label is defined %}{{ headItem.label|trans }}{% else %}{{ headItem|trans }}{% endif %}
+                        {% if headItem.aiLabel is defined and headItem.aiLabel %}{% include '@MauticCore/Components/ai-label.html.twig' with ({inline: true, size: 'sm'}|merge(headItem.aiLabel is iterable ? headItem.aiLabel : {})) only %}{% endif %}
+                    </th>
                 {% endfor %}
             </tr>
         </thead>
@@ -17,6 +20,7 @@
                     {% if row is iterable %}
                         {% for item in row %}
                             <td>
+                                {% if item.aiLabel is defined and item.aiLabel %}{% include '@MauticCore/Components/ai-label.html.twig' with ({inline: true, size: 'sm'}|merge(item.aiLabel is iterable ? item.aiLabel : {})) only %}{% endif %}
                                 {% if item.type is defined and 'link' == item.type %}
                                     <a href="{{ item.link }}" title="{{ item.value }}" {% if item.external is defined %}target="_blank"{% else %}data-toggle="ajax"{% endif %}>
                                         {{ item.value|slice(0, shortenLinkText) }}

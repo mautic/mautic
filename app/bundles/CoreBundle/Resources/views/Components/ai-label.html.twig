@@ -1,0 +1,30 @@
+{% set inline = inline|default(false) %}
+{% set size = size|default(inline ? 'md' : 'xs') %}
+{% set label = label|default('mautic.core.ai.label') %}
+{% set additionalText = additionalText|default(null) %}
+{% set classes = ['ai-label__button', 'ai-label__button--' ~ size] %}
+{% if inline %}{% set classes = classes|merge(['ai-label__button--inline']) %}{% endif %}
+{% if static is defined and static %}{% set classes = classes|merge(['ai-label__button--static']) %}{% endif %}
+{% if additionalText %}{% set classes = classes|merge(['ai-label__button--with-content']) %}{% endif %}
+{% set accessible_label = (aria_label is defined and aria_label ? aria_label : label)|trans ~ (additionalText ? ' ' ~ additionalText|trans : '') %}
+{% set text_markup %}<span class="ai-label__text">{{ label|trans }}</span>{% if additionalText %}<span class="ai-label__additional-text">{{ additionalText|trans }}</span>{% endif %}{% endset %}
+<span class="{{ ('ai-label' ~ (className is defined and className ? ' ' ~ className : ''))|e('html_attr') }}">
+    {% if static is defined and static %}
+    <span class="{{ classes|join(' ')|e('html_attr') }}" role="img" aria-label="{{ accessible_label|e('html_attr') }}">{{ text_markup }}</span>
+    {% else %}
+    <button type="button"
+        class="{{ classes|join(' ')|e('html_attr') }}"
+        data-bs-toggle="popover"
+        data-bs-container="body"
+        data-bs-custom-class="ai-popover"
+        data-bs-placement="{{ placement|default('bottom')|e('html_attr') }}"
+        data-bs-html="false"
+        data-bs-trigger="{{ trigger|default('click focus')|e('html_attr') }}"
+        title="{{ title|default('mautic.core.ai.explainability.title')|trans|e('html_attr') }}"
+        {% if content is defined and content %}data-bs-content="{{ content|trans|e('html_attr') }}"{% endif %}
+        aria-label="{{ (aria_label is defined and aria_label ? accessible_label : accessible_label ~ ' - ' ~ ('mautic.core.ai.explainability'|trans))|e('html_attr') }}"
+    >
+        {{ text_markup }}
+    </button>
+    {% endif %}
+</span>

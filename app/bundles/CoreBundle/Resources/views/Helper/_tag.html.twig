@@ -23,6 +23,11 @@
 
     {% set translated_label = tag.label|trans|purify %}
     {% set classes = ['label', 'label-' ~ color] %}
+    {% set ai_label = tag.aiLabel|default(false) %}
+    {% set ai_label_options = {inline: true, size: 'sm'}|merge(ai_label is iterable ? ai_label : {}) %}
+    {% set ai_label_options = ai_label_options|merge({static: attributes.href is defined or ai_label_options.static|default(false)}) %}
+    {% set ai_label_name = ai_label_options.label|default('mautic.core.ai.label')|trans ~ (ai_label_options.additionalText|default(null) ? ' ' ~ ai_label_options.additionalText|trans : '') %}
+    {% if ai_label %}{% set classes = classes|merge(['label--ai']) %}{% endif %}
 
     {% if icon_only %}
         {% set classes = classes|merge(['label-icon']) %}
@@ -43,7 +48,8 @@
 
     {# Wrapper element switching logic #}
     {% set wrapper_tag = attributes.href is defined ? 'a' : 'div' %}
-    <{{ wrapper_tag }} id="{{ id }}" class="{{ classes|join(' ') }}" aria-label="{{ translated_label|striptags }}" size="{{ size }}"
+    {% set wrapper_aria_label = translated_label|striptags ~ (ai_label ? ' ' ~ ai_label_name : '') %}
+    <{{ wrapper_tag }} id="{{ id }}" class="{{ classes|join(' ') }}" aria-label="{{ wrapper_aria_label|e('html_attr') }}" size="{{ size }}"
         {% if wrapper_tag == 'a' %} href="{{ attributes.href }}" {% endif %}
         {% for attr_key, attr_value in other_attributes %}
             {{ attr_key }}="{{ attr_value }}"
@@ -59,6 +65,7 @@
                 <span aria-hidden="true" {% if label_tooltip %} title="{{ label_tooltip }}" data-bs-toggle="tooltip" tooltip-placement="top"{% endif %}>
                     {{ truncated_label|raw }}
                 </span>
+                {% if ai_label %}{% include '@MauticCore/Components/ai-label.html.twig' with ai_label_options only %}{% endif %}
                 <button type="button" class="label-close" onclick="{{ dismissible_onclick|default('') }}" aria-label="{{ 'mautic.core.dismiss'|trans }}" title="{{ 'mautic.core.dismiss'|trans }}" data-bs-toggle="tooltip" tooltip-placement="top">
                     <i class="ri-close-line" aria-hidden="true" focusable="false"></i>
                 </button>
@@ -70,13 +77,15 @@
                 <span aria-hidden="true" {% if label_tooltip %} title="{{ label_tooltip }}" data-bs-toggle="tooltip" tooltip-placement="top"{% endif %}>
                     {{ truncated_label|raw }}
                 </span>
+                {% if ai_label %}{% include '@MauticCore/Components/ai-label.html.twig' with ai_label_options only %}{% endif %}
 
             {% elseif type == 'selectable' %}
-                <button type="button" aria-pressed="false" title="{{ label_tooltip ?: translated_label|striptags }}">
+                <button type="button" aria-pressed="false" title="{{ label_tooltip ?: translated_label|striptags }}" aria-label="{{ (translated_label|striptags ~ (ai_label ? ' ' ~ ai_label_name : ''))|e('html_attr') }}">
                     {% if icon %}
                         <i class="{{ icon }}" aria-hidden="true" focusable="false"></i>
                     {% endif %}
                     <span aria-hidden="true">{{ truncated_label|raw }}</span>
+                    {% if ai_label %}{% include '@MauticCore/Components/ai-label.html.twig' with ai_label_options|merge({static: true}) only %}{% endif %}
                 </button>
 
             {% else %}

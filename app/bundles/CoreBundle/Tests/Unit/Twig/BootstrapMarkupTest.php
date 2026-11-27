@@ -26,6 +26,7 @@ final class BootstrapMarkupTest extends TestCase
     protected function setUp(): void
     {
         $loader = new FilesystemLoader(__DIR__.'/../../../Resources/views');
+        $loader->addPath(__DIR__.'/../../../Resources/views', 'MauticCore');
         $loader->addPath(dirname((new \ReflectionClass(FormExtension::class))->getFileName(), 2).'/Resources/views/Form');
         $this->twig = new Environment($loader, ['autoescape' => 'html']);
         $this->twig->addExtension(new TranslationExtension());
@@ -78,5 +79,96 @@ final class BootstrapMarkupTest extends TestCase
         $html = $this->twig->createTemplate('{{ form_widget(form) }}')->render(['form' => $form->createView()]);
 
         $this->assertCount(2, (new Crawler($html))->filter('input.btn-check:disabled + label.btn'));
+    }
+
+    public function testStaticAiLabelKeepsAdditionalText(): void
+    {
+        $crawler = new Crawler($this->twig->render('Components/ai-label.html.twig', [
+            'static'         => true,
+            'additionalText' => 'Predicted',
+        ]));
+
+        $this->assertCount(1, $crawler->filter('.ai-label span.ai-label__additional-text'));
+        $this->assertSame('Predicted', $crawler->filter('.ai-label__additional-text')->text());
+        $this->assertStringEndsWith('Predicted', $crawler->filter('[role="img"]')->attr('aria-label'));
+        $this->assertCount(0, $crawler->filter('button'));
+    }
+
+    public function testSelectableTagRendersStaticAiLabelWithoutNestedButton(): void
+    {
+        $crawler = new Crawler($this->twig->render('Helper/_tag.html.twig', [
+            'tags' => [['label' => 'Draft', 'type' => 'selectable', 'aiLabel' => true]],
+        ]));
+
+        $this->assertCount(1, $crawler->filter('button .ai-label'));
+        $this->assertCount(0, $crawler->filter('button button'));
+    }
+
+    public function testLinkedTagAiLabelStaysStaticInsideAnchor(): void
+    {
+        $crawler = new Crawler($this->twig->render('Helper/_tag.html.twig', [
+            'tags' => [['label' => 'Draft', 'aiLabel' => ['static' => false, 'additionalText' => 'Predicted'], 'attributes' => ['href' => '/example']]],
+        ]));
+
+        $this->assertCount(1, $crawler->filter('a .ai-label'));
+        $this->assertCount(0, $crawler->filter('a button'));
+        $this->assertStringEndsWith(' Predicted', $crawler->filter('a')->attr('aria-label'));
+    }
+
+    public function testAiLabelClassNameIsEscapedAsOneClassList(): void
+    {
+        $crawler = new Crawler($this->twig->render('Components/ai-label.html.twig', [
+            'static'    => true,
+            'className' => 'mt-4 mr-4',
+        ]));
+
+        $this->assertCount(1, $crawler->filter('span.ai-label.mt-4.mr-4'));
+    }
+
+    public function testSelectableTagAiLabelIsPartOfButtonName(): void
+    {
+        $crawler = new Crawler($this->twig->render('Helper/_tag.html.twig', [
+            'tags' => [['label' => 'Draft', 'type' => 'selectable', 'aiLabel' => ['additionalText' => 'Predicted']]],
+        ]));
+
+        $label = $crawler->filter('button[aria-pressed="false"]')->attr('aria-label');
+        $this->assertStringStartsWith('Draft ', $label);
+        $this->assertStringEndsWith(' Predicted', $label);
+    }
+
+    public function testInteractiveAiLabelAccessibleNameIncludesVisibleText(): void
+    {
+        $crawler = new Crawler($this->twig->render('Components/ai-label.html.twig', [
+            'additionalText' => 'Predicted',
+        ]));
+
+        $label = $crawler->filter('button.ai-label__button')->attr('aria-label');
+        $this->assertStringContainsString(' Predicted - ', (string) $label);
+        $this->assertCount(0, $crawler->filter('button[aria-haspopup]'));
+        $this->assertSame('click focus', $crawler->filter('button.ai-label__button')->attr('data-bs-trigger'));
+    }
+
+    public function testAiLabelWithAdditionalTextMarksFormWrapper(): void
+    {
+        $crawler = new Crawler($this->twig->render('Components/form-control.html.twig', [
+            'name'    => 'predicted',
+            'label'   => 'Predicted',
+            'aiLabel' => ['size' => 'lg', 'additionalText' => 'Predicted'],
+        ]));
+
+        $this->assertCount(1, $crawler->filter('div.form-field-ai.form-field-ai--lg.form-field-ai--with-content'));
+    }
+
+    public function testPlaintextFormControlKeepsAiLabelWrapper(): void
+    {
+        $crawler = new Crawler($this->twig->render('Components/form-control.html.twig', [
+            'name'      => 'predicted',
+            'label'     => 'Predicted',
+            'plaintext' => true,
+            'value'     => 'value',
+            'aiLabel'   => true,
+        ]));
+
+        $this->assertCount(1, $crawler->filter('div.form-field-ai > input.form-control-plaintext'));
     }
 }
