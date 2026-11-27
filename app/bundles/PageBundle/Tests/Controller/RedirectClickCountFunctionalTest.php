@@ -52,8 +52,8 @@ final class RedirectClickCountFunctionalTest extends MauticMysqlTestCase
 
         $target = $this->click($redirect, $contact, $server + ['REMOTE_ADDR' => '203.0.113.40']);
 
-        // No contact data is put into a URL that goes to another site
-        $this->assertStringContainsStringIgnoringCase('contactfield', urldecode($target));
+        // No contact data is put into a URL that goes to another site, tokens fall back to their default or to nothing
+        $this->assertSame('https://example.com/offer?who=&name=there', urldecode($target));
         $this->assertSame([1, 0], $this->getRedirectCounts($redirect));
         $this->assertSame([1, 0], $this->getTrackableCounts($redirect));
         $this->assertCount(0, $this->em->getRepository(Hit::class)->findBy(['redirect' => $redirect->getId()]));
@@ -284,7 +284,7 @@ final class RedirectClickCountFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($contact);
 
         $redirect = new Redirect();
-        $redirect->setUrl('https://example.com/offer?who={contactfield=email}');
+        $redirect->setUrl('https://example.com/offer?who={contactfield=email}&name={contactfield=firstname|there}');
         $redirect->setRedirectId('untrackedclick000000000');
         $this->em->persist($redirect);
 
