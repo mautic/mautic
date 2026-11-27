@@ -44,12 +44,16 @@ final class Version20261117155532 extends PreUpAssertionMigration
     }
 
     /**
-     * Drops the index without locking the table.
+     * Drops the index when this migration added it.
      *
      * @param Schema $schema the current database schema
      */
     public function down(Schema $schema): void
     {
+        if (!$schema->getTable($this->getPrefixedTableName())->hasIndex($this->getIndexName())) {
+            return;
+        }
+
         $this->addSql("ALTER TABLE {$this->getPrefixedTableName()} DROP INDEX {$this->getIndexName()}, ALGORITHM=INPLACE, LOCK=NONE");
     }
 
