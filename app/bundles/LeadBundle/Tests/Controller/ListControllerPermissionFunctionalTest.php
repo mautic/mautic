@@ -439,14 +439,14 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->loginOtherUser($user->getUserIdentifier());
 
         $segmentIds = [
-            101,
+            999999999,
         ];
 
         $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/batchDelete?ids='.json_encode($segmentIds));
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
-        // The segment 101 is invalid.
-        $this->assertStringContainsString('No segment with an id of 101 was found!', $crawler->text());
+        // No segment can have this ID, unlike a low one that auto-increment may already have reached.
+        $this->assertStringContainsString('No segment with an id of 999999999 was found!', $crawler->text());
     }
 
     public function testBatchDeleteSegmentWhenUserHavePermission(): void
