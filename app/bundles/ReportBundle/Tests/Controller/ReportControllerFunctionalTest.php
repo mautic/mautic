@@ -9,6 +9,7 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
@@ -748,5 +749,85 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         $content = $this->client->getResponse()->getContent();
         $this->assertStringContainsString(self::DEFAULT_TEST_EMAIL, (string) $content);
+    }
+
+    public function testDynamicMultiselectFilterWithSavedValueIsApplied(): void
+    {
+        [$tagA] = $this->createTaggedContacts();
+        $report = $this->createReportWithDynamicTagFilter([$tagA->getId()]);
+
+        $this->client->request('GET', '/s/reports/view/'.$report->getId());
+        self::assertResponseIsSuccessful();
+
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('a@example.com', $content);
+        $this->assertStringNotContainsString('b@example.com', $content);
+        $this->assertStringNotContainsString('c@example.com', $content);
+    }
+
+    public function testDynamicMultiselectFilterWithMultipleRequestValuesIsApplied(): void
+    {
+        [$tagA, $tagB] = $this->createTaggedContacts();
+        $report        = $this->createReportWithDynamicTagFilter([$tagA->getId()]);
+
+        $this->client->request('GET', sprintf(
+            '/s/reports/view/%d?tmpl=list&name=report.%d&filterby=tag&value[]=%d&value[]=%d',
+            $report->getId(),
+            $report->getId(),
+            $tagA->getId(),
+            $tagB->getId()
+        ));
+        self::assertResponseIsSuccessful();
+
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('a@example.com', $content);
+        $this->assertStringContainsString('b@example.com', $content);
+        $this->assertStringNotContainsString('c@example.com', $content);
+    }
+
+    /**
+     * @return Tag[]
+     */
+    private function createTaggedContacts(): array
+    {
+        $tags = [];
+        foreach (['a', 'b', 'c'] as $name) {
+            $tag = new Tag('tag-'.$name);
+            $this->em->persist($tag);
+
+            $contact = new Lead();
+            $contact->setEmail($name.'@example.com');
+            $contact->addTag($tag);
+            $this->em->persist($contact);
+
+            $tags[] = $tag;
+        }
+        $this->em->flush();
+
+        return $tags;
+    }
+
+    /**
+     * @param int[] $tagIds
+     */
+    private function createReportWithDynamicTagFilter(array $tagIds): Report
+    {
+        $report = new Report();
+        $report->setName('Report with dynamic tag filter');
+        $report->setSource('leads');
+        $report->setColumns(['l.email']);
+        $report->setFilters([
+            [
+                'column'    => 'tag',
+                'glue'      => 'and',
+                'condition' => 'in',
+                'dynamic'   => 1,
+                'value'     => $tagIds,
+            ],
+        ]);
+
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
+
+        return $report;
     }
 }
