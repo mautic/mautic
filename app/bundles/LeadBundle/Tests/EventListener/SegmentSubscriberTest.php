@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -95,9 +97,9 @@ final class SegmentSubscriberTest extends TestCase
         $segment->deletedId = $segmentId;
         $segment->setName($segmentName);
 
-        $event = $this->createMock(SegmentEvent::class);
+        $event = $this->createMock(EntityPostDelete::class);
         $event->expects($this->once())
-            ->method('getList')
+            ->method('getEntity')
             ->willReturn($segment);
 
         $subscriber->onSegmentPostDelete($event);
@@ -177,9 +179,9 @@ final class SegmentSubscriberTest extends TestCase
         $segment = new LeadList();
         $segment->setId($segmentId);
 
-        $event = $this->createMock(SegmentEvent::class);
+        $event = $this->createMock(EntityPostSave::class);
         $event->expects($this->once())
-            ->method('getList')
+            ->method('getEntity')
             ->willReturn($segment);
         $event->expects($this->once())
             ->method('getChanges')
