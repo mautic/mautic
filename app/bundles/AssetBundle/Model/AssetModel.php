@@ -137,8 +137,9 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         // Denied (401) or missing (404) files weren't downloaded, so they don't count as downloads
         $countsAsDownload = $code < Response::HTTP_BAD_REQUEST;
 
-        // Check if request is trackable (includes IP, bot, privacy signal, and prefetch checks)
-        if (!$this->ipLookupHelper->isRequestTrackable()) {
+        // Downloads may be tracked and the request is trackable (includes IP, bot, privacy signal, and prefetch checks).
+        // The setting goes first, since the trackability check looks up and stores the visitor's IP address.
+        if (!$this->isDownloadTrackingEnabled() || !$this->ipLookupHelper->isRequestTrackable()) {
             // Still counted, but with nothing that links it to the visitor. Without an identifier it can't count as unique.
             // Bots, excluded IP addresses and prefetches aren't counted, privacy signals are.
             if ($countsAsDownload && empty($systemEntry) && $this->ipLookupHelper->isRequestCountable()) {
@@ -305,6 +306,14 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         }
 
         $this->em->detach($download);
+    }
+
+    /**
+     * With download tracking off, a download is counted but never linked to a contact.
+     */
+    private function isDownloadTrackingEnabled(): bool
+    {
+        return (bool) $this->coreParametersHelper->get('track_asset_downloads', true);
     }
 
     /**
