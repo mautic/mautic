@@ -85,14 +85,16 @@ class CodeEditor {
     const code = this.codeEditor.editor.getValue();
     const isMjmlMode = ContentService.isMjmlMode(this.editor);
     let updateSuccessful = false;
-    // validate MJML code
-    if (isMjmlMode) {
-      MjmlService.mjmlToHtml(code);
-    }
+
+    let beforeTriggered = false;
 
     try {
       if (isMjmlMode) {
+        // Validate MJML code inside the existing error boundary so invalid
+        // source is reported instead of silently aborting the update.
+        MjmlService.mjmlToHtml(code);
         this.editor.trigger('mautic:code-editor-update:before', code);
+        beforeTriggered = true;
       }
 
       // delete canvas and set new content
@@ -114,7 +116,7 @@ class CodeEditor {
     } catch (e) {
       window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')}\n${e.message}`);
     } finally {
-      if (isMjmlMode) {
+      if (isMjmlMode && beforeTriggered) {
         this.editor.trigger('mautic:code-editor-update:complete', updateSuccessful);
       }
     }
