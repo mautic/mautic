@@ -126,7 +126,7 @@ final class PointActionHelperTest extends TestCase
                 'name'       => 'Invalid URL',
                 'properties' => [
                     'page_url'               => 'https://example.com/invalid',
-                    'page_hits'              => 1,
+                    'page_hits'              => 0,
                     'accumulative_time_unit' => 'H',
                     'accumulative_time'      => 0,
                     'returns_within_unit'    => 'H',
@@ -137,6 +137,25 @@ final class PointActionHelperTest extends TestCase
                 'points' => 5,
             ],
             false,
+        ];
+        yield 'page_hits_works_with_historical_data_regardless_of_url' => [
+            [
+                'id'         => 4,
+                'type'       => 'url.hit',
+                'name'       => 'Page Hits Historical',
+                'properties' => [
+                    'page_url'               => 'https://example.com/invalid',
+                    'page_hits'              => 1,
+                    'accumulative_time_unit' => 'H',
+                    'accumulative_time'      => 0,
+                    'returns_within_unit'    => 'H',
+                    'returns_within'         => 0,
+                    'returns_after_unit'     => 'H',
+                    'returns_after'          => 0,
+                ],
+                'points' => 5,
+            ],
+            true,
         ];
     }
 
@@ -210,5 +229,71 @@ final class PointActionHelperTest extends TestCase
             ],
             false,
         ];
+    }
+
+    public function testDwellTimeOnAnotherUrlDoesNotBypassReturnsAfter(): void
+    {
+        $this->eventDetails->method('getUrl')->willReturn('https://example.com/blog');
+        $this->hitRepository->method('getDwellTimesForUrl')->willReturn([
+            'sum'     => 90,
+            'min'     => 90,
+            'max'     => 90,
+            'average' => 90.0,
+            'count'   => 1,
+        ]);
+        $this->hitRepository->expects($this->never())->method('getLatestHit');
+
+        $pointActionHelper = new PointActionHelper($this->hitRepository);
+        $result            = $pointActionHelper->validateUrlHit($this->eventDetails, [
+            'id'         => 7,
+            'type'       => 'url.hit',
+            'name'       => 'Pricing dwell time and return',
+            'properties' => [
+                'page_url'               => 'https://example.com/pricing',
+                'page_hits'              => 0,
+                'accumulative_time_unit' => 'S',
+                'accumulative_time'      => 60,
+                'returns_within_unit'    => 'H',
+                'returns_within'         => 0,
+                'returns_after_unit'     => 'H',
+                'returns_after'          => 3600,
+            ],
+            'points' => 10,
+        ]);
+
+        $this->assertFalse($result);
+    }
+
+    public function testDwellTimeStillTriggersOnAnotherUrlWhenNoReturnConditionIsSet(): void
+    {
+        $this->eventDetails->method('getUrl')->willReturn('https://example.com/blog');
+        $this->hitRepository->method('getDwellTimesForUrl')->willReturn([
+            'sum'     => 90,
+            'min'     => 90,
+            'max'     => 90,
+            'average' => 90.0,
+            'count'   => 1,
+        ]);
+        $this->hitRepository->expects($this->never())->method('getLatestHit');
+
+        $pointActionHelper = new PointActionHelper($this->hitRepository);
+        $result            = $pointActionHelper->validateUrlHit($this->eventDetails, [
+            'id'         => 8,
+            'type'       => 'url.hit',
+            'name'       => 'Pricing dwell time only',
+            'properties' => [
+                'page_url'               => 'https://example.com/pricing',
+                'page_hits'              => 0,
+                'accumulative_time_unit' => 'S',
+                'accumulative_time'      => 60,
+                'returns_within_unit'    => 'H',
+                'returns_within'         => 0,
+                'returns_after_unit'     => 'H',
+                'returns_after'          => 0,
+            ],
+            'points' => 10,
+        ]);
+
+        $this->assertTrue($result);
     }
 }
