@@ -742,7 +742,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\LeadBundle\Event\FieldPostDeleteEvent` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof LeadField`) |
     | `Mautic\LeadBundle\Event\LeadFieldEvent` | generic entity events above; `getField()` becomes `getEntity()` and `setField()` has no replacement |
 
-    `Mautic\ChannelBundle\Model\MessageQueueModel` now dispatches the generic `EntityPreSave` / `EntityPostSave` / `EntityPreDelete` / `EntityPostDelete` events for message queue entities (guard on `Mautic\ChannelBundle\Entity\MessageQueue`); its `dispatchEvent()` override only keeps the `process_message_queue` and `process_batch_message_queue` actions. `Mautic\ChannelBundle\Event\MessageQueueEvent` and the `Mautic\ChannelBundle\ChannelEvents::MESSAGE_QUEUED` constant were only used for the `post_save` action and are removed.
+    `Mautic\ChannelBundle\Model\MessageQueueModel` now dispatches the generic `EntityPreSave` / `EntityPostSave` / `EntityPreDelete` / `EntityPostDelete` events for message queue entities (guard on `Mautic\ChannelBundle\Entity\MessageQueue`); its `dispatchEvent()` override only keeps the `process_message_queue` and `process_batch_message_queue` actions. `Mautic\ChannelBundle\Event\MessageQueueEvent` was only used for the `post_save` action and is removed - listen to `Mautic\CoreBundle\Event\EntityPostSave` instead and replace `getMessageQueue()` with `getEntity()`. The `Mautic\ChannelBundle\ChannelEvents::MESSAGE_QUEUED` constant was never dispatched by name and is removed with no replacement.
 
 ## Changed code
 
