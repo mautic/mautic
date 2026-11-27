@@ -28,4 +28,19 @@ final class EmailAddressHelper
 
         return array_values(array_unique($emails));
     }
+
+    public static function getDomain(string $email): ?string
+    {
+        if (!str_contains($email, '@')) {
+            return null;
+        }
+
+        $domain = substr(strrchr($email, '@'), 1);
+
+        if ('' === $domain) {
+            return null;
+        }
+
+        return strtolower($domain);
+    }
 }
