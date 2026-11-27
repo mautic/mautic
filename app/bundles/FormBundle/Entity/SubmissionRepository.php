@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -598,5 +599,220 @@ class SubmissionRepository extends CommonRepository
         $qb->delete($tableName)
             ->where($qb->expr()->in('submission_id', $inValidSubmissionIds))
             ->executeStatement();
+    }
+
+    /**
+     * @param int[] $contactIds
+     */
+    public function recordDeletedContacts(array $contactIds): void
+    {
+        if ([] === $contactIds) {
+            return;
+        }
+
+        $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'form_submissions')
+            ->set('deleted_lead_id', 'lead_id')
+            ->where('lead_id IN (:contactIds)')
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER)
+            ->executeStatement();
+    }
+
+    /**
+     * @param int[] $contactIds
+     */
+    public function removeDeletedContactRecords(array $contactIds): void
+    {
+        if ([] === $contactIds) {
+            return;
+        }
+
+        $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'form_submissions')
+            ->set('deleted_lead_id', 'NULL')
+            ->where('lead_id IN (:contactIds)')
+            ->andWhere('deleted_lead_id IS NOT NULL')
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER)
+            ->executeStatement();
+    }
+
+    /**
+     * @param int[] $excludedFormIds
+     *
+     * @return array<int, int> Form ID => number of submissions
+     */
+    public function countSubmissionsOfDeletedContactsByForm(?int $formId = null, array $excludedFormIds = []): array
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('fs.form_id', 'COUNT(fs.id) AS submission_count')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
+            ->groupBy('fs.form_id')
+            ->orderBy('fs.form_id', 'ASC');
+
+        $this->whereSubmissionOfDeletedContact($qb, 'fs');
+
+        if (null !== $formId) {
+            $qb->andWhere('fs.form_id = :formId')
+                ->setParameter('formId', $formId);
+        }
+
+        if ([] !== $excludedFormIds) {
+            $qb->andWhere('fs.form_id NOT IN (:excludedFormIds)')
+                ->setParameter('excludedFormIds', $excludedFormIds, ArrayParameterType::INTEGER);
+        }
+
+        $counts = [];
+
+        foreach ($qb->executeQuery()->fetchAllAssociative() as $row) {
+            $counts[(int) $row['form_id']] = (int) $row['submission_count'];
+        }
+
+        return $counts;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getSubmissionIdsOfDeletedContacts(int $formId, int $limit, int $afterSubmissionId = 0): array
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('fs.id')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
+            ->where('fs.form_id = :formId')
+            ->andWhere('fs.id > :afterSubmissionId')
+            ->setParameter('formId', $formId)
+            ->setParameter('afterSubmissionId', $afterSubmissionId)
+            ->orderBy('fs.id', 'ASC')
+            ->setMaxResults($limit);
+
+        $this->whereSubmissionOfDeletedContact($qb, 'fs');
+
+        return array_map(intval(...), $qb->executeQuery()->fetchFirstColumn());
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getExistingResultsTableNames(): array
+    {
+        $tableNamePrefix = MAUTIC_TABLE_PREFIX.'form_results_';
+
+        return array_values(array_filter(
+            $this->getEntityManager()->getConnection()->createSchemaManager()->listTableNames(),
+            static fn (string $tableName): bool => str_starts_with($tableName, $tableNamePrefix)
+        ));
+    }
+
+    /**
+     * @param string[] $fieldAliases  Aliases of fields of type "file"
+     * @param int[]    $submissionIds
+     *
+     * @return array<int, array<string, string>> Submission ID => [field alias => file name]
+     */
+    public function getUploadedFileNames(Form $form, array $fieldAliases, array $submissionIds): array
+    {
+        if ([] === $fieldAliases || [] === $submissionIds) {
+            return [];
+        }
+
+        $connection       = $this->getEntityManager()->getConnection();
+        $databasePlatform = $connection->getDatabasePlatform();
+        $columns          = array_map(static fn (string $alias): string => 'r.'.$databasePlatform->quoteIdentifier($alias), $fieldAliases);
+
+        $rows = $connection->createQueryBuilder()
+            ->select('r.submission_id', ...$columns)
+            ->from($this->getResultsTableName($form->getId(), $form->getAlias()), 'r')
+            ->where('r.submission_id IN (:submissionIds)')
+            ->setParameter('submissionIds', $submissionIds, ArrayParameterType::INTEGER)
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $fileNames = [];
+
+        foreach ($rows as $row) {
+            foreach ($fieldAliases as $alias) {
+                if (is_string($row[$alias] ?? null) && '' !== $row[$alias]) {
+                    $fileNames[(int) $row['submission_id']][$alias] = $row[$alias];
+                }
+            }
+        }
+
+        return $fileNames;
+    }
+
+    /**
+     * @param int[] $submissionIds
+     */
+    public function clearUploadedFileNames(Form $form, string $fieldAlias, array $submissionIds): void
+    {
+        if ([] === $submissionIds) {
+            return;
+        }
+
+        $connection = $this->getEntityManager()->getConnection();
+
+        $connection->createQueryBuilder()
+            ->update($this->getResultsTableName($form->getId(), $form->getAlias()))
+            ->set($connection->getDatabasePlatform()->quoteIdentifier($fieldAlias), 'NULL')
+            ->where('submission_id IN (:submissionIds)')
+            ->setParameter('submissionIds', $submissionIds, ArrayParameterType::INTEGER)
+            ->executeStatement();
+    }
+
+    /**
+     * @param int[] $submissionIds
+     */
+    public function deleteSubmissionsOfDeletedContacts(Form $form, array $submissionIds, bool $resultsTableExists): int
+    {
+        if ([] === $submissionIds) {
+            return 0;
+        }
+
+        $resultsTableName = $this->getResultsTableName($form->getId(), $form->getAlias());
+
+        return (int) $this->getEntityManager()->getConnection()->transactional(
+            function (Connection $connection) use ($form, $resultsTableName, $resultsTableExists, $submissionIds): int {
+                if ($resultsTableExists) {
+                    $connection->createQueryBuilder()
+                        ->delete($resultsTableName)
+                        ->where('submission_id IN (:submissionIds)')
+                        ->setParameter('submissionIds', $submissionIds, ArrayParameterType::INTEGER)
+                        ->executeStatement();
+                }
+
+                $qb = $connection->createQueryBuilder()
+                    ->delete(MAUTIC_TABLE_PREFIX.'form_submissions')
+                    ->where('id IN (:submissionIds)')
+                    ->setParameter('submissionIds', $submissionIds, ArrayParameterType::INTEGER);
+
+                $this->whereSubmissionOfDeletedContact($qb, MAUTIC_TABLE_PREFIX.'form_submissions');
+
+                $deleted = (int) $qb->executeStatement();
+
+                if ($deleted > 0) {
+                    // The SQL deletion skips SubmissionSubscriber::postRemove(), so the count for the submission limit is decreased in the same transaction
+                    $connection->createQueryBuilder()
+                        ->update(MAUTIC_TABLE_PREFIX.'forms')
+                        ->set('submission_count', 'CASE WHEN submission_count > :deleted THEN submission_count - :deleted ELSE 0 END')
+                        ->where('id = :formId')
+                        ->setParameter('deleted', $deleted)
+                        ->setParameter('formId', $form->getId())
+                        ->executeStatement();
+                }
+
+                return $deleted;
+            }
+        );
+    }
+
+    /**
+     * LeadSubscriber::onLeadPreDelete() records the contact in deleted_lead_id before the foreign key sets lead_id to NULL.
+     * Submissions without this record are never deleted: they never had a contact, or their contact was deleted
+     * before Mautic recorded deleted contacts, or without the contact model (for example by mautic:maintenance:cleanup).
+     */
+    private function whereSubmissionOfDeletedContact(DbalQueryBuilder $qb, string $submissionTable): void
+    {
+        $qb->andWhere($submissionTable.'.lead_id IS NULL')
+            ->andWhere($submissionTable.'.deleted_lead_id IS NOT NULL');
     }
 }

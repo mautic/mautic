@@ -9,6 +9,10 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\InvalidOptionException;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
 
 #[CoversClass(InputHelper::class)]
 final class InputHelperTest extends TestCase
@@ -383,5 +387,76 @@ final class InputHelperTest extends TestCase
             $rawResult = InputHelper::raw($originalValue);
             $this->assertEquals($originalValue, $rawResult, "Raw filter should preserve: {$originalValue}");
         }
+    }
+
+    /**
+     * @param array<string, string> $parameters
+     */
+    #[DataProvider('validPositiveIntegerOptionProvider')]
+    public function testPositiveIntegerOptionReturnsTheValue(array $parameters, string $option, ?int $expected): void
+    {
+        $this->assertSame($expected, InputHelper::positiveIntegerOption($this->createInput($parameters), $option));
+    }
+
+    /**
+     * @return iterable<string, array{array<string, string>, string, ?int}>
+     */
+    public static function validPositiveIntegerOptionProvider(): iterable
+    {
+        yield 'option is not set' => [[], 'id', null];
+        yield 'number' => [['--id' => '12'], 'id', 12];
+        yield 'number with spaces' => [['--id' => ' 12 '], 'id', 12];
+        yield 'number with leading zeros' => [['--id' => '007'], 'id', 7];
+        yield 'largest integer' => [['--id' => (string) PHP_INT_MAX], 'id', PHP_INT_MAX];
+        yield 'default value' => [[], 'limit', 1000];
+    }
+
+    #[DataProvider('invalidPositiveIntegerProvider')]
+    public function testPositiveIntegerOptionRejectsAnInvalidValue(string $value): void
+    {
+        $this->expectException(InvalidOptionException::class);
+        $this->expectExceptionMessage(sprintf('The "--id" option must be a positive integer, "%s" given.', $value));
+
+        InputHelper::positiveIntegerOption($this->createInput(['--id' => $value]), 'id');
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function invalidPositiveIntegerProvider(): iterable
+    {
+        yield 'zero' => ['0'];
+        yield 'negative number' => ['-3'];
+        yield 'decimal number' => ['1.5'];
+        yield 'text' => ['abc'];
+        yield 'comma-separated list' => ['3,7'];
+        yield 'number above the largest integer' => ['9223372036854775808'];
+        yield 'empty string' => [''];
+    }
+
+    public function testPositiveIntegerArrayOptionReturnsTheValues(): void
+    {
+        $this->assertSame([], InputHelper::positiveIntegerArrayOption($this->createInput([]), 'ids'));
+        $this->assertSame([3, 7], InputHelper::positiveIntegerArrayOption($this->createInput(['--ids' => ['3', '7']]), 'ids'));
+    }
+
+    public function testPositiveIntegerArrayOptionRejectsAnInvalidValue(): void
+    {
+        $this->expectException(InvalidOptionException::class);
+        $this->expectExceptionMessage('The "--ids" option must be a positive integer, "abc" given.');
+
+        InputHelper::positiveIntegerArrayOption($this->createInput(['--ids' => ['3', 'abc']]), 'ids');
+    }
+
+    /**
+     * @param array<string, string|string[]> $parameters
+     */
+    private function createInput(array $parameters): ArrayInput
+    {
+        return new ArrayInput($parameters, new InputDefinition([
+            new InputOption('id', null, InputOption::VALUE_REQUIRED),
+            new InputOption('ids', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED),
+            new InputOption('limit', null, InputOption::VALUE_OPTIONAL, '', 1000),
+        ]));
     }
 }
