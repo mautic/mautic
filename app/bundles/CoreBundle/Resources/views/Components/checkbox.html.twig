@@ -5,11 +5,12 @@
 {% set wrapperClass = wrapperClass|default('') %}
 {% set inline = inline|default(false) %}
 {% set reverse = reverse|default(false) %}
+{% set chip = (variant|default('')) == 'chip' %}
 {% set required = required|default(false) %}
 {% set base_id = (name ?: 'checkbox')|replace({'[': '-', ']': '', ' ': '-', '.': '-'}) %}
 {% set help_id = helpText ? base_id ~ '-help' : null %}
 
-<fieldset class="{{ [wrapperClass, 'border-0', 'p-0', 'm-0']|filter(value => value is not empty)|join(' ')|escape('html_attr') }}" style="min-width: 0; border: 0; padding: 0; margin: 0;">
+<fieldset class="{{ [wrapperClass, chip ? 'checkbox-chips' : '', 'border-0', 'p-0', 'm-0']|filter(value => value is not empty)|join(' ')|escape('html_attr') }}" style="min-width: 0; border: 0; padding: 0; margin: 0;">
     {% if legend %}
         <legend class="form-label mb-2">{{ legend|trans }}</legend>
     {% endif %}
@@ -24,6 +25,10 @@
 
         {% if inline %}
             {% set classes = classes|merge(['form-check-inline']) %}
+        {% endif %}
+
+        {% if chip %}
+            {% set classes = classes|merge(['form-check--chip']) %}
         {% endif %}
 
         {% if reverse %}
@@ -54,6 +59,9 @@
                     {% endif %}
                 {% endfor %}
             >
+            {% if chip %}
+                <svg class="form-check-chip__check" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4 10.5l4 4 8-8" /></svg>
+            {% endif %}
             {% if item_label is not same as('') %}
             <label class="form-check-label" for="{{ item_id|escape('html_attr') }}"{% for label_key, label_value in item.labelAttributes|default({}) %} {{ label_key|escape('html_attr') }}="{{ label_value|escape('html_attr') }}"{% endfor %}>
                 {% set item_text = item_label|trans(item.label_translation_parameters|default({}), item.translation_domain is defined ? item.translation_domain : null) %}

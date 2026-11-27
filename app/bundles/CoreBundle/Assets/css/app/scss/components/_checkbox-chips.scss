@@ -1,0 +1,139 @@
+.checkbox-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.form-check--chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 0;
+    margin: 0;
+    padding: .5rem 1.25rem .5rem 1rem;
+    gap: .75rem;
+    border: 1px solid var(--icon-primary);
+    border-radius: 999px;
+    background-color: var(--background);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color var(--duration-productive) var(--easing-standard-productive), color var(--duration-productive) var(--easing-standard-productive);
+
+    .form-check-input {
+        position: static;
+        flex: none;
+        float: none;
+        margin: 0;
+        inline-size: 1.125rem;
+        block-size: 1.125rem;
+        border-color: currentcolor;
+        border-radius: 0;
+        background-color: transparent;
+
+        &::after {
+            content: none;
+        }
+
+        &:checked {
+            border-color: var(--text-inverse);
+            background-color: var(--text-inverse);
+            background-image: none;
+            mask: none;
+
+            &::after {
+                content: none;
+            }
+        }
+    }
+
+    .form-check-chip__check {
+        position: absolute;
+        inset-inline-start: 1rem;
+        top: 50%;
+        inline-size: 1.125rem;
+        block-size: 1.125rem;
+        transform: translateY(-50%);
+        overflow: visible;
+        pointer-events: none;
+
+        path {
+            fill: none;
+            stroke: var(--text-primary);
+            stroke-dasharray: 18;
+            stroke-dashoffset: 18;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 2.25;
+        }
+    }
+
+    .form-check-input:checked + .form-check-chip__check path {
+        animation: checkbox-chip-draw 380ms linear both;
+    }
+
+    .form-check-input:not(:checked) + .form-check-chip__check path {
+        transition: stroke-dashoffset 140ms ease-in;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+
+        .form-check-input:not(:checked) + .form-check-chip__check path {
+            transition: none;
+        }
+
+        .form-check-input:checked + .form-check-chip__check path {
+            animation: none;
+            stroke-dashoffset: 0;
+        }
+    }
+
+    @keyframes checkbox-chip-draw {
+        33.33% {
+            stroke-dashoffset: 12;
+        }
+
+        to {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    .form-check-label {
+        margin: 0;
+        color: inherit;
+        font-size: 1rem;
+        line-height: 1.5;
+
+        &::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+        }
+
+        a {
+            position: relative;
+            z-index: 1;
+        }
+    }
+
+    &:hover {
+        background-color: var(--layer-hover);
+    }
+
+    &:has(.form-check-input:checked) {
+        border-color: var(--layer-selected-inverse);
+        background-color: var(--layer-selected-inverse);
+        color: var(--text-inverse);
+    }
+
+    &:has(.form-check-input:focus-visible) {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
+    }
+
+    &:has(.form-check-input:disabled) {
+        cursor: not-allowed;
+        opacity: .5;
+    }
+}
