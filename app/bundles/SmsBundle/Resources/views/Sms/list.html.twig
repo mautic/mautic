@@ -191,7 +191,7 @@
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.getCategory()}) }}
+                        {{ include('@MauticCore/Components/category.html.twig', {'type': 'expanded', 'category': item.getCategory()}) }}
                     </td>
                         {{- include('@MauticSms/Sms/list_stats.html.twig', { 'item' : item }) -}}
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>

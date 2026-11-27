@@ -19,7 +19,7 @@ final class CategoryTest extends TestCase
         $category->setTitle('Title Changed of Category');
         $category->setAlias('changed alias of category');
         $category->setBundle('campaigns');
-        $category->setColor('Blue');
+        $category->setColor('#4e5d9d');
         $category->setDescription('My Description');
 
         $this->assertIsArray($category->getChanges());

@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[ORM\Table(name: 'categories')]
@@ -81,6 +82,7 @@ class Category extends FormEntity implements UuidInterface, IdentifierInterface
      * @var string|null
      */
     #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
+    #[Regex(pattern: '/^(?:#?(?:[a-f0-9]{3}|[a-f0-9]{6}))?$/iD', message: 'mautic.category.color.invalid')]
     #[ORM\Column(type: 'string', length: 7, nullable: true)]
     private $color;
 

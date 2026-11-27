@@ -131,6 +131,40 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 
         $body = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertSame('Category for color edit', $body['categoryName']);
+        $this->em->refresh($category);
+        $this->assertSame('4e5d9d', $category->getColor());
+    }
+
+    public function testEditCategoryRejectsNonHexColor(): void
+    {
+        $category = $this->createCategory(
+            'Category with invalid color',
+            'Category with invalid color',
+            'global',
+            'category-with-invalid-color'
+        );
+
+        $crawler        = $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
+        $clientResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $crawler->addHtmlContent($clientResponse['newContent']);
+
+        $form = $crawler->selectButton('category_form[buttons][save]')->form();
+        $form['category_form[title]']->setValue('Category with invalid color');
+        $form['category_form[color]']->setValue('rgb(255, 0, 0)');
+        $form['category_form[isPublished]']->setValue('1');
+        $form['category_form[inForm]']->setValue('1');
+
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $body = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertStringContainsString(
+            $this->translator->trans('mautic.category.color.invalid', [], 'validators'),
+            (string) $body['newContent']
+        );
+
+        $this->em->refresh($category);
+        $this->assertNull($category->getColor());
     }
 
     public function testEditLockCategory(): void

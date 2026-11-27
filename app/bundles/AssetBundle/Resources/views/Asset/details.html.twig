@@ -18,7 +18,7 @@
             'targetLabel': 'mautic.asset.assets'|trans
         }
     ) -}}
-    {{ include('@MauticCore/Modules/category--inline.html.twig', {'category': activeAsset.category}) }}
+    {{ include('@MauticCore/Components/category.html.twig', {'type': 'inline', 'category': activeAsset.category}) }}
     {{ include('@MauticProject/Modules/projects.html.twig', {'item': activeAsset}) }}
 {% endblock %}
 
