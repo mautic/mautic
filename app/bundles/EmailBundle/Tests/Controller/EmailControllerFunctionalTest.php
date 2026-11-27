@@ -649,6 +649,20 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals('Test html', $secondEmail->getCustomHtml());
     }
 
+    public function testNewVariantDefaultWeightIsNotInheritedFromParent(): void
+    {
+        $segment = $this->createSegment('Variant default segment', 'variant-default-segment');
+        $parent  = $this->createEmail('Variant default parent', 'Variant default parent subject', 'list', 'blank', 'Parent html', $segment, ['weight' => 10, 'winnerCriteria' => 'email.openrate']);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/abtest/'.$parent->getId());
+        $this->assertResponseIsSuccessful();
+
+        $weight = $crawler->filter('input[type="range"][name="emailform[variantSettings][weight]"]');
+        $this->assertCount(1, $weight);
+        $this->assertSame('50', $weight->attr('value'));
+    }
+
     public function testEmailVariantWeightIsVisibleAndEditable(): void
     {
         $segment = $this->createSegment('Variant weight segment', 'variant-weight-segment');

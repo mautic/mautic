@@ -435,23 +435,34 @@ final class EmailType extends AbstractType
             );
         };
 
+        // A new variant is cloned from its parent, so the parent's own weight must not become the variant's weight.
+        $getVariantSettings = static function (Email $email): array {
+            $settings = $email->getVariantSettings();
+
+            if ($email->isNew()) {
+                unset($settings['weight']);
+            }
+
+            return $settings;
+        };
+
         // Building the form
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($variantSettingsModifier, $getDefaultWeight): void {
+            function (FormEvent $event) use ($variantSettingsModifier, $getDefaultWeight, $getVariantSettings): void {
                 /** @var Email $emailEntity */
                 $emailEntity     = $event->getData();
                 $variantChildren = $emailEntity->getVariantChildren();
                 $isParent        = $variantChildren && count($variantChildren) > 0 || $emailEntity->isNew();
                 $isExisting      = $emailEntity->getId() > 0;
-                $variantSettingsModifier($event, $isParent, $isExisting, $getDefaultWeight($emailEntity), $emailEntity->getVariantSettings());
+                $variantSettingsModifier($event, $isParent, $isExisting, $getDefaultWeight($emailEntity), $getVariantSettings($emailEntity));
             }
         );
 
         // After submit
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($variantSettingsModifier, $getDefaultWeight): void {
+            function (FormEvent $event) use ($variantSettingsModifier, $getDefaultWeight, $getVariantSettings): void {
                 $data = $event->getData();
 
                 /** @var Email $emailEntity */
@@ -459,7 +470,7 @@ final class EmailType extends AbstractType
                 $variantChildren = $emailEntity->getVariantChildren();
                 $isParent        = $variantChildren && count($variantChildren) > 0;
 
-                $variantSettingsModifier($event, $isParent, false, $getDefaultWeight($emailEntity), $emailEntity->getVariantSettings());
+                $variantSettingsModifier($event, $isParent, false, $getDefaultWeight($emailEntity), $getVariantSettings($emailEntity));
 
                 $emailType = $data['emailType'] ?? null;
 
