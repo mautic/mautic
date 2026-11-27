@@ -1,8 +1,6 @@
 <?php
 
-if (!isset($root)) {
-    $root = __DIR__;
-}
+$root ??= __DIR__;
 
 $paths = [
     // customizable

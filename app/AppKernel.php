@@ -303,7 +303,7 @@ class AppKernel extends Kernel
     public function getCacheDir(): string
     {
         if ($cachePath = $this->getParameterLoader()->getLocalParameterBag()->get('cache_path')) {
-            $envFolder = ('/' != substr($cachePath, -1)) ? '/'.$this->environment : $this->environment;
+            $envFolder = (! str_ends_with($cachePath, '/')) ? '/'.$this->environment : $this->environment;
 
             return str_replace('%kernel.project_dir%', $this->getProjectDir(), $cachePath.$envFolder);
         }
