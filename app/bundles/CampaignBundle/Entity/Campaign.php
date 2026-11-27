@@ -133,7 +133,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     private Collection $forms;
 
     #[Groups(['campaign:read', 'campaign:write'])]
-    private array $canvasSettings = [];
+    private ?array $canvasSettings = [];
 
     #[Groups(['campaign:read', 'campaign:write'])]
     private bool $allowRestart = false;
@@ -614,7 +614,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      */
     public function getCanvasSettings(): array
     {
-        return $this->canvasSettings;
+        return $this->canvasSettings ?? [];
     }
 
     public function setCanvasSettings(array $canvasSettings): void
