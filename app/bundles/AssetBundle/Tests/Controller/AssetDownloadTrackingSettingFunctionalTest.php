@@ -6,6 +6,7 @@ namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -122,7 +123,9 @@ final class AssetDownloadTrackingSettingFunctionalTest extends MauticMysqlTestCa
 
     private function createAsset(): Asset
     {
-        $asset = new Asset();
+        // Through the model, so a new asset starts from the global setting like it does in the app
+        $asset = self::getContainer()->get(AssetModel::class)->getEntity();
+        $this->assertInstanceOf(Asset::class, $asset);
         $asset->setTitle('Tracked asset');
         $asset->setAlias('tracked-asset');
         $asset->setStorageLocation('remote');
