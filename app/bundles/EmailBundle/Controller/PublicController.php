@@ -150,7 +150,6 @@ final class PublicController extends CommonFormController
             return TrackingPixelHelper::getResponse($request);
         }
 
-    
         if ($recorder->isEnabled()) {
             $stat = $this->emailModel->getEmailStatus($idHash);
 
