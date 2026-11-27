@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\EventListener;
 
-use Mautic\ApiBundle\Entity\Client;
+use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Event\EntityPostDelete;
 use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
