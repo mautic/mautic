@@ -9,9 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\ListLead;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class LeadListRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     public function testCheckLeadSegmentsByIds(): void

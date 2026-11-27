@@ -19,9 +19,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class CampaignModelFunctionalTest extends MauticMysqlTestCase
 {
     /**

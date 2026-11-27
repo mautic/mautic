@@ -16,10 +16,8 @@ use Mautic\LeadBundle\LeadEvents;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[Group('non-parallel')]
 final class EventExecutionerLockTest extends MauticMysqlTestCase
 {
     /**

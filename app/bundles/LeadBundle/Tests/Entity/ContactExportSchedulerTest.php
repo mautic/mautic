@@ -7,9 +7,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class ContactExportSchedulerTest extends MauticMysqlTestCase
 {
     private string $previousTimeZone;

@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-#[Group('non-parallel')]
 final class ConfigSubscriberTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

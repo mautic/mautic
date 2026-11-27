@@ -8,9 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class CompanyModelFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

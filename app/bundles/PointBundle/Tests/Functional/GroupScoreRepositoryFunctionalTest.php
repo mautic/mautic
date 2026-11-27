@@ -10,7 +10,6 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 
-#[\PHPUnit\Framework\Attributes\Group('non-parallel')]
 final class GroupScoreRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private GroupContactScoreRepository $repository;

@@ -19,13 +19,11 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[Group('non-parallel')]
 final class ListControllerFunctionalTest extends MauticMysqlTestCase
 {
     private ListModel $listModel;

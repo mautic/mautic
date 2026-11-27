@@ -8,9 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\TagModel;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class TagModelFunctionalTest extends MauticMysqlTestCase
 {
     public function testDeleteOrphanTags(): void

@@ -10,9 +10,7 @@ use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
 {
     /**

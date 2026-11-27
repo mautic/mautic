@@ -42,7 +42,6 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\PHPUnit\Framework\Attributes\Group('non-parallel')]
 final class AjaxControllerTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;

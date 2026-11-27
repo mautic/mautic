@@ -11,9 +11,7 @@ use Mautic\CampaignBundle\Tests\CampaignAuditLogTrait;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class PublishStateServiceTest extends MauticMysqlTestCase
 {
     use CampaignAuditLogTrait;

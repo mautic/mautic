@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
-#[Group('non-parallel')]
 final class LeadCompanyControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

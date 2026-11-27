@@ -13,7 +13,6 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\PointInsight;
 use Mautic\PointBundle\Model\PointGroupModel;
 
-#[\PHPUnit\Framework\Attributes\Group('non-parallel')]
 final class PointInsightsFunctionalTest extends MauticMysqlTestCase
 {
     private const string GROUP_A_SUFFIX = ' (Group A)';

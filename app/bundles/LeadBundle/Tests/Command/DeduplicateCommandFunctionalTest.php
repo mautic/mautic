@@ -12,9 +12,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

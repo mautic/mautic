@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Frequency rules are configured by the "email_frequency_number" config parameter, which is read
@@ -22,7 +21,6 @@ use PHPUnit\Framework\Attributes\Group;
  * MauticMysqlTestCase forbids re-creating the client while transaction rollback cleanup
  * is active, so we fall back to resetDatabase() for cleanup instead.
  */
-#[Group('non-parallel')]
 final class EmailModelFrequencyRuleFunctionalTest extends MauticMysqlTestCase
 {
     private const int EMAILS_A_MONTH = 2;

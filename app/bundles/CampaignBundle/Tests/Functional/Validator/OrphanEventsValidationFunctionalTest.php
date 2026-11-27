@@ -10,9 +10,7 @@ use Mautic\CampaignBundle\Tests\Functional\Controller\CampaignControllerTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
 {
     use CampaignControllerTrait;

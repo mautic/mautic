@@ -8,9 +8,7 @@ use Mautic\CampaignBundle\Command\SummarizeCommand;
 use Mautic\CampaignBundle\Entity\Summary;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class SummarizeCommandTest extends AbstractCampaignTestCase
 {
     /**

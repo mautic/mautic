@@ -26,11 +26,9 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[Group('non-parallel')]
 final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait {

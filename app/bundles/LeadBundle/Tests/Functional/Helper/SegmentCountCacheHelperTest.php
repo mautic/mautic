@@ -6,9 +6,7 @@ namespace Mautic\LeadBundle\Tests\Functional\Helper;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class SegmentCountCacheHelperTest extends MauticMysqlTestCase
 {
     private const int SEGMENT_ID = 1;

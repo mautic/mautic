@@ -14,9 +14,7 @@ use Mautic\CampaignBundle\Tests\Command\AbstractCampaignCommand;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class ScheduledExecutionerExtendTriggerDateTest extends AbstractCampaignCommand
 {
     use CampaignAuditLogTrait;

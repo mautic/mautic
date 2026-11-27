@@ -9,11 +9,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-#[Group('non-parallel')]
 final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

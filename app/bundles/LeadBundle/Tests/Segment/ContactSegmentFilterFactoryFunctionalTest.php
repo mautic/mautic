@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
@@ -19,7 +18,6 @@ use Symfony\Component\Console\Tester\ApplicationTester;
  *
  * @see \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory
  */
-#[Group('non-parallel')]
 final class ContactSegmentFilterFactoryFunctionalTest extends MauticMysqlTestCase
 {
     /**

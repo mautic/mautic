@@ -7,10 +7,8 @@ namespace Mautic\LeadBundle\Tests\Form\Type;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 
-#[Group('non-parallel')]
 final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
 {
     private const string TEMP_CAMPAIGN_ID = 'mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775';

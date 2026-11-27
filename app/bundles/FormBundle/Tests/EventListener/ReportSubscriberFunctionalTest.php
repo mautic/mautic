@@ -7,12 +7,10 @@ namespace Mautic\FormBundle\Tests\EventListener;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Tests\Functional\AbstractReportSubscriberTestCase;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[Group('non-parallel')]
 final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 {
     public function testLeadReportWithDncListColumn(): void

@@ -7,10 +7,8 @@ namespace Mautic\LeadBundle\Tests\Functional;
 use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
-#[Group('non-parallel')]
 final class DncSearchFunctionalTest extends MauticMysqlTestCase
 {
     private const string MESSAGE_EMAIL_DNC_SHOULD_APPEAR_IN_EMAIL_SEARCH = 'Contact with email DNC should appear in dnc:email search';

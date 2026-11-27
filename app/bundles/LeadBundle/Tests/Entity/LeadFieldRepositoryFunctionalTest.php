@@ -10,9 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private const string ADMINISTRATOR_VALUE = "administrator's";

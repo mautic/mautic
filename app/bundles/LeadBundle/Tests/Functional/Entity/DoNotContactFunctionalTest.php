@@ -10,9 +10,7 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class DoNotContactFunctionalTest extends MauticMysqlTestCase
 {
     public function testGetCount(): void

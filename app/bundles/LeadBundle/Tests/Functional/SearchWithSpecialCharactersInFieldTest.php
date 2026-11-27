@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional;
 
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 
-#[Group('non-parallel')]
 final class SearchWithSpecialCharactersInFieldTest extends AbstractSearchTestCase
 {
     public function testGlobalSearchContactWithSpecialCharacterInName(): void

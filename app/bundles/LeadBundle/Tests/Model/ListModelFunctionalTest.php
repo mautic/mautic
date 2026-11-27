@@ -14,9 +14,7 @@ use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class ListModelFunctionalTest extends MauticMysqlTestCase
 {
     public function testPublicSegmentsInContactPreferences(): void

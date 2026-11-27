@@ -6,11 +6,9 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[Group('non-parallel')]
 final class NotFoundFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

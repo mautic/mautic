@@ -10,9 +10,7 @@ use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class WebhookModelTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

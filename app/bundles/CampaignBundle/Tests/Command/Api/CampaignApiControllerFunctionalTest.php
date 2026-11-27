@@ -11,10 +11,8 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
-#[Group('non-parallel')]
 final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     #[DataProvider('withContactCountsProvider')]

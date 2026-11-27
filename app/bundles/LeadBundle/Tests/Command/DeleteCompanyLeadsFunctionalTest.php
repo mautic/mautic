@@ -11,9 +11,7 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('non-parallel')]
 final class DeleteCompanyLeadsFunctionalTest extends MauticMysqlTestCase
 {
     use TestEntityCreationTrait;
