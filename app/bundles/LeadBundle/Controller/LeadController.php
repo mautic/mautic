@@ -2268,9 +2268,9 @@ final class LeadController extends FormController
             'withTotalCount' => true,
         ];
 
-        // First, get the total count without creating the iterator
-        $totalContacts      = $this->leadModel->getEntities($args)['count'];
-        $contactExportLimit = $this->coreParametersHelper->get('contact_export_limit', 0);
+        $contactExportLimit = (int) $this->coreParametersHelper->get('contact_export_limit', 0);
+        // Only count when a limit is configured
+        $totalContacts = $contactExportLimit > 0 ? $this->leadModel->getExportCount($args) : 0;
         // Check if export limit is exceeded
         if ($contactExportLimit > 0 && $totalContacts > $contactExportLimit) {
             $messageVars = [
@@ -2291,7 +2291,9 @@ final class LeadController extends FormController
         $iterator = new IteratorExportDataModel(
             $this->leadModel,
             $args,
-            fn (Lead $contact): array => $exportHelper->parseLeadToExport($contact)
+            fn (array $contact): array => $contact,
+            false,
+            $this->leadModel->getExportRows(...)
         );
         $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
 

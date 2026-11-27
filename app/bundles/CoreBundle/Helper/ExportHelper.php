@@ -223,6 +223,8 @@ class ExportHelper
 
     /**
      * @return array<string, string>
+     *
+     * @deprecated since Mautic 7.2, will be removed in 8.0. Use LeadModel::getExportRows() instead.
      */
     public function parseLeadToExport(Lead $lead): array
     {

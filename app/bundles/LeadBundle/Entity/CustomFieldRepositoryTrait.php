@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
@@ -26,44 +27,16 @@ trait CustomFieldRepositoryTrait
 
     /**
      * @param string $object
-     * @param array  $args
      */
-    public function getEntitiesWithCustomFields($object, $args, $resultsCallback = null)
+    public function getEntitiesWithCustomFields($object, array $args, $resultsCallback = null)
     {
         $skipOrdering           = $args['skipOrdering'] ?? false;
         [$fields, $fixedFields] = $this->getCustomFieldList($object);
-
-        // Fix arguments if necessary
-        $args = $this->convertOrmProperties($this->getClassName(), $args);
-
-        // DBAL
-        /** @var QueryBuilder $dq */
-        $dq = $args['qb'] ?? $this->getEntitiesDbalQueryBuilder();
-
-        // Generate where clause first to know if we need to use distinct on primary ID or not
-        $this->useDistinctCount = false;
-        $this->buildWhereClause($dq, $args);
-        $groupBy = $dq->getQueryPart('groupBy');
+        [$dq, $args]            = $this->buildCustomFieldQuery($args);
+        $groupBy                = $dq->getQueryPart('groupBy');
 
         if (!empty($args['withTotalCount']) || !isset($args['count'])) {
-            // Distinct is required here to get the correct count when group by is used due to applied filters
-            $countSelect = !empty($groupBy) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
-            $dq->select($countSelect.' as count');
-
-            // Advanced search filters may have set a group by and if so, let's remove it for the count.
-            if ($groupBy) {
-                $dq->resetQueryPart('groupBy');
-            }
-
-            // get a total count
-            if (!empty($args['totalCountTtl'])) {
-                $statement = ResultCacheHelper::executeCachedDbalQuery($this->getEntityManager()->getConnection(), $dq, new ResultCacheOptions($object.'-total-count', $args['totalCountTtl']));
-            } else {
-                $statement = $dq->executeQuery();
-            }
-
-            $result = $statement->fetchAllAssociative();
-            $total  = ($result) ? $result[0]['count'] : 0;
+            $total = $this->countCustomFieldQuery($dq, $object, $args);
         } else {
             $total = $args['count'];
         }
@@ -175,6 +148,87 @@ trait CustomFieldRepositoryTrait
                 'count'   => $total,
                 'results' => $results,
             ] : $results;
+    }
+
+    /**
+     * Field values as plain arrays rather than hydrated entities, applying the filter, orderBy and start/limit args.
+     *
+     * @param mixed[] $args
+     *
+     * @return array<int, array<string, mixed>> keyed by id
+     */
+    public function getFieldValueRowsWithCustomFields(string $object, array $args): array
+    {
+        [$fields, $fixedFields] = $this->getCustomFieldList($object);
+        [$dq, $args]            = $this->buildCustomFieldQuery($args);
+
+        $this->buildOrderByClause($dq, $args);
+        $this->buildLimiterClauses($dq, $args);
+
+        $dq->resetQueryPart('select');
+        $this->buildSelectClause($dq, $args);
+
+        return $this->fetchFieldValueRows($dq->executeQuery(), $fields, $fixedFields);
+    }
+
+    /**
+     * @param mixed[] $args
+     */
+    public function getCountWithCustomFields(string $object, array $args): int
+    {
+        [$dq, $args] = $this->buildCustomFieldQuery($args);
+
+        return (int) $this->countCustomFieldQuery($dq, $object, $args);
+    }
+
+    /**
+     * @param mixed[] $args
+     *
+     * @return array{0: QueryBuilder, 1: mixed[]} the filtered query and the args converted to DBAL columns
+     */
+    private function buildCustomFieldQuery(array $args): array
+    {
+        $args = $this->convertOrmProperties($this->getClassName(), $args);
+
+        /** @var QueryBuilder $dq */
+        $dq = $args['qb'] ?? $this->getEntitiesDbalQueryBuilder();
+
+        // Generate where clause first to know if we need to use distinct on primary ID or not
+        $this->useDistinctCount = false;
+        $this->buildWhereClause($dq, $args);
+
+        return [$dq, $args];
+    }
+
+    /**
+     * Replaces the select with a count and drops any group by, so callers reusing the query must restore its group by.
+     *
+     * @param mixed[] $args
+     *
+     * @return int|string
+     */
+    private function countCustomFieldQuery(QueryBuilder $dq, string $object, array $args)
+    {
+        $groupBy = $dq->getQueryPart('groupBy');
+
+        // Distinct is required here to get the correct count when group by is used due to applied filters
+        $countSelect = !empty($groupBy) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
+        $dq->select($countSelect.' as count');
+
+        // Advanced search filters may have set a group by and if so, let's remove it for the count.
+        if ($groupBy) {
+            $dq->resetQueryPart('groupBy');
+        }
+
+        if (!empty($args['totalCountTtl'])) {
+            $statement = ResultCacheHelper::executeCachedDbalQuery($this->getEntityManager()->getConnection(), $dq, new ResultCacheOptions($object.'-total-count', $args['totalCountTtl']));
+        } else {
+            $statement = $dq->executeQuery();
+        }
+
+        $result = $statement->fetchAllAssociative();
+
+        return ($result) ? $result[0]['count'] : 0;
     }
 
     /**
@@ -301,6 +355,35 @@ trait CustomFieldRepositoryTrait
             }
         }
         unset($r['owner_id']);
+    }
+
+    /**
+     * Columns match getProfileFields(): int id, then field values grouped in first-seen order.
+     *
+     * @param array<string, array<string, mixed>> $fields
+     * @param array<string, string>               $fixedFields
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function fetchFieldValueRows(Result $result, array $fields, array $fixedFields): array
+    {
+        $rows = [];
+
+        while (false !== ($row = $result->fetchAssociative())) {
+            $id = (int) $row['id'];
+            $this->removeNonFieldColumns($row, $fixedFields);
+
+            $grouped = [];
+            foreach ($row as $column => $value) {
+                if (isset($fields[$column])) {
+                    $grouped[$fields[$column]['group']][$fields[$column]['alias']] = $value;
+                }
+            }
+
+            $rows[$id] = array_merge(['id' => $id], ...array_values($grouped));
+        }
+
+        return $rows;
     }
 
     protected function formatFieldValues(array $values, bool $byGroup = true, string $object = 'lead'): array

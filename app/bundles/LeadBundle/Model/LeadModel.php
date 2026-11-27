@@ -355,6 +355,34 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Stored contacts matching the filter, orderBy and start/limit args as plain export rows; merged-away ids are not resolved.
+     *
+     * @param array<mixed> $args
+     *
+     * @return array<int, array<string, mixed>> keyed by contact id
+     */
+    public function getExportRows(array $args): array
+    {
+        $repository = $this->getRepository();
+        $repository->setCurrentUser($this->userHelper->getUser());
+
+        return $repository->getExportRows($args);
+    }
+
+    /**
+     * Number of stored contacts matching the filter args; merged-away ids are not resolved.
+     *
+     * @param array<mixed> $args
+     */
+    public function getExportCount(array $args): int
+    {
+        $repository = $this->getRepository();
+        $repository->setCurrentUser($this->userHelper->getUser());
+
+        return $repository->getExportCount($args);
+    }
+
+    /**
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event

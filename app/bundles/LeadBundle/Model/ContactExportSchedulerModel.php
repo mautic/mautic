@@ -139,12 +139,13 @@ final class ContactExportSchedulerModel extends AbstractCommonModel
     {
         $data            = $contactExportScheduler->getData();
         $fileType        = $data['fileType'];
-        $resultsCallback = fn ($contact) => $contact->getProfileFields();
+        $resultsCallback = fn (array $contact) => $contact;
         $iterator        = new IteratorExportDataModel(
             $this->leadModel,
-            $contactExportScheduler->getData(),
+            $data,
             $resultsCallback,
-            true
+            true,
+            $this->leadModel->getExportRows(...)
         );
         /** @var \DateTimeImmutable $scheduledDateTime */
         $scheduledDateTime = $contactExportScheduler->getScheduledDateTime();

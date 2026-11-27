@@ -565,6 +565,53 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return $contacts;
     }
 
+    /**
+     * Stored contacts as export rows: id, field values in profile-field order, then stage name.
+     *
+     * @param mixed[] $args
+     *
+     * @return array<int, array<string, mixed>> keyed by contact id
+     */
+    public function getExportRows(array $args): array
+    {
+        $rows = $this->getFieldValueRowsWithCustomFields('lead', $args);
+        if (!$rows) {
+            return [];
+        }
+
+        $stageNames = $this->getStageNamesForContacts(array_keys($rows));
+        foreach ($rows as $id => $row) {
+            $rows[$id]['stage'] = $stageNames[$id] ?? null;
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param mixed[] $args
+     */
+    public function getExportCount(array $args): int
+    {
+        return $this->getCountWithCustomFields('lead', $args);
+    }
+
+    /**
+     * @param array<int|string> $contactIds
+     *
+     * @return array<int, string>
+     */
+    private function getStageNamesForContacts(array $contactIds): array
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('l.id, s.name')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->innerJoin('l', MAUTIC_TABLE_PREFIX.'stages', 's', 's.id = l.stage_id')
+            ->where($q->expr()->in('l.id', ':contactIds'))
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER);
+
+        return $q->executeQuery()->fetchAllKeyValue();
+    }
+
     public function getFieldGroups(): array
     {
         return ['core', 'social', 'personal', 'professional'];

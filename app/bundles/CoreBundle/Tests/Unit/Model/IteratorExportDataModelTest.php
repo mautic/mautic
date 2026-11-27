@@ -44,6 +44,49 @@ final class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(1, $this->iteratorExportDataModel->key());
     }
 
+    public function testIteratesEveryRowOnceAcrossBatches(): void
+    {
+        $this->commonModel->expects($this->exactly(3))
+            ->method('getEntities')
+            ->willReturnCallback(fn (array $args): array => match ($args['start']) {
+                0       => ['results' => [1 => ['id' => 1], 2 => ['id' => 2]]],
+                2       => ['results' => [3 => ['id' => 3]]],
+                default => ['results' => []],
+            });
+
+        $commonRepository = $this->createMock(CommonRepository::class);
+        $this->commonModel->method('getRepository')->willReturn($commonRepository);
+
+        // Array rows are not entities, so nothing is detached
+        $commonRepository->expects($this->exactly(2))
+            ->method('detachEntities')
+            ->with([]);
+
+        $this->assertSame([['id' => '1'], ['id' => '2'], ['id' => '3']], iterator_to_array($this->iteratorExportDataModel, false));
+        $this->assertSame(3, $this->iteratorExportDataModel->getTotal());
+    }
+
+    public function testFetcherSuppliesEachPageInPlaceOfGetEntities(): void
+    {
+        $this->commonModel->expects($this->never())->method('getEntities');
+        $this->commonModel->method('getRepository')->willReturn($this->createStub(CommonRepository::class));
+
+        $requestedStarts = [];
+        $fetcher         = function (array $args) use (&$requestedStarts): array {
+            $requestedStarts[] = $args['start'];
+
+            return match ($args['start']) {
+                0       => [1 => ['id' => 1], 2 => ['id' => 2]],
+                default => [],
+            };
+        };
+
+        $iterator = new IteratorExportDataModel($this->commonModel, ['limit' => 1000], fn ($row) => $row, false, $fetcher);
+
+        $this->assertSame([['id' => '1'], ['id' => '2']], iterator_to_array($iterator, false));
+        $this->assertSame([0, 2], $requestedStarts);
+    }
+
     public function testWorkflowWithoutItems(): void
     {
         $this->commonModel->expects($this->once())

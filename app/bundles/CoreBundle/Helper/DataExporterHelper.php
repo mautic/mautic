@@ -11,8 +11,9 @@ final class DataExporterHelper
      *
      * Overwrite in your controller if required.
      *
-     * @param int|null               $start
-     * @param AbstractCommonModel<T> $model
+     * @param int|null                               $start
+     * @param AbstractCommonModel<T>                 $model
+     * @param (callable(array<mixed>): mixed[])|null $fetcher returns the items for one page of args; defaults to the model's getEntities() results
      *
      * @template T of object
      *
@@ -24,17 +25,16 @@ final class DataExporterHelper
         array $args,
         ?callable $resultsCallback = null,
         bool $skipOrdering = false,
+        ?callable $fetcher = null,
     ): ?array {
         $args['limit']        = max($args['limit'], 200);
         $args['start']        = $start;
         $args['skipOrdering'] = $skipOrdering;
 
-        $results = $model->getEntities($args);
-        $items   = $results['results'];
+        $items = null !== $fetcher ? $fetcher($args) : $model->getEntities($args)['results'];
         if (0 === count($items)) {
             return null;
         }
-        unset($results);
 
         $toExport = [];
 
@@ -52,7 +52,7 @@ final class DataExporterHelper
             }
         }
 
-        $model->getRepository()->detachEntities($items);
+        $model->getRepository()->detachEntities(array_filter($items, is_object(...)));
 
         return $toExport;
     }
