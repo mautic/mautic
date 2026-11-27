@@ -1668,7 +1668,9 @@ class CommonRepository extends ServiceEntityRepository
                         break;
                     case 'in':
                     case 'notIn':
-                        $parsed = CsvHelper::strGetCsv(html_entity_decode($clause['val']), ',', '"');
+                        $parsed = is_array($clause['val']) ?
+                                $clause['val'] :
+                                CsvHelper::strGetCsv(html_entity_decode($clause['val']), ',', '"');
 
                         $param = $this->generateRandomParameterName();
                         $arg   = count($parsed) > 1 ? $parsed : array_shift($parsed);

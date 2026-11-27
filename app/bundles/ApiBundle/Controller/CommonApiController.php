@@ -456,6 +456,7 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Processes API Form.
      *
+     * @param object            $entity
      * @param array<mixed>|null $parameters
      * @param string            $method
      *

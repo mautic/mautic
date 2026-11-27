@@ -289,6 +289,7 @@ final class PublicController extends AbstractFormController
             );
 
             $event = new PageDisplayEvent((string) $content, $entity);
+            $event->setIsPreview(false);
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
             $content = $event->getContent();
 
@@ -380,6 +381,7 @@ final class PublicController extends AbstractFormController
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
             $event = new PageDisplayEvent($content, $page, $this->getPreferenceCenterConfig());
+            $event->setIsPreview(true);
             if (isset($contact) && $contact instanceof Lead) {
                 $event->setLead($contact);
             }
