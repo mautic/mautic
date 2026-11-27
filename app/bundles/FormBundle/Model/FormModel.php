@@ -658,6 +658,11 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         return $customComponents;
     }
 
+    public function isFieldTypeRegistered(string $type): bool
+    {
+        return 'button' === $type || isset($this->fieldHelper->getTypes()[$type]);
+    }
+
     /**
      * Get the document write javascript for the form.
      */
