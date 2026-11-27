@@ -18,8 +18,8 @@ final class Version20261117155532 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            fn (Schema $schema): bool => $schema->getTable($this->getPrefixedTableName())->hasIndex(self::INDEX_NAME),
-            'Index '.self::INDEX_NAME.' already exists'
+            fn (Schema $schema): bool => $schema->getTable($this->getPrefixedTableName())->hasIndex($this->getIndexName()),
+            'Index '.$this->getIndexName().' already exists'
         );
     }
 
@@ -40,6 +40,16 @@ final class Version20261117155532 extends PreUpAssertionMigration
      */
     public function up(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' ADD INDEX '.self::INDEX_NAME.' (redirect_id), ALGORITHM=INPLACE, LOCK=NONE');
+        $this->addSql("ALTER TABLE {$this->getPrefixedTableName()} ADD INDEX {$this->getIndexName()} (redirect_id), ALGORITHM=INPLACE, LOCK=NONE");
+    }
+
+    /**
+     * Returns the index name with the table prefix.
+     *
+     * @return string the prefixed index name
+     */
+    private function getIndexName(): string
+    {
+        return $this->prefix.self::INDEX_NAME;
     }
 }
