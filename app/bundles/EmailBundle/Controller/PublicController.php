@@ -162,7 +162,6 @@ final class PublicController extends CommonFormController
 
     public function scannerCheckAction(Request $request, ScannerDiagnosticsRecorder $recorder, string $idHash): Response
     {
-    
         $stat = $recorder->isEnabled() ? $this->emailModel->getEmailStatus($idHash) : null;
 
         if ($stat instanceof Stat) {
