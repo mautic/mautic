@@ -439,8 +439,8 @@ final class EmailType extends AbstractType
                 /** @var Email $emailEntity */
                 $emailEntity     = $event->getData();
                 $variantChildren = $emailEntity->getVariantChildren();
-                $isParent        = $variantChildren && count($variantChildren) > 0 || $event->getData()->isNew();
-                $isExisting      = $event->getData()->getId() > 0;
+                $isParent        = $variantChildren && count($variantChildren) > 0 || $emailEntity->isNew();
+                $isExisting      = $emailEntity->getId() > 0;
                 $variantSettingsModifier($event, $isParent, $isExisting, $getDefaultWeight($emailEntity), $emailEntity->getVariantSettings());
             }
         );
@@ -456,7 +456,7 @@ final class EmailType extends AbstractType
                 $variantChildren = $emailEntity->getVariantChildren();
                 $isParent        = $variantChildren && count($variantChildren) > 0;
 
-                $variantSettingsModifier($event, $isParent, false, $getDefaultWeight($emailEntity), $data['variantSettings'] ?? []);
+                $variantSettingsModifier($event, $isParent, false, $getDefaultWeight($emailEntity), $emailEntity->getVariantSettings());
 
                 $emailType = $data['emailType'] ?? null;
 

@@ -127,6 +127,12 @@ class AbTestSettingsService
             $weight = (int) floor(100 / (count($parentVariant->getVariantChildren()) + 1));
         }
 
+        if ($weight < 0) {
+            // a negative explicit weight is invalid, so reject it before it reduces the published total
+            $this->configurationError = true;
+            $weight                   = 0;
+        }
+
         $this->setVariantSettingsWeight($variant, $weight);
 
         if ($this->setCriteriaFromVariants && array_key_exists('winnerCriteria', $variantsSettings)) {

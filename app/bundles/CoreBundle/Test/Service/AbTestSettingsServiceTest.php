@@ -100,6 +100,31 @@ final class AbTestSettingsServiceTest extends TestCase
         $this->assertSame(45, $settings['variants'][1]['weight']);
     }
 
+    public function testGetAbTestSettingsRejectsNegativeExplicitWeights(): void
+    {
+        $service = new AbTestSettingsService();
+        $parent  = $this->getMockBuilder(Email::class)->onlyMethods(['getId'])->getMock();
+        $parent->method('getId')->willReturn(1);
+        $parent->setVariantSettings(['totalWeight' => 100]);
+        $parent->setIsPublished(true);
+
+        foreach ([2 => ['weight' => -10], 3 => ['weight' => 30]] as $id => $settings) {
+            $variant = $this->getMockBuilder(Email::class)->onlyMethods(['getId'])->getMock();
+            $variant->method('getId')->willReturn($id);
+            $variant->setIsPublished(true);
+            $variant->setVariantParent($parent);
+            $variant->setVariantSettings($settings);
+            $parent->addVariantChild($variant);
+        }
+
+        $settings = $service->getAbTestSettings($parent);
+
+        $this->assertTrue($settings['configurationError']);
+        $this->assertSame(0, $settings['variants'][2]['weight']);
+        $this->assertSame(30, $settings['variants'][3]['weight']);
+        $this->assertSame(70, $settings['variants'][1]['weight']);
+    }
+
     public function testGetAbTestSettingsRoundedWeightsStayWithinTotal(): void
     {
         $service = new AbTestSettingsService();
