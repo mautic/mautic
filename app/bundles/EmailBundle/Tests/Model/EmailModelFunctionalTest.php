@@ -222,6 +222,33 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(10, $sentCount);
     }
 
+    /**
+     * Checks that a run with a limit and a batch size stops at the limit when the email goes to two segments.
+     */
+    public function testSendEmailToListsKeepsTheLimitAcrossSegments(): void
+    {
+        $contacts = $this->generateContacts(30);
+        $segmentA = $this->createSegment();
+        $this->addContactsToSegment(array_slice($contacts, 0, 15), $segmentA);
+
+        $segmentB = new LeadList();
+        $segmentB->setName('Segment B');
+        $segmentB->setPublicName('Segment B');
+        $segmentB->setAlias('segment-b');
+        $this->em->persist($segmentB);
+        $this->em->flush();
+        $this->addContactsToSegment(array_slice($contacts, 15), $segmentB);
+
+        $email = $this->createEmail($segmentA);
+        $email->addList($segmentB);
+        $this->em->flush();
+
+        [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segmentA, $segmentB], 10, 10);
+
+        $this->assertSame(10, $sentCount);
+        $this->assertSame(10, $this->em->getRepository(Stat::class)->count(['email' => $email]));
+    }
+
     public function testSendEmailToListsWithContinueSendingFalse(): void
     {
         $contacts = $this->generateContacts(5);
