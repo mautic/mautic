@@ -21,6 +21,7 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\SMimeHelper;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
@@ -1249,6 +1250,45 @@ final class MailHelperTest extends TestCase
         }
     }
 
+    public function testImagesAreEmbeddedAgainAfterTheMailerIsReset(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(5))->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_convert_embed_images', null, true],
+                    ['mailer_from_name', null, 'Test'],
+                    ['secret_key', null, 'secret'],
+                    ['site_url', null, 'https://mautic.url'],
+                ]
+            );
+
+        $this->router->method('generate')->willReturn('http://tracking.url');
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+
+        // We should use a local image to avoid network requests.
+        $sampleImagePath = __DIR__.'/../../../../assets/images/avatar.png';
+
+        // Simulate two batches sent by the same long-running process.
+        foreach ([$this->contacts[0], $this->contacts[1]] as $contact) {
+            $email = new Email();
+            $email->setSubject('Test');
+            $email->setCustomHtml('<img src="'.$sampleImagePath.'">');
+
+            $mailer->reset(true);
+            $mailer->setEmail($email);
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->send();
+
+            $message = $transport->getMessage();
+            $this->assertInstanceOf(MauticMessage::class, $message);
+            $this->assertCount(1, $message->getAttachments(), 'The image must be embedded in every message.');
+            $this->assertStringContainsString('src="cid:'.md5($sampleImagePath).'.png"', (string) $message->getHtmlBody());
+        }
+    }
+
     public function testThatWeDontEmbedAlreadyEmbeddedImages(): void
     {
         $this->coreParametersHelper->expects($this->atLeast(6))->method('get')
@@ -1285,6 +1325,101 @@ final class MailHelperTest extends TestCase
         $body = $transport->getMessage()->getHtmlBody();
 
         $this->assertSame('<img src="cid:abcdefg"><img height="1" width="1" src="{tracking_pixel}" alt="" />', $body);
+    }
+
+    public function testLocalImagesWithQueryStringOrEncodedCharactersAreEmbedded(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(5))->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_convert_embed_images', null, true],
+                    ['mailer_from_name', null, 'Test'],
+                    ['secret_key', null, 'secret'],
+                    ['site_url', null, 'https://mautic.url'],
+                ]
+            );
+
+        $rootPath = sys_get_temp_dir().'/mautic-embed-'.bin2hex(random_bytes(4));
+        mkdir($rootPath.'/media/images', 0777, true);
+        $sampleImagePath = __DIR__.'/../../../../assets/images/avatar.png';
+        copy($sampleImagePath, $rootPath.'/media/images/My File.png');
+        copy($sampleImagePath, $rootPath.'/media/images/logo.png');
+        $this->pathsHelper->method('getRootPath')->willReturn($rootPath);
+
+        $this->router->method('generate')->willReturn('http://tracking.url');
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+
+        $encodedUrl    = 'https://mautic.url/media/images/My%20File.png';
+        $cacheBusted   = 'https://mautic.url/media/images/logo.png?v1a2b3c4d#top';
+        $email         = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<img src="'.$encodedUrl.'"> <img src="'.$cacheBusted.'">');
+
+        try {
+            $mailer->setEmail($email);
+            $mailer->addTo($this->contacts[0]['email']);
+            $mailer->setLead($this->contacts[0]);
+            $mailer->send();
+        } finally {
+            unlink($rootPath.'/media/images/My File.png');
+            unlink($rootPath.'/media/images/logo.png');
+            rmdir($rootPath.'/media/images');
+            rmdir($rootPath.'/media');
+            rmdir($rootPath);
+        }
+
+        $message = $transport->getMessage();
+        $body    = (string) $message->getHtmlBody();
+        $this->assertCount(2, $message->getAttachments());
+        $this->assertStringContainsString('src="cid:'.md5($encodedUrl).'.png"', $body);
+        $this->assertStringContainsString('src="cid:'.md5($cacheBusted).'.png"', $body);
+    }
+
+    public function testLocalUrlsWithNullByteOrNonImageContentAreNotEmbedded(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(5))->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_convert_embed_images', null, true],
+                    ['mailer_from_name', null, 'Test'],
+                    ['secret_key', null, 'secret'],
+                    ['site_url', null, 'https://mautic.url'],
+                ]
+            );
+
+        $rootPath = sys_get_temp_dir().'/mautic-embed-'.bin2hex(random_bytes(4));
+        mkdir($rootPath);
+        file_put_contents($rootPath.'/thumbnail.php', '<?php echo "not an image";');
+        $this->pathsHelper->method('getRootPath')->willReturn($rootPath);
+
+        $this->router->method('generate')->willReturn('http://tracking.url');
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+
+        $nullByteUrl = 'https://mautic.url/media/images/a%00.png';
+        $scriptUrl   = 'https://mautic.url/thumbnail.php?id=42';
+        $email       = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<img src="'.$nullByteUrl.'"> <img src="'.$scriptUrl.'">');
+
+        try {
+            $mailer->setEmail($email);
+            $mailer->addTo($this->contacts[0]['email']);
+            $mailer->setLead($this->contacts[0]);
+            $mailer->send();
+        } finally {
+            unlink($rootPath.'/thumbnail.php');
+            rmdir($rootPath);
+        }
+
+        $message = $transport->getMessage();
+        $body    = (string) $message->getHtmlBody();
+        $this->assertCount(0, $message->getAttachments());
+        $this->assertStringContainsString('src="'.$nullByteUrl.'"', $body);
+        $this->assertStringContainsString('src="'.$scriptUrl.'"', $body);
     }
 
     public function testAddToWithLongAddress(): void
@@ -1554,8 +1689,13 @@ final class MailHelperTest extends TestCase
         $this->assertSame($trackedHtml, $mailer->getBody());
         $mailer->send(true);
 
-        $this->assertMatchesRegularExpression('#^Text <a href="https://mautic\.com">Mautic</a> <img src="cid:abc" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79"/> <img src="https://mautic\.com/fake\.jpg">\{unsubscribe_url\}<img height="1" width="1" src="/tracking\.gif\?ct=[A-Za-z0-9%]+" alt="" />$#', $mailer->message->getHtmlBody());
+        $this->assertMatchesRegularExpression('#^Text <a href="https://mautic\.com">Mautic</a> <img src="cid:abc" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79\.png" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79\.png"/> <img src="https://mautic\.com/fake\.jpg">\{unsubscribe_url\}<img height="1" width="1" src="/tracking\.gif\?ct=[A-Za-z0-9%]+" alt="" />$#', $mailer->message->getHtmlBody());
         $this->assertSame($trackedHtml, $mailer->getBody());
+
+        $attachments = $mailer->message->getAttachments();
+        $this->assertCount(1, $attachments);
+        $this->assertSame('image/png', $attachments[0]->getContentType());
+        $this->assertSame('2cb7cfd2ffccfbbbaf0e4d8891df2d79.png', $attachments[0]->getFilename());
     }
 
     public function testEmailWithDefaultSignature(): void
