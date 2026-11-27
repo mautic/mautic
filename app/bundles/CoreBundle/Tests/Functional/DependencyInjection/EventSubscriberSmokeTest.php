@@ -221,6 +221,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\ChannelBundle\EventListener\MessageSubscriber::class,
             \Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber::class,
             \Mautic\EmailBundle\EventListener\EmailSubscriber::class,
+            \Mautic\FormBundle\EventListener\CustomFieldSubscriber::class,
             \Mautic\FormBundle\EventListener\FormConditionalSubscriber::class,
             \Mautic\FormBundle\EventListener\FormSubscriber::class,
             \Mautic\IntegrationsBundle\EventListener\LeadSubscriber::class,
@@ -249,6 +250,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\CategoryBundle\EventListener\CategorySubscriber::class,
             \Mautic\EmailBundle\EventListener\EmailSubscriber::class,
             \Mautic\LeadBundle\EventListener\LeadSubscriber::class,
+            \Mautic\LeadBundle\Field\EventListener\LeadFieldSubscriber::class,
             \Mautic\PluginBundle\EventListener\LeadSubscriber::class,
         ],
         EntityPostDelete::class => [
