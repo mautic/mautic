@@ -58,6 +58,9 @@ final class AssetMapperWebRootPassTest extends TestCase
     #[RunInSeparateProcess]
     public function testLocalConfigurationOverridesPathsAndUsesCustomPublicPrefix(): void
     {
+        // the fixture writes its own config/local.php, so ignore the paratest per-worker override
+        putenv('MAUTIC_LOCAL_CONFIG_FILE');
+
         $applicationDir = $this->createRecommendedProject();
         $pathsRoot      = $this->projectDir.'/paths-root';
         $localRoot      = $this->projectDir.'/local-root';

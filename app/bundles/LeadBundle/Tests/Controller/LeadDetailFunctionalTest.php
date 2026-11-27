@@ -12,10 +12,12 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('non-parallel')]
 final class LeadDetailFunctionalTest extends MauticMysqlTestCase
 {
     public function testCustomFieldOrderIsRespected(): void

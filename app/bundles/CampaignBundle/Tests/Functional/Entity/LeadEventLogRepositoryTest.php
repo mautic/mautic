@@ -10,7 +10,9 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class LeadEventLogRepositoryTest extends MauticMysqlTestCase
 {
     private LeadEventLogRepository $repository;

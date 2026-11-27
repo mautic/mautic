@@ -8,9 +8,11 @@ use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('non-parallel')]
 final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCase
 {
     use CampaignEntitiesTrait;

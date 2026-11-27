@@ -14,10 +14,12 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+#[Group('non-parallel')]
 final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

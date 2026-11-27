@@ -12,8 +12,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('non-parallel')]
 final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
 {
     /**

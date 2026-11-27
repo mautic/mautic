@@ -30,11 +30,13 @@ use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * These tests cover same tests like \Mautic\LeadBundle\Tests\Model\ListModelFunctionalTest.
  */
+#[Group('non-parallel')]
 final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

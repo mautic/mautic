@@ -9,9 +9,11 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('non-parallel')]
 final class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

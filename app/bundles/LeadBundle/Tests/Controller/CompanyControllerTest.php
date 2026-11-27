@@ -16,12 +16,14 @@ use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('non-parallel')]
 final class CompanyControllerTest extends MauticMysqlTestCase
 {
     private const string COUNTRY_UNITED_STATES = 'United States';

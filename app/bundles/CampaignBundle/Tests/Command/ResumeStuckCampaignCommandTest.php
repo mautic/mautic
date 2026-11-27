@@ -10,8 +10,10 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Console\Exception\RuntimeException;
 
+#[Group('non-parallel')]
 final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
 {
     private const string TAG_GREATER_THAN_FOUR = 'greater than 4';

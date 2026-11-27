@@ -6,10 +6,12 @@ namespace Mautic\LeadBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('non-parallel')]
 final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
 {
     #[DataProvider('dataTestCreatingCustomFieldIndexableAndSearchable')]

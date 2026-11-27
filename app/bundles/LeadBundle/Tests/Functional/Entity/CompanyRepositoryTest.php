@@ -16,9 +16,11 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Mailer;
 
+#[Group('non-parallel')]
 final class CompanyRepositoryTest extends MauticMysqlTestCase
 {
     private SmtpTransport $transport;

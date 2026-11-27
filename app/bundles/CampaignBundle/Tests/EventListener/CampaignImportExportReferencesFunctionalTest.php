@@ -42,6 +42,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * Imports an exported campaign as another instance would: the entities get new IDs,
  * while unrelated entities with the old IDs exist there.
  */
+#[\PHPUnit\Framework\Attributes\Group('non-parallel')]
 final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTestCase
 {
     #[ResetDatabase]

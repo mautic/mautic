@@ -13,9 +13,11 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList as Segment;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+#[Group('non-parallel')]
 final class BuilderSubscriberTest extends MauticMysqlTestCase
 {
     // Custom preference center page

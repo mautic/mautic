@@ -8,10 +8,12 @@ use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('non-parallel')]
 final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testNewEmailFieldFormIsPreMapped(): void

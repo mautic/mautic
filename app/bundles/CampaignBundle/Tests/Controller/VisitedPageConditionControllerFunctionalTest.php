@@ -6,8 +6,10 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 
+#[Group('non-parallel')]
 final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTestCase
 {
     /**
