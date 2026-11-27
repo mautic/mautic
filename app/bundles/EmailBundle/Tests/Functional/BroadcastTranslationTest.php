@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Functional;
 
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -15,11 +16,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 final class BroadcastTranslationTest extends MauticMysqlTestCase
 {
-    /**
-     * Disabled so the kernel can be rebooted mid-test to simulate consecutive cron runs.
-     */
-    protected $useCleanupRollback = false;
-
     public function testTranslationChildrenAreNotBroadcastIndependently(): void
     {
         $segment  = $this->createSegment();
@@ -38,6 +34,7 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
         $this->assertSame([$parent->getId()], $broadcastIds);
     }
 
+    #[ResetDatabase]
     public function testBroadcastSendsTranslationByPreferredLocale(): void
     {
         // Contacts are created before the segment because LeadModel::saveEntity()
@@ -99,6 +96,7 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
      * translation parent behind an association that does not cascade persist,
      * which aborts the whole cron run with an ORMInvalidArgumentException.
      */
+    #[ResetDatabase]
     public function testAutoUnpublishOfALaterBroadcastDoesNotBreakOnADetachedTranslationParent(): void
     {
         $contacts = [

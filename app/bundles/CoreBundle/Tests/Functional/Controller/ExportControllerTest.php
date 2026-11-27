@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Entity\Report;
@@ -17,8 +18,6 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 final class ExportControllerTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback   = false;
-
     protected bool $authenticateApi = true;
 
     public const string PERMISSION_LEAD_EXPORT     = 'lead:export:enable';
@@ -41,6 +40,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
     }
 
+    #[ResetDatabase]
     public function testFormExportAction(): void
     {
         $permissions = [

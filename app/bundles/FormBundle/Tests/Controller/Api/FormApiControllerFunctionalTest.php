@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Controller\Api;
 
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
@@ -17,8 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     private const array TEST_PAYLOAD = [
         'name'        => 'API form',
         'description' => 'Form created via API test',
@@ -98,6 +97,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
      * @param array<string, mixed> $expectedResponse
      */
     #[DataProvider('formDataProvider')]
+    #[ResetDatabase]
     public function testAddAndEditForms(array $payload, array $expectedResponse): void
     {
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -261,6 +261,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
+    #[ResetDatabase]
     public function testSingleFormWorkflow(): void
     {
         $payload    = self::TEST_PAYLOAD;
@@ -438,6 +439,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_NOT_FOUND, $response['errors'][0]['code']);
     }
 
+    #[ResetDatabase]
     public function testFormWithChangeTagsAction(): void
     {
         // Create tag:
@@ -519,6 +521,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($tag2Payload['tag'], $response['form']['actions'][0]['properties']['remove_tags'][0]);
     }
 
+    #[ResetDatabase]
     public function testFormWithDuplicateFieldAliases(): void
     {
         // Create form
@@ -624,6 +627,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND, 'Return code must be 404.');
     }
 
+    #[ResetDatabase]
     public function testFormIsNotUnpublishedWhenEdited(): void
     {
         $payload = [

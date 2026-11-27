@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
@@ -19,8 +20,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 final class CampaignSubscriberTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     private CampaignSubscriber $campaignSubscriber;
 
     protected function setUp(): void
@@ -113,6 +112,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
      * @param array<string, string> $properties
      */
     #[DataProvider('dataEventProperties')]
+    #[ResetDatabase]
     public function testOnCampaignTriggerConditionReturnsCorrectResultsForLeadFieldContext(array $field, array $properties, bool $expected): void
     {
         $this->makeField($field);
@@ -145,6 +145,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
         $this->assertSame($expected, $conditionEvent->wasConditionSatisfied());
     }
 
+    #[ResetDatabase]
     public function testOnCampaignTriggerConditionReturnsCorrectResultsForContactAddedContext(): void
     {
         $field = ['type' => 'text', 'alias' => 'test_text_field'];

@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Functional;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar as GuzzleCookieJar;
 use GuzzleHttp\RequestOptions;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -17,8 +18,6 @@ use Twig\Environment;
 
 final class SamlTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     public function testDiscoveryTemplateIsOverridden(): void
     {
         $twig    = $this->getService(Environment::class);
@@ -32,6 +31,7 @@ final class SamlTest extends MauticMysqlTestCase
      *
      * @see https://github.com/mautic/mautic/pull/13742#issue-2291225011
      */
+    #[ResetDatabase]
     public function testSamlLogin(): void
     {
         if (!isset($_ENV['SAML_PORT'])) {

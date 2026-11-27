@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Controller\Api;
 
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -12,12 +13,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FormApiControllerTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     /**
      * @param array<string, mixed> $formData
      */
     #[DataProvider('formDataProvider')]
+    #[ResetDatabase]
     public function testCreateFormWithFieldsAndActions(array $formData, int $expectedStatusCode): void
     {
         $this->client->request(
@@ -65,6 +65,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
      * @param array<string, mixed> $updateData
      */
     #[DataProvider('updateFormDataProvider')]
+    #[ResetDatabase]
     public function testUpdateFormWithFieldsAndActions(array $initialFormData, array $updateData): void
     {
         $form = $this->createForm($initialFormData);
@@ -160,6 +161,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
     }
 
+    #[ResetDatabase]
     public function testUpdateFormRemovesUnspecifiedFieldsOnPut(): void
     {
         // Create form with multiple fields

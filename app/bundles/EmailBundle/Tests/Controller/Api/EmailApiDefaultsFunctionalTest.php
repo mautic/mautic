@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
@@ -18,12 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * Disabled because testNewEmailViaApiAppliesConfiguredDefaults calls
-     * setUpSymfony() mid-test to reboot the kernel with the actual page ID.
-     */
-    protected $useCleanupRollback = false;
-
     protected function setUp(): void
     {
         $this->configParams['email_default_utm_source']    = 'config-source';
@@ -34,6 +29,7 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
     }
 
+    #[ResetDatabase]
     public function testNewEmailViaApiAppliesOnlyPersistedConfiguredDefaults(): void
     {
         $preferenceCenter = $this->createPreferenceCenterPage('API Default PC');

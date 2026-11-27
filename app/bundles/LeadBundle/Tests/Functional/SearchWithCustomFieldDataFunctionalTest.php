@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional;
 
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,8 +12,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
 {
-    protected $useCleanupRollback = false;
-
     #[DataProvider('dataTestCreatingCustomFieldIndexableAndSearchable')]
     public function testCreatingCustomFieldIndexableAndSearchable(int $isIndex, string $expectedValue): void
     {
@@ -48,6 +47,7 @@ final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCa
         yield 'When "Add to Search Index" is disabled' => [0, '0'];
     }
 
+    #[ResetDatabase]
     public function testGlobalSearchForContactsUsingCustomFieldsData(): void
     {
         // Create a custom field for Contact
@@ -97,6 +97,7 @@ final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCa
         }
     }
 
+    #[ResetDatabase]
     public function testSearchCompaniesWithCustomFields(): void
     {
         // Create a custom field for Company

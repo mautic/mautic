@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Controller;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Action;
@@ -25,8 +26,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormControllerFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -153,6 +152,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('has-error', (string) $divClass, $crawler->html());
     }
 
+    #[ResetDatabase]
     public function testLanguageForm(): void
     {
         $translationsPath = __DIR__.'/resource/language/fr';
@@ -197,6 +197,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $filesystem->remove($languagePath);
     }
 
+    #[ResetDatabase]
     public function testMappedFieldIsNotAutoFilledWhenUpdatingField(): void
     {
         $form  = $this->createForm('Test', 'test');
@@ -313,6 +314,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    #[ResetDatabase]
     public function testEditNewActionUsingBaseTemplateToDisplay(): void
     {
         // Create new form
@@ -388,6 +390,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
      *  }> $expectedMessages The expected messages with translation arguments
      */
     #[DataProvider('dataTestLabelsForFormActions')]
+    #[ResetDatabase]
     public function testLabelsForFormAction(array $inputValues, array $expectedMessages): void
     {
         $form = $this->createForm('test', 'test');
@@ -588,6 +591,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         return $action;
     }
 
+    #[ResetDatabase]
     public function testCloneActionWithCondition(): void
     {
         $form = $this->createForm('Conditional Form', 'Conditional Form');
@@ -655,6 +659,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame((int) $clonedField2->getParent(), $clonedField1->getId());
     }
 
+    #[ResetDatabase]
     public function testFormWithProject(): void
     {
         $form = $this->createForm('Name', 'Alias');

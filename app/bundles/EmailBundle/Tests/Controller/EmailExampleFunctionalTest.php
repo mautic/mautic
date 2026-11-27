@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
@@ -16,8 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
-
-    protected $useCleanupRollback = false;
 
     public function testSendExampleEmailWithContact(): void
     {
@@ -75,6 +74,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Contact emails is [Email]. Company details: [Company Name], [City].', $message->getBody()->toString());
     }
 
+    #[ResetDatabase]
     public function testSendExampleEmailWithOutContactAndMonitoringEnabled(): void
     {
         $configParams = $this->configParams;
@@ -149,6 +149,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Contact emails is [Email]. Company details: [Company Name], [City].', $message->getBody()->toString());
     }
 
+    #[ResetDatabase]
     public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithNoContact(): void
     {
         // Create custom field
@@ -221,6 +222,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Default Dynamic Content', $message->getBody()->toString());
     }
 
+    #[ResetDatabase]
     public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithMatchFilterContact(): void
     {
         // Create custom field
@@ -313,6 +315,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Variant 1 Dynamic Content', $message->getBody()->toString());
     }
 
+    #[ResetDatabase]
     public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithNoMatchFilterContact(): void
     {
         // Create custom field
