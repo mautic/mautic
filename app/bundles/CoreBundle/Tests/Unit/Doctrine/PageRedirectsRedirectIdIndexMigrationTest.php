@@ -33,6 +33,23 @@ final class PageRedirectsRedirectIdIndexMigrationTest extends TestCase
     }
 
     /**
+     * Checks that the table prefix is applied to the table and to the index.
+     */
+    public function testUsesTheTablePrefix(): void
+    {
+        $migration = $this->createMigration('mautic_');
+        $schema    = $this->createSchema('mautic_');
+
+        $migration->preUp($schema);
+        $migration->up($schema);
+
+        $this->assertSame(
+            'ALTER TABLE mautic_page_redirects ADD INDEX mautic_redirect_id_search (redirect_id), ALGORITHM=INPLACE, LOCK=NONE',
+            $migration->getSql()[0]->getStatement()
+        );
+    }
+
+    /**
      * Checks that the migration is skipped when the index already exists.
      */
     public function testSkipsWhenTheIndexAlreadyExists(): void
