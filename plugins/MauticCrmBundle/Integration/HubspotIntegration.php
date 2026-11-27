@@ -430,10 +430,8 @@ final class HubspotIntegration extends CrmAbstractIntegration
      * @param array|string $data        Profile data from integration
      * @param bool|true    $persist     Set to false to not persist lead to the database in this method
      * @param string|null  $object
-     *
-     * @return Lead
      */
-    public function getMauticLead(array|string $data, $persist = true, ?array $socialCache = null, mixed $identifiers = null, $object = null)
+    public function getMauticLead(array|string $data, $persist = true, ?array $socialCache = null, mixed $identifiers = null, $object = null): ?Lead
     {
         if (is_string($data)) {
             // Assume JSON
@@ -459,7 +457,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
                     $stage->setName($stageName);
                     $stages             = [$stageName => $stage];
                 }
-                if (!$lead->getStage() && $lead->getStage() != $stage) {
+                if (!$lead->getStage()) {
                     $lead->setStage($stage);
 
                     // add a contact stage change log
@@ -497,7 +495,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
                 } catch (Exception $exception) {
                     $this->logger->warning($exception->getMessage());
 
-                    return;
+                    return null;
                 }
             }
         }

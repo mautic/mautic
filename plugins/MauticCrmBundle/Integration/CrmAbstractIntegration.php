@@ -326,10 +326,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param array|string $data        Profile data from integration
      * @param bool|true    $persist     Set to false to not persist lead to the database in this method
      * @param string|null  $object
-     *
-     * @return Lead|null
      */
-    public function getMauticLead(array|string $data, $persist = true, ?array $socialCache = null, mixed $identifiers = null, $object = null)
+    public function getMauticLead(array|string $data, $persist = true, ?array $socialCache = null, mixed $identifiers = null, $object = null): ?Lead
     {
         if (is_string($data)) {
             // Assume JSON
