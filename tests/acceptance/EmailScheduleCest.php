@@ -65,33 +65,33 @@ final class EmailScheduleCest
         $I->dontSeeElement('#scheduleOptions');
     }
 
-    public function createTriggeredEmailAndVerifyScheduleOptionsOnEdit(AcceptanceTester $I, EmailStep $email): void
+    public function createTriggeredEmailAndVerifyScheduleOptionsOnEdit(EmailStep $email): void
     {
-        $I->login(reuseSessionSnapshot: false);
+        $email->login(reuseSessionSnapshot: false);
         $name = 'Triggered Email '.date('YmdHis');
 
         $email->createTriggeredEmail($name);
 
         // Wait for redirect to email detail page
-        $I->waitForText($name, AcceptanceTester::TIMEOUT, 'h1.page-header-title');
+        $email->waitForText($name, AcceptanceTester::TIMEOUT, 'h1.page-header-title');
 
         // Assert the header contains the created email name
-        $I->see($name, 'h1.page-header-title');
+        $email->see($name, 'h1.page-header-title');
 
         // Click on Edit button
-        $I->waitForElementClickable(EmailsPage::EDIT_BUTTON, AcceptanceTester::TIMEOUT);
-        $I->click(EmailsPage::EDIT_BUTTON);
+        $email->waitForElementClickable(EmailsPage::EDIT_BUTTON, AcceptanceTester::TIMEOUT);
+        $email->click(EmailsPage::EDIT_BUTTON);
 
         // Assert schedule container is visible
-        $I->waitForElementVisible('#scheduleOptions', AcceptanceTester::TIMEOUT);
-        $I->seeElement('#scheduleOptions');
+        $email->waitForElementVisible('#scheduleOptions', AcceptanceTester::TIMEOUT);
+        $email->seeElement('#scheduleOptions');
 
         // Assert publish up/down datetime fields exist
-        $I->seeElement('#emailform_publishUp');
-        $I->seeElement('#emailform_publishDown');
+        $email->seeElement('#emailform_publishUp');
+        $email->seeElement('#emailform_publishDown');
 
         // Scheduling options notice must NOT exist
-        $I->dontSeeElement('#scheduleOptionsNotice');
+        $email->dontSeeElement('#scheduleOptionsNotice');
     }
 
     public function createSegmentEmailAndVerifyScheduleNoticeTogglesOnEdit(AcceptanceTester $I, SegmentStep $segment, EmailStep $email): void
