@@ -302,7 +302,9 @@ final class SubmissionModel extends CommonFormModel
             ->setResults($results)
             ->setContactFieldMatches($leadFieldMatches);
 
-        $lead = $this->contactTracker->getContact();
+        $lead = $form->isInKioskMode()
+            ? null
+            : $this->contactTracker->getContact();
 
         // Remove validation errors if the field is not visible
         if ($lead && $form->usesProgressiveProfiling()) {
@@ -383,7 +385,7 @@ final class SubmissionModel extends CommonFormModel
         $campaigns = $this->campaignModel->getCampaignsByForm($form);
         /** @var Campaign $campaign */
         foreach ($campaigns ?? [] as $campaign) {
-            if ($campaign->isPublished()) {
+            if ($lead instanceof Lead && $campaign->isPublished()) {
                 $this->membershipManager->addContact($lead, $campaign);
             }
         }
