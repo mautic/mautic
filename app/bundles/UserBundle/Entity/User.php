@@ -137,10 +137,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     private $activePermissions;
 
     /**
-     * @var mixed[]
+     * @var mixed[]|null
      */
     #[Groups(['user:read', 'user:write'])]
-    private array $preferences = [];
+    private ?array $preferences = [];
 
     /**
      * @var string|null
@@ -673,7 +673,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     public function getPreferences(): array
     {
-        return $this->preferences;
+        return $this->preferences ?? [];
     }
 
     /**

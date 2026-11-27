@@ -20,9 +20,9 @@ class ContactExportScheduler
     private \DateTimeImmutable $scheduledDateTime;
 
     /**
-     * @var array<mixed>
+     * @var array<mixed>|null
      */
-    private array $data = [];
+    private ?array $data = [];
 
     /**
      * @var array<mixed>
@@ -95,7 +95,7 @@ class ContactExportScheduler
      */
     public function getData(): array
     {
-        return $this->data;
+        return $this->data ?? [];
     }
 
     /**

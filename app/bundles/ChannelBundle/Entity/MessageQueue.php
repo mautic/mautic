@@ -90,7 +90,7 @@ class MessageQueue
      */
     private $dateSent;
 
-    private array $options = [];
+    private ?array $options = [];
 
     /**
      * Used by listeners to note if the message had been processed in bulk.
@@ -201,7 +201,7 @@ class MessageQueue
 
     public function getOptions(): array
     {
-        return $this->options;
+        return $this->options ?? [];
     }
 
     /**
@@ -451,7 +451,7 @@ class MessageQueue
      */
     public function getMetadata()
     {
-        return $this->options['metadata'] ?? [];
+        return $this->getOptions()['metadata'] ?? [];
     }
 
     public function setMetadata(array $metadata = []): void
