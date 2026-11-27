@@ -34,8 +34,8 @@ class AppKernel extends Kernel
     {
         $metadata = ThisRelease::getMetadata();
 
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', $environment);
-        defined('MAUTIC_VERSION') or define('MAUTIC_VERSION', $metadata->getVersion());
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', $environment);
+        defined('MAUTIC_VERSION') || define('MAUTIC_VERSION', $metadata->getVersion());
 
         /**
          * This is required for Doctrine's automatic database detection. When Mautic hasn't been
@@ -54,7 +54,7 @@ class AppKernel extends Kernel
     public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
     {
         if (str_contains($request->getRequestUri(), 'installer') || !$this->isInstalled()) {
-            defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);
+            defined('MAUTIC_INSTALLER') || define('MAUTIC_INSTALLER', 1);
         }
 
         if (defined('MAUTIC_INSTALLER')) {
