@@ -1987,6 +1987,26 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
         }
     });
 
+    // Legacy #btn-filter stays hidden until 8.0 so custom code that clicks it still filters.
+    const legacyButton = mQuery("button[data-livesearch-parent='" + mQuery(el).attr('id') + "']");
+    if (legacyButton.length) {
+        legacyButton.on('click', {'parent': mQuery(el).attr('id')}, function (event) {
+            const searchStr = mQuery(el).val().trim();
+            MauticVars[searchStrVar] = searchStr;
+
+            Mautic.filterButtonClicked = true;
+
+            Mautic.filterList(
+                event,
+                event.data.parent,
+                mQuery('#' + event.data.parent).attr('data-action'),
+                mQuery('#' + event.data.parent).attr('data-target'),
+                'liveCache',
+                searchStr ? 'clear' : 'search'
+            );
+        });
+    }
+
     if (Mautic.isGlobalSearchInput(el)) {
         mQuery(el).off('keydown.globalSearchNav');
 
