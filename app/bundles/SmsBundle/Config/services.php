@@ -23,6 +23,13 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\SmsBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
+    $services->set(Mautic\SmsBundle\ApiPlatform\SmsProcessor::class)
+        ->args([
+            service('api_platform.doctrine.orm.state.persist_processor'),
+            service(Mautic\CoreBundle\Security\Permissions\CorePermissions::class),
+        ])
+        ->tag('api_platform.state_processor');
+
     $services->set('mautic.sms.twilio.transport', Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class)
         ->arg('$logger', service('monolog.logger.mautic'))
         ->tag('mautic.sms_transport', ['integrationAlias' => 'Twilio']);
@@ -39,8 +46,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.sms.helper.reply', Mautic\SmsBundle\Helper\ReplyHelper::class);
     $services->set('mautic.sms.twilio.configuration', Mautic\SmsBundle\Integration\Twilio\Configuration::class);
     $services->set('mautic.sms.twilio.callback', Mautic\SmsBundle\Integration\Twilio\TwilioCallback::class)->tag('mautic.sms_callback_handler');
-    $services->set('mautic.sms.broadcast.executioner', Mautic\SmsBundle\Broadcast\BroadcastExecutioner::class);
-    $services->set('mautic.sms.broadcast.query', Mautic\SmsBundle\Broadcast\BroadcastQuery::class);
+    $services->set(Mautic\SmsBundle\Broadcast\BroadcastExecutioner::class)
+        ->arg('$logger', service('monolog.logger.mautic'));
+    $services->alias('mautic.sms.broadcast.executioner', Mautic\SmsBundle\Broadcast\BroadcastExecutioner::class);
+    $services->alias('mautic.sms.broadcast.query', Mautic\SmsBundle\Broadcast\BroadcastQuery::class);
     $services->set('mautic.integration.twilio', Mautic\SmsBundle\Integration\TwilioIntegration::class);
 
     $services->alias('mautic.sms.model.sms', Mautic\SmsBundle\Model\SmsModel::class);
