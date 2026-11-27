@@ -48,7 +48,10 @@ final readonly class UserSubscriber
         }
     }
 
-    private function logUserSave(User $user, bool $isNew, mixed $changes): void
+    /**
+     * @param mixed[]|false $changes
+     */
+    private function logUserSave(User $user, bool $isNew, array|false $changes): void
     {
         if (!$changes) {
             return;
@@ -64,7 +67,10 @@ final readonly class UserSubscriber
         ]);
     }
 
-    private function logRoleSave(Role $role, bool $isNew, mixed $changes): void
+    /**
+     * @param mixed[]|false $changes
+     */
+    private function logRoleSave(Role $role, bool $isNew, array|false $changes): void
     {
         if (!$changes) {
             return;
