@@ -2002,7 +2002,7 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
                 mQuery('#' + event.data.parent).attr('data-action'),
                 mQuery('#' + event.data.parent).attr('data-target'),
                 'liveCache',
-                searchStr ? 'clear' : 'search'
+                'search'
             );
         });
     }
