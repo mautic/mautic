@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Segment\ContactSegmentService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -19,28 +20,49 @@ use Symfony\Component\Console\Tester\ApplicationTester;
  */
 final class LeadEmailReadDateSegmentFunctionalTest extends MauticMysqlTestCase
 {
+    private const CUTOFF = '2024-08-01 20:50:00';
+
     /**
      * @return iterable<string, array{
      *     operator: string,
      *     expectRecentOnly: bool,
      *     expectOldOnly: bool,
-     *     expectBoth: bool
+     *     expectBoth: bool,
+     *     expectAtCutoff: bool
      * }>
      */
     public static function emailReadDateOperatorProvider(): iterable
     {
-        yield 'less than 180 days ago' => [
+        yield 'before cutoff' => [
             'operator'         => 'lt',
             'expectRecentOnly' => false,
             'expectOldOnly'    => true,
             'expectBoth'       => false,
+            'expectAtCutoff'   => false,
         ];
 
-        yield 'greater than 180 days ago' => [
+        yield 'on or before cutoff' => [
+            'operator'         => 'lte',
+            'expectRecentOnly' => false,
+            'expectOldOnly'    => true,
+            'expectBoth'       => false,
+            'expectAtCutoff'   => true,
+        ];
+
+        yield 'after cutoff' => [
             'operator'         => 'gt',
             'expectRecentOnly' => true,
             'expectOldOnly'    => false,
             'expectBoth'       => true,
+            'expectAtCutoff'   => false,
+        ];
+
+        yield 'on or after cutoff' => [
+            'operator'         => 'gte',
+            'expectRecentOnly' => true,
+            'expectOldOnly'    => false,
+            'expectBoth'       => true,
+            'expectAtCutoff'   => true,
         ];
     }
 
@@ -50,10 +72,21 @@ final class LeadEmailReadDateSegmentFunctionalTest extends MauticMysqlTestCase
         bool $expectRecentOnly,
         bool $expectOldOnly,
         bool $expectBoth,
+        bool $expectAtCutoff,
     ): void {
-        ['recentOnly' => $recentOnly, 'oldOnly' => $oldOnly, 'both' => $both] = $this->createContactsWithReadStats($operator);
+        ['recentOnly' => $recentOnly, 'oldOnly' => $oldOnly, 'both' => $both, 'atCutoff' => $atCutoff] = $this->createContactsWithReadStats($operator);
 
-        $segment = $this->createSegmentWithFilter($operator, '180 days ago');
+        $segment = $this->createSegmentWithFilter($operator, self::CUTOFF);
+
+        $segmentService = self::getContainer()->get(ContactSegmentService::class);
+        $sql            = $segmentService->getNewLeadListLeadsQueryBuilder($segment, [])->getSQL();
+        if ($expectRecentOnly) {
+            $this->assertStringContainsString('IN (SELECT', $sql);
+            $this->assertStringContainsString('.lead_id IS NOT NULL', $sql);
+            $this->assertStringNotContainsStringIgnoringCase('MAX(', $sql);
+        } else {
+            $this->assertStringContainsStringIgnoringCase('MAX(DISTINCT', $sql);
+        }
 
         $this->rebuildSegment($segment);
 
@@ -62,10 +95,11 @@ final class LeadEmailReadDateSegmentFunctionalTest extends MauticMysqlTestCase
         $this->assertMembership($recentOnly->getId(), $memberLeadIds, $expectRecentOnly);
         $this->assertMembership($oldOnly->getId(), $memberLeadIds, $expectOldOnly);
         $this->assertMembership($both->getId(), $memberLeadIds, $expectBoth);
+        $this->assertMembership($atCutoff->getId(), $memberLeadIds, $expectAtCutoff);
     }
 
     /**
-     * @return array{recentOnly: Lead, oldOnly: Lead, both: Lead}
+     * @return array{recentOnly: Lead, oldOnly: Lead, both: Lead, atCutoff: Lead}
      */
     private function createContactsWithReadStats(string $suffix): array
     {
@@ -74,16 +108,19 @@ final class LeadEmailReadDateSegmentFunctionalTest extends MauticMysqlTestCase
         $recentOnly = $this->createLead('RecentOnly'.$suffix);
         $oldOnly    = $this->createLead('OldOnly'.$suffix);
         $both       = $this->createLead('BothReads'.$suffix);
+        $atCutoff   = $this->createLead('AtCutoff'.$suffix);
 
-        $this->createReadStat($recentOnly, $email, new \DateTime('-21 days'));
-        $this->createReadStat($oldOnly, $email, new \DateTime('-200 days'));
-        $this->createReadStat($both, $email, new \DateTime('-200 days'));
-        $this->createReadStat($both, $email, new \DateTime('-21 days'));
+        $this->createReadStat($recentOnly, $email, new \DateTime('2024-08-01 20:50:01'));
+        $this->createReadStat($oldOnly, $email, new \DateTime('2024-08-01 20:49:59'));
+        $this->createReadStat($both, $email, new \DateTime('2024-08-01 20:49:59'));
+        $this->createReadStat($both, $email, new \DateTime('2024-08-01 20:50:01'));
+        $this->createReadStat($atCutoff, $email, new \DateTime(self::CUTOFF));
 
         return [
             'recentOnly' => $recentOnly,
             'oldOnly'    => $oldOnly,
             'both'       => $both,
+            'atCutoff'   => $atCutoff,
         ];
     }
 
