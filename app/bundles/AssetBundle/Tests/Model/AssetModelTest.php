@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
+use Mautic\PageBundle\Helper\AggregateAnalyticsHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -83,8 +84,11 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
-            ->with('max_size')
-            ->willReturn('2MB');
+            ->willReturnMap([
+                ['max_size', null, '2MB'],
+                ['track_asset_downloads', true, true],
+                ['aggregate_analytics', true, true],
+            ]);
         $cacheProvider               = new CacheProvider($this->coreParametersHelper, $this->createStub(ContainerInterface::class));
         $this->leadModel             = $this->createStub(LeadModel::class);
         $this->categoryModel         = $this->createStub(CategoryModel::class);
@@ -125,6 +129,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(DownloadRepository::class),
             $this->createStub(CategoryRepository::class),
         );
+        $this->assetModel->autowireAssetModel(new AggregateAnalyticsHelper($this->coreParametersHelper));
     }
 
     /**
@@ -288,6 +293,53 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($lead, $download->getLead());
         $this->assertEquals($asset, $download->getAsset());
         $this->assertEquals('http://localhost', $download->getReferer());
+    }
+
+    public function testDownloadWithoutATrackingIdIsCountedButNotAsUnique(): void
+    {
+        $asset = new Asset();
+
+        $this->corePermissions->method('isAnonymous')->willReturn(true);
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
+        $this->contactTracker->method('getContact')->willReturn(null);
+        $this->deviceTrackingService->method('getTrackedDevice')->willReturn(null);
+
+        // Without an identifier Mautic can't tell whether the visitor downloaded the asset before
+        $this->assetRepository->expects($this->once())
+            ->method('upDownloadCount')
+            ->with($asset->getId(), 1, false);
+        $this->entityManager->expects($this->never())->method('persist');
+
+        $this->assetModel->trackDownload($asset, new Request());
+    }
+
+    /**
+     * @return iterable<string, array{bool}>
+     */
+    public static function failedDownloadProvider(): iterable
+    {
+        yield 'tracked visitor' => [true];
+        yield 'visitor with a privacy signal' => [false];
+    }
+
+    #[DataProvider('failedDownloadProvider')]
+    public function testDeniedOrMissingFileIsNotCountedAsADownload(bool $trackable): void
+    {
+        $asset = new Asset();
+
+        $this->corePermissions->method('isAnonymous')->willReturn(true);
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn($trackable);
+        $this->ipLookupHelper->method('isRequestCountable')->willReturn(true);
+        $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress('203.0.113.30'));
+        $this->contactTracker->method('getContact')->willReturn(new Lead());
+        $trackedDevice = $this->createStub(LeadDevice::class);
+        $trackedDevice->method('getTrackingId')->willReturn('failed-download-device');
+        $this->deviceTrackingService->method('getTrackedDevice')->willReturn($trackedDevice);
+
+        $this->assetRepository->expects($this->never())->method('upDownloadCount');
+
+        $this->assetModel->trackDownload($asset, new Request(), 401);
+        $this->assetModel->trackDownload($asset, new Request(), 404);
     }
 
     #[DataProvider('getEntityBySlugsProvider')]

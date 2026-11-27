@@ -44,19 +44,33 @@ export default class ButtonCloseCommands {
     }
 
     editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
-    let htmlCode = MjmlService.getEditorHtmlContent(editor);
-    const mjmlCode = MjmlService.getEditorMjmlContent(editor); // Update textarea for save
+    let closed = false;
 
-    if (!htmlCode || !mjmlCode) {
-      throw new Error('Could not generate html from MJML');
+    try {
+      let htmlCode = MjmlService.getEditorHtmlContent(editor);
+      const mjmlCode = MjmlService.getEditorMjmlContent(editor); // Update textarea for save
+
+      if (!htmlCode || !mjmlCode) {
+        return false;
+      }
+
+      if (mauticEditorFonts) {
+        htmlCode = EditorFontsService.addFontLinksToHtml(htmlCode);
+      }
+
+      ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode); // Reset HTML
+      ButtonCloseCommands.resetHtml(editor);
+      closed = true;
+
+      return true;
+    } finally {
+      // A failed conversion leaves the builder open. Restore Dynamic Content
+      // components so the user can correct the MJML and retry without losing
+      // the editable component structure.
+      if (!closed) {
+        editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
+      }
     }
-
-    if (mauticEditorFonts) {
-      htmlCode = EditorFontsService.addFontLinksToHtml(htmlCode);
-    }
-
-    ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode); // Reset HTML
-    ButtonCloseCommands.resetHtml(editor);
   }
 
   /**

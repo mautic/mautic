@@ -57,6 +57,8 @@ class Asset extends FormEntity implements UuidInterface
 
     public const ENTITY_NAME = 'asset';
 
+    public const TABLE_NAME = 'assets';
+
     /**
      * @var int|null
      */
@@ -217,6 +219,12 @@ class Asset extends FormEntity implements UuidInterface
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $disallow = true;
 
+    /**
+     * Whether a download is linked to the contact who downloads it. New assets start from the global setting.
+     */
+    #[Groups(['asset:read', 'asset:write'])]
+    private bool $trackDownloads = true;
+
     public function __construct()
     {
         $this->initializeProjects();
@@ -226,7 +234,7 @@ class Asset extends FormEntity implements UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('assets')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(AssetRepository::class)
             ->addIndex(['alias'], 'asset_alias_search');
 
@@ -290,6 +298,11 @@ class Asset extends FormEntity implements UuidInterface
             ->nullable()
             ->build();
 
+        $builder->createField('trackDownloads', Types::BOOLEAN)
+            ->columnName('track_downloads')
+            ->option('default', true)
+            ->build();
+
         static::addUuidField($builder);
         self::addProjectsField($builder, 'asset_projects_xref', 'asset_id');
     }
@@ -328,6 +341,7 @@ class Asset extends FormEntity implements UuidInterface
                     'downloadUrl',
                     'storageLocation',
                     'disallow',
+                    'trackDownloads',
                 ]
             )
             ->build();
@@ -1290,6 +1304,19 @@ class Asset extends FormEntity implements UuidInterface
     public function setDisallow($disallow): void
     {
         $this->disallow = $disallow;
+    }
+
+    public function getTrackDownloads(): bool
+    {
+        return $this->trackDownloads;
+    }
+
+    public function setTrackDownloads(bool $trackDownloads): self
+    {
+        $this->isChanged('trackDownloads', $trackDownloads);
+        $this->trackDownloads = $trackDownloads;
+
+        return $this;
     }
 
     /**
