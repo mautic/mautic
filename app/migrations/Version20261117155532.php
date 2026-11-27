@@ -34,12 +34,12 @@ final class Version20261117155532 extends PreUpAssertionMigration
     }
 
     /**
-     * Adds the index.
+     * Adds the index without locking the table.
      *
      * @param Schema $schema the current database schema
      */
     public function up(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' ADD INDEX '.self::INDEX_NAME.' (redirect_id)');
+        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' ADD INDEX '.self::INDEX_NAME.' (redirect_id), ALGORITHM=INPLACE, LOCK=NONE');
     }
 }
