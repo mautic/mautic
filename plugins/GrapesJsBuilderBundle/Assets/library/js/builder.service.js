@@ -11,9 +11,14 @@ import grapesjstuiimageeditor from 'grapesjs-tui-image-editor';
 import grapesjsstylebg from 'grapesjs-style-bg';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import grapesjsckeditor from './plugins/grapesjs-ckeditor';
-import grapesjsMjmlThemeTokens, { pluginId as mjmlThemeTokensPluginId } from './plugins/grapesjs-mjmlThemeTokens';
+import grapesjsMjmlThemeTokens, {
+  pluginId as mjmlThemeTokensPluginId,
+} from './plugins/grapesjs-mjmlThemeTokens';
 import grapesjsImageLink from './plugins/grapesjs-image-link';
-import { extractMjHeadContent, createHeadInjectingMjmlParser } from './plugins/grapesjs-mjmlThemeTokens/utils';
+import {
+  extractMjHeadContent,
+  createHeadInjectingMjmlParser,
+} from './plugins/grapesjs-mjmlThemeTokens/utils';
 import contentService from './preset-mautic/content.service';
 import grapesjsmautic from './preset-mautic';
 import editorFontsService from './preset-mautic/editorFonts/editorFonts.service';
@@ -413,7 +418,12 @@ export default class BuilderService {
       }
 
       try {
-        return originalRun(...args);
+        const result = originalRun(...args);
+        if (false === result && typeof MauticVars !== 'undefined') {
+          MauticVars.formSubmitInProgress = false;
+        }
+
+        return result;
       } catch (error) {
         if (typeof MauticVars !== 'undefined') {
           MauticVars.formSubmitInProgress = false;
@@ -726,7 +736,11 @@ export default class BuilderService {
       }
     });
 
-    const triggerBuilderHide = () => {
+    const triggerBuilderHide = (event) => {
+      if (false === event?.result) {
+        return;
+      }
+
       this.persistEditorState();
       // trigger hide event on DOM element
       mQuery('.builder').trigger('builder:hide', [this.editor]);
@@ -748,10 +762,14 @@ export default class BuilderService {
           this.cacheOptimisticLockVersion();
         });
     }
-    this.editor.on('run:mautic-editor-page-html-close', triggerBuilderHide);
-    this.editor.on('run:mautic-editor-email-html-close', triggerBuilderHide);
-    this.editor.on('run:mautic-editor-email-mjml-close', triggerBuilderHide);
-    this.editor.on('run:preset-mautic:apply-form', () => this.persistEditorState());
+    this.editor.on('command:run:mautic-editor-page-html-close', triggerBuilderHide);
+    this.editor.on('command:run:mautic-editor-email-html-close', triggerBuilderHide);
+    this.editor.on('command:run:mautic-editor-email-mjml-close', triggerBuilderHide);
+    this.editor.on('command:run:preset-mautic:apply-form', (event) => {
+      if (false !== event?.result) {
+        this.persistEditorState();
+      }
+    });
 
     this.editor.on('load', () => {
       if (this.isPageContext()) {
@@ -759,7 +777,9 @@ export default class BuilderService {
       }
       this.normalizeTextComponentContainers();
     });
-    this.editor.on('component:add', (component) => this.normalizeTextComponentContainers(component));
+    this.editor.on('component:add', (component) =>
+      this.normalizeTextComponentContainers(component)
+    );
     this.editor.on('rte:disable', (component) => this.normalizeTextComponentContainers(component));
     this.editor.on('mautic:code-editor-update', () => this.normalizeTextComponentContainers());
 
@@ -1243,10 +1263,15 @@ export default class BuilderService {
   }
 
   mjmlToHtml(mjml) {
-    const converted = MjmlService.mjmlToHtml(mjml);
+    try {
+      const converted = MjmlService.mjmlToHtml(mjml);
 
-    if (0 === converted.errors.length) {
-      return converted.html;
+      if (converted && 0 === converted.errors.length) {
+        return converted.html;
+      }
+    } catch (error) {
+      console.warn(error.message);
+      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')}\n${error.message}`);
     }
 
     return '';
@@ -1255,7 +1280,12 @@ export default class BuilderService {
   initEmailMjml() {
     const components = MjmlService.getOriginalContentMjml();
     // validate
-    MjmlService.mjmlToHtml(components);
+    try {
+      MjmlService.mjmlToHtml(components);
+    } catch (error) {
+      console.warn(error.message);
+      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')}\n${error.message}`);
+    }
 
     const mjHeadContent = extractMjHeadContent(components);
 
@@ -1649,13 +1679,17 @@ export default class BuilderService {
       return;
     }
 
-    cssc.setRule('.gjs-cell, .gjs-cell30, .gjs-cell70', {
-      height: 'auto',
-    }, {
-      atRuleType: 'media',
-      atRuleParams: '(max-width: 768px)',
-      addStyles: true,
-    });
+    cssc.setRule(
+      '.gjs-cell, .gjs-cell30, .gjs-cell70',
+      {
+        height: 'auto',
+      },
+      {
+        atRuleType: 'media',
+        atRuleParams: '(max-width: 768px)',
+        addStyles: true,
+      }
+    );
   }
 
   removeSelectedElementsEmailMjml() {
@@ -1688,6 +1722,14 @@ export default class BuilderService {
 
   normalizeTextComponentContainer(component) {
     if (!component || typeof component.get !== 'function' || typeof component.set !== 'function') {
+      return;
+    }
+
+    // MJML owns the structure of inline content inside mj-text. Applying the
+    // generic HTML normalization here turns inline spans into block wrappers
+    // and changes the layout when the template is serialized again.
+    const mode = this.editor?.getConfig?.()?.pluginsOpts?.grapesjsmautic?.mode;
+    if (mode === contentService.modeEmailMjml) {
       return;
     }
 
