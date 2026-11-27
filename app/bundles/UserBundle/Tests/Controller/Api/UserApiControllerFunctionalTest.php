@@ -125,6 +125,37 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
     }
 
+    public function testListRolesLimit(): void
+    {
+        // Add more roles. Total will be 12.
+        for ($i = 0; $i < 10; $i++) {
+            $role = new Role();
+            $role->setName('Role'.$i);
+            $role->setIsAdmin(false);
+            $this->em->persist($role);
+        }
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->client->request(Request::METHOD_GET, '/api/users/list/roles', ['limit' => '3']);
+        self::assertResponseIsSuccessful();
+        $clientResponse = $this->client->getResponse();
+        $data = json_decode((string) $clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertCount(3, $data);
+
+        $this->client->request(Request::METHOD_GET, '/api/users/list/roles', ['limit' => '10']);
+        self::assertResponseIsSuccessful();
+        $clientResponse = $this->client->getResponse();
+        $data = json_decode((string) $clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertCount(10, $data);
+
+        $this->client->request(Request::METHOD_GET, '/api/users/list/roles', []);
+        self::assertResponseIsSuccessful();
+        $clientResponse = $this->client->getResponse();
+        $data = json_decode((string) $clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertCount(12, $data);
+    }
+
     #[DataProvider('passwordProvider')]
     public function testUserPasswordPolicy(int $responseCode, string $password): void
     {

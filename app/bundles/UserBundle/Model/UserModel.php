@@ -34,7 +34,7 @@ use Twig\Environment;
 /**
  * @extends FormModel<User>
  */
-final class UserModel extends FormModel implements GlobalSearchInterface
+class UserModel extends FormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {
@@ -92,8 +92,11 @@ final class UserModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of users for an autocomplete input.
+     *
+     * @param positive-int|null $limit
+     * @param non-negative-int $start
      */
-    public function getUserList(string $search = '', int $limit = 10, int $start = 0, array $permissionLimiter = []): array
+    public function getUserList(string $search = '', ?int $limit = 10, int $start = 0, array $permissionLimiter = []): array
     {
         return $this->userRepository->getUserList($search, $limit, $start, $permissionLimiter);
     }
@@ -164,8 +167,10 @@ final class UserModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get list of entities for autopopulate fields.
+     *
+     * @param positive-int|null $limit
      */
-    public function getLookupResults(string $type, ?string $filter = '', int|string|null $limit = 10): array
+    public function getLookupResults(string $type, ?string $filter = '', ?int $limit = 10): array
     {
         $results = [];
 

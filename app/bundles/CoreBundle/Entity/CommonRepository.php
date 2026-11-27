@@ -1348,7 +1348,15 @@ abstract class CommonRepository extends ServiceEntityRepository
         $start = array_key_exists('start', $args) ? $args['start'] : 0;
         $limit = array_key_exists('limit', $args) ? $args['limit'] : 0;
 
-        if (!empty($limit)) {
+        if (is_numeric($limit)) {
+            $limit = (int) $limit;
+        }
+
+        if (is_numeric($start)) {
+            $start = (int) $start;
+        }
+
+        if (null !== $limit && $limit > 0) {
             $q->setFirstResult($start)
                 ->setMaxResults($limit);
         }

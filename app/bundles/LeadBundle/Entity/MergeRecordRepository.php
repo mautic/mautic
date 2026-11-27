@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<MergeRecord>
  */
-final class MergeRecordRepository extends CommonRepository
+class MergeRecordRepository extends CommonRepository
 {
     public function findMergedContact($id): ?Lead
     {

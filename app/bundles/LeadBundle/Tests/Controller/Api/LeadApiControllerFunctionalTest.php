@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
+use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\DynamicContentBundle\Entity\Stat as StatDC;
 use Mautic\EmailBundle\Entity\Stat as StatEmail;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
@@ -33,6 +34,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use ApiTestUserTrait;
     use CreateTestEntitiesTrait;
+    use UserEntityTrait;
 
     protected function setUp(): void
     {
@@ -1509,6 +1511,63 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN, $response->getContent());
+    }
+
+    public function testListOwnersLimit(): void
+    {
+        // Create contacts.
+        $role = new Role();
+        $role->setName('View own contacts');
+        $role->setIsAdmin(false);
+        $this->em->persist($role);
+
+        $permission = new Permission();
+        $permission->setBundle('lead');
+        $permission->setName('leads');
+        $permission->setRole($role);
+        $permission->setBitwise(2);
+        $this->em->persist($permission);
+
+        // Add 10 more users, so system will have 12 total.
+        for ($i = 0; $i < 10; $i++) {
+            $this->createApiUser(
+                $role,
+                'api-owner'.$i,
+                'api-owner'.$i.'@test.com',
+                'API'.$i,
+                'Owner'.$i
+            );
+        }
+
+        $this->em->flush();
+
+        // Limit 10 returns 10 records
+        $this->client->request(Request::METHOD_GET, '/api/contacts/list/owners', ['limit' => '10']);
+        $clientResponse = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertCount(10, $response);
+
+        // Limit 10, start 2 returns 10 records
+        $this->client->request(Request::METHOD_GET, '/api/contacts/list/owners', ['limit' => '10', 'start' => '2']);
+        $clientResponse = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertCount(10, $response);
+
+        // Limit 10, start 10 returns 2 records
+        $this->client->request(Request::METHOD_GET, '/api/contacts/list/owners', ['limit' => '10', 'start' => '10']);
+        $clientResponse = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertCount(2, $response);
+
+        // No limit, start ignored returns 12 records
+        $this->client->request(Request::METHOD_GET, '/api/contacts/list/owners', ['start' => '10']);
+        $clientResponse = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertCount(12, $response);
     }
 
     private function createContactWithNote(User $owner, string $email, string $text = 'Contact note'): Lead
