@@ -58,10 +58,11 @@ final class FormFieldRatingTypeTest extends TypeTestCase
         $this->assertSame('mautic.form.field.form.rating_star_count', $starCount->getConfig()->getOption('label'));
         $this->assertSame(['class' => 'form-label'], $starCount->getConfig()->getOption('label_attr'));
         $this->assertSame([
-            'class'   => 'form-control',
             'tooltip' => 'mautic.form.field.help.rating_star_count',
             'min'     => 1,
             'max'     => 10,
+            'digits'  => 2,
+            'size'    => 'sm',
         ], $starCount->getConfig()->getOption('attr'));
         $this->assertSame(5, $starCount->getData());
         $this->assertFalse($starCount->isRequired());
