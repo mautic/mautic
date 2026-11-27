@@ -37,8 +37,8 @@
 
   &__heading i {
     color: var(--benchmark-muted);
-    font-size: 16px;
-    line-height: 16px;
+    font-size: var(--body-02-font-size);
+    line-height: 1;
   }
 
   &__summary {
