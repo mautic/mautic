@@ -57,4 +57,9 @@ if (false !== $token && '' !== $token) {
     putenv('SYMFONY_DOTENV_VARS='.$newList);
     $_ENV['SYMFONY_DOTENV_VARS']    = $newList;
     $_SERVER['SYMFONY_DOTENV_VARS'] = $newList;
+
+    // Same stub as in tests/bootstrap.php, for this worker's own local config file.
+    if (!file_exists($overrides['MAUTIC_LOCAL_CONFIG_FILE'])) {
+        file_put_contents($overrides['MAUTIC_LOCAL_CONFIG_FILE'], '<?php $parameters = [];');
+    }
 }
