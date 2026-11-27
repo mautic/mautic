@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Event\RedirectClickEvent;
 use Mautic\PageBundle\Event\TrackingEvent;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use Mautic\PageBundle\Helper\PageConfig;
@@ -523,6 +524,8 @@ final class PublicController extends AbstractFormController
                     $lead           = $contactRequestHelper->getContactFromQuery();
                     $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
                 }
+
+                $this->dispatcher->dispatch(new RedirectClickEvent($redirect, $request));
 
                 if ($lead) {
                     try {
