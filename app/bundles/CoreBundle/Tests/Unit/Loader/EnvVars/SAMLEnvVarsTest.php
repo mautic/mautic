@@ -51,6 +51,22 @@ final class SAMLEnvVarsTest extends TestCase
         $this->assertEquals('mautic', $this->envVars->get('MAUTIC_SAML_ENTITY_ID'));
     }
 
+    public function testEntityIdFallsBackToMauticWhenSiteUrlIsMalformed(): void
+    {
+        $this->assertEntityIdFallsBackWithoutWarnings(
+            'http://',
+            'Malformed site_url must not emit PHP warnings'
+        );
+    }
+
+    public function testEntityIdFallsBackToMauticWhenSiteUrlHasNoHost(): void
+    {
+        $this->assertEntityIdFallsBackWithoutWarnings(
+            'not a url',
+            'Host-less site_url must not emit PHP warnings'
+        );
+    }
+
     public function testLoginPathIsDefaultIfSamlIsDisabled(): void
     {
         $this->config->set('saml_idp_metadata', 'enabled');
@@ -69,5 +85,27 @@ final class SAMLEnvVarsTest extends TestCase
 
         $this->assertEquals('/s/saml/login', $this->envVars->get('MAUTIC_SAML_LOGIN_PATH'));
         $this->assertEquals('/s/saml/login_check', $this->envVars->get('MAUTIC_SAML_LOGIN_CHECK_PATH'));
+    }
+
+    private function assertEntityIdFallsBackWithoutWarnings(string $siteUrl, string $failureMessage): void
+    {
+        $this->config->set('saml_idp_entity_id', '');
+        $this->config->set('site_url', $siteUrl);
+
+        $warnings = [];
+        set_error_handler(static function (int $severity, string $message) use (&$warnings): bool {
+            $warnings[] = $message;
+
+            return true;
+        });
+
+        try {
+            SAMLEnvVars::load($this->config, $this->defaultConfig, $this->envVars);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertEquals('mautic', $this->envVars->get('MAUTIC_SAML_ENTITY_ID'));
+        $this->assertSame([], $warnings, $failureMessage);
     }
 }
