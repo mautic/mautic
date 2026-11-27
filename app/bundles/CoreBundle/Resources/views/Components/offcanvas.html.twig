@@ -1,0 +1,26 @@
+{% set placement = placement|default('end') %}
+{% set backdropValue = backdrop is defined and backdrop is same as('static') ? 'static' : (backdrop is defined and backdrop is same as(false) ? 'false' : 'true') %}
+{% set headingId = id ~ '-heading' %}
+{% set classes = ['offcanvas', 'offcanvas-' ~ placement] %}
+{% if className|default('') %}{% set classes = classes|merge([className]) %}{% endif %}
+<div class="{{ classes|join(' ')|e('html_attr') }}" id="{{ id|e('html_attr') }}" tabindex="-1"
+    {% if offcanvasHeading is defined %}aria-labelledby="{{ headingId|e('html_attr') }}"{% else %}aria-label="{{ offcanvasAriaLabel|default('')|trans|e('html_attr') }}"{% endif %}
+    data-bs-backdrop="{{ backdropValue }}"
+    data-bs-scroll="{{ scroll is defined and scroll ? 'true' : 'false' }}"
+    data-bs-keyboard="{{ keyboard is defined and keyboard is same as(false) ? 'false' : 'true' }}"
+    {% if offcanvasAttributes is defined %}{% for key, value in offcanvasAttributes %} {{ key|e('html_attr') }}="{{ value|e('html_attr') }}"{% endfor %}{% endif %}>
+    <div class="offcanvas-header">
+        {% if offcanvasHeading is defined %}
+            <h2 class="offcanvas-title type-heading-03" id="{{ headingId|e('html_attr') }}">{{ offcanvasHeading|trans }}</h2>
+        {% endif %}
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" aria-label="{{ closeButtonLabel|default('mautic.core.close'|trans)|e('html_attr') }}"></button>
+    </div>
+    <div class="offcanvas-body">
+        {% block offcanvas_body %}{{ offcanvasContent|default('')|raw }}{% endblock %}
+    </div>
+    {% if buttons is defined and buttons is not empty %}
+        <div class="offcanvas-footer d-flex gap-8 p-16 border-top">
+            {% include '@MauticCore/Helper/button.html.twig' with {'buttons': buttons} %}
+        </div>
+    {% endif %}
+</div>
