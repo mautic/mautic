@@ -149,7 +149,7 @@ final class PublicController extends CommonFormController
         $isHeadRequest          = $request->isMethod(Request::METHOD_HEAD);
 
         if ($request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe')) {
-            return $this->oneClickUnsubscribe($model, $stat);
+            return $this->oneClickUnsubscribe($model, $mailHash, $stat, $urlEmail, $secretHash);
         }
 
         if (!empty($stat) && $email = $stat->getEmail()) {
@@ -801,19 +801,56 @@ final class PublicController extends CommonFormController
         return array_merge($showParamsBasedOnConfiguration, $showParamsBasedOnContent);
     }
 
-    private function oneClickUnsubscribe(EmailModel $model, ?Stat $stat): Response
+    /**
+     * Handles an RFC 8058 one-click unsubscribe. When the email stat is gone, the contact is found by the
+     * signed email address in the link, the same way the unsubscribe page does.
+     *
+     * @param EmailModel     $model      the email model that adds the Do Not Contact entry
+     * @param MailHashHelper $mailHash   signs email addresses
+     * @param Stat|null      $stat       the email stat of the link, null when it is gone
+     * @param string|null    $urlEmail   the email address in the link
+     * @param string|null    $secretHash the signature of that address in the link
+     *
+     * @return Response the unsubscribed text, or 404 when no contact is found
+     */
+    private function oneClickUnsubscribe(EmailModel $model, MailHashHelper $mailHash, ?Stat $stat, ?string $urlEmail, ?string $secretHash): Response
     {
-        if (!$stat) {
-            $statsNotFount = $this->translator->trans('mautic.email.stat_record.not_found');
+        $unsubscribeComment = $this->translator->trans('mautic.email.dnc.unsubscribed');
 
-            return new Response($statsNotFount, Response::HTTP_NOT_FOUND);
+        if ($stat) {
+            $model->setDoNotContact($stat, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
+
+            return new Response($this->translator->trans('mautic.lead.do.not.contact_unsubscribed'));
         }
 
-        // RFC 8058 One-Click unsubscribe
-        $unsubscribeComment = $this->translator->trans('mautic.email.dnc.unsubscribed');
-        $model->setDoNotContact($stat, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
+        $lead = $this->getContactBySignedEmail($mailHash, $urlEmail, $secretHash);
+        if (!$lead) {
+            return new Response($this->translator->trans('mautic.email.stat_record.not_found'), Response::HTTP_NOT_FOUND);
+        }
+
+        $model->setDoNotContactLead($lead, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
 
         return new Response($this->translator->trans('mautic.lead.do.not.contact_unsubscribed'));
+    }
+
+    /**
+     * Finds the contact of a signed email address.
+     *
+     * @param MailHashHelper $mailHash   signs email addresses
+     * @param string|null    $urlEmail   the email address in the link
+     * @param string|null    $secretHash the signature of that address in the link
+     *
+     * @return Lead|null the last contact with the address, or null when the signature does not match or no contact has it
+     */
+    private function getContactBySignedEmail(MailHashHelper $mailHash, ?string $urlEmail, ?string $secretHash): ?Lead
+    {
+        if (!$urlEmail || !$secretHash || !hash_equals($mailHash->getEmailHash($urlEmail), $secretHash)) {
+            return null;
+        }
+
+        $contacts = $this->leadRepository->getContactsByEmail($urlEmail);
+
+        return array_pop($contacts);
     }
 
     /**

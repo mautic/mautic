@@ -11,6 +11,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
@@ -211,6 +212,71 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $dncCollection = $stat->getLead()->getDoNotContact();
         $this->assertCount(1, $dncCollection);
         $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncCollection->first()->getReason());
+    }
+
+    /**
+     * A one-click unsubscribe whose email stat is gone finds the contact by the signed email address in the link.
+     */
+    public function testOneClickUnsubscribeWithDeletedStatUsesTheSignedEmailAddress(): void
+    {
+        $contact = new Lead();
+        $contact->setEmail('one.click@mautic.tld');
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_POST, '/email/unsubscribe/deleted-stat-hash/one.click@mautic.tld/'.$this->getEmailHash('one.click@mautic.tld'), [
+            'List-Unsubscribe' => 'One-Click',
+        ]);
+
+        self::assertResponseIsSuccessful();
+        $this->assertSame('Unsubscribed', $this->client->getResponse()->getContent());
+
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+        /** @var DoNotContact[] $dncRecords */
+        $dncRecords = $dncRepository->findBy(['lead' => $contact->getId()]);
+
+        $this->assertCount(1, $dncRecords);
+        $this->assertSame(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason());
+        $this->assertSame('email', $dncRecords[0]->getChannel());
+        $this->assertSame('User unsubscribed.', $dncRecords[0]->getComments());
+    }
+
+    /**
+     * A one-click unsubscribe whose email stat is gone and whose signature does not match the address is not found and writes nothing.
+     */
+    public function testOneClickUnsubscribeWithDeletedStatAndWrongHashIsNotFound(): void
+    {
+        $contact = new Lead();
+        $contact->setEmail('one.click@mautic.tld');
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_POST, '/email/unsubscribe/deleted-stat-hash/one.click@mautic.tld/'.$this->getEmailHash('other@mautic.tld'), [
+            'List-Unsubscribe' => 'One-Click',
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+
+        $this->assertCount(0, $dncRepository->findBy(['lead' => $contact->getId()]));
+    }
+
+    /**
+     * Signs an email address the way unsubscribe links are signed.
+     *
+     * @param string $email the email address
+     *
+     * @return string the signature
+     */
+    private function getEmailHash(string $email): string
+    {
+        /** @var CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
+
+        return MailHashHelper::getEmailHashForSecret($email, (string) $coreParametersHelper->get('secret_key'));
     }
 
     public function testHeadRequestWithNoShowContactPreferences(): void
