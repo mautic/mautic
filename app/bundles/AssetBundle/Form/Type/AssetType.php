@@ -138,6 +138,13 @@ final class AssetType extends AbstractType
             ],
         ]);
 
+        $builder->add('trackDownloads', YesNoButtonGroupType::class, [
+            'label' => 'mautic.asset.asset.form.track_downloads',
+            'attr'  => [
+                'tooltip' => 'mautic.asset.asset.form.track_downloads.tooltip',
+            ],
+        ]);
+
         $builder->add('isPublished', YesNoButtonGroupType::class, [
             'label' => 'mautic.core.form.available',
         ]);
