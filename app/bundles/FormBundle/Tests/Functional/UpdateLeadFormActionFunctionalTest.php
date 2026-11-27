@@ -56,11 +56,24 @@ final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($formElement);
 
         $this->em->clear();
+        $leadFieldValues = $this->em->getRepository(Lead::class)->getFieldValues($lead->getId(), false);
+
         foreach ($expectedLeadData as $field => $value) {
-            $leadFieldValue = $lead->getFieldValue($field);
-            if ('{datetime=now}' === $value) {
+            $leadFieldValue = $leadFieldValues[$field]['value'] ?? null;
+
+            if ('{date=now}' === $value) {
+                $this->assertIsString($leadFieldValue);
+
                 $actualValue = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $leadFieldValue);
-                $diff        = abs($actualValue->getTimestamp() - (new \DateTime())->getTimestamp());
+                $this->assertInstanceOf(\DateTimeImmutable::class, $actualValue);
+                $this->assertSame((new \DateTime())->format('Y-m-d'), $actualValue->format('Y-m-d'));
+            } elseif ('{datetime=now}' === $value) {
+                $this->assertIsString($leadFieldValue);
+
+                $actualValue = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $leadFieldValue);
+                $this->assertInstanceOf(\DateTimeImmutable::class, $actualValue);
+
+                $diff = abs($actualValue->getTimestamp() - (new \DateTime())->getTimestamp());
                 $this->assertLessThan(60, $diff, "The {$field} is not within 60 seconds of now.");
             } else {
                 $this->assertEquals($value, $leadFieldValue ?? null, "Field {$field} does not match");
@@ -102,6 +115,21 @@ final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
             ],
             'expectedLeadData' => [
                 'attribution_date' => '{datetime=now}',
+            ],
+        ];
+        yield 'Update attribution amount and set its date' => [
+            'leadData' => [
+                'email' => 'attribution@test.com',
+            ],
+            'formData' => [
+                'email' => 'attribution@test.com',
+            ],
+            'actionProperties' => [
+                'attribution' => 100,
+            ],
+            'expectedLeadData' => [
+                'attribution'      => 100,
+                'attribution_date' => '{date=now}',
             ],
         ];
         yield 'Form data wins over action properties for same field' => [

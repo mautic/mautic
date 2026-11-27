@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Doctrine\ORM\ORMException;
 use Illuminate\Support\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
@@ -31,7 +32,6 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\StageBundle\Entity\Stage;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -60,7 +60,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
      */
     protected function createLeadCompany(Lead $contactA, Company $company): CompanyLead
     {
@@ -413,6 +413,57 @@ final class LeadControllerTest extends MauticMysqlTestCase
             'points'    => [0, 20.0],
             'company'   => ['', 'Doe Corp'],
         ], $auditLog->getDetails()['fields']);
+    }
+
+    public function testDateModifiedIsPersistedWhenContactIsEditedViaUI(): void
+    {
+        $email   = 'modified-date-contact@example.com';
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues([
+            'lead[firstname]' => 'Original',
+            'lead[lastname]'  => 'Contact',
+            'lead[email]'     => $email,
+        ]);
+
+        $this->client->submit($form);
+        self::assertResponseIsSuccessful();
+
+        /** @var Lead $contact */
+        $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => $email]);
+        $this->assertInstanceOf(Lead::class, $contact);
+
+        $contactId    = $contact->getId();
+        $dateAdded    = $contact->getDateAdded();
+        $dateModified = $contact->getDateModified();
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateAdded);
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateModified);
+        $this->assertLessThanOrEqual(1, abs($dateModified->getTimestamp() - $dateAdded->getTimestamp()));
+
+        $previousDateModified = new \DateTime('2000-01-01 00:00:00');
+        $this->connection->update(
+            $this->em->getClassMetadata(Lead::class)->getTableName(),
+            ['date_modified' => $previousDateModified->format('Y-m-d H:i:s')],
+            ['id' => $contactId]
+        );
+        $this->em->clear();
+
+        $contact = $this->em->getRepository(Lead::class)->find($contactId);
+        $this->assertInstanceOf(Lead::class, $contact);
+        $this->assertSame($previousDateModified->getTimestamp(), $contact->getDateModified()->getTimestamp());
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/'.$contactId);
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues(['lead[firstname]' => 'Updated']);
+        $this->client->submit($form);
+        self::assertResponseIsSuccessful();
+
+        $this->em->clear();
+        $updatedContact = $this->em->getRepository(Lead::class)->find($contactId);
+        $this->assertInstanceOf(Lead::class, $updatedContact);
+        $this->assertSame('Updated', $updatedContact->getFirstname());
+        $this->assertSame($dateAdded->getTimestamp(), $updatedContact->getDateAdded()->getTimestamp());
+        $this->assertGreaterThan($previousDateModified->getTimestamp(), $updatedContact->getDateModified()->getTimestamp());
     }
 
     /**

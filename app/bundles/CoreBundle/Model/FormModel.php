@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\UnitOfWork;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
@@ -270,14 +271,14 @@ class FormModel extends AbstractCommonModel
             return;
         }
 
-        if (method_exists($entity, 'getChanges') ? !empty($entity->getChanges()) : true) {
+        if (!method_exists($entity, 'getChanges') || !empty($entity->getChanges())) {
             $this->setModifiedData($entity);
         }
     }
 
     private function setModifiedData(object $entity): void
     {
-        if (method_exists($entity, 'setDateModified') && method_exists($entity, 'getDateModified') && !$entity->getDateModified()) {
+        if (method_exists($entity, 'setDateModified')) {
             $entity->setDateModified(
                 defined('MAUTIC_DATE_MODIFIED_OVERRIDE') ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE) : new \DateTime()
             );
@@ -442,7 +443,7 @@ class FormModel extends AbstractCommonModel
      * @param string   $spaceCharacter    Character to replace spaces with
      * @param string[] $allowedCharacters Allowed characters in alias
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function cleanAlias(
         string $alias,

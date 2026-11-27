@@ -104,4 +104,75 @@ final class FormModelTest extends TestCase
             ++$countDispatch;
         }
     }
+
+    public function testSaveEntityIfDateModifiedIsUpdatedOnlyWhenEntityChanges(): void
+    {
+        $corePermissionsMock      = $this->createStub(CorePermissions::class);
+        $dispatcherMock           = $this->createStub(EventDispatcherInterface::class);
+        $routerMock               = $this->createStub(UrlGeneratorInterface::class);
+        $translatorMock           = $this->createStub(Translator::class);
+        $userHelperMock           = $this->createStub(UserHelper::class);
+        $loggerMock               = $this->createStub(LoggerInterface::class);
+        $coreParametersHelperMock = $this->createStub(CoreParametersHelper::class);
+        $formRepository           = $this->createStub(FormRepository::class);
+
+        $formRepository
+            ->method('saveEntity')
+            ->willReturnCallback(function (Lead $lead): void {
+                if (!$lead->getId()) {
+                    $lead->setId(1);
+                }
+            });
+
+        $this
+            ->entityManagerMock
+            ->method('getRepository')
+            ->willReturn($formRepository);
+
+        $formModel = new FormModel(
+            $this->entityManagerMock,
+            $corePermissionsMock,
+            $dispatcherMock,
+            $routerMock,
+            $translatorMock,
+            $userHelperMock,
+            $loggerMock,
+            $coreParametersHelperMock,
+        );
+
+        // Step 1: Create a new entity and save it
+        $lead = new Lead();
+        $formModel->saveEntity($lead);
+
+        $dateModified1 = $lead->getDateModified();
+        $dateAdded1    = $lead->getDateAdded();
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateModified1);
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateAdded1);
+        $this->assertLessThanOrEqual(1, abs($dateModified1->getTimestamp() - $dateAdded1->getTimestamp()));
+
+        // Step 2: Save the entity again without making any changes
+        $lead->resetChanges();
+        $formModel->saveEntity($lead);
+        $this->assertSame($dateModified1->getTimestamp(), $lead->getDateModified()->getTimestamp(), 'Date modified should not be updated when the entity has no changes');
+
+        // Step 3: Update the existing entity and save it
+        $previousDateModified = new \DateTime('2000-01-01 00:00:00');
+        $lead->setDateModified($previousDateModified);
+        $lead->setTitle('Lorem ipsum');
+        $formModel->saveEntity($lead);
+
+        $dateModified2 = $lead->getDateModified();
+        $dateAdded2    = $lead->getDateAdded();
+
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateModified2);
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateAdded2);
+        $this->assertSame($dateAdded1->getTimestamp(), $dateAdded2->getTimestamp(), 'Date added should not be updated after saving the entity again');
+        $this->assertGreaterThan($previousDateModified->getTimestamp(), $dateModified2->getTimestamp(), 'Date modified should be updated after saving the entity again');
+
+        // Step 4: Update the DNC channel status and save the entity
+        $lead->resetChanges();
+        $lead->setChanges(['dnc_channel_status' => []]);
+        $formModel->saveEntity($lead);
+        $this->assertSame($dateModified2->getTimestamp(), $lead->getDateModified()->getTimestamp(), 'Date modified should not be updated when only the DNC channel status changes');
+    }
 }

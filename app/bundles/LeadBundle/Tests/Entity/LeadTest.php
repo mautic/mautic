@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -280,6 +282,104 @@ final class LeadTest extends TestCase
         $lead->checkAttributionDate();
         $this->assertNull($lead->getFieldValue('attribution_date'));
         $this->assertNotEmpty($lead->getChanges());
+    }
+
+    public function testAttributionDateIsUnchangedForTimestampOnlyUpdate(): void
+    {
+        $lead = new Lead();
+        $lead->addUpdatedField('attribution_date', '2017-09-09');
+
+        $changes = [
+            'dateModified' => [
+                new \DateTime('2000-01-01'),
+                new \DateTime('2001-01-01'),
+            ],
+        ];
+
+        $lead->checkAttributionDateOnUpdate(new PreUpdateEventArgs($lead, $this->createStub(EntityManagerInterface::class), $changes));
+        $this->assertSame('2017-09-09', $lead->getFieldValue('attribution_date'));
+    }
+
+    public function testAttributionDateIsAddedForTimestampOnlyAttributionUpdate(): void
+    {
+        $lead = new Lead();
+        $lead->setFields(
+            [
+                'core' => [
+                    'attribution_date' => [
+                        'type'  => 'date',
+                        'value' => null,
+                    ],
+                    'attribution' => [
+                        'type'  => 'int',
+                        'value' => 0,
+                    ],
+                ],
+            ]
+        );
+        $lead->addUpdatedField('attribution', 100);
+
+        $changes = [
+            'dateModified' => [
+                new \DateTime('2000-01-01'),
+                new \DateTime('2001-01-01'),
+            ],
+        ];
+
+        $lead->checkAttributionDateOnUpdate(new PreUpdateEventArgs($lead, $this->createStub(EntityManagerInterface::class), $changes));
+        $this->assertSame((new \DateTime())->format('Y-m-d'), $lead->getFieldValue('attribution_date'));
+    }
+
+    public function testAttributionDateIsRemovedForTimestampOnlyClearedAttributionUpdate(): void
+    {
+        foreach ([0, null] as $attribution) {
+            $lead = new Lead();
+            $lead->setFields(
+                [
+                    'core' => [
+                        'attribution_date' => [
+                            'type'  => 'date',
+                            'value' => '2017-09-09',
+                        ],
+                        'attribution' => [
+                            'type'  => 'int',
+                            'value' => 100,
+                        ],
+                    ],
+                ]
+            );
+            $lead->addUpdatedField('attribution', $attribution);
+
+            $changes = [
+                'dateModified' => [
+                    new \DateTime('2000-01-01'),
+                    new \DateTime('2001-01-01'),
+                ],
+            ];
+
+            $lead->checkAttributionDateOnUpdate(new PreUpdateEventArgs($lead, $this->createStub(EntityManagerInterface::class), $changes));
+            $this->assertNull($lead->getFieldValue('attribution_date'));
+        }
+    }
+
+    public function testAttributionDateIsCheckedForMappedFieldUpdate(): void
+    {
+        $lead = new Lead();
+        $lead->addUpdatedField('attribution_date', '2017-09-09');
+
+        $changes = [
+            'dateModified' => [
+                new \DateTime('2000-01-01'),
+                new \DateTime('2001-01-01'),
+            ],
+            'firstname'    => [
+                'Old',
+                'New',
+            ],
+        ];
+
+        $lead->checkAttributionDateOnUpdate(new PreUpdateEventArgs($lead, $this->createStub(EntityManagerInterface::class), $changes));
+        $this->assertNull($lead->getFieldValue('attribution_date'));
     }
 
     public function testAttributionDateIsNotChangedWhen0ChangedToNull(): void
