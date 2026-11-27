@@ -193,30 +193,18 @@ class Configurator
     public function render(): string
     {
         $string = "<?php\n";
-        $string .= "\$parameters = array(\n";
+        $string .= '$parameters = ';
 
-        foreach ($this->parameters as $key => $value) {
-            if ('' !== $value) {
-                if (is_string($value)) {
-                    $value = "'".addcslashes($value, '\\\'')."'";
-                } elseif (is_bool($value)) {
-                    $value = ($value) ? 'true' : 'false';
-                } elseif (null === $value) {
-                    $value = 'null';
-                } elseif (is_array($value)) {
-                    $value = $this->renderArray($value);
-                }
+        $string .= var_export($this->parameters, true);
 
-                $string .= "\t'{$key}' => {$value},\n";
-            }
-        }
-
-        return $string.");\n";
+        return $string.";\n";
     }
 
     /**
      * @param array<mixed> $array
      * @param int          $level
+     *
+     * @deprecated use \var_export instead
      */
     protected function renderArray($array, $level = 1): string
     {
