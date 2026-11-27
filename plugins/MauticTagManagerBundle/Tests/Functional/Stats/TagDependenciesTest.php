@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\ReportBundle\Entity\Report;
+use Symfony\Component\DomCrawler\Crawler;
 
 final class TagDependenciesTest extends MauticMysqlTestCase
 {
@@ -30,7 +31,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
         $searchIds      = implode(',', [$campaign->getId(), $campaign2->getId()]);
-        $this->assertStringContainsString("href=\"/s/campaigns?search=ids:{$searchIds}\"", (string) $content);
+        $this->assertCount(1, (new Crawler((string) $content))->filter("a[href=\"/s/campaigns?search=ids:{$searchIds}\"]"));
     }
 
     public function testTagUsageInSegments(): void
@@ -58,7 +59,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
         $searchIds      = implode(',', [$segmentWithTag->getId()]);
-        $this->assertStringContainsString("href=\"/s/segments?search=ids:{$searchIds}\"", (string) $content);
+        $this->assertCount(1, (new Crawler((string) $content))->filter("a[href=\"/s/segments?search=ids:{$searchIds}\"]"));
     }
 
     public function testTagUsageInForms(): void
@@ -72,7 +73,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
         $searchIds      = implode(',', [$form->getId()]);
-        $this->assertStringContainsString("href=\"/s/forms?search=ids:{$searchIds}\"", (string) $content);
+        $this->assertCount(1, (new Crawler((string) $content))->filter("a[href=\"/s/forms?search=ids:{$searchIds}\"]"));
     }
 
     public function testTagUsageInPointTriggers(): void
@@ -85,7 +86,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
         $searchIds      = implode(',', [$pointActionIsSent->getId()]);
-        $this->assertStringContainsString("href=\"/s/points/triggers?search=ids:{$searchIds}\"", (string) $content);
+        $this->assertCount(1, (new Crawler((string) $content))->filter("a[href=\"/s/points/triggers?search=ids:{$searchIds}\"]"));
     }
 
     public function testTagUsageInReports(): void
@@ -96,7 +97,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
         $searchIds      = implode(',', [$report->getId()]);
-        $this->assertStringContainsString("href=\"/s/reports?search=ids:{$searchIds}\"", (string) $content);
+        $this->assertCount(1, (new Crawler((string) $content))->filter("a[href=\"/s/reports?search=ids:{$searchIds}\"]"));
     }
 
     public function testTagUsageInReportsEmpty(): void
