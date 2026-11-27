@@ -109,8 +109,10 @@ final class ModifyCustomFieldCommand extends Command
          *
          */
         while (false !== ($row = fgetcsv($inputCsv, escape: '\\'))) {
-            // Treat a single null value (blank line) as no row
-            if ([null] === $row || [false] === $row) {
+            // Treat a blank line (single null value) as no row.
+            // fgetcsv() returns scalar `false` only at EOF/error, which the
+            // while condition already handles — there is no `[false]` case.
+            if ([null] === $row) {
                 continue;
             }
 
