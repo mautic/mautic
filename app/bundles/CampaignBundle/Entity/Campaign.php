@@ -627,7 +627,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      */
     public function hasOrphanEvents(): bool
     {
-        $canvasSettings = $this->canvasSettings;
+        $canvasSettings = $this->getCanvasSettings();
 
         if (empty($canvasSettings['nodes'])) {
             return false;
