@@ -202,7 +202,8 @@ final class CategoryController extends AbstractFormController
         $session    = $request->getSession();
         $entity     = $this->categoryModel->getEntity();
         $success    = 0;
-        $cancelled  = $valid  = false;
+        $cancelled  = false;
+        $valid  = false;
         $method     = $request->getMethod();
         $inForm     = $this->getInFormValue($request, $method);
 
@@ -295,8 +296,10 @@ final class CategoryController extends AbstractFormController
     {
         $session = $request->getSession();
         $entity    = $this->categoryModel->getEntity($objectId);
-        $success   = $closeModal   = 0;
-        $cancelled = $valid = false;
+        $success   = 0;
+        $closeModal   = 0;
+        $cancelled = false;
+        $valid = false;
         $method    = $request->getMethod();
         $inForm    = $this->getInFormValue($request, $method);
         $response  = null;

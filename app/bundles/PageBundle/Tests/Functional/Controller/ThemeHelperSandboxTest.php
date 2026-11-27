@@ -75,8 +75,8 @@ final class ThemeHelperSandboxTest extends MauticMysqlTestCase
         try {
             $themeHelper->renderThemeTemplate('@themes/'.$themeName.'/html/page.html.twig', []);
             $this->fail('A PHP callable must be rejected by the theme sandbox.');
-        } catch (RuntimeError $exception) {
-            $this->assertStringContainsString('must be a Closure in sandbox mode', $exception->getMessage());
+        } catch (RuntimeError $runtimeError) {
+            $this->assertStringContainsString('must be a Closure in sandbox mode', $runtimeError->getMessage());
         } finally {
             $this->assertSame(0, self::$callbackInvocations, 'The callback must never execute, even if rendering subsequently fails.');
         }

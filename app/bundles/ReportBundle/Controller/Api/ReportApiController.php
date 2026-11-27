@@ -67,8 +67,8 @@ final class ReportApiController extends CommonApiController
             if (!$this->security->isGranted($this->permissionBase.':view')) {
                 return $this->accessDenied();
             }
-        } catch (PermissionException $e) {
-            return $this->accessDenied($e->getMessage());
+        } catch (PermissionException $permissionException) {
+            return $this->accessDenied($permissionException->getMessage());
         }
 
         $entity        = $this->model->getEntity($id);

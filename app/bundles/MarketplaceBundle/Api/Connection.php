@@ -65,8 +65,8 @@ final readonly class Connection
 
         try {
             $response = $this->httpClient->send($request);
-        } catch (GuzzleException $e) {
-            throw new ApiException($e->getMessage(), $e->getCode(), $e);
+        } catch (GuzzleException $guzzleException) {
+            throw new ApiException($guzzleException->getMessage(), $guzzleException->getCode(), $guzzleException);
         }
 
         $body = (string) $response->getBody();

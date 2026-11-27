@@ -161,9 +161,9 @@ final readonly class ComposerHelper
 
         try {
             $exitCode = $application->run($arrayInput, $output);
-        } catch (\Exception $e) {
-            $output->writeln('Exception while running Composer command: '.$e->getMessage());
-            $this->logger->error('Exception while running Composer command: '.$e->getMessage());
+        } catch (\Exception $exception) {
+            $output->writeln('Exception while running Composer command: '.$exception->getMessage());
+            $this->logger->error('Exception while running Composer command: '.$exception->getMessage());
         }
 
         $this->logger->info('Composer command output: '.$output->fetch());

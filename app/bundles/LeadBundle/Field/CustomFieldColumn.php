@@ -66,12 +66,12 @@ final readonly class CustomFieldColumn
 
         try {
             $this->fieldColumnDispatcher->dispatchPreAddColumnEvent($leadField);
-        } catch (AbortColumnCreateException $e) {
+        } catch (AbortColumnCreateException $abortColumnCreateException) {
             // Save the field metadata and throw the exception again to stop column creation.
             // As the column should be created by a background job.
             $this->leadFieldSaver->saveLeadFieldEntityWithoutColumnCreated($leadField);
 
-            throw $e;
+            throw $abortColumnCreateException;
         }
 
         $this->processCreateLeadColumn($leadField);
@@ -105,14 +105,14 @@ final readonly class CustomFieldColumn
 
         try {
             $leadsSchema->executeChanges();
-        } catch (DriverException $e) {
-            $this->logger->warning($e->getMessage());
+        } catch (DriverException $driverException) {
+            $this->logger->warning($driverException->getMessage());
 
-            if (1118 === $e->getCode() /* ER_TOO_BIG_ROWSIZE */) {
-                throw new CustomFieldLimitException('mautic.lead.field.max_column_error', $e->getCode(), $e);
+            if (1118 === $driverException->getCode() /* ER_TOO_BIG_ROWSIZE */) {
+                throw new CustomFieldLimitException('mautic.lead.field.max_column_error', $driverException->getCode(), $driverException);
             }
 
-            throw $e;
+            throw $driverException;
         }
 
         if ($saveLeadField) {

@@ -26,8 +26,8 @@ final class TranslatorTest extends AbstractMauticTestCase
         $internalTranslator->addLoader('array', new ArrayLoader());
 
         $internalTranslator->addResource('array', [
-            'test.valid.message'       => 'Show warning if segment hasn\'t been rebuilt for X hours',
-            'test.problematic.message' => 'This segment hasn\'t been rebuilt for 1 hour.|This segment hasn\'t been rebuilt for %count% hours.',
+            'test.valid.message'       => "Show warning if segment hasn't been rebuilt for X hours",
+            'test.problematic.message' => "This segment hasn't been rebuilt for 1 hour.|This segment hasn't been rebuilt for %count% hours.",
         ], $fallback);
 
         $internalTranslator->addResource('array', [
@@ -46,7 +46,7 @@ final class TranslatorTest extends AbstractMauticTestCase
             'Russian plural message expected.'
         );
         $this->assertSame(
-            'This segment hasn\'t been rebuilt for 5 hours.',
+            "This segment hasn't been rebuilt for 5 hours.",
             $translator->trans('test.problematic.message', ['%count%' => 5], null, $locale),
             'Fallback to english plural message expected.'
         );

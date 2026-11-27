@@ -215,17 +215,18 @@ final class Configurator
     {
         $string = "array(\n";
 
-        $count = $counter = count($array);
+        $count = count($array);
+        $counter = $count;
         foreach ($array as $key => $value) {
             if ($counter === $count) {
                 $string .= str_repeat("\t", $level + 1);
             }
-            $string .= '\''.$key.'\' => ';
+            $string .= "'".$key."' => ";
 
             if (is_array($value)) {
                 $string .= $this->renderArray($value, $level + 1);
             } else {
-                $string .= '\''.addcslashes((string) $value, '\\\'').'\'';
+                $string .= "'".addcslashes((string) $value, '\\\'')."'";
             }
 
             --$counter;

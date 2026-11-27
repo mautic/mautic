@@ -1164,7 +1164,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'submissionData' => [
                 'email'           => 'jane@example.com',
                 'firstname'       => 'Jane',
-                'lastname'        => 'O\'Brien-Smith',
+                'lastname'        => "O'Brien-Smith",
                 'country'         => 'Ireland',
                 'company_name'    => '"Super" R&D Company, Ltd.',
                 'company_country' => 'Ireland',
@@ -1174,7 +1174,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'expectedData' => [
                 'email'           => 'jane@example.com',
                 'firstname'       => 'Jane',
-                'lastname'        => 'O\'Brien-Smith',
+                'lastname'        => "O'Brien-Smith",
                 'country'         => 'Ireland',
                 'company_name'    => '"Super" R&D Company, Ltd.',
                 'company_country' => 'Ireland',

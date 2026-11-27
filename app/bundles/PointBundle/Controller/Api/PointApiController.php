@@ -103,8 +103,8 @@ final class PointApiController extends CommonApiController
 
         try {
             $this->logApiPointChange($request, $ipLookupHelper, $lead, $delta, $operator);
-        } catch (\Exception $e) {
-            return $this->returnError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+        } catch (\Exception $exception) {
+            return $this->returnError($exception->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
         return $this->handleView($this->view(['success' => 1], Response::HTTP_OK));

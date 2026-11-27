@@ -45,7 +45,7 @@ final readonly class BuildJsSubscriber
             $this->router->generate('mautic_page_tracker_getcontact', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
 
-        $js = <<<JS
+        $js = <<<JS_WRAP
 (function(m, l, n, d) {
     if (!m || m.runtimeReady !== true) {
         return;
@@ -181,7 +181,7 @@ final readonly class BuildJsSubscriber
       }
     });
 })(window.MauticJS, location, navigator, document);
-JS;
+JS_WRAP;
 
         $event->appendJsForScope($js, BuildJsScope::TRACKING, 'Mautic Tracking Pixel');
     }

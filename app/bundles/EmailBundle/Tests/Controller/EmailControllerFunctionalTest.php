@@ -451,7 +451,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email = self::getMailerMessage();
         $this->assertInstanceOf(MauticMessage::class, $email);
 
-        $quote = $singleOrDoubleQuotes ? '\'' : '"';
+        $quote = $singleOrDoubleQuotes ? "'" : '"';
         // The order of the recipients is not guaranteed, so we need to check both possibilities.
         $this->assertSame('Subject A', $email->getSubject());
         $this->assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email</i><a href='.$quote.'(?:\R|)https://localhost/r/[a-z0-9]+\?ct=[a-zA-Z0-9%]+(?:\R|)'.$quote.'>Mautic</a><img height="1" width="1" src="https://localhost/email/[a-z0-9]+\.gif\?ct=[^"]+" alt="" />#', $email->getHtmlBody());

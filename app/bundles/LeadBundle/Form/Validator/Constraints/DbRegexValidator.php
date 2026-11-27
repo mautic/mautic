@@ -25,9 +25,9 @@ final class DbRegexValidator extends ConstraintValidator
 
         try {
             $this->connection->executeQuery('SELECT 1 REGEXP ? AS is_valid', [$regex]);
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             $this->context->buildViolation(
-                $this->stripUglyPartOfTheErrorMessage($e->getPrevious()->getMessage())
+                $this->stripUglyPartOfTheErrorMessage($exception->getPrevious()->getMessage())
             )->addViolation();
         }
     }

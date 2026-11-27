@@ -39,7 +39,7 @@ final class InstallCommand extends Command
     protected function configure(): void
     {
         $this->addArgument('package', InputArgument::REQUIRED, 'The Packagist package to install (e.g. mautic/example-plugin)');
-        $this->addOption('dry-run', null, null, 'Simulate the installation of the package. Doesn\'t actually install it.');
+        $this->addOption('dry-run', null, null, "Simulate the installation of the package. Doesn't actually install it.");
         $this->addOption('user-id', null, InputOption::VALUE_REQUIRED, 'ID of the admin user who will own the installed resource. Required for mautic-resource packages when not run interactively.');
 
         parent::configure();
@@ -52,11 +52,11 @@ final class InstallCommand extends Command
 
         try {
             $package = $this->packageModel->getPackageDetail($packageName);
-        } catch (ApiException $e) {
-            if (404 === $e->getCode()) {
-                throw new \InvalidArgumentException('Given package '.$packageName.' does not exist in Packagist. Please check the name for typos.', $e->getCode(), $e);
+        } catch (ApiException $apiException) {
+            if (404 === $apiException->getCode()) {
+                throw new \InvalidArgumentException('Given package '.$packageName.' does not exist in Packagist. Please check the name for typos.', $apiException->getCode(), $apiException);
             }
-            throw new \Exception('Error while trying to get package details: '.$e->getMessage(), $e->getCode(), $e);
+            throw new \Exception('Error while trying to get package details: '.$apiException->getMessage(), $apiException->getCode(), $apiException);
         }
 
         $type = $package->packageBase->type ?? '';

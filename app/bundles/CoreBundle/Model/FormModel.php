@@ -512,14 +512,14 @@ class FormModel extends AbstractCommonModel
     {
         try {
             $this->em->flush();
-        } catch (\Exception $ex) {
+        } catch (\Exception $exception) {
             if (MAUTIC_ENV === 'dev') {
-                throw $ex;
+                throw $exception;
             }
 
             $this->logger->error(
-                $ex->getMessage(),
-                ['exception' => $ex]
+                $exception->getMessage(),
+                ['exception' => $exception]
             );
         }
     }

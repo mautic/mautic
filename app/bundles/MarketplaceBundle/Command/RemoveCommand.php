@@ -46,13 +46,13 @@ final class RemoveCommand extends Command
 
         try {
             $package = $this->packageModel->getPackageDetail($packageName);
-        } catch (ApiException $e) {
-            if (404 === $e->getCode()) {
+        } catch (ApiException $apiException) {
+            if (404 === $apiException->getCode()) {
                 $output->writeln('<error>Package '.$packageName.' not found.</error>');
 
                 return Command::FAILURE;
             }
-            throw new \Exception('Error while trying to get package details: '.$e->getMessage(), $e->getCode(), $e);
+            throw new \Exception('Error while trying to get package details: '.$apiException->getMessage(), $apiException->getCode(), $apiException);
         }
 
         $type = $package->packageBase->type ?? '';
@@ -93,8 +93,8 @@ final class RemoveCommand extends Command
 
         try {
             $this->resourceInstaller->uninstall($packageName);
-        } catch (\Exception $e) {
-            $output->writeln('<error>Error while removing resource: '.$e->getMessage().'</error>');
+        } catch (\Exception $exception) {
+            $output->writeln('<error>Error while removing resource: '.$exception->getMessage().'</error>');
 
             return Command::FAILURE;
         }

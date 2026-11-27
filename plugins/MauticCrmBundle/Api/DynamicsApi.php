@@ -75,7 +75,7 @@ final class DynamicsApi extends CrmApi
 
         $logicalName = rtrim($object, 's'); // singularize object name
 
-        $operation  = sprintf('EntityDefinitions(LogicalName=\'%s\')/Attributes', $logicalName);
+        $operation  = sprintf("EntityDefinitions(LogicalName='%s')/Attributes", $logicalName);
         $parameters = [
             // ignore system fields
             '$filter' => 'Microsoft.Dynamics.CRM.NotIn(PropertyName=\'AttributeTypeName\',PropertyValues=["Virtual", "Uniqueidentifier", "Picklist", "Lookup", "Owner", "Customer"]) and IsValidForUpdate eq true and AttributeOf eq null and LogicalName ne \'parentcustomerid\'',

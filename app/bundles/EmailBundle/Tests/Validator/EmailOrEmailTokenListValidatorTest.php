@@ -186,7 +186,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
                 Assert::assertSame(
                     [
                         '%value%'   => 'somestring',
-                        '%details%' => '\'somestring\' is not a valid contact field token. A valid token example: \'{contactfield=firstname|John}\'',
+                        '%details%' => "'somestring' is not a valid contact field token. A valid token example: '{contactfield=firstname|John}'",
                     ],
                     $parameters
                 );
@@ -217,7 +217,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
                 Assert::assertSame(
                     [
                         '%value%'   => 'somestring',
-                        '%details%' => '\'somestring\' is not a valid contact field token. A valid token example: \'{contactfield=firstname|John}\'',
+                        '%details%' => "'somestring' is not a valid contact field token. A valid token example: '{contactfield=firstname|John}'",
                     ],
                     $parameters
                 );
@@ -324,7 +324,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
                 Assert::assertSame(
                     [
                         '%value%'   => 'jone@doe.email {contactfield=somefield}',
-                        '%details%' => '\'jone@doe.email {contactfield=somefield}\' is not a valid contact field token. A valid token example: \'{contactfield=firstname|John}\'',
+                        '%details%' => "'jone@doe.email {contactfield=somefield}' is not a valid contact field token. A valid token example: '{contactfield=firstname|John}'",
                     ],
                     $parameters
                 );

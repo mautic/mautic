@@ -261,7 +261,8 @@ abstract class AbstractPermissions
      */
     public function getPermissionRatio(array $data): array
     {
-        $totalAvailable = $totalGranted = 0;
+        $totalAvailable = 0;
+        $totalGranted = 0;
 
         foreach ($this->permissions as $level => $perms) {
             $perms = array_keys($perms);

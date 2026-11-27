@@ -554,7 +554,7 @@ final class CampaignRepository extends CommonRepository
             'ce.event_type AS next_event_event_type',
             'ce.event_order AS event_order',
             'parent.id AS parent_event_id',
-            'DATE_FORMAT(log.date_triggered, \'%Y-%m-%d %H:%i\') AS last_executed_date'
+            "DATE_FORMAT(log.date_triggered, '%Y-%m-%d %H:%i') AS last_executed_date"
         )
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'clr')
             // Ensure the contact is still active in the campaign and get the latest rotation

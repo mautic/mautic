@@ -61,14 +61,14 @@ final readonly class ReportSubscriber
             'alias'   => 'unsubscribed_ratio',
             'label'   => 'mautic.email.report.unsubscribed_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.unsubscribed/'.self::EMAILS_PREFIX.'.sent_count)*100, 1), \'0.0\')',
+            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.unsubscribed/'.self::EMAILS_PREFIX.".sent_count)*100, 1), '0.0')",
             'suffix'  => '%',
         ],
         'unsubscribed_to_open_ratio' => [
             'alias'   => 'unsubscribed_to_open_ratio',
             'label'   => 'mautic.email.report.unsubscribed_to_open_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.unsubscribed/'.self::EMAILS_PREFIX.'.read_count)*100, 1), \'0.0\')',
+            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.unsubscribed/'.self::EMAILS_PREFIX.".read_count)*100, 1), '0.0')",
             'suffix'  => '%',
         ],
         'bounced' => [
@@ -81,7 +81,7 @@ final readonly class ReportSubscriber
             'alias'   => 'bounced_ratio',
             'label'   => 'mautic.email.report.bounced_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.bounced/'.self::EMAILS_PREFIX.'.sent_count)*100, 1), \'0.0\')',
+            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.bounced/'.self::EMAILS_PREFIX.".sent_count)*100, 1), '0.0')",
             'suffix'  => '%',
         ],
     ];
@@ -155,14 +155,14 @@ final readonly class ReportSubscriber
             'alias'   => 'hits_ratio',
             'label'   => 'mautic.email.report.hits_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL(ROUND('.self::CLICK_PREFIX.'.hits/('.self::EMAILS_PREFIX.'.sent_count)*100, 1), \'0.0\')',
+            'formula' => 'IFNULL(ROUND('.self::CLICK_PREFIX.'.hits/('.self::EMAILS_PREFIX.".sent_count)*100, 1), '0.0')",
             'suffix'  => '%',
         ],
         'unique_ratio' => [
             'alias'   => 'unique_ratio',
             'label'   => 'mautic.email.report.unique_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL(ROUND('.self::CLICK_PREFIX.'.unique_hits/('.self::EMAILS_PREFIX.'.sent_count)*100, 1), \'0.0\')',
+            'formula' => 'IFNULL(ROUND('.self::CLICK_PREFIX.'.unique_hits/('.self::EMAILS_PREFIX.".sent_count)*100, 1), '0.0')",
             'suffix'  => '%',
         ],
     ];
@@ -208,7 +208,7 @@ final readonly class ReportSubscriber
                 'alias'   => 'read_ratio',
                 'label'   => 'mautic.email.report.read_ratio',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND(('.$prefix.'read_count/'.$prefix.'sent_count)*100, 1), \'0.0\')',
+                'formula' => 'IFNULL(ROUND(('.$prefix.'read_count/'.$prefix."sent_count)*100, 1), '0.0')",
                 'suffix'  => '%',
             ],
             $prefix.'sent_count' => [
@@ -242,14 +242,14 @@ final readonly class ReportSubscriber
                 'alias'   => 'click_through_rate',
                 'label'   => 'mautic.email.report.click_through_rate',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND('.self::CLICK_THROUGH_PREFIX.'.click_through_count/'.$prefix.'sent_count * 100, 1), \'0.0\')',
+                'formula' => 'IFNULL(ROUND('.self::CLICK_THROUGH_PREFIX.'.click_through_count/'.$prefix."sent_count * 100, 1), '0.0')",
                 'suffix'  => '%',
             ],
             'click_to_open_rate' => [
                 'alias'   => 'click_to_open_rate',
                 'label'   => 'mautic.email.report.click_to_open_rate',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND('.self::CLICK_THROUGH_PREFIX.'.click_through_count/'.$prefix.'read_count * 100, 1), \'0.0\')',
+                'formula' => 'IFNULL(ROUND('.self::CLICK_THROUGH_PREFIX.'.click_through_count/'.$prefix."read_count * 100, 1), '0.0')",
                 'suffix'  => '%',
             ],
         ];
@@ -304,7 +304,7 @@ final readonly class ReportSubscriber
                 'alias'   => 'read_delay',
                 'label'   => 'mautic.email.report.read.delay',
                 'type'    => 'string',
-                'formula' => 'IF(es.date_read IS NOT NULL, TIMEDIFF(es.date_read, es.date_sent), \'-\')',
+                'formula' => "IF(es.date_read IS NOT NULL, TIMEDIFF(es.date_read, es.date_sent), '-')",
             ];
 
             $columns = array_merge(
@@ -380,7 +380,7 @@ final readonly class ReportSubscriber
                         'cut2.channel_id'
                     )
                         ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut2')
-                        ->where('cut2.channel = \'email\'')
+                        ->where("cut2.channel = 'email'")
                         ->groupBy('cut2.channel_id');
                     $qb->leftJoin(self::EMAILS_PREFIX, sprintf('(%s)', $qbcut->getSQL()), self::CLICK_PREFIX, 'e.id = cut.channel_id');
                 }
@@ -396,7 +396,7 @@ final readonly class ReportSubscriber
                     )
                         ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
                         ->innerJoin('ph', MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut', 'cut.redirect_id = ph.redirect_id AND cut.channel_id = ph.source_id')
-                        ->where('cut.channel = \'email\' AND ph.source = \'email\'')
+                        ->where("cut.channel = 'email' AND ph.source = 'email'")
                         ->groupBy('cut.channel_id');
                     $qb->leftJoin(self::EMAILS_PREFIX, sprintf('(%s)', $qbct->getSQL()), self::CLICK_THROUGH_PREFIX, 'e.id = ct.channel_id');
                 }
@@ -450,7 +450,7 @@ final readonly class ReportSubscriber
                             'ph',
                             'cut2.redirect_id = ph.redirect_id AND cut2.channel_id = ph.source_id'
                         )
-                        ->where('cut2.channel = \'email\' AND ph.source = \'email\'')
+                        ->where("cut2.channel = 'email' AND ph.source = 'email'")
                         ->groupBy('cut2.channel_id, ph.lead_id');
 
                     if ($event->hasFilter('e.id')) {
@@ -870,7 +870,7 @@ final readonly class ReportSubscriber
                 self::EMAILS_PREFIX,
                 $table,
                 self::DNC_PREFIX,
-                'e.id = dnc.channel_id AND dnc.channel=\'email\''
+                "e.id = dnc.channel_id AND dnc.channel='email'"
             );
         }
     }
@@ -890,7 +890,7 @@ final readonly class ReportSubscriber
         )
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc2')
             ->innerJoin('dnc2', MAUTIC_TABLE_PREFIX.'emails', 'e2', 'e2.id = dnc2.channel_id')
-            ->where('dnc2.channel = \'email\'')
+            ->where("dnc2.channel = 'email'")
             ->groupBy('e2.id');
         $qb->leftJoin(self::EMAILS_PREFIX, sprintf('(%s)', $qbdnc->getSQL()), self::DNC_COUNT_PREFIX, 'e.id = dnc_count.channel_id');
     }
@@ -905,7 +905,7 @@ final readonly class ReportSubscriber
                 self::EMAILS_PREFIX,
                 $trTable,
                 self::TRACKABLE_PREFIX,
-                'e.id = tr.channel_id AND tr.channel = \'email\''
+                "e.id = tr.channel_id AND tr.channel = 'email'"
             );
         }
         if (!$this->isJoined($qb, $prTable, self::TRACKABLE_PREFIX, self::REDIRECT_PREFIX)) {
@@ -930,7 +930,7 @@ final readonly class ReportSubscriber
                 self::EMAIL_STATS_PREFIX,
                 $table,
                 self::DNC_PREFIX,
-                'es.email_id = dnc.channel_id AND dnc.channel=\'email\' AND es.lead_id = dnc.lead_id'
+                "es.email_id = dnc.channel_id AND dnc.channel='email' AND es.lead_id = dnc.lead_id"
             );
         }
     }

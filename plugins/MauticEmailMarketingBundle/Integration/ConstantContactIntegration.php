@@ -115,8 +115,8 @@ class ConstantContactIntegration extends BasicIntegration implements BasicInterf
                 $data,
                 empty($listSettings['sendWelcome']) ? 'ACTION_BY_OWNER' : 'ACTION_BY_VISITOR'
             );
-        } catch (ApiException $e) {
-            throw new PushContactException($e->getMessage(), 0, $e);
+        } catch (ApiException $apiException) {
+            throw new PushContactException($apiException->getMessage(), 0, $apiException);
         }
     }
 }

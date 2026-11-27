@@ -148,7 +148,8 @@ final readonly class FormSubscriber
         $config    = $event->getActionConfig();
         $lead      = $event->getSubmission()->getLead();
         $leadEmail = $lead?->getEmail();
-        $ccEmails  = $bccEmails = [];
+        $ccEmails  = [];
+        $bccEmails = [];
         $emails    = $this->getEmailsFromString($config['to']);
 
         if (isset($config['cc']) && '' !== $config['cc']) {

@@ -705,13 +705,13 @@ final class ReportSubscriberTest extends TestCase
                         ],
                         'channel' => [
                             'alias'   => 'channel',
-                            'formula' => 'SUBSTRING_INDEX(e.type, \'.\', 1)',
+                            'formula' => "SUBSTRING_INDEX(e.type, '.', 1)",
                             'label'   => '',
                             'type'    => 'string',
                         ],
                         'channel_action' => [
                             'alias'   => 'channel_action',
-                            'formula' => 'SUBSTRING_INDEX(e.type, \'.\', -1)',
+                            'formula' => "SUBSTRING_INDEX(e.type, '.', -1)",
                             'label'   => '',
                             'type'    => 'string',
                         ],

@@ -416,7 +416,7 @@ final class IntegrationEntityRepository extends CommonRepository
             $q->select('i.integration, i.integration_entity, i.integration_entity_id, i.date_added, i.last_sync_date, i.internal');
         }
 
-        $q->where('i.internal not like \'%error%\' and i.integration_entity_id is not null');
+        $q->where("i.internal not like '%error%' and i.integration_entity_id is not null");
         $q->orderBy('i.last_sync_date', 'DESC');
 
         if (empty($integration)) {

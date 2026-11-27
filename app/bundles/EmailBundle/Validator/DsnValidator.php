@@ -37,18 +37,18 @@ final class DsnValidator extends ConstraintValidator
 
         try {
             $dsn = MailerDsn::fromString($value);
-        } catch (InvalidArgumentException $e) {
-            $this->context->addViolation($e->getMessage() ?: 'mautic.email.dsn.invalid_dsn');
+        } catch (InvalidArgumentException $invalidArgumentException) {
+            $this->context->addViolation($invalidArgumentException->getMessage() ?: 'mautic.email.dsn.invalid_dsn');
 
             return;
         }
 
         try {
             $this->transportFactory->fromDsnObject($dsn);
-        } catch (UnsupportedSchemeException $e) {
-            $this->context->addViolation($e->getMessage() ?: 'mautic.email.dsn.unsupported_scheme');
-        } catch (ExceptionInterface $e) {
-            $this->context->addViolation($e->getMessage() ?: 'mautic.email.dsn.invalid_dsn');
+        } catch (UnsupportedSchemeException $invalidArgumentException) {
+            $this->context->addViolation($invalidArgumentException->getMessage() ?: 'mautic.email.dsn.unsupported_scheme');
+        } catch (ExceptionInterface $invalidArgumentException) {
+            $this->context->addViolation($invalidArgumentException->getMessage() ?: 'mautic.email.dsn.invalid_dsn');
         }
     }
 }

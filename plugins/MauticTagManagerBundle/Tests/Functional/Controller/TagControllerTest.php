@@ -171,7 +171,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Edit tag: '.$tag->getTag(), (string) $clientResponseContent, 'The return must contain \'Edit tag\' text');
+        $this->assertStringContainsString('Edit tag: '.$tag->getTag(), (string) $clientResponseContent, "The return must contain 'Edit tag' text");
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['tag_entity[tag]']->setValue($TagName);

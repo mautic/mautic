@@ -71,7 +71,7 @@ final class LeadRepositoryTest extends TestCase
 
         $parameters = $dbalMock->getQueryPart('parameters');
 
-        $this->assertCount(2, $parameters, 'There should be two parameters bound because that\'s the number of emails we passed into the method.');
+        $this->assertCount(2, $parameters, "There should be two parameters bound because that's the number of emails we passed into the method.");
     }
 
     public function testBuildQueryForGetLeadsByFieldValueQuotesFieldIdentifier(): void

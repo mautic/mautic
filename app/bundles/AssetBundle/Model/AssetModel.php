@@ -279,11 +279,11 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
         try {
             $this->em->persist($download);
             $this->em->flush();
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             if (MAUTIC_ENV === 'dev') {
-                throw $e;
+                throw $exception;
             }
-            error_log($e);
+            error_log($exception);
         }
 
         $this->em->detach($download);

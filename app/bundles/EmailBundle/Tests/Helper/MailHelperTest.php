@@ -425,7 +425,7 @@ final class MailHelperTest extends TestCase
         $this->assertCount(3, $fromAddresses); // 3, not 4, because the last contact has the same owner as the first contact.
         $this->assertCount(3, $fromNames);
         $this->assertSame(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
-        $this->assertSame(['owner 1', 'No Body\'s Business', 'owner 2'], $fromNames);
+        $this->assertSame(['owner 1', "No Body's Business", 'owner 2'], $fromNames);
     }
 
     public function testQueuedAdvancedFromUsesResolvedMetadataFromAddressOnFlush(): void
@@ -1445,8 +1445,8 @@ final class MailHelperTest extends TestCase
         try {
             $mailer->message->getBody();
             $this->fail('The body should be empty before send');
-        } catch (LogicException $e) {
-            $this->assertSame('A message must have a text or an HTML part or attachments.', $e->getMessage());
+        } catch (LogicException $logicException) {
+            $this->assertSame('A message must have a text or an HTML part or attachments.', $logicException->getMessage());
         }
 
         $this->assertSame($trackedHtml, $mailer->getBody());

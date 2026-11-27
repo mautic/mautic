@@ -77,7 +77,7 @@ final class Version20220208032455 extends PreUpAssertionMigration
             unset($columns['submission_id'], $columns['form_id']);
 
             return array_keys($columns);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return [];
         }
     }

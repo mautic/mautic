@@ -692,5 +692,6 @@ final class SugarcrmApi extends CrmApi
                 return $this->request("{$object}/filter", $parameters, 'GET', $object);
             }
         }
+        return null;
     }
 }

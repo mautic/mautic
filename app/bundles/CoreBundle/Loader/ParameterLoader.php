@@ -259,7 +259,8 @@ final class ParameterLoader
 
     public static function getProjectDirByRoot(string $root): string
     {
-        $dir = $rootDir = \dirname($root, 1);
+        $dir = \dirname($root, 1);
+        $rootDir = $dir;
         while (!is_file($dir.'/composer.json')) {
             if ($dir === \dirname($dir)) {
                 return $rootDir;

@@ -49,10 +49,10 @@ final class IntegrationSyncSettingsFieldMappingsType extends AbstractType
 
                 try {
                     $fieldFilterHelper->filterFieldsByPage($objectName, 1);
-                } catch (\Throwable $exception) {
-                    $this->logger->debug($exception->getMessage(), ['exception' => $exception]);
+                } catch (\Throwable $throwable) {
+                    $this->logger->debug($throwable->getMessage(), ['exception' => $throwable]);
 
-                    $error = $this->translator->trans($exception->getMessage());
+                    $error = $this->translator->trans($throwable->getMessage());
                 }
 
                 $form = $event->getForm();

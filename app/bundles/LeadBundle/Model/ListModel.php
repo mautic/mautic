@@ -399,7 +399,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
         }
 
         // Handle by batches
-        $start = $leadsProcessed = 0;
+        $start = 0;
+        $leadsProcessed = 0;
 
         // Try to save some memory
         gc_enable();

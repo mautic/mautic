@@ -117,8 +117,8 @@ trait PushToIntegrationTrait
 
         try {
             $integration->pushContact($lead, $config);
-        } catch (PushContactException $e) {
-            $errors[] = $e->getMessage();
+        } catch (PushContactException $pushContactException) {
+            $errors[] = $pushContactException->getMessage();
 
             return false;
         }

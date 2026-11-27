@@ -41,7 +41,9 @@ final readonly class DetermineWinnerSubscriber
             $counts = $this->statRepository->getOpenedRates($ids, $startDate, $parent->getVariantEndDate());
 
             if ([] !== $counts) {
-                $rates      = $support      = $data      = [];
+                $rates      = [];
+                $support      = [];
+                $data      = [];
                 $hasResults = [];
 
                 $parentId = $parent->getId();
@@ -136,7 +138,9 @@ final readonly class DetermineWinnerSubscriber
             $sentCounts         = $this->statRepository->getSentCounts($ids, $startDate, $parent->getVariantEndDate());
 
             if ([] !== $clickthroughCounts) {
-                $rates      = $support      = $data      = [];
+                $rates      = [];
+                $support      = [];
+                $data      = [];
                 $hasResults = [];
 
                 $parentId = $parent->getId();

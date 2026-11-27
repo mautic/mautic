@@ -95,12 +95,12 @@ final readonly class DoctrineSubscriber
                         break;
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             if (defined('MAUTIC_INSTALLER')) {
                 return;
             }
             // table doesn't exist or something bad happened so oh well
-            $this->logger->error('SCHEMA ERROR: '.$e->getMessage());
+            $this->logger->error('SCHEMA ERROR: '.$exception->getMessage());
         }
     }
 

@@ -343,10 +343,10 @@ final class DashboardController extends AbstractFormController
                     ]
                 ),
             ], 'flashes');
-        } catch (IOException $e) {
+        } catch (IOException $ioException) {
             $type = 'error';
             $msg  = $this->translator->trans('mautic.dashboard.error.save', [
-                '%msg%' => $e->getMessage(),
+                '%msg%' => $ioException->getMessage(),
             ], 'flashes');
         }
 

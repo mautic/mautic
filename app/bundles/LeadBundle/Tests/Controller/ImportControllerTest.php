@@ -581,7 +581,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
     private function assertInsufficientPermissionError(LeadEventLog $log, User $user): void
     {
         $this->assertSame('failed', $log->getAction(), 'The insertion should fail as the user does not have permission to create contacts.');
-        $this->assertSame(sprintf('User \'%s\' has insufficient permissions', $user->getUserIdentifier()), $log->getProperties()['error'], 'There should be an insufficient permission error.');
+        $this->assertSame(sprintf("User '%s' has insufficient permissions", $user->getUserIdentifier()), $log->getProperties()['error'], 'There should be an insufficient permission error.');
     }
 
     private function selectCompanyMapping(Crawler $crawler, Form $mappingForm): void

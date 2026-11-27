@@ -40,7 +40,12 @@ final class ConfigChangeLoggerTest extends TestCase
         $auditLogModel->expects($this->never())->method('writeToLog');
         $logger = new ConfigChangeLogger($ipLookupHelper, $auditLogModel);
 
-        $originalData = $postData = [
+        $originalData = [
+            'bundle' => [
+                'key' => 'value',
+            ],
+        ];
+        $postData = [
             'bundle' => [
                 'key' => 'value',
             ],

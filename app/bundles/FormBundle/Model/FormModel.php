@@ -441,8 +441,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     {
         $pages = ['open' => [], 'close' => []];
 
-        $openFieldId  =
-        $previousId   =
+        $openFieldId  = false;
+        $previousId   = false;
         $lastPage     = false;
         $pageCount    = 1;
 

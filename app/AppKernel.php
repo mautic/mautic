@@ -34,8 +34,8 @@ class AppKernel extends Kernel
     {
         $metadata = ThisRelease::getMetadata();
 
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', $environment);
-        defined('MAUTIC_VERSION') or define('MAUTIC_VERSION', $metadata->getVersion());
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', $environment);
+        defined('MAUTIC_VERSION') || define('MAUTIC_VERSION', $metadata->getVersion());
 
         /**
          * This is required for Doctrine's automatic database detection. When Mautic hasn't been
@@ -54,7 +54,7 @@ class AppKernel extends Kernel
     public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
     {
         if (str_contains($request->getRequestUri(), 'installer') || !$this->isInstalled()) {
-            defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);
+            defined('MAUTIC_INSTALLER') || define('MAUTIC_INSTALLER', 1);
         }
 
         if (defined('MAUTIC_INSTALLER')) {
@@ -284,7 +284,8 @@ class AppKernel extends Kernel
             }
 
             // We need 1 level deeper than the parent method, as the app folder contains a composer.json file
-            $dir = $rootDir = \dirname($dir, 2);
+            $dir = \dirname($dir, 2);
+            $rootDir = $dir;
             while (!is_file($dir.'/composer.json')) {
                 if ($dir === \dirname($dir)) {
                     return $this->projectDir = $rootDir;
@@ -303,7 +304,7 @@ class AppKernel extends Kernel
     public function getCacheDir(): string
     {
         if ($cachePath = $this->getParameterLoader()->getLocalParameterBag()->get('cache_path')) {
-            $envFolder = ('/' != substr($cachePath, -1)) ? '/'.$this->environment : $this->environment;
+            $envFolder = (! str_ends_with($cachePath, '/')) ? '/'.$this->environment : $this->environment;
 
             return str_replace('%kernel.project_dir%', $this->getProjectDir(), $cachePath.$envFolder);
         }

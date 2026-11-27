@@ -135,9 +135,9 @@ final class ProcessWebhookQueuesCommand extends Command
             } else {
                 $this->webhookModel->processWebhooks($webhooks);
             }
-        } catch (\Exception $e) {
-            $output->writeLn('<error>'.$e->getMessage().'</error>');
-            $output->writeLn('<error>'.$e->getTraceAsString().'</error>');
+        } catch (\Exception $exception) {
+            $output->writeLn('<error>'.$exception->getMessage().'</error>');
+            $output->writeLn('<error>'.$exception->getTraceAsString().'</error>');
 
             return Command::FAILURE;
         }

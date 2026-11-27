@@ -24,7 +24,7 @@ final class PermissionListType extends AbstractType
             'label_attr'        => ['class' => 'form-label'],
             'attr'              => fn (Options $options): array => [
                 'data-permission' => $options['bundle'].':'.$options['level'],
-                'onchange'        => 'Mautic.onPermissionChange(this, \''.$options['bundle'].'\')',
+                'onchange'        => "Mautic.onPermissionChange(this, '".$options['bundle']."')",
             ],
             'choices_as_values' => false,
         ]);

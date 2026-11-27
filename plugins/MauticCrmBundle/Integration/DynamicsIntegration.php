@@ -268,10 +268,10 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (ApiErrorException $exception) {
-            $this->logIntegrationError($exception);
+        } catch (ApiErrorException $apiErrorException) {
+            $this->logIntegrationError($apiErrorException);
             if (!$silenceExceptions) {
-                throw $exception;
+                throw $apiErrorException;
             }
 
             return [];
@@ -333,8 +333,8 @@ final class DynamicsIntegration extends CrmAbstractIntegration
 
                 return true;
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return false;
@@ -416,8 +416,8 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $executed;
@@ -495,8 +495,8 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $executed;
@@ -723,7 +723,9 @@ final class DynamicsIntegration extends CrmAbstractIntegration
         $config                = $this->mergeConfigToFeatureSettings();
         $fieldsToUpdateInCrm   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields            = array_unique(array_values($config['leadFields'] ?? []));
-        $totalUpdated          = $totalCreated          = $totalErrors          = 0;
+        $totalUpdated          = 0;
+        $totalCreated          = 0;
+        $totalErrors          = 0;
 
         if ($key = array_search('mauticContactTimelineLink', $leadFields, true)) {
             unset($leadFields[$key]);
@@ -914,7 +916,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
         $availableFields    = $this->getAvailableLeadFields();
         $oparams            = [];
         $oparams['$select'] = implode(',', array_keys($availableFields[$object]));
-        $oparams['$filter'] = $seachColumn.' eq \''.$searchValue.'\'';
+        $oparams['$filter'] = $seachColumn." eq '".$searchValue."'";
         $data               = $this->getApiHelper()->getLeads($oparams);
 
         return (isset($data['value'][0]) && !empty($data['value'][0])) ? $data['value'][0] : [];

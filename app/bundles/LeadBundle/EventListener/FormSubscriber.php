@@ -263,7 +263,8 @@ final readonly class FormSubscriber
             return;
         }
 
-        $queryReferer = $queryArray = [];
+        $queryReferer = [];
+        $queryArray = [];
 
         parse_str($event->getRequest()->server->get('QUERY_STRING'), $queryArray);
         $refererURL       = $event->getRequest()->server->get('HTTP_REFERER');

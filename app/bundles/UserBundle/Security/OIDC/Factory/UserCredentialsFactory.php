@@ -35,8 +35,8 @@ final readonly class UserCredentialsFactory implements UserCredentialsFactoryInt
 
         try {
             $tokens = $client->getVerifiedClaims($claims);
-        } catch (OidcAuthorizationException $e) {
-            throw new OidcException('mautic.open_id.login.exception.user_info', $e->getCode(), $e);
+        } catch (OidcAuthorizationException $oidcAuthorizationException) {
+            throw new OidcException('mautic.open_id.login.exception.user_info', $oidcAuthorizationException->getCode(), $oidcAuthorizationException);
         }
 
         $this->logger->debug('OpenID Connect: User info', ['claims' => array_keys($userInfo)]);

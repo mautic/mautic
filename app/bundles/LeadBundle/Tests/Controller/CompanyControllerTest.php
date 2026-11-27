@@ -121,7 +121,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $company                = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertInstanceOf(Company::class, $company);
-        $this->assertStringContainsString('Edit Company '.$company->getName(), (string) $clientResponseContent, 'The return must contain \'Edit Company\' text');
+        $this->assertStringContainsString('Edit Company '.$company->getName(), (string) $clientResponseContent, "The return must contain 'Edit Company' text");
 
         $buttonCrawler = $crawler->selectButton('Save & Close');
         $form          = $buttonCrawler->form();

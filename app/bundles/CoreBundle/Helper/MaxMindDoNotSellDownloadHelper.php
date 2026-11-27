@@ -57,8 +57,8 @@ final class MaxMindDoNotSellDownloadHelper
                 $this->getRemoteDataStoreDownloadUrl(),
                 $httpClientOptions
             );
-        } catch (TransportExceptionInterface $e) {
-            $this->logger->error('Failed to fetch remote Do Not Sell data: '.$e->getMessage());
+        } catch (TransportExceptionInterface $transportException) {
+            $this->logger->error('Failed to fetch remote Do Not Sell data: '.$transportException->getMessage());
 
             return false;
         }
@@ -70,8 +70,8 @@ final class MaxMindDoNotSellDownloadHelper
                 return false;
             }
             $responseContent = $response->getContent();
-        } catch (\Throwable $e) {
-            $this->logger->error('Failed to get content from remote Do Not Sell data: '.$e->getMessage());
+        } catch (\Throwable $transportException) {
+            $this->logger->error('Failed to get content from remote Do Not Sell data: '.$transportException->getMessage());
 
             return false;
         }

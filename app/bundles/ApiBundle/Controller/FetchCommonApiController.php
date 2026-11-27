@@ -151,8 +151,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             if (!$this->security->isGranted($this->permissionBase.':view')) {
                 return $this->accessDenied();
             }
-        } catch (PermissionException $e) {
-            return $this->accessDenied($e->getMessage());
+        } catch (PermissionException $permissionException) {
+            return $this->accessDenied($permissionException->getMessage());
         }
 
         if ($this->security->checkPermissionExists($this->permissionBase.':viewother')
@@ -390,8 +390,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
         try {
             return $this->security->isGranted("{$this->permissionBase}:{$action}");
-        } catch (PermissionException $e) {
-            return $this->accessDenied($e->getMessage());
+        } catch (PermissionException $permissionException) {
+            return $this->accessDenied($permissionException->getMessage());
         }
     }
 

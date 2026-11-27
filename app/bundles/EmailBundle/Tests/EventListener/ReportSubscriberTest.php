@@ -237,7 +237,7 @@ final class ReportSubscriberTest extends TestCase
                 ReportSubscriber::EMAILS_PREFIX,
                 MAUTIC_TABLE_PREFIX.'lead_donotcontact',
                 ReportSubscriber::DNC_PREFIX,
-                'e.id = dnc.channel_id AND dnc.channel=\'email\''
+                "e.id = dnc.channel_id AND dnc.channel='email'"
             );
 
         $this->subscriber->onReportGraphGenerate($eventMock);
@@ -479,7 +479,7 @@ final class ReportSubscriberTest extends TestCase
                 'alias'   => 'read_delay',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IF(es.date_read IS NOT NULL, TIMEDIFF(es.date_read, es.date_sent), \'-\')',
+                'formula' => "IF(es.date_read IS NOT NULL, TIMEDIFF(es.date_read, es.date_sent), '-')",
             ],
             'es.email_address' => [
                 'label' => '',
@@ -576,7 +576,7 @@ final class ReportSubscriberTest extends TestCase
                 'alias'   => 'read_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND((e.read_count/e.sent_count)*100, 1), \'0.0\')',
+                'formula' => "IFNULL(ROUND((e.read_count/e.sent_count)*100, 1), '0.0')",
                 'suffix'  => '%',
             ],
             'e.sent_count' => [
@@ -625,7 +625,7 @@ final class ReportSubscriberTest extends TestCase
                 'alias'   => 'unsubscribed_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND((dnc_count.unsubscribed/e.sent_count)*100, 1), \'0.0\')',
+                'formula' => "IFNULL(ROUND((dnc_count.unsubscribed/e.sent_count)*100, 1), '0.0')",
                 'suffix'  => '%',
             ],
             'bounced' => [
@@ -638,7 +638,7 @@ final class ReportSubscriberTest extends TestCase
                 'alias'   => 'bounced_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND((dnc_count.bounced/e.sent_count)*100, 1), \'0.0\')',
+                'formula' => "IFNULL(ROUND((dnc_count.bounced/e.sent_count)*100, 1), '0.0')",
                 'suffix'  => '%',
             ],
             'vp.id' => [
@@ -667,14 +667,14 @@ final class ReportSubscriberTest extends TestCase
                 'alias'   => 'hits_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND(cut.hits/(e.sent_count)*100, 1), \'0.0\')',
+                'formula' => "IFNULL(ROUND(cut.hits/(e.sent_count)*100, 1), '0.0')",
                 'suffix'  => '%',
             ],
             'unique_ratio' => [
                 'alias'   => 'unique_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND(cut.unique_hits/(e.sent_count)*100, 1), \'0.0\')',
+                'formula' => "IFNULL(ROUND(cut.unique_hits/(e.sent_count)*100, 1), '0.0')",
                 'suffix'  => '%',
             ],
         ];

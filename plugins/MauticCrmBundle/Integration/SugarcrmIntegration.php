@@ -359,11 +359,11 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
 
             if (!$silenceExceptions) {
-                throw $e;
+                throw $exception;
             }
         }
 
@@ -404,8 +404,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
                 return $executed;
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $executed;
@@ -541,8 +541,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
                 return $executed;
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $executed;
@@ -1068,8 +1068,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
                 return true;
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return false;
@@ -1116,7 +1116,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
         $limit                   = $params['limit'];
         $config                  = $this->mergeConfigToFeatureSettings();
-        $mauticData              = $leadsToUpdate              = $fields              = [];
+        $mauticData              = [];
+        $leadsToUpdate              = [];
+        $fields              = [];
         $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields              = $config['leadFields'];
         if (!empty($leadFields)) {
@@ -1315,7 +1317,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         $queryParam = ('Leads' === $object) ? 'checkemail' : 'checkemail_contacts';
 
         $sugarLead         = $this->getApiHelper()->getLeads([$queryParam => array_keys($checkEmailsInSugar), 'offset' => 0, 'max_results' => 1000], $object);
-        $deletedSugarLeads = $sugarLeadRecords = [];
+        $deletedSugarLeads = [];
+        $sugarLeadRecords = [];
 
         if (isset($sugarLead['entry_list'])) {
             // Sugar 6.X
@@ -1483,7 +1486,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         $persistEntities = [];
         if (is_array($response)) {
             foreach ($response as $item) {
-                $contactId = $integrationEntityId = null;
+                $contactId = null;
+                $integrationEntityId = null;
                 if (!empty($item['reference_id'])) {
                     $reference = explode('-', $item['reference_id']);
                     if (3 === count($reference)) {

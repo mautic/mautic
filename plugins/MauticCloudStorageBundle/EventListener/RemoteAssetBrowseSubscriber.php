@@ -22,8 +22,8 @@ final class RemoteAssetBrowseSubscriber
 
         try {
             $event->setAdapter($integration->getAdapter());
-        } catch (InvalidCredentialConfigurationException $e) {
-            $event->setFailed($e->getMessage());
+        } catch (InvalidCredentialConfigurationException $invalidCredentialConfigurationException) {
+            $event->setFailed($invalidCredentialConfigurationException->getMessage());
         }
     }
 }

@@ -12,7 +12,7 @@ final class Version20220216161028 extends AbstractMauticMigration
     public function up(Schema $schema): void
     {
         $oldAndNewValues = [
-            $this->connection->quote('Val d\'Oise') => $this->connection->quote('Val-d\'Oise'),
+            $this->connection->quote("Val d'Oise") => $this->connection->quote("Val-d'Oise"),
             $this->connection->quote('Réunion')     => $this->connection->quote('La Réunion'),
         ];
 

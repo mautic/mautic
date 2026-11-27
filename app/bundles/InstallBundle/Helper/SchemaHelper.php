@@ -211,7 +211,10 @@ final class SchemaHelper
         $sm  = $this->getSchemaManager();
 
         // backup existing tables
-        $backupRestraints = $backupSequences = $backupIndexes = $backupTables = $dropSequences = $dropTables = [];
+        $backupRestraints = [];
+        $backupIndexes = [];
+        $backupTables = [];
+        $dropTables = [];
 
         // cycle through the first time to drop all the foreign keys
         foreach ($tables as $t) {

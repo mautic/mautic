@@ -34,7 +34,7 @@ final readonly class DncReportService
                 'alias'   => 'dnc_preferences',
                 'label'   => 'mautic.lead.report.dnc_preferences',
                 'type'    => 'string',
-                'formula' => '(SELECT GROUP_CONCAT(CONCAT(dnc.reason, \':\', dnc.channel) ORDER BY dnc.date_added DESC SEPARATOR \',\') FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc WHERE dnc.lead_id = l.id)',
+                'formula' => "(SELECT GROUP_CONCAT(CONCAT(dnc.reason, ':', dnc.channel) ORDER BY dnc.date_added DESC SEPARATOR ',') FROM ".MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc WHERE dnc.lead_id = l.id)',
             ],
         ];
     }

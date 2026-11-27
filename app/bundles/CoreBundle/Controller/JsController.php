@@ -71,7 +71,7 @@ final class JsController extends CommonController
     {
         $year = date('Y');
 
-        return <<<JS
+        return <<<JS_WRAP
 /**
  * @package     MauticJS
  * @copyright   {$year} Mautic Contributors. All rights reserved.
@@ -79,6 +79,6 @@ final class JsController extends CommonController
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-JS;
+JS_WRAP;
     }
 }

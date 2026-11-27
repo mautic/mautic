@@ -358,7 +358,7 @@ return [
             'InterfaxScanBot',
             'IstellaBot',
             'James BOT',
-            'Jamie\'s Spider',
+            "Jamie's Spider",
             'Jetslide',
             'Jetty',
             'Jugendschutzprogramm-Crawler',

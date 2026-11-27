@@ -43,7 +43,7 @@ final class SegmentCountCacheCommand extends Command
                 $this->segmentCountCacheHelper->setSegmentContactCount((int) $segmentId, (int) $leadCount);
             }
         }
-        $output->writeln(sprintf('<info>%s segment\'s contact count have been updated.</info>', count($segmentsForRecount)));
+        $output->writeln(sprintf("<info>%s segment's contact count have been updated.</info>", count($segmentsForRecount)));
 
         return ExitCode::SUCCESS;
     }

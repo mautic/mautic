@@ -53,8 +53,8 @@ final class DashboardWidgetPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $html = $this->renderWidgetAsUser($this->withoutViewOther, 'top.submitters');
 
-        $this->assertStringContainsString(self::OWN_SUBMITTER, $html, 'Submissions to the user\'s own form should still be counted.');
-        $this->assertStringNotContainsString(self::OTHER_SUBMITTER, $html, 'Without form:forms:viewother the widget must not count submissions to another user\'s form.');
+        $this->assertStringContainsString(self::OWN_SUBMITTER, $html, "Submissions to the user's own form should still be counted.");
+        $this->assertStringNotContainsString(self::OTHER_SUBMITTER, $html, "Without form:forms:viewother the widget must not count submissions to another user's form.");
     }
 
     public function testTopSubmittersCountsEveryFormWithViewOther(): void
@@ -69,7 +69,7 @@ final class DashboardWidgetPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $html = $this->renderWidgetAsUser($this->withoutViewOther, 'submissions.in.time');
 
-        $this->assertSame(1, $this->sumChartData($html), 'Without form:forms:viewother the chart must count only submissions to the user\'s own form.');
+        $this->assertSame(1, $this->sumChartData($html), "Without form:forms:viewother the chart must count only submissions to the user's own form.");
     }
 
     public function testSubmissionsInTimeCountsEveryFormWithViewOther(): void
@@ -83,8 +83,8 @@ final class DashboardWidgetPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $html = $this->renderWidgetAsUser($this->withoutViewOther, 'top.submission.referrers');
 
-        $this->assertStringContainsString(self::OWN_REFERRER, $html, 'Referrers of the user\'s own form should still be listed.');
-        $this->assertStringNotContainsString(self::OTHER_REFERRER, $html, 'Without form:forms:viewother the widget must not list referrers of another user\'s form.');
+        $this->assertStringContainsString(self::OWN_REFERRER, $html, "Referrers of the user's own form should still be listed.");
+        $this->assertStringNotContainsString(self::OTHER_REFERRER, $html, "Without form:forms:viewother the widget must not list referrers of another user's form.");
     }
 
     public function testTopReferrersListsEveryFormWithViewOther(): void

@@ -590,7 +590,8 @@ final class UserController extends AbstractFormController
 
                     $reEntity = $form->get('entity')->getData();
                     if (empty($reEntity)) {
-                        $bundle   = $object   = 'user';
+                        $bundle   = 'user';
+                        $object   = 'user';
                         $entityId = $user->getId();
                     } else {
                         $bundle = $object = $reEntity;

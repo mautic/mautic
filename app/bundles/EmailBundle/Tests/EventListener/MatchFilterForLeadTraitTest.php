@@ -742,8 +742,8 @@ final class MatchFilterForLeadTraitTest extends TestCase
 
         try {
             $this->assertEquals(false, $this->matchFilterForLeadTrait->match($filters, $lead));
-        } catch (\Exception $e) {
-            $this->fail($e->getMessage());
+        } catch (\Exception $exception) {
+            $this->fail($exception->getMessage());
         }
     }
 

@@ -50,7 +50,9 @@ final readonly class DetermineWinnerSubscriber
             $counts = ('page' === $type) ? $this->downloadRepository->getDownloadCountsByPage($ids, $startDate) : $this->downloadRepository->getDownloadCountsByEmail($ids, $startDate, $parent->getVariantEndDate());
 
             if ([] !== $counts) {
-                $downloads  = $support  = $data  = [];
+                $downloads  = [];
+                $support  = [];
+                $data  = [];
                 $hasResults = [];
 
                 $downloadsLabel = $this->translator->trans('mautic.asset.abtest.label.downloads');

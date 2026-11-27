@@ -201,7 +201,7 @@ final class ConfigMonitoredMailboxesType extends AbstractType
                 'required' => false,
                 'attr'     => [
                     'class'   => 'btn btn-tertiary btn-sm',
-                    'onclick' => 'Mautic.testMonitoredEmailServerConnection(\''.$options['mailbox'].'\')',
+                    'onclick' => "Mautic.testMonitoredEmailServerConnection('".$options['mailbox']."')",
                 ],
             ]
         );

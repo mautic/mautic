@@ -201,7 +201,8 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
         // will be converted to clickables
         $fields             = $form ? $form->getFields()->toArray() : [];
         [$pages, $lastPage] = $this->formModel->getPages($fields);
-        $displayManager     = $viewOnlyFields = null;
+        $displayManager     = null;
+        $viewOnlyFields = null;
         if ($form) {
             $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
             $displayManager = new DisplayManager($form, !empty($viewOnlyFields) ? $viewOnlyFields : []);

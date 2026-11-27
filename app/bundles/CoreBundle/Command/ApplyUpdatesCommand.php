@@ -106,9 +106,9 @@ final class ApplyUpdatesCommand extends Command
             }
 
             return $this->finishUpgrade($input, $output, $progressBar);
-        } catch (UpdateFailedException $exception) {
+        } catch (UpdateFailedException $updateFailedException) {
             $output->writeln(
-                "\n\n<error>".$exception->getMessage().'</error>'
+                "\n\n<error>".$updateFailedException->getMessage().'</error>'
             );
         }
 

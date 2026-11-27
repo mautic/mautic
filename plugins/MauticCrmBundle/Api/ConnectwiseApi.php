@@ -191,10 +191,10 @@ final class ConnectwiseApi extends CrmApi
                     break;
                 }
             }
-        } catch (ApiErrorException $exception) {
-            if (404 !== $exception->getCode()) {
+        } catch (ApiErrorException $apiErrorException) {
+            if (404 !== $apiErrorException->getCode()) {
                 // Ignore 404 due to pagination
-                throw $exception;
+                throw $apiErrorException;
             }
         }
 

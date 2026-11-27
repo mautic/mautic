@@ -11,7 +11,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 
-final class BcInterfaceTokenTransport implements TransportInterface
+final class BcInterfaceTokenTransport implements TransportInterface, \Stringable
 {
     /**
      * @var array<string, mixed>

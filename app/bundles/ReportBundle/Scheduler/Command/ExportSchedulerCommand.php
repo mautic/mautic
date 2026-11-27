@@ -48,7 +48,7 @@ final class ExportSchedulerCommand extends Command
 
         try {
             $exportOption = new ExportOption((int) $report);
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $invalidArgumentException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
 
             return Command::FAILURE;
@@ -68,8 +68,8 @@ final class ExportSchedulerCommand extends Command
             $this->reportExporter->processExport($exportOption);
 
             $output->writeln('<info>'.$this->translator->trans('mautic.report.schedule.command.finished').'</info>');
-        } catch (FileIOException $e) {
-            $output->writeln('<error>'.$e->getMessage().'</error>');
+        } catch (FileIOException $invalidArgumentException) {
+            $output->writeln('<error>'.$invalidArgumentException->getMessage().'</error>');
 
             return Command::FAILURE;
         }

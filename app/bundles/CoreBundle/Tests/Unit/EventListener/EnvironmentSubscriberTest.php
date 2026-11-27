@@ -126,7 +126,7 @@ final class EnvironmentSubscriberTest extends TestCase
         $this->assertLessThan(
             $sessionListenerPriority,
             $timezonePriority,
-            'onKernelRequestSetTimezone must run after Symfony\'s session listener.'
+            "onKernelRequestSetTimezone must run after Symfony's session listener."
         );
     }
 }

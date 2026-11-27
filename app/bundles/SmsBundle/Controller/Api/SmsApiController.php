@@ -93,8 +93,8 @@ final class SmsApiController extends CommonApiController
 
         try {
             $response = $this->model->sendSms($message, $contact, ['channel' => 'api'])[$contact->getId()];
-        } catch (\Exception $e) {
-            $mauticLogger->error($e->getMessage(), ['error' => (array) $e]);
+        } catch (\Exception $exception) {
+            $mauticLogger->error($exception->getMessage(), ['error' => (array) $exception]);
 
             return new Response('Interval server error', Response::HTTP_INTERNAL_SERVER_ERROR);
         }

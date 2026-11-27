@@ -797,15 +797,15 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     ]);
                     break;
             }
-        } catch (RequestException $exception) {
+        } catch (RequestException $requestException) {
             if (!empty($settings['return_raw'])) {
-                return $exception->getResponse();
+                return $requestException->getResponse();
             }
 
             return [
                 'error' => [
-                    'message' => $exception->getResponse()->getBody()->getContents(),
-                    'code'    => $exception->getCode(),
+                    'message' => $requestException->getResponse()->getBody()->getContents(),
+                    'code'    => $requestException->getCode(),
                 ],
             ];
         }
@@ -1514,7 +1514,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $matched = [];
 
         foreach ($availableFields as $key => $field) {
-            $integrationKey = $matchIntegrationKey = $this->convertLeadFieldKey($key, $field);
+            $integrationKey = $this->convertLeadFieldKey($key, $field);
+            $matchIntegrationKey = $integrationKey;
             if (!isset($config['leadFields'][$integrationKey])) {
                 continue;
             }
@@ -1661,7 +1662,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $matchedFields = $this->populateMauticLeadData($data);
 
         if ($matchedFields === []) {
-            return;
+            return null;
         }
 
         // Find unique identifier fields used by the integration
@@ -1723,7 +1724,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             } catch (\Exception $exception) {
                 $this->logger->warning($exception->getMessage());
 
-                return;
+                return null;
             }
         }
 

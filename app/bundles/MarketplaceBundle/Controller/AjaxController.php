@@ -76,8 +76,8 @@ final class AjaxController extends CommonAjaxController
         try {
             $packageDetail = $this->packageModel->getPackageDetail($packageName);
             $type          = $packageDetail->packageBase->type ?? '';
-        } catch (\Exception $e) {
-            return $this->installError($e);
+        } catch (\Exception $exception) {
+            return $this->installError($exception);
         }
 
         if ('mautic-resource' === $type) {
@@ -108,8 +108,8 @@ final class AjaxController extends CommonAjaxController
             if (Command::SUCCESS !== $installResult->exitCode) {
                 return $this->installError(new \Exception($installResult->output));
             }
-        } catch (\Exception $e) {
-            return $this->installError($e);
+        } catch (\Exception $exception) {
+            return $this->installError($exception);
         }
 
         // Note: do not do anything except returning a response after clearing the cache to prevent errors
@@ -149,8 +149,8 @@ final class AjaxController extends CommonAjaxController
         try {
             $packageDetail = $this->packageModel->getPackageDetail($packageName);
             $type          = $packageDetail->packageBase->type ?? '';
-        } catch (\Exception $e) {
-            return $this->removeError($e);
+        } catch (\Exception $exception) {
+            return $this->removeError($exception);
         }
 
         if ('mautic-resource' === $type) {
@@ -162,8 +162,8 @@ final class AjaxController extends CommonAjaxController
 
             try {
                 $this->resourceInstaller->uninstall($packageName);
-            } catch (\Exception $e) {
-                return $this->removeError($e);
+            } catch (\Exception $exception) {
+                return $this->removeError($exception);
             }
 
             return new JsonResponse([]);
@@ -187,8 +187,8 @@ final class AjaxController extends CommonAjaxController
             if (0 !== $removeResult->exitCode) {
                 return $this->removeError(new \Exception($removeResult->output));
             }
-        } catch (\Exception $e) {
-            return $this->removeError($e);
+        } catch (\Exception $exception) {
+            return $this->removeError($exception);
         }
 
         // Note: do not do anything except returning a response after clearing the cache to prevent errors
@@ -207,14 +207,14 @@ final class AjaxController extends CommonAjaxController
             $exitCode = $this->cacheHelper->clearSymfonyCache();
 
             if (0 !== $exitCode) {
-                $this->logger->error('Could not clear Mautic\'s cache. Please try again.');
+                $this->logger->error("Could not clear Mautic's cache. Please try again.");
 
                 return $this->sendJsonResponse([
                     'error' => $this->translator->trans('marketplace.package.cache.clear.failed'),
                 ], 500);
             }
-        } catch (\Exception $e) {
-            $this->logger->error('Could not clear Mautic\'s cache. Details: '.$e->getMessage());
+        } catch (\Exception $exception) {
+            $this->logger->error("Could not clear Mautic's cache. Details: ".$exception->getMessage());
 
             return $this->sendJsonResponse([
                 'error' => $this->translator->trans('marketplace.package.cache.clear.failed'),
@@ -231,8 +231,8 @@ final class AjaxController extends CommonAjaxController
 
         try {
             $result = $this->resourceInstaller->install($packageName, $userId);
-        } catch (\Exception $e) {
-            return $this->installError($e);
+        } catch (\Exception $exception) {
+            return $this->installError($exception);
         }
 
         if (!$result['success']) {

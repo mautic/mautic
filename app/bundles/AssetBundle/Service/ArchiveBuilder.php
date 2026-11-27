@@ -23,9 +23,9 @@ final class ArchiveBuilder
         try {
             $this->addAssetsToArchive($zipArchive, $assets);
             $this->closeZipArchive($zipArchive, $zipPath);
-        } catch (\Throwable $e) {
+        } catch (\Throwable $throwable) {
             $this->cleanupZipArchive($zipArchive, $zipPath);
-            throw $e;
+            throw $throwable;
         }
 
         return $zipPath;

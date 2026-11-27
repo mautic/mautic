@@ -24,7 +24,8 @@ trait TranslationModelTrait
         /** @var array<TranslationEntityInterface> $translationChildren */
         [$translationParent, $translationChildren] = $entity->getTranslations();
 
-        $leadPreference = $chosenLanguage = null;
+        $leadPreference = null;
+        $chosenLanguage = null;
 
         if (count($translationChildren)) {
             if ($translationParent) {

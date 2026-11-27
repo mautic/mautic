@@ -478,8 +478,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $executed;
@@ -556,8 +556,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $executed;
@@ -767,16 +767,16 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (ApiErrorException $exception) {
-            $this->logIntegrationError($exception);
+        } catch (ApiErrorException $apiErrorException) {
+            $this->logIntegrationError($apiErrorException);
 
             if (!$silenceExceptions) {
-                if (str_contains($exception->getMessage(), 'Invalid Ticket Id')) {
+                if (str_contains($apiErrorException->getMessage(), 'Invalid Ticket Id')) {
                     // Use a bit more friendly message
-                    $exception = new ApiErrorException('There was an issue with communicating with Zoho. Please try to reauthorize.');
+                    $apiErrorException = new ApiErrorException('There was an issue with communicating with Zoho. Please try to reauthorize.');
                 }
 
-                throw $exception;
+                throw $apiErrorException;
             }
 
             return [];
@@ -800,7 +800,9 @@ final class ZohoIntegration extends CrmAbstractIntegration
         $config                = $this->mergeConfigToFeatureSettings();
         $fieldsToUpdateInZoho  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields            = array_unique(array_values($config['leadFields']));
-        $totalUpdated          = $totalCreated = $totalErrors = 0;
+        $totalUpdated          = 0;
+        $totalCreated = 0;
+        $totalErrors = 0;
         if ($key = array_search('mauticContactTimelineLink', $leadFields, true)) {
             unset($leadFields[$key]);
         }
@@ -1074,8 +1076,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
                 return true;
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return false;

@@ -186,11 +186,11 @@ final class HubspotIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
 
             if (!$silenceExceptions) {
-                throw $e;
+                throw $exception;
             }
         }
 
@@ -372,8 +372,8 @@ final class HubspotIntegration extends CrmAbstractIntegration
 
                 return $executed;
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $executed;
@@ -417,8 +417,8 @@ final class HubspotIntegration extends CrmAbstractIntegration
 
                 return $executed;
             }
-        } catch (Exception $e) {
-            $this->logIntegrationError($e);
+        } catch (Exception $exception) {
+            $this->logIntegrationError($exception);
         }
 
         return $executed;
@@ -497,7 +497,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
                 } catch (Exception $exception) {
                     $this->logger->warning($exception->getMessage());
 
-                    return;
+                    return null;
                 }
             }
         }

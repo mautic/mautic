@@ -67,9 +67,9 @@ final readonly class SyncService implements SyncServiceInterface
 
         try {
             $integrationSyncProcess->execute();
-        } catch (ClientException $exception) {
+        } catch (ClientException $clientException) {
             // The sync failed to communicate with the integration so log it
-            DebugLogger::log($inputOptionsDAO->getIntegration(), $exception->getMessage(), null, [], LogLevel::ERROR);
+            DebugLogger::log($inputOptionsDAO->getIntegration(), $clientException->getMessage(), null, [], LogLevel::ERROR);
         }
     }
 
