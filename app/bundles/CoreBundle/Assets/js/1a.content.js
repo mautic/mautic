@@ -320,6 +320,10 @@ Mautic.processPageContent = function (response) {
 Mautic.onPageLoad = function (container, response, inModal) {
     mQuery(container).trigger('mautic:onPageLoad:before', [container, response, inModal]);
 
+    if (container === 'body' || container === '#app-content') {
+        mQuery('body').toggleClass('focus-mode', mQuery('#app-content .content-body--focus').length > 0);
+    }
+
     Mautic.initDateRangePicker(container + ' #daterange_date_from', container + ' #daterange_date_to');
 
     //initiate links

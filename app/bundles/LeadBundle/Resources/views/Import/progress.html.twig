@@ -11,11 +11,23 @@ Variables
 - currentRoute
 #}
 {% extends '@MauticCore/Default/content.html.twig' %}
+{% set focusMode = true %}
 
 {% block mauticContent %}leadImport{% endblock %}
 
 {% block headerTitle %}
 {{ 'mautic.lead.import.leads'|trans({'%object%': objectName|trans}) }}
+{% endblock %}
+
+{% block actions %}
+  {% if not complete %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+        'routeBase': 'import',
+        'langVar': 'lead.import',
+        'templateButtons': {'close': true},
+        'closeUrl': path(indexRoute, indexRouteParams),
+    }) -}}
+  {% endif %}
 {% endblock %}
 
 {% block content %}

@@ -9,6 +9,7 @@
     - template
 #}
 {% extends '@MauticCore/Default/content.html.twig' %}
+{% set focusMode = true %}
 
 {% block mauticContent %}leadImport{% endblock %}
 
@@ -17,18 +18,16 @@
 {% endblock %}
 
 {% block actions %}
-  {% if step is defined and constant('Mautic\\LeadBundle\\Controller\\ImportController::STEP_UPLOAD_CSV') == step %}
-    {{- include('@MauticCore/Helper/page_actions.html.twig', {
-            'routeBase': 'import',
-            'langVar': 'lead.import',
-            'templateButtons': {'close': true},
-            'routeVars': {
-                'close': {
-                    'object': app.request.attributes.all()['object'] ?? app.request.query.all()['object'] ?? app.request.request.all()['object'] ?? 'contacts',
-                },
+  {{- include('@MauticCore/Helper/page_actions.html.twig', {
+        'routeBase': 'import',
+        'langVar': 'lead.import',
+        'templateButtons': {'close': true},
+        'routeVars': {
+            'close': {
+                'object': app.request.attributes.all()['object'] ?? app.request.query.all()['object'] ?? app.request.request.all()['object'] ?? 'contacts',
             },
+        },
     }) -}}
-  {% endif %}
 {% endblock %}
 
 {% block content %}

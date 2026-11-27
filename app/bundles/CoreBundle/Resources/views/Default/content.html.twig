@@ -21,6 +21,7 @@
         toolbar: block('toolbar') is defined ? block('toolbar') : toolbar|default(''),
         mauticTemplateVars: mauticTemplateVars|default({}),
         isXmlHttpRequest: request.isXmlHttpRequest,
+        focusMode: focusMode|default(false),
     }) -}}
 {% else %}
     {{ block('content') }}

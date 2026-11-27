@@ -300,3 +300,18 @@ html.responsejs.sidebar-open-ltr .sidebar-left {
     }
   }
 }
+
+.focus-mode {
+  .app-sidebar.sidebar-left {
+    display: none;
+
+    ~ #app-content,
+    ~ #app-footer {
+      margin-left: 0;
+    }
+  }
+
+  .navbar-left [data-toggle='sidebar'] {
+    display: none;
+  }
+}
