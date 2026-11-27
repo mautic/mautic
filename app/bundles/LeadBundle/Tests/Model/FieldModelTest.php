@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -27,8 +28,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class FieldModelTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     protected function setUp(): void
     {
         // Debug wires up DBAL's query logging, which the index assertions read.
@@ -43,6 +42,7 @@ final class FieldModelTest extends MauticMysqlTestCase
      * @param array<string, mixed[]> $filters
      */
     #[DataProvider('dataForGetFieldsProperties')]
+    #[ResetDatabase]
     public function testGetFieldsProperties(array $filters, int $expectedCount): void
     {
         $fieldModel = $this->getService(FieldModel::class);
@@ -104,6 +104,7 @@ final class FieldModelTest extends MauticMysqlTestCase
         ];
     }
 
+    #[ResetDatabase]
     public function testSingleContactFieldIsCreatedAndDeleted(): void
     {
         $fieldModel = $this->getService(FieldModel::class);
@@ -120,6 +121,7 @@ final class FieldModelTest extends MauticMysqlTestCase
         $this->assertCount(0, $this->getColumns('leads', $field->getAlias()));
     }
 
+    #[ResetDatabase]
     public function testSingleCompanyFieldIsCreatedAndDeleted(): void
     {
         $fieldModel = $this->getService(FieldModel::class);
@@ -136,6 +138,7 @@ final class FieldModelTest extends MauticMysqlTestCase
         $this->assertCount(0, $this->getColumns('companies', $field->getAlias()));
     }
 
+    #[ResetDatabase]
     public function testMultipleFieldsAreCreatedAndDeleted(): void
     {
         $fieldModel = $this->getService(FieldModel::class);
@@ -257,6 +260,7 @@ final class FieldModelTest extends MauticMysqlTestCase
         $this->assertTrue($model->isUsedField($leadField));
     }
 
+    #[ResetDatabase]
     public function testUniqueIdentifierIndexToggleForContacts(): void
     {
         // DBAL 4 dropped the SQL logger, so the queries are read off doctrine-bundle's

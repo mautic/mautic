@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
@@ -43,9 +44,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTestCase
 {
-    // Importing forms creates their results tables, which ends the transaction
-    protected $useCleanupRollback = false;
-
+    #[ResetDatabase]
     public function testImportedEventsReferToTheImportedEntities(): void
     {
         $pages    = [$this->createPage('One'), $this->createPage('Two')];
@@ -183,6 +182,7 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $this->assertSame($companyName, $companyModel->getEntity($companyId)->getName());
     }
 
+    #[ResetDatabase]
     public function testImportedFormActionsReferToTheImportedEntities(): void
     {
         $form    = $this->createForm('Actions');
@@ -325,6 +325,7 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $this->assertSame($mjml, $imported->getCustomMjml());
     }
 
+    #[ResetDatabase]
     public function testImportCreatesTheTagsAndCustomFieldsTheEventsUse(): void
     {
         $this->dropColumns('leads', 'imported_custom');
@@ -364,6 +365,7 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $this->assertSame("Imported custom ({$importedAlias})", $fieldList[$importedAlias]);
     }
 
+    #[ResetDatabase]
     public function testImportedFormCanBeSubmitted(): void
     {
         $form = $this->createFormWithEmailField('Form Submitted', 'formsubmitted');
@@ -401,6 +403,7 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
      * The aliases become the name of the form results table and its columns.
      */
     #[DataProvider('craftedAliasProvider')]
+    #[ResetDatabase]
     public function testImportWithACraftedAliasIsRejectedBeforeAnythingIsSaved(string $entityName, string $alias): void
     {
         $form     = $this->createFormWithEmailField('Crafted', 'crafted');
@@ -457,6 +460,7 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         yield 'form alias changing the table' => [Form::ENTITY_NAME, 'x (review_extra TEXT); --'];
     }
 
+    #[ResetDatabase]
     public function testImportedCampaignRunsItsActionsOnTheImportedEntities(): void
     {
         $this->dropColumns('leads', 'run_custom');

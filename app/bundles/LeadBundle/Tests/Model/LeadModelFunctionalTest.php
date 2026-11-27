@@ -11,6 +11,7 @@ use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
@@ -25,8 +26,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class LeadModelFunctionalTest extends MauticMysqlTestCase
 {
     private bool $pointsAdded = false;
-
-    protected $useCleanupRollback = false;
 
     public function testSavingPrimaryCompanyAfterPointsAreSetByListenerAreNotResetToDefaultOf0BecauseOfPointsFieldDefaultIs0(): void
     {
@@ -82,6 +81,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(2, $this->getContactWithAssignTwoCompanies());
     }
 
+    #[ResetDatabase]
     public function testSignleAssignedCompany(): void
     {
         $this->setUpSymfony(array_merge($this->configParams, ['contact_allow_multiple_companies' => 0]));
@@ -123,6 +123,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         return $companyLeadRepo->getCompaniesByLeadId($contact->getId());
     }
 
+    #[ResetDatabase]
     public function testGetCustomLeadFieldLength(): void
     {
         $leadModel  = $this->getService(LeadModel::class);
@@ -184,6 +185,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
      * @throws MappingException
      */
     #[DataProvider('fieldValueProvider')]
+    #[ResetDatabase]
     public function testSelectFieldSavesOnlyAllowedValuesInDB(string $selectFieldValue, ?string $expectedValue): void
     {
         $fieldModel = $this->getService(FieldModel::class);

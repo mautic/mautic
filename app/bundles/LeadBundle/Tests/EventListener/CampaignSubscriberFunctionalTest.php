@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -40,8 +41,6 @@ use Symfony\Component\HttpFoundation\Response;
 #[AllowMockObjectsWithoutExpectations]
 final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     use LeadFieldTestTrait;
 
     private LeadRepository $contactRepository;
@@ -416,6 +415,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals('abcdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $address1Value, 'Shortening too long messages did not work properly');
     }
 
+    #[ResetDatabase]
     public function testUpdatesContactCampaignActionWithBooleanFields(): void
     {
         $this->createField([
@@ -1073,6 +1073,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     #[DataProvider('regexOperatorProvider')]
+    #[ResetDatabase]
     public function testRegexOperatorOnDateFieldCondition(string $operator, string $regex, string $fieldValue, bool $expectedResult): void
     {
 

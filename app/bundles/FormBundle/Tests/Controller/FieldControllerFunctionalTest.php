@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -13,8 +14,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     public function testNewEmailFieldFormIsPreMapped(): void
     {
         $this->client->xmlHttpRequest(
@@ -27,6 +26,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('<option value="email" selected="selected">', (string) $payload['newContent']);
     }
 
+    #[ResetDatabase]
     public function testNewCaptchaFieldFormCanBeSaved(): void
     {
         $payload = [

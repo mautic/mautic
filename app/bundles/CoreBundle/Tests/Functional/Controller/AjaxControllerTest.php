@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\CoreBundle\Entity\IdentifierInterface;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -44,8 +45,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class AjaxControllerTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;
-
-    protected $useCleanupRollback = false;
 
     /**
      * All entities are created at once, to avoid a full database reset per search
@@ -475,6 +474,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->assertCount(4, $crawler->filterXPath("//li[contains(@class, 'gsearch--results-item')]"));
     }
 
+    #[ResetDatabase]
     public function testDownloadIpLookupDataStoreError(): void
     {
         $configParams = $this->configParams;
@@ -524,6 +524,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->assertCount(0, $mockHandler);
     }
 
+    #[ResetDatabase]
     public function testGetIpLookupForm(): void
     {
         $configParams                   = $this->configParams;

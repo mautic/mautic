@@ -6,14 +6,13 @@ namespace Mautic\CoreBundle\Tests\Command;
 
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 
 final class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     /**
      * @throws \Exception
      */
@@ -53,6 +52,7 @@ final class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
     /**
      * @throws \Exception
      */
+    #[ResetDatabase]
     public function testGdprMaintenanceCommand(): void
     {
         $identified           = '-4 years';

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Field\Command;
 
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -13,14 +14,13 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     public function testAnalyseWhenNoCustomFieldPresent(): void
     {
         $commandTester = $this->testSymfonyCommand('mautic:fields:analyse');
         $this->assertStringContainsString('No custom field(s) to analyse!!!', $commandTester->getDisplay());
     }
 
+    #[ResetDatabase]
     public function testAnalyseCustomField(): void
     {
         $fields = [
@@ -101,6 +101,7 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    #[ResetDatabase]
     public function testCustomFieldWhenColumnIsNotExistsInLeadsSchema(): void
     {
         // Create a field and add it to the lead object.

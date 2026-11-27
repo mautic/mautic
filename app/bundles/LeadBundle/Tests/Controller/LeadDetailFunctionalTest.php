@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -17,9 +18,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadDetailFunctionalTest extends MauticMysqlTestCase
 {
-    // Creating a custom field alters the leads table (DDL), which commits the transaction, so rollback cleanup must be disabled.
-    protected $useCleanupRollback = false;
-
     public function testCustomFieldOrderIsRespected(): void
     {
         $lead = new Lead();
@@ -121,6 +119,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString(sprintf('data-target-url="/s/contacts/view/%s/stats"', $lead->getId()), (string) $response->getContent());
     }
 
+    #[ResetDatabase]
     public function testHtmlContactFieldIsPurifiedOnLeadDetailPage(): void
     {
         $htmlField = new LeadField();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Controller\Api\FieldApiController;
 use Mautic\LeadBundle\Entity\Lead;
@@ -21,8 +22,6 @@ use Symfony\Component\HttpFoundation\Response;
 #[CoversClass(CreateCustomFieldCommand::class)]
 final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     protected function setUp(): void
     {
         $this->configParams['create_custom_field_in_background'] = 'testFieldApiEndpointsWithBackgroundProcessingEnabled' === $this->name();
@@ -30,6 +29,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
     }
 
+    #[ResetDatabase]
     public function testCreatingMultiselectField(): void
     {
         $payload = [
@@ -67,6 +67,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful($clientResponse->getContent());
     }
 
+    #[ResetDatabase]
     public function testFieldApiEndpointsWithBackgroundProcessingEnabled(): void
     {
         $alias   = uniqid('field');
@@ -92,6 +93,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertDeleteEntityActionFieldUsedInSegment(true);
     }
 
+    #[ResetDatabase]
     public function testFieldApiEndpointsWithBackgroundProcessingDisabled(): void
     {
         $alias   = uniqid('field');
@@ -169,6 +171,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     #[DataProvider('provideEmptyMultiSelectValue')]
+    #[ResetDatabase]
     public function testMultiselectSetDefaultValue(mixed $defaultFieldValue): void
     {
         $fieldAlias = 'test_multi';
@@ -279,6 +282,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     #[DataProvider('provideEmptySelectValue')]
+    #[ResetDatabase]
     public function testSelectSetDefaultValue(mixed $defaultFieldValue): void
     {
         $fieldAlias = 'test_single';

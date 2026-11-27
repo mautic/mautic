@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Helper\CsvHelper;
+use Mautic\CoreBundle\Test\Attribute\ResetDatabase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
@@ -26,8 +27,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportControllerFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     private string $csvFile;
 
     protected function beforeTearDown(): void
@@ -84,6 +83,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     #[DataProvider('dataImportCSV')]
+    #[ResetDatabase]
     public function testImportCSV(bool $createLead, string $expectedOutput): void
     {
         $this->generateSmallCSV();
@@ -185,6 +185,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     #[DataProvider('dataImportWithInvalidDates')]
+    #[ResetDatabase]
     public function testImportWithInvalidDates(bool $createLead, string $expectedOutput): void
     {
         $this->generateSmallCSV([
