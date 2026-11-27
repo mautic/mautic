@@ -172,7 +172,17 @@ final class FormSubscriberTest extends TestCase
             ->willReturn(true);
 
         $this->emailModel->expects($this->once())
-            ->method('sendEmail');
+            ->method('sendEmail')
+            ->with(
+                $email,
+                $feedback['lead.create']['lead'],
+                $this->callback(function (array|\ArrayAccess $options): bool {
+                    $this->assertArrayHasKey('ignoreDNC', $options);
+                    $this->assertTrue($options['ignoreDNC']);
+
+                    return true;
+                })
+            );
 
         $this->formSubscriber->onFormSubmitActionSendEmail($event);
     }
