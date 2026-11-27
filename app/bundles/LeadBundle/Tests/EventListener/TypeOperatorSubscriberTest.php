@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Form\Type\NumberRangeType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
@@ -17,6 +18,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Entity\StageRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -129,6 +131,9 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $operators = $event->getOperatorsForAllFieldTypes();
 
+        $this->assertEquals($operators['int'], $operators['number']);
+        $this->assertEquals($operators['integer'], $operators['number']);
+
         // Test for random operators:
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['text']['include']);
         $this->assertNotContains(OperatorOptions::INCLUDING_ANY, $operators['text']['include']);
@@ -143,6 +148,8 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertContains(OperatorOptions::INCLUDING_ANY, $operators['country']['include']);
         $this->assertContains(OperatorOptions::EXCLUDING_ANY, $operators['multiselect']['include']);
         $this->assertNotContains(OperatorOptions::STARTS_WITH, $operators['country']['include']);
+        $this->assertContains(OperatorOptions::BETWEEN, $operators['int']['include']);
+        $this->assertContains(OperatorOptions::NOT_BETWEEN, $operators['int']['include']);
     }
 
     public function testOnTypeListCollect(): void
@@ -519,5 +526,44 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->subscriber->onSegmentFilterFormHandleDefault($event);
+    }
+
+    #[DataProvider('operatorProvider')]
+    public function testOnSegmentFilterFormHandleNumber(string $operator): void
+    {
+        $alias   = 'number_a';
+        $object  = 'lead';
+        $details = [
+            'properties'  => [
+                'type'   => 'number',
+                'filter' => [
+                    'number_from' => 5,
+                    'number_to'   => 10,
+                ],
+            ],
+        ];
+        $event = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->once())
+            ->method('add')
+            ->with(
+                'filter',
+                NumberRangeType::class,
+                [
+                    'label' => false,
+                    'data'  => $event->getForm()->getData()['filter'] ?? [],
+                ]
+            );
+
+        $this->subscriber->onSegmentFilterFormHandleNumber($event);
+    }
+
+    /**
+     * @return \Iterator<string, array<int, string>>
+     */
+    public static function operatorProvider(): \Iterator
+    {
+        yield 'between' => [OperatorOptions::BETWEEN];
+        yield 'not_between' => [OperatorOptions::NOT_BETWEEN];
     }
 }
