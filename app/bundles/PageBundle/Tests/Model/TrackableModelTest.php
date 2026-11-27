@@ -610,7 +610,7 @@ final class TrackableModelTest extends TestCase
         $model = $this->getModel();
 
         [$content, $trackables] = $model->parseContentForTrackables(
-            '<style> .mf-modal { background-image: url(\'https://www.mautic.org/wp-content/uploads/2014/08/iTunesArtwork.png\'); } </style>',
+            "<style> .mf-modal { background-image: url('https://www.mautic.org/wp-content/uploads/2014/08/iTunesArtwork.png'); } </style>",
             [],
             'email',
             1

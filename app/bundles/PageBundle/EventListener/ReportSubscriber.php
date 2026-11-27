@@ -130,7 +130,7 @@ final readonly class ReportSubscriber
                 $hitPrefix.'time_spent' => [
                     'label'   => 'mautic.page.report.hits.time_spent',
                     'type'    => 'string',
-                    'formula' => 'IF('.$hitPrefix.'date_left IS NOT NULL, SEC_TO_TIME(TIMESTAMPDIFF(SECOND, '.$hitPrefix.'date_hit, '.$hitPrefix.'date_left)), \'\')',
+                    'formula' => 'IF('.$hitPrefix.'date_left IS NOT NULL, SEC_TO_TIME(TIMESTAMPDIFF(SECOND, '.$hitPrefix.'date_hit, '.$hitPrefix."date_left)), '')",
                 ],
                 $hitPrefix.'country' => [
                     'label' => 'mautic.page.report.hits.country',
@@ -330,12 +330,12 @@ final readonly class ReportSubscriber
                 'time_watched' => [
                     'label'   => 'mautic.page.report.hits.time_watched',
                     'type'    => 'string',
-                    'formula' => 'if('.$hitPrefix.'duration = 0,\'-\',SEC_TO_TIME('.$hitPrefix.'time_watched))',
+                    'formula' => 'if('.$hitPrefix."duration = 0,'-',SEC_TO_TIME(".$hitPrefix.'time_watched))',
                 ],
                 'duration' => [
                     'label'   => 'mautic.page.report.hits.duration',
                     'type'    => 'string',
-                    'formula' => 'if('.$hitPrefix.'duration = 0,\'-\',SEC_TO_TIME('.$hitPrefix.'duration))',
+                    'formula' => 'if('.$hitPrefix."duration = 0,'-',SEC_TO_TIME(".$hitPrefix.'duration))',
                 ],
             ];
 

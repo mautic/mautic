@@ -211,7 +211,7 @@ final class FileApiController extends CommonApiController
                         throw new \InvalidArgumentException($dir.'/'.$subdir.' subdirectory could not be created.', Response::HTTP_INTERNAL_SERVER_ERROR);
                     }
                 } else {
-                    throw new \InvalidArgumentException($subdir.' doesn\'t exist in the '.$dir.' dir.');
+                    throw new \InvalidArgumentException($subdir." doesn't exist in the ".$dir.' dir.');
                 }
             }
 

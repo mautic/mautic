@@ -134,7 +134,7 @@ final class EmailValidatorTest extends TestCase
     public function testValidateEmailWithApostropheInTheDomainPortion(): void
     {
         $this->expectException(InvalidEmailException::class);
-        $this->emailValidator->validate('john@gm\'ail.com');
+        $this->emailValidator->validate("john@gm'ail.com");
     }
 
     public function testValidateEmailWithSemicolonInIt(): void

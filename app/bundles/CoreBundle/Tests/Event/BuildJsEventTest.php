@@ -19,7 +19,7 @@ JS;
     public function testMinificationIsONInProd(): void
     {
         $event = new BuildJsEvent(self::TEST_JS);
-        $this->assertSame('console.log(\'logging this\')', $event->getJs());
+        $this->assertSame("console.log('logging this')", $event->getJs());
     }
 
     public function testMinificationIsOffInDev(): void

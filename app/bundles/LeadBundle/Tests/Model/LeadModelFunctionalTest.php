@@ -199,7 +199,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
             ->setProperties(['list' => [
                 ['label' => 'Male', 'value' => 'male'],
                 ['label' => 'Female', 'value' => 'female'],
-                ['label' => 'Other\'s', 'value' => 'other\'s'],
+                ['label' => "Other's", 'value' => "other's"],
             ]]);
         $fieldModel->saveEntity($selectField);
         $this->em->clear();
@@ -261,6 +261,6 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     {
         yield 'allowed_value' => ['female', 'female'];
         yield 'disallowed_value' => ['gibberish', null];
-        yield 'with_quotes' => ['other\'s', 'other\'s'];
+        yield 'with_quotes' => ["other's", "other's"];
     }
 }

@@ -22,7 +22,7 @@ final class AuditLogRepository extends CommonRepository
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'al')
             ->select('count(*)')
-            ->where('al.object = \'lead\'')
+            ->where("al.object = 'lead'")
             ->andWhere('al.object_id = :id')
             ->setParameter('id', $lead->getId());
 
@@ -48,8 +48,8 @@ final class AuditLogRepository extends CommonRepository
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
-            ->where('al.bundle = \'lead\'')
-            ->andWhere('al.object = \'lead\'')
+            ->where("al.bundle = 'lead'")
+            ->andWhere("al.object = 'lead'")
             ->andWhere('al.objectId = :id')
             ->setParameter('id', $lead->getId());
 
@@ -97,8 +97,8 @@ final class AuditLogRepository extends CommonRepository
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
-            ->where('al.bundle = \'lead\'')
-            ->andWhere('al.object = \'lead\'');
+            ->where("al.bundle = 'lead'")
+            ->andWhere("al.object = 'lead'");
         $query
             ->andWhere($query->expr()->in('al.objectId', ':listOfContacts'))
             ->setParameter('listOfContacts', $listOfContacts, ArrayParameterType::INTEGER);
@@ -231,7 +231,7 @@ final class AuditLogRepository extends CommonRepository
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object,
             al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
-            ->where('al.bundle = \'user\'')
+            ->where("al.bundle = 'user'")
             ->andWhere('al.userId = :user_id')
             ->setParameter('user_id', $user->getId())
             ->orderBy('al.dateAdded', 'DESC')

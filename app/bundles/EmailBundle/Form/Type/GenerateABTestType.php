@@ -31,7 +31,7 @@ final class GenerateABTestType extends AbstractType
 
         $attr = [
             'class'    => 'form-control',
-            'onchange' => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
+            'onchange' => "Mautic.getAbTestWinnerForm('email', 'emailform', this);",
         ];
 
         if ($abTestWinnerCriteria !== []) {

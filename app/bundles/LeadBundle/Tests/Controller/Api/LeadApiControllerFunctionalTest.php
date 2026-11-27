@@ -648,7 +648,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testSearchContactsWithSpecialCharacters(): void
     {
         $contact = new Lead();
-        $contact->setFirstname('O\'neal');
+        $contact->setFirstname("O'neal");
 
         $this->em->persist($contact);
         $this->em->flush();
@@ -660,7 +660,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             [
                 'where' => [
                     [
-                        'val'  => 'O\'neal',
+                        'val'  => "O'neal",
                         'col'  => 'firstname',
                         'expr' => 'eq',
                     ],

@@ -200,21 +200,21 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     {
         yield 'No properties' => [
             [],
-            'A \'positive\' label is required.',
+            "A 'positive' label is required.",
         ];
 
         yield 'Only Yes' => [
             [
                 'yes' => 'Yes',
             ],
-            'A \'negative\' label is required.',
+            "A 'negative' label is required.",
         ];
 
         yield 'Only No' => [
             [
                 'no' => 'No',
             ],
-            'A \'positive\' label is required.',
+            "A 'positive' label is required.",
         ];
     }
 

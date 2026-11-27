@@ -51,7 +51,7 @@ final class ImportCommandTest extends MauticMysqlTestCase
         // See the notifications.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/import');
         $html    = $crawler->filterXPath('//div[contains(@id, "notifications")]')->html();
-        $this->assertStringContainsString('Import failed. Reason: The import hasn\'t been updated in 2 hours by the background job. It\'s considered failed', $html, $html);
+        $this->assertStringContainsString("Import failed. Reason: The import hasn't been updated in 2 hours by the background job. It's considered failed", $html, $html);
     }
 
     private function generateSmallCSV(): string

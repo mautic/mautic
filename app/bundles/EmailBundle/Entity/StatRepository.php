@@ -103,7 +103,7 @@ final class StatRepository extends CommonRepository
         $q->select(...$selectColumns)
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
-            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.source = \'email\' and ph.source_id = s.email_id and ph.lead_id = s.lead_id')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', "ph.source = 'email' and ph.source_id = s.email_id and ph.lead_id = s.lead_id")
             ->addSelect('COUNT(ph.id) AS link_hits');
 
         if (null !== $createdByUserId) {

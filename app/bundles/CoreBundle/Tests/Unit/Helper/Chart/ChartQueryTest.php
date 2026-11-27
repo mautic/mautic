@@ -55,15 +55,15 @@ final class ChartQueryTest extends TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('select')
-            ->with('DATE_FORMAT(CONVERT_TZ(t.date_sent, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\') AS date, COUNT(*) AS count');
+            ->with("DATE_FORMAT(CONVERT_TZ(t.date_sent, '+00:00', '".$this->dateTimeHelper->getLocalTimezoneOffset()."'), '%Y-%m-%d') AS date, COUNT(*) AS count");
 
         $this->queryBuilder->expects($this->once())
             ->method('groupBy')
-            ->with('DATE_FORMAT(CONVERT_TZ(t.date_sent, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\')');
+            ->with("DATE_FORMAT(CONVERT_TZ(t.date_sent, '+00:00', '".$this->dateTimeHelper->getLocalTimezoneOffset()."'), '%Y-%m-%d')");
 
         $this->queryBuilder->expects($this->once())
             ->method('orderBy')
-            ->with('DATE_FORMAT(CONVERT_TZ(t.date_sent, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\')');
+            ->with("DATE_FORMAT(CONVERT_TZ(t.date_sent, '+00:00', '".$this->dateTimeHelper->getLocalTimezoneOffset()."'), '%Y-%m-%d')");
 
         $this->queryBuilder->expects($this->once())
             ->method('setMaxResults')
@@ -320,7 +320,7 @@ final class ChartQueryTest extends TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('select')
-            ->with('DATE_FORMAT(CONVERT_TZ(t.date_added, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\') AS date, COUNT(*) AS count');
+            ->with("DATE_FORMAT(CONVERT_TZ(t.date_added, '+00:00', '".$this->dateTimeHelper->getLocalTimezoneOffset()."'), '%Y-%m-%d') AS date, COUNT(*) AS count");
 
         $this->queryBuilder->expects($this->once())
             ->method('from')
@@ -328,11 +328,11 @@ final class ChartQueryTest extends TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('groupBy')
-            ->with('DATE_FORMAT(CONVERT_TZ(t.date_added, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\')');
+            ->with("DATE_FORMAT(CONVERT_TZ(t.date_added, '+00:00', '".$this->dateTimeHelper->getLocalTimezoneOffset()."'), '%Y-%m-%d')");
 
         $this->queryBuilder->expects($this->once())
             ->method('orderBy')
-            ->with('DATE_FORMAT(CONVERT_TZ(t.date_added, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\')');
+            ->with("DATE_FORMAT(CONVERT_TZ(t.date_added, '+00:00', '".$this->dateTimeHelper->getLocalTimezoneOffset()."'), '%Y-%m-%d')");
 
         $this->queryBuilder->expects($this->once())
             ->method('setMaxResults')
