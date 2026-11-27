@@ -16,30 +16,10 @@
             </div>
         </li>
 
-        <li>
-            <a href="{{ path('mautic_user_account') }}" data-toggle="ajax">
-                <i class="ri-user-smile-line ri-lg"></i><span>{% trans %}mautic.user.account.settings{% endtrans %}</span>
-            </a>
-        </li>
-
-        {% if securityIsGranted('user:users:create') %}
-        <li>
-            <a href="{{ path('mautic_user_index', {'open': 'invite'}) }}" data-toggle="ajax">
-                <i class="ri-team-line"></i>
-                <span>{{ 'mautic.user.profile.invite'|trans }}</span>
-            </a>
-        </li>
-        {% endif %}
-
-        <li>
-            <a href="{{ path('mautic_user_logout') }}">
-                <i class="ri-logout-circle-r-line ri-lg"></i><span>{% trans %}mautic.user.auth.logout{% endtrans %}</span>
-            </a>
-        </li>
-
         {% if inline %}
         <li role="separator" class="divider"></li>
-        {{ inline }}
+        {# menuRender returns trusted HTML, but assigning it to a variable drops Twig's safe marker. #}
+        {{ inline|raw }}
         {% endif %}
     </ul>
 </li>
