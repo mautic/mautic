@@ -54,7 +54,7 @@ Mautic.initFieldSliders = function () {
     const baseLength = 20;
     const peakLength = 32;
     const thumbLength = 40;
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const reducedMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : {matches: false};
     const state = new WeakMap();
 
     function numeric(value, fallback) {
@@ -177,7 +177,9 @@ Mautic.initFieldSliders = function () {
         slider.goal = slider.shown = target(slider);
         slider.input.addEventListener('input', () => update(slider));
         slider.input.addEventListener('change', () => update(slider));
-        new ResizeObserver(() => draw(slider)).observe(slider.canvas);
+        if (typeof ResizeObserver !== 'undefined') {
+            new ResizeObserver(() => draw(slider)).observe(slider.canvas);
+        }
         update(slider);
     }
 
@@ -195,8 +197,11 @@ Mautic.initFieldSliders = function () {
 
     document.addEventListener('DOMContentLoaded', () => {
         init(document.body);
-        new MutationObserver((records) => records.forEach((record) => record.addedNodes.forEach(init)))
-            .observe(document.body, {childList: true, subtree: true});
+
+        if (typeof MutationObserver !== 'undefined') {
+            new MutationObserver((records) => records.forEach((record) => record.addedNodes.forEach(init)))
+                .observe(document.body, {childList: true, subtree: true});
+        }
     });
 };
 
