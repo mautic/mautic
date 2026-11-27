@@ -68,6 +68,11 @@
 
 - `Mautic\CoreBundle\Event\SearchHelpEvent` is deprecated and will be removed in Mautic 8.0. List toolbars no longer display search help or dispatch this event, so plugin listeners are no longer called. Plugins can supply legacy quick-filter arrays or grouped filters through the `quickFilters` toolbar option instead.
 
+## Deprecated live search button helper
+
+- `Mautic.updateLiveSearchButton()` is deprecated and will be removed in Mautic 8.0. The search field's clear button now updates itself, so the function is a no-op. Remove calls to it from custom JavaScript.
+- The `#btn-filter` button was removed from list search toolbars. Custom JavaScript, CSS or tests that target it need to be updated.
+
 # Notes
 
 - Migration file `app/migrations/Version20230522141144.php` has been removed. If you do not use the Mautic Citrix plugin or a fork of it, you can manually drop the `plugin_citrix_events` table from the database, as it is no longer used.
