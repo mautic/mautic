@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\PageBundle\Controller\PublicController;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -51,7 +52,7 @@ final class DefaultController extends CommonController
 
         $request->attributes->set('ignore_mismatch', true);
 
-        return $this->forward('Mautic\PageBundle\Controller\PublicController::indexAction', ['slug' => $slug]);
+        return $this->forward(PublicController::class.'::indexAction', ['slug' => $slug]);
     }
 
     public function globalSearchAction(Request $request): Response

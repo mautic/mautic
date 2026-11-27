@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\InstallBundle\Controller\InstallController;
+
 return [
     'routes' => [
         'public' => [
@@ -10,23 +13,23 @@ return [
             // attribute scanning would autoload every controller and exhaust it.
             'mautic_installer_home' => [
                 'path'       => '/installer',
-                'controller' => 'Mautic\InstallBundle\Controller\InstallController::stepAction',
+                'controller' => InstallController::class.'::stepAction',
             ],
             'mautic_installer_step' => [
                 'path'       => '/installer/step/{index}',
-                'controller' => 'Mautic\InstallBundle\Controller\InstallController::stepAction',
+                'controller' => InstallController::class.'::stepAction',
             ],
             'mautic_installer_final' => [
                 'path'       => '/installer/final',
-                'controller' => 'Mautic\InstallBundle\Controller\InstallController::finalAction',
+                'controller' => InstallController::class.'::finalAction',
             ],
             'mautic_installer_remove_slash' => [
                 'path'       => '/installer/',
-                'controller' => 'Mautic\CoreBundle\Controller\CommonController::removeTrailingSlashAction',
+                'controller' => CommonController::class.'::removeTrailingSlashAction',
             ],
             'mautic_installer_catchcall' => [
                 'path'         => '/installer/{noerror}',
-                'controller'   => 'Mautic\InstallBundle\Controller\InstallController::stepAction',
+                'controller'   => InstallController::class.'::stepAction',
                 'requirements' => [
                     'noerror' => '(?).+',
                 ],

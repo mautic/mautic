@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\EventListener;
 
+use Mautic\IntegrationsBundle\Controller\ConfigController;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\PluginBundle\Controller\PluginController;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -26,7 +28,7 @@ final readonly class ControllerSubscriber
     {
         $request = $event->getRequest();
 
-        if ('Mautic\PluginBundle\Controller\PluginController::configAction' === ($request->attributes->all()['_controller'] ?? $request->query->all()['_controller'] ?? $request->request->all()['_controller'] ?? null)) {
+        if (PluginController::class.'::configAction' === ($request->attributes->all()['_controller'] ?? $request->query->all()['_controller'] ?? $request->request->all()['_controller'] ?? null)) {
             $integrationName = $request->attributes->all()['name'] ?? $request->query->all()['name'] ?? $request->request->all()['name'] ?? null;
             $page            = $request->attributes->all()['page'] ?? $request->query->all()['page'] ?? $request->request->all()['page'] ?? null;
 
@@ -36,7 +38,7 @@ final readonly class ControllerSubscriber
                     [
                         'integration'   => $integrationName,
                         'page'          => $page,
-                        '_controller'   => 'Mautic\IntegrationsBundle\Controller\ConfigController::editAction',
+                        '_controller'   => ConfigController::class.'::editAction',
                         '_route_params' => [
                             'integration' => $integrationName,
                             'page'        => $page,

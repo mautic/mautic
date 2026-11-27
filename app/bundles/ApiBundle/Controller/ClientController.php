@@ -6,6 +6,7 @@ use Mautic\ApiBundle\Helper\ClientSearchScopeProvider;
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\UserBundle\Controller\ProfileController;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
 use Symfony\Component\HttpFoundation\Request;
@@ -174,7 +175,7 @@ final class ClientController extends AbstractStandardFormController
         return $this->postActionRedirect(
             [
                 'returnUrl'       => $this->generateUrl('mautic_user_account'),
-                'contentTemplate' => 'Mautic\UserBundle\Controller\ProfileController::indexAction',
+                'contentTemplate' => ProfileController::class.'::indexAction',
                 'passthroughVars' => [
                     'success' => $success,
                 ],

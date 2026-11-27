@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\PageBundle\Controller\PublicController;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
@@ -409,7 +410,7 @@ class CommonController extends AbstractController implements MauticController
         $query      = ['ignoreAjax' => true, 'subrequest' => true];
 
         return $this->forwardWithPost(
-            'Mautic\CoreBundle\Controller\ExceptionController::showAction',
+            ExceptionController::class.'::showAction',
             $request->request->all(),
             $parameters,
             array_merge($query, $request->query->all())
@@ -474,7 +475,7 @@ class CommonController extends AbstractController implements MauticController
             if ($page instanceof Page && $page->getIsPublished() && !empty($page->getCustomHtml())) {
                 $slug     = $this->pageModel->generateSlug($page);
                 $response = $this->forward(
-                    'Mautic\PageBundle\Controller\PublicController::indexAction',
+                    PublicController::class.'::indexAction',
                     [
                         'slug'            => $slug,
                         'ignore_mismatch' => true,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Controller;
 
+use Mautic\ApiBundle\Controller\ClientController;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\UserBundle\Entity\User;
@@ -251,7 +252,7 @@ final class ProfileController extends AbstractFormController
             'me'                => $me,
             'userForm'          => $form->createView(),
             'isSamlUser'        => $isSamlUser,
-            'authorizedClients' => $this->forward('Mautic\ApiBundle\Controller\ClientController::authorizedClientsAction')->getContent(),
+            'authorizedClients' => $this->forward(ClientController::class.'::authorizedClientsAction')->getContent(),
         ];
 
         return $this->delegateView(

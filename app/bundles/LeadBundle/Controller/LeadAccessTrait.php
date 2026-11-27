@@ -42,7 +42,7 @@ trait LeadAccessTrait
                     [
                         'returnUrl'       => $returnUrl,
                         'viewParameters'  => ['page' => $page],
-                        'contentTemplate' => $isPlugin ? 'Mautic\LeadBundle\Controller\LeadController::pluginIndexAction' : 'Mautic\LeadBundle\Controller\LeadController::indexAction',
+                        'contentTemplate' => $isPlugin ? LeadController::class.'::pluginIndexAction' : LeadController::class.'::indexAction',
                         'passthroughVars' => [
                             'activeLink'    => $isPlugin ? '#mautic_plugin_timeline_index' : '#mautic_contact_index',
                             'mauticContent' => 'leadTimeline',

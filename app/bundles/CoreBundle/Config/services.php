@@ -189,7 +189,7 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$pluginBundles', param('mautic.plugin.bundles'));
 
     $services->set(ExceptionListener::class)
-        ->arg('$controller', 'Mautic\CoreBundle\Controller\ExceptionController::showAction');
+        ->arg('$controller', ExceptionController::class.'::showAction');
 
     $services->set(CookieHelper::class)
         ->arg('$path', param('mautic.cookie_path'))

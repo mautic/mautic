@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Mautic\UserBundle\Controller\Api\RoleApiController;
 use Mautic\UserBundle\Controller\Api\UserApiController;
+use Mautic\UserBundle\Controller\SecurityController;
 
 return [
     'menu' => [
@@ -32,7 +33,7 @@ return [
         'main' => [
             'mautic_user_logincheck' => [
                 'path'       => '/login_check',
-                'controller' => 'Mautic\UserBundle\Controller\SecurityController::loginCheckAction',
+                'controller' => SecurityController::class.'::loginCheckAction',
             ],
             'mautic_user_logout' => [
                 'path' => '/logout',

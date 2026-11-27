@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use MauticPlugin\MauticTagManagerBundle\Controller\BatchTagController;
+use MauticPlugin\MauticTagManagerBundle\Controller\TagController;
+
 return [
     'name'        => 'Mautic tag manager bundle',
     'description' => 'Provides an interface for tags management.',
@@ -11,19 +14,19 @@ return [
         'main' => [
             'mautic_tagmanager_batch_index_action' => [
                 'path'       => '/tags/batch/view',
-                'controller' => 'MauticPlugin\MauticTagManagerBundle\Controller\BatchTagController::indexAction',
+                'controller' => BatchTagController::class.'::indexAction',
             ],
             'mautic_tagmanager_batch_set_action' => [
                 'path'       => '/tags/batch/set',
-                'controller' => 'MauticPlugin\MauticTagManagerBundle\Controller\BatchTagController::execAction',
+                'controller' => BatchTagController::class.'::execAction',
             ],
             'mautic_tagmanager_index' => [
                 'path'       => '/tags/{page}',
-                'controller' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
+                'controller' => TagController::class.'::indexAction',
             ],
             'mautic_tagmanager_action' => [
                 'path'       => '/tags/{objectAction}/{objectId}',
-                'controller' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::executeAction',
+                'controller' => TagController::class.'::executeAction',
             ],
         ],
     ],
