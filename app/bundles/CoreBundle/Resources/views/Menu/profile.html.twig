@@ -38,8 +38,8 @@
         </li>
 
         {% if inline %}
-        <li role="separator" class="divider"></li>
-        {{ inline }}
+        {# menuRender returns trusted HTML, but assigning it to a variable drops Twig's safe marker. #}
+        {{ inline|raw }}
         {% endif %}
     </ul>
 </li>
