@@ -326,7 +326,10 @@ Mautic.deleteTab = function(deleteBtn) {
         if (/\/new$/.test(globalThis.location.pathname)) {
             return;
         }
-        mQuery('.nav-tabs').each(function(index) {
+        // Modal content can change without the page path changing, so its tab state is not safe to restore.
+        mQuery('.nav-tabs').filter(function() {
+            return !mQuery(this).closest('.modal').length;
+        }).each(function(index) {
             // Using index would have nasty effects when tabs, with different tab count, are loaded asynchronously somewhere on the page.
             const $navTabs = mQuery(this);
             const mauticTabKey = tabId(index);
