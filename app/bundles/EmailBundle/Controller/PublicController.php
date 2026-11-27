@@ -143,10 +143,20 @@ final class PublicController extends CommonFormController
         Request $request,
         MessageBusInterface $messageBus,
         LoggerInterface $logger,
+        ScannerDiagnosticsRecorder $recorder,
         string $idHash,
     ): Response {
         if (!$this->emailModel->allowsOpenTracking($idHash)) {
             return TrackingPixelHelper::getResponse($request);
+        }
+
+    
+        if ($recorder->isEnabled()) {
+            $stat = $this->emailModel->getEmailStatus($idHash);
+
+            if ($stat instanceof Stat) {
+                $recorder->record(ScannerDiagnostic::EVENT_OPEN, $request, $stat);
+            }
         }
 
         try {
