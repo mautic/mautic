@@ -242,6 +242,25 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     }
 
     /**
+     * MariaDB 10.11 mysqldump does not support --set-gtid-purged.
+     * Add the flag only when the installed client accepts it.
+     */
+    private function gtidPurgedFlag(): string
+    {
+        static $flag = null;
+        if (null !== $flag) {
+            return $flag;
+        }
+        $probe = Process::fromShellCommandline('mysqldump --help');
+        $probe->run();
+        $flag = str_contains($probe->getOutput().$probe->getErrorOutput(), 'set-gtid-purged')
+            ? '--set-gtid-purged=OFF '
+            : '';
+
+        return $flag;
+    }
+
+    /**
      * @throws \InvalidArgumentException
      * @throws ProcessFailedException
      */
@@ -405,7 +424,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
 
         $password = ($this->connection->getParams()['password']) ? " -p{$this->connection->getParams()['password']}" : '';
-        $command  = "mysqldump --set-gtid-purged=OFF --skip-triggers --compact --no-create-info --skip-opt --single-transaction --opt -h{$this->connection->getParams()['host']} -P{$this->connection->getParams()['port']} -u{$this->connection->getParams()['user']}$password {$this->connection->getParams()['dbname']} | grep -v \"LOCK TABLE\" | grep -v \"ALTER TABLE\"";
+        $command  = 'mysqldump '.$this->gtidPurgedFlag()."--skip-triggers --compact --no-create-info --skip-opt --single-transaction --opt -h{$this->connection->getParams()['host']} -P{$this->connection->getParams()['port']} -u{$this->connection->getParams()['user']}$password {$this->connection->getParams()['dbname']} | grep -v \"LOCK TABLE\" | grep -v \"ALTER TABLE\"";
 
         $content .= shell_exec($command);
         $content .= 'COMMIT;'.PHP_EOL;
@@ -452,7 +471,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $connectionParams = $this->connection->getParams();
         $password         = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';
         $command          = sprintf(
-            'mysqldump --set-gtid-purged=OFF --opt -h%s -P%s -u%s %s %s > %s',
+            'mysqldump %s--opt -h%s -P%s -u%s %s %s > %s',
+            $this->gtidPurgedFlag(),
             escapeshellarg($connectionParams['host']),
             escapeshellarg((string) $connectionParams['port']),
             escapeshellarg($connectionParams['user']),

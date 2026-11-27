@@ -99,20 +99,41 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         // Treat EXCLUDING_ALL with a single value as notIn
         $operator = $event->operatorIsOneOf(OperatorOptions::EXCLUDING_ALL) ? 'notIn' : $event->getFilter()->getOperator();
 
-        $platform   = $event->getQueryBuilder()->getConnection()->getDatabasePlatform(); /** @phpstan-ignore-line getConnection is deprecated */
-        $fieldExpr  = 'notLike' == $operator ?
-            DatabasePlatform::applyTypeIfStrict($platform, $leadsTableAlias.'.'.$event->getFilter()->getField(), 'text') :
-            $leadsTableAlias.'.'.$event->getFilter()->getField();
+        $platform = $event->getQueryBuilder()->getConnection()->getDatabasePlatform(); /** @phpstan-ignore-line getConnection is deprecated */
+        $column   = $leadsTableAlias.'.'.$event->getFilter()->getField();
 
-        $event->addExpression(
-            $event->getQueryBuilder()->expr()->or(
-                $event->getQueryBuilder()->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
-                $event->getQueryBuilder()->expr()->{$operator}(
-                    $fieldExpr,
-                    $event->getParameterHolder()
+        if (in_array($operator, ['like', 'notLike'], true)) {
+            // getCaseInsensitiveComparison emits ILIKE on PostgreSQL and plain
+            // LIKE on MySQL (already case-insensitive). FLAG_ENSURE_CAST keeps
+            // the text cast; FLAG_NEGATIVE covers notLike.
+            $flags = DatabasePlatform::FLAG_ENSURE_CAST;
+            if ('notLike' === $operator) {
+                $flags |= DatabasePlatform::FLAG_NEGATIVE;
+            }
+            $comparison = DatabasePlatform::getCaseInsensitiveComparison(
+                $platform,
+                $column,
+                (string) $event->getParameterHolder(),
+                'LIKE',
+                $flags
+            );
+            $event->addExpression(
+                $event->getQueryBuilder()->expr()->or(
+                    $event->getQueryBuilder()->expr()->isNull($column),
+                    $comparison
                 )
-            )
-        );
+            );
+        } else {
+            $event->addExpression(
+                $event->getQueryBuilder()->expr()->or(
+                    $event->getQueryBuilder()->expr()->isNull($column),
+                    $event->getQueryBuilder()->expr()->{$operator}(
+                        $column,
+                        $event->getParameterHolder()
+                    )
+                )
+            );
+        }
 
         $event->stopPropagation();
     }
@@ -225,22 +246,33 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
         $qb         = $event->getQueryBuilder();
         $connection = $qb->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
-        if (in_array($operator, ['like', 'startsWith', 'endsWith', 'regexp', 'notRegexp'])) {
-            $fieldExpr  = DatabasePlatform::applyTypeIfStrict(
-                $connection->getDatabasePlatform(),
-                $leadsTableAlias.'.'.$event->getFilter()->getField(),
-                'text'
+        $platform = $connection->getDatabasePlatform();
+        $column   = $leadsTableAlias.'.'.$event->getFilter()->getField();
+
+        if ('like' === $operator) {
+            $event->addExpression(
+                DatabasePlatform::getCaseInsensitiveComparison(
+                    $platform,
+                    $column,
+                    (string) $event->getParameterHolder(),
+                    'LIKE',
+                    DatabasePlatform::FLAG_ENSURE_CAST
+                )
             );
         } else {
-            $fieldExpr  = $leadsTableAlias.'.'.$event->getFilter()->getField();
-        }
+            if (in_array($operator, ['startsWith', 'endsWith', 'regexp', 'notRegexp'])) {
+                $fieldExpr = DatabasePlatform::applyTypeIfStrict($platform, $column, 'text');
+            } else {
+                $fieldExpr = $column;
+            }
 
-        $event->addExpression(
-            $event->getQueryBuilder()->expr()->{$operator}(
-                $fieldExpr,
-                $event->getParameterHolder()
-            )
-        );
+            $event->addExpression(
+                $event->getQueryBuilder()->expr()->{$operator}(
+                    $fieldExpr,
+                    $event->getParameterHolder()
+                )
+            );
+        }
 
         $event->stopPropagation();
     }

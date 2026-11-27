@@ -496,7 +496,9 @@ final class FieldType extends AbstractType
                     $data['charLengthLimit'] = null;
                 }
 
-                if (!isset($data['group'])) {
+                // Apply the group default only when creating. A PATCH that omits
+                // group must not overwrite an existing professional/social/personal value.
+                if (!isset($data['group']) && null === $event->getForm()->getData()->getId()) {
                     $data['group'] = 'core';
                 }
 
