@@ -322,26 +322,36 @@ class TrackableModel extends AbstractCommonModel
         if ('html' === $type) {
             // Hours spent trying to handle through \DomDocument: 9h. The issue is that tokens "{token}" is replaced
             // by the \DomDocument::save will encode those on all doc, but here we need to replace only `href`.
-            foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
-                // Make the search regular expression match both "&" and "&amp;".
-                $searchPattern = preg_quote($search, '/');
-                $searchPattern = str_replace('&amp;', '&', $searchPattern);
-                $searchPattern = str_replace('&', '(?:&|&amp;)', $searchPattern);
-                $content       = preg_replace_callback(
-                    '/<(.*?) href=(["\'])(?:\R|)(?:\s*)('.$searchPattern.')(.*?)(?:\s*)(?:\R|)\\2(.*?)>/i',
-                    function (array $m) use ($replace): string {
-                        // Decode HTML entities so raw href suffixes (&amp;) match normalized URLs
-                        // in the do-not-track list (which are stored with plain &).
-                        $fullHref = trim(html_entity_decode($m[3].$m[4], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-                        if ($this->isInDoNotTrack($fullHref)) {
-                            return $m[0];
-                        }
-
-                        return '<'.$m[1].' href='.$m[2].$replace.$m[4].$m[2].$m[5].'>';
-                    },
-                    $content
-                );
+            //
+            // Each href value is decoded the same way the URLs were extracted (DOMDocument decodes entities) and has to
+            // match a tracked URL exactly. It is never matched as a prefix, otherwise a tracked base URL such as
+            // https://example.com/ would take over every longer, differently tracked (or untracked) link on that host.
+            $tokensByUrl      = $this->contentReplacements['second_pass'];
+            $tokensByLowerUrl = [];
+            foreach ($tokensByUrl as $url => $token) {
+                $tokensByLowerUrl[strtolower((string) $url)] ??= $token;
             }
+
+            // The tag matcher skips quoted attribute values, so an earlier attribute may contain "<" or ">".
+            $replaced = preg_replace_callback(
+                '/(<[a-z](?:[^<>"\']|"[^"]*"|\'[^\']*\')*?\shref=)(["\'])(.*?)\\2/is',
+                function (array $m) use ($tokensByUrl, $tokensByLowerUrl): string {
+                    $href = $this->decodeHref($m[3]);
+
+                    // Links that are excluded from tracking keep their href (the do-not-track list is stored with plain &).
+                    if ($this->isInDoNotTrack($href)) {
+                        return $m[0];
+                    }
+
+                    $token = $this->findTokenForHref($href, $tokensByUrl, $tokensByLowerUrl);
+
+                    return null === $token ? $m[0] : $m[1].$m[2].$token.$m[2];
+                },
+                $content
+            );
+
+            // preg_replace_callback returns null on a PCRE error; leave the content untouched in that case
+            $content = $replaced ?? $content;
         } else {
             // For text, just do a simple search/replace
             $secondPassSearch  = array_keys($this->contentReplacements['second_pass']);
@@ -350,6 +360,44 @@ class TrackableModel extends AbstractCommonModel
         }
 
         return $content;
+    }
+
+    /**
+     * Decodes the raw value of an href attribute the way the URL was normalized when it was registered as trackable.
+     */
+    private function decodeHref(string $href): string
+    {
+        return UrlHelper::decodeAmpersands(trim(html_entity_decode($href, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+    }
+
+    /**
+     * Finds the {trackable} token for a decoded href by exact (not prefix) match.
+     *
+     * @param array<string, string> $tokensByUrl      tracked URL => token
+     * @param array<string, string> $tokensByLowerUrl lowercased tracked URL => token
+     */
+    private function findTokenForHref(string $url, array $tokensByUrl, array $tokensByLowerUrl): ?string
+    {
+        if (isset($tokensByUrl[$url])) {
+            return $tokensByUrl[$url];
+        }
+
+        // Tracked URLs are stored as rebuilt by httpBuildUrl() (e.g. an empty "?" or "#" is dropped)
+        $parts = parse_url($url);
+        if (is_array($parts) && (isset($parts['host']) || isset($parts['path']))) {
+            try {
+                $rebuilt = $this->httpBuildUrl($parts);
+            } catch (\InvalidArgumentException) {
+                $rebuilt = null;
+            }
+
+            if (null !== $rebuilt && isset($tokensByUrl[$rebuilt])) {
+                return $tokensByUrl[$rebuilt];
+            }
+        }
+
+        // Stored redirect URLs may differ in case from the content (case insensitive DB collation)
+        return $tokensByLowerUrl[strtolower($url)] ?? null;
     }
 
     /**
