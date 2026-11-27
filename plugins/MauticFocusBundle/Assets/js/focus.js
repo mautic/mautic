@@ -285,6 +285,24 @@ Mautic.setFocusDefaultColors = function () {
     mQuery('#focus_properties_colors_button_text').minicolors('value', 'ffffff');
 };
 
+Mautic.standardFocusUrl = function(options) {
+    if (!options) {
+        return;
+    }
+
+    const url = options.windowUrl;
+    if (url) {
+        const editFocusKey    = '/focus/edit/focusId';
+        const previewFocusKey = '/focus/preview/focusId';
+        if (url.indexOf(editFocusKey) > -1 ||
+            url.indexOf(previewFocusKey) > -1) {
+            options.windowUrl = url.replace('focusId', mQuery('#campaignevent_properties_focus').val());
+        }
+    }
+
+    return options;
+};
+
 Mautic.toggleBarCollapse = function () {
     var svg = '.mf-bar-collapser-icon svg';
     var currentSize = mQuery(svg).data('transform-size');
