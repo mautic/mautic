@@ -125,6 +125,11 @@
   color: var(--label-color-red);
 }
 
+.label-yellow {
+  background-color: var(--label-background-yellow);
+  color: var(--label-color-yellow);
+}
+
 .label-magenta {
   background-color: var(--label-background-magenta);
   color: var(--label-color-magenta);
@@ -217,6 +222,13 @@
     color: var(--label-color-warm-gray);
     &:hover {
       background-color: var(--label-background-hover-warm-gray);
+    }
+  }
+  &.label-yellow {
+    border: 1px solid var(--label-border-yellow);
+    color: var(--label-color-yellow);
+    &:hover {
+      background-color: var(--label-background-hover-yellow);
     }
   }
   &.label-red {
