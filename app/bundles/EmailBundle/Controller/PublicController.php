@@ -811,16 +811,15 @@ final class PublicController extends CommonFormController
      */
     private function oneClickUnsubscribe(EmailModel $model, ?Stat $stat): Response
     {
-        if (!$stat) {
-            $statsNotFount = $this->translator->trans('mautic.email.stat_record.not_found');
+        $unsubscribeComment = $this->translator->trans('mautic.email.dnc.unsubscribed');
 
-            return new Response($statsNotFount, Response::HTTP_NOT_FOUND);
+        if ($stat) {
+            $model->setDoNotContact($stat, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
+
+            return new Response($this->translator->trans('mautic.lead.do.not.contact_unsubscribed'));
         }
 
-        $unsubscribeComment = $this->translator->trans('mautic.email.dnc.unsubscribed');
-        $model->setDoNotContact($stat, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
-
-        return new Response($this->translator->trans('mautic.lead.do.not.contact_unsubscribed'));
+        return new Response($this->translator->trans('mautic.email.stat_record.not_found'), Response::HTTP_NOT_FOUND);
     }
 
     /**
