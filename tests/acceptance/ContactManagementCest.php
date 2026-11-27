@@ -124,44 +124,24 @@ const originalSearch = Mautic.liveSearchXhr;
 const requests = [];
 const first = mQuery.Deferred();
 const replacement = mQuery.Deferred();
-window.sortRetryOriginalLoad = originalLoad;
-window.sortRetryOriginalSearch = originalSearch;
-window.sortRetryRequests = requests;
-window.replacementDeferred = replacement;
 first.listTarget = replacement.listTarget = '.page-list';
-window.replacementHandlerAttached = false;
-window.sortRetryCompleted = false;
-const originalReplacementAlways = replacement.always;
-replacement.always = function (callback) {
-    const result = originalReplacementAlways.call(this, callback);
-    window.replacementHandlerAttached = true;
-
-    return result;
-};
 Mautic.loadContent = function (route) {
     requests.push(route);
-    window.sortRetryCompleted = true;
 };
 Mautic.liveSearchXhr = first;
 Mautic.reorderTableData('lead', 'l.lastname', 'list', '.page-list');
 first.reject(null, 'searchCompleted');
 Mautic.liveSearchXhr = replacement;
-window.queuedSortWhilePending = requests.length;
-JS);
-        $I->waitForJS('return window.replacementHandlerAttached === true;', AcceptanceTester::TIMEOUT);
-        $I->executeJS('window.sortRetryCompleted = false; window.replacementHandlerAttached = false; window.replacementDeferred.reject(null, "error");');
-        $I->waitForJS('return window.sortRetryCompleted === true;', AcceptanceTester::TIMEOUT);
-        $I->executeJS(<<<'JS'
-Mautic.loadContent = window.sortRetryOriginalLoad;
-Mautic.liveSearchXhr = window.sortRetryOriginalSearch;
-window.queuedSortResult = {
-    whilePending: window.queuedSortWhilePending,
-    requests: window.sortRetryRequests,
-};
-delete window.sortRetryOriginalLoad;
-delete window.sortRetryOriginalSearch;
-delete window.sortRetryRequests;
-delete window.replacementDeferred;
+setTimeout(function () {
+    const whilePending = requests.length;
+    replacement.reject(null, 'error');
+    delete Mautic.liveSearchXhr;
+    setTimeout(function () {
+        Mautic.loadContent = originalLoad;
+        Mautic.liveSearchXhr = originalSearch;
+        window.queuedSortResult = {whilePending, requests};
+    }, 20);
+}, 20);
 JS);
         $I->waitForJS('return window.queuedSortResult !== null;', AcceptanceTester::TIMEOUT);
         $result = $I->executeJS('return window.queuedSortResult;');
