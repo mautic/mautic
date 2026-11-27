@@ -299,6 +299,42 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 </div>
 {% endblock form_widget_compound %}
 
+{% block field_slider_widget %}
+{% set suffix = attr.postaddon_text|default(null) %}
+{% set ticks = attr.ticks|default(41) %}
+{% set lean = attr.lean|default(30) %}
+{% set reach = attr.reach|default(4) %}
+{% set min = attr.min|default(0) %}
+{% set max = attr.max|default(100) %}
+{% set step = attr.step is defined and attr.step != 'any' ? attr.step : 1 %}
+{% set inputClass = (attr.class|default('') ~ ' field-slider__input')|trim %}
+{% set readonly = attr.readonly|default(false) %}
+{% if readonly %}
+    {% set disabled = true %}
+{% endif %}
+{% set attr = attr|filter((v, k) => k not in ['postaddon_text', 'ticks', 'lean', 'reach', 'readonly'])|merge({class: inputClass, min: min, max: max, step: step, 'data-field-slider-suffix': suffix ? suffix|trans({}, translation_domain) : ''}) %}
+{% set inputAttributes %}{{ block('widget_attributes') }}{% endset %}
+{% if readonly %}
+    {% set inputAttributes = inputAttributes|replace({('name="' ~ full_name ~ '"'): ''}) %}
+{% endif %}
+{% embed '@MauticCore/Components/field-slider.html.twig' with {
+    min: min,
+    max: max,
+    ticks: ticks,
+    lean: lean,
+    reach: reach,
+    suffix: suffix ? suffix|trans({}, translation_domain) : null,
+    disabled: disabled
+} %}
+    {% block field_slider_input %}
+        <input type="range" {{ inputAttributes|raw }} value="{{ value is not same as('') and value is not null ? value|e('html_attr') : min|e('html_attr') }}">
+    {% endblock %}
+{% endembed %}
+{% if readonly %}
+    <input type="hidden" name="{{ full_name|e('html_attr') }}" value="{{ value|e('html_attr') }}">
+{% endif %}
+{% endblock field_slider_widget %}
+
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_widget_simple.html.php #}
 {% block form_widget_simple %}
 {% set preaddonAttr = attr.preaddon_attr is defined ? attr.preaddon_attr : {} %}

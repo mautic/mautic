@@ -409,37 +409,60 @@ final class EmailType extends AbstractType
             ]
         );
 
-        $variantSettingsModifier = function (FormEvent $event, bool $isParent, bool $isExisting = false): void {
+        $getDefaultWeight = static function (?Email $email): int {
+            $parent = $email?->getVariantParent();
+
+            if (!$email instanceof Email || !$parent instanceof Email) {
+                return VariantType::DEFAULT_WEIGHT;
+            }
+
+            // An unsaved variant is not among the parent's children yet, so it is counted separately.
+            return (int) floor(100 / (count($parent->getVariantChildren()) + ($email->isNew() ? 2 : 1)));
+        };
+
+        $variantSettingsModifier = function (FormEvent $event, bool $isParent, bool $isExisting = false, int $defaultWeight = VariantType::DEFAULT_WEIGHT, array $settings = []): void {
             $event->getForm()->add(
                 'variantSettings',
                 VariantType::class,
                 [
-                    'label'       => 'mautic.core.ab_test.form.abtest_settings',
-                    'required'    => false,
-                    'is_parent'   => $isParent,
-                    'is_existing' => $isExisting,
-                    'data'        => $event->getData() instanceof Email ? $event->getData()->getVariantSettings() : [],
+                    'label'          => 'mautic.core.ab_test.form.abtest_settings',
+                    'required'       => false,
+                    'is_parent'      => $isParent,
+                    'is_existing'    => $isExisting,
+                    'data'           => $settings,
+                    'default_weight' => $defaultWeight,
                 ]
             );
+        };
+
+        // A new variant is cloned from its parent, so the parent's own weight must not become the variant's weight.
+        $getVariantSettings = static function (Email $email): array {
+            $settings = $email->getVariantSettings();
+
+            if ($email->isNew()) {
+                unset($settings['weight']);
+            }
+
+            return $settings;
         };
 
         // Building the form
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($variantSettingsModifier): void {
+            function (FormEvent $event) use ($variantSettingsModifier, $getDefaultWeight, $getVariantSettings): void {
                 /** @var Email $emailEntity */
                 $emailEntity     = $event->getData();
                 $variantChildren = $emailEntity->getVariantChildren();
-                $isParent        = $variantChildren && count($variantChildren) > 0 || $event->getData()->isNew();
-                $isExisting      = $event->getData()->getId() > 0;
-                $variantSettingsModifier($event, $isParent, $isExisting);
+                $isParent        = $variantChildren && count($variantChildren) > 0 || $emailEntity->isNew();
+                $isExisting      = $emailEntity->getId() > 0;
+                $variantSettingsModifier($event, $isParent, $isExisting, $getDefaultWeight($emailEntity), $getVariantSettings($emailEntity));
             }
         );
 
         // After submit
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($variantSettingsModifier): void {
+            function (FormEvent $event) use ($variantSettingsModifier, $getDefaultWeight, $getVariantSettings): void {
                 $data = $event->getData();
 
                 /** @var Email $emailEntity */
@@ -447,7 +470,7 @@ final class EmailType extends AbstractType
                 $variantChildren = $emailEntity->getVariantChildren();
                 $isParent        = $variantChildren && count($variantChildren) > 0;
 
-                $variantSettingsModifier($event, $isParent);
+                $variantSettingsModifier($event, $isParent, false, $getDefaultWeight($emailEntity), $getVariantSettings($emailEntity));
 
                 $emailType = $data['emailType'] ?? null;
 

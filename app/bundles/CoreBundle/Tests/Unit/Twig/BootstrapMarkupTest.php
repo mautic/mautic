@@ -10,6 +10,8 @@ use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\Forms;
 use Twig\Environment;
@@ -26,6 +28,7 @@ final class BootstrapMarkupTest extends TestCase
     protected function setUp(): void
     {
         $loader = new FilesystemLoader(__DIR__.'/../../../Resources/views');
+        $loader->addPath(__DIR__.'/../../../Resources/views', 'MauticCore');
         $loader->addPath(dirname((new \ReflectionClass(FormExtension::class))->getFileName(), 2).'/Resources/views/Form');
         $this->twig = new Environment($loader, ['autoescape' => 'html']);
         $this->twig->addExtension(new TranslationExtension());
@@ -78,5 +81,57 @@ final class BootstrapMarkupTest extends TestCase
         $html = $this->twig->createTemplate('{{ form_widget(form) }}')->render(['form' => $form->createView()]);
 
         $this->assertCount(2, (new Crawler($html))->filter('input.btn-check:disabled + label.btn'));
+    }
+
+    public function testFieldSliderRendersNativeRangeInputWithSuffix(): void
+    {
+        $form = Forms::createFormFactory()->createNamedBuilder('variant', FormType::class)
+            ->add('weight', IntegerType::class, [
+                'block_prefix' => 'field_slider',
+                'attr'         => ['min' => 0, 'max' => 100, 'postaddon_text' => '%'],
+            ])
+            ->getForm();
+        $form->get('weight')->setData(30);
+        $html    = $this->twig->createTemplate('{{ form_widget(form.weight) }}')->render(['form' => $form->createView()]);
+        $crawler = new Crawler($html);
+        $input   = $crawler->filter('.field-slider input[type="range"].field-slider__input');
+
+        $this->assertCount(1, $input);
+        $this->assertCount(1, $crawler->filter('.field-slider input'));
+        $this->assertSame('variant[weight]', $input->attr('name'));
+        $this->assertSame('variant_weight', $input->attr('id'));
+        $this->assertSame('30', $input->attr('value'));
+        $this->assertSame('0', $input->attr('min'));
+        $this->assertSame('100', $input->attr('max'));
+        $this->assertSame('variant_weight', $crawler->filter('output.field-slider__value')->attr('for'));
+        $this->assertSame('30%', trim($crawler->filter('output.field-slider__value')->text()));
+    }
+
+    public function testFieldSliderRetainsReadonlyValueWithoutAllowingChanges(): void
+    {
+        $form = Forms::createFormFactory()->createNamedBuilder('variant', FormType::class)
+            ->add('weight', IntegerType::class, [
+                'block_prefix' => 'field_slider',
+                'attr'         => ['min' => 0, 'max' => 100, 'readonly' => true],
+            ])
+            ->getForm();
+        $form->get('weight')->setData(30);
+        $crawler = new Crawler($this->twig->createTemplate('{{ form_widget(form.weight) }}')->render(['form' => $form->createView()]));
+
+        $this->assertSame('disabled', $crawler->filter('input[type="range"]')->attr('disabled'));
+        $this->assertSame('30', $crawler->filter('input[type="range"]')->attr('value'));
+        $this->assertSame('variant[weight]', $crawler->filter('input[type="hidden"]')->attr('name'));
+        $this->assertSame('30', $crawler->filter('input[type="hidden"]')->attr('value'));
+        $this->assertNull($crawler->filter('input[type="range"]')->attr('name'));
+    }
+
+    public function testFieldSliderStartsAtMinimumWithoutValue(): void
+    {
+        $form = Forms::createFormFactory()->createNamedBuilder('variant', FormType::class)
+            ->add('weight', IntegerType::class, ['block_prefix' => 'field_slider', 'attr' => ['min' => 0, 'max' => 100]])
+            ->getForm();
+        $html = $this->twig->createTemplate('{{ form_widget(form.weight) }}')->render(['form' => $form->createView()]);
+
+        $this->assertSame('0', (new Crawler($html))->filter('input[type="range"]')->attr('value'));
     }
 }

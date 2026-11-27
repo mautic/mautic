@@ -26,11 +26,14 @@ final class VariantType extends AbstractType
         $builder->add(
             'weight',
             IntegerType::class, [
-                'label'      => 'mautic.core.ab_test.form.traffic_weight',
-                'label_attr' => ['class' => 'form-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.ab_test.form.traffic_weight.help',
+                'label'        => 'mautic.core.ab_test.form.traffic_weight',
+                'label_attr'   => ['class' => 'form-label'],
+                'block_prefix' => 'field_slider',
+                'attr'         => [
+                    'tooltip'        => 'mautic.core.ab_test.form.traffic_weight.help',
+                    'postaddon_text' => '%',
+                    'min'            => 0,
+                    'max'            => 100,
                 ],
                 'constraints' => [
                     new NotBlank(

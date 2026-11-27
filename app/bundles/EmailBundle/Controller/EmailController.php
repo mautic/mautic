@@ -1327,7 +1327,7 @@ final class EmailController extends FormController
         ));
     }
 
-    public function abTestAction(Request $request, AssetModel $assetModel, CorePermissions $corePermissions, EmailConfig $emailConfig, EmailModel $model, ThemeHelper $themeHelper, int $objectId): Response
+    public function abtestAction(Request $request, AssetModel $assetModel, CorePermissions $corePermissions, EmailConfig $emailConfig, EmailModel $model, ThemeHelper $themeHelper, int $objectId): Response
     {
         $entity = $model->getEntity($objectId);
 

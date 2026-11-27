@@ -46,13 +46,17 @@ final class VariantType extends AbstractType
         );
 
         $builder->add('weight', IntegerType::class, [
-            'label'      => 'mautic.core.ab_test.form.traffic_weight',
-            'label_attr' => ['class' => 'form-label'],
-            'attr'       => [
-                'class'           => 'form-control',
-                'tooltip'         => 'mautic.core.ab_test.form.traffic_weight.help',
-                'postaddon_text'  => '%',
+            'label'        => 'mautic.core.ab_test.form.traffic_weight',
+            'label_attr'   => ['class' => 'form-label'],
+            'block_prefix' => 'field_slider',
+            'attr'         => [
+                'tooltip'        => 'mautic.core.ab_test.form.traffic_weight.help',
+                'postaddon_text' => '%',
+                'min'            => 0,
+                'max'            => 100,
             ],
+            'data'        => $options['data']['weight'] ?? $options['default_weight'],
+            'constraints' => [new Assert\Range(min: 0, max: 100)],
         ]);
 
         $attr = [
@@ -166,6 +170,7 @@ final class VariantType extends AbstractType
             'is_parent'         => true,
             'is_existing'       => false,
             'add_buttons'       => false,
+            'default_weight'    => self::DEFAULT_WEIGHT,
             'validation_groups' => function (Form $form): array {
                 $data = $form->getData();
 

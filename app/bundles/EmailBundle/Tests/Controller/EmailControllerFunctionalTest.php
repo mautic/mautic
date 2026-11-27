@@ -649,6 +649,54 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals('Test html', $secondEmail->getCustomHtml());
     }
 
+    public function testNewVariantDefaultWeightIsNotInheritedFromParent(): void
+    {
+        $segment = $this->createSegment('Variant default segment', 'variant-default-segment');
+        $parent  = $this->createEmail('Variant default parent', 'Variant default parent subject', 'list', 'blank', 'Parent html', $segment, ['weight' => 10, 'winnerCriteria' => 'email.openrate']);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/abtest/'.$parent->getId());
+        $this->assertResponseIsSuccessful();
+
+        $weight = $crawler->filter('input[type="range"][name="emailform[variantSettings][weight]"]');
+        $this->assertCount(1, $weight);
+        $this->assertSame('50', $weight->attr('value'));
+    }
+
+    public function testEmailVariantWeightIsVisibleAndEditable(): void
+    {
+        $segment = $this->createSegment('Variant weight segment', 'variant-weight-segment');
+        $parent  = $this->createEmail('Variant weight parent', 'Variant weight parent subject', 'list', 'blank', 'Parent html', $segment);
+        $variant = $this->createEmail('Variant weight child', 'Variant weight child subject', 'list', 'blank', 'Child html', $segment);
+        $variant->setVariantParent($parent);
+        $variant->setVariantSettings(['winnerCriteria' => 'email.openrate']);
+        $parent->addVariantChild($variant);
+        $this->em->persist($parent);
+        $this->em->persist($variant);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$variant->getId());
+        $this->assertResponseIsSuccessful();
+
+        $weight = $crawler->filter('input[type="range"][name="emailform[variantSettings][weight]"]');
+        $this->assertCount(1, $weight);
+        $this->assertSame('50', $weight->attr('value'));
+        $this->assertCount(1, $crawler->filter('label[for="'.$weight->attr('id').'"]'));
+
+        $form = $crawler->selectButton('Save & Close')->form();
+        $form['emailform[variantSettings][weight]']->setValue('30');
+        $this->client->submit($form);
+        $this->em->clear();
+
+        $savedVariant = $this->em->getRepository(Email::class)->find($variant->getId());
+        $this->assertInstanceOf(Email::class, $savedVariant);
+        $this->assertSame(30, $savedVariant->getVariantSettings()['weight']);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$variant->getId());
+        $this->assertResponseIsSuccessful();
+        $this->assertSame('30', $crawler->filter('input[type="range"][name="emailform[variantSettings][weight]"]')->attr('value'));
+    }
+
     public function testCloneWithTranslationsAndVariantsAction(): void
     {
         $segment = $this->createSegment('Segment C', 'segment-C');

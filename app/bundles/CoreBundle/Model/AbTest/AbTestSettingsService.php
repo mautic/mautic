@@ -19,6 +19,8 @@ class AbTestSettingsService
 
     private ?int $allPublishedVariantsWeight = null;
 
+    private int $allPublishedVariantsPercentage = 0;
+
     /**
      * @var array<int,array<string|int>>
      */
@@ -75,13 +77,14 @@ class AbTestSettingsService
      */
     private function init(): void
     {
-        $this->variantsSettings           = [];
-        $this->winnerCriteria             = null;
-        $this->allPublishedVariantsWeight = 0;
-        $this->totalWeight                = self::DEFAULT_TOTAL_WEIGHT;
-        $this->sendWinnerDelay            = 0;
-        $this->configurationError         = false;
-        $this->setCriteriaFromVariants    = false;
+        $this->variantsSettings               = [];
+        $this->winnerCriteria                 = null;
+        $this->allPublishedVariantsWeight     = 0;
+        $this->allPublishedVariantsPercentage = 0;
+        $this->totalWeight                    = self::DEFAULT_TOTAL_WEIGHT;
+        $this->sendWinnerDelay                = 0;
+        $this->configurationError             = false;
+        $this->setCriteriaFromVariants        = false;
     }
 
     private function setGeneralSettings(VariantEntityInterface $parentVariant): void
@@ -120,8 +123,14 @@ class AbTestSettingsService
         $weight           = (int) ($variantsSettings['weight'] ?? 0);
         $parentVariant    = $variant->getVariantParent();
 
-        if ($parentVariant instanceof VariantEntityInterface) {
+        if ($parentVariant instanceof VariantEntityInterface && !isset($variantsSettings['weight'])) {
             $weight = (int) floor(100 / (count($parentVariant->getVariantChildren()) + 1));
+        }
+
+        if ($weight < 0) {
+            // a negative explicit weight is invalid, so reject it before it reduces the published total
+            $this->configurationError = true;
+            $weight                   = 0;
         }
 
         $this->setVariantSettingsWeight($variant, $weight);
@@ -134,7 +143,12 @@ class AbTestSettingsService
     private function setVariantSettingsWeight(VariantEntityInterface|FormEntity $variant, int $weight): void
     {
         if ($variant->getIsPublished()) {
-            $variantWeight                                       = (int) round(($weight / 100) * $this->totalWeight);
+            $this->allPublishedVariantsPercentage += $weight;
+
+            // rounding each variant can exceed the total, so cap it at the weight still available
+            $roundedWeight = (int) round(($weight / 100) * $this->totalWeight);
+            $variantWeight = min($roundedWeight, $this->totalWeight - $this->allPublishedVariantsWeight);
+
             $this->variantsSettings[$variant->getId()]['weight'] = $variantWeight;
             $this->addPublishedVariantWeight($variantWeight);
         } else {
@@ -144,8 +158,8 @@ class AbTestSettingsService
 
     private function setParentSettingsWeight(VariantEntityInterface $parentVariant): void
     {
-        if ($this->totalWeight < $this->allPublishedVariantsWeight) {
-            // published variants weight exceeds total weight
+        if ($this->allPublishedVariantsPercentage > 100) {
+            // published variants percentages exceed 100 percent
             $this->configurationError = true;
         }
         $this->variantsSettings[$parentVariant->getId()]['weight'] = $this->totalWeight - $this->allPublishedVariantsWeight;

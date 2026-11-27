@@ -197,6 +197,7 @@
                 {{ form_row(form.name) }}
                 {{ form_row(form.preheaderText) }}
                 {% if isVariant %}
+                    {{ form_row(form.variantSettings.weight) }}
                 {% else %}
                     <div id="leadList"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
                         {{ form_row(form.lists) }}
