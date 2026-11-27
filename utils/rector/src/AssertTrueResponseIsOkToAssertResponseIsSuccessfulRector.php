@@ -225,6 +225,6 @@ final class AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector extends Abs
         $classReflection = ScopeFetcher::fetch($node)->getClassReflection();
 
         return null !== $classReflection
-            && $classReflection->is('Symfony\Bundle\FrameworkBundle\Test\WebTestCase');
+            && $classReflection->is(\Symfony\Bundle\FrameworkBundle\Test\WebTestCase::class);
     }
 }
