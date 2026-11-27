@@ -79,7 +79,8 @@ final class RedirectClickCountFunctionalTest extends MauticMysqlTestCase
 
         $target = $this->click($redirect, $contact, ['REMOTE_ADDR' => '203.0.113.42']);
 
-        $this->assertStringContainsStringIgnoringCase('contactfield', urldecode($target));
+        // No contact data is put into the link, tokens fall back to their default or to nothing
+        $this->assertSame('https://example.com/offer?who=&name=there', urldecode($target));
         $this->assertSame([1, 0], $this->getRedirectCounts($redirect));
         $this->assertSame([1, 0], $this->getTrackableCounts($redirect));
         $this->assertCount(0, $this->em->getRepository(Hit::class)->findBy(['redirect' => $redirect->getId()]));
