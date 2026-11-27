@@ -94,8 +94,6 @@ final class ModifyCustomFieldCommand extends Command
      */
     private function convertCsvToArray($inputCsv): array
     {
-        // \SplFileObject::READ_CSV is deprecated
-        $inputCsv->setFlags(\SplFileObject::SKIP_EMPTY | \SplFileObject::DROP_NEW_LINE);
         $headerSkipped  = false;
         $keys           = [];
         $data           = [];
