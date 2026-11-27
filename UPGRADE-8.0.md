@@ -742,6 +742,8 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\LeadBundle\Event\FieldPostDeleteEvent` | `Mautic\CoreBundle\Event\EntityPostDelete` (check `instanceof LeadField`) |
     | `Mautic\LeadBundle\Event\LeadFieldEvent` | generic entity events above; `getField()` becomes `getEntity()` and `setField()` has no replacement |
 
+    `Mautic\ChannelBundle\Model\MessageQueueModel` now dispatches the generic `EntityPreSave` / `EntityPostSave` / `EntityPreDelete` / `EntityPostDelete` events for message queue entities (guard on `Mautic\ChannelBundle\Entity\MessageQueue`); its `dispatchEvent()` override only keeps the `process_message_queue` and `process_batch_message_queue` actions. `Mautic\ChannelBundle\Event\MessageQueueEvent` was only used for the `post_save` action and is removed - listen to `Mautic\CoreBundle\Event\EntityPostSave` instead and replace `getMessageQueue()` with `getEntity()`. The `Mautic\ChannelBundle\ChannelEvents::MESSAGE_QUEUED` constant was never dispatched by name and is removed with no replacement.
+
 ## Changed code
 
 - `Mautic\CoreBundle\Controller\AbstractStandardFormController::deleteStandard()` and `batchDeleteStandard()` now require the model returned for `getModelName()` to extend `Mautic\CoreBundle\Model\FormModel` and throw a `LogicException` otherwise, as `editStandard()` and `newStandard()` already did.
@@ -927,7 +929,6 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | --- | --- |
     | `ChannelEvents::ADD_CHANNEL` | `ChannelEvent` |
     | `ChannelEvents::CHANNEL_BROADCAST` | `ChannelBroadcastEvent` |
-    | `ChannelEvents::MESSAGE_QUEUED` | `MessageQueueEvent` |
     | `ChannelEvents::PROCESS_MESSAGE_QUEUE` | `MessageQueueProcessEvent` |
     | `ChannelEvents::PROCESS_MESSAGE_QUEUE_BATCH` | `MessageQueueBatchProcessEvent` |
 - DynamicContentBundle's `ON_CONTACTS_FILTER_EVALUATE` event is now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\DynamicContentBundle\DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE` string constant. Update any subscriber or listener that keys on that constant to key on `Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent::class` instead, e.g. `$dispatcher->dispatch($event, DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)` becomes `$dispatcher->dispatch($event)`. The `ON_CONTACTS_FILTER_EVALUATE` constant has been removed (see the Removed code section), together with the unused `CATEGORY_PRE_SAVE` / `CATEGORY_POST_SAVE` / `CATEGORY_PRE_DELETE` / `CATEGORY_POST_DELETE` constants. The `DynamicContentEvent` CRUD constants (`PRE_SAVE` / `POST_SAVE` / `PRE_DELETE` / `POST_DELETE`) were removed in favor of the generic entity lifecycle events (see the Removed code section).

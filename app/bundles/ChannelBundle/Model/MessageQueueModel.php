@@ -5,7 +5,6 @@ namespace Mautic\ChannelBundle\Model;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
-use Mautic\ChannelBundle\Event\MessageQueueEvent;
 use Mautic\ChannelBundle\Event\MessageQueueProcessEvent;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
@@ -13,7 +12,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -300,34 +298,25 @@ final class MessageQueueModel extends FormModel
 
     /**
      * @param MessageQueue|null $entity
-     *
-     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent(string $action, ?object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
-        switch ($action) {
-            case 'process_message_queue':
-                $name = MessageQueueProcessEvent::class;
-                break;
-            case 'process_batch_message_queue':
-                $name = MessageQueueBatchProcessEvent::class;
-                break;
-            case 'post_save':
-                $name = MessageQueueEvent::class;
-                break;
-            default:
-                return null;
+        $name = match ($action) {
+            'process_message_queue'       => MessageQueueProcessEvent::class,
+            'process_batch_message_queue' => MessageQueueBatchProcessEvent::class,
+            default                       => null,
+        };
+
+        if (null === $name) {
+            return null === $entity ? null : parent::dispatchEvent($action, $entity, $isNew, $event);
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new MessageQueueEvent($entity, $isNew);
-            }
-            $this->dispatcher->dispatch($event);
-
-            return $event;
+        if (!$event instanceof Event || !$this->dispatcher->hasListeners($name)) {
+            return null;
         }
 
-        return null;
+        $this->dispatcher->dispatch($event);
+
+        return $event;
     }
 }
