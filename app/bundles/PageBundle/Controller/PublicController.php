@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
@@ -537,6 +538,9 @@ final class PublicController extends AbstractFormController
                     $this->dispatcher->dispatch($urlEvent);
                     $url = $urlEvent->getContent();
                 }
+            } else {
+                // No contact data goes into a URL for another site, so contact tokens fall back to their default or to nothing
+                $url = TokenHelper::findLeadTokens($url, ['id' => null], true);
             }
 
             if (str_contains($url, $this->generateUrl('mautic_asset_download'))) {
