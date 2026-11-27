@@ -412,9 +412,12 @@ final class EmailType extends AbstractType
         $getDefaultWeight = static function (?Email $email): int {
             $parent = $email?->getVariantParent();
 
-            return $parent instanceof Email
-                ? (int) floor(100 / (count($parent->getVariantChildren()) + 1))
-                : VariantType::DEFAULT_WEIGHT;
+            if (!$email instanceof Email || !$parent instanceof Email) {
+                return VariantType::DEFAULT_WEIGHT;
+            }
+
+            // An unsaved variant is not among the parent's children yet, so it is counted separately.
+            return (int) floor(100 / (count($parent->getVariantChildren()) + ($email->isNew() ? 2 : 1)));
         };
 
         $variantSettingsModifier = function (FormEvent $event, bool $isParent, bool $isExisting = false, int $defaultWeight = VariantType::DEFAULT_WEIGHT, array $settings = []): void {
