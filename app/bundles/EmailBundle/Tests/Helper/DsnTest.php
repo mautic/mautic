@@ -131,13 +131,15 @@ final class DsnTest extends TestCase
     public function testToStringUrlEncodesProperly(): void
     {
         $dsn = new Dsn('scheme', 'local+@$#/:*!host', 'us+@$#/:*!er', 'pass+@$#/:*!word', 3300, 'pa+@$#/:*!th', ['type' => 'ty+@$#/:*!pe']);
-        $this->assertSame('scheme://'.urlencode('us+@$#/:*!er').':'.urlencode('pass+@$#/:*!word').'@'.urlencode('local+@$#/:*!host').':3300/'.urlencode('pa+@$#/:*!th').'?type='.urlencode('ty+@$#/:*!pe'), (string) $dsn);
+        // A literal "/" in the path separates segments and is kept; every other character is encoded per segment.
+        $this->assertSame('scheme://'.urlencode('us+@$#/:*!er').':'.urlencode('pass+@$#/:*!word').'@'.urlencode('local+@$#/:*!host').':3300/'.rawurlencode('pa+@$#').'/'.rawurlencode(':*!th').'?type='.urlencode('ty+@$#/:*!pe'), (string) $dsn);
 
         $dsnFromString = Dsn::fromString((string) $dsn);
         $this->assertSame('local+@$#/:*!host', $dsnFromString->getHost());
         $this->assertSame('us+@$#/:*!er', $dsnFromString->getUser());
         $this->assertSame('pass+@$#/:*!word', $dsnFromString->getPassword());
-        $this->assertSame('pa+@$#/:*!th', $dsnFromString->getPath());
+        // getPath() returns the path as written in the DSN: segments stay encoded, "/" separates them.
+        $this->assertSame('pa%2B%40%24%23/%3A%2A%21th', $dsnFromString->getPath());
         $this->assertSame('ty+@$#/:*!pe', $dsnFromString->getOption('type'));
     }
 }
