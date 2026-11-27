@@ -173,11 +173,6 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                 Mautic['liveSearchXhr'].abort('searchCompleted');
             }
 
-            var btn = "button[data-livesearch-parent='" + elId + "']";
-        if (mQuery(btn).length && !mQuery(btn).hasClass('btn-nospin') && !Mautic.filterButtonClicked) {
-            Mautic.startIconSpinOnEvent(btn);
-        }
-
         if (scopeSelect.length) {
             if (action === 'clear' && !scopeChange) {
                 if (isClearButton) {
@@ -252,9 +247,6 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     response.overlayEnabled = overlayEnabled;
                     response.overlayTarget = overlayTarget;
 
-                    //update the buttons class and action
-                    Mautic.updateLiveSearchButton(elId, value);
-
                     if (inModal) {
                         Mautic.processModalContent(response);
                         Mautic.stopModalLoadingBar(modalTarget);
@@ -265,13 +257,9 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                 },
                 error: function (request, textStatus, errorThrown) {
                     Mautic.processAjaxError(request, textStatus, errorThrown);
-
-                    //update the buttons class and action
-                    Mautic.updateLiveSearchButton(elId, value);
                 },
                 complete: function() {
                     delete Mautic.liveSearchXhr;
-                    delete Mautic.filterButtonClicked;
                 }
             });
             Mautic.liveSearchXhr.listTarget = target;

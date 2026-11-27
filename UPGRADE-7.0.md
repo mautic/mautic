@@ -63,6 +63,8 @@
 
 ### Javascript
 - Removed `Mautic.insertTextInEditor` function. Use `Mautic.insertHtmlInEditor` instead.
+- `Mautic.updateLiveSearchButton()` is deprecated and will be removed in Mautic 8.0. It is a no-op because the search field's clear button now updates itself. Remove calls to it from custom JavaScript.
+- `#btn-filter` is deprecated and will be removed in Mautic 8.0. The button is hidden in list search toolbars, but clicking it still runs the search. Search by typing in the search field instead.
 
 ## Deprecated search help event
 
