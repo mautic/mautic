@@ -54,7 +54,7 @@ final class FieldFilterTransformer implements DataTransformerInterface
             $operator = $filter['operator'] ?? '';
             $filterType = $filter['type'];
             if ('datetime' === $filterType || 'date' === $filterType) {
-                if (in_array($operator, [OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT])) {
+                if (in_array($operator, [OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT, OperatorOptions::BETWEEN, OperatorOptions::NOT_BETWEEN])) {
                     continue;
                 }
 
@@ -100,7 +100,7 @@ final class FieldFilterTransformer implements DataTransformerInterface
             $operator = $f['operator'] ?? '';
 
             if ('datetime' == $f['type'] || 'date' === $f['type']) {
-                if (in_array($operator, [OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT])) {
+                if (in_array($operator, [OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT, OperatorOptions::BETWEEN, OperatorOptions::NOT_BETWEEN])) {
                     continue;
                 }
 

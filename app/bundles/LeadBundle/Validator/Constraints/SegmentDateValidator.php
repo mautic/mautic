@@ -25,7 +25,7 @@ final class SegmentDateValidator extends ConstraintValidator
     {
         foreach ($filters as $filter) {
             if (isset($filter['type']) && in_array($filter['type'], ['date', 'datetime'])) {
-                if (in_array($filter['operator'] ?? '', ['regexp', '!regexp', 'like', '!like', 'startsWith', 'endsWith', 'contains', OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT])) {
+                if (in_array($filter['operator'] ?? '', ['regexp', '!regexp', 'like', '!like', 'startsWith', 'endsWith', 'contains', OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT, OperatorOptions::BETWEEN, OperatorOptions::NOT_BETWEEN])) {
                     continue;
                 }
 

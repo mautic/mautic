@@ -10,6 +10,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\Type\AlertType;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Form\Type\DateSpanType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
@@ -60,6 +61,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 ['onSegmentFilterFormHandleLookup', 600],
                 ['onSegmentFilterFormHandleGlobalCategory', 400],
                 ['onSegmentFilterFormHandleSelect', 200],
+                ['onSegmentFilterFormHandleDate', 150],
                 ['onSegmentFilterFormHandleDateSpan', 100],
                 ['onSegmentFilterFormHandleDefault', 0],
             ],
@@ -317,6 +319,29 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             );
             $event->stopPropagation();
         }
+    }
+
+    public function onSegmentFilterFormHandleDate(FormAdjustmentEvent $event): void
+    {
+        if (!$event->fieldTypeIsOneOf('date', 'datetime')
+            || !$event->operatorIsOneOf(OperatorOptions::BETWEEN, OperatorOptions::NOT_BETWEEN)) {
+            return;
+        }
+
+        $form       = $event->getForm();
+        $filterData = $form->getData()['filter'] ?? [];
+        $form->add(
+            'filter',
+            DateRangeType::class,
+            [
+                'label'              => false,
+                'data'               => is_array($filterData) ? $filterData : [],
+                'show_apply_button'  => false,
+                'set_default_values' => false,
+            ]
+        );
+
+        $event->stopPropagation();
     }
 
     public function onSegmentFilterFormHandleDateSpan(FormAdjustmentEvent $event): void
