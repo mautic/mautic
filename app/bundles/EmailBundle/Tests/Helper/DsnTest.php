@@ -128,10 +128,29 @@ final class DsnTest extends TestCase
         ];
     }
 
+    public function testCredentialEncodingRoundTripsWithoutFormEncoding(): void
+    {
+        $cases = [
+            ['user name', 'pass word', 'user%20name:pass%20word@'],
+            ['user+name', 'pass+word', 'user%2Bname:pass%2Bword@'],
+            ['user', '0', 'user:0@'],
+        ];
+
+        foreach ($cases as [$user, $password, $encodedCredentials]) {
+            $dsn = new Dsn('scheme', 'host', $user, $password);
+
+            $this->assertStringContainsString($encodedCredentials, (string) $dsn);
+
+            $parsed = Dsn::fromString((string) $dsn);
+            $this->assertSame($user, $parsed->getUser());
+            $this->assertSame($password, $parsed->getPassword());
+        }
+    }
+
     public function testToStringUrlEncodesProperly(): void
     {
         $dsn = new Dsn('scheme', 'local+@$#/:*!host', 'us+@$#/:*!er', 'pass+@$#/:*!word', 3300, 'pa+@$#/:*!th', ['type' => 'ty+@$#/:*!pe']);
-        $this->assertSame('scheme://'.urlencode('us+@$#/:*!er').':'.urlencode('pass+@$#/:*!word').'@'.urlencode('local+@$#/:*!host').':3300/'.urlencode('pa+@$#/:*!th').'?type='.urlencode('ty+@$#/:*!pe'), (string) $dsn);
+        $this->assertSame('scheme://'.rawurlencode('us+@$#/:*!er').':'.rawurlencode('pass+@$#/:*!word').'@'.urlencode('local+@$#/:*!host').':3300/'.urlencode('pa+@$#/:*!th').'?type='.urlencode('ty+@$#/:*!pe'), (string) $dsn);
 
         $dsnFromString = Dsn::fromString((string) $dsn);
         $this->assertSame('local+@$#/:*!host', $dsnFromString->getHost());
