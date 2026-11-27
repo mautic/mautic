@@ -15,6 +15,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\ProjectBundle\Validator\Constraints\UniqueName;
@@ -44,7 +45,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     ]
 )]
 #[UniqueName]
-class Project extends FormEntity implements UuidInterface
+class Project extends FormEntity implements UuidInterface, IdentifierInterface
 {
     use UuidTrait;
 

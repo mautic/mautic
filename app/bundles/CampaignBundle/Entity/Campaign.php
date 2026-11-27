@@ -19,6 +19,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CampaignBundle\Validator\Constraints\NoOrphanEvents;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -60,7 +61,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
     joinTable: new ORM\JoinTable(name: 'campaign_projects_xref'),
 )])]
-class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterface
+class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterface, IdentifierInterface
 {
     use UuidTrait;
 

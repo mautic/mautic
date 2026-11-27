@@ -7,12 +7,13 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: LeadNoteRepository::class)]
 #[ORM\Table(name: 'lead_notes')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
-class LeadNote extends FormEntity
+class LeadNote extends FormEntity implements IdentifierInterface
 {
     /**
      * @var int
