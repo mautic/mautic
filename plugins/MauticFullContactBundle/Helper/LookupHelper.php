@@ -4,38 +4,42 @@ namespace MauticPlugin\MauticFullContactBundle\Helper;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Company;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Person;
-use Monolog\Logger;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 final class LookupHelper
 {
-    /**
-     * @var bool|FullContactIntegration
-     */
-    private $integration;
+    private ?FullContactIntegration $integration = null;
 
     public function __construct(
-        IntegrationHelper $integrationHelper,
+        IntegrationsHelper $integrationsHelper,
         private readonly UserHelper $userHelper,
-        private readonly Logger $logger,
-        private readonly Router $router,
+        private readonly LoggerInterface $logger,
+        private readonly RouterInterface $router,
         private readonly LeadModel $leadModel,
         private readonly CompanyModel $companyModel,
         private readonly LeadRepository $leadRepository,
         private readonly CompanyRepository $companyRepository,
     ) {
-        $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
+        try {
+            /** @var FullContactIntegration $integration */
+            $integration       = $integrationsHelper->getIntegration('FullContact');
+            $this->integration = $integration;
+        } catch (IntegrationNotFoundException) {
+            $this->integration = null;
+        }
     }
 
     /**
@@ -171,12 +175,12 @@ final class LookupHelper
 
     private function getFullContact(bool $person = true): false|FullContact_Person|FullContact_Company
     {
-        if (!$this->integration || !$this->integration->getIntegrationSettings()->getIsPublished()) {
+        if (!$this->integration || !$this->integration->getIntegrationConfiguration()->getIsPublished()) {
             return false;
         }
 
         // get api_key from plugin settings
-        $keys = $this->integration->getDecryptedApiKeys();
+        $keys = $this->integration->getIntegrationConfiguration()->getApiKeys();
 
         return ($person) ? new FullContact_Person($keys['apikey']) : new FullContact_Company($keys['apikey']);
     }
