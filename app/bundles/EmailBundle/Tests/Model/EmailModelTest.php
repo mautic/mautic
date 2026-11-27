@@ -601,11 +601,7 @@ final class EmailModelTest extends TestCase
             ->willReturn([]);
 
         $this->statRepository->method('checkContactSentEmail')
-            ->willReturnCallback(function () use ($contacts): bool {
-                $args = func_get_args();
-
-                return $contacts[$args[0]]['stateExists'];
-            });
+            ->willReturnCallback(fn(...$args): bool => $contacts[$args[0]]['stateExists']);
 
         $this->companyModel->method('getRepository')
             ->willReturn($this->companyRepository);

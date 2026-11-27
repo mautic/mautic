@@ -138,11 +138,7 @@ final class CampaignBuilderEventTest extends CampaignTestAbstract
 
         $translator
             ->method('trans')
-            ->willReturnCallback(function (): string {
-                $args = func_get_args();
-
-                return $args[0];
-            });
+            ->willReturnCallback(fn(...$args): string => $args[0]);
 
         return new CampaignBuilderEvent($translator);
     }
