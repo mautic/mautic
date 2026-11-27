@@ -19,6 +19,9 @@ class LeadEventLog
      */
     public const INDEX_SEARCH = 'IDX_SEARCH';
 
+    public const ACTION_SUBSCRIBED   = 'subscribed';
+    public const ACTION_UNSUBSCRIBED = 'unsubscribed';
+
     /**
      * @var string
      */
@@ -296,5 +299,28 @@ class LeadEventLog
     public function getUserName()
     {
         return $this->userName;
+    }
+
+    /**
+     * Describes a DNC change. The DNC must already have an ID.
+     *
+     * @param self::ACTION_SUBSCRIBED|self::ACTION_UNSUBSCRIBED $action
+     */
+    public static function forDoNotContact(Lead $contact, string $action, DoNotContact $dnc): self
+    {
+        $log = new self();
+        $log->setLead($contact)
+            ->setBundle('lead')
+            ->setObject('dnc')
+            ->setObjectId($dnc->getId())
+            ->setAction($action)
+            ->setProperties([
+                'channel'    => $dnc->getChannel(),
+                'channel_id' => $dnc->getChannelId(),
+                'reason'     => $dnc->getReason(),
+                'comments'   => self::ACTION_UNSUBSCRIBED === $action ? $dnc->getComments() : '',
+            ]);
+
+        return $log;
     }
 }
