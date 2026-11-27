@@ -13,6 +13,7 @@ final class EmailStep extends \AcceptanceTester
     {
         $I=$this;
         $I->amOnPage(EmailsPage::URL);
+        $I->waitForJS('return window.jQuery && window.jQuery.active === 0;', self::TIMEOUT);
         $I->waitForElementClickable(EmailsPage::NEW_BUTTON);
         $I->click(EmailsPage::NEW_BUTTON);
         $I->waitForElementClickable(EmailsPage::SELECT_SEGMENT_EMAIL);
@@ -34,6 +35,7 @@ final class EmailStep extends \AcceptanceTester
     {
         $I=$this;
         $I->amOnPage(EmailsPage::URL);
+        $I->waitForJS('return window.jQuery && window.jQuery.active === 0;', self::TIMEOUT);
         $I->waitForElementClickable(EmailsPage::NEW_BUTTON);
         $I->click(EmailsPage::NEW_BUTTON);
         $I->waitForElementClickable(EmailsPage::SELECT_TRIGGERED_EMAIL);
