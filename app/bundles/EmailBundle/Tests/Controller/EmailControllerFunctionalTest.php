@@ -32,6 +32,7 @@ use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
@@ -1042,6 +1043,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form['emailform[subject]']->setValue('Email publish test');
         $form['emailform[name]']->setValue('Email publish test');
         $form['emailform[template]']->setValue('blank');
+        $form['emailform[customHtml]']->setValue('<p>Test html</p>');
 
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
@@ -1087,6 +1089,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form['emailform[subject]']->setValue('Email publish test');
         $form['emailform[name]']->setValue('Email publish test');
         $form['emailform[template]']->setValue('blank');
+        $form['emailform[customHtml]']->setValue('<p>Test html</p>');
 
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
@@ -1271,7 +1274,207 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(1, $response['success']);
         $this->assertNotEmpty($response['subject']);
         $this->assertEquals($email->getSubject(), $response['subject']);
-        $this->assertNotEmpty($response['body']);
+        // Blank theme is MJML; with empty customHtml, MailHelper skips the theme
+        // fallback so the import body stays empty rather than raw uncompiled <mjml>.
+        $this->assertSame('', $response['body']);
+        $this->assertStringNotContainsString('<mjml>', $response['body']);
+    }
+
+    public function testSaveRejectsMjmlThemeWithEmptyCustomHtml(): void
+    {
+        $payload = [
+            'name'        => 'MJML empty customHtml test',
+            'subject'     => 'Test subject',
+            'template'    => 'blank',
+            'customHtml'  => '',
+            'emailType'   => 'template',
+            'isPublished' => 1,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+
+        // The API must reject creating an email with an MJML theme and empty
+        // customHtml so the bad state is blocked at save time.
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        $content = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('errors', $content);
+        $this->assertStringContainsString('MJML', (string) $content['errors'][0]['message']);
+    }
+
+    public function testSaveAllowsPublishedPlainTextOnlyEmail(): void
+    {
+        $payload = [
+            'name'        => 'MJML plain text only test',
+            'subject'     => 'Test subject',
+            'template'    => 'blank',
+            'customHtml'  => '',
+            'plainText'   => 'Plain text body from the plain text field.',
+            'emailType'   => 'template',
+            'isPublished' => 1,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+
+        // MailHelper::setEmail() treats an email with empty customHtml and a
+        // plain text body as sendable (the MJML theme fallback is skipped, and
+        // the message goes out as text/plain). The save path must not be
+        // stricter than the send path, otherwise the email can never be
+        // published — and segment sends only pick up published emails.
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+        $content = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('email', $content);
+        $this->assertSame($payload['plainText'], $content['email']['plainText']);
+    }
+
+    public function testSaveRejectsPublishedEmailWithoutAnyBody(): void
+    {
+        // Entity rule: an active email needs HTML or plain text — or a theme
+        // that supplies the body at send time. With no theme and neither body
+        // field the publish attempt must fail validation.
+        $payload = [
+            'name'        => 'Published email without body',
+            'subject'     => 'Test subject',
+            'template'    => '',
+            'customHtml'  => '',
+            'plainText'   => '',
+            'emailType'   => 'template',
+            'isPublished' => 1,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+
+        $this->assertContains(
+            $response->getStatusCode(),
+            [Response::HTTP_BAD_REQUEST, Response::HTTP_UNPROCESSABLE_ENTITY],
+            $response->getContent()
+        );
+        $this->assertStringContainsString('Provide HTML or plain-text content', (string) $response->getContent());
+    }
+
+    public function testSaveRejectsPublishedEmailWithUncompiledMjmlTheme(): void
+    {
+        // An active email whose body would come entirely from an MJML theme
+        // has no compiled HTML and no plain text: the theme only supplies raw
+        // <mjml> markup, so the model save boundary must reject it.
+        $payload = [
+            'name'        => 'Theme-only body email',
+            'subject'     => 'Test subject',
+            'template'    => 'blank',
+            'customHtml'  => '',
+            'plainText'   => '',
+            'emailType'   => 'template',
+            'isPublished' => 1,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode(), $response->getContent());
+        $this->assertStringContainsString('MJML', (string) $response->getContent());
+    }
+
+    public function testSaveAllowsInactiveDraftWithoutAnyBody(): void
+    {
+        // Incomplete inactive drafts are allowed; the rule gates activation.
+        $payload = [
+            'name'        => 'Draft email without body',
+            'subject'     => 'Test subject',
+            'template'    => '',
+            'customHtml'  => '',
+            'plainText'   => '',
+            'emailType'   => 'template',
+            'isPublished' => 0,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+    }
+
+    public function testSaveRejectsPublishingBodylessDraftOnUpdate(): void
+    {
+        // Update path: publishing an existing bodyless draft must fail the
+        // same way as creating it published.
+        $payload = [
+            'name'        => 'Draft published later',
+            'subject'     => 'Test subject',
+            'template'    => '',
+            'customHtml'  => '',
+            'plainText'   => '',
+            'emailType'   => 'template',
+            'isPublished' => 0,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+        $content = json_decode($response->getContent(), true);
+        $id      = $content['email']['id'];
+
+        $this->client->request(Request::METHOD_PATCH, "/api/emails/{$id}/edit", ['isPublished' => 1]);
+        $response = $this->client->getResponse();
+
+        $this->assertContains(
+            $response->getStatusCode(),
+            [Response::HTTP_BAD_REQUEST, Response::HTTP_UNPROCESSABLE_ENTITY],
+            $response->getContent()
+        );
+        $this->assertStringContainsString('Provide HTML or plain-text content', (string) $response->getContent());
+    }
+
+    public function testSaveRejectsScheduledActivationWithoutBody(): void
+    {
+        // Scheduled activation keeps the published flag set, so the rule must
+        // catch it as well.
+        $payload = [
+            'name'        => 'Scheduled email without body',
+            'subject'     => 'Test subject',
+            'template'    => '',
+            'customHtml'  => '',
+            'plainText'   => '',
+            'emailType'   => 'template',
+            'isPublished' => 1,
+            'publishUp'   => (new \DateTime('+2 days'))->format('Y-m-d H:i'),
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+
+        $this->assertContains(
+            $response->getStatusCode(),
+            [Response::HTTP_BAD_REQUEST, Response::HTTP_UNPROCESSABLE_ENTITY],
+            $response->getContent()
+        );
+        $this->assertStringContainsString('Provide HTML or plain-text content', (string) $response->getContent());
+    }
+
+    public function testUiFormShowsBodyRequiredErrorWhenPublishingWithoutBody(): void
+    {
+        // The violation anchors to customHtml, which the email form renders in
+        // its own error block even while the field stays hidden behind the
+        // builder — the error must be visible in the re-rendered form.
+        $crawler       = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $buttonCrawler = $crawler->selectButton('Save & Close');
+        $form          = $buttonCrawler->form();
+        $form->disableValidation();
+        $form['emailform[emailType]']->setValue('template');
+        $form['emailform[subject]']->setValue('Test subject');
+        $form['emailform[name]']->setValue('Published without body');
+        $form['emailform[template]']->setValue('');
+        $form['emailform[customHtml]']->setValue('');
+        $form['emailform[plainText]']->setValue('');
+        $form['emailform[isPublished]']->setValue('1');
+
+        $this->client->submit($form);
+
+        $this->assertStringContainsString(
+            'Provide HTML or plain-text content',
+            (string) $this->client->getResponse()->getContent()
+        );
     }
 
     public function testSegmentEmailSendWithoutContinueSending(): void

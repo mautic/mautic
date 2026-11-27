@@ -55,6 +55,7 @@ final class EmailVariantInCampaignFunctionalTest extends MauticMysqlTestCase
         $email = new Email();
         $email->setName('Email Parent');
         $email->setSubject('Email Parent subject');
+        $email->setCustomHtml('<p>Email Parent</p>');
         $email->setEmailType('template');
         $email->setIsPublished(true);
         $this->em->persist($email);
@@ -63,6 +64,7 @@ final class EmailVariantInCampaignFunctionalTest extends MauticMysqlTestCase
         $variant = new Email();
         $variant->setName('Email Variant');
         $variant->setSubject('Email Variant subject');
+        $variant->setCustomHtml('<p>Email Variant</p>');
         $variant->setEmailType('template');
         $variant->setIsPublished(true);
         $variant->setVariantParent($email);

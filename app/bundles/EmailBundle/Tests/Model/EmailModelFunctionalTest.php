@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Exception\MjmlThemeEmptyCustomHtmlException;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
@@ -881,6 +882,39 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
             $stat->setDateSent(new \DateTime('-1 day'));
             $this->em->persist($stat);
         }
+    }
+
+    /**
+     * saveEntities() validates the batch before the persistence loop, so an
+     * email that fails the MJML-theme check late in the batch must not leave
+     * the earlier entities committed behind it.
+     */
+    public function testSaveEntitiesValidatesWholeBatchBeforePersisting(): void
+    {
+        $valid = new Email();
+        $valid->setName('Batch valid email');
+        $valid->setSubject('Batch valid subject');
+        $valid->setEmailType('template');
+        $valid->setTemplate('blank');
+        $valid->setCustomHtml('<p>Compiled body</p>');
+        $valid->setIsPublished(true);
+
+        $uncompiled = new Email();
+        $uncompiled->setName('Batch uncompiled MJML email');
+        $uncompiled->setSubject('Batch uncompiled MJML subject');
+        $uncompiled->setEmailType('template');
+        $uncompiled->setTemplate('blank');
+        $uncompiled->setIsPublished(true);
+
+        try {
+            $this->emailModel->saveEntities([$valid, $uncompiled]);
+            $this->fail('A published email using an MJML theme with no compiled customHtml must not be persisted.');
+        } catch (MjmlThemeEmptyCustomHtmlException) {
+        }
+
+        $this->em->clear();
+        $this->assertNotInstanceOf(Email::class, $this->em->getRepository(Email::class)->findOneBy(['name' => 'Batch valid email']));
+        $this->assertNotInstanceOf(Email::class, $this->em->getRepository(Email::class)->findOneBy(['name' => 'Batch uncompiled MJML email']));
     }
 
     private function sendEmail(Email $email, Lead $contact): void

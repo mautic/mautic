@@ -120,6 +120,7 @@ trait CreateTestEntitiesTrait
         $email = new Email();
         $email->setName($name);
         $email->setSubject('Test Subject');
+        $email->setCustomHtml('<p>Test Email</p>');
         $email->setIsPublished(true);
 
         $this->em->persist($email);
