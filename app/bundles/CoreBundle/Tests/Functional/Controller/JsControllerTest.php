@@ -67,6 +67,8 @@ final class JsControllerTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('/mtc/event', $content);
         $this->assertStringNotContainsString('/mtracking.gif', $content);
         $this->assertStringNotContainsString('setTrackedEvents', $content);
+        $this->assertStringNotContainsString('withdrawTrackingConsent', $content);
+        $this->assertStringNotContainsString('/mtc/withdraw', $content);
         $this->assertStringNotContainsString('focus_item', $content);
         $this->assertStringNotContainsString('https://connect.facebook.net/en_US/fbevents.js', $content);
     }
@@ -84,6 +86,8 @@ final class JsControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('/mtc/event', $content);
         $this->assertStringContainsString('/mtracking.gif', $content);
         $this->assertStringContainsString('setTrackedEvents', $content);
+        $this->assertStringContainsString('withdrawTrackingConsent', $content);
+        $this->assertStringContainsString('/mtc/withdraw', $content);
         $this->assertStringContainsString('focus_item', $content);
         $this->assertStringContainsString('https://connect.facebook.net/en_US/fbevents.js', $content);
         $this->assertStringNotContainsString('serialize=function', $content);

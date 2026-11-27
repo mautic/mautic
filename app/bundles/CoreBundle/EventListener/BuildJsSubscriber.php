@@ -244,6 +244,11 @@ MauticJS.trackingEnabled = true;
 MauticJS.requestWithCredentials = true;
 MauticJS.mtcSet = false;
 MauticJS.appendTrackedContact = function(data) {
+    if (!MauticJS.trackingEnabled) {
+        // Tracking consent was withdrawn on this page, so no identifier is read or sent any more
+        return data;
+    }
+
     if (window.localStorage) {
         if (mtcId  = localStorage.getItem('mtc_id')) {
             data['mautic_device_id'] = localStorage.getItem('mautic_device_id');
@@ -254,7 +259,7 @@ MauticJS.appendTrackedContact = function(data) {
 };
 
 MauticJS.getTrackedContact = function () {
-    if (MauticJS.mtcSet) {
+    if (MauticJS.mtcSet || !MauticJS.trackingEnabled) {
         // Already set
         return;
     }
@@ -265,7 +270,8 @@ MauticJS.getTrackedContact = function () {
 };
 
 MauticJS.setTrackedContact = function(response) {
-    if (response.id) {
+    // Nothing is stored once tracking consent was withdrawn on this page
+    if (response.id && MauticJS.trackingEnabled) {
         MauticJS.setCookie('mtc_id', response.id);
         MauticJS.setCookie('mautic_device_id', response.device_id);
         MauticJS.mtcSet = true;
