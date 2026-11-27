@@ -30,6 +30,7 @@ final class ValidateEmailType extends AbstractType
                     'autocorrect'   => 'off',
                     'spellcheck'    => 'false',
                     'autofocus'     => 'autofocus',
+                    'readonly'      => null !== $options['validated_email'],
                 ],
                 'constraints' => [
                     new NotBlank(),
@@ -60,8 +61,12 @@ final class ValidateEmailType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['secret_hash']);
-        $resolver->setDefaults(['stat_email_address' => null]);
+        $resolver->setDefaults([
+            'stat_email_address' => null,
+            'validated_email'    => null,
+        ]);
         $resolver->setAllowedTypes('secret_hash', 'string');
         $resolver->setAllowedTypes('stat_email_address', ['null', 'string']);
+        $resolver->setAllowedTypes('validated_email', ['null', 'string']);
     }
 }

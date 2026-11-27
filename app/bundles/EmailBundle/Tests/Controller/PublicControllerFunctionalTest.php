@@ -35,6 +35,8 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     private const UNSUBSCRIBE_TESTS = [
         'testUnsubscribeWithEmailStat',
         'testUnsubscribeEmail',
+        'testValidationGrantAllowsImmediateOppositeActionWithoutRetypingEmail',
+        'testValidationGrantExpiresAndRequiresEmailAgain',
         'testHeadRequestWithNoShowContactPreferences',
         'testUnsubscribeWithExistingStatRejectsDifferentValidEmailHashPair',
         'testUnsubscribeWithDeletedStatAllowsValidEmailHashPair',
@@ -780,6 +782,89 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertStringContainsString('We are sorry to see you go!', strip_tags((string) $this->client->getResponse()->getContent()));
+    }
+
+    public function testValidationGrantAllowsImmediateOppositeActionWithoutRetypingEmail(): void
+    {
+        $lead       = $this->createLead();
+        $stat       = $this->getStat(null, $lead);
+        $email      = $stat->getEmailAddress();
+        $secretHash = $this->getSecretHash($email);
+        $idHash     = $stat->getTrackingHash();
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/validate/unsubscribe/'.$secretHash.'/'.$idHash);
+        $form    = $crawler->selectButton('Verify email')->form();
+        $form['validate_email[emailAddress]'] = (string) $email;
+        $this->client->submit($form);
+
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+        $dncRecords    = $dncRepository->findBy(['lead' => $lead->getId()]);
+        $this->assertCount(1, $dncRecords);
+        $this->assertSame(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason());
+
+        $resubscribePath = '/email/validate/resubscribe/'.$secretHash.'/'.$idHash;
+        $crawler         = $this->client->request(Request::METHOD_GET, $resubscribePath);
+        $emailField      = $crawler->filter('input[type="email"]');
+
+        $this->assertSame((string) $email, $emailField->attr('value'));
+        $this->assertSame('readonly', $emailField->attr('readonly'));
+
+        $this->client->followRedirects(false);
+        $this->client->submit($crawler->selectButton('Verify email')->form());
+
+        $this->assertResponseRedirects();
+        $this->assertNull($this->client->getRequest()->getSession()->get('mautic.email.validation_grant'));
+
+        $this->client->followRedirects(true);
+        $this->client->followRedirect();
+
+        $this->assertStringContainsString('has been re-subscribed', strip_tags((string) $this->client->getResponse()->getContent()));
+        $this->assertCount(0, $dncRepository->findBy(['lead' => $lead->getId()]));
+
+        // The consumed grant cannot be replayed for the same action. The successful
+        // resubscribe creates a new grant for the opposite action instead.
+        $crawler    = $this->client->request(Request::METHOD_GET, $resubscribePath);
+        $emailField = $crawler->filter('input[type="email"]');
+        $this->assertNull($emailField->attr('readonly'));
+
+        $crawler    = $this->client->request(Request::METHOD_GET, '/email/validate/unsubscribe/'.$secretHash.'/'.$idHash);
+        $emailField = $crawler->filter('input[type="email"]');
+        $this->assertSame((string) $email, $emailField->attr('value'));
+        $this->assertSame('readonly', $emailField->attr('readonly'));
+    }
+
+    public function testValidationGrantExpiresAndRequiresEmailAgain(): void
+    {
+        $lead       = $this->createLead();
+        $stat       = $this->getStat(null, $lead);
+        $email      = $stat->getEmailAddress();
+        $secretHash = $this->getSecretHash($email);
+        $idHash     = $stat->getTrackingHash();
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/validate/unsubscribe/'.$secretHash.'/'.$idHash);
+        $form = $crawler->selectButton('Verify email')->form();
+        $form['validate_email[emailAddress]'] = (string) $email;
+        $this->client->submit($form);
+
+        /** @var DoNotContact[] $dncRecords */
+        $dncRecords = $this->em->getRepository(DoNotContact::class)->findBy(['lead' => $lead->getId()]);
+        $this->assertCount(1, $dncRecords);
+        $this->assertSame(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason());
+
+        $session = $this->client->getRequest()->getSession();
+        $grant   = $session->get('mautic.email.validation_grant');
+        $this->assertIsArray($grant);
+        $grant['expiresAt'] = time() - 1;
+        $session->set('mautic.email.validation_grant', $grant);
+        $session->save();
+
+        $crawler    = $this->client->request(Request::METHOD_GET, '/email/validate/resubscribe/'.$secretHash.'/'.$idHash);
+        $emailField = $crawler->filter('input[type="email"]');
+        $this->assertNull($emailField->attr('readonly'));
+        $this->assertNull($emailField->attr('value'));
     }
 
     public function testValidateEmailFormShowsErrorForMismatchedEmail(): void
