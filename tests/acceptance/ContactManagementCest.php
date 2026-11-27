@@ -372,7 +372,9 @@ JS);
 
         // Navigate to the campaign page and click the Contacts tab
         $I->amOnPage(CampaignPage::$URL);
+        $I->waitForJS('return window.jQuery && window.jQuery.active === 0;', AcceptanceTester::TIMEOUT);
         $I->waitForElementClickable(CampaignPage::$contactsTab, AcceptanceTester::TIMEOUT);
+        $I->scrollTo(CampaignPage::$contactsTab, 0, -100);
         $I->click(CampaignPage::$contactsTab);
         $I->waitForElement(CampaignPage::$contactsTabContainer, AcceptanceTester::TIMEOUT);
         $I->waitForJS('return document.querySelector("#leads-container .contact-cards") !== null || document.querySelector("#leads-container h4") !== null;', 15);
@@ -393,7 +395,9 @@ JS);
 
         // Navigate to the campaign page and click the Contacts tab
         $I->amOnPage(CampaignPage::$URL);
+        $I->waitForJS('return window.jQuery && window.jQuery.active === 0;', AcceptanceTester::TIMEOUT);
         $I->waitForElementClickable(CampaignPage::$contactsTab, AcceptanceTester::TIMEOUT);
+        $I->scrollTo(CampaignPage::$contactsTab, 0, -100);
         $I->click(CampaignPage::$contactsTab);
         $I->waitForElement(CampaignPage::$contactsTabContainer, AcceptanceTester::TIMEOUT);
         $I->waitForJS('return document.querySelector("#leads-container .contact-cards") !== null || document.querySelector("#leads-container h4") !== null;', 15);
@@ -452,7 +456,9 @@ JS);
 
         // Navigate to the campaign page and click the Contacts tab
         $I->amOnPage(CampaignPage::$URL);
+        $I->waitForJS('return window.jQuery && window.jQuery.active === 0;', AcceptanceTester::TIMEOUT);
         $I->waitForElementClickable(CampaignPage::$contactsTab, AcceptanceTester::TIMEOUT);
+        $I->scrollTo(CampaignPage::$contactsTab, 0, -100);
         $I->click(CampaignPage::$contactsTab);
         $I->waitForElement(CampaignPage::$contactsTabContainer, AcceptanceTester::TIMEOUT);
         $I->waitForJS('return document.querySelector("#leads-container .contact-cards") !== null || document.querySelector("#leads-container h4") !== null;', 15);

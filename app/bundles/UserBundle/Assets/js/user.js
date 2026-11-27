@@ -123,7 +123,8 @@ Mautic.onPermissionChange = function (changedPermission, bundle) {
     }
 
     //update granted numbers
-    if (mQuery('.' + bundle + '_granted').length) {
+    const $ratio = mQuery('#' + bundle + '-permission-ratio');
+    if (mQuery('.' + bundle + '_granted').length || $ratio.length) {
         var granted = 0;
         var levelPerms = MauticVars.permissionList[bundle];
         mQuery.each(levelPerms, function (level, perms) {
@@ -143,5 +144,7 @@ Mautic.onPermissionChange = function (changedPermission, bundle) {
             });
         });
         mQuery('.' + bundle + '_granted').html(granted);
+        const ratioText = granted + ' / ' + $ratio.data('total');
+        $ratio.attr('aria-label', ratioText).find('span').text(ratioText);
     }
 };

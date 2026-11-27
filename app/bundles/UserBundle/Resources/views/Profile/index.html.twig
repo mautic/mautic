@@ -5,12 +5,9 @@
 
 {% block content %}
 
-<!-- start: box layout -->
 <div class="container">
-    <!-- step container -->
     <div class="row">
         <div class="col-md-3 height-auto">
-
             {% if me.getId() %}
             <div class="media">
                 <div class="float-start">
@@ -24,40 +21,8 @@
             </div>
             <hr />
             {% endif %}
-
-            <ul class="list-group list-group-tabs">
-                <li class="list-group-item active">
-                    <a href="#profile" role="tab" class="nav-link list-group-item-heading steps active" data-bs-toggle="tab" aria-selected="true">
-                        {{ 'mautic.user.account.header.details'|trans }}
-                    </a>
-                </li>
-
-                {% if permissions['apiAccess'] %}
-                <li class="list-group-item">
-                    <a href="#clients" role="tab" class="nav-link list-group-item-heading steps" data-bs-toggle="tab">
-                        {{ 'mautic.user.account.header.authorizedclients'|trans }}
-                    </a>
-                </li>
-                {% endif %}
-
-                <li class="list-group-item">
-                    <a href="#appearance" role="tab" class="nav-link list-group-item-heading steps" data-bs-toggle="tab">{{
-                        'mautic.user.account.appearance'|trans }}</a>
-                </li>
-
-                <li class="list-group-item">
-                    <a href="#accessibility" role="tab" class="nav-link list-group-item-heading steps" data-bs-toggle="tab">{{
-                        'mautic.user.account.accessibility'|trans }}</a>
-                </li>
-            </ul>
-
         </div>
-        <!--/ step container -->
-
-        <!-- container -->
-        <div class="col-md-9 height-auto">
-            <div class="tab-content">
-                <div class="tab-pane fade show active rounded-0 bdr-w-0" id="profile">
+{% set profileContent %}
                     {{ form_start(userForm) }}
                     <div class="row pa-16 bdr-b">
                         <h4 class="fw-sb">{{ 'mautic.user.account.header.details'|trans }}</h4>
@@ -103,20 +68,16 @@
                     </div>
                     {{ form_row(userForm.preferences) }}
                     {{ form_end(userForm) }}
-                </div>
-
-                {% if permissions.apiAccess is defined and permissions.apiAccess %}
-                <div class="tab-pane fade rounded-0 bdr-w-0" id="clients">
+{% endset %}
+{% set clientsContent %}
                     <div class="row pa-16 bdr-b">
                         <h4 class="fw-sb">{{ 'mautic.user.account.header.authorizedclients'|trans }}</h4>
                     </div>
                     <div class="row">
                         {{ authorizedClients|raw }}
                     </div>
-                </div>
-                {% endif %}
-
-                <div class="tab-pane fade rounded-0 bdr-w-0" id="appearance">
+{% endset %}
+{% set appearanceContent %}
                     <div class="row pa-16 bdr-b">
                         <h4 class="fw-sb">{{ 'mautic.user.account.appearance'|trans }}</h4>
                     </div>
@@ -170,9 +131,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="tab-pane fade rounded-0 bdr-w-0" id="accessibility">
+{% endset %}
+{% set accessibilityContent %}
                     <div class="row pa-16 bdr-b">
                         <h4 class="fw-sb">{{ 'mautic.user.account.accessibility'|trans }}</h4>
                     </div>
@@ -275,11 +235,18 @@
                             </div>
                         </div>
                     </div>
+{% endset %}
+{% set profileTabs = [{'id': 'profile', 'label': 'mautic.user.account.header.details', 'content': profileContent, 'className': 'rounded-0'}] %}
+{% if permissions['apiAccess'] %}
+    {% set profileTabs = profileTabs|merge([{'id': 'clients', 'label': 'mautic.user.account.header.authorizedclients', 'content': clientsContent, 'className': 'rounded-0'}]) %}
+{% endif %}
+{% set profileTabs = profileTabs|merge([
+    {'id': 'appearance', 'label': 'mautic.user.account.appearance', 'content': appearanceContent, 'className': 'rounded-0'},
+    {'id': 'accessibility', 'label': 'mautic.user.account.accessibility', 'content': accessibilityContent, 'className': 'rounded-0'}
+]) %}
+        <div class="col-md-9 height-auto">
+            {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': profileTabs, 'variant': 'line'}) }}
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<!--/ end: container -->
-</div>
 {% endblock %}

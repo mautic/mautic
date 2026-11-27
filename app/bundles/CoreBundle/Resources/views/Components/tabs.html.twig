@@ -1,0 +1,139 @@
+{% macro generateTabId(translationKey) -%}
+    {%- set parts = translationKey|split('.') -%}
+    {%- set lastParts = parts|slice(-2) -%}
+    {{- lastParts|join('-')|lower -}}
+{%- endmacro %}
+
+{% macro tabContent(tab, tabId, isActive, variant, layer) %}
+    <div class="tab-pane fade{% if isActive %} show active{% endif %}{% if tab.className is defined and tab.className %} {{ tab.className|e('html_attr') }}{% endif %}{% if variant in ['contained', 'vertical'] %} layer-{{ layer|e('html_attr') }}{% endif %}"
+         id="{{ tabId|e('html_attr') }}"
+         {%- for attrName, attrValue in tab.paneAttributes|default({}) %} {{ attrName }}="{{ attrValue|e('html_attr') }}"{% endfor %}
+         role="tabpanel"
+         aria-labelledby="{{ tab.attributes.id|default(tabId ~ '-tab')|e('html_attr') }}"
+         tabindex="0">
+        {{ tab.content|raw }}
+    </div>
+{% endmacro %}
+
+{% macro iconContent(tab, variant, isDismissable) %}
+    {% if tab.renderIcon is defined and tab.renderIcon %}
+        <i class="tabs__nav-item-icon{% if variant == 'line' %} me-4{% elseif variant in ['contained', 'vertical'] %} ms-3{% endif %} {{ tab.renderIcon|e('html_attr') }}"
+           aria-hidden="true"
+           focusable="false"></i>
+    {% endif %}
+{% endmacro %}
+
+{% macro tagContent(tab, variant, isDismissable) %}
+    {% if tab.renderTag is defined and tab.renderTag %}
+        {% set tagData = tab.renderTag|merge({'color': tab.renderTag.color|default('primary'), 'size': tab.renderTag.size|default('sm')}) %}
+        <div class="tabs__nav-item-tag{% if variant == 'line' and isDismissable %} me-2{% elseif variant == 'line' %} ms-2{% elseif variant == 'contained' %} ms-3{% endif %}">
+            {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [tagData]} %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro secondaryLabel(tab) %}
+    {% if tab.secondaryLabel is defined and tab.secondaryLabel %}
+        {% set secondaryLabel = tab.secondaryLabel|trans %}
+        <div class="tabs__nav-item-secondary-label type-label-01 text-start" title="{{ secondaryLabel|e('html_attr') }}">
+            {{ secondaryLabel }}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% set variant = variant|default(style|default('line')) %}
+{% set layer = layer|default('two') %}
+{% set selectedIndex = selectedIndex|default(0) %}
+{% set iconOnlyLarge = iconSize is defined and iconSize == 'lg' %}
+{% set isDismissable = isDismissable|default(false) %}
+
+<div class="tabs-container{% if variant == 'vertical' %} tabs-container--vertical{% endif %}">
+    <ul class="nav nav-tabs{% if variant == 'line' %} nav-tabs--default{% elseif variant == 'contained' %} nav-tabs--contained{% elseif variant == 'iconOnly' %} nav-tabs--default nav-tabs--icon-only{% elseif variant == 'vertical' %} nav-tabs--vertical nav-tabs--contained{% endif %}"
+        role="tablist"{% if variant == 'vertical' %} aria-orientation="vertical"{% endif %}>
+        {% for tab in tabs %}
+            {%- set tabLabel = tab.label|default(tab.title|default('')) -%}
+            {%- set tabId = tab.id|default(_self.generateTabId(tabLabel)) -%}
+            {%- set isActive = loop.index0 == selectedIndex -%}
+            {%- set isDisabled = tab.disabled is defined and tab.disabled -%}
+            {%- set hasError = tab.hasError|default(false) -%}
+            {%- if hasError -%}{%- set tab = tab|merge({'renderIcon': 'ri-alert-line'}) -%}{%- endif -%}
+            <li class="nav-item{% if isDisabled %} disabled{% endif %}{% if tab.itemClass is defined and tab.itemClass %} {{ tab.itemClass|e('html_attr') }}{% endif %}"
+                role="presentation"
+                {%- for attrName, attrValue in tab.itemAttributes|default({}) %} {{ attrName }}="{{ attrValue|e('html_attr') }}"{% endfor %}
+                {% if variant == 'iconOnly' %}title="{{ tabLabel|trans|e('html_attr') }}"{% endif %}>
+                <button type="button"
+                        class="nav-link{% if isActive %} active{% endif %}{% if variant == 'iconOnly' %} tabs__nav-item tabs__nav-item--icon-only{% if iconOnlyLarge %} tabs__nav-item--icon-only__20{% endif %}{% elseif variant == 'vertical' %} tabs__nav-item tabs__nav-item--vertical{% if iconOnlyLarge %} tabs__nav-item--icon-only__20{% endif %}{% else %} tabs__nav-item{% endif %}{% if isDisabled %} disabled{% endif %}{% if hasError %} text-danger{% endif %}"
+                        id="{{ tab.attributes.id|default(tabId ~ '-tab')|e('html_attr') }}"
+                        data-bs-toggle="tab"
+                        data-bs-target="#{{ tabId|e('html_attr') }}"
+                        {%- for attrName, attrValue in tab.attributes|default({}) %}{% if attrName != 'id' %} {{ attrName }}="{{ attrValue|e('html_attr') }}"{% endif %}{% endfor %}
+                        role="tab"
+                        aria-controls="{{ tabId|e('html_attr') }}"
+                        {% if variant == 'iconOnly' %}aria-label="{{ tabLabel|trans|e('html_attr') }}"{% endif %}
+                        aria-selected="{{ (isActive ? 'true' : 'false')|e('html_attr') }}"
+                        {% if isDisabled %}disabled tabindex="-1"{% endif %}>
+                    {% if variant == 'iconOnly' %}
+                        <div class="tabs__nav-item-label-wrapper">
+                            {% if tab.renderTag is defined and tab.renderTag %}
+                                {{ _self.tagContent(tab, variant, false) }}
+                            {% elseif tab.renderIcon is defined and tab.renderIcon %}
+                                <i class="tabs__nav-item-icon {{ tab.renderIcon|e('html_attr') }}" aria-hidden="true" focusable="false"></i>
+                            {% endif %}
+                        </div>
+                    {% elseif variant == 'vertical' %}
+                        <div class="tabs__nav-item-label-wrapper justify-content-between">
+                            <span class="tabs__nav-item-label">{{ tabLabel|trans }}</span>
+                            {% if tab.renderTag is defined and tab.renderTag %}
+                                {{ _self.tagContent(tab, variant, false) }}
+                            {% else %}
+                                {{ _self.iconContent(tab, variant, false) }}
+                            {% endif %}
+                        </div>
+                        {{ _self.secondaryLabel(tab) }}
+                    {% else %}
+                        <div class="tabs__nav-item-label-wrapper">
+                            {% if isDismissable %}
+                                {% if tab.renderTag is defined and tab.renderTag %}
+                                    {{ _self.tagContent(tab, variant, isDismissable) }}
+                                {% else %}
+                                    {{ _self.iconContent(tab, variant, isDismissable) }}
+                                {% endif %}
+                                <span class="tabs__nav-item-label">{{ tabLabel|trans }}</span>
+                            {% else %}
+                                {% if variant == 'line' %}
+                                    {% if tab.renderTag is defined and tab.renderTag %}
+                                        {{ _self.tagContent(tab, variant, isDismissable) }}
+                                    {% else %}
+                                        {{ _self.iconContent(tab, variant, isDismissable) }}
+                                    {% endif %}
+                                    <span class="tabs__nav-item-label">{{ tabLabel|trans }}</span>
+                                {% else %}
+                                    <span class="tabs__nav-item-label">{{ tabLabel|trans }}</span>
+                                    {% if tab.renderTag is defined and tab.renderTag %}
+                                        {{ _self.tagContent(tab, variant, isDismissable) }}
+                                    {% else %}
+                                        {{ _self.iconContent(tab, variant, isDismissable) }}
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        {% if variant == 'contained' %}
+                            {{ _self.secondaryLabel(tab) }}
+                        {% endif %}
+                    {% endif %}
+                </button>
+            </li>
+        {% endfor %}
+        {% block tabs_nav_extra %}{% endblock %}
+    </ul>
+
+    <div class="tab-content{% if variant == 'contained' %} tab-content--contained{% elseif variant == 'vertical' %} tab-content--contained tab-content--vertical{% endif %}">
+        {% for tab in tabs %}
+            {%- set tabLabel = tab.label|default(tab.title|default('')) -%}
+            {%- set tabId = tab.id|default(_self.generateTabId(tabLabel)) -%}
+            {%- set isActive = loop.index0 == selectedIndex -%}
+            {{ _self.tabContent(tab, tabId, isActive, variant, layer) }}
+        {% endfor %}
+        {% block tabs_pane_extra %}{% endblock %}
+    </div>
+</div>

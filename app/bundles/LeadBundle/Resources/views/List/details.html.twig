@@ -174,27 +174,14 @@
 
             {{ customContent('details.stats.graph.below', _context) }}
 
-            <!-- tabs controls -->
-            <ul class="nav nav-tabs nav-tabs-contained">
+            {% set tabsviewsdetails = [] %}
                 {% if hasSegmentMembershipFilter %}
-                  <li class="active">
-                      <a id="segment-dependencies" href="#segment-dependencies-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">{{ 'mautic.lead.segment.dependencies'|trans }}</a>
-                  </li>
+            {% set tabsviewsdetailsContent1 %}
+
+            {% endset %}
+            {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'segment-dependencies-container', 'label': 'mautic.lead.segment.dependencies', 'content': tabsviewsdetailsContent1, 'className': 'pa-16 page-list', 'attributes': {'id': 'segment-dependencies'}}]) %}
                 {% endif %}
-                <li{% if not hasSegmentMembershipFilter %} class="active"{% endif %}>
-                    <a id="campaign-share-tab" href="#campaign-container" role="tab" data-bs-toggle="tab" class="nav-link{% if not hasSegmentMembershipFilter %} active{% endif %}"{% if not hasSegmentMembershipFilter %} aria-selected="true"{% endif %}>{{ 'mautic.lead.campaign.share'|trans }}</a>
-                </li>
-            </ul>
-            <!--/ tabs controls -->
-        </div>
-
-        <!-- start: tab-content -->
-        <div class="tab-content pa-16">
-            {% if hasSegmentMembershipFilter %}
-              <div class="tab-pane active bdr-w-0 page-list" id="segment-dependencies-container"></div>
-            {% endif %}
-
-            <div class="tab-pane{% if not hasSegmentMembershipFilter %} active{% endif %} bdr-w-0 page-list" id="campaign-container">
+            {% set tabsviewsdetailsContent2 %}
                 <div id="campaign-share-container" style="position: relative">
                     <table id="campaign-share-table" class="table table-hover mb-0">
                         <thead>
@@ -225,9 +212,12 @@
                         </tbody>
                     </table>
                 </div>
+
+            {% endset %}
+            {% set tabsviewsdetails = tabsviewsdetails|merge([{'id': 'campaign-container', 'label': 'mautic.lead.campaign.share', 'content': tabsviewsdetailsContent2, 'className': 'pa-16 page-list', 'attributes': {'id': 'campaign-share-tab'}}]) %}
+            {{ include('@MauticCore/Components/tabs.html.twig', {'tabs': tabsviewsdetails, 'variant': 'contained'}) }}
             </div>
-        </div>
-        <!-- end: tab-content -->
+
     </div>
     <!--/ left section -->
 

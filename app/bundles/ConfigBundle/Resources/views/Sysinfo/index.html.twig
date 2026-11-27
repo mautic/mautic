@@ -5,54 +5,12 @@
 {% block headerTitle %}{{ 'mautic.sysinfo.header.index'|trans }}{% endblock %}
 
 {% block content %}
-<!-- start: box layout -->
-<div class="box-layout">
-    <!-- step container -->
-    <div class="col-md-3 height-auto">
-        <div class="pe-24 ps-24 pt-16 pb-16">
-            <!-- Nav tabs -->
-            <ul class="list-group list-group-tabs" role="tablist">
-                <li role="presentation" class="list-group-item show active">
-                    <a href="#phpinfo" aria-controls="phpinfo" role="tab" data-bs-toggle="tab" class="nav-link active list-group-item-heading" aria-selected="true">
-                        {{ 'mautic.sysinfo.tab.phpinfo'|trans }}
-                    </a>
-                </li>
-                <li role="presentation" class="list-group-item">
-                    <a href="#recommendations" aria-controls="recommendations" role="tab" data-bs-toggle="tab" class="nav-link list-group-item-heading">
-                        {{ 'mautic.sysinfo.tab.recommendations'|trans }}
-                    </a>
-                </li>
-                <li role="presentation" class="list-group-item">
-                    <a href="#folders" aria-controls="folders" role="tab" data-bs-toggle="tab" class="nav-link list-group-item-heading">
-                        {{ 'mautic.sysinfo.tab.folders'|trans }}
-                    </a>
-                </li>
-                <li role="presentation" class="list-group-item">
-                    <a href="#log" aria-controls="log" role="tab" data-bs-toggle="tab" class="nav-link list-group-item-heading">
-                        {{ 'mautic.sysinfo.tab.log'|trans }}
-                    </a>
-                </li>
-                <li role="presentation" class="list-group-item">
-                    <a href="#dbinfo" aria-controls="dbinfo" role="tab" data-bs-toggle="tab" class="nav-link list-group-item-heading">
-                        {{ 'mautic.sysinfo.tab.dbinfo'|trans }}
-                    </a>
-                </li>
-            </ul>
-
-        </div>
-    </div>
-
-    <!-- container -->
-    <div class="col-md-9 height-auto bdr-l">
-
-        <!-- Tab panes -->
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane fade show active bdr-w-0" id="phpinfo">
+{% set phpinfoContent %}
                 <div class="pt-16 pe-16 ps-16 pb-16">
                     {{ phpInfo|raw }}
                 </div>
-            </div>
-            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="recommendations">
+{% endset %}
+{% set recommendationsContent %}
                 <div class="pt-16 pe-16 ps-16 pb-16">
                     {% if recommendations is empty and requirements is empty %}
                         <div class="alert alert-info">
@@ -70,8 +28,8 @@
                         </div>
                     {% endfor %}
                 </div>
-            </div>
-            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="folders">
+{% endset %}
+{% set foldersContent %}
                 <div class="pt-16 pe-16 ps-16 pb-16">
                     <h2 class="pb-16">{{ 'mautic.sysinfo.folders.title'|trans }}</h2>
                     <table class="table table-hover">
@@ -95,8 +53,8 @@
                         {% endfor %}
                     </table>
                 </div>
-            </div>
-            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="log">
+{% endset %}
+{% set logContent %}
                 <div class="pt-16 pe-16 ps-16 pb-16">
                     <h2 class="pb-16">{{ 'mautic.sysinfo.log.title'|trans }}</h2>
                     {% if log is defined and log is not empty %}
@@ -107,8 +65,8 @@
                         </div>
                     {% endif %}
                 </div>
-            </div>
-            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="dbinfo">
+{% endset %}
+{% set dbinfoContent %}
                 <div class="pt-16 pe-16 ps-16 pb-16">
                     <h2 class="pb-16">{{ 'mautic.sysinfo.dbinfo.title'|trans }}</h2>
                     <table class="table table-bordered">
@@ -134,9 +92,15 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-
-    </div>
-</div>
+{% endset %}
+{{ include('@MauticCore/Components/tabs.html.twig', {
+    'variant': 'vertical',
+    'tabs': [
+    {'id': 'phpinfo', 'label': 'mautic.sysinfo.tab.phpinfo', 'content': phpinfoContent},
+    {'id': 'recommendations', 'label': 'mautic.sysinfo.tab.recommendations', 'content': recommendationsContent},
+    {'id': 'folders', 'label': 'mautic.sysinfo.tab.folders', 'content': foldersContent},
+    {'id': 'log', 'label': 'mautic.sysinfo.tab.log', 'content': logContent},
+    {'id': 'dbinfo', 'label': 'mautic.sysinfo.tab.dbinfo', 'content': dbinfoContent}
+    ]
+}) }}
 {% endblock %}
