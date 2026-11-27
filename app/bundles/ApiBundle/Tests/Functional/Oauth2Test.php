@@ -13,16 +13,10 @@ use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * This test must run in a separate process because it sets the global constant
- * MAUTIC_INSTALLER which breaks other tests.
- */
-#[PreserveGlobalState(false)]
-#[RunTestsInSeparateProcesses]
 #[AllowMockObjectsWithoutExpectations]
 final class Oauth2Test extends MauticMysqlTestCase
 {
@@ -100,6 +94,11 @@ final class Oauth2Test extends MauticMysqlTestCase
         $this->assertSame('{"errors":[{"message":"The access token provided is invalid.","code":401,"type":"invalid_grant"}]}', $response->getContent());
     }
 
+    /**
+     * Authenticated API calls define the global MAUTIC_AUDITLOG_USER constant, which breaks audit log tests that run later.
+     */
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testAuthWorkflow(): void
     {
         $this->client->disableReboot();
@@ -150,6 +149,11 @@ final class Oauth2Test extends MauticMysqlTestCase
         $this->assertStringContainsString('"users":[', (string) $this->client->getResponse()->getContent());
     }
 
+    /**
+     * Authenticated API calls define the global MAUTIC_AUDITLOG_USER constant, which breaks audit log tests that run later.
+     */
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testUserBoundBearerTokenAuthenticatesOnApiV1AndApiV2(): void
     {
         $adminUser = $this->getService(UserRepository::class)->findOneBy(['username' => 'admin']);
