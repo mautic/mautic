@@ -101,7 +101,8 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             $object = $this->assetRepository->findOneBy(['uuid' => $element['uuid']]);
             $isNew  = !$object;
 
-            $object ??= new Asset();
+            // A new asset starts from this instance's download tracking setting, which exports don't carry
+            $object ??= $this->assetModel->getEntity();
             if (isset($element['size'])) {
                 $element['size'] = (int) $element['size'];
             }
