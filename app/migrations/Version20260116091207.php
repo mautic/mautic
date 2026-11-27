@@ -15,7 +15,7 @@ final class Version20260116091207 extends PreUpAssertionMigration
     {
         // Skip if alias column is already nullable
         $this->skipAssertion(
-            fn (Schema $schema) => !$schema
+            fn (Schema $schema): bool => !$schema
                 ->getTable($this->getPrefixedTableName())
                 ->getColumn('alias')
                 ->getNotnull(),

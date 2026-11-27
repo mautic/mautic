@@ -33,7 +33,7 @@ abstract class CloudStorageIntegration extends AbstractIntegration
         }
     }
 
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'api';
     }

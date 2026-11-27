@@ -14,7 +14,7 @@ final class Version20241004132307 extends PreUpAssertionMigration
 
     protected function preUpAssertions(): void
     {
-        $this->skipAssertion(function (Schema $schema) {
+        $this->skipAssertion(function (Schema $schema): bool {
             $table = $schema->getTable($this->getPrefixedTableName());
 
             return $table->hasColumn('marked_unhealthy_at') && $table->hasColumn('unhealthy_since') && $table->hasColumn('last_notification_sent_at');

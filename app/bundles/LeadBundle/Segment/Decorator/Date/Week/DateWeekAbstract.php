@@ -10,10 +10,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionAbstract;
 
 abstract class DateWeekAbstract extends DateOptionAbstract
 {
-    /**
-     * @return string
-     */
-    protected function getModifierForBetweenRange()
+    protected function getModifierForBetweenRange(): string
     {
         return '+1 week';
     }
@@ -30,7 +27,7 @@ abstract class DateWeekAbstract extends DateOptionAbstract
         return [$startWith, $endWith];
     }
 
-    protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate)
+    protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate): string
     {
         return '!=' === $leadSegmentFilterCrate->getOperator() ? 'notBetween' : 'between';
     }

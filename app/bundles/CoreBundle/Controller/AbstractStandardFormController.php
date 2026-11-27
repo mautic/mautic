@@ -690,10 +690,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Get the template file.
-     *
-     * @return string
      */
-    protected function getTemplateName(string $file)
+    protected function getTemplateName(string $file): string
     {
         $namespaces = [
             $this->getTemplateBase(),

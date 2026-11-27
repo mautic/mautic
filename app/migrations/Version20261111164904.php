@@ -17,7 +17,7 @@ final class Version20261111164904 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => !$schema->getTable($this->getPrefixedTableName())->hasColumn(self::COLUMN_NAME),
+            fn (Schema $schema): bool => !$schema->getTable($this->getPrefixedTableName())->hasColumn(self::COLUMN_NAME),
             sprintf('Column %s.%s does not exist', self::TABLE_NAME, self::COLUMN_NAME)
         );
     }

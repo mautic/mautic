@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper\TestResources;
 
 final class WakeupCall
 {
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \Exception('this should not have been executed');
     }

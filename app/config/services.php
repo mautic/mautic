@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 // This is loaded by \Mautic\CoreBundle\DependencyInjection\MauticCoreExtension to auto-wire services
 // if the bundle do not cover it itself by their own *Extension and services.php which is prefered.
-return function (ContainerConfigurator $configurator, ContainerBuilder $container) {
+return function (ContainerConfigurator $configurator, ContainerBuilder $container): void {
     $services = $configurator->services()
         ->defaults()
         ->autowire()

@@ -1776,6 +1776,18 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `Mautic\CampaignBundle\Entity\Event` | `getCampaign()` | `?Mautic\CampaignBundle\Entity\Campaign` |
     | `Mautic\LeadBundle\Entity\Lead` | `getManipulator()` | `?Mautic\LeadBundle\DataObject\LeadManipulator` |
     | `Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter` | `createFormatter()` | `self` (`AbstractFormatter`) |
+    | `Mautic\CoreBundle\Controller\AbstractStandardFormController` | `getTemplateName()` | `string` |
+    | `Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup` | `getConfigFormService()` | `string` |
+    | `Mautic\CoreBundle\IpLookup\AbstractMaxmindLookup` | `getAttribution()` | `string` |
+    | `Mautic\CoreBundle\IpLookup\AbstractMaxmindLookup` | `getUrl()` | `string` |
+    | `Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayAbstract` | `getModifierForBetweenRange()` | `string` |
+    | `Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayAbstract` | `getOperatorForBetweenRange()` | `string` |
+    | `Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthAbstract` | `getModifierForBetweenRange()` | `string` |
+    | `Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthAbstract` | `getOperatorForBetweenRange()` | `string` |
+    | `Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekAbstract` | `getModifierForBetweenRange()` | `string` |
+    | `Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekAbstract` | `getOperatorForBetweenRange()` | `string` |
+    | `Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearAbstract` | `getModifierForBetweenRange()` | `string` |
+    | `Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearAbstract` | `getOperatorForBetweenRange()` | `string` |
 
 - `Mautic\CoreBundle\Entity\VariantEntityInterface` and `VariantEntityTrait` now declare `getVariantStartDate(): ?\DateTimeInterface` and `setVariantStartDate(?\DateTimeInterface $variantStartDate): static`. The date getter's return type and setter's parameter type were previously `mixed`. Update implementations and overrides accordingly; pass a mutable `DateTimeInterface` or `null`, not a `DateTimeImmutable` or another value.
 - Setters of string entity columns now declare a native `?string` parameter (previously untyped or `@param mixed`). Callers in files with `declare(strict_types=1)` that pass a non-string value (e.g. an integer) now get a `TypeError`; pass a string (`null` only where the column is nullable):

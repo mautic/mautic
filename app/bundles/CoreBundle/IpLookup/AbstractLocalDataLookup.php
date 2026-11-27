@@ -24,10 +24,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
      */
     abstract public function getRemoteDateStoreDownloadUrl(): string;
 
-    /**
-     * @return string
-     */
-    public function getConfigFormService()
+    public function getConfigFormService(): string
     {
         return IpLookupDownloadDataStoreButtonType::class;
     }

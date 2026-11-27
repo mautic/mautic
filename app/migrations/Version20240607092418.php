@@ -15,7 +15,7 @@ final class Version20240607092418 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME))->getColumn('id')->getType() instanceof BigIntType,
+            fn (Schema $schema): bool => $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME))->getColumn('id')->getType() instanceof BigIntType,
             sprintf('Index %s already exists', 'index_name')
         );
     }

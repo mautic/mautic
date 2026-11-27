@@ -10,10 +10,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionAbstract;
 
 abstract class DateMonthAbstract extends DateOptionAbstract
 {
-    /**
-     * @return string
-     */
-    protected function getModifierForBetweenRange()
+    protected function getModifierForBetweenRange(): string
     {
         return '+1 month';
     }
@@ -23,7 +20,7 @@ abstract class DateMonthAbstract extends DateOptionAbstract
         return $dateTimeHelper->toLocalString('Y-m-%');
     }
 
-    protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate)
+    protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate): string
     {
         return '!=' === $leadSegmentFilterCrate->getOperator() ? 'notLike' : 'like';
     }
