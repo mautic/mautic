@@ -32,8 +32,9 @@ if (false !== $token && '' !== $token) {
         // Each worker owns its database: mautictest_1, mautictest_2, ...
         // doctrine:database:create makes it on the worker's first test.
         'DB_NAME'        => $baseDbName.'_'.$token,
-        // AppTestKernel::getCacheDir()/getLogDir() read these env vars.
-        'TEST_CACHE_DIR' => 'var/cache/test_'.$token,
+        // AppTestKernel::getCacheDir()/getLogDir() read these env vars. The cache dir is nested
+        // one level deeper because command locks live in "<cache dir>/../run", keyed by entity ID.
+        'TEST_CACHE_DIR' => 'var/cache/test_'.$token.'/test',
         'TEST_LOG_DIR'   => 'var/logs/test_'.$token,
         // ParameterLoader::getLocalConfigFile() reads this: each worker backs up and
         // rewrites its own config/local.php instead of racing on the shared one.
