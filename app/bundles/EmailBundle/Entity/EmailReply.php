@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeMicrosecondType;
 use Ramsey\Uuid\Uuid;
 
 class EmailReply
@@ -31,8 +32,9 @@ class EmailReply
             ->addJoinColumn('stat_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->createField('dateReplied', 'datetime')
+        $builder->createField('dateReplied', UTCDateTimeMicrosecondType::NAME)
             ->columnName('date_replied')
+            ->precision(3)
             ->build();
 
         $builder->createField('messageId', 'string')
