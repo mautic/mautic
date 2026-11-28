@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use Mautic\LeadBundle\Helper\ContactTrackingPreferenceHelper;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -22,6 +23,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         private readonly RandomHelperInterface $randomHelper,
         private readonly RequestStack $requestStack,
         private readonly CorePermissions $security,
+        private readonly ContactTrackingPreferenceHelper $contactTrackingPreferenceHelper,
     ) {
     }
 
@@ -76,18 +78,26 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
             $this->entityManager->flush();
         }
 
-        $this->createTrackingCookies($device);
-
         // Store the device in case a service uses this within the same session
         $this->trackedDevice = $device;
+
+        // The browser of a contact who turned tracking off gets nothing that would recognise them again
+        if (!$this->contactTrackingPreferenceHelper->allowsActivityTracking($device->getLead())) {
+            $this->clearTrackingCookies();
+
+            return $device;
+        }
+
+        $this->createTrackingCookies($device);
 
         return $device;
     }
 
     public function clearTrackingCookies(): void
     {
-        $this->cookieHelper->deleteCookie('mautic_device_id');
-        $this->cookieHelper->deleteCookie('mtc_id');
+        // SameSite=None like when they were written, so the browser also takes the expiry from a request sent by another site
+        $this->cookieHelper->deleteCookie('mautic_device_id', sameSite: Cookie::SAMESITE_NONE);
+        $this->cookieHelper->deleteCookie('mtc_id', sameSite: Cookie::SAMESITE_NONE);
     }
 
     public function reset(): void

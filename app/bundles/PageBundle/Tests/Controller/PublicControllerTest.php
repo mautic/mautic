@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
+use Mautic\LeadBundle\Tests\Helper\ContactTrackingPreferenceHelperTrait;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Controller\PublicController;
@@ -47,6 +48,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class PublicControllerTest extends TestCase
 {
+    use ContactTrackingPreferenceHelperTrait;
+
     private MockObject&Container $internalContainer;
 
     private \PHPUnit\Framework\MockObject\Stub&LoggerInterface $logger;
@@ -519,7 +522,8 @@ final class PublicControllerTest extends TestCase
             $trackingHelper,
             $contactTracker,
             $this->pageModel,
-            $this->ipLookupHelper
+            $this->ipLookupHelper,
+            $this->createTrackingPreferenceHelper()
         );
 
         $json = json_decode($response->getContent(), true);
@@ -565,7 +569,8 @@ final class PublicControllerTest extends TestCase
             $this->createStub(TrackingHelper::class),
             $this->createStub(ContactTracker::class),
             $this->pageModel,
-            $this->ipLookupHelper
+            $this->ipLookupHelper,
+            $this->createTrackingPreferenceHelper()
         );
         $this->assertEquals(
             ['success' => 0],
@@ -619,7 +624,8 @@ final class PublicControllerTest extends TestCase
             $trackingHelper,
             $contactTracker,
             $this->pageModel,
-            $this->ipLookupHelper
+            $this->ipLookupHelper,
+            $this->createTrackingPreferenceHelper()
         );
 
         $this->assertSame(

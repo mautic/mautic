@@ -11,12 +11,15 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use Mautic\LeadBundle\Tests\Helper\ContactTrackingPreferenceHelperTrait;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
 {
+    use ContactTrackingPreferenceHelperTrait;
+
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&CookieHelper
      */
@@ -288,7 +291,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->with($uniqueTrackingIdentifier)
             ->willReturn($leadDeviceMock);
 
-        $leadDeviceMock->expects($this->once())
+        $leadDeviceMock->expects($this->atLeastOnce())
             ->method('getLead')
             ->willReturn(new Lead());
         $matcher = $this->any();
@@ -347,7 +350,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->with($uniqueTrackingIdentifier)
             ->willReturn($leadDeviceMock);
 
-        $leadDeviceMock->expects($this->once())
+        $leadDeviceMock->expects($this->atLeastOnce())
             ->method('getLead')
             ->willReturn(new Lead());
 
@@ -395,7 +398,8 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             $this->leadDeviceRepositoryMock,
             $this->randomHelperMock,
             $this->requestStackMock,
-            $this->security
+            $this->security,
+            $this->createTrackingPreferenceHelper()
         );
     }
 }

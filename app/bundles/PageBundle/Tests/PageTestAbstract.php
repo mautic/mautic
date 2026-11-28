@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tests\Helper\ContactTrackingPreferenceHelperTrait;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\Hit;
@@ -49,6 +50,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class PageTestAbstract extends TestCase
 {
+    use ContactTrackingPreferenceHelperTrait;
+
     protected static $mockId   = 123;
 
     protected static $mockName = 'Mock test name';
@@ -160,7 +163,8 @@ abstract class PageTestAbstract extends TestCase
             $this->createStub(UtmTagRepository::class), // $utmTagRepository
             $this->createStub(RedirectRepository::class),
             $this->createStub(TrackableRepository::class),
-            $this->createStub(LeadRepository::class)
+            $this->createStub(LeadRepository::class),
+            $this->createTrackingPreferenceHelper()
         );
     }
 
