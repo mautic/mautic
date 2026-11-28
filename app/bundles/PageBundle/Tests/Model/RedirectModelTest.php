@@ -88,4 +88,27 @@ final class RedirectModelTest extends PageTestAbstract
         $url = $model->generateRedirectUrl($redirect, $clickthrough);
         $this->assertEquals('https://mautic.org?ct=YToyOntzOjM6ImZvbyI7czozOiJiYXIiO3M6MzoiYmFyIjtzOjM6ImZvbyI7fQ%3D%3D', $url);
     }
+
+    public function testApplyUtmTagsLeavesTheUrlAloneWhenAllValuesAreEmpty(): void
+    {
+        $redirectModel = $this->getRedirectModel();
+
+        // The email form saves every UTM field, empty ones included
+        $utmTags = ['utmSource' => '', 'utmMedium' => null, 'utmCampaign' => '', 'utmContent' => null];
+
+        $this->assertSame('https://example.com/offer', $redirectModel->applyUtmTags('https://example.com/offer', $utmTags));
+        $this->assertSame('https://example.com/offer?a=1', $redirectModel->applyUtmTags('https://example.com/offer?a=1', $utmTags));
+    }
+
+    public function testApplyUtmTagsAppendsOnlyTheFilledValues(): void
+    {
+        $redirectModel = $this->getRedirectModel();
+
+        $utmTags = ['utmSource' => 'newsletter', 'utmMedium' => '', 'utmCampaign' => null, 'utmContent' => 'offer'];
+
+        $this->assertSame(
+            'https://example.com/offer?utm_source=newsletter&utm_content=offer',
+            $redirectModel->applyUtmTags('https://example.com/offer', $utmTags)
+        );
+    }
 }

@@ -1190,8 +1190,21 @@ class MailHelper
         // Append pixel to body before send
         $this->appendTrackingPixel = true;
 
+        $this->markIdHashUntrackedIfTrackingOff();
+    }
+
+    /**
+     * A copy of an email with tracking off gets a marked hash, so it stays untracked if the email turns tracking on
+     * later. The hash can be set before or after the email, so this runs from both.
+     */
+    private function markIdHashUntrackedIfTrackingOff(): void
+    {
+        if (null !== $this->idHash && $this->email instanceof Email && !$this->email->getTrackingEnabled()) {
+            $this->idHash = Stat::markHashUntracked($this->idHash);
+        }
+
         // Add the trackingID to the $message object in order to update the stats if the email failed to send
-        $this->message->updateLeadIdHash($idHash);
+        $this->message->updateLeadIdHash($this->idHash);
     }
 
     /**
@@ -1260,6 +1273,10 @@ class MailHelper
 
         $this->email = $email;
 
+        if (null !== $this->idHash) {
+            $this->markIdHashUntrackedIfTrackingOff();
+        }
+
         $subject = $email->getSubject();
 
         // Set message settings from the email
@@ -1292,7 +1309,8 @@ class MailHelper
             ]);
         }
 
-        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
+        // An email with tracking off gets no open pixel
+        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel || !$email->getTrackingEnabled());
 
         // Reset attachments
         $this->assets = $this->attachedAssets = [];
@@ -1441,8 +1459,9 @@ class MailHelper
     {
         $tokens = array_merge($this->globalTokens, $this->eventTokens);
 
-        // Include the tracking pixel token as it's auto appended to the body
-        if ($this->appendTrackingPixel) {
+        // Include the tracking pixel token as it's auto appended to the body. An email with tracking off gets a blank one,
+        // also where the token was placed in the content by hand.
+        if ($this->shouldAddTrackingPixel()) {
             $tokens['{tracking_pixel}'] = $this->router->generate(
                 'mautic_email_tracker',
                 [
@@ -1455,6 +1474,15 @@ class MailHelper
         }
 
         return $tokens;
+    }
+
+    private function shouldAddTrackingPixel(): bool
+    {
+        if (!$this->appendTrackingPixel) {
+            return false;
+        }
+
+        return !$this->email instanceof Email || $this->email->getTrackingEnabled();
     }
 
     /**

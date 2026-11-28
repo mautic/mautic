@@ -19,6 +19,8 @@ class Stat
 
     public const TABLE_NAME = 'email_stats';
 
+    public const UNTRACKED_HASH_PREFIX = 'untracked-';
+
     private ?string $id = null;
 
     /**
@@ -453,6 +455,33 @@ class Stat
     {
         $this->addChange('viewedInBrowser', $this->viewedInBrowser, $viewedInBrowser);
         $this->viewedInBrowser = $viewedInBrowser;
+    }
+
+    /**
+     * A copy sent with tracking off has this prefix on its tracking hash, so it stays untracked if the email turns
+     * tracking on later.
+     */
+    public static function markHashUntracked(string $trackingHash): string
+    {
+        return self::isHashUntracked($trackingHash) ? $trackingHash : self::UNTRACKED_HASH_PREFIX.$trackingHash;
+    }
+
+    public static function isHashUntracked(?string $trackingHash): bool
+    {
+        return null !== $trackingHash && str_starts_with($trackingHash, self::UNTRACKED_HASH_PREFIX);
+    }
+
+    /**
+     * Opens are recorded only when both the email and this copy of it allow tracking, so a copy sent with tracking off
+     * is not tracked after tracking is turned on.
+     */
+    public function allowsTracking(): bool
+    {
+        if (self::isHashUntracked($this->trackingHash)) {
+            return false;
+        }
+
+        return !$this->email instanceof Email || $this->email->getTrackingEnabled();
     }
 
     /**

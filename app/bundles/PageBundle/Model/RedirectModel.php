@@ -133,6 +133,29 @@ class RedirectModel extends FormModel
      */
     public function getRedirectsByUrls(array $urls)
     {
+        return $this->findOrBuildRedirectsByUrls($urls, true);
+    }
+
+    /**
+     * Same as getRedirectsByUrls(), for links that won't be tracked: Redirect entities are built for the URLs that
+     * aren't known yet, but not saved.
+     *
+     * @param array<string> $urls
+     *
+     * @return array<Redirect>
+     */
+    public function getRedirectsByUrlsWithoutSaving(array $urls): array
+    {
+        return $this->findOrBuildRedirectsByUrls($urls, false);
+    }
+
+    /**
+     * @param array<string> $urls
+     *
+     * @return array<Redirect>
+     */
+    private function findOrBuildRedirectsByUrls(array $urls, bool $persistRedirects): array
+    {
         /** @var array<Redirect> $redirects */
         $redirects   = $this->redirectRepository->findByUrls(array_values($urls));
         $newEntities = [];
@@ -155,14 +178,14 @@ class RedirectModel extends FormModel
             if (isset($byUrl[$url])) {
                 $return[$key] = $byUrl[$url];
             } else {
-                $redirect      = $this->createRedirectEntity($url);
+                $redirect      = $persistRedirects ? $this->createRedirectEntity($url) : $this->createUnsavedRedirectEntity($url);
                 $newEntities[] = $redirect;
                 $return[$key]  = $redirect;
             }
         }
 
         // Save new entities
-        if (count($newEntities)) {
+        if ($persistRedirects && count($newEntities)) {
             $this->redirectRepository->saveEntities($newEntities);
         }
 
@@ -186,15 +209,32 @@ class RedirectModel extends FormModel
     }
 
     /**
+     * A Redirect entity that is only used to build a token for a link that won't be tracked. Its ID comes from
+     * the URL, so the same content gets the same token, and the same stored copy, every time it is sent.
+     */
+    public function createUnsavedRedirectEntity(string $url): Redirect
+    {
+        $redirect = $this->createRedirectEntity($url);
+        $redirect->setRedirectId(substr(hash('sha1', $url), 0, 25));
+
+        return $redirect;
+    }
+
+    /**
      * @param array<mixed> $utmTags
      */
     public function applyUtmTags(string $url, array $utmTags): string
     {
+        // An empty UTM value would only leave a stray "?" or "&" on the URL
+        $utmTags = array_filter(
+            $this->getUtmTagsForUrl($utmTags),
+            static fn ($value): bool => null !== $value && '' !== $value
+        );
+
         if ([] === $utmTags) {
             return $url;
         }
 
-        $utmTags         = $this->getUtmTagsForUrl($utmTags);
         $appendUtmString = http_build_query($utmTags, '', '&');
 
         return UrlHelper::appendQueryToUrl($url, $appendUtmString);

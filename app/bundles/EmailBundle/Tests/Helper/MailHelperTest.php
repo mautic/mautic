@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
@@ -1838,5 +1839,43 @@ final class MailHelperTest extends TestCase
     {
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(fn (string $name, $default = null) => $values[$name] ?? $default);
+    }
+
+    /**
+     * @return iterable<string, array{bool, bool}>
+     */
+    public static function untrackedHashProvider(): iterable
+    {
+        yield 'hash set after the email, tracking off' => [false, false];
+        yield 'hash set before the email, tracking off' => [true, false];
+        yield 'hash set after the email, tracking on' => [false, true];
+        yield 'hash set before the email, tracking on' => [true, true];
+    }
+
+    #[DataProvider('untrackedHashProvider')]
+    public function testCopyOfAnEmailWithTrackingOffGetsAMarkedHash(bool $hashBeforeEmail, bool $trackingEnabled): void
+    {
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<html>Hi</html>');
+        $email->setTrackingEnabled($trackingEnabled);
+
+        $mailer = $this->mockEmptyMailHelper();
+
+        if ($hashBeforeEmail) {
+            $mailer->setIdHash('abc123');
+            $mailer->setEmail($email);
+        } else {
+            $mailer->setEmail($email);
+            $mailer->setIdHash('abc123');
+        }
+
+        $expected = $trackingEnabled ? 'abc123' : Stat::UNTRACKED_HASH_PREFIX.'abc123';
+        $this->assertSame($expected, $mailer->getIdHash());
+        $this->assertSame($expected, $mailer->message->getLeadIdHash(), 'the message carries the same hash');
+
+        // Setting the email again doesn't add the prefix twice
+        $mailer->setEmail($email);
+        $this->assertSame($expected, $mailer->getIdHash());
     }
 }

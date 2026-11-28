@@ -203,6 +203,18 @@ final class EmailType extends AbstractType
         );
 
         $builder->add(
+            'trackingEnabled',
+            YesNoButtonGroupType::class,
+            [
+                'label'    => 'mautic.email.tracking_enabled',
+                'attr'     => [
+                    'tooltip' => 'mautic.email.tracking_enabled.tooltip',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
             'utmTags',
             EmailUtmTagsType::class,
             [

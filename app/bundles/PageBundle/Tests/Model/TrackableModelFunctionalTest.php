@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -50,6 +52,41 @@ final class TrackableModelFunctionalTest extends MauticMysqlTestCase
         } else {
             $this->assertStringContainsString('{trackable=', (string) $newContent);
         }
+    }
+
+    public function testParsingWithoutPersistingLeavesNoTrackableOrRedirectRows(): void
+    {
+        $content = '<a href="https://example.com/not-tracked">Offer</a>';
+
+        [$newContent, $trackableTokens] = $this->trackableModel->parseContentForTrackablesWithoutSaving($content, [], 'email', 2);
+
+        // The tokens are still built, so the links can be replaced and get UTM tags or shortening
+        $this->assertCount(1, $trackableTokens);
+        $this->assertStringContainsString('{trackable=', (string) $newContent);
+        $this->assertSame('https://example.com/not-tracked', reset($trackableTokens)->getRedirect()->getUrl());
+
+        $this->em->clear();
+        $this->assertSame([], $this->em->getRepository(Trackable::class)->findBy(['channel' => 'email', 'channelId' => 2]));
+        $this->assertSame([], $this->em->getRepository(Redirect::class)->findBy(['url' => 'https://example.com/not-tracked']));
+
+        // The next parse saves again
+        $this->trackableModel->parseContentForTrackables($content, [], 'email', 2);
+        $this->em->clear();
+        $this->assertCount(1, $this->em->getRepository(Trackable::class)->findBy(['channel' => 'email', 'channelId' => 2]));
+    }
+
+    public function testParsingWithoutPersistingAndWithoutAChannelLeavesNoRedirectRows(): void
+    {
+        $content = '<a href="https://example.com/not-tracked-redirect">Offer</a>';
+
+        // Without a channel the links are plain redirects, which must not be saved either
+        [, $trackableTokens] = $this->trackableModel->parseContentForTrackablesWithoutSaving($content);
+
+        $this->assertCount(1, $trackableTokens);
+        $this->assertInstanceOf(Redirect::class, reset($trackableTokens));
+
+        $this->em->clear();
+        $this->assertSame([], $this->em->getRepository(Redirect::class)->findBy(['url' => 'https://example.com/not-tracked-redirect']));
     }
 
     /**

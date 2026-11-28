@@ -58,6 +58,8 @@ return RectorConfig::configure()
         // Keep saveUser() compatible with authentication plugins overriding its untyped return.
         Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class => [
             __DIR__.'/app/bundles/UserBundle/Security/Provider/UserProvider.php',
+            // a return type on the public getRedirectsByUrls() would break plugins that override it
+            __DIR__.'/app/bundles/PageBundle/Model/RedirectModel.php',
         ],
 
         // @todo move to "twig" group
