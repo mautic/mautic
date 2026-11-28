@@ -18,6 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Locale;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -45,6 +46,9 @@ final class ConfigType extends AbstractType
                     'unsubscribe_message'    => 'html',
                     'resubscribe_message'    => 'html',
                     'webview_text'           => 'html',
+                    'forward_text'           => 'html',
+                    'forward_mail_subject'   => 'html',
+                    'forward_mail_body'      => 'html',
                     // Encode special chars to keep congruent with Email entity custom headers
                     'mailer_custom_headers'  => 'clean',
                 ]
@@ -90,6 +94,51 @@ final class ConfigType extends AbstractType
                     ),
             ]
         );
+
+        $builder->add(
+            'forward_text',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.email.config.forward_text',
+                'label_attr' => ['class' => 'form-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.forward_text.tooltip',
+                ],
+                'required'   => false,
+                'data'       => (isset($options['data']['forward_text']) && '' !== $options['data']['forward_text'])
+                    ? $options['data']['forward_text']
+                    : $this->translator->trans(
+                        'mautic.email.forward.text',
+                        ['%link%' => '|URL|']
+                    ),
+            ]
+        );
+
+        foreach (['forward_mail_subject', 'forward_mail_body'] as $field) {
+            $builder->add(
+                $field,
+                SortableListType::class,
+                [
+                    'required'            => false,
+                    'label'               => 'mautic.email.config.'.$field,
+                    'attr'                => [
+                        'tooltip' => 'mautic.email.config.'.$field.'.tooltip',
+                    ],
+                    'option_required'     => false,
+                    'with_labels'         => true,
+                    'key_value_pairs'     => true, // the language is the key
+                    'entry_extra_options' => [
+                        'label_placeholder' => 'mautic.email.config.forward_mail.language',
+                        'value_placeholder' => 'mautic.email.config.'.$field.'.value',
+                        // A text made up from the language code would end up in the message
+                        'generate_value'    => false,
+                        'label_constraints' => [new Locale(canonicalize: true)],
+                        'value_constraints' => [new NotBlank()],
+                    ],
+                ]
+            );
+        }
 
         $builder->add(
             'unsubscribe_message',

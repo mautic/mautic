@@ -91,6 +91,13 @@ return [
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::resubscribeAction',
                 'defaults'   => ['urlEmail' => null, 'secretHash' => null], // @todo make the secretHash required after a few years.
             ],
+            'mautic_email_forward' => [
+                'path'         => '/email/forward/{objectId}/{hash}',
+                'controller'   => 'Mautic\EmailBundle\Controller\PublicController::forwardAction',
+                'requirements' => [
+                    'objectId' => '\d+',
+                ],
+            ],
             'mautic_email_validate_email_form' => [
                 'path'       => '/email/validate/{action}/{secretHash}/{idHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::validateEmailAction',
@@ -146,6 +153,9 @@ return [
         'mailer_dsn'                                                        => 'smtp://localhost:1025',
         'unsubscribe_text'                                                  => null,
         'webview_text'                                                      => null,
+        'forward_text'                                                      => null,
+        'forward_mail_subject'                                              => [],
+        'forward_mail_body'                                                 => [],
         'unsubscribe_message'                                               => null,
         'resubscribe_message'                                               => null,
         'email_default_preference_center_id'                                => null,

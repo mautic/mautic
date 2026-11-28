@@ -94,6 +94,11 @@ final class OwnerSubscriber implements EventSubscriberInterface
      */
     private function getGeneratedTokens(EmailSendEvent $event): array
     {
+        if ($event->isForwardedCopy()) {
+            // A forwarded copy has no contact, so it names no owner either
+            return $this->getEmptyTokens();
+        }
+
         if ($event->isInternalSend()) {
             return $this->getFakeTokens();
         }

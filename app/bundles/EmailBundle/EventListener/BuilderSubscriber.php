@@ -13,6 +13,7 @@ use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Entity\Trackable;
@@ -84,6 +85,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $tokens      = [
             '{unsubscribe_text}' => $emailPrefix.$this->translator->trans('mautic.email.token.unsubscribe_text'),
             '{webview_text}'     => $emailPrefix.$this->translator->trans('mautic.email.token.webview_text'),
+            '{forward_text}'     => $emailPrefix.$this->translator->trans('mautic.email.token.forward_text'),
             '{signature}'        => $emailPrefix.$this->translator->trans('mautic.email.token.signature'),
             '{brand=name}'       => $emailPrefix.$this->translator->trans('mautic.core.token.brand_name'),
             '{subject}'          => $emailPrefix.$this->translator->trans('mautic.email.subject'),
@@ -101,6 +103,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             '{dnc_url}'         => $emailPrefix.$this->translator->trans('mautic.email.token.unsubscribe_all_url'),
             '{resubscribe_url}' => $emailPrefix.$this->translator->trans('mautic.email.token.resubscribe_url'),
             '{webview_url}'     => $emailPrefix.$this->translator->trans('mautic.email.token.webview_url'),
+            '{forward_url}'     => $emailPrefix.$this->translator->trans('mautic.email.token.forward_url'),
         ];
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(
@@ -154,6 +157,44 @@ final class BuilderSubscriber implements EventSubscriberInterface
         /** @var Email|null $email */
         $email  = $event->getEmail();
 
+        if ($event->isForwardedCopy()) {
+            $this->addForwardedCopyTokens($event, $email);
+        } else {
+            $this->addRecipientLinkTokens($event, $email, $lead, $idHash);
+        }
+
+        $signatureText = (string) $this->coreParametersHelper->get('default_signature_text');
+
+        // In owner-mailer mode, use the owner's signature for display/send generation.
+        if ($email && $email->getUseOwnerAsMailer() && is_array($lead)) {
+            $this->fromEmailHelper->getFromAddressConsideringOwner($this->fromEmailHelper->getFrom($email), $lead, $email);
+            if ($this->fromEmailHelper->hasSignature()) {
+                $signatureText = $this->fromEmailHelper->getSignature();
+            } else {
+                $signatureText = '';
+            }
+        } else {
+            $fromName      = $this->coreParametersHelper->get('mailer_from_name') ?? '';
+            $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
+        }
+
+        $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
+
+        $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
+        $event->addToken('{brand=name}', (string) $this->coreParametersHelper->get('brand_name'));
+
+        $forwardUrl = $this->getForwardUrl($email);
+        $event->addToken('{forward_url}', $forwardUrl);
+        $event->addToken('{forward_text}', $this->getForwardText($forwardUrl));
+    }
+
+    /**
+     * The links that act on, or point back at, the person this email is sent to.
+     *
+     * @param array<string, mixed>|Lead|null $lead
+     */
+    private function addRecipientLinkTokens(EmailSendEvent $event, ?Email $email, array|Lead|null $lead, string $idHash): void
+    {
         // Get email
         $toEmail = null;
         if (is_array($lead) && array_key_exists('email', $lead) && is_string($lead['email'])) {
@@ -182,20 +223,15 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
 
         // We will replace tokens in unsubscribe text too
-        $unsubscribeText = \Mautic\LeadBundle\Helper\TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
+        $unsubscribeText = TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
         $unsubscribeText = str_replace('|URL|', $unsubscribeUrl, $unsubscribeText);
         $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
         $event->addToken('{unsubscribe_url}', $unsubscribeUrl);
         $event->addToken('{dnc_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe_all', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
         $event->addToken('{resubscribe_url}', $resubscribeUrl);
 
-        $webviewText = $this->coreParametersHelper->get('webview_text');
-        if (!$webviewText) {
-            $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
-        }
         $webviewLink = $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]);
-        $webviewText = str_replace('|URL|', $webviewLink, $webviewText);
-        $event->addToken('{webview_text}', EmojiHelper::toHtml($webviewText));
+        $event->addToken('{webview_text}', $this->getWebviewText($webviewLink));
 
         // Show public email preview if the lead is not known to prevent 404
         if (empty($lead['id']) && $email) {
@@ -203,35 +239,137 @@ final class BuilderSubscriber implements EventSubscriberInterface
         } else {
             $event->addToken('{webview_url}', $webviewLink);
         }
+    }
 
-        $signatureText = (string) $this->coreParametersHelper->get('default_signature_text');
-
-        // In owner-mailer mode, use the owner's signature for display/send generation.
-        if ($email && $email->getUseOwnerAsMailer() && is_array($lead)) {
-            $this->fromEmailHelper->getFromAddressConsideringOwner($this->fromEmailHelper->getFrom($email), $lead, $email);
-            if ($this->fromEmailHelper->hasSignature()) {
-                $signatureText = $this->fromEmailHelper->getSignature();
-            } else {
-                $signatureText = '';
-            }
-        } else {
-            $fromName      = $this->coreParametersHelper->get('mailer_from_name') ?? '';
-            $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
+    private function getWebviewText(string $webviewLink): string
+    {
+        $webviewText = $this->coreParametersHelper->get('webview_text');
+        if (!$webviewText) {
+            $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
         }
 
-        $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
+        return EmojiHelper::toHtml(str_replace('|URL|', $webviewLink, $webviewText));
+    }
 
-        $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
-        $event->addToken('{brand=name}', (string) $this->coreParametersHelper->get('brand_name'));
+    /**
+     * The text comes from the configuration, or from the translation when none is set. Without a link there is
+     * nothing to forward, so the text is left out as well.
+     */
+    private function getForwardText(string $forwardUrl): string
+    {
+        if ('' === $forwardUrl) {
+            return '';
+        }
+
+        $forwardText = $this->coreParametersHelper->get('forward_text');
+        if (null === $forwardText || '' === $forwardText) {
+            $forwardText = $this->translator->trans('mautic.email.forward.text', ['%link%' => '|URL|']);
+        }
+
+        return EmojiHelper::toHtml(str_replace('|URL|', $forwardUrl, $forwardText));
+    }
+
+    /**
+     * Opens a new message in the mail client of whoever clicks it, already holding a link to the copy of the email
+     * that is meant to be passed on. Mautic sends nothing itself and never learns who the message goes to.
+     */
+    private function getForwardUrl(?Email $email): string
+    {
+        $copyUrl = $this->getForwardedCopyUrl($email);
+        if ('' === $copyUrl) {
+            return '';
+        }
+
+        // The subject may greet the recipient by name, which is not for whoever the message goes to
+        $subject  = (string) $email->getSubject();
+        $defaults = TokenHelper::findLeadTokenDefaults($subject);
+        $subject  = str_replace(array_keys($defaults), $defaults, $subject);
+
+        $locale  = $email->getLanguage() ?: (string) $this->coreParametersHelper->get('locale');
+        $subject = $this->getForwardMailText('forward_mail_subject', '|SUBJECT|', $subject, $locale)
+            ?? $this->translator->trans('mautic.email.forward.mail.subject', ['%subject%' => $subject], null, $locale);
+        $body    = $this->getForwardMailText('forward_mail_body', '|URL|', $copyUrl, $locale)
+            ?? $this->translator->trans('mautic.email.forward.mail.body', ['%link%' => $copyUrl], null, $locale);
+
+        return 'mailto:?subject='.rawurlencode($subject).'&body='.rawurlencode($body);
+    }
+
+    /**
+     * The text set in the configuration for the language of the email, or for its base language, so `pt` also
+     * covers `pt_BR`. Null when none is set, and the translation is used instead. The link is the point of the
+     * message, so a text without its placeholder gets the link at the end.
+     */
+    private function getForwardMailText(string $parameter, string $placeholder, string $value, string $locale): ?string
+    {
+        $texts = [];
+        foreach ((array) $this->coreParametersHelper->get($parameter, []) as $language => $text) {
+            $text = trim(html_entity_decode(strip_tags((string) $text), ENT_QUOTES | ENT_HTML5));
+            if ('' !== $text) {
+                $texts[$this->normalizeLocale((string) $language)] = $text;
+            }
+        }
+
+        $locale = $this->normalizeLocale($locale);
+        $text   = $texts[$locale] ?? $texts[explode('_', $locale)[0]] ?? null;
+        if (null === $text) {
+            return null;
+        }
+
+        if ('|URL|' === $placeholder && !str_contains($text, $placeholder)) {
+            $text .= "\n".$placeholder;
+        }
+
+        return str_replace($placeholder, $value, $text);
+    }
+
+    private function normalizeLocale(string $locale): string
+    {
+        return str_replace('-', '_', strtolower(trim($locale)));
+    }
+
+    /**
+     * The page with the copy of the email that carries nothing of any recipient. An email that isn't saved yet has
+     * no such page.
+     */
+    private function getForwardedCopyUrl(?Email $email): string
+    {
+        if (null === $email || null === $email->getId()) {
+            return '';
+        }
+
+        return $this->emailModel->buildUrl(
+            'mautic_email_forward',
+            ['objectId' => $email->getId(), 'hash' => $this->mailHash->getForwardHash((int) $email->getId())]
+        );
+    }
+
+    /**
+     * A forwarded copy must carry nothing that acts on, or points back at, the original recipient. Its web view
+     * is the copy itself.
+     */
+    private function addForwardedCopyTokens(EmailSendEvent $event, ?Email $email): void
+    {
+        $copyUrl = $this->getForwardedCopyUrl($email);
+
+        $event->addTokens([
+            '{unsubscribe_text}' => '',
+            '{unsubscribe_url}'  => '',
+            '{dnc_url}'          => '',
+            '{resubscribe_url}'  => '',
+            '{webview_text}'     => '' === $copyUrl ? '' : $this->getWebviewText($copyUrl),
+            '{webview_url}'      => $copyUrl,
+        ]);
     }
 
     public function convertUrlsToTokens(EmailSendEvent $event): void
     {
-        if ($event->isInternalSend()) {
+        if ($event->isInternalSend() && !$event->isForwardedCopy()) {
             return;
         }
 
-        $disableTrackableUrls = $this->coreParametersHelper->get('disable_trackable_urls');
+        // Whoever opens a forwarded copy is not the original recipient, so its links are never tracked. They keep
+        // the UTM tags of the email, which say nothing about a person.
+        $disableTrackableUrls = $event->isForwardedCopy() || $this->coreParametersHelper->get('disable_trackable_urls');
         $shortenEnabled       = $this->coreParametersHelper->get('shortener_email_enable', false);
 
         $email          = $event->getEmail();

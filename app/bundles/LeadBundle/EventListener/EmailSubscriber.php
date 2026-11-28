@@ -52,6 +52,13 @@ final class EmailSubscriber implements EventSubscriberInterface
 
         $lead = $event->getLead();
 
+        if (null === $lead && $event->isForwardedCopy()) {
+            // A forwarded copy carries nothing about the original recipient, so contact tokens get their defaults
+            $event->addTokens(TokenHelper::findLeadTokenDefaults($content));
+
+            return;
+        }
+
         $tokenList = TokenHelper::findLeadTokens($content, $lead);
         if (count($tokenList)) {
             $event->addTokens($tokenList);

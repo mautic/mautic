@@ -61,6 +61,7 @@ class TokenSubscriber implements EventSubscriberInterface
                     'lead'           => null,
                     'dynamicContent' => $dynamicContentAsArray,
                     'idHash'         => $event->getIdHash(),
+                    'forwardedCopy'  => $event->isForwardedCopy(),
                 ],
                 $email,
                 $event->isInternalSend()
@@ -84,15 +85,18 @@ class TokenSubscriber implements EventSubscriberInterface
 
         if ($lead instanceof Lead) {
             $lead = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
-        } else {
+        } elseif (is_array($lead) && isset($lead['id'])) {
             $lead = $this->primaryCompanyHelper->mergePrimaryCompanyWithProfileFields($lead['id'], $lead);
+        } else {
+            // No contact, such as an internal send or a forwarded copy: the default content is used
+            $lead = null;
         }
 
         foreach ($tokenData as $data) {
             // Default content
             $filterContent = $data['content'];
 
-            foreach ($data['filters'] as $filter) {
+            foreach (null === $lead ? [] : $data['filters'] as $filter) {
                 if ($this->matchFilterForLead($filter['filters'], $lead)) {
                     $filterContent = $filter['content'];
                     break;
@@ -106,8 +110,9 @@ class TokenSubscriber implements EventSubscriberInterface
                     'content' => $filterContent,
                     'email'   => $event->getPassthrough(),
                     'idHash'  => !empty($clickthrough['idHash']) ? $clickthrough['idHash'] : null,
-                    'tokens'  => $tokens,
-                    'lead'    => $lead,
+                    'tokens'        => $tokens,
+                    'lead'          => $lead,
+                    'forwardedCopy' => !empty($clickthrough['forwardedCopy']),
                 ],
                 true
             );

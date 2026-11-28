@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Form\Type\EmailPreviewOptionsType;
 use Mautic\EmailBundle\Form\Type\ValidateEmailType;
@@ -220,6 +221,35 @@ final class PublicController extends CommonFormController
                 'template'              => $themeName,
             ]
         ));
+    }
+
+    /**
+     * The copy of an email that its recipients pass on to somebody else. It is the same for everybody: it carries
+     * none of the links or tracking that belong to a recipient, and whoever opens it is not recorded.
+     */
+    public function forwardAction(AssetsHelper $assetsHelper, MailHashHelper $mailHash, string $objectId, string $hash): Response
+    {
+        $email = $this->emailModel->getEntity((int) $objectId);
+        if (!$email instanceof Email || !$email->isPublished() || !hash_equals($mailHash->getForwardHash((int) $email->getId()), $hash)) {
+            return $this->notFound();
+        }
+
+        $event = new EmailSendEvent(
+            null,
+            [
+                'content'       => $this->generateContent($email, $assetsHelper, false),
+                'email'         => $email,
+                'tokens'        => ['{tracking_pixel}' => ''],
+                'internalSend'  => true,
+                'forwardedCopy' => true,
+            ]
+        );
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
+
+        $response = new Response($event->getContent(true));
+        $response->headers->set('X-Robots-Tag', 'noindex');
+
+        return $response;
     }
 
     public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, EmailDefaultsHelper $emailDefaultsHelper, string $idHash, ?string $secretHash = null, ?string $urlEmail = null): Response

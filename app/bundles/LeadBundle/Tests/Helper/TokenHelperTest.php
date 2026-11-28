@@ -265,6 +265,35 @@ final class TokenHelperTest extends \PHPUnit\Framework\TestCase
         yield ['{contactfield=randomField}', 'randomField'];
     }
 
+    public function testTokenDefaultsAreUsedWhenThereIsNoContact(): void
+    {
+        $content = 'Hi {contactfield=firstname|there}, from {contactfield=city} {contactfield=firstname|there}';
+
+        $this->assertSame(
+            [
+                '{contactfield=firstname|there}' => 'there',
+                '{contactfield=city}'            => '',
+            ],
+            TokenHelper::findLeadTokenDefaults($content)
+        );
+        $this->assertSame([], TokenHelper::findLeadTokenDefaults('No tokens here'));
+    }
+
+    public function testLeadTokenDefaultsDoNotShowAModifierAsText(): void
+    {
+        // What follows the "|" here says how to format the value, it is not a default value
+        $this->assertSame(
+            [
+                '{contactfield=website|true}'       => '',
+                '{contactfield=date_added|date}'     => '',
+                '{contactfield=date_added|time}'     => '',
+                '{contactfield=date_added|datetime}' => '',
+                '{contactfield=country|label}'       => '',
+            ],
+            TokenHelper::findLeadTokenDefaults('{contactfield=website|true} {contactfield=date_added|date} {contactfield=date_added|time} {contactfield=date_added|datetime} {contactfield=country|label}')
+        );
+    }
+
     #[DataProvider('dataLabelProvider')]
     public function testLabelFormatForSelect(string $token, string|int $result): void
     {

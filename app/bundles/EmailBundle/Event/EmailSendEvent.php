@@ -43,6 +43,8 @@ class EmailSendEvent extends CommonEvent
      */
     private $internalSend = false;
 
+    private readonly bool $forwardedCopy;
+
     private array $textHeaders = [];
 
     private bool $fatal;
@@ -84,6 +86,8 @@ class EmailSendEvent extends CommonEvent
         } elseif (null !== $helper) {
             $this->internalSend = $helper->isInternalSend();
         }
+
+        $this->forwardedCopy = (bool) ($args['forwardedCopy'] ?? false);
     }
 
     /**
@@ -94,6 +98,14 @@ class EmailSendEvent extends CommonEvent
     public function isInternalSend()
     {
         return $this->internalSend;
+    }
+
+    /**
+     * A copy of the email shown to somebody the recipient passed it on to.
+     */
+    public function isForwardedCopy(): bool
+    {
+        return $this->forwardedCopy;
     }
 
     /**

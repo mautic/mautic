@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -67,6 +68,72 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($data['user'], $form['config[emailconfig][mailer_dsn][user]']->getValue());
         $this->assertSame('🔒', $form['config[emailconfig][mailer_dsn][password]']->getValue());
         $this->assertSame($data['type'], $form['config[emailconfig][mailer_dsn][options][list][0][value]']->getValue());
+    }
+
+    public function testForwardMessageTextsAreSavedPerLanguage(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/emailconfig');
+        self::assertResponseIsSuccessful();
+
+        $form   = $crawler->selectButton('config[buttons][save]')->form();
+        $values = $form->getPhpValues();
+
+        $values['config']['emailconfig']['forward_mail_subject']['list'] = [['label' => 'fr', 'value' => 'TR : |SUBJECT|']];
+        $values['config']['emailconfig']['forward_mail_body']['list']    = [
+            ['label' => 'fr', 'value' => "Cet e-mail pourrait t'intéresser : |URL|"],
+            ['label' => 'de', 'value' => 'Schau mal: |URL|'],
+        ];
+
+        $this->client->request($form->getMethod(), $form->getUri(), $values);
+        self::assertResponseIsSuccessful();
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertSame(['fr' => 'TR : |SUBJECT|'], $configParameters['forward_mail_subject']);
+        $this->assertSame(['fr', 'de'], array_keys($configParameters['forward_mail_body']));
+        $this->assertSame('Schau mal: |URL|', $configParameters['forward_mail_body']['de']);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/emailconfig');
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('config[buttons][save]')->form();
+        $this->assertSame('fr', $form['config[emailconfig][forward_mail_body][list][0][label]']->getValue());
+        $this->assertSame("Cet e-mail pourrait t'intéresser : |URL|", $form['config[emailconfig][forward_mail_body][list][0][value]']->getValue());
+
+        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $this->assertSame($translator->trans('mautic.email.config.forward_mail.language'), $crawler->filter('#config_emailconfig_forward_mail_body_list_0_label')->attr('placeholder'));
+        $this->assertSame($translator->trans('mautic.email.config.forward_mail_body.value'), $crawler->filter('#config_emailconfig_forward_mail_body_list_0_value')->attr('placeholder'));
+    }
+
+    /**
+     * @return iterable<string, array{array{label: string, value: string}}>
+     */
+    public static function invalidForwardMessageTextProvider(): iterable
+    {
+        yield 'a language that does not exist' => [['label' => 'fe', 'value' => 'Regarde : |URL|']];
+        yield 'a language without a text' => [['label' => 'fr', 'value' => '']];
+    }
+
+    /**
+     * @param array{label: string, value: string} $row
+     */
+    #[DataProvider('invalidForwardMessageTextProvider')]
+    public function testInvalidForwardMessageTextIsNotSaved(array $row): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/emailconfig');
+        self::assertResponseIsSuccessful();
+
+        $form   = $crawler->selectButton('config[buttons][save]')->form();
+        $values = $form->getPhpValues();
+
+        $values['config']['emailconfig']['forward_mail_body']['list'] = [$row];
+        $savedBefore                                                  = $this->getConfigParameters()['forward_mail_body'] ?? [];
+
+        $crawler = $this->client->request($form->getMethod(), $form->getUri(), $values);
+        self::assertResponseIsSuccessful();
+
+        $label = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.email.config.forward_mail_body');
+        $this->assertCount(1, $crawler->filter('.has-error > label')->reduce(fn ($node): bool => str_contains($node->text(), $label)), 'The list is marked as invalid.');
+        $this->assertSame($savedBefore, $this->getConfigParameters()['forward_mail_body'] ?? [], 'Nothing is saved.');
     }
 
     /**
