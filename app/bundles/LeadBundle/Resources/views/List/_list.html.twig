@@ -5,7 +5,7 @@
     - page
     - limit
 #}
-{% if items|length > 0 %}
+{% if items|length > 0 and leadListRowTemplateOverridden() %}
     <div class="table-responsive">
         <table class="table table-hover" id="leadListTable">
             <thead>
@@ -64,6 +64,137 @@
               {% endfor %}
             </tbody>
         </table>
+        <div class="panel-footer">
+            {{ include('@MauticCore/Helper/pagination.html.twig', {
+                    'totalItems': items|length,
+                    'page': page,
+                    'limit': limit,
+                    'baseUrl': path('mautic_segment_index'),
+                    'sessionVar': 'lead.list',
+            }) }}
+        </div>
+    </div>
+{% elseif items|length > 0 %}
+{% set rows = [] %}
+{% for item in items %}
+    {% set now = dateTimeGetUtcDateTime() %}
+    {% set hoursSinceLastBuilt = null %}
+    {% if item.lastBuiltDate is not null %}
+        {% set lastBuiltDate = date(item.lastBuiltDate.timestamp) %}
+        {% set now = date() %}
+        {% set diffInSeconds = now.timestamp - lastBuiltDate.timestamp %}
+        {% set hoursSinceLastBuilt = diffInSeconds / 3600 | round %}
+    {% endif %}
+    {% set mauticTemplateVars = _context|merge([{'item': item}]) %}
+    {% set actionsHtml %}
+        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                        'item': item,
+                        'hideCheckbox': true,
+                        'templateButtons': {
+                            'edit': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OTHER')], item.createdBy),
+                            'clone': permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_CREATE')] and securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OTHER')], item.createdBy),
+                            'delete': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OTHER')], item.createdBy),
+                        },
+                        'routeBase': 'segment',
+                        'langVar': 'lead.list',
+                        'customButtons': {
+                            'viewcontacts': {
+                                'attr': {
+                                    'data-toggle': 'ajax',
+                                    'href': path('mautic_contact_index', {'search': listCommand ~ ':' ~ item.alias})|e('html_attr'),
+                                },
+                                'iconClass': 'ri-team-line',
+                                'btnText': 'mautic.lead.list.view_contacts'|trans,
+                                'priority': 100
+                            }
+                        },
+                }) }}
+    {% endset %}
+    {% set nameHtml %}
+        <div>
+                    {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'lead.list'}) }}
+                    {% if securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy) %}
+                        <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': item.id})|e('html_attr') }}" data-toggle="ajax">
+                          {{ item.name }} ({{ item.alias }})
+                        </a>
+                    {% else %}
+                        {{ item.name }} ({{ item.alias }})
+                    {% endif %}
+                    {{ include('@MauticProject/Modules/projects.html.twig') }}
+                    {% if not item.isGlobal and app.user.id != item.createdBy %}
+                        <br/>
+                        <span class="small">({{ item.createdByUser }})</span>
+                    {% endif %}
+                    {% if item.isGlobal %}<i title="{{ 'mautic.lead.list.form.isglobal'|trans|e('html_attr') }}" class="ri-group-2-fill fs-14"></i>{% endif %}
+                    {% if item.getFilters() is not empty %}<i title="{{ 'mautic.core.filters'|trans|e('html_attr') }}" class="ri-fw ri-filter-2-fill fs-14"></i>{% endif %}
+                    {% if hoursSinceLastBuilt >= segmentRebuildWarningThreshold %}
+                        <label class="form-label" data-bs-toggle="tooltip"
+                               data-bs-container="body" data-bs-placement="top" title=""
+                               data-bs-title="{{ 'mautic.lead.list.form.config.segment_rebuild_time.message'|trans({'%count%': hoursSinceLastBuilt  | number_format(2)})|e('html_attr') }}">
+                            <i class="text-danger ri-error-warning-line fs-14"></i></label>
+                    {% endif %}
+                    {% if item.lastBuiltTime >= segmentBuildWarningThreshold %}
+                        <label class="form-label" data-bs-toggle="tooltip"
+                               data-bs-container="body" data-bs-placement="top" title=""
+                               data-bs-title="{{ 'mautic.lead.list.form.config.segment_build_time.message'|trans({'%count%': item.lastBuiltTime})|e('html_attr') }}">
+                            <i class="text-danger ri-time-line fs-14"></i></label>
+                    {% endif %}
+                    {{ customContent('segment.name', mauticTemplateVars) }}
+                </div>
+                {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                    'description': item.description
+                }) }}
+    {% endset %}
+    {% set categoryHtml %}
+        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
+    {% endset %}
+    {% set countHtml %}
+        <span size="sm" class="label {{ item.needsRebuild() ? 'label-info' : 'label-gray' }} col-count" data-id="{{ item.id|e('html_attr') }}">
+                    <a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.list'|trans ~ ':' ~ item.alias})|e('html_attr') }}"
+                        data-toggle="ajax">{{ (item.needsRebuild() ? 'mautic.lead.list.building' : 'mautic.lead.list.viewleads_count')|trans({'%count%': leadCounts[item.id]}) }}</a>
+                </span>
+    {% endset %}
+    {% set rows = rows|merge([{
+        id: item.id,
+        selectionClassName: 'list-checkbox',
+        selectionAttr: {'data-toggle': 'selectrow', 'data-target': 'tbody'},
+        actionsHtml: actionsHtml,
+        cells: {
+            name: {trustedHtml: nameHtml, sortValue: item.name},
+            category: {trustedHtml: categoryHtml},
+            leadcount: {trustedHtml: countHtml},
+            dateAdded: item.dateAdded ? {label: dateToDate(item.dateAdded), attr: {title: dateToFullConcat(item.dateAdded)}} : '',
+            dateModified: item.dateModified ? {label: dateToDate(item.dateModified), attr: {title: dateToFullConcat(item.dateModified)}} : '',
+            createdByUser: item.createdByUser,
+            id: item.id,
+        },
+    }]) %}
+{% endfor %}
+{% set order = app.session.get('mautic.lead.list.orderby', 'l.dateModified') %}
+{% set dir = app.session.get('mautic.lead.list.orderbydir', 'ASC') %}
+{% set columns = [] %}
+{% for column in [
+    {key: 'name', label: 'mautic.core.name', orderBy: 'l.name', className: 'col-leadlist-name'},
+    {key: 'category', label: 'mautic.core.category', orderBy: 'cat.title', className: 'visible-md visible-lg col-leadlist-category'},
+    {key: 'leadcount', label: 'mautic.lead.list.thead.leadcount', className: 'visible-md visible-lg col-leadlist-leadcount'},
+    {key: 'dateAdded', label: 'mautic.lead.import.label.dateAdded', orderBy: 'l.dateAdded', className: 'visible-md visible-lg col-leadlist-dateAdded'},
+    {key: 'dateModified', label: 'mautic.lead.import.label.dateModified', orderBy: 'l.dateModified', className: 'visible-md visible-lg col-leadlist-dateModified'},
+    {key: 'createdByUser', label: 'mautic.core.createdby', orderBy: 'l.createdByUser', className: 'visible-md visible-lg col-leadlist-createdByUser'},
+    {key: 'id', label: 'mautic.core.id', orderBy: 'l.id', className: 'visible-md visible-lg col-leadlist-id'},
+] %}
+    {% set columns = columns|merge([column|merge(column.orderBy is defined ? {
+        sortHref: path('mautic_segment_index', {tmpl: 'list', name: 'lead.list', orderby: column.orderBy}),
+        sort: order == column.orderBy ? (dir == 'ASC' ? 'asc' : 'desc') : 'none',
+    } : {})]) %}
+{% endfor %}
+    <div class="table-responsive">
+        {{ include('@MauticCore/Components/data-table.html.twig', {
+            id: 'leadListTable',
+            accessibleName: 'mautic.lead.list.header.index',
+            selection: 'multi',
+            columns: columns,
+            rows: rows,
+        }) }}
         <div class="panel-footer">
             {{ include('@MauticCore/Helper/pagination.html.twig', {
                     'totalItems': items|length,

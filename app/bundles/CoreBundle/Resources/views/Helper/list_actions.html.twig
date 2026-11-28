@@ -15,12 +15,14 @@
 {% endif %}
 
 <div class="input-group input-group-sm">
+    {% if not hideCheckbox|default(false) %}
     <span class="input-group-addon">
         {% include '@MauticCore/Components/checkbox.html.twig' with {
             name: 'cb' ~ id,
             items: [{ value: id, className: 'list-checkbox', attributes: { 'data-target': 'tbody', 'data-toggle': 'selectrow' } }]
         } only %}
     </span>
+    {% endif %}
 
     <div class="ms-5">
         {% include '@MauticCore/Helper/button.html.twig' with {

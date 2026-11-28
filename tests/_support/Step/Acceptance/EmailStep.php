@@ -13,14 +13,17 @@ final class EmailStep extends \AcceptanceTester
     {
         $I=$this;
         $I->amOnPage(EmailsPage::URL);
+        $I->waitForJS('return window.jQuery && window.jQuery.active === 0;', self::TIMEOUT);
         $I->waitForElementClickable(EmailsPage::NEW_BUTTON);
         $I->click(EmailsPage::NEW_BUTTON);
         $I->waitForElementClickable(EmailsPage::SELECT_SEGMENT_EMAIL);
         $I->click(EmailsPage::SELECT_SEGMENT_EMAIL);
+        $I->waitForElementNotVisible(EmailsPage::EMAIL_TYPE_MODAL, self::TIMEOUT);
         $I->fillField(EmailsPage::SUBJECT_FIELD, $name);
         $I->click(''.EmailsPage::CONTACT_SEGMENT_DROPDOWN);
         $I->waitForElementClickable(EmailsPage::CONTACT_SEGMENT_OPTION);
         $I->click(EmailsPage::CONTACT_SEGMENT_OPTION);
+        $I->waitForElementClickable(EmailsPage::SAVE_AND_CLOSE, self::TIMEOUT);
         $I->click(EmailsPage::SAVE_AND_CLOSE);
         $I->waitForText($name, self::TIMEOUT, 'h1.page-header-title');
     }
@@ -32,11 +35,14 @@ final class EmailStep extends \AcceptanceTester
     {
         $I=$this;
         $I->amOnPage(EmailsPage::URL);
+        $I->waitForJS('return window.jQuery && window.jQuery.active === 0;', self::TIMEOUT);
         $I->waitForElementClickable(EmailsPage::NEW_BUTTON);
         $I->click(EmailsPage::NEW_BUTTON);
         $I->waitForElementClickable(EmailsPage::SELECT_TRIGGERED_EMAIL);
         $I->click(EmailsPage::SELECT_TRIGGERED_EMAIL);
+        $I->waitForElementNotVisible(EmailsPage::EMAIL_TYPE_MODAL, self::TIMEOUT);
         $I->fillField(EmailsPage::SUBJECT_FIELD, $name);
+        $I->waitForElementClickable(EmailsPage::SAVE_AND_CLOSE, self::TIMEOUT);
         $I->click(EmailsPage::SAVE_AND_CLOSE);
         $I->waitForText($name, self::TIMEOUT, 'h1.page-header-title');
     }

@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Twig\Extension;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
+use Mautic\LeadBundle\Twig\Helper\ListRowTemplateHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -13,6 +14,7 @@ final class LeadExtension extends AbstractExtension
 {
     public function __construct(
         private readonly AvatarHelper $avatarHelper,
+        private readonly ListRowTemplateHelper $listRowTemplateHelper,
     ) {
     }
 
@@ -23,6 +25,7 @@ final class LeadExtension extends AbstractExtension
     {
         return [
             new TwigFunction('leadGetAvatar', $this->getAvatar(...)),
+            new TwigFunction('leadListRowTemplateOverridden', $this->listRowTemplateHelper->isOverridden(...)),
         ];
     }
 

@@ -341,6 +341,8 @@ Mautic.onPageLoad = function (container, response, inModal) {
         Mautic.activateLiveSearch(mQuery(this), "lastSearchStr", "liveCache");
     });
 
+    Mautic.initDataTable(container);
+
     mQuery(container).find('[data-bs-toggle="tab"], [data-bs-toggle="pill"]').each((index, element) => {
         if (bootstrap.Tab.getInstance(element)) {
             return;
